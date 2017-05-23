@@ -879,8 +879,6 @@ public class GradebookService implements IGradebookService {
 
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
-	SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
-
 	// -------------------- process summary excel page --------------------------------
 
 	// The entire data list
@@ -986,9 +984,9 @@ public class GradebookService implements IGradebookService {
 	    for (GBUserGridRowDTO userDto : userDtos) {
 
 		String startDate = (userDto.getStartDate() == null) ? ""
-			: cellDateFormat.format(userDto.getStartDate());
+			: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(userDto.getStartDate());
 		String finishDate = (userDto.getFinishDate() == null) ? ""
-			: cellDateFormat.format(userDto.getFinishDate());
+			: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(userDto.getFinishDate());
 
 		count = 0;
 		ExcelCell[] userDataRow = new ExcelCell[7];
@@ -1058,9 +1056,9 @@ public class GradebookService implements IGradebookService {
 			    : StringEscapeUtils.escapeHtml(activity.getTitle());
 
 		    String startDate = (userDto.getStartDate() == null) ? ""
-			    : cellDateFormat.format(userDto.getStartDate());
+			    : FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(userDto.getStartDate());
 		    String finishDate = (userDto.getFinishDate() == null) ? ""
-			    : cellDateFormat.format(userDto.getFinishDate());
+			    : FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(userDto.getFinishDate());
 
 		    ExcelCell[] activityDataRow = new ExcelCell[5];
 		    activityDataRow[0] = new ExcelCell(activityRowName, false);
@@ -1084,7 +1082,6 @@ public class GradebookService implements IGradebookService {
     @Override
     @SuppressWarnings("unchecked")
     public LinkedHashMap<String, ExcelCell[][]> exportCourseGradebook(Integer userId, Integer organisationId) {
-	SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
 	// The entire data list
@@ -1186,12 +1183,12 @@ public class GradebookService implements IGradebookService {
 
 			// start date
 			if ((learnerProgress != null) && (learnerProgress.getStartDate() != null)) {
-			    startDate = cellDateFormat.format(learnerProgress.getStartDate());
+			    startDate = FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(learnerProgress.getStartDate());
 			}
 
 			// finish date
 			if ((learnerProgress != null) && (learnerProgress.getFinishDate() != null)) {
-			    finishDate = cellDateFormat.format(learnerProgress.getFinishDate());
+			    finishDate = FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(learnerProgress.getFinishDate());
 			}
 
 			// calculate time taken
@@ -1240,7 +1237,6 @@ public class GradebookService implements IGradebookService {
     @Override
     public LinkedHashMap<String, ExcelCell[][]> exportSelectedLessonsGradebook(Integer userId, Integer organisationId,
 	    String[] lessonIds, boolean simplified) {
-	SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
 	Organisation organisation = (Organisation) userService.findById(Organisation.class, organisationId);
@@ -1385,10 +1381,10 @@ public class GradebookService implements IGradebookService {
 			    }
 			}
 			String startDate = (learnerProgress == null || learnerProgress.getStartDate() == null) ? ""
-				: cellDateFormat.format(learnerProgress.getStartDate());
+				: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(learnerProgress.getStartDate());
 			userRow[i++] = new ExcelCell(startDate, false);
 			String finishDate = (learnerProgress == null || learnerProgress.getFinishDate() == null) ? ""
-				: cellDateFormat.format(learnerProgress.getFinishDate());
+				: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(learnerProgress.getFinishDate());
 			userRow[i++] = new ExcelCell(finishDate, false);
 		    }
 

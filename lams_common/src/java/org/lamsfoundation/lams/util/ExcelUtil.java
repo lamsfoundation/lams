@@ -181,8 +181,7 @@ public class ExcelUtil {
 	    Row row = sheet.createRow(1);
 	    ExcelUtil.createCell(new ExcelCell(dateHeader, false), 0, row, workbook);
 
-	    SimpleDateFormat titleDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
-	    ExcelUtil.createCell(new ExcelCell(titleDateFormat.format(new Date()), false), 1, row, workbook);
+	    ExcelUtil.createCell(new ExcelCell(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(new Date()), false), 1, row, workbook);
 	}
 
 	if (data != null) {
@@ -222,8 +221,7 @@ public class ExcelUtil {
 	if (excelCell != null) {
 	    Cell cell = row.createCell(cellnum);
 	    if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof Date) {
-		SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT);
-		cell.setCellValue(cellDateFormat.format(excelCell.getCellValue()));
+		cell.setCellValue(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT.format(excelCell.getCellValue()));
 	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Double) {
 		cell.setCellValue((Double) excelCell.getCellValue());
 	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Long) {
