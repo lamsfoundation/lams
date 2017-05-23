@@ -45,10 +45,7 @@ public class McGeneralAuthoringDTO implements Comparable {
     protected String retries;
 
     protected String markValue;
-
     protected String passMarkValue;
-
-    protected String totalMarks;
 
     @Override
     public int compareTo(Object o) {
@@ -209,21 +206,6 @@ public class McGeneralAuthoringDTO implements Comparable {
      */
     public void setPassMarkValue(String passMarkValue) {
 	this.passMarkValue = passMarkValue;
-    }
-
-    /**
-     * @return Returns the totalMarks.
-     */
-    public String getTotalMarks() {
-	return totalMarks;
-    }
-
-    /**
-     * @param totalMarks
-     *            The totalMarks to set.
-     */
-    public void setTotalMarks(String totalMarks) {
-	this.totalMarks = totalMarks;
     }
 
     /**

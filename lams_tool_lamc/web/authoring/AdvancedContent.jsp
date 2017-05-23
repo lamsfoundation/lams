@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 
 <lams:SimplePanel titleKey="label.select.leader">
 	<div class="checkbox">
@@ -47,23 +48,22 @@
 	
 	<div class="checkbox">
 		<label for="retries">
-		<html:checkbox property="retries" value="1" styleId="retries"
-			onclick="javascript:updatePass(this); submitMethod('updateMarksList');"/>
-		<fmt:message key="radiobox.retries" />		
+			<html:checkbox property="retries" value="1" styleId="retries"/>
+			<fmt:message key="radiobox.retries" />
 		</label>
 	</div>
 	
 	<div class="form-inline loffset20">
-		<div class="form-group">
-		<select name="passmark"  class="form-control input-sm">
-			<c:forEach var="i" begin="1" end="${mcGeneralAuthoringDTO.totalMarks}">
-				<option value="${i}"
-					<c:if test="${i == mcGeneralAuthoringDTO.passMarkValue}">SELECTED</c:if>>
-					${i}
-				</option>
-			</c:forEach>
-		</select>
-		<fmt:message key="radiobox.passmark" />
+		<div id="passmark-container" class="form-group"
+				<c:if test="${formBean.retries != 1}">style="display:none;"</c:if>>
+			<select id="passmark" name="passmark"  class="form-control input-sm">
+				<c:if test="${formBean.passmark != 0}">
+					<option value="${formBean.passmark}" SELECTED>
+						${formBean.passmark}
+					</option>
+				</c:if>
+			</select>
+			<fmt:message key="radiobox.passmark" />
 		</div>
 	</div>
 </lams:SimplePanel>
@@ -71,12 +71,12 @@
 <lams:SimplePanel titleKey="label.activity.completion">
 	<div class="checkbox">
 		<label for="reflect">
-		<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect"/>
-		<fmt:message key="label.reflect" />
+			<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect"/>
+			<fmt:message key="label.reflect" />
 		</label>
 	</div>
 	<div class="form-group">
-	<html:textarea property="reflectionSubject" styleId="reflectInstructions"  styleClass="form-control" rows="3"/>
+		<html:textarea property="reflectionSubject" styleId="reflectInstructions"  styleClass="form-control" rows="3"/>
 	</div>
 </lams:SimplePanel>
 
@@ -96,4 +96,3 @@
 
 	ra.onkeyup=turnOnRefect;
 </script>
-
