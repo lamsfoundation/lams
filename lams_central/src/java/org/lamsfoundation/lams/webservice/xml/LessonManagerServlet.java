@@ -1011,7 +1011,8 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     /**
-     * This method gets the tool outputs for a lesson or a specific user and returns them in XML format.
+     * This method gets the tool outputs for a lesson or a specific user and returns them in XML format. In case of
+     * requesting results for a lesson/course it returns them only for users that had finished the lesson.
      *
      * @param document
      * @param serverId
@@ -1025,7 +1026,6 @@ public class LessonManagerServlet extends HttpServlet {
      * @return
      * @throws Exception
      */
-    @SuppressWarnings("unchecked")
     private Element getGradebookMarks(Document document, String serverId, String datetime, String hashValue,
 	    String username, Long lessonIdParam, String courseId, String outputsUser) throws Exception {
 
@@ -1073,9 +1073,9 @@ public class LessonManagerServlet extends HttpServlet {
 		}
 	    }
 	    lessonElement.setAttribute("lessonMaxPossibleMark", lessonMaxPossibleMark.toString());
+	    
+	    List<ExtUserUseridMap> allUsers = integrationService.getExtUserUseridMapByExtServer(extServer);
 
-	    // get gradebook marks from DB
-	    List<GradebookUserLesson> gradebookUserLessons = new LinkedList<GradebookUserLesson>();
 	    // if outputsUser is null we build results for the whole lesson, otherwise - for the specified learner
 	    if (outputsUser != null) {
 
@@ -1090,45 +1090,36 @@ public class LessonManagerServlet extends HttpServlet {
 		if (gradebookUserLesson == null) {
 		    gradebookUserLesson = new GradebookUserLesson(lesson, user);
 		}
-		gradebookUserLessons.add(gradebookUserLesson);
-
-	    } else {
-		gradebookUserLessons.addAll(gradebookService.getGradebookUserLesson(lessonId));
-		log.debug("Getting tool ouputs report for: " + lessonId + ". With learning design: "
-			+ lesson.getLearningDesign().getLearningDesignId());
-	    }
-
-	    List<ExtUserUseridMap> allUsers = integrationService.getExtUserUseridMapByExtServer(extServer);
-
-	    for (GradebookUserLesson gradebookUserLesson : gradebookUserLessons) {
-		Integer userId = gradebookUserLesson.getLearner().getUserId();
 		Double gradebookUserLessonMark = gradebookUserLesson.getMark();
 
 		// Creates learner element and appends it to the specified lessonElement
 		createLearnerElement(extServer, lessonElement, allUsers, userId, gradebookUserLessonMark);
-	    }
 
-	    // in case of "gradebookMarksLesson" is requested - add all users that have completed the lesson but have no
-	    // gradebookUserLesson (it happens when lesson contains zero activities that set to produce toolOutputs)
-	    boolean isGradebookMarksLessonRequest = courseId == null && outputsUser == null;
-	    if (isGradebookMarksLessonRequest) {
+	    } else {
+		log.debug("Getting tool ouputs report for: " + lessonId + ". With learning design: "
+			+ lesson.getLearningDesign().getLearningDesignId());
+		
 		List<User> usersCompletedLesson = monitoringService.getUsersCompletedLesson(lessonId, null, null, true);
-
-		// add all users that haven't been added yet
-		for (User userCompletedLesson : usersCompletedLesson) {
-		    boolean isUserHaventBeenAddedYet = true;
+		List<GradebookUserLesson> gradebookUserLessons = gradebookService.getGradebookUserLesson(lessonId);
+		
+		// add all users who had finished the lesson
+		for (User user : usersCompletedLesson) {
+		    Integer userId = user.getUserId();
+		    
+		    // find user's gradebookLessonMark (it will be null in cases when lesson contains zero activities that
+		    // set to produce toolOutputs)
+		    Double gradebookUserLessonMark = null;
 		    for (GradebookUserLesson gradebookUserLesson : gradebookUserLessons) {
-			if (userCompletedLesson.getUserId().equals(gradebookUserLesson.getLearner().getUserId())) {
-			    isUserHaventBeenAddedYet = false;
+			if (userId.equals(gradebookUserLesson.getLearner().getUserId())) {
+			    gradebookUserLessonMark = gradebookUserLesson.getMark();
 			    break;
 			}
 		    }
 
-		    // creates learner element and appends it to the specified lessonElement
-		    if (isUserHaventBeenAddedYet) {
-			createLearnerElement(extServer, lessonElement, allUsers, userCompletedLesson.getUserId(), null);
-		    }
+		    // Creates learner element and appends it to the specified lessonElement
+		    createLearnerElement(extServer, lessonElement, allUsers, userId, gradebookUserLessonMark);
 		}
+
 	    }
 
 	    gradebookMarksElement.appendChild(lessonElement);
