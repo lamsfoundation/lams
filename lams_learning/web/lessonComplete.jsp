@@ -48,7 +48,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			async: 'false',
 		    success: function (data) {
 		    	//log mark has been successfullly pushed to the integrated server
-		    	if (data && data == 'OK') {
+		    	if (data && ((data == 'OK') || (data == 'No Lineitem object found'))) {
 		    		$.ajax({ 
 		    		    url: "<lams:WebAppURL/>logLessonMarkPushedToIntegrations",
 		    		    data: {lessonID: "${lessonID}"},
