@@ -110,9 +110,6 @@ public class McStarterAction extends Action implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setMarkValue("1");
 
-	String totalMark = AuthoringUtil.getTotalMark(questionDtos);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
 	String passMark = " ";
 	if ((mcContent.getPassMark() != null) && (mcContent.getPassMark().intValue() != 0)) {
 	    passMark = mcContent.getPassMark().toString();
@@ -147,6 +144,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	mcAuthoringForm.setPrefixAnswersWithLetters(mcContent.isPrefixAnswersWithLetters() ? "1" : "0");
 
 	mcAuthoringForm.setRetries(mcContent.isRetries() ? "1" : "0");
+	mcAuthoringForm.setPassmark("" + mcContent.getPassMark());
 	mcAuthoringForm.setReflect(mcContent.isReflect() ? "1" : "0");
 	mcAuthoringForm.setReflectionSubject(mcContent.getReflectionSubject());
 

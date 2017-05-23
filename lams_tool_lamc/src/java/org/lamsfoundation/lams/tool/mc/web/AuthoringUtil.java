@@ -205,10 +205,10 @@ public class AuthoringUtil implements McAppConstants {
 	return null;
     }
 
-    public static String getTotalMark(List<McQuestionDTO> questionDTOs) {
+    public static int getTotalMark(List<McQuestionDTO> questionDTOs) {
 
 	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
-	int intTotalMark = 0;
+	int totalMark = 0;
 	while (iter.hasNext()) {
 	    McQuestionDTO questionDto = iter.next();
 
@@ -216,11 +216,11 @@ public class AuthoringUtil implements McAppConstants {
 
 	    if (StringUtils.isNotBlank(mark)) {
 		int intMark = new Integer(mark).intValue();
-		intTotalMark += intMark;
+		totalMark += intMark;
 	    }
 	}
 
-	return new Integer(intTotalMark).toString();
+	return totalMark;
     }
 
     /**
@@ -336,7 +336,7 @@ public class AuthoringUtil implements McAppConstants {
      * persisting content
      */
     public static McContent saveOrUpdateMcContent(IMcService mcService, HttpServletRequest request, McContent mcContent,
-	    String strToolContentID) {
+	    String strToolContentID, List<McQuestionDTO> questionDTOs) {
 	UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
@@ -426,18 +426,6 @@ public class AuthoringUtil implements McAppConstants {
 	mcContent.setCreatedBy(userId);
 	/** make sure we are setting the userId from the User object above */
 
-	String passmark = request.getParameter("passmark");
-
-	if (passmark == null) {
-	    passmark = "0";
-	}
-
-	if ((passmark != null) && (passmark.equals(" "))) {
-	    passmark = "0";
-	} else if ((passmark != null) && (passmark.length() == 0)) {
-	    passmark = "0";
-	}
-
 	mcContent.setQuestionsSequenced(questionsSequencedBoolean);
 	mcContent.setRandomize(randomizeBoolean);
 	mcContent.setDisplayAnswers(displayAnswersBoolean);
@@ -450,7 +438,18 @@ public class AuthoringUtil implements McAppConstants {
 	mcContent.setReflect(reflectBoolean);
 	mcContent.setReflectionSubject(reflectionSubject);
 
-	mcContent.setPassMark(new Integer(passmark));
+	String passmarkStr = request.getParameter("passmark");
+	//nullify passmark in case 'retries' option is OFF
+	if (StringUtils.isBlank(passmarkStr) || !retriesBoolean) {
+	    passmarkStr = "0";
+	}
+	//passmark can't be more than total mark
+	Integer passmark = new Integer(passmarkStr);
+	int totalMark = AuthoringUtil.getTotalMark(questionDTOs);
+	if (totalMark < passmark) {
+	    passmark = totalMark;
+	}
+	mcContent.setPassMark(passmark);
 
 	if (newContent) {
 	    mcService.createMc(mcContent);

@@ -50,7 +50,7 @@
 					</div>					
 				</td>
 
-				<td width="70px" class="text-center">
+				<td width="70px" class="text-center question-max-mark">
 					<c:out value="${mark}" />
 				</td>
 

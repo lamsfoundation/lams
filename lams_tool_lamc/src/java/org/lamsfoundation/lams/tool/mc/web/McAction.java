@@ -141,7 +141,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    }
 
 	    //store content
-	    mcContent = AuthoringUtil.saveOrUpdateMcContent(mcService, request, mcContentTest, strToolContentID);
+	    mcContent = AuthoringUtil.saveOrUpdateMcContent(mcService, request, mcContentTest, strToolContentID, questionDTOs);
 
 	    //store questions
 	    mcContent = mcService.createQuestions(questionDTOs, mcContent);
@@ -176,10 +176,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	sessionMap.put(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	mcAuthoringForm.setCurrentTab("1");
@@ -398,8 +394,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
 	mcAuthoringForm.setTitle(richTextTitle);
 	mcAuthoringForm.setCurrentTab("1");
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 	return mapping.findForward(McAppConstants.LOAD_AUTHORING);
@@ -502,9 +496,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestionParam);
 	mcAuthoringForm.setFeedback(feedback);
 
@@ -577,10 +568,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
 	return (mapping.findForward("newQuestionBox"));
@@ -652,11 +639,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setFeedback(editableFeedback);
 
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	String requestNewEditableQuestionBox = (String) request.getAttribute("requestNewEditableQuestionBox");
 
@@ -724,10 +707,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 
@@ -776,10 +755,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 	return (mapping.findForward("itemList"));
@@ -815,12 +790,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 
 	return (mapping.findForward("itemList"));
@@ -891,9 +861,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	setFormProperties(request, mcAuthoringForm, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	String newQuestion = request.getParameter("newQuestion");
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
@@ -967,9 +934,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	setFormProperties(request, mcAuthoringForm, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	String newQuestion = request.getParameter("newQuestion");
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
@@ -1049,9 +1013,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
 	String newQuestion = request.getParameter("newQuestion");
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 
@@ -1128,55 +1089,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 
 	request.setAttribute("requestNewEditableQuestionBox", new Boolean(true).toString());
 	return (mapping.findForward("candidateAnswersList"));
-    }
-
-    public ActionForward updateMarksList(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-	//TODO
-	String sessionMapId = mcAuthoringForm.getHttpSessionID(); //= request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapId);
-	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
-
-	String questionIndex = request.getParameter("questionIndex");
-	mcAuthoringForm.setQuestionIndex(questionIndex);
-
-	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
-
-	sessionMap.put(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-
-	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	mcAuthoringForm.setTitle(richTextTitle);
-
-	setFormProperties(request, mcAuthoringForm, mcGeneralAuthoringDTO);
-	mcAuthoringForm.setCurrentTab("2");
-
-	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
-	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
-	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-
-	return (mapping.findForward(McAppConstants.LOAD_AUTHORING));
     }
 
     public ActionForward moveAddedCandidateUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -1209,9 +1130,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	setFormProperties(request, mcAuthoringForm, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	String newQuestion = request.getParameter("newQuestion");
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
@@ -1256,9 +1174,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	setFormProperties(request, mcAuthoringForm, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	String newQuestion = request.getParameter("newQuestion");
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
@@ -1311,9 +1226,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
 	String newQuestion = request.getParameter("newQuestion");
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 
@@ -1358,8 +1270,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
@@ -1438,7 +1348,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String retries = request.getParameter("retries");
 	mcAuthoringForm.setRetries(retries);
 	mcGeneralAuthoringDTO.setRetries(retries);
-
+	
 	String reflect = request.getParameter(REFLECT);
 	mcAuthoringForm.setReflect(reflect);
 	mcGeneralAuthoringDTO.setReflect(reflect);
@@ -1449,6 +1359,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String passmark = request.getParameter("passmark");
 	mcGeneralAuthoringDTO.setPassMarkValue(passmark);
+	mcAuthoringForm.setPassmark(passmark);
    }
 
 }

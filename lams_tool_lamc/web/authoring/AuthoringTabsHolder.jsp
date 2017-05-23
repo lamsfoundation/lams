@@ -9,6 +9,16 @@
 	
 	<%@ include file="/common/header.jsp"%>
 	<script type="text/JavaScript">
+		$(document).ready(function(){
+			//handler for retries checkbox from advanced tab
+			$("#retries").click(function() {
+				if ($(this).is(':checked')) {
+					$("#passmark-container").show(400);	
+				} else {
+					$("#passmark-container").hide(400);
+				}
+			});		
+		});
 
 		function submitMethod(actionMethod) {
 			document.McAuthoringForm.dispatch.value=actionMethod; 
@@ -32,22 +42,7 @@
 		    });
 		}
 
-		function updatePass(clickedObj) {
-			if (clickedObj.checked) {
-				document.McAuthoringForm.passmark.disabled= false;
-				
-			}else {
-				document.McAuthoringForm.passmark.value= ' ';
-				document.McAuthoringForm.passmark.disabled= true;
-			}
-		}
-
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
-
-        function init() {
-			updatePass(document.McAuthoringForm.retries);
-				
+        function init() {				
 	        var tag = document.getElementById("currentTab");
 		    if(tag.value != "")
 		    	selectTab(tag.value);
@@ -61,6 +56,24 @@
 	    	tag.value = tabId;
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
+	    	
+	    	//advanced tab is selected
+	    	if (tabId == 2) {
+	    		var oldValue = $("#passmark").val();
+	    		alert(oldValue);
+	    		$('#passmark').empty();
+	    		
+	    		var totalMark = 0;
+	    		$("td.question-max-mark").each(function() {
+	    			totalMark += eval($(this).text());
+	    		});
+	    		alert(totalMark);
+	    		
+	    		for (var i = 1; i<=totalMark; i++) {
+	    			var isSelected = (oldValue == i);
+	    		    $('#passmark').append( new Option(i, i, isSelected, isSelected) );
+	    		}
+	    	}
         } 
         
         function doSubmit(method) {
