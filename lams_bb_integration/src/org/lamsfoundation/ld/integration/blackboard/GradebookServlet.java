@@ -116,21 +116,38 @@ public class GradebookServlet extends HttpServlet {
 		throw new ServletException("User not found with userName:" + userName);
 	    }
 	    Id userId = user.getId();
+	    
+	    //allow lessonComplete.jsp on LAMS side to make an Ajax call to this servlet
+	    String serverUrlWithLamsWord = LamsSecurityUtil.getServerAddress();
+	    URI uri = new URI(serverUrlWithLamsWord);
+	    //strip out '/lams/' from the end of the URL
+	    String serverUrl = serverUrlWithLamsWord.lastIndexOf(uri.getPath()) == -1 ? serverUrlWithLamsWord
+		    : serverUrlWithLamsWord.substring(0, serverUrlWithLamsWord.lastIndexOf(uri.getPath()));
+	    response.addHeader("Access-Control-Allow-Origin", serverUrl);
 
-	    String serviceURL = LamsSecurityUtil.getServerAddress() + "/services/xml/LessonManager?"
+	    Lineitem lineitem = LineitemUtil.getLineitem(userId, lamsLessonIdParam, false);
+	    //notifying LAMS that servlet finished its work without exceptions but the score wasn't saved
+	    if (lineitem == null) {
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
+		out.write("No Lineitem object found");
+		return;
+	    }
+	    // do not remove the following line: it's required to instantiate the object
+	    logger.info("Record score for " + lineitem.getName() + " lesson. It now has " + lineitem.getScores().size()
+		    + " scores.");
+
+	    String getLamsMarkURL = LamsSecurityUtil.getServerAddress() + "/services/xml/LessonManager?"
 		    + LamsSecurityUtil.generateAuthenticateParameters(userName)
 		    + "&method=gradebookMarksUser"
 		    + "&lsId=" + lamsLessonIdParam 
 		    + "&outputsUser=" + URLEncoder.encode(userName, "UTF8");
-	    
-	    URL url = new URL(serviceURL);
+	    URL url = new URL(getLamsMarkURL);
 	    URLConnection conn = url.openConnection();
 	    if (!(conn instanceof HttpURLConnection)) {
-		throw new RuntimeException("Unable to open connection to: " + serviceURL);
+		throw new RuntimeException("Unable to open connection to: " + getLamsMarkURL);
 	    }
-
 	    HttpURLConnection httpConn = (HttpURLConnection) conn;
-
 	    if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
 		String errorMsg = "HTTP Response Code: " + httpConn.getResponseCode() + ", HTTP Response Message: "
 			+ httpConn.getResponseMessage();
@@ -141,7 +158,6 @@ public class GradebookServlet extends HttpServlet {
 
 	    // InputStream is = url.openConnection().getInputStream();
 	    InputStream is = conn.getInputStream();
-
 	    // parse xml response
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder db = dbf.newDocumentBuilder();
@@ -149,14 +165,6 @@ public class GradebookServlet extends HttpServlet {
 	    
 	    Node lesson = document.getDocumentElement().getFirstChild();
 	    Node learnerResult = lesson.getFirstChild();
-
-	    Lineitem lineitem = LineitemUtil.getLineitem(userId, lamsLessonIdParam);
-	    if (lineitem == null) {
-		throw new ServletException("Lineitem was not found for userId:" + userId + " and lamsLessonId:" + lamsLessonIdParam);
-	    }
-	    // do not remove the following line: it's required to instantiate the object
-	    logger.info("Record score for " + lineitem.getName() + " lesson. It now has " + lineitem.getScores().size()
-		    + " scores.");
 
 	    // store new score
 	    CourseMembership courseMembership = courseMembershipLoader.loadByCourseAndUserId(lineitem.getCourseId(),
@@ -173,16 +181,6 @@ public class GradebookServlet extends HttpServlet {
 	    
 	    //updates and persists currentScore in the DB
 	    LineitemUtil.updateScoreBasedOnLamsResponse(lesson, learnerResult, currentScore);
-	    
-	    // get LAMS server address
-	    String serverUrlWithLamsWord = LamsSecurityUtil.getServerAddress();
-	    URI uri = new URI(serverUrlWithLamsWord);
-	    //strip out '/lams/' from the end of the URL
-	    String serverUrl = serverUrlWithLamsWord.lastIndexOf(uri.getPath()) == -1 ? serverUrlWithLamsWord
-		    : serverUrlWithLamsWord.substring(0, serverUrlWithLamsWord.lastIndexOf(uri.getPath()));
-	    
-	    //allow lessonComplete.jsp on LAMS side to make an Ajax call to this servlet
-	    response.addHeader("Access-Control-Allow-Origin", serverUrl);
 	    
 	    //notifying LAMS that score has been stored successfully
 	    response.setContentType("text/html");

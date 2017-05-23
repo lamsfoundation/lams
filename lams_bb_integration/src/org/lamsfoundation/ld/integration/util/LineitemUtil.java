@@ -401,10 +401,11 @@ public class LineitemUtil {
      * Finds lineitem by userId and lamsLessonId. The same as above method but first finds bbContentId and also checks
      * Grade center option is ON.
      * 
+     * @param isThrowException whether exception should be thrown in case Gradecenter option is OFF or it should return simple null
      * @throws ServletException
      * @throws PersistenceException
      */
-    public static Lineitem getLineitem(Id userId, String lamsLessonIdParam)
+    public static Lineitem getLineitem(Id userId, String lamsLessonIdParam, boolean isThrowException)
 	    throws ServletException, PersistenceException {
 	BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
 	Container bbContainer = bbPm.getContainer();
@@ -429,8 +430,12 @@ public class LineitemUtil {
 	    Content bbContent = contentDbLoader.loadById(contentId);
 	    // check isGradecenter option is ON (bbContent.isDescribed field is used for storing isGradecenter parameter)
 	    if (!bbContent.getIsDescribed()) {
-		throw new LamsBuildingBlockException("Operation failed due to lesson (lessonId=" + lamsLessonIdParam
-			+ ") has gradecenter option switched OFF.");
+		if (isThrowException) {
+		    throw new LamsBuildingBlockException("Operation failed due to lesson (lessonId=" + lamsLessonIdParam
+			    + ", bbContentId=" + bbContentId + ") has gradecenter option switched OFF.");
+		} else {
+		    return null;
+		}
 	    }
 	}
 
