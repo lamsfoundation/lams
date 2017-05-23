@@ -33,6 +33,10 @@
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.GradebookSyncServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>GradebookSyncFixServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.GradebookSyncFixServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>LessonManagerServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.LessonManagerServlet</servlet-class>
   </servlet>
@@ -88,7 +92,11 @@
   <servlet-mapping>
     <servlet-name>GradebookSyncServlet</servlet-name>
     <url-pattern>/GradebookSync</url-pattern>
-  </servlet-mapping>  
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GradebookSyncFixServlet</servlet-name>
+    <url-pattern>/GradebookSyncFix</url-pattern>
+  </servlet-mapping> 
   <servlet-mapping>
     <servlet-name>LessonManagerServlet</servlet-name>
     <url-pattern>/LessonManager</url-pattern>
