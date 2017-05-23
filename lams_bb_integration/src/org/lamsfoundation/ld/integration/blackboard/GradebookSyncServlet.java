@@ -98,7 +98,7 @@ public class GradebookSyncServlet extends HttpServlet {
 		throw new RuntimeException("Requred parameters missing. lsid=" + lamsLessonIdParam);
 	    }
 
-	    Lineitem lineitem = LineitemUtil.getLineitem(ctx.getUserId(), lamsLessonIdParam);
+	    Lineitem lineitem = LineitemUtil.getLineitem(ctx.getUserId(), lamsLessonIdParam, true);
 	    if (lineitem == null) {
 		throw new ServletException("Lineitem was not found for userId:" + ctx.getUserId() + " and lamsLessonId:" + lamsLessonIdParam);
 	    }
@@ -224,7 +224,7 @@ public class GradebookSyncServlet extends HttpServlet {
 	
 	response.setContentType("text/html");
 	PrintWriter out = response.getWriter();
-        out.write("Complete! " + numberUpdatedScores + " marks have been updated/added to LMS Gradecenter.");
+        out.write("Complete! " + numberUpdatedScores + " marks have been updated/added to Blackboard Gradecenter.");
 	
     }
     
