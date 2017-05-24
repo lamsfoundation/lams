@@ -29,9 +29,28 @@
 	
 	//init the connection with server using server URL but with different protocol
 	var scratchieWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
-					+ 'learningWebsocket?toolSessionID=' + ${toolSessionID});
+					+ 'learningWebsocket?toolSessionID=' + ${toolSessionID}),
+		scratchieWebsocketPingTimeout = null,
+		scratchieWebsocketPingFunc = null;
+	
+	scratchieWebsocketPingFunc = function(skipPing){
+		if (scratchieWebsocket.readyState == scratchieWebsocket.CLOSING 
+				|| scratchieWebsocket.readyState == scratchieWebsocket.CLOSED){
+			location.reload();
+		}
+		
+		// check and ping every 3 minutes
+		scratchieWebsocketPingTimeout = setTimeout(scratchieWebsocketPingFunc, 3*60*1000);
+		// initial set up does not send ping
+		if (!skipPing) {
+			scratchieWebsocket.send("ping");
+		}
+	};
+	// set up timer for the first time
+	scratchieWebsocketPingFunc(true);
 	
 	scratchieWebsocket.onclose = function(e) {
+		// react only on abnormal close
 		if (e.code === 1006) {
 			location.reload();		
 		}
@@ -42,16 +61,20 @@
 		// create JSON object
 		var input = JSON.parse(e.data);
 
-		// leader finished the activity
-		if (input.close) {
-			$('#finishButton').show();
-			return;
-		}
-		
 		//time limit is expired but leader hasn't submitted required notebook/burning questions yet. Non-leaders
         //will need to refresh the page in order to stop showing them questions page.
 		if (input.pageRefresh) {
 			location.reload();
+			return;
+		}
+		
+		// reset ping timer
+		clearTimeout(scratchieWebsocketPingTimeout);
+		scratchieWebsocketPingFunc(true);
+		
+		// leader finished the activity
+		if (input.close) {
+			$('#finishButton').show();
 			return;
 		}
 		

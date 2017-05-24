@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.OnClose;
-import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
@@ -203,14 +202,6 @@ public class LearningWebsocketServer {
 					    + reason.getReasonPhrase()
 				    : ""));
 	}
-    }
-
-    /**
-     * Receives a message sent by Learner via a websocket.
-     */
-    @OnMessage
-    public void receiveRequest(String input, Session websocket) throws JSONException {
-	log.debug("Received \"" + input + "\" from " + websocket.getUserPrincipal().getName());
     }
 
     /**

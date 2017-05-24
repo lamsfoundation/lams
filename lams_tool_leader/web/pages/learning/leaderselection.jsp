@@ -28,9 +28,28 @@
     
  	//init the connection with server using server URL but with different protocol
  	var leaderWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
- 			+ 'learningWebsocket?toolSessionID=' + ${toolSessionID});
+ 			+ 'learningWebsocket?toolSessionID=' + ${toolSessionID}),
+		leaderWebsocketPingTimeout = null,
+		leaderWebsocketPingFunc = null;
+ 		
+	leaderWebsocketPingFunc = function(skipPing){
+		if (leaderWebsocket.readyState == leaderWebsocket.CLOSING 
+				|| leaderWebsocket.readyState == leaderWebsocket.CLOSED){
+			location.reload();
+		}
+		
+		// check and ping every 3 minutes
+		leaderWebsocketPingTimeout = setTimeout(leaderWebsocketPingFunc, 3*60*1000);
+		// initial set up does not send ping
+		if (!skipPing) {
+			leaderWebsocket.send("ping");
+		}
+	};
+	// set up timer for the first time
+	leaderWebsocketPingFunc(true);
  	
  	leaderWebsocket.onclose = function(e){
+ 		// react only on abnormal close
  		if (e.code === 1006) {
  	 		location.reload();
  		}
@@ -38,6 +57,8 @@
  	
 	// run when the leader has just been selected
 	leaderWebsocket.onmessage = function(e) {
+		// no need to reset ping timer as the only possible message is page refresh
+		
 		// create JSON object
 		var input = JSON.parse(e.data);
 		

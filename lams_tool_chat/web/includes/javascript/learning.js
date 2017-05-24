@@ -22,15 +22,39 @@ $(document).ready(function() {
 	// only Monitor can send a personal message
 	var selectedUser = null,
 		// init the connection with server using server URL but with different protocol
-		chatToolWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'learningWebsocket?toolSessionID=' + TOOL_SESSION_ID);
+		chatWebsocket = new WebSocket(APP_URL.replace('http', 'ws')
+				+ 'learningWebsocket?toolSessionID=' + TOOL_SESSION_ID),
+		chatWebsocketPingTimeout = null,
+		chatWebsocketPingFunc = null;
 	
-	chatToolWebsocket.onclose = function(e){
+	chatWebsocketPingFunc = function(skipPing){
+		if (chatWebsocket.readyState == chatWebsocket.CLOSING 
+				|| chatWebsocket.readyState == chatWebsocket.CLOSED){
+			location.reload();
+		}
+		
+		// check and ping every 3 minutes
+		chatWebsocketPingTimeout = setTimeout(chatWebsocketPingFunc, 3*60*1000);
+		// initial set up does not send ping
+		if (!skipPing) {
+			chatWebsocket.send("ping");
+		}
+	};
+	// set up timer for the first time
+	chatWebsocketPingFunc(true);
+	
+	chatWebsocket.onclose = function(e){
+		// react only on abnormal close
 		if (e.code === 1006) {
 			location.reload();
 		}
 	};
 
-	chatToolWebsocket.onmessage = function(e){
+	chatWebsocket.onmessage = function(e){
+		// reset ping timer
+		clearTimeout(chatWebsocketPingTimeout);
+		chatWebsocketPingFunc(true);
+		
 		// create JSON object
 		var input = JSON.parse(e.data);
 		// clear old messages
@@ -72,10 +96,6 @@ $(document).ready(function() {
 		});
 		
 	}
-
-	chatToolWebsocket.onerror = function(e){
-		alert("Error estabilishing connection to server: " + e.data);
-	}
 	
 	function userSelected(userDiv) {
 		var userDivContent = userDiv.html();
@@ -108,7 +128,11 @@ $(document).ready(function() {
 			};
 		
 		// send it to server
-		chatToolWebsocket.send(JSON.stringify(output)); 
+		chatWebsocket.send(JSON.stringify(output));
+		
+		// reset ping timer
+		clearTimeout(chatWebsocketPingTimeout);
+		chatWebsocketPingFunc(true);
 	}
 });
 

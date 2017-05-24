@@ -2,7 +2,6 @@ package org.lamsfoundation.lams.tool.chat.web.actions;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -302,6 +301,10 @@ public class LearningWebsocketServer {
     @OnMessage
     public void receiveMessage(String input, Session session) throws JSONException {
 	if (StringUtils.isBlank(input)) {
+	    return;
+	}
+	if (input.equalsIgnoreCase("ping")) {
+	    // just a ping every few minutes
 	    return;
 	}
 	JSONObject messageJSON = new JSONObject(input);
