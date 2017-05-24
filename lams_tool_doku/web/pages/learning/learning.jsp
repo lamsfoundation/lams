@@ -96,14 +96,39 @@
 		<c:if test="${isTimeLimitEnabled}">
 			//init the connection with server using server URL but with different protocol
 			var dokuWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
-							+ 'learningWebsocket?toolContentID=' + ${toolContentID});
+							+ 'learningWebsocket?toolContentID=' + ${toolContentID}),
+				dokuWebsocketPingTimeout = null,
+				dokuWebsocketPingFunc = null;
+			
+			dokuWebsocketPingFunc = function(skipPing){
+				if (dokuWebsocket.readyState == dokuWebsocket.CLOSING 
+						|| dokuWebsocket.readyState == dokuWebsocket.CLOSED){
+					location.reload();
+				}
+				
+				// check and ping every 3 minutes
+				dokuWebsocketPingTimeout = setTimeout(dokuWebsocketPingFunc, 3*60*1000);
+				// initial set up does not send ping
+				if (!skipPing) {
+					dokuWebsocket.send("ping");
+				}
+			};
+			// set up timer for the first time
+			dokuWebsocketPingFunc(true);
 			
 			dokuWebsocket.onclose = function(){
-				location.reload();
+				// react only on abnormal close
+				if (e.code === 1006) {
+					location.reload();
+				}
 			};
 			
 			// run when the server pushes new reports and vote statistics
 			dokuWebsocket.onmessage = function(e) {
+				// reset ping timer
+				clearTimeout(dokuWebsocketPingTimeout);
+				dokuWebsocketPingFunc(true);
+				
 				// create JSON object
 				var input = JSON.parse(e.data);
 				
