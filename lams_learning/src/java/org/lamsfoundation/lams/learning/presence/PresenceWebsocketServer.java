@@ -1,9 +1,7 @@
 package org.lamsfoundation.lams.learning.presence;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -69,30 +68,27 @@ public class PresenceWebsocketServer {
 	@Override
 	public void run() {
 	    while (!stopFlag) {
-		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-		HibernateSessionManager.openSession();
 		try {
-		    // synchronize websockets as a new Learner entering chat could modify this collection
-		    synchronized (PresenceWebsocketServer.websockets) {
-			Iterator<Entry<Long, Set<Websocket>>> entryIterator = PresenceWebsocketServer.websockets
-				.entrySet().iterator();
-			// go through lessons and update registered learners with messages and roster
-			while (entryIterator.hasNext()) {
-			    Entry<Long, Set<Websocket>> entry = entryIterator.next();
-			    Long lessonId = entry.getKey();
-			    Long lastSendTime = lastSendTimes.get(lessonId);
-			    if ((lastSendTime == null)
-				    || ((System.currentTimeMillis() - lastSendTime) >= SendWorker.CHECK_INTERVAL)) {
-				send(lessonId, null);
-			    }
+		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+		    HibernateSessionManager.openSession();
+		    Iterator<Entry<Long, Set<Websocket>>> entryIterator = PresenceWebsocketServer.websockets.entrySet()
+			    .iterator();
+		    // go through lessons and update registered learners with messages and roster
+		    while (entryIterator.hasNext()) {
+			Entry<Long, Set<Websocket>> entry = entryIterator.next();
+			Long lessonId = entry.getKey();
+			Long lastSendTime = lastSendTimes.get(lessonId);
+			if ((lastSendTime == null)
+				|| ((System.currentTimeMillis() - lastSendTime) >= SendWorker.CHECK_INTERVAL)) {
+			    send(lessonId, null);
+			}
 
-			    // if all learners left the chat, remove the obsolete mapping
-			    Set<Websocket> lessonWebsockets = entry.getValue();
-			    if (lessonWebsockets.isEmpty()) {
-				entryIterator.remove();
-				PresenceWebsocketServer.rosters.remove(lessonId);
-				lastSendTimes.remove(lessonId);
-			    }
+			// if all learners left the chat, remove the obsolete mapping
+			Set<Websocket> lessonWebsockets = entry.getValue();
+			if (lessonWebsockets.isEmpty()) {
+			    entryIterator.remove();
+			    PresenceWebsocketServer.rosters.remove(lessonId);
+			    lastSendTimes.remove(lessonId);
 			}
 		    }
 		} catch (Exception e) {
@@ -125,10 +121,9 @@ public class PresenceWebsocketServer {
 		lastSendTimes.put(lessonId, System.currentTimeMillis());
 	    }
 
-	    Set<Websocket> lessonWebsockets = new HashSet<Websocket>(PresenceWebsocketServer.websockets.get(lessonId));
+	    Set<Websocket> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
 	    Roster roster = PresenceWebsocketServer.rosters.get(lessonId);
 	    JSONArray rosterJSON = roster.getRosterJSON();
-	    // make a copy of the websocket collection so it does not get blocked while sending messages
 	    for (Websocket websocket : lessonWebsockets) {
 		// if this run is meant only for one learner, skip the others
 		if ((nickName != null) && !nickName.equals(websocket.nickName)) {
@@ -216,9 +211,8 @@ public class PresenceWebsocketServer {
     private static IPresenceChatService presenceChatService;
 
     private static final SendWorker sendWorker = new SendWorker();
-    private static final Map<Long, Roster> rosters = Collections.synchronizedMap(new TreeMap<Long, Roster>());
-    private static final Map<Long, Set<Websocket>> websockets = Collections
-	    .synchronizedMap(new TreeMap<Long, Set<Websocket>>());
+    private static final Map<Long, Roster> rosters = new ConcurrentHashMap<Long, Roster>();
+    private static final Map<Long, Set<Websocket>> websockets = new ConcurrentHashMap<Long, Set<Websocket>>();
 
     static {
 	// run the singleton thread
@@ -233,7 +227,7 @@ public class PresenceWebsocketServer {
 	Long lessonId = Long.valueOf(session.getRequestParameterMap().get(AttributeNames.PARAM_LESSON_ID).get(0));
 	Set<Websocket> sessionWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
 	if (sessionWebsockets == null) {
-	    sessionWebsockets = Collections.synchronizedSet(new HashSet<Websocket>());
+	    sessionWebsockets = ConcurrentHashMap.newKeySet();
 	    PresenceWebsocketServer.websockets.put(lessonId, sessionWebsockets);
 	}
 	Websocket websocket = new Websocket(session);
@@ -270,14 +264,12 @@ public class PresenceWebsocketServer {
     public void unregisterUser(Session session, CloseReason reason) {
 	Long lessonId = Long.valueOf(session.getRequestParameterMap().get(AttributeNames.PARAM_LESSON_ID).get(0));
 	Set<Websocket> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
-	synchronized (lessonWebsockets) {
-	    Iterator<Websocket> websocketIterator = lessonWebsockets.iterator();
-	    while (websocketIterator.hasNext()) {
-		Websocket websocket = websocketIterator.next();
-		if (websocket.session.equals(session)) {
-		    websocketIterator.remove();
-		    break;
-		}
+	Iterator<Websocket> websocketIterator = lessonWebsockets.iterator();
+	while (websocketIterator.hasNext()) {
+	    Websocket websocket = websocketIterator.next();
+	    if (websocket.session.equals(session)) {
+		websocketIterator.remove();
+		break;
 	    }
 	}
 
@@ -302,6 +294,11 @@ public class PresenceWebsocketServer {
 	if (StringUtils.isBlank(input)) {
 	    return;
 	}
+	if (input.equalsIgnoreCase("ping")) {
+	    // just a ping every few minutes
+	    return;
+	}
+
 	JSONObject requestJSON = new JSONObject(input);
 	switch (requestJSON.getString("type")) {
 	    case "message":
@@ -411,10 +408,8 @@ public class PresenceWebsocketServer {
 	}
 	// there can be few websockets (browser windows) for a single learner
 	Set<String> activeNicknames = new TreeSet<String>();
-	synchronized (lessonWebsockets) {
-	    for (Websocket websocket : lessonWebsockets) {
-		activeNicknames.add(websocket.nickName);
-	    }
+	for (Websocket websocket : lessonWebsockets) {
+	    activeNicknames.add(websocket.nickName);
 	}
 	return activeNicknames.size();
     }
