@@ -257,6 +257,11 @@ public class LearningWebsocketServer {
 	if (StringUtils.isBlank(input)) {
 	    return;
 	}
+	if (input.equalsIgnoreCase("ping")) {
+	    // just a ping every few minutes
+	    return;
+	}
+	
 	JSONObject requestJSON = new JSONObject(input);
 	switch (requestJSON.getString("type")) {
 	    case "vote":

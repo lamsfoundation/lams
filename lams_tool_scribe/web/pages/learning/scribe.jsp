@@ -15,13 +15,38 @@
 	});
 
 	//init the connection with server using server URL but with different protocol
-	var websocket = new WebSocket('${tool}'.replace('http', 'ws')
+	var scribeWebsocket = new WebSocket('${tool}'.replace('http', 'ws')
 					+ 'learningWebsocket?toolSessionID=' + ${scribeSessionDTO.sessionID}),
+		scribeWebsocketPingTimeout = null,
+		scribeWebsocketPingFunc = null,
 		agreementPercentageLabel = '<fmt:message key="message.voteStatistics" />',
 		reportSubmitted = ${scribeSessionDTO.reportSubmitted};
 		
+	scribeWebsocketPingFunc = function(skipPing){
+		if (scribeWebsocket.readyState == scribeWebsocket.CLOSING 
+				|| scribeWebsocket.readyState == scribeWebsocket.CLOSED){
+			location.reload();
+		}
+		
+		// check and ping every 3 minutes
+		scribeWebsocketPingTimeout = setTimeout(scribeWebsocketPingFunc, 3*60*1000);
+		// initial set up does not send ping
+		if (!skipPing) {
+			scribeWebsocket.send("ping");
+		}
+	};
+	// set up timer for the first time
+	scribeWebsocketPingFunc(true);
+ 	
+ 	scribeWebsocket.onclose = function(e){
+ 		// react only on abnormal close
+ 		if (e.code === 1006) {
+ 	 		location.reload();
+ 		}
+ 	};
+ 	
 	// run when the server pushes new reports and vote statistics
-	websocket.onmessage = function(e) {
+	scribeWebsocket.onmessage = function(e) {
 		// create JSON object
 		var input = JSON.parse(e.data),
 			agreeButton = $('#agreeButton');
@@ -31,6 +56,10 @@
 			window.location.href = '${tool}learning.do?toolSessionID=${scribeSessionDTO.sessionID}&mode=${MODE}';
 			return;
 		}
+		
+		// reset ping timer
+		clearTimeout(scribeWebsocketPingTimeout);
+		scribeWebsocketPingFunc(true);
 		
 		// only changed reports will be sent
 		if (input.reports) {
@@ -59,7 +88,7 @@
 		var data = {
 				type : 'vote'	
 			};
-		websocket.send(JSON.stringify(data));
+		scribeWebsocket.send(JSON.stringify(data));
 		
 		$('#agreeButton').hide();
 	}
@@ -77,7 +106,7 @@
 			});
 		});
 		data.reports = reports;
-		websocket.send(JSON.stringify(data));
+		scribeWebsocket.send(JSON.stringify(data));
 		
 		reportSubmitted = true;
 	}

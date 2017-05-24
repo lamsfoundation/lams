@@ -96,13 +96,30 @@
 
 				// it gets initialised along with progress bar
 				commandWebsocket = null,
-
+				commandWebsocketPingTimeout = null,
+				commandWebsocketPingFunc = null,
+				
 				bars = {
 					'learnerMainBar' : {
 						'containerId' : 'progressBarDiv'
 					}
 				};
-
+				
+			commandWebsocketPingFunc = function(skipPing){
+				if (commandWebsocket.readyState == commandWebsocket.CLOSING 
+						|| commandWebsocket.readyState == commandWebsocket.CLOSED){
+					initCommandWebsocket();
+					return;
+				}
+				
+				// check and ping every 3 minutes
+				commandWebsocketPingTimeout = setTimeout(commandWebsocketPingFunc, 3*60*1000);
+				// initial set up does not send ping
+				if (!skipPing) {
+					commandWebsocket.send("ping");
+				}
+			};
+				
 			function restartLesson(){
 				if (confirm(restartLessonConfirmation)) {
 					window.location.href = LEARNING_URL + 'learner.do?method=restartLesson&lessonID=' + lessonId;
@@ -145,6 +162,37 @@
 					$('#restartitem').show();
 				}
 				$('#sidebar').show();
+			}
+
+			function initCommandWebsocket(){
+				// it is not an obvious place to init the websocket, but we need lesson ID
+				commandWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
+						+ 'commandWebsocket?lessonID=' + lessonId);
+				// set up timer for the first time
+				commandWebsocketPingFunc(true);
+				
+				commandWebsocket.onclose = function(e){
+					if (e.code === 1006) {
+						// maybe iPad went into sleep mode?
+						// we need this websocket working, so init it again
+						initCommandWebsocket();
+					}
+				};
+				// when the server pushes new commands
+				commandWebsocket.onmessage = function(e){
+					// read JSON object
+					var command = JSON.parse(e.data);
+					if (command.message) {
+						alert(command.message);
+					}
+					if (command.redirectURL) {
+						window.location.href = command.redirectURL;
+					}
+
+					// reset ping timer
+					clearTimeout(commandWebsocketPingTimeout);
+					commandWebsocketPingFunc(true);
+				};
 			}
 			
 			$(document).ready(function() {
@@ -203,27 +251,7 @@
 								});
 							}
 
-							// it is not an obvious place to init the websocket, but we need lesson ID
-							commandWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws') + 'commandWebsocket?lessonID=' + lessonId);
-
-							commandWebsocket.onclose = function(e){
-								if (e.code === 1006) {
-									// maybe iPad went into sleep mode?
-									// we need this websocket working, so init it again
-									initCommandWebsocket();
-								}
-							};
-							// when the server pushes new commands
-							commandWebsocket.onmessage = function(e){
-								// read JSON object
-								var command = JSON.parse(e.data);
-								if (command.message) {
-									alert(command.message);
-								}
-								if (command.redirectURL) {
-									window.location.href = command.redirectURL;
-								}
-							};
+							initCommandWebsocket();
 						}
 					});
 				}
@@ -347,7 +375,3 @@
 		</div>
 	</c:otherwise>
 </c:choose>
-
-
-		
-			
