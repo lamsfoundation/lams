@@ -46,10 +46,9 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.mc.AnswerDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McComparator;
-import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.mc.dto.AnswerDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -58,6 +57,8 @@ import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
+import org.lamsfoundation.lams.tool.mc.util.McComparator;
+import org.lamsfoundation.lams.tool.mc.web.form.McLearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -68,7 +69,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * @author Ozgur Demirtas
  */
-public class McLearningAction extends LamsDispatchAction implements McAppConstants {
+public class McLearningAction extends LamsDispatchAction {
     private static Logger logger = Logger.getLogger(McLearningAction.class.getName());
 
     private static IMcService mcService;
@@ -472,7 +473,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
 	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.MY_SIGNATURE, new Integer(user.getQueUsrId().intValue()));
+		McAppConstants.TOOL_SIGNATURE, new Integer(user.getQueUsrId().intValue()));
 	request.setAttribute("notebookEntry", notebookEntry);
 	if (notebookEntry != null) {
 	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
@@ -609,14 +610,14 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	String reflectionEntry = request.getParameter(McAppConstants.ENTRY_TEXT);
 	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.MY_SIGNATURE, userID.intValue());
+		McAppConstants.TOOL_SIGNATURE, userID.intValue());
 
 	if (notebookEntry != null) {
 	    notebookEntry.setEntry(reflectionEntry);
 	    mcService.updateEntry(notebookEntry);
 	} else {
 	    mcService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		    McAppConstants.MY_SIGNATURE, userID.intValue(), reflectionEntry);
+		    McAppConstants.TOOL_SIGNATURE, userID.intValue(), reflectionEntry);
 	}
 
 	return endLearning(mapping, form, request, response);
@@ -655,7 +656,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	// attempt getting notebookEntry
 	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.MY_SIGNATURE, userID.intValue());
+		McAppConstants.TOOL_SIGNATURE, userID.intValue());
 
 	if (notebookEntry != null) {
 	    String notebookEntryPresentable = notebookEntry.getEntry();

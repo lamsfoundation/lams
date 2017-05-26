@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc;
+package org.lamsfoundation.lams.tool.mc.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 

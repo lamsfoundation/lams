@@ -73,21 +73,19 @@ import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.mc.AnswerDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McOptionDTO;
-import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
-import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
-import org.lamsfoundation.lams.tool.mc.McStringComparator;
-import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
-import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.mc.dto.AnswerDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McSessionMarkDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
+import org.lamsfoundation.lams.tool.mc.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
@@ -96,6 +94,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.util.McSessionComparator;
+import org.lamsfoundation.lams.tool.mc.util.McStringComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -323,7 +322,7 @@ public class McServicePOJO
 	    }
 
 	    // persist candidate answers
-	    List<McOptionDTO> optionDTOs = questionDTO.getListCandidateAnswersDTO();
+	    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
 	    Set<McOptsContent> oldOptions = question.getMcOptionsContents();
 	    Set<McOptsContent> newOptions = new HashSet<McOptsContent>();
 	    int displayOrderOption = 1;
@@ -792,7 +791,7 @@ public class McServicePOJO
 	gradebookService.updateActivityMark(new Double(totalMark), null, userId, toolSessionId, false);
 
 	// record mark change with audit service
-	auditService.logMarkChange(McAppConstants.MY_SIGNATURE, userAttempt.getMcQueUsr().getQueUsrId(),
+	auditService.logMarkChange(McAppConstants.TOOL_SIGNATURE, userAttempt.getMcQueUsr().getQueUsrId(),
 		userAttempt.getMcQueUsr().getUsername(), "" + oldMark, "" + totalMark);
 
     }
@@ -824,7 +823,7 @@ public class McServicePOJO
 
 		    // options are different
 		    Set<McOptsContent> oldOptions = oldQuestion.getMcOptionsContents();
-		    List<McOptionDTO> optionDTOs = questionDTO.getListCandidateAnswersDTO();
+		    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
 		    for (McOptsContent oldOption : oldOptions) {
 			for (McOptionDTO optionDTO : optionDTOs) {
 			    if (oldOption.getUid().equals(optionDTO.getUid())) {
@@ -1233,7 +1232,7 @@ public class McServicePOJO
 
 	if (fromContentId == null) {
 	    McServicePOJO.logger.warn("fromContentId is null.");
-	    long defaultContentId = getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE);
+	    long defaultContentId = getToolDefaultContentIdBySignature(McAppConstants.TOOL_SIGNATURE);
 	    fromContentId = new Long(defaultContentId);
 	}
 
@@ -1246,7 +1245,7 @@ public class McServicePOJO
 
 	if (fromContent == null) {
 	    McServicePOJO.logger.warn("fromContent is null.");
-	    long defaultContentId = getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE);
+	    long defaultContentId = getToolDefaultContentIdBySignature(McAppConstants.TOOL_SIGNATURE);
 	    fromContent = mcContentDAO.findMcContentById(defaultContentId);
 	}
 
@@ -1270,7 +1269,7 @@ public class McServicePOJO
 
 	for (McSession session : (Set<McSession>) mcContent.getMcSessions()) {
 	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getMcSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.MY_SIGNATURE);
+		    CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.TOOL_SIGNATURE);
 	    for (NotebookEntry entry : entries) {
 		coreNotebookService.deleteEntry(entry);
 	    }
@@ -1305,7 +1304,7 @@ public class McServicePOJO
 		    mcUsrAttemptDAO.removeAllUserAttempts(user.getUid());
 
 		    NotebookEntry entry = getEntry(session.getMcSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			    McAppConstants.MY_SIGNATURE, userId);
+			    McAppConstants.TOOL_SIGNATURE, userId);
 		    if (entry != null) {
 			mcContentDAO.delete(entry);
 		    }
@@ -1326,7 +1325,7 @@ public class McServicePOJO
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	McContent toolContentObj = mcContentDAO.findMcContentById(toolContentId);
 	if (toolContentObj == null) {
-	    long defaultContentId = getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE);
+	    long defaultContentId = getToolDefaultContentIdBySignature(McAppConstants.TOOL_SIGNATURE);
 	    toolContentObj = mcContentDAO.findMcContentById(defaultContentId);
 	}
 	if (toolContentObj == null) {
@@ -1372,7 +1371,7 @@ public class McServicePOJO
 	    throws ToolException {
 	McContent content = getMcContent(toolContentId);
 	if (content == null) {
-	    long defaultToolContentId = getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE);
+	    long defaultToolContentId = getToolDefaultContentIdBySignature(McAppConstants.TOOL_SIGNATURE);
 	    content = getMcContent(defaultToolContentId);
 	}
 	return mcOutputFactory.getToolOutputDefinitions(content, definitionType);
@@ -1694,7 +1693,7 @@ public class McServicePOJO
 		for (McQueUsr user : (Set<McQueUsr>) mcSession.getMcQueUsers()) {
 
 		    NotebookEntry notebookEntry = this.getEntry(mcSession.getMcSessionId(),
-			    CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.MY_SIGNATURE,
+			    CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.TOOL_SIGNATURE,
 			    new Integer(user.getQueUsrId().toString()));
 
 		    if (notebookEntry != null) {
@@ -1717,7 +1716,7 @@ public class McServicePOJO
 		    McQueUsr user = (McQueUsr) userIter.next();
 		    if (user.getQueUsrId().equals(userID)) {
 			NotebookEntry notebookEntry = this.getEntry(mcSession.getMcSessionId(),
-				CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.MY_SIGNATURE,
+				CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.TOOL_SIGNATURE,
 				new Integer(user.getQueUsrId().toString()));
 
 			if (notebookEntry != null) {

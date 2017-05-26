@@ -28,8 +28,8 @@ import java.util.List;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
+import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.springframework.stereotype.Repository;
 

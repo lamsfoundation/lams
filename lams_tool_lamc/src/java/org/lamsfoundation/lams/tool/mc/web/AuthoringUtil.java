@@ -37,13 +37,13 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McComparator;
-import org.lamsfoundation.lams.tool.mc.McOptionDTO;
-import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
+import org.lamsfoundation.lams.tool.mc.util.McComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -53,129 +53,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  * @author Ozgur Demirtas
  */
-public class AuthoringUtil implements McAppConstants {
+public class AuthoringUtil {
     private static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
-
-    public static List<McOptionDTO> removeBlankOptions(List<McOptionDTO> optionDtos) {
-	List<McOptionDTO> newList = new LinkedList<McOptionDTO>();
-
-	for (McOptionDTO optionDTO : optionDtos) {
-	    String optionText = optionDTO.getCandidateAnswer();
-
-	    if ((optionText != null) && (optionText.length() > 0)) {
-		newList.add(optionDTO);
-	    }
-	}
-
-	return newList;
-    }
-
-    /**
-     * swappes McQuestionDTO questions in the list
-     */
-    public static List<McQuestionDTO> swapQuestions(List<McQuestionDTO> questionDTOs, String questionIndex,
-	    String direction) {
-
-	int intQuestionIndex = new Integer(questionIndex).intValue();
-	int intOriginalQuestionIndex = intQuestionIndex;
-
-	int replacedQuestionIndex = 0;
-	if (direction.equals("down")) {
-	    replacedQuestionIndex = ++intQuestionIndex;
-	} else {
-	    replacedQuestionIndex = --intQuestionIndex;
-	}
-
-	McQuestionDTO mainQuestion = AuthoringUtil.getQuestionAtDisplayOrder(questionDTOs, intOriginalQuestionIndex);
-
-	McQuestionDTO replacedQuestion = AuthoringUtil.getQuestionAtDisplayOrder(questionDTOs, replacedQuestionIndex);
-
-	if ((mainQuestion == null) || (replacedQuestion == null)) {
-	    return questionDTOs;
-	}
-
-	List<McQuestionDTO> newQuestionDtos = new LinkedList<McQuestionDTO>();
-
-	int queIndex = 0;
-	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
-	while (iter.hasNext()) {
-	    McQuestionDTO questionDto = iter.next();
-	    queIndex++;
-	    McQuestionDTO tempQuestion = new McQuestionDTO();
-
-	    if ((!questionDto.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString()))
-		    && !questionDto.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
-		// normal copy
-		tempQuestion = questionDto;
-
-	    } else if (questionDto.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) {
-		// move type 1
-		tempQuestion = replacedQuestion;
-
-	    } else if (questionDto.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
-		// move type 2
-		tempQuestion = mainQuestion;
-	    }
-
-	    newQuestionDtos.add(tempQuestion);
-	}
-
-	return newQuestionDtos;
-    }
-
-    /**
-     * swaps options in the list
-     */
-    public static List<McOptionDTO> swapOptions(List<McOptionDTO> optionDtos, String optionIndex, String direction) {
-
-	int intOptionIndex = new Integer(optionIndex).intValue();
-	int intOriginalOptionIndex = intOptionIndex;
-
-	int replacedOptionIndex = 0;
-	if (direction.equals("down")) {
-	    replacedOptionIndex = ++intOptionIndex;
-	} else {
-	    replacedOptionIndex = --intOptionIndex;
-	}
-
-	McOptionDTO mainOption = AuthoringUtil.getOptionAtDisplayOrder(optionDtos, intOriginalOptionIndex);
-
-	McOptionDTO replacedOption = AuthoringUtil.getOptionAtDisplayOrder(optionDtos, replacedOptionIndex);
-
-	if ((mainOption == null) || (replacedOption == null)) {
-	    return optionDtos;
-	}
-
-	List<McOptionDTO> newOptionDtos = new LinkedList<McOptionDTO>();
-
-	int queIndex = 1;
-	for (McOptionDTO option : optionDtos) {
-
-	    McOptionDTO tempOption = new McOptionDTO();
-	    if ((!new Integer(queIndex).toString().equals(new Integer(intOriginalOptionIndex).toString()))
-		    && !new Integer(queIndex).toString().equals(new Integer(replacedOptionIndex).toString())) {
-		// normal copy
-		tempOption = option;
-	    } else if (new Integer(queIndex).toString().equals(new Integer(intOriginalOptionIndex).toString())) {
-		// move type 1
-		tempOption = replacedOption;
-	    } else if (new Integer(queIndex).toString().equals(new Integer(replacedOptionIndex).toString())) {
-		// move type 2
-		tempOption = mainOption;
-	    }
-
-	    newOptionDtos.add(tempOption);
-	    queIndex++;
-	}
-
-	return newOptionDtos;
-    }
 
     /**
      * returns McQuestionDTO in the specified order of the list
      */
     public static McQuestionDTO getQuestionAtDisplayOrder(List questionDTOs, int intOriginalQuestionIndex) {
-
 	Iterator iter = questionDTOs.iterator();
 	while (iter.hasNext()) {
 	    McQuestionDTO questionDto = (McQuestionDTO) iter.next();
@@ -191,7 +75,6 @@ public class AuthoringUtil implements McAppConstants {
      * extractCandidateAtOrder
      */
     public static McOptionDTO getOptionAtDisplayOrder(List options, int intOriginalCandidateIndex) {
-
 	int counter = 0;
 	Iterator iter = options.iterator();
 	while (iter.hasNext()) {
@@ -203,105 +86,6 @@ public class AuthoringUtil implements McAppConstants {
 	    }
 	}
 	return null;
-    }
-
-    public static int getTotalMark(List<McQuestionDTO> questionDTOs) {
-
-	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
-	int totalMark = 0;
-	while (iter.hasNext()) {
-	    McQuestionDTO questionDto = iter.next();
-
-	    String mark = questionDto.getMark();
-
-	    if (StringUtils.isNotBlank(mark)) {
-		int intMark = new Integer(mark).intValue();
-		totalMark += intMark;
-	    }
-	}
-
-	return totalMark;
-    }
-
-    /**
-     * reorderSimpleListQuestionContentDTO
-     */
-    public static List<McQuestionDTO> reorderSimpleQuestionDtos(List<McQuestionDTO> questionDTOs) {
-	List<McQuestionDTO> listFinalQuestionContentDTO = new LinkedList<McQuestionDTO>();
-
-	int queIndex = 0;
-	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
-	while (iter.hasNext()) {
-	    McQuestionDTO questionDto = iter.next();
-
-	    String question = questionDto.getQuestion();
-
-	    String feedback = questionDto.getFeedback();
-
-	    List<McOptionDTO> optionDtos = questionDto.getListCandidateAnswersDTO();
-
-	    String mark = questionDto.getMark();
-
-	    if ((question != null) && (!question.equals(""))) {
-		++queIndex;
-
-		questionDto.setQuestion(question);
-		questionDto.setDisplayOrder(new Integer(queIndex).toString());
-		questionDto.setFeedback(feedback);
-		questionDto.setListCandidateAnswersDTO(optionDtos);
-		questionDto.setMark(mark);
-		listFinalQuestionContentDTO.add(questionDto);
-	    }
-	}
-
-	return listFinalQuestionContentDTO;
-    }
-
-    /**
-     * reorderUpdateListQuestionContentDTO
-     */
-    public static List reorderUpdateQuestionDtos(List questionDTOs, McQuestionDTO mcQuestionContentDTONew,
-	    String editableQuestionIndex) {
-
-	List listFinalQuestionContentDTO = new LinkedList();
-
-	int queIndex = 0;
-	Iterator iter = questionDTOs.iterator();
-	while (iter.hasNext()) {
-	    McQuestionDTO questionDto = (McQuestionDTO) iter.next();
-
-	    ++queIndex;
-	    String question = questionDto.getQuestion();
-
-	    String displayOrder = questionDto.getDisplayOrder();
-
-	    String feedback = questionDto.getFeedback();
-
-	    String mark = questionDto.getMark();
-
-	    List<McOptionDTO> optionDtos = questionDto.getListCandidateAnswersDTO();
-
-	    if (displayOrder.equals(editableQuestionIndex)) {
-		questionDto.setQuestion(mcQuestionContentDTONew.getQuestion());
-		questionDto.setDisplayOrder(mcQuestionContentDTONew.getDisplayOrder());
-		questionDto.setFeedback(mcQuestionContentDTONew.getFeedback());
-		questionDto.setMark(mcQuestionContentDTONew.getMark());
-		questionDto.setListCandidateAnswersDTO(mcQuestionContentDTONew.getListCandidateAnswersDTO());
-
-		listFinalQuestionContentDTO.add(questionDto);
-	    } else {
-		questionDto.setQuestion(question);
-		questionDto.setDisplayOrder(displayOrder);
-		questionDto.setFeedback(feedback);
-		questionDto.setMark(mark);
-		questionDto.setListCandidateAnswersDTO(optionDtos);
-		listFinalQuestionContentDTO.add(questionDto);
-
-	    }
-
-	}
-
-	return listFinalQuestionContentDTO;
     }
 
     /**
@@ -437,6 +221,16 @@ public class AuthoringUtil implements McAppConstants {
 
 	mcContent.setReflect(reflectBoolean);
 	mcContent.setReflectionSubject(reflectionSubject);
+	
+	//calculate total mark
+	int totalMark = 0;
+	for (McQuestionDTO questionDto: questionDTOs) {
+	    String mark = questionDto.getMark();
+	    if (StringUtils.isNotBlank(mark)) {
+		int intMark = new Integer(mark).intValue();
+		totalMark += intMark;
+	    }
+	}
 
 	String passmarkStr = request.getParameter("passmark");
 	//nullify passmark in case 'retries' option is OFF
@@ -445,7 +239,6 @@ public class AuthoringUtil implements McAppConstants {
 	}
 	//passmark can't be more than total mark
 	Integer passmark = new Integer(passmarkStr);
-	int totalMark = AuthoringUtil.getTotalMark(questionDTOs);
 	if (totalMark < passmark) {
 	    passmark = totalMark;
 	}
@@ -466,7 +259,7 @@ public class AuthoringUtil implements McAppConstants {
      * generates a list for holding default questions and their candidate answers
      */
     public static List<McQuestionDTO> buildDefaultQuestions(McContent mcContent) {
-	List<McQuestionDTO> questionDTOs = new LinkedList<McQuestionDTO>();
+	List<McQuestionDTO> questionDtos = new LinkedList<McQuestionDTO>();
 
 	Long mapIndex = new Long(1);
 
@@ -482,7 +275,7 @@ public class AuthoringUtil implements McAppConstants {
 
 	    questionDto.setUid(question.getUid());
 	    questionDto.setQuestion(questionText);
-	    questionDto.setDisplayOrder(question.getDisplayOrder().toString());
+	    questionDto.setDisplayOrder(question.getDisplayOrder());
 	    questionDto.setFeedback(feedback);
 	    questionDto.setMark(question.getMark().toString());
 
@@ -493,13 +286,12 @@ public class AuthoringUtil implements McAppConstants {
 		optionDtos.add(optionDTO);
 	    }
 
-	    questionDto.setListCandidateAnswersDTO(optionDtos);
-
-	    questionDTOs.add(questionDto);
+	    questionDto.setOptionDtos(optionDtos);
+	    questionDtos.add(questionDto);
 
 	    mapIndex = new Long(mapIndex.longValue() + 1);
 	}
 
-	return questionDTOs;
+	return questionDtos;
     }
 }

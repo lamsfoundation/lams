@@ -20,31 +20,51 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc;
-
-import java.io.Serializable;
-import java.util.Comparator;
-
-import org.apache.log4j.Logger;
+package org.lamsfoundation.lams.tool.mc.service;
 
 /**
- * @author Ozgur Demirtas * A comparator implementation that can be used as a constructor to collections. The TreeMap in
- *         the web layer makes use of it.
+ * <p>
+ * This exception wraps all basic exception occured in the mcq tool. It is not suppose to be try and catched in any
+ * level. The struts should be taking care of handling this exception.
+ * </p>
+ *
+ * @author Ozgur Demirtas
  *
  */
-public class McStringComparator implements Comparator, Serializable {
-    static Logger logger = Logger.getLogger(McStringComparator.class.getName());
-
-    @Override
-    public int compare(Object o1, Object o2) {
-	String s1 = (String) o1;
-	String s2 = (String) o2;
-
-	return s1.compareTo(s2);
+public class McApplicationException extends RuntimeException {
+    /**
+     * Default Constructor
+     */
+    public McApplicationException() {
+	super();
     }
 
-    @Override
-    public boolean equals(Object o) {
-	return compare(this, o) == 0;
+    /**
+     * Constructor for customized error message
+     *
+     * @param message
+     */
+    public McApplicationException(String message) {
+	super(message);
     }
+
+    /**
+     * Constructor for wrapping the throwable object
+     *
+     * @param cause
+     */
+    public McApplicationException(Throwable cause) {
+	super(cause);
+    }
+
+    /**
+     * Constructor for wrapping both the customized error message and throwable exception object.
+     *
+     * @param message
+     * @param cause
+     */
+    public McApplicationException(String message, Throwable cause) {
+	super(message, cause);
+    }
+
 }

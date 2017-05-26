@@ -46,15 +46,16 @@ import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.mc.AnswerDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.mc.dto.AnswerDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
+import org.lamsfoundation.lams.tool.mc.service.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
+import org.lamsfoundation.lams.tool.mc.web.form.McLearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -68,7 +69,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  *
  * @author Ozgur Demirtas
  */
-public class McLearningStarterAction extends Action implements McAppConstants {
+public class McLearningStarterAction extends Action {
 
     private static Logger logger = Logger.getLogger(McLearningStarterAction.class.getName());
 
@@ -161,7 +162,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
 	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.MY_SIGNATURE, userID.intValue());
+		McAppConstants.TOOL_SIGNATURE, userID.intValue());
 
 	if (notebookEntry != null) {
 	    // String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
@@ -191,11 +192,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 
 		Set<McQueUsr> groupUsers = mcSession.getMcQueUsers();// mcService.getUsersBySession(new
 								     // Long(toolSessionID).longValue());
-		request.setAttribute(ATTR_GROUP_USERS, groupUsers);
-		request.setAttribute(TOOL_SESSION_ID, toolSessionID);
-		request.setAttribute(ATTR_CONTENT, mcContent);
+		request.setAttribute(McAppConstants.ATTR_GROUP_USERS, groupUsers);
+		request.setAttribute(McAppConstants.TOOL_SESSION_ID, toolSessionID);
+		request.setAttribute(McAppConstants.ATTR_CONTENT, mcContent);
 
-		return mapping.findForward(WAIT_FOR_LEADER);
+		return mapping.findForward(McAppConstants.WAIT_FOR_LEADER);
 	    }
 
 	    // check if leader has submitted all answers
@@ -210,11 +211,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    }
 	}
 
-	sessionMap.put(ATTR_GROUP_LEADER, groupLeader);
+	sessionMap.put(McAppConstants.ATTR_GROUP_LEADER, groupLeader);
 	boolean isUserLeader = mcSession.isUserGroupLeader(user);
-	sessionMap.put(ATTR_IS_USER_LEADER, isUserLeader);
+	sessionMap.put(McAppConstants.ATTR_IS_USER_LEADER, isUserLeader);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
-	sessionMap.put(ATTR_CONTENT, mcContent);
+	sessionMap.put(McAppConstants.ATTR_CONTENT, mcContent);
 	request.setAttribute("sessionMapID", sessionMap.getSessionID());
 
 	/* user has already submitted response once OR it's a monitor - go to viewAnswers page. */
@@ -223,7 +224,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("viewAnswersRedirect"));
 	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 	    redirect.addParameter("userID", userID);
-	    redirect.addParameter(MODE, mode);
+	    redirect.addParameter(McAppConstants.MODE, mode);
 	    redirect.addParameter("httpSessionID", sessionMap.getSessionID());
 	    return redirect;
 	}

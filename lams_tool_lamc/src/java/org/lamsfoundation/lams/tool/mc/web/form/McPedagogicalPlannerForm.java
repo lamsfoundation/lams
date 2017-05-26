@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.mc.web;
+package org.lamsfoundation.lams.tool.mc.web.form;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -36,10 +36,11 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McOptionDTO;
-import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
+import org.lamsfoundation.lams.tool.mc.web.AuthoringUtil;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
@@ -121,10 +122,10 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	    setCandidateAnswerCount(new ArrayList<Integer>(questionDtos.size()));
 	    for (int questionIndex = 1; questionIndex <= questionDtos.size(); questionIndex++) {
 		McQuestionDTO item = questionDtos.get(questionIndex - 1);
-		int questionDisplayOrder = Integer.parseInt(item.getDisplayOrder());
+		int questionDisplayOrder = item.getDisplayOrder();
 		String questionText = item.getQuestion();
 		setQuestion(questionDisplayOrder - 1, questionText);
-		List<McOptionDTO> candidateAnswers = item.getListCandidateAnswersDTO();
+		List<McOptionDTO> candidateAnswers = item.getOptionDtos();
 
 		for (int candidateAnswerIndex = 1; candidateAnswerIndex <= candidateAnswers
 			.size(); candidateAnswerIndex++) {

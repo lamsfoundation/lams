@@ -20,31 +20,31 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc;
+package org.lamsfoundation.lams.tool.mc.util;
 
 import java.io.Serializable;
 import java.util.Comparator;
 
+import org.apache.log4j.Logger;
+
 /**
- * @author Ozgur Demirtas A comparator implementation that can be used as a constructor to collections. The TreeMap in
+ * @author Ozgur Demirtas * A comparator implementation that can be used as a constructor to collections. The TreeMap in
  *         the web layer makes use of it.
  *
  */
-public class McComparator implements Comparator, Serializable {
+public class McStringComparator implements Comparator, Serializable {
+    static Logger logger = Logger.getLogger(McStringComparator.class.getName());
 
     @Override
     public int compare(Object o1, Object o2) {
 	String s1 = (String) o1;
 	String s2 = (String) o2;
 
-	int key1 = new Long(s1).intValue();
-	int key2 = new Long(s2).intValue();
-	return key1 - key2;
+	return s1.compareTo(s2);
     }
 
     @Override
     public boolean equals(Object o) {
-	String s = (String) o;
 	return compare(this, o) == 0;
     }
 }

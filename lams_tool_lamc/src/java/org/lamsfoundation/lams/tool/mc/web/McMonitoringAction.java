@@ -48,8 +48,8 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -68,7 +68,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * * @author Ozgur Demirtas
  */
-public class McMonitoringAction extends LamsDispatchAction implements McAppConstants {
+public class McMonitoringAction extends LamsDispatchAction {
     private static Logger logger = Logger.getLogger(McMonitoringAction.class.getName());
 
     /**
@@ -101,7 +101,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	String userName = request.getParameter("userName");
 	String sessionId = request.getParameter("sessionId");
 	NotebookEntry notebookEntry = mcService.getEntry(new Long(sessionId), CoreNotebookConstants.NOTEBOOK_TOOL,
-		MY_SIGNATURE, new Integer(userId));
+		McAppConstants.TOOL_SIGNATURE, new Integer(userId));
 
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = new McGeneralLearnerFlowDTO();
 	if (notebookEntry != null) {
@@ -110,9 +110,9 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    mcGeneralLearnerFlowDTO.setUserName(userName);
 	}
 
-	request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 
-	return mapping.findForward(LEARNER_NOTEBOOK);
+	return mapping.findForward(McAppConstants.LEARNER_NOTEBOOK);
     }
 
     /**

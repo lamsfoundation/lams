@@ -4,9 +4,9 @@
 <struts-config>
 	  <!-- ========== Form Bean Definitions =================================== -->
 	<form-beans>
-		<form-bean name="McAuthoringForm" type="org.lamsfoundation.lams.tool.mc.web.McAuthoringForm"/>
-		<form-bean name="McLearningForm" type="org.lamsfoundation.lams.tool.mc.web.McLearningForm"/>
-		<form-bean name="McPedagogicalPlannerForm" type="org.lamsfoundation.lams.tool.mc.web.McPedagogicalPlannerForm"/>
+		<form-bean name="McAuthoringForm" type="org.lamsfoundation.lams.tool.mc.web.form.McAuthoringForm"/>
+		<form-bean name="McLearningForm" type="org.lamsfoundation.lams.tool.mc.web.form.McLearningForm"/>
+		<form-bean name="McPedagogicalPlannerForm" type="org.lamsfoundation.lams.tool.mc.web.form.McPedagogicalPlannerForm"/>
 	</form-beans>
 	
   	<!-- ========== Global Exception Definitions =================================== -->
@@ -58,12 +58,6 @@
 	        path="/authoring/AuthoringTabsHolder.jsp"
 	        redirect="false"
 		/>
-	    
-	    <forward
-			name="newQuestionBox"
-			path="/authoring/newQuestionBox.jsp"
-			redirect="false"
-	    />
 
 	    <forward
 			name="editQuestionBox"
@@ -80,12 +74,6 @@
 	    <forward
 			name="candidateAnswersList"
 			path="/authoring/candidateAnswersList.jsp"
-			redirect="false"
-	    />
-	    
-	    <forward
-			name="candidateAnswersAddList"
-			path="/authoring/candidateAnswersAddList.jsp"
 			redirect="false"
 	    />
   </action>

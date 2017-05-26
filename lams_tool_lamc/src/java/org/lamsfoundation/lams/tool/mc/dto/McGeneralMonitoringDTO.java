@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc;
+package org.lamsfoundation.lams.tool.mc.dto;
 
 /**
  * <p>
@@ -31,7 +31,6 @@ package org.lamsfoundation.lams.tool.mc;
  */
 public class McGeneralMonitoringDTO {
 
-    protected String currentTab;
     protected String activityTitle;
     protected String activityInstructions;
     protected Integer countAllUsers;
@@ -40,21 +39,6 @@ public class McGeneralMonitoringDTO {
     protected String toolContentID;
 
     protected String contentFolderID;
-
-    /**
-     * @return Returns the currentTab.
-     */
-    public String getCurrentTab() {
-	return currentTab;
-    }
-
-    /**
-     * @param currentTab
-     *            The currentTab to set.
-     */
-    public void setCurrentTab(String currentTab) {
-	this.currentTab = currentTab;
-    }
 
     /**
      * @return Returns the activityInstructions.

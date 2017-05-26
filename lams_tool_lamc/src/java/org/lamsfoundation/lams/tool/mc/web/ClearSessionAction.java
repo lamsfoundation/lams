@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.mc.web;
 
 import javax.servlet.http.HttpSession;
 
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 
@@ -37,7 +36,9 @@ public class ClearSessionAction extends LamsAuthoringFinishAction {
 
     @Override
     public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {
-	session.removeAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG);
+	if (mode.isAuthor()) {
+	    session.removeAttribute(customiseSessionID);
+	}
     }
 
 }

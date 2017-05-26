@@ -28,10 +28,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.mc.AnswerDTO;
-import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.mc.dto.AnswerDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.web.form.McLearningForm;
 
 /**
  *
@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McContent;
  *
  * @author Ozgur Demirtas
  */
-public class LearningUtil implements McAppConstants {
+public class LearningUtil {
     static Logger logger = Logger.getLogger(LearningUtil.class.getName());
 
     public static void saveFormRequestData(HttpServletRequest request, McLearningForm mcLearningForm) {

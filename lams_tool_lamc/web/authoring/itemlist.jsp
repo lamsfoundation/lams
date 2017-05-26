@@ -1,7 +1,8 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapId]}" />
+<c:set var="questionDtos" value="${sessionMap.questionDtos}" />
 
 <div id="itemList">
-
 	<div class="panel panel-default add-file">
 	
 	<div class="panel-heading panel-title">
@@ -21,7 +22,7 @@
 		<c:set var="queIndex" scope="request" value="0" />
 
 		<tr>
-			<c:if test="${totalQuestionCount > 0}">
+			<c:if test="${fn:length(questionDtos) > 0}">
 			<th>
 				<fmt:message key="label.questions" />
 			</th>
@@ -36,7 +37,7 @@
 			</c:if>
 		</tr>
 
-		<c:forEach items="${listQuestionContentDTO}" var="currentDTO" varStatus="status">
+		<c:forEach items="${questionDtos}" var="currentDTO" varStatus="status">
 			<c:set var="queIndex" scope="request" value="${queIndex +1}" />
 			<c:set var="question" scope="request" value="${currentDTO.question}" />
 			<c:set var="feedback" scope="request" value="${currentDTO.feedback}" />
@@ -47,7 +48,7 @@
 				<td>
 					<div style="overflow: auto;">
 						<c:out value="${question}" escapeXml="false" />
-					</div>					
+					</div>
 				</td>
 
 				<td width="70px" class="text-center question-max-mark">
@@ -56,7 +57,7 @@
 
 				<td class="arrows" style="width:5%">
 					<!-- Don't display up icon if first line -->
-					<c:if test="${totalQuestionCount != 1}">
+					<c:if test="${fn:length(questionDtos) != 1}">
 						<!-- Don't display up icon if first line -->
 						<c:if test="${queIndex != 1}">
 							<c:set var="tip"><fmt:message key='label.tip.moveQuestionUp'/></c:set>
@@ -64,7 +65,7 @@
 		 						onclick="javascript:submitModifyAuthoringQuestion(${queIndex},'moveQuestionUp');"/>
  		 				</c:if>
 						<!-- Don't display down icon if last line -->
-						<c:if test="${queIndex != totalQuestionCount}">
+						<c:if test="${queIndex != fn:length(questionDtos)}">
 							<c:set var="tip"><fmt:message key='label.tip.moveQuestionDown'/></c:set>
 	 						<lams:Arrow state="down" title="${tip} ${queIndex}"  
 								onclick="javascript:submitModifyAuthoringQuestion(${queIndex},'moveQuestionDown');"/>
@@ -74,7 +75,7 @@
 
 				<td align="center" style="width:5%">
 					<c:set var="editItemUrl" >
-						<html:rewrite page="/authoring.do"/>?dispatch=newEditableQuestionBox&questionIndex=${queIndex}&sessionMapId=${sessionMapId}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&reflect=${mcGeneralAuthoringDTO.reflect}&KeepThis=true&TB_iframe=true&modal=true
+						<html:rewrite page="/authoring.do"/>?dispatch=editQuestionBox&questionIndex=${queIndex}&sessionMapId=${sessionMapId}&KeepThis=true&TB_iframe=true&modal=true
 					</c:set>
 					<a href="${editItemUrl}" class="thickbox"> 
 						<i class="fa fa-pencil" title="<fmt:message key='label.tip.editQuestion'/>"></i>
@@ -82,7 +83,7 @@
 				</td>
 
 				<td  align="center" style="width:5%">
-					<i class="fa fa-times"	title="<fmt:message key="label.tip.deleteQuestion" />" 	onclick="removeQuestion(${queIndex});"></i>
+					<i class="fa fa-times" title="<fmt:message key="label.tip.deleteQuestion" />" 	onclick="removeQuestion(${queIndex});"></i>
 				</td>
 
 			</tr>

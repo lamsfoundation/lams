@@ -27,8 +27,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
+import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.springframework.stereotype.Repository;
 

@@ -30,10 +30,17 @@
     }
 	
     function saveQTI(formHTML, formName) {
-    	document.body.innerHTML += formHTML;
-    	var form = document.getElementById(formName);
-    	form.action = '<html:rewrite page="/authoring.do?dispatch=saveQTI&sessionMapId=${sessionMapId}"/>';
-    	form.submit();
+    	var form = $(formHTML);
+    	form.prop("action", '<html:rewrite page="/authoring.do?dispatch=saveQTI&sessionMapId=${sessionMapId}"/>').appendTo(document.body);
+    	form.ajaxSubmit({ 
+    		target:  $('#resourceListArea'),
+    		iframe: true,
+    		success:    function() { 
+    			document.McAuthoringForm.dispatch.value="submitAllContent";
+    			refreshThickbox();
+    	    	form.remove();
+    	    }
+	    });
     }
     
     function exportQTI() {
@@ -61,7 +68,7 @@
 </div>
   
 <p>
-	<a href="<html:rewrite page="/authoring.do"/>?dispatch=newQuestionBox&sessionMapId=${sessionMapId}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&KeepThis=true&TB_iframe=true&modal=true"
+	<a href="<html:rewrite page="/authoring.do"/>?dispatch=editQuestionBox&sessionMapId=${sessionMapId}&KeepThis=true&TB_iframe=true&modal=true"
 		class="btn btn-default btn-sm thickbox"> 
 		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.save.question" /> 
 	</a>

@@ -11,11 +11,7 @@
 	<script type="text/javascript">
 	
         function init(){
-            var tag = "${mcGeneralMonitoringDTO.currentTab}";
-	    	if(tag != "")
-	    		selectTab(tag);
-            else
-                selectTab(1); //select the default tab;
+			selectTab(1); //select the default tab;
         }     
         
         function doSelectTab(tabId) {
@@ -44,7 +40,7 @@
 <c:set var="title"><fmt:message key="activity.title" /></c:set>
 <lams:Page title="${title}" type="navbar">
 
-	<lams:Tabs title="${title}" control="true" helpToolSignature="<%= McAppConstants.MY_SIGNATURE %>" helpModule="monitoring">
+	<lams:Tabs title="${title}" control="true" helpToolSignature="<%= McAppConstants.TOOL_SIGNATURE %>" helpModule="monitoring">
 		<lams:Tab id="1" key="label.summary" />
 		<lams:Tab id="2" key="label.editActivity" />
 		<lams:Tab id="3" key="label.stats" />
