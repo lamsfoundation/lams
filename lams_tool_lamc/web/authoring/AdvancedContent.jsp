@@ -4,8 +4,8 @@
 <lams:SimplePanel titleKey="label.select.leader">
 	<div class="checkbox">
 		<label for="useSelectLeaderToolOuput">
-		<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput" onclick="clickSelectLeaderToolOuputHandler();"/>
-		<fmt:message key="label.use.select.leader.tool.output" />
+			<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput" onclick="clickSelectLeaderToolOuputHandler();"/>
+			<fmt:message key="label.use.select.leader.tool.output" />
 		</label>
 	</div>
 </lams:SimplePanel>
@@ -13,29 +13,29 @@
 <lams:SimplePanel titleKey="label.question.options">
 	<div class="checkbox">
 		<label for="prefixAnswersWithLetters">
-		<html:checkbox property="prefixAnswersWithLetters" value="1" styleId="prefixAnswersWithLetters"/>
-		<fmt:message key="label.prefix.sequential.letters.for.each.answer" />
+			<html:checkbox property="prefixAnswersWithLetters" value="1" styleId="prefixAnswersWithLetters"/>
+			<fmt:message key="label.prefix.sequential.letters.for.each.answer" />
 		</label>
 	</div>
 	
 	<div class="checkbox">
 		<label for="questionsSequenced">
-		<html:checkbox property="questionsSequenced" value="1" styleId="questionsSequenced"/>
-		<fmt:message key="radiobox.onepq" />
+			<html:checkbox property="questionsSequenced" value="1" styleId="questionsSequenced"/>
+			<fmt:message key="radiobox.onepq" />
 		</label>
 	</div>
 	
 	<div class="checkbox">
 		<label for="showMarks">
-		<html:checkbox property="showMarks" value="1" styleId="showMarks"/>
-		<fmt:message key="label.showMarks" />
+			<html:checkbox property="showMarks" value="1" styleId="showMarks"/>
+			<fmt:message key="label.showMarks" />
 		</label>
 	</div>
 	
 	<div class="checkbox">
 		<label for="randomize">
-		<html:checkbox property="randomize" value="1" styleId="randomize"/>
-		<fmt:message key="label.randomize" />
+			<html:checkbox property="randomize" value="1" styleId="randomize"/>
+			<fmt:message key="label.randomize" />
 		</label>
 	</div>
 	
@@ -81,7 +81,7 @@
 </lams:SimplePanel>
 
 <script type="text/javascript">
-//automatically turn on refect option if there are text input in refect instruction area
+	//automatically turn on refect option if there are text input in refect instruction area
 	var ra = document.getElementById("reflectInstructions");
 	var rao = document.getElementById("reflect");
 	function turnOnRefect(){

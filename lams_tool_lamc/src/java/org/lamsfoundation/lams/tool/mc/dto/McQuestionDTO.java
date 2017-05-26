@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.mc;
+package org.lamsfoundation.lams.tool.mc.dto;
 
 import java.util.List;
 
@@ -30,19 +30,17 @@ import java.util.List;
  *
  * @author Ozgur Demirtas
  */
-public class McQuestionDTO implements Comparable {
+public class McQuestionDTO implements Comparable<McQuestionDTO> {
     private Long uid;
     private String question;
-    private String displayOrder;
+    private Integer displayOrder;
     private String feedback;
-    private String weight;
     private String mark;
 
-    private List<McOptionDTO> listCandidateAnswersDTO;
+    private List<McOptionDTO> optionDtos;
 
     @Override
-    public int compareTo(Object o) {
-	McQuestionDTO mcQuestionDTO = (McQuestionDTO) o;
+    public int compareTo(McQuestionDTO mcQuestionDTO) {
 
 	if (mcQuestionDTO == null) {
 	    return 1;
@@ -69,7 +67,7 @@ public class McQuestionDTO implements Comparable {
     /**
      * @return Returns the displayOrder.
      */
-    public String getDisplayOrder() {
+    public Integer getDisplayOrder() {
 	return displayOrder;
     }
 
@@ -77,7 +75,7 @@ public class McQuestionDTO implements Comparable {
      * @param displayOrder
      *            The displayOrder to set.
      */
-    public void setDisplayOrder(String displayOrder) {
+    public void setDisplayOrder(Integer displayOrder) {
 	this.displayOrder = displayOrder;
     }
 
@@ -112,21 +110,6 @@ public class McQuestionDTO implements Comparable {
     }
 
     /**
-     * @return Returns the weight.
-     */
-    public String getWeight() {
-	return weight;
-    }
-
-    /**
-     * @param weight
-     *            The weight to set.
-     */
-    public void setWeight(String weight) {
-	this.weight = weight;
-    }
-
-    /**
      * @return Returns the mark.
      */
     public String getMark() {
@@ -142,17 +125,17 @@ public class McQuestionDTO implements Comparable {
     }
 
     /**
-     * @return Returns the listCandidateAnswersDTO.
+     * @return Returns the optionDtos.
      */
-    public List<McOptionDTO> getListCandidateAnswersDTO() {
-	return listCandidateAnswersDTO;
+    public List<McOptionDTO> getOptionDtos() {
+	return optionDtos;
     }
 
     /**
-     * @param listCandidateAnswersDTO
-     *            The listCandidateAnswersDTO to set.
+     * @param optionDtos
+     *            The optionDtos to set.
      */
-    public void setListCandidateAnswersDTO(List<McOptionDTO> listCandidateAnswersDTO) {
-	this.listCandidateAnswersDTO = listCandidateAnswersDTO;
+    public void setOptionDtos(List<McOptionDTO> optionDtos) {
+	this.optionDtos = optionDtos;
     }
 }

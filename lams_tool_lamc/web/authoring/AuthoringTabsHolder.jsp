@@ -42,32 +42,22 @@
 		    });
 		}
 
-        function init() {				
-	        var tag = document.getElementById("currentTab");
-		    if(tag.value != "")
-		    	selectTab(tag.value);
-	        else
-	        	selectTab(1); //select the default tab;
+        function init() {
+	        selectTab(1); //select the default tab;
         }
         
         function doSelectTab(tabId) {
-        	// start optional tab controller stuff
-        	var tag = document.getElementById("currentTab");
-	    	tag.value = tabId;
-	    	// end optional tab controller stuff
 	    	selectTab(tabId);
 	    	
 	    	//advanced tab is selected
 	    	if (tabId == 2) {
 	    		var oldValue = $("#passmark").val();
-	    		alert(oldValue);
 	    		$('#passmark').empty();
 	    		
 	    		var totalMark = 0;
 	    		$("td.question-max-mark").each(function() {
 	    			totalMark += eval($(this).text());
 	    		});
-	    		alert(totalMark);
 	    		
 	    		for (var i = 1; i<=totalMark; i++) {
 	    			var isSelected = (oldValue == i);
@@ -86,16 +76,15 @@
 
 	<html:form  action="/authoring?validate=false" styleId="authoringForm" enctype="multipart/form-data" method="POST" target="_self">
 		<html:hidden property="dispatch" value="submitAllContent"/>
-		<html:hidden property="currentTab" styleId="currentTab" />
 		<html:hidden property="httpSessionID" value="${sessionMapId}"/>
 			
-	<c:set var="title"><fmt:message key="activity.title" /></c:set>
-	<lams:Page title="${title}" type="navbar">
+		<c:set var="title"><fmt:message key="activity.title" /></c:set>
+		<lams:Page title="${title}" type="navbar">
 
-		 <lams:Tabs control="true" title="${title}" helpToolSignature="<%= McAppConstants.MY_SIGNATURE %>" helpModule="authoring">
-                    <lams:Tab id="1" key="label.basic" />
-                    <lams:Tab id="2" key="label.advanced" />
-            </lams:Tabs>   
+			<lams:Tabs control="true" title="${title}" helpToolSignature="<%= McAppConstants.TOOL_SIGNATURE %>" helpModule="authoring">
+				<lams:Tab id="1" key="label.basic" />
+				<lams:Tab id="2" key="label.advanced" />
+			</lams:Tabs>   
 			
 			<lams:TabBodyArea>
 				<%@ include file="/common/messages.jsp"%>
@@ -111,10 +100,8 @@
 					contentFolderID="${sessionMap.contentFolderID}" accessMode="${sessionMap.mode}" defineLater="${sessionMap.mode=='teacher'}"/>
 			</lams:TabBodyArea>
 					
-		<div id="footer"></div>
-
-	</lams:Page>
-	
+			<div id="footer"></div>
+		</lams:Page>
 	</html:form>
 	
 </body>

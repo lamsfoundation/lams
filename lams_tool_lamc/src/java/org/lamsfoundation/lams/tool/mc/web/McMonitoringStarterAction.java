@@ -43,13 +43,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McGeneralMonitoringDTO;
-import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
+import org.lamsfoundation.lams.tool.mc.dto.McGeneralMonitoringDTO;
+import org.lamsfoundation.lams.tool.mc.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
+import org.lamsfoundation.lams.tool.mc.service.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.tool.mc.util.McSessionComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -63,7 +63,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  * @author Ozgur Demirtas
  */
-public class McMonitoringStarterAction extends Action implements McAppConstants {
+public class McMonitoringStarterAction extends Action {
     private static Logger logger = Logger.getLogger(McMonitoringStarterAction.class.getName());
     private static IMcService service;
 
@@ -100,11 +100,11 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 
 	    sessionDtos.add(sessionDto);
 	}
-	request.setAttribute(SESSION_DTOS, sessionDtos);
+	request.setAttribute(McAppConstants.SESSION_DTOS, sessionDtos);
 
 	// setting up the advanced summary
 
-	request.setAttribute(ATTR_CONTENT, mcContent);
+	request.setAttribute(McAppConstants.ATTR_CONTENT, mcContent);
 	request.setAttribute("questionsSequenced", mcContent.isQuestionsSequenced());
 	request.setAttribute("showMarks", mcContent.isShowMarks());
 	request.setAttribute("useSelectLeaderToolOuput", mcContent.isUseSelectLeaderToolOuput());
@@ -143,16 +143,14 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	boolean isGroupedActivity = service.isGroupedActivity(new Long(mcContent.getMcContentId()));
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
 
-	mcGeneralMonitoringDTO.setCurrentTab("1");
-
 	/* this section is needed for Edit Activity screen, from here... */
 
 	mcGeneralMonitoringDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
 
 	List<ReflectionDTO> reflectionsContainerDTO = service.getReflectionList(mcContent, null);
-	request.setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+	request.setAttribute(McAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
 
-	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
+	request.setAttribute(McAppConstants.MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
 	
 	//count users
 	int countSessionComplete = 0;
@@ -163,7 +161,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 
 	    if (mcSession != null) {
 
-		if (mcSession.getSessionStatus().equals(COMPLETED)) {
+		if (mcSession.getSessionStatus().equals(McAppConstants.COMPLETED)) {
 		    countSessionComplete++;
 		}
 		countAllUsers += mcSession.getMcQueUsers().size();
@@ -172,7 +170,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	mcGeneralMonitoringDTO.setCountAllUsers(new Integer(countAllUsers));
 	mcGeneralMonitoringDTO.setCountSessionComplete(new Integer(countSessionComplete));
 
-	return (mapping.findForward(LOAD_MONITORING_CONTENT));
+	return (mapping.findForward(McAppConstants.LOAD_MONITORING_CONTENT));
     }
 
     // *************************************************************************************
