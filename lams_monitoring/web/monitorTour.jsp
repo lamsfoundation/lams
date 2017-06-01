@@ -66,6 +66,16 @@
 			        onShow: revealIM,
 			        onHide: hideIM
 			      },{
+			        element: "#sendProgressEmail", 
+			        title: "<fmt:message key="tour.progress.email.send.title"/>",
+			        content: "<fmt:message key="tour.progress.email.send.content"/>",
+			        placement: "bottom"
+			      },{
+			        element: "#configureProgressEmail", 
+			        title: "<fmt:message key="tour.progress.email.configure.title"/>",
+			        content: "<fmt:message key="tour.progress.email.confure.content"/>",
+			        placement: "bottom"
+			      },{
 			        element: "#chartDiv",
 			        title: "<fmt:message key="lesson.chart.title"/>",
 			        content: "<fmt:message key="tour.completion.chart.content"/>",

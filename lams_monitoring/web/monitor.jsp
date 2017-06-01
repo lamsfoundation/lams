@@ -178,8 +178,26 @@
 				<fmt:message key="label.email" var="EMAIL_TITLE_VAR"/>
 				EMAIL_TITLE : '<c:out value="${EMAIL_TITLE_VAR}" />',
 				<fmt:message key="tour.this.is.disabled" var="TOUR_DISABLED_ELEMENT_VAR"/>
-				TOUR_DISABLED_ELEMENT : '<c:out value="${TOUR_DISABLED_ELEMENT_VAR}" />'
-			}
+				TOUR_DISABLED_ELEMENT : '<c:out value="${TOUR_DISABLED_ELEMENT_VAR}" />',
+				<fmt:message key="progress.email.sent.success" var="PROGRESS_EMAIL_SUCCESS_VAR"/>
+				PROGRESS_EMAIL_SUCCESS : '<c:out value="${PROGRESS_EMAIL_SUCCESS_VAR}" />',
+				<fmt:message key="progress.email.send.now.question" var="PROGRESS_EMAIL_SEND_NOW_QUESTION_VAR"/>
+				PROGRESS_EMAIL_SEND_NOW_QUESTION : '<c:out value="${PROGRESS_EMAIL_SEND_NOW_QUESTION_VAR}" />',
+				<fmt:message key="progress.email.send.failed" var="PROGRESS_EMAIL_SEND_FAILED_VAR"/>
+				PROGRESS_EMAIL_SEND_FAILED : '<c:out value="${PROGRESS_EMAIL_SEND_FAILED_VAR}" />',
+				<fmt:message key="progress.email.select.date.first" var="PROGRESS_EMAIL_SELECT_DATE_FIRST_VAR"/>
+				PROGRESS_SELECT_DATE_FIRST : '<c:out value="${PROGRESS_EMAIL_SELECT_DATE_FIRST_VAR}" />',
+				<fmt:message key="progress.email.enter.two.dates.first" var="PROGRESS_EMAIL_ENTER_TWO_DATES_FIRST_VAR"/>
+				PROGRESS_ENTER_TWO_DATES_FIRST : '<c:out value="${PROGRESS_EMAIL_ENTER_TWO_DATES_FIRST_VAR}" />',
+				<fmt:message key="progress.email.would.you.like.to.generate" var="PROGRESS_EMAIL_GENERATE_ONE_VAR"/>
+				PROGRESS_EMAIL_GENERATE_ONE : '<c:out value="${PROGRESS_EMAIL_GENERATE_ONE_VAR}" />',
+				<fmt:message key="progress.email.how.many.dates.to.generate" var="PROGRESS_EMAIL_GENERATE_TWO_VAR"/>
+				PROGRESS_EMAIL_GENERATE_TWO : '<c:out value="${PROGRESS_EMAIL_GENERATE_TWO_VAR}" />',
+				<fmt:message key="progress.email.title" var="PROGRESS_EMAIL_TITLE_VAR"/>
+				PROGRESS_EMAIL_TITLE : '<c:out value="${PROGRESS_EMAIL_TITLE_VAR}" />',
+				<fmt:message key="error.date.in.past" var="ERROR_DATE_IN_PAST_VAR"/>
+				ERROR_DATE_IN_PAST : '<c:out value="${ERROR_DATE_IN_PAST_VAR}" />'
+		}
 	    
 		$(document).ready(function(){
 			initLessonTab();
@@ -409,6 +427,24 @@
 										</button>
 									</div>
 								</dd>
+								
+								<!-- Progress Emails -->
+								<dt><fmt:message key="lesson.progress.email"/>:</dt>
+								<dd>
+									<div class="btn-group btn-group-xs" role="group">
+										<button id="sendProgressEmail" class="btn btn-default roffset10"
+											onClick="javascript:sendProgressEmail()"/>
+											<i class="fa fa-sm fa-envelope"></i>
+											<span class="hidden-xs"><fmt:message key="progress.email.send"/></span> 
+										</button>
+										<button id="configureProgressEmail" class="btn btn-default roffset10"
+											onClick="javascript:configureProgressEmail()"/>
+											<i class="fa fa-sm fa-cog"></i>
+											<span class="hidden-xs"><fmt:message key="progress.email.configure"/></span> 
+										</button>
+									</div>
+								</dd>
+								
 							</dl>	
 						</div>
 						<div class="panel panel-default pull-right">
@@ -770,6 +806,46 @@
                        <span><fmt:message key="button.close" /></span>
                </button>
        </div>
+	</div>
+	
+	<div id="emailProgressDialogContents" class="dialogContainer">
+		<div id="emailProgressDialogTable">
+			<div class="row">
+				<div class="col-xs-12">
+					<table id="emailProgressTable" class="table table-condensed">
+						<tr class="active">
+							<td class="dialogTitle" colspan="6"><fmt:message key="progress.email.will.be.sent.on"/></td>
+						</tr>
+						<tr>
+							<td class="dialogList" colspan="6"></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-6">
+					<div class="form-group">
+						<label for="emaildatePicker"><fmt:message key="progress.email.select.date"/></label><input type="text" class="form-control" name="emaildatePicker" id="emaildatePicker" value=""/>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-6">
+					<button id="addEmailProgressDateButton"
+						class="btn btn-sm btn-default pull-left"
+						onClick="javascript:addEmailProgressDate()">
+						<fmt:message key="progress.email.add.date"/>
+					</button>
+				</div>
+				<div class="col-xs-6">
+					<button id="addEmailProgressSeriesButton"
+						class="btn btn-sm btn-default pull-right"
+						onClick="javascript:addEmailProgressSeries(true)">
+						<fmt:message key="progress.email.generate.date.list"/>
+					</button>
+				</div>
+			</div>
+		</div>
 	</div>
 	
 	<div id="tooltip"></div>

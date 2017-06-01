@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -84,6 +85,7 @@ import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
+import org.lamsfoundation.lams.monitoring.dto.EmailProgressActivityDTO;
 import org.lamsfoundation.lams.monitoring.quartz.job.CloseScheduleGateJob;
 import org.lamsfoundation.lams.monitoring.quartz.job.FinishScheduleLessonJob;
 import org.lamsfoundation.lams.monitoring.quartz.job.OpenScheduleGateJob;
@@ -106,6 +108,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.audit.AuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -2255,6 +2258,120 @@ public class MonitoringService implements IMonitoringService {
 	}
     }
 
+    @SuppressWarnings("unchecked")
+    private EmailProgressActivitiesProcessor getEmailProgressActivitiesProcessor(Long lessonId) {
+	
+	// TODO custom SQL to get the ids, number of users & marks in one go 
+	Lesson lesson = lessonService.getLesson(lessonId);
+	LearningDesign ld = lesson.getLearningDesign();
+	Long[] activityIds = new Long[ld.getActivities().size()];
+	int i=0;
+	Iterator<Activity> activityIterator = (Iterator<Activity>) ld.getActivities().iterator();
+	while ( activityIterator.hasNext() ) {
+	    Activity activity = activityIterator.next();
+	    activityIds[i] = activity.getActivityId();
+	    i++;
+	}
+	Map<Long, Integer> numberOfUsersInActivity = getCountLearnersCurrentActivities(activityIds);
+
+	EmailProgressActivitiesProcessor processor = new EmailProgressActivitiesProcessor(ld, activityDAO, numberOfUsersInActivity);
+	processor.parseLearningDesign();
+	return processor;
+    }
+
+    @Override
+    public String[] generateLessonProgressEmail(Long lessonId, Integer userId) {
+
+	Lesson lesson = lessonService.getLesson(lessonId);
+	EmailProgressActivitiesProcessor activityProcessor = getEmailProgressActivitiesProcessor(lessonId);
+	Integer completedLearnersCount = getCountLearnersCompletedLesson(lessonId);
+	Integer startedLearnersCount = lessonService.getCountActiveLessonLearners(lessonId) - completedLearnersCount;
+	Integer possibleLearnersCount = lessonService.getCountLessonLearners(lessonId, null);
+	Integer notStarted = possibleLearnersCount - completedLearnersCount - startedLearnersCount;
+
+	StringBuilder progress = new StringBuilder();
+	progress.append("<H3>Lesson ").append(lesson.getLessonName()).append("</H3><p>")
+		.append(getMessageService().getMessage("label.started")).append(" ")
+		.append(lesson.getStartDateTime()).append("</p><H3>")
+		.append(getMessageService().getMessage("label.grouping.learners")).append("</H3>")
+		.append("<table><tr><th width=\"50%\" align=\"left\">").append(getMessageService().getMessage("label.status")).append("</th><th>")
+		.append(getMessageService().getMessage("progress.email.heading.number.learners"))
+		.append("</th><th>%</th></tr>")
+		.append("<tr><td width=\"50%\">").append(getMessageService().getMessage("label.not.started")).append("</td><td>")
+		.append(notStarted).append("</td><td>")
+		.append(asPercentage(notStarted, possibleLearnersCount)).append("%</td></tr>")
+		.append("<tr><td width=\"50%\">").append(getMessageService().getMessage("lesson.chart.started")).append("</td><td>")
+		.append(startedLearnersCount).append("</td><td>")
+		.append(asPercentage(startedLearnersCount, possibleLearnersCount)).append("%</td></tr>")
+		.append("<tr><td width=\"50%\">").append(getMessageService().getMessage("lesson.chart.completed")).append("</td><td>")
+		.append(completedLearnersCount).append("</td><td>")
+		.append(asPercentage(completedLearnersCount, possibleLearnersCount)).append("%</td></tr>")
+		.append("<td width=\"50%\"></td><td><strong>").append(possibleLearnersCount).append("</strong></td><td><strong>")
+		.append("100%</strong></td></tr></table>")
+		.append("<H3>").append(getMessageService().getMessage("progress.email.heading.overall.progress")).append("</H3>")
+		.append("<table><tr><th width=\"50%\" align=\"left\">").append(getMessageService().getMessage("label.activity")).append("</th><th>")
+		.append(getMessageService().getMessage("progress.email.heading.number.learners"))
+		.append("</th><th>%</th></tr>")
+		.append("<tr><td width=\"50%\"><i>")
+		.append(getMessageService().getMessage("label.not.started")).append("</i></td><td>").append(notStarted)
+		.append("</td>").append("<td>").append(asPercentage(notStarted, possibleLearnersCount))
+		.append("%</td></tr>");
+
+	int numLearnersProcessed = notStarted;
+
+	Vector<EmailProgressActivityDTO> activities = activityProcessor.getActivityList();
+	for (EmailProgressActivityDTO dto : activities) {
+	    Activity activity = dto.getActivity();
+	    if (!activity.isFloatingActivity()) {
+		progress.append("<tr><td width=\"50%\">");
+		for (int i = 0; i < dto.getDepth(); i++) {
+		    progress.append("&bull;&nbsp;");
+		}
+		String title = activity.getTitle(); // null for gates
+		if (title == null) {
+		    title = activity.isGateActivity() ? getMessageService().getMessage("label.gate.title") : 
+			getMessageService().getMessage("label.unknown");
+		}
+
+		if (activity.isBranchingActivity() || activity.isOptionsActivity()) {
+		    progress.append("<u><strong>").append(title).append("</strong></u></td><td>");
+		} else {
+		    progress.append("<strong>").append(title).append("</strong></td><td>");
+		}
+		// output the headings for branching/options but only output numbers if there are learners stuck in the complex activity.
+		if ((activity.isBranchingActivity() || activity.isOptionsActivity() || activity.isSequenceActivity())
+			&& (dto.getNumberOfLearners() == null || dto.getNumberOfLearners() == 0)) {
+		    progress.append("</td><td></td></tr>");
+		} else {
+		    progress.append(dto.getNumberOfLearners()).append("</td><td>")
+			    .append(asPercentage(dto.getNumberOfLearners(), possibleLearnersCount))
+			    .append("%</td></tr>");
+		    numLearnersProcessed += dto.getNumberOfLearners();
+		}
+	    }
+	}
+	numLearnersProcessed += completedLearnersCount;
+	progress.append("<tr><td width=\"50%\"><i>Finished</i></td>").append("<td>").append(completedLearnersCount)
+		.append("</td>").append("<td>").append(asPercentage(completedLearnersCount, possibleLearnersCount))
+		.append("%</td></tr>").append("<tr><td width=\"60%\"><td><strong>").append(numLearnersProcessed)
+		.append("</strong></td><td><strong>").append(asPercentage(numLearnersProcessed, possibleLearnersCount))
+		.append("%</strong></td>").append("</table>").append("<p>&nbsp;</p>").append("<p>&nbsp;</p>")
+		.append("<p><i>")
+		.append(getMessageService().getMessage("progress.email.sent.automatically"))
+		.append("</i></p>");
+
+	String subject = getMessageService().getMessage("progress.email.subject",
+		new Object[] { lesson.getLessonName() });
+
+	return new String[] { subject, progress.toString() };
+
+    }
+    
+    private String asPercentage(Integer numerator, Integer denominator ) {
+	double raw = numerator.doubleValue() / denominator * 100;
+	return NumberUtil.formatLocalisedNumber(raw, (Locale)null, 2);  
+    }
+
     @Override
     public Long cloneLesson(Long lessonId, Integer creatorId, Boolean addAllStaff, Boolean addAllLearners,
 	    String[] staffIds, String[] learnerIds, Organisation group) throws MonitoringServiceException {
@@ -2378,4 +2495,5 @@ public class MonitoringService implements IMonitoringService {
 
 	return resetReadOnly;
     }
+    
 }

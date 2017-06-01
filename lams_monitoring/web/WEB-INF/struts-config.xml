@@ -214,6 +214,15 @@
         redirect="false"
       />
     </action>
+    <action
+      path="/emailProgress"
+      type="org.lamsfoundation.lams.monitoring.web.EmailProgressAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+    	<!-- all calls are ajax calls -->
+    </action>
 
     <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
   </action-mappings>

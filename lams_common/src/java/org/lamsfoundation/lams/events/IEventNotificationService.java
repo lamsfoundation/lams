@@ -127,6 +127,19 @@ public interface IEventNotificationService {
      */
     void notifyLessonMonitors(Long sessionId, String message, boolean isHtmlFormat);
 
+    /**
+     * Notify lesson monitors with the specified message and subject
+     *
+     * @param lessonId
+     *            tool session to which monitors belong
+     * @param subject
+     * 	      	  subject to be sent
+     * @param message
+     *            message to be sent
+     * @isHtmlFormat whether email is required to of HTML format
+     */
+    void notifyLessonMonitors(Long lessonId, String subject, String message, boolean isHtmlFormat);
+    
     void resendMessages();
 
     /**

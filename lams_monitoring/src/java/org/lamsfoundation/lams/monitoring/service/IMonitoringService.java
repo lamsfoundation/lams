@@ -651,6 +651,10 @@ public interface IMonitoringService {
 
 
     void removeLearnerContent(Long lessonId, Integer learnerId);
+
+    /** Generate an email containing the progress details for individual activities in a lesson. 
+     * @return String[] {subject, email body} */
+    String[] generateLessonProgressEmail(Long lessonId, Integer userId);
     
     /**
      * Get list of users who completed the given lesson.

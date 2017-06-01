@@ -33,9 +33,6 @@ import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.SchedulerContext;
-import org.quartz.SchedulerException;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Email messages at the specified date. List of recipients is being constructed real time based on specified search
@@ -83,16 +80,4 @@ public class EmailScheduleMessageJob extends MonitoringJob {
 	}
     }
 
-    private IEventNotificationService getEventNotificationService(JobExecutionContext context)
-	    throws JobExecutionException {
-	try {
-	    final String CONTEXT_NAME = "context.central";
-
-	    SchedulerContext sc = context.getScheduler().getContext();
-	    ApplicationContext cxt = (ApplicationContext) sc.get(CONTEXT_NAME);
-	    return (IEventNotificationService) cxt.getBean("eventNotificationService");
-	} catch (SchedulerException e) {
-	    throw new JobExecutionException("Failed look up the Scheduler" + e.toString());
-	}
-    }
 }
