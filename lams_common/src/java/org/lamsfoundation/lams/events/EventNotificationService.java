@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -114,6 +115,23 @@ public class EventNotificationService implements IEventNotificationService {
     }
 
     @Override
+    public void notifyLessonMonitors(Long lessonId, String subject, String message, boolean isHtmlFormat) {
+	Map<User, Boolean> monitoringUsers = lessonService.getUsersWithLessonParticipation(lessonId, "MONITOR", null, null, null, true);
+	if (monitoringUsers.isEmpty()) {
+	    return;
+	}
+
+	ArrayList<Integer> monitoringUsersIds = new ArrayList<Integer>();
+	for ( Map.Entry<User, Boolean> entry : monitoringUsers.entrySet() ) {
+	    if ( entry.getValue() )
+		monitoringUsersIds.add(entry.getKey().getUserId());
+	}
+
+	sendMessage(null, monitoringUsersIds.toArray(new Integer[monitoringUsersIds.size()]), IEventNotificationService.DELIVERY_METHOD_MAIL, subject, message,
+		isHtmlFormat);
+    }
+    
+    @Override
     public void notifyLessonMonitors(Long sessionId, String message, boolean isHtmlFormat) {
 	List<User> monitoringUsers = lessonService.getMonitorsByToolSessionId(sessionId);
 	if (monitoringUsers.isEmpty()) {
@@ -159,6 +177,7 @@ public class EventNotificationService implements IEventNotificationService {
      *            whether the message is of HTML content-type or plain text
      */
     public void notifyUser(Subscription subscription, String subject, String message, boolean isHtmlFormat) {
+	log.debug("EventNotificationService notifyUser "+this.toString());
 	subscription.setLastOperationMessage(
 		subscription.getDeliveryMethod().send(null, subscription.getUserId(), subject, message, isHtmlFormat));
     }
@@ -200,9 +219,8 @@ public class EventNotificationService implements IEventNotificationService {
 
 	EventNotificationService.log.error("Error occured while sending message: " + result);
 	Event event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
-		String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat);
+		String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat, new Date());
 	subscribe(event, toUserId, deliveryMethod);
-	event.setFailTime(new Date());
 	eventDAO.insertOrUpdate(event);
 	return false;
     }
@@ -221,19 +239,15 @@ public class EventNotificationService implements IEventNotificationService {
 	new Thread(() -> {
 	    try {
 		HibernateSessionManager.openSession();
-
-		Event event = null;
 		for (Integer id : toUserIds) {
 		    String result = deliveryMethod.send(fromUserId, id, subject, message, isHtmlFormat);
 		    if (result != null) {
-			event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
-				String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat);
+			Event event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
+				String.valueOf(System.currentTimeMillis()), null, subject, message, 
+				isHtmlFormat, new Date());
 			subscribe(event, id, deliveryMethod);
+			log.debug("Set up new event "+event.getUid()+":"+event.getName()+" number of subscriptions "+event.getSubscriptions().size());
 		    }
-		}
-		if (event != null) {
-		    event.setFailTime(new Date());
-		    eventDAO.insertOrUpdate(event);
 		}
 	    } finally {
 		HibernateSessionManager.closeSession();
@@ -341,7 +355,7 @@ public class EventNotificationService implements IEventNotificationService {
 		while (subscriptionIterator.hasNext()) {
 		    Subscription subscription = subscriptionIterator.next();
 		    notifyUser(subscription, subjectToSend, messageToSend, event.isHtmlFormat());
-		    if (subscription.getDeliveryMethod().lastOperationFailed(subscription)) {
+		    if (! subscription.getDeliveryMethod().lastOperationFailed(subscription)) {
 			if (event.getFailTime() != null) {
 			    subscriptionIterator.remove();
 			}
@@ -353,6 +367,7 @@ public class EventNotificationService implements IEventNotificationService {
 		    }
 		}
 		if (event.getSubscriptions().isEmpty()) {
+		    log.debug("Deleting event "+event.getUid()+" "+event.getFailTime());
 		    eventDAO.delete(event);
 		} else {
 		    eventDAO.insertOrUpdate(event);

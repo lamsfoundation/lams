@@ -148,8 +148,24 @@ function initLessonTab(){
 			}
 		});
 
-}
+	var emailProgressDialog = showDialog('emailProgressDialog',{
+			'autoOpen'  : false,
+			'height'    : 700,
+			'width'     : 510,
+			'title' 	: LABELS.PROGRESS_EMAIL_TITLE,
+			'resizable' : true,
+			'open'      : function(){
+				autoRefreshBlocked = true;
+			},
+			'close' : function(){
+				autoRefreshBlocked = false;
+			}
+		}, false);
+	$('.modal-body', emailProgressDialog).empty().append($('#emailProgressDialogContents').show());
+	//initialize datetimepicker
+	$("#emaildatePicker").datetimepicker();
 
+}
 
 /**
  * Shows all learners in the lesson class.
@@ -497,6 +513,196 @@ function updateContributeActivities(contributeActivities) {
 		$('#requiredTasks').show();
 	}
 }
+
+/**
+ * Set up when the progress emails should be sent to monitors
+ */
+function configureProgressEmail(){
+	fillEmailProgress();
+	$('#emailProgressDialog').modal('show');
+}
+
+/**
+ * Adds/removes date to the set of progress report emailing dates
+ */
+function editEmailProgressDate(dateCheckbox){
+	var dateid = dateCheckbox.parent().attr('dateid'),
+		add = dateCheckbox.is(':checked');
+		
+	$.ajax({
+		url : LAMS_URL + 'monitoring/emailProgress.do',
+		type : 'POST',
+		cache : false,
+		data : {
+			'method'   : 'updateEmailProgressDate',
+			'lessonID' : lessonId,
+			'id'   : dateid,
+			'add' 	   : add
+		},
+		success : function( dateObj ) {
+			dateCheckbox.parent().attr('dateid', dateObj.id);
+			dateCheckbox.parent().attr('datems', dateObj.ms);
+			dateCheckbox.parent().children().last().html(dateObj.date); 
+		}
+	});
+}
+
+/**
+ * Fills the dates from the server for the email progress
+ */
+function fillEmailProgress() {
+	var dialog = $('#emailProgressDialog'),
+		table = $('#emailProgressDialogTable', dialog),
+		list = $('.dialogList', table).empty(),
+		dates = null;
+		ajaxProperties = dialog.data('ajaxProperties'),
+		dates = null;
+	
+	if (!ajaxProperties) {
+		// initialise ajax config
+		ajaxProperties = {
+		dataType : 'json',
+		url : LAMS_URL + 'monitoring/emailProgress.do',
+		cache : false,
+		async : false,
+		data : {
+			'method'    : 'getEmailProgressDates',
+			'lessonID'  : lessonId
+		}};
+		dialog.data('ajaxProperties', ajaxProperties);
+	}
+
+	ajaxProperties.success = function(response) {
+		dates = response.dates;
+	}
+
+	$.ajax(ajaxProperties);
+
+	$.each(dates, function(dateIndex, date) {
+		addCheckbox(date, list, true);
+	});	
+
+	colorDialogList(table);
+}
+
+function addCheckbox(dateObj, list, checked) {
+	// check for an existing matching date
+	var alreadyExists = false;
+	var existingDivs = $("div", list);
+	$.each(existingDivs, function(divIndex, div) {
+		if ( div.getAttribute('dateid') == dateObj.id ) {
+			alreadyExists = true;
+			return false;
+		}
+	});	
+	if ( alreadyExists )
+		return;
+
+	// does not exist so add to list
+	var checkbox = $('<input />').attr({
+   	 	'type' : 'checkbox'
+     }).change(function(){
+    	 editEmailProgressDate($(this));
+     }),
+
+     dateString = $('<span/>').html(dateObj.date),
+   	
+     dateDiv = $('<div />').attr({
+			'dateid'  : dateObj.id,
+			'datems'  : dateObj.ms
+			})
+         .addClass('dialogListItem')
+          .append(dateString)
+	      .prepend(checkbox)
+	      .appendTo(list);
+   	
+	checkbox.prop('checked', checked);
+	return checkbox;
+}
+
+function sendProgressEmail() {
+	if ( confirm(LABELS.PROGRESS_EMAIL_SEND_NOW_QUESTION) ) {
+		$.ajax({
+			dataType : 'json',
+			url : LAMS_URL + 'monitoring/emailProgress.do',
+			cache : false,
+			data : {
+				'method'    : 'sendLessonProgressEmail',
+				'lessonID'  : lessonId
+				},		
+			success : function(response) {
+				if ( response.error || ! response.sent > 0 )
+					alert(LABELS.PROGRESS_EMAIL_SEND_FAILED+"\n"+(response.error ? response.error : ""));
+				else 
+					alert(LABELS.PROGRESS_EMAIL_SUCCESS.replace('[0]',response.sent));
+			}
+		});	
+	}
+}
+
+function addEmailProgressDate() {
+	var table = $('#emailProgressDialogTable', '#emailProgressDialog'),
+		list = $('.dialogList', table),
+		newDateMS = $('#emaildatePicker').datetimepicker('getDate');
+
+	if ( newDateMS != null ) {
+		if ( newDateMS.getTime() < Date.now()  ) {
+			alert(LABELS.ERROR_DATE_IN_PAST);
+		} else {
+			var dateObj = { id: newDateMS.getTime(), date: getEmailDateString(newDateMS)},
+				checkbox = addCheckbox(dateObj, list, true);
+			editEmailProgressDate(checkbox); // update back end
+			addEmailProgressSeries(false, table);
+		}
+	} else {
+		alert(LABELS.PROGRESS_SELECT_DATE_FIRST);
+	}
+}
+
+
+
+function getEmailDateString(date) {
+	return date.toLocaleDateString('en', {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false });
+}
+
+function addEmailProgressSeries(forceQuestion, table) {
+	if ( ! table ) {
+		table = $('#emailProgressDialogTable', '#emailProgressDialog');
+	} 
+	var list = $('.dialogList', table),
+		items = $('.dialogListItem', list);
+	
+	if ( forceQuestion && items.length < 2 ) {
+		alert(LABELS.PROGRESS_ENTER_TWO_DATES_FIRST);
+	} else if ( items.length == 2 || forceQuestion ) {
+    	var numDates = prompt(LABELS.PROGRESS_EMAIL_GENERATE_ONE+"\n\n"+LABELS.PROGRESS_EMAIL_GENERATE_TWO);
+    	if ( numDates > 0 ) {
+    		var dates=[];
+    		var maxDate = 0;
+    		items.each( function() {
+    			var nextDate = $(this).attr('dateid');
+    			dates.push($(this).attr('dateid'));
+    			if ( maxDate < nextDate ) 
+    				maxDate = nextDate;
+    		});
+    		if ( dates[1] < dates[0] ) {
+    			var swap = dates[1];
+    			dates[1] = dates[0];
+    			dates[0] = swap;
+    		}
+    		var diff = dates[1] - dates[0];
+    		if ( diff > 0 ) {
+				var genDateMS = maxDate;
+    			for (var i = 0; i < numDates; i++) {
+    				genDateMS = +genDateMS + +diff;
+    				var genDateObj = { id: genDateMS, date: getEmailDateString(new Date(genDateMS))};
+    			    var checkbox = addCheckbox(genDateObj, list, false);
+    			}
+    		}
+    	}
+    }
+	colorDialogList(table);
+} 
 
 //********** SEQUENCE TAB FUNCTIONS **********
 

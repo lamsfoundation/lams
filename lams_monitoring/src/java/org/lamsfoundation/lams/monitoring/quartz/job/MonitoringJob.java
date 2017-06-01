@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.monitoring.quartz.job;
 
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -33,23 +34,31 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
- * All Quartz Job Bean super classes in monitoring. It provides a simple helper method to get monitoringService.
- *
+ * All Quartz Job Bean super classes in monitoring. It provides a simple helper methods to get monitoringService, eventNotificationService.
  * @author Steve.Ni
- *
- * @version $Revision$
  */
 public abstract class MonitoringJob extends QuartzJobBean {
     private static final String CONTEXT_NAME = "context.central";
-    private static final String SERVICE_NAME = "monitoringService";
+    private static final String MONITORING_SERVICE_NAME = "monitoringService";
+    private static final String EVENT_SERVICE_NAME = "eventNotificationService";
 
-    protected IMonitoringService getMonitoringService(JobExecutionContext context) throws JobExecutionException {
+    protected Object getService(JobExecutionContext context, String serviceName) throws JobExecutionException {
 	try {
 	    SchedulerContext sc = context.getScheduler().getContext();
 	    ApplicationContext cxt = (ApplicationContext) sc.get(MonitoringJob.CONTEXT_NAME);
-	    return (IMonitoringService) cxt.getBean(MonitoringJob.SERVICE_NAME);
+	    return cxt.getBean(serviceName);
 	} catch (SchedulerException e) {
-	    throw new JobExecutionException("Failed look up the Scheduler" + e.toString());
+	    throw new JobExecutionException("Failed look up the " + serviceName + " " + e.toString());
 	}
     }
+
+    protected IMonitoringService getMonitoringService(JobExecutionContext context) throws JobExecutionException {
+	return (IMonitoringService) getService(context, MonitoringJob.MONITORING_SERVICE_NAME);
+    }
+
+    protected IEventNotificationService getEventNotificationService(JobExecutionContext context)
+	    throws JobExecutionException {
+	return (IEventNotificationService) getService(context, MonitoringJob.EVENT_SERVICE_NAME);
+    }
+
 }
