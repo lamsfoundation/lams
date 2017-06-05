@@ -26,6 +26,7 @@ import java.net.URLEncoder;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
@@ -126,7 +127,7 @@ public class LoginRequestDispatcher {
 	String lessonId = request.getParameter(PARAM_LESSON_ID);
 	String mode = request.getParameter(PARAM_MODE);
 
-	if (lessonId != null) {
+	if (StringUtils.isNotEmpty(lessonId)) {
 	    try {
 		LoginRequestDispatcher.addUserToLessonClass(request, lessonId, method);
 	    } catch (UserInfoFetchException e) {
