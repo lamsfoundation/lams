@@ -617,9 +617,10 @@ public class GradebookService implements IGradebookService {
 	    gradebookUserActivity.setUpdateDate(new Date());
 	    gradebookUserActivity.setMarkedInGradebook(markedInGradebook);
 	    gradebookDAO.insertOrUpdate(gradebookUserActivity);
-
+	    //flush the session in order to make updated mark be available at calculating lesson total mark
+	    gradebookDAO.flush();
+	    
 	    // Now update the lesson mark
-
 	    if (gradebookUserLesson == null) {
 		gradebookUserLesson = new GradebookUserLesson();
 		gradebookUserLesson.setLearner(learner);
