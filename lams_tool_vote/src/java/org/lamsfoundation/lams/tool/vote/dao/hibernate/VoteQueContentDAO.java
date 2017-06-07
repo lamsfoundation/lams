@@ -23,7 +23,6 @@ package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteQueContentDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
@@ -95,7 +94,6 @@ public class VoteQueContentDAO extends LAMSBaseDAO implements IVoteQueContentDAO
 
     @Override
     public void removeQuestion(VoteQueContent voteQueContent) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().delete(voteQueContent);
     }
 }

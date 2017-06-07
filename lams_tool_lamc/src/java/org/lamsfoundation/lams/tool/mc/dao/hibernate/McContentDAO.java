@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
@@ -63,19 +62,16 @@ public class McContentDAO extends LAMSBaseDAO implements IMcContentDAO {
 
     @Override
     public void saveMcContent(McContent mcContent) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().saveOrUpdate(mcContent);
     }
 
     @Override
     public void updateMcContent(McContent mcContent) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().update(mcContent);
     }
 
     @Override
     public void saveOrUpdateMc(McContent mc) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().saveOrUpdate(mc);
     }
 
@@ -87,7 +83,6 @@ public class McContentDAO extends LAMSBaseDAO implements IMcContentDAO {
 
 	    if (list != null && list.size() > 0) {
 		McContent mc = (McContent) list.get(0);
-		getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 		getSession().delete(mc);
 		getSession().flush();
 	    }

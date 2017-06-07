@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.FlushMode;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
@@ -151,7 +150,6 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	    Iterator<VoteUsrAttempt> listIterator = list.iterator();
 	    while (listIterator.hasNext()) {
 		VoteUsrAttempt attempt = listIterator.next();
-		getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 		getSession().delete(attempt);
 		getSession().flush();
 	    }
@@ -258,13 +256,11 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 
     @Override
     public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().update(voteUsrAttempt);
     }
 
     @Override
     public void removeVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().delete(voteUsrAttempt);
     }
 

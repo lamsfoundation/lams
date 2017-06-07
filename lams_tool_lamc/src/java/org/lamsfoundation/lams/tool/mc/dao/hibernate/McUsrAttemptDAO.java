@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
@@ -106,14 +105,11 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 
     @Override
     public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().update(mcUsrAttempt);
     }
 
     @Override
     public void removeAllUserAttempts(Long queUserUid) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-
 	List<McUsrAttempt> userAttempts = getSessionFactory().getCurrentSession()
 		.createQuery(LOAD_ALL_QUESTION_ATTEMPTS).setLong("queUsrUid", queUserUid.longValue()).list();
 

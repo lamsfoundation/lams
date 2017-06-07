@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteSessionDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
@@ -90,7 +89,6 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 
     @Override
     public void updateVoteSession(VoteSession voteSession) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().update(voteSession);
     }
 
@@ -109,7 +107,6 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 
 	    if (list != null && list.size() > 0) {
 		VoteSession vote = list.get(0);
-		getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 		getSession().delete(vote);
 		getSession().flush();
 	    }
@@ -119,7 +116,6 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 
     @Override
     public void removeVoteSession(VoteSession voteSession) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().delete(voteSession);
     }
 

@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
@@ -64,13 +63,11 @@ public class McSessionDAO extends LAMSBaseDAO implements IMcSessionDAO {
 
     @Override
     public void updateMcSession(McSession mcSession) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().update(mcSession);
     }
 
     @Override
     public void removeMcSession(McSession mcSession) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().delete(mcSession);
     }
 
