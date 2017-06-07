@@ -47,7 +47,10 @@
 
 </lams:head>
 
-<body>
+<body class="stripes">
+
+	<lams:Page title="${title}" type="admin">
+
 	<h4>
 		<fmt:message key="email.notifications.scheduled.messages.list"/>
 	</h4>
@@ -113,7 +116,7 @@
 	<a href="<c:url value='/emailNotifications.do'/>${returnUrlParams}" class="btn btn-primary pull-right">
 		<fmt:message key="email.notifications.scheduled.messages.list.back" />
 	</a>
-
+	</lams:Page>
 	
 </body>
 </lams:html>
