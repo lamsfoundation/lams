@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 import java.util.Iterator;
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUserDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -129,7 +128,6 @@ public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
 
     @Override
     public void removeVoteUser(VoteQueUsr voteUser) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().delete(voteUser);
     }
 

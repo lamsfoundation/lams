@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
@@ -86,7 +85,6 @@ public class NoticeboardSessionDAO extends LAMSBaseDAO implements INoticeboardSe
 
 	    if ((list != null) && (list.size() > 0)) {
 		NoticeboardSession nb = list.get(0);
-		getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 		getSession().delete(nb);
 		getSession().flush();
 	    }

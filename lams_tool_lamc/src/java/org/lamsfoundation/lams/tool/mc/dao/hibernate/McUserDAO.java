@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
@@ -77,7 +76,6 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 
     @Override
     public void removeMcUser(McQueUsr mcUser) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().delete(mcUser);
     }
 

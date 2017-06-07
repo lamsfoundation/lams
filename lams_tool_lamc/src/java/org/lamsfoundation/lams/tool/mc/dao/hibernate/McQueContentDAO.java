@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -98,7 +97,6 @@ public class McQueContentDAO extends LAMSBaseDAO implements IMcQueContentDAO {
 
     @Override
     public void updateMcQueContent(McQueContent mcQueContent) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().saveOrUpdate(mcQueContent);
     }
 
@@ -113,9 +111,7 @@ public class McQueContentDAO extends LAMSBaseDAO implements IMcQueContentDAO {
     @Override
     public void removeMcQueContent(McQueContent mcQueContent) {
 	if ((mcQueContent != null) && (mcQueContent.getUid() != null)) {
-	    getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	    this.getSession().delete(mcQueContent);
-
 	}
     }
 
