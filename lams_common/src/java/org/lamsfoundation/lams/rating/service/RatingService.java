@@ -623,19 +623,25 @@ public class RatingService implements IRatingService {
 	    for (Object[] row : rawDataRows) {
 		int numColumns = row.length;
 		if ( ( isComment && numColumns < 4 ) || ( !isComment && numColumns < 7) ) {
-		    log.error("convertToStyledDTO: ratingCriteria" + ratingCriteria.getRatingCriteriaId() + " UserId: "
-			    + currentUserId + "  Skipping data row as there are not enough columns. Only " + numColumns
-			    + " columns. Data:" + row);
+		    StringBuffer buf = new StringBuffer("convertToStyledDTO: ratingCriteria")
+			    .append(ratingCriteria.getRatingCriteriaId()).append(" UserId: ").append(currentUserId)
+			    .append("  Skipping data row as there are not enough columns. Only ").append(numColumns)
+			    .append(" columns. numColumns: ").append(numColumns);
+		    if (numColumns > 0)
+			buf.append(" Data: 0:").append(row[0]);
+		    if (numColumns > 1)
+			buf.append(" 1:").append(row[1]);
+		    log.error(buf.toString());
 		    break;
 		}
 
 		long itemId = ((BigInteger) row[0]).longValue();
 		if ( includeCurrentUser || itemId != currentUserId) {
 
-		    if (row[1] != null && row[0] != row[1]) {
+		    if (row[1] != null && itemId != ((BigInteger) row[0]).longValue() ) {
 			log.error("convertToStyledDTO: ratingCriteria" + ratingCriteria.getRatingCriteriaId() + " UserId: "
-				+ currentUserId + "  Potential issue: expected item id " + row[0] + " does match real item id"
-				+ row[1] + ". Data: " + row);
+				+ currentUserId + "  Potential issue: expected item id " + row[0] + " does match real item id "
+				+ row[1] + ". Data: 0:" + row[0] + " 1:" + row[1]);
 		    }
 		    
 		    StyledRatingDTO dto = new StyledRatingDTO(((BigInteger) row[0]).longValue());
@@ -691,19 +697,25 @@ public class RatingService implements IRatingService {
 	    for (Object[] row : rawDataRows) {
 		int numColumns = row.length;
 		if ( ( isComment && numColumns < 4 ) || ( !isComment && numColumns < 7) ) {
-		    log.error("convertToStyledDTO: ratingCriteria" + ratingCriteria.getRatingCriteriaId() + " UserId: "
-			    + currentUserId + "  Skipping data row as there are not enough columns. Only " + numColumns
-			    + " columns. Data:" + row);
+		    StringBuffer buf = new StringBuffer("convertToStyledJSON: ratingCriteria")
+			    .append(ratingCriteria.getRatingCriteriaId()).append(" UserId: ").append(currentUserId)
+			    .append("  Skipping data row as there are not enough columns. Only ").append(numColumns)
+			    .append(" columns. numColumns: ").append(numColumns);
+		    if (numColumns > 0)
+			buf.append(" Data: 0:").append(row[0]);
+		    if (numColumns > 1)
+			buf.append(" 1:").append(row[1]);
+		    log.error(buf.toString());
 		    break;
 		}
 		
 		Long itemId = ((BigInteger) row[0]).longValue();
 		if ( includeCurrentUser || itemId != currentUserId) {
 
-		    if (row[1] != null && row[0] != row[1]) {
-			log.error("convertToStyledDTO: ratingCriteria" + ratingCriteria.getRatingCriteriaId() + " UserId: "
-				+ currentUserId + "  Potential issue: expected item id " + row[0] + " does match real item id"
-				+ row[1] + ". Data: " + row);
+		    if (row[1] != null &&  itemId.longValue() != ((BigInteger) row[0]).longValue() ) {
+			log.error("convertToStyledJSON: ratingCriteria" + ratingCriteria.getRatingCriteriaId() + " UserId: "
+				+ currentUserId + "  Potential issue: expected item id " + row[0] + " does match real item id "
+				+ row[1] + ". Data: 0:" + row[0] + " 1:" + row[1]);
 		    }
 		    
 		    JSONObject userRow = new JSONObject();
