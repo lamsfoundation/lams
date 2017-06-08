@@ -1074,7 +1074,7 @@ public class AssessmentServiceImpl
 
     @Override
     public Map<Long, QuestionSummary> getQuestionSummaryForExport(Assessment assessment) {
-	Map<Long, QuestionSummary> questionSummaries = new HashMap<Long, QuestionSummary>();
+	Map<Long, QuestionSummary> questionSummaries = new LinkedHashMap<Long, QuestionSummary>();
 
 	if (assessment.getQuestions() == null) {
 	    return questionSummaries;
