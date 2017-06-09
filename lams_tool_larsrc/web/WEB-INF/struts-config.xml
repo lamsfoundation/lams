@@ -240,6 +240,12 @@
 			<forward name="file" path="/pages/learning/addfile.jsp" />
 			<forward name="success" path="/pages/learning/success.jsp" />
 		</action>
+		<action path="/learning/hideItem"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
+			parameter="hideItem"
+			scope="request" 
+			validate="false">
+		</action>
 		<!--  ========= Reflection =============== -->
 		<action path="/learning/newReflection"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"

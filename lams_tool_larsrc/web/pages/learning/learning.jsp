@@ -22,6 +22,7 @@
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="resource" value="${sessionMap.resource}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+	<c:set var="userID"><lams:user property="userID"/></c:set>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
@@ -129,6 +130,19 @@
 			$('.btn-disable-on-submit').prop('disabled', true);
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
+		function hideItem(itemUid) {
+	        $.ajax({
+	        	url: '<c:url value="/learning/hideItem.do"/>',
+	            data: 'sessionMapID=${sessionMapID}&itemUid=' + itemUid,
+	            cache : false,
+				async: false,
+	            success: function () {
+	            	alert('success');
+	            	checkNew();
+	            	
+	            }
+	       	});
+		}
 		    </script>
 </lams:head>
 <body class="stripes">
@@ -198,6 +212,9 @@
 					<fmt:message key="export.label.resource" />
 				</th>
 				<th class="text-center">
+					<fmt:message key="label.delete" />
+				</th>
+				<th class="text-center">
 					<fmt:message key="label.completed" />
 				</th>
 				<c:if test="${sessionMap.rateItems}">
@@ -216,7 +233,13 @@
 								(<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true"/>)
 						</c:if>
 					</td>
-					<td class="text-center">
+						<td class="text-center"><c:if
+								test="${!item.createByAuthor && userID == item.createBy.userId}">
+								<i class="fa fa-times"
+									title="<fmt:message key="label.delete" />"
+									id="delete${status.index}" onclick="hideItem(${item.uid})"></i>
+							</c:if></td>
+						<td class="text-center">
 						<c:choose>
 							<c:when test="${item.complete}">
 								<i class="fa fa-check"></i>
