@@ -32,6 +32,7 @@ import java.util.TreeMap;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
@@ -400,13 +401,30 @@ public interface IAssessmentService {
 	    boolean showUserNames);
 
     /** 
+     * Gets the basic statistics for the grades for the Leaders when an Assessment is done using
+     * Group Leaders. So the averages, etc are for the whole Assessment, not for a Group.
+     * @param contentId
+     * @return
+     */
+    LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
+    
+    /** 
      * Prepares data for the marks summary graph on the statistics page
      * @param assessment
      * @param sessionDtos
      * @return
      */
     List<Number> getMarksArray(Long sessionId);
-    
+
+    /** 
+     * Prepares data for the marks summary graph on the statistics page, using the grades for the Leaders 
+     * when an Assessment is done using Group Leaders. So the grades are for the whole Assessment, not for a Group.
+     * @param assessment
+     * @param sessionDtos
+     * @return
+     */
+    List<Number> getMarksArrayForLeaders(Long contentId);
+
     void changeQuestionResultMark(Long questionResultUid, float newMark);
 
     void notifyTeachersOnAttemptCompletion(Long sessionId, String userName);

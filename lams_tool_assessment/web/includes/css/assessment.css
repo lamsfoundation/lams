@@ -94,26 +94,3 @@ table.table-row-spacing {
 	margin-top: -10px;
 }
 
-/* Chart in Monitoring */
-.chartDiv {
-	margin-top: 10px;
-	margin-left: 10px;
-	margin-bottom: 10px;
-	width: 95%;
-	height: 500px;
-}
-
-.bar rect {
-	fill: steelblue;
-}
-
-.bar text {
-	fill: #fff;
-	font: 14px sans-serif;
-}
-.zoom {
-	cursor: move;
-	fill: none;
-	pointer-events: all;
-}
-

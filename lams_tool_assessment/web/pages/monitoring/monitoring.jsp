@@ -11,6 +11,7 @@
 		<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css" >
 		<link href="${lams}css/thickbox.css" rel="stylesheet" rel="stylesheet" type="text/css">
 		<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
+		<link href="${lams}css/chart.css" rel="stylesheet" type="text/css"/>
 		<style type="text/css">
 			.ui-jqgrid tr.jqgrow td {
 			    white-space: normal !important;
@@ -55,19 +56,14 @@
 		    
 			function doStatistic(){
 				var url = '<c:url value="/monitoring/statistic.do?sessionMapID=${sessionMapID}"/>';
-				$("#statisticArea_Busy").show();
 				$.ajaxSetup({ cache: true });
 				$("#statisticArea").load(
 					url,
 					{
 						toolContentID: ${param.toolContentID}, 
 						reqID: (new Date()).getTime()
-					},
-					function() {
-						$("#statisticArea_Busy").hide();
 					}
 				);
-				
 			}       
 		</script>	  
 	</lams:head>
