@@ -29,10 +29,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -55,6 +53,7 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
@@ -316,9 +315,17 @@ public class MonitoringAction extends Action {
 	    HttpServletResponse response) throws JSONException, IOException {
 	initAssessmentService();
 
-	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+
+	Long contentID = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
 	String activityEvaluation = WebUtil.readStrParam(request, AssessmentConstants.ATTR_ACTIVITY_EVALUATION);
 	service.setActivityEvaluation(contentID, activityEvaluation);
+
+	// update the session ready for stats tab to be reloaded otherwise flicking between tabs 
+	// causes the old value to be redisplayed
+	sessionMap.put(AssessmentConstants.ATTR_ACTIVITY_EVALUATION, activityEvaluation);
 
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("success", "true");
@@ -521,7 +528,7 @@ public class MonitoringAction extends Action {
    /**
      * Get the mark summary with data arranged in bands. Can be displayed graphically or in a table.
      */
-    public ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse res) throws IOException, ServletException, JSONException {
 
 	initAssessmentService();
@@ -531,16 +538,18 @@ public class MonitoringAction extends Action {
 		.getAttribute(sessionMapID);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
-	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.ATTR_TOOL_SESSION_ID);
-	List<Number> results = service.getMarksArray(sessionId);
-//
-//	log.debug("fudging results to get more data for transmission. New results will have "+(origResults.length*50)+" entries");
-//	Float[] results = new Float[origResults.length*50];
-//	for (int i=0; i<50; i++) {
-//	    for ( int j=0; j < origResults.length; j++ ) {
-//		results[i*origResults.length + j] = origResults[j];
-//	    }
-//	}
+	Long contentId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Assessment assessment = service.getAssessmentByContentId(contentId);
+	List<Number> results = null;
+	
+	if ( assessment != null ) {
+	    if ( assessment.isUseSelectLeaderToolOuput() ) {
+		results = service.getMarksArrayForLeaders(contentId);
+	    } else {
+		Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.ATTR_TOOL_SESSION_ID);
+		results = service.getMarksArray(sessionId);
+	    }
+	}
 	
 	JSONObject responseJSON = new JSONObject();
 	if ( results != null )
@@ -627,8 +636,16 @@ public class MonitoringAction extends Action {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	List<SessionDTO> sessionDtos = service.getSessionDtos(contentId, true);
-	sessionMap.put("sessionDtos", sessionDtos);
+	Assessment assessment = service.getAssessmentByContentId(contentId);
+	if ( assessment != null ) {
+	    if ( assessment.isUseSelectLeaderToolOuput() ) {
+		LeaderResultsDTO leaderDto = service.getLeaderResultsDTOForLeaders(contentId);
+		sessionMap.put("leaderDto", leaderDto);
+	    } else {
+		List<SessionDTO> sessionDtos = service.getSessionDtos(contentId, true);
+		sessionMap.put("sessionDtos", sessionDtos);
+	    }
+	}
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
 

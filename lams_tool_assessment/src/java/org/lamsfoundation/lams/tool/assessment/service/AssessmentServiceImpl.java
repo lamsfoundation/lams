@@ -76,6 +76,7 @@ import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
@@ -982,9 +983,9 @@ public class AssessmentServiceImpl
 		sessionDto.setNumberLearners(countUsers);
 		Object[] markStats = assessmentUserDao.getStatsMarksBySession(sessionId);
 		if ( markStats != null ) {
-		    sessionDto.setMinMark(NumberUtil.formatLocalisedNumber((Float)markStats[0], (Locale)null, 2));
-		    sessionDto.setAvgMark(NumberUtil.formatLocalisedNumber((Float)markStats[1], (Locale)null, 2));
-		    sessionDto.setMaxMark(NumberUtil.formatLocalisedNumber((Float)markStats[2], (Locale)null, 2));
+		    sessionDto.setMinMark(markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[0], (Locale)null, 2) : "0.00");
+		    sessionDto.setAvgMark(markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[1], (Locale)null, 2) : "0.00");
+		    sessionDto.setMaxMark(markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[2], (Locale)null, 2) : "0.00");
 		}
 	    }
 
@@ -994,6 +995,19 @@ public class AssessmentServiceImpl
 	return sessionDtos;
     }
 
+    @Override
+    public LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId) {
+	LeaderResultsDTO newDto = new LeaderResultsDTO(contentId);
+	Object[] markStats = assessmentUserDao.getStatsMarksForLeaders(contentId);
+	if ( markStats != null ) {
+	    newDto.setMinMark(markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[0], (Locale)null, 2) : "0.00");
+	    newDto.setAvgMark(markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[1], (Locale)null, 2) : "0.00");
+	    newDto.setMaxMark(markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[2], (Locale)null, 2) : "0.00");
+	    newDto.setNumberGroupsLeaderFinished((Integer)markStats[3]);
+	}
+	return newDto;
+    }
+    
     @Override
     public AssessmentResult getUserMasterDetail(Long sessionId, Long userId) {
 	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultByUser(sessionId,
@@ -2214,6 +2228,11 @@ public class AssessmentServiceImpl
     @Override
     public List<Number> getMarksArray(Long sessionId) {
 	return assessmentUserDao.getRawUserMarksBySession(sessionId);
+    }
+
+    @Override
+    public List<Number> getMarksArrayForLeaders(Long toolContentId) {
+	return assessmentUserDao.getRawLeaderMarksByToolContentId(toolContentId);
     }
 
     private LinkedHashMap<String, Integer> getMarksSummaryForSession(List<AssessmentUserDTO> userDtos, float minGrade, float maxGrade, Integer numBuckets) {

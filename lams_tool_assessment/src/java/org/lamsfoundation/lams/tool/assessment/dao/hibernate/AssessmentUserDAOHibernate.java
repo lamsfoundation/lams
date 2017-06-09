@@ -51,7 +51,19 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     private static final String FIND_MARK_STATS_FOR_SESSION = "SELECT MIN(grade) min_grade, AVG(grade) avg_grade, MAX(grade) max_grade FROM tl_laasse10_assessment_result "
 	    + " WHERE finish_date IS NOT NULL AND latest = 1 AND session_id = :sessionId";
 
+    private static final String LOAD_MARKS_FOR_LEADERS = "SELECT r.grade FROM tl_laasse10_assessment_result r "	
+	    + " JOIN tl_laasse10_session s ON r.session_id = s.session_id AND r.user_uid = s.group_leader_uid "
+	    + " JOIN tl_laasse10_assessment a ON s.assessment_uid = a.uid "
+	    + " WHERE r.finish_date IS NOT NULL AND r.latest = 1 AND a.content_id = :toolContentId";
+    private static final String FIND_MARK_STATS_FOR_LEADERS = "SELECT MIN(grade) min_grade, AVG(grade) avg_grade, MAX(grade) max_grade, COUNT(grade) num_complete "
+	    + " FROM tl_laasse10_assessment_result r "	
+	    + " JOIN tl_laasse10_session s ON r.session_id = s.session_id AND r.user_uid = s.group_leader_uid "
+	    + " JOIN tl_laasse10_assessment a ON s.assessment_uid = a.uid "
+	    + " WHERE r.finish_date IS NOT NULL AND r.latest = 1 AND a.content_id = :toolContentId";
 
+    
+
+    @SuppressWarnings("rawtypes")
     @Override
     public AssessmentUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
 	List list = doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
@@ -61,6 +73,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	return (AssessmentUser) list.get(0);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public AssessmentUser getUserByUserIDAndContentID(Long userId, Long contentId) {
 	List list = doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
@@ -85,6 +98,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     private static String LOAD_USERS_ORDERED_ORDER_BY_NAME = "ORDER BY (CONCAT(user.last_name, ' ', user.first_name)) ";
     private static String LOAD_USERS_ORDERED_ORDER_BY_TOTAL = "ORDER BY result.grade ";
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
@@ -129,6 +143,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	return userDtos;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public int getCountUsersBySession(Long sessionId, String searchString) {
 
@@ -150,7 +165,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	}
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     @Override
     public Object[] getStatsMarksBySession(Long sessionId) {
 
@@ -167,6 +182,25 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	}
     }
 
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Object[] getStatsMarksForLeaders(Long toolContentId) {
+
+	Query query = getSession().createSQLQuery(FIND_MARK_STATS_FOR_LEADERS)
+		.addScalar("min_grade", FloatType.INSTANCE)
+		.addScalar("avg_grade", FloatType.INSTANCE)
+		.addScalar("max_grade", FloatType.INSTANCE)
+		.addScalar("num_complete", IntegerType.INSTANCE);
+	query.setLong("toolContentId", toolContentId);
+	List list = query.list();
+	if ((list == null) || (list.size() == 0)) {
+	    return null;
+	} else {
+	    return (Object[]) list.get(0);
+	}
+    }
+
+
     private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION = "SELECT DISTINCT question_result.uid, user.last_name, user.first_name, user.login_name, question_result.mark"
 		+ " FROM tl_laasse10_user user" + " INNER JOIN tl_laasse10_session session"
 		+ " ON user.session_uid=session.uid" +
@@ -181,6 +215,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) ";
     private static String LOAD_USERS_ORDERED_ORDER_BY_RESULT = "ORDER BY question_result.mark ";
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page,
 	    int size, String sortBy, String sortOrder, String searchString) {
@@ -227,11 +262,22 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	return userDtos;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<Number> getRawUserMarksBySession(Long sessionId) {
 
 	SQLQuery query = getSession().createSQLQuery(LOAD_MARKS_FOR_SESSION);
 	query.setLong("sessionId", sessionId);
+	List<Number> list = query.list();
+	return list;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Number> getRawLeaderMarksByToolContentId(Long toolContentId) {
+
+	SQLQuery query = getSession().createSQLQuery(LOAD_MARKS_FOR_LEADERS);
+	query.setLong("toolContentId", toolContentId);
 	List<Number> list = query.list();
 	return list;
     }
