@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
+import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
@@ -369,4 +370,11 @@ public interface IScratchieService {
     ScratchieConfigItem getConfigItem(String key);
 
     void saveOrUpdateScratchieConfigItem(ScratchieConfigItem item);
+    
+    /** Get the raw marks for display in a graph in monitoring */
+    List<Number> getMarksArray(Long contentId);
+
+    /** Get the statistics such as average, max, min for the marks. Used in monitoring */
+    LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
+
 }

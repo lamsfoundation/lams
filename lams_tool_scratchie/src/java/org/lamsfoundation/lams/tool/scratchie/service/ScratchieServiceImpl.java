@@ -38,6 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -82,6 +83,7 @@ import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieUserDAO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
+import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
@@ -102,6 +104,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
@@ -1583,6 +1586,24 @@ public class ScratchieServiceImpl
 	}
 
 	return dataToExport;
+    }
+
+    @Override
+    public List<Number> getMarksArray(Long toolContentId) {
+	return scratchieSessionDao.getRawLeaderMarksByToolContentId(toolContentId);
+    }
+
+    @Override
+    public LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId) {
+	LeaderResultsDTO newDto = new LeaderResultsDTO(contentId);
+	Object[] markStats = scratchieSessionDao.getStatsMarksForLeaders(contentId);
+	if ( markStats != null ) {
+	    newDto.setMinMark(markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[0], (Locale)null, 2) : "0.00");
+	    newDto.setAvgMark(markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[1], (Locale)null, 2) : "0.00");
+	    newDto.setMaxMark(markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[2], (Locale)null, 2) : "0.00");
+	    newDto.setNumberGroupsLeaderFinished((Integer)markStats[3]);
+	}
+	return newDto;
     }
 
     // *****************************************************************************

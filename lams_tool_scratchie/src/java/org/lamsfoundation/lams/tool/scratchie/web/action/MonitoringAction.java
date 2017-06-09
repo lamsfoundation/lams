@@ -45,9 +45,12 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
+import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
@@ -73,7 +76,7 @@ public class MonitoringAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException, JSONException {
 	String param = mapping.getParameter();
 
 	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
@@ -92,6 +95,12 @@ public class MonitoringAction extends Action {
 	}
 	if (param.equals("exportExcel")) {
 	    return exportExcel(mapping, form, request, response);
+	}
+	if (param.equals("getMarkChartData")) {
+	    return getMarkChartData(mapping, form, request, response);
+	}
+	if (param.equals("statistic")) {
+	    return statistic(mapping, form, request, response);
 	}
 
 	return mapping.findForward(ScratchieConstants.ERROR);
@@ -267,6 +276,54 @@ public class MonitoringAction extends Action {
 	ExcelUtil.createExcel(out, dataToExport, null, false);
 
 	return null;
+    }
+
+    /**
+     * Get the mark summary with data arranged in bands. Can be displayed graphically or in a table.
+     */
+    private ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+
+	initializeScratchieService();
+	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+
+	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
+	List<Number> results = null;
+	
+	if ( scratchie != null ) {
+	    results = service.getMarksArray(scratchie.getContentId());
+	}
+	
+	JSONObject responseJSON = new JSONObject();
+	if ( results != null )
+	    responseJSON.put("data", results);
+	else 
+	    responseJSON.put("data", new Float[0]);
+
+	res.setContentType("application/json;charset=utf-8");
+	res.getWriter().write(responseJSON.toString());
+	return null;
+
+    }
+
+    private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	initializeScratchieService();
+	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+
+	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
+	if ( scratchie != null ) {
+	    LeaderResultsDTO leaderDto = service.getLeaderResultsDTOForLeaders(scratchie.getContentId());
+	    sessionMap.put("leaderDto", leaderDto);
+	}
+	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
 
     // *************************************************************************************

@@ -14,6 +14,7 @@
 	<link type="text/css" href="${lams}css/thickbox.css" rel="stylesheet"  media="screen">
 	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 	<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css" >
+	<link href="${lams}css/chart.css" rel="stylesheet" type="text/css"/>
 		
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
@@ -30,6 +31,10 @@
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
  
+ 	<!--  Marks Chart -->
+ 	<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
+ 	<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
+ 
 	 <script>
 			var initialTabId = "${initialTabId}";
 
@@ -42,9 +47,25 @@
 	        }     
 	        
 	        function doSelectTab(tabId) {
-		    	// end optional tab controller stuff
+		    	if ( tabId == 3 )
+		    		doStatistic();
 		    	selectTab(tabId);
 	        } 
+	        
+			function doStatistic(){
+				var url = '<c:url value="/monitoring/statistic.do?sessionMapID=${sessionMapID}"/>';
+				$.ajaxSetup({ cache: true });
+				$("#statisticArea").load(
+					url,
+					{
+						toolContentID: ${param.toolContentID}, 
+						reqID: (new Date()).getTime()
+					}
+				);
+				
+			}       
+		</script>	  
+
 	    </script>		 
 	</lams:head>
 	<body class="stripes" onLoad="init()">
@@ -52,7 +73,7 @@
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	<lams:Page title="${title}" type="navbar">
 	
-		<lams:Tabs title="${title}" control="true" helpToolSignature="<%= ScratchieConstants.TOOL_SIGNATURE %>" helpModule="monitoring">
+		<lams:Tabs title="${title}" control="true" helpToolSignature="<%= ScratchieConstants.TOOL_SIGNATURE %>" helpModule="monitoring" refreshOnClickAction="javascript:location.reload();">
  			<lams:Tab id="1" key="monitoring.tab.summary" />
 			<lams:Tab id="2" key="monitoring.tab.edit.activity" />			
  			<lams:Tab id="3" key="monitoring.tab.statistics" />

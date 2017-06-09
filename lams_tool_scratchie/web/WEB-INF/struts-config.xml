@@ -296,6 +296,16 @@
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
 			parameter="exportExcel" >
 		</action>
+		<action path="/monitoring/getMarkChartData"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
+			parameter="getMarkChartData" >
+		</action>			
+		<action path="/monitoring/statistic"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
+			parameter="statistic" >
+			<forward name="success" path="/pages/monitoring/parts/statisticpart.jsp" />
+		</action>			
+		
 		<!-- ========== Admin Definitions ============================== -->		
 		<action path="/admin/start"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.AdminAction"

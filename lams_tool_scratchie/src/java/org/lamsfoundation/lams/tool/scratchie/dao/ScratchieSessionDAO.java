@@ -42,5 +42,10 @@ public interface ScratchieSessionDAO extends DAO {
     void delete(ScratchieSession session);
 
     void deleteBySessionId(Long toolSessionId);
+    
+    List<Number> getRawLeaderMarksByToolContentId(Long toolContentId);
+    Object[] getStatsMarksForLeaders(Long toolContentId);
+    
+
 
 }

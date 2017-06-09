@@ -28,6 +28,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.type.FloatType;
+import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
@@ -42,6 +46,15 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
     private static final String FIND_BY_CONTENT_ID = "from " + ScratchieSession.class.getName()
 	    + " as p where p.scratchie.contentId=? order by p.sessionName asc";
 
+    private static final String LOAD_MARKS = "SELECT mark FROM tl_lascrt11_session session "
+	    + " JOIN tl_lascrt11_scratchie scratchie ON session.scratchie_uid = scratchie.uid "
+	    + " WHERE session.scratching_finished = 1 AND scratchie.content_id = :toolContentId";
+    private static final String FIND_MARK_STATS = "SELECT MIN(mark) min_grade, AVG(mark) avg_grade, MAX(mark) max_grade, COUNT(mark) num_complete "
+	    + " FROM tl_lascrt11_session session "
+	    + " JOIN tl_lascrt11_scratchie scratchie ON session.scratchie_uid = scratchie.uid "
+	    + " WHERE session.scratching_finished = 1 AND scratchie.content_id = :toolContentId";
+
+    @SuppressWarnings("rawtypes")
     @Override
     public ScratchieSession getSessionBySessionId(Long sessionId) {
 	List list = doFind(FIND_BY_SESSION_ID, sessionId);
@@ -71,5 +84,33 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
     public void deleteBySessionId(Long toolSessionId) {
 	this.removeObject(ScratchieSession.class, toolSessionId);
     }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Number> getRawLeaderMarksByToolContentId(Long toolContentId) {
+	SQLQuery query = getSession().createSQLQuery(LOAD_MARKS);
+	query.setLong("toolContentId", toolContentId);
+	List<Number> list = query.list();
+	return list;
+    }
+    
+    @Override
+    public Object[] getStatsMarksForLeaders(Long toolContentId) {
+	Query query = getSession().createSQLQuery(FIND_MARK_STATS)
+		.addScalar("min_grade", FloatType.INSTANCE)
+		.addScalar("avg_grade", FloatType.INSTANCE)
+		.addScalar("max_grade", FloatType.INSTANCE)
+		.addScalar("num_complete", IntegerType.INSTANCE);
+	query.setLong("toolContentId", toolContentId);
+	@SuppressWarnings("rawtypes")
+	List list = query.list();
+	if ((list == null) || (list.size() == 0)) {
+	    return null;
+	} else {
+	    return (Object[]) list.get(0);
+	}
+    }
+
+
 
 }
