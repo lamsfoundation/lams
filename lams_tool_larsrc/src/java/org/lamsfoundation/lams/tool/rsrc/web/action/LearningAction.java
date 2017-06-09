@@ -107,6 +107,9 @@ public class LearningAction extends Action {
 	if (param.equals("saveOrUpdateItem")) {
 	    return saveOrUpdateItem(mapping, form, request, response);
 	}
+	if (param.equals("hideItem")) {
+	    return hideItem(mapping, form, request, response);
+	}
 
 	// ================ Reflection =======================
 	if (param.equals("newReflection")) {
@@ -280,7 +283,7 @@ public class LearningAction extends Action {
 	} else {
 	    return mapping.findForward(ResourceConstants.SUCCESS);
 	}
-	
+
     }
 
     /**
@@ -698,5 +701,22 @@ public class LearningAction extends Action {
 		break;
 	    }
 	}
+    }
+
+    private ActionForward hideItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID);
+	IResourceService service = getResourceService();
+	ResourceItem resourceItem = service.getResourceItemByUid(itemUid);
+	if (!resourceItem.isCreateByAuthor()
+		&& user.getUserID().longValue() == resourceItem.getCreateBy().getUserId()) {
+	    service.setItemVisible(itemUid, false);
+	    //open session Map
+	} else {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not allowed to hide this item");
+	}
+	return null;
     }
 }
