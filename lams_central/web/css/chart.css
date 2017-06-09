@@ -33,3 +33,12 @@ div.tooltip {
 	fill: none;
 	pointer-events: all;
 }
+
+/* Tool Mark Charts (Monitoring) - space for the histogram chart */
+.markChartDiv {
+	margin-top: 10px;
+	margin-left: 10px;
+	margin-bottom: 10px;
+	width: 95%;
+	height: 500px;
+}
