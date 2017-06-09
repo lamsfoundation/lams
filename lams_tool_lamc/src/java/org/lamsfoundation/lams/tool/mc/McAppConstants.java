@@ -46,6 +46,7 @@ public interface McAppConstants {
     public static final String REFLECTIONS_CONTAINER_DTO = "reflectionsContainerDTO";
     public static final String LEARNER_NOTEBOOK = "learnerNotebook";
     public static final String USER_MASTER_DETAIL = "userMasterDetail";
+    public static final String STATISTICS = "statistic";
 
     public static final String TOOL_CONTENT_ID = "toolContentID";
     public static final String TOOL_SESSION_ID = "toolSessionID";

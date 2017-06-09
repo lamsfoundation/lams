@@ -24,4 +24,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
 
-
+<!-- Marks Chart -->
+<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
+ 

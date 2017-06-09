@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -81,11 +82,13 @@ import org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.mc.dto.AnswerDTO;
+import org.lamsfoundation.lams.tool.mc.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McSessionMarkDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.dto.ReflectionDTO;
+import org.lamsfoundation.lams.tool.mc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
@@ -102,6 +105,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -730,8 +734,8 @@ public class McServicePOJO
     }
 
     @Override
-    public Integer[] getMarkStatistics(McSession mcSession) {
-	return mcUserDAO.getMarkStatisticsForSession(mcSession.getUid());
+    public Object[] getMarkStatistics(McSession mcSession) {
+	return mcUserDAO.getStatsMarksBySession(mcSession.getMcSessionId());
     }
 
     @Override
@@ -1834,6 +1838,65 @@ public class McServicePOJO
 	else
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
     }
+
+    @Override
+    public LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId) {
+	LeaderResultsDTO newDto = new LeaderResultsDTO(contentId);
+	Object[] markStats = mcUserDAO.getStatsMarksForLeaders(contentId);
+	if ( markStats != null ) {
+	    newDto.setMinMark(markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[0], (Locale)null, 2) : "0.00");
+	    newDto.setAvgMark(markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[1], (Locale)null, 2) : "0.00");
+	    newDto.setMaxMark(markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[2], (Locale)null, 2) : "0.00");
+	    newDto.setNumberGroupsLeaderFinished((Integer)markStats[3]);
+	}
+	return newDto;
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics) {
+	List<SessionDTO> sessionDtos = new ArrayList<SessionDTO>();
+
+	McContent mcContent = getMcContent(contentId);
+	if (mcContent != null) {
+	    Set<McSession> sessions = new TreeSet<McSession>(new McSessionComparator());
+	    sessions.addAll(mcContent.getMcSessions());
+	    for (McSession session : sessions) {
+		SessionDTO sessionDto = new SessionDTO();
+		sessionDto.setSessionId(session.getMcSessionId());
+		sessionDto.setSessionName(session.getSession_name());
+		//for statistics tab
+		if (includeStatistics) {
+		    int countUsers = mcUserDAO.getCountPagedUsersBySession(session.getMcSessionId(), "");
+		    sessionDto.setNumberLearners(countUsers);
+		    Object[] markStats = mcUserDAO.getStatsMarksBySession(session.getMcSessionId());
+		    if (markStats != null) {
+			sessionDto.setMinMark(markStats[0] != null
+				? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2) : "0.00");
+			sessionDto.setAvgMark(markStats[1] != null
+				? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2) : "0.00");
+			sessionDto.setMaxMark(markStats[2] != null
+				? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2) : "0.00");
+		    }
+		}
+
+		sessionDtos.add(sessionDto);
+	    }
+	}
+	return sessionDtos;
+    }
+	
+    @Override
+    public List<Number> getMarksArray(Long sessionId) {
+	return mcUserDAO.getRawUserMarksBySession(sessionId);
+    }
+
+    @Override
+    public List<Number> getMarksArrayForLeaders(Long toolContentId) {
+	return mcUserDAO.getRawLeaderMarksByToolContentId(toolContentId);
+    }
+
+
 
     // ****************** REST methods *************************
 

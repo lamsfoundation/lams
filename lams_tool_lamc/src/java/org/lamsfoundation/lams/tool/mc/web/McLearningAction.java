@@ -487,16 +487,18 @@ public class McLearningAction extends LamsDispatchAction {
 	mcGeneralLearnerFlowDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
 	mcGeneralLearnerFlowDTO.setLearnerMark(user.getLastAttemptTotalMark());
 	
+	Object[] markStatistics = null;
 	if (mcContent.isShowMarks()) {
-	    Integer[] markStatistics = mcService.getMarkStatistics(mcSession);
-	    mcGeneralLearnerFlowDTO.setTopMark(markStatistics[0]);
-	    mcGeneralLearnerFlowDTO.setLowestMark(markStatistics[1]);
-	    mcGeneralLearnerFlowDTO.setAverageMark(markStatistics[2]);
-	    
+	    markStatistics = mcService.getMarkStatistics(mcSession);
+	}
+	if (markStatistics != null) {
+	    mcGeneralLearnerFlowDTO.setLowestMark(markStatistics[0] != null ? ((Float)markStatistics[0]).intValue() : 0);
+	    mcGeneralLearnerFlowDTO.setAverageMark(markStatistics[1] != null ? ((Float)markStatistics[1]).intValue() : 0);
+	    mcGeneralLearnerFlowDTO.setTopMark(markStatistics[2] != null ? ((Float)markStatistics[2]).intValue() : 0);
 	} else {
-	    mcGeneralLearnerFlowDTO.setTopMark(0);
 	    mcGeneralLearnerFlowDTO.setLowestMark(0);
 	    mcGeneralLearnerFlowDTO.setAverageMark(0);
+	    mcGeneralLearnerFlowDTO.setTopMark(0);
 	}
 
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
