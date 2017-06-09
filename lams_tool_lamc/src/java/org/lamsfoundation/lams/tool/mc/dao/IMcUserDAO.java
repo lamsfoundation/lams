@@ -71,11 +71,13 @@ public interface IMcUserDAO {
      */
     void removeMcUser(McQueUsr mcUser);
 
-    /** Get the max, min and average mark (in that order) for a session */
-    Integer[] getMarkStatisticsForSession(Long sessionUid);
-
     List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
 	    String searchString);
 
     int getCountPagedUsersBySession(Long sessionId, String searchString);
+    
+    Object[] getStatsMarksBySession(Long sessionId);
+    Object[] getStatsMarksForLeaders(Long toolContentId);
+    List<Number> getRawUserMarksBySession(Long sessionId);
+    List<Number> getRawLeaderMarksByToolContentId(Long toolContentId);
 }

@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -48,8 +49,10 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
+import org.lamsfoundation.lams.tool.mc.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
+import org.lamsfoundation.lams.tool.mc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -340,4 +343,67 @@ public class McMonitoringAction extends LamsDispatchAction {
 
 	return null;
     }
+    
+    /**
+     * Get the mark summary with data arranged in bands. Can be displayed graphically or in a table.
+     */
+    public ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	McContent mcContent = mcService.getMcContent(contentID);
+	List<Number> results = null;
+	
+	if ( mcContent != null ) {
+	    if ( mcContent.isUseSelectLeaderToolOuput() ) {
+		results = mcService.getMarksArrayForLeaders(contentID);
+	    } else {
+		Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+		results = mcService.getMarksArray(sessionID);
+	    }
+	}
+	
+	JSONObject responseJSON = new JSONObject();
+	if ( results != null )
+	    responseJSON.put("data", results);
+	else 
+	    responseJSON.put("data", new Float[0]);
+
+	res.setContentType("application/json;charset=utf-8");
+	res.getWriter().write(responseJSON.toString());
+	return null;
+
+    }
+    
+    public ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, contentID);
+	McContent mcContent = mcService.getMcContent(contentID);
+	if ( mcContent != null ) {
+	    if ( mcContent.isUseSelectLeaderToolOuput() ) {
+		LeaderResultsDTO leaderDto = mcService.getLeaderResultsDTOForLeaders(contentID);
+		request.setAttribute("leaderDto", leaderDto);
+	    } else {
+		List<SessionDTO> sessionDtos = mcService.getSessionDtos(contentID, true);
+		request.setAttribute("sessionDtos", sessionDtos);
+	    }
+	    request.setAttribute("useSelectLeaderToolOutput", mcContent.isUseSelectLeaderToolOuput());
+	}
+	
+	// prepare toolOutputDefinitions and activityEvaluation
+	List<String> toolOutputDefinitions = new ArrayList<String>();
+	toolOutputDefinitions.add(McAppConstants.OUTPUT_NAME_LEARNER_MARK);
+	toolOutputDefinitions.add(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT);
+	String activityEvaluation = mcService.getActivityEvaluation(contentID);
+	request.setAttribute(McAppConstants.ATTR_TOOL_OUTPUT_DEFINITIONS, toolOutputDefinitions);
+	request.setAttribute(McAppConstants.ATTR_ACTIVITY_EVALUATION, activityEvaluation);
+
+	return mapping.findForward(McAppConstants.STATISTICS);
+    }
+
+
 }

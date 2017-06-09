@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -32,11 +33,13 @@ import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.dto.AnswerDTO;
+import org.lamsfoundation.lams.tool.mc.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McSessionMarkDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.dto.ReflectionDTO;
+import org.lamsfoundation.lams.tool.mc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
@@ -44,6 +47,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
+import org.lamsfoundation.lams.util.NumberUtil;
 
 /**
  * Interface that defines the contract that all MCQ service provider must follow.
@@ -161,9 +165,9 @@ public interface IMcService {
      * Return the top, lowest and average mark for all learners for one particular tool session.
      *
      * @param request
-     * @return top mark, lowest mark, average mark in that order
+     * @return lowest mark, average mark, top mark in that order
      */
-    Integer[] getMarkStatistics(McSession mcSession);
+    Object[] getMarkStatistics(McSession mcSession);
 
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
@@ -235,5 +239,36 @@ public interface IMcService {
      * @return
      */
     List<ReflectionDTO> getReflectionList(McContent mcContent, Long userID);
+    
+    /** 
+     * Gets the basic statistics for the grades for the Leaders when an Assessment is done using
+     * Group Leaders. So the averages, etc are for the whole Assessment, not for a Group.
+     * @param contentId
+     * @return
+     */
+    LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
+    
+    /** 
+     * Prepares data for the marks summary graph on the statistics page
+     * @param assessment
+     * @param sessionDtos
+     * @return
+     */
+    List<Number> getMarksArray(Long sessionId);
+
+    /** 
+     * Prepares data for the marks summary graph on the statistics page, using the grades for the Leaders 
+     * when an Assessment is done using Group Leaders. So the grades are for the whole Assessment, not for a Group.
+     * @param assessment
+     * @param sessionDtos
+     * @return
+     */
+    List<Number> getMarksArrayForLeaders(Long contentId);
+
+    /** 
+     * Contains the session id and name for a session. If includeStatistics is true also includes the number of 
+     * learners, max min and average of marks for the session.
+     */
+    List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics);
 
 }

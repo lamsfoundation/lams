@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.type.FloatType;
+import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
@@ -41,16 +44,35 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 
-    private static final String CALC_MARK_STATS_FOR_SESSION = "select max(mu.lastAttemptTotalMark), min(mu.lastAttemptTotalMark), avg(mu.lastAttemptTotalMark)"
-	    + " from McQueUsr mu where mu.mcSessionId = :mcSessionUid";
-
     private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSessionId=:mcSessionUid";
+
+    private static final String LOAD_MARKS_FOR_SESSION = "SELECT last_attempt_total_mark "
+	    + " FROM tl_lamc11_que_usr usr "
+	    + " JOIN tl_lamc11_session sess ON usr.mc_session_id = sess.uid "
+	    + " WHERE responseFinalised = 1 AND sess.mc_session_id = :sessionId";
+    private static final String FIND_MARK_STATS_FOR_SESSION = "SELECT MIN(last_attempt_total_mark) min_grade, AVG(last_attempt_total_mark) avg_grade, "
+    	    + " MAX(last_attempt_total_mark) max_grade FROM tl_lamc11_que_usr usr "
+	    + " JOIN tl_lamc11_session sess ON usr.mc_session_id = sess.uid "
+	    + " WHERE responseFinalised = 1 AND sess.mc_session_id = :sessionId";
+
+    private static final String LOAD_MARKS_FOR_LEADERS = "SELECT usr.last_attempt_total_mark "
+    	    + " FROM tl_lamc11_que_usr usr "
+    	    + " JOIN tl_lamc11_session sess ON usr.mc_session_id = sess.uid AND usr.uid = sess.mc_group_leader_uid "
+    	    + " JOIN tl_lamc11_content mcq ON sess.mc_content_id = mcq.uid  "
+    	    + " WHERE responseFinalised = 1 AND mcq.content_id = :toolContentId";
+    private static final String FIND_MARK_STATS_FOR_LEADERS = "SELECT MIN(usr.last_attempt_total_mark) min_grade, AVG(usr.last_attempt_total_mark) avg_grade,  "
+    	    + " MAX(usr.last_attempt_total_mark) max_grade, COUNT(usr.last_attempt_total_mark) num_complete  "
+    	    + " FROM tl_lamc11_que_usr usr "
+    	    + " JOIN tl_lamc11_session sess ON usr.mc_session_id = sess.uid AND usr.uid = sess.mc_group_leader_uid "
+    	    + " JOIN tl_lamc11_content mcq ON sess.mc_content_id = mcq.uid  "
+    	    + " WHERE responseFinalised = 1 AND mcq.content_id = :toolContentId";
 
     @Override
     public McQueUsr getMcUserByUID(Long uid) {
 	return (McQueUsr) this.getSession().get(McQueUsr.class, uid);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) {
 
@@ -79,26 +101,7 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 	this.getSession().delete(mcUser);
     }
 
-    /** Get the max, min and average mark (in that order) for a session */
-    @Override
-    public Integer[] getMarkStatisticsForSession(Long sessionUid) {
-	Object[] stats = (Object[]) getSessionFactory().getCurrentSession().createQuery(CALC_MARK_STATS_FOR_SESSION)
-		.setLong("mcSessionUid", sessionUid.longValue()).uniqueResult();
-
-	if (stats != null) {
-	    if (stats[2] instanceof Float) {
-		return new Integer[] { (Integer) stats[0], (Integer) stats[1],
-			new Integer(((Float) stats[2]).intValue()) };
-	    } else if (stats[2] instanceof Double) {
-		return new Integer[] { (Integer) stats[0], (Integer) stats[1],
-			new Integer(((Double) stats[2]).intValue()) };
-	    }
-	}
-
-	return null;
-
-    }
-
+    @SuppressWarnings("unchecked")
     @Override
     public List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
@@ -139,6 +142,7 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 	return userDtos;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public int getCountPagedUsersBySession(Long sessionId, String searchString) {
 
@@ -158,6 +162,61 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 	} else {
 	    return ((Number) list.get(0)).intValue();
 	}
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Object[] getStatsMarksBySession(Long sessionId) {
+
+	Query query = getSession().createSQLQuery(FIND_MARK_STATS_FOR_SESSION)
+		.addScalar("min_grade", FloatType.INSTANCE)
+		.addScalar("avg_grade", FloatType.INSTANCE)
+		.addScalar("max_grade", FloatType.INSTANCE);
+	query.setLong("sessionId", sessionId);
+	List list = query.list();
+	if ((list == null) || (list.size() == 0)) {
+	    return null;
+	} else {
+	    return (Object[]) list.get(0);
+	}
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Object[] getStatsMarksForLeaders(Long toolContentId) {
+
+	Query query = getSession().createSQLQuery(FIND_MARK_STATS_FOR_LEADERS)
+		.addScalar("min_grade", FloatType.INSTANCE)
+		.addScalar("avg_grade", FloatType.INSTANCE)
+		.addScalar("max_grade", FloatType.INSTANCE)
+		.addScalar("num_complete", IntegerType.INSTANCE);
+	query.setLong("toolContentId", toolContentId);
+	List list = query.list();
+	if ((list == null) || (list.size() == 0)) {
+	    return null;
+	} else {
+	    return (Object[]) list.get(0);
+	}
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Number> getRawUserMarksBySession(Long sessionId) {
+
+	SQLQuery query = getSession().createSQLQuery(LOAD_MARKS_FOR_SESSION);
+	query.setLong("sessionId", sessionId);
+	List<Number> list = query.list();
+	return list;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Number> getRawLeaderMarksByToolContentId(Long toolContentId) {
+
+	SQLQuery query = getSession().createSQLQuery(LOAD_MARKS_FOR_LEADERS);
+	query.setLong("toolContentId", toolContentId);
+	List<Number> list = query.list();
+	return list;
     }
 
 }

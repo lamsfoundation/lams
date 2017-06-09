@@ -8,6 +8,8 @@
 	<title><fmt:message key="label.monitoring"/></title>
 	
 	<%@ include file="/common/monitoringheader.jsp"%>
+	<link href="${lams}css/chart.css" rel="stylesheet" type="text/css"/>
+
 	<script type="text/javascript">
 	
         function init(){
@@ -16,8 +18,22 @@
         
         function doSelectTab(tabId) {
 	    	// end optional tab controller stuff
+	    	if ( tabId == 3 )
+	    		doStatistic();
 	    	selectTab(tabId);
         }
+
+		function doStatistic(){
+			var url = '<c:url value="/monitoring.do?dispatch=statistic"/>';
+			$.ajaxSetup({ cache: true });
+			$("#statisticArea").load(
+				url,
+				{
+					toolContentID: ${mcGeneralMonitoringDTO.toolContentID}, 
+					reqID: (new Date()).getTime()
+				}
+			);
+		}       
 
 		function downloadMarks() {
 			var url = "<c:url value='/monitoring.do'/>";
@@ -40,7 +56,7 @@
 <c:set var="title"><fmt:message key="activity.title" /></c:set>
 <lams:Page title="${title}" type="navbar">
 
-	<lams:Tabs title="${title}" control="true" helpToolSignature="<%= McAppConstants.TOOL_SIGNATURE %>" helpModule="monitoring">
+	<lams:Tabs title="${title}" control="true" helpToolSignature="<%= McAppConstants.TOOL_SIGNATURE %>" helpModule="monitoring" refreshOnClickAction="javascript:location.reload();">
 		<lams:Tab id="1" key="label.summary" />
 		<lams:Tab id="2" key="label.editActivity" />
 		<lams:Tab id="3" key="label.stats" />

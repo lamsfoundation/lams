@@ -294,6 +294,12 @@
 	        path="/monitoringStarter.do"
 		    redirect="true"
 	  	/>
+
+	  	<forward
+		    name="statistic"
+	        path="/monitoring/parts/statsPart.jsp"
+		    redirect="false"
+	  	/>
 	  	
 	</action>  
 	

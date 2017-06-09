@@ -132,14 +132,6 @@ public class McMonitoringStarterAction extends Action {
 		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
-	//prepare toolOutputDefinitions and activityEvaluation
-	List<String> toolOutputDefinitions = new ArrayList<String>();
-	toolOutputDefinitions.add(McAppConstants.OUTPUT_NAME_LEARNER_MARK);
-	toolOutputDefinitions.add(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT);
-	String activityEvaluation = service.getActivityEvaluation(mcContent.getMcContentId());
-	request.setAttribute(McAppConstants.ATTR_TOOL_OUTPUT_DEFINITIONS, toolOutputDefinitions);
-	request.setAttribute(McAppConstants.ATTR_ACTIVITY_EVALUATION, activityEvaluation);
-
 	boolean isGroupedActivity = service.isGroupedActivity(new Long(mcContent.getMcContentId()));
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
 
