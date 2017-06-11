@@ -39,5 +39,6 @@
   		</paths>
   	</system>   
     <module name="javax.servlet.api" />
+    <module name="org.apache.log4j" />
   </dependencies>    
 </module>
