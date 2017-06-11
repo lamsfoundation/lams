@@ -96,6 +96,24 @@
 				div.style.display = '';
 			}
 		}
+		
+		function deleteLearnerFile(detailId) {
+			var msg = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
+			var answer = confirm(msg);
+			if (answer) {	
+				 $.ajax({
+			            url: '<c:url value="/learner.do"/>',
+			            data: 'method=deleteLearnerFile&detailId=' + detailId,
+			            success: function () {
+			            	document.location.href = "<c:url value='/learner.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}'/>";
+			            },
+			            error: function(error){
+			                alert("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
+			                alert("responseText: "+xhr.responseText);
+			            }
+			       	});
+			}
+		}
 	</script>
 
 </lams:head>
@@ -182,11 +200,16 @@
 								</c:set>
 								</td>
 								<td>
+								<c:if test="${empty file.marks}">
+								 <html:link href="javascript:deleteLearnerFile(${file.submissionID});" styleClass="btn btn-default btn-disable-on-submit pull-right">
+					                      <i class="fa fa-trash" title="<fmt:message key="label.monitoring.original.learner.file.delete" />"></i> <span class="hidden-xs"></span>
+				                 </html:link>
+				                 </c:if>
 									<a href="${downloadURL}" title="<fmt:message key="label.download" />" class="btn btn-default btn-disable-on-submit pull-right">
 										<i class="fa fa-download" ></i>
 									</a>
 								</td>
-							</c:if>
+							   </c:if>
 						</td>
 					</tr>
 					<tr>
@@ -204,7 +227,7 @@
 					</tr>
 
 				<!--Fourth row displaying the comments -->
-				<c:if test="${not empty file.comments}">
+				<c:if test="${not empty file.dateMarksReleased and not empty file.comments}">
 					<tr>
 						<td style="vertical-align:top"><fmt:message key="label.learner.comments" /></td>
 						<td colspan="2">
@@ -214,7 +237,7 @@
 				</c:if>
 
 				<!--Fifth row displaying the marks-->
-				<c:if test="${not empty file.marks}">
+				<c:if test="${not empty file.dateMarksReleased and not empty file.marks}">
 					<tr>
 						<td><fmt:message key="label.learner.marks" /></td>
 						<td>

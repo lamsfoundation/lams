@@ -750,8 +750,10 @@ public class SubmitFilesService
 	SubmissionDetails detail = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
 
 	if (detail != null) {
+	    if(monitor != null){
 
 	    auditRemoveRestore(monitor, detail, "audit.file.delete");
+	    }
 
 	    detail.setRemoved(true);
 	    submissionDetailsDAO.update(detail);
