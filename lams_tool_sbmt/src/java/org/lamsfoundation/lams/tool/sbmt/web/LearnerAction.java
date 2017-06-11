@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -84,6 +85,7 @@ public class LearnerAction extends DispatchAction {
     private static final boolean MODE_OPTIONAL = false;
 
     public static Logger logger = Logger.getLogger(LearnerAction.class);
+    public ISubmitFilesService submitFilesService;
 
     /**
      * The initial page of learner in Submission tool. This page will list all uploaded files and learn
@@ -151,7 +153,7 @@ public class LearnerAction extends DispatchAction {
 	sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER, content.getLimitUploadNumber());
 	sessionMap.put(SbmtConstants.ATTR_USER_FINISHED, learner.isFinished());
 
-	sessionMap.put(SbmtConstants.ATTR_UPLOAD_MAX_FILE_SIZE, 
+	sessionMap.put(SbmtConstants.ATTR_UPLOAD_MAX_FILE_SIZE,
 		FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)));
 	setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
 
@@ -232,7 +234,8 @@ public class LearnerAction extends DispatchAction {
 	    Integer userID = user.getUserID();
 
 	    ISubmitFilesService submitFilesService = getService();
-	    List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(), false);
+	    List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(),
+		    false);
 
 	    SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 	    ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -390,10 +393,10 @@ public class LearnerAction extends DispatchAction {
 		    } else {
 			filedto.setCurrentLearner(false);
 		    }
-		    if (filedto.getDateMarksReleased() == null) {
-			filedto.setComments(null);
-			filedto.setMarks(null);
-		    }
+//		    if (filedto.getDateMarksReleased() == null) {
+//			filedto.setComments(null);
+//			filedto.setMarks(null);
+//		    }
 		}
 	    }
 	    dto.setFilesUploaded(filesUploaded);
@@ -437,6 +440,33 @@ public class LearnerAction extends DispatchAction {
 	}
 
 	return learner;
+    }
+
+    private ISubmitFilesService getSubmitFilesService() {
+	return SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
+    }
+
+    public ActionForward deleteLearnerFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException, IOException {
+	HttpSession ss = SessionManager.getSession();
+	
+
+	UserDTO currentUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	Long detailID = WebUtil.readLongParam(request, "detailId");
+
+	if (submitFilesService == null) {
+	    submitFilesService = getSubmitFilesService();
+	}
+	FileDetailsDTO fileDetail = submitFilesService.getFileDetails(detailID, request.getLocale());
+	
+	if (fileDetail.getOwner().getUserID().equals(currentUser.getUserID()) && (StringUtils.isBlank(fileDetail.getMarks()))) {
+
+	    submitFilesService.removeLearnerFile(detailID,null);
+
+	} else {
+	  response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not allowed to delete this item");
+	}
+	return null;
     }
 
 }
