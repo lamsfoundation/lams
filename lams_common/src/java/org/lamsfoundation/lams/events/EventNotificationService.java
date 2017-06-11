@@ -22,6 +22,9 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Provides tools for managing events and notifing users.
@@ -116,21 +119,23 @@ public class EventNotificationService implements IEventNotificationService {
 
     @Override
     public void notifyLessonMonitors(Long lessonId, String subject, String message, boolean isHtmlFormat) {
-	Map<User, Boolean> monitoringUsers = lessonService.getUsersWithLessonParticipation(lessonId, "MONITOR", null, null, null, true);
+	Map<User, Boolean> monitoringUsers = lessonService.getUsersWithLessonParticipation(lessonId, "MONITOR", null,
+		null, null, true);
 	if (monitoringUsers.isEmpty()) {
 	    return;
 	}
 
 	ArrayList<Integer> monitoringUsersIds = new ArrayList<Integer>();
-	for ( Map.Entry<User, Boolean> entry : monitoringUsers.entrySet() ) {
-	    if ( entry.getValue() )
+	for (Map.Entry<User, Boolean> entry : monitoringUsers.entrySet()) {
+	    if (entry.getValue()) {
 		monitoringUsersIds.add(entry.getKey().getUserId());
+	    }
 	}
 
-	sendMessage(null, monitoringUsersIds.toArray(new Integer[monitoringUsersIds.size()]), IEventNotificationService.DELIVERY_METHOD_MAIL, subject, message,
-		isHtmlFormat);
+	sendMessage(null, monitoringUsersIds.toArray(new Integer[monitoringUsersIds.size()]),
+		IEventNotificationService.DELIVERY_METHOD_MAIL, subject, message, isHtmlFormat);
     }
-    
+
     @Override
     public void notifyLessonMonitors(Long sessionId, String message, boolean isHtmlFormat) {
 	List<User> monitoringUsers = lessonService.getMonitorsByToolSessionId(sessionId);
@@ -177,7 +182,7 @@ public class EventNotificationService implements IEventNotificationService {
      *            whether the message is of HTML content-type or plain text
      */
     public void notifyUser(Subscription subscription, String subject, String message, boolean isHtmlFormat) {
-	log.debug("EventNotificationService notifyUser "+this.toString());
+	log.debug("EventNotificationService notifyUser " + this.toString());
 	subscription.setLastOperationMessage(
 		subscription.getDeliveryMethod().send(null, subscription.getUserId(), subject, message, isHtmlFormat));
     }
@@ -217,7 +222,6 @@ public class EventNotificationService implements IEventNotificationService {
 	    return true;
 	}
 
-	EventNotificationService.log.error("Error occured while sending message: " + result);
 	Event event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
 		String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat, new Date());
 	subscribe(event, toUserId, deliveryMethod);
@@ -239,15 +243,15 @@ public class EventNotificationService implements IEventNotificationService {
 	new Thread(() -> {
 	    try {
 		HibernateSessionManager.openSession();
+		// use proxy bean instead of concrete implementation of service
+		// otherwise there is no transaction for the new session
+		WebApplicationContext ctx = WebApplicationContextUtils
+			.getWebApplicationContext(SessionManager.getServletContext());
+		IEventNotificationService eventNotificationService = (IEventNotificationService) ctx
+			.getBean("eventNotificationService");
 		for (Integer id : toUserIds) {
-		    String result = deliveryMethod.send(fromUserId, id, subject, message, isHtmlFormat);
-		    if (result != null) {
-			Event event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
-				String.valueOf(System.currentTimeMillis()), null, subject, message, 
-				isHtmlFormat, new Date());
-			subscribe(event, id, deliveryMethod);
-			log.debug("Set up new event "+event.getUid()+":"+event.getName()+" number of subscriptions "+event.getSubscriptions().size());
-		    }
+		    eventNotificationService.sendMessage(fromUserId, id, deliveryMethod, subject, message,
+			    isHtmlFormat);
 		}
 	    } finally {
 		HibernateSessionManager.closeSession();
@@ -339,54 +343,64 @@ public class EventNotificationService implements IEventNotificationService {
     /**
      * See {@link IEventNotificationService#trigger(String, String, Long, String, String)
      */
-    private void trigger(Event eventData, String subject, String message) {
-	final String subjectToSend = subject == null ? eventData.getSubject() : subject;
-	final String messageToSend = message == null ? eventData.getMessage() : message;
+    private void trigger(Event event, String subject, String message) {
+	final String subjectToSend = subject == null ? event.getSubject() : subject;
+	final String messageToSend = message == null ? event.getMessage() : message;
 
 	// create a new thread to send the messages as it can take some time
 	new Thread(() -> {
 	    try {
 		HibernateSessionManager.openSession();
-
-		// fetch the event again so it is associated with current session
-		Event event = (Event) eventDAO.find(Event.class, eventData.getUid());
-		Event eventFailCopy = null;
-		Iterator<Subscription> subscriptionIterator = event.getSubscriptions().iterator();
-		while (subscriptionIterator.hasNext()) {
-		    Subscription subscription = subscriptionIterator.next();
-		    notifyUser(subscription, subjectToSend, messageToSend, event.isHtmlFormat());
-		    if (! subscription.getDeliveryMethod().lastOperationFailed(subscription)) {
-			if (event.getFailTime() != null) {
-			    subscriptionIterator.remove();
-			}
-		    } else if (event.getFailTime() == null) {
-			if (eventFailCopy == null) {
-			    eventFailCopy = (Event) event.clone();
-			}
-			subscribe(eventFailCopy, subscription.getUserId(), subscription.getDeliveryMethod());
-		    }
-		}
-		if (event.getSubscriptions().isEmpty()) {
-		    log.debug("Deleting event "+event.getUid()+" "+event.getFailTime());
-		    eventDAO.delete(event);
-		} else {
-		    eventDAO.insertOrUpdate(event);
-		}
-
-		/*
-		 * if any of the notifications failed,
-		 * a copy of the event is created in order to repeat the attempt later
-		 */
-		if (eventFailCopy != null) {
-		    eventFailCopy.setFailTime(new Date());
-		    eventFailCopy.setSubject(subjectToSend);
-		    eventFailCopy.setMessage(messageToSend);
-		    eventDAO.insertOrUpdate(eventFailCopy);
-		}
+		// use proxy bean instead of concrete implementation of service
+		// otherwise there is no transaction for the new session
+		WebApplicationContext ctx = WebApplicationContextUtils
+			.getWebApplicationContext(SessionManager.getServletContext());
+		IEventNotificationService eventNotificationService = (IEventNotificationService) ctx
+			.getBean("eventNotificationService");
+		eventNotificationService.triggerInternal(event, subjectToSend, messageToSend);
 	    } finally {
 		HibernateSessionManager.closeSession();
 	    }
 	}).start();
+    }
+
+    @Override
+    public void triggerInternal(Event eventData, String subject, String message) {
+	// fetch the event again so it is associated with current session
+	Event event = (Event) eventDAO.find(Event.class, eventData.getUid());
+	Event eventFailCopy = null;
+	Iterator<Subscription> subscriptionIterator = event.getSubscriptions().iterator();
+	while (subscriptionIterator.hasNext()) {
+	    Subscription subscription = subscriptionIterator.next();
+	    notifyUser(subscription, subject, message, event.isHtmlFormat());
+	    if (!subscription.getDeliveryMethod().lastOperationFailed(subscription)) {
+		if (event.getFailTime() != null) {
+		    subscriptionIterator.remove();
+		}
+	    } else if (event.getFailTime() == null) {
+		if (eventFailCopy == null) {
+		    eventFailCopy = (Event) event.clone();
+		}
+		subscribe(eventFailCopy, subscription.getUserId(), subscription.getDeliveryMethod());
+	    }
+	}
+	if (event.getSubscriptions().isEmpty()) {
+	    log.debug("Deleting event " + event.getUid() + " " + event.getFailTime());
+	    eventDAO.delete(event);
+	} else {
+	    eventDAO.insertOrUpdate(event);
+	}
+
+	/*
+	 * if any of the notifications failed,
+	 * a copy of the event is created in order to repeat the attempt later
+	 */
+	if (eventFailCopy != null) {
+	    eventFailCopy.setFailTime(new Date());
+	    eventFailCopy.setSubject(subject);
+	    eventFailCopy.setMessage(message);
+	    eventDAO.insertOrUpdate(eventFailCopy);
+	}
     }
 
     @Override
