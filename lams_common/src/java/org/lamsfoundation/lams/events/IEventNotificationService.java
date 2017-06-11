@@ -133,13 +133,13 @@ public interface IEventNotificationService {
      * @param lessonId
      *            tool session to which monitors belong
      * @param subject
-     * 	      	  subject to be sent
+     *            subject to be sent
      * @param message
      *            message to be sent
      * @isHtmlFormat whether email is required to of HTML format
      */
     void notifyLessonMonitors(Long lessonId, String subject, String message, boolean isHtmlFormat);
-    
+
     void resendMessages();
 
     /**
@@ -323,6 +323,11 @@ public interface IEventNotificationService {
      */
     void triggerForSingleUser(String scope, String name, Long eventSessionId, Integer userId, String subject,
 	    String message) throws InvalidParameterException;
+
+    /**
+     * Do not call from other classes. Internal use only.
+     */
+    void triggerInternal(Event eventData, String subject, String message);
 
     /**
      * Unregister an user from notification of the event.
