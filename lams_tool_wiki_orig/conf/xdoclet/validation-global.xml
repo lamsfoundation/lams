@@ -1,6 +1,0 @@
-	<global>
-		<constant>
-			<constant-name>datePattern</constant-name>
-			<constant-value>yyyy-MM-dd</constant-value>
-		</constant>
-	</global>

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<message_catalog package_key="forums-portlet" locale="ja_JP" charset="utf-8">
-
-  <msg key="No_Forums">フォーラムはありません</msg>
-  <msg key="pretty_name">フォーラム</msg>
-</message_catalog>

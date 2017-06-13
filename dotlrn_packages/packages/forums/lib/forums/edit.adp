@@ -1,1 +1,0 @@
-<formtemplate id="forum"></formtemplate>

@@ -1,9 +1,0 @@
-*.swp
-installer-package/build
-installer-package/build/*
-installer-package/assembly
-installer-package/assembly/*
-upgrader-package/build
-upgrader-package/build/*
-upgrader-package/assembly
-upgrader-package/assembly/*

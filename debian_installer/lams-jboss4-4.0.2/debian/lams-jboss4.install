@@ -1,5 +1,0 @@
-bin/*	/usr/share/jboss-4.0.2/bin
-client/*	/usr/share/jboss-4.0.2/client
-docs/*	/usr/share/jboss-4.0.2/docs
-lib/*	/usr/share/jboss-4.0.2/lib
-server/*	/usr/share/jboss-4.0.2/server

@@ -1,7 +1,0 @@
-This is where the finally configured wildfire server will go. You can download it from here:
-
-http://lamscommunity.org/3rdparty/wildfire_2_6_2.tar.gz
-
-Make sure you configure it with admin password: wildfire (or change the LAMS config settings). Make sure you also do the changes the Config changes suggested for group history and security (see http://is.gd/beyic).
-
-In terms of DB, you can choose to use the embedding one or MySQL. 

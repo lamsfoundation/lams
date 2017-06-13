@@ -1,1 +1,0 @@
--- No updates for locales in LAMS 2.3.5 (check previous version if needed)
