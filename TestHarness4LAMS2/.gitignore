@@ -1,0 +1,5 @@
+/bin/
+/build/
+/*.users
+/report_*.html
+/test.log*

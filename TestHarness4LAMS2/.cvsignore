@@ -1,5 +1,0 @@
-build
-bin
-*.users
-report_*.html
-test.log*
