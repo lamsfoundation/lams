@@ -18,7 +18,7 @@
 	
 	<!-- Set library paths -->
 	<path id="libs.classpath" >
-		<fileset dir="../lams_build/lib">
+		<fileset dir="../../lams/lams_build/lib">
 			<include name="**/*.jar" />
 		</fileset>
 		<!-- Same list as in projects' .classpath file references to WildFly modules.
@@ -126,9 +126,9 @@
 	<target name="copy-tags" description="Copies LAMS TLD and TAGs.">
 		<echo>${ant.project.name}: Copying tags from Central</echo>
    		<copy todir="${conf.web.dir}/WEB-INF/tlds/lams" 
-   			  file="../lams_central/web/WEB-INF/tlds/lams/lams.tld" overwrite="true" verbose="true" />	
+   			  file="../../lams/lams_central/web/WEB-INF/tlds/lams/lams.tld" overwrite="true" verbose="true" />	
 		<copy todir="${conf.web.dir}/WEB-INF/tags" overwrite="true" verbose="true">
-			<fileset dir="../lams_central/web/WEB-INF/tags" />
+			<fileset dir="../../lams/lams_central/web/WEB-INF/tags" />
 		</copy>
 	</target>
 	
@@ -144,7 +144,7 @@
 			 password="${db.password}"
 			 encoding="utf8">
 			<classpath>
-				<fileset dir="../lams_build/lib/mysql" includes="*.jar"/> 
+				<fileset dir="../../lams/lams_build/lib/mysql" includes="*.jar"/> 
 			</classpath>
 			<transaction src="${sql.script}" />
 		</sql>
@@ -276,7 +276,7 @@
 	
 	<target name="copy-to-lams-lib" if="product.core" depends="_build-jar"
 		    description="Copies JAR file to lams_build/lib/lams for other projects to use.">
-  		<copy overwrite="yes" todir="../lams_build/lib/lams">
+  		<copy overwrite="yes" todir="../../lams/lams_build/lib/lams">
   			<fileset dir="${basedir}/build/lib">
   				<include name="${product}.jar"/>
   			</fileset>
