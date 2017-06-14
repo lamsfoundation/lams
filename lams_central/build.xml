@@ -5,13 +5,13 @@
 	<import file="../lams_build/build_base.xml"/> 
 
 	<!-- Additional properties -->
-	<available file="../lams_planner/build.xml" property="planner.available" />
+	<available file="../../lams-private/lams_planner/build.xml" property="planner.available" />
 		
 	
 	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
 	<target name="_copy-planner" if="planner.available" depends="_copy-language">
 		<echo>Copying Pedagogical Planner files</echo>
-		<ant antfile="../lams_planner/build.xml" target="_copy-to-central" />
+		<ant antfile="../../lams-private/lams_planner/build.xml" target="_copy-to-central" />
 	</target>
 	
 	

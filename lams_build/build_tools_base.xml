@@ -14,7 +14,7 @@
 	<import file="${toolsbase.dir}/build_base.xml"/> 
 	
 	<path id="deploy.classpath">
-		<fileset dir="../lams_build/deploy-tool/lib">
+		<fileset dir="../../lams/lams_build/deploy-tool/lib">
 			<include name="*.jar" />
 		</fileset>
 	</path>
@@ -62,7 +62,7 @@
 
 		<echo>${ant.project.name}: Copying additional libraries and scripts for deployment</echo>
 		<copy todir="${basedir}/build/deploy" overwrite="true" verbose="true">
-			<fileset dir="../lams_build/deploy-tool">
+			<fileset dir="../../lams/lams_build/deploy-tool">
 				<include name="**" />
 			</fileset>
 		</copy>
