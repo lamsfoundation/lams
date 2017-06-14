@@ -2,6 +2,9 @@
 <%@ page import="org.lamsfoundation.lams.admin.service.IImportService"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %> 
+
+<c:set var="lams"><lams:LAMSURL/></c:set>
 
 <c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
 <c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>
@@ -9,11 +12,36 @@
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
 
+<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set> 
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set> 
+<c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set> 
+
+
+<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
+ 
 <script language="javascript" type="text/JavaScript">
+	
 	function goToStatus() {
+		if ( "undefined" === typeof bCancel || ! bCancel ) {
+			var fileSelect = document.getElementById('file');
+			var files = fileSelect.files;
+				if (files.length == 0) {
+				clearFileError();
+				showFileError('<fmt:message key="button.select.importfile"/>');
+				return false;
+			} else {
+				var file = files[0];
+				if ( ! validateShowErrorSpreadsheetType(file, '<fmt:message key="error.attachment.not.xls"/>', false)
+						 || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', '<fmt:message key="errors.maxfilesize"/>') ) {
+					return false;
+				}
+			}
+			document.getElementById('fileUpload_Busy').style.display = '';
+		}
 		document.location = '<lams:LAMSURL/>/admin/import/status.jsp';
 	}
-</script>
+ </script>
 
 <p>
 	<a href="<lams:LAMSURL/>/admin/sysadminstart.do"
@@ -72,15 +100,12 @@
 </p>
 
 <html:form action="/importexcelsave.do" method="post"
-	enctype="multipart/form-data" onsubmit="goToStatus();">
+	enctype="multipart/form-data" onsubmit="return goToStatus();">
 	<html:hidden property="orgId" />
 
-	<table>
-		<tr>
-			<td align="right"><fmt:message key="label.excel.spreadsheet" />:&nbsp;</td>
-			<td><html:file property="file" styleClass="form-control" /></td>
-		</tr>
-	</table>
+	<lams:FileUpload fileFieldname="file" fileInputMessageKey="label.excel.spreadsheet" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/> 
+	<lams:WaitingSpinner id="fileUpload_Busy"/> 
+
 	<div class="pull-right">
 		<html:cancel styleId="cancelButton" styleClass="btn btn-default">
 			<fmt:message key="admin.cancel" />

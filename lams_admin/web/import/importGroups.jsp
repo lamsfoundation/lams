@@ -2,21 +2,42 @@
 <%@ page import="org.lamsfoundation.lams.admin.service.IImportService" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.OrganisationType" %>
+<%@ page import="org.lamsfoundation.lams.util.Configuration"%>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %> 
 
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/prototype.js"></script>
+<c:set var="lams"><lams:LAMSURL/></c:set>
+
+<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set> 
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set> 
+<c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set> 
+
+<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
+ 
 <script language="javascript" type="text/JavaScript">
-function loading(){
-	document.getElementById('loading').style.display="";
-	document.getElementById('main-page').style.display="none";
-}
-</script>
+	
+	function verifyAndSubmit() {
+		if ( "undefined" === typeof bCancel || ! bCancel ) {
+			var fileSelect = document.getElementById('file');
+			var files = fileSelect.files;
+				if (files.length == 0) {
+				clearFileError();
+				showFileError('<fmt:message key="button.select.importfile"/>');
+				return false;
+			} else {
+				var file = files[0];
+				if ( ! validateShowErrorSpreadsheetType(file, '<fmt:message key="error.attachment.not.xls"/>', false)
+						 || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', '<fmt:message key="errors.maxfilesize"/>') ) {
+					return false;
+				}
+			}
+		document.getElementById('fileUpload_Busy').style.display = '';
+		}
+	}
+ </script>
 
 <p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
-
-<div id="loading" style="display:none">
-	<h4><fmt:message key="msg.please.wait"/></h4>
-	<p class="text-center"><i class="fa fa-refresh fa-spin fa-2x fa-fw"></i></p>
-</div>
 
 <div id="main-page">
 
@@ -68,15 +89,12 @@ function loading(){
 </p>
 <p><fmt:message key="msg.import.conclusion"/></p>
 
-<html:form action="/importgroups.do" method="post" enctype="multipart/form-data" onsubmit="loading();">
+<html:form action="/importgroups.do" method="post" enctype="multipart/form-data" onsubmit="return verifyAndSubmit();">
 <html:hidden property="orgId" />
 
-<table>
-	<tr>
-		<td align="right"><fmt:message key="label.excel.spreadsheet" />:&nbsp;</td>
-		<td><html:file property="file" styleClass="form-control"/></td>
-	</tr>
-</table>
+<lams:FileUpload fileFieldname="file" fileInputMessageKey="label.excel.spreadsheet" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/> 
+	<lams:WaitingSpinner id="fileUpload_Busy"/> 
+
 <div class="pull-right">
 <html:cancel styleId="cancelButton" styleClass="btn btn-default"><fmt:message key="admin.cancel"/></html:cancel>
 <html:submit styleId="importButton" styleClass="btn btn-primary loffset5"><fmt:message key="label.import"/></html:submit> &nbsp; 	
