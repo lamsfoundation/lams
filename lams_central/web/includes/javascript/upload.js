@@ -43,6 +43,21 @@ function validateShowErrorImageType(file, errorMessage, showFilename, errDivId) 
     return true;
 }
 
+//returns false if not simple .xls file.
+function validateShowErrorSpreadsheetType(file, errorMessage, showFilename, errDivId) {
+    // Check the file type.
+	clearFileError(errDivId);
+	var filename = file.name;
+	var isExcel = false;
+	if ( filename ) {
+		var extname = filename.substr((~-filename.lastIndexOf(".") >>> 0) + 2);
+		isExcel = extname.length > 0 && extname.toUpperCase() === "XLS" ;
+	} 
+	if ( ! isExcel ) {
+		showFileError(showFilename ? file.value + ": " + errorMessage: errorMessage, errDivId);
+	}
+	return isExcel;
+}
 // file: the file to check
 // maxSize: maximum size allowed in bytes
 // rawErrorMessage: message text from I18N files. Must contain '{0}' which will be replaced by the size and the units
