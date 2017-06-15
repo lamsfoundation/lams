@@ -57,21 +57,6 @@ public class AuthoringUtil {
     private static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
 
     /**
-     * returns McQuestionDTO in the specified order of the list
-     */
-    public static McQuestionDTO getQuestionAtDisplayOrder(List questionDTOs, int intOriginalQuestionIndex) {
-	Iterator iter = questionDTOs.iterator();
-	while (iter.hasNext()) {
-	    McQuestionDTO questionDto = (McQuestionDTO) iter.next();
-
-	    if (new Integer(intOriginalQuestionIndex).toString().equals(questionDto.getDisplayOrder())) {
-		return questionDto;
-	    }
-	}
-	return null;
-    }
-
-    /**
      * extractCandidateAtOrder
      */
     public static McOptionDTO getOptionAtDisplayOrder(List options, int intOriginalCandidateIndex) {

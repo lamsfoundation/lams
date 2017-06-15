@@ -165,13 +165,13 @@ public class McAction extends LamsDispatchAction {
 	McQuestionDTO questionDto = null;
 	//editing existing question
 	if (questionIndex != null) {
-	    mcAuthoringForm.setQuestionIndex("" + questionIndex);
+	    mcAuthoringForm.setQuestionIndex(questionIndex);
 	    
 	    //find according questionDto
 	    for (McQuestionDTO questionDtoIter : questionDtos) {
 		Integer displayOrder = questionDtoIter.getDisplayOrder();
 
-		if ((displayOrder != null) && (!displayOrder.equals("")) && displayOrder.equals(questionIndex)) {
+		if ((displayOrder != null) && displayOrder.equals(questionIndex)) {
 		    questionDto = questionDtoIter;
 		    break;
 		}
@@ -207,7 +207,7 @@ public class McAction extends LamsDispatchAction {
 	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 	
 	Integer questionIndexToDelete = WebUtil.readIntParam(request, "questionIndex");
-	mcAuthoringForm.setQuestionIndex("" + questionIndexToDelete);
+	mcAuthoringForm.setQuestionIndex(questionIndexToDelete);
 
 	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
 
@@ -218,17 +218,19 @@ public class McAction extends LamsDispatchAction {
 
 	    String questionText = questionDTO.getQuestion();
 	    Integer displayOrder = questionDTO.getDisplayOrder();
-	    if ((questionText != null) && (!questionText.isEmpty()) && !displayOrder.equals(questionIndexToDelete)) {
+	    if ((questionText != null) && !questionText.isEmpty()) {
 
-		++queIndex;
-		questionDTO.setDisplayOrder(queIndex);
-		tempQuestionDtos.add(questionDTO);
-	    }
-	    if ((questionText != null) && (!questionText.isEmpty()) && displayOrder.equals(questionIndexToDelete)) {
-		List<McQuestionDTO> deletedQuestionDTOs = (List<McQuestionDTO>) sessionMap
-			.get(McAppConstants.LIST_DELETED_QUESTION_DTOS);
-		deletedQuestionDTOs.add(questionDTO);
-		sessionMap.put(McAppConstants.LIST_DELETED_QUESTION_DTOS, deletedQuestionDTOs);
+		if (!displayOrder.equals(questionIndexToDelete)) {
+		    ++queIndex;
+		    questionDTO.setDisplayOrder(queIndex);
+		    tempQuestionDtos.add(questionDTO);
+		    
+		} else {
+		    List<McQuestionDTO> deletedQuestionDTOs = (List<McQuestionDTO>) sessionMap
+			    .get(McAppConstants.LIST_DELETED_QUESTION_DTOS);
+		    deletedQuestionDTOs.add(questionDTO);
+		    sessionMap.put(McAppConstants.LIST_DELETED_QUESTION_DTOS, deletedQuestionDTOs);
+		}
 	    }
 	}
 	questionDTOs = tempQuestionDtos;
@@ -257,7 +259,7 @@ public class McAction extends LamsDispatchAction {
 		.getAttribute(sessionMapId);
 	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 
-	String questionIndex = request.getParameter("questionIndex");
+	Integer questionIndex = WebUtil.readIntParam(request, "questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.QUESTION_DTOS);
@@ -276,7 +278,7 @@ public class McAction extends LamsDispatchAction {
 		.getAttribute(sessionMapId);
 	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 
-	String questionIndex = request.getParameter("questionIndex");
+	Integer questionIndex = WebUtil.readIntParam(request, "questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.QUESTION_DTOS);
@@ -290,21 +292,13 @@ public class McAction extends LamsDispatchAction {
     /*
      * swappes McQuestionDTO questions in the list. Auxiliary method for moveQuestionDown() and moveQuestionUp()
      */
-    private static List<McQuestionDTO> swapQuestions(List<McQuestionDTO> questionDTOs, String questionIndex,
+    private static List<McQuestionDTO> swapQuestions(List<McQuestionDTO> questionDTOs, Integer originalQuestionIndex,
 	    String direction) {
 
-	int intQuestionIndex = new Integer(questionIndex).intValue();
-	int intOriginalQuestionIndex = intQuestionIndex;
+	int replacedQuestionIndex = direction.equals("down") ? originalQuestionIndex + 1 : originalQuestionIndex - 1;
 
-	int replacedQuestionIndex = 0;
-	if (direction.equals("down")) {
-	    replacedQuestionIndex = ++intQuestionIndex;
-	} else {
-	    replacedQuestionIndex = --intQuestionIndex;
-	}
-
-	McQuestionDTO mainQuestion = AuthoringUtil.getQuestionAtDisplayOrder(questionDTOs, intOriginalQuestionIndex);
-	McQuestionDTO replacedQuestion = AuthoringUtil.getQuestionAtDisplayOrder(questionDTOs, replacedQuestionIndex);
+	McQuestionDTO mainQuestion = questionDTOs.get(originalQuestionIndex - 1);
+	McQuestionDTO replacedQuestion = questionDTOs.get(replacedQuestionIndex - 1);
 	if ((mainQuestion == null) || (replacedQuestion == null)) {
 	    return questionDTOs;
 	}
@@ -316,16 +310,16 @@ public class McAction extends LamsDispatchAction {
 	    McQuestionDTO questionDto = iter.next();
 	    McQuestionDTO tempQuestion = new McQuestionDTO();
 
-	    if ((!questionDto.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString()))
-		    && !questionDto.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
+	    if ((!questionDto.getDisplayOrder().equals(originalQuestionIndex))
+		    && !questionDto.getDisplayOrder().equals(replacedQuestionIndex)) {
 		// normal copy
 		tempQuestion = questionDto;
 
-	    } else if (questionDto.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) {
+	    } else if (questionDto.getDisplayOrder().equals(originalQuestionIndex)) {
 		// move type 1
 		tempQuestion = replacedQuestion;
 
-	    } else if (questionDto.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
+	    } else if (questionDto.getDisplayOrder().equals(replacedQuestionIndex)) {
 		// move type 2
 		tempQuestion = mainQuestion;
 	    }
@@ -396,7 +390,7 @@ public class McAction extends LamsDispatchAction {
 	String newQuestion = request.getParameter("newQuestion");
 	String feedback = request.getParameter("feedback");
 	Integer questionIndex = WebUtil.readIntParam(request, "questionIndex", true);
-	mcAuthoringForm.setQuestionIndex("" + questionIndex);
+	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	if ((newQuestion != null) && (newQuestion.length() > 0)) {
 	    // adding new question
@@ -406,7 +400,7 @@ public class McAction extends LamsDispatchAction {
 		if (!duplicates) {
 		    
 		    //finding max displayOrder
-		    int maxDisplayOrder = 1;
+		    int maxDisplayOrder = 0;
 		    for (McQuestionDTO questionDTO : questionDTOs) {
 			int displayOrder = new Integer(questionDTO.getDisplayOrder());
 			if (displayOrder > maxDisplayOrder) {

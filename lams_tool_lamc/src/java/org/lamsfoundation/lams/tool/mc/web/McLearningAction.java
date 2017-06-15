@@ -336,9 +336,8 @@ public class McLearningAction extends LamsDispatchAction {
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
 
 	Integer totalQuestionCount = mcGeneralLearnerFlowDTO.getTotalQuestionCount();
-	String questionIndex = mcLearningForm.getQuestionIndex();
-	Integer intQuestionIndex = new Integer(questionIndex);
-	if (totalQuestionCount.equals(intQuestionIndex)) {
+	Integer questionIndex = mcLearningForm.getQuestionIndex();
+	if (totalQuestionCount.equals(questionIndex)) {
 	    mcGeneralLearnerFlowDTO.setTotalCountReached(new Boolean(true).toString());
 	}
 
@@ -346,7 +345,7 @@ public class McLearningAction extends LamsDispatchAction {
 	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 	mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
 	mcGeneralLearnerFlowDTO.setTotalMarksPossible(mcContent.getTotalMarksPossible());
-	mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(questionIndex));
+	mcGeneralLearnerFlowDTO.setQuestionIndex(questionIndex);
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
