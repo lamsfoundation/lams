@@ -60,7 +60,7 @@ public class McLearningForm extends ActionForm {
 
     protected String entryText;
 
-    protected String questionIndex;
+    protected Integer questionIndex;
     protected String nextQuestionSelected;
     protected String httpSessionID;
 
@@ -283,7 +283,7 @@ public class McLearningForm extends ActionForm {
     /**
      * @return Returns the questionIndex.
      */
-    public String getQuestionIndex() {
+    public Integer getQuestionIndex() {
 	return questionIndex;
     }
 
@@ -291,7 +291,7 @@ public class McLearningForm extends ActionForm {
      * @param questionIndex
      *            The questionIndex to set.
      */
-    public void setQuestionIndex(String questionIndex) {
+    public void setQuestionIndex(Integer questionIndex) {
 	this.questionIndex = questionIndex;
     }
 

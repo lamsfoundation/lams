@@ -30,7 +30,6 @@ package org.lamsfoundation.lams.tool.mc.web.form;
 public class McAuthoringForm extends McLearningForm  {
     /* form controllers */
 
-    protected String questionIndex;
     protected String optionIndex;
 
     protected String showMarks;
@@ -65,23 +64,6 @@ public class McAuthoringForm extends McLearningForm  {
     protected String edit;
     private String feedback;
     private String candidateIndex;
-
-    /**
-     * @return Returns the questionIndex.
-     */
-    @Override
-    public String getQuestionIndex() {
-	return questionIndex;
-    }
-
-    /**
-     * @param questionIndex
-     *            The questionIndex to set.
-     */
-    @Override
-    public void setQuestionIndex(String questionIndex) {
-	this.questionIndex = questionIndex;
-    }
 
     /**
      * @return Returns the submitAllContent.
