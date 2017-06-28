@@ -36,7 +36,7 @@ public class Kumalive implements Serializable {
     private Organisation organisation;
     private User createdBy;
     private String name;
-    private Boolean finished;
+    private Boolean finished = false;
     private Map<User, Short> scores;
 
     public Kumalive(Organisation organisation, User createdBy, String name) {

@@ -39,6 +39,8 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.command.dao.ICommandDAO;
 import org.lamsfoundation.lams.learning.command.model.Command;
+import org.lamsfoundation.lams.learning.kumalive.dao.IKumaliveDAO;
+import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
 import org.lamsfoundation.lams.learning.progress.ProgressBuilder;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
@@ -81,6 +83,7 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -89,6 +92,8 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
@@ -111,13 +116,15 @@ public class LearnerService implements ICoreLearnerService {
     private ProgressEngine progressEngine;
     private IDataFlowDAO dataFlowDAO;
     private ICommandDAO commandDAO;
+    private IKumaliveDAO kumaliveDAO;
     private ILamsCoreToolService lamsCoreToolService;
     private ActivityMapping activityMapping;
     private IUserManagementService userManagementService;
     private ILessonService lessonService;
-    private static HashMap<Integer, Long> syncMap = new HashMap<Integer, Long>();
+    private static HashMap<Integer, Long> syncMap = new HashMap<>();
     private IGradebookService gradebookService;
     private ILogEventService logEventService;
+    private ISecurityService securityService;
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
@@ -216,6 +223,10 @@ public class LearnerService implements ICoreLearnerService {
 
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
+    }
+
+    public void setSecurityService(ISecurityService securityService) {
+	this.securityService = securityService;
     }
 
     // ---------------------------------------------------------------------
@@ -764,7 +775,7 @@ public class LearnerService implements ICoreLearnerService {
     private boolean forceGrouping(Lesson lesson, Grouping grouping, Group group, User learner) {
 	boolean groupingDone = false;
 	if (lesson.isPreviewLesson()) {
-	    ArrayList<User> learnerList = new ArrayList<User>();
+	    ArrayList<User> learnerList = new ArrayList<>();
 	    learnerList.add(learner);
 	    if (group != null) {
 		if (group.getGroupId() != null) {
@@ -857,7 +868,7 @@ public class LearnerService implements ICoreLearnerService {
     @Override
     public Set<Group> getGroupsForGate(GateActivity gate) {
 	Lesson lesson = getLessonByActivity(gate);
-	Set<Group> result = new HashSet<Group>();
+	Set<Group> result = new HashSet<>();
 
 	Activity branchActivity = gate.getParentBranch();
 	while ((branchActivity != null) && !(branchActivity.getParentActivity().isChosenBranchingActivity()
@@ -909,7 +920,7 @@ public class LearnerService implements ICoreLearnerService {
      * @return the lesson dto array.
      */
     private LessonDTO[] getLessonDataFor(List lessons) {
-	List<LessonDTO> lessonDTOList = new ArrayList<LessonDTO>();
+	List<LessonDTO> lessonDTOList = new ArrayList<>();
 	for (Iterator i = lessons.iterator(); i.hasNext();) {
 	    Lesson currentLesson = (Lesson) i.next();
 	    lessonDTOList.add(new LessonDTO(currentLesson));
@@ -969,7 +980,7 @@ public class LearnerService implements ICoreLearnerService {
 	if (toolSession != null) {
 
 	    // Get all the conditions for this branching activity, ordered by order id.
-	    Map<BranchCondition, SequenceActivity> conditionsMap = new TreeMap<BranchCondition, SequenceActivity>();
+	    Map<BranchCondition, SequenceActivity> conditionsMap = new TreeMap<>();
 	    Iterator branchIterator = branchingActivity.getActivities().iterator();
 	    while (branchIterator.hasNext()) {
 		Activity branchActivity = (Activity) branchIterator.next();
@@ -986,7 +997,7 @@ public class LearnerService implements ICoreLearnerService {
 
 	    // Go through each condition until we find one that passes and that is the required branch.
 	    // Cache the tool output so that we aren't calling it over an over again.
-	    Map<String, ToolOutput> toolOutputMap = new HashMap<String, ToolOutput>();
+	    Map<String, ToolOutput> toolOutputMap = new HashMap<>();
 	    Iterator<BranchCondition> conditionIterator = conditionsMap.keySet().iterator();
 
 	    while ((matchedBranch == null) && conditionIterator.hasNext()) {
@@ -1101,7 +1112,7 @@ public class LearnerService implements ICoreLearnerService {
 
 		// Go through each condition until we find one that passes and that opens the gate.
 		// Cache the tool output so that we aren't calling it over an over again.
-		Map<String, ToolOutput> toolOutputMap = new HashMap<String, ToolOutput>();
+		Map<String, ToolOutput> toolOutputMap = new HashMap<>();
 		for (BranchActivityEntry entry : conditionGate.getBranchActivityEntries()) {
 		    BranchCondition condition = entry.getCondition();
 		    String conditionName = condition.getName();
@@ -1286,12 +1297,12 @@ public class LearnerService implements ICoreLearnerService {
 	this.dataFlowDAO = dataFlowDAO;
     }
 
-    public ICommandDAO getCommandDAO() {
-	return commandDAO;
-    }
-
     public void setCommandDAO(ICommandDAO commandDAO) {
 	this.commandDAO = commandDAO;
+    }
+
+    public void setKumaliveDAO(IKumaliveDAO kumaliveDAO) {
+	this.kumaliveDAO = kumaliveDAO;
     }
 
     /**
@@ -1398,6 +1409,16 @@ public class LearnerService implements ICoreLearnerService {
     public ActivityPositionDTO getActivityPositionByToolSessionId(Long toolSessionId) {
 	ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);
 	return toolSession == null ? null : getActivityPosition(toolSession.getToolActivity().getActivityId());
+    }
+
+    @Override
+    public Long startKumalive(Integer organisationId, Integer userId, String name) {
+	securityService.isGroupMonitor(organisationId, userId, "start kumalive", true);
+	Organisation organisation = (Organisation) kumaliveDAO.find(Organisation.class, organisationId);
+	User createdBy = (User) kumaliveDAO.find(User.class, userId);
+	Kumalive kumalive = new Kumalive(organisation, createdBy, name);
+	kumaliveDAO.insert(kumalive);
+	return kumalive.getKumaliveId();
     }
 
     private boolean isActivityLast(Activity activity) {
@@ -1601,5 +1622,4 @@ public class LearnerService implements ICoreLearnerService {
     public IActivityDAO getActivityDAO() {
 	return activityDAO;
     }
-
 }

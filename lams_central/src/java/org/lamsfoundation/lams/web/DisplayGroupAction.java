@@ -158,6 +158,8 @@ public class DisplayGroupAction extends Action {
 		    String name = org.getEnableSingleActivityLessons() ? "index.addlesson.single" : "index.addlesson";
 		    links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + org.getOrganisationId() + ")",
 			    "fa fa-fw fa-plus", null));
+		    links.add(new IndexLinkBean("index.kumalive", "javascript:showKumaliveDialog(" + org.getOrganisationId() + ")",
+			    "fa fa-fw fa-bolt", null));
 		}
 		moreLinks.add(new IndexLinkBean("index.searchlesson",
 			"javascript:showSearchLessonDialog(" + org.getOrganisationId() + ")", "fa fa-fw fa-search",

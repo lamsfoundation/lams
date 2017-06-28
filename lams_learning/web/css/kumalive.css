@@ -1,0 +1,86 @@
+#raiseHandContainer {
+	display: none;
+	margin-bottom : 10px;
+	border-bottom: thin black solid;
+}
+
+table {
+	table-layout: fixed;
+}
+
+#actionCell {
+	width: 400px;
+	border-left: thin black solid;
+	vertical-align: top;
+}
+
+
+.learner {
+	width: 80px;
+	height: 120px;
+	position: relative;
+	float: left;
+	margin: 5px 5px 0 5px;
+	text-align: center;
+	display: none;
+}
+
+.learner .profilePictureWrapper {
+	width: 80px;
+	height: 80px;
+}
+
+.profilePicture {
+	position: relative;
+	border-radius: 100%;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+}
+
+.profilePictureHidden {
+	top: 40px;
+	left: 40px;
+	width: 0;
+	height: 0;
+}
+
+.profilePictureShown {
+	top: 0;
+	left: 0;
+	width: 80px;
+	height: 80px;
+}
+
+.name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.learner .name {
+	font-size: 12px;
+}
+
+
+.speaker {
+	width: 200px;
+	height: 300px;
+	margin: auto;
+	text-align: center;
+}
+
+.speaker .profilePicture{
+	width: 200px;
+	height: 200px;
+}
+
+.speaker .name {
+	font-size: 18px;
+}
+
+#raiseHandPrompt {
+	display: none;
+	text-align: center;
+	padding-top: 100px;
+	cursor: pointer;
+}

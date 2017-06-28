@@ -60,4 +60,6 @@ public interface ILearnerService {
     void createCommandForLearner(Long lessonId, String userName, String jsonCommand);
 
     List<Command> getCommandsForLesson(Long lessonId, Date laterThan);
+
+    Long startKumalive(Integer organisationId, Integer userId, String name);
 }

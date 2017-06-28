@@ -87,7 +87,9 @@
 				<fmt:message key="label.remove.org.favorite" var="REMOVE_ORG_FAVORITE_VAR"/>
 				REMOVE_ORG_FAVORITE : '<c:out value="${REMOVE_ORG_FAVORITE_VAR}" />',
 				<fmt:message key="label.mark.org.favorite" var="MARK_ORG_FAVORITE_VAR"/>
-				MARK_ORG_FAVORITE : '<c:out value="${MARK_ORG_FAVORITE_VAR}" />'
+				MARK_ORG_FAVORITE : '<c:out value="${MARK_ORG_FAVORITE_VAR}" />',
+				<fmt:message key="index.kumalive" var="KUMALIVE_TITLE_VAR"/>
+				KUMALIVE_TITLE : '<c:out value="${KUMALIVE_TITLE_VAR}" />',
 			},
 			activeOrgId = <c:choose><c:when test="${empty activeOrgId}">null</c:when><c:otherwise>${activeOrgId}</c:otherwise></c:choose>;
 

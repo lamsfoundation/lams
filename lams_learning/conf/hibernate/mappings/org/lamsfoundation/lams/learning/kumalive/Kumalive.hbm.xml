@@ -4,7 +4,7 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" >
 
 <hibernate-mapping>
-	<class name="org.lamsfoundation.lams.learning.kumalive.Kumalive"
+	<class name="org.lamsfoundation.lams.learning.kumalive.model.Kumalive"
 		table="lams_kumalive">
 
 		<id name="kumaliveId" type="java.lang.Long" column="kumalive_id">
@@ -13,7 +13,7 @@
 
 		<property name="name" type="java.lang.String" column="name" length="250" />
 
-		<property name="finished" type="java.lang.Boolean" column="finished" length="1" />
+		<property name="finished" type="java.lang.Boolean" column="finished" length="1" not-null="true" />
 
 		<many-to-one name="organisation"
 			class="org.lamsfoundation.lams.usermanagement.Organisation" not-null="true" lazy="false">
@@ -22,7 +22,7 @@
 
 		<many-to-one name="createdBy" lazy="false"
 			class="org.lamsfoundation.lams.usermanagement.User" not-null="false">
-			<column name="user_id" />
+			<column name="created_by" />
 		</many-to-one>
 
 		<map name="scores" lazy="true" batch-size="20" cascade="none" table="lams_kumalive_score">
