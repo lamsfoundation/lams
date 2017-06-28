@@ -131,6 +131,7 @@
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		function hideItem(itemUid) {
+			if (confirm(msg.del.confirmation)) {
 	        $.ajax({
 	        	url: '<c:url value="/learning/hideItem.do"/>',
 	            data: 'sessionMapID=${sessionMapID}&itemUid=' + itemUid,
@@ -142,6 +143,7 @@
 	            	
 	            }
 	       	});
+			}
 		}
 		    </script>
 </lams:head>
@@ -212,7 +214,6 @@
 					<fmt:message key="export.label.resource" />
 				</th>
 				<th class="text-center">
-					<fmt:message key="label.delete" />
 				</th>
 				<th class="text-center">
 					<fmt:message key="label.completed" />
@@ -233,9 +234,9 @@
 								(<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true"/>)
 						</c:if>
 					</td>
-						<td class="text-center"><c:if
-								test="${!item.createByAuthor && userID == item.createBy.userId}">
-								<i class="fa fa-times"
+						<td class="text-center">
+						  <c:if test="${!item.createByAuthor && userID == item.createBy.userId}">
+								<i class="fa fa-trash"
 									title="<fmt:message key="label.delete" />"
 									id="delete${status.index}" onclick="hideItem(${item.uid})"></i>
 							</c:if></td>
