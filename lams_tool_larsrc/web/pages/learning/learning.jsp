@@ -23,11 +23,11 @@
 	<c:set var="resource" value="${sessionMap.resource}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 	<c:set var="userID"><lams:user property="userID"/></c:set>
+	<c:set var="delConfirmMsgKey" value="del.confirmation" scope="request"/>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
-	
 	<c:if test="${sessionMap.rateItems}">
 	<script type="text/javascript">
 		var pathToImageFolder = "${lams}images/css/",
@@ -131,14 +131,13 @@
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		function hideItem(itemUid) {
-			if (confirm(msg.del.confirmation)) {
+			if(confirm("<fmt:message key='${delConfirmMsgKey}'/>")){
 	        $.ajax({
 	        	url: '<c:url value="/learning/hideItem.do"/>',
 	            data: 'sessionMapID=${sessionMapID}&itemUid=' + itemUid,
 	            cache : false,
 				async: false,
 	            success: function () {
-	            	alert('success');
 	            	checkNew();
 	            	
 	            }
