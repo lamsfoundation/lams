@@ -183,14 +183,14 @@
 		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 	});
 	
+	
 	function changeItemVisibility(linkObject, itemUid, isHideItem) {
 		<c:set var="hideShowLink"><a href='<c:url value='/monitoring/changeItemVisibility.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}' class='button'> <fmt:message key='monitoring.label.show' /> </a></c:set>
         $.ajax({
             url: '<c:url value="/monitoring/changeItemVisibility.do"/>',
             data: 'sessionMapID=${sessionMapID}&itemUid=' + itemUid + '&isHideItem=' + isHideItem,
-            dataType: 'json',
             type: 'post',
-            success: function (json) {
+            success: function () {
             	if (isHideItem) {
             		linkObject.innerHTML = '<fmt:message key='monitoring.label.show' />' ;
             		linkObject.onclick = function (){
