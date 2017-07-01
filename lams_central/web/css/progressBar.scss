@@ -1,0 +1,54 @@
+@import "_lams_variables.scss";
+	
+div#tooltip {
+	display: none;
+	position: absolute;
+	border: $border-thin-default;
+	background-color: $gray-light-mid;
+	padding: 3px;
+	z-index: 5;
+	width: 100px;
+	font-size: 9px;
+	word-wrap: break-word;
+}
+
+.progressBarContainer {
+	overflow: auto;
+}
+
+div.optionalActivity {
+	display: none;
+	position: absolute;
+	z-index: 6;
+}
+
+div.optionalActivity table {
+	border: $border-thin-black;
+	background-color: $optional-activity-background;
+	width: 145px;
+}
+
+div.optionalActivity table tr:first-child td {
+	border-top: none;
+	background-color: $optional-activity-background-heading;
+}
+
+div.optionalActivity td {
+	border-top: $border-thin-black;
+	cursor: pointer;
+	padding: 0px;
+}
+
+div.optionalActivity td:hover {
+	background-color: $optional-activity-background-hover;
+}
+
+div#progressBarDialog {
+	display: none;
+}
+
+div#progressBarDialog iframe {
+	width: 100%;
+	height: 100%;
+	border: none;
+}

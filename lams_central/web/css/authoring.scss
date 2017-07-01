@@ -1,0 +1,482 @@
+@import "_lams_variables.scss";
+@import url('/lams/css/inlineeditor.css');
+
+/**** Global styles ****/
+
+.ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
+	background-color: $brand-primary-light;
+}
+
+a.ygtvspacer {
+	border-bottom: none;
+}
+
+
+/**** Dialog styles ****/
+#loadingOverlay {
+	width: 99%;
+	height: 99%;
+	z-index: 2000;
+	position: absolute;
+	background-color: $body-bg;
+	text-align: center;
+}
+
+#loadingOverlay * {
+	margin-top: 20%;
+}
+
+.dialogContainer {
+	-webkit-overflow-scrolling: touch !important;
+}
+
+.dialogContainer .modal-content {
+	box-shadow: none;
+}
+
+.dialogContainer .modal-body {
+	height : 100%;
+	max-height: calc(100% - 38px);
+	padding: 0;
+}
+
+.dialogContainer button {
+	cursor: pointer;
+}
+
+.dialogContainer button:focus {
+	outline: none;
+}
+
+.dialogContainer .modal-header button .fa {
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.dialogContainer .ui-draggable .modal-header {
+	cursor: move;
+}
+
+div.dialogContents, #ldScreenshotAuthor, #ldScreenshotLoading {
+	display: none;
+}
+
+.dialogContainer iframe {
+	width: 100%;
+	height: 99%;
+	border: none;
+}
+
+.dialogContainer .ui-spinner {
+	border: none;
+}
+
+.dialogMin {
+	top: auto !important;
+	bottom: 5px !important;
+	overflow: hidden !important;
+	padding: 0 !important;
+	position: fixed !important;
+	width: 250px !important;
+	height: 35px !important;
+}
+
+.dialogMin .modal-title {
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.dialogMin .modal-dialog {
+	left: 0 !important;
+	top: 0 !important;
+}
+
+.dialogMin .modal-dialog, .dialogMin .modal-content {
+	width: 250px !important;
+	height: 35px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.dialogMin .modal-header {
+	height: 100%;
+	margin: 0 !important;
+	padding: 3px 5px !important;
+	cursor: default !important;
+}
+
+div.smallHeader .modal-header {
+	padding: 5px;
+}
+
+div.smallHeader .modal-title {
+	font-size: 16px;
+}
+
+div.propertiesDialogContainer .dialogContents table {
+	width: 100%;
+}
+
+div.propertiesDialogContainer .dialogContents td {
+	padding: 5px;
+}
+
+input[name="propertiesContentFieldGroupDivide"] {
+	margin-right: 10px;
+}
+
+input.propertiesContentFieldLearnerCount, input.propertiesContentFieldGroupCount {
+	width: 40px;
+}
+
+tr.propertiesContentRowGateSchedule input.spinner {
+	width: 30px;
+}
+
+input.propertiesContentFieldTitle, textarea.propertiesContentFieldDescription,
+select.propertiesContentFieldGradebook {
+	width: 99%;	
+}
+
+.dialogContents .labelPlusSize {
+	cursor: pointer;
+}
+
+.dialogContents .labelMinusSize {
+	margin-left: 15px;
+	cursor: pointer;
+}
+
+div#groupNamingDialog .btn-group,
+div#gtbDialog  .btn-group,
+div#ctbDialog .btn-group,
+div#outputConditionsDialog .btn-group {
+	margin: 10px 0 10px 10px;
+}
+
+input.groupName {
+	margin: 5px 0 5px 10px;
+	width: 95%;
+}
+
+
+div#infoDialog .modal-body {
+	font-weight: bold;
+	padding: 5px;
+}
+
+
+div.exportDialog {
+	text-align: center;
+}
+
+div.exportDialog a {
+	text-decoration: none;
+}
+
+div.exportDialog iframe {
+	display: none;
+}
+
+div#exportLDDialog {
+	cursor: pointer;
+}
+
+div#ldStoreDialog {
+	z-index: 1051;
+}
+
+div#ldStoreDialogContents {
+	width: 100%;
+	height: 100%;
+}
+
+div#ldStoreDialogContents > table {
+	height: 100%;
+	width: 100%;
+	border-collapse: separate;
+}
+
+div#ldStoreDialogContents #ldStoreDialogButtonCell {
+	height: 40px;
+	border-top: $border-thin-dotted;
+	padding-top: 5px;
+}
+
+div#ldStoreDialogContents #ldStoreDialogButtonCell > div > div {
+	display: inline-block;
+}
+
+div#ldStoreDialogContents td#ldStoreDialogTreeCell {
+	padding: 2px 2px 0px 5px;
+	vertical-align: top;
+	border-right: $border-thin-dotted;
+	width: 200px;
+}
+
+div#ldStoreDialogContents div#ldStoreDialogTree {
+	width: 200px;
+	overflow: auto;
+}
+
+div#ldStoreDialogContents #ldStoreDialogAccessCell {
+	border-top: $border-thin-dotted;
+	border-right: $border-thin-dotted;
+}
+
+div#ldStoreDialogContents #ldStoreDialogAccessDiv {
+	width: 200px;
+	overflow: auto;
+	height: 150px;
+	vertical-align: top;
+	padding: 5px 0px 5px 0px;
+}
+
+div#ldStoreDialogContents #ldStoreDialogAccessDiv > div#ldStoreDialogAccessTitle {
+	font-size: 13px;
+	font-weight: bold;
+	text-align: center;
+}
+
+div#ldStoreDialogContents #ldStoreDialogAccessDiv > div.access {
+	padding: 3px 0 3px 3px;
+	cursor: pointer;
+	margin-left: 10px;
+	margin-right: 10px;
+	font-size: small;
+}
+
+div#ldStoreDialogContents #ldStoreDialogAccessDiv > div.selected {
+	background-color: $brand-primary-light;
+}
+
+
+div#ldStoreDialogContents td#ldStoreDialogCanvasCell {
+	text-align: center;
+	padding: 10px 0px 0px 10px;
+	vertical-align: middle;
+}
+
+div#ldStoreDialogContents div#ldStoreDialogCanvasDiv {
+	overflow: auto;
+}
+
+div#ldStoreDialogContents img#ldScreenshotLoading  {
+	padding-top: 200px;
+}
+
+div#ldStoreDialogContents #ldStoreDialogImportPartFrame {
+	border: none;
+	width: 99%;
+}
+
+div#ldStoreDialogContents div#ldStoreDialogNameContainer {
+	margin-left: 20px;
+}
+
+div#ldStoreDialogContents div#ldStoreDialogNameContainer span {
+	font-weight: bold;
+}
+
+div#ldStoreDialogContents #ldStoreDialogNameContainer input {
+	width: 300px;
+	margin-left: 10px;
+	color: $gray-base;
+}
+
+div.branchMappingDialog .container-fluid {
+	padding-right: 0;
+}
+
+div.branchMappingDialog > table {
+	width: 100%;
+	height: 98%;
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+
+div.branchMappingDialog td {
+	text-align: center;
+	vertical-align: top;
+}
+
+div.branchMappingDialog td.branchMappingLabelCell {
+	height: 15px;
+	font-weight: bold;
+}
+
+div.branchMappingDialog td.branchMappingListCell {
+	border: $border-thin-black;
+	padding: 3px;
+}
+
+div.branchMappingDialog td.branchMappingListCell .selected {
+	background-color: $brand-primary-mid;
+	color: white;
+}
+
+div.branchMappingDialog .branchMappingButton {
+	width: 40%;
+	display: block;
+	margin: auto;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+div.branchMappingDialog td.branchMappingListCell div {
+	text-align: left;
+	cursor: pointer;
+}
+
+div#outputConditionsDialogContents div#complexConditions > div {
+	font-weight: bold;
+	margin: 10px 0 0 2px;
+}
+
+div#outputConditionsDialogContents select {
+	margin-bottom: 10px;
+	width: 95%;
+}
+
+div#outputConditionsDialogContents .spinner {
+	width: 40px;
+}
+
+div#outputConditionsDialogContents div#multiRangeDiv {
+	display: inline-block;	
+}
+
+div#outputConditionsDialogContents #rangeAddButton {
+	margin-left: 10px;
+}
+
+div#outputConditionsDialogContents table#rangeConditions {
+	width: 100%;
+	margin-top: 15px;
+	border-collapse: collapse;
+	text-align: center;
+}
+
+div#outputConditionsDialogContents table#rangeConditions tr td,
+div#outputConditionsDialogContents table#rangeConditions tr th {
+	padding: 3px;
+	border: $border-thin-black;
+	cursor: pointer;
+}
+
+div#outputConditionsDialogContents table#rangeConditions input {
+	width: 95%;
+}
+
+div#outputConditionsDialogContents tr.selected {
+	background-color: $brand-primary-light;
+}
+
+/**** Main authoring styles ****/
+
+div#toolbar {
+	padding: 3px;
+}
+
+#cancelLiveEditButton {
+	display: none;
+}
+
+table#authoringTable {
+	table-layout: fixed;
+	width: 100%;
+}
+
+td#templateContainerCell {
+	width: 175px;
+	vertical-align: top;
+}
+
+td#templateContainerCell select {
+	width: 100%;
+	margin-bottom: 3px;
+}
+
+div.templateContainer {
+	display: none;
+	overflow: auto;
+	border: $border-thin-default;
+	border-radius: 3px;
+}
+
+div.template {
+	min-height: 45px;
+	border-bottom: $border-thin-default;
+	cursor: pointer;
+}
+
+.tooltemplate :hover {
+	background-color:$gray-lighter;
+}
+
+.tooltemplate .media {
+	margin-top: 0px;
+	padding: 8px 0px 5px 5px;
+}
+
+.media #toolDisplayName {
+}
+
+td#canvasContainerCell {
+	vertical-align: top;
+}
+
+#ldDescriptionDiv {
+	z-index: 1099;
+	border-bottom: $border-thin-default;
+}
+
+#ldDescriptionDiv #ldDescriptionTitleContainer {
+	padding: 2px 0 0 0;
+	text-align: center;
+	font-size: 14px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+#ldDescriptionDiv #ldDescriptionHideTip {
+	float: right;
+	margin-right: 10px;
+}
+
+#ldDescriptionDiv #ldDescriptionDetails {
+	padding: 0 0 5px 10px;
+	display: none;
+}
+
+#ldDescriptionDiv .ldDescriptionLabel {
+	font-size: 12px;
+}
+
+#ldDescriptionDiv #ldDescriptionEditorContainer {
+	margin: 0px 15px 15px 0;
+}
+
+#ldDescriptionDiv #ldDescriptionLicenseTextContainer,
+#ldDescriptionDiv #ldDescriptionLicenseImage,
+#ldDescriptionDiv #ldDescriptionLicenseButton {
+	display: none;
+}
+
+#ldDescriptionDiv #ldDescriptionLicenseImage {
+	vertical-align: text-bottom;
+	padding: 0 10px;
+}
+
+#ldDescriptionDiv #ldDescriptionLicenseTextContainer {
+	padding-top: 10px;
+}
+
+#ldDescriptionDiv #ldDescriptionLicenseText {
+	width: 99%;
+} 
+
+#canvas {
+	overflow: auto;
+	vertical-align: top;
+}

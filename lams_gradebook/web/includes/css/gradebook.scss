@@ -1,0 +1,62 @@
+@import "_lams_variables.scss";
+
+#select-lessons-area {
+	display: none;
+}
+
+#export-selected-lessons-button {
+	margin-bottom: 10px;
+}
+
+#gbox_lessons-jqgrid {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+// Grids should have no border but date widgets need the border
+.ui-jqgrid.ui-widget-content {
+    border: 0px solid #aaaaaa !important;
+}
+
+
+/* Formatting buttons on the Gradebook Lesson screen */
+.gbTopButtonsContainer {
+	height: 30px;
+	padding: 0px !important;
+}
+
+.gbTopButtonsContainer div {
+	display: inline;
+}
+
+.gbTopButtonsContainer a {
+	margin: 5px 5px 5px 0;
+}
+
+.gbTopButtonsContainer button {
+	margin: 5px 5px 5px 0;
+}
+
+.lockLabel {
+	margin: 10px 5px 5px 0;
+	display: block;
+}
+
+.markChartDiv {
+	margin-top: 10px;
+	margin-left: 10px;
+	margin-bottom: 10px;
+	width: 95%;
+	height: 500px;
+}
+
+.tooltip{
+    position:absolute;
+    z-index:999;
+    left:-9999px;
+    background-color:$gray-light-mid;
+    padding:5px;
+    border:$border-thin-body-bg;
+    width:250px;
+    font-size: 1.1em;
+}

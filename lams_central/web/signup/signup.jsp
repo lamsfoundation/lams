@@ -13,51 +13,6 @@
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" rel="stylesheet" />
-	<style media="screen,projection" type="text/css">
-		.with-nav-tabs.panel-default .nav-tabs>li>a, .with-nav-tabs.panel-default .nav-tabs>li>a:hover,
-		.with-nav-tabs.panel-default .nav-tabs>li>a:focus {
-			color: #777;
-		}
-	
-		.with-nav-tabs.panel-default .nav-tabs>.open>a, .with-nav-tabs.panel-default .nav-tabs>.open>a:hover,
-			.with-nav-tabs.panel-default .nav-tabs>.open>a:focus, .with-nav-tabs.panel-default .nav-tabs>li>a:hover,
-			.with-nav-tabs.panel-default .nav-tabs>li>a:focus {
-			color: #777;
-			background-color: #ddd;
-			border-color: transparent;
-		}
-		
-		.with-nav-tabs.panel-default .nav-tabs>li.active>a, .with-nav-tabs.panel-default .nav-tabs>li.active>a:hover,
-			.with-nav-tabs.panel-default .nav-tabs>li.active>a:focus {
-			color: #555;
-			background-color: #fff;
-			border-color: #ddd;
-			border-bottom-color: transparent;
-		}
-		
-		.with-nav-tabs.panel-default .nav-tabs>li.dropdown .dropdown-menu {
-			background-color: #f5f5f5;
-			border-color: #ddd;
-		}
-		
-		.with-nav-tabs.panel-default .nav-tabs>li.dropdown .dropdown-menu>li>a {
-			color: #777;
-		}
-		
-		.with-nav-tabs.panel-default .nav-tabs>li.dropdown .dropdown-menu>li>a:hover,
-			.with-nav-tabs.panel-default .nav-tabs>li.dropdown .dropdown-menu>li>a:focus
-			{
-			background-color: #ddd;
-		}
-		
-		.with-nav-tabs.panel-default .nav-tabs>li.dropdown .dropdown-menu>.active>a,
-			.with-nav-tabs.panel-default .nav-tabs>li.dropdown .dropdown-menu>.active>a:hover,
-			.with-nav-tabs.panel-default .nav-tabs>li.dropdown .dropdown-menu>.active>a:focus
-			{
-			color: #fff;
-			background-color: #555;
-		}
-	</style>
 
 	<script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="/lams/includes/javascript/jquery-ui.js"></script>
@@ -99,7 +54,7 @@
 					<i class="ui-icon ui-icon-info"></i>
 				</div>
 				<div class="media-body">
-					<small><fmt:message key="register.if.you.want.to.signup" /></small>
+					<small><fmt:message key="register.if.you.want.to.signup" />x</small>
 				</div>
 			</div>
 

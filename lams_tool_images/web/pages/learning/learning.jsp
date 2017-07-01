@@ -33,62 +33,8 @@
 	<c:set var="thumbnailImageDimensions" value="${empty sessionMap.thumbnailImageDimensions ? 100 : sessionMap.thumbnailImageDimensions}" />
 
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/fotorama.css'/>"/>
-	<style media="screen,projection" type="text/css">
-		@media (max-width: 750px) {
-		  	#aside {
-		    	float: none;
-		    	width: auto;
-		    	position: static;
-		  	}
-		}
-		.extra-controls-inner {
-			float: right;
-		}
-		.caption{
-			color:#0087e5; 
-			font:italic 14px georgia,serif;
-		}
-		.description{ 
-			font-style:italic; 
-			font-size:11px;
-		}
-		#extra-controls {
-			text-align: center;
-			float: right;
-			clear: both;
-			padding-top: 20px;
-		}
-		[id^=comments-area] {
-			clear: both;
-			padding-top: 10px;
-		}
-		.button.add-comment {
-			margin-right: 12px;
-		}
-		table.forum {
-			border-bottom: none;
-			margin-bottom: 0;
-		}
-    	.fotorama__thumb {
-		    background-color: #000;
-		}
-		.fotorama__wrap {
-			margin: auto;
-		}
-		.fotorama__caption {
-			text-align: left;
-		}
-		.fotorama-container {
-			text-align: center;
-			padding-top: 10px;
-		}
-		#image-info:after {
-		   content: " ";
-		   display: block; 
-		   height: 0; 
-		   clear: both;
-		}
-    </style>
+	<link href="<html:rewrite page='/includes/css/imageGallery.css'/>" rel="stylesheet" type="text/css">
+	
     <link rel="stylesheet" type="text/css" href="${lams}css/jquery.jRating.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css">
@@ -132,7 +78,7 @@
 				    data: [
 						<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
 							<c:if test="${!image.createByAuthor && (image.createBy != null)}">
-								<c:set var="imageAddedBy" ><div class="description"><fmt:message key="label.learning.added.by" /> <c:out value="${image.createBy.firstName} ${commentsImage.createBy.lastName}" escapeXml="true"/></div></c:set>
+								<c:set var="imageAddedBy" ><div class="caption-description"><fmt:message key="label.learning.added.by" /> <c:out value="${image.createBy.firstName} ${commentsImage.createBy.lastName}" escapeXml="true"/></div></c:set>
 							</c:if>					
 						
 							{
@@ -140,8 +86,8 @@
 								//thumb: '<html:rewrite page="/download/?uuid="/>${image.thumbnailFileUuid}&preferDownload=false',
 								full: '<html:rewrite page="/download/?uuid="/>${image.originalFileUuid}&preferDownload=false',
 								id: '${image.uid}', // Custom anchor is used with the hash:true option.
-								caption: '<div class="caption">${image.titleEscaped}</div>'
-									+ '<span class="description">${image.descriptionEscaped}</span>'
+								caption: '<div class="caption-heading">${image.titleEscaped}</div>'
+									+ '<span class="caption-description">${image.descriptionEscaped}</span>'
 									+'${imageAddedBy}',
 								//html: $('selector'), // ...or '<div>123</div>'. Custom HTML inside the frame.
 								//fit: 'cover' // Override the global fit option.

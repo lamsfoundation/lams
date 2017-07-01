@@ -1,238 +1,187 @@
-@import url('/lams/css/inlineeditor.css');
-
+@import url("/lams/css/inlineeditor.css");
 #loadingOverlay {
-	width: 100%;
-	height: 99%;
-	z-index: 2000;
-	position: absolute;
-	background-color: #FFFFFF;
-	text-align: center;
-}
+  width: 100%;
+  height: 99%;
+  z-index: 2000;
+  position: absolute;
+  background-color: #fff;
+  text-align: center; }
 
 #loadingOverlay * {
-	margin-top: 20%;
-}
+  margin-top: 20%; }
 
 #content {
-	width: 100%;
-	padding: 0;
-}
+  width: 100%;
+  padding: 0; }
 
 #content > .panel {
-	border: none;
-	border-shadow: none;
-	box-shadow: none;
-}
+  border: none;
+  border-shadow: none;
+  box-shadow: none; }
 
-#content .panel-monitor-page, #content .panel-monitor-body  {
-	margin: 0;
-	padding: 0;
-}
+#content .panel-monitor-page, #content .panel-monitor-body {
+  margin: 0;
+  padding: 0; }
 
 #content .navbar-collapse {
-	padding-left: 0;
-}
+  padding-left: 0; }
 
 .ui-spinner {
-	margin-left: 10px;
-}
+  margin-left: 10px; }
 
 table.tabTable {
-	height: 517px;
-	table-layout: fixed;
-	border-top: thin dotted #2E6E9E;
-	border-collapse: separate;
-}
+  height: 517px;
+  table-layout: fixed;
+  border-top: thin dotted #2E6DA4;
+  border-collapse: separate; }
 
 div.tabTitle {
-	padding: 5px 0px 5px 0px;
-	font-size: larger;
-	text-align: center;
-}
+  padding: 5px 0px 5px 0px;
+  font-size: larger;
+  text-align: center; }
 
 .errorMessage {
-	font-weight: bold;
-	color: red;
-}
+  font-weight: bold;
+  color: #d9534f; }
 
 .errorField {
-	border: thick solid red;
-}
-
+  border: 3px solid #d9534f; }
 
 td#learningDesignTreeCell {
-	border-right: thin dotted #2E6E9E;
-}
+  border-right: thin dotted #2E6DA4; }
 
 div#learningDesignTree {
-	overflow: auto;
-	height: 510px;
-	width: 250px;
-	padding: 2px 2px 0px 5px;
-	vertical-align: top;
-}
+  overflow: auto;
+  height: 510px;
+  width: 250px;
+  padding: 2px 2px 0px 5px;
+  vertical-align: top; }
 
 .ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
-	background-color: #dfeffc;
-}
+  background-color: #dbe9f5; }
 
 td#canvasControlCell {
-	padding: 2px 0px 0px 10px;
-	height: 15px;
-}
+  padding: 2px 0px 0px 10px;
+  height: 15px; }
 
 td#canvasControlCell a {
-	color: #47BC23;
-}
+  color: #5cb85c; }
 
 td#canvasCell {
-	text-align: center;
-	padding: 10px 0px 0px 10px;
-}
+  text-align: center;
+  padding: 10px 0px 0px 10px; }
 
 div#canvasDiv {
-	overflow: auto;
-	height: 452px;
-}
+  overflow: auto;
+  height: 452px; }
 
 .ldChoiceDependentCanvasElement {
-	display: none;
-}
+  display: none; }
 
-img#ldScreenshotLoading, div#ldNotChosenError  {
-	padding-top: 200px;
-}
+img#ldScreenshotLoading, div#ldNotChosenError {
+  padding-top: 200px; }
 
 td#lessonNameCell {
-	height: 20px;
-	padding: 0px 0px 5px 10px;
-}
+  height: 20px;
+  padding: 0px 0px 5px 10px; }
 
 #lessonNameInput {
-	width:370px;
-	margin-left: 10px;
-	color: #000000;
-}
-	
+  width: 370px;
+  margin-left: 10px;
+  color: #000; }
 
 table#classTable {
-	width: 100%;
-}
+  width: 100%; }
 
 td.userContainerCell {
-	vertical-align: top;
-	padding: 5px 5px 0px 5px;
-}
+  vertical-align: top;
+  padding: 5px 5px 0px 5px; }
 
 td.userConainterTransferCell {
-	height: 100px;
-	width: 25px;
-	padding: 18px 3px 8px 3px;
-	vertical-align: top;
-}
+  height: 100px;
+  width: 25px;
+  padding: 18px 3px 8px 3px;
+  vertical-align: top; }
 
 td.userConainterTransferTopCell {
-	vertical-align: bottom;
-}
+  vertical-align: bottom; }
 
 td.userConainterTransferCell img {
-	cursor: pointer;
-}
+  cursor: pointer; }
 
 .draggableUser {
-	padding: 3px 0px 3px 0px;
-	cursor: default;
-}
+  padding: 3px 0px 3px 0px;
+  cursor: default; }
 
 .userContainer {
-	height: 210px;
-	overflow: auto;
-	border: thin solid black;
-	padding : 5px;
-}
+  height: 210px;
+  overflow: auto;
+  border: thin solid black;
+  padding: 5px; }
 
 .userContainerTitle {
-	margin-bottom: 5px;
-	font-weight: bold;
-	text-align: center;
-}
+  margin-bottom: 5px;
+  font-weight: bold;
+  text-align: center; }
 
 .sortUsersButton {
-	text-align: right;
-	padding-right: 3px;
-	float: right;
-	cursor: pointer;
-}
+  text-align: right;
+  padding-right: 3px;
+  float: right;
+  cursor: pointer; }
 
 .droppableHighlight {
-	padding : 1px;
-	border: 5px solid #5c9ccc;
-}
+  padding: 1px;
+  border: 5px solid #5898d0; }
 
 .draggableUserSelected {
-	background-color: #5c9ccc !important;
-	color: white !important;
-}
+  background-color: #5898d0 !important;
+  color: white !important; }
 
-	
 div#tabAdvanced, div#tabConditions {
-	padding-left: 30px;
-}
+  padding-left: 30px; }
 
 .p {
-	padding: 15px 0px 5px 15px;
-	font-size: small;
-	font-weight: bold;
-}
+  padding: 15px 0px 5px 15px;
+  font-size: small;
+  font-weight: bold; }
 
 .fieldSectionDescription {
-	padding: 10px 0px 10px 0px;
-}
+  padding: 10px 0px 10px 0px; }
 
 div#introDescriptionDiv {
-	padding: 0px 30px 0px 15px;
-}
+  padding: 0px 30px 0px 15px; }
 
 div#introDescriptionLabelDiv {
-	padding: 5px 0px 15px 0px;
-}
+  padding: 5px 0px 15px 0px; }
 
 textarea#introDescription {
-	display: none;
-}
+  display: none; }
 
 span#splitLearnersDescription {
-	font-style: italic;
-}
+  font-style: italic; }
 
 #schedulingEnableField {
-	margin-bottom: 15px;
-}
+  margin-bottom: 15px; }
 
 #schedulingDatetimeField {
-	margin: 0px 0px 10px 50px;
-	display: none;
-}
-
+  margin: 0px 0px 10px 50px;
+  display: none; }
 
 #precedingLessonIdField {
-	margin: 0px 0px 0px 70px;
-	display: none;
-}
+  margin: 0px 0px 0px 70px;
+  display: none; }
 
 .lead {
-	margin-top: 15px;
-	margin-bottom: 10px;
-}
+  margin-top: 15px;
+  margin-bottom: 10px; }
 
 .options {
-	margin-left: 25px;
-}
+  margin-left: 25px; }
 
 .separator {
-	margin-top: 10px;
-	margin-bottom: 10px;
-	border: 0px;
-	border-top: 1px solid #eee;	
-	width: 100%;
-}
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: 0px;
+  border-top: thin solid #eeeeee;
+  width: 100%; }

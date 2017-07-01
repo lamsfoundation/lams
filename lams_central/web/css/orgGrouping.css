@@ -1,85 +1,69 @@
 div#titleDiv {
-	font-size: small;
-	font-weight: bold;
-	padding: 5px 0;
-	text-align: center;
-	border-bottom: thin dotted #2E6E9E;
-}
+  font-size: small;
+  font-weight: bold;
+  padding: 5px 0;
+  text-align: center;
+  border-bottom: thin dotted #2E6DA4; }
 
 .removeGroupingButton {
-	float: right;
-	cursor: pointer;
-	padding-right: 3px;
-	width: 16px;
-	height: 16px;
-}
+  float: right;
+  cursor: pointer;
+  padding-right: 3px;
+  width: 16px;
+  height: 16px; }
 
 #addGroupingButton {
-	float: right;
-	margin: 20px 10px 10px 0;
-}
+  float: right;
+  margin: 20px 10px 10px 0; }
 
 .groupingContainer {
-	padding: 10px 10px 0 10px;
-}
+  padding: 10px 10px 0 10px; }
 
 .groupingName {
-	font-size: 12px;
-	border-bottom: 1px dotted #0087E5;
-	color: #0087E5;
-	text-decoration: none;
-}
+  font-size: 12px;
+  border-bottom: thin dotted #2E6DA4;
+  color: #337ab7;
+  text-decoration: none; }
 
 .groupingName:hover {
-	border-bottom: 1px solid #0087E5;
-	color: #0087E5;
-}
+  border-bottom: thin solid #337ab7;
+  color: #337ab7; }
 
 .groupCount {
-	font-size: 12px;
-	padding-left: 10px;
-}
-
+  font-size: 12px;
+  padding-left: 10px; }
 
 #gtbDialog > table {
-	width: 100%;
-	height: 98%;
-	table-layout: fixed;
-	border-collapse: collapse;
-}
+  width: 100%;
+  height: 98%;
+  table-layout: fixed;
+  border-collapse: collapse; }
 
 #gtbDialog td {
-	text-align: center;
-	vertical-align: top;
-}
+  text-align: center;
+  vertical-align: top; }
 
 #gtbDialog td.branchMappingLabelCell {
-	height: 15px;
-	font-weight: bold;
-}
+  height: 15px;
+  font-weight: bold; }
 
 #gtbDialog td.branchMappingListCell {
-	border: thin black solid;
-	padding: 3px;
-}
+  border: thin solid black;
+  padding: 3px; }
 
 #gtbDialog td.branchMappingListCell .selected {
-	background-color: #5c9ccc;
-	color: white;
-}
+  background-color: #5898d0;
+  color: white; }
 
 #gtbDialog .branchMappingButton {
-	display: block;
-	margin: auto;
-	margin-top: 10px;
-	margin-bottom: 10px;
-}
+  display: block;
+  margin: auto;
+  margin-top: 10px;
+  margin-bottom: 10px; }
 
 #gtbDialog #branchMappingOKButton {
-	margin-top: 5px;
-}
+  margin-top: 5px; }
 
 #gtbDialog td.branchMappingListCell div {
-	text-align: left;
-	cursor: pointer;
-}
+  text-align: left;
+  cursor: pointer; }

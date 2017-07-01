@@ -5,7 +5,6 @@
 
 <!-- ********************  CSS ********************** -->
 <lams:css/>
-<link href="<html:rewrite page='/includes/css/imageGallery.css'/>" rel="stylesheet" type="text/css">
 
 <!-- ********************  javascript ********************** -->
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>

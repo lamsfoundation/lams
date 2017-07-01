@@ -1,99 +1,84 @@
-/* .rating-stars-div {margin-top: 8px;}
- */
-.user-answer {padding: 0 2px;}
-.tablesorter tr.odd:hover .jStar {
-	background-image: url(/lams/images/css/jquery.jRating-stars-grey.png)!important;
-}
-.tablesorter tr.even:hover .jStar {
-	background-image: url(/lams/images/css/jquery.jRating-stars-light-grey_copy.png)!important;
-}
-.tablesorter tr.odd .jStar {
-	background-image: url(/lams/images/css/jquery.jRating-stars-light-blue.png)!important;
-}
+.user-answer {
+  padding: 0 2px; }
 
 /* override the usual jrating greyed area */
 textarea[id^=comment-textarea-] {
-	color: inherit !important;
-}
+  color: inherit !important; }
 
-td.username {min-width: 150px;}
-td.rating {width:150px;}
-td.comment {min-width: 250px;}
-.alert {padding:8px}
+td.username {
+  min-width: 150px; }
+
+td.rating {
+  width: 150px; }
+
+td.comment {
+  min-width: 250px; }
+
+.alert {
+  padding: 8px; }
+
 .extra-controls-inner:after {
-   margin-top: -10px;
-}
-.rating-comment{
-	background-image: none;
-	background-color: rgba(205, 205, 205, 0.1);
-	border: 1px solid rgba(205, 205, 205, 0.2);
-}
-.criteria-title{
-	margin-top: 10px;
-	font-weight: bold;	
-}
-textarea {
-    margin: 10px 0px;
-    width: 88%;
-}
-.add-comment {
-    margin-top: 60px;
-}
-@media (max-width: 768px)  {
-	.add-comment {
-		margin-top: 10px;
-	}
-}
+  margin-top: -10px; }
 
+.rating-comment {
+  background-image: none;
+  background-color: #eeeeee;
+  border: thin solid #eeeeee; }
+
+.criteria-title {
+  margin-top: 10px;
+  font-weight: bold; }
+
+textarea {
+  margin: 10px 0px;
+  width: 88%; }
+
+.add-comment {
+  margin-top: 60px; }
+
+@media (max-width: 768px) {
+  .add-comment {
+    margin-top: 10px; } }
 .ui-jqgrid {
-	border-left-style: none !important;
-	border-right-style: none !important;
-	border-bottom-style: none !important;
-}
+  border-left-style: none !important;
+  border-right-style: none !important;
+  border-bottom-style: none !important; }
 
 .ui-jqgrid tr {
-	border-left-style: none !important;
-}
+  border-left-style: none !important; }
 
 .ui-jqgrid td {
-	border-style: none !important;
-	padding: 0px 4px 4px 4px;
-}
+  border-style: none !important;
+  padding: 0px 4px 4px 4px; }
 
 .ui-jqgrid tr.jqgrow td {
-	padding: 8px 8px 8px 8px;
-	white-space: normal !important;
-}
+  padding: 8px 8px 8px 8px;
+  white-space: normal !important; }
 
 .ui-jqgrid .ui-jqgrid-view {
-	font-size: 14px;
-	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-}
+  font-size: 14px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
 
 .divrankx {
-    width: 300px;
-    height: 30px;
-    margin: 5px;
-    padding: 5px;
-    border: 1px solid #aaaaaa;
-}
+  width: 300px;
+  height: 30px;
+  margin: 5px;
+  padding: 5px;
+  border: thin solid #AAAAAA; }
 
 .divrankxlabel {
-    height: 20px;
-    margin: 5px;
-    padding: 5px;
-}
+  height: 20px;
+  margin: 5px;
+  padding: 5px; }
 
 .drop-target {
-  	background-color: #337ab7;
-}
+  background-color: #337ab7; }
+
 .draggable {
-	width: 290px;
-}
+  width: 290px; }
+
 .draggable.can-drop {
-  	background-color: #337ab7;
-}
+  background-color: #337ab7; }
 
 .email-button {
-	margin: 2px;
-}
+  margin: 2px; }

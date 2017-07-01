@@ -5,7 +5,6 @@
 <c:set var="spreadsheetURL"><html:rewrite page="/includes/javascript/simple_spreadsheet/spreadsheet_offline.html"/>?lang=${pageContext.response.locale.language}</c:set>
 
 <!-- ********************  CSS ********************** -->
-<link href="<html:rewrite page='/includes/css/spreadsheet.css'/>" rel="stylesheet" type="text/css">
 <lams:css />
 
 <!-- ********************  javascript ********************** -->

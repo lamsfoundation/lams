@@ -1,0 +1,86 @@
+// SASS Imports 
+@import "_lams_variables.scss";
+
+div {
+  &.error, &.message {
+    background-color: $body-bg;
+    border: $border-thin-default;
+    color: $gray-base;
+    font-family: $font-family-base;
+    font-weight: normal;
+    margin: 10px auto;
+    padding: 3px;
+    text-align: left;
+    vertical-align: bottom;
+  }
+  &.error {
+  	// use a different color for the errors 
+    border: $border-medium-danger;
+  }
+}
+
+img.validationWarning, div.errors img.icon, div.messages img.icon {
+    border: 0;
+    width: 14px;
+    height: 13px;
+    vertical-align: top;
+}
+div.message img.icon {
+    vertical-align: middle;
+}
+.hint {
+	font-style: italic;
+}
+
+form#recordForm {
+  input, textarea, select {
+    margin-top: 6px;
+  }
+  input.file-input-name {
+	// overrides form#recordForm input for file input
+    margin-top: 0px;
+  }
+}
+
+div.bigNumber{
+	font-weight: bold;
+	font-size: larger;
+}
+
+// cells must have the same height, otherwise they will be incorrectly aligned in horizontal record list
+table {
+  &#recordListTable td, &#horizontalListTable td {
+    padding-left: 5px;
+    vertical-align: middle;
+    padding-right: 5px;
+  }
+  &#recordListTable td {
+    background-color: $gray-lightest;
+    &.fixedCellHeight {
+      height: 150px;
+    }
+  }
+  &#horizontalListTable td.fixedCellHeight {
+    height: 150px;
+  }
+  &#summaryTable table.alternative-color-inner-table {
+    // centers the table in the outer table column
+    margin: auto;
+  }
+  &#recordListTable {
+    border-right: none !important;
+    tr, td {
+      border-right: none !important;
+    }
+  }
+  &#summaryTable {
+    td.singleSummaryCell, th.singleSummaryCell {
+      vertical-align: middle;
+      text-align: center;
+    }
+  }
+}
+
+border-thick { 
+	border-left-width: 3px;
+}

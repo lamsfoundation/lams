@@ -1,37 +1,42 @@
-.innerforms {
-	border: 0px;
-	font-size: small;
-	font-style: normal;
-	width:100%;
-}
+@media (max-width: 750px) {
+  #aside {
+    float: none;
+    width: auto;
+    position: static; } }
+.extra-controls-inner {
+  float: right; }
 
-div.error, div.message {
-    background-color: #ffffcc;
-    border: 1px solid #000;
-    color: #000000;
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: normal;
-    margin: 10px auto;
-    padding: 3px;
-    text-align: left;
-    vertical-align: bottom;
-}
+#extra-controls {
+  text-align: center;
+  float: right;
+  clear: both;
+  padding-top: 20px; }
 
-/* use a different color for the errors */
-div.error {
-	border: 2px solid red;
-}
+[id^=comments-area] {
+  clear: both;
+  padding-top: 10px; }
 
-img.validationWarning, div.errors img.icon, div.messages img.icon {
-    border: 0;
-    width: 14px;
-    height: 13px;
-    vertical-align: top;
-}
-div.message img.icon {
-    vertical-align: middle;
-}
+.button.add-comment {
+  margin-right: 12px; }
 
-span.input-group-btn {
-    font-size:inherit;
-}
+.fotorama__thumb {
+  background-color: #000; }
+
+.fotorama__wrap {
+  margin: auto; }
+
+.fotorama__caption {
+  text-align: left; }
+
+.fotorama__thumb-border {
+  border-color: #337ab7; }
+
+.fotorama-container {
+  text-align: center;
+  padding-top: 10px; }
+
+#image-info:after {
+  content: " ";
+  display: block;
+  height: 0;
+  clear: both; }

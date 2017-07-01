@@ -29,38 +29,7 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<style media="screen,projection" type="text/css">
-		#timelimit-start-dialog {
-			display:none; cursor: default; padding: 10px;
-		}
-		#timelimit-start-dialog h1{
-			padding-bottom: 10px;
-		}
-		#countdown {
-			width: 150px; position: absolute; font-size: 110%; font-style: italic; color:#47bc23;
-		}
-		#countdown-label {
-			font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color:#47bc23;
-		}
-		#timelimit-expired {
-			font-size: 145%; padding: 15px;
-		}
-		
-		.jGrowl {
-		  	font-size: 22px;
-		  	font-family: arial, helvetica, sans-serif;
-		  	margin-left: 120px;
-		}
-		.jGrowl-notification {
-			opacity: .6;
-			border-radius: 10px;
-			width: 260px;
-			padding: 10px 20px;
-  			margin: 10px 20px;
-		}
-		.jGrowl-message {
-			padding-left: 10px;
-			padding-top: 5px;
-		}
+
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>

@@ -20,7 +20,7 @@
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-	<link rel="stylesheet" href="<html:rewrite page='/includes/qalearning.css'/>">
+	<link rel="stylesheet" href="<html:rewrite page='/includes/css/qalearning.css'/>">
 	<lams:css />
 
 	<script type="text/javascript">

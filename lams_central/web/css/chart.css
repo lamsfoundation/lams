@@ -1,44 +1,38 @@
 .axis {
-	font: 10px sans-serif;
-}
+  font: 10px sans-serif; }
 
 .axis path, .axis line {
-	fill: none;
-	stroke: #000;
-	shape-rendering: crispEdges;
-}
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges; }
 
-div.tooltip {	
-    position: absolute;			
-    padding: 2px;				
-    font: 12px sans-serif;		
-    background: #FFFFFF;
-    border: 0px;		
-    border-radius: 8px;			
-    pointer-events: none;
-	opacity: 0;
-}
+div.chartTooltip {
+  position: absolute;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: white;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0; }
 
 /* Histogram Chart */
 .bar rect {
-	fill: steelblue;
-}
+  fill: #337ab7; }
 
 .bar text {
-	fill: #fff;
-	font: 14px sans-serif;
-}
+  fill: white;
+  font: 14px sans-serif; }
+
 .zoom {
-	cursor: move;
-	fill: none;
-	pointer-events: all;
-}
+  cursor: move;
+  fill: none;
+  pointer-events: all; }
 
 /* Tool Mark Charts (Monitoring) - space for the histogram chart */
 .markChartDiv {
-	margin-top: 10px;
-	margin-left: 10px;
-	margin-bottom: 10px;
-	width: 95%;
-	height: 500px;
-}
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  width: 95%;
+  height: 500px; }

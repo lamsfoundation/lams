@@ -23,17 +23,13 @@
 	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css"> 
-	<link type="text/css" rel="stylesheet" href="<html:rewrite page='/includes/qalearning.css'/>">
+	<link type="text/css" rel="stylesheet" href="<html:rewrite page='/includes/css/qalearning.css'/>">
 	<style media="screen,projection" type="text/css">
 		.rating-stars-div {
 			padding-top: 12px;
 		}
 		#reflections {
 			padding: 70px 0 0px;
-		}
-		.hidden {
-			color: red !important;
-			font-style: italic;
 		}
 		.dialog {
 			display: none;
@@ -44,10 +40,6 @@
 		a.image-link {
 			border-bottom: none !important;
 		}
-		
-		tr:nth-child(odd):hover .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-grey.png)!important;}
-		tr:nth-child(even):hover .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-light-grey.png)!important;}
-		tr:nth-child(odd) .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-light-blue.png)!important;}
 	</style>
 	
 	<script type="text/javascript"> 
@@ -310,7 +302,7 @@
 	            			changeResponseVisibility(this, responseUid, false); 
 	            			return false;
 	            		}
-	            		$("#td-response-" + responseUid).addClass( "hidden" );
+	            		$("#td-response-" + responseUid).addClass( "hiddenEntryInMonitoring" );
 	            		
 	            	} else {
 	            		linkObject.innerHTML = '<img src="<c:out value="${tool}"/>images/display-eye.png" border="0">' ;
@@ -319,7 +311,7 @@
 	            			changeResponseVisibility(this, responseUid, true); 
 	            			return false;
 	            		}
-	            		$("#td-response-" + responseUid).removeClass( "hidden" );
+	            		$("#td-response-" + responseUid).removeClass( "hiddenEntryInMonitoring" );
 	            	}
 	            }
 	       	});

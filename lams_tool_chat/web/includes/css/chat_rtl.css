@@ -1,69 +1,56 @@
 /* ==================== COMMON ==================== */
 .message {
-	padding-bottom: 4px;
-}
+  padding-bottom: 4px; }
 
 .private_message {
-	font-style: italic;
-	background-color: #efefef;
-}
+  font-style: italic;
+  background-color: whitesmoke; }
 
 .messageFrom {
-	font-weight: bold;
-}
+  font-weight: bold; }
 
 /* ==================== LEARNING PAGE STYLES ==================== */
-
 #chatContent {
-	table-layout: fixed;
-	margin-top: 10px;
-	border-spacing: 10px;
-}
+  table-layout: fixed;
+  margin-top: 10px;
+  border-spacing: 10px; }
 
 #messages {
-	height: 260px;
-	overflow: auto;
-	border: 1px solid #999;
-	padding: 2px;
-	padding-right:5px;
-}
+  height: 260px;
+  overflow: auto;
+  border: thin solid #AAAAAA;
+  padding: 2px;
+  padding-right: 5px; }
 
 #roster {
-	height: 260px;
-	overflow: auto;
-	border: 1px solid #999;
-	font-weight: bold;
-	padding: 2px;
-}
+  height: 260px;
+  overflow: auto;
+  border: thin solid #AAAAAA;
+  font-weight: bold;
+  padding: 2px; }
 
 #sendMessageArea {
-	border: 1px solid #999;
-	width: 99%;
-}
+  border: thin solid #AAAAAA;
+  width: 99%; }
 
 #sendMessageButtonCell {
-	text-align: right;
-}
+  text-align: right; }
 
 #sendMessageButton {
-	width: 100%;
-}
+  width: 100%; }
 
 .selected {
-	background-color: #ececec;
-	padding: 2px;
-	cursor: pointer;
-}
+  background-color: whitesmoke;
+  padding: 2px;
+  cursor: pointer; }
 
 .unselected {
-	background-color: white;
-	padding: 2px;
-	cursor: pointer;
-}
+  background-color: white;
+  padding: 2px;
+  cursor: pointer; }
 
 /* ================== MONITORING ================== */
 .edit-pane {
-	display: none;;
-	border: 1px solid;
-	padding: 8px;
-}
+  display: none;
+  border: 1px solid;
+  padding: 8px; }

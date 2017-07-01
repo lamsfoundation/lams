@@ -120,6 +120,7 @@
 		<mkdir dir="${basedir}/build/deploy/sql" />
 		<mkdir dir="${basedir}/build/deploy/language" />
 		<mkdir dir="${basedir}/build/war" />
+		<mkdir dir="${basedir}/build/css" />
 	</target>
 	
 	
@@ -327,6 +328,7 @@
 		<copy todir="${server.home}/standalone/deployments/lams.ear/${product}.war" verbose="yes">
 			<fileset dir="${conf.web.dir}">
 				<include name="**/*.*" />
+				<exclude name="**/*.scss"/>
 			</fileset>
 		</copy>
 	</target>
@@ -341,14 +343,16 @@
 	</target>
 	
 	
-	<target name="_copy-jsp">
+	<target name="_copy-jsp" depends="sass.compile">
 		<!-- Internal target: Copies JSP files. -->
 		<echo>${ant.project.name}: Copying JSP files</echo>
 
 		<!-- No processing is needed so copy files straight to assembly dir to create WAR -->
 		<echo>Copying web resources</echo>
 	 	<copy todir="${basedir}/build/war">
-			<fileset dir="${conf.web.dir}" />
+			<fileset dir="${conf.web.dir}">
+				<exclude name="**/*.scss"/>
+			</fileset>
 	 	</copy>
 	</target>
 	
@@ -360,4 +364,52 @@
 			</fileset>
 	 	</copy>
 	</target>
+
+	<!-- ====================================================================== -->
+	<!--  Compile scss files to css files. Assumes SASS is installed. See       -->
+	<!--  sass_exec_file in unix/windows.properties.						    -->
+	<!--  sass.compile compiles all .sccs files.    						    -->
+	<!--  sass.compile.auto compiles modified .sccs files. Use for auto builds. -->
+	<!-- ====================================================================== -->
+	<target name="_sass.do.compile">
+        <apply dest="${basedir}/build/css" executable="${sass_exec_file}" failonerror="true" verbose="true">
+        	<arg value="--sourcemap=none"/>
+        	<arg value="--load-path=${scss.common.variables}"/>
+            <srcfile/>
+            <targetfile/>
+	        <fileset dir="${scss.css.dir}" erroronmissingdir="false">
+		        <include name="*.scss"/>
+	            <exclude name="_*.scss" />
+ 	        </fileset>
+            <mapper from="*.scss" to="*.css" type="glob"/>
+        </apply>
+		<echo>Copying css files from build area to web/css directory. The .map files are not copied. </echo>
+	 	<copy todir="${scss.css.dir}" verbose="true">
+			<fileset dir="${basedir}/build/css" erroronmissingdir="false">
+				<include name="*.css"/>
+			</fileset>
+	 	</copy>
+	</target>
+
+	<target name="_sass.build.clean">
+		<delete dir="${basedir}/build/css" quiet="true" />
+	</target>
+		
+    <target name="sass.compile" description="Creates css files from scss (sass) files">
+		<echo>Compiling ALL .sccs files from ${scss.css.dir} using ${sass_exec_file}</echo>
+		<mkdir dir="${basedir}/build/css" />
+		<touch verbose="true">
+	        <fileset dir="${scss.css.dir}" erroronmissingdir="false">
+		        <include name="**/*.scss"/>
+ 	        </fileset>
+    	</touch>
+    	<ant target="_sass.do.compile"/>
+    </target>
+
+    <target name="sass.compile.auto" description="Creates css files from *modified* scss (sass) files">
+		<echo>Compiling modified .sccs files from ${scss.css.dir} using ${sass_exec_file}</echo>
+		<mkdir dir="${basedir}/build/css" />
+		<ant target="_sass.do.compile"/>
+    </target>
+
 </project>

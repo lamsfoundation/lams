@@ -1,92 +1,67 @@
 /* ==================== COMMON ==================== */
 .message {
-	font-size: 12px;
-	padding-bottom: 4px;
-}
+  font-size: 12px;
+  padding-bottom: 4px; }
 
 .private_message {
-	font-style: italic;
-	background-color: #efefef;
-}
+  font-style: italic;
+  background-color: whitesmoke; }
 
 .messageFrom {
-	font-weight: bold;
-}
-
-
-
-
+  font-weight: bold; }
 
 /* ==================== LEARNING PAGE STYLES ==================== */
-
 #chatContent {
-	table-layout: fixed;
-	margin-top: 10px;
-	border-spacing: 10px;
-}
+  table-layout: fixed;
+  margin-top: 10px;
+  border-spacing: 10px; }
 
 @media (max-width: 768px) {
-	#messages {
-		height: 100px;
-		resize: vertical;
-		overflow: auto;
-		border: 1px solid #999;
-		padding: 2px;
-		padding-left:5px;
-	}
-	
-}
-
+  #messages {
+    height: 100px;
+    resize: vertical;
+    overflow: auto;
+    border: thin solid #AAAAAA;
+    padding: 2px;
+    padding-left: 5px; } }
 @media (min-width: 769px) {
-	#messages {
-		height: 200px;
-		resize: vertical;
-		overflow: auto;
-		border: 1px solid #999;
-		padding: 2px;
-		padding-left:5px;
-	}
-
-  
-}
-
+  #messages {
+    height: 200px;
+    resize: vertical;
+    overflow: auto;
+    border: thin solid #AAAAAA;
+    padding: 2px;
+    padding-left: 5px; } }
 #roster {
-	height: 200px;
-	overflow: auto;
-	border: 1px solid #999;
-	font-size: 12px;
-	font-weight: bold;
-	padding: 2px;
-}
-	
+  height: 200px;
+  overflow: auto;
+  border: thin solid #AAAAAA;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px; }
+
 #sendMessageArea {
-	border: 1px solid #999;
-	width: 100%;
-}
+  border: thin solid #AAAAAA;
+  width: 100%; }
 
 #sendMessageButtonCell {
-	text-align: right;
-}
+  text-align: right; }
 
 #sendMessageButton {
-	width: 100%;
-}
+  width: 100%; }
 
 .selected {
-	background-color: #ececec;
-	padding: 2px;
-	cursor: pointer;
-}
+  background-color: whitesmoke;
+  padding: 2px;
+  cursor: pointer; }
 
 .unselected {
-	background-color: white;
-	padding: 2px;
-	cursor: pointer;
-}
+  background-color: white;
+  padding: 2px;
+  cursor: pointer; }
 
 /* ================== MONITORING ================== */
 .edit-pane {
-	display: none;;
-	border: 1px solid;
-	padding: 8px;
-}
+  display: none;
+  border: 1px solid;
+  padding: 8px; }

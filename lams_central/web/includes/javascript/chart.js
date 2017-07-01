@@ -74,7 +74,7 @@ function _drawBarChart(svg, legend, width, height, rawData, domainX, scaleColor)
 	// otherwise the chart would be too wide
 	var tooltip = legend ? null : d3.select($(svg.node()).parent()[0])
 									.append('div')
-								    .attr('class', 'tooltip'),
+								    .attr('class', 'chartTooltip'),
 		legendWidth = legend ? legend.node().getBBox().width : 0,
 		// guess how wide the chart can be and compare it to half of available width
 		canvasWidth = (rawData.length * MIN_BAR_WIDTH * 1.1 + CHART_MARGIN.left > width / 2 ?
@@ -149,7 +149,7 @@ function _drawPieChart(svg, legend, width, height, rawData, scaleColor){
 	// calculate how much space we've got for the chart
 	var tooltip = legend ? null : d3.select($(svg.node()).parent()[0])
 									.append('div')
-								    .attr('class', 'tooltip'),
+								    .attr('class', 'chartTooltip'),
 		legendWidth = legend ? legend.node().getBBox().width : 0,
 		canvasWidth = width - legendWidth - (legend ? CHART_MARGIN.right : 0),
 		radius = Math.min(canvasWidth, height) / 2,

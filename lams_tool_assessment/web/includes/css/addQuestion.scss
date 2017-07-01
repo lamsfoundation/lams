@@ -1,0 +1,42 @@
+@import "_lams_variables.scss";
+
+div.error {
+	display:none;
+}
+// label.error { 
+// 	color: brand-danger; 
+// 	font-weight: bold; 
+// 	margin-left: 0px;
+// 	display: inline-block;
+// }
+em { 
+	font-weight: bold; 
+	padding-right: 1em; 
+	vertical-align: top; 
+}
+#content {
+	width: 91%; 
+	margin-bottom: 10px;
+}
+table.alternative-color td {
+	padding-left: 0;
+}
+.short-input-text {
+	width:10%;
+}
+
+#max-words-limit-checkbox, #min-words-limit-checkbox {
+	vertical-align: sub;
+}
+
+.fake-validation-input {
+	visibility: hidden;
+	height: 0;
+	width: 0;
+	float: right !important;
+}
+
+/* overwriting bootstrap value. */
+.panel {
+	margin-bottom: 0 !important;
+}

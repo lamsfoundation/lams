@@ -12,23 +12,6 @@
 <lams:head>
 	<lams:css/>
 	<style type="text/css">
-		.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited, .ui-state-active a:hover {
-			color: #47bc23 !important;
-			background-image: none;
-			background-color: transparent;
-		}
-		
-		.button {
-			font-size: 11px;
-			font-family: verdana, arial, helvetica, sans-serif;
-		}
-		
-		.tableCaptions {
-			text-align: right;
-			vertical-align: top;
-			width: 30%;
-		}
-		
 		#accordion h3 a {
 			border-bottom: 0;
 		}

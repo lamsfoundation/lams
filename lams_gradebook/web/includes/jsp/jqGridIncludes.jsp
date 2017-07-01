@@ -17,19 +17,6 @@ Include this jsp in your jqGrid page head to get some jqGrid functionaility
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
 </c:if>
 
-<style>
-	.tooltip{
-	    position:absolute;
-	    z-index:999;
-	    left:-9999px;
-	    background-color:#dedede;
-	    padding:5px;
-	    border:1px solid #fff;
-	    width:250px;
-	    font-size: 1.1em;
-	}
-</style>
-
 <script type="text/javascript">
 		
 	// JQGRID LANGUAGE ENTRIES ---------------------------------------------

@@ -1,0 +1,56 @@
+// Import this file into all LAMS scss files to get the consistent definitions
+@import "_bootstrap-variables.scss";
+
+// LAMS SASS Global Variables
+$gray-light-mid:  lighten($gray-base, 86.5%); // #dddddd
+$gray-lightest:  lighten($gray-base, 96%); // #f5f5f5 or whitesmoke
+
+// Primary Blue shades
+$brand-primary-darkest: #072B57; // used for main page offcanvas course list
+$brand-primary-darker: #164276;  // used for main page offcanvas course list
+$brand-primary-mid: lighten($brand-primary, 12%); // #5798d0
+$brand-primary-light: lighten($brand-primary, 45%); // #dbe9f5
+$brand-primary-bright: #0E9AEF;   // used when we need a blue standout, such as the right hand bar indicating the current org in the offcanvas course list.
+
+// Success Green shades
+$brand-success-light: lighten($brand-success, 25%); // #b5dfb5
+
+// Warning Yellow shades:
+$contrast-fade-start: #FCF0AD; // Used in Forum, Comment for highlighting replies
+$contrast-light: #F6EEBF; 
+
+// Borders in various colours
+$border-thin-black: thin solid black;
+$border-thin-dotted: thin dotted #2E6DA4; // blue
+$border-thin-dashed: thin dashed #2E6DA4; // blue
+$border-thin-solid: thin solid #2E6DA4; // blue
+$border-thin-body-bg: thin solid $body-bg; // white line
+// Grey
+$border-thin-default: thin solid #AAAAAA;
+$border-thin-default-light: thin solid $gray-lighter;
+$medium-default: 3px solid $gray-light-mid;
+// Blue
+$border-thin-primary: thin solid $brand-primary;
+// Red
+$border-thin-danger: thin solid $brand-danger;
+$border-medium-danger: 3px solid $brand-danger;
+
+// learner page box shadow
+$panel-box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
+
+// progress bar
+$optional-activity-background: lighten($brand-primary-mid, 35%);
+$optional-activity-background-heading: lighten($brand-primary-mid, 5%); 
+$optional-activity-background-hover: $contrast-light;
+
+// Used just for main.css - the main page
+$main_default_link: #5A738E;
+$main_blue_light_highlight: #A6E5FD;
+$main_fav_org_link: #A7B1C2;
+$main_offcanvas_link: #2B5B95;
+$main_dropdown_border: #D9DEE4;
+$main_navbar_link: #515356;
+$main_singlelesson_hover_border: #9be0f9;
+$main_singlelesson_hover_background: #F0F8FF;
+
+$url_css_directory: "/lams/images/css/";

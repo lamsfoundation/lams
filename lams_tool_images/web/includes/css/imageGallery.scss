@@ -1,0 +1,49 @@
+@import "_lams_variables.scss";
+
+@media (max-width: 750px) {
+  	#aside {
+    	float: none;
+    	width: auto;
+    	position: static;
+  	}
+}
+.extra-controls-inner {
+	float: right;
+}
+
+#extra-controls {
+	text-align: center;
+	float: right;
+	clear: both;
+	padding-top: 20px;
+}
+[id^=comments-area] {
+	clear: both;
+	padding-top: 10px;
+}
+.button.add-comment {
+	margin-right: 12px;
+}
+.fotorama__thumb {
+    background-color: $gray-base;
+}
+.fotorama__wrap {
+	margin: auto;
+}
+.fotorama__caption {
+	text-align: left;
+}
+.fotorama__thumb-border {
+	border-color: $link-color;
+}
+
+.fotorama-container {
+	text-align: center;
+	padding-top: 10px;
+}
+#image-info:after {
+   content: " ";
+   display: block; 
+   height: 0; 
+   clear: both;
+}

@@ -1,0 +1,71 @@
+@import "_lams_variables.scss";
+
+/* ==================== COMMON ==================== */
+.message {
+	padding-bottom: 4px;
+}
+
+.private_message {
+	font-style: italic;
+	background-color: $gray-lightest;
+}
+
+.messageFrom {
+	font-weight: bold;
+}
+
+/* ==================== LEARNING PAGE STYLES ==================== */
+
+#chatContent {
+	table-layout: fixed;
+	margin-top: 10px;
+	border-spacing: 10px;
+}
+
+#messages {
+	height: 260px;
+	overflow: auto;
+	border: $border-thin-default;
+	padding: 2px;
+	padding-right:5px;
+}
+
+#roster {
+	height: 260px;
+	overflow: auto;
+	border: $border-thin-default;
+	font-weight: bold;
+	padding: 2px;
+}
+
+#sendMessageArea {
+	border: $border-thin-default;
+	width: 99%;
+}
+
+#sendMessageButtonCell {
+	text-align: right;
+}
+
+#sendMessageButton {
+	width: 100%;
+}
+
+.selected {
+	background-color: $gray-lightest;
+	padding: 2px;
+	cursor: pointer;
+}
+
+.unselected {
+	background-color: white;
+	padding: 2px;
+	cursor: pointer;
+}
+
+/* ================== MONITORING ================== */
+.edit-pane {
+	display: none;;
+	border: 1px solid;
+	padding: 8px;
+}
