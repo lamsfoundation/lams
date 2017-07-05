@@ -124,7 +124,7 @@ function lamslesson_update_instance($lamslesson) {
     // if the displaydesign setting is unchecked with make sure we do that
     if (isset($originallamslesson->displaydesign) && !isset($lamslesson->displaydesign)) {
        	$lamslesson->displaydesign = 0;
-    }   
+    }
 
     return $DB->update_record('lamslesson', $lamslesson);
 }
@@ -338,7 +338,6 @@ function lamslesson_get_design_image($username,$courseid,$coursename,$coursecrea
     $request = "$CFG->lamslesson_serverurl".LAMSLESSON_LD_SERVICE_SVG."?serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue . "&username=" . $username  . "&courseId=" . $courseid . "&courseName=" . urlencode($coursename) . "&mode=2&country=" . $country . "&lang=" . $lang . "&ldId=" . $ldid . "&svgFormat=" . $format;
 
     return $request;
-
 }
 
 
@@ -351,8 +350,7 @@ function lamslesson_get_design_image($username,$courseid,$coursename,$coursecrea
  */
 function lamslesson_get_sequences_rest($username,$firstname,$lastname,$email,$courseid,$coursename,$coursecreatedate,$country,$lang) {
     global $CFG,$USER;
-    if(!isset($CFG->lamslesson_serverurl)||!isset($CFG->lamslesson_serverid)||!isset($CFG->lamslesson_serverkey))
-    {
+    if(!isset($CFG->lamslesson_serverurl)||!isset($CFG->lamslesson_serverid)||!isset($CFG->lamslesson_serverkey)) {
         return get_string('notsetup', 'lamslesson');
     }
 
@@ -393,7 +391,6 @@ function lamslesson_get_sequences_rest($username,$firstname,$lastname,$email,$co
 
     $result = lamslesson_process_array($xml_array['Folder']);
     return $result;
-
 }
 
 /*
@@ -685,7 +682,8 @@ function lamslesson_get_lams_outputs($username,$lamslesson,$foruser) {
 		'hashValue'	=>	$hash,
 		'method'	=> 	LAMSLESSON_OUTPUT_METHOD,
 		'lsId'		=>	$lamslesson->lesson_id,
-		'outputsUser'	=>	$foruser);
+		'outputsUser'	=>	$foruser
+	);
 
   // GET call to LAMS
   $xml = lamslesson_http_call_post($request, $load);
@@ -773,7 +771,7 @@ function lamslesson_get_url($username, $firstname, $lastname, $email, $lang, $co
  * Returns list of userids of users in the given context
  */
 function lamslesson_get_course_userids($lamslessonid, $context=NULL) {
-  global $CFG, $DB;
+	global $CFG, $DB;
 
 	if ($context == NULL) {
 	  $lamslesson = $DB->get_record('lamslesson', array('id' => $lamslessonid));
@@ -800,26 +798,25 @@ function lamslesson_get_course_userids($lamslessonid, $context=NULL) {
 }
 
 
-
 /*
  * Gets all the student progress for a lesson in one go
  * 
  */
 function lamslesson_get_student_progress($username,$ldid,$courseid,$firstname,$lastname,$email,$country,$lang) {
-  global $CFG;
-  if (!isset($CFG->lamslesson_serverid, $CFG->lamslesson_serverkey) || $CFG->lamslesson_serverid == "") {
-    print_error(get_string('notsetup', 'lamslesson'));
-    return NULL;
-  }
+	global $CFG;
+	if (!isset($CFG->lamslesson_serverid, $CFG->lamslesson_serverkey) || $CFG->lamslesson_serverid == "") {
+		print_error(get_string('notsetup', 'lamslesson'));
+		return NULL;
+	}
     
-  //$datetime =    date("F d,Y g:i a");
-  $datetime = lamslesson_get_datetime();
-  $plaintext = $datetime.$username.$CFG->lamslesson_serverid.$CFG->lamslesson_serverkey;
-  $hashvalue = sha1(strtolower($plaintext));
+	//$datetime =    date("F d,Y g:i a");
+  	$datetime = lamslesson_get_datetime();
+  	$plaintext = $datetime.$username.$CFG->lamslesson_serverid.$CFG->lamslesson_serverkey;
+  	$hashvalue = sha1(strtolower($plaintext));
 
-  $request = "$CFG->lamslesson_serverurl" . LAMSLESSON_LESSON_MANAGER;
+  	$request = "$CFG->lamslesson_serverurl" . LAMSLESSON_LESSON_MANAGER;
 
-  $load = array('method'	=>	LAMSLESSON_PARAM_SINGLE_PROGRESS_METHOD,
+  	$load = array('method'	=>	LAMSLESSON_PARAM_SINGLE_PROGRESS_METHOD,
 		'serverId'	=>	$CFG->lamslesson_serverid,
 		'datetime'	=>	$datetime,
 		'hashValue'	=>	$hashvalue,
@@ -831,60 +828,56 @@ function lamslesson_get_student_progress($username,$ldid,$courseid,$firstname,$l
 		'lastName'	=> 	$lastname,
 		'email'		=> 	$email,
 		'country'	=> 	$country,
-		'lang'		=>	$lang);
+		'lang'		=>	$lang
+	);
 
-  // GET call to LAMS
+  	// GET call to LAMS
   
-  $xml = lamslesson_http_call_post($request, $load);
+  	$xml = lamslesson_http_call_post($request, $load);
 
-  $xml_array = xmlize($xml);
+  	$xml_array = xmlize($xml);
 
-  $response = $xml_array['LessonProgress']['#'];
-  $learnerProgress = $response['LearnerProgress']['0'];
+  	$response = $xml_array['LessonProgress']['#'];
+  	$learnerProgress = $response['LearnerProgress']['0'];
   
-  return $learnerProgress['@'];
+  	return $learnerProgress['@'];
 }
-
 
 //returns the moodle completion state for a user)
 function lamslesson_get_moodle_completion($course,$cm) {
-
-  $completion = new completion_info($course);
-  return $completion->get_data($cm);
-
+	$completion = new completion_info($course);
+	return $completion->get_data($cm);
 }
 
 function lamslesson_set_as_completed($cm,$course,$lamslesson) {
-  // Update completion state
-  $completion = new completion_info($course);
-  if ($completion->is_enabled($cm) && $lamslesson->completionfinish) {
-    lamslesson_set_completion_state($cm,$completion,COMPLETION_COMPLETE);
-  }
+	// Update completion state
+	$completion = new completion_info($course);
+	if ($completion->is_enabled($cm) && $lamslesson->completionfinish) {
+		lamslesson_set_completion_state($cm,$completion,COMPLETION_COMPLETE);
+	}
 }
 
 function lamslesson_set_as_incomplete($cm,$course,$lamslesson) {
-  // Update completion state
-  $completion = new completion_info($course);
-  if ($completion->is_enabled($cm) && $lamslesson->completionfinish) {
-    lamslesson_set_completion_state($cm,$completion,COMPLETION_INCOMPLETE);
-  }
+	// Update completion state
+	$completion = new completion_info($course);
+	if ($completion->is_enabled($cm) && $lamslesson->completionfinish) {
+		lamslesson_set_completion_state($cm,$completion,COMPLETION_INCOMPLETE);
+	}
 }
 
 function lamslesson_set_completion_state($cm,$completion,$state) {
-  //Update completion state
+	//Update completion state
 
-  switch ($state) {
-  case COMPLETION_COMPLETE: 
+	switch ($state) {
+	case COMPLETION_COMPLETE: 
     
-    $completion->update_state($cm, COMPLETION_COMPLETE);
-    break;
+		$completion->update_state($cm, COMPLETION_COMPLETE);
+		break;
 
-  default:
-    $completion->update_state($cm, COMPLETION_INCOMPLETE);
-    break;
-  }
-      
-
+ 	default:
+		$completion->update_state($cm, COMPLETION_INCOMPLETE);
+		break;
+	}
 }
 
 /**
@@ -941,7 +934,6 @@ function lamslesson_grade_item_update($lamslesson, $grades=NULL) {
         $grades = NULL;
     }
 
-    
     return grade_update('mod/lamslesson', $lamslesson->course, 'mod', 'lamslesson', $lamslesson->id, 0, $grades, $params);
 }
 
@@ -1005,17 +997,18 @@ function lamslesson_verify($url, $id, $key){
     $load = array('method' 	=>	LAMSLESSON_PARAM_VERIFY_METHOD,
 		  'serverId'	=>	$id,
 		  'datetime'	=>	$datetime,
-		  'hashValue'	=>	$hashvalue);
+		  'hashValue'	=>	$hashvalue
+	);
 
     $validate = lamslesson_http_call_post($request, $load);
 
-   if ( $validate == 1 )  {
-	// validation successful
-	return get_string('validationsuccessful', 'lamslesson');
-   } else {
-	// validation failed
-	return get_string('validationfailed', 'lamslesson');
-   }
+	if ( $validate == 1 )  {
+		// validation successful
+		return get_string('validationsuccessful', 'lamslesson');
+	} else {
+		// validation failed
+		return get_string('validationfailed', 'lamslesson');
+	}
 
 }
 
@@ -1025,20 +1018,20 @@ function lamslesson_verify($url, $id, $key){
  * @return false or string with response if correct
  */
 function lamslesson_http_call_post($url,$request) {
-        global $CFG;
+	global $CFG;
 
-        # pass charset as part of headers so it is interpreted correctly
-        # on the LAMS side. See LDEV-2875
-        $headers = array(
-                "Content-Type" =>  "application/x-www-form-urlencoded;charset=UTF-8"
-        );
-        $results = download_file_content($url, $headers, $request);
+	# pass charset as part of headers so it is interpreted correctly
+	# on the LAMS side. See LDEV-2875
+	$headers = array(
+		"Content-Type" =>  "application/x-www-form-urlencoded;charset=UTF-8"
+	);
+	$results = download_file_content($url, $headers, $request);
 
-        if ($results) {
-            return $results;
-        } else {
-            return false;
-        }
+	if ($results) {
+		return $results;
+	} else {
+		return false;
+	}
 }
 
 /**
@@ -1048,10 +1041,10 @@ function lamslesson_http_call_post($url,$request) {
  * @return timestamp in milliseconds
 */
 function lamslesson_get_datetime() {
-        global $CFG;
+	global $CFG;
 
-    	// change datetime to enforce time to live for login request
-    	// See LDEV-3382
+    // change datetime to enforce time to live for login request
+    // See LDEV-3382
 
 	$offset = $CFG->lamslesson_servertimeoffset * 60 * 1000;
 
@@ -1066,8 +1059,8 @@ function lamslesson_get_datetime() {
  * @return timestamp in milliseconds (from LAMS server)
 */
 function lamslesson_get_lamsserver_time() {
-        // change datetime to enforce time to live for login request
-        // See LDEV-3382
+    // change datetime to enforce time to live for login request
+    // See LDEV-3382
 	global $CFG;
 	$url = "$CFG->lamslesson_serverurl" . LAMSLESSON_LAMS_SERVERTIME;
  	$load = array('method'      =>      LAMSLESSON_PARAM_VERIFY_METHOD);
@@ -1078,8 +1071,5 @@ function lamslesson_get_lamsserver_time() {
 
 	$offset = $result - $localtime;
 	
-        return "LAMS time: " . date('m-d-Y H:i:s.u', $result/1000) . " \rMoodle time:" . date('m-d-Y H:i:s.u', $localtime/1000) . " \rOffset: " . $offset/1000/60 . " minutes";
+    return "LAMS time: " . date('m-d-Y H:i:s.u', $result/1000) . " \rMoodle time:" . date('m-d-Y H:i:s.u', $localtime/1000) . " \rOffset: " . $offset/1000/60 . " minutes";
 }
-
-
-
