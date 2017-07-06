@@ -23,10 +23,22 @@
 
 package org.lamsfoundation.lams.learning.kumalive.dao.hibernate;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learning.kumalive.dao.IKumaliveDAO;
+import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
+    private static final String FIND_BY_ORGANISATION = "FROM " + Kumalive.class.getName()
+	    + " AS k WHERE k.organisation.organisationId = ? AND k.finished = 0";
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Kumalive findByOrganisationId(Integer organisationId) {
+	List<Kumalive> result = (List<Kumalive>) doFind(FIND_BY_ORGANISATION, organisationId);
+	return result.isEmpty() ? null : result.get(0);
+    }
 }

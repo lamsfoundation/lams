@@ -30,7 +30,10 @@
 		<c:when test="${link.name eq 'index.addlesson.single'}">
 			<div class="course-right-buttons pull-right">
 				<div class="btn-group" role="group">
-					<button onClick="<c:out value='${link.url}'/>" type="button" class="btn btn-primary btn-sm ${addTourClass?'tour-add-lesson':''}"><i class="${link.style}" title="<fmt:message key="index.addlesson" />"></i> <span class="hidden-xs"><fmt:message key="index.addlesson" /></span></button>
+					<button onClick="<c:out value='${link.url}'/>" type="button" class="btn btn-primary btn-sm ${addTourClass?'tour-add-lesson':''}">
+						<i class="${link.style}" title="<fmt:message key="index.addlesson" />"></i>
+						<span class="hidden-xs"><fmt:message key="index.addlesson" /></span>
+					</button>
 					<div class="btn-group" role="group">
 						<button id="addSingleActivityLessonDrop" type="button" class="btn btn-primary btn-sm dropdown-toggle ${addTourClass?'tour-add-single-lesson':''}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							<span class="caret"></span>
@@ -47,13 +50,34 @@
 				</div>
 			</div>
 		</c:when>
+		<c:when test="${link.name eq 'index.kumalive.teacher'}">
+			<div class="course-right-buttons pull-right">
+				<div class="btn-group" role="group" title="<fmt:message key="${link.tooltip}" />">
+					<button onClick="<c:out value='${link.url}'/>" type="button" class="btn btn-primary btn-sm">
+						<i class="${link.style}"></i>
+						<span class="hidden-xs"><fmt:message key="index.kumalive" /></span>
+					</button>
+					<div class="btn-group" role="group">
+						<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+						 	<li onClick="javascript:showKumaliveDialog(${org.id}, 'learner')">
+						 		<a href="#"><fmt:message key="index.kumalive.enter.learner" /></a>
+						 	</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</c:when>
 		<c:otherwise>
 			<div class="course-right-buttons pull-right">
 				<a class="btn btn-primary btn-sm tour-${link.id}" onClick="<c:out value='${link.url}'/>"
                                         <c:if test="${not empty link.tooltip}">
                                         title="<fmt:message key='${link.tooltip}'/>"
                                     </c:if>>
-				<i class="${link.style}" title="<fmt:message key="${link.name}" />"> </i> <span class="hidden-xs"><fmt:message key="${link.name}" /></span>
+					<i class="${link.style}" title="<fmt:message key="${link.name}" />"></i>
+					<span class="hidden-xs"><fmt:message key="${link.name}" /></span>
 				</a>
 			</div>
 		</c:otherwise>

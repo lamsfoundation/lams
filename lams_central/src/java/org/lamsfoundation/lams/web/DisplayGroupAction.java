@@ -106,7 +106,7 @@ public class DisplayGroupAction extends Action {
 		request.setAttribute("tools",
 			getLearningDesignService().getToolDTOs(false, false, request.getRemoteUser()));
 	    }
-	    
+
 	    //set whether organisation is favorite
 	    boolean isFavorite = service.isOrganisationFavorite(orgId, user.getUserId());
 	    iob.setFavorite(isFavorite);
@@ -158,8 +158,6 @@ public class DisplayGroupAction extends Action {
 		    String name = org.getEnableSingleActivityLessons() ? "index.addlesson.single" : "index.addlesson";
 		    links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + org.getOrganisationId() + ")",
 			    "fa fa-fw fa-plus", null));
-		    links.add(new IndexLinkBean("index.kumalive", "javascript:showKumaliveDialog(" + org.getOrganisationId() + ")",
-			    "fa fa-fw fa-bolt", null));
 		}
 		moreLinks.add(new IndexLinkBean("index.searchlesson",
 			"javascript:showSearchLessonDialog(" + org.getOrganisationId() + ")", "fa fa-fw fa-search",
@@ -172,7 +170,7 @@ public class DisplayGroupAction extends Action {
 			    "javascript:showNotificationsDialog(" + org.getOrganisationId() + ",null)",
 			    "fa fa-fw fa-bullhorn", "index.emailnotifications.tooltip"));
 		}
-		
+
 		// Adding lesson sorting link
 		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
 
@@ -206,10 +204,17 @@ public class DisplayGroupAction extends Action {
 		// Adding gradebook course monitor links if enabled
 		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_GROUP_ADMIN)) {
 		    String link = "javascript:showGradebookCourseDialog(" + org.getOrganisationId() + ")";
-		    moreLinks.add(new IndexLinkBean("index.coursegradebook.subgroup", link, "fa fa-fw fa-list-ol", null));
+		    moreLinks.add(
+			    new IndexLinkBean("index.coursegradebook.subgroup", link, "fa fa-fw fa-list-ol", null));
 		}
 	    }
 	}
+
+	links.add(new IndexLinkBean(
+		roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR) ? "index.kumalive.teacher"
+			: "index.kumalive",
+		"javascript:showKumaliveDialog(" + org.getOrganisationId() + ")", "fa fa-fw fa-bolt", "index.kumalive.tooltip"));
+
 	orgBean.setLinks(links);
 	orgBean.setMoreLinks(moreLinks);
 
@@ -289,12 +294,6 @@ public class DisplayGroupAction extends Action {
 	    }
 	}
 
-	// getting the organisation
-	Organisation org = (Organisation) DisplayGroupAction.service.findById(Organisation.class, orgId);
-
-	// Getting the parent organisation if applicable
-	Organisation parent = org.getParentOrganisation();
-
 	// iterate through user's lessons where they are staff (or simply through all lessons in case of Group_Manager),
 	// and add staff links to the beans in the map.
 	Integer userRole = (roles.contains(Role.ROLE_GROUP_MANAGER)) ? Role.ROLE_GROUP_MANAGER : Role.ROLE_MONITOR;
@@ -332,8 +331,8 @@ public class DisplayGroupAction extends Action {
 	    // Add delete lesson option
 	    if (isGroupManagerOrMonitor) {
 		String removeLessonLink = "javascript:removeLesson(" + bean.getId() + ")";
-		lessonLinks.addFirst(new IndexLinkBean("index.remove.lesson", removeLessonLink,
-			"fa fa-fw fa-trash-o", "index.remove.lesson.tooltip"));
+		lessonLinks.addFirst(new IndexLinkBean("index.remove.lesson", removeLessonLink, "fa fa-fw fa-trash-o",
+			"index.remove.lesson.tooltip"));
 	    }
 
 	    if (lessonLinks.size() > 0) {

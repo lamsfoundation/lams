@@ -534,7 +534,7 @@ function showSearchLessonDialog(orgID){
 	}, true);
 }
 
-function showKumaliveDialog(orgID) {
+function showKumaliveDialog(orgID, role) {
 	showDialog("dialogKumalive", {
 		'data' : {
 			'orgID' : orgID
@@ -547,7 +547,7 @@ function showKumaliveDialog(orgID) {
 			// load contents after opening the dialog
 			$('iframe', dialog)
 					.attr('src', LAMS_URL
-						+ '/learning/kumalive.jsp?organisationID='	+ dialog.data('orgID'));
+						+ '/learning/kumalive.jsp?organisationID='	+ dialog.data('orgID') + '&role=' + role);
 		}
 	});
 }

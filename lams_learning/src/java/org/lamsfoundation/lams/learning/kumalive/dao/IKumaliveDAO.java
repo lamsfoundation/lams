@@ -24,6 +24,8 @@
 package org.lamsfoundation.lams.learning.kumalive.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
 
 public interface IKumaliveDAO extends IBaseDAO {
+    Kumalive findByOrganisationId(Integer organisationId);
 }

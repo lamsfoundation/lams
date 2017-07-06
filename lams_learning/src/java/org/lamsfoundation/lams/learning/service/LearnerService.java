@@ -93,7 +93,6 @@ import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
@@ -1411,14 +1410,49 @@ public class LearnerService implements ICoreLearnerService {
 	return toolSession == null ? null : getActivityPosition(toolSession.getToolActivity().getActivityId());
     }
 
+    /**
+     * Fetches or creates a Kumalive
+     */
     @Override
-    public Long startKumalive(Integer organisationId, Integer userId, String name) {
-	securityService.isGroupMonitor(organisationId, userId, "start kumalive", true);
+    public Kumalive startKumalive(Integer organisationId, Integer userId, String name, boolean isTeacher) {
+	if (isTeacher) {
+	    securityService.isGroupMonitor(organisationId, userId, "start kumalive", true);
+	}
+	Kumalive kumalive = kumaliveDAO.findByOrganisationId(organisationId);
+	if (kumalive == null) {
+	    if (!isTeacher) {
+		return null;
+	    }
+	} else {
+	    return kumalive;
+	}
+
 	Organisation organisation = (Organisation) kumaliveDAO.find(Organisation.class, organisationId);
 	User createdBy = (User) kumaliveDAO.find(User.class, userId);
-	Kumalive kumalive = new Kumalive(organisation, createdBy, name);
+	kumalive = new Kumalive(organisation, createdBy, name);
 	kumaliveDAO.insert(kumalive);
-	return kumalive.getKumaliveId();
+	return kumalive;
+    }
+
+    /**
+     * Ends Kumalive
+     */
+    @Override
+    public void finishKumalive(Long id) {
+	Kumalive kumalive = (Kumalive) kumaliveDAO.find(Kumalive.class, id);
+	kumalive.setFinished(true);
+	kumaliveDAO.update(kumalive);
+    }
+
+    /**
+     * Save Kumalive score
+     */
+    @Override
+    public void scoreKumalive(Long id, Integer userId, Short score) {
+	Kumalive kumalive = (Kumalive) kumaliveDAO.find(Kumalive.class, id);
+	User user = (User) kumaliveDAO.find(User.class, userId);
+	kumalive.getScores().put(user, score);
+	kumaliveDAO.update(kumalive);
     }
 
     private boolean isActivityLast(Activity activity) {

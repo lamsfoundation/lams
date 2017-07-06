@@ -76,6 +76,8 @@
 				<prop key="learner*">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
 				<prop key="recalcProgressForLearner">PROPAGATION_REQUIRES_NEW</prop>
+				<prop key="score*">PROPAGATION_REQUIRED</prop>
+				<prop key="finish*">PROPAGATION_REQUIRED</prop>
    			</props>
 		</property>
 	</bean> 
