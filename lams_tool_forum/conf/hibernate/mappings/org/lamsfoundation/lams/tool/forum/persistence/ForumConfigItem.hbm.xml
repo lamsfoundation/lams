@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.forum.persistence.ForumConfigItem"
+        table="tl_lafrum11_configuration"
+    >
+
+        <id
+            name="id"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native" />
+        </id>
+
+        <property
+            name="configKey"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="config_key"
+            length="30"
+            not-null="false"
+            unique="true"
+        />
+
+        <property
+            name="configValue"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="config_value"
+            length="255"
+            not-null="false"
+        />
+
+    </class>
+</hibernate-mapping>

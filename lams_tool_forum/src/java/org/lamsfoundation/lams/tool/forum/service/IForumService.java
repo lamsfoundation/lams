@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.service;
 
 import java.util.Collection;
@@ -35,6 +34,7 @@ import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumConfigItem;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
@@ -430,10 +430,10 @@ public interface IForumService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);
@@ -461,4 +461,7 @@ public interface IForumService {
      */
     int getNumOfRatingsByUserAndForum(Long userUid, Long forumUid);
 
+    ForumConfigItem getConfigItem(String key);
+
+    void saveForumConfigItem(ForumConfigItem item);
 }
