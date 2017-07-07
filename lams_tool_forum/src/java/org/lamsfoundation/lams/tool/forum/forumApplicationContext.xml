@@ -176,9 +176,9 @@
 				<prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="replyTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="saveTimestamp">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="releaseMarksForSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="rateMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="finishUserSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

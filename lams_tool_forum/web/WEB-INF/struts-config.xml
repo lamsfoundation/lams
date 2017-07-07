@@ -37,6 +37,10 @@
       name="forumForm"
       type="org.lamsfoundation.lams.tool.forum.web.forms.ForumForm"
     />
+    <form-bean
+      name="adminForm"
+      type="org.lamsfoundation.lams.tool.forum.web.forms.AdminForm"
+    />
 
    <form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm" />
 
@@ -422,6 +426,31 @@
 		</action> 	
 
 		<!-- ========== END: Monitoring  Definitions ============================== -->
+		
+		<!-- ========== BEGIN: Admin Definitions ============================== -->		
+		<action path="/admin/start"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AdminAction"
+			name="adminForm" 
+			scope="request" 
+			parameter="start" 
+			validate="false">
+			<forward name="config" path="/jsps/admin/config.jsp" />
+		</action>
+		<action path="/admin/saveContent"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AdminAction"
+			name="adminForm" 
+			scope="request" 
+			parameter="saveContent" 
+			validate="false">
+			<forward name="config" path="/jsps/admin/config.jsp" />
+		</action>
+		<!-- ========== END: Admin Definitions ============================== -->	
+		
+		<!-- ========== BEGIN: Common ============================== -->
+		<action path="/clearsession"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.ClearSessionAction">
+		</action>
+		
 		<!-- System level actions -->
 		<action path="/index" type="org.apache.struts.actions.ForwardAction"
 			parameter="tiles:/layout" />

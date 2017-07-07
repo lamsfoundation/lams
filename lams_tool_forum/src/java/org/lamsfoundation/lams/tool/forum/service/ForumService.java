@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.service;
 
 import java.io.FileNotFoundException;
@@ -84,6 +83,7 @@ import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumConfigItem;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
@@ -282,7 +282,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public List<MessageDTO> getMessageAsDTO(Long messageUid) throws PersistenceException {
 
 	MessageSeq msgSeq = messageSeqDao.getByMessageId(messageUid);
-	List<MessageDTO> msgDtoList = new ArrayList<MessageDTO>();
+	List<MessageDTO> msgDtoList = new ArrayList<>();
 	msgDtoList.add(makeDTOSetRating(msgSeq, msgSeq.getMessage()));
 	return msgDtoList;
     }
@@ -418,7 +418,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	List unsortedThread = messageSeqDao.getCompleteTopic(rootTopicId);
 	Iterator iter = unsortedThread.iterator();
 	MessageSeq msgSeq;
-	SortedMap<MessageSeq, Message> map = new TreeMap<MessageSeq, Message>(new TopicComparator());
+	SortedMap<MessageSeq, Message> map = new TreeMap<>(new TopicComparator());
 	while (iter.hasNext()) {
 	    msgSeq = (MessageSeq) iter.next();
 	    map.put(msgSeq, msgSeq.getMessage());
@@ -432,7 +432,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
 	long lastThreadMessageUid = afterSequenceId != null ? afterSequenceId.longValue() : 0L;
 	long usePagingSize = pagingSize != null ? pagingSize.longValue() : ForumConstants.DEFAULT_PAGE_SIZE;
-	SortedMap<MessageSeq, Message> map = new TreeMap<MessageSeq, Message>(new TopicComparator());
+	SortedMap<MessageSeq, Message> map = new TreeMap<>(new TopicComparator());
 
 	// first time through we need to include the top topic message (level 0)
 	if (lastThreadMessageUid == 0) {
@@ -471,7 +471,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     @Override
     public List getThread(Long threadId) {
 	List msgSeqs = messageSeqDao.getThreadByThreadId(threadId);
-	SortedMap<MessageSeq, Message> map = new TreeMap<MessageSeq, Message>(new TopicComparator());
+	SortedMap<MessageSeq, Message> map = new TreeMap<>(new TopicComparator());
 	Iterator iter = msgSeqs.iterator();
 	while (iter.hasNext()) {
 	    MessageSeq msgSeq = (MessageSeq) iter.next();
@@ -493,7 +493,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	List<MessageDTO> messageDTOs = MessageDTO.getMessageDTO(topicsBySession);
 
 	// sort by sequence id
-	Set topicSet = new TreeSet<MessageDTO>(new MessageDtoComparator());
+	Set topicSet = new TreeSet<>(new MessageDtoComparator());
 	topicSet.addAll(messageDTOs);
 
 	topicsBySession.clear();
@@ -557,7 +557,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public List getAuthoredTopics(Long forumUid) {
 	List list = messageDao.getTopicsFromAuthor(forumUid);
 
-	TreeMap<Date, Message> map = new TreeMap<Date, Message>(new DateComparator());
+	TreeMap<Date, Message> map = new TreeMap<>(new DateComparator());
 	// get all the topics skipping ones with a tool session (we may be editing in monitor) and sort by create date
 	Iterator iter = list.iterator();
 	while (iter.hasNext()) {
@@ -566,7 +566,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		map.put(topic.getCreated(), topic);
 	    }
 	}
-	return MessageDTO.getMessageDTO(new ArrayList<Message>(map.values()));
+	return MessageDTO.getMessageDTO(new ArrayList<>(map.values()));
     }
 
     @Override
@@ -603,7 +603,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	Map<Integer, StringBuilder> notificationMessages = null;
 	Object[] notificationMessageParameters = null;
 	if (notifyLearnersOnMarkRelease) {
-	    notificationMessages = new TreeMap<Integer, StringBuilder>();
+	    notificationMessages = new TreeMap<>();
 	    notificationMessageParameters = new Object[3];
 	}
 
@@ -699,7 +699,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	Iterator iter;
 	MessageSeq msgSeq;
 	Message message;
-	List<MessageDTO> msgDtoList = new ArrayList<MessageDTO>();
+	List<MessageDTO> msgDtoList = new ArrayList<>();
 	iter = map.entrySet().iterator();
 	while (iter.hasNext()) {
 	    Map.Entry entry = (Entry) iter.next();
@@ -819,10 +819,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
@@ -848,7 +848,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 
 	Forum toContent = Forum.newInstance(fromContent, toContentId);
-	
+
 	// remove session Messages from topics
 	for (ForumCondition condition : toContent.getConditions()) {
 	    Iterator<Message> conditionMessageIter = condition.getTopics().iterator();
@@ -859,7 +859,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		}
 	    }
 	}
-	
+
 	// save topics in this forum, only save the author created topic!!! and reset its reply number to zero.
 	Set topics = toContent.getMessages();
 	if (topics != null) {
@@ -915,6 +915,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	// do not remove learner content if it was set up so in sysadmin tool management
+	ForumConfigItem keepLearnerContent = getConfigItem(ForumConfigItem.KEY_KEEP_LEARNER_CONTENT);
+	if (Boolean.valueOf(keepLearnerContent.getConfigValue())) {
+	    return;
+	}
+
 	if (ForumService.log.isDebugEnabled()) {
 	    ForumService.log.debug(
 		    "Hiding or removing Forum messages for user ID " + userId + " and toolContentId " + toolContentId);
@@ -988,7 +994,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	toolContentObj = Forum.newInstance(toolContentObj, toolContentId);
 	toolContentObj.setCreatedBy(null);
 	Set<Message> items = toolContentObj.getMessages();
-	Set<Message> authorItems = new HashSet<Message>();
+	Set<Message> authorItems = new HashSet<>();
 	for (Message item : items) {
 	    if (item.getIsAuthored() && (item.getToolSession() == null)) {
 		authorItems.add(item);
@@ -1182,10 +1188,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return forumOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -1451,7 +1457,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	if (forum.isNotifyLearnersOnForumPosting()) {
 	    List<User> learners = lessonService.getLearnersAttemptedOrCompletedActivity(activity);
 	    if ((learners != null) && !learners.isEmpty()) {
-		ArrayList<Integer> learnerIds = new ArrayList<Integer>();
+		ArrayList<Integer> learnerIds = new ArrayList<>();
 		for (User learner : learners) {
 		    learnerIds.add(learner.getUserId());
 		}
@@ -1475,7 +1481,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getForumOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
-    
+
     @Override
     public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
 	ForumUser learner = getUserByUserAndSession(learnerId, toolSessionId);
@@ -1484,12 +1490,25 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 
 	Object[] dates = messageDao.getDateRangeOfMessages(learner.getUid());
-	if (learner.isSessionFinished())
-	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, (Date)dates[0], (Date)dates[1]);
-	else
-	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED,(Date) dates[0], null);
+	if (learner.isSessionFinished()) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, (Date) dates[0], (Date) dates[1]);
+	} else {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, (Date) dates[0], null);
+	}
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public ForumConfigItem getConfigItem(String key) {
+	List<ForumConfigItem> result = forumDao.findByProperty(ForumConfigItem.class, "configKey",
+		ForumConfigItem.KEY_KEEP_LEARNER_CONTENT);
+	return result.isEmpty() ? null : result.get(0);
+    }
+
+    @Override
+    public void saveForumConfigItem(ForumConfigItem item) {
+	forumDao.insertOrUpdate(item);
+    }
 
     // ****************** REST methods *************************
 
