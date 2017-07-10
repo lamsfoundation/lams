@@ -93,9 +93,9 @@ kumaliveWebsocket.onmessage = function(e){
 		}
 		break;
 		case 'finish' : {
-			// tell user that Kumalive is finished and close the dialog
+			// tell user that Kumalive is finished and close the window
 			window.alert(LABELS.FINISH_KUMALIVE_MESSAGE);
-			window.parent.closeDialog('dialogKumalive');
+			window.close();
 		}
 		break;
 	} 

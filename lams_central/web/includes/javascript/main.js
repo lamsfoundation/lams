@@ -534,25 +534,6 @@ function showSearchLessonDialog(orgID){
 	}, true);
 }
 
-function showKumaliveDialog(orgID, role) {
-	showDialog("dialogKumalive", {
-		'data' : {
-			'orgID' : orgID
-		},
-		'height': Math.max(380, Math.min(800, $(window).height() - 30)),
-		'width' : Math.max(380, Math.min(1280, $(window).width() - 60)),
-		'title' : LABELS.KUMALIVE_TITLE,
-		'open' : function() {
-			var dialog = $(this);
-			// load contents after opening the dialog
-			$('iframe', dialog)
-					.attr('src', LAMS_URL
-						+ '/learning/kumalive.jsp?organisationID='	+ dialog.data('orgID') + '&role=' + role);
-		}
-	});
-}
-
-
 function closeAddSingleActivityLessonDialog(action) {
 	var id = 'dialogAddSingleActivityLesson',
 		dialog = $('#' + id),

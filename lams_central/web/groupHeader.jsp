@@ -62,7 +62,7 @@
 							<span class="caret"></span>
 						</button>
 						<ul class="dropdown-menu">
-						 	<li onClick="javascript:showKumaliveDialog(${org.id}, 'learner')">
+						 	<li onClick="javascript:openKumalive(${org.id}, 'learner')">
 						 		<a href="#"><fmt:message key="index.kumalive.enter.learner" /></a>
 						 	</li>
 						</ul>

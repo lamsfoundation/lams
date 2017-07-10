@@ -213,7 +213,7 @@ public class DisplayGroupAction extends Action {
 	links.add(new IndexLinkBean(
 		roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR) ? "index.kumalive.teacher"
 			: "index.kumalive",
-		"javascript:showKumaliveDialog(" + org.getOrganisationId() + ")", "fa fa-fw fa-bolt", "index.kumalive.tooltip"));
+		"javascript:openKumalive(" + org.getOrganisationId() + ")", "fa fa-fw fa-bolt", "index.kumalive.tooltip"));
 
 	orgBean.setLinks(links);
 	orgBean.setMoreLinks(moreLinks);
