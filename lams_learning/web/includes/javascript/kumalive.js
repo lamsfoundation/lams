@@ -406,8 +406,10 @@ function toggleSpeak(message) {
 		
 		// create speaker HTML element
 		$('.name', learnerDiv).clone().appendTo(speaker);
-		$('<div />').addClass('btn btn-default').click(stopSpeak).text(LABELS.SPEAK_FINISH).appendTo(speaker);
-
+		if (roleTeacher) {
+			$('<div />').addClass('btn btn-default').click(stopSpeak).text(LABELS.SPEAK_FINISH).appendTo(speaker);
+		}
+		
 		var targetProfilePicture = $('.profilePicture', learnerDiv).clone()
 			   .removeClass('profilePictureShown')
 			   .prependTo(speaker),
