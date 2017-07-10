@@ -24,11 +24,5 @@
 			class="org.lamsfoundation.lams.usermanagement.User" not-null="false">
 			<column name="created_by" />
 		</many-to-one>
-
-		<map name="scores" lazy="true" batch-size="20" cascade="none" table="lams_kumalive_score">
-			<key column="kumalive_id" />
-			<index-many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User" />
-			<element column="score" type="java.lang.Short" />
-		</map>
 	</class>
 </hibernate-mapping>

@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.learning.kumalive.model;
 
 import java.io.Serializable;
-import java.util.Map;
 
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -37,9 +36,8 @@ public class Kumalive implements Serializable {
     private User createdBy;
     private String name;
     private Boolean finished = false;
-    private Map<User, Short> scores;
-    
-    public Kumalive(){
+
+    public Kumalive() {
     }
 
     public Kumalive(Organisation organisation, User createdBy, String name) {
@@ -86,13 +84,5 @@ public class Kumalive implements Serializable {
 
     public void setFinished(Boolean finished) {
 	this.finished = finished;
-    }
-
-    public Map<User, Short> getScores() {
-	return scores;
-    }
-
-    public void setScores(Map<User, Short> scores) {
-	this.scores = scores;
     }
 }

@@ -19,10 +19,11 @@ CREATE TABLE lams_kumalive (
 );
 
 CREATE TABLE lams_kumalive_score (
-	   kumalive_id BIGINT(20) NOT NULL
-     , user_id BIGINT(20) NOT NULL
+	   score_id BIGINT(20) NOT NULL AUTO_INCREMENT
+	 , kumalive_id BIGINT(20) NOT NULL
+     , user_id BIGINT(20)
      , score TINYINT
-     , PRIMARY KEY (kumalive_id, user_id)
+     , PRIMARY KEY (score_id)
      , CONSTRAINT FK_lams_kumalive_score_1 FOREIGN KEY (kumalive_id)
                   REFERENCES lams_kumalive (kumalive_id) ON DELETE CASCADE ON UPDATE CASCADE
   	 , CONSTRAINT FK_lams_kumalive_score_2 FOREIGN KEY (user_id)

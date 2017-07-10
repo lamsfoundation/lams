@@ -1449,10 +1449,7 @@ public class LearnerService implements ICoreLearnerService {
      */
     @Override
     public void scoreKumalive(Long id, Integer userId, Short score) {
-	Kumalive kumalive = (Kumalive) kumaliveDAO.find(Kumalive.class, id);
-	User user = (User) kumaliveDAO.find(User.class, userId);
-	kumalive.getScores().put(user, score);
-	kumaliveDAO.update(kumalive);
+	kumaliveDAO.saveScore(id, userId, score);
     }
 
     private boolean isActivityLast(Activity activity) {

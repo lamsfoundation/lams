@@ -1,11 +1,11 @@
 package org.lamsfoundation.lams.learning.kumalive;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -35,7 +35,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Processes messages for Kumalive
- * 
+ *
  * @author Marcin Cieslak
  */
 @ServerEndpoint("/kumaliveWebsocket")
@@ -60,7 +60,7 @@ public class KumaliveWebsocketServer {
 	private String name;
 	private UserDTO createdBy;
 	private boolean raiseHandPrompt;
-	private List<Integer> raisedHand;
+	private final List<Integer> raisedHand = new CopyOnWriteArrayList<>();
 	private Integer speaker;
 	private final Map<String, KumaliveUser> learners = new ConcurrentHashMap<>();
 
@@ -106,7 +106,16 @@ public class KumaliveWebsocketServer {
 	if (kumalive == null) {
 	    return;
 	}
-	kumalive.learners.remove(login);
+	KumaliveUser user = kumalive.learners.remove(login);
+	if (user != null) {
+	    Integer userId = user.userDTO.getUserID();
+	    if (kumalive.raisedHand != null) {
+		kumalive.raisedHand.remove(userId);
+	    }
+	    if (userId.equals(kumalive.speaker)) {
+		kumalive.speaker = null;
+	    }
+	}
 
 	sendRefresh(kumalive);
     }
@@ -235,7 +244,7 @@ public class KumaliveWebsocketServer {
 
 	// current state of question and speaker
 	responseJSON.put("raiseHandPrompt", kumalive.raiseHandPrompt);
-	if (kumalive.raisedHand != null) {
+	if (!kumalive.raisedHand.isEmpty()) {
 	    responseJSON.put("raisedHand", new JSONArray(kumalive.raisedHand));
 	}
 	responseJSON.put("speaker", kumalive.speaker);
@@ -252,6 +261,8 @@ public class KumaliveWebsocketServer {
 	    learnerJSON.put("lastName", participantDTO.getLastName());
 	    learnerJSON.put("portraitUuid", participantDTO.getPortraitUuid());
 	    learnerJSON.put("roleTeacher", participant.roleTeacher);
+
+	    logins.put("user" + participantDTO.getUserID(), participantDTO.getLogin());
 
 	    learnersJSON.put(learnerJSON);
 	}
@@ -270,7 +281,7 @@ public class KumaliveWebsocketServer {
 		    responseJSON.put("logins", logins);
 		    teacherResponseJSON = responseJSON;
 		}
-		responseJSON.put("roleTeacher", participant.roleTeacher);
+		teacherResponseJSON.put("roleTeacher", participant.roleTeacher);
 		channel.sendText(teacherResponseJSON.toString());
 	    } else {
 		channel.sendText(learnerResponse);
@@ -319,7 +330,7 @@ public class KumaliveWebsocketServer {
 	}
 
 	kumalive.raiseHandPrompt = false;
-	kumalive.raisedHand = null;
+	kumalive.raisedHand.clear();
 	sendRefresh(kumalive);
     }
 
@@ -346,9 +357,7 @@ public class KumaliveWebsocketServer {
 	    return;
 	}
 
-	if (kumalive.raisedHand == null) {
-	    kumalive.raisedHand = new LinkedList<>();
-	} else if (kumalive.raisedHand.contains(userId)) {
+	if (kumalive.raisedHand.contains(userId)) {
 	    return;
 	}
 
@@ -379,9 +388,7 @@ public class KumaliveWebsocketServer {
 	}
 
 	kumalive.raisedHand.remove(userId);
-	if (kumalive.raisedHand.isEmpty()) {
-	    kumalive.raisedHand = null;
-	}
+
 	sendRefresh(kumalive);
     }
 

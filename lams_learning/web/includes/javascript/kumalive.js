@@ -235,7 +235,7 @@ function processParticipants(message) {
 		
 		if (roleTeacher) {
 			// teacher can see logins and chooses who speaks
-			learnerDiv.attr('title', learner.login)
+			learnerDiv.attr('title', message.logins['user' + learner.id])
 					  .css('cursor', 'pointer')
 					  .click(speak);
 		}

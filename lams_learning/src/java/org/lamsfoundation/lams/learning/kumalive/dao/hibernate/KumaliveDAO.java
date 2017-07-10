@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.learning.kumalive.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learning.kumalive.dao.IKumaliveDAO;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
@@ -35,10 +36,21 @@ public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
     private static final String FIND_BY_ORGANISATION = "FROM " + Kumalive.class.getName()
 	    + " AS k WHERE k.organisation.organisationId = ? AND k.finished = 0";
 
+    private static final String SAVE_SCORE_SQL = "INSERT INTO lams_kumalive_score VALUES (NULL, ?, ?, ?)";
+
     @Override
     @SuppressWarnings("unchecked")
     public Kumalive findByOrganisationId(Integer organisationId) {
 	List<Kumalive> result = (List<Kumalive>) doFind(FIND_BY_ORGANISATION, organisationId);
 	return result.isEmpty() ? null : result.get(0);
+    }
+
+    @Override
+    public void saveScore(Long kumaliveId, Integer userId, Short score) {
+	Query query = getSession().createSQLQuery(SAVE_SCORE_SQL);
+	query.setLong(0, kumaliveId);
+	query.setInteger(1, userId);
+	query.setShort(2, score);
+	query.executeUpdate();
     }
 }

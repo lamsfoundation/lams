@@ -28,4 +28,6 @@ import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
 
 public interface IKumaliveDAO extends IBaseDAO {
     Kumalive findByOrganisationId(Integer organisationId);
+
+    void saveScore(Long kumaliveId, Integer userId, Short score);
 }
