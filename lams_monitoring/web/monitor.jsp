@@ -848,6 +848,6 @@
 		</div>
 	</div>
 	
-	<div id="tooltip"></div>
+	<div class="tooltip" id="tooltip"></div>
 </body>
 </lams:html>

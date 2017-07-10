@@ -1,17 +1,5 @@
 @import "_lams_variables.scss";
 	
-div#tooltip {
-	display: none;
-	position: absolute;
-	border: $border-thin-default;
-	background-color: $gray-light-mid;
-	padding: 3px;
-	z-index: 5;
-	width: 100px;
-	font-size: 9px;
-	word-wrap: break-word;
-}
-
 .progressBarContainer {
 	overflow: auto;
 }

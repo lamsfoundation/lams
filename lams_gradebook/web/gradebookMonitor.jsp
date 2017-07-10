@@ -285,13 +285,13 @@
 						     	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.cellsave"/>", "<fmt:message key="label.ok"/>");
 						     },
 							 gridComplete: function(){
-							 	toolTip($(".jqgrow"));
+							 	toolTip($(".jqgrow"), "jqgridTooltip");
 							 }
 					  	}).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}); // applying refresh button
 					  
 					},
 					gridComplete: function(){
-						toolTip($(".jqgrow"));  // Allow tooltips for this grid	
+						toolTip($(".jqgrow"), "jqgridTooltip");  // Allow tooltips for this grid	
 						// Load dates shown but hide straight away as all columns needed initially so that subgrid is displayed properly LDEV-4289
 						processLessonDateFields( lessonDatesHidden );
 					}
@@ -455,7 +455,7 @@
 						     	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.cellsave"/>", "<fmt:message key="label.ok"/>");
 						     },
 							 gridComplete: function(){
-							 	toolTip($(".jqgrow"));	// applying tooltips for this grid
+							 	toolTip($(".jqgrow"), "jqgridTooltip");	// applying tooltips for this grid
 							 }
 						 }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}) // applying refresh button
 						 
@@ -474,7 +474,7 @@
 						  
 					 },
 					 gridComplete: function(){
-					 	toolTip($(".jqgrow"));	// enable tooltips for grid
+					 	toolTip($(".jqgrow"), "jqgridTooltip");	// enable tooltips for grid
 					 }	 
 				}).navGrid("#activityViewPager", {edit:false,add:false,del:false,search:false}); // enable refresh button
 				
@@ -664,10 +664,9 @@
 				<table id="activityView" class="scroll" ></table>
 				<div id="activityViewPager" class="scroll" ></div>	
 				
-				<div class="tooltip" id="tooltip"></div>
-				
+				<%-- not #tooltip as it conflicts with the learner progress tooltip --%>
+				<div class="tooltip-lg" id="jqgridTooltip"></div> 
 			</div>
-				<div class="tooltip">blah</div>xxxxx
 	 
 	<c:if test="not isInTabs">
  		</div>

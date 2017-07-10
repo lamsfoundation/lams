@@ -704,6 +704,29 @@ div.growlUI h1,div.growlUI h2 {
 	font-size: medium;
 }
 
+// Tooltips used for learner progress and gradebook (large version)
+.tooltip {
+	position: absolute;
+	border: $border-thin-default;
+	background-color: $gray-light-mid;
+	padding: 3px;
+	z-index: 5;
+	width: 150px;
+	font-size: 0.9em;
+	word-wrap: break-word;
+}
+
+.tooltip-lg{
+	display: none;
+    position:absolute;
+	border: $border-thin-default;
+    background-color:$gray-light-mid;
+    padding:5px;
+    width:250px;
+    font-size: 1.1em;
+	word-wrap: break-word;
+}
+
 // Image Gallery
 .caption-heading {
 	color: $brand-primary; 

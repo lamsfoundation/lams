@@ -180,7 +180,7 @@
  		<div>
  			<table id="organisationGrid" class="scroll"></table>
 			<div id="organisationGridPager" class="scroll"></div>
- 			<div class="tooltip" id="tooltip"></div>
+ 			<div class="tooltip-lg" id="tooltip"></div>
 		</div>
  		<div id="footer">
 		</div> <!--Closes footer-->

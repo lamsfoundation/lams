@@ -504,7 +504,7 @@
 				<table id="userView" class="scroll" ></table>
 				<div id="userViewPager" class="scroll" ></div>
 				
-				<div class="tooltip" id="tooltip"></div>
+				<div class="tooltip-lg" id="tooltip"></div>
 			</div>
 		
 		<div id="footer">

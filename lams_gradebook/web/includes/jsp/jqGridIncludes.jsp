@@ -69,8 +69,12 @@ Include this jsp in your jqGrid page head to get some jqGrid functionaility
 	
 	
 	// Applies tooltips to a jqgrid
-	function toolTip(gRowObject) {
-		var my_tooltip = $('#tooltip'); // Div created for tooltip
+	function toolTip(gRowObject, tooltipDiv) {
+		var my_tooltip = null; // Div created for tooltip
+		if ( tooltipDiv != undefined && tooltipDiv.length > 0 )
+			my_tooltip = $('#'+tooltipDiv);
+		else
+			my_tooltip = $('#tooltip'); 
 		gRowObject.css({ 
 			cursor: 'pointer' 
         }).mouseover(function(kmouse){ 

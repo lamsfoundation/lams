@@ -49,14 +49,3 @@
 	width: 95%;
 	height: 500px;
 }
-
-.tooltip{
-    position:absolute;
-    z-index:999;
-    left:-9999px;
-    background-color:$gray-light-mid;
-    padding:5px;
-    border:$border-thin-body-bg;
-    width:250px;
-    font-size: 1.1em;
-}
