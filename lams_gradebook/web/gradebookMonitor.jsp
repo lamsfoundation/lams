@@ -26,6 +26,7 @@
 	
 		var marksReleased = ${marksReleased};
 		var graphLoaded = false;
+		var lessonDatesHidden = true;
 
 		function toggleMarkChart() {
 			// the two methods showMarkChart and hideMarkChart are used in the Monitoring tour
@@ -99,36 +100,27 @@
 		}
 		
 		// Show/hide the dates for the start and end of the lesson. 
-		function toggleLessonDates(){
-		    var colModel = jQuery("#userView").jqGrid('getGridParam', 'colModel'), 
-		    	i, 
-		    	l = colModel.length,
-		    	hidden = false;
-		    
-	        for (i = 0; ! hidden && i < l; i++) {
-	            var colItem = colModel[i];
-	            var cmName = colItem.name;
-	            if (cmName == 'startDate' || cmName == 'finishDate') {
-	            	hidden = colItem.hidden;
-	            }
-	        }
-	            
-            if ( hidden ) {
-				jQuery("#userView").jqGrid('showCol','startDate');
-				jQuery("#userView").jqGrid('showCol','finishDate');
-				document.getElementById("datesShown").style.display="inline";
-				document.getElementById("datesNotShown").style.display="none";
+		function toggleLessonDates() {
+			lessonDatesHidden = !lessonDatesHidden;
+			processLessonDateFields( lessonDatesHidden ) 
+		}
+		
+		function processLessonDateFields( hide ) {
 
-            } else { 
+            if ( hide ) {
 				jQuery("#userView").jqGrid('hideCol','startDate');
 				jQuery("#userView").jqGrid('hideCol','finishDate');
 				document.getElementById("datesShown").style.display="none";
 				document.getElementById("datesNotShown").style.display="inline";
+            } else { 
+				jQuery("#userView").jqGrid('showCol','startDate');
+				jQuery("#userView").jqGrid('showCol','finishDate');
+				document.getElementById("datesShown").style.display="inline";
+				document.getElementById("datesNotShown").style.display="none";
             }
 
             resizeJqgrid(jQuery("#userView"));
-
-		}
+ 		}
 
         function resizeJqgrid(jqgrids) {
             jqgrids.each(function(index) {
@@ -301,7 +293,7 @@
 					gridComplete: function(){
 						toolTip($(".jqgrow"));  // Allow tooltips for this grid	
 						// Load dates shown but hide straight away as all columns needed initially so that subgrid is displayed properly LDEV-4289
-						toggleLessonDates();  
+						processLessonDateFields( lessonDatesHidden );
 					}
 				}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false}); // applying refresh button
 				
