@@ -44,7 +44,7 @@
 <body>
 	<div id="initDiv">
 		<span>
-			<i class="fa fa-spinner fa-spin fa-5x" aria-hidden="true"></i><br /><br />
+			<i class="fa fa-2x fa-refresh fa-spin text-primary"></i><br /><br />
 			<fmt:message key="label.kumalive.wait.start"/>
 		</span>
 	</div>
@@ -56,18 +56,9 @@
 	<div id="closedDiv">
 		<span><fmt:message key="label.kumalive.closed"/></span>
 	</div>
-	<table>
-		<tr>
-			<td id="learnersCell">
-				<div id="raiseHandContainer" class="container-fluid">
-					<h4><fmt:message key="label.kumalive.raised.hands"/></h4>
-				</div>
-				<div id="learnersContainer" class="container-fluid">
-					<h4><fmt:message key="label.kumalive.learners"/></h4>
-					<br />
-				</div>
-			</td>
-			<td id="actionCell">
+	<div id="mainDiv" class="container-fluid">
+		<div class="row">
+			<div id="actionCell" class="col-sm-11">
 				<div id="teacher" class="speaker">
 					<h3><fmt:message key="label.kumalive.teacher"/></h3>
 					<div class="profilePicture"></div>
@@ -76,7 +67,7 @@
 					<button id="finishButton" class="btn btn-default"><fmt:message key="button.kumalive.finish.kumalive"/></button>
 				</div>
 				<div id="raiseHandPrompt">
-					<i class="fa fa-hand-stop-o"></i>
+					<i class="fa fa-hand-stop-o"></i><br />
 					<button id="raiseHandButton" class="btn btn-default"><fmt:message key="button.kumalive.raise"/></button>
 					<button id="downHandButton" class="btn btn-default"><fmt:message key="button.kumalive.putdown"/></button>
 					<button id="downHandPromptButton" class="btn btn-default"><fmt:message key="button.kumalive.finish.question"/></button>
@@ -88,8 +79,16 @@
 					<i title="<fmt:message key="label.kumalive.mark.bad"/>" class="scoreBad fa fa-frown-o"></i>
 					<i title="<fmt:message key="label.kumalive.mark.cancel"/>" class="scoreNone fa fa-times"></i>
 				</div>
-			</td>
-		</tr>
-	</table>
+			</div>
+			<div id="learnersCell" class="col-sm-1">
+				<div id="raiseHandContainer">
+					<h4><fmt:message key="label.kumalive.raised.hands"/></h4>
+				</div>
+				<div id="learnersContainer">
+					<h4><fmt:message key="label.kumalive.learners"/></h4>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </lams:html>

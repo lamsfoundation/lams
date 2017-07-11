@@ -18,7 +18,8 @@ var kumaliveWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
 	learnerDivTemplate = $('<div />').addClass('learner changing')
 		.append($('<div />').addClass('profilePictureWrapper').append($('<div />').addClass('profilePicture profilePictureHidden')))
 		.append($('<div />').addClass('name')),
-	REFRESH_DELAY = 1000;
+	REFRESH_DELAY = 1000,
+	ANIMATION_DURATION = 1000;
 
 /**
  * Fetches existing Kumalive session
@@ -110,7 +111,7 @@ function init(message) {
 	roleTeacher = message.isTeacher && message.roleTeacher;
 	
 	// hide all buttons and enable ones appropriate for the role
-	$('table button').hide();
+	$('#mainDiv button').hide();
 	if (roleTeacher) {
 		$('#raiseHandPromptButton').click(raiseHandPrompt);
 		$('#downHandPromptButton').click(downHandPrompt);
@@ -134,7 +135,7 @@ function init(message) {
 	
 	// show proper work screen
 	$('#initDiv').hide();
-	$('table').show();
+	$('#mainDiv').show();
 }
 
 /**
@@ -200,7 +201,6 @@ function processParticipants(message) {
 		currentLearnerIds = [],
 		// should refresh be repeated?
 		result = false;
-
 	$.each(message.learners, function(index, learner){
 		if (learner.roleTeacher) {
 			// do not add teachers to learners container
@@ -311,7 +311,7 @@ function processRaisedHand(message) {
 				        .animate({
 					    	'left' : targetOffset.left,
 					    	'top' : targetOffset.top
-					    }, 1000, function(){
+					    }, ANIMATION_DURATION, function(){
 					    	targetLearnerDiv.css('visibility', 'visible');
 					    	transitionCopy.remove();
 					    	learnerDiv.removeClass('changing');
@@ -426,7 +426,7 @@ function toggleSpeak(message) {
 			    	'width' : '200px',
 			    	'height' : '200px',
 			    	'font-size' : '200px'
-			    }, 1000, function(){
+			    }, ANIMATION_DURATION, function(){
 					speaker.css('visibility', 'visible');
 			    	transitionCopy.remove();
 			    });
@@ -438,9 +438,9 @@ function toggleSpeak(message) {
  */
 function learnerFadeIn(learnerDiv) {
 	var nameDiv = $('.name', learnerDiv).css('color', 'green');
-	learnerDiv.show();
+	learnerDiv.css('display', 'inline-block');
 
-	$('.profilePicture', learnerDiv).switchClass('profilePictureHidden', 'profilePictureShown', 1000, function(){
+	$('.profilePicture', learnerDiv).switchClass('profilePictureHidden', 'profilePictureShown', ANIMATION_DURATION, function(){
 		nameDiv.css('color', 'initial');
 		learnerDiv.removeClass('changing');
 	});
@@ -456,11 +456,11 @@ function learnerFadeOut(learnerDiv) {
 	learnerDiv.addClass('changing');
 	var nameDiv = $('.name', learnerDiv).css('color', 'red');
 
-	$('.profilePicture', learnerDiv).switchClass('profilePictureShown', 'profilePictureHidden', 1000, function(){
+	$('.profilePicture', learnerDiv).switchClass('profilePictureShown', 'profilePictureHidden', ANIMATION_DURATION, function(){
 		nameDiv.remove();
 		learnerDiv.animate({
 			'width' : 'toggle'
-		}, 1000, function(){
+		}, ANIMATION_DURATION, function(){
 			learnerDiv.remove();
 		});
 	});
