@@ -278,13 +278,14 @@ function processRaisedHand(message) {
 		
 		// add learners who raised hand
 		$.each(message.raisedHand, function() {
-			// if the user has already raised hand, do nothing
+			// if this user has raised hand, set buttons properly
+			if (userId == this) {
+				raisedHand = true;
+			}
+			// if the given user has already raised hand, do nothing
 			var	raisedHandDiv = $('.learner[userId="' + this + '"]', raiseHandContainer);
 			if (raisedHandDiv.length > 0) {
 				return true;
-			}
-			if (userId == this) {
-				raisedHand = true;
 			}
 			
 			var learnerDiv = $('#learnersContainer .learner[userId="' + this + '"]');
