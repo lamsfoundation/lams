@@ -31,18 +31,7 @@
 
 #learnersCell {
 	width: 100%;
-}
-
-@media (min-width : $screen-sm-min) {
-	#actionCell {
-		width: 350px;
-		height: 100vh;
-		border-bottom: none;
-		border-right: $border-thin-black;
-	}
-	#learnersCell {
-		width: calc(100% - 350px);
-	}
+	padding: 0;
 }
 
 #actionCell button {
@@ -50,24 +39,30 @@
 	margin-top: 10px;
 }
 
+#learnersContainer {
+	padding-left: 15px;
+}
+
 #raiseHandContainer {
 	display: none;
 	margin-bottom : 10px;
+	padding-left: 15px;
 	border-bottom: $border-thin-black;
 }
 
 .learner {
 	display: inline-block;
 	width: 80px;
-	height: 120px;
-	margin: 5px 5px 0 5px;
+	height: 80px;
+	margin: 5px 5px 0 0;
 	text-align: center;
 	display: none;
 }
 
 .learner .profilePictureWrapper {
-	width: 80px;
-	height: 80px;
+	width: 40px;
+	height: 40px;
+	margin-left: 20px;
 }
 
 .profilePicture {
@@ -79,8 +74,8 @@
 }
 
 .profilePictureHidden {
-	top: 40px;
-	left: 40px;
+	top: 20px;
+	left: 20px;
 	width: 0;
 	height: 0;
 	font-size: 0;
@@ -89,35 +84,27 @@
 .profilePictureShown {
 	top: 0;
 	left: 0;
-	width: 80px;
-	height: 80px;
-	font-size: 80px;
+	width: 40px;
+	height: 40px;
+	font-size: 40px;
 }
 
 .name {
+	height: 40px;
+	padding-top: 5px;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	padding-top: 5px;
-}
-
-.learner .name {
-	font-size: 12px;
 }
 
 .speaker {
 	text-align: center;
-	margin-bottom: 10px;
 }
 
-.speaker .profilePicture{
-	width: 200px;
-	height: 200px;
-	font-size: 200px;
+.speaker .profilePicture {
+	width: 80px;
+	height: 80px;
+	font-size: 80px;
 	margin: auto;
-}
-
-.speaker .name {
-	font-size: 18px;
 }
 
 #teacher {
@@ -131,7 +118,7 @@
 }
 
 #raiseHandPrompt i {
-	font-size: 140px;
+	font-size: 80px;
 }
 
 .score {
@@ -144,7 +131,7 @@
 }
 
 .score i {
-	font-size: 70px;
+	font-size: 40px;
 	margin-right: 15px;
 	cursor: pointer;
 }
@@ -163,4 +150,60 @@
 
 .scoreNone {
 	color: gray;
+}
+
+@media (min-width : $screen-sm-min) {
+	#actionCell {
+		width: 350px;
+		height: 100vh;
+		border-bottom: none;
+		border-right: $border-thin-black;
+	}
+	#learnersCell {
+		width: calc(100% - 350px);
+	}
+	
+	.learner {
+		height: 120px;
+		margin-right: 20px;
+	}
+	
+	.learner .name {
+		font-size: 12px;
+	}
+	
+	.learner .profilePictureWrapper {
+		width: 80px;
+		height: 80px;
+		margin-left: 0;
+	}
+	
+	.profilePictureHidden {
+		top: 40px;
+		left: 40px;
+	}
+
+	.profilePictureShown {
+		width: 80px;
+		height: 80px;
+		font-size: 80px;
+	}
+	
+	.speaker .profilePicture {
+		width: 200px;
+		height: 200px;
+		font-size: 200px;
+	}
+	
+	.speaker .name {
+		font-size: 18px;
+	}
+	
+	#raiseHandPrompt i {
+		font-size: 140px;
+	}
+	
+	.score i {
+		font-size: 70px;
+	}
 }

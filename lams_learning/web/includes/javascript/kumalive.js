@@ -420,13 +420,13 @@ function toggleSpeak(message) {
 				.css({
 					'position' : 'fixed'
 				}).offset(profilePicture.offset())
-				// animate moving speaker from learners to right panel
+				// animate moving speaker from learners to speaker panel
 		        .animate({
-			    	'left' : targetOffset.left,
-			    	'top' : targetOffset.top,
-			    	'width' : '200px',
-			    	'height' : '200px',
-			    	'font-size' : '200px'
+			    	'left'      : targetOffset.left,
+			    	'top'       : targetOffset.top,
+			    	'width'     : targetProfilePicture.css('width'),
+			    	'height'    : targetProfilePicture.css('height'),
+			    	'font-size' : targetProfilePicture.css('font-size')
 			    }, ANIMATION_DURATION, function(){
 					speaker.css('visibility', 'visible');
 			    	transitionCopy.remove();
