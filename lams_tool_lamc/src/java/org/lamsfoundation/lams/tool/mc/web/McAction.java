@@ -87,7 +87,7 @@ public class McAction extends LamsDispatchAction {
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	List<McQuestionDTO> deletedQuestionDTOs = (List<McQuestionDTO>) sessionMap
 		.get(McAppConstants.LIST_DELETED_QUESTION_DTOS);
-	
+
 	if (questionDTOs.isEmpty()) {
 	    ActionMessages errors = new ActionMessages();
 	    ActionMessage error = new ActionMessage("questions.none.submitted");
@@ -147,7 +147,7 @@ public class McAction extends LamsDispatchAction {
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	return mapping.findForward(McAppConstants.LOAD_AUTHORING);
     }
-    
+
     /**
      * opens up an new screen within the current page for editing a question
      */
@@ -161,12 +161,12 @@ public class McAction extends LamsDispatchAction {
 	List<McQuestionDTO> questionDtos = (List) sessionMap.get(McAppConstants.QUESTION_DTOS);
 
 	Integer questionIndex = WebUtil.readIntParam(request, "questionIndex", true);
-	
+
 	McQuestionDTO questionDto = null;
 	//editing existing question
 	if (questionIndex != null) {
 	    mcAuthoringForm.setQuestionIndex(questionIndex);
-	    
+
 	    //find according questionDto
 	    for (McQuestionDTO questionDtoIter : questionDtos) {
 		Integer displayOrder = questionDtoIter.getDisplayOrder();
@@ -176,12 +176,12 @@ public class McAction extends LamsDispatchAction {
 		    break;
 		}
 	    }
-	    
-	//adding new question
+
+	    //adding new question
 	} else {
 	    // prepare question for adding new question page
 	    questionDto = new McQuestionDTO();
-	    List<McOptionDTO> newOptions = new ArrayList<McOptionDTO>();
+	    List<McOptionDTO> newOptions = new ArrayList<>();
 	    McOptionDTO newOption1 = new McOptionDTO();
 	    newOption1.setCorrect("Correct");
 	    McOptionDTO newOption2 = new McOptionDTO();
@@ -205,14 +205,14 @@ public class McAction extends LamsDispatchAction {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
 	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
-	
+
 	Integer questionIndexToDelete = WebUtil.readIntParam(request, "questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndexToDelete);
 
 	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
 
 	//exclude Question with questionIndex From List
-	List<McQuestionDTO> tempQuestionDtos = new LinkedList<McQuestionDTO>();
+	List<McQuestionDTO> tempQuestionDtos = new LinkedList<>();
 	int queIndex = 0;
 	for (McQuestionDTO questionDTO : questionDTOs) {
 
@@ -224,7 +224,7 @@ public class McAction extends LamsDispatchAction {
 		    ++queIndex;
 		    questionDTO.setDisplayOrder(queIndex);
 		    tempQuestionDtos.add(questionDTO);
-		    
+
 		} else {
 		    List<McQuestionDTO> deletedQuestionDTOs = (List<McQuestionDTO>) sessionMap
 			    .get(McAppConstants.LIST_DELETED_QUESTION_DTOS);
@@ -303,7 +303,7 @@ public class McAction extends LamsDispatchAction {
 	    return questionDTOs;
 	}
 
-	List<McQuestionDTO> questionDtos = new LinkedList<McQuestionDTO>();
+	List<McQuestionDTO> questionDtos = new LinkedList<>();
 
 	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
 	while (iter.hasNext()) {
@@ -331,10 +331,10 @@ public class McAction extends LamsDispatchAction {
     }
 
     /*
-     *Auxiliary method for moveQuestionDown() and moveQuestionUp()
+     * Auxiliary method for moveQuestionDown() and moveQuestionUp()
      */
     private static List<McQuestionDTO> reorderQuestionDtos(List<McQuestionDTO> questionDTOs) {
-	List<McQuestionDTO> tempQuestionDtos = new LinkedList<McQuestionDTO>();
+	List<McQuestionDTO> tempQuestionDtos = new LinkedList<>();
 
 	int queIndex = 0;
 	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
@@ -374,9 +374,9 @@ public class McAction extends LamsDispatchAction {
 	String mark = request.getParameter("mark");
 
 	List<McOptionDTO> options = McAction.repopulateOptionDTOs(request, false);
-	
+
 	//remove blank options
-	List<McOptionDTO> optionsWithoutEmptyOnes = new LinkedList<McOptionDTO>();
+	List<McOptionDTO> optionsWithoutEmptyOnes = new LinkedList<>();
 	for (McOptionDTO optionDTO : options) {
 	    String optionText = optionDTO.getCandidateAnswer();
 	    if ((optionText != null) && (optionText.length() > 0)) {
@@ -396,31 +396,25 @@ public class McAction extends LamsDispatchAction {
 	    // adding new question
 	    if (questionIndex == null) {
 
-		boolean duplicates = AuthoringUtil.checkDuplicateQuestions(questionDTOs, newQuestion);
-		if (!duplicates) {
-		    
-		    //finding max displayOrder
-		    int maxDisplayOrder = 0;
-		    for (McQuestionDTO questionDTO : questionDTOs) {
-			int displayOrder = new Integer(questionDTO.getDisplayOrder());
-			if (displayOrder > maxDisplayOrder) {
-			    maxDisplayOrder = displayOrder;
-			}
+		//finding max displayOrder
+		int maxDisplayOrder = 0;
+		for (McQuestionDTO questionDTO : questionDTOs) {
+		    int displayOrder = new Integer(questionDTO.getDisplayOrder());
+		    if (displayOrder > maxDisplayOrder) {
+			maxDisplayOrder = displayOrder;
 		    }
-
-		    McQuestionDTO questionDTO = new McQuestionDTO();
-		    questionDTO.setQuestion(newQuestion);
-		    questionDTO.setFeedback(feedback);
-		    questionDTO.setDisplayOrder(maxDisplayOrder + 1);
-		    questionDTO.setOptionDtos(options);
-		    questionDTO.setMark(mark);
-
-		    questionDTOs.add(questionDTO);
-		} else {
-		    // duplicate question entry, not adding
 		}
 
-	    // updating existing question
+		McQuestionDTO questionDTO = new McQuestionDTO();
+		questionDTO.setQuestion(newQuestion);
+		questionDTO.setFeedback(feedback);
+		questionDTO.setDisplayOrder(maxDisplayOrder + 1);
+		questionDTO.setOptionDtos(options);
+		questionDTO.setMark(mark);
+
+		questionDTOs.add(questionDTO);
+
+		// updating existing question
 	    } else {
 		McQuestionDTO questionDto = null;
 		for (McQuestionDTO questionDtoIter : questionDTOs) {
@@ -476,12 +470,7 @@ public class McAction extends LamsDispatchAction {
 	    questionText = QuestionParser.processHTMLField(questionText, false, contentFolderID,
 		    question.getResourcesFolderPath());
 
-	    if (AuthoringUtil.checkDuplicateQuestions(questionDtos, questionText)) {
-		logger.warn("Skipping duplicate question: " + questionText);
-		continue;
-	    }
-
-	    List<McOptionDTO> optionDtos = new ArrayList<McOptionDTO>();
+	    List<McOptionDTO> optionDtos = new ArrayList<>();
 	    String correctAnswer = null;
 	    Integer correctAnswerScore = 1;
 
@@ -495,8 +484,7 @@ public class McAction extends LamsDispatchAction {
 			continue;
 		    }
 		    if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
-			logger
-				.warn("Skipping an answer with same text as the correct answer: " + answerText);
+			logger.warn("Skipping an answer with same text as the correct answer: " + answerText);
 
 			continue;
 		    }
@@ -559,7 +547,7 @@ public class McAction extends LamsDispatchAction {
 	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 
 	List<McQuestionDTO> questionDtos = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
-	List<Question> questions = new LinkedList<Question>();
+	List<Question> questions = new LinkedList<>();
 
 	for (McQuestionDTO mcQuestion : questionDtos) {
 	    Question question = new Question();
@@ -568,7 +556,7 @@ public class McAction extends LamsDispatchAction {
 	    question.setTitle("Question " + mcQuestion.getDisplayOrder());
 	    question.setText(mcQuestion.getQuestion());
 	    question.setFeedback(mcQuestion.getFeedback());
-	    List<Answer> answers = new ArrayList<Answer>();
+	    List<Answer> answers = new ArrayList<>();
 
 	    for (McOptionDTO mcAnswer : mcQuestion.getOptionDtos()) {
 		Answer answer = new Answer();
@@ -605,7 +593,7 @@ public class McAction extends LamsDispatchAction {
 
 	//moveAddedCandidateUp
 	McQuestionDTO questionDto = (McQuestionDTO) sessionMap.get(McAppConstants.QUESTION_DTO);
-	List<McOptionDTO> listCandidates = new LinkedList<McOptionDTO>();
+	List<McOptionDTO> listCandidates = new LinkedList<>();
 	listCandidates = McAction.swapOptions(optionDtos, candidateIndex, "up");
 	questionDto.setOptionDtos(listCandidates);
 	sessionMap.put(McAppConstants.QUESTION_DTO, questionDto);
@@ -627,14 +615,14 @@ public class McAction extends LamsDispatchAction {
 
 	//moveAddedCandidateDown
 	McQuestionDTO questionDto = (McQuestionDTO) sessionMap.get(McAppConstants.QUESTION_DTO);
-	List<McOptionDTO> swapedOptions = new LinkedList<McOptionDTO>();
+	List<McOptionDTO> swapedOptions = new LinkedList<>();
 	swapedOptions = McAction.swapOptions(optionDtos, candidateIndex, "down");
 	questionDto.setOptionDtos(swapedOptions);
 	sessionMap.put(McAppConstants.QUESTION_DTO, questionDto);
 
 	return (mapping.findForward("candidateAnswersList"));
     }
-    
+
     /*
      * swaps options in the list
      */
@@ -656,7 +644,7 @@ public class McAction extends LamsDispatchAction {
 	    return optionDtos;
 	}
 
-	List<McOptionDTO> newOptionDtos = new LinkedList<McOptionDTO>();
+	List<McOptionDTO> newOptionDtos = new LinkedList<>();
 
 	int queIndex = 1;
 	for (McOptionDTO option : optionDtos) {
@@ -695,7 +683,7 @@ public class McAction extends LamsDispatchAction {
 	McQuestionDTO questionDto = (McQuestionDTO) sessionMap.get(McAppConstants.QUESTION_DTO);
 
 	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, false);
-	List<McOptionDTO> listFinalCandidatesDTO = new LinkedList<McOptionDTO>();
+	List<McOptionDTO> listFinalCandidatesDTO = new LinkedList<>();
 	int caIndex = 0;
 	for (McOptionDTO mcOptionDTO : optionDtos) {
 	    caIndex++;
@@ -744,7 +732,7 @@ public class McAction extends LamsDispatchAction {
 	    intCorrect = new Integer(correct).intValue();
 	}
 
-	List<McOptionDTO> optionDtos = new LinkedList<McOptionDTO>();
+	List<McOptionDTO> optionDtos = new LinkedList<>();
 	for (int i = 0; i < McAppConstants.MAX_OPTION_COUNT; i++) {
 	    String optionText = request.getParameter("ca" + i);
 	    Long optionUid = WebUtil.readLongParam(request, "caUid" + i, true);
