@@ -573,7 +573,7 @@ public class AuthoringAction extends Action {
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 	for (Question question : questions) {
 	    AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
-	    int maxSeq = 1;
+	    int maxSeq = 0;
 	    if ((questionList != null) && (questionList.size() > 0)) {
 		AssessmentQuestion last = questionList.last();
 		maxSeq = last.getSequenceId() + 1;
@@ -613,7 +613,7 @@ public class AuthoringAction extends Action {
 		if (question.getAnswers() != null) {
 		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
 			    new SequencableComparator());
-		    int orderId = 1;
+		    int orderId = 0;
 		    for (Answer answer : question.getAnswers()) {
 			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
 				question.getResourcesFolderPath());
