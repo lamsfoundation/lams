@@ -74,34 +74,6 @@ public class AuthoringUtil {
     }
 
     /**
-     * verifies that there are no duplicate questions
-     */
-    public static boolean checkDuplicateQuestions(List<McQuestionDTO> questionDTOs, String newQuestion) {
-
-	Map<String, String> mapQuestionContent = new TreeMap<String, String>(new McComparator());
-	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
-	int queIndex = 0;
-	while (iter.hasNext()) {
-	    McQuestionDTO questionDto = iter.next();
-
-	    queIndex++;
-	    mapQuestionContent.put(new Integer(queIndex).toString(), questionDto.getQuestion());
-	}
-
-	Iterator<Map.Entry<String, String>> itMap = mapQuestionContent.entrySet().iterator();
-	while (itMap.hasNext()) {
-	    Entry<String, String> pairs = itMap.next();
-	    if ((pairs.getValue() != null) && (!pairs.getValue().equals(""))) {
-
-		if (pairs.getValue().equals(newQuestion)) {
-		    return true;
-		}
-	    }
-	}
-	return false;
-    }
-
-    /**
      * persisting content
      */
     public static McContent saveOrUpdateMcContent(IMcService mcService, HttpServletRequest request, McContent mcContent,
