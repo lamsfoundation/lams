@@ -40,3 +40,39 @@ div#progressBarDialog iframe {
 	height: 100%;
 	border: none;
 }
+
+.activityCurrent {
+	fill: rgb(187, 0, 0);
+	stroke: rgb(0, 0, 0);
+}
+
+.activityNotStarted {
+	fill: rgb(0, 153, 0);
+	stroke: rgb(0, 0, 0);
+}
+
+.activityCompleted {
+	fill: rgb(0, 0, 153);
+	stroke: rgb(0, 0, 0);
+}
+
+.activityComplex {
+	fill: rgb(153, 153, 153);
+	stroke: rgb(0, 0, 0);
+}
+
+.gate {
+	fill: rgb(255, 0, 0);
+}
+
+.gateCurrent {
+	stroke: rgb(187, 0, 0);
+}
+
+.gateText {
+	stroke: rgb(255, 255, 255);
+}
+
+.transitionLine {
+	stroke: rgb(0, 0, 0);
+}
