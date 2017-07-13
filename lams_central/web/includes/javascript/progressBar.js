@@ -8,22 +8,6 @@ var lessonId = lessonId || null,
 	presenceEnabled = presenceEnabled || false,
 	REVIEW_ACTIVITY_TITLE = REVIEW_ACTIVITY_TITLE || 'Review activity',
 
-	//colors used in shapes
-	//dark red
-	COLOR_CURRENT_ACTIVITY = "rgb(187,0,0)",
-	//dark blue
-	COLOR_COMPLETED_ACTIVITY = "rgb(0,0,153)",
-	//green
-	COLOR_TOSTART_ACTIVITY = "rgb(0,153,0)",
-	//black
-	COLOR_STROKE_ACTIVITY = "rgb(0,0,0)",
-	//red
-	COLOR_GATE = "rgb(255,0,0)",
-	//white
-	COLOR_GATE_TEXT = "rgb(255,255,255)",
-	//gray
-	COLOR_COMPLEX_BACKGROUND = "rgb(153,153,153)",
-
 	//SVG paths for activity shapes
 	PATH_START_LINE_HORIZONTAL = 'M 0 18 h 35',
 	PATH_START_LINE_VERTICAL = 'M 70 0 v 20',
@@ -173,8 +157,7 @@ var ActivityUtils = {
 		// dark red square
 		activity.path = 'M ' + (activity.middle - 8) + ' ' + activity.y
 				+ PATH_SQUARE;
-		activity.fill = COLOR_CURRENT_ACTIVITY;
-		activity.stroke = COLOR_STROKE_ACTIVITY;
+		activity.cssClass = 'activityCurrent';
 		activity.statusTooltip = LABELS.CURRENT_ACTIVITY;
 	},
 
@@ -182,8 +165,7 @@ var ActivityUtils = {
 		// dark blue circle
 		activity.path = 'M ' + activity.middle + ' ' + (activity.y + 8)
 				+ PATH_CIRCLE;
-		activity.fill = COLOR_COMPLETED_ACTIVITY;
-		activity.stroke = COLOR_STROKE_ACTIVITY;
+		activity.cssClass = 'activityCompleted';
 		activity.statusTooltip = LABELS.COMPLETED_ACTIVITY;
 	},
 
@@ -191,12 +173,10 @@ var ActivityUtils = {
 		// green square with dark red arc
 		activity.path = 'M ' + (activity.middle - 8) + ' ' + activity.y
 				+ PATH_SQUARE;
-		activity.fill = COLOR_TOSTART_ACTIVITY;
-		activity.stroke = COLOR_STROKE_ACTIVITY;
+		activity.cssClass = 'activityNotStarted';
 		activity.statusTooltip = LABELS.ATTEMPTED_ACTIVITY;
 
-		// this and similar methods are run when activity shape is drawn for
-		// real
+		// this and similar methods are run when activity shape is drawn for  real
 		activity.addDecoration = function(act) {
 			var paper = act.bar.paper;
 			act.decoration = Snap.set();
@@ -211,7 +191,7 @@ var ActivityUtils = {
 				arc.transform(transformation);
 			}
 			arc.attr({
-				'fill' : COLOR_CURRENT_ACTIVITY,
+				'class' : 'activityCurrent',
 				'opacity' : 0,
 				'cursor' : 'pointer'
 			});
@@ -223,8 +203,7 @@ var ActivityUtils = {
 		// green triangle
 		activity.path = 'M ' + (activity.middle - 8) + ' ' + activity.y
 				+ PATH_TRIANGLE;
-		activity.fill = COLOR_TOSTART_ACTIVITY;
-		activity.stroke = COLOR_STROKE_ACTIVITY;
+		activity.cssClass = 'activityNotStarted';
 		activity.statusTooltip = LABELS.TOSTART_ACTIVITY;
 	},
 
@@ -232,7 +211,7 @@ var ActivityUtils = {
 		// red octagon for STOP road sign
 		activity.path = 'M ' + (activity.middle - 6) + ' ' + activity.y
 				+ PATH_OCTAGON;
-		activity.fill = COLOR_GATE;
+		activity.cssClass = 'gate';
 
 		activity.addDecoration = function(act) {
 			var paper = act.bar.paper;
@@ -245,7 +224,7 @@ var ActivityUtils = {
 			text.attr({
 				'opacity'   : 0,
 				'font-size' : 9,
-				'stroke'    : COLOR_GATE_TEXT,
+				'class'     : 'gateText',
 				'cursor'    : 'pointer'
 			});
 			act.decoration.push(text);
@@ -258,7 +237,7 @@ var ActivityUtils = {
 				var edge = paper.path(act.path);
 				edge.attr({
 					'opacity'      : 0,
-					'stroke'       : COLOR_CURRENT_ACTIVITY,
+					'class'        : 'activityCurrent',
 					'stroke-width' : 3,
 					'fill'         : 'none',
 					'cursor'       : 'pointer'
@@ -284,9 +263,8 @@ var ActivityUtils = {
 			var square = paper.path('M ' + (act.middle - 13) + ' ' + act.y
 					+ PATH_BIG_SQUARE);
 			square.attr({
-				'opacity' : 0,
-				'stroke' : COLOR_STROKE_ACTIVITY,
-				'fill' : COLOR_COMPLEX_BACKGROUND,
+				'opacity': 0,
+				'class'  : 'activityComplex',
 				'cursor' : 'pointer'
 			});
 
@@ -306,6 +284,7 @@ var ActivityUtils = {
 		return {
 			'path' : activity.path,
 			'fill' : activity.fill,
+			'class' : activity.cssClass,
 			'stroke' : activity.stroke,
 			'cursor' : 'pointer'
 		}
@@ -349,13 +328,13 @@ var ActivityUtils = {
 			var line = null;
 			if (isHorizontalBar) {
 				line = paper.path('M ' + (activity.middle + 15) + ' 18 h 30')
-							.attr('stroke', COLOR_STROKE_ACTIVITY)
+							.attr('class', 'transitionLine');
 			} else {
 				var startY = activity.y + label.getBBox().height + (isLarger ? 28 : 18),
 					endY = 20 + 60 * (activity.index + 1);
 				if (startY < endY) {
 					line = paper.path('M ' + activity.middle + ' ' + startY + ' L ' + activity.middle + ' ' + endY)
-								.attr('stroke', COLOR_STROKE_ACTIVITY);
+								.attr('class', 'transitionLine');
 				}
 			}
 			
