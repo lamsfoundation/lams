@@ -469,7 +469,7 @@ public class McAction extends LamsDispatchAction {
 	    // quietly do same verification as in other question-adding methods
 	    String questionText = question.getText();
 	    if (StringUtils.isBlank(questionText)) {
-		LamsDispatchAction.log.warn("Skipping a blank question.");
+		logger.warn("Skipping a blank question.");
 		continue;
 	    }
 
@@ -477,7 +477,7 @@ public class McAction extends LamsDispatchAction {
 		    question.getResourcesFolderPath());
 
 	    if (AuthoringUtil.checkDuplicateQuestions(questionDtos, questionText)) {
-		LamsDispatchAction.log.warn("Skipping duplicate question: " + questionText);
+		logger.warn("Skipping duplicate question: " + questionText);
 		continue;
 	    }
 
@@ -491,11 +491,11 @@ public class McAction extends LamsDispatchAction {
 		    String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
 			    question.getResourcesFolderPath());
 		    if (answerText == null) {
-			LamsDispatchAction.log.warn("Skipping a blank answer");
+			logger.warn("Skipping a blank answer");
 			continue;
 		    }
 		    if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
-			LamsDispatchAction.log
+			logger
 				.warn("Skipping an answer with same text as the correct answer: " + answerText);
 
 			continue;
@@ -511,7 +511,7 @@ public class McAction extends LamsDispatchAction {
 			    correctAnswerScore = Math.min(new Double(Math.ceil(answer.getScore())).intValue(), 10);
 			} else {
 			    // there can be only one correct answer in a MCQ question
-			    LamsDispatchAction.log.warn(
+			    logger.warn(
 				    "Choosing only first correct answer, despite another one was found: " + answerText);
 			    optionDto.setCorrect("Incorrect");
 			}
@@ -524,7 +524,7 @@ public class McAction extends LamsDispatchAction {
 	    }
 
 	    if (correctAnswer == null) {
-		LamsDispatchAction.log.warn("No correct answer found for question: " + questionText);
+		logger.warn("No correct answer found for question: " + questionText);
 		continue;
 	    }
 
@@ -537,8 +537,8 @@ public class McAction extends LamsDispatchAction {
 
 	    questionDtos.add(questionDto);
 
-	    if (LamsDispatchAction.log.isDebugEnabled()) {
-		LamsDispatchAction.log.debug("Added question: " + questionText);
+	    if (logger.isDebugEnabled()) {
+		logger.debug("Added question: " + questionText);
 	    }
 	}
 
