@@ -143,3 +143,4 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 * LDEV-4171: Remove obsolete svgFormat parameter that is no longer used in WF as long as it produces only SVGs (no PNGs)
 * LDEV-4178: Escape commas when pre-adding users to a lesson
 * LDEV-4169: Preview window doesn't scroll down with IE11
+* LDEV-4375: IE forces background page to become blank and contain "false" work on opening monitor interface

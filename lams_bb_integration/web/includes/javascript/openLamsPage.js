@@ -18,8 +18,6 @@ function openAuthor(courseId) {
 			alert("Pop-up windows have been blocked by your browser. Please allow pop-ups for this site and try again");
 		}
 	}
-	
-	return false;
 }
 
 // Open the LAMS Seuence Monitor Window       
@@ -42,6 +40,4 @@ function openMonitor(courseId, lsid) {
             alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");    
         }
     }
-
-    return false;
 }
