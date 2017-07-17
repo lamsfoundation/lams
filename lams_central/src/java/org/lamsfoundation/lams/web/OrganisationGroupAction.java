@@ -30,10 +30,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,6 +52,7 @@ import org.lamsfoundation.lams.integration.dto.ExtGroupDTO;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -131,15 +130,15 @@ public class OrganisationGroupAction extends DispatchAction {
 	List<OrganisationGrouping> orgGroupings = getUserManagementService().findByProperty(OrganisationGrouping.class,
 		"organisationId", organisationId);
 	Grouping grouping = getLessonGrouping(activityID);
-	
+
 	// show groups page if this is a lesson mode and user have already chosen a grouping or there is no organisation
 	// groupings available
 	boolean lessonGroupsExist = (grouping != null) && (grouping.getGroups() != null)
 		&& !grouping.getGroups().isEmpty() && !isDefaultChosenGrouping(grouping);
-	if (lessonGroupsExist || (activityID!= null &&orgGroupings.isEmpty())) {
+	if (lessonGroupsExist || (activityID != null && orgGroupings.isEmpty())) {
 	    return viewGroups(mapping, form, request, response);
 	}
-	
+
 	// if this grouping is used for branching then it should use groups set in authoring. It will be possible to
 	// remove users from the groups, but not delete groups due to the branching relationships.
 	boolean isUsedForBranching = (grouping != null) && grouping.isUsedForBranching();
@@ -171,7 +170,7 @@ public class OrganisationGroupAction extends DispatchAction {
 		|| getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
 	request.setAttribute("canEdit", isGroupSuperuser || (activityID != null));
 
-	Set<OrganisationGroupingDTO> orgGroupingDTOs = new TreeSet<OrganisationGroupingDTO>();
+	Set<OrganisationGroupingDTO> orgGroupingDTOs = new TreeSet<>();
 	for (OrganisationGrouping orgGrouping : orgGroupings) {
 	    orgGroupingDTOs.add(new OrganisationGroupingDTO(orgGrouping));
 	}
@@ -244,7 +243,7 @@ public class OrganisationGroupAction extends DispatchAction {
 		OrganisationGroupAction.log.debug("Removing default groups for grouping " + orgGroupingId);
 	    }
 
-	    Set<Long> groupIDs = new HashSet<Long>(lessonGroups.size());
+	    Set<Long> groupIDs = new HashSet<>(lessonGroups.size());
 	    for (Group group : lessonGroups) {
 		groupIDs.add(group.getGroupId());
 	    }
@@ -254,7 +253,7 @@ public class OrganisationGroupAction extends DispatchAction {
 
 	    lessonGroups = null;
 	}
-	
+
 	// if this grouping is used for branching then it should use groups set in authoring. It will be possible to
 	// remove users from the groups, but not delete groups due to the branching relationships.
 	boolean isUsedForBranching = (lessonGrouping != null) && lessonGrouping.isUsedForBranching();
@@ -278,7 +277,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	    if (extGroups != null) {
 
 		//if there are duplicate users - put them into unassigned column
-		List<User> allDuplicates = new ArrayList<User>();
+		List<User> allDuplicates = new ArrayList<>();
 		for (ExtGroupDTO groupA : extGroups) {
 		    for (ExtGroupDTO groupB : extGroups) {
 			List<User> usersA = groupA.getUsers();
@@ -349,11 +348,7 @@ public class OrganisationGroupAction extends DispatchAction {
 
     /**
      * Saves a course grouping.
-     *
-     * @throws InvalidParameterException
-     * @throws IOException
      */
-    @SuppressWarnings("unchecked")
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, InvalidParameterException, IOException {
 	// check if user is allowed to edit groups
@@ -380,12 +375,12 @@ public class OrganisationGroupAction extends DispatchAction {
 	}
 
 	// iterate over groups
-	List<OrganisationGroup> orgGroups = new LinkedList<OrganisationGroup>();
+	List<OrganisationGroup> orgGroups = new LinkedList<>();
 	JSONArray orgGroupsJSON = orgGroupingJSON.optJSONArray("groups");
 	if (orgGroupsJSON != null) {
 	    for (int i = 0; i < orgGroupsJSON.length(); i++) {
 		// just overwrite existing groups; they will be updated if already exist
-		Set<User> users = new HashSet<User>();
+		Set<User> users = new HashSet<>();
 		JSONObject orgGroupJSON = orgGroupsJSON.getJSONObject(i);
 		JSONArray usersJSON = orgGroupJSON.optJSONArray("users");
 		if (usersJSON != null) {
@@ -464,18 +459,19 @@ public class OrganisationGroupAction extends DispatchAction {
 	OrganisationGrouping orgGrouping = (OrganisationGrouping) getUserManagementService()
 		.findById(OrganisationGrouping.class, orgGroupingId);
 	JSONArray groupsJSON = new JSONArray();
-	SortedSet<OrganisationGroup> orgGroups = new TreeSet<OrganisationGroup>(orgGrouping.getGroups());
+	SortedSet<OrganisationGroup> orgGroups = new TreeSet<>(orgGrouping.getGroups());
 	for (OrganisationGroup group : orgGroups) {
 	    JSONObject groupJSON = new JSONObject();
 	    groupJSON.put("id", group.getGroupId());
 	    groupJSON.put("name", group.getName());
 	    groupsJSON.put(groupJSON);
 	}
-	GroupingActivity branchingActivity = (GroupingActivity) getUserManagementService().findById(Activity.class, activityID);
-	Grouping grouping = branchingActivity.getCreateGrouping();
+	Activity activity = (Activity) getUserManagementService().findById(Activity.class, activityID);
+	Grouping grouping = activity.isGroupingActivity() ? ((GroupingActivity) activity).getCreateGrouping()
+		: ((BranchingActivity) activity).getGrouping();
 
 	JSONArray branchesJSON = new JSONArray();
-	SortedSet<Group> groups = new TreeSet<Group>(grouping.getGroups());
+	SortedSet<Group> groups = new TreeSet<>(grouping.getGroups());
 	for (Group group : groups) {
 	    JSONObject groupJSON = new JSONObject();
 	    groupJSON.put("id", group.getGroupId());
@@ -523,7 +519,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	JSONArray groupsJSON = new JSONArray();
 	if (groups != null) {
 	    // sort groups by their name
-	    List<Group> groupList = new LinkedList<Group>(groups);
+	    List<Group> groupList = new LinkedList<>(groups);
 	    Collections.sort(groupList, new GroupComparator());
 	    for (Group group : groupList) {
 		JSONObject groupJSON = new JSONObject();
@@ -567,7 +563,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	JSONArray groupsJSON = new JSONArray();
 	if (groups != null) {
 	    // sort groups by their name
-	    List<OrganisationGroup> groupList = new LinkedList<OrganisationGroup>(groups);
+	    List<OrganisationGroup> groupList = new LinkedList<>(groups);
 	    Collections.sort(groupList, ORG_GROUP_COMPARATOR);
 
 	    for (OrganisationGroup group : groupList) {

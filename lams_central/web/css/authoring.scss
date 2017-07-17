@@ -284,6 +284,11 @@ div#ldStoreDialogContents #ldStoreDialogNameContainer input {
 	color: $gray-base;
 }
 
+div.branchMappingDialog {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
 div.branchMappingDialog .container-fluid {
 	padding-right: 0;
 }
