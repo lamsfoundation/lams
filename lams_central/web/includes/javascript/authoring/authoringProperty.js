@@ -84,6 +84,7 @@ var PropertyDefs = {
 					branchingActivity.grouping = groupingRow.show()
 												.find('option:selected').data('grouping');
 				} else {
+					branchingActivity.grouping = null;
 					groupingRow.hide();
 				}
 				$('.propertiesContentFieldMatchGroups', content).closest('tr')
