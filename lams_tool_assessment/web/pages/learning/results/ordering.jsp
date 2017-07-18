@@ -16,10 +16,10 @@
 
 				<td class="complete-item-gif">
 					<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.sequenceId == ordStatus.index)}">
-						<i class="fa fa-check"></i>	
+						<i class="fa fa-check text-success"></i>	
 					</c:if>
 					<c:if test="${assessment.allowWrongAnswersAfterQuestion && (option.sequenceId != ordStatus.index)}">
-						<i class="fa fa-times"></i>	
+						<i class="fa fa-times text-danger"></i>	
 					</c:if>			
 				</td>											
 			

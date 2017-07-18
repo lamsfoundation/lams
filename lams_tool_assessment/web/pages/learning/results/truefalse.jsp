@@ -15,10 +15,10 @@
 					
 					<c:choose>
 						<c:when test="${question.correctAnswer}">
-							<i class="fa fa-check"></i>
+							<i class="fa fa-check text-success"></i>
 						</c:when>
 						<c:otherwise>
-							<i class="fa fa-times"></i>	
+							<i class="fa fa-times text-danger"></i>	
 						</c:otherwise>		
 					</c:choose>					
 					
@@ -45,10 +45,10 @@
 					
 					<c:choose>
 						<c:when test="${!question.correctAnswer}">
-							<i class="fa fa-check"></i>	
+							<i class="fa fa-check text-success"></i>	
 						</c:when>
 						<c:otherwise>
-							<i class="fa fa-times"></i>	
+							<i class="fa fa-times text-danger"></i>	
 						</c:otherwise>		
 					</c:choose>					
 				</c:if>				

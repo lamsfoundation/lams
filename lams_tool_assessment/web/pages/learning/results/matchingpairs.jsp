@@ -10,10 +10,10 @@
 			<tr>
 				<td class="complete-item-gif">
 					<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.answerInt == option.uid)}">
-						<i class="fa fa-check"></i>	
+						<i class="fa fa-check text-success"></i>	
 					</c:if>
 					<c:if test="${assessment.allowWrongAnswersAfterQuestion && (option.answerInt != -1) && (option.answerInt != option.uid)}">
-						<i class="fa fa-times"></i>	
+						<i class="fa fa-times text-danger"></i>	
 					</c:if>			
 				</td>
 						

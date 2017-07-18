@@ -16,14 +16,13 @@
 		<c:forEach var="option" items="${question.optionDtos}">
 			<tr>
 				<td class="complete-item-gif">
-					<c:if test="${assessment.allowRightAnswersAfterQuestion && option.answerBoolean && (option.grade > 0)}">
-						<i class="fa fa-check"></i>
-					</c:if>
-					<c:if test="${assessment.allowWrongAnswersAfterQuestion && option.answerBoolean && (option.grade <= 0)}">
-						<i class="fa fa-times"></i>	
-					</c:if>			
-				</td>
-				
+				    <c:if test="${assessment.allowRightAnswersAfterQuestion && option.answerBoolean && (option.grade > 0)}">
+					    <i class="fa fa-check text-success"></i>
+		            </c:if>
+				    <c:if test="${assessment.allowWrongAnswersAfterQuestion && option.answerBoolean && (option.grade <= 0)}">
+					    <i class="fa fa-times text-danger"></i>	
+				    </c:if>			
+                </td>
 				<td class="has-radio-button">
 					<c:choose>
 						<c:when test="${question.multipleAnswersAllowed}">
