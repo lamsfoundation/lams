@@ -26,9 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
-<div class="panel">
-	<lams:out value="${GateForm.map.gate.description}" escapeHtml="true" />
-</div>
+<%@ include file="gateDescription.jsp"%>
 
 <lams:Alert type="info" close="false" id="waitingAtTheGate">
 	<fmt:message key="label.gate.waiting.learners">

@@ -22,10 +22,10 @@
 
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-core" prefix="c"%>
 
-<div class="panel">
-	<lams:out value="${GateForm.map.gate.description}" escapeHtml="true" />
-</div>
+<%@ include file="gateDescription.jsp"%>
+
 <div class="voffset5">
 	<fmt:message key="label.permission.gate.message" />
 </div>
