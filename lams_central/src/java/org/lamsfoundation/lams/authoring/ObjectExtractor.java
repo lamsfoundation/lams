@@ -140,13 +140,13 @@ public class ObjectExtractor implements IObjectExtractor {
      * database. The keys are the UIIDs of the activities, not the IDs. It is important that the values in this map are
      * the Activity objects related to the Hibernate session as they are updated by the parseTransitions code.
      */
-    protected HashMap<Integer, Activity> newActivityMap = new HashMap<Integer, Activity>();
+    protected HashMap<Integer, Activity> newActivityMap = new HashMap<>();
     /*
      * Record the tool sessions and activities as we go for edit on fly. This is needed in case we delete any. Cannot
      * get them at the end as Hibernate tries to store the activities before getting the tool sessions, and this fails
      * due to a foriegn key error. Its the foriegn key error that we are trying to avoid!
      */
-    protected HashMap<Integer, List<ToolSession>> toolSessionMap = new HashMap<Integer, List<ToolSession>>(); // Activity
+    protected HashMap<Integer, List<ToolSession>> toolSessionMap = new HashMap<>(); // Activity
     // UIID
     // ->
     // ToolSession
@@ -156,26 +156,26 @@ public class ObjectExtractor implements IObjectExtractor {
      * would end up with mappings still attached to a sequence activity that shouldn't be there! Not done as a map as we
      * sometimes will check via UIID, sometimes by ID
      */
-    protected List<BranchActivityEntry> oldbranchActivityEntryList = new ArrayList<BranchActivityEntry>();
+    protected List<BranchActivityEntry> oldbranchActivityEntryList = new ArrayList<>();
 
-    protected HashMap<Integer, Activity> oldActivityMap = new HashMap<Integer, Activity>(); // Activity
+    protected HashMap<Integer, Activity> oldActivityMap = new HashMap<>(); // Activity
     // UIID
     // ->
     // Activity
     /* cache of groupings - too hard to get them from the db */
-    protected HashMap<Integer, Grouping> groupings = new HashMap<Integer, Grouping>();
-    protected HashMap<Integer, Group> groups = new HashMap<Integer, Group>();
-    protected HashMap<Integer, BranchActivityEntry> branchEntries = new HashMap<Integer, BranchActivityEntry>();
-    protected HashMap<Integer, ComplexActivity> defaultActivityMap = new HashMap<Integer, ComplexActivity>();
+    protected HashMap<Integer, Grouping> groupings = new HashMap<>();
+    protected HashMap<Integer, Group> groups = new HashMap<>();
+    protected HashMap<Integer, BranchActivityEntry> branchEntries = new HashMap<>();
+    protected HashMap<Integer, ComplexActivity> defaultActivityMap = new HashMap<>();
     /*
      * can't delete as we go as they are linked to other items and have no way of knowing from the packet which ones
      * will need to be deleted, so start off assuming all need to be deleted and remove the ones we want to keep.
      */
-    protected HashMap<Integer, Grouping> groupingsToDelete = new HashMap<Integer, Grouping>();
+    protected HashMap<Integer, Grouping> groupingsToDelete = new HashMap<>();
     protected LearningDesign learningDesign = null;
     protected Date modificationDate = null;
     /* cache of system tools so we aren't going back to the db all the time */
-    protected HashMap<Long, SystemTool> systemTools = new HashMap<Long, SystemTool>();
+    protected HashMap<Long, SystemTool> systemTools = new HashMap<>();
 
     protected Logger log = Logger.getLogger(ObjectExtractor.class);
 
@@ -638,7 +638,7 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	grouping.setMaxNumberOfGroups((Integer) JsonUtil.opt(groupingDetails, "maxNumberOfGroups"));
 
-	Set<Group> groupsToDelete = new HashSet<Group>(grouping.getGroups());
+	Set<Group> groupsToDelete = new HashSet<>(grouping.getGroups());
 
 	JSONArray groupsList = (JSONArray) JsonUtil.opt(groupingDetails, "groups");
 	if (groupsList != null) {
@@ -671,7 +671,7 @@ public class ObjectExtractor implements IObjectExtractor {
     private Group extractGroupObject(JSONObject groupDetails, Grouping grouping) throws JSONException {
 
 	Group group = null;
-	Integer groupUIID = groupDetails.getInt(AuthoringJsonTags.GROUP_UIID);
+	Integer groupUIID = (Integer) JsonUtil.opt(groupDetails, AuthoringJsonTags.GROUP_UIID);
 	Long groupID = JsonUtil.optLong(groupDetails, AuthoringJsonTags.GROUP_ID);
 
 	// Does it exist already? If the group was created at runtime, there
@@ -688,10 +688,10 @@ public class ObjectExtractor implements IObjectExtractor {
 	    Iterator iter = grouping.getGroups().iterator();
 	    while ((uiid_match == null) && iter.hasNext()) {
 		Group possibleGroup = (Group) iter.next();
-		if (groupUIID.equals(possibleGroup.getGroupUIID())) {
+		if (groupUIID != null && groupUIID.equals(possibleGroup.getGroupUIID())) {
 		    uiid_match = possibleGroup;
 		}
-		if ((groupID != null) && groupID.equals(possibleGroup.getGroupId())) {
+		if (groupID != null && groupID.equals(possibleGroup.getGroupId())) {
 		    id_match = possibleGroup;
 		}
 	    }
@@ -781,7 +781,7 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	String toolOutputDefinition = (String) JsonUtil.opt(activityDetails, AuthoringJsonTags.TOOL_OUTPUT_DEFINITION);
 	if (!StringUtils.isBlank(toolOutputDefinition)) {
-	    activityEvaluations = new HashSet<ActivityEvaluation>();
+	    activityEvaluations = new HashSet<>();
 	    activityEvaluation.setActivity(toolActivity);
 	    activityEvaluation.setToolOutputDefinition(toolOutputDefinition);
 	    activityEvaluations.add(activityEvaluation);
@@ -823,7 +823,7 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	    // now go through and delete any competences from the old list,
 	    // that dont exist in the new list.
-	    Set<Competence> removeCompetences = new HashSet<Competence>();
+	    Set<Competence> removeCompetences = new HashSet<>();
 	    if (existingCompetences != null) {
 		if ((competenceList != null) && (competenceList.length() > 0)) {
 		    for (Competence existingCompetence : existingCompetences) {
@@ -856,10 +856,10 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	Set<LearningDesignAnnotation> existingAnnotations = learningDesign.getAnnotations();
 	if (existingAnnotations == null) {
-	    existingAnnotations = new HashSet<LearningDesignAnnotation>();
+	    existingAnnotations = new HashSet<>();
 	    learningDesign.setAnnotations(existingAnnotations);
 	}
-	Set<LearningDesignAnnotation> updatedAnnotations = new HashSet<LearningDesignAnnotation>();
+	Set<LearningDesignAnnotation> updatedAnnotations = new HashSet<>();
 
 	for (int annotationIndex = 0; annotationIndex < annotationList.length(); annotationIndex++) {
 	    JSONObject annotationJSON = annotationList.getJSONObject(annotationIndex);
@@ -890,7 +890,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    if (size != null) {
 		annotation.setSize(Short.valueOf(size));
 	    }
-	    
+
 	    if (found) {
 		baseDAO.update(annotation);
 	    } else {
@@ -971,7 +971,7 @@ public class ObjectExtractor implements IObjectExtractor {
 
     private void parseTransitions(JSONArray transitionsList) throws JSONException {
 
-	HashMap<Integer, Transition> newMap = new HashMap<Integer, Transition>();
+	HashMap<Integer, Transition> newMap = new HashMap<>();
 
 	if (transitionsList != null) {
 	    for (int transitionIndex = 0; transitionIndex < transitionsList.length(); transitionIndex++) {
