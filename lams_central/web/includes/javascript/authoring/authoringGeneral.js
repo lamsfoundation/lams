@@ -2401,6 +2401,7 @@ GeneralLib = {
 								   || $('#ldDescriptionLicenseSelect option:selected').attr('url')
 								   ? null : $('#ldDescriptionLicenseText').val(),
 			'designType'		 : layout.ld.designType,
+			'systemGate'		 : systemGate,
 			'activities'		 : activities,
 			'transitions'		 : transitions,
 			'groupings'			 : groupings,
@@ -2473,6 +2474,7 @@ GeneralLib = {
 	 */
 	saveLearningDesign : function(folderID, learningDesignID, title) {
 		var ld = GeneralLib.prepareLearningDesignData(true),
+			systemGate = ld.systemGate,
 			// final success/failure of the save
 			result = false;
 		
@@ -2483,6 +2485,7 @@ GeneralLib = {
 		ld.description = CKEDITOR.instances['ldDescriptionFieldDescription'].getData();
 		ld.saveMode = layout.ld.learningDesignID && layout.ld.learningDesignID != learningDesignID
 		   			  ? 1 : 0;
+		ld.systemGate = null;
 
 		$.ajax({
 			type     : 'POST',
