@@ -82,7 +82,12 @@
 		</c:when>
 		<c:otherwise>
 			<lams:Alert type="warning" id="no-leader" close="false">
-				<strong><fmt:message key="label.no.leader.yet" /></strong>
+                <h4>
+                    <fmt:message key="label.no.leader.yet.title" />
+                </h4>
+                <p>
+				    <fmt:message key="label.no.leader.yet.body" />
+                </p>
 			</lams:Alert>
 		</c:otherwise>
 	</c:choose>
