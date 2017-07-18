@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
+import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
@@ -68,8 +69,8 @@ public class AssessmentEscapeUtils {
      * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly escapes
      * all quotes in the following way \").
      */
-    public static void escapeQuotes(AssessmentResult assessmentResult) {
-	for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
+    public static void escapeQuotes(AssessmentResultDTO assessmentResultDto) {
+	for (AssessmentQuestionResult questionResult : assessmentResultDto.getQuestionResults()) {
 	    AssessmentEscapeUtils.escapeQuotesInQuestionResult(questionResult);
 	}
     }

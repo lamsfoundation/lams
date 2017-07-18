@@ -242,6 +242,17 @@ public class Assessment implements Cloneable {
     public boolean isContentModifiedInMonitor(Date attemptStartingDate) {
 	return (updated != null) && updated.after(attemptStartingDate);
     }
+    
+    /**
+     * @return true if there is at least one random question reference, false otherwise
+     */
+    public boolean hasRandomQuestion() {
+	boolean hasRandomQuestion = false;
+	for (QuestionReference reference : (Set<QuestionReference>) questionReferences) {
+	    hasRandomQuestion |= reference.isRandomQuestion();
+	}
+	return hasRandomQuestion;
+    }
 
     // **********************************************************
     // get/set methods

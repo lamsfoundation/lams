@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
@@ -360,7 +361,11 @@ public interface IAssessmentService {
      */
     List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics);
 
-    AssessmentResult getUserMasterDetail(Long sessionId, Long userId);
+    /**
+     * Prepares question results to be displayed in "Learner Summary" table. Shows all of them in case there is at least
+     * one random question present, and just questions from the question list if no random questions.
+     */
+    AssessmentResultDTO getUserMasterDetail(Long sessionId, Long userId);
 
     /**
      * Return user summary. This summary contains list of all attempts made by user.
