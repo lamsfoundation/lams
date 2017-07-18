@@ -27,7 +27,7 @@
 				<div class="checkbox">
 					<label for="keepLearnerContent">
 					<html:checkbox property="keepLearnerContent"/>
-					<fmt:message key="admin.keep.content" /></label>
+					<fmt:message key="admin.keep.learner.content" /></label>
 				</div>
 				<html:submit styleClass="btn btn-primary pull-right"><fmt:message key="admin.button.save" /></html:submit>
 			</html:form>
