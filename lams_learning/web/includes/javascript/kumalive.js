@@ -1,5 +1,7 @@
 var kumaliveWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws') 
 		+ 'kumaliveWebsocket?organisationID=' + orgId + '&role=' +role),
+	kumaliveWebsocketPingTimeout = null,
+	kumaliveWebsocketPingFunc = null,
 	// is the user a learenr or a teacher
 	roleTeacher = false,
 	// was the initial set up run
@@ -19,7 +21,34 @@ var kumaliveWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
 		.append($('<div />').addClass('profilePictureWrapper').append($('<div />').addClass('profilePicture profilePictureHidden')))
 		.append($('<div />').addClass('name')),
 	REFRESH_DELAY = 1000,
-	ANIMATION_DURATION = 1000;
+	ANIMATION_DURATION = 1000,
+	PING_DELAY = 3*60*1000;
+
+
+kumaliveWebsocketPingFunc = function(skipPing){
+	if (kumaliveWebsocket.readyState == kumaliveWebsocket.CLOSING 
+			|| kumaliveWebsocket.readyState == kumaliveWebsocket.CLOSED){
+		location.reload();
+	}
+	
+	// check and ping every few minutes
+	kumaliveWebsocketPingTimeout = setTimeout(kumaliveWebsocketPingFunc, PING_DELAY);
+	// initial set up does not send ping
+	if (!skipPing) {
+		kumaliveWebsocket.send("ping");
+	}
+};
+// set up timer for the first time
+kumaliveWebsocketPingFunc(true);
+
+kumaliveWebsocket.onclose = function(e){
+	// react only on abnormal close
+	if (e.code === 1006) {
+		location.reload();
+	}
+};
+// when the server pushes new messages and roster to the learner's browser
+
 
 /**
  * Fetches existing Kumalive session
@@ -42,6 +71,10 @@ kumaliveWebsocket.onclose = function(e){
  * Process a message from server.
  */
 kumaliveWebsocket.onmessage = function(e){
+	 // reset ping timer
+    clearTimeout(kumaliveWebsocketPingTimeout);
+    kumaliveWebsocketPingFunc(true);
+    
 	// read JSON object
 	var message = JSON.parse(e.data),
 		type = message.type;
