@@ -75,6 +75,7 @@ import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
+import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
@@ -1009,24 +1010,47 @@ public class AssessmentServiceImpl
     }
     
     @Override
-    public AssessmentResult getUserMasterDetail(Long sessionId, Long userId) {
+    public AssessmentResultDTO getUserMasterDetail(Long sessionId, Long userId) {
+	AssessmentResultDTO resultDto = new AssessmentResultDTO();
+	resultDto.setSessionId(sessionId);
+	
 	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultByUser(sessionId,
 		userId);
 	if (lastFinishedResult != null) {
-	    //sorting
-	    SortedSet<AssessmentQuestionResult> questionResults = new TreeSet<AssessmentQuestionResult>(
+	    Assessment assessment = lastFinishedResult.getAssessment();
+	    Set<QuestionReference> questionReferences = lastFinishedResult.getAssessment().getQuestionReferences();
+	    Set<AssessmentQuestionResult> questionResults = lastFinishedResult.getQuestionResults();
+
+	    //prepare list of the questions to display in user master detail table, filtering out questions that aren't supposed to be answered
+	    SortedSet<AssessmentQuestionResult> questionResultsToDisplay = new TreeSet<AssessmentQuestionResult>(
 		    new AssessmentQuestionResultComparator());
-	    questionResults.addAll(lastFinishedResult.getQuestionResults());
-	    lastFinishedResult.setQuestionResults(questionResults);
+	    //in case there is at least one random question - we need to show all questions
+	    if (assessment.hasRandomQuestion()) {
+		questionResultsToDisplay.addAll(questionResults);
+
+	    //otherwise show only questions from the question list
+	    } else {
+		for (QuestionReference reference : questionReferences) {
+		    for (AssessmentQuestionResult questionResult : questionResults) {
+			if (reference.getQuestion().getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
+			    questionResultsToDisplay.add(questionResult);
+			}
+		    }
+		}
+	    }
+	    resultDto.setQuestionResults(questionResultsToDisplay);
+
 	    //escaping
-	    AssessmentEscapeUtils.escapeQuotes(lastFinishedResult);
+	    AssessmentEscapeUtils.escapeQuotes(resultDto);
 	}
 
-	return lastFinishedResult;
+	return resultDto;
     }
 
     @Override
     public UserSummary getUserSummary(Long contentId, Long userId, Long sessionId) {
+	Assessment assessment = assessmentDao.getByContentId(contentId);
+	
 	UserSummary userSummary = new UserSummary();
 	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 	userSummary.setUser(user);
@@ -1041,38 +1065,48 @@ public class AssessmentServiceImpl
 	if (lastFinishedResult != null) {
 	    userSummary.setLastAttemptGrade(lastFinishedResult.getGrade());
 	}
+	
+	if (!results.isEmpty()) {
 
-	Assessment assessment = assessmentDao.getByContentId(contentId);
-	ArrayList<UserSummaryItem> userSummaryItems = new ArrayList<UserSummaryItem>();
-	Set<AssessmentQuestion> questions = assessment.getQuestions();
-	for (AssessmentQuestion question : questions) {
-	    UserSummaryItem userSummaryItem = new UserSummaryItem(question);
-	    List<AssessmentQuestionResult> questionResultsForSummary = new ArrayList<AssessmentQuestionResult>();
+	    //prepare list of the questions to display, filtering out questions that aren't supposed to be answered
+	    Set<AssessmentQuestion> questions = new TreeSet<AssessmentQuestion>();
+	    //in case there is at least one random question - we need to show all questions in a drop down select
+	    if (assessment.hasRandomQuestion()) {
+		questions.addAll(assessment.getQuestions());
 
-	    for (AssessmentResult result : results) {
-		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
-
-			// for displaying purposes, no saving occurrs
-			questionResult.setFinishDate(result.getFinishDate());
-
-			questionResultsForSummary.add(questionResult);
-			break;
-		    }
+		//otherwise show only questions from the question list
+	    } else {
+		for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
+		    questions.add(reference.getQuestion());
 		}
 	    }
 
-	    // skip questions without answers
-	    if (questionResultsForSummary.isEmpty()) {
-		continue;
-	    } else {
-		userSummaryItem.setQuestionResults(questionResultsForSummary);
+	    //prepare list of UserSummaryItems
+	    ArrayList<UserSummaryItem> userSummaryItems = new ArrayList<UserSummaryItem>();
+	    for (AssessmentQuestion question : questions) {
+		UserSummaryItem userSummaryItem = new UserSummaryItem(question);
+
+		//find all questionResults that correspond to the current question
+		List<AssessmentQuestionResult> questionResults = new ArrayList<AssessmentQuestionResult>();
+		for (AssessmentResult result : results) {
+		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
+			if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
+
+			    // for displaying purposes only (no saving occurrs)
+			    questionResult.setFinishDate(result.getFinishDate());
+
+			    questionResults.add(questionResult);
+			    break;
+			}
+		    }
+		}
+
+		userSummaryItem.setQuestionResults(questionResults);
 		userSummaryItems.add(userSummaryItem);
 	    }
+	    userSummary.setUserSummaryItems(userSummaryItems);
+	    AssessmentEscapeUtils.escapeQuotes(userSummary);
 	}
-	userSummary.setUserSummaryItems(userSummaryItems);
-
-	AssessmentEscapeUtils.escapeQuotes(userSummary);
 
 	return userSummary;
     }

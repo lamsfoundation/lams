@@ -52,6 +52,7 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
+import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
@@ -163,14 +164,10 @@ public class MonitoringAction extends Action {
 	    sessionMap.put(AssessmentConstants.ATTR_REFLECT_LIST, reflectList);
 	}
 
-	//create list of questions to display in question drop down menu
+	//prepare list of the questions to display in question drop down menu, filtering out questions that aren't supposed to be answered
 	Set<AssessmentQuestion> questionList = new TreeSet<AssessmentQuestion>();
-	boolean hasRandomQuestion = false;
-	for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
-	    hasRandomQuestion |= reference.isRandomQuestion();
-	}
 	//in case there is at least one random question - we need to show all questions in a drop down select
-	if (hasRandomQuestion) {
+	if (assessment.hasRandomQuestion()) {
 	    questionList.addAll(assessment.getQuestions());
 
 	    //show only questions from question list otherwise
@@ -207,7 +204,7 @@ public class MonitoringAction extends Action {
 	initAssessmentService();
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_SESSION_ID);
-	AssessmentResult result = service.getUserMasterDetail(sessionId, userId);
+	AssessmentResultDTO result = service.getUserMasterDetail(sessionId, userId);
 
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
 	return (result == null) ? null : mapping.findForward(AssessmentConstants.SUCCESS);
