@@ -45,9 +45,9 @@
 			  <html:checkbox property="selected" styleId="currentSelectAllTZ"> </html:checkbox>
 			</th>
 			<th width="22%"><fmt:message key="admin.timezone.time.zone.id" /></th>
-			<th width="24%" align="center"><fmt:message key="admin.timezone.raw.offset" /></th>
+			<th width="25%" align="center"><fmt:message key="admin.timezone.raw.offset" /></th>
 			<th width="12%" align="center"><fmt:message key="admin.timezone.dst.offset" /></th>
-			<th width="32%"><fmt:message key="admin.timezone.display.name" /></th>
+			<th width="31%"><fmt:message key="admin.timezone.display.name" /></th>
 		</tr>	
 	
 		<logic:iterate name="timezoneDtos" id="timezoneDto">
