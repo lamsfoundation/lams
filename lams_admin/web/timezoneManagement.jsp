@@ -3,7 +3,23 @@
 <link rel="stylesheet" href="<lams:LAMSURL/>/css/thickbox.css" type="text/css" media="screen">
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox.js"></script>
-
+<script type="text/javascript">	
+	//this script lets user select all available timezones just by enabling the checkbox in header label
+	$(document).ready(function(){
+		if ($('.timezoneCheckBox:checked').length == $('.timezoneCheckBox').length) {
+				$('#currentSelectAllTZ').prop('checked', true);			
+			}
+		
+		$("#currentSelectAllTZ").click(function(){
+			if ($("#currentSelectAllTZ").is(':checked')) {
+				//$('#ttl-login-request').prop("value", 80);
+			    $('input:checkbox').not(this).prop('checked', this.checked);
+			}else{
+			    $('input:checkbox').not(this).prop('checked', false);	
+			}
+		});
+	});
+</script>
 <p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 <fmt:message key="admin.timezone.select.timezones.you.want.users.choose" >
 <fmt:param>
@@ -24,17 +40,20 @@
 	
 	<table class="table table-striped table-condensed">
 		<tr>
-			<th width="8%"><fmt:message key="admin.timezone.select" /></th>
+			<th width="10%" align="center"><fmt:message key="admin.timezone.select" />
+			<!-- added this check box for the user to enable all available time zones -->
+			  <html:checkbox property="selected" styleId="currentSelectAllTZ"> </html:checkbox>
+			</th>
 			<th width="22%"><fmt:message key="admin.timezone.time.zone.id" /></th>
 			<th width="24%" align="center"><fmt:message key="admin.timezone.raw.offset" /></th>
-			<th width="13%" align="center"><fmt:message key="admin.timezone.dst.offset" /></th>
-			<th width="33%"><fmt:message key="admin.timezone.display.name" /></th>
+			<th width="12%" align="center"><fmt:message key="admin.timezone.dst.offset" /></th>
+			<th width="32%"><fmt:message key="admin.timezone.display.name" /></th>
 		</tr>	
 	
 		<logic:iterate name="timezoneDtos" id="timezoneDto">
 			<tr>
 				<td align="center">
-					<html:checkbox name="timezoneDto" property="selected" value="${timezoneDto.timeZoneId}"></html:checkbox>
+					<html:checkbox name="timezoneDto" styleClass="timezoneCheckBox" property="selected" value="${timezoneDto.timeZoneId}"></html:checkbox>
 				</td>
 				<td>
 					${timezoneDto.timeZoneId}
