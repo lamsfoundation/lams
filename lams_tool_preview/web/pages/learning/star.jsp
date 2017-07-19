@@ -1,4 +1,4 @@
-	<link rel="stylesheet" href="${lams}css/jquery.jRating.css">
+	<lams:css suffix="jquery.jRating"/>
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<style media="screen,projection" type="text/css">

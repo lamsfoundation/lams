@@ -58,10 +58,10 @@ p.jRatingInfos span.maxRate {
 .rating-stars, .rating-stars-disabled {margin: 0px auto; min-height: 20px;}
 .add-comment {
 	background-image: url('../images/tick.png');
-	width:16px;
+	width:16px !important;
 	height:16px;
 	cursor: pointer;
-	float: right;
+	float: right !important;
 	margin-top: 20px;
 }
 .rating-comment{

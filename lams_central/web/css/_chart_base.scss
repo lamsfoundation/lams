@@ -1,7 +1,5 @@
-@import "_lams_variables.scss";
-	
 .axis {
-	font: 10px sans-serif;
+	font: 10px $font-family-sans-serif;
 }
 
 .axis path, .axis line {
@@ -14,7 +12,7 @@
 div.chartTooltip {
     position: absolute;			
     padding: 2px;
-    font: 12px sans-serif;		
+    font: 12px $font-family-sans-serif;		
     background: white;
     border: 0px;
     border-radius: 8px;			
@@ -29,7 +27,7 @@ div.chartTooltip {
 
 .bar text {
 	fill: white;
-	font: 14px sans-serif;
+	font: 14px $font-family-sans-serif;
 }
 .zoom {
 	cursor: move;

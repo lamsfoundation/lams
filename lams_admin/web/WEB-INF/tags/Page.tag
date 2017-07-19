@@ -46,7 +46,7 @@
 	<c:if test="${ not hideProgressBar && ( empty mode || mode == 'author' || mode == 'learner') }">
 	
 		<%-- Links placed in body instead of head. Ugly, but it works. --%>
-		<link rel="stylesheet" href="<lams:LAMSURL/>css/progressBar.css" type="text/css" />
+		<lams:css suffix="progressBar"/>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 		
@@ -277,7 +277,7 @@
 				<div class="collapse navbar-collapse" id="bs-sidebar-navbar-collapse-1">
 					<ul class="nav navbar-nav">
 						<li><a href="#" class="hidden-xs visible-sm visible-md visible-lg slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
-							<i class="pull-right fa fa-bars" style="color:#337ab7"></i>
+							<i class="pull-right fa fa-bars"></i>
 							<p class="lessonName"></p></a></li>
 						<li><a href="#" onClick="javascript:closeWindow()" ><span id="exitlabel">Exit</span><i class="pull-right fa fa-times"></i></a></li>
 						<li><a href="#" onClick="javascript:viewNotebookEntries(); return false;" ><span id="notebooklabel">Notebook</span><i class="pull-right fa fa-book"></i></a></li>

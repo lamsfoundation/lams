@@ -29,11 +29,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="learnerAppUrl">
 	<lams:WebAppURL />
 </c:set>
-<link href="${learnerAppUrl}css/nprogress.css" rel="stylesheet" type="text/css" />
+<lams:css/>
+<%-- nprogress.css contents in learner.css --%>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="${learnerAppUrl}includes/javascript/nprogress.js"></script>
-
-
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/nprogress.js"></script>
 
 <c:if test="${!empty activityForm.activityURLs}">
 
@@ -44,6 +43,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				speed : 30
 			});
 			NProgress.configure({
+				showSpinner: false, 
 				trickleRate : 0.2,
 				trickleSpeed : 110
 			});

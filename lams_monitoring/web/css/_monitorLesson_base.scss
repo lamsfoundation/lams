@@ -1,5 +1,3 @@
-@import "_lams_variables.scss";
-
 @mixin checkboxInTable {
 	margin: 0 5px 0px 0px;
 	border: none;
@@ -37,15 +35,6 @@ dd {
 #content .panel-monitor-page, #content .panel-monitor-body  {
 	margin-bottom: 0;
 	padding-bottom: 0;
-}
-
-.errorMessage {
-	font-weight: bold;
-	color: $brand-danger;
-}
-
-.errorField {
-	border: thick solid red;
 }
 
 input[type="checkbox"] {

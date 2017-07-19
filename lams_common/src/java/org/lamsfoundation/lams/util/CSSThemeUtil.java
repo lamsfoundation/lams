@@ -39,19 +39,14 @@ public class CSSThemeUtil {
 
     /**
      * Will return a list of stylesheets for the current user. If the user does not have a specific stylesheet, then the
-     * default stylesheet will be included in this list. The default stylesheet will always be included in this list.
+     * default stylesheet will be included in this list. The different skins replace the default stylesheet, they do 
+     * not build on top of the stylesheet. This is a change from earlier version of LAMS.
      *
      * @return
      */
     public static List<String> getAllUserThemes() {
 	List<String> themeList = new ArrayList<String>();
 
-	// Always have default as that defines everything. Other themes
-	// define changes.
-
-	themeList.add(CSSThemeUtil.DEFAULT_HTML_THEME);
-
-	boolean userThemeFound = false;
 	HttpSession ss = SessionManager.getSession();
 	if (ss != null) {
 	    UserDTO user = null;
@@ -64,9 +59,8 @@ public class CSSThemeUtil {
 		ThemeDTO theme = user.getTheme();
 
 		if (theme != null) {
-		    userThemeFound = true;
 		    String themeName = theme.getName();
-		    if ((themeName != null) && !CSSThemeUtil.isLAMSDefaultTheme(themeName)) {
+		    if (themeName != null) {
 			themeList.add(theme.getName());
 		    }
 		}
@@ -75,13 +69,18 @@ public class CSSThemeUtil {
 
 	// if we haven't got a user theme, we are probably on the login page
 	// so we'd better include the default server theme (if it isn't the LAMS default theme
-	if (!userThemeFound) {
+	if (themeList.size() == 0) {
 	    String serverDefaultTheme = Configuration.get(ConfigurationKeys.DEFAULT_THEME);
-	    if ((serverDefaultTheme != null) && !serverDefaultTheme.equals(CSSThemeUtil.DEFAULT_HTML_THEME)) {
+	    if (serverDefaultTheme != null) {
 		themeList.add(serverDefaultTheme);
 	    }
 	}
 
+	// Still no theme? Default to default. 
+	if (themeList.size() == 0) {
+	    themeList.add(CSSThemeUtil.DEFAULT_HTML_THEME);
+	}
+	
 	return themeList;
     }
 

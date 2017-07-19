@@ -22,7 +22,7 @@
 		<%@ include file="/common/tabbedheader.jsp" %>
 		
 		<link href="${lams}css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
-		<link href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+		<lams:css suffix="jquery.jRating"/>
 		<link href="${lams}css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet" >
 		<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 		<style media="screen,projection" type="text/css">

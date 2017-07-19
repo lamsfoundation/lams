@@ -1,7 +1,5 @@
 @import "_lams_variables.scss";
 
-@import url('/lams/css/inlineeditor.css');
-
 #loadingOverlay {
 	width: 100%;
 	height: 99%;
@@ -52,16 +50,6 @@ div.tabTitle {
 	text-align: center;
 }
 
-.errorMessage {
-	font-weight: bold;
-	color: $brand-danger;
-}
-
-.errorField {
-	border: $border-medium-danger;
-}
-
-
 td#learningDesignTreeCell {
 	border-right: $border-thin-dotted;
 }
@@ -72,10 +60,6 @@ div#learningDesignTree {
 	width: 250px;
 	padding: 2px 2px 0px 5px;
 	vertical-align: top;
-}
-
-.ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
-	background-color: $brand-primary-light;
 }
 
 td#canvasControlCell {
@@ -166,16 +150,6 @@ td.userConainterTransferCell img {
 	cursor: pointer;
 }
 
-.droppableHighlight {
-	padding : 1px;
-	border: 5px solid $brand-primary-mid;
-}
-
-.draggableUserSelected {
-	background-color: $brand-primary-mid !important;
-	color: white !important;
-}
-	
 div#tabAdvanced, div#tabConditions {
 	padding-left: 30px;
 }

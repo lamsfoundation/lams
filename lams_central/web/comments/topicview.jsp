@@ -9,7 +9,7 @@
 <c:set var="hide"><fmt:message key="label.hide" /></c:set>
 <c:set var="prompt"><fmt:message key="label.showhide.prompt" /></c:set>
 <c:set var="tableCommand">expandable:true,initialState:'expanded',
-	expanderTemplate:'<a class=\"btn btn-xs\" href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a>',
+	expanderTemplate:'<a href=\"#\"><span style="margin-left:20px">${prompt}</span></a>',
 	stringCollapse:'${hide}',stringExpand:'${show}',
 	clickableNodeNames:true,indent:${indent},
 	onNodeInitialized:function() {
@@ -19,7 +19,7 @@
 	}
  </c:set>
 <c:set var="tableCommandSticky">expandable:true,initialState:'collapsed',
-	expanderTemplate:'<a class=\"btn btn-xs\" href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a>',
+	expanderTemplate:'<a href=\"#\"><span style="margin-left:20px">${prompt}</span></a>',
 	stringCollapse:'${hide}',stringExpand:'${show}',
 	clickableNodeNames:true,indent:${indent},
 	onNodeInitialized:function() {

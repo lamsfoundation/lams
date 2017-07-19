@@ -12,7 +12,7 @@
 	
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL />gradebook/includes/css/gradebook.css" rel="stylesheet" />
-	<link type="text/css" href="<lams:LAMSURL/>css/chart.css" rel="stylesheet" />
+	<lams:css suffix="chart"/>
 	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 	

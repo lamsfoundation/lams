@@ -126,7 +126,7 @@
 							</td>
 							
 							<c:if test="${sessionMap.isCommentsEnabled}">
-								<td style="vertical-align:middle; padding-left:0px; text-align:center;">
+								<td style="min-width: 250px;vertical-align:middle; padding-left:0px;">
 									<c:forEach var="commentDto" items="${summary.itemRatingDto.commentDtos}">
 										<div class="rating-comment">
 											${commentDto.comment}

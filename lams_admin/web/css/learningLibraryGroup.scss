@@ -78,18 +78,3 @@ td#learningLibraryCell .learningLibraryContainer {
 .groupContainer .removeGroupButton {
 	padding-top: 3px;
 }
-
-.draggableLearningLibrary {
-	padding: 3px 0px 3px 0px;
-	cursor: default;
-}
-
-.droppableHighlight {
-	padding : 1px !important;
-	border: 5px solid $brand-primary-mid !important;
-}
-
-.draggableLearningLibrarySelected {
-	background-color: $brand-primary-mid !important;
-	color: white !important;
-}

@@ -1,0 +1,957 @@
+// The content defaultHTML_learner.scss and all the equivalent skin files. Change this an then all the skin files change. 
+@media (max-width: 500px) {
+  .h1,
+  .h2,
+  .h3,
+  .h4 {
+    font-size: $font-size-base;
+  }
+  * {
+    font-size: $font-size-small;
+  }
+  .panel-title {
+    font-size: $font-size-base;
+  }
+  .no-gutter > [class*='col-'] {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+  .rating-criteria-tag {
+	width: 100%;
+  }
+  .rating-criteria-tag input[type="text"] {
+	width: 100%;
+  }
+  .rating-criteria-tag .ui-widget input{
+	font-family: $font-family-base;
+	font-size:11px;
+  }
+  #criterias-table {
+	margin-left: 0px;
+	border-bottom: inherit;
+  }
+  #criterias-table td {
+	vertical-align:middle;
+  }
+ .navbar-login {
+    margin-bottom: 5px;
+  }
+ .navbar-brand-login {
+    font-size: large;
+  }
+}
+
+@media (min-width: 501px) {
+  .no-gutter > [class*='col-'] {
+    padding-right: 8px;
+    padding-left: 8px;
+ }
+ .navbar-login {
+    margin-bottom: 10px;
+  }
+ .navbar-brand-login {
+    font-size: x-large;
+  } 
+}
+
+/* customizations */
+.fa-bars {
+	color: $brand-primary;
+}
+
+.alert-info {
+	@include alert-variant($alert-info-bg, $alert-info-border, $alert-info-text);
+}
+
+.form-control {
+	@include form-control-focus($input-border-focus);
+}
+
+a {
+    color: $a-link-default;
+}
+
+
+a:hover {
+    color: $a-link-default-hover;
+}
+
+a:focus {
+    color: $a-link-default-focus;
+}
+
+@if variable-exists(panel-default-heading-background) {
+    .panel-default>.panel-heading {
+	    background-color: $panel-default-heading-background;
+    }
+}
+
+@if variable-exists(navbar-login-background) {
+    .navbar-login {
+        background-color: $navbar-login-background;
+    }
+}
+
+.navbar-brand {
+    @if variable-exists(navbar-brand-login-color) {
+	    color: $navbar-brand-login-color !important;
+    } @else {
+        color: $brand-primary !important;
+    }
+}
+
+@if variable-exists(headings-default-color) {
+    h1,h2,h3,h4 {
+	    color: $headings-default-color;
+    }
+}
+
+.text-primary {
+    color: $brand-primary-darker;
+}
+
+// Useful coloured backgrounds 
+@include bg-variant('.bg-primary', $brand-primary);
+@include bg-variant('.bg-primary-mid', $brand-primary-mid);
+
+.bg-primary-hover:hover,
+.ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
+	background-color: $brand-primary-light;
+}
+
+
+/* Spacer classes */
+
+.offset2 {
+	margin: 2px;
+}
+.offset3 {
+	margin: 3px;
+}
+.offset5 {
+	margin: 5px;
+}
+.offset10 {
+	margin: 10px;
+}
+.offset15 {
+	margin: 15px;
+}
+.offset20 {
+	margin: 20px;
+}
+
+.voffset2 {
+  margin-top: 2px;
+}
+.voffset5 {
+  margin-top: 5px;
+}
+.voffset10 {
+  margin-top: 10px;
+}
+.voffset20 {
+  margin-top: 20px;
+}
+.roffset2 {
+  margin-right: 2px;
+}
+.roffset5 {
+  margin-right: 5px;
+}
+.roffset10 {
+  margin-right: 10px;
+}
+.loffset2 {
+  margin-left: 2px;
+}
+.loffset5 {
+  margin-left: 5px;
+}
+.loffset10 {
+  margin-left: 10px;
+}
+.loffset20 {
+  margin-left: 20px;
+}
+.clear-both {
+	clear: both;
+}
+/* Eliminate the scrollbar on learner popup windows, monitoring windows */
+.no-margin{
+	margin-left: 0px;
+	margin-right: 0px;
+}
+/* Comments/Forum classes */
+.msg .panel-heading {
+  padding: 3px;
+}
+.msg {
+  margin-bottom: 5px;
+}
+.msg .panel-title {
+  font-weight: normal;
+  font-size: $font-size-base;
+}
+.msg-footer {
+  display: block;
+  font-size: $font-size-small;
+  float: right;
+}
+.msg-hr {
+  margin-top: 5px;
+  margin-bottom: 3px;
+}
+.msg .panel-footer {
+  font-size: $font-size-small;
+}
+.panel-heading-sm {
+  padding: 3px 5px;
+  font-size: smaller;
+  font-weight: bold;
+}
+.panel-body-sm {
+  padding: 3px 5px;
+}
+.panel-learner-page {
+  border-radius: 6px;
+  box-shadow: $panel-box-shadow;
+}
+.panel-monitor-page {
+  border-radius: 6px;
+  box-shadow: $panel-box-shadow;
+}
+// .panel-learner-page-title,
+// .panel-admin-page-title {
+//   -moz-border-bottom-colors: none;
+//   -moz-border-left-colors: none;
+//   -moz-border-right-colors: none;
+//   -moz-border-top-colors: none;
+//   border-color: #e7eaec;
+//   border-radius: 0px;
+//   border-image: none;
+//   border-style: solid solid none;
+//   border-width: 3px 0 0;
+//   color: inherit;
+//   min-height: 48px;
+// }
+.panel-admin-page {
+  border-radius: 6px;
+  box-shadow: $panel-box-shadow;
+  margin-top: 20px;
+}
+.panel-learner-title {
+	color:$brand-primary !important;
+}
+.panel-admin-title {
+	color:$brand-primary !important;
+}
+.panel-title {
+	font-size: inherit;
+	font-weight: 500;
+}
+.panel-heading {
+  padding: 7px 10px;
+}
+
+th {
+	font-weight: normal;
+	font-style: italic;
+	
+}
+
+body.stripes {
+  background: url('/lams/images/css/light-fabric.jpg');
+}
+.sbox {
+  border-bottom: 2px solid $gray-lighter;
+  border-radius: 0px;
+}
+.sbox-body {
+  padding: 5px;
+}
+.sbox-heading {
+  padding: 3px 5px;
+  border-bottom: 1px solid $gray-lighter;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+.user {
+  display: inline-block;
+}
+.user:before {
+  content: "\f007";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  margin-right: 3px;
+  color: inherit;
+  float: left;
+}
+.help-tabs{
+  display: inline-block;
+  margin-right: 10px;
+}
+.help-no-tabs{
+  display: inline-block;
+  margin-right: 10px;
+}
+.help {
+  display: inline-block;
+}
+.help:before {
+  content: "\f059";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  margin-right: 2px;
+  color: inherit;
+  float: right;
+}
+.na {
+  display: inline-block;
+}
+.na:after {
+  content: "\f0a9";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  margin-left: 5px;
+  color: inherit;
+  /*float: right;*/
+}
+
+/* Restrict the width of the up and down arrows so they do not grow wider when the screen is enlarged. td needs to be 5px wider than div. */
+div.arrows{
+	display:inline-block;
+	width:30px;
+	text-align: center;
+}
+td.arrows{
+	width:35px;
+	text-align: center;
+}
+/* Tabs are a cross between pills (colouring) and tab outlines. */
+.nav-tabs > li > a{
+  border: $border-thin-default-light
+}
+/* Icons to show panel is collapsed */
+.collapsable-icon-right a:after {
+    font-family: FontAwesome;
+    content:"\f078";
+    float: right;
+    color: $gray-light;
+	margin-right: 5px;
+}
+.collapsable-icon-right a.collapsed:after {
+    content:"\f054";
+}
+.collapsable-icon-left a:after {
+    font-family: FontAwesome;
+    content:"\f078";
+    float: left;
+    color: $gray-light;
+	margin-right: 5px;
+}
+.collapsable-icon-left a.collapsed:after {
+    content:"\f054";
+}
+
+div.navbar-heading {
+	padding:0;
+}
+
+nav.navbar-heading {
+	border: 0; 
+	margin: 0;
+	color: inherit;
+}
+
+.navbar-heading .divider {
+	height: 50px;
+	margin-left: 5px;
+	margin-right: 5px;
+	border-left: $border-thin-default-light;
+}
+
+.navbar-heading .in .divider {
+	height: 1px;
+	margin-left: 5px;
+	margin-right: 5px;
+	margin-bottom: 5px;
+	border-top: $border-thin-default-light;
+}
+
+.navbar-heading .in .navbar-text {
+	padding-left: 15px;
+}
+
+.navbar-text {
+	cursor: pointer;
+}
+
+/** Special settings for the nav bar used in monitoring, authoring, etc */
+.panel-monitor-page .navbar {
+    min-height: 40px;
+}   
+
+.panel-monitor-page .navbar-heading .divider {
+	height: 40px;
+}
+
+/* small display - drop down menu view */
+@media (max-width: 767px) {
+	.panel-monitor-page .navbar-brand {
+		color:$brand-primary !important;
+	 	height: 35px;
+	    margin-top: 5px;
+	    margin-bottom: 3px;
+	   	padding: 5px 10px 5px 25px;
+	}
+	
+	.panel-monitor-page>.navbar-toggle {
+	    margin-top: 3px;
+	    margin-bottom: 3px;
+	}
+	.panel-monitor-page .navbar-nav>li>a {
+	 	padding: 5px;
+	}
+	
+	.panel-monitor-page .navbar-text {
+		cursor: pointer;
+	 	margin-top: 5px;
+		margin-bottom: 5px;
+	}
+	
+	.panel-monitor-page .navbar-header .navbar-toggle {
+	    margin-top: 3px;
+	    margin-bottom: 3px;
+	}
+	
+	.panel-monitor-page .divider {
+		display:none
+	}
+	
+	.panel-monitor-page .navbar-heading .in .navbar-text {
+		padding-left: 4px;
+	}
+
+}
+
+/* normal display */ 
+@media (min-width: 768px) {
+	
+	.panel-monitor-page .navbar-brand {
+		color:$brand-primary !important;
+ 		height: 40px;
+   		padding: 10px; 
+	}
+
+	.panel-monitor-page .navbar-nav>li>a {
+	 	padding: 10px;
+	}
+	
+	.panel-monitor-page .navbar-text {
+		cursor: pointer;
+	 	margin-top: 10px;
+		margin-bottom: 10px;
+	}
+	
+	.panel-monitor-page .navbar-heading .in .navbar-text {
+		padding-left: 15px;
+	}
+	
+}
+
+
+@media (min-width: 0px) and (max-width: 767px) {
+  .btn-primary, .btn-default, .btn-success, .btn-info, .btn-danger {
+    padding:4px 9px 2px;
+  }
+}
+
+@media (max-width: 500px) {  
+  .file-input-name {
+  	height: 22px; /* match height of btn */
+    padding:4px 9px;
+    font-size:90%;
+    line-height: 1.2;		
+  }
+}
+
+@media (min-width: 501px ) and (max-width: 992px) {  
+  .file-input-name {
+  	height: 25px; /* match height of btn */
+    padding:4px 9px;
+    font-size:90%;
+    line-height: 1.2;		
+  }
+}
+
+
+ul.dropdown-menu {
+	left: auto;
+	right: 0;
+}
+
+/** Authoring */
+/*layout of adding a topic button */
+a.button-add-item:before {
+  content: "\f067";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  margin-left: 5px;
+  color: inherit;
+}
+
+.modal-header {
+    padding: 8px 15px 8px 15px;
+}
+
+.modal .ui-resizable-handle.ui-resizable-s {
+	border-radius: 6px;
+    border-bottom: 1px solid white;
+}
+
+.table-no-border>thead>tr>th, 
+.table-no-border>tbody>tr>th, 
+.table-no-border>tfoot>tr>th, 
+.table-no-border>thead>tr>td, 
+.table-no-border>tbody>tr>td, 
+.table-no-border>tfoot>tr>td {
+  border-top: none; 
+}
+
+.table-nonfluid {
+   width: auto !important;
+}
+
+.table-centered th, .table-centered td {
+	text-align: center;
+}
+
+.table > tbody > tr > td {
+	vertical-align: middle;
+}
+
+.table .fa {
+	cursor: pointer;
+}
+
+.form-control-inline {
+   width: auto !important;
+   display: inline-block;
+}
+
+.rating-criteria-tag {
+	width: 100%;
+}
+.rating-criteria-tag input[type="text"] {
+	width: 100%;
+}
+.rating-criteria-tag .ui-widget input{
+	font-family: $font-family-base;
+	font-size: $font-size-small;
+	line-height:1.42857143;
+	padding: 2px;
+}
+
+#criterias-table {
+	margin-left: 0px;
+	border-bottom: inherit;
+}
+#criterias-table td {
+	vertical-align:middle;
+}
+
+/* .....NavBar: Icon only with coloring/layout.....*/
+
+/*small/medium side display*/
+@media (min-width: 768px) {
+
+	/*Allow content to be next to Nav*/
+	.navcontent{
+		position: absolute;
+		width: calc(100% - 40px); /*keeps 100% minus nav size*/
+		margin-left: 20px;
+		float: right;
+		min-height:100%;
+	}
+	
+	/* darker outline than usual */
+	nav.sidebar{
+		  border-radius: 6px;
+		  box-shadow: $panel-box-shadow;
+		  min-height:300px;
+	}
+ 
+	/*Center Brand*/
+	nav.sidebar.navbar.sidebar>.container .navbar-brand, .navbar>.container-fluid .navbar-brand {
+		margin-left: 0px;
+	}
+	/*Center Brand*/
+	nav.sidebar .navbar-brand, nav.sidebar .navbar-header{
+		text-align: center;
+		width: 100%;
+		margin-left: 0px;
+	}
+
+	/*Format Icons*/
+	nav.sidebar a{
+		padding:10px 10px 10px 12px;
+	}
+
+	nav.sidebar.slidesidemenu{
+		padding:10px 10px 10px 12px;
+	}
+	/*Hide text when compressed*/
+	nav.sidebar p{
+		padding-right: 35px;
+		text-align: center;
+	}
+ 
+	/* colour in top box to match panel heading */
+	nav.sidebar .navbar-nav > li:first-child{
+		background-color: $gray-lightest !important;
+	}
+
+	/*adds border to bottom nav boxes except for the last box */
+	nav.sidebar .navbar-nav > li{
+		border-bottom: $border-thin-default-light;
+		background-color: $body-bg;
+	}
+
+	nav.sidebar .navbar-nav > li:last-child{
+		border-bottom: 0px;
+	}
+
+	/*allows nav box to use 100% width, style to be like panel */
+	nav.sidebar .navbar-collapse, nav.sidebar .container-fluid{
+		padding: 0 0px 0 0px;
+		border:2px solid transparent;
+		box-shadow: $panel-box-shadow;
+	}
+
+	/*gives sidebar width/height*/
+	nav.sidebar{
+		width: 180px;
+		height: 100%;
+		margin-left: -135px;
+		float: left;
+		z-index: 8000;
+		margin-top: 0px;
+		margin-bottom: 0px;
+	}
+
+	/*give sidebar 100% width;*/
+	nav.sidebar li {
+		width: 100%;
+		margin-top: 3px;
+		margin-bottom: 3px;
+	}
+
+ 	/* Move nav to full on mouse over*/
+ 	nav.sidebar.expandmenu {
+		margin-left: 0;
+	}
+	 
+/* 	nav.sidebar:hover{
+		margin-left: 0px;
+	}
+ */
+ 	/*for hiden things when navbar hidden*/
+	.forAnimate{
+		opacity: 0;
+	}
+	
+	nav.sidebar .fa{
+		font-size: 18px;
+	}
+	
+}
+
+/* .....NavBar: Fully showing nav bar..... */
+
+@media (min-width: 1330px) {
+
+	/*Allow content to be next to Nav*/
+	.navcontent{
+		position: absolute;
+		width: calc(100% - 180px); /*keeps 100% minus nav size*/
+		margin-left: 170px;
+		float: right;
+	}
+
+	/*Show all nav*/
+	nav.sidebar{
+		margin-left: 0px;
+		float: left;
+	}
+	/*Show hidden items on nav*/
+	nav.sidebar .forAnimate{
+		opacity: 1;
+	}
+}
+
+nav.sidebar .navbar-nav .open .dropdown-menu>li>a:hover, nav.sidebar .navbar-nav .open .dropdown-menu>li>a:focus {
+	background-color: transparent;
+}
+
+nav:hover .forAnimate{
+	opacity: 1;
+}
+section{
+	padding-left: 15px;
+}
+
+// Login page
+// CSS to make the footer stick to the bottom see http://cssreset.com/how-to-keep-footer-at-bottom-of-page-with-css/ 
+// Height of footer set to match the navbar at the top for visual reasons - it may be changed. 
+.login-logo {
+  background: url($login_logo) no-repeat center right;
+  background-size: $login_logo_size;
+  width:100px;
+  height:50px;
+}
+
+.login-body {
+	margin:0;
+	padding:0;
+	height:100%;
+}
+.login-content{
+	min-height:100%;
+	position:relative;
+	padding-bottom:50px;
+}
+.login-footer {
+	width: 100%;
+	background-color: $gray-lightest;
+	font-size: 85%;
+	padding-top: 15px;
+	border-top: $border-thin-default-light;
+	height:50px;
+	position:absolute;
+	bottom:0;
+	left:0;
+}
+
+/* fontawesome icon x-small */
+.fa-xs {
+	font-size: smaller;
+}
+
+/* Growl functionality, jquery.blockUI (version: 2.38) */
+.growlUI {
+	width: auto;
+	padding: 0px;
+}
+
+div.growlUI h1,div.growlUI h2 {
+	color: white;
+	padding: 0px;
+	margin: 5px;
+	text-align: center;
+	font-size: medium;
+}
+
+// Tooltips used for learner progress and gradebook (large version)
+.tooltip {
+	position: absolute;
+	border: $border-thin-default;
+	background-color: $gray-light-mid;
+	padding: 3px;
+	z-index: 5;
+	width: 150px;
+	font-size: 0.9em;
+	word-wrap: break-word;
+}
+
+.tooltip-lg{
+	display: none;
+    position:absolute;
+	border: $border-thin-default;
+    background-color:$gray-light-mid;
+    padding:5px;
+    width:250px;
+    font-size: 1.1em;
+	word-wrap: break-word;
+}
+
+// Image Gallery
+.caption-heading {
+	color: $brand-primary; 
+	font-style: italic;
+	font-size: $font-size-base;
+}
+
+.caption-description {
+	color: $text-color; 
+	font-style: italic;
+	font-size: $font-size-small;
+}
+
+// Ratings
+.rating-comment{
+	background-image: none;
+	background-color: $gray-lighter;
+	border: $border-thin-default-light;
+}
+
+.rating-comment-posted-by{
+	color: $brand-primary;
+	text-align: left;
+	font-size: x-small;
+}
+
+// Drag and Drop
+.droppableHighlight {
+	padding : 1px !important;
+	border: 5px solid $brand-primary-mid !important;
+}
+
+.draggableSelected {
+	background-color: $brand-primary-mid !important;
+	color: white !important;
+}
+
+.draggableItem {
+	padding: 3px 0px 3px 0px;
+	cursor: default;
+}
+
+.draggableOdd {
+	background-color: $brand-primary-light;
+}
+	
+.draggableEven {
+	background-color: inherit;
+}
+
+.errorMessage {
+	font-weight: bold;
+	color: $brand-danger;
+}
+
+.errorBorder {
+	border: $border-medium-danger;
+}
+
+// Assessment and Scratchie Countdown - growl settings need to be moved too
+#timelimit-start-dialog {
+	display:none; cursor: default; padding: 10px;
+}
+#timelimit-start-dialog h1{
+	padding-bottom: 10px;
+}
+#countdown {
+	width: 150px; position: absolute; font-size: 110%; font-style: italic; color: $brand-success;
+}
+#countdown-label {
+	font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color: $brand-success;
+}
+#timelimit-expired {
+	font-size: 145%; padding: 15px;
+}
+
+// nprogress bar used in learning for the Load Tool Activity page
+// Make clicks pass-through/
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: $brand-primary;
+
+  position: fixed;
+  z-index: 1031;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 2px;
+}
+
+// Fancy blur effect
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0px;
+  width: 100px;
+  height: 100%;
+  box-shadow: 0 0 10px $brand-primary, 0 0 5px $brand-primary;
+  opacity: 1.0;
+
+  -webkit-transform: rotate(3deg) translate(0px, -4px);
+      -ms-transform: rotate(3deg) translate(0px, -4px);
+          transform: rotate(3deg) translate(0px, -4px);
+}
+
+// Add these back to use the spinner */
+// #nprogress .spinner {
+//   display: block;
+//   position: fixed;
+//   z-index: 1031;
+//   top: 15px;
+//   right: 15px;
+// }
+// 
+// #nprogress .spinner-icon {
+//   width: 18px;
+//   height: 18px;
+//   box-sizing: border-box;
+// 
+//   border: solid 2px transparent;
+//   border-top-color: $main-color;
+//   border-left-color: $main-color;
+//   border-radius: 50%;
+// 
+//   -webkit-animation: nprogress-spinner 400ms linear infinite;
+//           animation: nprogress-spinner 400ms linear infinite;
+// }
+
+.nprogress-custom-parent {
+  overflow: hidden;
+  position: relative;
+}
+
+// .nprogress-custom-parent #nprogress .spinner,
+.nprogress-custom-parent #nprogress .bar {
+  position: absolute;
+}
+
+// @-webkit-keyframes nprogress-spinner {
+//   0%   { -webkit-transform: rotate(0deg); }
+//   100% { -webkit-transform: rotate(360deg); }
+// }
+// @keyframes nprogress-spinner {
+//   0%   { transform: rotate(0deg); }
+//   100% { transform: rotate(360deg); }
+// }
+
+// end nprogress bar
+
+// fotorama used for image gallery
+.fotorama__thumb {
+    background-color: $gray-base;
+}
+.fotorama__wrap {
+	margin: auto;
+}
+.fotorama__caption {
+	text-align: left;
+}
+.fotorama__thumb-border {
+	border-color: $a-link-default !important;
+}
+
+.fotorama-container {
+	text-align: center;
+	padding-top: 10px;
+}
+// end fotorama

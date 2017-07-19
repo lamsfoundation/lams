@@ -11,7 +11,8 @@
 		<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css" >
 		<link href="${lams}css/thickbox.css" rel="stylesheet" rel="stylesheet" type="text/css">
 		<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
-		<link href="${lams}css/chart.css" rel="stylesheet" type="text/css"/>
+		<lams:css suffix="main"/>
+		
 		<style type="text/css">
 			.ui-jqgrid tr.jqgrow td {
 			    white-space: normal !important;

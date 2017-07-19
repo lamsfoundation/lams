@@ -107,7 +107,7 @@ function fillGroup(users, container) {
 		// create user DIVs
 		$.each(users, function(index, userJSON) {
 			var userDiv = $('<div />').attr('userId', userJSON.id)
-				.addClass('draggableUser')
+				.addClass('draggableItem')
 	    		.text(userJSON.firstName + ' ' + userJSON.lastName 
 	    				  + ' (' + userJSON.login + ')'
 	    			   );
@@ -126,11 +126,11 @@ function fillGroup(users, container) {
 						    'cursor'      : 'move',
 							'helper'      : function(event){
 								// include the user from which dragging started
-								$(this).addClass('draggableUserSelected');
+								$(this).addClass('draggableSelected');
 								
 								// copy selected users
 								var helperContainer = $('<div />');
-								$(this).siblings('.draggableUserSelected').andSelf().each(function(){
+								$(this).siblings('.draggableSelected').andSelf().each(function(){
 									$(this).clone().appendTo(helperContainer);
 								});
 								return helperContainer;
@@ -138,14 +138,14 @@ function fillGroup(users, container) {
 					})
 				
 					.click(function(event){
-						var wasSelected = $(this).hasClass('draggableUserSelected');
+						var wasSelected = $(this).hasClass('draggableSelected');
 						var parentId = $(this).parent().parent().attr('id');
 						// this is needed for shift+click
 						var lastSelectedUser = lastSelectedUsers[parentId];
 						
 						if (event.shiftKey && lastSelectedUser && lastSelectedUser != this) {
 							// clear current selection
-							$(this).siblings().andSelf().removeClass('draggableUserSelected');
+							$(this).siblings().andSelf().removeClass('draggableSelected');
 							
 							// find range of users to select
 							var lastSelectedIndex = $(lastSelectedUser).index();
@@ -155,18 +155,18 @@ function fillGroup(users, container) {
 							var endingElem = lastSelectedIndex > index ? lastSelectedUser : this;
 							
 							$(startingElem).nextUntil(endingElem).andSelf().add(endingElem)
-								.addClass('draggableUserSelected');
+								.addClass('draggableSelected');
 						} else {
 							if (!event.ctrlKey) {
 								// clear current sleection
-								$(this).siblings().andSelf().removeClass('draggableUserSelected');
+								$(this).siblings().andSelf().removeClass('draggableSelected');
 							}
 							
 							if (wasSelected && !event.shiftKey){
-								$(this).removeClass('draggableUserSelected');
+								$(this).removeClass('draggableSelected');
 								lastSelectedUsers[parentId] = null;
 							} else {
-								$(this).addClass('draggableUserSelected');
+								$(this).addClass('draggableSelected');
 								lastSelectedUsers[parentId] = this;
 							}
 						}
@@ -215,7 +215,7 @@ function fillGroup(users, container) {
 					   executeDrop = !transferToLocked || confirm(LABELS.TRANSFER_LOCKED_LABEL);
 					   if (executeDrop) {
 						   var userIds = [];
-						   $('div.draggableUserSelected', draggableUserContainer).each(function(){
+						   $('div.draggableSelected', draggableUserContainer).each(function(){
 							   userIds.push($(this).attr('userId'));
 						   });
 						   // execute transfer on server side
@@ -247,14 +247,14 @@ function fillGroup(users, container) {
  * Move user DIVs from one group to another
  */
 function transferUsers(fromContainer, toContainer) {
-	var selectedUsers =  $('.draggableUserSelected', fromContainer);
+	var selectedUsers =  $('.draggableSelected', fromContainer);
 	var locked = toContainer.parent().hasClass('locked');
 	if (selectedUsers.length > 0){   
 	   // move the selected users
 	   selectedUsers.each(function(){	  
 		  $(this).css({'top'  : '0px',
               		   'left' : '0px',
-          }).removeClass('draggableUserSelected')
+          }).removeClass('draggableSelected')
             .appendTo(toContainer);
 		  
 		  if (locked) {
@@ -271,9 +271,9 @@ function transferUsers(fromContainer, toContainer) {
 
 function colorDraggableUsers(container) {
 	// every second line is different
-	$(container).find('div.draggableUser').each(function(index, userDiv){
-		// exact colour should be defined in CSS, but it's easier this way...
-		$(this).css('background-color', index % 2 ? '#dfeffc' : 'inherit');
+	$(container).find('div.draggableItem').each(function(index, userDiv){
+		$(this).removeClass( index % 2 ? 'draggableEven' : 'draggableOdd');
+		$(this).addClass( index % 2 ? 'draggableOdd' : 'draggableEven');
 	});
 }
 
@@ -282,7 +282,7 @@ function colorDraggableUsers(container) {
  */
 function sortUsers(container) {
 	var containerId = container.attr('id');
-	var users = $('div.draggableUser', container);
+	var users = $('div.draggableItem', container);
 	if (users.length > 1) {
 		var sortOrderAsc = sortOrderAscending[containerId];
 		
@@ -342,7 +342,7 @@ function removeGroup(container) {
 		}
 		
 		if (executeDelete) {
-			$('#unassignedUserCell .userContainer').append($('.userContainer div.draggableUser', container));
+			$('#unassignedUserCell .userContainer').append($('.userContainer div.draggableItem', container));
 			container.remove();
 		}
 	}
@@ -414,7 +414,7 @@ function saveGroups(){
 	var acceptEmptyGroups = true;
 	var groupContainers = $('#groupsTable .groupContainer').not('#newGroupPlaceholder');
 	$.each(groupContainers.not('[groupId]'), function(){
-		if ($('div.draggableUser', this).length == 0) {
+		if ($('div.draggableItem', this).length == 0) {
 			 acceptEmptyGroups = false;
 			 return false;
 		}
@@ -433,7 +433,7 @@ function saveGroups(){
 	};
 	groupContainers.each(function(){
 		var groupId = $(this).attr('groupId'),
-			users = $('div.draggableUser', this);
+			users = $('div.draggableItem', this);
 		if (!groupId && users.length == 0) {
 			return true;
 		}
@@ -513,7 +513,7 @@ function markGroupLocked(container) {
 	container.addClass('locked');
 	$('.removeGroupButton', container).remove();
 	// $('input', container).attr('readonly', 'readonly');
-	$('div.draggableUser', container).off('click').draggable('disable');
+	$('div.draggableItem', container).off('click').draggable('disable');
 }
 
 /**

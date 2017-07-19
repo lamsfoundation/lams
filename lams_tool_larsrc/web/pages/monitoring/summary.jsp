@@ -3,7 +3,7 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
-<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+<lams:css suffix="jquery.jRating"/>
 <link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet"/>
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 <style media="screen,projection" type="text/css">

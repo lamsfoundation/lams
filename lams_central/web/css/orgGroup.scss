@@ -6,8 +6,6 @@ html, body {
 
 .errorMessage {
 	display: none;
-	font-weight: bold;
-	color: red;
 	margin-left: 5px;
 }
 
@@ -100,28 +98,13 @@ td#unassignedUserCell .userContainer {
 	padding-top: 3px;
 }
 
-.draggableUser {
-	padding: 3px 0px 3px 0px;
-	cursor: default;
-}
-
 .userContainer .ui-state-disabled {
 	opacity: 1 !important;
-}
-
-.droppableHighlight {
-	padding : 1px !important;
-	border: 5px solid $brand-primary-mid !important;
 }
 
 .locked {
 	padding : 4px;
 	border: $border-medium-danger;
-}
-
-.draggableUserSelected {
-	background-color: $brand-primary-mid !important;
-	color: white !important;
 }
 
 #course-grouping-advanced-settings {

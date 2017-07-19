@@ -73,7 +73,7 @@ $(document).ready(function (){
 					// create listing div
 					var listingDiv = $('<div id="' + listingName
 							            + '" onClick="javascript:roster.handleUserClicked(' 
-							            + localId + ');" class="presenceListing">'
+							            + localId + ');" class="presenceListing bg-primary-hover">'
 							            + createPresenceListing(nick, tag)
 							            + '</div>');
 					

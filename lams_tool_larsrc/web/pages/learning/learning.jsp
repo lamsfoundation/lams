@@ -9,7 +9,7 @@
 	<title><fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
-	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jRating.css">
+	<lams:css suffix="jquery.jRating"/>
 
 	<%-- param has higher level for request attribute --%>
 	<c:if test="${not empty param.sessionMapID}">

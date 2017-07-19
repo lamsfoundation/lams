@@ -56,6 +56,9 @@ public class CssTag extends TagSupport {
 
     private static final String RTL_DIR = "rtl"; // right-to-left direction
 
+    private String suffix = null;
+    private String webapp = null;
+    
     public CssTag() {
 	super();
     }
@@ -99,25 +102,49 @@ public class CssTag extends TagSupport {
     }
 
     private String appendStyle(String stylesheetName, boolean rtl) {
-	String ssName = stylesheetName;
-	if (ssName != null) {
-	    ssName = rtl ? ssName + "_" + CssTag.RTL_DIR + "_" + "learner" : ssName + "_" + "learner";
+	if (stylesheetName != null) {
+	    StringBuilder bldr = new StringBuilder(stylesheetName);
+	    if ( rtl ) {
+		bldr.append("_").append(CssTag.RTL_DIR);
+	    }
+	    bldr.append("_");
+	    bldr.append(suffix != null ? suffix : "learner");
+	    return bldr.toString();
 	}
-	return ssName;
+	return null;
     }
 
     private String generateLink(String stylesheetName, String serverURL) {
-	if (serverURL.endsWith("/")) {
-	    return "<link href=\"" + serverURL + "css/" + stylesheetName
-		    + ".css\" rel=\"stylesheet\" type=\"text/css\">";
-	} else {
-	    return "<link href=\"" + serverURL + "/css/" + stylesheetName
-		    + ".css\" rel=\"stylesheet\" type=\"text/css\">";
+	StringBuilder bldr = new StringBuilder("<link href=\"").append(serverURL);
+	if (!serverURL.endsWith("/")) {
+	    bldr.append("/");
 	}
+	if ( webapp!= null ) {
+	    bldr.append(webapp).append("/");
+	}
+	bldr.append("css/").append(stylesheetName).append(".css\" rel=\"stylesheet\" type=\"text/css\">");
+	return bldr.toString();
     }
 
     @Override
     public int doEndTag() {
 	return Tag.EVAL_PAGE;
+    }
+
+    public String getSuffix() {
+	return suffix;
+    }
+
+    /** Set the end of the stylesheet name to call a secondary stylesheet. Do not define to get the normal blah_learner.html stylesheet */
+    public void setSuffix(String suffix) {
+	this.suffix = suffix;
+    }
+
+    public String getWebapp() {
+	return webapp;
+    }
+
+    public void setWebapp(String webapp) {
+	this.webapp = webapp;
     }
 }

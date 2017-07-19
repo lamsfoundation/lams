@@ -1,5 +1,4 @@
-@import "_lams_variables.scss";
-
+// The content for defaultHTML_main.scss and all the equivalent skin files. Change this an then all the skin files change. 
 body {
 	width: 100%;
 	overflow-x: hidden;
@@ -84,6 +83,9 @@ a {
 	color: $main_default_link; 
 	text-decoration: none;
 }
+a:hover, a:focus {
+	color: $brand-primary-darker;
+}
 
 /*OFFCANVAS BAR*/
 #favorite-organisations {
@@ -158,10 +160,10 @@ a {
 .ts-pager {
 	text-align: center;
     padding: 0 10px 10px;
-    color: $brand-primary-darkest;
+    color: darken($main_fav_org_link, 30%);
 }
 .ts-pager .btn{
-	color: $brand-primary-darker;
+	color: darken($main_fav_org_link, 10%);
     background-color: $brand-primary-darkest;
     padding: 2px 5px;
     line-height: 1;

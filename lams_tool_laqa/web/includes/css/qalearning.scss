@@ -8,16 +8,6 @@
 .extra-controls-inner:after {
    margin-top: -10px;
 }
-.rating-comment{
-	background-image: none;
-	background-color: $gray-lighter;
-	border: $border-thin-default-light;
-}
-.rating-comment-posted-by{
-	color: $brand-primary;
-	text-align: left;
-	font-size: x-small;
-}
 textarea {
     margin: 10px 0px;
     width: 88%;
@@ -27,6 +17,5 @@ textarea {
 }
  
 .hiddenEntryInMonitoring {
-	color: $brand-danger !important;
 	font-style: italic;
 }

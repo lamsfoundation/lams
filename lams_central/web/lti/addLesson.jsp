@@ -17,14 +17,11 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen">
 	<link type="text/css" rel="stylesheet" href="<lams:LAMSURL/>css/yui/treeview.css">
 	<link type="text/css" rel="stylesheet" href="<lams:LAMSURL/>css/yui/folders.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/authoring.css" type="text/css" media="screen">
+	<lams:css suffix="authoring"/>
 	<style>
 		a, a:hover {
 			border-bottom: none;
 		}
-		/*.ygtvfocus .ygtvlabel, .ygtvfocus .ygtvlabel:link, .ygtvfocus ygtvlabel:visited, .ygtvfocus .ygtvlabel:hover {
-			background-color: white;
-		}*/
 		#title-table {
 			padding-top: 10px;
 			padding-bottom: 20px;

@@ -17,7 +17,7 @@
 	</title>
 	<%@ include file="/common/header.jsp"%>
 
-	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+	<lams:css suffix="jquery.jRating"/>
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<link rel="stylesheet" href="<html:rewrite page='/includes/css/learning.css'/>">

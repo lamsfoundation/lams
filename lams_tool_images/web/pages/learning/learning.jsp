@@ -35,7 +35,7 @@
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/fotorama.css'/>"/>
 	<link href="<html:rewrite page='/includes/css/imageGallery.css'/>" rel="stylesheet" type="text/css">
 	
-    <link rel="stylesheet" type="text/css" href="${lams}css/jquery.jRating.css">
+    <lams:css suffix="jquery.jRating"/>
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css">
     

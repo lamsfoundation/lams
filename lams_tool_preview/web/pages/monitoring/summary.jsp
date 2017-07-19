@@ -7,7 +7,7 @@
 
 <link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
-<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+<lams:css suffix="jquery.jRating"/>
 <link rel="stylesheet" href="${webapp}includes/css/learning.css'/>">
 <style type="text/css">
 	#common-buttons-area {

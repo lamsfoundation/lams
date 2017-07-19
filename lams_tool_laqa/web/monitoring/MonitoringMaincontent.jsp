@@ -20,7 +20,7 @@
 	<lams:css />
 	<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet">
-	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+	<lams:css suffix="jquery.jRating"/>
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css"> 
 	<link type="text/css" rel="stylesheet" href="<html:rewrite page='/includes/css/qalearning.css'/>">
@@ -303,6 +303,7 @@
 	            			return false;
 	            		}
 	            		$("#td-response-" + responseUid).addClass( "hiddenEntryInMonitoring" );
+	            		$("#td-response-" + responseUid).addClass( "text-danger" );
 	            		
 	            	} else {
 	            		linkObject.innerHTML = '<img src="<c:out value="${tool}"/>images/display-eye.png" border="0">' ;
@@ -312,6 +313,7 @@
 	            			return false;
 	            		}
 	            		$("#td-response-" + responseUid).removeClass( "hiddenEntryInMonitoring" );
+	            		$("#td-response-" + responseUid).removeClass( "text-danger" );
 	            	}
 	            }
 	       	});

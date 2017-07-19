@@ -132,7 +132,7 @@
 				<span>${criteriaRatings.justificationComment}</span>
 			</c:when>
 			<c:otherwise>
-				<textarea id="justify" name="justify" rows="4" cols="60" class="mark-hedging-select" onblur="updateMark()">${criteriaRatings.justificationComment}</textarea>
+				<textarea id="justify" name="justify" rows="4" cols="60" class="mark-hedging-select form-control" onblur="updateMark()">${criteriaRatings.justificationComment}</textarea>
 			</c:otherwise>
 			</c:choose>
 			</div>

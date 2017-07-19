@@ -7,7 +7,7 @@
 <c:set var="lams" ><lams:LAMSURL/></c:set>
 
 <lams:css/>
-<link rel="stylesheet" href="${lams}css/main.css" type="text/css" />
+<lams:css suffix="main"/>
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}/includes/javascript/bootstrap.min.js"></script>

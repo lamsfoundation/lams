@@ -15,10 +15,9 @@
 	<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 	
 	<lams:css/>
-	<link rel="stylesheet" href="/lams/includes/font-awesome/css/font-awesome.css" type="text/css">
+	<lams:css suffix="main"/>
 	<link rel="stylesheet" href="/lams/css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="/lams/css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="/lams/css/main.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="/lams/css/bootstrap-tour.min.css" type="text/css" media="screen">
 
 	<script type="text/javascript" src="includes/javascript/getSysInfo.js"></script>

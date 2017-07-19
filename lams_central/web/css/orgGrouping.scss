@@ -28,13 +28,12 @@ div#titleDiv {
 .groupingName {
 	font-size: 12px;
 	border-bottom: $border-thin-dotted;
-	color: $brand-primary;
 	text-decoration: none;
 }
 
 .groupingName:hover {
-	border-bottom: $border-thin-primary;
-	color: $brand-primary;
+	border-bottom: none;
+	text-decoration: underline;
 }
 
 .groupCount {

@@ -118,7 +118,7 @@ function initClassTab(){
 	fillUserContainer(users.unselectedMonitors, 'unselected-monitors');
 	
 	// allow dragging of user divs
-	$('.draggableUser').each(function(){
+	$('.draggableItem').each(function(){
 		$(this).draggable({ 'scope'       : getDraggableScope($(this).parents('.userContainer').attr('id')),
 							'appendTo'    : 'body',
 							'containment' : '#classTable',
@@ -128,24 +128,24 @@ function initClassTab(){
 						    'cursor'      : 'move',
 							'helper'      : function(event){
 								// include the user from which dragging started
-								$(this).addClass('draggableUserSelected');
+								$(this).addClass('draggableSelected');
 								
 								// copy selected users
 								var helperContainer = $('<div />');
-								$(this).siblings('.draggableUserSelected').andSelf().each(function(){
+								$(this).siblings('.draggableSelected').andSelf().each(function(){
 									$(this).clone().appendTo(helperContainer);
 								});
 								return helperContainer;
 							}	
 		}).click(function(event){
-			var wasSelected = $(this).hasClass('draggableUserSelected');
+			var wasSelected = $(this).hasClass('draggableSelected');
 			var parentId = $(this).parent().attr('id');
 			// this is needed for shift+click
 			var lastSelectedUser = lastSelectedUsers[parentId];
 			
 			if (event.shiftKey && lastSelectedUser && lastSelectedUser != this) {
 				// clear current selection
-				$(this).siblings().andSelf().removeClass('draggableUserSelected');
+				$(this).siblings().andSelf().removeClass('draggableSelected');
 				
 				// find range of users to select
 				var lastSelectedIndex = $(lastSelectedUser).index();
@@ -155,18 +155,18 @@ function initClassTab(){
 				var endingElem = lastSelectedIndex > index ? lastSelectedUser : this;
 				
 				$(startingElem).nextUntil(endingElem).andSelf().add(endingElem)
-					.addClass('draggableUserSelected');
+					.addClass('draggableSelected');
 			} else {
 				if (!event.ctrlKey) {
 					// clear current sleection
-					$(this).siblings().andSelf().removeClass('draggableUserSelected');
+					$(this).siblings().andSelf().removeClass('draggableSelected');
 				}
 				
 				if (wasSelected && !event.shiftKey){
-					$(this).removeClass('draggableUserSelected');
+					$(this).removeClass('draggableSelected');
 					lastSelectedUsers[parentId] = null;
 				} else {
-					$(this).addClass('draggableUserSelected');
+					$(this).addClass('draggableSelected');
 					lastSelectedUsers[parentId] = this;
 				}
 			}
@@ -286,7 +286,7 @@ function addLesson(){
 	// some validation at first
 	var lessonName = $('#lessonNameInput').val();
 	if (lessonName){
-		$('#lessonNameInput').removeClass('errorField');
+		$('#lessonNameInput').removeClass('errorBorder');
 	}
 	
 	var ldNode = tree.getHighlightedNode();
@@ -300,13 +300,13 @@ function addLesson(){
 	if (lessonName){
 		var nameValidator = /^[^<>^*@%$]*$/igm;	
 		if (!nameValidator.test(lessonName)) {
-			$('#lessonNameInput').addClass('errorField');
+			$('#lessonNameInput').addClass('errorBorder');
 			doSelectTab(1);
 			alert(LABEL_NAME_INVALID_CHARACTERS);
 			return;
 		}
 	} else {
-		$('#lessonNameInput').addClass('errorField');
+		$('#lessonNameInput').addClass('errorBorder');
 		doSelectTab(1);
 		return;
 	}
@@ -334,7 +334,7 @@ function addLesson(){
 	$('#monitorsField').val(monitors);
 	
 	if ($('#splitLearnersField').is(':checked')) {
-		var maxLearnerCount = $('#selected-learners div.draggableUser').length,
+		var maxLearnerCount = $('#selected-learners div.draggableItem').length,
 			learnerCount = $('#splitLearnersCountField').val(),
 			instances = Math.ceil(maxLearnerCount/learnerCount);
 		$('#splitNumberLessonsField').val(instances);
@@ -554,7 +554,7 @@ function fillUserContainer(users, containerId) {
 					$('<div />').attr({
 									'userId'  : userJSON.userID
 									})
-			                    .addClass('draggableUser')
+			                    .addClass('draggableItem')
     						    .text(userJSON.firstName + ' ' + userJSON.lastName 
     						    		  + ' (' + userJSON.login + ')'
     						    	 )
@@ -575,16 +575,16 @@ function getDraggableScope(containerId) {
 
 function colorDraggableUsers(container) {
 	// every second line is different
-	$(container).find('div.draggableUser').each(function(index, userDiv){
-		// exact colour should be defined in CSS, but it's easier this way...
-		$(this).css('background-color', index % 2 ? '#dfeffc' : 'inherit');
+	$(container).find('div.draggableItem').each(function(index, userDiv){
+		$(this).removeClass( index % 2 ? 'draggableEven' : 'draggableOdd');
+		$(this).addClass( index % 2 ? 'draggableOdd' : 'draggableEven');
 	});
 }
 
 
 function getSelectedUserList(containerId) {
 	var list = '';
-	$('#' + containerId).children('div.draggableUser').each(function(){
+	$('#' + containerId).children('div.draggableItem').each(function(){
 		list += $(this).attr('userId') + ',';
 	});
 	return list;
@@ -592,7 +592,7 @@ function getSelectedUserList(containerId) {
 
 function sortUsers(buttonId) {
 	var container = $('#' + buttonId.substring(buttonId.indexOf('-') + 1));
-	var users = container.children('div.draggableUser');
+	var users = container.children('div.draggableItem');
 	if (users.length > 1) {
 		var sortOrderAsc = sortOrderAscending[buttonId];
 		
@@ -630,7 +630,7 @@ function transferUsers(toContainerId) {
 	var toContainer = $('#' + toContainerId);
 	var fromContainerId = getDraggableScope(toContainerId);
 	var fromContainer = $('#' + fromContainerId);
-	var selectedUsers =  fromContainer.children('.draggableUserSelected');
+	var selectedUsers =  fromContainer.children('.draggableSelected');
 	if (selectedUsers.length > 0){
 	   // remove error message, if exists
 	   toContainer.children('.errorMessage').remove();
@@ -648,7 +648,7 @@ function transferUsers(toContainerId) {
 	            
 	   
 	   // recolour both containers
-	   toContainer.children().removeClass('draggableUserSelected');
+	   toContainer.children().removeClass('draggableSelected');
 	   colorDraggableUsers(toContainer);
 	   colorDraggableUsers(fromContainer);
 	   
@@ -664,7 +664,7 @@ function transferUsers(toContainerId) {
 function updateSplitLearnersFields(){
 	if ($('#splitLearnersField').is(':checked')) {
 		// put users into groups
-		var maxLearnerCount = $('#selected-learners div.draggableUser').length,
+		var maxLearnerCount = $('#selected-learners div.draggableItem').length,
 			learnerCount = $('#splitLearnersCountField').val(),
 			instances = Math.ceil(maxLearnerCount/learnerCount);
 		learnerCount = Math.ceil(maxLearnerCount/instances);

@@ -49,7 +49,7 @@
 			    } 
 			    theTarget.appendChild(newChild);
 	    	}
-		    newChild.classList.remove('can-drop');
+	    	removeClassWithHighlight(newChild, 'can-drop');
 		    resetXY(newChild);
 		    
 			testButtons();

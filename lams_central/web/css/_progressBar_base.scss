@@ -1,5 +1,3 @@
-@import "_lams_variables.scss";
-	
 .progressBarContainer {
 	overflow: auto;
 }
@@ -42,37 +40,37 @@ div#progressBarDialog iframe {
 }
 
 .activityCurrent {
-	fill: rgb(187, 0, 0);
-	stroke: rgb(0, 0, 0);
+	fill: $current-activity-fill;
+	stroke: $gray-base;
 }
 
 .activityNotStarted {
-	fill: rgb(0, 153, 0);
-	stroke: rgb(0, 0, 0);
+	fill: $not-started-activity-fill;
+	stroke: $gray-base;
 }
 
 .activityCompleted {
-	fill: rgb(0, 0, 153);
-	stroke: rgb(0, 0, 0);
+	fill: $completed-activity-fill;
+	stroke: $gray-base;
 }
 
 .activityComplex {
-	fill: rgb(153, 153, 153);
-	stroke: rgb(0, 0, 0);
+	fill:  $complex-activity-fill;
+	stroke: $gray-base;
 }
 
 .gate {
-	fill: rgb(255, 0, 0);
+	fill: $gate-activity-fill;
 }
 
 .gateCurrent {
-	stroke: rgb(187, 0, 0);
+	stroke: $current-activity-fill;
 }
 
 .gateText {
-	stroke: rgb(255, 255, 255);
+	stroke: $body-bg;
 }
 
 .transitionLine {
-	stroke: rgb(0, 0, 0);
+	stroke: $gray-base;
 }

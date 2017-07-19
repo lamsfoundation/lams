@@ -79,8 +79,8 @@
 		    	var parent = theTarget.parentNode;
 		    	parent.insertBefore(newChild, theTarget);
 		    }
-		    newChild.classList.remove('can-drop');
-		    newChild.classList.add('${rowdrop}');
+	    	removeClassWithHighlight(newChild, 'can-drop');
+	    	addClassWithHighlight(newChild, '${rowdrop}');
 		    resetXY(newChild);
 		    updateAddLabel();
 		    

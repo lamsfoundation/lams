@@ -36,7 +36,17 @@
 			target.setAttribute('data-x', 0);
 			target.setAttribute('data-y', 0);
 		}
-		    
+		
+		function addClassWithHighlight(item, styleClass) {
+			item.classList.add(styleClass);
+			item.classList.add('draggableSelected');
+		}
+		
+		function removeClassWithHighlight(item, styleClass) {
+			item.classList.remove(styleClass);
+			item.classList.remove('draggableSelected');
+		}
+		
 		// enable draggables to be dropped into this
 		  interact('.dropzone').dropzone({
 		    // only accept elements matching this CSS selector
@@ -54,13 +64,13 @@
 		          dropzoneElement = event.target;
 
 		      // feedback the possibility of a drop
-		      dropzoneElement.classList.add('drop-target');
-		      draggableElement.classList.add('can-drop');
+		      addClassWithHighlight(dropzoneElement, 'drop-target');
+		      addClassWithHighlight(draggableElement, 'can-drop');
 		    },
 		    ondragleave: function (event) {
 		      // remove the drop feedback style
-		      event.target.classList.remove('drop-target');
-		      event.relatedTarget.classList.remove('can-drop');
+		      removeClassWithHighlight(event.target, 'drop-target');
+		      removeClassWithHighlight(event.relatedTarget, 'can-drop');
 		    },
 		    ondrop: function (event) {
 		    	doDrop(event);
@@ -70,6 +80,6 @@
 		      resetXY(event.relatedTarget);
 		      // remove active dropzone feedback
 		      event.target.classList.remove('drop-active');
-		      event.target.classList.remove('drop-target');
+		      removeClassWithHighlight(event.target, 'drop-target');
 		    }
 		  });

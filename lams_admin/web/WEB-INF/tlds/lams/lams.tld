@@ -178,7 +178,18 @@
       <name>css</name>
       <tag-class>org.lamsfoundation.lams.web.tag.CssTag</tag-class>
       <body-content>empty</body-content>
-
+  	  <attribute>
+ 	      <description>Override the name to use a different suffix than "learner"</description>
+	      <name>suffix</name>
+ 	      <required>false</required>
+ 	      <rtexprvalue>true</rtexprvalue>
+ 	  </attribute>
+ 	  <attribute>
+ 	      <description>Include this webapp in the path</description>
+	      <name>webapp</name>
+ 	      <required>false</required>
+ 	      <rtexprvalue>true</rtexprvalue>
+ 	  </attribute>
    </tag>
    <tag>
 

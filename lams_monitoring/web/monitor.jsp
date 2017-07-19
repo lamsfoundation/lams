@@ -17,9 +17,9 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery.jqGrid.css" type="text/css" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-tour.min.css"> 
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/progressBar.css" type="text/css" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/chart.css" type="text/css" />
-	<link rel="stylesheet" href="<lams:WebAppURL/>css/monitorLesson.css" type="text/css" media="screen" />
+	<lams:css suffix="progressBar"/>
+	<lams:css suffix="chart"/>
+	<lams:css webapp="monitoring" suffix="monitorLesson"/>
   
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" >

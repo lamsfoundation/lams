@@ -10,7 +10,6 @@
 	
 	<%-- css --%>
 	<link type="text/css" rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css">
-	<link type="text/css" rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap.min.css" />
 	<link type="text/css" rel="stylesheet" href="<lams:WebAppURL />css/presence.css" />
 
 	<%-- javascript --%>

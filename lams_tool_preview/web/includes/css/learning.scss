@@ -14,11 +14,6 @@ td.comment {min-width: 250px;}
 .extra-controls-inner:after {
    margin-top: -10px;
 }
-.rating-comment{
-	background-image: none;
-	background-color: $gray-lighter;
-	border: $border-thin-default-light;
-}
 .criteria-title{
 	margin-top: 10px;
 	font-weight: bold;	
@@ -75,16 +70,9 @@ textarea {
     padding: 5px;
 }
 
-.drop-target {
-  	background-color: $brand-primary;
-}
 .draggable {
 	width: 290px;
 }
-.draggable.can-drop {
-  	background-color: $brand-primary;
-}
-
 .email-button {
 	margin: 2px;
 }

@@ -181,8 +181,8 @@ function transferLearningLibraries(fromContainer, toContainer) {
 function colorDraggableLearningLibraries(container) {
 	// every second line is different
 	$(container).find('div.draggableLearningLibrary').each(function(index, learningLibraryDiv){
-		// exact colour should be defined in CSS, but it's easier this way...
-		$(this).css('background-color', index % 2 ? '#dfeffc' : 'inherit');
+		$(this).removeClass( index % 2 ? 'draggableEven' : 'draggableOdd');
+		$(this).addClass( index % 2 ? 'draggableOdd' : 'draggableEven');
 	});
 }
 

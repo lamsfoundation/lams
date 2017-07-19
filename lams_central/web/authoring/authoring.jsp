@@ -13,7 +13,7 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/yui/folders.css" type="text/css" media="screen" />
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/authoring.css" type="text/css" media="screen" />
+	<lams:css suffix="authoring"/>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>

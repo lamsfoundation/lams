@@ -90,7 +90,7 @@
 						    	<div id="canvasDiv">
 						    		<div id="ldScreenshotAuthor" class="ldChoiceDependentCanvasElement"></div>
 					    			<i id="ldScreenshotLoading" class="ldChoiceDependentCanvasElement fa fa-refresh fa-spin fa-2x fa-fw"></i>
-					    			<div id="ldNotChosenError" class="ldChoiceDependentCanvasElement errorMessage" ><fmt:message key="error.tab.lesson.sequence" /></div>
+					    			<div id="ldNotChosenError" class="ldChoiceDependentCanvasElement errorMessage text-danger" ><fmt:message key="error.tab.lesson.sequence" /></div>
 					    			<div id="ldCannotLoadSVG" class="ldChoiceDependentCanvasElement" ><fmt:message key="error.cannot.load.thumbnail" /></div>
 						    	</div>
 							</td>

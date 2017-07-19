@@ -19,8 +19,7 @@
 		
 		<!-- ********************  CSS ********************** -->
 		<lams:css />
-		<link type="text/css" href="<lams:LAMSURL />css/jquery.treetable.css" rel="stylesheet"/>
-		<link type="text/css" href="<lams:LAMSURL />css/jquery.treetable.lams.css" rel="stylesheet"/>
+		<lams:css suffix="treetable"/>
 		
 		<!-- ********************  javascript ********************** -->
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery-ui.js"></script>

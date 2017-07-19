@@ -12,7 +12,7 @@
 		<c:set var="imageGallery" value="${sessionMap.imageGallery}" />		
 		
 		<%@ include file="/common/header.jsp"%>
-		<link href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+		<lams:css suffix="jquery.jRating"/>
 		
 		<script type="text/javascript">
 			//var for jquery.jRating.js

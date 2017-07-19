@@ -1,0 +1,17 @@
+table.treetable span.indenter {
+	text-align: left;
+	width: 250px;
+}
+
+table.treetable tr span.indenter a {
+  outline: none; /* Expander shows outline after upgrading to 3.0 (#141) */
+  border-bottom: none; /* Hide the dotted line underneath */
+  width: 250px;
+  font-size: x-small;
+}
+
+#clearfix:after { 
+    content: " "; 
+    display: block;
+    clear: both;
+} 

@@ -15,7 +15,7 @@
 		<lams:css />
 		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet">
-		<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+		<lams:css suffix="jquery.jRating"/>
 		<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 		<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css">
 		 

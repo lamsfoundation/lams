@@ -11,10 +11,9 @@
 	</title>
 	<%@ include file="/common/header.jsp"%>
 
-	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+	<lams:css suffix="jquery.jRating"/>
 	<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
-	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 	<link rel="stylesheet" href="<html:rewrite page='/includes/css/learning.css'/>">
 
 <script type="text/javascript">
