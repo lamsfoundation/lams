@@ -2,12 +2,7 @@
 /build/
 /.sass-cache/
 /web/css/addLesson.css
-/web/css/authoring.css
-/web/css/chart.css
-/web/css/defaultHTML_learner.css
-/web/css/inlineeditor.css
-/web/css/jquery.treetable.lams.css
-/web/css/main.css
+/web/css/defaultHTML*.css
 /web/css/orgGroup.css
 /web/css/orgGrouping.css
-/web/css/progressBar.css
+/web/css/purple*.css
