@@ -9,7 +9,6 @@
 		if ($('.timezoneCheckBox:checked').length == $('.timezoneCheckBox').length) {
 				$('#currentSelectAllTZ').prop('checked', true);			
 			}
-		
 		$("#currentSelectAllTZ").click(function(){
 			if ($("#currentSelectAllTZ").is(':checked')) {
 				//$('#ttl-login-request').prop("value", 80);
