@@ -36,7 +36,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.lamsfoundation.ld.integration.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -74,7 +75,7 @@ public class LineitemUtil {
 
     private final static String LAMS_LINEITEM_STORAGE = "LamsLineitemStorage";
 
-    private static Logger logger = Logger.getLogger(LineitemUtil.class);
+    private static Logger logger = LoggerFactory.getLogger(LineitemUtil.class);
 
     @SuppressWarnings("deprecation")
     public static void createLineitem(Content bbContent, String userName)

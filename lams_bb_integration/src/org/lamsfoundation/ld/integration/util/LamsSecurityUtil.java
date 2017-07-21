@@ -46,7 +46,8 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.lamsfoundation.ld.integration.dto.LearnerProgressDTO;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -73,7 +74,7 @@ import blackboard.portal.servlet.PortalUtil;
  */
 public class LamsSecurityUtil {
 
-    private static Logger logger = Logger.getLogger(LamsSecurityUtil.class);
+    private static Logger logger = LoggerFactory.getLogger(LamsSecurityUtil.class);
     private static final String DUMMY_COURSE = "Previews"; 
     private static final String EXPORT_FOLDER_LAMS_SERVER = "/tmp/lams/";
 

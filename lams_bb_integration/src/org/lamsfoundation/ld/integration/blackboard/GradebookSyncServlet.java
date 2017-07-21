@@ -42,7 +42,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.lamsfoundation.ld.integration.Constants;
 import org.lamsfoundation.ld.integration.util.LamsBuildingBlockException;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
@@ -73,7 +74,7 @@ import blackboard.util.StringUtil;
 public class GradebookSyncServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3587062723412672084L;
-    private static Logger logger = Logger.getLogger(GradebookSyncServlet.class);
+    private static Logger logger = LoggerFactory.getLogger(GradebookSyncServlet.class);
 
     /**
      * Monitor on BB side calls this servlet to syncronize lesson marks with LAMS Gradebook. After that get the latest

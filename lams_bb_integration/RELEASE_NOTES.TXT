@@ -142,4 +142,11 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 * LDEV-4164: Fix sorting in BB content area
 * LDEV-4171: Remove obsolete svgFormat parameter that is no longer used in WF as long as it produces only SVGs (no PNGs)
 * LDEV-4178: Escape commas when pre-adding users to a lesson
+
+1.2.21 Release Fixes
+====================
 * LDEV-4169: Preview window doesn't scroll down with IE11
+
+1.2.22 Release Fixes
+====================
+* NTU-13: Make BB recurrently fetch marks from LAMS that were not yet submitted to external server

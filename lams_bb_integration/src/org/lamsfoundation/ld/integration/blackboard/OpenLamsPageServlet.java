@@ -28,7 +28,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 
 import blackboard.base.InitializationException;
@@ -54,7 +55,7 @@ import blackboard.platform.plugin.PlugInUtil;
 public class OpenLamsPageServlet extends HttpServlet {
 
     private static final long serialVersionUID = -351131323404991332L;
-    private static Logger logger = Logger.getLogger(OpenLamsPageServlet.class);
+    private static Logger logger = LoggerFactory.getLogger(OpenLamsPageServlet.class);
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 	process(request, response);
