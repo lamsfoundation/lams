@@ -52,6 +52,7 @@ import org.lamsfoundation.lams.timezone.Timezone;
 import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.timezone.util.TimezoneDTOComparator;
+import org.lamsfoundation.lams.timezone.util.TimezoneIDComparator;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
@@ -235,7 +236,10 @@ public class ProfileAction extends LamsDispatchAction {
 	userForm.set("userTheme", userSelectedTheme);
 
 	List<Timezone> availableTimeZones = getTimezoneService().getDefaultTimezones();
-	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<TimezoneDTO>(new TimezoneDTOComparator());
+	//TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<TimezoneDTO>(new TimezoneDTOComparator());
+	// Comparator to sort timezones by timezone id 
+	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<TimezoneDTO>(new TimezoneIDComparator());
+
 	for (Timezone availableTimeZone : availableTimeZones) {
 	    String timezoneId = availableTimeZone.getTimezoneId();
 	    TimezoneDTO timezoneDto = new TimezoneDTO();
