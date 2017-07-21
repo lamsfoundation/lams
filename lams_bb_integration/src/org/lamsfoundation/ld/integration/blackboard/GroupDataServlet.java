@@ -31,7 +31,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.lamsfoundation.ld.integration.Constants;
 import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
@@ -59,7 +60,7 @@ import blackboard.platform.persistence.PersistenceServiceFactory;
 public class GroupDataServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static Logger logger = Logger.getLogger(GroupDataServlet.class);
+    private static Logger logger = LoggerFactory.getLogger(GroupDataServlet.class);
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 

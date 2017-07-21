@@ -41,7 +41,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.lamsfoundation.ld.integration.Constants;
 import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
@@ -72,7 +73,7 @@ import blackboard.platform.context.ContextManager;
 public class GradebookServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3587062723412672084L;
-    private static Logger logger = Logger.getLogger(GradebookServlet.class);
+    private static Logger logger = LoggerFactory.getLogger(GradebookServlet.class);
 
     /**
      * Receives call from Lams ab lesson completion. After that get the latest marks for this user in this lesson and stores it in DB. 

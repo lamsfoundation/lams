@@ -29,7 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.lamsfoundation.ld.integration.util.BlackboardUtil;
 import org.xml.sax.SAXException;
 
@@ -49,7 +50,7 @@ import blackboard.platform.context.ContextManager;
 public class StartLessonAjaxServlet extends HttpServlet {
 
     private static final long serialVersionUID = -351131323404991332L;
-    private static Logger logger = Logger.getLogger(StartLessonAjaxServlet.class);
+    private static Logger logger = LoggerFactory.getLogger(StartLessonAjaxServlet.class);
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	process(request, response);
