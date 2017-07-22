@@ -317,7 +317,7 @@ var ActivityUtils = {
 							   content)
 						.attr(DEFAULT_TEXT_ATTRIBUTES);
 		} else {
-			label = ActivityUtils.breakTitle(paper, +paper.attr('width'),
+			label = ActivityUtils.breakTitle(paper, +paper.attr('width') - 7,
 											 activity.middle, 47 + 60 * activity.index + (isLarger ? 10 : 0),
 											 content );
 		}
@@ -845,18 +845,11 @@ var ActivityUtils = {
 	// break string into several lines if it is too long
 	breakTitle : function(paper, width, x, y, title) {
 		var brokenTitle = [title],
-			elem = null;
+			elem = null,
+			dummyPaper = Snap(width, 10000);
+		$('body').append(dummyPaper.node);
 		do {
-			elem = paper.text(x, y, brokenTitle).attr(DEFAULT_TEXT_ATTRIBUTES);
-			// move each line, except the first, a bit lower
-			$('tspan', elem.node).each(function(index, tspan){
-				if (index > 0) {
-					$(tspan).attr({
-						'x'  : x,
-						'dy' : '1.1em'
-					});
-				}
-			});
+			elem = ActivityUtils.createLabel(dummyPaper, x, y, brokenTitle);
 			if (elem.getBBox().width > width) {
 				// break the title into more chunks
 				elem.remove();
@@ -870,10 +863,25 @@ var ActivityUtils = {
 				}
 			} else {
 				// stop the iteration
-				brokenTitle = null;
+				elem = null;
 			}
-		} while (brokenTitle);
+		} while (elem != null);
 
+		dummyPaper.remove();
+		return ActivityUtils.createLabel(paper, x, y, brokenTitle);
+	},
+	
+	createLabel : function(paper, x, y, text) {
+		var elem = paper.text(x, y, text).attr(DEFAULT_TEXT_ATTRIBUTES);
+		// move each line, except the first, a bit lower
+		$('tspan', elem.node).each(function(index, tspan){
+			if (index > 0) {
+				$(tspan).attr({
+					'x'  : x,
+					'dy' : '1.1em'
+				});
+			}
+		});
 		return elem;
 	}
 }
