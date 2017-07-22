@@ -615,7 +615,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
 				</td>
 			</tr>
 			<tr>
@@ -636,7 +636,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
 				</td>
 			</tr>
 			<tr>
@@ -666,7 +666,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
 				</td>
 			</tr>
 			<tr>
@@ -733,7 +733,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td colspan="3">
-					 <input class="propertiesContentFieldTitle" type="text"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
 				</td>
 			</tr>
 			<tr>
@@ -808,7 +808,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
 				</td>
 			</tr>
 			<tr>
@@ -882,7 +882,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
 				</td>
 			</tr>
 			<tr>
@@ -904,7 +904,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
 				</td>
 			</tr>
 			<tr>
