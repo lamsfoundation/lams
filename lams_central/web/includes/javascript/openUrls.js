@@ -117,7 +117,7 @@
 		}
 		
 		function openKumalive(orgID, role) {
-			var kumaliveUrl = LAMS_URL + '/learning/kumalive.jsp?organisationID=' + orgID + '&role=' + role
+			var kumaliveUrl = LAMS_URL + '/learning/kumalive/kumalive.jsp?organisationID=' + orgID + '&role=' + role
 			
 			if (isMac) {
 				kumaliveWin = window.open(kumaliveUrl,'kumaliveWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes');

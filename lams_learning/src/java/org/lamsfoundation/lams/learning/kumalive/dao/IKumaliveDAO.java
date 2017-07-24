@@ -23,11 +23,14 @@
 
 package org.lamsfoundation.lams.learning.kumalive.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
+import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
 
 public interface IKumaliveDAO extends IBaseDAO {
-    Kumalive findByOrganisationId(Integer organisationId);
+    Kumalive findKumaliveByOrganisationId(Integer organisationId);
 
-    void saveScore(Long kumaliveId, Integer userId, Short score);
+    List<KumaliveRubric> findRubricsByOrganisationId(Integer organisationId);
 }

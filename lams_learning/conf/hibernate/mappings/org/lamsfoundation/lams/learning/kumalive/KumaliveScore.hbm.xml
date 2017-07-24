@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping>
+	<class name="org.lamsfoundation.lams.learning.kumalive.model.KumaliveScore" table="lams_kumalive_score">
+
+		<id name="scoreId" type="java.lang.Long" column="score_id">
+			<generator class="native" />
+		</id>
+
+		<property name="score" type="java.lang.Short" column="score" not-null="true" />
+
+		<many-to-one name="rubric"
+			class="org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric" not-null="true">
+			<column name="rubric_id" />
+		</many-to-one>
+
+		<many-to-one name="user"
+			class="org.lamsfoundation.lams.usermanagement.User">
+			<column name="user_id" />
+		</many-to-one>
+	
+	</class>
+</hibernate-mapping>

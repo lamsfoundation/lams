@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.learning.kumalive.model;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -36,6 +37,7 @@ public class Kumalive implements Serializable {
     private User createdBy;
     private String name;
     private Boolean finished = false;
+    private Set<KumaliveRubric> rubrics;
 
     public Kumalive() {
     }
@@ -84,5 +86,13 @@ public class Kumalive implements Serializable {
 
     public void setFinished(Boolean finished) {
 	this.finished = finished;
+    }
+
+    public Set<KumaliveRubric> getRubrics() {
+	return rubrics;
+    }
+
+    public void setRubrics(Set<KumaliveRubric> rubrics) {
+	this.rubrics = rubrics;
     }
 }

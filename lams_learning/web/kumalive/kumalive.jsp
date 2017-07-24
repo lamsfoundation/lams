@@ -7,9 +7,9 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
+	<title><fmt:message key="label.kumalive.title"/></title>
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL />includes/font-awesome/css/font-awesome.css" type="text/css" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" />
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/kumalive.css" type="text/css" />
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -49,9 +49,14 @@
 		</span>
 	</div>
 	<div id="createKumaliveDiv">
-		<span><fmt:message key="label.kumalive.name.enter"/><br/><br/></span>
-		<input type="text" />
-		<button class="btn btn-default"><fmt:message key="button.kumalive.create"/></button>
+		<input type="text" class="form-control" placeholder="<fmt:message key='label.kumalive.name.enter'/>" />
+		<button class="btn btn-primary"><fmt:message key="button.kumalive.create"/></button>
+		<br />
+		<div id="rubrics" class="panel">
+			<div class="panel-body">
+				<h4><fmt:message key="label.kumalive.rubric.choose"/></h4>
+			</div>
+		</div>
 	</div>
 	<div id="closedDiv">
 		<span><fmt:message key="label.kumalive.closed"/></span>
@@ -73,11 +78,14 @@
 					<button id="downHandPromptButton" class="btn btn-default"><fmt:message key="button.kumalive.finish.question"/></button>
 				</div>
 				<div id="score" class="score">
-					<p><fmt:message key="label.kumalive.mark"/> <span></span></p>
-					<i title="<fmt:message key="label.kumalive.mark.great"/>" class="scoreGood fa fa-smile-o"></i>
-					<i title="<fmt:message key="label.kumalive.mark.ok"/>" class="scoreNeutral fa fa-meh-o"></i>
-					<i title="<fmt:message key="label.kumalive.mark.bad"/>" class="scoreBad fa fa-frown-o"></i>
-					<i title="<fmt:message key="label.kumalive.mark.cancel"/>" class="scoreNone fa fa-times"></i>
+					<p></p>
+					<div class="scoreButtons">
+						<i title="<fmt:message key="label.kumalive.mark.great"/>" class="scoreGood fa fa-smile-o"></i>
+						<i title="<fmt:message key="label.kumalive.mark.ok"/>" class="scoreNeutral fa fa-meh-o"></i>
+						<i title="<fmt:message key="label.kumalive.mark.bad"/>" class="scoreBad fa fa-frown-o"></i>
+						<i title="<fmt:message key="label.kumalive.mark.cancel"/>" class="scoreNone fa fa-times"></i>
+					</div>
+					<hr />
 				</div>
 			</div>
 			<div id="learnersCell" class="col-sm-1">

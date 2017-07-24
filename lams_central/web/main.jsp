@@ -72,6 +72,8 @@
 				AUTHORING_TITLE : '<c:out value="${AUTHORING_TITLE_VAR}" />',
 				<fmt:message key="index.monitoring.title" var="MONITORING_TITLE_VAR"/>
 				MONITORING_TITLE : '<c:out value="${MONITORING_TITLE_VAR}" />',
+				<fmt:message key="index.kumalive.rubric" var="KUMALIVE_RUBRICS_TITLE_VAR"/>
+				KUMALIVE_RUBRICS_TITLE : '<c:out value="${KUMALIVE_RUBRICS_TITLE_VAR}" />',
 				<fmt:message key="label.private.notifications.title" var="PRIVATE_NOTIFICATIONS_TITLE_VAR"/>
 				PRIVATE_NOTIFICATIONS_TITLE : '<c:out value="${PRIVATE_NOTIFICATIONS_TITLE_VAR}" />',
 				<fmt:message key="label.private.notifications.messages" var="PRIVATE_NOTIFICATIONS_MESSAGES_VAR"/>

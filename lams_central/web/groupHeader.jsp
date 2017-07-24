@@ -65,6 +65,12 @@
 						 	<li onClick="javascript:openKumalive(${org.id}, 'learner')">
 						 		<a href="#"><fmt:message key="index.kumalive.enter.learner" /></a>
 						 	</li>
+						 	<li onClick="javascript:showKumaliveReportDialog(${org.id})">
+						 		<a href="#"><fmt:message key="index.kumalive.report" /></a>
+						 	</li>
+						 	<li onClick="javascript:showKumaliveRubricsDialog(${org.id})">
+						 		<a href="#"><fmt:message key="index.kumalive.rubric" /></a>
+						 	</li>
 						</ul>
 					</div>
 				</div>

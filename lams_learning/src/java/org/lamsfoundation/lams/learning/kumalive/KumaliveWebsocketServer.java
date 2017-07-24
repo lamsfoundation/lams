@@ -22,7 +22,8 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
+import org.lamsfoundation.lams.learning.kumalive.service.IKumaliveService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -34,7 +35,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * Processes messages for Kumalive
+ * Processes messages for Kumalive.
  *
  * @author Marcin Cieslak
  */
@@ -63,17 +64,24 @@ public class KumaliveWebsocketServer {
 	private final List<Integer> raisedHand = new CopyOnWriteArrayList<>();
 	private Integer speaker;
 	private final Map<String, KumaliveUser> learners = new ConcurrentHashMap<>();
+	private final JSONArray rubrics = new JSONArray();
 
-	private KumaliveDTO(Kumalive kumalive) {
+	private KumaliveDTO(Kumalive kumalive) throws JSONException {
 	    this.id = kumalive.getKumaliveId();
 	    this.name = kumalive.getName();
 	    this.createdBy = kumalive.getCreatedBy().getUserDTO();
+	    for (KumaliveRubric rubric : kumalive.getRubrics()) {
+		JSONObject rubricJSON = new JSONObject();
+		rubricJSON.put("id", rubric.getRubricId());
+		rubricJSON.put("name", rubric.getName());
+		rubrics.put(rubricJSON);
+	    }
 	}
     }
 
-    private static Logger log = Logger.getLogger(KumaliveWebsocketServer.class);
+    private static Logger logger = Logger.getLogger(KumaliveWebsocketServer.class);
 
-    private static ILearnerService learnerService;
+    private static IKumaliveService kumaliveService;
     private static ISecurityService securityService;
     private static IUserManagementService userManagementService;
     // mapping org ID -> Kumalive
@@ -84,11 +92,11 @@ public class KumaliveWebsocketServer {
 	Integer organisationId = Integer
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_ORGANISATION_ID).get(0));
 	Integer userId = getUser(websocket).getUserId();
-	if (!getSecurityService().hasOrgRole(organisationId, userId,
+	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER }, "register on kumalive", false)) {
 	    // prevent unauthorised user from accessing Kumalive
 	    String warning = "User " + userId + " is not a monitor nor a learner of organisation " + organisationId;
-	    log.warn(warning);
+	    logger.warn(warning);
 	    websocket.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, warning));
 	}
     }
@@ -102,7 +110,7 @@ public class KumaliveWebsocketServer {
 
 	Integer organisationId = Integer
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_ORGANISATION_ID).get(0));
-	KumaliveDTO kumalive = KumaliveWebsocketServer.kumalives.get(organisationId);
+	KumaliveDTO kumalive = kumalives.get(organisationId);
 	if (kumalive == null) {
 	    return;
 	}
@@ -172,16 +180,18 @@ public class KumaliveWebsocketServer {
 	boolean isTeacher = false;
 	if (kumaliveDTO == null) {
 	    String name = requestJSON.optString("name");
+	    JSONArray rubricsJSON = requestJSON.optJSONArray("rubrics");
 	    String role = websocket.getRequestParameterMap().get(AttributeNames.PARAM_ROLE).get(0);
 	    User user = getUser(websocket);
 	    Integer userId = user.getUserId();
-	    isTeacher = !Role.LEARNER.equalsIgnoreCase(role)
-		    && (getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_MANAGER)
-			    || getUserManagementService().isUserInRole(userId, organisationId, Role.MONITOR));
+	    isTeacher = !Role.LEARNER.equalsIgnoreCase(role) && (KumaliveWebsocketServer.getUserManagementService()
+		    .isUserInRole(userId, organisationId, Role.GROUP_MANAGER)
+		    || KumaliveWebsocketServer.getUserManagementService().isUserInRole(userId, organisationId,
+			    Role.MONITOR));
 	    // if it kumalive does not exists and the user is not a teacher or he did not provide a name yet,
 	    // kumalive will not get created
-	    Kumalive kumalive = KumaliveWebsocketServer.getLearnerService().startKumalive(organisationId, userId, name,
-		    isTeacher && StringUtils.isNotBlank(name));
+	    Kumalive kumalive = KumaliveWebsocketServer.getKumaliveService().startKumalive(organisationId, userId, name,
+		    rubricsJSON, isTeacher && StringUtils.isNotBlank(name));
 	    if (kumalive != null) {
 		kumaliveDTO = new KumaliveDTO(kumalive);
 		kumalives.put(organisationId, kumaliveDTO);
@@ -190,8 +200,22 @@ public class KumaliveWebsocketServer {
 
 	// tell teacher to provide a name for Kumalive and create it
 	// or tell learner to join
-	websocket.getBasicRemote()
-		.sendText("{ \"type\" : \"" + (kumaliveDTO == null && isTeacher ? "create" : "join") + "\" }");
+	JSONObject responseJSON = new JSONObject();
+	if (kumaliveDTO == null && isTeacher) {
+	    responseJSON.put("type", "create");
+	    List<KumaliveRubric> rubrics = KumaliveWebsocketServer.getKumaliveService().getRubrics(organisationId);
+	    if (!rubrics.isEmpty()) {
+		JSONArray rubricsJSON = new JSONArray();
+		for (KumaliveRubric rubric : rubrics) {
+		    rubricsJSON.put(rubric.getName());
+		}
+		responseJSON.put("rubrics", rubricsJSON);
+	    }
+
+	    websocket.getBasicRemote().sendText(responseJSON.toString());
+	} else {
+	    websocket.getBasicRemote().sendText("{ \"type\" : \"join\" }");
+	}
     }
 
     /**
@@ -209,8 +233,10 @@ public class KumaliveWebsocketServer {
 	User user = getUser(websocket);
 	Integer userId = user.getUserId();
 	String login = user.getLogin();
-	boolean isTeacher = getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_MANAGER)
-		|| getUserManagementService().isUserInRole(userId, organisationId, Role.MONITOR);
+	boolean isTeacher = KumaliveWebsocketServer.getUserManagementService().isUserInRole(userId, organisationId,
+		Role.GROUP_MANAGER)
+		|| KumaliveWebsocketServer.getUserManagementService().isUserInRole(userId, organisationId,
+			Role.MONITOR);
 	String role = websocket.getRequestParameterMap().get(AttributeNames.PARAM_ROLE).get(0);
 
 	KumaliveUser learner = kumalive.learners.get(login);
@@ -225,7 +251,26 @@ public class KumaliveWebsocketServer {
 	learner = new KumaliveUser(user, websocket, isTeacher, roleTeacher);
 	kumalive.learners.put(login, learner);
 
+	sendInit(kumalive, learner);
 	sendRefresh(kumalive);
+    }
+
+    private void sendInit(KumaliveDTO kumalive, KumaliveUser user) throws JSONException, IOException {
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("type", "init");
+	// Kumalive title
+	responseJSON.put("name", kumalive.name);
+	responseJSON.put("isTeacher", user.isTeacher);
+	responseJSON.put("roleTeacher", user.roleTeacher);
+	// teacher details
+	responseJSON.put("teacherId", kumalive.createdBy.getUserID());
+	responseJSON.put("teacherName", kumalive.createdBy.getFirstName() + " " + kumalive.createdBy.getLastName());
+	responseJSON.put("teacherPortraitUuid", kumalive.createdBy.getPortraitUuid());
+
+	// rubric details
+	responseJSON.put("rubrics", kumalive.rubrics);
+
+	user.websocket.getBasicRemote().sendText(responseJSON.toString());
     }
 
     /**
@@ -234,13 +279,6 @@ public class KumaliveWebsocketServer {
     private void sendRefresh(KumaliveDTO kumalive) throws JSONException, IOException {
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("type", "refresh");
-	// Kumalive title
-	responseJSON.put("name", kumalive.name);
-
-	// teacher details
-	responseJSON.put("teacherId", kumalive.createdBy.getUserID());
-	responseJSON.put("teacherName", kumalive.createdBy.getFirstName() + " " + kumalive.createdBy.getLastName());
-	responseJSON.put("teacherPortraitUuid", kumalive.createdBy.getPortraitUuid());
 
 	// current state of question and speaker
 	responseJSON.put("raiseHandPrompt", kumalive.raiseHandPrompt);
@@ -277,11 +315,9 @@ public class KumaliveWebsocketServer {
 	    if (participant.isTeacher) {
 		// send extra information to teachers
 		if (teacherResponseJSON == null) {
-		    responseJSON.put("isTeacher", true);
 		    responseJSON.put("logins", logins);
 		    teacherResponseJSON = responseJSON;
 		}
-		teacherResponseJSON.put("roleTeacher", participant.roleTeacher);
 		channel.sendText(teacherResponseJSON.toString());
 	    } else {
 		channel.sendText(learnerResponse);
@@ -300,14 +336,17 @@ public class KumaliveWebsocketServer {
 	User user = getUser(websocket);
 	Integer userId = user.getUserId();
 
-	if (!getSecurityService().hasOrgRole(organisationId, userId, new String[] { Role.GROUP_MANAGER, Role.MONITOR },
-		"kumalive raise hand prompt", false)) {
+	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive raise hand prompt", false)) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
-	    log.warn(warning);
+	    logger.warn(warning);
 	    return;
 	}
 
 	kumalive.raiseHandPrompt = true;
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Teacher " + userId + " asked a question in Kumalive " + kumalive.id);
+	}
 	sendRefresh(kumalive);
     }
 
@@ -322,15 +361,19 @@ public class KumaliveWebsocketServer {
 	User user = getUser(websocket);
 	Integer userId = user.getUserId();
 
-	if (!getSecurityService().hasOrgRole(organisationId, userId, new String[] { Role.GROUP_MANAGER, Role.MONITOR },
-		"kumalive down hand prompt", false)) {
+	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive down hand prompt", false)) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
-	    log.warn(warning);
+	    logger.warn(warning);
 	    return;
 	}
 
 	kumalive.raiseHandPrompt = false;
 	kumalive.raisedHand.clear();
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Teacher " + userId + " finished a question in Kumalive " + kumalive.id);
+	}
+
 	sendRefresh(kumalive);
     }
 
@@ -345,15 +388,15 @@ public class KumaliveWebsocketServer {
 	User user = getUser(websocket);
 	Integer userId = user.getUserId();
 
-	if (!getSecurityService().hasOrgRole(organisationId, userId,
+	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER }, "kumalive raise hand", false)) {
 	    String warning = "User " + userId + " is not a monitor nor a learner of organisation " + organisationId;
-	    log.warn(warning);
+	    logger.warn(warning);
 	    return;
 	}
 
 	if (!kumalive.raiseHandPrompt) {
-	    log.warn("Raise hand prompt was not sent by teacher yet for organisation " + organisationId);
+	    logger.warn("Raise hand prompt was not sent by teacher yet for organisation " + organisationId);
 	    return;
 	}
 
@@ -362,6 +405,10 @@ public class KumaliveWebsocketServer {
 	}
 
 	kumalive.raisedHand.add(userId);
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Learner " + userId + " raised hand in Kumalive " + kumalive.id);
+	}
+
 	sendRefresh(kumalive);
     }
 
@@ -376,10 +423,10 @@ public class KumaliveWebsocketServer {
 	User user = getUser(websocket);
 	Integer userId = user.getUserId();
 
-	if (!getSecurityService().hasOrgRole(organisationId, userId,
+	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER }, "kumalive down hand", false)) {
 	    String warning = "User " + userId + " is not a monitor nor a learner of organisation " + organisationId;
-	    log.warn(warning);
+	    logger.warn(warning);
 	    return;
 	}
 
@@ -388,6 +435,9 @@ public class KumaliveWebsocketServer {
 	}
 
 	kumalive.raisedHand.remove(userId);
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Learner " + userId + " put hand down in Kumalive " + kumalive.id);
+	}
 
 	sendRefresh(kumalive);
     }
@@ -403,10 +453,10 @@ public class KumaliveWebsocketServer {
 	User user = getUser(websocket);
 	Integer userId = user.getUserId();
 
-	if (!getSecurityService().hasOrgRole(organisationId, userId, new String[] { Role.GROUP_MANAGER, Role.MONITOR },
-		"kumalive speak", false)) {
+	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive speak", false)) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
-	    log.warn(warning);
+	    logger.warn(warning);
 	    return;
 	}
 
@@ -420,20 +470,27 @@ public class KumaliveWebsocketServer {
     private void score(JSONObject requestJSON, Session websocket) throws IOException, JSONException {
 	Integer organisationId = Integer
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_ORGANISATION_ID).get(0));
-	KumaliveDTO kumalive = kumalives.get(organisationId);
 
 	User user = getUser(websocket);
 	Integer userId = user.getUserId();
 
-	if (!getSecurityService().hasOrgRole(organisationId, userId, new String[] { Role.GROUP_MANAGER, Role.MONITOR },
-		"kumalive score", false)) {
+	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive score", false)) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
-	    log.warn(warning);
+	    logger.warn(warning);
 	    return;
 	}
+	Long rubricId = requestJSON.getLong("rubricId");
+	Integer learnerId = requestJSON.getInt(AttributeNames.PARAM_USER_ID);
+	KumaliveWebsocketServer.getKumaliveService().scoreKumalive(rubricId, learnerId,
+		Short.valueOf(requestJSON.getString("score")));
 
-	KumaliveWebsocketServer.getLearnerService().scoreKumalive(kumalive.id,
-		requestJSON.getInt(AttributeNames.PARAM_USER_ID), Short.valueOf(requestJSON.getString("score")));
+	KumaliveDTO kumalive = kumalives.get(organisationId);
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Teacher " + userId + " marked rubric " + rubricId + " for learner " + learnerId
+		    + " in Kumalive " + kumalive.id);
+	}
+
 	sendRefresh(kumalive);
     }
 
@@ -448,34 +505,39 @@ public class KumaliveWebsocketServer {
 	User user = getUser(websocket);
 	Integer userId = user.getUserId();
 
-	if (!getSecurityService().hasOrgRole(organisationId, userId, new String[] { Role.GROUP_MANAGER, Role.MONITOR },
-		"kumalive finish", false)) {
+	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive finish", false)) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
-	    log.warn(warning);
+	    logger.warn(warning);
 	    return;
 	}
 
-	KumaliveWebsocketServer.getLearnerService().finishKumalive(kumalive.id);
+	KumaliveWebsocketServer.getKumaliveService().finishKumalive(kumalive.id);
 	kumalives.remove(organisationId);
 	for (KumaliveUser participant : kumalive.learners.values()) {
 	    participant.websocket.getBasicRemote().sendText("{ \"type\" : \"finish\"}");
 	}
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Teacher " + userId + " finished Kumalive " + kumalive.id);
+	}
     }
 
     private User getUser(Session websocket) {
-	return getUserManagementService().getUserByLogin(websocket.getUserPrincipal().getName());
+	return KumaliveWebsocketServer.getUserManagementService()
+		.getUserByLogin(websocket.getUserPrincipal().getName());
     }
 
-    private static ILearnerService getLearnerService() {
-	if (learnerService == null) {
+    private static IKumaliveService getKumaliveService() {
+	if (kumaliveService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getWebApplicationContext(SessionManager.getServletContext());
-	    learnerService = (ILearnerService) ctx.getBean("learnerService");
+	    kumaliveService = (IKumaliveService) ctx.getBean("kumaliveService");
 	}
-	return learnerService;
+	return kumaliveService;
     }
 
-    private ISecurityService getSecurityService() {
+    private static ISecurityService getSecurityService() {
 	if (securityService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
@@ -484,7 +546,7 @@ public class KumaliveWebsocketServer {
 	return securityService;
     }
 
-    private IUserManagementService getUserManagementService() {
+    private static IUserManagementService getUserManagementService() {
 	if (userManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(SessionManager.getServletContext());

@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.learning.command.model.Command;
-import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.tool.ToolOutput;
 
@@ -61,10 +60,4 @@ public interface ILearnerService {
     void createCommandForLearner(Long lessonId, String userName, String jsonCommand);
 
     List<Command> getCommandsForLesson(Long lessonId, Date laterThan);
-
-    Kumalive startKumalive(Integer organisationId, Integer userId, String name, boolean isTeacher);
-
-    void finishKumalive(Long id);
-
-    void scoreKumalive(Long id, Integer userId, Short score);
 }

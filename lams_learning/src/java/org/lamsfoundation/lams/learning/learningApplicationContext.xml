@@ -32,7 +32,7 @@
 	</bean>
 	
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
-		<bean id="learnerService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+	<bean id="learnerService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="preInterceptors">
 			<list>
@@ -55,8 +55,6 @@
 				<property name="logEventService"><ref bean="logEventService"/></property>
 				<property name="dataFlowDAO"><ref bean="dataFlowDAO"/></property>
 				<property name="commandDAO"><ref bean="commandDAO"/></property>
-				<property name="kumaliveDAO"><ref bean="kumaliveDAO"/></property>
-				<property name="securityService"><ref bean="securityService"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">
@@ -76,8 +74,30 @@
 				<prop key="learner*">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
 				<prop key="recalcProgressForLearner">PROPAGATION_REQUIRES_NEW</prop>
-				<prop key="score*">PROPAGATION_REQUIRED</prop>
+   			</props>
+		</property>
+	</bean> 
+	
+	<bean id="kumaliveService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="target">
+			<bean class="org.lamsfoundation.lams.learning.kumalive.service.KumaliveService">
+				<property name="securityService"><ref bean="securityService"/></property>
+				<property name="kumaliveDAO"><ref bean="kumaliveDAO"/></property>
+			</bean>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="start*">PROPAGATION_REQUIRED</prop>
 				<prop key="finish*">PROPAGATION_REQUIRED</prop>
+				<prop key="score*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
    			</props>
 		</property>
 	</bean> 

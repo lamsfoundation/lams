@@ -534,6 +534,23 @@ function showSearchLessonDialog(orgID){
 	}, true);
 }
 
+function showKumaliveRubricsDialog(orgID){
+	var id = "dialogKumaliveRubrics" + orgID;
+	showDialog(id, {
+		'data' : {
+			'orgID' : orgID
+		},
+		'height': Math.max(380, Math.min(650, $(window).height() - 30)),
+		'width' : Math.max(380, Math.min(610, $(window).width() - 60)),
+		'title' : LABELS.KUMALIVE_RUBRICS_TITLE,
+		'open' : function() {
+			var orgID = $(this).data('orgID');
+			// load contents after opening the dialog
+			$('iframe', this).attr('src', LAMS_URL	+ '/learning/kumalive.do?method=getRubrics&organisationID=' + orgID);
+		}
+	}, false);
+}
+
 function closeAddSingleActivityLessonDialog(action) {
 	var id = 'dialogAddSingleActivityLesson',
 		dialog = $('#' + id),

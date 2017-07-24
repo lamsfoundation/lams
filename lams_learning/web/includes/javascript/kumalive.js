@@ -12,6 +12,8 @@ var kumaliveWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
 	queuedMessage = null,
 	// is there a learner speaking right now
 	speakerId = null,
+	// rubrics to evaluate speaker
+	rubrics = null,
 	// learners with no profile picture will get an icon with one of these colours
 	learnerColors = ['#001f3f', '#FF851B', '#85144b', '#111111', '#3D9970', '#0074D9', '#FF4136'],
 	// index of user icon colour currently used
@@ -96,8 +98,24 @@ kumaliveWebsocket.onmessage = function(e){
 			// hide splash screen
 			$('#initDiv').hide();
 			// show name input
-			var createDiv = $('#createKumaliveDiv').show(),
-				createButton = createDiv.children('button').click(create).prop('disabled', true);
+			var createDiv = $('#createKumaliveDiv'),
+				rubricsDiv = $('#rubrics .panel-body', createDiv);
+			if (message.rubrics) {
+				$.each(message.rubrics, function(){
+					if (this) {
+						var checkbox = $('<div />').addClass('checkbox').appendTo(rubricsDiv),
+							label = $('<label />').appendTo(checkbox);
+						$('<span />').text(this).appendTo(label);
+						$('<input />').attr('type', 'checkbox')
+									  .prependTo(label);
+					}
+				});
+			}
+			if (rubricsDiv.is(':empty')){
+				rubricsDiv.remove();
+			}
+			
+			var createButton = createDiv.show().children('button').click(create).prop('disabled', true);
 			createDiv.children('input').focus().keyup(function(){
 				// name can not be empty
 				createButton.prop('disabled', !$(this).val());
@@ -111,12 +129,14 @@ kumaliveWebsocket.onmessage = function(e){
 			}));
 		}
 		break;
-		case 'refresh': {
+		case 'init' : {
 			if (!initialised) {
 				// it is the first refresh message ever
 				init(message);
 			}
-			
+		}
+		break;
+		case 'refresh': {
 			if (refreshing) {
 				// set current message as the next one to be processed
 				queuedMessage = message;
@@ -156,7 +176,7 @@ function init(message) {
 	}
 	
 	// set dialog name
-	$('#dialogKumaliveLabel', window.parent.document).text(LABELS.KUMALIVE_TITLE + ' ' + message.name);
+	$('head title').text(LABELS.KUMALIVE_TITLE + ' ' + message.name);
 	// set teacher portrait and name
 	if (message.teacherPortraitUuid) {
 		$('#actionCell #teacher .profilePicture').css('background-image',
@@ -165,6 +185,8 @@ function init(message) {
 		$('#actionCell #teacher .profilePicture').addClass('fa fa-user-circle-o');
 	}
 	$('#teacher .name').text(message.teacherName);
+	
+	rubrics = message.rubrics;
 	
 	// show proper work screen
 	$('#initDiv').hide();
@@ -401,13 +423,18 @@ function toggleSpeak(message) {
 				speaker.remove();
 				if (roleTeacher) {
 					if ($('#actionCell .score[userId="' + speakerId + '"]').length == 0) {
-						$('#score').clone(true).attr({
-							'id' : null,
-							'userId' : speakerId
-						}).appendTo('#actionCell')
-						  .slideDown()
-						  .find('span')
-						  .text($('#learnersContainer .learner[userId="' + speakerId + '"] .name').text());
+						// create a score panel for each rubric
+						$.each(rubrics, function(){
+							$('#score').clone(true).attr({
+								'id'       : null,
+								'userId'   : speakerId,
+								'rubricId' : this.id
+							}).appendTo('#actionCell')
+							  .slideDown()
+							  // user name and rubric
+							  .find('p').html('<strong>' + $('#learnersContainer .learner[userId="' + speakerId + '"] .name').text() + '</strong>'
+										+ (this.name ? '<br />' + this.name : ''));
+						});
 					}
 					speakerId = null;
 				} else if (message.raiseHandPrompt) {
@@ -552,7 +579,7 @@ function stopSpeak() {
  */
 function score(){
 	var button = $(this),
-		container = button.parent(),
+		container = button.closest('.score'),
 		score = null;
 	if (button.is('.scoreGood')) {
 		score = 2;
@@ -564,9 +591,10 @@ function score(){
 	
 	if (score !== null) {
 		kumaliveWebsocket.send(JSON.stringify({
-			'type' : 'score',
-			'userID' : container.attr('userId'),
-			'score' : score
+			'type'     : 'score',
+			'userID'   : container.attr('userId'),
+			'rubricId' : container.attr('rubricId'),
+			'score'    : score
 		}));
 	}
 	
@@ -580,12 +608,18 @@ function score(){
  * Create a new Kumalive
  */
 function create(){
-	var container = $('#createKumaliveDiv').hide(), 
-		name = $('input', container).val();
+	var createDiv = $('#createKumaliveDiv').hide(), 
+		name = $('input', createDiv).val(),
+		rubrics = [];
+	// find checked rubrics and prepare them for serialization
+	$('#rubrics input:checked', createDiv).each(function(){
+		rubrics.push($(this).siblings('span').text());
+	});
 	kumaliveWebsocket.send(JSON.stringify({
-		'type' : 'start',
-		'role' : role,
-		'name' : name
+		'type'    : 'start',
+		'role'    : role,
+		'name'    : name,
+		'rubrics' : rubrics.length > 0 ? rubrics : null
 	}));
 }
 
