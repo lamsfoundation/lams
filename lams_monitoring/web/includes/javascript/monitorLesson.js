@@ -1503,13 +1503,13 @@ function getActivityCoordinates(activity){
 	}
 	var path = $('path', group).attr('d'),
 	// extract width and height from path M<x>,<y>h<width>v<height>... or M <x> <y> h <width> v <height>...
-		match = /h\s?(\d+)\s?v\s?(\d+)/.exec(path);
+		match = /M\s?(\d+)\s?,?\s?(\d+)\s?h\s?(\d+)\s?v\s?(\d+)/.exec(path);
 	if (match) {
 		return {
-			'x'    : activity.x,
-			'y'    : activity.y + 1,
-			'x2'   : activity.x + +match[1],
-			'y2'   : activity.y + +match[2]
+			'x'    : +match[1],
+			'y'    : +match[2] + 1,
+			'x2'   : +match[1] + +match[3],
+			'y2'   : +match[2] + +match[4]
 		}
 	}
 }
