@@ -10,3 +10,6 @@
 .btn-primary {
     @include button-variant($main_fav_org_link, $brand-primary, darken($brand-primary, 5%));
 }
+.btn:focus,.btn:active {
+   outline: none !important; // remove blue focus in Chrome
+}
