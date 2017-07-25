@@ -1,0 +1,91 @@
+// Definitions for the Purple skin
+@import "_bootstrap-variables.scss";
+@import "_mixins.scss";
+
+$brand-primary:  #85237d;  // Overridden bootstrap setting
+
+// LAMS SASS Global Variables
+
+$gray-light-mid:  lighten($gray-base, 86.5%); // #dddddd
+$gray-lightest:  lighten($gray-base, 96%); // #f5f5f5 or whitesmoke
+
+// Primary colour shades
+$brand-primary-darkest: #33002e; // used for main page offcanvas course list
+$brand-primary-darker: #4d0046;  // used for main page offcanvas course list
+$brand-primary-mid: lighten($brand-primary, 12%); 
+$brand-primary-light: #edbae9; 
+$brand-primary-bright: #aa7fa6;   // used when we need a primary standout, such as the right hand bar indicating the current org in the offcanvas course list.
+
+// a links
+$a-link-default: $brand-primary-darkest;
+$a-link-default-hover: $brand-primary-bright;
+$a-link-default-focus: $brand-primary-bright;
+
+// Success Green shades
+$brand-success-light: lighten($brand-success, 25%); // #b5dfb5
+
+// Warning Yellow shades:
+$contrast-fade-start: #FCF0AD; // Used in Forum, Comment for highlighting replies
+$contrast-light: #F6EEBF; 
+
+// Borders in various colours
+// Grey or black
+$border-thin-black: thin solid black;
+$border-thin-dotted: thin dotted #AAAAAA; // admin, central, monitoring
+$border-thin-dashed: thin dashed #AAAAAA; // only used in admin
+$border-thin-solid: thin solid #AAAAAA; // admin and monitoring
+$border-thin-body-bg: thin solid $body-bg; // white line
+$border-thin-default: thin solid #AAAAAA;
+$border-thin-default-light: thin solid $legend-border-color;
+$medium-default: 3px solid $gray-light-mid;
+// Blue
+$border-thin-primary: thin solid $brand-primary;
+// Red
+$border-thin-danger: thin solid $brand-danger;
+$border-medium-danger: 3px solid $brand-danger;
+
+// learner page box shadow
+$panel-box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
+
+// progress bar
+$optional-activity-background: lighten($brand-primary-mid, 50%); 
+$optional-activity-background-heading: lighten($brand-primary-mid, 35%); 
+$optional-activity-background-hover: $contrast-light;
+$completed-activity-fill: $brand-primary;
+$current-activity-fill: #BB0000;
+$gate-activity-fill: #FF0000;
+$complex-activity-fill: #999999;
+$not-started-activity-fill: #009900;
+
+// Used just for main.css - the main page
+$main_default_link: #560400; // #5A738E;
+$main_default_link_hover:  $brand-primary-darker;
+$main_blue_light_highlight: #b57bb1;
+$main_fav_org_link: #fefefe; // #A7B1C2;
+$main_offcanvas_link: #85237D;
+$main_dropdown_border: #D9DEE4;
+$main_navbar_link: #515356;
+$main_singlelesson_hover_border: #dabdd8;
+$main_singlelesson_hover_background: #e6d3e5;
+
+// navbar login bar
+$navbar-brand-login-color: #f6f6f6;
+$navbar-login-background: #56004e;
+
+// panel header color
+$panel-default-heading-background: lighten($brand-primary-bright, 20%);
+
+// Text & typography
+$headings-default-color: $brand-primary-darker;
+
+$url_css_directory: "/lams/images/css/";
+$login_logo: "/lams/images/svg/lams_logo_white.svg";
+$login_logo_size: auto 20px;
+
+// Forms - Overridden bootstrap settings
+$input-border-focus: lighten($brand-primary-bright, 20%); 
+
+// Alerts - Overridden bootstrap settings
+$alert-info-bg:      lighten($brand-primary-bright, 30%);
+$alert-info-text:    $brand-primary;
+$alert-info-border:  darken(adjust-hue($alert-info-bg, -10), 7%);

@@ -1,0 +1,12 @@
+// Purple Skin. If you need to add anything add it to _main_base.scss and it will go in all skins.
+@import "_lams_variables_purple.scss";
+// Stylesheet Imports
+@import url("/lams/includes/font-awesome/css/font-awesome.min.css");
+@import url("/lams/css/bootstrap.min.css");
+// LAMS Classes and overrides
+@import "_inlineeditor.scss";
+@import "_learner_base.scss";
+
+.btn-primary {
+    @include button-variant($main_fav_org_link, $brand-primary, darken($brand-primary, 5%));
+}
