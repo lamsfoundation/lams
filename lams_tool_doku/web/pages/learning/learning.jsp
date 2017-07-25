@@ -95,7 +95,8 @@
 		
 		<c:if test="${isTimeLimitEnabled}">
 			//init the connection with server using server URL but with different protocol
-			var dokuWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
+			var dokuWebsocketInitTime = Date.now(),
+				dokuWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
 							+ 'learningWebsocket?toolContentID=' + ${toolContentID}),
 				dokuWebsocketPingTimeout = null,
 				dokuWebsocketPingFunc = null;
@@ -103,6 +104,9 @@
 			dokuWebsocketPingFunc = function(skipPing){
 				if (dokuWebsocket.readyState == dokuWebsocket.CLOSING 
 						|| dokuWebsocket.readyState == dokuWebsocket.CLOSED){
+					if (Date.now() - dokuWebsocketInitTime < 1000) {
+						return;
+					}
 					location.reload();
 				}
 				
@@ -118,7 +122,8 @@
 			
 			dokuWebsocket.onclose = function(){
 				// react only on abnormal close
-				if (e.code === 1006) {
+				if (e.code === 1006 &&
+					Date.now() - dokuWebsocketInitTime > 1000) {
 					location.reload();
 				}
 			};

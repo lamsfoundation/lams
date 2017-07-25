@@ -27,7 +27,8 @@
     }
     
  	//init the connection with server using server URL but with different protocol
- 	var leaderWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
+ 	var leaderWebsocketInitTime = Date.now(),
+ 		leaderWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
  			+ 'learningWebsocket?toolSessionID=' + ${toolSessionID}),
 		leaderWebsocketPingTimeout = null,
 		leaderWebsocketPingFunc = null;
@@ -35,6 +36,9 @@
 	leaderWebsocketPingFunc = function(skipPing){
 		if (leaderWebsocket.readyState == leaderWebsocket.CLOSING 
 				|| leaderWebsocket.readyState == leaderWebsocket.CLOSED){
+			if (Date.now() - leaderWebsocketInitTime < 1000) {
+				return;
+			}
 			location.reload();
 		}
 		
@@ -50,7 +54,8 @@
  	
  	leaderWebsocket.onclose = function(e){
  		// react only on abnormal close
- 		if (e.code === 1006) {
+ 		if (e.code === 1006 &&
+ 		 	Date.now() - leaderWebsocketInitTime > 1000) {
  	 		location.reload();
  		}
  	};

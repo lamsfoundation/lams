@@ -46,7 +46,7 @@
 	<c:if test="${ not hideProgressBar && ( empty mode || mode == 'author' || mode == 'learner') }">
 	
 		<%-- Links placed in body instead of head. Ugly, but it works. --%>
-		<link rel="stylesheet" href="<lams:LAMSURL/>css/progressBar.css" type="text/css" />
+		<lams:css suffix="progressBar"/>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 		
@@ -95,9 +95,11 @@
 				LEARNING_URL = LAMS_URL + 'learning/',
 
 				// it gets initialised along with progress bar
+				commandWebsocketInitTime = null,
 				commandWebsocket = null,
 				commandWebsocketPingTimeout = null,
 				commandWebsocketPingFunc = null,
+				commandWebsocketReconnectAttempts = 0,
 				
 				bars = {
 					'learnerMainBar' : {
@@ -108,7 +110,9 @@
 			commandWebsocketPingFunc = function(skipPing){
 				if (commandWebsocket.readyState == commandWebsocket.CLOSING 
 						|| commandWebsocket.readyState == commandWebsocket.CLOSED){
-					initCommandWebsocket();
+					if (Date.now() - commandWebsocketInitTime > 1000) {
+						initCommandWebsocket();
+					}
 					return;
 				}
 				
@@ -165,6 +169,7 @@
 			}
 
 			function initCommandWebsocket(){
+				commandWebsocketInitTime = Date.now();
 				// it is not an obvious place to init the websocket, but we need lesson ID
 				commandWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
 						+ 'commandWebsocket?lessonID=' + lessonId);
@@ -172,10 +177,15 @@
 				commandWebsocketPingFunc(true);
 				
 				commandWebsocket.onclose = function(e){
-					if (e.code === 1006) {
+					// check reason and whether the close did not happen immediately after websocket creation
+					// (possible access denied, user logged out?)
+					if (e.code === 1006 &&
+						Date.now() - commandWebsocketInitTime > 1000 &&
+						commandWebsocketReconnectAttempts < 20) {
+						commandWebsocketReconnectAttempts++;
 						// maybe iPad went into sleep mode?
-						// we need this websocket working, so init it again
-						initCommandWebsocket();
+						// we need this websocket working, so init it again after delay
+						setTimeout(initCommandWebsocket, 3000);
 					}
 				};
 				// when the server pushes new commands
@@ -277,7 +287,7 @@
 				<div class="collapse navbar-collapse" id="bs-sidebar-navbar-collapse-1">
 					<ul class="nav navbar-nav">
 						<li><a href="#" class="hidden-xs visible-sm visible-md visible-lg slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
-							<i class="pull-right fa fa-bars" style="color:#337ab7"></i>
+							<i class="pull-right fa fa-bars"></i>
 							<p class="lessonName"></p></a></li>
 						<li><a href="#" onClick="javascript:closeWindow()" ><span id="exitlabel">Exit</span><i class="pull-right fa fa-times"></i></a></li>
 						<li><a href="#" onClick="javascript:viewNotebookEntries(); return false;" ><span id="notebooklabel">Notebook</span><i class="pull-right fa fa-book"></i></a></li>

@@ -28,7 +28,8 @@
 	});
 	
 	//init the connection with server using server URL but with different protocol
-	var scratchieWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
+	var scratchieWebsocketInitTime = Date.now(),
+		scratchieWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
 					+ 'learningWebsocket?toolSessionID=' + ${toolSessionID}),
 		scratchieWebsocketPingTimeout = null,
 		scratchieWebsocketPingFunc = null;
@@ -36,6 +37,9 @@
 	scratchieWebsocketPingFunc = function(skipPing){
 		if (scratchieWebsocket.readyState == scratchieWebsocket.CLOSING 
 				|| scratchieWebsocket.readyState == scratchieWebsocket.CLOSED){
+			if (Date.now() - scratchieWebsocketInitTime < 1000) {
+				return;
+			}
 			location.reload();
 		}
 		
@@ -51,7 +55,8 @@
 	
 	scratchieWebsocket.onclose = function(e) {
 		// react only on abnormal close
-		if (e.code === 1006) {
+		if (e.code === 1006 &&
+			Date.now() - scratchieWebsocketInitTime > 1000) {
 			location.reload();		
 		}
 	};
