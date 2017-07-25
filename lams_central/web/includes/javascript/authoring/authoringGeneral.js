@@ -1498,7 +1498,6 @@ GeneralLib = {
 					if (activityData.activityUIID && layout.ld.maxUIID < activityData.activityUIID) {
 						layout.ld.maxUIID = activityData.activityUIID;
 					}
-
 					switch(activityData.activityTypeID) {
 						// Tool Activity
 						case 1 :
@@ -1508,8 +1507,9 @@ GeneralLib = {
 											activityData.toolContentID,
 											activityData.toolID,
 											activityData.learningLibraryID,
-											LAMS_URL + activityData.authoringURL+ (activityData.authoringURL.includes('?') ? '&' : '?') + 'toolContentID='   + activityData.toolContentID
-											+ '&contentFolderID=' + layout.ld.contentFolderID,
+											LAMS_URL + activityData.authoringURL + (activityData.authoringURL.indexOf('?') < 0 ? '?' : '&') 
+												+ 'toolContentID='   + activityData.toolContentID
+												+ '&contentFolderID=' + layout.ld.contentFolderID,
 											activityData.xCoord ? activityData.xCoord : 1,
 											activityData.yCoord ? activityData.yCoord : 1,
 											activityData.activityTitle,
