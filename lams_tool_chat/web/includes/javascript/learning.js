@@ -21,6 +21,7 @@ $(document).ready(function() {
 	
 	// only Monitor can send a personal message
 	var selectedUser = null,
+		chatWebsocketInitTime = Date.now(),
 		// init the connection with server using server URL but with different protocol
 		chatWebsocket = new WebSocket(APP_URL.replace('http', 'ws')
 				+ 'learningWebsocket?toolSessionID=' + TOOL_SESSION_ID),
@@ -30,6 +31,9 @@ $(document).ready(function() {
 	chatWebsocketPingFunc = function(skipPing){
 		if (chatWebsocket.readyState == chatWebsocket.CLOSING 
 				|| chatWebsocket.readyState == chatWebsocket.CLOSED){
+			if (Date.now() - chatWebsocketInitTime < 1000) {
+				return;
+			}
 			location.reload();
 		}
 		
@@ -45,7 +49,8 @@ $(document).ready(function() {
 	
 	chatWebsocket.onclose = function(e){
 		// react only on abnormal close
-		if (e.code === 1006) {
+		if (e.code === 1006 &&
+			Date.now() - chatWebsocketInitTime > 1000) {
 			location.reload();
 		}
 	};

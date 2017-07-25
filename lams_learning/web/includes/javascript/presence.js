@@ -90,16 +90,19 @@ $(document).ready(function (){
 		}
 	},
 	
+	presenceWebsocketInitTime = Date.now(),
 	// init the connection with server using server URL but with different protocol
 	presenceWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'presenceChatWebsocket?lessonID=' + lessonId 
-															   + '&imEnabled=' + presenceImEnabled 
-															   + '&nickname=' + encodeURIComponent(nickname)),
+															        + '&imEnabled=' + presenceImEnabled 
+															        + '&nickname=' + encodeURIComponent(nickname)),
 	presenceWebsocketPingTimeout = null,
 	presenceWebsocketPingFunc = null;
 	
 	presenceWebsocketPingFunc = function(skipPing){
-		if (presenceWebsocket.readyState == presenceWebsocket.CLOSING 
-				|| presenceWebsocket.readyState == presenceWebsocket.CLOSED){
+		if (presenceWebsocket.readyState == presenceWebsocket.CLOSING || presenceWebsocket.readyState == presenceWebsocket.CLOSED) {
+			if (Date.now() - presenceWebsocketInitTime < 1000) {
+				return;
+			}
 			location.reload();
 		}
 		
@@ -115,7 +118,8 @@ $(document).ready(function (){
 	
 	presenceWebsocket.onclose = function(e){
 		// react only on abnormal close
-		if (e.code === 1006) {
+		if (e.code === 1006 &&
+			Date.now() - presenceWebsocketInitTime > 1000) {
 			location.reload();
 		}
 	};

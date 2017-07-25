@@ -95,9 +95,11 @@
 				LEARNING_URL = LAMS_URL + 'learning/',
 
 				// it gets initialised along with progress bar
+				commandWebsocketInitTime = null,
 				commandWebsocket = null,
 				commandWebsocketPingTimeout = null,
 				commandWebsocketPingFunc = null,
+				commandWebsocketReconnectAttempts = 0,
 				
 				bars = {
 					'learnerMainBar' : {
@@ -108,7 +110,9 @@
 			commandWebsocketPingFunc = function(skipPing){
 				if (commandWebsocket.readyState == commandWebsocket.CLOSING 
 						|| commandWebsocket.readyState == commandWebsocket.CLOSED){
-					initCommandWebsocket();
+					if (Date.now() - commandWebsocketInitTime > 1000) {
+						initCommandWebsocket();
+					}
 					return;
 				}
 				
@@ -165,6 +169,7 @@
 			}
 
 			function initCommandWebsocket(){
+				commandWebsocketInitTime = Date.now();
 				// it is not an obvious place to init the websocket, but we need lesson ID
 				commandWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
 						+ 'commandWebsocket?lessonID=' + lessonId);
@@ -172,10 +177,15 @@
 				commandWebsocketPingFunc(true);
 				
 				commandWebsocket.onclose = function(e){
-					if (e.code === 1006) {
+					// check reason and whether the close did not happen immediately after websocket creation
+					// (possible access denied, user logged out?)
+					if (e.code === 1006 &&
+						Date.now() - commandWebsocketInitTime > 1000 &&
+						commandWebsocketReconnectAttempts < 20) {
+						commandWebsocketReconnectAttempts++;
 						// maybe iPad went into sleep mode?
-						// we need this websocket working, so init it again
-						initCommandWebsocket();
+						// we need this websocket working, so init it again after delay
+						setTimeout(initCommandWebsocket, 3000);
 					}
 				};
 				// when the server pushes new commands

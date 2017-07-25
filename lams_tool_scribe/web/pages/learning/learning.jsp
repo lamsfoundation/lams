@@ -11,13 +11,36 @@
 <script type="text/javascript" src='<lams:LAMSURL/>includes/javascript/jquery.js'></script>
 <script type="text/javascript">
 	//init the connection with server using server URL but with different protocol
-	var scribeWebsocket = new WebSocket('${tool}'.replace('http', 'ws')
+	var scribeWebsocketInitTime = Date.now(), 
+		scribeWebsocket = new WebSocket('${tool}'.replace('http', 'ws')
 					+ 'learningWebsocket?toolSessionID=' + ${scribeSessionDTO.sessionID}),
+		scribeWebsocketPingTimeout = null,
+		scribeWebsocketPingFunc = null,
 		agreementPercentageLabel = '<fmt:message key="message.voteStatistics" />',
 		reportSubmitted = ${scribeSessionDTO.reportSubmitted};
+
+	scribeWebsocketPingFunc = function(skipPing){
+		if (scribeWebsocket.readyState == scribeWebsocket.CLOSING 
+				|| scribeWebsocket.readyState == scribeWebsocket.CLOSED){
+			if (Date.now() - scribeWebsocketInitTime < 1000) {
+				return;
+			}
+			location.reload();
+		}
 		
+		// check and ping every 3 minutes
+		scribeWebsocketPingTimeout = setTimeout(scribeWebsocketPingFunc, 3*60*1000);
+		// initial set up does not send ping
+		if (!skipPing) {
+			scribeWebsocket.send("ping");
+		}
+	};
+	// set up timer for the first time
+	scribeWebsocketPingFunc(true);
+	
 	scribeWebsocket.onclose = function(e){
-		if (e.code === 1006) {
+		if (e.code === 1006 &&
+			Date.now() - scribeWebsocketInitTime > 1000) {
 			location.reload();
 		}
 	};
@@ -33,6 +56,10 @@
 			window.location.href = '${tool}learning.do?toolSessionID=${scribeSessionDTO.sessionID}&mode=${MODE}';
 			return;
 		}
+
+		// reset ping timer
+		clearTimeout(scribeWebsocketPingTimeout);
+		scribeWebsocketPingFunc(true);
 		
 		// only changed reports will be sent
 		if (input.reports) {
