@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web;
 
 import java.io.InputStream;
@@ -61,7 +60,10 @@ public class PortraitSaveAction extends LamsDispatchAction {
     private static Logger log = Logger.getLogger(PortraitSaveAction.class);
     private static IUserManagementService service;
     private static CentralToolContentHandler centralToolContentHandler;
-    private static int LARGEST_DIMENSION = 120;
+    private static int LARGEST_DIMENSION_ORIGINAL = 400;
+    private static int LARGEST_DIMENSION_LARGE = 200;
+    private static int LARGEST_DIMENSION_MEDIUM = 80;
+    private static int LARGEST_DIMENSION_SMALL = 29;
 
     /**
      * Upload portrait image.
@@ -79,8 +81,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	PortraitActionForm portraitForm = (PortraitActionForm) form;
 	FormFile file = portraitForm.getFile();
 	String fileName = file.getFileName();
-	PortraitSaveAction.log.debug(
-		"got file: " + fileName + " of type: " + file.getContentType() + " with size: " + file.getFileSize());
+	log.debug("got file: " + fileName + " of type: " + file.getContentType() + " with size: " + file.getFileSize());
 
 	User user = getService().getUserByLogin(request.getRemoteUser());
 
@@ -92,8 +93,8 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	    return mapping.findForward("errors");
 	}
 
-	// resize picture
-	InputStream is = PortraitUtils.resizePicture(file.getInputStream(), PortraitSaveAction.LARGEST_DIMENSION);
+	// check file exists
+	InputStream is = file.getInputStream();
 	if (is == null) {
 	    errors.add("file", new ActionMessage("error.general.1"));
 	    saveErrors(request, errors);
@@ -101,71 +102,65 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	}
 
 	// write to content repository
-	NodeKey node = null;
+	NodeKey originalFileNode = null;
 	if ((file != null) && !StringUtils.isEmpty(fileName)) {
+	    
+	    //Create nice file name. If file name equals to "blob" - it means it was uploaded using webcam
+	    String fileNameWithoutExt;
+	    boolean isUploadedFromWebcam = false;
+	    if (fileName.equals("blob")) {
+		HttpSession ss = SessionManager.getSession();
+		UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		fileNameWithoutExt = userDTO.getLogin() + "_portrait";
+		isUploadedFromWebcam = true;
+
+	    } else {
+		fileNameWithoutExt = fileName.substring(0, fileName.indexOf('.'));
+	    }
+
+	    // upload to the content repository
 	    try {
-		fileName = fileName.substring(0, fileName.indexOf('.')) + ".jpg";
-		node = getCentralToolContentHandler().uploadFile(is, fileName, file.getContentType());
+		if (!isUploadedFromWebcam) {
+		    //resize
+		    is = PortraitUtils.resizePicture(file.getInputStream(), LARGEST_DIMENSION_ORIGINAL);
+		}
+		originalFileNode = getCentralToolContentHandler().uploadFile(is, fileNameWithoutExt + "_original.jpg", file.getContentType());
 		is.close();
+		log.debug("saved file with uuid: " + originalFileNode.getUuid() + " and version: " + originalFileNode.getVersion());
+		
+		//resize to the large size
+		is = PortraitUtils.resizePicture(file.getInputStream(), LARGEST_DIMENSION_LARGE);
+		NodeKey node = getCentralToolContentHandler().updateFile(originalFileNode.getUuid(), is, fileNameWithoutExt + "_large.jpg", file.getContentType());
+		is.close();
+		log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+		
+		//resize to the medium size
+		is = PortraitUtils.resizePicture(file.getInputStream(), LARGEST_DIMENSION_MEDIUM);
+		node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_medium.jpg", file.getContentType());
+		is.close();
+		log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+		
+		//resize to the small size
+		is = PortraitUtils.resizePicture(file.getInputStream(), LARGEST_DIMENSION_SMALL);
+		node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_small.jpg", file.getContentType());
+		is.close();
+		log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+		
 	    } catch (Exception e) {
 		request.setAttribute("errorMessage", e.getMessage());
 		return mapping.findForward("error.system");
 	    }
-	}
 
-	PortraitSaveAction.log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+	}
 
 	// delete old portrait file (we only want to keep the user's current portrait)
 	if (user.getPortraitUuid() != null) {
 	    getCentralToolContentHandler().deleteFile(user.getPortraitUuid());
 	}
-	user.setPortraitUuid(node.getUuid());
+	user.setPortraitUuid(originalFileNode.getUuid());
 	getService().saveUser(user);
 
 	return mapping.findForward("profile");
-    }
-
-    /**
-     * Save portrait taken from web camera.
-     */
-    public ActionForward saveWebcamPortrait(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	// check if there is a session with logged in user
-	HttpSession ss = SessionManager.getSession();
-	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	User user = getService().getUserByLogin(request.getRemoteUser());
-	if ((userDTO == null) || (user == null)) {
-	    throw new UserAccessDeniedException("User hasn't been logged in");
-	}
-
-	// check if the file is an image using the MIME content type
-	String mediaType = request.getContentType().split("/", 2)[0];
-	if (!mediaType.equals("image")) {
-	    throw new FileUtilException("The file is not an image.");
-	}
-
-	// check if there is an input stream
-	InputStream is = request.getInputStream();
-	if (is == null) {
-	    throw new FileUtilException("Sorry, there has been an error.");
-	}
-
-	// write to content repository
-	String fileName = user.getFullName() + " portrait.jpg";
-	NodeKey node = getCentralToolContentHandler().uploadFile(is, fileName, "image/jpeg");
-	is.close();
-
-	log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
-
-	// delete old portrait file (we only want to keep the user's current portrait)
-	if (user.getPortraitUuid() != null) {
-	    getCentralToolContentHandler().deleteFile(user.getPortraitUuid());
-	}
-	user.setPortraitUuid(node.getUuid());
-	getService().saveUser(user);
-
-	return null;
     }
 
     private CentralToolContentHandler getCentralToolContentHandler() {
@@ -178,10 +173,10 @@ public class PortraitSaveAction extends LamsDispatchAction {
     }
 
     private IUserManagementService getService() {
-	if (PortraitSaveAction.service == null) {
+	if (service == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    PortraitSaveAction.service = (IUserManagementService) ctx.getBean("userManagementService");
+	    service = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return service;
     }

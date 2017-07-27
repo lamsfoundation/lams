@@ -53,7 +53,7 @@
 
 						<p class="text-center">
 							<bean:write name="fullName" />
-							<br /> <i class="fa fa-envelope small"></i>
+								<br /> <i class="fa fa-envelope small"></i>
 							<bean:write name="email" />
 						</p>
 					</div>
@@ -63,7 +63,9 @@
 						<a class="btn btn-sm btn-default offset5"
 							href="index.do?method=editprofile" role="button"><i
 							class="fa fa-fw fa-pencil"></i> <span class="hidden-xs"><fmt:message
-									key="title.profile.edit.screen" /></span></i></a>&nbsp;&nbsp;
+									key="title.profile.edit.screen" /></span></i>
+						</a>&nbsp;&nbsp;
+						
 						<c:set var="authenticationMethodId">
 							<lams:user property="authenticationMethodId" />
 						</c:set>
@@ -71,20 +73,27 @@
 						<c:if test="${authenticationMethodId eq dbId}">
 
 							<a class="btn btn-sm btn-default offset5"
-								href="index.do?method=password&redirectURL=index.do%3Fstate%3Dactive%26method%3Dprofile" role="button"><i
-								class="fa fa-fw fa-lock"></i> <span class="hidden-xs"><fmt:message
-										key="title.password.change.screen" /></span></i></a>
+								href="index.do?method=password&redirectURL=index.do%3Fstate%3Dactive%26method%3Dprofile" role="button">
+									<i class="fa fa-fw fa-lock"></i> 
+										<span class="hidden-xs"><fmt:message
+											key="title.password.change.screen" />
+										</span>
+									</i>
+							</a>
 						</c:if>
 						<a class="btn btn-sm btn-default offset5"
-							href="index.do?method=portrait" role="button"><i
-							class="fa fa-fw fa-camera"></i> <span class="hidden-xs"><fmt:message
-									key="title.portrait.change.screen" /></span></i></a>&nbsp;&nbsp;
+							href="index.do?method=portrait" role="button">
+							<i class="fa fa-fw fa-camera"></i> <span class="hidden-xs"><fmt:message
+									key="title.portrait.change.screen" /></span></i>
+						</a>&nbsp;&nbsp;
 
 						<c:if test="${showAllMyLessonLink}">
 							<a class="btn btn-sm btn-default offset5"
-								href="index.do?method=lessons" role="button"><i
-								class="fa fa-fw fa-book"></i> <span class="hidden-xs"><fmt:message
-										key="title.all.my.lessons" /></span></i></a>
+								href="index.do?method=lessons" role="button">
+								<i class="fa fa-fw fa-book"></i> <span class="hidden-xs"><fmt:message
+										key="title.all.my.lessons" /></span>
+								</i>
+							</a>
 						</c:if>
 					</div>
 				</div>
