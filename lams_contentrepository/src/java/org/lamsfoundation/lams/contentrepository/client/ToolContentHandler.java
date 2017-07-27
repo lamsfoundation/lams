@@ -174,6 +174,28 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 
 	return nodeKey;
     }
+	    
+    @Override
+    public NodeKey updateFile(Long uuid, InputStream stream, String fileName, String mimeType)
+	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
+	NodeKey nodeKey = null;
+	try {
+	    try {
+		nodeKey = getRepositoryService().updateFileItem(getTicket(false), uuid, fileName, stream, mimeType, null);
+	    } catch (AccessDeniedException e) {
+		log.warn("Unable to access repository to add file " + fileName + "AccessDeniedException: "
+			+ e.getMessage() + " Retrying login.");
+		nodeKey = getRepositoryService().updateFileItem(getTicket(true), uuid, fileName, stream, mimeType, null);
+	    }
+
+	} catch (RepositoryCheckedException e2) {
+	    log.warn("Unable to to updateFile" + fileName + "Repository Exception: " + e2.getMessage()
+		    + " Retry not possible.");
+	    throw e2;
+	}
+
+	return nodeKey;
+    }
 
     /**
      * TODO To be removed from the system and replaced with the call with the user id.
