@@ -97,6 +97,30 @@ public interface IToolContentHandler {
 	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException;
 
     /**
+     * Update an existing file in the repository. This will create a new version of this file (its version number will
+     * be equal to the current one incremented by 1).
+     *
+     * @param uuid
+     *            unique id of the updated file. Mandatory
+     * 
+     * @param stream
+     *            Input filestream. Mandatory.
+     * @param fileName
+     *            Input filename. Mandatory.
+     * @param mimeType
+     *            Mimetype of file. Optional.
+     * @return key to the new content repository node
+     * @throws InvalidParameterException
+     *             One of the mandatory parameters is missing.
+     * @throws FileException
+     *             An error occured writing the input stream to disk.
+     * @throws RepositoryCheckedException
+     *             Some other error occured.
+     */
+    public abstract NodeKey updateFile(Long uuid, InputStream stream, String fileName, String mimeType)
+	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException;
+
+    /**
      * Save a directory of files in the content repository.
      * 
      * @param ticket
