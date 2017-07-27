@@ -110,9 +110,6 @@
 			commandWebsocketPingFunc = function(skipPing){
 				if (commandWebsocket.readyState == commandWebsocket.CLOSING 
 						|| commandWebsocket.readyState == commandWebsocket.CLOSED){
-					if (Date.now() - commandWebsocketInitTime > 1000) {
-						initCommandWebsocket();
-					}
 					return;
 				}
 				
@@ -173,9 +170,7 @@
 				// it is not an obvious place to init the websocket, but we need lesson ID
 				commandWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
 						+ 'commandWebsocket?lessonID=' + lessonId);
-				// set up timer for the first time
-				commandWebsocketPingFunc(true);
-				
+
 				commandWebsocket.onclose = function(e){
 					// check reason and whether the close did not happen immediately after websocket creation
 					// (possible access denied, user logged out?)
@@ -188,6 +183,10 @@
 						setTimeout(initCommandWebsocket, 3000);
 					}
 				};
+
+				// set up timer for the first time
+				commandWebsocketPingFunc(true);
+				
 				// when the server pushes new commands
 				commandWebsocket.onmessage = function(e){
 					// read JSON object

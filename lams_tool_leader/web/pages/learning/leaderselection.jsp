@@ -32,14 +32,19 @@
  			+ 'learningWebsocket?toolSessionID=' + ${toolSessionID}),
 		leaderWebsocketPingTimeout = null,
 		leaderWebsocketPingFunc = null;
- 		
+ 	
+ 	leaderWebsocket.onclose = function(e){
+ 		// react only on abnormal close
+ 		if (e.code === 1006 &&
+ 		 	Date.now() - leaderWebsocketInitTime > 1000) {
+ 	 		location.reload();
+ 		}
+ 	};
+ 	
 	leaderWebsocketPingFunc = function(skipPing){
 		if (leaderWebsocket.readyState == leaderWebsocket.CLOSING 
 				|| leaderWebsocket.readyState == leaderWebsocket.CLOSED){
-			if (Date.now() - leaderWebsocketInitTime < 1000) {
-				return;
-			}
-			location.reload();
+			return;
 		}
 		
 		// check and ping every 3 minutes
@@ -49,16 +54,10 @@
 			leaderWebsocket.send("ping");
 		}
 	};
+	
 	// set up timer for the first time
 	leaderWebsocketPingFunc(true);
- 	
- 	leaderWebsocket.onclose = function(e){
- 		// react only on abnormal close
- 		if (e.code === 1006 &&
- 		 	Date.now() - leaderWebsocketInitTime > 1000) {
- 	 		location.reload();
- 		}
- 	};
+
  	
 	// run when the leader has just been selected
 	leaderWebsocket.onmessage = function(e) {
