@@ -34,13 +34,18 @@
 		scratchieWebsocketPingTimeout = null,
 		scratchieWebsocketPingFunc = null;
 	
+	scratchieWebsocket.onclose = function(e) {
+		// react only on abnormal close
+		if (e.code === 1006 &&
+			Date.now() - scratchieWebsocketInitTime > 1000) {
+			location.reload();		
+		}
+	};
+	
 	scratchieWebsocketPingFunc = function(skipPing){
 		if (scratchieWebsocket.readyState == scratchieWebsocket.CLOSING 
 				|| scratchieWebsocket.readyState == scratchieWebsocket.CLOSED){
-			if (Date.now() - scratchieWebsocketInitTime < 1000) {
-				return;
-			}
-			location.reload();
+			return;
 		}
 		
 		// check and ping every 3 minutes
@@ -50,16 +55,10 @@
 			scratchieWebsocket.send("ping");
 		}
 	};
+	
 	// set up timer for the first time
 	scratchieWebsocketPingFunc(true);
-	
-	scratchieWebsocket.onclose = function(e) {
-		// react only on abnormal close
-		if (e.code === 1006 &&
-			Date.now() - scratchieWebsocketInitTime > 1000) {
-			location.reload();		
-		}
-	};
+
 	
 	// run when the server pushes new reports and vote statistics
 	scratchieWebsocket.onmessage = function(e) {

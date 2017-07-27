@@ -98,12 +98,17 @@ $(document).ready(function (){
 	presenceWebsocketPingTimeout = null,
 	presenceWebsocketPingFunc = null;
 	
+	presenceWebsocket.onclose = function(e){
+		// react only on abnormal close
+		if (e.code === 1006 &&
+			Date.now() - presenceWebsocketInitTime > 1000) {
+			location.reload();
+		}
+	};
+	
 	presenceWebsocketPingFunc = function(skipPing){
 		if (presenceWebsocket.readyState == presenceWebsocket.CLOSING || presenceWebsocket.readyState == presenceWebsocket.CLOSED) {
-			if (Date.now() - presenceWebsocketInitTime < 1000) {
 				return;
-			}
-			location.reload();
 		}
 		
 		// check and ping every 3 minutes
@@ -116,13 +121,7 @@ $(document).ready(function (){
 	// set up timer for the first time
 	presenceWebsocketPingFunc(true);
 	
-	presenceWebsocket.onclose = function(e){
-		// react only on abnormal close
-		if (e.code === 1006 &&
-			Date.now() - presenceWebsocketInitTime > 1000) {
-			location.reload();
-		}
-	};
+
 	// when the server pushes new messages and roster to the learner's browser
 	presenceWebsocket.onmessage = function(e){
 	  // reset ping timer

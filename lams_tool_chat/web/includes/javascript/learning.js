@@ -28,13 +28,18 @@ $(document).ready(function() {
 		chatWebsocketPingTimeout = null,
 		chatWebsocketPingFunc = null;
 	
+	chatWebsocket.onclose = function(e){
+		// react only on abnormal close
+		if (e.code === 1006 &&
+			Date.now() - chatWebsocketInitTime > 1000) {
+			location.reload();
+		}
+	};
+	
 	chatWebsocketPingFunc = function(skipPing){
 		if (chatWebsocket.readyState == chatWebsocket.CLOSING 
 				|| chatWebsocket.readyState == chatWebsocket.CLOSED){
-			if (Date.now() - chatWebsocketInitTime < 1000) {
-				return;
-			}
-			location.reload();
+			return;
 		}
 		
 		// check and ping every 3 minutes
@@ -46,14 +51,7 @@ $(document).ready(function() {
 	};
 	// set up timer for the first time
 	chatWebsocketPingFunc(true);
-	
-	chatWebsocket.onclose = function(e){
-		// react only on abnormal close
-		if (e.code === 1006 &&
-			Date.now() - chatWebsocketInitTime > 1000) {
-			location.reload();
-		}
-	};
+
 
 	chatWebsocket.onmessage = function(e){
 		// reset ping timer

@@ -46,7 +46,7 @@
 	<c:if test="${ not hideProgressBar && ( empty mode || mode == 'author' || mode == 'learner') }">
 	
 		<%-- Links placed in body instead of head. Ugly, but it works. --%>
-		<link rel="stylesheet" href="<lams:LAMSURL/>css/progressBar.css" type="text/css" />
+		<lams:css suffix="progressBar"/>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 		
@@ -95,14 +95,32 @@
 				LEARNING_URL = LAMS_URL + 'learning/',
 
 				// it gets initialised along with progress bar
+				commandWebsocketInitTime = null,
 				commandWebsocket = null,
-
+				commandWebsocketPingTimeout = null,
+				commandWebsocketPingFunc = null,
+				commandWebsocketReconnectAttempts = 0,
+				
 				bars = {
 					'learnerMainBar' : {
 						'containerId' : 'progressBarDiv'
 					}
 				};
-
+				
+			commandWebsocketPingFunc = function(skipPing){
+				if (commandWebsocket.readyState == commandWebsocket.CLOSING 
+						|| commandWebsocket.readyState == commandWebsocket.CLOSED){
+					return;
+				}
+				
+				// check and ping every 3 minutes
+				commandWebsocketPingTimeout = setTimeout(commandWebsocketPingFunc, 3*60*1000);
+				// initial set up does not send ping
+				if (!skipPing) {
+					commandWebsocket.send("ping");
+				}
+			};
+				
 			function restartLesson(){
 				if (confirm(restartLessonConfirmation)) {
 					window.location.href = LEARNING_URL + 'learner.do?method=restartLesson&lessonID=' + lessonId;
@@ -146,18 +164,28 @@
 				}
 				$('#sidebar').show();
 			}
-			
+
 			function initCommandWebsocket(){
+				commandWebsocketInitTime = Date.now();
 				// it is not an obvious place to init the websocket, but we need lesson ID
-				commandWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws') + 'commandWebsocket?lessonID=' + lessonId);
+				commandWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
+						+ 'commandWebsocket?lessonID=' + lessonId);
 
 				commandWebsocket.onclose = function(e){
-					if (e.code === 1006) {
+					// check reason and whether the close did not happen immediately after websocket creation
+					// (possible access denied, user logged out?)
+					if (e.code === 1006 &&
+						Date.now() - commandWebsocketInitTime > 1000 &&
+						commandWebsocketReconnectAttempts < 20) {
+						commandWebsocketReconnectAttempts++;
 						// maybe iPad went into sleep mode?
-						// we need this websocket working, so init it again
-						initCommandWebsocket();
+						// we need this websocket working, so init it again after delay
+						setTimeout(initCommandWebsocket, 3000);
 					}
 				};
+
+				// set up timer for the first time
+				commandWebsocketPingFunc(true);
 				
 				// when the server pushes new commands
 				commandWebsocket.onmessage = function(e){
@@ -169,6 +197,10 @@
 					if (command.redirectURL) {
 						window.location.href = command.redirectURL;
 					}
+
+					// reset ping timer
+					clearTimeout(commandWebsocketPingTimeout);
+					commandWebsocketPingFunc(true);
 				};
 			}
 			
@@ -254,11 +286,11 @@
 				<div class="collapse navbar-collapse" id="bs-sidebar-navbar-collapse-1">
 					<ul class="nav navbar-nav">
 						<li><a href="#" class="hidden-xs visible-sm visible-md visible-lg slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
-							<i class="pull-right fa fa-bars" style="color:#337ab7"></i>
+							<i class="pull-right fa fa-bars"></i>
 							<p class="lessonName"></p></a></li>
 						<li><a href="#" onClick="javascript:closeWindow()" ><span id="exitlabel">Exit</span><i class="pull-right fa fa-times"></i></a></li>
 						<li><a href="#" onClick="javascript:viewNotebookEntries(); return false;" ><span id="notebooklabel">Notebook</span><i class="pull-right fa fa-book"></i></a></li>
-						<li id="restartitem" style="display:none"><a href="#" onClick="javascript:restartLesson()"><span id="restartlabel">Restart</span><i class="pull-right fa fa-fast-backward"></i></a></li>
+						<li id="restartitem" style="display:none"><a href="#" onClick="javascript:restartLesson()"><span id="restartlabel">Restart</span><i class="pull-right fa fa-fast-backward "></i></a></li>
 						<li id="supportitem" style="display:none"><a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
 							<span id="supportlabel">Support Activities</span><i class="pull-right fa fa-th-large"></i></a>
 							<div id="supportPart" class="progressBarContainer"></div>
@@ -352,7 +384,3 @@
 		</div>
 	</c:otherwise>
 </c:choose>
-
-
-		
-			

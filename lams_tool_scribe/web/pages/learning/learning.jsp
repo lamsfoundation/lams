@@ -18,7 +18,14 @@
 		scribeWebsocketPingFunc = null,
 		agreementPercentageLabel = '<fmt:message key="message.voteStatistics" />',
 		reportSubmitted = ${scribeSessionDTO.reportSubmitted};
-
+		
+	scribeWebsocket.onclose = function(e){
+		if (e.code === 1006 &&
+			Date.now() - scribeWebsocketInitTime > 1000) {
+			location.reload();
+		}
+	};
+		
 	scribeWebsocketPingFunc = function(skipPing){
 		if (scribeWebsocket.readyState == scribeWebsocket.CLOSING 
 				|| scribeWebsocket.readyState == scribeWebsocket.CLOSED){
@@ -35,15 +42,9 @@
 			scribeWebsocket.send("ping");
 		}
 	};
+	
 	// set up timer for the first time
 	scribeWebsocketPingFunc(true);
-	
-	scribeWebsocket.onclose = function(e){
-		if (e.code === 1006 &&
-			Date.now() - scribeWebsocketInitTime > 1000) {
-			location.reload();
-		}
-	};
 	
 	// run when the server pushes new reports and vote statistics
 	scribeWebsocket.onmessage = function(e) {
