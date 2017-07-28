@@ -12,7 +12,7 @@
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
 <c:set var="isScratchingFinished" value="${sessionMap.isScratchingFinished}" />
 <c:set var="isWaitingForLeaderToSubmitNotebook" value="${sessionMap.isWaitingForLeaderToSubmitNotebook}" />
-<c:set var="hideFinishButton" value="${!isUserLeader && (!isScratchingFinished || !isWaitingForLeaderToSubmitNotebook)}" />
+<c:set var="hideFinishButton" value="${!isUserLeader && (!isScratchingFinished || isWaitingForLeaderToSubmitNotebook)}" />
 
 <!-- Used by TestHarness 
 	 isUserLeader=${isUserLeader}
