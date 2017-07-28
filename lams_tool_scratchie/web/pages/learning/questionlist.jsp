@@ -78,6 +78,7 @@
 		
 		// leader finished the activity
 		if (input.close) {
+			scratchieWebsocket.close();
 			$('#finishButton').show();
 			return;
 		}

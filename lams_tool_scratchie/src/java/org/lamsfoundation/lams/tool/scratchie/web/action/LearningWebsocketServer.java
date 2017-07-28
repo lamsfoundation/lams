@@ -21,6 +21,7 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceProxy;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
@@ -56,16 +57,39 @@ public class LearningWebsocketServer {
 		    while (entryIterator.hasNext()) {
 			Entry<Long, Set<Session>> entry = entryIterator.next();
 			Long toolSessionId = entry.getKey();
-			try {
-			    send(toolSessionId);
-			} catch (JSONException e) {
-			    LearningWebsocketServer.log.error("Error while building Scratchie answer JSON", e);
-			}
 			// if all learners left the activity, remove the obsolete mapping
 			Set<Session> sessionWebsockets = entry.getValue();
 			if (sessionWebsockets.isEmpty()) {
 			    entryIterator.remove();
 			    LearningWebsocketServer.cache.remove(toolSessionId);
+			    continue;
+			}
+
+			ScratchieSession toolSession = LearningWebsocketServer.getScratchieService()
+				.getScratchieSessionBySessionId(toolSessionId);
+			if (toolSession.isScratchingFinished()) {
+			    boolean isWaitingForLeaderToSubmit = LearningWebsocketServer.getScratchieService()
+				    .isWaitingForLeaderToSubmit(toolSession);
+			    if (isWaitingForLeaderToSubmit) {
+				Object cache = LearningWebsocketServer.cache.get(toolSessionId);
+				// missing cache is a marker that we've been here before,
+				// so no need to send refresh again
+				if (cache != null) {
+				    LearningWebsocketServer.cache.remove(toolSessionId);
+				    LearningWebsocketServer.sendPageRefreshRequest(toolSessionId);
+				}
+			    } else {
+				// this should make all websockets close on client side,
+				// so next run will not happen
+				LearningWebsocketServer.sendCloseRequest(toolSessionId);
+			    }
+			    continue;
+			}
+
+			try {
+			    send(toolSessionId);
+			} catch (JSONException e) {
+			    LearningWebsocketServer.log.error("Error while building Scratchie answer JSON", e);
 			}
 		    }
 		} catch (Exception e) {
@@ -106,13 +130,13 @@ public class LearningWebsocketServer {
 			    if (sessionCache == null) {
 				sessionCache = LearningWebsocketServer.cache.get(toolSessionId);
 				if (sessionCache == null) {
-				    sessionCache = new TreeMap<Long, Map<Long, Boolean>>();
+				    sessionCache = new TreeMap<>();
 				    LearningWebsocketServer.cache.put(toolSessionId, sessionCache);
 				}
 			    }
 			    itemCache = sessionCache.get(itemUid);
 			    if (itemCache == null) {
-				itemCache = new TreeMap<Long, Boolean>();
+				itemCache = new TreeMap<>();
 				sessionCache.put(itemUid, itemCache);
 			    }
 			}
@@ -149,14 +173,14 @@ public class LearningWebsocketServer {
 	}
     }
 
-    private static Logger log = Logger.getLogger(LearningWebsocketServer.class);
+    private static final Logger log = Logger.getLogger(LearningWebsocketServer.class);
 
     private static IScratchieService scratchieService;
 
     private static final SendWorker sendWorker = new SendWorker();
     // maps toolSessionId -> itemUid -> answerUid -> isCorrect
-    private static final Map<Long, Map<Long, Map<Long, Boolean>>> cache = new ConcurrentHashMap<Long, Map<Long, Map<Long, Boolean>>>();
-    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<Long, Set<Session>>();
+    private static final Map<Long, Map<Long, Map<Long, Boolean>>> cache = new ConcurrentHashMap<>();
+    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<>();
 
     static {
 	// run the singleton thread

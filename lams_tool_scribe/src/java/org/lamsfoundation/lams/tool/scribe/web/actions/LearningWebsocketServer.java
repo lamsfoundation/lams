@@ -68,17 +68,27 @@ public class LearningWebsocketServer {
 		    while (entryIterator.hasNext()) {
 			Entry<Long, Set<Session>> entry = entryIterator.next();
 			Long toolSessionId = entry.getKey();
-			try {
-			    send(toolSessionId, null);
-			} catch (JSONException e) {
-			    LearningWebsocketServer.log.error("Error while building Scribe report JSON", e);
-			}
 			// if all learners left the activity, remove the obsolete mapping
 			Set<Session> sessionWebsockets = entry.getValue();
 			if (sessionWebsockets.isEmpty()) {
 			    entryIterator.remove();
 			    LearningWebsocketServer.cache.remove(toolSessionId);
+			    continue;
 			}
+
+			ScribeSession scribeSession = LearningWebsocketServer.getScribeService()
+				.getSessionBySessionId(toolSessionId);
+			if (scribeSession.isForceComplete()) {
+			    sendCloseRequest(toolSessionId);
+			    continue;
+			}
+
+			try {
+			    send(toolSessionId, null);
+			} catch (JSONException e) {
+			    LearningWebsocketServer.log.error("Error while building Scribe report JSON", e);
+			}
+
 		    }
 		} catch (Exception e) {
 		    // error caught, but carry on
@@ -136,7 +146,7 @@ public class LearningWebsocketServer {
 		    Long uid = storedReport.getUid();
 		    String cachedReportText = sessionCache.reports.get(uid);
 		    String storedReportText = StringEscapeUtils.escapeHtml(storedReport.getEntryText());
-		    storedReportText = storedReportText != null ? storedReportText.replaceAll("\n", "<br>") : null;	
+		    storedReportText = storedReportText != null ? storedReportText.replaceAll("\n", "<br>") : null;
 		    if (cachedReportText == null ? storedReportText != null
 			    : (storedReportText == null) || (cachedReportText.length() != storedReportText.length())
 				    || !cachedReportText.equals(storedReportText)) {
@@ -261,7 +271,7 @@ public class LearningWebsocketServer {
 	    // just a ping every few minutes
 	    return;
 	}
-	
+
 	JSONObject requestJSON = new JSONObject(input);
 	switch (requestJSON.getString("type")) {
 	    case "vote":

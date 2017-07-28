@@ -23,7 +23,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
  * @author Andrey Balan
  */
 public class FinishScratchingJob extends QuartzJobBean {
-    
+
     private static Logger log = Logger.getLogger(FinishScratchingJob.class);
 
     @Override
@@ -34,21 +34,12 @@ public class FinishScratchingJob extends QuartzJobBean {
 	Map properties = context.getJobDetail().getJobDataMap();
 	Long toolSessionId = (Long) properties.get("toolSessionId");
 	ScratchieSession toolSession = scratchieService.getScratchieSessionBySessionId(toolSessionId);
-	
+
 	//proceed only in case the leader hasn't finished scratching on his own
 	if (!toolSession.isScratchingFinished()) {
 	    try {
 		//mark scratching as finished to stop showing learning.jsp to the leader
 		scratchieService.setScratchingFinished(toolSessionId);
-		
-		// if non-leaders should not wait for notebook or burning questions to be submitted by the leader - let them see Finish button
-		boolean isWaitingForLeaderToSubmit = scratchieService.isWaitingForLeaderToSubmit(toolSession);
-		if (isWaitingForLeaderToSubmit) {
-		    LearningWebsocketServer.sendPageRefreshRequest(toolSessionId);
-		} else {
-		    LearningWebsocketServer.sendCloseRequest(toolSessionId);
-		}
-		
 	    } catch (JSONException | IOException e) {
 		throw new RuntimeException(e);
 	    }
@@ -58,7 +49,7 @@ public class FinishScratchingJob extends QuartzJobBean {
 	    log.debug("Scratching is finished for toolSessionId: " + toolSessionId.longValue());
 	}
     }
-    
+
     protected IScratchieService getScratchieService(JobExecutionContext context) throws JobExecutionException {
 	try {
 	    SchedulerContext sc = context.getScheduler().getContext();

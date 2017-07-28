@@ -147,25 +147,27 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public List<DokumaranUser> checkLeaderSelectToolForSessionLeader(DokumaranUser user, Long toolSessionId, boolean isFirstTimeAccess) {
+    public List<DokumaranUser> checkLeaderSelectToolForSessionLeader(DokumaranUser user, Long toolSessionId,
+	    boolean isFirstTimeAccess) {
 	if ((user == null) || (toolSessionId == null)) {
 	    return null;
 	}
 
 	DokumaranSession session = getDokumaranSessionBySessionId(toolSessionId);
 	Dokumaran dokumaran = session.getDokumaran();
-	List<DokumaranUser> leaders = new ArrayList<DokumaranUser>();
+	List<DokumaranUser> leaders = new ArrayList<>();
 	if (dokumaran.isAllowMultipleLeaders() && !isGroupedActivity(dokumaran.getContentId())) {
-	    
+
 	    List<DokumaranUser> createdLeaders = dokumaranUserDao.getLeadersBySessionId(toolSessionId);
 	    leaders.addAll(createdLeaders);
-	    
+
 	    // check leader select tool for a leader only in case Dokumaran activity is accessed by this user for the first
 	    // time. We need to add this check in order to reduce amount of queries to Leader Selection tool.
 	    if (isFirstTimeAccess) {
 
 		//get all leaders from Leader Selection tool
-		Set<Long> allLeaderUserIds = toolService.getAllLeaderUserIds(toolSessionId, user.getUserId().intValue());
+		Set<Long> allLeaderUserIds = toolService.getAllLeaderUserIds(toolSessionId,
+			user.getUserId().intValue());
 		for (Long leaderUserId : allLeaderUserIds) {
 		    //in case current user is leader - store his leader status
 		    if (leaderUserId.equals(user.getUserId())) {
@@ -174,7 +176,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 			leaders.add(user);
 			continue;
 		    }
-		    
+
 		    //check if such leader is already created inside doKumaran
 		    boolean isLeaderCreated = false;
 		    for (DokumaranUser leader : createdLeaders) {
@@ -183,7 +185,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 			    break;
 			}
 		    }
-		    
+
 		    //if the leader is not yet created - create him
 		    if (!isLeaderCreated && (getUserByIDAndSession(leaderUserId, toolSessionId) == null)) {
 			log.debug("creating new user with userId: " + leaderUserId);
@@ -194,7 +196,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 			leaders.add(leader);
 		    }
 		}
-		
+
 	    }
 	} else {
 	    DokumaranUser leader = session.getGroupLeader();
@@ -219,7 +221,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		    dokumaranSessionDao.saveObject(session);
 		}
 	    }
-	    
+
 	    if (leader != null) {
 		leaders.add(leader);
 	    }
@@ -237,7 +239,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	}
 	return false;
     }
-    
+
     @Override
     public boolean isLeaderResponseFinalized(List<DokumaranUser> leaders) {
 	for (DokumaranUser leader : leaders) {
@@ -247,15 +249,15 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	}
 	return false;
     }
-    
+
     @Override
     public boolean isLeaderResponseFinalized(Long toolSessionId) {
 	DokumaranSession session = getDokumaranSessionBySessionId(toolSessionId);
 	Dokumaran dokumaran = session.getDokumaran();
-	
+
 	boolean isLeaderResponseFinalized = false;
 	if (dokumaran.isAllowMultipleLeaders() && !isGroupedActivity(dokumaran.getContentId())) {
-	    
+
 	    List<DokumaranUser> leaders = dokumaranUserDao.getLeadersBySessionId(toolSessionId);
 	    for (DokumaranUser leader : leaders) {
 		if (leader.isSessionFinished()) {
@@ -263,7 +265,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		    break;
 		}
 	    }
-	    
+
 	} else {
 	    DokumaranUser leader = session.getGroupLeader();
 	    isLeaderResponseFinalized = (leader != null) && leader.isSessionFinished();
@@ -271,25 +273,23 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	return isLeaderResponseFinalized;
     }
-    
+
     @Override
     public void launchTimeLimit(Long toolContentId) throws JSONException, IOException {
 	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
 	dokumaran.setTimeLimitLaunchedDate(new Date());
 	dokumaranDao.saveObject(dokumaran);
-	
-	LearningWebsocketServer.sendPageRefreshRequest(dokumaran.getContentId());
     }
-    
+
     @Override
     public void addOneMinute(Long toolContentId) throws JSONException, IOException {
 	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
-	
+
 	int timeLimit = dokumaran.getTimeLimit();
 	if (timeLimit == 0) {
 	    return;
 	}
-	
+
 	int newTimeLimit;
 	if (checkTimeLimitExceeded(dokumaran)) {
 	    dokumaran.setTimeLimitLaunchedDate(new Date());
@@ -299,8 +299,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	}
 	dokumaran.setTimeLimit(newTimeLimit);
 	dokumaranDao.saveObject(dokumaran);
-	
-	LearningWebsocketServer.sendAddOneMinuteRequest(dokumaran.getContentId());
     }
 
     @Override
@@ -395,7 +393,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	// DokumaranSession session = dokumaranSessionDao.getSessionBySessionId(toolSessionId);
 	// session.setStatus(DokumaranConstants.COMPLETED);
 	// dokumaranSessionDao.saveObject(session);
-	
+
 	//finish Etherpad session. Encapsulate it in try-catch block as we don't want it to affect regular LAMS workflow.
 	try {
 	    EPLiteClient client = initializeEPLiteClient();
@@ -434,7 +432,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     @Override
     public List<SessionDTO> getSummary(Long contentId) {
-	List<SessionDTO> groupList = new ArrayList<SessionDTO>();
+	List<SessionDTO> groupList = new ArrayList<>();
 
 	// get all sessions in a dokumaran and retrieve all dokumaran items under this session
 	// plus initial dokumaran items by author creating (resItemList)
@@ -448,9 +446,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	    String padId = session.getPadId();
 	    group.setPadId(padId);
-	    
+
 	    //mark all session that has had problems with pad initializations so that they could be fixed in monitoring by a teacher
-	    if (StringUtils.isEmpty(session.getEtherpadReadOnlyId()) || StringUtils.isEmpty(session.getEtherpadGroupId())) {
+	    if (StringUtils.isEmpty(session.getEtherpadReadOnlyId())
+		    || StringUtils.isEmpty(session.getEtherpadGroupId())) {
 		group.setSessionFaulty(true);
 	    }
 
@@ -462,7 +461,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     @Override
     public List<ReflectDTO> getReflectList(Long contentId) {
-	List<ReflectDTO> reflections = new LinkedList<ReflectDTO>();
+	List<ReflectDTO> reflections = new LinkedList<>();
 
 	List<DokumaranSession> sessionList = dokumaranSessionDao.getByContentId(contentId);
 	for (DokumaranSession session : sessionList) {
@@ -546,10 +545,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     // *******************************************************************************
@@ -748,7 +747,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	}
 
     }
-    
+
     @Override
     public void createPad(Dokumaran dokumaran, DokumaranSession session) throws DokumaranConfigurationException {
 	Long toolSessionId = session.getSessionId();
@@ -832,7 +831,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     public Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session)
 	    throws DokumaranConfigurationException, URISyntaxException, DokumaranApplicationException {
 	String groupId = session.getEtherpadGroupId();
-	
+
 	//don't allow sessions that has had problems with pad initializations. they could be fixed in monitoring by a teacher
 	if (StringUtils.isEmpty(session.getEtherpadReadOnlyId()) || StringUtils.isEmpty(groupId)) {
 	    throw new DokumaranApplicationException(
@@ -878,7 +877,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	Map etherpadSessions = client.listSessionsOfAuthor(authorId);
 	for (DokumaranSession session : sessionList) {
 	    String groupId = session.getEtherpadGroupId();
-	    
+
 	    //skip sessions that has had problems with pad initializations so that they could be fixed in monitoring by a teacher
 	    if (StringUtils.isEmpty(session.getEtherpadReadOnlyId()) || StringUtils.isEmpty(groupId)) {
 		continue;
@@ -890,13 +889,13 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	return createEtherpadCookie(etherpadSessionIds);
     }
-    
+
     /**
      * Returns valid Etherpad session. Returns existing one if finds such one and creates the new one otherwise
      */
     private String getEtherpadSession(String authorId, String etherpadGroupId, Map etherpadSessions) {
 	String etherpadSessionId = null;
-	
+
 	// search for already existing user's session
 	boolean isValidForMoreThan1Hour = false;
 	for (String etherpadSessionIdIter : (Set<String>) etherpadSessions.keySet()) {
@@ -914,7 +913,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		if (isValidForMoreThan1Hour) {
 		    etherpadSessionId = etherpadSessionIdIter;
 		    break;
-		
+
 		} else {
 		    // can't delete expired sessions as Etherpad throws an exception. Nonetheless it returns expired
 		    // ones when client.listSessionsOfAuthor(authorId) is requested
@@ -931,10 +930,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	return etherpadSessionId;
     }
-    
+
     /**
      * Constructs cookie to be stored at a clientside browser.
-     * 
+     *
      * @param etherpadSessionIds
      * @return
      * @throws URISyntaxException
@@ -944,7 +943,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
 	URI uri = new URI(etherpadServerUrl);
 	//regex to get the top level part of a domain
-        Pattern p = Pattern.compile("^(?:\\w+://)?[^:?#/\\s]*?([^.\\s]+\\.(?:[a-z]{2,}|co\\.uk|org\\.uk|ac\\.uk|edu\\.au|org\\.au|com\\.au|edu\\.sg|com\\.sg|net\\.sg|org\\.sg|gov\\.sg|per\\.sg))(?:[:?#/]|$)");
+	Pattern p = Pattern.compile(
+		"^(?:\\w+://)?[^:?#/\\s]*?([^.\\s]+\\.(?:[a-z]{2,}|co\\.uk|org\\.uk|ac\\.uk|edu\\.au|org\\.au|com\\.au|edu\\.sg|com\\.sg|net\\.sg|org\\.sg|gov\\.sg|per\\.sg))(?:[:?#/]|$)");
 	// eg: uri.getHost() will return "www.foo.com"
 	Matcher m = p.matcher(uri.getHost());
 	String topLevelDomain = m.matches() ? "." + m.group(1) : uri.getHost();
@@ -956,7 +956,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	etherpadSessionCookie.setMaxAge(-1);
 	etherpadSessionCookie.setPath("/");
 
-	return etherpadSessionCookie;	
+	return etherpadSessionCookie;
     }
 
     @Override
@@ -1033,7 +1033,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override

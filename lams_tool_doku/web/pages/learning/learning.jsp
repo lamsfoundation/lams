@@ -136,14 +136,14 @@
 				var input = JSON.parse(e.data);
 				
 				//monitor has added one minute to the total timeLimit time
-				if (input.addOneMinute) {
+				if (input.addTime) {
 					//reload page in order to allow editing the pad again
 					if (!$('#countdown').length) {
 						location.reload();
 					}
 					
-			    	var times = $("#countdown").countdown('getTimes');
-			    	var secondsLeft = times[4]*3600 + times[5]*60 + times[6] + 60;
+			    	var times = $("#countdown").countdown('getTimes'),
+			    		secondsLeft = times[4]*3600 + times[5]*60 + times[6] + +addTime*60;
 			    	$('#countdown').countdown('option', "until", '+' + secondsLeft + 'S');
 					
 					return;
