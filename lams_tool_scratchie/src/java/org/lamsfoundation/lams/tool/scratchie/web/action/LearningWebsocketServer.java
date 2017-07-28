@@ -70,15 +70,7 @@ public class LearningWebsocketServer {
 			if (toolSession.isScratchingFinished()) {
 			    boolean isWaitingForLeaderToSubmit = LearningWebsocketServer.getScratchieService()
 				    .isWaitingForLeaderToSubmit(toolSession);
-			    if (isWaitingForLeaderToSubmit) {
-				Object cache = LearningWebsocketServer.cache.get(toolSessionId);
-				// missing cache is a marker that we've been here before,
-				// so no need to send refresh again
-				if (cache != null) {
-				    LearningWebsocketServer.cache.remove(toolSessionId);
-				    LearningWebsocketServer.sendPageRefreshRequest(toolSessionId);
-				}
-			    } else {
+			    if (!isWaitingForLeaderToSubmit) {
 				// this should make all websockets close on client side,
 				// so next run will not happen
 				LearningWebsocketServer.sendCloseRequest(toolSessionId);
@@ -240,27 +232,6 @@ public class LearningWebsocketServer {
 
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("close", true);
-	String response = responseJSON.toString();
-
-	for (Session websocket : sessionWebsockets) {
-	    if (websocket.isOpen()) {
-		websocket.getBasicRemote().sendText(response);
-	    }
-	}
-    }
-
-    /**
-     * The time limit is expired but leader hasn't submitted required notebook/burning questions yet. Non-leaders
-     * will need to refresh the page in order to stop showing them questions page.
-     */
-    public static void sendPageRefreshRequest(Long toolSessionId) throws JSONException, IOException {
-	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
-	if (sessionWebsockets == null) {
-	    return;
-	}
-
-	JSONObject responseJSON = new JSONObject();
-	responseJSON.put("pageRefresh", true);
 	String response = responseJSON.toString();
 
 	for (Session websocket : sessionWebsockets) {
