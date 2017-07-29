@@ -69,7 +69,7 @@ public class LearningWebsocketServer {
 	// how ofter the thread runs
 	private static final long CHECK_INTERVAL = 2000;
 	// mapping toolSessionId -> timestamp when the check was last performed, so the thread does not run too often
-	private final Map<Long, Long> lastSendTimes = new TreeMap<Long, Long>();
+	private static final Map<Long, Long> lastSendTimes = new TreeMap<>();
 
 	@Override
 	public void run() {
@@ -86,7 +86,7 @@ public class LearningWebsocketServer {
 			Long lastSendTime = lastSendTimes.get(toolSessionId);
 			if ((lastSendTime == null)
 				|| ((System.currentTimeMillis() - lastSendTime) >= SendWorker.CHECK_INTERVAL)) {
-			    send(toolSessionId);
+			    SendWorker.send(toolSessionId);
 			}
 			// if all users left the chat, remove the obsolete mapping
 			Set<Websocket> sessionWebsockets = entry.getValue();
@@ -114,7 +114,7 @@ public class LearningWebsocketServer {
 	/**
 	 * Feeds opened websockets with messages and roster.
 	 */
-	private void send(Long toolSessionId) {
+	private static void send(Long toolSessionId) {
 	    // update the timestamp
 	    lastSendTimes.put(toolSessionId, System.currentTimeMillis());
 
@@ -175,7 +175,7 @@ public class LearningWebsocketServer {
 	private long lastDBCheckTime = 0;
 
 	// Learners who are currently active
-	private final Set<String> activeUsers = new TreeSet<String>();
+	private final Set<String> activeUsers = new TreeSet<>();
 
 	private Roster(Long toolSessionId) {
 	    this.toolSessionId = toolSessionId;
@@ -185,7 +185,7 @@ public class LearningWebsocketServer {
 	 * Checks which Learners
 	 */
 	private JSONArray getRosterJSON() {
-	    Set<String> localActiveUsers = new TreeSet<String>();
+	    Set<String> localActiveUsers = new TreeSet<>();
 	    Set<Websocket> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	    // find out who is active locally
 	    for (Websocket websocket : sessionWebsockets) {
@@ -222,8 +222,8 @@ public class LearningWebsocketServer {
     private static IChatService chatService;
 
     private static final SendWorker sendWorker = new SendWorker();
-    private static final Map<Long, Roster> rosters = new ConcurrentHashMap<Long, Roster>();
-    private static final Map<Long, Set<Websocket>> websockets = new ConcurrentHashMap<Long, Set<Websocket>>();
+    private static final Map<Long, Roster> rosters = new ConcurrentHashMap<>();
+    private static final Map<Long, Set<Websocket>> websockets = new ConcurrentHashMap<>();
 
     static {
 	// run the singleton thread
@@ -255,7 +255,7 @@ public class LearningWebsocketServer {
 		finalSessionWebsockets.add(websocket);
 
 		// update the chat window immediatelly
-		LearningWebsocketServer.sendWorker.send(toolSessionId);
+		SendWorker.send(toolSessionId);
 
 		if (LearningWebsocketServer.log.isDebugEnabled()) {
 		    LearningWebsocketServer.log

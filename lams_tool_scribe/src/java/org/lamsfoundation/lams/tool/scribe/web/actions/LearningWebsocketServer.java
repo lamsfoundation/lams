@@ -45,7 +45,7 @@ public class LearningWebsocketServer {
     private static class ScribeSessionCache {
 	private int numberOfVotes = 0;
 	private int numberOfLearners = 0;
-	private final Map<Long, String> reports = new TreeMap<Long, String>();
+	private final Map<Long, String> reports = new TreeMap<>();
     }
 
     /**
@@ -79,16 +79,11 @@ public class LearningWebsocketServer {
 			ScribeSession scribeSession = LearningWebsocketServer.getScribeService()
 				.getSessionBySessionId(toolSessionId);
 			if (scribeSession.isForceComplete()) {
-			    sendCloseRequest(toolSessionId);
+			    LearningWebsocketServer.sendCloseRequest(toolSessionId);
 			    continue;
 			}
 
-			try {
-			    send(toolSessionId, null);
-			} catch (JSONException e) {
-			    LearningWebsocketServer.log.error("Error while building Scribe report JSON", e);
-			}
-
+			SendWorker.send(toolSessionId, null);
 		    }
 		} catch (Exception e) {
 		    // error caught, but carry on
@@ -109,7 +104,7 @@ public class LearningWebsocketServer {
 	 * Feeds websockets with reports and votes.
 	 */
 	@SuppressWarnings("unchecked")
-	private void send(Long toolSessionId, Session newWebsocket) throws JSONException, IOException {
+	private static void send(Long toolSessionId, Session newWebsocket) throws JSONException, IOException {
 	    JSONObject responseJSON = new JSONObject();
 	    ScribeSessionCache sessionCache = LearningWebsocketServer.cache.get(toolSessionId);
 	    if (sessionCache == null) {
@@ -129,7 +124,7 @@ public class LearningWebsocketServer {
 	    }
 
 	    // collect users who agreed on the report
-	    Set<String> learnersApproved = new TreeSet<String>();
+	    Set<String> learnersApproved = new TreeSet<>();
 	    for (ScribeUser user : learners) {
 		if (user.isReportApproved()) {
 		    learnersApproved.add(user.getLoginName());
@@ -199,8 +194,8 @@ public class LearningWebsocketServer {
 
     private static final SendWorker sendWorker = new SendWorker();
     // maps toolSessionId -> cached session data
-    private static final Map<Long, ScribeSessionCache> cache = new ConcurrentHashMap<Long, ScribeSessionCache>();
-    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<Long, Set<Session>>();
+    private static final Map<Long, ScribeSessionCache> cache = new ConcurrentHashMap<>();
+    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<>();
 
     static {
 	// run the singleton thread
@@ -229,7 +224,7 @@ public class LearningWebsocketServer {
 	new Thread(() -> {
 	    try {
 		HibernateSessionManager.openSession();
-		LearningWebsocketServer.sendWorker.send(toolSessionId, websocket);
+		SendWorker.send(toolSessionId, websocket);
 	    } catch (Exception e) {
 		log.error("Error while sending messages", e);
 	    } finally {
