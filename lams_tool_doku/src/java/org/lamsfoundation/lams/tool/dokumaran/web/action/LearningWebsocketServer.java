@@ -3,8 +3,8 @@ package org.lamsfoundation.lams.tool.dokumaran.web.action;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.CloseReason;
@@ -63,14 +63,16 @@ public class LearningWebsocketServer {
 			    continue;
 			}
 
-			Dokumaran dokumaran = getDokumaranService().getDokumaranByContentId(toolContentId);
+			Dokumaran dokumaran = LearningWebsocketServer.getDokumaranService()
+				.getDokumaranByContentId(toolContentId);
 			int timeLimit = dokumaran.getTimeLimit();
 			if (dokumaran.getTimeLimitLaunchedDate() != null && timeLimit != 0) {
 			    Integer cachedTimeLimit = timeLimitCache.get(toolContentId);
-			    if (cachedTimeLimit == null || !cachedTimeLimit.equals(timeLimit)) {
+			    if (cachedTimeLimit == null) {
 				timeLimitCache.put(toolContentId, timeLimit);
-				sendAddTimeRequest(toolContentId,
-					timeLimit - (cachedTimeLimit == null ? 0 : cachedTimeLimit));
+				LearningWebsocketServer.sendPageRefreshRequest(toolContentId);
+			    } else if (!cachedTimeLimit.equals(timeLimit)) {
+				LearningWebsocketServer.sendAddTimeRequest(toolContentId, timeLimit - cachedTimeLimit);
 			    }
 			}
 		    }
@@ -93,8 +95,8 @@ public class LearningWebsocketServer {
     private static final Logger log = Logger.getLogger(LearningWebsocketServer.class);
 
     private static final SendWorker sendWorker = new SendWorker();
-    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<Long, Set<Session>>();
-    private static final Map<Long, Integer> timeLimitCache = new ConcurrentHashMap<Long, Integer>();
+    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<>();
+    private static final Map<Long, Integer> timeLimitCache = new ConcurrentHashMap<>();
 
     private static IDokumaranService dokumaranService;
 
@@ -148,7 +150,7 @@ public class LearningWebsocketServer {
      * Monitor has added one more minute to the time limit. All learners will need
      * to add +1 minute to their countdown counters.
      */
-    public static void sendAddTimeRequest(Long toolContentId, int timeLimit) throws JSONException, IOException {
+    private static void sendAddTimeRequest(Long toolContentId, int timeLimit) throws JSONException, IOException {
 	Set<Session> toolContentWebsockets = websockets.get(toolContentId);
 	if (toolContentWebsockets == null) {
 	    return;
@@ -156,6 +158,27 @@ public class LearningWebsocketServer {
 
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("addTime", timeLimit);
+	String response = responseJSON.toString();
+
+	for (Session websocket : toolContentWebsockets) {
+	    if (websocket.isOpen()) {
+		websocket.getBasicRemote().sendText(response);
+	    }
+	}
+    }
+
+    /**
+     * Monitor has launched time limit. All learners will need to refresh the page in order to stop showing them
+     * waitForTimeLimitLaunch page.
+     */
+    private static void sendPageRefreshRequest(Long toolContentId) throws JSONException, IOException {
+	Set<Session> toolContentWebsockets = websockets.get(toolContentId);
+	if (toolContentWebsockets == null) {
+	    return;
+	}
+
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("pageRefresh", true);
 	String response = responseJSON.toString();
 
 	for (Session websocket : toolContentWebsockets) {
