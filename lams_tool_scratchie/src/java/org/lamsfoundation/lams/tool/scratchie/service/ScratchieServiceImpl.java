@@ -28,10 +28,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -42,7 +40,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -93,7 +90,6 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
-import org.lamsfoundation.lams.tool.scratchie.util.FinishScratchingJob;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
@@ -106,12 +102,8 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
 
 /**
  * @author Andrey Balan
@@ -162,7 +154,7 @@ public class ScratchieServiceImpl
     private IEventNotificationService eventNotificationService;
 
     private ScratchieOutputFactory scratchieOutputFactory;
-    
+
     private Scheduler scheduler;
 
     // *******************************************************************************
@@ -271,7 +263,7 @@ public class ScratchieServiceImpl
 	}
 	return leader;
     }
-    
+
     @Override
     public void launchTimeLimit(Long sessionId) throws SchedulerException {
 	ScratchieSession session = getScratchieSessionBySessionId(sessionId);
@@ -279,38 +271,19 @@ public class ScratchieServiceImpl
 	if (timeLimit == 0) {
 	    return;
 	}
-	
+
 	//store timeLimitLaunchedDate into DB
 	Date timeLimitLaunchedDate = new Date();
 	session.setTimeLimitLaunchedDate(timeLimitLaunchedDate);
 	scratchieSessionDao.saveObject(session);
-	
-	//calculate timeLimit finish date
-	Calendar timeLimitFinishDate = new GregorianCalendar(TimeZone.getDefault());
-	timeLimitFinishDate.setTime(timeLimitLaunchedDate);
-	timeLimitFinishDate.add(Calendar.MINUTE, timeLimit);
-	//adding 5 extra seconds to let leader auto-submit results and store them in DB
-	timeLimitFinishDate.add(Calendar.SECOND, 5);
-	
-	//start quartz job to notify non-leaders time is over
-	JobDetail finishScratchingJob = JobBuilder.newJob(FinishScratchingJob.class)
-		.withIdentity("finishScratching:" + sessionId)
-		.withDescription("Group name: " + session.getSessionName())
-		.usingJobData("toolSessionId", sessionId).build();
-	
-	Trigger fnishScratchingTrigger = TriggerBuilder.newTrigger()
-		.withIdentity("fnishScratchingTrigger:" + sessionId)
-		.startAt(timeLimitFinishDate.getTime()).build();
-	
-	scheduler.scheduleJob(finishScratchingJob, fnishScratchingTrigger);
     }
-    
+
     @Override
     public boolean isWaitingForLeaderToSubmit(ScratchieSession toolSession) {
 	Long toolSessionId = toolSession.getSessionId();
 	Scratchie scratchie = toolSession.getScratchie();
 	ScratchieUser groupLeader = toolSession.getGroupLeader();
-	
+
 	boolean isReflectOnActivity = scratchie.isReflectOnActivity();
 	// get notebook entry
 	NotebookEntry notebookEntry = null;
@@ -325,7 +298,7 @@ public class ScratchieServiceImpl
 	boolean isWaitingForLeaderToSubmitNotebook = isReflectOnActivity && (notebookEntry == null);
 	boolean isWaitingForLeaderToSubmitBurningQuestions = scratchie.isBurningQuestionsEnabled()
 		&& ((burningQuestions == null) || burningQuestions.isEmpty()) && !toolSession.isSessionFinished();
-	
+
 	return isWaitingForLeaderToSubmitNotebook || isWaitingForLeaderToSubmitBurningQuestions;
     }
 
@@ -433,7 +406,7 @@ public class ScratchieServiceImpl
 	    List<ScratchieItem> deletedItems) {
 
 	// create list of modified questions
-	List<ScratchieItem> modifiedItems = new ArrayList<ScratchieItem>();
+	List<ScratchieItem> modifiedItems = new ArrayList<>();
 	for (ScratchieItem oldItem : oldItems) {
 	    for (ScratchieItem newItem : newItems) {
 		if (oldItem.getUid().equals(newItem.getUid())) {
@@ -471,7 +444,7 @@ public class ScratchieServiceImpl
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
 	for (ScratchieSession session : sessionList) {
 	    Long toolSessionId = session.getSessionId();
-	    List<ScratchieAnswerVisitLog> visitLogsToDelete = new ArrayList<ScratchieAnswerVisitLog>();
+	    List<ScratchieAnswerVisitLog> visitLogsToDelete = new ArrayList<>();
 	    boolean isRecalculateMarks = false;
 
 	    // remove all scratches for modified and removed items
@@ -575,7 +548,7 @@ public class ScratchieServiceImpl
 
     @Override
     public Set<ScratchieUser> getAllLeaders(Long contentId) {
-	Set<ScratchieUser> leaders = new TreeSet<ScratchieUser>();
+	Set<ScratchieUser> leaders = new TreeSet<>();
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
 	for (ScratchieSession session : sessionList) {
 	    ScratchieUser leader = session.getGroupLeader();
@@ -598,7 +571,7 @@ public class ScratchieServiceImpl
 
     @Override
     public List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders) {
-	List<GroupSummary> groupSummaryList = new ArrayList<GroupSummary>();
+	List<GroupSummary> groupSummaryList = new ArrayList<>();
 	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(contentId);
 
 	for (ScratchieSession session : sessions) {
@@ -611,7 +584,7 @@ public class ScratchieServiceImpl
 	    groupSummary.setTotalAttempts(totalAttempts);
 
 	    List<ScratchieUser> sessionUsers = scratchieUserDao.getBySessionID(sessionId);
-	    List<ScratchieUser> usersToShow = new LinkedList<ScratchieUser>();
+	    List<ScratchieUser> usersToShow = new LinkedList<>();
 	    for (ScratchieUser user : sessionUsers) {
 
 		boolean isUserGroupLeader = session.isUserGroupLeader(user.getUid());
@@ -654,7 +627,7 @@ public class ScratchieServiceImpl
     public Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId) {
 
 	Scratchie scratchie = this.getScratchieBySessionId(toolSessionId);
-	Set<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
+	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
 
 	return getItemsWithIndicatedScratches(toolSessionId, items);
@@ -769,7 +742,7 @@ public class ScratchieServiceImpl
 
     @Override
     public List<GroupSummary> getQuestionSummary(Long contentId, Long itemUid) {
-	List<GroupSummary> groupSummaryList = new ArrayList<GroupSummary>();
+	List<GroupSummary> groupSummaryList = new ArrayList<>();
 
 	ScratchieItem item = scratchieItemDao.getByUid(itemUid);
 	Collection<ScratchieAnswer> answers = item.getAnswers();
@@ -780,7 +753,7 @@ public class ScratchieServiceImpl
 	    // one new summary for one session.
 	    GroupSummary groupSummary = new GroupSummary(session);
 
-	    Map<Long, ScratchieAnswer> answerMap = new HashMap<Long, ScratchieAnswer>();
+	    Map<Long, ScratchieAnswer> answerMap = new HashMap<>();
 	    for (ScratchieAnswer dbAnswer : (Set<ScratchieAnswer>) answers) {
 
 		// clone it so it doesn't interfere with values from other sessions
@@ -807,7 +780,7 @@ public class ScratchieServiceImpl
 		}
 	    }
 
-	    Collection<ScratchieAnswer> sortedAnswers = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
+	    Collection<ScratchieAnswer> sortedAnswers = new TreeSet<>(new ScratchieAnswerComparator());
 	    sortedAnswers.addAll(answerMap.values());
 	    groupSummary.setAnswers(sortedAnswers);
 	    groupSummaryList.add(groupSummary);
@@ -820,7 +793,7 @@ public class ScratchieServiceImpl
 	    groupSummaryTotal.setSessionName("Summary");
 	    groupSummaryTotal.setMark(0);
 
-	    Map<Long, ScratchieAnswer> answerMapTotal = new HashMap<Long, ScratchieAnswer>();
+	    Map<Long, ScratchieAnswer> answerMapTotal = new HashMap<>();
 	    for (ScratchieAnswer dbAnswer : (Set<ScratchieAnswer>) answers) {
 		// clone it so it doesn't interfere with values from other sessions
 		ScratchieAnswer answer = (ScratchieAnswer) dbAnswer.clone();
@@ -842,7 +815,7 @@ public class ScratchieServiceImpl
 		}
 	    }
 
-	    Collection<ScratchieAnswer> sortedAnswers = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
+	    Collection<ScratchieAnswer> sortedAnswers = new TreeSet<>(new ScratchieAnswerComparator());
 	    sortedAnswers.addAll(answerMapTotal.values());
 	    groupSummaryTotal.setAnswers(sortedAnswers);
 	    groupSummaryList.add(0, groupSummaryTotal);
@@ -854,17 +827,17 @@ public class ScratchieServiceImpl
     @Override
     public List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId) {
 
-	Set<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
+	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
 
 	List<BurningQuestionDTO> burningQuestionDtos = scratchieBurningQuestionDao
 		.getBurningQuestionsByContentId(scratchie.getUid(), sessionId);
 
 	//in order to group BurningQuestions by items, organise them as a list of BurningQuestionItemDTOs
-	List<BurningQuestionItemDTO> burningQuestionItemDtos = new ArrayList<BurningQuestionItemDTO>();
+	List<BurningQuestionItemDTO> burningQuestionItemDtos = new ArrayList<>();
 	for (ScratchieItem item : items) {
 
-	    List<BurningQuestionDTO> burningQuestionDtosOfSpecifiedItem = new ArrayList<BurningQuestionDTO>();
+	    List<BurningQuestionDTO> burningQuestionDtosOfSpecifiedItem = new ArrayList<>();
 
 	    for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
 		ScratchieBurningQuestion burningQuestion = burningQuestionDto.getBurningQuestion();
@@ -889,7 +862,7 @@ public class ScratchieServiceImpl
 	final String generalQuestionMessage = messageService.getMessage("label.general.burning.question");
 	generalDummyItem.setTitle(generalQuestionMessage);
 	generalBurningQuestionItemDto.setScratchieItem(generalDummyItem);
-	List<BurningQuestionDTO> burningQuestionDtosOfSpecifiedItem = new ArrayList<BurningQuestionDTO>();
+	List<BurningQuestionDTO> burningQuestionDtosOfSpecifiedItem = new ArrayList<>();
 	for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
 	    ScratchieBurningQuestion burningQuestion = burningQuestionDto.getBurningQuestion();
 
@@ -927,7 +900,7 @@ public class ScratchieServiceImpl
 
     @Override
     public List<ReflectDTO> getReflectionList(Long contentId) {
-	ArrayList<ReflectDTO> reflections = new ArrayList<ReflectDTO>();
+	ArrayList<ReflectDTO> reflections = new ArrayList<>();
 
 	// get all available leaders associated with this content as only leaders have reflections
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
@@ -986,16 +959,16 @@ public class ScratchieServiceImpl
     @Override
     public LinkedHashMap<String, ExcelCell[][]> exportExcel(Long contentId) {
 	Scratchie scratchie = scratchieDao.getByContentId(contentId);
-	Collection<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
+	Collection<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
 	int numberOfItems = items.size();
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
 
 	// ======================================================= For Immediate Analysis page
 	// =======================================
 
-	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+	List<ExcelCell[]> rowList = new LinkedList<>();
 
 	ExcelCell[] row = new ExcelCell[1];
 	row[0] = new ExcelCell(getMessage("label.quick.analysis"), true);
@@ -1057,7 +1030,7 @@ public class ScratchieServiceImpl
 	// ======================================================= For Report by Team TRA page
 	// =======================================
 
-	rowList = new LinkedList<ExcelCell[]>();
+	rowList = new LinkedList<>();
 
 	row = new ExcelCell[1];
 	row[0] = new ExcelCell(getMessage("label.quick.analysis"), true);
@@ -1168,7 +1141,7 @@ public class ScratchieServiceImpl
 	// =======================================
 
 	// all rows
-	rowList = new LinkedList<ExcelCell[]>();
+	rowList = new LinkedList<>();
 
 	// Caption
 	row = new ExcelCell[2];
@@ -1412,7 +1385,7 @@ public class ScratchieServiceImpl
 	// ======================================================= For_XLS_export(SPSS analysis) page
 	// =======================================
 
-	rowList = new LinkedList<ExcelCell[]>();
+	rowList = new LinkedList<>();
 
 	// Table header------------------------------------
 
@@ -1501,7 +1474,7 @@ public class ScratchieServiceImpl
 		    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
 			    item.getUid());
 		    if (logs == null) {
-			logs = new ArrayList<ScratchieAnswerVisitLog>();
+			logs = new ArrayList<>();
 		    }
 
 		    for (ScratchieAnswerVisitLog log : logs) {
@@ -1549,7 +1522,7 @@ public class ScratchieServiceImpl
 	// =======================================
 
 	if (scratchie.isBurningQuestionsEnabled()) {
-	    rowList = new LinkedList<ExcelCell[]>();
+	    rowList = new LinkedList<>();
 
 	    row = new ExcelCell[1];
 	    row[0] = new ExcelCell(getMessage("label.burning.questions"), true);
@@ -1597,11 +1570,17 @@ public class ScratchieServiceImpl
     public LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId) {
 	LeaderResultsDTO newDto = new LeaderResultsDTO(contentId);
 	Object[] markStats = scratchieSessionDao.getStatsMarksForLeaders(contentId);
-	if ( markStats != null ) {
-	    newDto.setMinMark(markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[0], (Locale)null, 2) : "0.00");
-	    newDto.setAvgMark(markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[1], (Locale)null, 2) : "0.00");
-	    newDto.setMaxMark(markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[2], (Locale)null, 2) : "0.00");
-	    newDto.setNumberGroupsLeaderFinished((Integer)markStats[3]);
+	if (markStats != null) {
+	    newDto.setMinMark(
+		    markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setAvgMark(
+		    markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setMaxMark(
+		    markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setNumberGroupsLeaderFinished((Integer) markStats[3]);
 	}
 	return newDto;
     }
@@ -1621,7 +1600,7 @@ public class ScratchieServiceImpl
      * Serves merely for excel export purposes. Produces data for "Summary By Team" section.
      */
     private List<GroupSummary> getSummaryByTeam(Scratchie scratchie, Collection<ScratchieItem> sortedItems) {
-	List<GroupSummary> groupSummaries = new ArrayList<GroupSummary>();
+	List<GroupSummary> groupSummaries = new ArrayList<>();
 
 	String presetMarks = getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS).getConfigValue();
 
@@ -1630,7 +1609,7 @@ public class ScratchieServiceImpl
 	    Long sessionId = session.getSessionId();
 	    // one new summary for one session.
 	    GroupSummary groupSummary = new GroupSummary(session);
-	    ArrayList<ScratchieItem> items = new ArrayList<ScratchieItem>();
+	    ArrayList<ScratchieItem> items = new ArrayList<>();
 
 	    ScratchieUser groupLeader = session.getGroupLeader();
 
@@ -1715,10 +1694,10 @@ public class ScratchieServiceImpl
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     // *****************************************************************************
@@ -2041,10 +2020,10 @@ public class ScratchieServiceImpl
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getScratchieOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -2137,7 +2116,7 @@ public class ScratchieServiceImpl
     public void setScratchieOutputFactory(ScratchieOutputFactory scratchieOutputFactory) {
 	this.scratchieOutputFactory = scratchieOutputFactory;
     }
-    
+
     /**
      * @param scheduler
      *            The scheduler to set.
@@ -2188,7 +2167,7 @@ public class ScratchieServiceImpl
 	scratchie.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
 
 	// Scratchie Items
-	Set<ScratchieItem> newItems = new LinkedHashSet<ScratchieItem>();
+	Set<ScratchieItem> newItems = new LinkedHashSet<>();
 
 	JSONArray questions = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
 	for (int i = 0; i < questions.length(); i++) {
@@ -2203,7 +2182,7 @@ public class ScratchieServiceImpl
 	    newItems.add(item);
 
 	    // set options
-	    Set<ScratchieAnswer> newAnswers = new LinkedHashSet<ScratchieAnswer>();
+	    Set<ScratchieAnswer> newAnswers = new LinkedHashSet<>();
 
 	    JSONArray answersData = questionData.getJSONArray(RestTags.ANSWERS);
 	    for (int j = 0; j < answersData.length(); j++) {

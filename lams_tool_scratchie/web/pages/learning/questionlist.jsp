@@ -65,13 +65,19 @@
 		// create JSON object
 		var input = JSON.parse(e.data);
 
+		//time limit is expired but leader hasn't submitted required notebook/burning questions yet. Non-leaders
+        //will need to refresh the page in order to stop showing them questions page.
+		if (input.pageRefresh) {
+			location.reload();
+			return;
+		}
+		
 		// reset ping timer
 		clearTimeout(scratchieWebsocketPingTimeout);
 		scratchieWebsocketPingFunc(true);
 		
 		// leader finished the activity
 		if (input.close) {
-			scratchieWebsocket.close();
 			$('#finishButton').show();
 			return;
 		}
