@@ -72,6 +72,7 @@ public class LearningWebsocketServer {
 				timeLimitCache.put(toolContentId, timeLimit);
 				LearningWebsocketServer.sendPageRefreshRequest(toolContentId);
 			    } else if (!cachedTimeLimit.equals(timeLimit)) {
+				timeLimitCache.put(toolContentId, timeLimit);
 				LearningWebsocketServer.sendAddTimeRequest(toolContentId, timeLimit - cachedTimeLimit);
 			    }
 			}

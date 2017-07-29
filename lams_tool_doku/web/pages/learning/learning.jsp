@@ -143,7 +143,7 @@
 					}
 					
 			    	var times = $("#countdown").countdown('getTimes'),
-			    		secondsLeft = times[4]*3600 + times[5]*60 + times[6] + +addTime*60;
+			    		secondsLeft = times[4]*3600 + times[5]*60 + times[6] + input.addTime*60;
 			    	$('#countdown').countdown('option', "until", '+' + secondsLeft + 'S');
 					
 					return;
