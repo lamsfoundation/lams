@@ -70,10 +70,14 @@ public class LearningWebsocketServer {
 			ScratchieSession toolSession = LearningWebsocketServer.getScratchieService()
 				.getScratchieSessionBySessionId(toolSessionId);
 			boolean timeLimitUp = false;
+			boolean scratchingFinished = toolSession.isScratchingFinished();
+			// is Scratchie time limited?
 			if (toolSession.getTimeLimitLaunchedDate() != null) {
+			    // missing whole cache is a marker that we already checked time limit and it is up
 			    if (LearningWebsocketServer.cache.get(toolSessionId) == null) {
 				timeLimitUp = true;
 			    } else {
+				// calculate whether time limit is up
 				Calendar currentTime = new GregorianCalendar(TimeZone.getDefault());
 				Calendar timeLimitFinishDate = new GregorianCalendar(TimeZone.getDefault());
 				timeLimitFinishDate.setTime(toolSession.getTimeLimitLaunchedDate());
@@ -81,28 +85,37 @@ public class LearningWebsocketServer {
 				//adding 5 extra seconds to let leader auto-submit results and store them in DB
 				timeLimitFinishDate.add(Calendar.SECOND, 5);
 				if (timeLimitFinishDate.compareTo(currentTime) <= 0) {
-				    if (!toolSession.isScratchingFinished()) {
-					toolSession.setScratchingFinished(true);
+				    // time is up
+				    if (!scratchingFinished) {
+					// Leader did not finish scratching yet? Pity. We do it for him
 					LearningWebsocketServer.getScratchieService()
-						.saveOrUpdateScratchieSession(toolSession);
+						.setScratchingFinished(toolSessionId);
+					scratchingFinished = true;
 				    }
+				    // mark time limit as up with this trick
 				    LearningWebsocketServer.cache.remove(toolSessionId);
 				    timeLimitUp = true;
 				}
 			    }
 			}
 
+			boolean isWaitingForLeaderToSubmit = LearningWebsocketServer.getScratchieService()
+				.isWaitingForLeaderToSubmit(toolSession);
 			if (timeLimitUp) {
-			    boolean isWaitingForLeaderToSubmit = LearningWebsocketServer.getScratchieService()
-				    .isWaitingForLeaderToSubmit(toolSession);
+			    // time limit is up
 			    if (isWaitingForLeaderToSubmit) {
+				// if Leader did not finish burning questions or notebook, push non-leaders to wait page
 				LearningWebsocketServer.sendPageRefreshRequest(toolSessionId);
 			    } else {
+				// if Leader finished everything, non-leaders see Finish button
 				LearningWebsocketServer.sendCloseRequest(toolSessionId);
 			    }
-			} else if (toolSession.isScratchingFinished()) {
+			} else if (scratchingFinished && !isWaitingForLeaderToSubmit) {
+			    // time limit not set or not up yet, but everything is finished
+			    // show non-leaders Finish button
 			    LearningWebsocketServer.sendCloseRequest(toolSessionId);
 			} else {
+			    // regular send of scratched items
 			    SendWorker.send(toolSessionId);
 			}
 		    }
