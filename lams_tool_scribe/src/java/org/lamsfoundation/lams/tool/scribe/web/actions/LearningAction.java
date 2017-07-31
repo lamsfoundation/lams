@@ -285,8 +285,6 @@ public class LearningAction extends LamsDispatchAction {
 	setupDTOs(request, session, scribeUser);
 	scribeService.saveOrUpdateScribeUser(scribeUser);
 
-	LearningWebsocketServer.sendCloseRequest(session.getSessionId());
-
 	if (session.getScribe().isShowAggregatedReports()) {
 	    setupOtherGroupReportDTO(request, session, scribeUser);
 	}

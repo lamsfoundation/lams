@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.leaderselection.service;
 
 import java.io.IOException;
@@ -68,7 +67,6 @@ import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstants;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionException;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionToolContentHandler;
-import org.lamsfoundation.lams.tool.leaderselection.web.actions.LearningWebsocketServer;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -157,10 +155,10 @@ public class LeaderselectionService
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getLeaderselectionOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -349,8 +347,6 @@ public class LeaderselectionService
 
 	session.setGroupLeader(newLeader);
 	saveOrUpdateSession(session);
-	
-	LearningWebsocketServer.sendPageRefreshRequest(toolSessionId);
     }
 
     @Override
@@ -591,10 +587,10 @@ public class LeaderselectionService
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override

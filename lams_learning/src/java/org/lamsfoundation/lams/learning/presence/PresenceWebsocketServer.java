@@ -63,7 +63,7 @@ public class PresenceWebsocketServer {
 	// how ofter the thread runs
 	private static final long CHECK_INTERVAL = 2000;
 	// mapping lessonId -> timestamp when the check was last performed, so the thread does not run too often
-	private final Map<Long, Long> lastSendTimes = new TreeMap<Long, Long>();
+	private static final Map<Long, Long> lastSendTimes = new TreeMap<>();
 
 	@Override
 	public void run() {
@@ -80,7 +80,7 @@ public class PresenceWebsocketServer {
 			Long lastSendTime = lastSendTimes.get(lessonId);
 			if ((lastSendTime == null)
 				|| ((System.currentTimeMillis() - lastSendTime) >= SendWorker.CHECK_INTERVAL)) {
-			    send(lessonId, null);
+			    SendWorker.send(lessonId, null);
 			}
 
 			// if all learners left the chat, remove the obsolete mapping
@@ -109,7 +109,7 @@ public class PresenceWebsocketServer {
 	/**
 	 * Feeds opened websockets with messages and roster.
 	 */
-	private void send(Long lessonId, String nickName) {
+	private static void send(Long lessonId, String nickName) {
 	    Long lastSendTime = lastSendTimes.get(lessonId);
 	    // fetch messages a bit earlier than the last run, in case there was a lag somewhere
 	    // JS code will filter out duplicates
@@ -163,7 +163,7 @@ public class PresenceWebsocketServer {
 	private long lastDBCheckTime = 0;
 
 	// Learners who are currently active
-	private final Set<String> activeUsers = new TreeSet<String>();
+	private final Set<String> activeUsers = new TreeSet<>();
 
 	private Roster(Long lessonId, boolean imEnabled) {
 	    this.lessonId = lessonId;
@@ -174,7 +174,7 @@ public class PresenceWebsocketServer {
 	 * Checks which Learners
 	 */
 	private JSONArray getRosterJSON() {
-	    Set<String> localActiveUsers = new TreeSet<String>();
+	    Set<String> localActiveUsers = new TreeSet<>();
 	    Set<Websocket> sessionWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
 	    // find out who is active locally
 	    for (Websocket websocket : sessionWebsockets) {
@@ -211,8 +211,8 @@ public class PresenceWebsocketServer {
     private static IPresenceChatService presenceChatService;
 
     private static final SendWorker sendWorker = new SendWorker();
-    private static final Map<Long, Roster> rosters = new ConcurrentHashMap<Long, Roster>();
-    private static final Map<Long, Set<Websocket>> websockets = new ConcurrentHashMap<Long, Set<Websocket>>();
+    private static final Map<Long, Roster> rosters = new ConcurrentHashMap<>();
+    private static final Map<Long, Set<Websocket>> websockets = new ConcurrentHashMap<>();
 
     static {
 	// run the singleton thread
@@ -245,7 +245,7 @@ public class PresenceWebsocketServer {
 	    try {
 		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		HibernateSessionManager.openSession();
-		PresenceWebsocketServer.sendWorker.send(lessonId, websocket.nickName);
+		SendWorker.send(lessonId, websocket.nickName);
 	    } finally {
 		HibernateSessionManager.closeSession();
 	    }
@@ -407,7 +407,7 @@ public class PresenceWebsocketServer {
 	    return 0;
 	}
 	// there can be few websockets (browser windows) for a single learner
-	Set<String> activeNicknames = new TreeSet<String>();
+	Set<String> activeNicknames = new TreeSet<>();
 	for (Websocket websocket : lessonWebsockets) {
 	    activeNicknames.add(websocket.nickName);
 	}

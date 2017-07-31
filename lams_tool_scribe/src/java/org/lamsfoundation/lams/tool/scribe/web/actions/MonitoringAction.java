@@ -147,8 +147,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	session.setForceComplete(true);
 	scribeService.saveOrUpdateScribeSession(session);
 
-	LearningWebsocketServer.sendCloseRequest(session.getSessionId());
-
 	ScribeDTO scribeDTO = setupScribeDTO(session.getScribe());
 	request.setAttribute("monitoringDTO", scribeDTO);
 	request.setAttribute("contentFolderID", monForm.getContentFolderID());
