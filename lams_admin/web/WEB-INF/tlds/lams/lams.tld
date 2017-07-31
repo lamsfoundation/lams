@@ -397,6 +397,32 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
+	
+	<tag>
+      <description>Small portrait of a user</description>
+      <display-name>User Portrait</display-name>
+      <icon></icon>
+      <name>Portrait</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.PortraitTag</tag-class>
+      <body-content>empty</body-content>
+      <attribute>
+         <name>userId</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+         <name>size</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+         <name>round</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+         <description>If true shows the portrait as a round dot. Defaults to true.</description>
+      </attribute>
+   </tag>
+	
 	<tag-file>
        <name>Tab</name>
        <path>/WEB-INF/tags/Tab.tag</path>

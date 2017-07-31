@@ -107,3 +107,21 @@
     background-color: darken($color, 10%);
   }
 }
+
+// Generic avatars used in place of profile pictures
+@mixin portrait($size) {
+	width: $size;
+	height: $size;
+	display: inline-block;
+}
+
+// Generic avatars used in place of profile pictures
+@mixin portrait-generic($fontsize) {
+  display: inline-block;
+  &:before {
+  content: "\f2be";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-size: $fontsize;
+  font-weight: normal;
+} }

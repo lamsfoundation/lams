@@ -78,3 +78,4 @@
 		});
 		$(".rating-stars-new").removeClass("rating-stars-new");
 	}
+

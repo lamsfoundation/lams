@@ -955,3 +955,73 @@ div.growlUI h1,div.growlUI h2 {
 	padding-top: 10px;
 }
 // end fotorama
+
+// User Photo / Avatar
+$portrait-size-image-sm: 29px;
+$portrait-size-image-md: 80px;
+$portrait-size-image-lg: 200px;
+$portrait-size-image-xl: 400px;
+
+.portrait-round {
+	border-radius:50%;
+}
+
+.portrait-sm {
+	@include portrait($portrait-size-image-sm);
+}
+
+.portrait-md {
+	@include portrait($portrait-size-image-md);
+}
+
+.portrait-lg {
+	@include portrait($portrait-size-image-lg);
+}
+
+.portrait-xl {
+	@include portrait($portrait-size-image-xl);
+}
+
+.portrait-container-sm {
+	height: $portrait-size-image-sm + 3;
+	margin-top: 3px;
+}
+
+// Used in PortraitTag.java when user does not have a portrait
+.portrait-color-0 {
+	color:$portrait-color-0;
+}
+.portrait-color-1 {
+	color:$portrait-color-1;
+}
+.portrait-color-2 {
+	color:$portrait-color-2;
+}
+.portrait-color-3 {
+	color:$portrait-color-3;
+}
+.portrait-color-4 {
+	color:$portrait-color-4;
+}
+.portrait-color-5 {
+	color:$portrait-color-5;
+}
+.portrait-color-6 {
+	color:$portrait-color-6;
+}
+
+.portrait-generic-sm {
+	@include portrait-generic($portrait-size-image-sm - 2);
+}
+
+.portrait-generic-md {
+	@include portrait-generic($portrait-size-image-md - 2);
+}
+
+.portrait-generic-lg {
+	@include portrait-generic($portrait-size-image-lg - 2);
+}
+
+.portrait-generic-xl {
+	@include portrait-generic($portrait-size-image-xl - 2);
+}

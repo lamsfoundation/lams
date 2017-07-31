@@ -72,7 +72,7 @@
 <script type="text/javascript">
 	//we set LAMS_AUTHORING_SUCCESS_FLAG to true in AuthoringAction.update() method 
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
-
+		
 		//if defineLater is true close current window
 		if (("${defineLater}" == "true") || ("${defineLater}" == "yes")) {
 			closeWindow("defineLater");
