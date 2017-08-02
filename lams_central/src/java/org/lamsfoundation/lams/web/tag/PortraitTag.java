@@ -137,7 +137,6 @@ public class PortraitTag extends TagSupport {
 	return userManagementService;
     }
 
-    // Should this be a concurrent hash map - could the tag be running concurrently in the same page context?
     @SuppressWarnings("unchecked")
     private HashMap<String, String> getPortraitCache() {
 	HashMap<String, String> cache = (HashMap<String, String>) pageContext.getAttribute("portraitCache");

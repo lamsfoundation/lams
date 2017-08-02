@@ -22,7 +22,6 @@ var NUM_COLORS = 7,
 
 function addPortrait( selector, portraitId, userId, size, round, LAMS_URL ) {
     var isRound = round == null ? true : round;
-    alert(round+" "+isRound);
     if ( portraitId  && portraitId > 0) {
     		selector.css('background-image', 'url(' + LAMS_URL + 'download?preferDownload=false&uuid=' + portraitId + getSizeVersion(size) + ')');
     		selector.addClass(getSizeCSS(size));
