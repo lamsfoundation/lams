@@ -51,7 +51,7 @@
 			    	var formData = new FormData();
 					formData.append("file", blob);
 					uploadProtraitToServerSide(formData);
-			    }, 'image/jpeg');		
+			    }, 'image/png');		
 			});
 
 			//update dialog's height and title

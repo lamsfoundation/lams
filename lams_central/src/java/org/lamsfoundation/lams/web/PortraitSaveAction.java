@@ -40,11 +40,9 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralToolContentHandler;
-import org.lamsfoundation.lams.util.FileUtilException;
-import org.lamsfoundation.lams.util.PortraitUtils;
+import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -119,37 +117,36 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	    }
 
 	    // upload to the content repository
-	    try {
-		if (!isUploadedFromWebcam) {
-		    //resize
-		    is = PortraitUtils.resizePicture(file.getInputStream(), LARGEST_DIMENSION_ORIGINAL);
-		}
-		originalFileNode = getCentralToolContentHandler().uploadFile(is, fileNameWithoutExt + "_original.jpg", file.getContentType());
-		is.close();
-		log.debug("saved file with uuid: " + originalFileNode.getUuid() + " and version: " + originalFileNode.getVersion());
-		
-		//resize to the large size
-		is = PortraitUtils.resizePicture(file.getInputStream(), LARGEST_DIMENSION_LARGE);
-		NodeKey node = getCentralToolContentHandler().updateFile(originalFileNode.getUuid(), is, fileNameWithoutExt + "_large.jpg", file.getContentType());
-		is.close();
-		log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
-		
-		//resize to the medium size
-		is = PortraitUtils.resizePicture(file.getInputStream(), LARGEST_DIMENSION_MEDIUM);
-		node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_medium.jpg", file.getContentType());
-		is.close();
-		log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
-		
-		//resize to the small size
-		is = PortraitUtils.resizePicture(file.getInputStream(), LARGEST_DIMENSION_SMALL);
-		node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_small.jpg", file.getContentType());
-		is.close();
-		log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
-		
-	    } catch (Exception e) {
-		request.setAttribute("errorMessage", e.getMessage());
-		return mapping.findForward("error.system");
+	    if (!isUploadedFromWebcam) {
+		//resize
+		is = ResizePictureUtil.resize(file.getInputStream(), LARGEST_DIMENSION_ORIGINAL);
 	    }
+	    originalFileNode = getCentralToolContentHandler().uploadFile(is, fileNameWithoutExt + "_original.png",
+		    "image/png");
+	    is.close();
+	    log.debug("saved file with uuid: " + originalFileNode.getUuid() + " and version: "
+		    + originalFileNode.getVersion());
+
+	    //resize to the large size
+	    is = ResizePictureUtil.resize(file.getInputStream(), LARGEST_DIMENSION_LARGE);
+	    NodeKey node = getCentralToolContentHandler().updateFile(originalFileNode.getUuid(), is,
+		    fileNameWithoutExt + "_large.png", "image/png");
+	    is.close();
+	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+
+	    //resize to the medium size
+	    is = ResizePictureUtil.resize(file.getInputStream(), LARGEST_DIMENSION_MEDIUM);
+	    node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_medium.png",
+		    "image/png");
+	    is.close();
+	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+
+	    //resize to the small size
+	    is = ResizePictureUtil.resize(file.getInputStream(), LARGEST_DIMENSION_SMALL);
+	    node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_small.png",
+		    "image/png");
+	    is.close();
+	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
 
 	}
 
