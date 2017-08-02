@@ -142,22 +142,6 @@
         />
 
         <property
-            name="fileVersionId"
-            type="java.lang.Long"
-            update="true"
-            insert="true"
-            column="file_version_id"
-        />
-
-        <property
-            name="fileType"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="file_type"
-        />
-
-        <property
             name="fileName"
             type="java.lang.String"
             update="true"

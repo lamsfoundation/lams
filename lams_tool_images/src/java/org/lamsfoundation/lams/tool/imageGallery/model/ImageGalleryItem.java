@@ -68,11 +68,7 @@ public class ImageGalleryItem implements Cloneable {
 
     private Long thumbnailFileUuid;
 
-    private Long fileVersionId;
-
     private String fileName;
-
-    private String fileType;
 
     // *************** NON Persist Fields  ********************
     private String attachmentLocalUrl;
@@ -308,29 +304,6 @@ public class ImageGalleryItem implements Cloneable {
 
     public void setThumbnailFileUuid(Long thumbnailFileUuid) {
 	this.thumbnailFileUuid = thumbnailFileUuid;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Long getFileVersionId() {
-	return fileVersionId;
-    }
-
-    public void setFileVersionId(Long crVersionId) {
-	this.fileVersionId = crVersionId;
-    }
-
-    /**
-     *
-     */
-    public String getFileType() {
-	return fileType;
-    }
-
-    public void setFileType(String type) {
-	this.fileType = type;
     }
 
     /**

@@ -723,7 +723,6 @@ public class AuthoringAction extends Action {
 
 	if (item.getOriginalFileUuid() != null) {
 	    form.setFileUuid(item.getOriginalFileUuid());
-	    form.setFileVersionId(item.getFileVersionId());
 	    form.setFileName(item.getFileName());
 	    form.setHasFile(true);
 	} else {
@@ -768,7 +767,7 @@ public class AuthoringAction extends Action {
 	}
 
 	// uploadImageGalleryItemFile
-	// and setting file properties' fields: item.setFileUuid(); item.setFileVersionId(); item.setFileType();
+	// and setting file properties' fields: item.setFileUuid();
 	// item.setFileName();
 	if (imageForm.getFile() != null) {
 	    // if it has old file, and upload a new, then save old to deleteList
@@ -779,7 +778,6 @@ public class AuthoringAction extends Action {
 		// be careful, This new ImageGalleryItem object never be save into database
 		// just temporarily use for saving fileUuid and versionID use:
 		delImage.setOriginalFileUuid(image.getOriginalFileUuid());
-		delImage.setFileVersionId(image.getFileVersionId());
 	    }
 	    IImageGalleryService service = getImageGalleryService();
 	    try {
@@ -838,7 +836,7 @@ public class AuthoringAction extends Action {
 	    imageList.add(image);
 
 	    // uploadImageGalleryItemFile
-	    // and setting file properties' fields: item.setFileUuid(); item.setFileVersionId(); item.setFileType();
+	    // and setting file properties' fields: item.setFileUuid();
 	    // item.setFileName();
 	    IImageGalleryService service = getImageGalleryService();
 	    try {

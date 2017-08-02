@@ -30,14 +30,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 
 /**
- * @author Dapeng Ni
- *
- *         A Wrapper class for uploaded files. An Attachment cannot exist independently and must belong to a
- *         ImageGallery.
- *
- *
- *
- *
+ * A Wrapper class for uploaded files. Used for learning design export/import functionality, namely, for export/import
+ * of the uploaded images.
+ * 
+ * @author Andrey Balan
  */
 public class ImageGalleryAttachment implements Cloneable {
     private static final Logger log = Logger.getLogger(ImageGalleryAttachment.class);
