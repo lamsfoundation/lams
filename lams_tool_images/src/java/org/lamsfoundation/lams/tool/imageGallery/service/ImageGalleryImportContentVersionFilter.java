@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.imageGallery.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 
 /**
  * Import filter class for different version of ImageGallery content.
@@ -53,5 +54,13 @@ public class ImageGalleryImportContentVersionFilter extends ToolContentVersionFi
      */
     public void up20150416To20151006() {
 	this.removeField(ImageGallery.class, "allowCommentImages");
+    }
+    
+    /**
+     * Import 20150416 version content to 20151006 version tool server.
+     */
+    public void up20170101To20170731() {
+	this.removeField(ImageGalleryItem.class, "fileVersionId");
+	this.removeField(ImageGalleryItem.class, "fileType");
     }
 }

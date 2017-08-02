@@ -91,13 +91,13 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryToolContentHandler;
 import org.lamsfoundation.lams.tool.imageGallery.util.ReflectDTOComparator;
-import org.lamsfoundation.lams.tool.imageGallery.util.ResizePictureUtil;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
 
 /**
  * @author Andrey Balan
@@ -542,50 +542,54 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     @Override
     public void uploadImageGalleryItemFile(ImageGalleryItem image, FormFile file)
 	    throws UploadImageGalleryFileException {
+
+	ImageGalleryConfigItem mediumImageDimensionsKey = getConfigItem(
+		ImageGalleryConfigItem.KEY_MEDIUM_IMAGE_DIMENSIONS);
+	int mediumImageDimensions = Integer.parseInt(mediumImageDimensionsKey.getConfigValue());
+
+	ImageGalleryConfigItem thumbnailImageDimensionsKey = getConfigItem(
+		ImageGalleryConfigItem.KEY_THUMBNAIL_IMAGE_DIMENSIONS);
+	int thumbnailImageDimensions = Integer.parseInt(thumbnailImageDimensionsKey.getConfigValue());
+	    
 	try {
 	    // upload file
 	    NodeKey nodeKey = uploadFormFile(file);
 	    image.setFileName(file.getFileName());
-	    image.setFileType(file.getContentType());
-	    image.setFileVersionId(nodeKey.getVersion());
 	    image.setOriginalFileUuid(nodeKey.getUuid());
-
 	    String fileName = file.getFileName();
 
-	    ImageGalleryConfigItem mediumImageDimensionsKey = getConfigItem(
-		    ImageGalleryConfigItem.KEY_MEDIUM_IMAGE_DIMENSIONS);
-	    int mediumImageDimensions = Integer.parseInt(mediumImageDimensionsKey.getConfigValue());
-
-	    // Read the original image from the repository
+	    
 	    InputStream originalIS = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
 	    BufferedImage originalImage = ImageIO.read(originalIS);
 	    //throw exception if image was not successfully read
 	    if (originalImage == null) {
 		throw new UploadImageGalleryFileException("Impossible to read image file");
 	    }
+	    //store orginalImageWidth and orginalImageHeight
 	    image.setOriginalImageWidth(originalImage.getWidth(null));
 	    image.setOriginalImageHeight(originalImage.getHeight(null));
-	    InputStream mediumIS = ResizePictureUtil.resizePicture(originalImage, mediumImageDimensions);
+	    
+	    // prepare medium image
+	    InputStream mediumIS = ResizePictureUtil.resize(originalImage, mediumImageDimensions);
 	    String mediumFileName = ImageGalleryServiceImpl.MEDIUM_FILENAME_PREFIX
-		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
+		    + fileName.substring(0, fileName.indexOf('.')) + ".png";
 	    NodeKey mediumNodeKey = imageGalleryToolContentHandler.uploadFile(mediumIS, mediumFileName,
-		    file.getContentType());
+		    "image/png");
 	    image.setMediumFileUuid(mediumNodeKey.getUuid());
-
-	    ImageGalleryConfigItem thumbnailImageDimensionsKey = getConfigItem(
-		    ImageGalleryConfigItem.KEY_THUMBNAIL_IMAGE_DIMENSIONS);
-	    int thumbnailImageDimensions = Integer.parseInt(thumbnailImageDimensionsKey.getConfigValue());
-
-	    // Read the original image from the repository
+	    //store MediumImageWidth and MediumImageHeight
 	    InputStream mediumIS2 = imageGalleryToolContentHandler.getFileNode(mediumNodeKey.getUuid()).getFile();
 	    BufferedImage mediumImage = ImageIO.read(mediumIS2);
 	    image.setMediumImageWidth(mediumImage.getWidth(null));
 	    image.setMediumImageHeight(mediumImage.getHeight(null));
-	    InputStream thumbnailIS = ResizePictureUtil.resizePicture(mediumImage, thumbnailImageDimensions);
+	    mediumIS2.close();
+	    
+	    // prepare thumbnail image
+	    InputStream originalIS2 = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
+	    InputStream thumbnailIS = ResizePictureUtil.resize(originalIS2, thumbnailImageDimensions);
 	    String thumbnailFileName = ImageGalleryServiceImpl.THUMBNAIL_FILENAME_PREFIX
-		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
+		    + fileName.substring(0, fileName.indexOf('.')) + ".png";
 	    NodeKey thumbnailNodeKey = imageGalleryToolContentHandler.uploadFile(thumbnailIS, thumbnailFileName,
-		    file.getContentType());
+		    "image/png");
 	    image.setThumbnailFileUuid(thumbnailNodeKey.getUuid());
 
 	} catch (RepositoryCheckedException e) {
@@ -751,19 +755,16 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
 	    ImageGalleryAttachment originalFile = new ImageGalleryAttachment();
 	    originalFile.setFileUuid(image.getOriginalFileUuid());
-	    originalFile.setFileVersionId(image.getFileVersionId());
 	    originalFile.setFileName(fileName);
 	    image.setOriginalFile(originalFile);
 
 	    ImageGalleryAttachment mediumFile = new ImageGalleryAttachment();
 	    mediumFile.setFileUuid(image.getMediumFileUuid());
-	    mediumFile.setFileVersionId(image.getFileVersionId());
 	    mediumFile.setFileName(ImageGalleryServiceImpl.MEDIUM_FILENAME_PREFIX + fileName);
 	    image.setMediumFile(mediumFile);
 
 	    ImageGalleryAttachment thumbnailFile = new ImageGalleryAttachment();
 	    thumbnailFile.setFileUuid(image.getThumbnailFileUuid());
-	    thumbnailFile.setFileVersionId(image.getFileVersionId());
 	    thumbnailFile.setFileName(ImageGalleryServiceImpl.THUMBNAIL_FILENAME_PREFIX + fileName);
 	    image.setThumbnailFile(thumbnailFile);
 	}

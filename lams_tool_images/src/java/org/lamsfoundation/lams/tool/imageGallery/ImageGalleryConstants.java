@@ -32,16 +32,12 @@ public class ImageGalleryConstants {
     // for action forward name
     public static final String SUCCESS = "success";
     public static final String ERROR = "error";
-    public static final String DEFINE_LATER = "definelater";
 
     // for parameters' name
     public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
     public static final String PARAM_TOOL_SESSION_ID = "toolSessionID";
-    public static final String PARAM_FILE_VERSION_ID = "fileVersionId";
-    public static final String PARAM_FILE_UUID = "fileUuid";
     public static final String PARAM_IMAGE_INDEX = "imageIndex";
     public static final String PARAM_IMAGE_UID = "imageUid";
-    public static final String PARAM_TITLE = "title";
     public static final String PARAM_CURRENT_IMAGE = "currentImage";
     public static final String PARAM_IS_VOTED = "isVoted";
     public static final String PARAM_IS_AUTHOR = "isAuthor";
@@ -54,7 +50,6 @@ public class ImageGalleryConstants {
     public static final String ATTR_DELETED_IMAGE_ATTACHMENT_LIST = "deletedItemAttachmmentList";;
     public static final String ATTR_IMAGE_GALLERY = "imageGallery";
     public static final String ATTR_IMAGE = "image";
-    public static final String ATTR_ITEM_UID = "itemUid";
     public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
     public static final String ATTR_SUMMARY_LIST = "summaryList";
     public static final String ATTR_IMAGE_SUMMARY = "imageSummary";
@@ -63,16 +58,12 @@ public class ImageGalleryConstants {
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
     public static final String ATTR_IMAGE_GALLERY_FORM = "imageGalleryForm";
     public static final String ATTR_NEXT_IMAGE_TITLE = "nextImageTitle";
-    public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
     public static final String ATTR_TITLE = "title";
     public static final String ATTR_INSTRUCTIONS = "instructions";
     public static final String ATTR_USER_FINISHED = "userFinished";
-    public static final String ATTR_CURRENT_IMAGE_UID = "currentImageUid";
-    public static final String ATTR_CONTENT_FOLDER_ID = "contentFolderID";
     public static final String ATTR_MEDIUM_IMAGE_DIMENSIONS = "mediumImageDimensions";
     public static final String ATTR_THUMBNAIL_IMAGE_DIMENSIONS = "thumbnailImageDimensions";
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
-    public static final String ATTR_RATING_DTOS = "ratingDtos";
 
     // error message keys
     public static final String ERROR_MSG_NOT_ALLOWED_FORMAT = "error.resource.image.not.alowed.format";
@@ -89,7 +80,4 @@ public class ImageGalleryConstants {
     public static final String ATTR_REFLECT_LIST = "reflectList";
     public static final String ATTR_USER_UID = "userUid";
     public static final String ATTR_IS_COMMENTS_ENABLED = "isCommentsEnabled";
-
-    public static final String DEFUALT_PROTOCOL_REFIX = "http://";
-    public static final String ALLOW_PROTOCOL_REFIX = new String("[http://|https://|ftp://|nntp://]");
 }

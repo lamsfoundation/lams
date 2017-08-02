@@ -44,7 +44,6 @@ public class ImageGalleryItemForm extends ActionForm {
     // flag of this item has attachment or not
     private boolean hasFile;
     private Long fileUuid;
-    private Long fileVersionId;
     private String fileName;
     private FormFile file;
 
@@ -116,14 +115,6 @@ public class ImageGalleryItemForm extends ActionForm {
 
     public void setFileUuid(Long fileUuid) {
 	this.fileUuid = fileUuid;
-    }
-
-    public Long getFileVersionId() {
-	return fileVersionId;
-    }
-
-    public void setFileVersionId(Long fileVersionId) {
-	this.fileVersionId = fileVersionId;
     }
 
     public boolean isHasFile() {
