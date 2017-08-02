@@ -36,6 +36,7 @@ public class MessageDTO {
 
     private Message message;
     private String author;
+    private Long authorUserId;
     private boolean hasAttachment;
     private short level;
     private int threadNum;
@@ -69,6 +70,7 @@ public class MessageDTO {
 	dto.setMessage(msg);
 	if (msg.getCreatedBy() != null) {
 	    dto.setAuthor(msg.getCreatedBy().getFirstName() + " " + msg.getCreatedBy().getLastName());
+	    dto.setAuthorUserId(msg.getCreatedBy().getUserId());
 	}
 	if ((msg.getAttachments() == null) || msg.getAttachments().isEmpty()) {
 	    dto.setHasAttachment(false);
@@ -105,6 +107,7 @@ public class MessageDTO {
 	    msgDto.setMessage(msg);
 	    if (msg.getCreatedBy() != null) {
 		msgDto.setAuthor(msg.getCreatedBy().getFirstName() + " " + msg.getCreatedBy().getLastName());
+		msgDto.setAuthorUserId(msg.getCreatedBy().getUserId());
 	    }
 
 	    if ((msg.getAttachments() == null) || msg.getAttachments().isEmpty()) {
@@ -227,5 +230,13 @@ public class MessageDTO {
 
     public int getNewPostingsNum() {
 	return newPostingsNum;
+    }
+
+    public Long getAuthorUserId() {
+	return authorUserId;
+    }
+
+    public void setAuthorUserId(Long authorUserId) {
+	this.authorUserId = authorUserId;
     }
 }

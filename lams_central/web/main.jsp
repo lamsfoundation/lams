@@ -185,13 +185,13 @@
 				<a href="javascript:;" class="user-profile dropdown-toggle tour-user-profile" data-toggle="dropdown" aria-expanded="false">
 	           		<c:choose>
 	           			<c:when test="${not empty portraitUuid}">
-	           				<c:set var="portraitSrc">download/?uuid=${portraitUuid}&preferDownload=false</c:set>
+	           				<c:set var="portraitSrc">download/?uuid=${portraitUuid}&preferDownload=false&version=4</c:set>
 	           			</c:when>
 	           			<c:otherwise>
 	           				<c:set var="portraitSrc">images/css/john-doe-portrait.jpg</c:set>
 	           			</c:otherwise>
 	           		</c:choose>
-		            <img src="${portraitSrc}" alt="">
+		            <img class="portrait-sm portrait-round" src="${portraitSrc}" alt="">
 			                  
 					<c:set var="firstName">
 						<lams:user property="firstName" />

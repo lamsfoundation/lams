@@ -32,6 +32,7 @@ public class CommentDTO {
 
     private Comment comment;
     private String authorname;
+    private Integer authorUserId;
     private boolean isAuthor;
     private boolean hasAttachment;
     private short level;
@@ -54,6 +55,7 @@ public class CommentDTO {
 	dto.setComment(comment);
 	if (comment.getCreatedBy() != null) {
 	    dto.setAuthorname(comment.getCreatedBy().getFirstName() + " " + comment.getCreatedBy().getLastName());
+	    dto.setAuthorUserId(comment.getCreatedBy().getUserId());
 	}
 
 	dto.liked = false;
@@ -145,6 +147,14 @@ public class CommentDTO {
 
     public void setDisliked(boolean disliked) {
 	this.disliked = disliked;
+    }
+
+    public Integer getAuthorUserId() {
+	return authorUserId;
+    }
+
+    public void setAuthorUserId(Integer authorUserId) {
+	this.authorUserId = authorUserId;
     }
 
 }
