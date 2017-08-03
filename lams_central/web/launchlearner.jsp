@@ -1,40 +1,39 @@
 <!DOCTYPE html>
-
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ page import="org.lamsfoundation.lams.lesson.Lesson" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
+<!-- defined Lesson states -->
+<c:set var="created"><%= Lesson.CREATED %></c:set>
+<c:set var="notstarted"><%= Lesson.NOT_STARTED_STATE %></c:set>
+<c:set var="started"><%= Lesson.STARTED_STATE %></c:set>
+<c:set var="finished"><%= Lesson.FINISHED_STATE %></c:set>
+<c:set var="suspended"><%= Lesson.SUSPENDED_STATE %></c:set>
+<c:set var="archived"><%= Lesson.ARCHIVED_STATE %></c:set>
+<c:set var="removed"><%= Lesson.REMOVED_STATE %></c:set>
 
 <lams:html>
 <lams:head>
 	<title><fmt:message key="index.welcome" /></title>
+	<link rel="icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
+	<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 	<lams:css />
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL />includes/javascript/getSysInfo.js"></script>
-	<script language="javascript" type="text/javascript" src="<lams:LAMSURL />loadVars.jsp"></script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL />includes/javascript/openUrls.js"></script>
+	
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>loadVars.jsp"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/openUrls.js"></script>
 </lams:head>
 
 <body class="stripes">
-	<div id="page">
-	
-	<div id="header-no-tabs">
-	</div>
+<c:set var="title"><fmt:message key="label.open.lesson"/></c:set>
+<lams:Page type="learner" title="${title}">
 
-	<div id="content">
+	<div class="text-center" style="margin-top: 20px; margin-bottom: 20px;">
+					
 		<h1 class="no-tabs-below"><c:out value="${name}"/></h1>
 		<p><c:out value="${description}" escapeXml="false"/></p>
 		<p>
-		
-			<!-- defined Lesson states -->
-			<c:set var="created"><%= Lesson.CREATED %></c:set>
-			<c:set var="notstarted"><%= Lesson.NOT_STARTED_STATE %></c:set>
-			<c:set var="started"><%= Lesson.STARTED_STATE %></c:set>
-			<c:set var="finished"><%= Lesson.FINISHED_STATE %></c:set>
-			<c:set var="suspended"><%= Lesson.SUSPENDED_STATE %></c:set>
-			<c:set var="archived"><%= Lesson.ARCHIVED_STATE %></c:set>
-			<c:set var="removed"><%= Lesson.REMOVED_STATE %></c:set>
-
 			<c:if test="${status == created || status == notstarted}">
 				<fmt:message key="label.msg.status">
 					<fmt:param>
@@ -71,13 +70,16 @@
 				<c:set var="button" value="false"/>
 			</c:if>
 		</p>
+		
 		<c:if test="${button}">
-			<a href='javascript:openLearnerShortenedUrl(<c:out value="${lessonID}"/>)' class='button'><fmt:message key="label.open.lesson"/></a>
+			<a href='javascript:openLearnerShortenedUrl(<c:out value="${lessonID}"/>)' class='btn btn-default'>
+				<fmt:message key="label.open.lesson"/>
+			</a>
 		</c:if>
 	</div>
-	<div id="footer">
-	</div><!--closes footer-->
-		
-	</div>
+	
+	<div id="footer"></div><!--closes footer-->
+
+</lams:Page>
 </body>
 </lams:html>
