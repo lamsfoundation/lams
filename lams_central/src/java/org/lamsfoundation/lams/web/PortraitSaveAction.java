@@ -61,7 +61,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
     private static int LARGEST_DIMENSION_ORIGINAL = 400;
     private static int LARGEST_DIMENSION_LARGE = 200;
     private static int LARGEST_DIMENSION_MEDIUM = 80;
-    private static int LARGEST_DIMENSION_SMALL = 29;
+    private static int LARGEST_DIMENSION_SMALL = 35;
 
     /**
      * Upload portrait image.
