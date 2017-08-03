@@ -272,6 +272,9 @@ ul.dropdown-usermenu li {
     line-height: 32px;
     border-radius: 3px;
 }
+.navbar-nav > li > a.user-profile {
+  padding-bottom: 12px; 
+}
 .top-nav .dropdown-menu li a {
     width: 100%;
     padding: 10px 20px;
