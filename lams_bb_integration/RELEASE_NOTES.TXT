@@ -150,3 +150,8 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 1.2.22 Release Fixes
 ====================
 * NTU-13: Make BB recurrently fetch marks from LAMS that were not yet submitted to external server
+
+1.2.23 Release Fixes
+====================
+* LDEV-4381: Removed obsolete requestSrc and alternative LAMS server URL settings
+

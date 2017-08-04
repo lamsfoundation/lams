@@ -39,9 +39,6 @@
                 </bbNG:dataElement>
                 <bbNG:dataElement label="LAMS SERVER TIME REFRESH INTERVAL (HOURS)" isRequired="true" labelFor="lamsServerTimeRefreshInterval">
                     <input type="text" name="lamsServerTimeRefreshInterval" size="20" value="${lamsServerTimeRefreshInterval}">
-                </bbNG:dataElement>                
-                <bbNG:dataElement label="LAMS ALTERNATIVE SERVER URL" isRequired="false" labelFor="lamsAltServerUrl">
-                    <input type="text" name="lamsAltServerUrl"  size="70" value="${lamsAltServerUrl}">
                 </bbNG:dataElement>
 				<p>For further information on how to configure these settings, see <a target="_blank" href="http://wiki.lamsfoundation.org/display/lamsdocs/Blackboard+9">this tutorial</a>.</p>
             </bbNG:step>  
