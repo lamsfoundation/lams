@@ -49,7 +49,6 @@ public class LamsPluginUtil {
     public static final String PROP_LAMS_SECRET_KEY = "LAMS_SERVER_SKEY";
     public static final String PROP_LAMS_SERVER_ID = "LAMS_SERVER_ID";
     public static final String PROP_LAMS_URL = "LAMS_SERVER_URL";
-    public static final String PROP_REQ_SRC = "BB_REQ_SRC";
     public static final String PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL = "LAMS_SERVER_TIME_REFRESH_INTERVAL";
     public static final String PROP_ALT_LAMS_URL = "LAMS_ALT_SERVER_URL";
 
@@ -79,7 +78,6 @@ public class LamsPluginUtil {
 		p.setProperty(PROP_LAMS_URL, "");
 		p.setProperty(PROP_LAMS_SECRET_KEY, "");
 		p.setProperty(PROP_LAMS_SERVER_ID, "");
-		p.setProperty(PROP_REQ_SRC, "");
 		p.setProperty(PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL, "24");
 	    }
 
@@ -123,7 +121,7 @@ public class LamsPluginUtil {
      * 
      * @return the secret key from lams.properties
      */
-    public static String getSecretKey() {
+    public static String getServerSecretKey() {
 	return getProperties().getProperty(PROP_LAMS_SECRET_KEY);
     }
 
@@ -141,14 +139,6 @@ public class LamsPluginUtil {
      */
     public static String getServerId() {
 	return getProperties().getProperty(PROP_LAMS_SERVER_ID);
-    }
-
-    /**
-     * 
-     * @return the request source from lams.properties
-     */
-    public static String getReqSrc() {
-	return getProperties().getProperty(PROP_REQ_SRC);
     }
     
     /**

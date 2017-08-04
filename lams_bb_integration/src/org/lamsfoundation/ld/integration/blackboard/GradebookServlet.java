@@ -102,7 +102,7 @@ public class GradebookServlet extends HttpServlet {
 	    }
 
 	    //check user rights
-	    String secretKey = LamsPluginUtil.getSecretKey();
+	    String secretKey = LamsPluginUtil.getServerSecretKey();
 	    String serverId = LamsPluginUtil.getServerId();
 	    if (!LamsSecurityUtil.sha1(
 		    timeStamp.toLowerCase() + userName.toLowerCase() + serverId.toLowerCase()
@@ -119,7 +119,7 @@ public class GradebookServlet extends HttpServlet {
 	    Id userId = user.getId();
 	    
 	    //allow lessonComplete.jsp on LAMS side to make an Ajax call to this servlet
-	    String serverUrlWithLamsWord = LamsSecurityUtil.getServerAddress();
+	    String serverUrlWithLamsWord = LamsPluginUtil.getServerUrl();
 	    URI uri = new URI(serverUrlWithLamsWord);
 	    //strip out '/lams/' from the end of the URL
 	    String serverUrl = serverUrlWithLamsWord.lastIndexOf(uri.getPath()) == -1 ? serverUrlWithLamsWord
@@ -138,7 +138,7 @@ public class GradebookServlet extends HttpServlet {
 	    logger.info("Record score for " + lineitem.getName() + " lesson. It now has " + lineitem.getScores().size()
 		    + " scores.");
 
-	    String getLamsMarkURL = LamsSecurityUtil.getServerAddress() + "/services/xml/LessonManager?"
+	    String getLamsMarkURL = LamsPluginUtil.getServerUrl() + "/services/xml/LessonManager?"
 		    + LamsSecurityUtil.generateAuthenticateParameters(userName)
 		    + "&method=gradebookMarksUser"
 		    + "&lsId=" + lamsLessonIdParam 

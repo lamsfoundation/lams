@@ -115,8 +115,6 @@ public class OpenLamsPageServlet extends HttpServlet {
 
 	// construct Login Request URL for authoring LAMS Lessons
 	String authorUrl = LamsSecurityUtil.generateRequestURL(ctx, "author", null);
-	authorUrl += "&isPostMessageToParent=true";
-
 	response.sendRedirect(authorUrl);
     }
     

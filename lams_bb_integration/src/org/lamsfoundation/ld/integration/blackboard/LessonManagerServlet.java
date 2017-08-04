@@ -35,6 +35,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.lamsfoundation.ld.integration.util.BlackboardUtil;
+import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 import org.lamsfoundation.ld.integration.util.LineitemUtil;
 import org.xml.sax.SAXException;
@@ -146,7 +147,7 @@ public class LessonManagerServlet extends HttpServlet {
     private void showStartLessonPage(HttpServletRequest request, HttpServletResponse response, Context ctx)
 	    throws InitializationException, BbServiceException, PersistenceException, IOException, ServletException {
 
-	String lamsServerUrl = LamsSecurityUtil.getServerAddress();
+	String lamsServerUrl = LamsPluginUtil.getServerUrl();
 	request.setAttribute("lamsServerUrl", lamsServerUrl);
 
 	// get all user accessible folders and LD descriptions as JSON

@@ -33,7 +33,6 @@
             LAMS_SERVER_URL: ${param.lamsServerUrl}<br>
             LAMS_SERVER_SKEY: ${param.lamsSecretKey}<br>
             LAMS_SERVER_ID: ${param.lamsServerId}<br>
-            BB_REQ_SRC: ${param.requestSrc}<br>
             LAMS_SERVER_TIME_REFRESH_INTERVAL: ${param.lamsServerTimeRefreshInterval}<br>
             LAMS_ALT_SERVER_URL: ${param.lamsAltServerUrl}
     </bbNG:receipt>

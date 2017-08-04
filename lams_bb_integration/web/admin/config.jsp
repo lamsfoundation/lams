@@ -37,9 +37,6 @@
                 <bbNG:dataElement label="LAMS SERVER SECRET KEY" isRequired="true" labelFor="lamsSecretKey">
                     <input type="text" name="lamsSecretKey" size="70" value="${secretKey}">
                 </bbNG:dataElement>
-                <bbNG:dataElement label="BLACKBOARD REQUEST SRC" isRequired="true" labelFor="requestSrc">
-                    <input type="text" name="requestSrc" size="70" value="${requestSrc}">
-                </bbNG:dataElement>
                 <bbNG:dataElement label="LAMS SERVER TIME REFRESH INTERVAL (HOURS)" isRequired="true" labelFor="lamsServerTimeRefreshInterval">
                     <input type="text" name="lamsServerTimeRefreshInterval" size="20" value="${lamsServerTimeRefreshInterval}">
                 </bbNG:dataElement>                

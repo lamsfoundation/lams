@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.lamsfoundation.ld.integration.Constants;
 import org.lamsfoundation.ld.integration.util.LamsBuildingBlockException;
+import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 import org.lamsfoundation.ld.integration.util.LineitemUtil;
 import org.w3c.dom.Document;
@@ -105,7 +106,7 @@ public class GradebookSyncServlet extends HttpServlet {
 	    }
 
 	    String username = ctx.getUser().getUserName();
-	    String serviceURL = LamsSecurityUtil.getServerAddress() + "/services/xml/LessonManager?"
+	    String serviceURL = LamsPluginUtil.getServerUrl() + "/services/xml/LessonManager?"
 		    + LamsSecurityUtil.generateAuthenticateParameters(username)
 		    + "&method=gradebookMarksLesson&lsId=" + lamsLessonIdParam;
 

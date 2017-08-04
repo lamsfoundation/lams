@@ -144,7 +144,7 @@ public class LineitemUtil {
 	//at this moment bbContent contains already updated lessonId
 	String lessonId = bbContent.getLinkRef();
 
-	String serviceURL = LamsSecurityUtil.getServerAddress() + "/services/xml/LessonManager?"
+	String serviceURL = LamsPluginUtil.getServerUrl() + "/services/xml/LessonManager?"
 		+ LamsSecurityUtil.generateAuthenticateParameters(username)
 		+ "&method=checkLessonForNumericToolOutputs&lsId=" + lessonId;
 

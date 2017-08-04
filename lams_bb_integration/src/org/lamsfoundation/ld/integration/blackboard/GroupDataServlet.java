@@ -79,7 +79,7 @@ public class GroupDataServlet extends HttpServlet {
 		return;
 	    }
 
-	    String secretKey = LamsPluginUtil.getSecretKey();
+	    String secretKey = LamsPluginUtil.getServerSecretKey();
 	    String serverId = LamsPluginUtil.getServerId();
 
 	    if (!LamsSecurityUtil.sha1(

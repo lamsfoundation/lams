@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 
 import blackboard.base.InitializationException;
@@ -53,8 +54,8 @@ public class LamsLearningDesignDeleteServlet extends HttpServlet {
     }
 
     protected void process(HttpServletRequest request, HttpServletResponse response) {	
-	String serverAddr = LamsSecurityUtil.getServerAddress();
-	String serverId = LamsSecurityUtil.getServerID();
+	String serverAddr = LamsPluginUtil.getServerUrl();
+	String serverId = LamsPluginUtil.getServerId();
 
 	// If lams.properties could not be read, throw exception
 	if (serverAddr == null || serverId == null) {
