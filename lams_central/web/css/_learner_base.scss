@@ -261,7 +261,7 @@ th {
 }
 
 body.stripes {
-  background: url('/lams/images/css/light-fabric.jpg');
+  background: $stripes_background;
 }
 .sbox {
   border-bottom: 2px solid $gray-lighter;
@@ -715,7 +715,7 @@ section{
 .login-logo {
   background: url($login_logo) no-repeat center right;
   background-size: $login_logo_size;
-  width:100px;
+  width:$login-logo_div_width;
   height:50px;
 }
 
@@ -728,6 +728,7 @@ section{
 	min-height:100%;
 	position:relative;
 	padding-bottom:50px;
+	background: $body-bg;
 }
 .login-footer {
 	width: 100%;
@@ -1011,17 +1012,17 @@ $portrait-size-image-xl: 400px;
 }
 
 .portrait-generic-sm {
-	@include portrait-generic($portrait-size-image-sm - 2);
+	@include portrait-generic($portrait-size-image-sm);
 }
 
 .portrait-generic-md {
-	@include portrait-generic($portrait-size-image-md - 2);
+	@include portrait-generic($portrait-size-image-md);
 }
 
 .portrait-generic-lg {
-	@include portrait-generic($portrait-size-image-lg - 2);
+	@include portrait-generic($portrait-size-image-lg);
 }
 
 .portrait-generic-xl {
-	@include portrait-generic($portrait-size-image-xl - 2);
+	@include portrait-generic($portrait-size-image-xl);
 }

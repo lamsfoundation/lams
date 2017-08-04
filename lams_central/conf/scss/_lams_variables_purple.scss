@@ -63,10 +63,16 @@ $main_default_link_hover:  $brand-primary-darker;
 $main_blue_light_highlight: #b57bb1;
 $main_fav_org_link: #fefefe; // #A7B1C2;
 $main_offcanvas_link: #85237D;
+$main_offcanvas_link_color: $body-bg;
+$main_offcanvas_background: $brand-primary-darker;
+$main_offcanvas_color: $gray-lighter;
+$main_offcanvas_logo_background: $brand-primary-darkest;
+$main_offcanvas_search_background: $brand-primary-darkest;
 $main_dropdown_border: #D9DEE4;
 $main_navbar_link: #515356;
 $main_singlelesson_hover_border: #dabdd8;
 $main_singlelesson_hover_background: #e6d3e5;
+
 
 // navbar login bar
 $navbar-brand-login-color: #f6f6f6;
@@ -78,10 +84,14 @@ $panel-default-heading-background: lighten($brand-primary-bright, 20%);
 // Text & typography
 $headings-default-color: $brand-primary-darker;
 
+$stripes_background: url('/lams/images/css/light-fabric.jpg');
 $url_css_directory: "/lams/images/css/";
 $login_logo: "/lams/images/svg/lams_logo_white.svg";
 $login_logo_size: auto 20px;
+$login-logo_div_width: 100px;
 
+$offcanvas_logo: "/lams/images/svg/lams_logo_white.svg";
+$offcanvas_height: 31px;
 // Forms - Overridden bootstrap settings
 $input-border-focus: lighten($brand-primary-bright, 20%); 
 

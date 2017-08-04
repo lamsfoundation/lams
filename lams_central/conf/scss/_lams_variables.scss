@@ -59,6 +59,11 @@ $main_default_link: #5A738E;
 $main_blue_light_highlight: #A6E5FD;
 $main_fav_org_link: #A7B1C2;
 $main_offcanvas_link: #2B5B95;
+$main_offcanvas_link_color: $body-bg;
+$main_offcanvas_background: $brand-primary-darker;
+$main_offcanvas_color: $gray-lighter;
+$main_offcanvas_logo_background: $brand-primary-darkest;
+$main_offcanvas_search_background: $brand-primary-darkest;
 $main_dropdown_border: #D9DEE4;
 $main_navbar_link: #515356;
 $main_singlelesson_hover_border: #9be0f9;
@@ -74,9 +79,14 @@ $main_singlelesson_hover_background: #F0F8FF;
 // Text & typography
 // $headings-default-color: $brand-primary-darker;
 
+$stripes_background: url('/lams/images/css/light-fabric.jpg');
 $url_css_directory: "/lams/images/css/";
 $login_logo: "/lams/images/svg/lams_logo_black.svg";
 $login_logo_size: auto 20px;
+$login-logo_div_width: 100px;
+
+$offcanvas_logo: "/lams/images/svg/lams_logo_white.svg";
+$offcanvas_height: 31px;
 
 // generic portrait colors
 $portrait-color-0:#001f3f;
