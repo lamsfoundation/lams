@@ -344,23 +344,6 @@
 								<dt><fmt:message key="lesson.learners"/>:</dt>
 								<dd title='<fmt:message key="lesson.ratio.learners.tooltip"/>' id="learnersStartedPossibleCell"></dd>
 								
-								<!--  encodedLessonID -->
-								<c:if test="${ALLOW_DIRECT_LESSON_LAUNCH}">
-									<dt class="voffset5"><fmt:message key="lesson.learner.url"/></dt>
-									
-									<dd class="voffset5">
-										<input id="learnerURLField" class="lessonManageField ui-autocomplete-input" autocomplete="off"
-												value="${serverURL}r/${lesson.encodedLessonID}" readonly="readonly" />
-										<a class="btn btn-sm btn-default lessonManageField" href="#"
-												onClick="javascript:selectLearnerURL()">
-											<fmt:message key="button.select"/>
-										</a>
-										<span id="copyLearnerURL">
-											<fmt:message key="lesson.copy.prompt"/>
-										</span>
-									</dd>
-								</c:if>
-								
 								<!--  lesson actions -->
 								<dt><fmt:message key="lesson.manage"/>:</dt>
 								<dd>
@@ -448,6 +431,14 @@
 										</button>
 									</div>
 								</dd>
+								
+								<!--  encodedLessonID -->
+								<c:if test="${ALLOW_DIRECT_LESSON_LAUNCH}">
+                                    <dt class="text-muted"><small><fmt:message key="lesson.learner.url"/></small></dt>
+									<dd class="text-muted">
+                                    <small><c:out value="${serverURL}r/${lesson.encodedLessonID}" escapeXml="true"/></small>
+									</dd>
+								</c:if>
 								
 							</dl>	
 						</div>

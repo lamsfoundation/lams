@@ -475,13 +475,6 @@ function updatePresenceAvailableCount(){
 }
 
 
-function selectLearnerURL(){
-	$('#learnerURLField').select().focus().blur(function(){
-		$('#copyLearnerURL').hide();
-	});
-	$('#copyLearnerURL').show();
-}
-
 function updateContributeActivities(contributeActivities) {
 	$('.contributeRow').remove();
 	var header = $('#contributeHeader');
