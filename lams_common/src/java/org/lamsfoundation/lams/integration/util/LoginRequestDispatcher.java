@@ -64,10 +64,6 @@ public class LoginRequestDispatcher {
 
     public static final String PARAM_IS_UPDATE_USER_DETAILS = "isUpdateUserDetails";
 
-    public static final String PARAM_REQUEST_SRC = "requestSrc";
-
-    public static final String PARAM_IS_POST_MESSAGE_TO_PARENT = "isPostMessageToParent";
-
     public static final String PARAM_FIRST_NAME = "firstName";
 
     public static final String PARAM_LAST_NAME = "lastName";
@@ -148,32 +144,17 @@ public class LoginRequestDispatcher {
 	}
 	/** AUTHOR * */
 	else if (METHOD_AUTHOR.equals(method)) {
-	    String requestSrc = request.getParameter(PARAM_REQUEST_SRC);
-	    String notifyCloseURL = request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL);
-	    String isPostMessageToParent = request.getParameter(PARAM_IS_POST_MESSAGE_TO_PARENT);
 	    String ldID = request.getParameter(PARAM_LEARNING_DESIGN_ID);
 
 	    // Custom CSV string to be used for tool adapters
 	    String customCSV = request.getParameter(PARAM_CUSTOM_CSV);
 	    String extLmsId = request.getParameter(PARAM_SERVER_ID);
-
-	    String parameters = "";
-
+	    
 	    // append the extra parameters if they are present in the request
-	    try {
-		parameters = ldID != null ? parameters + "&learningDesignID" + "=" + ldID : parameters;
-		parameters = customCSV != null ? parameters + "&" + PARAM_CUSTOM_CSV + "=" + customCSV : parameters;
-		parameters = extLmsId != null ? parameters + "&" + PARAM_EXT_LMS_ID + "=" + extLmsId : parameters;
-		parameters = requestSrc != null
-			? parameters + "&" + PARAM_REQUEST_SRC + "=" + URLEncoder.encode(requestSrc, "UTF8")
-			: parameters;
-		parameters = notifyCloseURL != null ? parameters + "&" + AttributeNames.PARAM_NOTIFY_CLOSE_URL + "="
-			+ URLEncoder.encode(notifyCloseURL, "UTF8") : parameters;
-		parameters = isPostMessageToParent != null
-			? parameters + "&" + PARAM_IS_POST_MESSAGE_TO_PARENT + "=" + isPostMessageToParent : parameters;
-	    } catch (UnsupportedEncodingException e) {
-		log.error(e);
-	    }
+	    String parameters = "";
+	    parameters = ldID != null ? parameters + "&learningDesignID" + "=" + ldID : parameters;
+	    parameters = customCSV != null ? parameters + "&" + PARAM_CUSTOM_CSV + "=" + customCSV : parameters;
+	    parameters = extLmsId != null ? parameters + "&" + PARAM_EXT_LMS_ID + "=" + extLmsId : parameters;
 
 	    return request.getContextPath() + URL_AUTHOR + parameters;
 	}
