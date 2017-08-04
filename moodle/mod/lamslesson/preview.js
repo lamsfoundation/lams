@@ -6,8 +6,6 @@
   */	  
 
 function openAuthor(url,name,fullscreen) {
-   url = url + "&requestSrc=" + escape(requestsrc);
-   url = url + "&notifyCloseURL=" + escape(window.location.href);
    authorWin = window.open(url,name,options);
    if (fullscreen) {
 	authorWin.moveTo(0,0);

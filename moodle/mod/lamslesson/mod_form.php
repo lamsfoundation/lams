@@ -96,7 +96,6 @@ class mod_lamslesson_mod_form extends moodleform_mod {
         $authorpreviewbutton = html_writer::script(js_writer::set_variable('authorWin', 'null') . 
                                 js_writer::set_variable('previewWin', 'null') .
                                 js_writer::set_variable('options', $popupoptions) .
-                                js_writer::set_variable('requestsrc', $CFG->lamslesson_requestsource) .
                                 js_writer::set_variable('course', $COURSE->id) .
 				js_writer::set_variable('sequence_id', $sequence_id) .
 				js_writer::set_variable('updatewarning', $updatewarning) .

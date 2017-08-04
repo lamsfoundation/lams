@@ -41,10 +41,6 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('lamslesson_serverkey', get_string('serverkey', 'lamslesson'),
                        get_string('serverkeyinfo', 'lamslesson'), ''));
 
-    // requestsource
-    $settings->add(new admin_setting_configtext('lamslesson_requestsource', get_string('requestsource', 'lamslesson'),
-                       get_string('requestsourceinfo', 'lamslesson'), 'My Moodle'));
-
     // Servers time offset
     $settings->add(new admin_setting_configtext('lamslesson_servertimeoffset', get_string('servertimeoffset', 'lamslesson'),
                        get_string('servertimeoffsetinfo', 'lamslesson'), '0'));
