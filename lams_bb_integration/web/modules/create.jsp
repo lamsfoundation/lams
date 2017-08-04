@@ -271,20 +271,6 @@
             function back() {
                 history.go(-1);
             }
-            
-            function receiveMessage(event) {
-            	var lamsServerUrl = "${lamsServerUrl}";
-            	
-            	// verify the sender of this message
-            	if ((lamsServerUrl.substring(0, event.origin.length) === event.origin) && (event.data == "refresh")) {
-            		window.location.reload();
-            	}
-            }
-			if (window.addEventListener){
-				window.addEventListener("message", receiveMessage, false);
-			} else if (window.attachEvent){
-				window.attachEvent("message", receiveMessage);
-			}
         </script>
     </bbNG:jsBlock>
     

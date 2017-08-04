@@ -93,12 +93,11 @@ public class LamsSecurityUtil {
      * @throws Exception
      */
     public static String generateRequestURL(Context ctx, String method, String lsid) throws PersistenceException, IOException {
-	String serverAddr = getServerAddress();
-	String serverId = getServerID();
-	String reqSrc = getReqSrc();
+	String serverAddr = LamsPluginUtil.getServerUrl();
+	String serverId = LamsPluginUtil.getServerId();
 
 	// If lams.properties could not be read, throw exception
-	if (serverAddr == null || serverId == null || reqSrc == null) {
+	if (serverAddr == null || serverId == null) {
 	    throw new RuntimeException("Configuration Exception " + serverAddr + ", " + serverId);
 	}
 
@@ -115,14 +114,14 @@ public class LamsSecurityUtil {
 	// do to be authorised to use authoring you must be in an organisation.
 	String courseId = setupCourseId(ctx, null, true);
 
-	String secretkey = LamsPluginUtil.getSecretKey();
+	String serverSecretKey = LamsPluginUtil.getServerSecretKey();
 
 	// in case of learnerStrictAuth we should also include lsid value when creating hash: [ts + uid + method + lsid
-	// + serverID + serverKey]
-	// regular case: [ts + uid + method + serverID + serverKey]
+	// + serverID + serverSecretKey]
+	// regular case: [ts + uid + method + serverID + serverSecretKey]
 	String plaintext = timestamp.toLowerCase().trim() + username.toLowerCase().trim() + method.toLowerCase().trim()
 		+ ("learnerStrictAuth".equals(method) ? lsid.toLowerCase().trim() : "") + serverId.toLowerCase().trim()
-		+ secretkey.toLowerCase().trim();		
+		+ serverSecretKey.toLowerCase().trim();		
 	// generate authentication hash code to validate parameters
 	String hash = sha1(plaintext);
 
@@ -130,11 +129,9 @@ public class LamsSecurityUtil {
 	try {
 	    String course = courseId != null ? "&courseid=" + URLEncoder.encode(courseId, "UTF8") : "";
 	    url = serverAddr + "/LoginRequest?" + "&uid=" + URLEncoder.encode(username, "UTF8") + "&method=" + method
-		    + "&ts=" + timestamp + "&sid=" + serverId + "&hash=" + hash + course
-		    + "&country=" + country + "&lang=" + lang + "&requestSrc="
-		    + URLEncoder.encode(reqSrc, "UTF8") + "&firstName=" + URLEncoder.encode(firstName, "UTF-8")
-		    + "&lastName=" + URLEncoder.encode(lastName, "UTF-8")
-		    + "&email=" + URLEncoder.encode(email, "UTF-8");
+		    + "&ts=" + timestamp + "&sid=" + serverId + "&hash=" + hash + course + "&country=" + country
+		    + "&lang=" + lang + "&firstName=" + URLEncoder.encode(firstName, "UTF-8") + "&lastName="
+		    + URLEncoder.encode(lastName, "UTF-8") + "&email=" + URLEncoder.encode(email, "UTF-8");
 	    
 	    if ("learnerStrictAuth".equals(method) || "monitor".equals(method)) {
 		url +=  "&lsid=" + lsid;
@@ -155,12 +152,11 @@ public class LamsSecurityUtil {
      * @throws UnsupportedEncodingException 
      */
     public static String generateAuthenticateParameters(String username) throws UnsupportedEncodingException {
-	String serverAddr = getServerAddress();
-	String serverId = getServerID();
-	String reqSrc = getReqSrc();
+	String serverAddr = LamsPluginUtil.getServerUrl();
+	String serverId = LamsPluginUtil.getServerId();
 
 	// If lams.properties could not be read, throw exception
-	if (serverAddr == null || serverId == null || reqSrc == null) {
+	if (serverAddr == null || serverId == null) {
 	    throw new RuntimeException("Configuration Exception " + serverAddr + ", " + serverId);
 	}
 
@@ -182,7 +178,7 @@ public class LamsSecurityUtil {
      * @throws UnsupportedEncodingException 
      */
     public static String generateRequestLearningDesignImage(String username) throws UnsupportedEncodingException {
-	String serverAddr = getServerAddress();
+	String serverAddr = LamsPluginUtil.getServerUrl();
 	
         //$request = "$CFG->lamslesson_serverurl/services/LearningDesignSVG?serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . 
         //$hashvalue . "&username=" . $username  . "&courseId=" . $courseid . "&courseName=" . urlencode($coursename) . "&mode=2&country=" . $country . "&lang=" . $lang . 
@@ -228,10 +224,10 @@ public class LamsSecurityUtil {
     public static String getLearningDesigns(Context ctx, String usernameFromParam, String urlCourseId, String folderId, String method, String type,
 	    String search, String page, String size, String sortName, String sortDate) {
 	
-	String serverAddr = getServerAddress();
+	String serverAddr = LamsPluginUtil.getServerUrl();
 		
 	String courseId = setupCourseId(ctx, urlCourseId, true);
-	String serverId = getServerID();
+	String serverId = LamsPluginUtil.getServerId();
 
 	// If lams.properties could not be read, throw exception
 	if (serverAddr == null || serverId == null) {
@@ -339,8 +335,8 @@ public class LamsSecurityUtil {
 	
 	String courseId = setupCourseId(ctx, urlCourseId, false);
 
-	String serverAddr = getServerAddress();
-	String serverId = getServerID();
+	String serverAddr = LamsPluginUtil.getServerUrl();
+	String serverId = LamsPluginUtil.getServerId();
 
 	// If lams.properties could not be read, throw exception
 	if (serverAddr == null || serverId == null) {
@@ -429,9 +425,9 @@ public class LamsSecurityUtil {
      */
     public static Long startLesson(User user, String courseId, long ldId, String title, String desc, boolean isPreview) {
 
-	String serverId = getServerID();
-	String serverAddr = getServerAddress();
-	String serverKey = getServerKey();
+	String serverId = LamsPluginUtil.getServerId();
+	String serverAddr = LamsPluginUtil.getServerUrl();
+	String serverSecretKey = LamsPluginUtil.getServerSecretKey();
 
 	String username = user.getUserName();
 	String locale = user.getLocale();
@@ -439,7 +435,7 @@ public class LamsSecurityUtil {
 	String lang = getLanguage(locale);
 	String method = (isPreview) ? "preview" : "start";
 	
-	if (courseId == null || serverId == null || serverAddr == null || serverKey == null) {
+	if (courseId == null || serverId == null || serverAddr == null || serverSecretKey == null) {
 	    logger.info("Unable to start lesson, one or more lams configuration properties or the course id is null");
 	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties or the course id is null. courseId="+courseId);
 	}
@@ -510,11 +506,11 @@ public class LamsSecurityUtil {
      */
     public static Boolean deleteLesson(String userName, String lsId) throws IOException, ParserConfigurationException, SAXException {
 
-	String serverId = getServerID();
-	String serverAddr = getServerAddress();
-	String serverKey = getServerKey();
+	String serverId = LamsPluginUtil.getServerId();
+	String serverAddr = LamsPluginUtil.getServerUrl();
+	String serverSecretKey = LamsPluginUtil.getServerSecretKey();
 
-	if (serverId == null || serverAddr == null || serverKey == null) {
+	if (serverId == null || serverAddr == null || serverSecretKey == null) {
 	    throw new RuntimeException("Unable to delete lesson. One or more LAMS configuration properties are null");
 	}
 
@@ -548,15 +544,15 @@ public class LamsSecurityUtil {
      */
     public static Long cloneLesson(User teacher, String courseId, String lsId) {
 
-	String serverId = getServerID();
-	String serverAddr = getServerAddress();
-	String serverKey = getServerKey();
+	String serverId = LamsPluginUtil.getServerId();
+	String serverAddr = LamsPluginUtil.getServerUrl();
+	String serverSecretKey = LamsPluginUtil.getServerSecretKey();
 	String username = teacher.getUserName();
 	String locale = teacher.getLocale();
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
 	
-	if (courseId == null || serverId == null || serverAddr == null || serverKey == null) {
+	if (courseId == null || serverId == null || serverAddr == null || serverSecretKey == null) {
 	    logger.info("Unable to clone lesson, one or more lams configuration properties or the course id is null");
 	    throw new RuntimeException("Unable to clone lesson, one or more lams configuration properties or the course id is null. courseId="+courseId);
 	}
@@ -622,15 +618,15 @@ public class LamsSecurityUtil {
      */
     public static Long importLearningDesign(User teacher, String courseId, String lsId, String ldId) throws LamsServerException {
 
-	String serverId = getServerID();
-	String serverAddr = getServerAddress();
-	String serverKey = getServerKey();
+	String serverId = LamsPluginUtil.getServerId();
+	String serverAddr = LamsPluginUtil.getServerUrl();
+	String serverSecretKey = LamsPluginUtil.getServerSecretKey();
 	String username = teacher.getUserName();
 	String locale = teacher.getLocale();
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
 	
-	if (courseId == null || serverId == null || serverAddr == null || serverKey == null) {
+	if (courseId == null || serverId == null || serverAddr == null || serverSecretKey == null) {
 	    logger.info("Unable to import lesson, one or more lams configuration properties or the course id is null");
 	    throw new RuntimeException("Unable to import lesson, one or more lams configuration properties or the course id is null. courseId="+courseId);
 	}
@@ -700,15 +696,15 @@ public class LamsSecurityUtil {
      *            the lesoon id that was just started
      */
     public static void preaddLearnersMonitorsToLesson(User user, Course course, long lessonId) {
-	String serverId = getServerID();
-	String serverAddr = getServerAddress();
-	String serverKey = getServerKey();
+	String serverId = LamsPluginUtil.getServerId();
+	String serverAddr = LamsPluginUtil.getServerUrl();
+	String serverSecretKey = LamsPluginUtil.getServerSecretKey();
 	String username = user.getUserName();
 	String locale = user.getLocale();
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
 
-	if (serverId == null || serverAddr == null || serverKey == null) {
+	if (serverId == null || serverAddr == null || serverSecretKey == null) {
 	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties is null");
 	}
 
@@ -857,9 +853,9 @@ public class LamsSecurityUtil {
      * @return the learning session id
      */
     public static LearnerProgressDTO getLearnerProgress(Context ctx, long lsId) {
-	String serverId = getServerID();
-	String serverAddr = getServerAddress();
-	String serverKey = getServerKey();
+	String serverId = LamsPluginUtil.getServerId();
+	String serverAddr = LamsPluginUtil.getServerUrl();
+	String serverSecretKey = LamsPluginUtil.getServerSecretKey();
 	String courseId = ctx.getCourse().getCourseId();
 	
 	String username = ctx.getUser().getUserName();
@@ -870,7 +866,7 @@ public class LamsSecurityUtil {
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
 
-	if (serverId == null || serverAddr == null || serverKey == null) {
+	if (serverId == null || serverAddr == null || serverSecretKey == null) {
 	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties is null");
 	}
 
@@ -1034,7 +1030,7 @@ public class LamsSecurityUtil {
 	if ((lamsServerTimeDeltaStr == null) || (lastUpdateTime + lamsServerTimeRefreshInterval < now)) {
 	    
 	    // refresh time from LAMS server
-	    String serverAddr = getServerAddress();
+	    String serverAddr = LamsPluginUtil.getServerUrl();
 	    String serviceURL = serverAddr + "/services/getServerTime";
 	    logger.info("LAMS Get Server Time request: " + serviceURL);
 	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
@@ -1062,42 +1058,6 @@ public class LamsSecurityUtil {
 	
 	return "" + lamsServerTime;
     }
-
-    /**
-     * @return gets server address from the lams.properties file
-     */
-    public static String getServerAddress() {
-	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_LAMS_URL);
-    }
-
-    /**
-     * @return gets alternative server address from the lams.properties file
-     */
-    private static String getAltServerAddress() {
-	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_ALT_LAMS_URL);
-    }
-
-
-    /**
-     * @return gets server id from the lams.properties file
-     */
-    public static String getServerID() {
-	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_LAMS_SERVER_ID);
-    }
-
-    /**
-     * @return gets server key from the lams.properties file
-     */
-    private static String getServerKey() {
-	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_LAMS_SECRET_KEY);
-    }
-
-    /**
-     * @return gets request source from the lams.properties file
-     */
-    private static String getReqSrc() {
-	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_REQ_SRC);
-    }
     
     /**
      * 
@@ -1108,8 +1068,7 @@ public class LamsSecurityUtil {
 	long lamsServerTimeRefreshInterval = 24;
 	
 	try {
-	    String lamsServerTimeRefreshIntervalStr = LamsPluginUtil.getProperties().getProperty(
-		    LamsPluginUtil.PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL);
+	    String lamsServerTimeRefreshIntervalStr = LamsPluginUtil.getLamsServerTimeRefreshInterval();
 	    lamsServerTimeRefreshInterval = Long.parseLong(lamsServerTimeRefreshIntervalStr);
 	} catch (NumberFormatException e) {
 	    logger.warn("Wrong format of PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL from lams.properties");
@@ -1120,10 +1079,10 @@ public class LamsSecurityUtil {
 
     // generate authentication hash code to validate parameters
     private static String generateAuthenticationHash(String datetime, String login, String serverId) {
-	String secretkey = getServerKey();
+	String serverSecretKey = LamsPluginUtil.getServerSecretKey();
 
 	String plaintext = datetime.toLowerCase().trim() + login.toLowerCase().trim() + serverId.toLowerCase().trim()
-		+ secretkey.toLowerCase().trim();
+		+ serverSecretKey.toLowerCase().trim();
 
 	String hash = sha1(plaintext);
 
@@ -1132,7 +1091,7 @@ public class LamsSecurityUtil {
 
     /**
      * The parameters are: uid - the username on the external system method - either author, monitor or learner ts -
-     * timestamp sid - serverID str is [ts + uid + method + serverID + serverKey] (Note: all lower case)
+     * timestamp sid - serverID str is [ts + uid + method + serverID + serverSecretKey] (Note: all lower case)
      * 
      * @param str
      *            The string to be hashed

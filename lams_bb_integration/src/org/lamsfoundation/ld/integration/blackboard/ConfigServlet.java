@@ -89,14 +89,8 @@ public class ConfigServlet extends HttpServlet{
 	String secretKey = properties.getProperty(LamsPluginUtil.PROP_LAMS_SECRET_KEY, "");
 	request.setAttribute("secretKey", secretKey);
 	
-	String requestSrc = properties.getProperty(LamsPluginUtil.PROP_REQ_SRC);
-	request.setAttribute("requestSrc", requestSrc);
-	
 	String lamsServerTimeRefreshInterval = properties.getProperty(LamsPluginUtil.PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL);
 	request.setAttribute("lamsServerTimeRefreshInterval", lamsServerTimeRefreshInterval);
-	
-	String lamsAltServerUrl = properties.getProperty(LamsPluginUtil.PROP_ALT_LAMS_URL, "https://");
-	request.setAttribute("lamsAltServerUrl", lamsAltServerUrl);
 
 	request.getRequestDispatcher("/admin/config.jsp").forward(request, response);
     }
@@ -115,17 +109,13 @@ public class ConfigServlet extends HttpServlet{
 	String lamsServerUrl = request.getParameter("lamsServerUrl");
 	String lamsServerId = request.getParameter("lamsServerId");
 	String lamsSecretKey = request.getParameter("lamsSecretKey");
-	String requestSrc = request.getParameter("requestSrc");
 	String lamsServerTimeRefreshInterval = request.getParameter("lamsServerTimeRefreshInterval");
-	String lamsAltServerUrl = request.getParameter("lamsAltServerUrl");
 
 	// Save the properties to Blackboard
 	properties.setProperty(LamsPluginUtil.PROP_LAMS_URL, lamsServerUrl);
 	properties.setProperty(LamsPluginUtil.PROP_LAMS_SECRET_KEY, lamsSecretKey);
 	properties.setProperty(LamsPluginUtil.PROP_LAMS_SERVER_ID, lamsServerId);
-	properties.setProperty(LamsPluginUtil.PROP_REQ_SRC, requestSrc);
 	properties.setProperty(LamsPluginUtil.PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL, lamsServerTimeRefreshInterval);
-	properties.setProperty(LamsPluginUtil.PROP_ALT_LAMS_URL, lamsAltServerUrl);
 
 	// Persist the properties object
 	LamsPluginUtil.setProperties(properties);
