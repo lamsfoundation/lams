@@ -646,7 +646,7 @@ public class LearningAction extends Action {
 	image.setCreateDate(new Timestamp(new Date().getTime()));
 
 	// upload ImageGalleryItem file
-	// and setting file properties' fields: item.setFileUuid(); item.setFileVersionId(); item.setFileType();
+	// and setting file properties' fields: item.setFileUuid();
 	// item.setFileName();
 	if (imageForm.getFile() != null) {
 	    try {

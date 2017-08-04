@@ -30,23 +30,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 
 <fmt:setBundle basename="org.lamsfoundation.lams.learning.ApplicationResources" />
-<c:set var="addnote">
-	<html:rewrite page="/notebook/add.do?lessonID=" />
-	<c:out value="${lessonID}" />
-</c:set>
 <c:set var="title">
 	<fmt:message key="mynotes.title" />
 </c:set>
 
 <lams:Page type="learner" title="${title}" hideProgressBar="true">
-	<c:set var="addnote">
-		<html:rewrite page="/notebook/add.do?lessonID=" />
-		<c:out value="${lessonID}" />
-	</c:set>
-	<div class="pull-right">
-		<a href="${addnote}" class="btn btn-default pull-right" id="addNewBtn"><fmt:message
-				key="mynotes.add.new.current.lesson.button" /></a>
-	</div>
+	<c:if test="${empty entries}">
+		<c:set var="addnote">
+			<html:rewrite page="/notebook/add.do?lessonID=" />
+			<c:out value="${lessonID}" />
+		</c:set>
+		<div class="pull-right">
+			<a href="${addnote}" class="btn btn-default pull-right" id="addNewBtn"><fmt:message
+					key="mynotes.add.new.current.lesson.button" /></a>
+		</div>
+	</c:if>
 	
 	<div class="lead">
 		<fmt:message key="mynotes.view.all.button" />

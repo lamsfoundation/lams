@@ -1,7 +1,9 @@
 package org.lamsfoundation.lams.tool.dokumaran.web.action;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,7 +17,14 @@ import javax.websocket.server.ServerEndpoint;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
+import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
+import org.lamsfoundation.lams.tool.dokumaran.service.IDokumaranService;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Sends time limit start and +1min events to learners.
@@ -26,9 +35,76 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 @ServerEndpoint("/learningWebsocket")
 public class LearningWebsocketServer {
 
-    private static Logger log = Logger.getLogger(LearningWebsocketServer.class);
+    /**
+     * A singleton which updates Learners with Leader selection.
+     */
+    private static class SendWorker extends Thread {
+	private boolean stopFlag = false;
+	// how ofter the thread runs
+	private static final long CHECK_INTERVAL = 3000;
 
-    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<Long, Set<Session>>();
+	@Override
+	public void run() {
+	    while (!stopFlag) {
+		try {
+		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+		    HibernateSessionManager.openSession();
+		    Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
+			    .iterator();
+		    // go through activities and update registered learners with reports and vote count
+		    while (entryIterator.hasNext()) {
+			Entry<Long, Set<Session>> entry = entryIterator.next();
+			Long toolContentId = entry.getKey();
+			// if all learners left the activity, remove the obsolete mapping
+			Set<Session> dokuWebsockets = entry.getValue();
+			if (dokuWebsockets.isEmpty()) {
+			    entryIterator.remove();
+			    timeLimitCache.remove(toolContentId);
+			    continue;
+			}
+
+			Dokumaran dokumaran = LearningWebsocketServer.getDokumaranService()
+				.getDokumaranByContentId(toolContentId);
+			int timeLimit = dokumaran.getTimeLimit();
+			if (dokumaran.getTimeLimitLaunchedDate() != null && timeLimit != 0) {
+			    Integer cachedTimeLimit = timeLimitCache.get(toolContentId);
+			    if (cachedTimeLimit == null) {
+				timeLimitCache.put(toolContentId, timeLimit);
+				LearningWebsocketServer.sendPageRefreshRequest(toolContentId);
+			    } else if (!cachedTimeLimit.equals(timeLimit)) {
+				timeLimitCache.put(toolContentId, timeLimit);
+				LearningWebsocketServer.sendAddTimeRequest(toolContentId, timeLimit - cachedTimeLimit);
+			    }
+			}
+		    }
+		} catch (Exception e) {
+		    // error caught, but carry on
+		    LearningWebsocketServer.log.error("Error in Dokumaran worker thread", e);
+		} finally {
+		    HibernateSessionManager.closeSession();
+		    try {
+			Thread.sleep(SendWorker.CHECK_INTERVAL);
+		    } catch (InterruptedException e) {
+			LearningWebsocketServer.log.warn("Stopping Dokumaran worker thread");
+			stopFlag = true;
+		    }
+		}
+	    }
+	}
+    };
+
+    private static final Logger log = Logger.getLogger(LearningWebsocketServer.class);
+
+    private static final SendWorker sendWorker = new SendWorker();
+    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<>();
+    private static final Map<Long, Integer> timeLimitCache = new ConcurrentHashMap<>();
+
+    private static IDokumaranService dokumaranService;
+
+    static {
+	// run the singleton thread
+	LearningWebsocketServer.sendWorker.start();
+    }
 
     /**
      * Registeres the Learner for processing.
@@ -75,14 +151,14 @@ public class LearningWebsocketServer {
      * Monitor has added one more minute to the time limit. All learners will need
      * to add +1 minute to their countdown counters.
      */
-    public static void sendAddOneMinuteRequest(Long toolContentID) throws JSONException, IOException {
-	Set<Session> toolContentWebsockets = websockets.get(toolContentID);
+    private static void sendAddTimeRequest(Long toolContentId, int timeLimit) throws JSONException, IOException {
+	Set<Session> toolContentWebsockets = websockets.get(toolContentId);
 	if (toolContentWebsockets == null) {
 	    return;
 	}
 
 	JSONObject responseJSON = new JSONObject();
-	responseJSON.put("addOneMinute", true);
+	responseJSON.put("addTime", timeLimit);
 	String response = responseJSON.toString();
 
 	for (Session websocket : toolContentWebsockets) {
@@ -96,8 +172,8 @@ public class LearningWebsocketServer {
      * Monitor has launched time limit. All learners will need to refresh the page in order to stop showing them
      * waitForTimeLimitLaunch page.
      */
-    public static void sendPageRefreshRequest(Long toolContentID) throws JSONException, IOException {
-	Set<Session> toolContentWebsockets = websockets.get(toolContentID);
+    private static void sendPageRefreshRequest(Long toolContentId) throws JSONException, IOException {
+	Set<Session> toolContentWebsockets = websockets.get(toolContentId);
 	if (toolContentWebsockets == null) {
 	    return;
 	}
@@ -111,5 +187,14 @@ public class LearningWebsocketServer {
 		websocket.getBasicRemote().sendText(response);
 	    }
 	}
+    }
+
+    private static IDokumaranService getDokumaranService() {
+	if (dokumaranService == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+	    dokumaranService = (IDokumaranService) wac.getBean(DokumaranConstants.RESOURCE_SERVICE);
+	}
+	return dokumaranService;
     }
 }

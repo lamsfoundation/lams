@@ -252,7 +252,7 @@ public class LearningAction extends Action {
 
 	// set scratched flag for display purpose
 	Collection<ScratchieItem> items = service.getItemsWithIndicatedScratches(toolSessionId);
-	
+
 	// shuffling items
 	if (scratchie.isShuffleItems()) {
 	    //items is a Set at this moment
@@ -319,14 +319,14 @@ public class LearningAction extends Action {
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    return redirect;
 
-	// show notebook page to the leader
+	    // show notebook page to the leader
 	} else if (isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("newReflection"));
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
 	    return redirect;
 
-	// show results page
+	    // show results page
 	} else if (isShowResults) {
 
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
@@ -334,7 +334,7 @@ public class LearningAction extends Action {
 	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
 	    return redirect;
 
-	// show learning.jsp page
+	    // show learning.jsp page
 	} else {
 
 	    // time limit feature
@@ -345,7 +345,8 @@ public class LearningAction extends Action {
 		// if user has pressed OK button already - calculate remaining time, and full time otherwise
 		secondsLeft = isTimeLimitNotLaunched ? scratchie.getTimeLimit() * 60
 			: scratchie.getTimeLimit() * 60
-				- (System.currentTimeMillis() - toolSession.getTimeLimitLaunchedDate().getTime()) / 1000;
+				- (System.currentTimeMillis() - toolSession.getTimeLimitLaunchedDate().getTime())
+					/ 1000;
 		// change negative number or zero to 1 so it can autosubmit results
 		secondsLeft = Math.max(1, secondsLeft);
 	    }
@@ -441,11 +442,12 @@ public class LearningAction extends Action {
 
 	return null;
     }
-    
+
     /**
      * Stores date when user has started activity with time limit
-     * @throws ScratchieApplicationException 
-     * @throws SchedulerException 
+     * 
+     * @throws ScratchieApplicationException
+     * @throws SchedulerException
      */
     private ActionForward launchTimeLimit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ScratchieApplicationException, SchedulerException {
@@ -455,13 +457,13 @@ public class LearningAction extends Action {
 		.getAttribute(sessionMapID);
 	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
-	
+
 	ScratchieUser leader = getCurrentUser(toolSessionId);
 	// only leader is allowed to launch time limit
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
 	    return null;
 	}
-	
+
 	service.launchTimeLimit(toolSessionId);
 
 	return null;
@@ -495,15 +497,9 @@ public class LearningAction extends Action {
 	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
 	Long userUid = (Long) sessionMap.get(ScratchieConstants.ATTR_USER_UID);
 	boolean isUserFinished = (boolean) sessionMap.get(ScratchieConstants.ATTR_USER_FINISHED);
-	
+
 	if (toolSession.isUserGroupLeader(userUid) && !toolSession.isScratchingFinished()) {
 	    service.setScratchingFinished(toolSessionId);
-	}
-
-	// in case of the leader (and if he hasn't done this last time accessing showResults page) we should let all other learners
-	// see Next Activity button
-	if (toolSession.isUserGroupLeader(userUid) && !isUserFinished) {
-	    LearningWebsocketServer.sendCloseRequest(toolSessionId);
 	}
 
 	// get updated score from ScratchieSession

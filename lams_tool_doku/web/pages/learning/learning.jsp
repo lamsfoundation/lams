@@ -101,13 +101,18 @@
 				dokuWebsocketPingTimeout = null,
 				dokuWebsocketPingFunc = null;
 			
+			dokuWebsocket.onclose = function(){
+				// react only on abnormal close
+				if (e.code === 1006 &&
+					Date.now() - dokuWebsocketInitTime > 1000) {
+					location.reload();
+				}
+			};
+			
 			dokuWebsocketPingFunc = function(skipPing){
 				if (dokuWebsocket.readyState == dokuWebsocket.CLOSING 
 						|| dokuWebsocket.readyState == dokuWebsocket.CLOSED){
-					if (Date.now() - dokuWebsocketInitTime < 1000) {
-						return;
-					}
-					location.reload();
+					return;
 				}
 				
 				// check and ping every 3 minutes
@@ -117,16 +122,9 @@
 					dokuWebsocket.send("ping");
 				}
 			};
+			
 			// set up timer for the first time
 			dokuWebsocketPingFunc(true);
-			
-			dokuWebsocket.onclose = function(){
-				// react only on abnormal close
-				if (e.code === 1006 &&
-					Date.now() - dokuWebsocketInitTime > 1000) {
-					location.reload();
-				}
-			};
 			
 			// run when the server pushes new reports and vote statistics
 			dokuWebsocket.onmessage = function(e) {
@@ -138,14 +136,14 @@
 				var input = JSON.parse(e.data);
 				
 				//monitor has added one minute to the total timeLimit time
-				if (input.addOneMinute) {
+				if (input.addTime) {
 					//reload page in order to allow editing the pad again
 					if (!$('#countdown').length) {
 						location.reload();
 					}
 					
-			    	var times = $("#countdown").countdown('getTimes');
-			    	var secondsLeft = times[4]*3600 + times[5]*60 + times[6] + 60;
+			    	var times = $("#countdown").countdown('getTimes'),
+			    		secondsLeft = times[4]*3600 + times[5]*60 + times[6] + input.addTime*60;
 			    	$('#countdown').countdown('option', "until", '+' + secondsLeft + 'S');
 					
 					return;

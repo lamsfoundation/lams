@@ -98,7 +98,7 @@
 		}
 		
 		if (${!hasEditRight && mode != "teacher"}) {
-			setInterval("checkLeaderProgress();",60000);// Auto-Refresh every 1 minute for non-leaders
+			setInterval("checkLeaderProgress();",45000);// Auto-Refresh every 1 minute for non-leaders
 		}
 		
 		function checkLeaderProgress() {

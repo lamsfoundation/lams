@@ -36,18 +36,11 @@ public class MultipleImagesForm extends ActionForm {
 
     private static final long serialVersionUID = -5595679171112282994L;
 
-    private String imageIndex;
     private String sessionMapID;
 
-    // tool access mode;
-    private String mode;
-
-    private String title;
-    private String description;
     // flag of this item has attachment or not
     private boolean hasFile;
     private Long fileUuid;
-    private Long fileVersionId;
     private String fileName;
     private FormFile file1;
     private FormFile file2;
@@ -58,55 +51,12 @@ public class MultipleImagesForm extends ActionForm {
     //used only in monitoring
     private String imageUid;
 
-    /**
-     * Returns ImageGallery order index.
-     *
-     * @return ImageGallery order index
-     */
-    public String getImageIndex() {
-	return imageIndex;
-    }
-
-    /**
-     * Sets ImageGallery order index.
-     *
-     * @param imageIndex
-     *            ImageGallery order index
-     */
-    public void setImageIndex(String imageIndex) {
-	this.imageIndex = imageIndex;
-    }
-
     public String getSessionMapID() {
 	return sessionMapID;
     }
 
     public void setSessionMapID(String sessionMapID) {
 	this.sessionMapID = sessionMapID;
-    }
-
-    public String getMode() {
-	return mode;
-    }
-
-    public void setMode(String mode) {
-	this.mode = mode;
-    }
-
-    public String getTitle() {
-	return title;
-    }
-
-    public void setTitle(String title) {
-	this.title = title;
-    }
-
-    public String getDescription() {
-	return description;
-    }
-
-    public void setDescription(String description) {
-	this.description = description;
     }
 
     public String getFileName() {
@@ -123,14 +73,6 @@ public class MultipleImagesForm extends ActionForm {
 
     public void setFileUuid(Long fileUuid) {
 	this.fileUuid = fileUuid;
-    }
-
-    public Long getFileVersionId() {
-	return fileVersionId;
-    }
-
-    public void setFileVersionId(Long fileVersionId) {
-	this.fileVersionId = fileVersionId;
     }
 
     public boolean isHasFile() {
