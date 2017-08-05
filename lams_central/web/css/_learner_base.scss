@@ -1026,3 +1026,10 @@ $portrait-size-image-xl: 400px;
 .portrait-generic-xl {
 	@include portrait-generic($portrait-size-image-xl);
 }
+
+.leader-display {
+	margin: 0px;
+	h4 {
+	    margin-bottom: 0px;
+	}
+}

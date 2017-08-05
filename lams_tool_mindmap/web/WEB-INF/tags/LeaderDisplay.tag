@@ -18,7 +18,7 @@
 
 <div class="row no-gutter">
 	<div class="col-xs-12 col-sm-offset-2 col-sm-8">
-		<div id="${idName}" class="alert alert-info" style="margin=0px">
+		<div id="${idName}" class="alert alert-info leader-display">
 			<h4><fmt:message key="${messageKey}">
 				<fmt:param>${username}</fmt:param>
 			</fmt:message>&nbsp;
