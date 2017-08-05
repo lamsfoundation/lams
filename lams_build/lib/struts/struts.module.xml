@@ -36,6 +36,7 @@
     <module name="org.apache.commons.digester"/>
     <module name="org.apache.commons.beanutils"/>
     <module name="org.apache.commons.fileupload"/>
+    <module name="org.apache.commons.collections"/>
     <module name="org.apache.xmlcommons" />
   </dependencies>
 </module>
