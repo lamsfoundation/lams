@@ -1,27 +1,14 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.dialect;
+
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.hibernate.LockOptions;
 import org.hibernate.sql.ANSIJoinFragment;
@@ -49,6 +36,11 @@ public class Oracle10gDialect extends Oracle9iDialect {
 	}
 
 	@Override
+	public String getCrossJoinSeparator() {
+		return " cross join ";
+	}
+
+	@Override
 	public String getWriteLockString(int timeout) {
 		if ( timeout == LockOptions.SKIP_LOCKED ) {
 			return  getForUpdateSkipLockedString();
@@ -66,5 +58,21 @@ public class Oracle10gDialect extends Oracle9iDialect {
 	@Override
 	public String getForUpdateSkipLockedString(String aliases) {
 		return getForUpdateString() + " of " + aliases + " skip locked";
+	}
+
+	@Override
+	public ResultSet getResultSet(CallableStatement statement, int position) throws SQLException {
+		return (ResultSet) statement.getObject( position );
+	}
+
+	@Override
+	public int registerResultSetOutParameter(CallableStatement statement, String name) throws SQLException {
+		statement.registerOutParameter( name, OracleTypesHelper.INSTANCE.getOracleCursorTypeSqlType() );
+		return 1;
+	}
+
+	@Override
+	public ResultSet getResultSet(CallableStatement statement, String name) throws SQLException {
+		return (ResultSet) statement.getObject( name );
 	}
 }

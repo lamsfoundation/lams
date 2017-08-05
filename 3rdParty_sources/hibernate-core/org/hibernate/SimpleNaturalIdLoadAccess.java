@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2012, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate;
 
@@ -32,7 +15,7 @@ package org.hibernate;
  * @see org.hibernate.annotations.NaturalId
  * @see NaturalIdLoadAccess
  */
-public interface SimpleNaturalIdLoadAccess {
+public interface SimpleNaturalIdLoadAccess<T> {
 	/**
 	 * Specify the {@link org.hibernate.LockOptions} to use when retrieving the entity.
 	 *
@@ -40,7 +23,7 @@ public interface SimpleNaturalIdLoadAccess {
 	 *
 	 * @return {@code this}, for method chaining
 	 */
-	public SimpleNaturalIdLoadAccess with(LockOptions lockOptions);
+	public SimpleNaturalIdLoadAccess<T> with(LockOptions lockOptions);
 
 	/**
 	 * For entities with mutable natural ids, should Hibernate perform "synchronization" prior to performing 
@@ -53,7 +36,7 @@ public interface SimpleNaturalIdLoadAccess {
 	 *
 	 * @return {@code this}, for method chaining
 	 */
-	public SimpleNaturalIdLoadAccess setSynchronizationEnabled(boolean enabled);
+	public SimpleNaturalIdLoadAccess<T> setSynchronizationEnabled(boolean enabled);
 
 	/**
 	 * Return the persistent instance with the given natural id value, assuming that the instance exists. This method
@@ -67,7 +50,7 @@ public interface SimpleNaturalIdLoadAccess {
 	 *
 	 * @return The persistent instance or proxy, if an instance exists.  Otherwise, {@code null}.
 	 */
-	public Object getReference(Object naturalIdValue);
+	public T getReference(Object naturalIdValue);
 
 	/**
 	 * Return the persistent instance with the given natural id value, or {@code null} if there is no such persistent
@@ -78,6 +61,6 @@ public interface SimpleNaturalIdLoadAccess {
 	 * 
 	 * @return The persistent instance or {@code null}
 	 */
-	public Object load(Object naturalIdValue);
+	public T load(Object naturalIdValue);
 
 }

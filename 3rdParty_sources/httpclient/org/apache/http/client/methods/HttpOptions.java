@@ -31,18 +31,19 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.http.annotation.NotThreadSafe;
-
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpResponse;
+import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.util.Args;
 
 /**
  * HTTP OPTIONS method.
  * <p>
  * The HTTP OPTIONS method is defined in section 9.2 of
  * <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC2616</a>:
+ * </p>
  * <blockquote>
  *  The OPTIONS method represents a request for information about the
  *  communication options available on the request/response chain
@@ -51,7 +52,6 @@ import org.apache.http.HttpResponse;
  *  or the capabilities of a server, without implying a resource action
  *  or initiating a resource retrieval.
  * </blockquote>
- * </p>
  *
  * @since 4.0
  */
@@ -83,16 +83,14 @@ public class HttpOptions extends HttpRequestBase {
     }
 
     public Set<String> getAllowedMethods(final HttpResponse response) {
-        if (response == null) {
-            throw new IllegalArgumentException("HTTP response may not be null");
-        }
+        Args.notNull(response, "HTTP response");
 
-        HeaderIterator it = response.headerIterator("Allow");
-        Set<String> methods = new HashSet<String>();
+        final HeaderIterator it = response.headerIterator("Allow");
+        final Set<String> methods = new HashSet<String>();
         while (it.hasNext()) {
-            Header header = it.nextHeader();
-            HeaderElement[] elements = header.getElements();
-            for (HeaderElement element : elements) {
+            final Header header = it.nextHeader();
+            final HeaderElement[] elements = header.getElements();
+            for (final HeaderElement element : elements) {
                 methods.add(element.getName());
             }
         }

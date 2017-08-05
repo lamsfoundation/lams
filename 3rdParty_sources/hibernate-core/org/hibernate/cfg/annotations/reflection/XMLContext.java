@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cfg.annotations.reflection;
 
@@ -32,11 +15,11 @@ import javax.persistence.AccessType;
 import javax.persistence.AttributeConverter;
 
 import org.hibernate.AnnotationException;
+import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
+import org.hibernate.boot.spi.ClassLoaderAccess;
 import org.hibernate.cfg.AttributeConverterDefinition;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.internal.util.StringHelper;
 
 import org.dom4j.Document;
@@ -51,12 +34,18 @@ import org.dom4j.Element;
 public class XMLContext implements Serializable {
     private static final CoreMessageLogger LOG = CoreLogging.messageLogger( XMLContext.class );
 
+	private final ClassLoaderAccess classLoaderAccess;
+
 	private Default globalDefaults;
 	private Map<String, Element> classOverriding = new HashMap<String, Element>();
 	private Map<String, Default> defaultsOverriding = new HashMap<String, Default>();
 	private List<Element> defaultElements = new ArrayList<Element>();
 	private List<String> defaultEntityListeners = new ArrayList<String>();
 	private boolean hasContext = false;
+
+	public XMLContext(ClassLoaderAccess classLoaderAccess) {
+		this.classLoaderAccess = classLoaderAccess;
+	}
 
 	/**
 	 * @param doc The xml document to add
@@ -200,14 +189,14 @@ public class XMLContext implements Serializable {
 			final boolean autoApply = autoApplyAttribute != null && Boolean.parseBoolean( autoApplyAttribute );
 
 			try {
-				final Class<? extends AttributeConverter> attributeConverterClass = ReflectHelper.classForName(
+				final Class<? extends AttributeConverter> attributeConverterClass = classLoaderAccess.classForName(
 						className
 				);
 				attributeConverterDefinitions.add(
 						new AttributeConverterDefinition( attributeConverterClass.newInstance(), autoApply )
 				);
 			}
-			catch (ClassNotFoundException e) {
+			catch (ClassLoadingException e) {
 				throw new AnnotationException( "Unable to locate specified AttributeConverter implementation class : " + className, e );
 			}
 			catch (Exception e) {
@@ -251,9 +240,9 @@ public class XMLContext implements Serializable {
 
 	private List<AttributeConverterDefinition> attributeConverterDefinitions = new ArrayList<AttributeConverterDefinition>();
 
-	public void applyDiscoveredAttributeConverters(Configuration configuration) {
+	public void applyDiscoveredAttributeConverters(AttributeConverterDefinitionCollector collector) {
 		for ( AttributeConverterDefinition definition : attributeConverterDefinitions ) {
-			configuration.addAttributeConverter( definition );
+			collector.addAttributeConverter( definition );
 		}
 		attributeConverterDefinitions.clear();
 	}

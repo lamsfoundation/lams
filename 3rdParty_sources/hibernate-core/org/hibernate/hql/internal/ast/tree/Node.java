@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal.ast.tree;
 
@@ -62,7 +44,7 @@ public class Node extends antlr.CommonAST {
 	}
 
 	@Override
-    public void initialize(Token tok) {
+	public void initialize(Token tok) {
 		super.initialize(tok);
 		filename = tok.getFilename();
 		line = tok.getLine();
@@ -72,7 +54,7 @@ public class Node extends antlr.CommonAST {
 	}
 
 	@Override
-    public void initialize(AST t) {
+	public void initialize(AST t) {
 		super.initialize( t );
 		if ( t instanceof Node ) {
 			Node n = (Node)t;
@@ -88,12 +70,12 @@ public class Node extends antlr.CommonAST {
 	}
 
 	@Override
-    public int getLine() {
+	public int getLine() {
 		return line;
 	}
 
 	@Override
-    public int getColumn() {
+	public int getColumn() {
 		return column;
 	}
 

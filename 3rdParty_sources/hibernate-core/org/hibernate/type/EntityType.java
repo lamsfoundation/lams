@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.type;
 
@@ -30,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.AssertionFailure;
-import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.engine.internal.ForeignKeys;
@@ -44,10 +26,6 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.persister.entity.Joinable;
 import org.hibernate.persister.entity.UniqueKeyLoadable;
 import org.hibernate.proxy.HibernateProxy;
-import org.hibernate.tuple.ElementWrapper;
-
-import org.dom4j.Element;
-import org.dom4j.Node;
 
 /**
  * Base for types which map associations to persistent entities.
@@ -59,13 +37,13 @@ public abstract class EntityType extends AbstractType implements AssociationType
 	private final TypeFactory.TypeScope scope;
 	private final String associatedEntityName;
 	protected final String uniqueKeyPropertyName;
-	protected final boolean isEmbeddedInXML;
 	private final boolean eager;
 	private final boolean unwrapProxy;
 	private final boolean referenceToPrimaryKey;
 
 	/**
 	 * Cached because of performance
+	 *
 	 * @see #getIdentifierType(SessionImplementor)
 	 * @see #getIdentifierType(Mapping)
 	 */
@@ -73,6 +51,7 @@ public abstract class EntityType extends AbstractType implements AssociationType
 
 	/**
 	 * Cached because of performance
+	 *
 	 * @see #getAssociatedEntityPersister
 	 */
 	private transient volatile EntityPersister associatedEntityPersister;
@@ -87,37 +66,10 @@ public abstract class EntityType extends AbstractType implements AssociationType
 	 * @param uniqueKeyPropertyName The property-ref name, or null if we
 	 * reference the PK of the associated entity.
 	 * @param eager Is eager fetching enabled.
-	 * @param isEmbeddedInXML Should values of this mapping be embedded in XML modes?
 	 * @param unwrapProxy Is unwrapping of proxies allowed for this association; unwrapping
 	 * says to return the "implementation target" of lazy prooxies; typically only possible
 	 * with lazy="no-proxy".
 	 *
-	 * @deprecated Use {@link #EntityType(org.hibernate.type.TypeFactory.TypeScope, String, boolean, String, boolean, boolean)} instead.
-	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
-	 */
-	@Deprecated
-	protected EntityType(
-			TypeFactory.TypeScope scope,
-			String entityName,
-			String uniqueKeyPropertyName,
-			boolean eager,
-			boolean isEmbeddedInXML,
-			boolean unwrapProxy) {
-		this( scope, entityName, uniqueKeyPropertyName == null, uniqueKeyPropertyName, eager, unwrapProxy );
-	}
-
-	/**
-	 * Constructs the requested entity type mapping.
-	 *
-	 * @param scope The type scope
-	 * @param entityName The name of the associated entity.
-	 * @param uniqueKeyPropertyName The property-ref name, or null if we
-	 * reference the PK of the associated entity.
-	 * @param eager Is eager fetching enabled.
-	 * @param unwrapProxy Is unwrapping of proxies allowed for this association; unwrapping
-	 * says to return the "implementation target" of lazy prooxies; typically only possible
-	 * with lazy="no-proxy".
-	 * 
 	 * @deprecated Use {@link #EntityType(org.hibernate.type.TypeFactory.TypeScope, String, boolean, String, boolean, boolean)} instead.
 	 */
 	@Deprecated
@@ -153,7 +105,6 @@ public abstract class EntityType extends AbstractType implements AssociationType
 		this.scope = scope;
 		this.associatedEntityName = entityName;
 		this.uniqueKeyPropertyName = uniqueKeyPropertyName;
-		this.isEmbeddedInXML = true;
 		this.eager = eager;
 		this.unwrapProxy = unwrapProxy;
 		this.referenceToPrimaryKey = referenceToPrimaryKey;
@@ -245,6 +196,7 @@ public abstract class EntityType extends AbstractType implements AssociationType
 	 * The name of the associated entity.
 	 *
 	 * @param factory The session factory, for resolution.
+	 *
 	 * @return The associated entity name.
 	 */
 	@Override
@@ -256,12 +208,14 @@ public abstract class EntityType extends AbstractType implements AssociationType
 	 * Retrieves the {@link Joinable} defining the associated entity.
 	 *
 	 * @param factory The session factory.
+	 *
 	 * @return The associated joinable
+	 *
 	 * @throws MappingException Generally indicates an invalid entity name.
 	 */
 	@Override
 	public Joinable getAssociatedJoinable(SessionFactoryImplementor factory) throws MappingException {
-		return ( Joinable ) getAssociatedEntityPersister( factory );
+		return (Joinable) getAssociatedEntityPersister( factory );
 	}
 
 	/**
@@ -282,16 +236,16 @@ public abstract class EntityType extends AbstractType implements AssociationType
 		return returnedClass;
 	}
 
-    private Class determineAssociatedEntityClass() {
-        final String entityName = getAssociatedEntityName();
-        try {
-            return ReflectHelper.classForName(entityName);
-        }
-        catch ( ClassNotFoundException cnfe ) {
-            return this.scope.resolveFactory().getEntityPersister(entityName).
-                getEntityTuplizer().getMappedClass();
-        }
-    }
+	private Class determineAssociatedEntityClass() {
+		final String entityName = getAssociatedEntityName();
+		try {
+			return ReflectHelper.classForName( entityName );
+		}
+		catch (ClassNotFoundException cnfe) {
+			return this.scope.resolveFactory().getEntityPersister( entityName ).
+					getEntityTuplizer().getMappedClass();
+		}
+	}
 
 	@Override
 	public Object nullSafeGet(ResultSet rs, String name, SessionImplementor session, Object owner)
@@ -305,15 +259,15 @@ public abstract class EntityType extends AbstractType implements AssociationType
 			String[] names,
 			SessionImplementor session,
 			Object owner) throws HibernateException, SQLException {
-		return resolve( hydrate(rs, names, session, owner), session, owner );
+		return resolve( hydrate( rs, names, session, owner ), session, owner );
 	}
 
 	/**
 	 * Two entities are considered the same when their instances are the same.
 	 *
-	 *
 	 * @param x One entity instance
 	 * @param y Another entity instance
+	 *
 	 * @return True if x == y; false otherwise.
 	 */
 	@Override
@@ -341,7 +295,7 @@ public abstract class EntityType extends AbstractType implements AssociationType
 		if ( original == null ) {
 			return null;
 		}
-		Object cached = copyCache.get(original);
+		Object cached = copyCache.get( original );
 		if ( cached != null ) {
 			return cached;
 		}
@@ -349,7 +303,7 @@ public abstract class EntityType extends AbstractType implements AssociationType
 			if ( original == target ) {
 				return target;
 			}
-			if ( session.getContextEntityIdentifier( original ) == null  &&
+			if ( session.getContextEntityIdentifier( original ) == null &&
 					ForeignKeys.isTransient( associatedEntityName, original, Boolean.FALSE, session ) ) {
 				final Object copy = session.getEntityPersister( associatedEntityName, original )
 						.instantiate( null, session );
@@ -359,10 +313,13 @@ public abstract class EntityType extends AbstractType implements AssociationType
 			else {
 				Object id = getIdentifier( original, session );
 				if ( id == null ) {
-					throw new AssertionFailure("non-transient entity has a null id: " + original.getClass().getName());
+					throw new AssertionFailure(
+							"non-transient entity has a null id: " + original.getClass()
+									.getName()
+					);
 				}
 				id = getIdentifierOrUniqueKeyType( session.getFactory() )
-						.replace(id, null, session, owner, copyCache);
+						.replace( id, null, session, owner, copyCache );
 				return resolve( id, session, owner );
 			}
 		}
@@ -376,7 +333,7 @@ public abstract class EntityType extends AbstractType implements AssociationType
 		}
 
 		final Serializable id;
-		if (x instanceof HibernateProxy) {
+		if ( x instanceof HibernateProxy ) {
 			id = ( (HibernateProxy) x ).getHibernateLazyInitializer().getIdentifier();
 		}
 		else {
@@ -400,12 +357,12 @@ public abstract class EntityType extends AbstractType implements AssociationType
 
 		EntityPersister persister = getAssociatedEntityPersister( factory );
 		if ( !persister.canExtractIdOutOfEntity() ) {
-			return super.isEqual(x, y );
+			return super.isEqual( x, y );
 		}
 
 		final Class mappedClass = persister.getMappedClass();
 		Serializable xid;
-		if (x instanceof HibernateProxy) {
+		if ( x instanceof HibernateProxy ) {
 			xid = ( (HibernateProxy) x ).getHibernateLazyInitializer()
 					.getIdentifier();
 		}
@@ -420,7 +377,7 @@ public abstract class EntityType extends AbstractType implements AssociationType
 		}
 
 		Serializable yid;
-		if (y instanceof HibernateProxy) {
+		if ( y instanceof HibernateProxy ) {
 			yid = ( (HibernateProxy) y ).getHibernateLazyInitializer()
 					.getIdentifier();
 		}
@@ -435,38 +392,7 @@ public abstract class EntityType extends AbstractType implements AssociationType
 		}
 
 		return persister.getIdentifierType()
-				.isEqual(xid, yid, factory);
-	}
-
-	@Override
-	public boolean isEmbeddedInXML() {
-		return isEmbeddedInXML;
-	}
-
-	@Override
-	public boolean isXMLElement() {
-		return isEmbeddedInXML;
-	}
-
-	@Override
-	public Object fromXMLNode(Node xml, Mapping factory) throws HibernateException {
-		if ( !isEmbeddedInXML ) {
-			return getIdentifierType(factory).fromXMLNode(xml, factory);
-		}
-		else {
-			return xml;
-		}
-	}
-
-	@Override
-	public void setToXMLNode(Node node, Object value, SessionFactoryImplementor factory) throws HibernateException {
-		if ( !isEmbeddedInXML ) {
-			getIdentifierType(factory).setToXMLNode(node, value, factory);
-		}
-		else {
-			Element elt = (Element) value;
-			replaceNode( node, new ElementWrapper(elt) );
-		}
+				.isEqual( xid, yid, factory );
 	}
 
 	@Override
@@ -493,10 +419,6 @@ public abstract class EntityType extends AbstractType implements AssociationType
 	 */
 	@Override
 	public Object resolve(Object value, SessionImplementor session, Object owner) throws HibernateException {
-		if ( isNotEmbedded( session ) ) {
-			return value;
-		}
-
 		if ( value != null && !isNull( owner, session ) ) {
 			if ( isReferenceToPrimaryKey() ) {
 				return resolveIdentifier( (Serializable) value, session );
@@ -505,7 +427,7 @@ public abstract class EntityType extends AbstractType implements AssociationType
 				return loadByUniqueKey( getAssociatedEntityName(), uniqueKeyPropertyName, value, session );
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -529,12 +451,12 @@ public abstract class EntityType extends AbstractType implements AssociationType
 	}
 
 	protected final Object getIdentifier(Object value, SessionImplementor session) throws HibernateException {
-		if ( isNotEmbedded(session) ) {
-			return value;
-		}
-
 		if ( isReferenceToPrimaryKey() || uniqueKeyPropertyName == null ) {
-			return ForeignKeys.getEntityIdentifierIfNotUnsaved( getAssociatedEntityName(), value, session ); //tolerates nulls
+			return ForeignKeys.getEntityIdentifierIfNotUnsaved(
+					getAssociatedEntityName(),
+					value,
+					session
+			); //tolerates nulls
 		}
 		else if ( value == null ) {
 			return null;
@@ -547,7 +469,7 @@ public abstract class EntityType extends AbstractType implements AssociationType
 			// an entity type, in which case we need to resolve its identitifier
 			Type type = entityPersister.getPropertyType( uniqueKeyPropertyName );
 			if ( type.isEntityType() ) {
-				propertyValue = ( ( EntityType ) type ).getIdentifier( propertyValue, session );
+				propertyValue = ( (EntityType) type ).getIdentifier( propertyValue, session );
 			}
 
 			return propertyValue;
@@ -555,21 +477,13 @@ public abstract class EntityType extends AbstractType implements AssociationType
 	}
 
 	/**
-	 * @deprecated To be removed in 5.  Removed as part of removing the notion of DOM entity-mode.
-	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
-	 */
-	@Deprecated
-	protected boolean isNotEmbedded(SessionImplementor session) {
-//		return !isEmbeddedInXML;
-		return false;
-	}
-
-	/**
 	 * Generate a loggable representation of an instance of the value mapped by this type.
 	 *
 	 * @param value The instance to be logged.
 	 * @param factory The session factory.
+	 *
 	 * @return The loggable string.
+	 *
 	 * @throws HibernateException Generally some form of resolution problem.
 	 */
 	@Override
@@ -577,30 +491,24 @@ public abstract class EntityType extends AbstractType implements AssociationType
 		if ( value == null ) {
 			return "null";
 		}
-		
+
 		EntityPersister persister = getAssociatedEntityPersister( factory );
 		StringBuilder result = new StringBuilder().append( associatedEntityName );
 
 		if ( persister.hasIdentifierProperty() ) {
-			final EntityMode entityMode = persister.getEntityMode();
 			final Serializable id;
-			if ( entityMode == null ) {
-				if ( isEmbeddedInXML ) {
-					throw new ClassCastException( value.getClass().getName() );
-				}
-				id = ( Serializable ) value;
-			} else if ( value instanceof HibernateProxy ) {
-				HibernateProxy proxy = ( HibernateProxy ) value;
+			if ( value instanceof HibernateProxy ) {
+				HibernateProxy proxy = (HibernateProxy) value;
 				id = proxy.getHibernateLazyInitializer().getIdentifier();
 			}
 			else {
 				id = persister.getIdentifier( value );
 			}
-			
+
 			result.append( '#' )
-				.append( persister.getIdentifierType().toLoggableString( id, factory ) );
+					.append( persister.getIdentifierType().toLoggableString( id, factory ) );
 		}
-		
+
 		return result.toString();
 	}
 
@@ -624,6 +532,7 @@ public abstract class EntityType extends AbstractType implements AssociationType
 	 * Convenience method to locate the identifier type of the associated entity.
 	 *
 	 * @param factory The mappings...
+	 *
 	 * @return The identifier type
 	 */
 	Type getIdentifierType(final Mapping factory) {
@@ -644,6 +553,7 @@ public abstract class EntityType extends AbstractType implements AssociationType
 	 * Convenience method to locate the identifier type of the associated entity.
 	 *
 	 * @param session The originating session
+	 *
 	 * @return The identifier type
 	 */
 	Type getIdentifierType(final SessionImplementor session) {
@@ -663,18 +573,20 @@ public abstract class EntityType extends AbstractType implements AssociationType
 	 * the property-ref).
 	 *
 	 * @param factory The mappings...
+	 *
 	 * @return The appropriate type.
+	 *
 	 * @throws MappingException Generally, if unable to resolve the associated entity name
 	 * or unique key property name.
 	 */
 	public final Type getIdentifierOrUniqueKeyType(Mapping factory) throws MappingException {
 		if ( isReferenceToPrimaryKey() || uniqueKeyPropertyName == null ) {
-			return getIdentifierType(factory);
+			return getIdentifierType( factory );
 		}
 		else {
 			Type type = factory.getReferencedPropertyType( getAssociatedEntityName(), uniqueKeyPropertyName );
 			if ( type.isEntityType() ) {
-				type = ( ( EntityType ) type).getIdentifierOrUniqueKeyType( factory );
+				type = ( (EntityType) type ).getIdentifierOrUniqueKeyType( factory );
 			}
 			return type;
 		}
@@ -685,11 +597,13 @@ public abstract class EntityType extends AbstractType implements AssociationType
 	 * refers
 	 *
 	 * @param factory The mappings...
+	 *
 	 * @return The appropriate property name.
+	 *
 	 * @throws MappingException Generally, if unable to resolve the associated entity name
 	 */
 	public final String getIdentifierOrUniqueKeyPropertyName(Mapping factory)
-	throws MappingException {
+			throws MappingException {
 		if ( isReferenceToPrimaryKey() || uniqueKeyPropertyName == null ) {
 			return factory.getIdentifierPropertyName( getAssociatedEntityName() );
 		}
@@ -697,7 +611,7 @@ public abstract class EntityType extends AbstractType implements AssociationType
 			return uniqueKeyPropertyName;
 		}
 	}
-	
+
 	protected abstract boolean isNullable();
 
 	/**
@@ -705,7 +619,9 @@ public abstract class EntityType extends AbstractType implements AssociationType
 	 *
 	 * @param id The entity id to resolve
 	 * @param session The orginating session.
+	 *
 	 * @return The resolved identifier (i.e., loaded entity).
+	 *
 	 * @throws org.hibernate.HibernateException Indicates problems performing the load.
 	 */
 	protected final Object resolveIdentifier(Serializable id, SessionImplementor session) throws HibernateException {
@@ -721,7 +637,7 @@ public abstract class EntityType extends AbstractType implements AssociationType
 		);
 
 		if ( proxyOrEntity instanceof HibernateProxy ) {
-			( ( HibernateProxy ) proxyOrEntity ).getHibernateLazyInitializer()
+			( (HibernateProxy) proxyOrEntity ).getHibernateLazyInitializer()
 					.setUnwrap( isProxyUnwrapEnabled );
 		}
 
@@ -739,23 +655,25 @@ public abstract class EntityType extends AbstractType implements AssociationType
 	 * @param uniqueKeyPropertyName The name of the property defining the uniqie key.
 	 * @param key The unique key property value.
 	 * @param session The originating session.
+	 *
 	 * @return The loaded entity
+	 *
 	 * @throws HibernateException generally indicates problems performing the load.
 	 */
 	public Object loadByUniqueKey(
-			String entityName, 
-			String uniqueKeyPropertyName, 
-			Object key, 
+			String entityName,
+			String uniqueKeyPropertyName,
+			Object key,
 			SessionImplementor session) throws HibernateException {
 		final SessionFactoryImplementor factory = session.getFactory();
-		UniqueKeyLoadable persister = ( UniqueKeyLoadable ) factory.getEntityPersister( entityName );
+		UniqueKeyLoadable persister = (UniqueKeyLoadable) factory.getEntityPersister( entityName );
 
 		//TODO: implement caching?! proxies?!
 
 		EntityUniqueKey euk = new EntityUniqueKey(
-				entityName, 
-				uniqueKeyPropertyName, 
-				key, 
+				entityName,
+				uniqueKeyPropertyName,
+				key,
 				getIdentifierOrUniqueKeyType( factory ),
 				persister.getEntityMode(),
 				session.getFactory()

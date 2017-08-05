@@ -21,18 +21,20 @@ package io.undertow.websockets.core.protocol.version07;
 
 import io.undertow.util.Headers;
 import io.undertow.websockets.core.WebSocketChannel;
-import io.undertow.websockets.core.WebSocketUtils;
 import io.undertow.websockets.core.WebSocketVersion;
 import io.undertow.websockets.core.protocol.Handshake;
+import io.undertow.websockets.extensions.CompositeExtensionFunction;
+import io.undertow.websockets.extensions.ExtensionFunction;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
 import org.xnio.IoUtils;
-import org.xnio.Pool;
+import io.undertow.connector.ByteBufferPool;
 import org.xnio.StreamConnection;
 
-import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -43,8 +45,6 @@ import java.util.Set;
 public class Hybi07Handshake extends Handshake {
 
     public static final String MAGIC_NUMBER = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-
-    protected final boolean allowExtensions;
 
     protected Hybi07Handshake(final WebSocketVersion version, final Set<String> subprotocols, boolean allowExtensions) {
         super(version, "SHA1", MAGIC_NUMBER, subprotocols);
@@ -95,12 +95,13 @@ public class Hybi07Handshake extends Handshake {
     protected final String solve(final String nonceBase64) throws NoSuchAlgorithmException {
         final String concat = nonceBase64.trim() + getMagicNumber();
         final MessageDigest digest = MessageDigest.getInstance(getHashAlgorithm());
-        digest.update(concat.getBytes(WebSocketUtils.UTF_8));
+        digest.update(concat.getBytes(StandardCharsets.UTF_8));
         return  Base64.encodeBytes(digest.digest()).trim();
     }
 
     @Override
-    public WebSocketChannel createChannel(WebSocketHttpExchange exchange, final StreamConnection channel, final Pool<ByteBuffer> pool) {
-        return new WebSocket07Channel(channel, pool, getWebSocketLocation(exchange), exchange.getResponseHeader(Headers.SEC_WEB_SOCKET_PROTOCOL_STRING), false, allowExtensions, exchange.getPeerConnections());
+    public WebSocketChannel createChannel(WebSocketHttpExchange exchange, final StreamConnection channel, final ByteBufferPool pool) {
+        List<ExtensionFunction> extensionFunctions = initExtensions(exchange);
+        return new WebSocket07Channel(channel, pool, getWebSocketLocation(exchange), exchange.getResponseHeader(Headers.SEC_WEB_SOCKET_PROTOCOL_STRING), false, !extensionFunctions.isEmpty(), CompositeExtensionFunction.compose(extensionFunctions), exchange.getPeerConnections(), exchange.getOptions());
     }
 }

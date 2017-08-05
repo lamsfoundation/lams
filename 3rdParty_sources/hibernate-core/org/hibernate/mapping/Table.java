@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.mapping;
 
@@ -29,82 +12,107 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
+import org.hibernate.boot.model.naming.Identifier;
+import org.hibernate.boot.model.relational.Exportable;
+import org.hibernate.boot.model.relational.InitCommand;
+import org.hibernate.boot.model.relational.Namespace;
+import org.hibernate.boot.model.relational.QualifiedTableName;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.env.spi.QualifiedObjectNameFormatter;
 import org.hibernate.engine.spi.Mapping;
+import org.hibernate.internal.util.StringHelper;
 import org.hibernate.tool.hbm2ddl.ColumnMetadata;
 import org.hibernate.tool.hbm2ddl.TableMetadata;
+import org.hibernate.tool.schema.extract.spi.ColumnInformation;
+import org.hibernate.tool.schema.extract.spi.TableInformation;
+
+import org.jboss.logging.Logger;
 
 /**
  * A relational table
  *
  * @author Gavin King
  */
-public class Table implements RelationalModel, Serializable {
+@SuppressWarnings("unchecked")
+public class Table implements RelationalModel, Serializable, Exportable {
+	private static final Logger log = Logger.getLogger( Table.class );
 
-	private String name;
-	private String schema;
-	private String catalog;
+	private Identifier catalog;
+	private Identifier schema;
+	private Identifier name;
+
 	/**
 	 * contains all columns, including the primary key
 	 */
 	private Map columns = new LinkedHashMap();
 	private KeyValue idValue;
 	private PrimaryKey primaryKey;
+	private Map<ForeignKeyKey, ForeignKey> foreignKeys = new LinkedHashMap<ForeignKeyKey, ForeignKey>();
 	private Map<String, Index> indexes = new LinkedHashMap<String, Index>();
-	private Map foreignKeys = new LinkedHashMap();
 	private Map<String,UniqueKey> uniqueKeys = new LinkedHashMap<String,UniqueKey>();
 	private int uniqueInteger;
-	private boolean quoted;
-	private boolean schemaQuoted;
-	private boolean catalogQuoted;
-	private List checkConstraints = new ArrayList();
+	private List<String> checkConstraints = new ArrayList<String>();
 	private String rowId;
 	private String subselect;
 	private boolean isAbstract;
 	private boolean hasDenormalizedTables;
 	private String comment;
-	
-	static class ForeignKeyKey implements Serializable {
-		String referencedClassName;
-		List columns;
-		List referencedColumns;
 
-		ForeignKeyKey(List columns, String referencedClassName, List referencedColumns) {
-			this.referencedClassName = referencedClassName;
-			this.columns = new ArrayList();
-			this.columns.addAll( columns );
-			if ( referencedColumns != null ) {
-				this.referencedColumns = new ArrayList();
-				this.referencedColumns.addAll( referencedColumns );
-			}
-			else {
-				this.referencedColumns = Collections.EMPTY_LIST;
-			}
-		}
+	private List<InitCommand> initCommands;
 
-		public int hashCode() {
-			return columns.hashCode() + referencedColumns.hashCode();
-		}
-
-		public boolean equals(Object other) {
-			ForeignKeyKey fkk = (ForeignKeyKey) other;
-			return fkk.columns.equals( columns ) &&
-					fkk.referencedClassName.equals( referencedClassName ) && fkk.referencedColumns
-					.equals( referencedColumns );
-		}
+	public Table() {
 	}
 
-	public Table() { }
-
 	public Table(String name) {
-		this();
 		setName( name );
 	}
 
+	public Table(
+			Namespace namespace,
+			Identifier physicalTableName,
+			boolean isAbstract) {
+		this.catalog = namespace.getPhysicalName().getCatalog();
+		this.schema = namespace.getPhysicalName().getSchema();
+		this.name = physicalTableName;
+		this.isAbstract = isAbstract;
+	}
+
+	public Table(
+			Identifier catalog,
+			Identifier schema,
+			Identifier physicalTableName,
+			boolean isAbstract) {
+		this.catalog = catalog;
+		this.schema = schema;
+		this.name = physicalTableName;
+		this.isAbstract = isAbstract;
+	}
+
+	public Table(Namespace namespace, Identifier physicalTableName, String subselect, boolean isAbstract) {
+		this.catalog = namespace.getPhysicalName().getCatalog();
+		this.schema = namespace.getPhysicalName().getSchema();
+		this.name = physicalTableName;
+		this.subselect = subselect;
+		this.isAbstract = isAbstract;
+	}
+
+	public Table(Namespace namespace, String subselect, boolean isAbstract) {
+		this.catalog = namespace.getPhysicalName().getCatalog();
+		this.schema = namespace.getPhysicalName().getSchema();
+		this.subselect = subselect;
+		this.isAbstract = isAbstract;
+	}
+
+	/**
+	 * @deprecated Should use {@link QualifiedObjectNameFormatter#format} on QualifiedObjectNameFormatter
+	 * obtained from {@link org.hibernate.engine.jdbc.env.spi.JdbcEnvironment}
+	 */
+	@Deprecated
 	public String getQualifiedName(Dialect dialect, String defaultCatalog, String defaultSchema) {
 		if ( subselect != null ) {
 			return "( " + subselect + " )";
@@ -119,6 +127,11 @@ public class Table implements RelationalModel, Serializable {
 		return qualify( usedCatalog, usedSchema, quotedName );
 	}
 
+	/**
+	 * @deprecated Should use {@link QualifiedObjectNameFormatter#format} on QualifiedObjectNameFormatter
+	 * obtained from {@link org.hibernate.engine.jdbc.env.spi.JdbcEnvironment}
+	 */
+	@Deprecated
 	public static String qualify(String catalog, String schema, String table) {
 		StringBuilder qualifiedName = new StringBuilder();
 		if ( catalog != null ) {
@@ -130,60 +143,79 @@ public class Table implements RelationalModel, Serializable {
 		return qualifiedName.append( table ).toString();
 	}
 
+	public void setName(String name) {
+		this.name = Identifier.toIdentifier( name );
+	}
+
 	public String getName() {
+		return name == null ? null : name.getText();
+	}
+
+	public Identifier getNameIdentifier() {
 		return name;
 	}
 
-	/**
-	 * returns quoted name as it would be in the mapping file.
-	 */
 	public String getQuotedName() {
-		return quoted ?
-				"`" + name + "`" :
-				name;
+		return name == null ? null : name.toString();
 	}
 
 	public String getQuotedName(Dialect dialect) {
-		return quoted ?
-				dialect.openQuote() + name + dialect.closeQuote() :
-				name;
+		return name == null ? null : name.render( dialect );
 	}
 
-	/**
-	 * returns quoted name as it is in the mapping file.
-	 */
+	public QualifiedTableName getQualifiedTableName() {
+		return name == null ? null : new QualifiedTableName( catalog, schema, name );
+	}
+
+	public boolean isQuoted() {
+		return name.isQuoted();
+	}
+
+	public void setQuoted(boolean quoted) {
+		if ( quoted == name.isQuoted() ) {
+			return;
+		}
+		this.name = new Identifier( name.getText(), quoted );
+	}
+
+	public void setSchema(String schema) {
+		this.schema = Identifier.toIdentifier( schema );
+	}
+
+	public String getSchema() {
+		return schema == null ? null : schema.getText();
+	}
+
 	public String getQuotedSchema() {
-		return schemaQuoted ?
-				"`" + schema + "`" :
-				schema;
+		return schema == null ? null : schema.toString();
 	}
 
 	public String getQuotedSchema(Dialect dialect) {
-		return schemaQuoted ?
-				dialect.openQuote() + schema + dialect.closeQuote() :
-				schema;
+		return schema == null ? null : schema.render( dialect );
+	}
+
+	public boolean isSchemaQuoted() {
+		return schema != null && schema.isQuoted();
+	}
+
+	public void setCatalog(String catalog) {
+		this.catalog = Identifier.toIdentifier( catalog );
+	}
+
+	public String getCatalog() {
+		return catalog == null ? null : catalog.getText();
 	}
 
 	public String getQuotedCatalog() {
-		return catalogQuoted ?
-				"`" + catalog + "`" :
-				catalog;
+		return catalog == null ? null : catalog.render();
 	}
 
 	public String getQuotedCatalog(Dialect dialect) {
-		return catalogQuoted ?
-				dialect.openQuote() + catalog + dialect.closeQuote() :
-				catalog;
+		return catalog == null ? null : catalog.render( dialect );
 	}
 
-	public void setName(String name) {
-		if ( name.charAt( 0 ) == '`' ) {
-			quoted = true;
-			this.name = name.substring( 1, name.length() - 1 );
-		}
-		else {
-			this.name = name;
-		}
+	public boolean isCatalogQuoted() {
+		return catalog != null && catalog.isQuoted();
 	}
 
 	/**
@@ -204,6 +236,14 @@ public class Table implements RelationalModel, Serializable {
 				null;
 	}
 
+	public Column getColumn(Identifier name) {
+		if ( name == null ) {
+			return null;
+		}
+
+		return (Column) columns.get( name.getCanonicalName() );
+	}
+
 	public Column getColumn(int n) {
 		Iterator iter = columns.values().iterator();
 		for ( int i = 0; i < n - 1; i++ ) {
@@ -215,8 +255,20 @@ public class Table implements RelationalModel, Serializable {
 	public void addColumn(Column column) {
 		Column old = getColumn( column );
 		if ( old == null ) {
-			columns.put( column.getCanonicalName(), column );
-			column.uniqueInteger = columns.size();
+			if ( primaryKey != null ) {
+				for ( Column c : primaryKey.getColumns() ) {
+					if ( c.getCanonicalName().equals( column.getCanonicalName() ) ) {
+						column.setNullable( false );
+						log.debugf(
+								"Forcing column [%s] to be non-null as it is part of the primary key for table [%s]",
+								column.getCanonicalName(),
+								getNameIdentifier().getCanonicalName()
+						);
+					}
+				}
+			}
+			this.columns.put( column.getCanonicalName(), column );
+			column.uniqueInteger = this.columns.size();
 		}
 		else {
 			column.uniqueInteger = old.uniqueInteger;
@@ -237,6 +289,10 @@ public class Table implements RelationalModel, Serializable {
 
 	public Iterator getForeignKeyIterator() {
 		return foreignKeys.values().iterator();
+	}
+
+	public Map<ForeignKeyKey, ForeignKey> getForeignKeys() {
+		return Collections.unmodifiableMap( foreignKeys );
 	}
 
 	public Iterator<UniqueKey> getUniqueKeyIterator() {
@@ -328,11 +384,9 @@ public class Table implements RelationalModel, Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-			+ ((catalog == null) ? 0 : isCatalogQuoted() ? catalog.hashCode() : catalog.toLowerCase().hashCode());
-		result = prime * result + ((name == null) ? 0 : isQuoted() ? name.hashCode() : name.toLowerCase().hashCode());
-		result = prime * result
-			+ ((schema == null) ? 0 : isSchemaQuoted() ? schema.hashCode() : schema.toLowerCase().hashCode());
+		result = prime * result + ((catalog == null) ? 0 : catalog.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((schema == null) ? 0 : schema.hashCode());
 		return result;
 	}
 
@@ -349,9 +403,9 @@ public class Table implements RelationalModel, Serializable {
 			return true;
 		}
 
-		return isQuoted() ? name.equals(table.getName()) : name.equalsIgnoreCase(table.getName())
-			&& ((schema == null && table.getSchema() != null) ? false : (schema == null) ? true : isSchemaQuoted() ? schema.equals(table.getSchema()) : schema.equalsIgnoreCase(table.getSchema()))
-			&& ((catalog == null && table.getCatalog() != null) ? false : (catalog == null) ? true : isCatalogQuoted() ? catalog.equals(table.getCatalog()) : catalog.equalsIgnoreCase(table.getCatalog()));
+		return Identifier.areEqual( name, table.name )
+				&& Identifier.areEqual( schema, table.schema )
+				&& Identifier.areEqual( catalog, table.catalog );
 	}
 	
 	public void validateColumns(Dialect dialect, Mapping mapping, TableMetadata tableInfo) {
@@ -365,15 +419,15 @@ public class Table implements RelationalModel, Serializable {
 				throw new HibernateException( "Missing column: " + col.getName() + " in " + Table.qualify( tableInfo.getCatalog(), tableInfo.getSchema(), tableInfo.getName()));
 			}
 			else {
-				final boolean typesMatch = col.getSqlType( dialect, mapping ).toLowerCase()
-						.startsWith( columnInfo.getTypeName().toLowerCase() )
+				final boolean typesMatch = col.getSqlType( dialect, mapping ).toLowerCase(Locale.ROOT)
+						.startsWith( columnInfo.getTypeName().toLowerCase(Locale.ROOT) )
 						|| columnInfo.getTypeCode() == col.getSqlTypeCode( mapping );
 				if ( !typesMatch ) {
 					throw new HibernateException(
 							"Wrong column type in " +
 							Table.qualify( tableInfo.getCatalog(), tableInfo.getSchema(), tableInfo.getName()) +
 							" for column " + col.getName() +
-							". Found: " + columnInfo.getTypeName().toLowerCase() +
+							". Found: " + columnInfo.getTypeName().toLowerCase(Locale.ROOT) +
 							", expected: " + col.getSqlType( dialect, mapping )
 					);
 				}
@@ -382,9 +436,12 @@ public class Table implements RelationalModel, Serializable {
 
 	}
 
-	public Iterator sqlAlterStrings(Dialect dialect, Mapping p, TableMetadata tableInfo, String defaultCatalog,
-									String defaultSchema)
-			throws HibernateException {
+	public Iterator sqlAlterStrings(
+			Dialect dialect,
+			Mapping p,
+			TableInformation tableInfo,
+			String defaultCatalog,
+			String defaultSchema) throws HibernateException {
 
 		StringBuilder root = new StringBuilder( "alter table " )
 				.append( getQualifiedName( dialect, defaultCatalog, defaultSchema ) )
@@ -395,9 +452,8 @@ public class Table implements RelationalModel, Serializable {
 		List results = new ArrayList();
 		
 		while ( iter.hasNext() ) {
-			Column column = (Column) iter.next();
-
-			ColumnMetadata columnInfo = tableInfo.getColumnMetadata( column.getName() );
+			final Column column = (Column) iter.next();
+			final ColumnInformation columnInfo = tableInfo.getColumn( Identifier.toIdentifier( column.getName(), column.isQuoted() ) );
 
 			if ( columnInfo == null ) {
 				// the column doesnt exist at all.
@@ -445,36 +501,15 @@ public class Table implements RelationalModel, Serializable {
 
 		}
 
+		if ( results.isEmpty() ) {
+			log.debugf( "No alter strings for table : %s", getQuotedName() );
+		}
+
 		return results.iterator();
 	}
 
 	public boolean hasPrimaryKey() {
 		return getPrimaryKey() != null;
-	}
-
-	public String sqlTemporaryTableCreateString(Dialect dialect, Mapping mapping) throws HibernateException {
-		StringBuilder buffer = new StringBuilder( dialect.getCreateTemporaryTableString() )
-				.append( ' ' )
-				.append( name )
-				.append( " (" );
-		Iterator itr = getColumnIterator();
-		while ( itr.hasNext() ) {
-			final Column column = (Column) itr.next();
-			buffer.append( column.getQuotedName( dialect ) ).append( ' ' );
-			buffer.append( column.getSqlType( dialect, mapping ) );
-			if ( column.isNullable() ) {
-				buffer.append( dialect.getNullColumnString() );
-			}
-			else {
-				buffer.append( " not null" );
-			}
-			if ( itr.hasNext() ) {
-				buffer.append( ", " );
-			}
-		}
-		buffer.append( ") " );
-		buffer.append( dialect.getCreateTemporaryTablePostfix() );
-		return buffer.toString();
 	}
 
 	public String sqlCreateString(Dialect dialect, Mapping p, String defaultCatalog, String defaultSchema) {
@@ -500,11 +535,11 @@ public class Table implements RelationalModel, Serializable {
 
 			if ( identityColumn && col.getQuotedName( dialect ).equals( pkname ) ) {
 				// to support dialects that have their own identity data type
-				if ( dialect.hasDataTypeInIdentityColumn() ) {
+				if ( dialect.getIdentityColumnSupport().hasDataTypeInIdentityColumn() ) {
 					buf.append( col.getSqlType( dialect, p ) );
 				}
 				buf.append( ' ' )
-						.append( dialect.getIdentityColumnString( col.getSqlTypeCode( p ) ) );
+						.append( dialect.getIdentityColumnSupport().getIdentityColumnString( col.getSqlTypeCode( p ) ) );
 			}
 			else {
 
@@ -556,10 +591,9 @@ public class Table implements RelationalModel, Serializable {
 		buf.append( dialect.getUniqueDelegate().getTableCreationUniqueConstraintsFragment( this ) );
 
 		if ( dialect.supportsTableCheck() ) {
-			Iterator chiter = checkConstraints.iterator();
-			while ( chiter.hasNext() ) {
+			for ( String checkConstraint : checkConstraints ) {
 				buf.append( ", check (" )
-						.append( chiter.next() )
+						.append( checkConstraint )
 						.append( ')' );
 			}
 		}
@@ -651,11 +685,14 @@ public class Table implements RelationalModel, Serializable {
 		return createForeignKey( keyName, keyColumns, referencedEntityName, null );
 	}
 
-	public ForeignKey createForeignKey(String keyName, List keyColumns, String referencedEntityName,
-									   List referencedColumns) {
-		Object key = new ForeignKeyKey( keyColumns, referencedEntityName, referencedColumns );
+	public ForeignKey createForeignKey(
+			String keyName,
+			List keyColumns,
+			String referencedEntityName,
+			List referencedColumns) {
+		final ForeignKeyKey key = new ForeignKeyKey( keyColumns, referencedEntityName, referencedColumns );
 
-		ForeignKey fk = (ForeignKey) foreignKeys.get( key );
+		ForeignKey fk = foreignKeys.get( key );
 		if ( fk == null ) {
 			fk = new ForeignKey();
 			fk.setTable( this );
@@ -664,15 +701,11 @@ public class Table implements RelationalModel, Serializable {
 			if ( referencedColumns != null ) {
 				fk.addReferencedColumns( referencedColumns.iterator() );
 			}
-			
-			if ( keyName != null ) {
-				fk.setName( keyName );
-			}
-			else {
-				fk.setName( Constraint.generateName( fk.generatedConstraintNamePrefix(),
-						this, keyColumns ) );
-			}
-			
+
+			// NOTE : if the name is null, we will generate an implicit name during second pass processing
+			// after we know the referenced table name (which might not be resolved yet).
+			fk.setName( keyName );
+
 			foreignKeys.put( key, fk );
 		}
 
@@ -683,35 +716,6 @@ public class Table implements RelationalModel, Serializable {
 		return fk;
 	}
 
-
-
-	public String getSchema() {
-		return schema;
-	}
-
-	public void setSchema(String schema) {
-		if ( schema != null && schema.charAt( 0 ) == '`' ) {
-			schemaQuoted = true;
-			this.schema = schema.substring( 1, schema.length() - 1 );
-		}
-		else {
-			this.schema = schema;
-		}
-	}
-
-	public String getCatalog() {
-		return catalog;
-	}
-
-	public void setCatalog(String catalog) {
-		if ( catalog != null && catalog.charAt( 0 ) == '`' ) {
-			catalogQuoted = true;
-			this.catalog = catalog.substring( 1, catalog.length() - 1 );
-		}
-		else {
-			this.catalog = catalog;
-		}
-	}
 
 	// This must be done outside of Table, rather than statically, to ensure
 	// deterministic alias names.  See HHH-2448.
@@ -729,21 +733,6 @@ public class Table implements RelationalModel, Serializable {
 
 	public KeyValue getIdentifierValue() {
 		return idValue;
-	}
-
-	public boolean isSchemaQuoted() {
-		return schemaQuoted;
-	}
-	public boolean isCatalogQuoted() {
-		return catalogQuoted;
-	}
-
-	public boolean isQuoted() {
-		return quoted;
-	}
-
-	public void setQuoted(boolean quoted) {
-		this.quoted = quoted;
 	}
 
 	public void addCheckConstraint(String constraint) {
@@ -766,10 +755,10 @@ public class Table implements RelationalModel, Serializable {
 		StringBuilder buf = new StringBuilder().append( getClass().getName() )
 				.append( '(' );
 		if ( getCatalog() != null ) {
-			buf.append( getCatalog() + "." );
+			buf.append( getCatalog() ).append( "." );
 		}
 		if ( getSchema() != null ) {
-			buf.append( getSchema() + "." );
+			buf.append( getSchema() ).append( "." );
 		}
 		buf.append( getName() ).append( ')' );
 		return buf.toString();
@@ -819,7 +808,7 @@ public class Table implements RelationalModel, Serializable {
 		this.comment = comment;
 	}
 
-	public Iterator getCheckConstraintsIterator() {
+	public Iterator<String> getCheckConstraintsIterator() {
 		return checkConstraints.iterator();
 	}
 
@@ -828,32 +817,84 @@ public class Table implements RelationalModel, Serializable {
 		if ( dialect.supportsCommentOn() ) {
 			String tableName = getQualifiedName( dialect, defaultCatalog, defaultSchema );
 			if ( comment != null ) {
-				StringBuilder buf = new StringBuilder()
-						.append( "comment on table " )
-						.append( tableName )
-						.append( " is '" )
-						.append( comment )
-						.append( "'" );
-				comments.add( buf.toString() );
+				comments.add( "comment on table " + tableName + " is '" + comment + "'" );
 			}
 			Iterator iter = getColumnIterator();
 			while ( iter.hasNext() ) {
 				Column column = (Column) iter.next();
 				String columnComment = column.getComment();
 				if ( columnComment != null ) {
-					StringBuilder buf = new StringBuilder()
-							.append( "comment on column " )
-							.append( tableName )
-							.append( '.' )
-							.append( column.getQuotedName( dialect ) )
-							.append( " is '" )
-							.append( columnComment )
-							.append( "'" );
-					comments.add( buf.toString() );
+					comments.add( "comment on column " + tableName + '.' + column.getQuotedName( dialect ) + " is '" + columnComment + "'" );
 				}
 			}
 		}
 		return comments.iterator();
 	}
 
+	@Override
+	public String getExportIdentifier() {
+		return Table.qualify(
+				render( catalog ),
+				render( schema ),
+				name.render()
+		);
+	}
+
+	private String render(Identifier identifier) {
+		return identifier == null ? null : identifier.render();
+	}
+
+
+	public static class ForeignKeyKey implements Serializable {
+		String referencedClassName;
+		List columns;
+		List referencedColumns;
+
+		ForeignKeyKey(List columns, String referencedClassName, List referencedColumns) {
+			this.referencedClassName = referencedClassName;
+			this.columns = new ArrayList();
+			this.columns.addAll( columns );
+			if ( referencedColumns != null ) {
+				this.referencedColumns = new ArrayList();
+				this.referencedColumns.addAll( referencedColumns );
+			}
+			else {
+				this.referencedColumns = Collections.EMPTY_LIST;
+			}
+		}
+
+		public int hashCode() {
+			return columns.hashCode() + referencedColumns.hashCode();
+		}
+
+		public boolean equals(Object other) {
+			ForeignKeyKey fkk = (ForeignKeyKey) other;
+			return fkk.columns.equals( columns ) && fkk.referencedColumns.equals( referencedColumns );
+		}
+
+		@Override
+		public String toString() {
+			return "ForeignKeyKey{" +
+					"columns=" + StringHelper.join( ",", columns ) +
+					", referencedClassName='" + referencedClassName + '\'' +
+					", referencedColumns=" + StringHelper.join( ",", referencedColumns ) +
+					'}';
+		}
+	}
+
+	public void addInitCommand(InitCommand command) {
+		if ( initCommands == null ) {
+			initCommands = new ArrayList<InitCommand>();
+		}
+		initCommands.add( command );
+	}
+
+	public List<InitCommand> getInitCommands() {
+		if ( initCommands == null ) {
+			return Collections.emptyList();
+		}
+		else {
+			return Collections.unmodifiableList( initCommands );
+		}
+	}
 }

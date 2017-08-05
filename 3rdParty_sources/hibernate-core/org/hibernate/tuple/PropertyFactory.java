@@ -1,37 +1,16 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.tuple;
 
 import java.lang.reflect.Constructor;
 
 import org.hibernate.EntityMode;
-import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
-import org.hibernate.cfg.NotYetImplementedException;
 import org.hibernate.engine.internal.UnsavedValueFactory;
-import org.hibernate.engine.spi.CascadeStyle;
-import org.hibernate.engine.spi.CascadeStyles;
 import org.hibernate.engine.spi.IdentifierValue;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.VersionValue;
@@ -40,17 +19,11 @@ import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.mapping.KeyValue;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
-import org.hibernate.metamodel.binding.AbstractPluralAttributeBinding;
-import org.hibernate.metamodel.binding.AssociationAttributeBinding;
-import org.hibernate.metamodel.binding.AttributeBinding;
-import org.hibernate.metamodel.binding.BasicAttributeBinding;
-import org.hibernate.metamodel.binding.EntityBinding;
-import org.hibernate.metamodel.binding.SimpleValueBinding;
-import org.hibernate.metamodel.binding.SingularAttributeBinding;
 import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.property.Getter;
-import org.hibernate.property.PropertyAccessor;
-import org.hibernate.property.PropertyAccessorFactory;
+import org.hibernate.property.access.spi.Getter;
+import org.hibernate.property.access.spi.PropertyAccess;
+import org.hibernate.property.access.spi.PropertyAccessStrategy;
+import org.hibernate.property.access.spi.PropertyAccessStrategyResolver;
 import org.hibernate.tuple.entity.EntityBasedAssociationAttribute;
 import org.hibernate.tuple.entity.EntityBasedBasicAttribute;
 import org.hibernate.tuple.entity.EntityBasedCompositionAttribute;
@@ -75,6 +48,7 @@ public final class PropertyFactory {
 	 *
 	 * @param mappedEntity The mapping definition of the entity.
 	 * @param generator The identifier value generator to use for this identifier.
+	 *
 	 * @return The appropriate IdentifierProperty definition.
 	 */
 	public static IdentifierProperty buildIdentifierAttribute(
@@ -83,82 +57,32 @@ public final class PropertyFactory {
 		String mappedUnsavedValue = mappedEntity.getIdentifier().getNullValue();
 		Type type = mappedEntity.getIdentifier().getType();
 		Property property = mappedEntity.getIdentifierProperty();
-		
-		IdentifierValue unsavedValue = UnsavedValueFactory.getUnsavedIdentifierValue(
-				mappedUnsavedValue,
-				getGetter( property ),
-				type,
-				getConstructor(mappedEntity)
-			);
-
-		if ( property == null ) {
-			// this is a virtual id property...
-			return new IdentifierProperty(
-			        type,
-					mappedEntity.hasEmbeddedIdentifier(),
-					mappedEntity.hasIdentifierMapper(),
-					unsavedValue,
-					generator
-				);
-		}
-		else {
-			return new IdentifierProperty(
-					property.getName(),
-					property.getNodeName(),
-					type,
-					mappedEntity.hasEmbeddedIdentifier(),
-					unsavedValue,
-					generator
-				);
-		}
-	}
-
-	/**
-	 * Generates an IdentifierProperty representation of the for a given entity mapping.
-	 *
-	 * @param mappedEntity The mapping definition of the entity.
-	 * @param generator The identifier value generator to use for this identifier.
-	 * @return The appropriate IdentifierProperty definition.
-	 */
-	public static IdentifierProperty buildIdentifierProperty(
-			EntityBinding mappedEntity,
-			IdentifierGenerator generator) {
-
-		final BasicAttributeBinding property = mappedEntity.getHierarchyDetails().getEntityIdentifier().getValueBinding();
-
-		// TODO: the following will cause an NPE with "virtual" IDs; how should they be set?
-		// (steve) virtual attributes will still be attributes, they will simply be marked as virtual.
-		//		see org.hibernate.metamodel.domain.AbstractAttributeContainer.locateOrCreateVirtualAttribute()
-
-		final String mappedUnsavedValue = property.getUnsavedValue();
-		final Type type = property.getHibernateTypeDescriptor().getResolvedTypeMapping();
 
 		IdentifierValue unsavedValue = UnsavedValueFactory.getUnsavedIdentifierValue(
 				mappedUnsavedValue,
 				getGetter( property ),
 				type,
 				getConstructor( mappedEntity )
-			);
+		);
 
 		if ( property == null ) {
 			// this is a virtual id property...
 			return new IdentifierProperty(
-			        type,
-					mappedEntity.getHierarchyDetails().getEntityIdentifier().isEmbedded(),
-					mappedEntity.getHierarchyDetails().getEntityIdentifier().isIdentifierMapper(),
+					type,
+					mappedEntity.hasEmbeddedIdentifier(),
+					mappedEntity.hasIdentifierMapper(),
 					unsavedValue,
 					generator
-				);
+			);
 		}
 		else {
 			return new IdentifierProperty(
-					property.getAttribute().getName(),
-					null,
+					property.getName(),
 					type,
-					mappedEntity.getHierarchyDetails().getEntityIdentifier().isEmbedded(),
+					mappedEntity.hasEmbeddedIdentifier(),
 					unsavedValue,
 					generator
-				);
+			);
 		}
 	}
 
@@ -168,6 +92,7 @@ public final class PropertyFactory {
 	 *
 	 * @param property The version mapping Property.
 	 * @param lazyAvailable Is property lazy loading currently available.
+	 *
 	 * @return The appropriate VersionProperty definition.
 	 */
 	public static VersionProperty buildVersionProperty(
@@ -177,7 +102,7 @@ public final class PropertyFactory {
 			Property property,
 			boolean lazyAvailable) {
 		String mappedUnsavedValue = ( (KeyValue) property.getValue() ).getNullValue();
-		
+
 		VersionValue unsavedValue = UnsavedValueFactory.getUnsavedVersionValue(
 				mappedUnsavedValue,
 				getGetter( property ),
@@ -191,8 +116,8 @@ public final class PropertyFactory {
 				persister,
 				sessionFactory,
 				attributeNumber,
-		        property.getName(),
-		        property.getValue().getType(),
+				property.getName(),
+				property.getValue().getType(),
 				new BaselineAttributeInformation.Builder()
 						.setLazy( lazy )
 						.setInsertable( property.isInsertable() )
@@ -203,23 +128,8 @@ public final class PropertyFactory {
 						.setVersionable( property.isOptimisticLocked() )
 						.setCascadeStyle( property.getCascadeStyle() )
 						.createInformation(),
-		        unsavedValue
-			);
-	}
-
-	/**
-	 * Generates a VersionProperty representation for an entity mapping given its
-	 * version mapping Property.
-	 *
-	 * @param property The version mapping Property.
-	 * @param lazyAvailable Is property lazy loading currently available.
-	 * @return The appropriate VersionProperty definition.
-	 */
-	public static VersionProperty buildVersionProperty(
-			EntityPersister persister,
-			BasicAttributeBinding property,
-			boolean lazyAvailable) {
-		throw new NotYetImplementedException();
+				unsavedValue
+		);
 	}
 
 	public static enum NonIdentifierAttributeNature {
@@ -235,6 +145,7 @@ public final class PropertyFactory {
 	 *
 	 * @param property The mapped property.
 	 * @param lazyAvailable Is property lazy loading currently available.
+	 *
 	 * @return The appropriate NonIdentifierProperty definition.
 	 */
 	public static NonIdentifierAttribute buildEntityBasedAttribute(
@@ -249,13 +160,13 @@ public final class PropertyFactory {
 
 		// we need to dirty check collections, since they can cause an owner
 		// version number increment
-		
+
 		// we need to dirty check many-to-ones with not-found="ignore" in order 
 		// to update the cache (not the database), since in this case a null
 		// entity reference can lose information
-		
-		boolean alwaysDirtyCheck = type.isAssociationType() && 
-				( (AssociationType) type ).isAlwaysDirtyChecked(); 
+
+		boolean alwaysDirtyCheck = type.isAssociationType() &&
+				( (AssociationType) type ).isAlwaysDirtyChecked();
 
 		switch ( nature ) {
 			case BASIC: {
@@ -348,6 +259,9 @@ public final class PropertyFactory {
 		}
 	}
 
+	/**
+	 * @deprecated See mainly {@link #buildEntityBasedAttribute}
+	 */
 	@Deprecated
 	public static StandardProperty buildStandardProperty(Property property, boolean lazyAvailable) {
 		final Type type = property.getValue().getType();
@@ -378,90 +292,6 @@ public final class PropertyFactory {
 	}
 
 
-	/**
-	 * Generate a "standard" (i.e., non-identifier and non-version) based on the given
-	 * mapped property.
-	 *
-	 * @param property The mapped property.
-	 * @param lazyAvailable Is property lazy loading currently available.
-	 * @return The appropriate NonIdentifierProperty definition.
-	 */
-	public static StandardProperty buildStandardProperty(AttributeBinding property, boolean lazyAvailable) {
-
-		final Type type = property.getHibernateTypeDescriptor().getResolvedTypeMapping();
-
-		// we need to dirty check collections, since they can cause an owner
-		// version number increment
-
-		// we need to dirty check many-to-ones with not-found="ignore" in order
-		// to update the cache (not the database), since in this case a null
-		// entity reference can lose information
-
-		final boolean alwaysDirtyCheck = type.isAssociationType() && ( (AssociationType) type ).isAlwaysDirtyChecked();
-
-		if ( property.getAttribute().isSingular() ) {
-			final SingularAttributeBinding singularAttributeBinding = ( SingularAttributeBinding ) property;
-			final CascadeStyle cascadeStyle = singularAttributeBinding.isAssociation()
-					? ( (AssociationAttributeBinding) singularAttributeBinding ).getCascadeStyle()
-					: CascadeStyles.NONE;
-			final FetchMode fetchMode = singularAttributeBinding.isAssociation()
-					? ( (AssociationAttributeBinding) singularAttributeBinding ).getFetchMode()
-					: FetchMode.DEFAULT;
-
-			return new StandardProperty(
-					singularAttributeBinding.getAttribute().getName(),
-					type,
-					lazyAvailable && singularAttributeBinding.isLazy(),
-					true, // insertable
-					true, // updatable
-					null,
-					singularAttributeBinding.isNullable(),
-					alwaysDirtyCheck || areAllValuesIncludedInUpdate( singularAttributeBinding ),
-					singularAttributeBinding.isIncludedInOptimisticLocking(),
-					cascadeStyle,
-					fetchMode
-			);
-		}
-		else {
-			final AbstractPluralAttributeBinding pluralAttributeBinding = (AbstractPluralAttributeBinding) property;
-			final CascadeStyle cascadeStyle = pluralAttributeBinding.isAssociation()
-					? pluralAttributeBinding.getCascadeStyle()
-					: CascadeStyles.NONE;
-			final FetchMode fetchMode = pluralAttributeBinding.isAssociation()
-					? pluralAttributeBinding.getFetchMode()
-					: FetchMode.DEFAULT;
-
-			return new StandardProperty(
-					pluralAttributeBinding.getAttribute().getName(),
-					type,
-					lazyAvailable && pluralAttributeBinding.isLazy(),
-					// TODO: fix this when HHH-6356 is fixed; for now assume AbstractPluralAttributeBinding is updatable and insertable
-					true, // pluralAttributeBinding.isInsertable(),
-					true, //pluralAttributeBinding.isUpdatable(),
-					null,
-					false, // nullable - not sure what that means for a collection
-					// TODO: fix this when HHH-6356 is fixed; for now assume AbstractPluralAttributeBinding is updatable and insertable
-					//alwaysDirtyCheck || pluralAttributeBinding.isUpdatable(),
-					true,
-					pluralAttributeBinding.isIncludedInOptimisticLocking(),
-					cascadeStyle,
-					fetchMode
-				);
-		}
-	}
-
-	private static boolean areAllValuesIncludedInUpdate(SingularAttributeBinding attributeBinding) {
-		if ( attributeBinding.hasDerivedValue() ) {
-			return false;
-		}
-		for ( SimpleValueBinding valueBinding : attributeBinding.getSimpleValueBindings() ) {
-			if ( ! valueBinding.isIncludeInUpdate() ) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	private static Constructor getConstructor(PersistentClass persistentClass) {
 		if ( persistentClass == null || !persistentClass.hasPojoRepresentation() ) {
 			return null;
@@ -470,20 +300,7 @@ public final class PropertyFactory {
 		try {
 			return ReflectHelper.getDefaultConstructor( persistentClass.getMappedClass() );
 		}
-		catch( Throwable t ) {
-			return null;
-		}
-	}
-
-	private static Constructor getConstructor(EntityBinding entityBinding) {
-		if ( entityBinding == null || entityBinding.getEntity() == null ) {
-			return null;
-		}
-
-		try {
-			return ReflectHelper.getDefaultConstructor( entityBinding.getEntity().getClassReference() );
-		}
-		catch( Throwable t ) {
+		catch (Throwable t) {
 			return null;
 		}
 	}
@@ -493,21 +310,21 @@ public final class PropertyFactory {
 			return null;
 		}
 
-		PropertyAccessor pa = PropertyAccessorFactory.getPropertyAccessor( mappingProperty, EntityMode.POJO );
-		return pa.getGetter( mappingProperty.getPersistentClass().getMappedClass(), mappingProperty.getName() );
-	}
+		final PropertyAccessStrategyResolver propertyAccessStrategyResolver =
+				mappingProperty.getPersistentClass().getServiceRegistry().getService( PropertyAccessStrategyResolver.class );
 
-	private static Getter getGetter(AttributeBinding mappingProperty) {
-		if ( mappingProperty == null || mappingProperty.getContainer().getClassReference() == null ) {
-			return null;
-		}
-
-		PropertyAccessor pa = PropertyAccessorFactory.getPropertyAccessor( mappingProperty, EntityMode.POJO );
-		return pa.getGetter(
-				mappingProperty.getContainer().getClassReference(),
-				mappingProperty.getAttribute().getName()
+		final PropertyAccessStrategy propertyAccessStrategy = propertyAccessStrategyResolver.resolvePropertyAccessStrategy(
+				mappingProperty.getClass(),
+				mappingProperty.getPropertyAccessorName(),
+				EntityMode.POJO
 		);
-	}
 
+		final PropertyAccess propertyAccess = propertyAccessStrategy.buildPropertyAccess(
+				mappingProperty.getPersistentClass().getMappedClass(),
+				mappingProperty.getName()
+		);
+
+		return propertyAccess.getGetter();
+	}
 
 }

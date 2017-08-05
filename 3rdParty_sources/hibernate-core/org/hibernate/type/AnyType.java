@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.type;
 
@@ -37,22 +20,21 @@ import org.hibernate.EntityNameResolver;
 import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
+import org.hibernate.PropertyNotFoundException;
 import org.hibernate.TransientObjectException;
 import org.hibernate.engine.internal.ForeignKeys;
+import org.hibernate.engine.jdbc.Size;
 import org.hibernate.engine.spi.CascadeStyle;
 import org.hibernate.engine.spi.CascadeStyles;
 import org.hibernate.engine.spi.Mapping;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.util.collections.ArrayHelper;
-import org.hibernate.metamodel.relational.Size;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.persister.entity.Joinable;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.HibernateProxyHelper;
 import org.hibernate.proxy.LazyInitializer;
-
-import org.dom4j.Node;
 
 /**
  * Handles "any" mappings
@@ -66,9 +48,6 @@ public class AnyType extends AbstractType implements CompositeType, AssociationT
 
 	/**
 	 * Intended for use only from legacy {@link ObjectType} type definition
-	 *
-	 * @param discriminatorType
-	 * @param identifierType
 	 */
 	protected AnyType(Type discriminatorType, Type identifierType) {
 		this( null, discriminatorType, identifierType );
@@ -378,18 +357,6 @@ public class AnyType extends AbstractType implements CompositeType, AssociationT
 		throw new UnsupportedOperationException( "any mappings may not form part of a property-ref" );
 	}
 
-	@Override
-	public void setToXMLNode(Node xml, Object value, SessionFactoryImplementor factory) {
-		throw new UnsupportedOperationException("any types cannot be stringified");
-	}
-
-	@Override
-	public Object fromXMLNode(Node xml, Mapping factory) throws HibernateException {
-		throw new UnsupportedOperationException();
-	}
-
-
-
 	// CompositeType implementation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	@Override
@@ -402,6 +369,18 @@ public class AnyType extends AbstractType implements CompositeType, AssociationT
 	@Override
 	public String[] getPropertyNames() {
 		return PROPERTY_NAMES;
+	}
+
+	@Override
+	public int getPropertyIndex(String name) {
+		if ( PROPERTY_NAMES[0].equals( name ) ) {
+			return 0;
+		}
+		else if ( PROPERTY_NAMES[1].equals( name ) ) {
+			return 1;
+		}
+
+		throw new PropertyNotFoundException( "Unable to locate property named " + name + " on AnyType" );
 	}
 
 	@Override
@@ -445,6 +424,12 @@ public class AnyType extends AbstractType implements CompositeType, AssociationT
 	}
 
 	@Override
+	public boolean hasNotNullProperty() {
+		// both are non-nullable
+		return true;
+	}
+
+	@Override
 	public Type[] getSubtypes() {
 		return new Type[] {discriminatorType, identifierType };
 	}
@@ -464,7 +449,7 @@ public class AnyType extends AbstractType implements CompositeType, AssociationT
 
 	@Override
 	public ForeignKeyDirection getForeignKeyDirection() {
-		return ForeignKeyDirection.FOREIGN_KEY_FROM_PARENT;
+		return ForeignKeyDirection.FROM_PARENT;
 	}
 
 	@Override
@@ -488,11 +473,6 @@ public class AnyType extends AbstractType implements CompositeType, AssociationT
 
 	@Override
 	public boolean isAlwaysDirtyChecked() {
-		return false;
-	}
-
-	@Override
-	public boolean isEmbeddedInXML() {
 		return false;
 	}
 

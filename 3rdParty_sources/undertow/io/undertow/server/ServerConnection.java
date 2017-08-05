@@ -18,8 +18,11 @@
 
 package io.undertow.server;
 
+import io.undertow.connector.ByteBufferPool;
 import io.undertow.util.AbstractAttachable;
 
+import io.undertow.util.HeaderMap;
+import io.undertow.util.HttpString;
 import org.xnio.Option;
 import org.xnio.OptionMap;
 import org.xnio.Pool;
@@ -46,7 +49,14 @@ public abstract class ServerConnection extends AbstractAttachable implements Con
      *
      * @return The connections buffer pool
      */
+    @Deprecated
     public abstract Pool<ByteBuffer> getBufferPool();
+
+    /**
+     *
+     * @return The connections buffer pool
+     */
+    public abstract ByteBufferPool getByteBufferPool();
 
     /**
      *
@@ -73,6 +83,12 @@ public abstract class ServerConnection extends AbstractAttachable implements Con
      * @param exchange The current exchange
      */
     public abstract HttpServerExchange sendOutOfBandResponse(HttpServerExchange exchange);
+
+    /**
+     *
+     * @return <code>true</code> if this connection supports sending a 100-continue response
+     */
+    public abstract boolean isContinueResponseSupported();
 
     /**
      * Invoked when the exchange is complete, and there is still data in the request channel. Some implementations
@@ -184,11 +200,19 @@ public abstract class ServerConnection extends AbstractAttachable implements Con
     protected abstract boolean isUpgradeSupported();
 
     /**
+     *
+     * @return <code>true</code> if this connection supports the HTTP CONNECT verb
+     */
+    protected abstract boolean isConnectSupported();
+
+    /**
      * Invoked when the exchange is complete.
      */
     protected abstract void exchangeComplete(HttpServerExchange exchange);
 
     protected abstract void setUpgradeListener(HttpUpgradeListener upgradeListener);
+
+    protected abstract void setConnectListener(HttpUpgradeListener connectListener);
 
     /**
      * Callback that is invoked if the max entity size is updated.
@@ -196,6 +220,52 @@ public abstract class ServerConnection extends AbstractAttachable implements Con
      * @param exchange The current exchange
      */
     protected abstract void maxEntitySizeUpdated(HttpServerExchange exchange);
+
+    /**
+     * Returns a string representation describing the protocol used to transmit messages
+     * on this connection.
+     *
+     * @return the transport protocol
+     */
+    public abstract String getTransportProtocol();
+
+    /**
+     * Attempts to push a resource if this connection supports server push. Otherwise the request is ignored.
+     *
+     * Note that push is always done on a best effort basis, even if this method returns true it is possible that
+     * the remote endpoint will reset the stream
+     *
+     *
+     * @param path The path of the resource
+     * @param method The request method
+     * @param requestHeaders The request headers
+     * @return <code>true</code> if the server attempted the push, false otherwise
+     */
+    public boolean pushResource(final String path, final HttpString method, final HeaderMap requestHeaders) {
+        return false;
+    }
+
+    /**
+     * Attempts to push a resource if this connection supports server push. Otherwise the request is ignored.
+     *
+     * Note that push is always done on a best effort basis, even if this method returns true it is possible that
+     * the remote endpoint will reset the stream.
+     *
+     * The {@link io.undertow.server.HttpHandler} passed in will be used to generate the pushed response
+     *
+     *
+     * @param path The path of the resource
+     * @param method The request method
+     * @param requestHeaders The request headers
+     * @return <code>true</code> if the server attempted the push, false otherwise
+     */
+    public boolean pushResource(final String path, final HttpString method, final HeaderMap requestHeaders, HttpHandler handler) {
+        return false;
+    }
+
+    public boolean isPushSupported() {
+        return false;
+    }
 
     public interface CloseListener {
 

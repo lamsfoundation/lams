@@ -1,31 +1,15 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.mapping;
+
 import java.util.Iterator;
 
 import org.hibernate.MappingException;
-import org.hibernate.cfg.Mappings;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.spi.Mapping;
 
 /**
@@ -38,10 +22,9 @@ public abstract class IndexedCollection extends Collection {
 	public static final String DEFAULT_INDEX_COLUMN_NAME = "idx";
 
 	private Value index;
-	private String indexNodeName;
 
-	public IndexedCollection(Mappings mappings, PersistentClass owner) {
-		super( mappings, owner );
+	public IndexedCollection(MetadataImplementor metadata, PersistentClass owner) {
+		super( metadata, owner );
 	}
 
 	public Value getIndex() {
@@ -56,14 +39,16 @@ public abstract class IndexedCollection extends Collection {
 
 	void createPrimaryKey() {
 		if ( !isOneToMany() ) {
-			PrimaryKey pk = new PrimaryKey();
+			PrimaryKey pk = new PrimaryKey( getCollectionTable() );
 			pk.addColumns( getKey().getColumnIterator() );
 			
 			// index should be last column listed
 			boolean isFormula = false;
 			Iterator iter = getIndex().getColumnIterator();
 			while ( iter.hasNext() ) {
-				if ( ( (Selectable) iter.next() ).isFormula() ) isFormula=true;
+				if ( ( (Selectable) iter.next() ).isFormula() ) {
+					isFormula=true;
+				}
 			}
 			if (isFormula) {
 				//if it is a formula index, use the element columns in the PK
@@ -86,7 +71,10 @@ public abstract class IndexedCollection extends Collection {
 	}
 
 	public void validate(Mapping mapping) throws MappingException {
-		super.validate(mapping);
+		super.validate( mapping );
+
+		assert getElement() != null : "IndexedCollection index not bound : " + getRole();
+
 		if ( !getIndex().isValid(mapping) ) {
 			throw new MappingException(
 				"collection index mapping has wrong number of columns: " +
@@ -95,22 +83,9 @@ public abstract class IndexedCollection extends Collection {
 				getIndex().getType().getName()
 			);
 		}
-		if ( indexNodeName!=null && !indexNodeName.startsWith("@") ) {
-			throw new MappingException("index node must be an attribute: " + indexNodeName );
-		}
 	}
 	
 	public boolean isList() {
 		return false;
 	}
-
-	public String getIndexNodeName() {
-		return indexNodeName;
-	}
-
-	public void setIndexNodeName(String indexNodeName) {
-		this.indexNodeName = indexNodeName;
-	}
-	
-
 }

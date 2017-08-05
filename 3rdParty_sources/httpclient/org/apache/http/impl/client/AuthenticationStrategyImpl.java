@@ -28,6 +28,7 @@
 package org.apache.http.impl.client;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,72 +46,79 @@ import org.apache.http.HttpResponse;
 import org.apache.http.annotation.Immutable;
 import org.apache.http.auth.AuthOption;
 import org.apache.http.auth.AuthScheme;
-import org.apache.http.auth.AuthSchemeRegistry;
+import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.MalformedChallengeException;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.AuthenticationStrategy;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.params.AuthPolicy;
-import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.client.config.AuthSchemes;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.config.Lookup;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.Args;
 import org.apache.http.util.CharArrayBuffer;
 
 @Immutable
-class AuthenticationStrategyImpl implements AuthenticationStrategy {
+abstract class AuthenticationStrategyImpl implements AuthenticationStrategy {
 
     private final Log log = LogFactory.getLog(getClass());
 
     private static final List<String> DEFAULT_SCHEME_PRIORITY =
-        Collections.unmodifiableList(Arrays.asList(new String[] {
-                AuthPolicy.SPNEGO,
-                AuthPolicy.KERBEROS,
-                AuthPolicy.NTLM,
-                AuthPolicy.DIGEST,
-                AuthPolicy.BASIC
-    }));
+        Collections.unmodifiableList(Arrays.asList(
+                AuthSchemes.SPNEGO,
+                AuthSchemes.KERBEROS,
+                AuthSchemes.NTLM,
+                AuthSchemes.DIGEST,
+                AuthSchemes.BASIC));
 
     private final int challengeCode;
     private final String headerName;
-    private final String prefParamName;
 
-    AuthenticationStrategyImpl(int challengeCode, final String headerName, final String prefParamName) {
+    /**
+     * @param challengeCode for example SC_PROXY_AUTHENTICATION_REQUIRED or SC_UNAUTHORIZED
+     * @param headerName for example "Proxy-Authenticate" or "WWW-Authenticate"
+     */
+    AuthenticationStrategyImpl(final int challengeCode, final String headerName) {
         super();
         this.challengeCode = challengeCode;
         this.headerName = headerName;
-        this.prefParamName = prefParamName;
     }
 
+    @Override
     public boolean isAuthenticationRequested(
             final HttpHost authhost,
             final HttpResponse response,
             final HttpContext context) {
-        if (response == null) {
-            throw new IllegalArgumentException("HTTP response may not be null");
-        }
-        int status = response.getStatusLine().getStatusCode();
+        Args.notNull(response, "HTTP response");
+        final int status = response.getStatusLine().getStatusCode();
         return status == this.challengeCode;
     }
 
+    /**
+     * Generates a map of challenge auth-scheme =&gt; Header entries.
+     *
+     * @return map: key=lower-cased auth-scheme name, value=Header that contains the challenge
+     */
+    @Override
     public Map<String, Header> getChallenges(
             final HttpHost authhost,
             final HttpResponse response,
             final HttpContext context) throws MalformedChallengeException {
-        if (response == null) {
-            throw new IllegalArgumentException("HTTP response may not be null");
-        }
-        Header[] headers = response.getHeaders(this.headerName);
-        Map<String, Header> map = new HashMap<String, Header>(headers.length);
-        for (Header header : headers) {
-            CharArrayBuffer buffer;
+        Args.notNull(response, "HTTP response");
+        final Header[] headers = response.getHeaders(this.headerName);
+        final Map<String, Header> map = new HashMap<String, Header>(headers.length);
+        for (final Header header : headers) {
+            final CharArrayBuffer buffer;
             int pos;
             if (header instanceof FormattedHeader) {
                 buffer = ((FormattedHeader) header).getBuffer();
                 pos = ((FormattedHeader) header).getValuePos();
             } else {
-                String s = header.getValue();
+                final String s = header.getValue();
                 if (s == null) {
                     throw new MalformedChallengeException("Header value is null");
                 }
@@ -121,51 +129,44 @@ class AuthenticationStrategyImpl implements AuthenticationStrategy {
             while (pos < buffer.length() && HTTP.isWhitespace(buffer.charAt(pos))) {
                 pos++;
             }
-            int beginIndex = pos;
+            final int beginIndex = pos;
             while (pos < buffer.length() && !HTTP.isWhitespace(buffer.charAt(pos))) {
                 pos++;
             }
-            int endIndex = pos;
-            String s = buffer.substring(beginIndex, endIndex);
-            map.put(s.toLowerCase(Locale.US), header);
+            final int endIndex = pos;
+            final String s = buffer.substring(beginIndex, endIndex);
+            map.put(s.toLowerCase(Locale.ROOT), header);
         }
         return map;
     }
 
+    abstract Collection<String> getPreferredAuthSchemes(RequestConfig config);
+
+    @Override
     public Queue<AuthOption> select(
             final Map<String, Header> challenges,
             final HttpHost authhost,
             final HttpResponse response,
             final HttpContext context) throws MalformedChallengeException {
-        if (challenges == null) {
-            throw new IllegalArgumentException("Map of auth challenges may not be null");
-        }
-        if (authhost == null) {
-            throw new IllegalArgumentException("Host may not be null");
-        }
-        if (response == null) {
-            throw new IllegalArgumentException("HTTP response may not be null");
-        }
-        if (context == null) {
-            throw new IllegalArgumentException("HTTP context may not be null");
-        }
+        Args.notNull(challenges, "Map of auth challenges");
+        Args.notNull(authhost, "Host");
+        Args.notNull(response, "HTTP response");
+        Args.notNull(context, "HTTP context");
+        final HttpClientContext clientContext = HttpClientContext.adapt(context);
 
-        Queue<AuthOption> options = new LinkedList<AuthOption>();
-        AuthSchemeRegistry registry = (AuthSchemeRegistry) context.getAttribute(
-                ClientContext.AUTHSCHEME_REGISTRY);
+        final Queue<AuthOption> options = new LinkedList<AuthOption>();
+        final Lookup<AuthSchemeProvider> registry = clientContext.getAuthSchemeRegistry();
         if (registry == null) {
             this.log.debug("Auth scheme registry not set in the context");
             return options;
         }
-        CredentialsProvider credsProvider = (CredentialsProvider) context.getAttribute(
-                ClientContext.CREDS_PROVIDER);
+        final CredentialsProvider credsProvider = clientContext.getCredentialsProvider();
         if (credsProvider == null) {
             this.log.debug("Credentials provider not set in the context");
             return options;
         }
-
-        @SuppressWarnings("unchecked")
-        List<String> authPrefs = (List<String>) response.getParams().getParameter(this.prefParamName);
+        final RequestConfig config = clientContext.getRequestConfig();
+        Collection<String> authPrefs = getPreferredAuthSchemes(config);
         if (authPrefs == null) {
             authPrefs = DEFAULT_SCHEME_PRIORITY;
         }
@@ -173,28 +174,29 @@ class AuthenticationStrategyImpl implements AuthenticationStrategy {
             this.log.debug("Authentication schemes in the order of preference: " + authPrefs);
         }
 
-        for (String id: authPrefs) {
-            Header challenge = challenges.get(id.toLowerCase(Locale.US));
+        for (final String id: authPrefs) {
+            final Header challenge = challenges.get(id.toLowerCase(Locale.ROOT));
             if (challenge != null) {
-                try {
-                    AuthScheme authScheme = registry.getAuthScheme(id, response.getParams());
-                    authScheme.processChallenge(challenge);
-
-                    AuthScope authScope = new AuthScope(
-                            authhost.getHostName(),
-                            authhost.getPort(),
-                            authScheme.getRealm(),
-                            authScheme.getSchemeName());
-
-                    Credentials credentials = credsProvider.getCredentials(authScope);
-                    if (credentials != null) {
-                        options.add(new AuthOption(authScheme, credentials));
-                    }
-                } catch (IllegalStateException e) {
+                final AuthSchemeProvider authSchemeProvider = registry.lookup(id);
+                if (authSchemeProvider == null) {
                     if (this.log.isWarnEnabled()) {
                         this.log.warn("Authentication scheme " + id + " not supported");
                         // Try again
                     }
+                    continue;
+                }
+                final AuthScheme authScheme = authSchemeProvider.create(context);
+                authScheme.processChallenge(challenge);
+
+                final AuthScope authScope = new AuthScope(
+                        authhost.getHostName(),
+                        authhost.getPort(),
+                        authScheme.getRealm(),
+                        authScheme.getSchemeName());
+
+                final Credentials credentials = credsProvider.getCredentials(authScope);
+                if (credentials != null) {
+                    options.add(new AuthOption(authScheme, credentials));
                 }
             } else {
                 if (this.log.isDebugEnabled()) {
@@ -206,22 +208,20 @@ class AuthenticationStrategyImpl implements AuthenticationStrategy {
         return options;
     }
 
+    @Override
     public void authSucceeded(
             final HttpHost authhost, final AuthScheme authScheme, final HttpContext context) {
-        if (authhost == null) {
-            throw new IllegalArgumentException("Host may not be null");
-        }
-        if (authScheme == null) {
-            throw new IllegalArgumentException("Auth scheme may not be null");
-        }
-        if (context == null) {
-            throw new IllegalArgumentException("HTTP context may not be null");
-        }
+        Args.notNull(authhost, "Host");
+        Args.notNull(authScheme, "Auth scheme");
+        Args.notNull(context, "HTTP context");
+
+        final HttpClientContext clientContext = HttpClientContext.adapt(context);
+
         if (isCachable(authScheme)) {
-            AuthCache authCache = (AuthCache) context.getAttribute(ClientContext.AUTH_CACHE);
+            AuthCache authCache = clientContext.getAuthCache();
             if (authCache == null) {
                 authCache = new BasicAuthCache();
-                context.setAttribute(ClientContext.AUTH_CACHE, authCache);
+                clientContext.setAuthCache(authCache);
             }
             if (this.log.isDebugEnabled()) {
                 this.log.debug("Caching '" + authScheme.getSchemeName() +
@@ -235,20 +235,20 @@ class AuthenticationStrategyImpl implements AuthenticationStrategy {
         if (authScheme == null || !authScheme.isComplete()) {
             return false;
         }
-        String schemeName = authScheme.getSchemeName();
-        return schemeName.equalsIgnoreCase(AuthPolicy.BASIC) ||
-                schemeName.equalsIgnoreCase(AuthPolicy.DIGEST);
+        final String schemeName = authScheme.getSchemeName();
+        return schemeName.equalsIgnoreCase(AuthSchemes.BASIC) ||
+                schemeName.equalsIgnoreCase(AuthSchemes.DIGEST);
     }
 
+    @Override
     public void authFailed(
             final HttpHost authhost, final AuthScheme authScheme, final HttpContext context) {
-        if (authhost == null) {
-            throw new IllegalArgumentException("Host may not be null");
-        }
-        if (context == null) {
-            throw new IllegalArgumentException("HTTP context may not be null");
-        }
-        AuthCache authCache = (AuthCache) context.getAttribute(ClientContext.AUTH_CACHE);
+        Args.notNull(authhost, "Host");
+        Args.notNull(context, "HTTP context");
+
+        final HttpClientContext clientContext = HttpClientContext.adapt(context);
+
+        final AuthCache authCache = clientContext.getAuthCache();
         if (authCache != null) {
             if (this.log.isDebugEnabled()) {
                 this.log.debug("Clearing cached auth scheme for " + authhost);

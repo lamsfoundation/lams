@@ -32,6 +32,7 @@ public class ResponseTimeAttribute implements ExchangeAttribute {
     public static final String RESPONSE_TIME_MILLIS_SHORT = "%D";
     public static final String RESPONSE_TIME_SECONDS_SHORT = "%T";
     public static final String RESPONSE_TIME_MILLIS = "%{RESPONSE_TIME}";
+    public static final String RESPONSE_TIME_NANOS = "%{RESPONSE_TIME_NANOS}";
 
     private final TimeUnit timeUnit;
 
@@ -45,7 +46,21 @@ public class ResponseTimeAttribute implements ExchangeAttribute {
         if(requestStartTime == -1) {
             return null;
         }
-        return String.valueOf(timeUnit.convert(System.nanoTime() - requestStartTime, TimeUnit.NANOSECONDS));
+        final long nanos = System.nanoTime() - requestStartTime;
+        if(timeUnit == TimeUnit.SECONDS) {
+            StringBuilder buf = new StringBuilder();
+            long milis = TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS);
+            buf.append(Long.toString(milis / 1000));
+            buf.append('.');
+            int remains = (int) (milis % 1000);
+            buf.append(Long.toString(remains / 100));
+            remains = remains % 100;
+            buf.append(Long.toString(remains / 10));
+            buf.append(Long.toString(remains % 10));
+            return buf.toString();
+        } else {
+            return String.valueOf(timeUnit.convert(nanos, TimeUnit.NANOSECONDS));
+        }
     }
 
     @Override
@@ -67,6 +82,9 @@ public class ResponseTimeAttribute implements ExchangeAttribute {
             }
             if (token.equals(RESPONSE_TIME_SECONDS_SHORT)) {
                 return new ResponseTimeAttribute(TimeUnit.SECONDS);
+            }
+            if(token.equals(RESPONSE_TIME_NANOS)) {
+                return new ResponseTimeAttribute(TimeUnit.NANOSECONDS);
             }
             return null;
         }

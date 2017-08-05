@@ -49,13 +49,14 @@ class SchemeSocketFactoryAdaptor implements SchemeSocketFactory {
         this.factory = factory;
     }
 
+    @Override
     public Socket connectSocket(
             final Socket sock,
             final InetSocketAddress remoteAddress,
             final InetSocketAddress localAddress,
             final HttpParams params) throws IOException, UnknownHostException, ConnectTimeoutException {
-        String host = remoteAddress.getHostName();
-        int port = remoteAddress.getPort();
+        final String host = remoteAddress.getHostName();
+        final int port = remoteAddress.getPort();
         InetAddress local = null;
         int localPort = 0;
         if (localAddress != null) {
@@ -65,10 +66,12 @@ class SchemeSocketFactoryAdaptor implements SchemeSocketFactory {
         return this.factory.connectSocket(sock, host, port, local, localPort, params);
     }
 
+    @Override
     public Socket createSocket(final HttpParams params) throws IOException {
         return this.factory.createSocket();
     }
 
+    @Override
     public boolean isSecure(final Socket sock) throws IllegalArgumentException {
         return this.factory.isSecure(sock);
     }
@@ -79,8 +82,12 @@ class SchemeSocketFactoryAdaptor implements SchemeSocketFactory {
 
     @Override
     public boolean equals(final Object obj) {
-        if (obj == null) return false;
-        if (this == obj) return true;
+        if (obj == null) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
         if (obj instanceof SchemeSocketFactoryAdaptor) {
             return this.factory.equals(((SchemeSocketFactoryAdaptor)obj).factory);
         } else {

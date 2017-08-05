@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2012, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.boot.registry;
 
@@ -37,6 +20,7 @@ import org.hibernate.boot.registry.selector.StrategyRegistrationProvider;
 import org.hibernate.boot.registry.selector.internal.StrategySelectorBuilder;
 import org.hibernate.integrator.internal.IntegratorServiceImpl;
 import org.hibernate.integrator.spi.Integrator;
+import org.hibernate.service.ServiceRegistry;
 
 /**
  * Builder for {@link BootstrapServiceRegistry} instances.  Provides registry for services needed for
@@ -59,15 +43,31 @@ public class BootstrapServiceRegistryBuilder {
 	private boolean autoCloseRegistry = true;
 
 	/**
+	 * @deprecated Use {@link #applyIntegrator} instead
+	 */
+	@Deprecated
+	public BootstrapServiceRegistryBuilder with(Integrator integrator) {
+		return applyIntegrator( integrator );
+	}
+
+	/**
 	 * Add an {@link Integrator} to be applied to the bootstrap registry.
 	 *
 	 * @param integrator The integrator to add.
 	 *
 	 * @return {@code this}, for method chaining
 	 */
-	public BootstrapServiceRegistryBuilder with(Integrator integrator) {
+	public BootstrapServiceRegistryBuilder applyIntegrator(Integrator integrator) {
 		providedIntegrators.add( integrator );
 		return this;
+	}
+
+	/**
+	 * @deprecated Use {@link #applyClassLoader} instead
+	 */
+	@Deprecated
+	public BootstrapServiceRegistryBuilder with(ClassLoader classLoader) {
+		return applyClassLoader( classLoader );
 	}
 
 	/**
@@ -77,12 +77,20 @@ public class BootstrapServiceRegistryBuilder {
 	 *
 	 * @return {@code this}, for method chaining
 	 */
-	public BootstrapServiceRegistryBuilder with(ClassLoader classLoader) {
+	public BootstrapServiceRegistryBuilder applyClassLoader(ClassLoader classLoader) {
 		if ( providedClassLoaders == null ) {
 			providedClassLoaders = new ArrayList<ClassLoader>();
 		}
 		providedClassLoaders.add( classLoader );
 		return this;
+	}
+
+	/**
+	 * @deprecated Use {@link #applyClassLoaderService} instead
+	 */
+	@Deprecated
+	public BootstrapServiceRegistryBuilder with(ClassLoaderService classLoaderService) {
+		return applyClassLoaderService( classLoaderService );
 	}
 
 	/**
@@ -92,69 +100,18 @@ public class BootstrapServiceRegistryBuilder {
 	 *
 	 * @return {@code this}, for method chaining
 	 */
-	public BootstrapServiceRegistryBuilder with(ClassLoaderService classLoaderService) {
+	public BootstrapServiceRegistryBuilder applyClassLoaderService(ClassLoaderService classLoaderService) {
 		providedClassLoaderService = classLoaderService;
 		return this;
 	}
 
 	/**
-	 * Applies the specified {@link ClassLoader} as the application class loader for the bootstrap registry.
-	 *
-	 * @param classLoader The class loader to use
-	 *
-	 * @return {@code this}, for method chaining
-	 *
-	 * @deprecated Use {@link #with(ClassLoader)} instead
+	 * @deprecated Use {@link #applyStrategySelector} instead
 	 */
-	@Deprecated
 	@SuppressWarnings( {"UnusedDeclaration"})
-	public BootstrapServiceRegistryBuilder withApplicationClassLoader(ClassLoader classLoader) {
-		return with( classLoader );
-	}
-
-	/**
-	 * Applies the specified {@link ClassLoader} as the resource class loader for the bootstrap registry.
-	 *
-	 * @param classLoader The class loader to use
-	 *
-	 * @return {@code this}, for method chaining
-	 *
-	 * @deprecated Use {@link #with(ClassLoader)} instead
-	 */
 	@Deprecated
-	@SuppressWarnings( {"UnusedDeclaration"})
-	public BootstrapServiceRegistryBuilder withResourceClassLoader(ClassLoader classLoader) {
-		return with( classLoader );
-	}
-
-	/**
-	 * Applies the specified {@link ClassLoader} as the Hibernate class loader for the bootstrap registry.
-	 *
-	 * @param classLoader The class loader to use
-	 *
-	 * @return {@code this}, for method chaining
-	 *
-	 * @deprecated Use {@link #with(ClassLoader)} instead
-	 */
-	@Deprecated
-	@SuppressWarnings( {"UnusedDeclaration"})
-	public BootstrapServiceRegistryBuilder withHibernateClassLoader(ClassLoader classLoader) {
-		return with( classLoader );
-	}
-
-	/**
-	 * Applies the specified {@link ClassLoader} as the environment (or system) class loader for the bootstrap registry.
-	 *
-	 * @param classLoader The class loader to use
-	 *
-	 * @return {@code this}, for method chaining
-	 *
-	 * @deprecated Use {@link #with(ClassLoader)} instead
-	 */
-	@Deprecated
-	@SuppressWarnings( {"UnusedDeclaration"})
-	public BootstrapServiceRegistryBuilder withEnvironmentClassLoader(ClassLoader classLoader) {
-		return with( classLoader );
+	public <T> BootstrapServiceRegistryBuilder withStrategySelector(Class<T> strategy, String name, Class<? extends T> implementation) {
+		return applyStrategySelector( strategy, name, implementation );
 	}
 
 	/**
@@ -171,9 +128,18 @@ public class BootstrapServiceRegistryBuilder {
 	 * @see org.hibernate.boot.registry.selector.spi.StrategySelector#registerStrategyImplementor(Class, String, Class)
 	 */
 	@SuppressWarnings( {"UnusedDeclaration"})
-	public <T> BootstrapServiceRegistryBuilder withStrategySelector(Class<T> strategy, String name, Class<? extends T> implementation) {
+	public <T> BootstrapServiceRegistryBuilder applyStrategySelector(Class<T> strategy, String name, Class<? extends T> implementation) {
 		this.strategySelectorBuilder.addExplicitStrategyRegistration( strategy, implementation, name );
 		return this;
+	}
+
+	/**
+	 * @deprecated Use {@link #applyStrategySelectors} instead
+	 */
+	@SuppressWarnings( {"UnusedDeclaration"})
+	@Deprecated
+	public BootstrapServiceRegistryBuilder withStrategySelectors(StrategyRegistrationProvider strategyRegistrationProvider) {
+		return applyStrategySelectors( strategyRegistrationProvider );
 	}
 
 	/**
@@ -186,7 +152,7 @@ public class BootstrapServiceRegistryBuilder {
 	 * @see org.hibernate.boot.registry.selector.spi.StrategySelector#registerStrategyImplementor(Class, String, Class)
 	 */
 	@SuppressWarnings( {"UnusedDeclaration"})
-	public BootstrapServiceRegistryBuilder withStrategySelectors(StrategyRegistrationProvider strategyRegistrationProvider) {
+	public BootstrapServiceRegistryBuilder applyStrategySelectors(StrategyRegistrationProvider strategyRegistrationProvider) {
 		for ( StrategyRegistration strategyRegistration : strategyRegistrationProvider.getStrategyRegistrations() ) {
 			this.strategySelectorBuilder.addExplicitStrategyRegistration( strategyRegistration );
 		}
@@ -256,5 +222,18 @@ public class BootstrapServiceRegistryBuilder {
 				strategySelectorBuilder.buildSelector( classLoaderService ),
 				integratorService
 		);
+	}
+
+	/**
+	 * Destroy a service registry.  Applications should only destroy registries they have explicitly created.
+	 *
+	 * @param serviceRegistry The registry to be closed.
+	 */
+	public static void destroy(ServiceRegistry serviceRegistry) {
+		if ( serviceRegistry == null ) {
+			return;
+		}
+
+		( (BootstrapServiceRegistryImpl) serviceRegistry ).destroy();
 	}
 }

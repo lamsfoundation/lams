@@ -9,9 +9,9 @@ basiclti-util 1.2
 
 CKEditor Java 2.6
 
-Apache HttpClient 4.2.1
+Apache HttpClient 4.5
 
-Apache HttpCore 4.2.1
+Apache HttpCore 4.4.1
 
 Commons Lang 2.6
 
@@ -19,7 +19,7 @@ Commons IO 2.4
 
 gson 2.2.4
 
-Hibernate Core 4.3.7
+Hibernate Core 5.0.10
 
 httpunit 1.7
 
@@ -48,12 +48,12 @@ Spring 4.0.6
 
 Struts 1.2.9
 
-Undertow core 1.1.8
+Undertow core 1.4.0
 
-Undertow servlet 1.1.8
+Undertow servlet 1.4.0
 
 xmltooling 1.4.0
 
 XStream 1.5.0
 
-websocket api_1.1_spec-1.1.0.Final
+websocket api_1.1_spec-1.1.1.Final

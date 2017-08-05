@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2012, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.type.descriptor.java;
 
@@ -44,13 +27,63 @@ public class JavaTypeDescriptorRegistry {
 
 	private ConcurrentHashMap<Class,JavaTypeDescriptor> descriptorsByClass = new ConcurrentHashMap<Class, JavaTypeDescriptor>();
 
+	public JavaTypeDescriptorRegistry() {
+		addDescriptorInternal( ByteTypeDescriptor.INSTANCE );
+		addDescriptorInternal( BooleanTypeDescriptor.INSTANCE );
+		addDescriptorInternal( CharacterTypeDescriptor.INSTANCE );
+		addDescriptorInternal( ShortTypeDescriptor.INSTANCE );
+		addDescriptorInternal( IntegerTypeDescriptor.INSTANCE );
+		addDescriptorInternal( LongTypeDescriptor.INSTANCE );
+		addDescriptorInternal( FloatTypeDescriptor.INSTANCE );
+		addDescriptorInternal( DoubleTypeDescriptor.INSTANCE );
+		addDescriptorInternal( BigDecimalTypeDescriptor.INSTANCE );
+		addDescriptorInternal( BigIntegerTypeDescriptor.INSTANCE );
+
+		addDescriptorInternal( StringTypeDescriptor.INSTANCE );
+
+		addDescriptorInternal( BlobTypeDescriptor.INSTANCE );
+		addDescriptorInternal( ClobTypeDescriptor.INSTANCE );
+		addDescriptorInternal( NClobTypeDescriptor.INSTANCE );
+
+		addDescriptorInternal( ByteArrayTypeDescriptor.INSTANCE );
+		addDescriptorInternal( CharacterArrayTypeDescriptor.INSTANCE );
+		addDescriptorInternal( PrimitiveByteArrayTypeDescriptor.INSTANCE );
+		addDescriptorInternal( PrimitiveCharacterArrayTypeDescriptor.INSTANCE );
+
+		addDescriptorInternal( CalendarTypeDescriptor.INSTANCE );
+		addDescriptorInternal( DateTypeDescriptor.INSTANCE );
+		descriptorsByClass.put( java.sql.Date.class, JdbcDateTypeDescriptor.INSTANCE );
+		descriptorsByClass.put( java.sql.Time.class, JdbcTimeTypeDescriptor.INSTANCE );
+		descriptorsByClass.put( java.sql.Timestamp.class, JdbcTimestampTypeDescriptor.INSTANCE );
+		addDescriptorInternal( TimeZoneTypeDescriptor.INSTANCE );
+
+		addDescriptorInternal( ClassTypeDescriptor.INSTANCE );
+
+		addDescriptorInternal( CurrencyTypeDescriptor.INSTANCE );
+		addDescriptorInternal( LocaleTypeDescriptor.INSTANCE );
+		addDescriptorInternal( UrlTypeDescriptor.INSTANCE );
+		addDescriptorInternal( UUIDTypeDescriptor.INSTANCE );
+	}
+
+	private JavaTypeDescriptor addDescriptorInternal(JavaTypeDescriptor descriptor) {
+		return descriptorsByClass.put( descriptor.getJavaTypeClass(), descriptor );
+	}
+
 	/**
 	 * Adds the given descriptor to this registry
 	 *
 	 * @param descriptor The descriptor to add.
 	 */
 	public void addDescriptor(JavaTypeDescriptor descriptor) {
-		descriptorsByClass.put( descriptor.getJavaTypeClass(), descriptor );
+		JavaTypeDescriptor old = addDescriptorInternal( descriptor );
+		if ( old != null ) {
+			log.debugf(
+					"JavaTypeDescriptorRegistry entry replaced : %s -> %s (was %s)",
+					descriptor.getJavaTypeClass(),
+					descriptor,
+					old
+			);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -61,6 +94,12 @@ public class JavaTypeDescriptorRegistry {
 
 		JavaTypeDescriptor<T> descriptor = descriptorsByClass.get( cls );
 		if ( descriptor != null ) {
+			return descriptor;
+		}
+
+		if ( cls.isEnum() ) {
+			descriptor = new EnumJavaTypeDescriptor( cls );
+			descriptorsByClass.put( cls, descriptor );
 			return descriptor;
 		}
 
@@ -80,12 +119,22 @@ public class JavaTypeDescriptorRegistry {
 		return new FallbackJavaTypeDescriptor<T>( cls );
 	}
 
-	public static class FallbackJavaTypeDescriptor<T> extends AbstractTypeDescriptor<T> {
 
+	public static class FallbackJavaTypeDescriptor<T> extends AbstractTypeDescriptor<T> {
 		@SuppressWarnings("unchecked")
-		protected FallbackJavaTypeDescriptor(Class<T> type) {
-			// MutableMutabilityPlan would be the "safest" option, but we do not necessarily know how to deepCopy etc...
-			super( type, ImmutableMutabilityPlan.INSTANCE );
+		protected FallbackJavaTypeDescriptor(final Class<T> type) {
+			// MutableMutabilityPlan is the "safest" option, but we do not necessarily know how to deepCopy etc...
+			super(
+					type,
+					new MutableMutabilityPlan<T>() {
+						@Override
+						protected T deepCopyNotNull(T value) {
+							throw new HibernateException(
+									"Not known how to deep copy value of type: [" + type.getName() + "]"
+							);
+						}
+					}
+			);
 		}
 
 		@Override
@@ -112,4 +161,5 @@ public class JavaTypeDescriptorRegistry {
 			return (T) value;
 		}
 	}
+
 }

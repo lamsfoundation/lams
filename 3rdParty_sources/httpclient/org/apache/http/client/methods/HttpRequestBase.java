@@ -27,50 +27,42 @@
 
 package org.apache.http.client.methods;
 
-import java.io.IOException;
 import java.net.URI;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.http.annotation.NotThreadSafe;
 
 import org.apache.http.ProtocolVersion;
 import org.apache.http.RequestLine;
-import org.apache.http.client.utils.CloneUtils;
-import org.apache.http.conn.ClientConnectionRequest;
-import org.apache.http.conn.ConnectionReleaseTrigger;
-import org.apache.http.message.AbstractHttpMessage;
+import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.message.BasicRequestLine;
-import org.apache.http.message.HeaderGroup;
-import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 
 /**
- * Basic implementation of an HTTP request that can be modified. Methods of the
- * {@link AbortableHttpRequest} interface implemented by this class are thread safe.
+ * Base implementation of {@link HttpUriRequest}.
  *
  * @since 4.0
  */
+@SuppressWarnings("deprecation")
 @NotThreadSafe
-public abstract class HttpRequestBase extends AbstractHttpMessage
-    implements HttpUriRequest, AbortableHttpRequest, Cloneable {
+public abstract class HttpRequestBase extends AbstractExecutionAwareRequest
+    implements HttpUriRequest, Configurable {
 
-    private Lock abortLock;
-    private volatile boolean aborted;
-
+    private ProtocolVersion version;
     private URI uri;
-    private ClientConnectionRequest connRequest;
-    private ConnectionReleaseTrigger releaseTrigger;
+    private RequestConfig config;
 
-    public HttpRequestBase() {
-        super();
-        this.abortLock = new ReentrantLock();
-    }
-
+    @Override
     public abstract String getMethod();
 
+    /**
+     * @since 4.3
+     */
+    public void setProtocolVersion(final ProtocolVersion version) {
+        this.version = version;
+    }
+
+    @Override
     public ProtocolVersion getProtocolVersion() {
-        return HttpProtocolParams.getVersion(getParams());
+        return version != null ? version : HttpProtocolParams.getVersion(getParams());
     }
 
     /**
@@ -79,98 +71,44 @@ public abstract class HttpRequestBase extends AbstractHttpMessage
      * Please note URI remains unchanged in the course of request execution and
      * is not updated if the request is redirected to another location.
      */
+    @Override
     public URI getURI() {
         return this.uri;
     }
 
+    @Override
     public RequestLine getRequestLine() {
-        String method = getMethod();
-        ProtocolVersion ver = getProtocolVersion();
-        URI uri = getURI();
+        final String method = getMethod();
+        final ProtocolVersion ver = getProtocolVersion();
+        final URI uriCopy = getURI(); // avoids possible window where URI could be changed
         String uritext = null;
-        if (uri != null) {
-            uritext = uri.toASCIIString();
+        if (uriCopy != null) {
+            uritext = uriCopy.toASCIIString();
         }
-        if (uritext == null || uritext.length() == 0) {
+        if (uritext == null || uritext.isEmpty()) {
             uritext = "/";
         }
         return new BasicRequestLine(method, uritext, ver);
+    }
+
+
+    @Override
+    public RequestConfig getConfig() {
+        return config;
+    }
+
+    public void setConfig(final RequestConfig config) {
+        this.config = config;
     }
 
     public void setURI(final URI uri) {
         this.uri = uri;
     }
 
-    public void setConnectionRequest(final ClientConnectionRequest connRequest)
-            throws IOException {
-        if (this.aborted) {
-            throw new IOException("Request already aborted");
-        }
-        this.abortLock.lock();
-        try {
-            this.connRequest = connRequest;
-        } finally {
-            this.abortLock.unlock();
-        }
-    }
-
-    public void setReleaseTrigger(final ConnectionReleaseTrigger releaseTrigger)
-            throws IOException {
-        if (this.aborted) {
-            throw new IOException("Request already aborted");
-        }
-        this.abortLock.lock();
-        try {
-            this.releaseTrigger = releaseTrigger;
-        } finally {
-            this.abortLock.unlock();
-        }
-    }
-
-    private void cleanup() {
-        if (this.connRequest != null) {
-            this.connRequest.abortRequest();
-            this.connRequest = null;
-        }
-        if (this.releaseTrigger != null) {
-            try {
-                this.releaseTrigger.abortConnection();
-            } catch (IOException ex) {
-            }
-            this.releaseTrigger = null;
-        }
-    }
-
-    public void abort() {
-        if (this.aborted) {
-            return;
-        }
-        this.abortLock.lock();
-        try {
-            this.aborted = true;
-            cleanup();
-        } finally {
-            this.abortLock.unlock();
-        }
-    }
-
-    public boolean isAborted() {
-        return this.aborted;
-    }
-
     /**
-     * Resets internal state of the request making it reusable.
-     *
      * @since 4.2
      */
-    public void reset() {
-        this.abortLock.lock();
-        try {
-            cleanup();
-            this.aborted = false;
-        } finally {
-            this.abortLock.unlock();
-        }
+    public void started() {
     }
 
     /**
@@ -184,20 +122,8 @@ public abstract class HttpRequestBase extends AbstractHttpMessage
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        HttpRequestBase clone = (HttpRequestBase) super.clone();
-        clone.abortLock = new ReentrantLock();
-        clone.aborted = false;
-        clone.releaseTrigger = null;
-        clone.connRequest = null;
-        clone.headergroup = (HeaderGroup) CloneUtils.clone(this.headergroup);
-        clone.params = (HttpParams) CloneUtils.clone(this.params);
-        return clone;
-    }
-
-    @Override
     public String toString() {
         return getMethod() + " " + getURI() + " " + getProtocolVersion();
-    }    
+    }
 
 }

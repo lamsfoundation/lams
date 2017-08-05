@@ -35,7 +35,11 @@ import java.util.Set;
  * @see HttpParams
  *
  * @since 4.2
+ *
+ * @deprecated (4.3) use configuration classes provided 'org.apache.http.config'
+ *  and 'org.apache.http.client.config'
  */
+@Deprecated
 public interface HttpParamsNames {
 
     /**
@@ -46,7 +50,7 @@ public interface HttpParamsNames {
      * Changes to the underlying HttpParams are not reflected
      * in the set - it is a snapshot.
      *
-     * @return the names, as a Set<String>
+     * @return the names, as a Set&lt;String&gt;
      */
     Set<String> getNames();
 

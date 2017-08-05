@@ -78,12 +78,13 @@ public interface HttpEntity {
      * chunked encoding should be used when the entity is sent.
      * For entities that are received, it can also indicate whether
      * the entity was received with chunked encoding.
-     * <br/>
+     * <p>
      * The behavior of wrapping entities is implementation dependent,
      * but should respect the primary purpose.
+     * </p>
      *
-     * @return  <code>true</code> if chunked encoding is preferred for this
-     *          entity, or <code>false</code> if it is not
+     * @return  {@code true} if chunked encoding is preferred for this
+     *          entity, or {@code false} if it is not
      */
     boolean isChunked();
 
@@ -104,7 +105,7 @@ public interface HttpEntity {
      * charset attribute.
      *
      * @return  the Content-Type header for this entity, or
-     *          <code>null</code> if the content type is unknown
+     *          {@code null} if the content type is unknown
      */
     Header getContentType();
 
@@ -116,7 +117,7 @@ public interface HttpEntity {
      * adjust this header accordingly.
      *
      * @return  the Content-Encoding header for this entity, or
-     *          <code>null</code> if the content encoding is unknown
+     *          {@code null} if the content encoding is unknown
      */
     Header getContentEncoding();
 
@@ -136,16 +137,15 @@ public interface HttpEntity {
      * @return content stream of the entity.
      *
      * @throws IOException if the stream could not be created
-     * @throws IllegalStateException
-     *  if content stream cannot be created.
+     * @throws UnsupportedOperationException
+     *  if entity content cannot be represented as {@link java.io.InputStream}.
      *
      * @see #isRepeatable()
      */
-    InputStream getContent() throws IOException, IllegalStateException;
+    InputStream getContent() throws IOException, UnsupportedOperationException;
 
     /**
      * Writes the entity content out to the output stream.
-     * <p>
      * <p>
      * IMPORTANT: Please note all entity implementations must ensure that
      * all allocated resources are properly deallocated when this method
@@ -160,12 +160,12 @@ public interface HttpEntity {
     /**
      * Tells whether this entity depends on an underlying stream.
      * Streamed entities that read data directly from the socket should
-     * return <code>true</code>. Self-contained entities should return
-     * <code>false</code>. Wrapping entities should delegate this call
+     * return {@code true}. Self-contained entities should return
+     * {@code false}. Wrapping entities should delegate this call
      * to the wrapped entity.
      *
-     * @return  <code>true</code> if the entity content is streamed,
-     *          <code>false</code> otherwise
+     * @return  {@code true} if the entity content is streamed,
+     *          {@code false} otherwise
      */
     boolean isStreaming(); // don't expect an exception here
 

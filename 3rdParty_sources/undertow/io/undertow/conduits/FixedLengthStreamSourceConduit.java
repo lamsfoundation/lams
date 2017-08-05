@@ -72,7 +72,7 @@ public final class FixedLengthStreamSourceConduit extends AbstractStreamSourceCo
      * Construct a new instance.  The given listener is called once all the bytes are read from the stream
      * <b>or</b> the stream is closed.  This listener should cause the remaining data to be drained from the
      * underlying stream if the underlying stream is to be reused.
-     * <p/>
+     * <p>
      * Calling this constructor will replace the read listener of the underlying channel.  The listener should be
      * restored from the {@code finishListener} object.  The underlying stream should not be closed while this wrapper
      * stream is active.
@@ -98,7 +98,7 @@ public final class FixedLengthStreamSourceConduit extends AbstractStreamSourceCo
      * Construct a new instance.  The given listener is called once all the bytes are read from the stream
      * <b>or</b> the stream is closed.  This listener should cause the remaining data to be drained from the
      * underlying stream if the underlying stream is to be reused.
-     * <p/>
+     * <p>
      * Calling this constructor will replace the read listener of the underlying channel.  The listener should be
      * restored from the {@code finishListener} object.  The underlying stream should not be closed while this wrapper
      * stream is active.
@@ -150,7 +150,7 @@ public final class FixedLengthStreamSourceConduit extends AbstractStreamSourceCo
             IoUtils.safeClose(exchange.getConnection());
             throw e;
         } finally {
-            exitRead(res == -1L ? val & MASK_COUNT : res + throughBuffer.remaining());
+            exitRead(res + throughBuffer.remaining());
         }
     }
 
@@ -216,7 +216,7 @@ public final class FixedLengthStreamSourceConduit extends AbstractStreamSourceCo
             IoUtils.safeClose(exchange.getConnection());
             throw e;
         } finally {
-            exitRead(res == -1L ? val & MASK_COUNT : res);
+            exitRead(res);
         }
     }
 
@@ -252,7 +252,7 @@ public final class FixedLengthStreamSourceConduit extends AbstractStreamSourceCo
             IoUtils.safeClose(exchange.getConnection());
             throw e;
         }  finally {
-            exitRead(res == -1 ? remaining : (long) res);
+            exitRead(res);
         }
     }
 
@@ -329,8 +329,16 @@ public final class FixedLengthStreamSourceConduit extends AbstractStreamSourceCo
      *
      * @param consumed the number of bytes consumed by this call (may be 0)
      */
-    private void exitRead(long consumed) {
+    private void exitRead(long consumed) throws IOException {
         long oldVal = state;
+        if(consumed == -1) {
+            if (anyAreSet(oldVal, MASK_COUNT)) {
+                invokeFinishListener();
+                state &= ~MASK_COUNT;
+                throw UndertowMessages.MESSAGES.couldNotReadContentLengthData();
+            }
+            return;
+        }
         long newVal = oldVal - consumed;
         state = newVal;
         if (anyAreSet(oldVal, MASK_COUNT) && allAreClear(newVal, MASK_COUNT)) {

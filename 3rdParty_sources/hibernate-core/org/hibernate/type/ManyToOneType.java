@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.type;
 
@@ -33,10 +16,10 @@ import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.engine.internal.ForeignKeys;
+import org.hibernate.engine.jdbc.Size;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.Mapping;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.metamodel.relational.Size;
 import org.hibernate.persister.entity.EntityPersister;
 
 /**
@@ -87,22 +70,6 @@ public class ManyToOneType extends EntityType {
 		this( scope, referencedEntityName, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy, ignoreNotFound, isLogicalOneToOne );
 	}
 
-	/**
-	 * @deprecated Use {@link #ManyToOneType(TypeFactory.TypeScope, String, boolean, String, boolean, boolean, boolean, boolean ) } instead.
-	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
-	 */
-	@Deprecated
-	public ManyToOneType(
-			TypeFactory.TypeScope scope,
-			String referencedEntityName,
-			String uniqueKeyPropertyName,
-			boolean lazy,
-			boolean unwrapProxy,
-			boolean ignoreNotFound,
-			boolean isLogicalOneToOne) {
-		this( scope, referencedEntityName, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy, ignoreNotFound, isLogicalOneToOne );
-	}
-
 	public ManyToOneType(
 			TypeFactory.TypeScope scope,
 			String referencedEntityName,
@@ -138,22 +105,33 @@ public class ManyToOneType extends EntityType {
 	}
 
 	public int getColumnSpan(Mapping mapping) throws MappingException {
-		// our column span is the number of columns in the PK
-		return getIdentifierOrUniqueKeyType( mapping ).getColumnSpan( mapping );
+		return requireIdentifierOrUniqueKeyType( mapping ).getColumnSpan( mapping );
+	}
+
+	private Type requireIdentifierOrUniqueKeyType(Mapping mapping) {
+		final Type fkTargetType = getIdentifierOrUniqueKeyType( mapping );
+		if ( fkTargetType == null ) {
+			throw new MappingException(
+					"Unable to determine FK target Type for many-to-one mapping: " +
+							"referenced-entity-name=[" + getAssociatedEntityName() +
+							"], referenced-entity-attribute-name=[" + getLHSPropertyName() + "]"
+			);
+		}
+		return fkTargetType;
 	}
 
 	public int[] sqlTypes(Mapping mapping) throws MappingException {
-		return getIdentifierOrUniqueKeyType( mapping ).sqlTypes( mapping );
+		return requireIdentifierOrUniqueKeyType( mapping ).sqlTypes( mapping );
 	}
 
 	@Override
 	public Size[] dictatedSizes(Mapping mapping) throws MappingException {
-		return getIdentifierOrUniqueKeyType( mapping ).dictatedSizes( mapping );
+		return requireIdentifierOrUniqueKeyType( mapping ).dictatedSizes( mapping );
 	}
 
 	@Override
 	public Size[] defaultSizes(Mapping mapping) throws MappingException {
-		return getIdentifierOrUniqueKeyType( mapping ).defaultSizes( mapping );
+		return requireIdentifierOrUniqueKeyType( mapping ).defaultSizes( mapping );
 	}
 
 	public void nullSafeSet(
@@ -162,7 +140,7 @@ public class ManyToOneType extends EntityType {
 			int index,
 			boolean[] settable,
 			SessionImplementor session) throws HibernateException, SQLException {
-		getIdentifierOrUniqueKeyType( session.getFactory() )
+		requireIdentifierOrUniqueKeyType( session.getFactory() )
 				.nullSafeSet( st, getIdentifier( value, session ), index, settable, session );
 	}
 
@@ -171,12 +149,12 @@ public class ManyToOneType extends EntityType {
 			Object value,
 			int index,
 			SessionImplementor session) throws HibernateException, SQLException {
-		getIdentifierOrUniqueKeyType( session.getFactory() )
+		requireIdentifierOrUniqueKeyType( session.getFactory() )
 				.nullSafeSet( st, getIdentifier( value, session ), index, session );
 	}
 
 	public ForeignKeyDirection getForeignKeyDirection() {
-		return ForeignKeyDirection.FOREIGN_KEY_FROM_PARENT;
+		return ForeignKeyDirection.FROM_PARENT;
 	}
 
 	public Object hydrate(
@@ -236,10 +214,6 @@ public class ManyToOneType extends EntityType {
 			SessionImplementor session,
 			Object owner) throws HibernateException {
 
-		if ( isNotEmbedded( session ) ) {
-			return getIdentifierType( session ).disassemble( value, session, owner );
-		}
-		
 		if ( value == null ) {
 			return null;
 		}
@@ -271,10 +245,6 @@ public class ManyToOneType extends EntityType {
 		
 		Serializable id = assembleId( oid, session );
 
-		if ( isNotEmbedded( session ) ) {
-			return id;
-		}
-		
 		if ( id == null ) {
 			return null;
 		}

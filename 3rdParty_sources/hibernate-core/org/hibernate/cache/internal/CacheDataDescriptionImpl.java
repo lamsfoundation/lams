@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cache.internal;
 
@@ -28,9 +11,9 @@ import java.util.Comparator;
 import org.hibernate.cache.spi.CacheDataDescription;
 import org.hibernate.mapping.Collection;
 import org.hibernate.mapping.PersistentClass;
-import org.hibernate.metamodel.binding.EntityBinding;
-import org.hibernate.metamodel.binding.PluralAttributeBinding;
+import org.hibernate.type.Type;
 import org.hibernate.type.VersionType;
+import org.hibernate.type.descriptor.java.IncomparableComparator;
 
 /**
  * Standard CacheDataDescription implementation.
@@ -41,19 +24,27 @@ public class CacheDataDescriptionImpl implements CacheDataDescription {
 	private final boolean mutable;
 	private final boolean versioned;
 	private final Comparator versionComparator;
+	private final Type keyType;
 
 	/**
 	 * Constructs a CacheDataDescriptionImpl instance.  Generally speaking, code should use one of the
 	 * overloaded {@link #decode} methods rather than direct instantiation.
-	 *
 	 * @param mutable Is the described data mutable?
 	 * @param versioned Is the described data versioned?
 	 * @param versionComparator The described data's version value comparator (if versioned).
+	 * @param keyType
 	 */
-	public CacheDataDescriptionImpl(boolean mutable, boolean versioned, Comparator versionComparator) {
+	public CacheDataDescriptionImpl(boolean mutable, boolean versioned, Comparator versionComparator, Type keyType) {
 		this.mutable = mutable;
 		this.versioned = versioned;
 		this.versionComparator = versionComparator;
+		if ( versioned &&
+				( versionComparator == null || IncomparableComparator.class.isInstance( versionComparator ) ) ) {
+			throw new IllegalArgumentException(
+					"versionComparator must not be null or an instance of " + IncomparableComparator.class.getName()
+			);
+		}
+		this.keyType = keyType;
 	}
 
 	@Override
@@ -71,6 +62,11 @@ public class CacheDataDescriptionImpl implements CacheDataDescription {
 		return versionComparator;
 	}
 
+	@Override
+	public Type getKeyType() {
+		return keyType;
+	}
+
 	/**
 	 * Builds a CacheDataDescriptionImpl from the mapping model of an entity class.
 	 *
@@ -84,19 +80,9 @@ public class CacheDataDescriptionImpl implements CacheDataDescription {
 				model.isVersioned(),
 				model.isVersioned()
 						? ( (VersionType) model.getVersion().getType() ).getComparator()
-						: null
+						: null,
+				model.getIdentifier().getType()
 		);
-	}
-
-	/**
-	 * Builds a CacheDataDescriptionImpl from the mapping model of an entity class (using the new metamodel code).
-	 *
-	 * @param model The mapping model.
-	 *
-	 * @return The constructed CacheDataDescriptionImpl
-	 */
-	public static CacheDataDescriptionImpl decode(EntityBinding model) {
-		return new CacheDataDescriptionImpl( model.isMutable(), model.isVersioned(), getVersionComparator( model ) );
 	}
 
 	/**
@@ -112,35 +98,9 @@ public class CacheDataDescriptionImpl implements CacheDataDescription {
 				model.getOwner().isVersioned(),
 				model.getOwner().isVersioned()
 						? ( (VersionType) model.getOwner().getVersion().getType() ).getComparator()
-						: null
+						: null,
+				model.getKey().getType()
 		);
 	}
 
-	/**
-	 * Builds a CacheDataDescriptionImpl from the mapping model of a collection (using the new metamodel code).
-	 *
-	 * @param model The mapping model.
-	 *
-	 * @return The constructed CacheDataDescriptionImpl
-	 */
-	public static CacheDataDescriptionImpl decode(PluralAttributeBinding model) {
-		return new CacheDataDescriptionImpl(
-				model.isMutable(),
-				model.getContainer().seekEntityBinding().isVersioned(),
-				getVersionComparator( model.getContainer().seekEntityBinding() )
-		);
-	}
-
-	private static Comparator getVersionComparator(EntityBinding model ) {
-		if ( model.isVersioned() ) {
-			final VersionType versionType = (VersionType) model.getHierarchyDetails()
-					.getVersioningAttributeBinding()
-					.getHibernateTypeDescriptor()
-					.getResolvedTypeMapping();
-
-			return versionType.getComparator();
-		}
-
-		return null;
-	}
 }

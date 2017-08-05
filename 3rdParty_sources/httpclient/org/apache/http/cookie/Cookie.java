@@ -29,11 +29,16 @@ package org.apache.http.cookie;
 
 import java.util.Date;
 
+import org.apache.http.annotation.Obsolete;
+
 /**
  * Cookie interface represents a token or short packet of state information
  * (also referred to as "magic-cookie") that the HTTP agent and the target
  * server can exchange to maintain a session. In its simples form an HTTP
  * cookie is merely a name / value pair.
+ * <p>
+ * Please do not use attributes marked as @Obsolete. They have been rendered
+ * obsolete by RFC 6265.
  *
  * @since 4.0
  */
@@ -55,34 +60,36 @@ public interface Cookie {
 
     /**
      * Returns the comment describing the purpose of this cookie, or
-     * <tt>null</tt> if no such comment has been defined.
+     * {@code null} if no such comment has been defined.
      *
      * @return comment
      */
+    @Obsolete
     String getComment();
 
     /**
      * If a user agent (web browser) presents this cookie to a user, the
      * cookie's purpose will be described by the information at this URL.
      */
+    @Obsolete
     String getCommentURL();
 
     /**
-     * Returns the expiration {@link Date} of the cookie, or <tt>null</tt>
+     * Returns the expiration {@link Date} of the cookie, or {@code null}
      * if none exists.
      * <p><strong>Note:</strong> the object returned by this method is
      * considered immutable. Changing it (e.g. using setTime()) could result
      * in undefined behaviour. Do so at your peril. </p>
-     * @return Expiration {@link Date}, or <tt>null</tt>.
+     * @return Expiration {@link Date}, or {@code null}.
      */
     Date getExpiryDate();
 
     /**
-     * Returns <tt>false</tt> if the cookie should be discarded at the end
-     * of the "session"; <tt>true</tt> otherwise.
+     * Returns {@code false} if the cookie should be discarded at the end
+     * of the "session"; {@code true} otherwise.
      *
-     * @return <tt>false</tt> if the cookie should be discarded at the end
-     *         of the "session"; <tt>true</tt> otherwise
+     * @return {@code false} if the cookie should be discarded at the end
+     *         of the "session"; {@code true} otherwise
      */
     boolean isPersistent();
 
@@ -107,13 +114,14 @@ public interface Cookie {
      * Get the Port attribute. It restricts the ports to which a cookie
      * may be returned in a Cookie request header.
      */
+    @Obsolete
     int[] getPorts();
 
     /**
      * Indicates whether this cookie requires a secure connection.
      *
-     * @return  <code>true</code> if this cookie should only be sent
-     *          over secure connections, <code>false</code> otherwise.
+     * @return  {@code true} if this cookie should only be sent
+     *          over secure connections, {@code false} otherwise.
      */
     boolean isSecure();
 
@@ -123,15 +131,18 @@ public interface Cookie {
      *
      * @return the version of the cookie.
      */
+    @Obsolete
     int getVersion();
 
     /**
      * Returns true if this cookie has expired.
      * @param date Current time
      *
-     * @return <tt>true</tt> if the cookie has expired.
+     * @return {@code true} if the cookie has expired.
      */
     boolean isExpired(final Date date);
+
+    //TODO: RFC 6265 requires cookies to track their creation time; add #getCreationDate()
 
 }
 

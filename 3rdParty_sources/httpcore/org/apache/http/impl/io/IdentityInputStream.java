@@ -33,6 +33,7 @@ import java.io.InputStream;
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.http.io.BufferInfo;
 import org.apache.http.io.SessionInputBuffer;
+import org.apache.http.util.Args;
 
 /**
  * Input stream that reads data without any transformation. The end of the
@@ -42,7 +43,7 @@ import org.apache.http.io.SessionInputBuffer;
  * <p>
  * Note that this class NEVER closes the underlying stream, even when close
  * gets called.  Instead, it will read until the end of the stream (until
- * <code>-1</code> is returned).
+ * {@code -1} is returned).
  *
  * @since 4.0
  */
@@ -60,10 +61,7 @@ public class IdentityInputStream extends InputStream {
      */
     public IdentityInputStream(final SessionInputBuffer in) {
         super();
-        if (in == null) {
-            throw new IllegalArgumentException("Session input buffer may not be null");
-        }
-        this.in = in;
+        this.in = Args.notNull(in, "Session input buffer");
     }
 
     @Override
@@ -90,7 +88,7 @@ public class IdentityInputStream extends InputStream {
     }
 
     @Override
-    public int read(final byte[] b, int off, int len) throws IOException {
+    public int read(final byte[] b, final int off, final int len) throws IOException {
         if (this.closed) {
             return -1;
         } else {

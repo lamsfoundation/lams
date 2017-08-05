@@ -31,29 +31,19 @@ import java.io.IOException;
 import java.net.Socket;
 
 import org.apache.http.annotation.NotThreadSafe;
-import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
+import org.apache.http.util.Args;
 
 /**
  * Default implementation of a server-side HTTP connection.
- * <p>
- * The following parameters can be used to customize the behavior of this
- * class:
- * <ul>
- *  <li>{@link org.apache.http.params.CoreProtocolPNames#HTTP_ELEMENT_CHARSET}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#TCP_NODELAY}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#SO_TIMEOUT}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#SO_LINGER}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#SO_KEEPALIVE}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#SOCKET_BUFFER_SIZE}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#MAX_LINE_LENGTH}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#MAX_HEADER_COUNT}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#MIN_CHUNK_LIMIT}</li>
- * </ul>
  *
  * @since 4.0
+ *
+ * @deprecated (4.3) use {@link DefaultBHttpServerConnection}
  */
 @NotThreadSafe
+@Deprecated
 public class DefaultHttpServerConnection extends SocketHttpServerConnection {
 
     public DefaultHttpServerConnection() {
@@ -62,18 +52,16 @@ public class DefaultHttpServerConnection extends SocketHttpServerConnection {
 
     @Override
     public void bind(final Socket socket, final HttpParams params) throws IOException {
-        if (socket == null) {
-            throw new IllegalArgumentException("Socket may not be null");
-        }
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
+        Args.notNull(socket, "Socket");
+        Args.notNull(params, "HTTP parameters");
         assertNotOpen();
-        socket.setTcpNoDelay(HttpConnectionParams.getTcpNoDelay(params));
-        socket.setSoTimeout(HttpConnectionParams.getSoTimeout(params));
-        socket.setKeepAlive(HttpConnectionParams.getSoKeepalive(params));
-
-        int linger = HttpConnectionParams.getLinger(params);
+        socket.setTcpNoDelay(params.getBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true));
+        socket.setSoTimeout(params.getIntParameter(CoreConnectionPNames.SO_TIMEOUT, 0));
+        socket.setKeepAlive(params.getBooleanParameter(CoreConnectionPNames.SO_KEEPALIVE, false));
+        final int linger = params.getIntParameter(CoreConnectionPNames.SO_LINGER, -1);
+        if (linger >= 0) {
+            socket.setSoLinger(linger > 0, linger);
+        }
         if (linger >= 0) {
             socket.setSoLinger(linger > 0, linger);
         }

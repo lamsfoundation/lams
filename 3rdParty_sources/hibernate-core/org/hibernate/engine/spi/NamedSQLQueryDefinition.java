@@ -1,28 +1,12 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.spi;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -238,5 +222,27 @@ public class NamedSQLQueryDefinition extends NamedQueryDefinition {
 				isCallable(),
 				getQueryReturns()
 		);
+	}
+
+	public void addQueryReturns(NativeSQLQueryReturn[] queryReturnsToAdd) {
+		if ( queryReturnsToAdd != null && queryReturnsToAdd.length > 0 ) {
+			int initialQueryReturnsLength = 0;
+			if ( this.queryReturns != null ) {
+				initialQueryReturnsLength = this.queryReturns.length;
+			}
+			NativeSQLQueryReturn[] allQueryReturns = new NativeSQLQueryReturn[initialQueryReturnsLength + queryReturnsToAdd.length];
+
+			int i = 0;
+			for ( i = 0; i < initialQueryReturnsLength; i++ ) {
+				allQueryReturns[i] = this.queryReturns[i];
+			}
+
+			for ( int j = 0; j < queryReturnsToAdd.length; j++ ) {
+				allQueryReturns[i] = queryReturnsToAdd[j];
+				i++;
+			}
+
+			this.queryReturns = allQueryReturns;
+		}
 	}
 }

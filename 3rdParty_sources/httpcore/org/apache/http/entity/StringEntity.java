@@ -37,6 +37,7 @@ import java.nio.charset.UnsupportedCharsetException;
 
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.Args;
 
 /**
  * A self contained, repeatable entity that obtains its content from
@@ -57,24 +58,18 @@ public class StringEntity extends AbstractHttpEntity implements Cloneable {
      *   MIME type {@link ContentType#TEXT_PLAIN} is assumed.
      *
      * @throws IllegalArgumentException if the string parameter is null
-     *
+     * @throws UnsupportedCharsetException Thrown when the named charset is not available in
+     * this instance of the Java virtual machine
      * @since 4.2
      */
-    public StringEntity(final String string, final ContentType contentType) {
+    public StringEntity(final String string, final ContentType contentType) throws UnsupportedCharsetException {
         super();
-        if (string == null) {
-            throw new IllegalArgumentException("Source string may not be null");
-        }
+        Args.notNull(string, "Source string");
         Charset charset = contentType != null ? contentType.getCharset() : null;
         if (charset == null) {
             charset = HTTP.DEF_CONTENT_CHARSET;
         }
-        try {
-            this.content = string.getBytes(charset.name());
-        } catch (UnsupportedEncodingException ex) {
-            // should never happen
-            throw new UnsupportedCharsetException(charset.name());
-        }
+        this.content = string.getBytes(charset);
         if (contentType != null) {
             setContentType(contentType.toString());
         }
@@ -88,6 +83,7 @@ public class StringEntity extends AbstractHttpEntity implements Cloneable {
      *   is {@link HTTP#PLAIN_TEXT_TYPE} i.e. "text/plain"
      * @param charset character set to be used. May be {@code null}, in which case the default
      *   is {@link HTTP#DEF_CONTENT_CHARSET} i.e. "ISO-8859-1"
+     * @throws  UnsupportedEncodingException If the named charset is not supported.
      *
      * @since 4.1
      * @throws IllegalArgumentException if the string parameter is null
@@ -95,20 +91,14 @@ public class StringEntity extends AbstractHttpEntity implements Cloneable {
      * @deprecated (4.1.3) use {@link #StringEntity(String, ContentType)}
      */
     @Deprecated
-    public StringEntity(final String string, String mimeType, String charset)
-            throws UnsupportedEncodingException {
+    public StringEntity(
+            final String string, final String mimeType, final String charset) throws UnsupportedEncodingException {
         super();
-        if (string == null) {
-            throw new IllegalArgumentException("Source string may not be null");
-        }
-        if (mimeType == null) {
-            mimeType = HTTP.PLAIN_TEXT_TYPE;
-        }
-        if (charset == null) {
-            charset = HTTP.DEFAULT_CONTENT_CHARSET;
-        }
-        this.content = string.getBytes(charset);
-        setContentType(mimeType + HTTP.CHARSET_PARAM + charset);
+        Args.notNull(string, "Source string");
+        final String mt = mimeType != null ? mimeType : HTTP.PLAIN_TEXT_TYPE;
+        final String cs = charset != null ? charset :HTTP.DEFAULT_CONTENT_CHARSET;
+        this.content = string.getBytes(cs);
+        setContentType(mt + HTTP.CHARSET_PARAM + cs);
     }
 
     /**
@@ -120,10 +110,11 @@ public class StringEntity extends AbstractHttpEntity implements Cloneable {
      *   is {@link HTTP#DEF_CONTENT_CHARSET} is assumed
      *
      * @throws IllegalArgumentException if the string parameter is null
-     * @throws UnsupportedEncodingException if the charset is not supported.
+     * @throws UnsupportedCharsetException Thrown when the named charset is not available in
+     * this instance of the Java virtual machine
      */
     public StringEntity(final String string, final String charset)
-            throws UnsupportedEncodingException {
+            throws UnsupportedCharsetException {
         this(string, ContentType.create(ContentType.TEXT_PLAIN.getMimeType(), charset));
     }
 
@@ -136,7 +127,7 @@ public class StringEntity extends AbstractHttpEntity implements Cloneable {
      *   is {@link HTTP#DEF_CONTENT_CHARSET} is assumed
      *
      * @throws IllegalArgumentException if the string parameter is null
-     * 
+     *
      * @since 4.2
      */
     public StringEntity(final String string, final Charset charset) {
@@ -157,22 +148,24 @@ public class StringEntity extends AbstractHttpEntity implements Cloneable {
         this(string, ContentType.DEFAULT_TEXT);
     }
 
+    @Override
     public boolean isRepeatable() {
         return true;
     }
 
+    @Override
     public long getContentLength() {
         return this.content.length;
     }
 
+    @Override
     public InputStream getContent() throws IOException {
         return new ByteArrayInputStream(this.content);
     }
 
+    @Override
     public void writeTo(final OutputStream outstream) throws IOException {
-        if (outstream == null) {
-            throw new IllegalArgumentException("Output stream may not be null");
-        }
+        Args.notNull(outstream, "Output stream");
         outstream.write(this.content);
         outstream.flush();
     }
@@ -180,8 +173,9 @@ public class StringEntity extends AbstractHttpEntity implements Cloneable {
     /**
      * Tells that this entity is not streaming.
      *
-     * @return <code>false</code>
+     * @return {@code false}
      */
+    @Override
     public boolean isStreaming() {
         return false;
     }

@@ -1,38 +1,21 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.id;
 
 import java.io.Serializable;
 import java.util.Properties;
 
-import org.hibernate.dialect.Dialect;
+import org.hibernate.MappingException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.config.ConfigurationHelper;
+import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.Type;
-
-import org.jboss.logging.Logger;
 
 /**
  * <b>uuid</b><br>
@@ -41,13 +24,13 @@ import org.jboss.logging.Logger;
  * This string will consist of only hex digits. Optionally,
  * the string may be generated with separators between each
  * component of the UUID.
- *
+ * <p/>
  * Mapping parameters supported: separator.
  *
  * @author Gavin King
  */
 public class UUIDHexGenerator extends AbstractUUIDGenerator implements Configurable {
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, UUIDHexGenerator.class.getName());
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( UUIDHexGenerator.class );
 
 	private static boolean WARNED;
 
@@ -56,12 +39,13 @@ public class UUIDHexGenerator extends AbstractUUIDGenerator implements Configura
 	public UUIDHexGenerator() {
 		if ( !WARNED ) {
 			WARNED = true;
-            LOG.usingUuidHexGenerator( this.getClass().getName(), UUIDGenerator.class.getName() );
+			LOG.usingUuidHexGenerator( this.getClass().getName(), UUIDGenerator.class.getName() );
 		}
 	}
 
+
 	@Override
-	public void configure(Type type, Properties params, Dialect d) {
+	public void configure(Type type, Properties params, ServiceRegistry serviceRegistry) throws MappingException {
 		sep = ConfigurationHelper.getString( "separator", params, "" );
 	}
 

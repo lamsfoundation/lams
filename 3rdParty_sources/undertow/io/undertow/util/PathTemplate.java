@@ -30,10 +30,10 @@ import io.undertow.UndertowMessages;
 
 /**
  * Represents a parsed web socket path template.
- * <p/>
+ * <p>
  * This class can be compared to other path templates, with templates that are considered
  * lower have a higher priority, and should be checked first.
- * <p/>
+ * <p>
  * This comparison can also be used to check for semantically equal paths, if
  * a.compareTo(b) == 0 then the two paths are equivalent, which will generally
  * result in a deployment exception.
@@ -67,14 +67,8 @@ public class PathTemplate implements Comparable<PathTemplate> {
             return PathTemplate.create("/" + inputPath);
         }
 
-        // otherwise normalize template
-        final StringBuilder builder = new StringBuilder(inputPath);
-        while(builder != null && builder.length() > 1 && '/' == builder.charAt(builder.length() - 1)) {
-            builder.deleteCharAt(builder.length() - 1);
-        }
-
         // create string from modified string
-        final String path = builder.toString();
+        final String path = inputPath;
 
         int state = 0;
         String base = "";
@@ -174,7 +168,7 @@ public class PathTemplate implements Comparable<PathTemplate> {
     /**
      * Check if the given uri matches the template. If so then it will return true and
      * place the value of any path parameters into the given map.
-     * <p/>
+     * <p>
      * Note the map may be modified even if the match in unsuccessful, however in this case
      * it will be emptied before the method returns
      *
@@ -183,6 +177,18 @@ public class PathTemplate implements Comparable<PathTemplate> {
      * @return true if the URI is a match
      */
     public boolean matches(final String path, final Map<String, String> pathParameters) {
+
+        if (!template && base.contains("*")) {
+            final int indexOf = base.indexOf("*");
+            final String startBase = base.substring(0, indexOf);
+            if (!path.startsWith(startBase)) {
+                return false;
+            }
+            pathParameters.put("*", path.substring(indexOf,path.length()));
+            return true;
+        }
+
+
         if (!path.startsWith(base)) {
             return false;
         }
@@ -191,16 +197,15 @@ public class PathTemplate implements Comparable<PathTemplate> {
             return path.length() == baseLength;
         }
 
-
-        int cp = 0;
-        Part current = parts.get(cp);
+        int currentPartPosition = 0;
+        PathTemplate.Part current = parts.get(currentPartPosition);
         int stringStart = baseLength;
         int i;
         for (i = baseLength; i < path.length(); ++i) {
-            final char c = path.charAt(i);
-            if (c == '?') {
+            final char currentChar = path.charAt(i);
+            if (currentChar == '?' || current.part.equals("*")) {
                 break;
-            } else if (c == '/') {
+            } else if (currentChar == '/') {
                 String result = path.substring(stringStart, i);
                 if (current.template) {
                     pathParameters.put(current.part, result);
@@ -208,20 +213,25 @@ public class PathTemplate implements Comparable<PathTemplate> {
                     pathParameters.clear();
                     return false;
                 }
-                ++cp;
-                if (cp == parts.size()) {
+                ++currentPartPosition;
+                if (currentPartPosition == parts.size()) {
                     //this is a match if this is the last character
                     return i == (path.length() - 1);
                 }
-                current = parts.get(cp);
+                current = parts.get(currentPartPosition);
                 stringStart = i + 1;
             }
         }
-        if (cp + 1 != parts.size()) {
+        if (currentPartPosition + 1 != parts.size()) {
             pathParameters.clear();
             return false;
         }
+
         String result = path.substring(stringStart, i);
+        if (current.part.equals("*")) {
+            pathParameters.put(current.part, path.substring(stringStart,path.length()));
+            return true;
+        }
         if (current.template) {
             pathParameters.put(current.part, result);
         } else if (!result.equals(current.part)) {

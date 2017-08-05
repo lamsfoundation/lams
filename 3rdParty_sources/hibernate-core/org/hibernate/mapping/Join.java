@@ -1,27 +1,11 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.mapping;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,7 +16,7 @@ import org.hibernate.sql.Alias;
 /**
  * @author Gavin King
  */
-public class Join implements Serializable {
+public class Join implements AttributeContainer, Serializable {
 
 	private static final Alias PK_ALIAS = new Alias(15, "PK");
 
@@ -56,11 +40,13 @@ public class Join implements Serializable {
 	private boolean customDeleteCallable;
 	private ExecuteUpdateResultCheckStyle deleteCheckStyle;
 
+	@Override
 	public void addProperty(Property prop) {
 		properties.add(prop);
 		declaredProperties.add(prop);
 		prop.setPersistentClass( getPersistentClass() );
 	}
+
 	public void addMappedsuperclassProperty(Property prop) {
 		properties.add(prop);
 		prop.setPersistentClass( getPersistentClass() );
@@ -105,8 +91,7 @@ public class Join implements Serializable {
 
 	public void createPrimaryKey() {
 		//Primary key constraint
-		PrimaryKey pk = new PrimaryKey();
-		pk.setTable(table);
+		PrimaryKey pk = new PrimaryKey( table );
 		pk.setName( PK_ALIAS.toAliasString( table.getName() ) );
 		table.setPrimaryKey(pk);
 
@@ -194,7 +179,9 @@ public class Join implements Serializable {
 		Iterator iter = getPropertyIterator();
 		while ( iter.hasNext() ) {
 			Property prop = (Property) iter.next();
-			if ( !prop.isLazy() ) return false;
+			if ( !prop.isLazy() ) {
+				return false;
+			}
 		}
 		return true;
 	}

@@ -20,13 +20,13 @@ package io.undertow.server.protocol.framed;
 
 import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
-import io.undertow.util.ImmediatePooled;
+import io.undertow.connector.PooledByteBuffer;
+import io.undertow.util.ImmediatePooledByteBuffer;
 import org.xnio.Buffers;
 import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
 import org.xnio.IoUtils;
 import org.xnio.Option;
-import org.xnio.Pooled;
 import org.xnio.XnioExecutor;
 import org.xnio.XnioIoThread;
 import org.xnio.XnioWorker;
@@ -39,16 +39,16 @@ import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 import static org.xnio.Bits.allAreClear;
-import static org.xnio.Bits.allAreSet;
 import static org.xnio.Bits.anyAreSet;
 
 /**
  * Framed Stream Sink Channel.
- * <p/>
+ * <p>
  * Thread safety notes:
- * <p/>
+ * <p>
  * The general contract is that this channel is only to be used by a single thread at a time. The only exception to this is
  * during flush. A flush will only happen when {@link #readyForFlush} is set, and while this bit is set the buffer
  * must not be modified.
@@ -57,9 +57,8 @@ import static org.xnio.Bits.anyAreSet;
  */
 public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedChannel<C, R, S>, R extends AbstractFramedStreamSourceChannel<C, R, S>, S extends AbstractFramedStreamSinkChannel<C, R, S>> implements StreamSinkChannel {
 
-    private static final Pooled<ByteBuffer> EMPTY_BYTE_BUFFER = new ImmediatePooled<>(ByteBuffer.allocateDirect(0));
+    private static final PooledByteBuffer EMPTY_BYTE_BUFFER = new ImmediatePooledByteBuffer(ByteBuffer.allocateDirect(0));
 
-    private Pooled<ByteBuffer> buffer;
     private final C channel;
     private final ChannelListener.SimpleSetter<S> writeSetter = new ChannelListener.SimpleSetter<>();
     private final ChannelListener.SimpleSetter<S> closeSetter = new ChannelListener.SimpleSetter<>();
@@ -96,19 +95,25 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
 
     private volatile int waiterCount = 0;
 
-    private SendFrameHeader header;
-    private Pooled<ByteBuffer> trailer;
+    private volatile SendFrameHeader header;
+    private volatile PooledByteBuffer writeBuffer;
+    private volatile PooledByteBuffer body;
+    private volatile PooledByteBuffer trailer;
 
     private static final int STATE_CLOSED = 1;
-    private static final int STATE_WRITES_RESUMED = 1 << 1;
-    private static final int STATE_WRITES_SHUTDOWN = 1 << 2;
-    private static final int STATE_IN_LISTENER_LOOP = 1 << 3;
-    private static final int STATE_FIRST_DATA_WRITTEN = 1 << 4;
+    private static final int STATE_WRITES_SHUTDOWN = 1 << 1;
+    private static final int STATE_FIRST_DATA_WRITTEN = 1 << 2;
+    private static final int STATE_PRE_WRITE_CALLED = 1 << 3;
 
+    private volatile boolean bufferFull;
+    private volatile boolean writesResumed;
+    @SuppressWarnings("unused")
+    private volatile int inListenerLoop;
+
+    private static final AtomicIntegerFieldUpdater<AbstractFramedStreamSinkChannel> inListenerLoopUpdater = AtomicIntegerFieldUpdater.newUpdater(AbstractFramedStreamSinkChannel.class, "inListenerLoop");
 
     protected AbstractFramedStreamSinkChannel(C channel) {
         this.channel = channel;
-        this.buffer = channel.getBufferPool().allocate();
     }
 
     public long transferFrom(final FileChannel src, final long position, final long count) throws IOException {
@@ -121,7 +126,7 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
 
     @Override
     public void suspendWrites() {
-        state &= ~STATE_WRITES_RESUMED;
+        writesResumed = false;
     }
 
     /**
@@ -162,16 +167,27 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
                 trailer = EMPTY_BYTE_BUFFER;
             }
         }
-        return trailer.getResource();
+        return trailer.getBuffer();
     }
 
-    protected Pooled<ByteBuffer> createFrameFooter() {
+    protected PooledByteBuffer createFrameFooter() {
         return null;
+    }
+
+    final void preWrite() {
+        if(allAreClear(state, STATE_PRE_WRITE_CALLED)) {
+            state |= STATE_PRE_WRITE_CALLED;
+            body = preWriteTransform(body);
+        }
+    }
+
+    protected PooledByteBuffer preWriteTransform(PooledByteBuffer body) {
+        return body;
     }
 
     @Override
     public boolean isWriteResumed() {
-        return anyAreSet(state, STATE_WRITES_RESUMED);
+        return writesResumed;
     }
 
     @Override
@@ -185,19 +201,18 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
     }
 
     protected void resumeWritesInternal(boolean wakeup) {
-        boolean alreadyResumed = anyAreSet(state, STATE_WRITES_RESUMED);
+        boolean alreadyResumed = writesResumed;
         if(!wakeup && alreadyResumed) {
             return;
         }
-        state |= STATE_WRITES_RESUMED;
+        writesResumed = true;
         if(readyForFlush && !wakeup) {
             //we already have data queued to be flushed
             return;
         }
 
-        if (!anyAreSet(state, STATE_IN_LISTENER_LOOP)) {
-            state |= STATE_IN_LISTENER_LOOP;
-            getIoThread().execute(new Runnable() {
+        if (inListenerLoopUpdater.compareAndSet(this, 0, 1)) {
+            getChannel().runInIoThread(new Runnable() {
 
                 int loopCount = 0;
 
@@ -208,22 +223,24 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
                         if (listener == null || !isWriteResumed()) {
                             return;
                         }
-                        if(loopCount++ == 100) {
+                        if (loopCount++ == 100) {
                             //should never happen
                             UndertowLogger.ROOT_LOGGER.listenerNotProgressing();
                             IoUtils.safeClose(AbstractFramedStreamSinkChannel.this);
                             return;
                         }
                         ChannelListeners.invokeChannelListener((S) AbstractFramedStreamSinkChannel.this, listener);
-                        //if writes are shutdown or we become active then we stop looping
-                        //we stop when writes are shutdown because we can't flush until we are active
-                        //although we may be flushed as part of a batch
 
-                        if (allAreSet(state, STATE_WRITES_RESUMED) && allAreClear(state, STATE_CLOSED) && !broken && !readyForFlush && !fullyFlushed) {
+                    } finally {
+                        inListenerLoopUpdater.set(AbstractFramedStreamSinkChannel.this, 0);
+                    }
+                    //if writes are shutdown or we become active then we stop looping
+                    //we stop when writes are shutdown because we can't flush until we are active
+                    //although we may be flushed as part of a batch
+                    if (writesResumed && allAreClear(state, STATE_CLOSED) && !broken && !readyForFlush && !fullyFlushed) {
+                        if (inListenerLoopUpdater.compareAndSet(AbstractFramedStreamSinkChannel.this, 0, 1)) {
                             getIoThread().execute(this);
                         }
-                    } finally {
-                        state &= ~STATE_IN_LISTENER_LOOP;
                     }
                 }
             });
@@ -236,15 +253,21 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
         if(anyAreSet(state, STATE_WRITES_SHUTDOWN) || broken ) {
             return;
         }
-        state |= STATE_WRITES_SHUTDOWN;
+        // Queue prior to shutting down writes, since we might send the write buffer
         queueFinalFrame();
+        state |= STATE_WRITES_SHUTDOWN;
     }
 
     private void queueFinalFrame() throws IOException {
         if (!readyForFlush && !fullyFlushed && allAreClear(state, STATE_CLOSED)  && !broken && !finalFrameQueued) {
+            if( null == body && null != writeBuffer) {
+                sendWriteBuffer();
+            } else if (null == body) {
+                body = EMPTY_BYTE_BUFFER;
+            }
             readyForFlush = true;
-            buffer.getResource().flip();
-            state |=  STATE_FIRST_DATA_WRITTEN;
+            state |= STATE_FIRST_DATA_WRITTEN;
+            state |= STATE_WRITES_SHUTDOWN; // Mark writes as shutdown as well, since we want that set prior to queueing
             finalFrameQueued = true;
             channel.queueFrame((S) this);
         }
@@ -352,24 +375,28 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
         if(anyAreSet(state, STATE_WRITES_SHUTDOWN)) {
             return false;
         }
-        if(buffer != null && buffer.getResource().position() > 0) {
+        if(isFlushRequiredOnEmptyBuffer() || (writeBuffer != null && writeBuffer.getBuffer().position() > 0)) {
             handleBufferFull();
             return !readyForFlush;
         }
         return true;
     }
 
+    protected boolean isFlushRequiredOnEmptyBuffer() {
+        return false;
+    }
+
     @Override
     public long write(ByteBuffer[] srcs, int offset, int length) throws IOException {
-        int state = this.state;
-        if (readyForFlush) {
-            return 0; //we can't do anything, we are waiting for a flush
+        if(!safeToSend()) {
+            return 0;
         }
-        if (anyAreSet(state, STATE_CLOSED | STATE_WRITES_SHUTDOWN) || broken) {
-            throw UndertowMessages.MESSAGES.channelIsClosed();
+        if(writeBuffer == null) {
+            writeBuffer = getChannel().getBufferPool().allocate();
         }
-        long copied = Buffers.copy(this.buffer.getResource(), srcs, offset, length);
-        if (!buffer.getResource().hasRemaining()) {
+        ByteBuffer buffer = writeBuffer.getBuffer();
+        int copied = Buffers.copy(buffer, srcs, offset, length);
+        if(!buffer.hasRemaining()) {
             handleBufferFull();
         }
         return copied;
@@ -382,18 +409,55 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
 
     @Override
     public int write(ByteBuffer src) throws IOException {
-        int state = this.state;
-        if (readyForFlush) {
-            return 0; //we can't do anything, we are waiting for a flush
+        if(!safeToSend()) {
+            return 0;
         }
-        if (anyAreSet(state, STATE_CLOSED | STATE_WRITES_SHUTDOWN) || broken) {
-            throw UndertowMessages.MESSAGES.channelIsClosed();
+        if(writeBuffer == null) {
+            writeBuffer = getChannel().getBufferPool().allocate();
         }
-        int copied = Buffers.copy(this.buffer.getResource(), src);
-        if (!buffer.getResource().hasRemaining()) {
+        ByteBuffer buffer = writeBuffer.getBuffer();
+        int copied = Buffers.copy(buffer, src);
+        if(!buffer.hasRemaining()) {
             handleBufferFull();
         }
         return copied;
+    }
+
+    /**
+     * Send a buffer to this channel.
+     *
+     * @param pooled Pooled ByteBuffer to send. The buffer should have data available. This channel will free the buffer
+     *               after sending data
+     * @return true if the buffer was accepted; false if the channel needs to first be flushed
+     * @throws IOException if this channel is closed
+     */
+    public boolean send(PooledByteBuffer pooled) throws IOException {
+        if(isWritesShutdown()) {
+            throw UndertowMessages.MESSAGES.channelIsClosed();
+        }
+        return sendInternal(pooled);
+    }
+
+    protected boolean sendInternal(PooledByteBuffer pooled) throws IOException {
+        if (safeToSend()) {
+            this.body = pooled;
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean safeToSend() throws IOException {
+        int state = this.state;
+        if (readyForFlush) {
+            return false; //we can't do anything, we are waiting for a flush
+        }
+        if( null != this.body) {
+            return false; // already have a pooled buffer
+        }
+        if (anyAreSet(state, STATE_CLOSED) || broken) {
+            throw UndertowMessages.MESSAGES.channelIsClosed();
+        }
+        return true;
     }
 
     @Override
@@ -412,12 +476,24 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
     }
 
     private void handleBufferFull() throws IOException {
+        bufferFull = true;
         if (!readyForFlush) {
+            sendWriteBuffer();
             readyForFlush = true;
-            getBuffer().flip();
             state |= STATE_FIRST_DATA_WRITTEN;
             channel.queueFrame((S) this);
         }
+    }
+
+    private void sendWriteBuffer() throws IOException {
+        if(writeBuffer == null) {
+            writeBuffer = EMPTY_BYTE_BUFFER;
+        }
+        writeBuffer.getBuffer().flip();
+        if(!sendInternal(writeBuffer)) {
+            throw UndertowMessages.MESSAGES.failedToSendAfterBeingSafe();
+        }
+        writeBuffer = null;
     }
 
     /**
@@ -452,13 +528,21 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
         }
         try {
             state |= STATE_CLOSED;
-            buffer.free();
-            buffer = null;
+            if(writeBuffer != null) {
+                writeBuffer.close();
+                writeBuffer = null;
+            }
+            if(body != null) {
+                body.close();
+                body = null;
+            }
             if (header != null && header.getByteBuffer() != null) {
-                header.getByteBuffer().free();
+                header.getByteBuffer().close();
+                header = null;
             }
             if (trailer != null) {
-                trailer.free();
+                trailer.close();
+                trailer = null;
             }
             if (anyAreSet(state, STATE_FIRST_DATA_WRITTEN)) {
                 channelForciblyClosed();
@@ -506,7 +590,14 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
     }
 
     public ByteBuffer getBuffer() {
-        return buffer.getResource();
+        if(anyAreSet(state, STATE_CLOSED)) {
+            throw new IllegalStateException();
+        }
+        if(body == null) {
+            // TODO should we IllegalState here? we expect a buffer to already exist
+            body = EMPTY_BYTE_BUFFER;
+        }
+        return body.getBuffer();
     }
 
     /**
@@ -514,11 +605,12 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
      */
     final void flushComplete() throws IOException {
         try {
+            bufferFull = false;
             int remaining = header.getRemainingInBuffer();
             boolean finalFrame = finalFrameQueued;
             boolean channelClosed = finalFrame && remaining == 0 && !header.isAnotherFrameRequired();
             if(remaining > 0) {
-                buffer.getResource().limit(buffer.getResource().limit() + remaining);
+                body.getBuffer().limit(body.getBuffer().limit() + remaining);
                 if(finalFrame) {
                     //we clear the final frame flag, as it could not actually be written out
                     //note that we don't attempt to requeue, as whatever stopped it from being written will likely still
@@ -527,18 +619,36 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
                 }
             } else if(header.isAnotherFrameRequired()) {
                 this.finalFrameQueued = false;
+                if(body != null) {
+                    body.close();
+                    body = null;
+                    state &= ~STATE_PRE_WRITE_CALLED;
+                }
+            } else if(body != null){
+                body.close();
+                body = null;
+                state &= ~STATE_PRE_WRITE_CALLED;
             }
             if (channelClosed) {
                 fullyFlushed = true;
-                buffer.free();
-                buffer = null;
-            } else {
-                buffer.getResource().compact();
+                if(body != null) {
+                    body.close();
+                    body = null;
+                    state &= ~STATE_PRE_WRITE_CALLED;
+                }
+            } else if (body != null) {
+                // We still have a body, but since we just flushed, we transfer it to the write buffer.
+                // This works as long as you call write() again
+                body.getBuffer().compact();
+                writeBuffer = body;
+                body = null;
+                state &= ~STATE_PRE_WRITE_CALLED;
             }
+
             if (header.getByteBuffer() != null) {
-                header.getByteBuffer().free();
+                header.getByteBuffer().close();
             }
-            trailer.free();
+            trailer.close();
             header = null;
             trailer = null;
 
@@ -586,14 +696,20 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
             }
         } finally {
             if(header != null && header.getByteBuffer() != null) {
-                header.getByteBuffer().free();
+                header.getByteBuffer().close();
+                header = null;
             }
             if(trailer != null) {
-                trailer.free();
+                trailer.close();
+                trailer = null;
             }
-            if(buffer != null) {
-                buffer.free();
-                buffer = null;
+            if(body != null) {
+                body.close();
+                body = null;
+            }
+            if(writeBuffer != null) {
+                writeBuffer.close();
+                writeBuffer = null;
             }
         }
     }
@@ -616,5 +732,9 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
 
     public boolean isBroken() {
         return broken;
+    }
+
+    public boolean isBufferFull() {
+        return bufferFull;
     }
 }

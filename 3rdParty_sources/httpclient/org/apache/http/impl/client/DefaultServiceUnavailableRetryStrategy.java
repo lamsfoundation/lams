@@ -32,10 +32,11 @@ import org.apache.http.HttpStatus;
 import org.apache.http.annotation.Immutable;
 import org.apache.http.client.ServiceUnavailableRetryStrategy;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.Args;
 
 /**
  * Default implementation of the {@link ServiceUnavailableRetryStrategy} interface.
- * that retries <code>503</code> (Service Unavailable) responses for a fixed number of times
+ * that retries {@code 503} (Service Unavailable) responses for a fixed number of times
  * at a fixed interval.
  *
  * @since 4.2
@@ -55,14 +56,10 @@ public class DefaultServiceUnavailableRetryStrategy implements ServiceUnavailabl
      */
     private final long retryInterval;
 
-    public DefaultServiceUnavailableRetryStrategy(int maxRetries, int retryInterval) {
+    public DefaultServiceUnavailableRetryStrategy(final int maxRetries, final int retryInterval) {
         super();
-        if (maxRetries < 1) {
-            throw new IllegalArgumentException("MaxRetries must be greater than 1");
-        }
-        if (retryInterval < 1) {
-            throw new IllegalArgumentException("Retry interval must be greater than 1");
-        }
+        Args.positive(maxRetries, "Max retries");
+        Args.positive(retryInterval, "Retry interval");
         this.maxRetries = maxRetries;
         this.retryInterval = retryInterval;
     }
@@ -71,11 +68,13 @@ public class DefaultServiceUnavailableRetryStrategy implements ServiceUnavailabl
         this(1, 1000);
     }
 
-    public boolean retryRequest(final HttpResponse response, int executionCount, final HttpContext context) {
+    @Override
+    public boolean retryRequest(final HttpResponse response, final int executionCount, final HttpContext context) {
         return executionCount <= maxRetries &&
             response.getStatusLine().getStatusCode() == HttpStatus.SC_SERVICE_UNAVAILABLE;
     }
 
+    @Override
     public long getRetryInterval() {
         return retryInterval;
     }

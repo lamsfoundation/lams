@@ -29,49 +29,46 @@ package org.apache.http.impl.cookie;
 import java.util.Locale;
 
 import org.apache.http.annotation.Immutable;
-
+import org.apache.http.cookie.ClientCookie;
+import org.apache.http.cookie.CommonCookieAttributeHandler;
 import org.apache.http.cookie.Cookie;
-import org.apache.http.cookie.CookieAttributeHandler;
 import org.apache.http.cookie.CookieOrigin;
 import org.apache.http.cookie.CookieRestrictionViolationException;
 import org.apache.http.cookie.MalformedCookieException;
 import org.apache.http.cookie.SetCookie;
+import org.apache.http.util.Args;
 
 /**
  *
  * @since 4.0
  */
 @Immutable
-public class RFC2109DomainHandler implements CookieAttributeHandler {
+public class RFC2109DomainHandler implements CommonCookieAttributeHandler {
 
     public RFC2109DomainHandler() {
         super();
     }
 
+    @Override
     public void parse(final SetCookie cookie, final String value)
             throws MalformedCookieException {
-        if (cookie == null) {
-            throw new IllegalArgumentException("Cookie may not be null");
-        }
+        Args.notNull(cookie, "Cookie");
         if (value == null) {
             throw new MalformedCookieException("Missing value for domain attribute");
         }
-        if (value.trim().length() == 0) {
+        if (value.trim().isEmpty()) {
             throw new MalformedCookieException("Blank value for domain attribute");
         }
         cookie.setDomain(value);
     }
 
+    @Override
     public void validate(final Cookie cookie, final CookieOrigin origin)
             throws MalformedCookieException {
-        if (cookie == null) {
-            throw new IllegalArgumentException("Cookie may not be null");
-        }
-        if (origin == null) {
-            throw new IllegalArgumentException("Cookie origin may not be null");
-        }
+        Args.notNull(cookie, "Cookie");
+        Args.notNull(origin, "Cookie origin");
         String host = origin.getHost();
-        String domain = cookie.getDomain();
+        final String domain = cookie.getDomain();
         if (domain == null) {
             throw new CookieRestrictionViolationException("Cookie domain may not be null");
         }
@@ -96,14 +93,14 @@ public class RFC2109DomainHandler implements CookieAttributeHandler {
                     + domain
                     + "\" violates RFC 2109: domain must contain an embedded dot");
             }
-            host = host.toLowerCase(Locale.ENGLISH);
+            host = host.toLowerCase(Locale.ROOT);
             if (!host.endsWith(domain)) {
                 throw new CookieRestrictionViolationException(
                     "Illegal domain attribute \"" + domain
                     + "\". Domain of origin: \"" + host + "\"");
             }
             // host minus domain may not contain any dots
-            String hostWithoutDomain = host.substring(0, host.length() - domain.length());
+            final String hostWithoutDomain = host.substring(0, host.length() - domain.length());
             if (hostWithoutDomain.indexOf('.') != -1) {
                 throw new CookieRestrictionViolationException("Domain attribute \""
                     + domain
@@ -112,19 +109,21 @@ public class RFC2109DomainHandler implements CookieAttributeHandler {
         }
     }
 
+    @Override
     public boolean match(final Cookie cookie, final CookieOrigin origin) {
-        if (cookie == null) {
-            throw new IllegalArgumentException("Cookie may not be null");
-        }
-        if (origin == null) {
-            throw new IllegalArgumentException("Cookie origin may not be null");
-        }
-        String host = origin.getHost();
-        String domain = cookie.getDomain();
+        Args.notNull(cookie, "Cookie");
+        Args.notNull(origin, "Cookie origin");
+        final String host = origin.getHost();
+        final String domain = cookie.getDomain();
         if (domain == null) {
             return false;
         }
         return host.equals(domain) || (domain.startsWith(".") && host.endsWith(domain));
+    }
+
+    @Override
+    public String getAttributeName() {
+        return ClientCookie.DOMAIN_ATTR;
     }
 
 }

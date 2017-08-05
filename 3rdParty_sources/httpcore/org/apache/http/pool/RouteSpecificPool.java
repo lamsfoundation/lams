@@ -1,20 +1,21 @@
 /*
  * ====================================================================
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  * ====================================================================
  *
  * This software consists of voluntary contributions made by many
@@ -23,7 +24,6 @@
  * <http://www.apache.org/>.
  *
  */
-
 package org.apache.http.pool;
 
 import java.util.HashSet;
@@ -32,6 +32,8 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.util.Args;
+import org.apache.http.util.Asserts;
 
 @NotThreadSafe
 abstract class RouteSpecificPool<T, C, E extends PoolEntry<T, C>> {
@@ -74,9 +76,9 @@ abstract class RouteSpecificPool<T, C, E extends PoolEntry<T, C>> {
     public E getFree(final Object state) {
         if (!this.available.isEmpty()) {
             if (state != null) {
-                Iterator<E> it = this.available.iterator();
+                final Iterator<E> it = this.available.iterator();
                 while (it.hasNext()) {
-                    E entry = it.next();
+                    final E entry = it.next();
                     if (state.equals(entry.getState())) {
                         it.remove();
                         this.leased.add(entry);
@@ -84,9 +86,9 @@ abstract class RouteSpecificPool<T, C, E extends PoolEntry<T, C>> {
                     }
                 }
             }
-            Iterator<E> it = this.available.iterator();
+            final Iterator<E> it = this.available.iterator();
             while (it.hasNext()) {
-                E entry = it.next();
+                final E entry = it.next();
                 if (entry.getState() == null) {
                     it.remove();
                     this.leased.add(entry);
@@ -106,9 +108,7 @@ abstract class RouteSpecificPool<T, C, E extends PoolEntry<T, C>> {
     }
 
     public boolean remove(final E entry) {
-        if (entry == null) {
-            throw new IllegalArgumentException("Pool entry may not be null");
-        }
+        Args.notNull(entry, "Pool entry");
         if (!this.available.remove(entry)) {
             if (!this.leased.remove(entry)) {
                 return false;
@@ -117,22 +117,17 @@ abstract class RouteSpecificPool<T, C, E extends PoolEntry<T, C>> {
         return true;
     }
 
-    public void free(final E entry, boolean reusable) {
-        if (entry == null) {
-            throw new IllegalArgumentException("Pool entry may not be null");
-        }
-        boolean found = this.leased.remove(entry);
-        if (!found) {
-            throw new IllegalStateException("Entry " + entry +
-                    " has not been leased from this pool");
-        }
+    public void free(final E entry, final boolean reusable) {
+        Args.notNull(entry, "Pool entry");
+        final boolean found = this.leased.remove(entry);
+        Asserts.check(found, "Entry %s has not been leased from this pool", entry);
         if (reusable) {
             this.available.addFirst(entry);
         }
     }
 
     public E add(final C conn) {
-        E entry = createEntry(conn);
+        final E entry = createEntry(conn);
         this.leased.add(entry);
         return entry;
     }
@@ -149,22 +144,23 @@ abstract class RouteSpecificPool<T, C, E extends PoolEntry<T, C>> {
     }
 
     public void unqueue(final PoolEntryFuture<E> future) {
-        if (future == null)
+        if (future == null) {
             return;
+        }
 
         this.pending.remove(future);
     }
 
     public void shutdown() {
-        for (PoolEntryFuture<E> future: this.pending) {
+        for (final PoolEntryFuture<E> future: this.pending) {
             future.cancel(true);
         }
         this.pending.clear();
-        for (E entry: this.available) {
+        for (final E entry: this.available) {
             entry.close();
         }
         this.available.clear();
-        for (E entry: this.leased) {
+        for (final E entry: this.leased) {
             entry.close();
         }
         this.leased.clear();
@@ -172,7 +168,7 @@ abstract class RouteSpecificPool<T, C, E extends PoolEntry<T, C>> {
 
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
         buffer.append("[route: ");
         buffer.append(this.route);
         buffer.append("][leased: ");

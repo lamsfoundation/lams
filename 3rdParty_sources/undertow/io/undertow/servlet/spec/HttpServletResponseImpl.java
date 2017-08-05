@@ -120,13 +120,19 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
             //not 100% sure this is the correct action
             return;
         }
+        ServletRequestContext src = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
         if (responseStarted()) {
+            if(src.getErrorCode() > 0) {
+                return; //error already set
+            }
             throw UndertowServletMessages.MESSAGES.responseAlreadyCommited();
+        }
+        if(servletContext.getDeployment().getDeploymentInfo().isSendCustomReasonPhraseOnError()) {
+            exchange.setReasonPhrase(msg);
         }
         writer = null;
         responseState = ResponseState.NONE;
-        exchange.setResponseCode(sc);
-        ServletRequestContext src = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+        exchange.setStatusCode(sc);
         if(src.isRunningInsideHandler()) {
             //all we do is set the error on the context, we handle it when the request is returned
             treatAsCommitted = true;
@@ -138,6 +144,8 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
     }
 
     public void doErrorDispatch(int sc, String error) throws IOException {
+        writer = null;
+        responseState = ResponseState.NONE;
         resetBuffer();
         treatAsCommitted = false;
         final String location = servletContext.getDeployment().getErrorPages().getErrorLocation(sc);
@@ -209,7 +217,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         if(name == null) {
             throw UndertowServletMessages.MESSAGES.headerNameWasNull();
         }
-        setHeader(new HttpString(name), value);
+        setHeader(HttpString.tryFromString(name), value);
     }
 
 
@@ -232,7 +240,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         if(name == null) {
             throw UndertowServletMessages.MESSAGES.headerNameWasNull();
         }
-        addHeader(new HttpString(name), value);
+        addHeader(HttpString.tryFromString(name), value);
     }
 
     public void addHeader(final HttpString name, final String value) {
@@ -267,17 +275,20 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         if (responseStarted()) {
             return;
         }
-        exchange.setResponseCode(sc);
+        exchange.setStatusCode(sc);
     }
 
     @Override
     public void setStatus(final int sc, final String sm) {
         setStatus(sc);
+        if(!insideInclude && servletContext.getDeployment().getDeploymentInfo().isSendCustomReasonPhraseOnError()) {
+            exchange.setReasonPhrase(sm);
+        }
     }
 
     @Override
     public int getStatus() {
-        return exchange.getResponseCode();
+        return exchange.getStatusCode();
     }
 
     @Override
@@ -366,7 +377,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         if (insideInclude || responseStarted() || writer != null || isCommitted()) {
             return;
         }
-        charsetSet = true;
+        charsetSet = charset != null;
         this.charset = charset;
         if (contentType != null) {
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, getContentType());
@@ -408,51 +419,21 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         if (type == null || insideInclude || responseStarted()) {
             return;
         }
-        contentType = type;
-        int split = type.indexOf(";");
-        if (split != -1) {
-            int pos = type.indexOf("charset=");
-            if (pos != -1) {
-                int i = pos + "charset=".length();
-                do {
-                    char c = type.charAt(i);
-                    if (c == ' ' || c == '\t' || c == ';') {
-                        break;
-                    }
-                    ++i;
-                } while (i < type.length());
-                if (writer == null && !isCommitted()) {
-                    charsetSet = true;
-                    //we only change the charset if the writer has not been retrieved yet
-                    this.charset = type.substring(pos + "charset=".length(), i);
-                    //it is valid for the charset to be enclosed in quotes
-                    if (this.charset.startsWith("\"") && this.charset.endsWith("\"") && this.charset.length() > 1) {
-                        this.charset = this.charset.substring(1, this.charset.length() - 1);
-                    }
-                }
-                int charsetStart = pos;
-                while (type.charAt(--charsetStart) != ';' && charsetStart > 0) {
-                }
-                StringBuilder contentTypeBuilder = new StringBuilder();
-                contentTypeBuilder.append(type.substring(0, charsetStart));
-                if (i != type.length()) {
-                    contentTypeBuilder.append(type.substring(i));
-                }
-                contentType = contentTypeBuilder.toString();
-            }
-            //strip any trailing semicolon
-            for (int i = contentType.length() - 1; i >= 0; --i) {
-                char c = contentType.charAt(i);
-                if (c == ' ' || c == '\t') {
-                    continue;
-                }
-                if (c == ';') {
-                    contentType = contentType.substring(0, i);
-                }
-                break;
-            }
+        ContentTypeInfo ct = servletContext.parseContentType(type);
+        contentType = ct.getContentType();
+        boolean useCharset = false;
+        if(ct.getCharset() != null && writer == null && !isCommitted()) {
+            charset = ct.getCharset();
+            charsetSet = true;
+            useCharset = true;
         }
-        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, getContentType());
+        if(useCharset || !charsetSet) {
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, ct.getHeader());
+        } else if(ct.getCharset() == null) {
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, ct.getHeader() + "; charset=" + charset);
+        }else {
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, ct.getContentType() + "; charset=" + charset);
+        }
     }
 
     @Override
@@ -530,7 +511,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         writer = null;
         responseState = ResponseState.NONE;
         exchange.getResponseHeaders().clear();
-        exchange.setResponseCode(StatusCodes.OK);
+        exchange.setStatusCode(StatusCodes.OK);
         treatAsCommitted = false;
     }
 
@@ -575,12 +556,13 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         if (responseDone || treatAsCommitted) {
             return;
         }
-        servletContext.updateSessionAccessTime(exchange);
         responseDone = true;
         try {
             closeStreamAndWriter();
         } catch (IOException e) {
             UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+        } finally {
+            servletContext.updateSessionAccessTime(exchange);
         }
     }
 
@@ -703,6 +685,8 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         final HttpSession session = hreq.getSession(false);
         if (session == null) {
             return false;
+        } else if(hreq.isRequestedSessionIdFromCookie()) {
+            return false;
         } else if (!hreq.isRequestedSessionIdFromURL() && !session.isNew()) {
             return false;
         }
@@ -765,7 +749,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         return contentLength;
     }
 
-    public static enum ResponseState {
+    public enum ResponseState {
         NONE,
         STREAM,
         WRITER

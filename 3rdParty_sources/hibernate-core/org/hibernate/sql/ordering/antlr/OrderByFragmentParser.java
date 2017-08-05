@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008 Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.sql.ordering.antlr;
 
@@ -46,7 +29,7 @@ import antlr.collections.AST;
  * @author Steve Ebersole
  */
 public class OrderByFragmentParser extends GeneratedOrderByFragmentParser {
-    private static final Logger LOG = Logger.getLogger(OrderByFragmentParser.class.getName());
+	private static final Logger LOG = Logger.getLogger( OrderByFragmentParser.class.getName() );
 
 	private final TranslationContext context;
 
@@ -63,7 +46,7 @@ public class OrderByFragmentParser extends GeneratedOrderByFragmentParser {
 	}
 
 	@Override
-    protected AST quotedIdentifier(AST ident) {
+	protected AST quotedIdentifier(AST ident) {
 		/*
 		 * Semantic action used during recognition of quoted identifiers (quoted column names)
 		 */
@@ -74,7 +57,7 @@ public class OrderByFragmentParser extends GeneratedOrderByFragmentParser {
 	}
 
 	@Override
-    protected AST quotedString(AST ident) {
+	protected AST quotedString(AST ident) {
 		/*
 		 * Semantic action used during recognition of quoted strings (string literals)
 		 */
@@ -103,19 +86,19 @@ public class OrderByFragmentParser extends GeneratedOrderByFragmentParser {
 		}
 		else {
 			// if function.hasParenthesesIfNoArguments() is true, then assume the node is not a function
-			return ! function.hasParenthesesIfNoArguments();
+			return !function.hasParenthesesIfNoArguments();
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-    protected AST resolveFunction(AST ast) {
+	protected AST resolveFunction(AST ast) {
 		/*
 		 * Semantic action used during recognition of a *known* function
 		 */
 		AST child = ast.getFirstChild();
 		if ( child != null ) {
-			assert "{param list}".equals(  child.getText() );
+			assert "{param list}".equals( child.getText() );
 			child = child.getFirstChild();
 		}
 
@@ -173,7 +156,7 @@ public class OrderByFragmentParser extends GeneratedOrderByFragmentParser {
 	}
 
 	@Override
-    protected AST resolveIdent(AST ident) {
+	protected AST resolveIdent(AST ident) {
 		/*
 		 * Semantic action used during recognition of an identifier.  This identifier might be a column name, it might
 		 * be a property name.
@@ -183,7 +166,7 @@ public class OrderByFragmentParser extends GeneratedOrderByFragmentParser {
 		try {
 			sqlValueReferences = context.getColumnMapper().map( text );
 		}
-		catch( Throwable t ) {
+		catch (Throwable t) {
 			sqlValueReferences = null;
 		}
 
@@ -261,9 +244,9 @@ public class OrderByFragmentParser extends GeneratedOrderByFragmentParser {
 	}
 
 	@Override
-    protected AST postProcessSortSpecification(AST sortSpec) {
+	protected AST postProcessSortSpecification(AST sortSpec) {
 		assert SORT_SPEC == sortSpec.getType();
-		SortSpecification sortSpecification = ( SortSpecification ) sortSpec;
+		SortSpecification sortSpecification = (SortSpecification) sortSpec;
 		AST sortKey = sortSpecification.getSortKey();
 		if ( IDENT_LIST == sortKey.getFirstChild().getType() ) {
 			AST identList = sortKey.getFirstChild();
@@ -299,9 +282,8 @@ public class OrderByFragmentParser extends GeneratedOrderByFragmentParser {
 		if ( orderingSpecification != null ) {
 			sortSpecification.addChild( orderingSpecification );
 		}
-		return ( SortSpecification ) sortSpecification;
+		return (SortSpecification) sortSpecification;
 	}
-
 
 
 	// trace logging ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -314,8 +296,8 @@ public class OrderByFragmentParser extends GeneratedOrderByFragmentParser {
 		if ( inputState.guessing > 0 ) {
 			return;
 		}
-		String prefix = StringHelper.repeat( '-', (traceDepth++ * 2) ) + "-> ";
-		LOG.trace(prefix + ruleName);
+		String prefix = StringHelper.repeat( '-', ( traceDepth++ * 2 ) ) + "-> ";
+		LOG.trace( prefix + ruleName );
 	}
 
 	@Override
@@ -323,8 +305,8 @@ public class OrderByFragmentParser extends GeneratedOrderByFragmentParser {
 		if ( inputState.guessing > 0 ) {
 			return;
 		}
-		String prefix = "<-" + StringHelper.repeat( '-', (--traceDepth * 2) ) + " ";
-		LOG.trace(prefix + ruleName);
+		String prefix = "<-" + StringHelper.repeat( '-', ( --traceDepth * 2 ) ) + " ";
+		LOG.trace( prefix + ruleName );
 	}
 
 	@Override

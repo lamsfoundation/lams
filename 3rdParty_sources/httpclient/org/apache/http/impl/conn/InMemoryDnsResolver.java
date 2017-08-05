@@ -35,9 +35,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.conn.DnsResolver;
+import org.apache.http.util.Args;
 
 /**
- * In-memory DNS resolver implementation.
+ * In-memory {@link DnsResolver} implementation.
  *
  * @since 4.2
  */
@@ -50,7 +51,7 @@ public class InMemoryDnsResolver implements DnsResolver {
      * In-memory collection that will hold the associations between a host name
      * and an array of InetAddress instances.
      */
-    private Map<String, InetAddress[]> dnsMap;
+    private final Map<String, InetAddress[]> dnsMap;
 
     /**
      * Builds a DNS resolver that will resolve the host names against a
@@ -71,20 +72,17 @@ public class InMemoryDnsResolver implements DnsResolver {
      *            host name.
      */
     public void add(final String host, final InetAddress... ips) {
-        if (host == null) {
-            throw new IllegalArgumentException("Host name may not be null");
-        }
-        if (ips == null) {
-            throw new IllegalArgumentException("Array of IP addresses may not be null");
-        }
+        Args.notNull(host, "Host name");
+        Args.notNull(ips, "Array of IP addresses");
         dnsMap.put(host, ips);
     }
 
     /**
      * {@inheritDoc}
      */
-    public InetAddress[] resolve(String host) throws UnknownHostException {
-        InetAddress[] resolvedAddresses = dnsMap.get(host);
+    @Override
+    public InetAddress[] resolve(final String host) throws UnknownHostException {
+        final InetAddress[] resolvedAddresses = dnsMap.get(host);
         if (log.isInfoEnabled()) {
             log.info("Resolving " + host + " to " + Arrays.deepToString(resolvedAddresses));
         }

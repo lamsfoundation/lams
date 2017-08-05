@@ -32,15 +32,15 @@ import java.io.IOException;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpException;
 import org.apache.http.HttpMessage;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestFactory;
-import org.apache.http.RequestLine;
 import org.apache.http.ParseException;
+import org.apache.http.RequestLine;
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.http.io.SessionInputBuffer;
 import org.apache.http.message.LineParser;
 import org.apache.http.message.ParserCursor;
 import org.apache.http.params.HttpParams;
+import org.apache.http.util.Args;
 import org.apache.http.util.CharArrayBuffer;
 
 /**
@@ -55,7 +55,7 @@ import org.apache.http.util.CharArrayBuffer;
  * </ul>
  *
  * @since 4.0
- * 
+ *
  * @deprecated (4.2) use {@link DefaultHttpRequestParser}
  */
 @Deprecated
@@ -71,7 +71,7 @@ public class HttpRequestParser extends AbstractMessageParser<HttpMessage> {
      * @param buffer the session input buffer.
      * @param parser the line parser.
      * @param requestFactory the factory to use to create
-     *    {@link HttpRequest}s.
+     *    {@link org.apache.http.HttpRequest}s.
      * @param params HTTP parameters.
      */
     public HttpRequestParser(
@@ -80,10 +80,7 @@ public class HttpRequestParser extends AbstractMessageParser<HttpMessage> {
             final HttpRequestFactory requestFactory,
             final HttpParams params) {
         super(buffer, parser, params);
-        if (requestFactory == null) {
-            throw new IllegalArgumentException("Request factory may not be null");
-        }
-        this.requestFactory = requestFactory;
+        this.requestFactory = Args.notNull(requestFactory, "Request factory");
         this.lineBuf = new CharArrayBuffer(128);
     }
 
@@ -93,12 +90,12 @@ public class HttpRequestParser extends AbstractMessageParser<HttpMessage> {
         throws IOException, HttpException, ParseException {
 
         this.lineBuf.clear();
-        int i = sessionBuffer.readLine(this.lineBuf);
+        final int i = sessionBuffer.readLine(this.lineBuf);
         if (i == -1) {
             throw new ConnectionClosedException("Client closed connection");
         }
-        ParserCursor cursor = new ParserCursor(0, this.lineBuf.length());
-        RequestLine requestline = this.lineParser.parseRequestLine(this.lineBuf, cursor);
+        final ParserCursor cursor = new ParserCursor(0, this.lineBuf.length());
+        final RequestLine requestline = this.lineParser.parseRequestLine(this.lineBuf, cursor);
         return this.requestFactory.newHttpRequest(requestline);
     }
 

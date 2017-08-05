@@ -37,7 +37,10 @@ import org.apache.http.HttpResponseInterceptor;
  * for {@link HttpProcessor processing}.
  *
  * @since 4.0
+ *
+ * @deprecated (4.3)
  */
+@Deprecated
 public interface HttpResponseInterceptorList {
 
     /**
@@ -69,7 +72,7 @@ public interface HttpResponseInterceptorList {
      *                  0 for first
      *
      * @return  the interceptor at the given index, or
-     *          <code>null</code> if the index is out of range
+     *          {@code null} if the index is out of range
      */
     HttpResponseInterceptor getResponseInterceptor(int index);
 

@@ -35,11 +35,12 @@ import org.apache.http.ProtocolException;
 import org.apache.http.annotation.Immutable;
 import org.apache.http.entity.ContentLengthStrategy;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.Args;
 
 /**
  * The strict implementation of the content length strategy. This class
  * will throw {@link ProtocolException} if it encounters an unsupported
- * transfer encoding or a malformed <code>Content-Length</code> header
+ * transfer encoding or a malformed {@code Content-Length} header
  * value.
  * <p>
  * This class recognizes "chunked" and "identitiy" transfer-coding only.
@@ -49,39 +50,40 @@ import org.apache.http.protocol.HTTP;
 @Immutable
 public class StrictContentLengthStrategy implements ContentLengthStrategy {
 
+    public static final StrictContentLengthStrategy INSTANCE = new StrictContentLengthStrategy();
+
     private final int implicitLen;
-    
+
     /**
-     * Creates <tt>StrictContentLengthStrategy</tt> instance with the given length used per default
+     * Creates {@code StrictContentLengthStrategy} instance with the given length used per default
      * when content length is not explicitly specified in the message.
-     * 
+     *
      * @param implicitLen implicit content length.
-     * 
+     *
      * @since 4.2
      */
-    public StrictContentLengthStrategy(int implicitLen) {
+    public StrictContentLengthStrategy(final int implicitLen) {
         super();
         this.implicitLen = implicitLen;
     }
 
     /**
-     * Creates <tt>StrictContentLengthStrategy</tt> instance. {@link ContentLengthStrategy#IDENTITY} 
+     * Creates {@code StrictContentLengthStrategy} instance. {@link ContentLengthStrategy#IDENTITY}
      * is used per default when content length is not explicitly specified in the message.
      */
     public StrictContentLengthStrategy() {
         this(IDENTITY);
     }
 
+    @Override
     public long determineLength(final HttpMessage message) throws HttpException {
-        if (message == null) {
-            throw new IllegalArgumentException("HTTP message may not be null");
-        }
+        Args.notNull(message, "HTTP message");
         // Although Transfer-Encoding is specified as a list, in practice
         // it is either missing or has the single value "chunked". So we
         // treat it as a single-valued header here.
-        Header transferEncodingHeader = message.getFirstHeader(HTTP.TRANSFER_ENCODING);
+        final Header transferEncodingHeader = message.getFirstHeader(HTTP.TRANSFER_ENCODING);
         if (transferEncodingHeader != null) {
-            String s = transferEncodingHeader.getValue();
+            final String s = transferEncodingHeader.getValue();
             if (HTTP.CHUNK_CODING.equalsIgnoreCase(s)) {
                 if (message.getProtocolVersion().lessEquals(HttpVersion.HTTP_1_0)) {
                     throw new ProtocolException(
@@ -96,16 +98,16 @@ public class StrictContentLengthStrategy implements ContentLengthStrategy {
                         "Unsupported transfer encoding: " + s);
             }
         }
-        Header contentLengthHeader = message.getFirstHeader(HTTP.CONTENT_LEN);
+        final Header contentLengthHeader = message.getFirstHeader(HTTP.CONTENT_LEN);
         if (contentLengthHeader != null) {
-            String s = contentLengthHeader.getValue();
+            final String s = contentLengthHeader.getValue();
             try {
-                long len = Long.parseLong(s);
+                final long len = Long.parseLong(s);
                 if (len < 0) {
                     throw new ProtocolException("Negative content length: " + s);
                 }
                 return len;
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 throw new ProtocolException("Invalid content length: " + s);
             }
         }

@@ -23,6 +23,7 @@ import io.undertow.security.api.NotificationReceiver;
 import io.undertow.security.api.SecurityContext;
 import io.undertow.security.api.SecurityNotification;
 import io.undertow.security.idm.Account;
+import io.undertow.security.idm.IdentityManager;
 import io.undertow.server.ConduitWrapper;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
@@ -32,9 +33,13 @@ import io.undertow.server.session.SessionListener;
 import io.undertow.server.session.SessionManager;
 import io.undertow.util.ConduitFactory;
 import io.undertow.util.Sessions;
+
+import org.jboss.logging.Logger;
 import org.xnio.conduits.StreamSinkConduit;
 
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -45,6 +50,8 @@ import java.util.WeakHashMap;
  * @author Paul Ferraro
  */
 public class SingleSignOnAuthenticationMechanism implements AuthenticationMechanism {
+
+    private static final Logger log = Logger.getLogger(SingleSignOnAuthenticationMechanism.class);
 
     private static final String SSO_SESSION_ATTRIBUTE = SingleSignOnAuthenticationMechanism.class.getName() + ".SSOID";
 
@@ -58,10 +65,21 @@ public class SingleSignOnAuthenticationMechanism implements AuthenticationMechan
     private String path;
     private final SessionInvalidationListener listener = new SessionInvalidationListener();
     private final ResponseListener responseListener = new ResponseListener();
-    private final SingleSignOnManager manager;
+    private final SingleSignOnManager singleSignOnManager;
+    private final IdentityManager identityManager;
 
     public SingleSignOnAuthenticationMechanism(SingleSignOnManager storage) {
-        this.manager = storage;
+        this(storage, null);
+    }
+
+    public SingleSignOnAuthenticationMechanism(SingleSignOnManager storage, IdentityManager identityManager) {
+        this.singleSignOnManager = storage;
+        this.identityManager = identityManager;
+    }
+
+    @SuppressWarnings("deprecation")
+    private IdentityManager getIdentityManager(SecurityContext securityContext) {
+        return identityManager != null ? identityManager : securityContext.getIdentityManager();
     }
 
     @Override
@@ -69,10 +87,17 @@ public class SingleSignOnAuthenticationMechanism implements AuthenticationMechan
         Cookie cookie = exchange.getRequestCookies().get(cookieName);
         if (cookie != null) {
             final String ssoId = cookie.getValue();
-            try (SingleSignOn sso = this.manager.findSingleSignOn(ssoId)) {
+            log.tracef("Found SSO cookie %s", ssoId);
+            try (final SingleSignOn sso = this.singleSignOnManager.findSingleSignOn(ssoId)) {
                 if (sso != null) {
-                    Account verified = securityContext.getIdentityManager().verify(sso.getAccount());
+                    if(log.isTraceEnabled()) {
+                        log.tracef("SSO session with ID: %s found.", ssoId);
+                    }
+                    Account verified = getIdentityManager(securityContext).verify(sso.getAccount());
                     if (verified == null) {
+                        if(log.isTraceEnabled()) {
+                            log.tracef("Account not found. Returning 'not attempted' here.");
+                        }
                         //we return not attempted here to allow other mechanisms to proceed as normal
                         return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
                     }
@@ -83,10 +108,11 @@ public class SingleSignOnAuthenticationMechanism implements AuthenticationMechan
                         @Override
                         public void handleNotification(SecurityNotification notification) {
                             if (notification.getEventType() == SecurityNotification.EventType.LOGGED_OUT) {
-                                manager.removeSingleSignOn(ssoId);
+                                singleSignOnManager.removeSingleSignOn(sso);
                             }
                         }
                     });
+                    log.tracef("Authenticated account %s using SSO", verified.getPrincipal().getName());
                     return AuthenticationMechanismOutcome.AUTHENTICATED;
                 }
             }
@@ -98,7 +124,15 @@ public class SingleSignOnAuthenticationMechanism implements AuthenticationMechan
 
     private void registerSessionIfRequired(SingleSignOn sso, Session session) {
         if (!sso.contains(session)) {
+            if(log.isTraceEnabled()) {
+                log.tracef("Session %s added to SSO %s", session.getId(), sso.getId());
+            }
             sso.add(session);
+        }
+        if(session.getAttribute(SSO_SESSION_ATTRIBUTE) == null) {
+            if(log.isTraceEnabled()) {
+                log.tracef("SSO_SESSION_ATTRIBUTE not found. Creating it with SSO ID %s as value.", sso.getId());
+            }
             session.setAttribute(SSO_SESSION_ATTRIBUTE, sso.getId());
             SessionManager manager = session.getSessionManager();
             if (seenSessionManagers.add(manager)) {
@@ -108,7 +142,7 @@ public class SingleSignOnAuthenticationMechanism implements AuthenticationMechan
     }
 
     private void clearSsoCookie(HttpServerExchange exchange) {
-        exchange.getResponseCookies().put(cookieName, new CookieImpl(cookieName).setMaxAge(0).setHttpOnly(httpOnly).setSecure(secure).setDomain(domain));
+        exchange.getResponseCookies().put(cookieName, new CookieImpl(cookieName).setMaxAge(0).setHttpOnly(httpOnly).setSecure(secure).setDomain(domain).setPath(path));
     }
 
     @Override
@@ -127,7 +161,7 @@ public class SingleSignOnAuthenticationMechanism implements AuthenticationMechan
             SecurityContext sc = exchange.getSecurityContext();
             Account account = sc.getAuthenticatedAccount();
             if (account != null) {
-                try (SingleSignOn sso = manager.createSingleSignOn(account, sc.getMechanismName())) {
+                try (SingleSignOn sso = singleSignOnManager.createSingleSignOn(account, sc.getMechanismName())) {
                     Session session = getSession(exchange);
                     registerSessionIfRequired(sso, session);
                     exchange.getResponseCookies().put(cookieName, new CookieImpl(cookieName, sso.getId()).setHttpOnly(httpOnly).setSecure(secure).setDomain(domain).setPath(path));
@@ -148,20 +182,29 @@ public class SingleSignOnAuthenticationMechanism implements AuthenticationMechan
         public void sessionDestroyed(Session session, HttpServerExchange exchange, SessionDestroyedReason reason) {
             String ssoId = (String) session.getAttribute(SSO_SESSION_ATTRIBUTE);
             if (ssoId != null) {
-                try (SingleSignOn sso = manager.findSingleSignOn(ssoId)) {
+                if(log.isTraceEnabled()) {
+                    log.tracef("Removing SSO ID %s from destroyed session %s.", ssoId, session.getId());
+                }
+                List<Session> sessionsToRemove = new LinkedList<>();
+                try (SingleSignOn sso = singleSignOnManager.findSingleSignOn(ssoId)) {
                     if (sso != null) {
                         sso.remove(session);
                         if (reason == SessionDestroyedReason.INVALIDATED) {
                             for (Session associatedSession : sso) {
-                                associatedSession.invalidate(null);
                                 sso.remove(associatedSession);
+                                sessionsToRemove.add(associatedSession);
                             }
                         }
                         // If there are no more associated sessions, remove the SSO altogether
                         if (!sso.iterator().hasNext()) {
-                            manager.removeSingleSignOn(ssoId);
+                            singleSignOnManager.removeSingleSignOn(sso);
                         }
                     }
+                }
+                // Any consequential session invalidations will trigger this listener recursively,
+                // so make sure we don't attempt to invalidate session until after the sso is removed.
+                for (Session sessionToRemove : sessionsToRemove) {
+                    sessionToRemove.invalidate(null);
                 }
             }
         }

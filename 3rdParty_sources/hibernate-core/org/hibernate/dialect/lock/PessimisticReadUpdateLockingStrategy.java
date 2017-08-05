@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.dialect.lock;
 
@@ -92,7 +75,7 @@ public class PessimisticReadUpdateLockingStrategy implements LockingStrategy {
 		final SessionFactoryImplementor factory = session.getFactory();
 		try {
 			try {
-				final PreparedStatement st = session.getTransactionCoordinator().getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
+				final PreparedStatement st = session.getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
 				try {
 					lockable.getVersionType().nullSafeSet( st, version, 1, session );
 					int offset = 2;
@@ -104,7 +87,7 @@ public class PessimisticReadUpdateLockingStrategy implements LockingStrategy {
 						lockable.getVersionType().nullSafeSet( st, version, offset, session );
 					}
 
-					final int affected = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().executeUpdate( st );
+					final int affected = session.getJdbcCoordinator().getResultSetReturn().executeUpdate( st );
 					// todo:  should this instead check for exactly one row modified?
 					if ( affected < 0 ) {
 						if (factory.getStatistics().isStatisticsEnabled()) {
@@ -115,7 +98,8 @@ public class PessimisticReadUpdateLockingStrategy implements LockingStrategy {
 
 				}
 				finally {
-					session.getTransactionCoordinator().getJdbcCoordinator().release( st );
+					session.getJdbcCoordinator().getResourceRegistry().release( st );
+					session.getJdbcCoordinator().afterStatementExecution();
 				}
 
 			}

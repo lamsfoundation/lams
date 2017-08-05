@@ -23,12 +23,14 @@ import java.net.SocketAddress;
 import java.nio.channels.ClosedChannelException;
 
 import io.undertow.predicate.PredicateBuilder;
+import io.undertow.protocols.http2.HpackException;
 import io.undertow.server.handlers.builder.HandlerBuilder;
 import org.jboss.logging.Messages;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
 /**
@@ -63,13 +65,13 @@ public interface UndertowMessages {
     @Message(id = 9, value = "Path must be specified")
     IllegalArgumentException pathMustBeSpecified();
 
-    @Message(id = 10, value = "Session not found %s")
-    IllegalStateException sessionNotFound(final String session);
+    @Message(id = 10, value = "Session is invalid %s")
+    IllegalStateException sessionIsInvalid(String sessionId);
 
     @Message(id = 11, value = "Session manager must not be null")
     IllegalStateException sessionManagerMustNotBeNull();
 
-    @Message(id = 12, value = "Session manager was not attached to the request. Make sure that the SessionAttachmentHander is installed in the handler chain")
+    @Message(id = 12, value = "Session manager was not attached to the request. Make sure that the SessionAttachmentHandler is installed in the handler chain")
     IllegalStateException sessionManagerNotFound();
 
     @Message(id = 13, value = "Argument %s cannot be null")
@@ -162,7 +164,7 @@ public interface UndertowMessages {
     @Message(id = 44, value = "More than one predicate with name %s. Builder class %s and %s")
     IllegalStateException moreThanOnePredicateWithName(String name, Class<? extends PredicateBuilder> aClass, Class<? extends PredicateBuilder> existing);
 
-    @Message(id = 45, value = "Error parsing predicate string %s:%n%s")
+    @Message(id = 45, value = "Error parsing predicated handler string %s:%n%s")
     IllegalArgumentException errorParsingPredicateString(String reason, String s);
 
     @Message(id = 46, value = "The number of cookies sent exceeded the maximum of %s")
@@ -222,8 +224,8 @@ public interface UndertowMessages {
     @Message(id = 65, value = "SSL must be specified to connect to a https URL")
     IOException sslWasNull();
 
-    @Message(id = 66, value = "Incorrect magic number for AJP packet header")
-    IOException wrongMagicNumber();
+    @Message(id = 66, value = "Incorrect magic number %s for AJP packet header")
+    IOException wrongMagicNumber(int number);
 
     @Message(id = 67, value = "No client cert was provided")
     SSLPeerUnverifiedException peerUnverified();
@@ -241,7 +243,8 @@ public interface UndertowMessages {
     IllegalStateException matcherAlreadyContainsTemplate(String templateString, String templateString1);
 
     @Message(id = 72, value = "Failed to decode url %s to charset %s")
-    IllegalArgumentException failedToDecodeURL(String s, String enc);
+    IllegalArgumentException failedToDecodeURL(String s, String enc, @Cause Exception e);
+
 
     @Message(id = 73, value = "Resource change listeners are not supported")
     IllegalArgumentException resourceChangeListenerNotSupported();
@@ -291,11 +294,11 @@ public interface UndertowMessages {
     @Message(id = 88, value = "SPDY control frames cannot have body content")
     IOException controlFrameCannotHaveBodyContent();
 
-    @Message(id = 89, value = "SPDY not supported")
-    IOException spdyNotSupported();
+//    @Message(id = 89, value = "SPDY not supported")
+//    IOException spdyNotSupported();
 
-    @Message(id = 90, value = "Jetty NPN not available")
-    IOException jettyNPNNotAvailable();
+    @Message(id = 90, value = "No ALPN implementation available (tried Jetty ALPN and JDK9)")
+    IOException alpnNotAvailable();
 
     @Message(id = 91, value = "Buffer has already been freed")
     IllegalStateException bufferAlreadyFreed();
@@ -303,8 +306,8 @@ public interface UndertowMessages {
     @Message(id = 92, value = "A SPDY header was too large to fit in a response buffer, if you want to support larger headers please increase the buffer size")
     IllegalStateException headersTooLargeToFitInHeapBuffer();
 
-    @Message(id = 93, value = "A SPDY stream was reset by the remote endpoint")
-    IOException spdyStreamWasReset();
+//    @Message(id = 93, value = "A SPDY stream was reset by the remote endpoint")
+//    IOException spdyStreamWasReset();
 
     @Message(id = 94, value = "Blocking await method called from IO thread. Blocking IO must be dispatched to a worker thread or deadlocks will result.")
     IOException awaitCalledFromIoThread();
@@ -319,7 +322,7 @@ public interface UndertowMessages {
     IllegalStateException ajpRequestAlreadyInProgress();
 
     @Message(id = 98, value = "HTTP ping data must be 8 bytes in length")
-    IllegalArgumentException httpPingDataMustBeLength8();
+    String httpPingDataMustBeLength8();
 
     @Message(id = 99, value = "Received a ping of size other than 8")
     String invalidPingSize();
@@ -345,14 +348,14 @@ public interface UndertowMessages {
     @Message(id = 106, value = "HTTP2 continuation frame received without a corresponding headers or push promise frame")
     IOException http2ContinuationFrameNotExpected();
 
-    //@Message(id = 107, value = "Huffman encoded value in HPACK headers did not end with EOS padding")
-    //HpackException huffmanEncodedHpackValueDidNotEndWithEOS();
+    @Message(id = 107, value = "Huffman encoded value in HPACK headers did not end with EOS padding")
+    HpackException huffmanEncodedHpackValueDidNotEndWithEOS();
 
-    //@Message(id = 108, value = "HPACK variable length integer encoded over too many octects, max is %s")
-    //HpackException integerEncodedOverTooManyOctets(int maxIntegerOctets);
+    @Message(id = 108, value = "HPACK variable length integer encoded over too many octects, max is %s")
+    HpackException integerEncodedOverTooManyOctets(int maxIntegerOctets);
 
-    //@Message(id = 109, value = "Zero is not a valid header table index")
-    //HpackException zeroNotValidHeaderTableIndex();
+    @Message(id = 109, value = "Zero is not a valid header table index")
+    HpackException zeroNotValidHeaderTableIndex();
 
 
     @Message(id = 110, value = "Cannot send 100-Continue, getResponseChannel() has already been called")
@@ -364,6 +367,108 @@ public interface UndertowMessages {
     @Message(id = 112, value = "Only client side can call createStream, if you wish to send a PUSH_PROMISE frame use createPushPromiseStream instead")
     IOException headersStreamCanOnlyBeCreatedByClient();
 
+    @Message(id = 113, value = "Only the server side can send a push promise stream")
+    IOException pushPromiseCanOnlyBeCreatedByServer();
+
     @Message(id = 114, value = "Invalid IP access control rule %s. Format is: [ip-match] allow|deny")
     IllegalArgumentException invalidAclRule(String rule);
+
+    @Message(id = 115, value = "Server received PUSH_PROMISE frame from client")
+    IOException serverReceivedPushPromise();
+
+    @Message(id = 116, value = "CONNECT not supported by this connector")
+    IllegalStateException connectNotSupported();
+
+    @Message(id = 117, value = "Request was not a CONNECT request")
+    IllegalStateException notAConnectRequest();
+
+    @Message(id = 118, value = "Cannot reset buffer, response has already been commited")
+    IllegalStateException cannotResetBuffer();
+
+    @Message(id = 119, value = "HTTP2 via prior knowledge failed")
+    IOException http2PriRequestFailed();
+
+    @Message(id = 120, value = "Out of band responses are not allowed for this connector")
+    IllegalStateException outOfBandResponseNotSupported();
+
+    @Message(id = 121, value = "Session was rejected as the maximum number of sessions (%s) has been hit")
+    IllegalStateException tooManySessions(int maxSessions);
+
+    @Message(id = 122, value = "CONNECT attempt failed as target proxy returned %s")
+    IOException proxyConnectionFailed(int responseCode);
+
+    @Message(id = 123, value = "MCMP message %s rejected due to suspicious characters")
+    RuntimeException mcmpMessageRejectedDueToSuspiciousCharacters(String data);
+
+    @Message(id = 124, value = "renegotiation timed out")
+    IllegalStateException rengotiationTimedOut();
+
+    @Message(id = 125, value = "Request body already read")
+    IllegalStateException requestBodyAlreadyRead();
+
+    @Message(id = 126, value = "Attempted to do blocking IO from the IO thread. This is prohibited as it may result in deadlocks")
+    IllegalStateException blockingIoFromIOThread();
+
+    @Message(id = 127, value = "Response has already been sent")
+    IllegalStateException responseComplete();
+
+    @Message(id = 128, value = "Remote peer closed connection before all data could be read")
+    IOException couldNotReadContentLengthData();
+
+    @Message(id = 129, value = "Failed to send after being safe to send")
+    IllegalStateException failedToSendAfterBeingSafe();
+
+    @Message(id = 130, value = "HTTP reason phrase was too large for the buffer. Either provide a smaller message or a bigger buffer. Phrase: %s")
+    IllegalStateException reasonPhraseToLargeForBuffer(String phrase);
+
+    @Message(id = 131, value = "Buffer pool is closed")
+    IllegalStateException poolIsClosed();
+
+    @Message(id = 132, value = "HPACK decode failed")
+    HpackException hpackFailed();
+
+    @Message(id = 133, value = "Request did not contain an Upgrade header, upgrade is not permitted")
+    IllegalStateException notAnUpgradeRequest();
+
+    @Message(id = 134, value = "Authentication mechanism %s requires property %s to be set")
+    IllegalStateException authenticationPropertyNotSet(String name, String header);
+
+    @Message(id = 135, value = "renegotiation failed")
+    IllegalStateException rengotiationFailed();
+
+    @Message(id = 136, value = "User agent charset string must have an even number of items, in the form pattern,charset,pattern,charset,... Instead got: %s")
+    IllegalArgumentException userAgentCharsetMustHaveEvenNumberOfItems(String supplied);
+
+    @Message(id = 137, value = "Could not find the datasource called %s")
+    IllegalArgumentException datasourceNotFound(String ds);
+
+    @Message(id = 138, value = "Server not started")
+    IllegalStateException serverNotStarted();
+
+    @Message(id = 139, value = "Exchange already complete")
+    IllegalStateException exchangeAlreadyComplete();
+
+    @Message(id = 140, value = "Initial SSL/TLS data is not a handshake record")
+    SSLHandshakeException notHandshakeRecord();
+
+    @Message(id = 141, value = "Initial SSL/TLS handshake record is invalid")
+    SSLHandshakeException invalidHandshakeRecord();
+
+    @Message(id = 142, value = "Initial SSL/TLS handshake spans multiple records")
+    SSLHandshakeException multiRecordSSLHandshake();
+
+    @Message(id = 143, value = "Expected \"client hello\" record")
+    SSLHandshakeException expectedClientHello();
+
+    @Message(id = 144, value = "Expected server hello")
+    SSLHandshakeException expectedServerHello();
+
+    @Message(id = 145, value = "Too many redirects")
+    IOException tooManyRedirects(@Cause IOException exception);
+
+    @Message(id = 146, value = "HttpServerExchange cannot have both async IO resumed and dispatch() called in the same cycle")
+    IllegalStateException resumedAndDispatched();
+
+    @Message(id = 147, value = "No host header in a HTTP/1.1 request")
+    IOException noHostInHttp11Request();
 }

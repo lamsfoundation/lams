@@ -1,33 +1,14 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cfg;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Connection;
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -35,6 +16,7 @@ import java.util.Properties;
 import org.hibernate.HibernateException;
 import org.hibernate.Version;
 import org.hibernate.bytecode.spi.BytecodeProvider;
+import org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.ConfigHelper;
 import org.hibernate.internal.util.config.ConfigurationHelper;
@@ -177,7 +159,6 @@ public final class Environment implements AvailableSettings {
 	private static final boolean JVM_HAS_TIMESTAMP_BUG;
 
 	private static final Properties GLOBAL_PROPERTIES;
-	private static final Map<Integer,String> ISOLATION_LEVELS;
 
 	private static final Map OBSOLETE_PROPERTIES = new HashMap();
 	private static final Map RENAMED_PROPERTIES = new HashMap();
@@ -206,13 +187,6 @@ public final class Environment implements AvailableSettings {
 	static {
 		Version.logVersion();
 
-		Map<Integer,String> temp = new HashMap<Integer,String>();
-		temp.put( Connection.TRANSACTION_NONE, "NONE" );
-		temp.put( Connection.TRANSACTION_READ_UNCOMMITTED, "READ_UNCOMMITTED" );
-		temp.put( Connection.TRANSACTION_READ_COMMITTED, "READ_COMMITTED" );
-		temp.put( Connection.TRANSACTION_REPEATABLE_READ, "REPEATABLE_READ" );
-		temp.put( Connection.TRANSACTION_SERIALIZABLE, "SERIALIZABLE" );
-		ISOLATION_LEVELS = Collections.unmodifiableMap( temp );
 		GLOBAL_PROPERTIES = new Properties();
 		//Set USE_REFLECTION_OPTIMIZER to false to fix HHH-227
 		GLOBAL_PROPERTIES.setProperty( USE_REFLECTION_OPTIMIZER, Boolean.FALSE.toString() );
@@ -331,14 +305,11 @@ public final class Environment implements AvailableSettings {
 	}
 
 	/**
-	 * Get the name of a JDBC transaction isolation level
-	 *
-	 * @see java.sql.Connection
-	 * @param isolation as defined by <tt>java.sql.Connection</tt>
-	 * @return a human-readable name
+	 * @deprecated Use {@link ConnectionProviderInitiator#toIsolationNiceName} instead
 	 */
+	@Deprecated
 	public static String isolationLevelToString(int isolation) {
-		return ISOLATION_LEVELS.get( isolation );
+		return ConnectionProviderInitiator.toIsolationNiceName( isolation );
 	}
 
 	public static BytecodeProvider buildBytecodeProvider(Properties properties) {

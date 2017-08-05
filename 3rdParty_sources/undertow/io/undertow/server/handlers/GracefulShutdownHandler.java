@@ -31,9 +31,9 @@ import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 /**
  * Handler that allows for graceful server shutdown. Basically it provides a way to prevent the server from
  * accepting new requests, and wait for existing requests to complete.
- * <p/>
+ * <p>
  * The handler itself does not shut anything down.
- * <p/>
+ * <p>
  * Import: The thread safety semantics of the handler are very important. Don't touch anything unless you know
  * what you are doing.
  *
@@ -61,7 +61,7 @@ public class GracefulShutdownHandler implements HttpHandler {
         activeRequestsUpdater.incrementAndGet(this);
         if (shutdown) {
             decrementRequests();
-            exchange.setResponseCode(StatusCodes.SERVICE_UNAVAILABLE);
+            exchange.setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);
             exchange.endExchange();
             return;
         }

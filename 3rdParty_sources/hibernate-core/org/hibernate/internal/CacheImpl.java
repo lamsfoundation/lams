@@ -1,42 +1,19 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.internal;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import org.hibernate.HibernateException;
-import org.hibernate.cache.spi.CacheKey;
+import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.cache.spi.QueryCache;
 import org.hibernate.cache.spi.Region;
 import org.hibernate.cache.spi.RegionFactory;
 import org.hibernate.cache.spi.UpdateTimestampsCache;
-import org.hibernate.cfg.Settings;
+import org.hibernate.cache.spi.access.CollectionRegionAccessStrategy;
+import org.hibernate.cache.spi.access.EntityRegionAccessStrategy;
 import org.hibernate.engine.spi.CacheImplementor;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.internal.util.collections.CollectionHelper;
@@ -44,18 +21,20 @@ import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.pretty.MessageHelper;
 
-import org.jboss.logging.Logger;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author Strong Liu <stliu@hibernate.org>
  */
 public class CacheImpl implements CacheImplementor {
-	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
-			CoreMessageLogger.class,
-			CacheImpl.class.getName()
-	);
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( CacheImpl.class );
+
 	private final SessionFactoryImplementor sessionFactory;
-	private final Settings settings;
+	private final SessionFactoryOptions settings;
 	private final transient QueryCache queryCache;
 	private final transient RegionFactory regionFactory;
 	private final transient UpdateTimestampsCache updateTimestampsCache;
@@ -64,9 +43,9 @@ public class CacheImpl implements CacheImplementor {
 
 	public CacheImpl(SessionFactoryImplementor sessionFactory) {
 		this.sessionFactory = sessionFactory;
-		this.settings = sessionFactory.getSettings();
+		this.settings = sessionFactory.getSessionFactoryOptions();
 		//todo should get this from service registry
-		this.regionFactory = settings.getRegionFactory();
+		this.regionFactory = settings.getServiceRegistry().getService( RegionFactory.class );
 		regionFactory.start( settings, sessionFactory.getProperties() );
 		if ( settings.isQueryCacheEnabled() ) {
 			updateTimestampsCache = new UpdateTimestampsCache(
@@ -95,8 +74,14 @@ public class CacheImpl implements CacheImplementor {
 	@Override
 	public boolean containsEntity(String entityName, Serializable identifier) {
 		EntityPersister p = sessionFactory.getEntityPersister( entityName );
-		return p.hasCache() &&
-				p.getCacheAccessStrategy().getRegion().contains( buildCacheKey( identifier, p ) );
+		if ( p.hasCache() ) {
+			EntityRegionAccessStrategy cache = p.getCacheAccessStrategy();
+			Object key = cache.generateCacheKey( identifier, p, sessionFactory, null ); // have to assume non tenancy
+			return cache.getRegion().contains( key );
+		}
+		else {
+			return false;
+		}
 	}
 
 	@Override
@@ -114,18 +99,10 @@ public class CacheImpl implements CacheImplementor {
 						MessageHelper.infoString( p, identifier, sessionFactory )
 				);
 			}
-			p.getCacheAccessStrategy().evict( buildCacheKey( identifier, p ) );
+			EntityRegionAccessStrategy cache = p.getCacheAccessStrategy();
+			Object key = cache.generateCacheKey( identifier, p, sessionFactory, null ); // have to assume non tenancy
+			cache.evict( key );
 		}
-	}
-
-	private CacheKey buildCacheKey(Serializable identifier, EntityPersister p) {
-		return new CacheKey(
-				identifier,
-				p.getIdentifierType(),
-				p.getRootEntityName(),
-				null,                         // have to assume non tenancy
-				sessionFactory
-		);
 	}
 
 	@Override
@@ -177,8 +154,14 @@ public class CacheImpl implements CacheImplementor {
 	@Override
 	public boolean containsCollection(String role, Serializable ownerIdentifier) {
 		CollectionPersister p = sessionFactory.getCollectionPersister( role );
-		return p.hasCache() &&
-				p.getCacheAccessStrategy().getRegion().contains( buildCacheKey( ownerIdentifier, p ) );
+		if ( p.hasCache() ) {
+			CollectionRegionAccessStrategy cache = p.getCacheAccessStrategy();
+			Object key = cache.generateCacheKey( ownerIdentifier, p, sessionFactory, null ); // have to assume non tenancy
+			return cache.getRegion().contains( key );
+		}
+		else {
+			return false;
+		}
 	}
 
 	@Override
@@ -191,19 +174,10 @@ public class CacheImpl implements CacheImplementor {
 						MessageHelper.collectionInfoString( p, ownerIdentifier, sessionFactory )
 				);
 			}
-			CacheKey cacheKey = buildCacheKey( ownerIdentifier, p );
-			p.getCacheAccessStrategy().evict( cacheKey );
+			CollectionRegionAccessStrategy cache = p.getCacheAccessStrategy();
+			Object key = cache.generateCacheKey( ownerIdentifier, p, sessionFactory, null ); // have to assume non tenancy
+			cache.evict( key );
 		}
-	}
-
-	private CacheKey buildCacheKey(Serializable ownerIdentifier, CollectionPersister p) {
-		return new CacheKey(
-				ownerIdentifier,
-				p.getKeyType(),
-				p.getRole(),
-				null,                        // have to assume non tenancy
-				sessionFactory
-		);
 	}
 
 	@Override
@@ -226,15 +200,20 @@ public class CacheImpl implements CacheImplementor {
 
 	@Override
 	public boolean containsQuery(String regionName) {
-		return queryCaches.containsKey( regionName );
+		if ( sessionFactory.getSessionFactoryOptions().isQueryCacheEnabled() ) {
+			return queryCaches.containsKey(regionName);
+		}
+		else {
+			return false;
+		}
 	}
 
 	@Override
 	public void evictDefaultQueryRegion() {
-		if ( sessionFactory.getSettings().isQueryCacheEnabled() ) {
-            if ( LOG.isDebugEnabled() ) {
-                LOG.debug( "Evicting default query region cache." );
-            }
+		if ( sessionFactory.getSessionFactoryOptions().isQueryCacheEnabled() ) {
+			if ( LOG.isDebugEnabled() ) {
+				LOG.debug( "Evicting default query region cache." );
+			}
 			sessionFactory.getQueryCache().clear();
 		}
 	}
@@ -246,13 +225,13 @@ public class CacheImpl implements CacheImplementor {
 					"Region-name cannot be null (use Cache#evictDefaultQueryRegion to evict the default query cache)"
 			);
 		}
-		if ( sessionFactory.getSettings().isQueryCacheEnabled() ) {
+		if ( sessionFactory.getSessionFactoryOptions().isQueryCacheEnabled() ) {
 			QueryCache namedQueryCache = queryCaches.get( regionName );
 			// TODO : cleanup entries in queryCaches + allCacheRegions ?
 			if ( namedQueryCache != null ) {
-                if ( LOG.isDebugEnabled() ) {
-                    LOG.debugf( "Evicting query cache, region: %s", regionName );
-                }
+				if ( LOG.isDebugEnabled() ) {
+					LOG.debugf( "Evicting query cache, region: %s", regionName );
+				}
 				namedQueryCache.clear();
 			}
 		}
@@ -261,13 +240,13 @@ public class CacheImpl implements CacheImplementor {
 	@Override
 	public void evictQueryRegions() {
 		evictDefaultQueryRegion();
-		
+
 		if ( CollectionHelper.isEmpty( queryCaches ) ) {
 			return;
 		}
-        if ( LOG.isDebugEnabled() ) {
-            LOG.debug( "Evicting cache of all query regions." );
-        }
+		if ( LOG.isDebugEnabled() ) {
+			LOG.debug( "Evicting cache of all query regions." );
+		}
 		for ( QueryCache queryCache : queryCaches.values() ) {
 			queryCache.clear();
 		}
@@ -278,9 +257,7 @@ public class CacheImpl implements CacheImplementor {
 		if ( settings.isQueryCacheEnabled() ) {
 			queryCache.destroy();
 
-			Iterator iter = queryCaches.values().iterator();
-			while ( iter.hasNext() ) {
-				QueryCache cache = (QueryCache) iter.next();
+			for ( QueryCache cache : queryCaches.values() ) {
 				cache.destroy();
 			}
 			updateTimestampsCache.destroy();
@@ -306,7 +283,7 @@ public class CacheImpl implements CacheImplementor {
 
 		QueryCache currentQueryCache = queryCaches.get( regionName );
 		if ( currentQueryCache == null ) {
-			synchronized ( allCacheRegions ) {
+			synchronized (allCacheRegions) {
 				currentQueryCache = queryCaches.get( regionName );
 				if ( currentQueryCache == null ) {
 					currentQueryCache = settings.getQueryCacheFactory()
@@ -354,17 +331,17 @@ public class CacheImpl implements CacheImplementor {
 		return allCacheRegions.get( regionName );
 	}
 
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({"unchecked"})
 	@Override
 	public Map<String, Region> getAllSecondLevelCacheRegions() {
-		return new HashMap<String,Region>( allCacheRegions );
+		return new HashMap<String, Region>( allCacheRegions );
 	}
 
 	@Override
 	public RegionFactory getRegionFactory() {
 		return regionFactory;
 	}
-	
+
 	@Override
 	public void evictAllRegions() {
 		evictCollectionRegions();

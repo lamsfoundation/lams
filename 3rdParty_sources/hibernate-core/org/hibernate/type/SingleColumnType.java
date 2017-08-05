@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.type;
 
@@ -31,20 +14,17 @@ import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
 
 /**
- * Provide convenient methods for binding and extracting values for use with {@link BasicType}.  Most of this
- * is copied from the (now deprecated) {@link NullableType}.
- * <p/>
- * Glaring omission are the forms that do not take
+ * Provide convenient methods for binding and extracting values for use with {@link BasicType}.
  *
  * @author Steve Ebersole
  */
 public interface SingleColumnType<T> extends Type {
 
-	public int sqlType();
+	int sqlType();
 
-	public String toString(T value) throws HibernateException;
+	String toString(T value) throws HibernateException;
 
-	public T fromStringValue(String xml) throws HibernateException;
+	T fromStringValue(String xml) throws HibernateException;
 
 	/**
 	 * Get a column value from a result set by name.
@@ -58,7 +38,7 @@ public interface SingleColumnType<T> extends Type {
 	 * @throws org.hibernate.HibernateException Generally some form of mismatch error.
 	 * @throws java.sql.SQLException Indicates problem making the JDBC call(s).
 	 */
-	public T nullSafeGet(ResultSet rs, String name, SessionImplementor session) throws HibernateException, SQLException;
+	T nullSafeGet(ResultSet rs, String name, SessionImplementor session) throws HibernateException, SQLException;
 
 	/**
 	 * Get a column value from a result set, without worrying about the possibility of null values.
@@ -72,7 +52,7 @@ public interface SingleColumnType<T> extends Type {
 	 * @throws org.hibernate.HibernateException Generally some form of mismatch error.
 	 * @throws java.sql.SQLException Indicates problem making the JDBC call(s).
 	 */
-	public Object get(ResultSet rs, String name, SessionImplementor session) throws HibernateException, SQLException;
+	Object get(ResultSet rs, String name, SessionImplementor session) throws HibernateException, SQLException;
 
 	/**
 	 * Set a parameter value without worrying about the possibility of null
@@ -87,5 +67,5 @@ public interface SingleColumnType<T> extends Type {
 	 * @throws org.hibernate.HibernateException Generally some form of mismatch error.
 	 * @throws java.sql.SQLException Indicates problem making the JDBC call(s).
 	 */
-	public void set(PreparedStatement st, T value, int index, SessionImplementor session) throws HibernateException, SQLException;
+	void set(PreparedStatement st, T value, int index, SessionImplementor session) throws HibernateException, SQLException;
 }

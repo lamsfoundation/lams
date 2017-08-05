@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.id;
 
@@ -36,6 +19,7 @@ import org.hibernate.id.insert.AbstractReturningDelegate;
 import org.hibernate.id.insert.IdentifierGeneratingInsert;
 import org.hibernate.id.insert.InsertGeneratedIdentifierDelegate;
 import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.service.ServiceRegistry;
 import org.hibernate.sql.Insert;
 import org.hibernate.type.Type;
 
@@ -53,31 +37,34 @@ import org.jboss.logging.Logger;
  * are completely disabled.
  *
  * @author Steve Ebersole
+ * @deprecated See deprecation discussion on {@link SequenceGenerator}
  */
+@Deprecated
 public class SequenceIdentityGenerator
 		extends SequenceGenerator
 		implements PostInsertIdentifierGenerator {
 
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
 			CoreMessageLogger.class,
 			SequenceIdentityGenerator.class.getName()
 	);
 
 	@Override
-    public Serializable generate(SessionImplementor s, Object obj) {
+	public Serializable generate(SessionImplementor s, Object obj) {
 		return IdentifierGeneratorHelper.POST_INSERT_INDICATOR;
 	}
 
+	@Override
 	public InsertGeneratedIdentifierDelegate getInsertGeneratedIdentifierDelegate(
 			PostInsertIdentityPersister persister,
-	        Dialect dialect,
-	        boolean isGetGeneratedKeysEnabled) throws HibernateException {
+			Dialect dialect,
+			boolean isGetGeneratedKeysEnabled) throws HibernateException {
 		return new Delegate( persister, dialect, getSequenceName() );
 	}
 
 	@Override
-    public void configure(Type type, Properties params, Dialect dialect) throws MappingException {
-		super.configure( type, params, dialect );
+	public void configure(Type type, Properties params, ServiceRegistry serviceRegistry) throws MappingException {
+		super.configure( type, params, serviceRegistry );
 	}
 
 	public static class Delegate extends AbstractReturningDelegate {
@@ -102,13 +89,14 @@ public class SequenceIdentityGenerator
 		}
 
 		@Override
-        protected PreparedStatement prepare(String insertSQL, SessionImplementor session) throws SQLException {
-			return session.getTransactionCoordinator().getJdbcCoordinator().getStatementPreparer().prepareStatement( insertSQL, keyColumns );
+		protected PreparedStatement prepare(String insertSQL, SessionImplementor session) throws SQLException {
+			return session.getJdbcCoordinator().getStatementPreparer().prepareStatement( insertSQL, keyColumns );
 		}
 
 		@Override
-		protected Serializable executeAndExtract(PreparedStatement insert, SessionImplementor session) throws SQLException {
-						session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().executeUpdate( insert );
+		protected Serializable executeAndExtract(PreparedStatement insert, SessionImplementor session)
+				throws SQLException {
+			session.getJdbcCoordinator().getResultSetReturn().executeUpdate( insert );
 			return IdentifierGeneratorHelper.getGeneratedIdentity(
 					insert.getGeneratedKeys(),
 					getPersister().getRootTableKeyColumnNames()[0],
@@ -123,7 +111,7 @@ public class SequenceIdentityGenerator
 		}
 
 		@Override
-        public Insert setComment(String comment) {
+		public Insert setComment(String comment) {
 			// don't allow comments on these insert statements as comments totally
 			// blow up the Oracle getGeneratedKeys "support" :(
 			LOG.disallowingInsertStatementComment();

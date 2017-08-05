@@ -43,19 +43,19 @@ public final class ExceptionUtils {
     static private final Method INIT_CAUSE_METHOD = getInitCauseMethod();
 
     /**
-     * Returns a <code>Method<code> allowing access to
+     * Returns a {@code Method} allowing access to
      * {@link Throwable#initCause(Throwable) initCause} method of {@link Throwable},
-     * or <code>null</code> if the method
+     * or {@code null} if the method
      * does not exist.
      *
-     * @return A <code>Method<code> for <code>Throwable.initCause</code>, or
-     * <code>null</code> if unavailable.
+     * @return A {@code Method} for {@code Throwable.initCause}, or
+     * {@code null} if unavailable.
      */
     static private Method getInitCauseMethod() {
         try {
-            Class<?>[] paramsClasses = new Class[] { Throwable.class };
+            final Class<?>[] paramsClasses = new Class[] { Throwable.class };
             return Throwable.class.getMethod("initCause", paramsClasses);
-        } catch (NoSuchMethodException e) {
+        } catch (final NoSuchMethodException e) {
             return null;
         }
     }
@@ -66,11 +66,11 @@ public final class ExceptionUtils {
      * @param  throwable The throwable.
      * @param  cause     The cause of the throwable.
      */
-    public static void initCause(Throwable throwable, Throwable cause) {
+    public static void initCause(final Throwable throwable, final Throwable cause) {
         if (INIT_CAUSE_METHOD != null) {
             try {
-                INIT_CAUSE_METHOD.invoke(throwable, new Object[] { cause });
-            } catch (Exception e) {
+                INIT_CAUSE_METHOD.invoke(throwable, cause);
+            } catch (final Exception e) {
                 // Well, with no logging, the only option is to munch the exception
             }
         }

@@ -44,9 +44,10 @@ class LayeredSocketFactoryAdaptor extends SocketFactoryAdaptor implements Layere
         this.factory = factory;
     }
 
+    @Override
     public Socket createSocket(
             final Socket socket,
-            final String host, int port, boolean autoClose) throws IOException, UnknownHostException {
+            final String host, final int port, final boolean autoClose) throws IOException, UnknownHostException {
         return this.factory.createLayeredSocket(socket, host, port, autoClose);
     }
 

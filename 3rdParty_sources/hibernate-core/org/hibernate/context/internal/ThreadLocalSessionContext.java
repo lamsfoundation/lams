@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.context.internal;
 
@@ -43,9 +26,9 @@ import org.hibernate.context.spi.AbstractCurrentSessionContext;
 import org.hibernate.engine.jdbc.LobCreationContext;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.engine.transaction.spi.TransactionContext;
 import org.hibernate.event.spi.EventSource;
 import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 
 import org.jboss.logging.Logger;
 
@@ -81,7 +64,6 @@ public class ThreadLocalSessionContext extends AbstractCurrentSessionContext {
 			Session.class,
 			SessionImplementor.class,
 			EventSource.class,
-			TransactionContext.class,
 			LobCreationContext.class
 	};
 
@@ -220,7 +202,7 @@ public class ThreadLocalSessionContext extends AbstractCurrentSessionContext {
 		if ( orphan != null ) {
 			LOG.alreadySessionBound();
 			try {
-				if ( orphan.getTransaction() != null && orphan.getTransaction().isActive() ) {
+				if ( orphan.getTransaction() != null && orphan.getTransaction().getStatus() == TransactionStatus.ACTIVE ) {
 					try {
 						orphan.getTransaction().rollback();
 					}
@@ -333,7 +315,7 @@ public class ThreadLocalSessionContext extends AbstractCurrentSessionContext {
 					//   but we capture that there simply to doAfterTransactionCompletion the unbind...
 					LOG.tracef( "Allowing invocation [%s] to proceed to real (closed) session", methodName );
 				}
-				else if ( !realSession.getTransaction().isActive() ) {
+				else if ( realSession.getTransaction().getStatus() != TransactionStatus.ACTIVE ) {
 					// limit the methods available if no transaction is active
 					if ( "beginTransaction".equals( methodName )
 							|| "getTransaction".equals( methodName )

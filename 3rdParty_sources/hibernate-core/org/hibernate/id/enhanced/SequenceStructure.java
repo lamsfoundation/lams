@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.id.enhanced;
 
@@ -27,8 +10,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
+import org.hibernate.boot.model.relational.Database;
+import org.hibernate.boot.model.relational.Namespace;
+import org.hibernate.boot.model.relational.QualifiedName;
+import org.hibernate.boot.model.relational.Sequence;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.id.IdentifierGeneratorHelper;
 import org.hibernate.id.IntegralDataTypeHolder;
@@ -47,25 +36,28 @@ public class SequenceStructure implements DatabaseStructure {
 			SequenceStructure.class.getName()
 	);
 
-	private final String sequenceName;
+	private final QualifiedName logicalQualifiedSequenceName;
 	private final int initialValue;
 	private final int incrementSize;
 	private final Class numberType;
-	private final String sql;
+
+
+	private String sequenceName;
+	private String sql;
 	private boolean applyIncrementSizeToSourceValues;
 	private int accessCounter;
 
 	public SequenceStructure(
-			Dialect dialect,
-			String sequenceName,
+			JdbcEnvironment jdbcEnvironment,
+			QualifiedName qualifiedSequenceName,
 			int initialValue,
 			int incrementSize,
 			Class numberType) {
-		this.sequenceName = sequenceName;
+		this.logicalQualifiedSequenceName = qualifiedSequenceName;
+
 		this.initialValue = initialValue;
 		this.incrementSize = incrementSize;
 		this.numberType = numberType;
-		sql = dialect.getSequenceNextValString( sequenceName );
 	}
 
 	@Override
@@ -90,14 +82,18 @@ public class SequenceStructure implements DatabaseStructure {
 
 	@Override
 	public AccessCallback buildCallback(final SessionImplementor session) {
+		if ( sql == null ) {
+			throw new AssertionFailure( "SequenceStyleGenerator's SequenceStructure was not properly initialized" );
+		}
+
 		return new AccessCallback() {
 			@Override
 			public IntegralDataTypeHolder getNextValue() {
 				accessCounter++;
 				try {
-					final PreparedStatement st = session.getTransactionCoordinator().getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
+					final PreparedStatement st = session.getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
 					try {
-						final ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().extract( st );
+						final ResultSet rs = session.getJdbcCoordinator().getResultSetReturn().extract( st );
 						try {
 							rs.next();
 							final IntegralDataTypeHolder value = IdentifierGeneratorHelper.getIntegralDataTypeHolder( numberType );
@@ -109,7 +105,7 @@ public class SequenceStructure implements DatabaseStructure {
 						}
 						finally {
 							try {
-								session.getTransactionCoordinator().getJdbcCoordinator().release( rs, st );
+								session.getJdbcCoordinator().getResourceRegistry().release( rs, st );
 							}
 							catch( Throwable ignore ) {
 								// intentionally empty
@@ -117,7 +113,8 @@ public class SequenceStructure implements DatabaseStructure {
 						}
 					}
 					finally {
-						session.getTransactionCoordinator().getJdbcCoordinator().release( st );
+						session.getJdbcCoordinator().getResourceRegistry().release( st );
+						session.getJdbcCoordinator().afterStatementExecution();
 					}
 
 				}
@@ -140,6 +137,33 @@ public class SequenceStructure implements DatabaseStructure {
 	@Override
 	public void prepare(Optimizer optimizer) {
 		applyIncrementSizeToSourceValues = optimizer.applyIncrementSizeToSourceValues();
+	}
+
+	@Override
+	public void registerExportables(Database database) {
+		final int sourceIncrementSize = applyIncrementSizeToSourceValues ? incrementSize : 1;
+
+
+		final Namespace namespace = database.locateNamespace(
+				logicalQualifiedSequenceName.getCatalogName(),
+				logicalQualifiedSequenceName.getSchemaName()
+		);
+		Sequence sequence = namespace.locateSequence( logicalQualifiedSequenceName.getObjectName() );
+		if ( sequence != null ) {
+			sequence.validate( initialValue, sourceIncrementSize );
+		}
+		else {
+			sequence = namespace.createSequence( logicalQualifiedSequenceName.getObjectName(), initialValue, sourceIncrementSize );
+		}
+
+		final JdbcEnvironment jdbcEnvironment = database.getJdbcEnvironment();
+		final Dialect dialect = jdbcEnvironment.getDialect();
+
+		this.sequenceName = jdbcEnvironment.getQualifiedObjectNameFormatter().format(
+				sequence.getName(),
+				dialect
+		);
+		this.sql = jdbcEnvironment.getDialect().getSequenceNextValString( sequenceName );
 	}
 
 	@Override

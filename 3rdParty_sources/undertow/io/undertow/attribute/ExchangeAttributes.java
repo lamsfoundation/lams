@@ -43,8 +43,8 @@ public class ExchangeAttributes {
         return new CookieAttribute(cookieName);
     }
 
-    public static ExchangeAttribute bytesSent(final String attribute) {
-        return new BytesSentAttribute(attribute);
+    public static ExchangeAttribute bytesSent(boolean dashIfZero) {
+        return new BytesSentAttribute(dashIfZero);
     }
 
     public static ExchangeAttribute dateTime() {
@@ -107,6 +107,10 @@ public class ExchangeAttributes {
         return new ResponseHeaderAttribute(header);
     }
 
+    public static ExchangeAttribute transportProtocol() {
+        return TransportProtocolAttribute.INSTANCE;
+    }
+
     public static ExchangeAttribute threadName() {
         return ThreadNameAttribute.INSTANCE;
     }
@@ -131,4 +135,7 @@ public class ExchangeAttributes {
 
     }
 
+    public static ExchangeAttribute authenticationType() {
+        return AuthenticationTypeExchangeAttribute.INSTANCE;
+    }
 }

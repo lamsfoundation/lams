@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.jdbc.spi;
 
@@ -95,7 +78,7 @@ public class SqlExceptionHelper {
 	 * @param sqlExceptionConverter The converter to use.
 	 */
 	public void setSqlExceptionConverter(SQLExceptionConverter sqlExceptionConverter) {
-		this.sqlExceptionConverter = (sqlExceptionConverter == null ? DEFAULT_CONVERTER : sqlExceptionConverter);
+		this.sqlExceptionConverter = ( sqlExceptionConverter == null ? DEFAULT_CONVERTER : sqlExceptionConverter );
 	}
 
 	// SQLException ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -154,13 +137,13 @@ public class SqlExceptionHelper {
 	/**
 	 * Contract for handling {@link SQLWarning warnings}
 	 */
-	public static interface WarningHandler {
+	public interface WarningHandler {
 		/**
 		 * Should processing be done? Allows short-circuiting if not.
 		 *
 		 * @return True to process warnings, false otherwise.
 		 */
-		public boolean doProcess();
+		boolean doProcess();
 
 		/**
 		 * Prepare for processing of a {@link SQLWarning warning} stack.
@@ -169,14 +152,14 @@ public class SqlExceptionHelper {
 		 *
 		 * @param warning The first warning in the stack.
 		 */
-		public void prepare(SQLWarning warning);
+		void prepare(SQLWarning warning);
 
 		/**
 		 * Handle an individual warning in the stack.
 		 *
 		 * @param warning The warning to handle.
 		 */
-		public void handleWarning(SQLWarning warning);
+		void handleWarning(SQLWarning warning);
 	}
 
 	/**
@@ -237,7 +220,9 @@ public class SqlExceptionHelper {
 	/**
 	 * Static access to the standard handler for logging warnings
 	 */
-	public static final StandardWarningHandler STANDARD_WARNING_HANDLER = new StandardWarningHandler( DEFAULT_WARNING_MSG );
+	public static final StandardWarningHandler STANDARD_WARNING_HANDLER = new StandardWarningHandler(
+			DEFAULT_WARNING_MSG
+	);
 
 	/**
 	 * Generic algorithm to walk the hierarchy of SQLWarnings
@@ -248,7 +233,7 @@ public class SqlExceptionHelper {
 	public void walkWarnings(
 			SQLWarning warning,
 			WarningHandler handler) {
-		if ( warning == null || handler.doProcess() ) {
+		if ( warning == null || !handler.doProcess() ) {
 			return;
 		}
 		handler.prepare( warning );
@@ -268,7 +253,7 @@ public class SqlExceptionHelper {
 	public void logAndClearWarnings(Connection connection) {
 		handleAndClearWarnings( connection, STANDARD_WARNING_HANDLER );
 	}
-	
+
 	public void logAndClearWarnings(Statement statement) {
 		handleAndClearWarnings( statement, STANDARD_WARNING_HANDLER );
 	}
@@ -314,16 +299,16 @@ public class SqlExceptionHelper {
 			Statement statement,
 			WarningHandler handler) {
 		// See HHH-9174.  Statement#getWarnings can be an expensive call for many JDBC libs.  Don't do it unless
-    	// the log level would actually allow a warning to be logged.
-    	if (LOG.isEnabled(Level.WARN)) {
-    		try {
+		// the log level would actually allow a warning to be logged.
+		if ( LOG.isEnabled( Level.WARN ) ) {
+			try {
 				walkWarnings( statement.getWarnings(), handler );
 			}
 			catch (SQLException sqlException) {
 				// workaround for WebLogic
 				LOG.debug( "could not log warnings", sqlException );
 			}
-    	}
+		}
 		try {
 			// Sybase fail if we don't do that, sigh...
 			statement.clearWarnings();

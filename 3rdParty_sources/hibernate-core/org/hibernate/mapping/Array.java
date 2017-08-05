@@ -1,31 +1,15 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.mapping;
 
 import org.hibernate.MappingException;
-import org.hibernate.cfg.Mappings;
-import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
+import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.type.CollectionType;
 import org.hibernate.type.PrimitiveType;
 
@@ -35,39 +19,41 @@ import org.hibernate.type.PrimitiveType;
  * @author Gavin King
  */
 public class Array extends List {
-
 	private String elementClassName;
 
-	public Array(Mappings mappings, PersistentClass owner) {
-		super( mappings, owner );
+	public Array(MetadataImplementor metadata, PersistentClass owner) {
+		super( metadata, owner );
 	}
 
 	public Class getElementClass() throws MappingException {
-		if (elementClassName==null) {
+		if ( elementClassName == null ) {
 			org.hibernate.type.Type elementType = getElement().getType();
-			return isPrimitiveArray() ?
-				( (PrimitiveType) elementType ).getPrimitiveClass() :
-				elementType.getReturnedClass();
+			return isPrimitiveArray()
+					? ( (PrimitiveType) elementType ).getPrimitiveClass()
+					: elementType.getReturnedClass();
 		}
 		else {
 			try {
-				return ReflectHelper.classForName(elementClassName);
+				return getMetadata().getMetadataBuildingOptions()
+						.getServiceRegistry()
+						.getService( ClassLoaderService.class )
+						.classForName( elementClassName );
 			}
-			catch (ClassNotFoundException cnfe) {
-				throw new MappingException(cnfe);
+			catch (ClassLoadingException e) {
+				throw new MappingException( e );
 			}
 		}
 	}
 
 	@Override
-    public CollectionType getDefaultCollectionType() throws MappingException {
-		return getMappings().getTypeResolver()
+	public CollectionType getDefaultCollectionType() throws MappingException {
+		return getMetadata().getTypeResolver()
 				.getTypeFactory()
 				.array( getRole(), getReferencedPropertyName(), getElementClass() );
 	}
 
 	@Override
-    public boolean isArray() {
+	public boolean isArray() {
 		return true;
 	}
 
@@ -77,6 +63,7 @@ public class Array extends List {
 	public String getElementClassName() {
 		return elementClassName;
 	}
+
 	/**
 	 * @param elementClassName The elementClassName to set.
 	 */
@@ -85,7 +72,7 @@ public class Array extends List {
 	}
 
 	@Override
-    public Object accept(ValueVisitor visitor) {
-		return visitor.accept(this);
+	public Object accept(ValueVisitor visitor) {
+		return visitor.accept( this );
 	}
 }

@@ -1,29 +1,13 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal.classic;
+
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.hibernate.QueryException;
@@ -50,7 +34,7 @@ public class FromParser implements Parser {
 	private boolean afterJoinType;
 	private JoinType joinType = JoinType.INNER_JOIN;
 	private boolean afterFetch;
-	
+
 	//support collection member declarations
 	//e.g. "from Customer c, in(c.orders) as o"
 	private boolean memberDeclarations;
@@ -58,7 +42,7 @@ public class FromParser implements Parser {
 	private boolean afterMemberDeclarations;
 	private String collectionName;
 
-	private static final Map<String,JoinType> JOIN_TYPES = new HashMap<String,JoinType>();
+	private static final Map<String, JoinType> JOIN_TYPES = new HashMap<String, JoinType>();
 
 	static {
 		JOIN_TYPES.put( "left", JoinType.LEFT_OUTER_JOIN );
@@ -70,15 +54,19 @@ public class FromParser implements Parser {
 	public void token(String token, QueryTranslatorImpl q) throws QueryException {
 
 		// start by looking for HQL keywords...
-		String lcToken = token.toLowerCase();
+		String lcToken = token.toLowerCase( Locale.ROOT );
 		if ( lcToken.equals( "," ) ) {
-			if ( !( expectingJoin | expectingAs ) ) throw new QueryException( "unexpected token: ," );
+			if ( !( expectingJoin | expectingAs ) ) {
+				throw new QueryException( "unexpected token: ," );
+			}
 			expectingJoin = false;
 			expectingAs = false;
 		}
 		else if ( lcToken.equals( "join" ) ) {
 			if ( !afterJoinType ) {
-				if ( !( expectingJoin | expectingAs ) ) throw new QueryException( "unexpected token: join" );
+				if ( !( expectingJoin | expectingAs ) ) {
+					throw new QueryException( "unexpected token: join" );
+				}
 				// inner joins can be abbreviated to 'join'
 				joinType = JoinType.INNER_JOIN;
 				expectingJoin = false;
@@ -89,8 +77,12 @@ public class FromParser implements Parser {
 			}
 		}
 		else if ( lcToken.equals( "fetch" ) ) {
-			if ( q.isShallowQuery() ) throw new QueryException( QueryTranslator.ERROR_CANNOT_FETCH_WITH_ITERATE );
-			if ( joinType == JoinType.NONE ) throw new QueryException( "unexpected token: fetch" );
+			if ( q.isShallowQuery() ) {
+				throw new QueryException( QueryTranslator.ERROR_CANNOT_FETCH_WITH_ITERATE );
+			}
+			if ( joinType == JoinType.NONE ) {
+				throw new QueryException( "unexpected token: fetch" );
+			}
 			if ( joinType == JoinType.FULL_JOIN || joinType == JoinType.RIGHT_OUTER_JOIN ) {
 				throw new QueryException( "fetch may only be used with inner join or left outer join" );
 			}
@@ -100,55 +92,71 @@ public class FromParser implements Parser {
 			// 'outer' is optional and is ignored
 			if ( !afterJoinType ||
 					( joinType != JoinType.LEFT_OUTER_JOIN && joinType != JoinType.RIGHT_OUTER_JOIN )
-			) {
+					) {
 				throw new QueryException( "unexpected token: outer" );
 			}
 		}
 		else if ( JOIN_TYPES.containsKey( lcToken ) ) {
-			if ( !( expectingJoin | expectingAs ) ) throw new QueryException( "unexpected token: " + token );
+			if ( !( expectingJoin | expectingAs ) ) {
+				throw new QueryException( "unexpected token: " + token );
+			}
 			joinType = JOIN_TYPES.get( lcToken );
 			afterJoinType = true;
 			expectingJoin = false;
 			expectingAs = false;
 		}
 		else if ( lcToken.equals( "class" ) ) {
-			if ( !afterIn ) throw new QueryException( "unexpected token: class" );
-			if ( joinType != JoinType.NONE ) throw new QueryException( "outer or full join must be followed by path expression" );
+			if ( !afterIn ) {
+				throw new QueryException( "unexpected token: class" );
+			}
+			if ( joinType != JoinType.NONE ) {
+				throw new QueryException( "outer or full join must be followed by path expression" );
+			}
 			afterClass = true;
 		}
 		else if ( lcToken.equals( "in" ) ) {
-			if (alias == null ){
+			if ( alias == null ) {
 				memberDeclarations = true;
 				afterMemberDeclarations = false;
 			}
 			else if ( !expectingIn ) {
 				throw new QueryException( "unexpected token: in" );
-			} else {
+			}
+			else {
 				afterIn = true;
 				expectingIn = false;
 			}
 		}
 		else if ( lcToken.equals( "as" ) ) {
-			if ( !expectingAs ) throw new QueryException( "unexpected token: as" );
+			if ( !expectingAs ) {
+				throw new QueryException( "unexpected token: as" );
+			}
 			afterAs = true;
 			expectingAs = false;
 		}
-		else if ( "(".equals( token ) ){
-			if( !memberDeclarations ) throw new QueryException( "unexpected token: (" );
+		else if ( "(".equals( token ) ) {
+			if ( !memberDeclarations ) {
+				throw new QueryException( "unexpected token: (" );
+			}
 			//TODO alias should be null here
 			expectingPathExpression = true;
-			
+
 		}
-		else if ( ")".equals( token ) ){
+		else if ( ")".equals( token ) ) {
 //			memberDeclarations = false;
 //			expectingPathExpression = false;
 			afterMemberDeclarations = true;
 		}
 		else {
-
-			if ( afterJoinType ) throw new QueryException( "join expected: " + token );
-			if ( expectingJoin ) throw new QueryException( "unexpected token: " + token );
-			if ( expectingIn ) throw new QueryException( "in expected: " + token );
+			if ( afterJoinType ) {
+				throw new QueryException( "join expected: " + token );
+			}
+			if ( expectingJoin ) {
+				throw new QueryException( "unexpected token: " + token );
+			}
+			if ( expectingIn ) {
+				throw new QueryException( "in expected: " + token );
+			}
 
 			// now anything that is not a HQL keyword
 
@@ -184,14 +192,20 @@ public class FromParser implements Parser {
 				// process the "old" HQL style where aliases appear _first_
 				// ie. using the IN or IN CLASS constructions
 
-				if ( alias == null ) throw new QueryException( "alias not specified for: " + token );
+				if ( alias == null ) {
+					throw new QueryException( "alias not specified for: " + token );
+				}
 
-				if ( joinType != JoinType.NONE ) throw new QueryException( "outer or full join must be followed by path expression" );
+				if ( joinType != JoinType.NONE ) {
+					throw new QueryException( "outer or full join must be followed by path expression" );
+				}
 
 				if ( afterClass ) {
 					// treat it as a classname
 					Queryable p = q.getEntityPersisterUsingImports( token );
-					if ( p == null ) throw new QueryException( "persister not found: " + token );
+					if ( p == null ) {
+						throw new QueryException( "persister not found: " + token );
+					}
 					q.addFromClass( alias, p );
 				}
 				else {
@@ -199,7 +213,11 @@ public class FromParser implements Parser {
 					peParser.setJoinType( JoinType.INNER_JOIN );
 					peParser.setUseThetaStyleJoin( true );
 					ParserHelper.parse( peParser, q.unalias( token ), ParserHelper.PATH_SEPARATORS, q );
-					if ( !peParser.isCollectionValued() ) throw new QueryException( "path expression did not resolve to collection: " + token );
+					if ( !peParser.isCollectionValued() ) {
+						throw new QueryException(
+								"path expression did not resolve to collection: " + token
+						);
+					}
 					String nm = peParser.addFromCollection( q );
 					q.setAliasName( alias, nm );
 				}
@@ -209,12 +227,14 @@ public class FromParser implements Parser {
 				afterClass = false;
 				expectingJoin = true;
 			}
-			else if( memberDeclarations && expectingPathExpression ){
+			else if ( memberDeclarations && expectingPathExpression ) {
 				expectingAs = true;
 				peParser.setJoinType( JoinType.INNER_JOIN );
 				peParser.setUseThetaStyleJoin( false );
 				ParserHelper.parse( peParser, q.unalias( token ), ParserHelper.PATH_SEPARATORS, q );
-				if ( !peParser.isCollectionValued() ) throw new QueryException( "path expression did not resolve to collection: " + token );
+				if ( !peParser.isCollectionValued() ) {
+					throw new QueryException( "path expression did not resolve to collection: " + token );
+				}
 				collectionName = peParser.addFromCollection( q );
 				expectingPathExpression = false;
 				memberDeclarations = false;
@@ -229,7 +249,9 @@ public class FromParser implements Parser {
 				Queryable p = q.getEntityPersisterUsingImports( token );
 				if ( p != null ) {
 					// starts with the name of a mapped class (new style)
-					if ( joinType != JoinType.NONE ) throw new QueryException( "outer or full join must be followed by path expression" );
+					if ( joinType != JoinType.NONE ) {
+						throw new QueryException( "outer or full join must be followed by path expression" );
+					}
 					entityName = q.createNameFor( p.getEntityName() );
 					q.addFromClass( entityName, p );
 					expectingAs = true;
@@ -292,10 +314,10 @@ public class FromParser implements Parser {
 	}
 
 	public void end(QueryTranslatorImpl q) {
-		if( afterMemberDeclarations ){
+		if ( afterMemberDeclarations ) {
 			//The exception throwned by the AST query translator contains the error token location, respensent by line and colum, 
 			//but it hard to get that info here.
-			throw new QueryException("alias not specified for IN");
+			throw new QueryException( "alias not specified for IN" );
 		}
 	}
 

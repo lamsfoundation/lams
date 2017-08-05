@@ -1,30 +1,14 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cfg;
 import java.util.Map;
 import javax.persistence.OrderColumn;
 
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.mapping.Join;
 
 /**
@@ -50,7 +34,7 @@ public class IndexColumn extends Ejb3Column {
 			String secondaryTableName,
 			Map<String, Join> joins,
 			PropertyHolder propertyHolder,
-			Mappings mappings) {
+			MetadataBuildingContext buildingContext) {
 		super();
 		setImplicit( isImplicit );
 		setSqlType( sqlType );
@@ -65,7 +49,7 @@ public class IndexColumn extends Ejb3Column {
 		setExplicitTableName( secondaryTableName );
 		setPropertyHolder( propertyHolder );
 		setJoins( joins );
-		setMappings( mappings );
+		setBuildingContext( buildingContext );
 		bind();
 	}
 
@@ -84,7 +68,6 @@ public class IndexColumn extends Ejb3Column {
 	 * @param propertyHolder Information about the property
 	 * @param inferredData Yeah, right.  Uh...
 	 * @param secondaryTables Any secondary tables available.
-	 * @param mappings The mappings being built.
 	 *
 	 * @return The index column
 	 */
@@ -93,7 +76,7 @@ public class IndexColumn extends Ejb3Column {
 			PropertyHolder propertyHolder,
 			PropertyData inferredData,
 			Map<String, Join> secondaryTables,
-			Mappings mappings) {
+			MetadataBuildingContext buildingContext) {
 		final IndexColumn column;
 		if ( ann != null ) {
 			final String sqlType = BinderHelper.isEmptyAnnotationValue( ann.columnDefinition() ) ? null : ann.columnDefinition();
@@ -106,15 +89,38 @@ public class IndexColumn extends Ejb3Column {
 //					secondaryTables, propertyHolder, mappings
 //			);
 			column = new IndexColumn(
-					false, sqlType, 0, 0, 0, name, ann.nullable(),
-					false, ann.insertable(), ann.updatable(), /*ann.table()*/null,
-					secondaryTables, propertyHolder, mappings
+					false,
+					sqlType,
+					0,
+					0,
+					0,
+					name,
+					ann.nullable(),
+					false,
+					ann.insertable(),
+					ann.updatable(),
+					/*ann.table()*/null,
+					secondaryTables,
+					propertyHolder,
+					buildingContext
 			);
 		}
 		else {
 			column = new IndexColumn(
-					true, null, 0, 0, 0, null, true,
-					false, true, true, null, null, propertyHolder, mappings
+					true,
+					null,
+					0,
+					0,
+					0,
+					null,
+					true,
+					false,
+					true,
+					true,
+					null,
+					null,
+					propertyHolder,
+					buildingContext
 			);
 		}
 		return column;
@@ -126,7 +132,6 @@ public class IndexColumn extends Ejb3Column {
 	 * @param ann The IndexColumn annotation instance
 	 * @param propertyHolder Information about the property
 	 * @param inferredData Yeah, right.  Uh...
-	 * @param mappings The mappings being built.
 	 *
 	 * @return The index column
 	 */
@@ -134,22 +139,46 @@ public class IndexColumn extends Ejb3Column {
 			org.hibernate.annotations.IndexColumn ann,
 			PropertyHolder propertyHolder,
 			PropertyData inferredData,
-			Mappings mappings) {
+			MetadataBuildingContext buildingContext) {
 		final IndexColumn column;
 		if ( ann != null ) {
 			final String sqlType = BinderHelper.isEmptyAnnotationValue( ann.columnDefinition() ) ? null : ann.columnDefinition();
 			final String name = BinderHelper.isEmptyAnnotationValue( ann.name() ) ? inferredData.getPropertyName() : ann.name();
 			//TODO move it to a getter based system and remove the constructor
 			column = new IndexColumn(
-					false, sqlType, 0, 0, 0, name, ann.nullable(),
-					false, true, true, null, null, propertyHolder, mappings
+					false,
+					sqlType,
+					0,
+					0,
+					0,
+					name,
+					ann.nullable(),
+					false,
+					true,
+					true,
+					null,
+					null,
+					propertyHolder,
+					buildingContext
 			);
 			column.setBase( ann.base() );
 		}
 		else {
 			column = new IndexColumn(
-					true, null, 0, 0, 0, null, true,
-					false, true, true, null, null, propertyHolder, mappings
+					true,
+					null,
+					0,
+					0,
+					0,
+					null,
+					true,
+					false,
+					true,
+					true,
+					null,
+					null,
+					propertyHolder,
+					buildingContext
 			);
 		}
 		return column;

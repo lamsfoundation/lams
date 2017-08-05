@@ -1,28 +1,11 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.sql;
+
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -30,6 +13,7 @@ import org.hibernate.dialect.Dialect;
 
 /**
  * A translated HQL query
+ *
  * @author Gavin King
  */
 public class QuerySelect {
@@ -43,38 +27,39 @@ public class QuerySelect {
 	private String comment;
 	private boolean distinct;
 
-	private static final HashSet DONT_SPACE_TOKENS = new HashSet();
+	private static final HashSet<String> DONT_SPACE_TOKENS = new HashSet<String>();
+
 	static {
 		//dontSpace.add("'");
-		DONT_SPACE_TOKENS.add(".");
-		DONT_SPACE_TOKENS.add("+");
-		DONT_SPACE_TOKENS.add("-");
-		DONT_SPACE_TOKENS.add("/");
-		DONT_SPACE_TOKENS.add("*");
-		DONT_SPACE_TOKENS.add("<");
-		DONT_SPACE_TOKENS.add(">");
-		DONT_SPACE_TOKENS.add("=");
-		DONT_SPACE_TOKENS.add("#");
-		DONT_SPACE_TOKENS.add("~");
-		DONT_SPACE_TOKENS.add("|");
-		DONT_SPACE_TOKENS.add("&");
-		DONT_SPACE_TOKENS.add("<=");
-		DONT_SPACE_TOKENS.add(">=");
-		DONT_SPACE_TOKENS.add("=>");
-		DONT_SPACE_TOKENS.add("=<");
-		DONT_SPACE_TOKENS.add("!=");
-		DONT_SPACE_TOKENS.add("<>");
-		DONT_SPACE_TOKENS.add("!#");
-		DONT_SPACE_TOKENS.add("!~");
-		DONT_SPACE_TOKENS.add("!<");
-		DONT_SPACE_TOKENS.add("!>");
-		DONT_SPACE_TOKENS.add("("); //for MySQL
-		DONT_SPACE_TOKENS.add(")");
+		DONT_SPACE_TOKENS.add( "." );
+		DONT_SPACE_TOKENS.add( "+" );
+		DONT_SPACE_TOKENS.add( "-" );
+		DONT_SPACE_TOKENS.add( "/" );
+		DONT_SPACE_TOKENS.add( "*" );
+		DONT_SPACE_TOKENS.add( "<" );
+		DONT_SPACE_TOKENS.add( ">" );
+		DONT_SPACE_TOKENS.add( "=" );
+		DONT_SPACE_TOKENS.add( "#" );
+		DONT_SPACE_TOKENS.add( "~" );
+		DONT_SPACE_TOKENS.add( "|" );
+		DONT_SPACE_TOKENS.add( "&" );
+		DONT_SPACE_TOKENS.add( "<=" );
+		DONT_SPACE_TOKENS.add( ">=" );
+		DONT_SPACE_TOKENS.add( "=>" );
+		DONT_SPACE_TOKENS.add( "=<" );
+		DONT_SPACE_TOKENS.add( "!=" );
+		DONT_SPACE_TOKENS.add( "<>" );
+		DONT_SPACE_TOKENS.add( "!#" );
+		DONT_SPACE_TOKENS.add( "!~" );
+		DONT_SPACE_TOKENS.add( "!<" );
+		DONT_SPACE_TOKENS.add( "!>" );
+		DONT_SPACE_TOKENS.add( "(" ); //for MySQL
+		DONT_SPACE_TOKENS.add( ")" );
 	}
 
 	public QuerySelect(Dialect dialect) {
 		this.dialect = dialect;
-		joins = new QueryJoinFragment(dialect, false);
+		joins = new QueryJoinFragment( dialect, false );
 	}
 
 	public JoinFragment getJoinFragment() {
@@ -82,16 +67,20 @@ public class QuerySelect {
 	}
 
 	public void addSelectFragmentString(String fragment) {
-		if ( fragment.length()>0 && fragment.charAt(0)==',' ) fragment = fragment.substring(1);
+		if ( fragment.length() > 0 && fragment.charAt( 0 ) == ',' ) {
+			fragment = fragment.substring( 1 );
+		}
 		fragment = fragment.trim();
-		if ( fragment.length()>0 ) {
-			if ( select.length()>0 ) select.append(", ");
-			select.append(fragment);
+		if ( fragment.length() > 0 ) {
+			if ( select.length() > 0 ) {
+				select.append( ", " );
+			}
+			select.append( fragment );
 		}
 	}
 
 	public void addSelectColumn(String columnName, String alias) {
-		addSelectFragmentString(columnName + ' ' + alias);
+		addSelectFragmentString( columnName + ' ' + alias );
 	}
 
 	public void setDistinct(boolean distinct) {
@@ -100,95 +89,109 @@ public class QuerySelect {
 
 	public void setWhereTokens(Iterator tokens) {
 		//if ( conjunctiveWhere.length()>0 ) conjunctiveWhere.append(" and ");
-		appendTokens(where, tokens);
+		appendTokens( where, tokens );
 	}
 
 	public void prependWhereConditions(String conditions) {
-		if (where.length() > 0) {
-			where.insert(0, conditions + " and ");
+		if ( where.length() > 0 ) {
+			where.insert( 0, conditions + " and " );
 		}
 		else {
-			where.append(conditions);
+			where.append( conditions );
 		}
 	}
 
 	public void setGroupByTokens(Iterator tokens) {
 		//if ( groupBy.length()>0 ) groupBy.append(" and ");
-		appendTokens(groupBy, tokens);
+		appendTokens( groupBy, tokens );
 	}
 
 	public void setOrderByTokens(Iterator tokens) {
 		//if ( orderBy.length()>0 ) orderBy.append(" and ");
-		appendTokens(orderBy, tokens);
+		appendTokens( orderBy, tokens );
 	}
 
 	public void setHavingTokens(Iterator tokens) {
 		//if ( having.length()>0 ) having.append(" and ");
-		appendTokens(having, tokens);
+		appendTokens( having, tokens );
 	}
 
 	public void addOrderBy(String orderByString) {
-		if ( orderBy.length() > 0 ) orderBy.append(", ");
-		orderBy.append(orderByString);
+		if ( orderBy.length() > 0 ) {
+			orderBy.append( ", " );
+		}
+		orderBy.append( orderByString );
 	}
 
 	public String toQueryString() {
-		StringBuilder buf = new StringBuilder(50);
-		if (comment!=null) buf.append("/* ").append(comment).append(" */ ");
-		buf.append("select ");
-		if (distinct) buf.append("distinct ");
-		String from = joins.toFromFragmentString();
-		if ( from.startsWith(",") ) {
-			from = from.substring(1);
+		StringBuilder buf = new StringBuilder( 50 );
+		if ( comment != null ) {
+			buf.append( "/* " ).append( comment ).append( " */ " );
 		}
-		else if ( from.startsWith(" inner join") ){
-			from = from.substring(11);
+		buf.append( "select " );
+		if ( distinct ) {
+			buf.append( "distinct " );
+		}
+		String from = joins.toFromFragmentString();
+		if ( from.startsWith( "," ) ) {
+			from = from.substring( 1 );
+		}
+		else if ( from.startsWith( " inner join" ) ) {
+			from = from.substring( 11 );
 		}
 
 		buf.append( select.toString() )
-			.append(" from")
-			.append(from);
+				.append( " from" )
+				.append( from );
 
 		String outerJoinsAfterWhere = joins.toWhereFragmentString().trim();
 		String whereConditions = where.toString().trim();
 		boolean hasOuterJoinsAfterWhere = outerJoinsAfterWhere.length() > 0;
 		boolean hasWhereConditions = whereConditions.length() > 0;
-		if (hasOuterJoinsAfterWhere || hasWhereConditions) {
-			buf.append(" where ");
-			if (hasOuterJoinsAfterWhere) {
-				buf.append( outerJoinsAfterWhere.substring(4) );
+		if ( hasOuterJoinsAfterWhere || hasWhereConditions ) {
+			buf.append( " where " );
+			if ( hasOuterJoinsAfterWhere ) {
+				buf.append( outerJoinsAfterWhere.substring( 4 ) );
 			}
-			if (hasWhereConditions) {
-				if (hasOuterJoinsAfterWhere) {
-					buf.append(" and (");
+			if ( hasWhereConditions ) {
+				if ( hasOuterJoinsAfterWhere ) {
+					buf.append( " and (" );
 				}
-				buf.append(whereConditions);
-				if (hasOuterJoinsAfterWhere) {
-					buf.append(")");
+				buf.append( whereConditions );
+				if ( hasOuterJoinsAfterWhere ) {
+					buf.append( ")" );
 				}
 			}
 		}
 
-		if ( groupBy.length() > 0 ) buf.append(" group by ").append( groupBy.toString() );
-		if ( having.length() > 0 ) buf.append(" having ").append( having.toString() );
-		if ( orderBy.length() > 0 ) buf.append(" order by ").append( orderBy.toString() );
+		if ( groupBy.length() > 0 ) {
+			buf.append( " group by " ).append( groupBy.toString() );
+		}
+		if ( having.length() > 0 ) {
+			buf.append( " having " ).append( having.toString() );
+		}
+		if ( orderBy.length() > 0 ) {
+			buf.append( " order by " ).append( orderBy.toString() );
+		}
 
 		return dialect.transformSelectString( buf.toString() );
 	}
 
 	private static void appendTokens(StringBuilder buf, Iterator iter) {
-		boolean lastSpaceable=true;
-		boolean lastQuoted=false;
+		boolean lastSpaceable = true;
+		boolean lastQuoted = false;
 		while ( iter.hasNext() ) {
 			String token = (String) iter.next();
-			boolean spaceable = !DONT_SPACE_TOKENS.contains(token);
-			boolean quoted = token.startsWith("'");
-			if (spaceable && lastSpaceable) {
-				if ( !quoted || !lastQuoted ) buf.append(' ');
+			boolean spaceable = !DONT_SPACE_TOKENS.contains( token );
+			boolean quoted = token.startsWith( "'" );
+			if ( spaceable && lastSpaceable ) {
+				if ( !quoted || !lastQuoted ) {
+					buf.append( ' ' );
+				}
 			}
 			lastSpaceable = spaceable;
-			buf.append(token);
-			lastQuoted = token.endsWith("'");
+			buf.append( token );
+			lastQuoted = token.endsWith( "'" );
 		}
 	}
 
@@ -197,7 +200,7 @@ public class QuerySelect {
 	}
 
 	public QuerySelect copy() {
-		QuerySelect copy = new QuerySelect(dialect);
+		QuerySelect copy = new QuerySelect( dialect );
 		copy.joins = this.joins.copy();
 		copy.select.append( this.select.toString() );
 		copy.where.append( this.where.toString() );

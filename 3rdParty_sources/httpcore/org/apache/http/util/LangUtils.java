@@ -68,7 +68,6 @@ public final class LangUtils {
 
     /**
      * Check if two object arrays are equal.
-     * <p>
      * <ul>
      * <li>If both parameters are null, return {@code true}</li>
      * <li>If one parameter is null, return {@code false}</li>
@@ -83,11 +82,7 @@ public final class LangUtils {
      */
     public static boolean equals(final Object[] a1, final Object[] a2) {
         if (a1 == null) {
-            if (a2 == null) {
-                return true;
-            } else {
-                return false;
-            }
+            return a2 == null;
         } else {
             if (a2 != null && a1.length == a2.length) {
                 for (int i = 0; i < a1.length; i++) {

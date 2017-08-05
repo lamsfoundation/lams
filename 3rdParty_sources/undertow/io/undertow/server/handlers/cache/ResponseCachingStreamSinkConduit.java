@@ -27,6 +27,7 @@ import org.xnio.IoUtils;
 import org.xnio.channels.StreamSourceChannel;
 import org.xnio.conduits.AbstractStreamSinkConduit;
 import org.xnio.conduits.ConduitWritableByteChannel;
+import org.xnio.conduits.Conduits;
 import org.xnio.conduits.StreamSinkConduit;
 
 /**
@@ -50,7 +51,7 @@ public class ResponseCachingStreamSinkConduit extends AbstractStreamSinkConduit<
         this.cacheEntry = cacheEntry;
         this.length = length;
         for(LimitedBufferSlicePool.PooledByteBuffer buffer: cacheEntry.buffers()) {
-            buffer.getResource().clear();
+            buffer.getBuffer().clear();
         }
     }
 
@@ -72,7 +73,7 @@ public class ResponseCachingStreamSinkConduit extends AbstractStreamSinkConduit<
             LimitedBufferSlicePool.PooledByteBuffer[] pooled = cacheEntry.buffers();
             ByteBuffer[] buffers = new ByteBuffer[pooled.length];
             for (int i = 0; i < buffers.length; i++) {
-                buffers[i] = pooled[i].getResource();
+                buffers[i] = pooled[i].getBuffer();
             }
             origSrc.limit(origSrc.position() + totalWritten);
             written += Buffers.copy(buffers, 0, buffers.length, origSrc);
@@ -99,7 +100,7 @@ public class ResponseCachingStreamSinkConduit extends AbstractStreamSinkConduit<
             LimitedBufferSlicePool.PooledByteBuffer[] pooled = cacheEntry.buffers();
             ByteBuffer[] buffers = new ByteBuffer[pooled.length];
             for (int i = 0; i < buffers.length; i++) {
-                buffers[i] = pooled[i].getResource();
+                buffers[i] = pooled[i].getBuffer();
             }
             long leftToCopy = totalWritten;
             for(int i = 0; i < len; ++i) {
@@ -141,5 +142,15 @@ public class ResponseCachingStreamSinkConduit extends AbstractStreamSinkConduit<
             cacheEntry.dereference();
         }
         super.truncateWrites();
+    }
+
+    @Override
+    public long writeFinal(ByteBuffer[] srcs, int offset, int length) throws IOException {
+        return Conduits.writeFinalBasic(this, srcs, offset, length);
+    }
+
+    @Override
+    public int writeFinal(ByteBuffer src) throws IOException {
+        return Conduits.writeFinalBasic(this, src);
     }
 }

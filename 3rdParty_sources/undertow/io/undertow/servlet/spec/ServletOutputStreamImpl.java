@@ -18,46 +18,44 @@
 
 package io.undertow.servlet.spec;
 
-import io.undertow.io.BufferWritableOutputStream;
-import io.undertow.servlet.UndertowServletMessages;
-import io.undertow.servlet.api.ThreadSetupAction;
-import io.undertow.servlet.core.CompositeThreadSetupAction;
-import io.undertow.servlet.handlers.ServletRequestContext;
-import io.undertow.util.Headers;
-import org.xnio.Buffers;
-import org.xnio.ChannelListener;
-import org.xnio.IoUtils;
-import org.xnio.Pool;
-import org.xnio.Pooled;
-import org.xnio.channels.Channels;
-import org.xnio.channels.StreamSinkChannel;
+import static org.xnio.Bits.allAreClear;
+import static org.xnio.Bits.anyAreClear;
+import static org.xnio.Bits.anyAreSet;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.WriteListener;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 
-import static org.xnio.Bits.allAreClear;
-import static org.xnio.Bits.anyAreClear;
-import static org.xnio.Bits.anyAreSet;
+import org.xnio.Buffers;
+import org.xnio.ChannelListener;
+import org.xnio.IoUtils;
+import org.xnio.channels.Channels;
+import org.xnio.channels.StreamSinkChannel;
+import io.undertow.connector.ByteBufferPool;
+import io.undertow.connector.PooledByteBuffer;
+import io.undertow.io.BufferWritableOutputStream;
+import io.undertow.servlet.UndertowServletMessages;
+import io.undertow.servlet.handlers.ServletRequestContext;
+import io.undertow.util.Headers;
 
 /**
  * This stream essentially has two modes. When it is being used in standard blocking mode then
  * it will buffer in the pooled buffer. If the stream is closed before the buffer is full it will
  * set a content-length header if one has not been explicitly set.
- * <p/>
+ * <p>
  * If a content-length header was present when the stream was created then it will automatically
  * close and flush itself once the appropriate amount of data has been written.
- * <p/>
+ * <p>
  * Once the listener has been set it goes into async mode, and writes become non blocking. Most methods
  * have two different code paths, based on if the listener has been set or not
- * <p/>
+ * <p>
  * Once the write listener has been set operations must only be invoked on this stream from the write
  * listener callback. Attempting to invoke from a different thread will result in an IllegalStateException.
- * <p/>
+ * <p>
  * Async listener tasks are queued in the {@link AsyncContextImpl}. At most one lister can be active at
  * one time, which simplifies the thread safety requirements.
  *
@@ -66,7 +64,7 @@ import static org.xnio.Bits.anyAreSet;
 public class ServletOutputStreamImpl extends ServletOutputStream implements BufferWritableOutputStream {
 
     private final ServletRequestContext servletRequestContext;
-    private Pooled<ByteBuffer> pooledBuffer;
+    private PooledByteBuffer pooledBuffer;
     private ByteBuffer buffer;
     private Integer bufferSize;
     private StreamSinkChannel channel;
@@ -96,13 +94,11 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
     //TODO: should this be configurable?
     private static final int MAX_BUFFERS_TO_ALLOCATE = 6;
 
-    private CompositeThreadSetupAction threadSetupAction;
 
     /**
      * Construct a new instance.  No write timeout is configured.
      */
     public ServletOutputStreamImpl(final ServletRequestContext servletRequestContext) {
-        this.threadSetupAction = servletRequestContext.getDeployment().getThreadSetupAction();
         this.servletRequestContext = servletRequestContext;
     }
 
@@ -152,9 +148,9 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
                 if (channel == null) {
                     this.channel = channel = servletRequestContext.getExchange().getResponseChannel();
                 }
-                final Pool<ByteBuffer> bufferPool = servletRequestContext.getExchange().getConnection().getBufferPool();
+                final ByteBufferPool bufferPool = servletRequestContext.getExchange().getConnection().getByteBufferPool();
                 ByteBuffer[] buffers = new ByteBuffer[MAX_BUFFERS_TO_ALLOCATE + 1];
-                Pooled[] pooledBuffers = new Pooled[MAX_BUFFERS_TO_ALLOCATE];
+                PooledByteBuffer[] pooledBuffers = new PooledByteBuffer[MAX_BUFFERS_TO_ALLOCATE];
                 try {
                     buffers[0] = buffer;
                     int bytesWritten = 0;
@@ -164,10 +160,10 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
                     bytesWritten += rem;
                     int bufferCount = 1;
                     for (int i = 0; i < MAX_BUFFERS_TO_ALLOCATE; ++i) {
-                        Pooled<ByteBuffer> pooled = bufferPool.allocate();
+                        PooledByteBuffer pooled = bufferPool.allocate();
                         pooledBuffers[bufferCount - 1] = pooled;
-                        buffers[bufferCount++] = pooled.getResource();
-                        ByteBuffer cb = pooled.getResource();
+                        buffers[bufferCount++] = pooled.getBuffer();
+                        ByteBuffer cb = pooled.getBuffer();
                         int toWrite = len - bytesWritten;
                         if (toWrite > cb.remaining()) {
                             rem = cb.remaining();
@@ -207,11 +203,11 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
                     buffer.clear();
                 } finally {
                     for (int i = 0; i < pooledBuffers.length; ++i) {
-                        Pooled p = pooledBuffers[i];
+                        PooledByteBuffer p = pooledBuffers[i];
                         if (p == null) {
                             break;
                         }
-                        p.free();
+                        p.close();
                     }
                 }
             } else {
@@ -377,8 +373,8 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
                     channel.shutdownWrites();
                     state |= FLAG_DELEGATE_SHUTDOWN;
                     channel.flush();
-                    if(pooledBuffer != null) {
-                        pooledBuffer.free();
+                    if (pooledBuffer != null) {
+                        pooledBuffer.close();
                         buffer = null;
                         pooledBuffer = null;
                     }
@@ -431,18 +427,18 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
     /**
      * Returns the underlying buffer. If this has not been created yet then
      * it is created.
-     * <p/>
+     * <p>
      * Callers that use this method must call {@link #updateWritten(long)} to update the written
      * amount.
-     * <p/>
+     * <p>
      * This allows the buffer to be filled directly, which can be more efficient.
-     * <p/>
+     * <p>
      * This method is basically a hack that should only be used by the print writer
      *
      * @return The underlying buffer
      */
     ByteBuffer underlyingBuffer() {
-        if(anyAreSet(state, FLAG_CLOSED)) {
+        if (anyAreSet(state, FLAG_CLOSED)) {
             return null;
         }
         return buffer();
@@ -613,7 +609,7 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
                 throw e;
             } finally {
                 if (pooledBuffer != null) {
-                    pooledBuffer.free();
+                    pooledBuffer.close();
                     buffer = null;
                 } else {
                     buffer = null;
@@ -626,7 +622,7 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
 
     /**
      * Closes the channel, and flushes any data out using async IO
-     * <p/>
+     * <p>
      * This is used in two situations, if an output stream is not closed when a
      * request is done, and when performing a close on a stream that is in async
      * mode
@@ -637,43 +633,52 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
         if (anyAreSet(state, FLAG_CLOSED) || servletRequestContext.getOriginalResponse().isTreatAsCommitted()) {
             return;
         }
+        try {
 
-        state |= FLAG_CLOSED;
-        state &= ~FLAG_READY;
-        if (allAreClear(state, FLAG_WRITE_STARTED) && channel == null) {
+            state |= FLAG_CLOSED;
+            state &= ~FLAG_READY;
+            if (allAreClear(state, FLAG_WRITE_STARTED) && channel == null) {
 
-            if (servletRequestContext.getOriginalResponse().getHeader(Headers.TRANSFER_ENCODING_STRING) == null) {
-                if (buffer == null) {
-                    servletRequestContext.getOriginalResponse().setHeader(Headers.CONTENT_LENGTH, "0");
-                } else {
-                    servletRequestContext.getOriginalResponse().setHeader(Headers.CONTENT_LENGTH, Integer.toString(buffer.position()));
+                if (servletRequestContext.getOriginalResponse().getHeader(Headers.TRANSFER_ENCODING_STRING) == null) {
+                    if (buffer == null) {
+                        servletRequestContext.getOriginalResponse().setHeader(Headers.CONTENT_LENGTH, "0");
+                    } else {
+                        servletRequestContext.getOriginalResponse().setHeader(Headers.CONTENT_LENGTH, Integer.toString(buffer.position()));
+                    }
                 }
             }
-        }
-        createChannel();
-        if (buffer != null) {
-            if (!flushBufferAsync(true)) {
-                return;
-            }
+            createChannel();
+            if (buffer != null) {
+                if (!flushBufferAsync(true)) {
+                    return;
+                }
 
+                if (pooledBuffer != null) {
+                    pooledBuffer.close();
+                    buffer = null;
+                } else {
+                    buffer = null;
+                }
+            }
+            channel.shutdownWrites();
+            state |= FLAG_DELEGATE_SHUTDOWN;
+            if (!channel.flush()) {
+                channel.resumeWrites();
+            }
+        } catch (IOException e) {
             if (pooledBuffer != null) {
-                pooledBuffer.free();
-                buffer = null;
-            } else {
+                pooledBuffer.close();
+                pooledBuffer = null;
                 buffer = null;
             }
-        }
-        channel.shutdownWrites();
-        state |= FLAG_DELEGATE_SHUTDOWN;
-        if(!channel.flush()) {
-            channel.resumeWrites();
+            throw e;
         }
     }
 
     private void createChannel() {
         if (channel == null) {
             channel = servletRequestContext.getExchange().getResponseChannel();
-            if(internalListener != null) {
+            if (internalListener != null) {
                 channel.getWriteSetter().set(internalListener);
             }
         }
@@ -689,8 +694,8 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
             this.buffer = ByteBuffer.allocateDirect(bufferSize);
             return this.buffer;
         } else {
-            this.pooledBuffer = servletRequestContext.getExchange().getConnection().getBufferPool().allocate();
-            this.buffer = pooledBuffer.getResource();
+            this.pooledBuffer = servletRequestContext.getExchange().getConnection().getByteBufferPool().allocate();
+            this.buffer = pooledBuffer.getBuffer();
             return this.buffer;
         }
     }
@@ -698,10 +703,11 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
     public void resetBuffer() {
         if (allAreClear(state, FLAG_WRITE_STARTED)) {
             if (pooledBuffer != null) {
-                pooledBuffer.free();
+                pooledBuffer.close();
                 pooledBuffer = null;
             }
             buffer = null;
+            this.written = 0;
         } else {
             throw UndertowServletMessages.MESSAGES.responseAlreadyCommited();
         }
@@ -735,7 +741,7 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
         if (listener != null) {
             throw UndertowServletMessages.MESSAGES.listenerAlreadySet();
         }
-        final ServletRequest servletRequest = servletRequestContext.getServletRequest();
+        final ServletRequest servletRequest = servletRequestContext.getOriginalRequest();
         if (!servletRequest.isAsyncStarted()) {
             throw UndertowServletMessages.MESSAGES.asyncNotStarted();
         }
@@ -745,14 +751,14 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
         //so we don't have to force the creation of the response channel
         //under normal circumstances this will break write listener delegation
         this.internalListener = new WriteChannelListener();
-        if(this.channel != null) {
+        if (this.channel != null) {
             this.channel.getWriteSetter().set(internalListener);
         }
         //we resume from an async task, after the request has been dispatched
         asyncContext.addAsyncTask(new Runnable() {
             @Override
             public void run() {
-                if(channel == null) {
+                if (channel == null) {
                     servletRequestContext.getExchange().getIoThread().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -792,7 +798,7 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
                 long toWrite = Buffers.remaining(buffersToWrite);
                 long written = 0;
                 long res;
-                if(toWrite > 0) { //should always be true, but just to be defensive
+                if (toWrite > 0) { //should always be true, but just to be defensive
                     do {
                         try {
                             res = channel.write(buffersToWrite);
@@ -832,7 +838,7 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
                 try {
 
                     if (pooledBuffer != null) {
-                        pooledBuffer.free();
+                        pooledBuffer.close();
                         buffer = null;
                     } else {
                         buffer = null;
@@ -858,21 +864,17 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
                 try {
                     state |= FLAG_IN_CALLBACK;
 
-                    ThreadSetupAction.Handle handle = threadSetupAction.setup(servletRequestContext.getExchange());
-                    try {
-                        listener.onWritePossible();
-                    } finally {
-                        handle.tearDown();
-                    }
+                    servletRequestContext.getCurrentServletContext().invokeOnWritePossible(servletRequestContext.getExchange(), listener);
+
                     if (isReady()) {
                         //if the stream is still ready then we do not resume writes
                         //this is per spec, we only call the listener once for each time
                         //isReady returns true
-                        if(channel != null) {
+                        if (channel != null) {
                             channel.suspendWrites();
                         }
                     } else {
-                        if(channel != null) {
+                        if (channel != null) {
                             channel.resumeWrites();
                         }
                     }
@@ -886,13 +888,14 @@ public class ServletOutputStreamImpl extends ServletOutputStream implements Buff
         }
 
         private void handleError(final IOException e) {
+
             try {
-                ThreadSetupAction.Handle handle = threadSetupAction.setup(servletRequestContext.getExchange());
-                try {
-                    listener.onError(e);
-                } finally {
-                    handle.tearDown();
-                }
+                servletRequestContext.getCurrentServletContext().invokeRunnable(servletRequestContext.getExchange(), new Runnable() {
+                    @Override
+                    public void run() {
+                        listener.onError(e);
+                    }
+                });
             } finally {
                 IoUtils.safeClose(channel, servletRequestContext.getExchange().getConnection());
             }

@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.loader.entity.plan;
 
@@ -30,6 +12,7 @@ import org.hibernate.MappingException;
 import org.hibernate.engine.spi.LoadQueryInfluencers;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.internal.CoreLogging;
+import org.hibernate.loader.plan.exec.query.internal.QueryBuildingParametersImpl;
 import org.hibernate.loader.plan.exec.query.spi.QueryBuildingParameters;
 import org.hibernate.persister.entity.OuterJoinLoadable;
 import org.hibernate.type.Type;
@@ -95,32 +78,18 @@ public class EntityLoader extends AbstractLoadPlanBasedEntityLoader  {
 		}
 
 		public EntityLoader byUniqueKey(String[] keyColumnNames, Type keyType) {
+			// capture current values in a new instance of QueryBuildingParametersImpl
 			return new EntityLoader(
 					persister.getFactory(),
 					persister,
 					keyColumnNames,
 					keyType,
-					new QueryBuildingParameters() {
-						@Override
-						public LoadQueryInfluencers getQueryInfluencers() {
-							return influencers;
-						}
-
-						@Override
-						public int getBatchSize() {
-							return batchSize;
-						}
-
-						@Override
-						public LockMode getLockMode() {
-							return lockMode;
-						}
-
-						@Override
-						public LockOptions getLockOptions() {
-							return lockOptions;
-						}
-					}
+					new QueryBuildingParametersImpl(
+							influencers,
+							batchSize,
+							lockMode,
+							lockOptions
+					)
 			);
 		}
 	}

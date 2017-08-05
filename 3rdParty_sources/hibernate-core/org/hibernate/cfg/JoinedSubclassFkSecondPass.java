@@ -1,30 +1,14 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cfg;
 import java.util.Map;
 
 import org.hibernate.MappingException;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.cfg.annotations.TableBinder;
 import org.hibernate.mapping.JoinedSubclass;
 import org.hibernate.mapping.SimpleValue;
@@ -35,16 +19,16 @@ import org.hibernate.mapping.SimpleValue;
 @SuppressWarnings({"serial", "unchecked"})
 public class JoinedSubclassFkSecondPass extends FkSecondPass {
 	private JoinedSubclass entity;
-	private Mappings mappings;
+	private MetadataBuildingContext buildingContext;
 
 	public JoinedSubclassFkSecondPass(
 			JoinedSubclass entity,
 			Ejb3JoinColumn[] inheritanceJoinedColumns,
 			SimpleValue key,
-			Mappings mappings) {
+			MetadataBuildingContext buildingContext) {
 		super( key, inheritanceJoinedColumns );
 		this.entity = entity;
-		this.mappings = mappings;
+		this.buildingContext = buildingContext;
 	}
 
 	public String getReferencedEntityName() {
@@ -56,6 +40,6 @@ public class JoinedSubclassFkSecondPass extends FkSecondPass {
 	}
 
 	public void doSecondPass(Map persistentClasses) throws MappingException {
-		TableBinder.bindFk( entity.getSuperclass(), entity, columns, value, false, mappings );
+		TableBinder.bindFk( entity.getSuperclass(), entity, columns, value, false, buildingContext );
 	}
 }

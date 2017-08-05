@@ -1,31 +1,11 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cfg.annotations.reflection;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +22,12 @@ import javax.persistence.TableGenerator;
 import org.hibernate.annotations.common.reflection.AnnotationReader;
 import org.hibernate.annotations.common.reflection.MetadataProvider;
 import org.hibernate.annotations.common.reflection.java.JavaMetadataProvider;
-import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.boot.internal.ClassLoaderAccessImpl;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
+import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
+import org.hibernate.boot.spi.ClassLoaderAccess;
+import org.hibernate.boot.spi.ClassLoaderAccessDelegateImpl;
+import org.hibernate.boot.spi.MetadataBuildingOptions;
 
 import org.dom4j.Element;
 
@@ -52,25 +37,43 @@ import org.dom4j.Element;
  * @author Emmanuel Bernard
  */
 @SuppressWarnings("unchecked")
-public class JPAMetadataProvider implements MetadataProvider, Serializable {
-	private transient MetadataProvider delegate = new JavaMetadataProvider();
-	private transient Map<Object, Object> defaults;
-	private transient Map<AnnotatedElement, AnnotationReader> cache = new HashMap<AnnotatedElement, AnnotationReader>(100);
+public class JPAMetadataProvider implements MetadataProvider {
+
+	private final MetadataProvider delegate = new JavaMetadataProvider();
+
+	private final ClassLoaderAccess classLoaderAccess;
+	private final XMLContext xmlContext;
+
+	private Map<Object, Object> defaults;
+	private Map<AnnotatedElement, AnnotationReader> cache = new HashMap<AnnotatedElement, AnnotationReader>(100);
+
+	public JPAMetadataProvider(final MetadataBuildingOptions metadataBuildingOptions) {
+		classLoaderAccess = new ClassLoaderAccessDelegateImpl() {
+			ClassLoaderAccess delegate;
+
+			@Override
+			protected ClassLoaderAccess getDelegate() {
+				if ( delegate == null ) {
+					delegate = new ClassLoaderAccessImpl(
+							metadataBuildingOptions.getTempClassLoader(),
+							metadataBuildingOptions.getServiceRegistry().getService( ClassLoaderService.class )
+					);
+				}
+				return delegate;
+			}
+		};
+
+		xmlContext = new XMLContext( classLoaderAccess );
+
+	}
 
 	//all of the above can be safely rebuilt from XMLContext: only XMLContext this object is serialized
-	private XMLContext xmlContext = new XMLContext();
-
-	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-		ois.defaultReadObject();
-		delegate = new JavaMetadataProvider();
-		cache = new HashMap<AnnotatedElement, AnnotationReader>(100);
-	}
 	@Override
 	public AnnotationReader getAnnotationReader(AnnotatedElement annotatedElement) {
 		AnnotationReader reader = cache.get( annotatedElement );
 		if (reader == null) {
 			if ( xmlContext.hasContext() ) {
-				reader = new JPAOverriddenAnnotationReader( annotatedElement, xmlContext );
+				reader = new JPAOverriddenAnnotationReader( annotatedElement, xmlContext, classLoaderAccess );
 			}
 			else {
 				reader = delegate.getAnnotationReader( annotatedElement );
@@ -91,9 +94,9 @@ public class JPAMetadataProvider implements MetadataProvider, Serializable {
 			List<Class> entityListeners = new ArrayList<Class>();
 			for ( String className : xmlContext.getDefaultEntityListeners() ) {
 				try {
-					entityListeners.add( ReflectHelper.classForName( className, this.getClass() ) );
+					entityListeners.add( classLoaderAccess.classForName( className ) );
 				}
-				catch ( ClassNotFoundException e ) {
+				catch ( ClassLoadingException e ) {
 					throw new IllegalStateException( "Default entity listener class not found: " + className );
 				}
 			}
@@ -130,7 +133,10 @@ public class JPAMetadataProvider implements MetadataProvider, Serializable {
 					defaults.put( NamedQuery.class, namedQueries );
 				}
 				List<NamedQuery> currentNamedQueries = JPAOverriddenAnnotationReader.buildNamedQueries(
-						element, false, xmlDefaults
+						element,
+						false,
+						xmlDefaults,
+						classLoaderAccess
 				);
 				namedQueries.addAll( currentNamedQueries );
 
@@ -140,7 +146,10 @@ public class JPAMetadataProvider implements MetadataProvider, Serializable {
 					defaults.put( NamedNativeQuery.class, namedNativeQueries );
 				}
 				List<NamedNativeQuery> currentNamedNativeQueries = JPAOverriddenAnnotationReader.buildNamedQueries(
-						element, true, xmlDefaults
+						element,
+						true,
+						xmlDefaults,
+						classLoaderAccess
 				);
 				namedNativeQueries.addAll( currentNamedNativeQueries );
 
@@ -152,7 +161,9 @@ public class JPAMetadataProvider implements MetadataProvider, Serializable {
 					defaults.put( SqlResultSetMapping.class, sqlResultSetMappings );
 				}
 				List<SqlResultSetMapping> currentSqlResultSetMappings = JPAOverriddenAnnotationReader.buildSqlResultsetMappings(
-						element, xmlDefaults
+						element,
+						xmlDefaults,
+						classLoaderAccess
 				);
 				sqlResultSetMappings.addAll( currentSqlResultSetMappings );
 
@@ -162,7 +173,9 @@ public class JPAMetadataProvider implements MetadataProvider, Serializable {
 					defaults.put( NamedStoredProcedureQuery.class, namedStoredProcedureQueries );
 				}
 				List<NamedStoredProcedureQuery> currentNamedStoredProcedureQueries = JPAOverriddenAnnotationReader.buildNamedStoreProcedureQueries(
-						element, xmlDefaults
+						element,
+						xmlDefaults,
+						classLoaderAccess
 				);
 				namedStoredProcedureQueries.addAll( currentNamedStoredProcedureQueries );
 			}

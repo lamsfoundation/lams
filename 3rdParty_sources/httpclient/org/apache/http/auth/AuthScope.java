@@ -1,20 +1,21 @@
 /*
  * ====================================================================
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  * ====================================================================
  *
  * This software consists of voluntary contributions made by many
@@ -23,45 +24,45 @@
  * <http://www.apache.org/>.
  *
  */
-
 package org.apache.http.auth;
 
 import java.util.Locale;
 
 import org.apache.http.HttpHost;
 import org.apache.http.annotation.Immutable;
-
+import org.apache.http.util.Args;
 import org.apache.http.util.LangUtils;
 
 /**
- * The class represents an authentication scope consisting of a host name,
- * a port number, a realm name and an authentication scheme name which
- * {@link Credentials Credentials} apply to.
- *
- *
+ * {@code AuthScope} represents an authentication scope consisting of a host name,
+ * a port number, a realm name and an authentication scheme name.
+ * <p>
+ * This class can also optionally contain a host of origin, if created in response
+ * to authentication challenge from a specific host.
+ * </p>
  * @since 4.0
  */
 @Immutable
 public class AuthScope {
 
     /**
-     * The <tt>null</tt> value represents any host. In the future versions of
+     * The {@code null} value represents any host. In the future versions of
      * HttpClient the use of this parameter will be discontinued.
      */
     public static final String ANY_HOST = null;
 
     /**
-     * The <tt>-1</tt> value represents any port.
+     * The {@code -1} value represents any port.
      */
     public static final int ANY_PORT = -1;
 
     /**
-     * The <tt>null</tt> value represents any realm.
+     * The {@code null} value represents any realm.
      */
     public static final String ANY_REALM = null;
 
     /**
-     * The <tt>null</tt> value represents any authentication scheme.
+     * The {@code null} value represents any authentication scheme.
      */
     public static final String ANY_SCHEME = null;
 
@@ -84,76 +85,91 @@ public class AuthScope {
     /** The port the credentials apply to. */
     private final int port;
 
-    /** Creates a new credentials scope for the given
-     * <tt>host</tt>, <tt>port</tt>, <tt>realm</tt>, and
-     * <tt>authentication scheme</tt>.
+    /** The original host, if known */
+    private final HttpHost origin;
+
+    /**
+     * Defines auth scope with the given {@code host}, {@code port}, {@code realm}, and
+     * {@code schemeName}.
      *
-     * @param host the host the credentials apply to. May be set
-     *   to <tt>null</tt> if credentials are applicable to
-     *   any host.
-     * @param port the port the credentials apply to. May be set
-     *   to negative value if credentials are applicable to
-     *   any port.
-     * @param realm the realm the credentials apply to. May be set
-     *   to <tt>null</tt> if credentials are applicable to
-     *   any realm.
-     * @param scheme the authentication scheme the credentials apply to.
-     *   May be set to <tt>null</tt> if credentials are applicable to
-     *   any authentication scheme.
+     * @param host authentication host. May be {@link #ANY_HOST} if applies
+     *   to any host.
+     * @param port authentication port. May be {@link #ANY_PORT} if applies
+     *   to any port of the host.
+     * @param realm authentication realm. May be {@link #ANY_REALM} if applies
+     *   to any realm on the host.
+     * @param schemeName authentication scheme. May be {@link #ANY_SCHEME} if applies
+     *   to any scheme supported by the host.
      */
-    public AuthScope(final String host, int port,
-        final String realm, final String scheme)
-    {
-        this.host =   (host == null)   ? ANY_HOST: host.toLowerCase(Locale.ENGLISH);
-        this.port =   (port < 0)       ? ANY_PORT: port;
-        this.realm =  (realm == null)  ? ANY_REALM: realm;
-        this.scheme = (scheme == null) ? ANY_SCHEME: scheme.toUpperCase(Locale.ENGLISH);
+    public AuthScope(
+            final String host,
+            final int port,
+            final String realm,
+            final String schemeName) {
+        this.host = host == null ? ANY_HOST: host.toLowerCase(Locale.ROOT);
+        this.port = port < 0 ? ANY_PORT : port;
+        this.realm = realm == null ? ANY_REALM : realm;
+        this.scheme = schemeName == null ? ANY_SCHEME : schemeName.toUpperCase(Locale.ROOT);
+        this.origin = null;
     }
 
     /**
+     * Defines auth scope for a specific host of origin.
+     *
+     * @param origin host of origin
+     * @param realm authentication realm. May be {@link #ANY_REALM} if applies
+     *   to any realm on the host.
+     * @param schemeName authentication scheme. May be {@link #ANY_SCHEME} if applies
+     *   to any scheme supported by the host.
+     *
      * @since 4.2
      */
-    public AuthScope(final HttpHost host, final String realm, final String schemeName) {
-        this(host.getHostName(), host.getPort(), realm, schemeName);
+    public AuthScope(
+            final HttpHost origin,
+            final String realm,
+            final String schemeName) {
+        Args.notNull(origin, "Host");
+        this.host = origin.getHostName().toLowerCase(Locale.ROOT);
+        this.port = origin.getPort() < 0 ? ANY_PORT : origin.getPort();
+        this.realm = realm == null ? ANY_REALM : realm;
+        this.scheme = schemeName == null ? ANY_SCHEME : schemeName.toUpperCase(Locale.ROOT);
+        this.origin = origin;
     }
 
     /**
+     * Defines auth scope for a specific host of origin.
+     *
+     * @param origin host of origin
+     *
      * @since 4.2
      */
-    public AuthScope(final HttpHost host) {
-        this(host, ANY_REALM, ANY_SCHEME);
+    public AuthScope(final HttpHost origin) {
+        this(origin, ANY_REALM, ANY_SCHEME);
     }
 
-    /** Creates a new credentials scope for the given
-     * <tt>host</tt>, <tt>port</tt>, <tt>realm</tt>, and any
-     * authentication scheme.
+    /**
+     * Defines auth scope with the given {@code host}, {@code port} and {@code realm}.
      *
-     * @param host the host the credentials apply to. May be set
-     *   to <tt>null</tt> if credentials are applicable to
-     *   any host.
-     * @param port the port the credentials apply to. May be set
-     *   to negative value if credentials are applicable to
-     *   any port.
-     * @param realm the realm the credentials apply to. May be set
-     *   to <tt>null</tt> if credentials are applicable to
-     *   any realm.
+     * @param host authentication host. May be {@link #ANY_HOST} if applies
+     *   to any host.
+     * @param port authentication port. May be {@link #ANY_PORT} if applies
+     *   to any port of the host.
+     * @param realm authentication realm. May be {@link #ANY_REALM} if applies
+     *   to any realm on the host.
      */
-    public AuthScope(final String host, int port, final String realm) {
+    public AuthScope(final String host, final int port, final String realm) {
         this(host, port, realm, ANY_SCHEME);
     }
 
-    /** Creates a new credentials scope for the given
-     * <tt>host</tt>, <tt>port</tt>, any realm name, and any
-     * authentication scheme.
+    /**
+     * Defines auth scope with the given {@code host} and {@code port}.
      *
-     * @param host the host the credentials apply to. May be set
-     *   to <tt>null</tt> if credentials are applicable to
-     *   any host.
-     * @param port the port the credentials apply to. May be set
-     *   to negative value if credentials are applicable to
-     *   any port.
+     * @param host authentication host. May be {@link #ANY_HOST} if applies
+     *   to any host.
+     * @param port authentication port. May be {@link #ANY_PORT} if applies
+     *   to any port of the host.
      */
-    public AuthScope(final String host, int port) {
+    public AuthScope(final String host, final int port) {
         this(host, port, ANY_REALM, ANY_SCHEME);
     }
 
@@ -162,13 +178,21 @@ public class AuthScope {
      */
     public AuthScope(final AuthScope authscope) {
         super();
-        if (authscope == null) {
-            throw new IllegalArgumentException("Scope may not be null");
-        }
+        Args.notNull(authscope, "Scope");
         this.host = authscope.getHost();
         this.port = authscope.getPort();
         this.realm = authscope.getRealm();
         this.scheme = authscope.getScheme();
+        this.origin = authscope.getOrigin();
+    }
+
+    /**
+     * @return host of origin. If unknown returns @null,
+     *
+     * @since 4.4
+     */
+    public HttpHost getOrigin() {
+        return this.origin;
     }
 
     /**
@@ -243,7 +267,7 @@ public class AuthScope {
      * @see java.lang.Object#equals(Object)
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (o == null) {
             return false;
         }
@@ -253,7 +277,7 @@ public class AuthScope {
         if (!(o instanceof AuthScope)) {
             return super.equals(o);
         }
-        AuthScope that = (AuthScope) o;
+        final AuthScope that = (AuthScope) o;
         return
         LangUtils.equals(this.host, that.host)
           && this.port == that.port
@@ -266,9 +290,9 @@ public class AuthScope {
      */
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
         if (this.scheme != null) {
-            buffer.append(this.scheme.toUpperCase(Locale.ENGLISH));
+            buffer.append(this.scheme.toUpperCase(Locale.ROOT));
             buffer.append(' ');
         }
         if (this.realm != null) {

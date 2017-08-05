@@ -27,40 +27,42 @@
 package org.apache.http.impl.cookie;
 
 import org.apache.http.annotation.Immutable;
-
+import org.apache.http.cookie.ClientCookie;
+import org.apache.http.cookie.CommonCookieAttributeHandler;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.cookie.CookieOrigin;
 import org.apache.http.cookie.MalformedCookieException;
 import org.apache.http.cookie.SetCookie;
+import org.apache.http.util.Args;
 
 /**
  *
  * @since 4.0
  */
 @Immutable
-public class BasicSecureHandler extends AbstractCookieAttributeHandler {
+public class BasicSecureHandler extends AbstractCookieAttributeHandler implements CommonCookieAttributeHandler {
 
     public BasicSecureHandler() {
         super();
     }
 
+    @Override
     public void parse(final SetCookie cookie, final String value)
             throws MalformedCookieException {
-        if (cookie == null) {
-            throw new IllegalArgumentException("Cookie may not be null");
-        }
+        Args.notNull(cookie, "Cookie");
         cookie.setSecure(true);
     }
 
     @Override
     public boolean match(final Cookie cookie, final CookieOrigin origin) {
-        if (cookie == null) {
-            throw new IllegalArgumentException("Cookie may not be null");
-        }
-        if (origin == null) {
-            throw new IllegalArgumentException("Cookie origin may not be null");
-        }
+        Args.notNull(cookie, "Cookie");
+        Args.notNull(origin, "Cookie origin");
         return !cookie.isSecure() || origin.isSecure();
+    }
+
+    @Override
+    public String getAttributeName() {
+        return ClientCookie.SECURE_ATTR;
     }
 
 }

@@ -33,15 +33,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.http.HttpRequest;
 import org.apache.http.annotation.Immutable;
-import org.apache.http.client.HttpRequestRetryHandler;
 
 /**
- * A {@link HttpRequestRetryHandler} which assumes that all requested
- * HTTP methods which should be idempotent according to RFC-2616 are
- * in fact idempotent and can be retried.
- *
+ * {@link org.apache.http.client.HttpRequestRetryHandler} which assumes
+ * that all requested HTTP methods which should be idempotent according
+ * to RFC-2616 are in fact idempotent and can be retried.
+ * <p>
  * According to RFC-2616 section 9.1.2 the idempotent HTTP methods are:
  * GET, HEAD, PUT, DELETE, OPTIONS, and TRACE
+ * </p>
  *
  * @since 4.2
  */
@@ -53,7 +53,7 @@ public class StandardHttpRequestRetryHandler extends DefaultHttpRequestRetryHand
     /**
      * Default constructor
      */
-    public StandardHttpRequestRetryHandler(int retryCount, boolean requestSentRetryEnabled) {
+    public StandardHttpRequestRetryHandler(final int retryCount, final boolean requestSentRetryEnabled) {
         super(retryCount, requestSentRetryEnabled);
         this.idempotentMethods = new ConcurrentHashMap<String, Boolean>();
         this.idempotentMethods.put("GET", Boolean.TRUE);
@@ -73,8 +73,8 @@ public class StandardHttpRequestRetryHandler extends DefaultHttpRequestRetryHand
 
     @Override
     protected boolean handleAsIdempotent(final HttpRequest request) {
-        String method = request.getRequestLine().getMethod().toUpperCase(Locale.US);
-        Boolean b = this.idempotentMethods.get(method);
+        final String method = request.getRequestLine().getMethod().toUpperCase(Locale.ROOT);
+        final Boolean b = this.idempotentMethods.get(method);
         return b != null && b.booleanValue();
     }
 

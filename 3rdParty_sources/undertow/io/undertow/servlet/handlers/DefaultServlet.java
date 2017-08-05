@@ -22,11 +22,13 @@ import io.undertow.io.IoCallback;
 import io.undertow.io.Sender;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.resource.DirectoryUtils;
+import io.undertow.server.handlers.resource.RangeAwareResource;
 import io.undertow.server.handlers.resource.Resource;
 import io.undertow.server.handlers.resource.ResourceManager;
 import io.undertow.servlet.api.DefaultServletConfig;
 import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.spec.ServletContextImpl;
+import io.undertow.util.ByteRange;
 import io.undertow.util.CanonicalPathUtils;
 import io.undertow.util.DateUtils;
 import io.undertow.util.ETag;
@@ -56,9 +58,9 @@ import java.util.Set;
  * match the current path then the resources will be served up asynchronously using the
  * {@link io.undertow.server.HttpHandler#handleRequest(io.undertow.server.HttpServerExchange)} method,
  * otherwise the request is handled as a normal servlet request.
- * <p/>
+ * <p>
  * By default we only allow a restricted set of extensions.
- * <p/>
+ * </p>
  * todo: this thing needs a lot more work. In particular:
  * - caching for blocking requests
  * - correct mime type
@@ -262,14 +264,16 @@ public class DefaultServlet extends HttpServlet {
                 return;
             }
         }
-        //todo: handle range requests
+
         //we are going to proceed. Set the appropriate headers
         if(resp.getContentType() == null) {
-            final String contentType = deployment.getServletContext().getMimeType(resource.getName());
-            if (contentType != null) {
-                resp.setContentType(contentType);
-            } else {
-                resp.setContentType("application/octet-stream");
+            if(!resource.isDirectory()) {
+                final String contentType = deployment.getServletContext().getMimeType(resource.getName());
+                if (contentType != null) {
+                    resp.setContentType(contentType);
+                } else {
+                    resp.setContentType("application/octet-stream");
+                }
             }
         }
         if (lastModified != null) {
@@ -278,11 +282,14 @@ public class DefaultServlet extends HttpServlet {
         if (etag != null) {
             resp.setHeader(Headers.ETAG_STRING, etag.toString());
         }
+        ByteRange.RangeResponseResult rangeResponse = null;
+        long start = -1, end = -1;
         try {
             //only set the content length if we are using a stream
             //if we are using a writer who knows what the length will end up being
             //todo: if someone installs a filter this can cause problems
             //not sure how best to deal with this
+            //we also can't deal with range requests if a writer is in use
             Long contentLength = resource.getContentLength();
             if (contentLength != null) {
                 resp.getOutputStream();
@@ -291,6 +298,29 @@ public class DefaultServlet extends HttpServlet {
                 } else {
                     resp.setContentLength(contentLength.intValue());
                 }
+                if(resource instanceof RangeAwareResource && ((RangeAwareResource)resource).isRangeSupported() && resource.getContentLength() != null) {
+                    resp.setHeader(Headers.ACCEPT_RANGES_STRING, "bytes");
+                    //TODO: figure out what to do with the content encoded resource manager
+                    final ByteRange range = ByteRange.parse(req.getHeader(Headers.RANGE_STRING));
+                    if(range != null) {
+                        rangeResponse = range.getResponseResult(resource.getContentLength(), req.getHeader(Headers.IF_RANGE_STRING), resource.getLastModified(), resource.getETag() == null ? null : resource.getETag().getTag());
+                        if(rangeResponse != null){
+                            start = rangeResponse.getStart();
+                            end = rangeResponse.getEnd();
+                            resp.setStatus(rangeResponse.getStatusCode());
+                            resp.setHeader(Headers.CONTENT_RANGE_STRING, rangeResponse.getContentRange());
+                            long length = rangeResponse.getContentLength();
+                            if(length > Integer.MAX_VALUE) {
+                                resp.setContentLengthLong(length);
+                            } else {
+                                resp.setContentLength((int) length);
+                            }
+                            if(rangeResponse.getStatusCode() == StatusCodes.REQUEST_RANGE_NOT_SATISFIABLE) {
+                                return;
+                            }
+                        }
+                    }
+                }
             }
         } catch (IllegalStateException e) {
 
@@ -298,22 +328,30 @@ public class DefaultServlet extends HttpServlet {
         final boolean include = req.getDispatcherType() == DispatcherType.INCLUDE;
         if (!req.getMethod().equals(Methods.HEAD_STRING)) {
             HttpServerExchange exchange = SecurityActions.requireCurrentServletRequestContext().getOriginalRequest().getExchange();
-            resource.serve(exchange.getResponseSender(), exchange, new IoCallback() {
+            if(rangeResponse == null) {
+                resource.serve(exchange.getResponseSender(), exchange, completionCallback(include));
+            } else {
+                ((RangeAwareResource)resource).serveRange(exchange.getResponseSender(), exchange, start, end, completionCallback(include));
+            }
+        }
+    }
 
-                @Override
-                public void onComplete(final HttpServerExchange exchange, final Sender sender) {
-                    if (!include) {
-                        sender.close();
-                    }
-                }
+    private IoCallback completionCallback(final boolean include) {
+        return new IoCallback() {
 
-                @Override
-                public void onException(final HttpServerExchange exchange, final Sender sender, final IOException exception) {
-                    //not much we can do here, the connection is broken
+            @Override
+            public void onComplete(final HttpServerExchange exchange, final Sender sender) {
+                if (!include) {
                     sender.close();
                 }
-            });
-        }
+            }
+
+            @Override
+            public void onException(final HttpServerExchange exchange, final Sender sender, final IOException exception) {
+                //not much we can do here, the connection is broken
+                sender.close();
+            }
+        };
     }
 
     private String getPath(final HttpServletRequest request) {
@@ -329,7 +367,7 @@ public class DefaultServlet extends HttpServlet {
         }
         String result = pathInfo;
         if (result == null) {
-            result = servletPath;
+            result = CanonicalPathUtils.canonicalize(servletPath);
         } else if(resolveAgainstContextRoot) {
             result = servletPath + CanonicalPathUtils.canonicalize(pathInfo);
         } else {
@@ -353,6 +391,9 @@ public class DefaultServlet extends HttpServlet {
                     return false;
                 }
             }
+        }
+        if(defaultAllowed && disallowed.isEmpty()) {
+            return true;
         }
         int pos = path.lastIndexOf('/');
         final String lastSegment;

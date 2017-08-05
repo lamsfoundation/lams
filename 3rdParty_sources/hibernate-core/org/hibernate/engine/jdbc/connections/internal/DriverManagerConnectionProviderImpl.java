@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.jdbc.connections.internal;
 
@@ -28,7 +11,6 @@ import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -36,11 +18,8 @@ import java.util.concurrent.TimeUnit;
 import org.hibernate.HibernateException;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.cfg.Environment;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
-import org.hibernate.internal.CoreLogging;
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.internal.log.ConnectionPoolingLogger;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 import org.hibernate.service.UnknownUnwrapTypeException;
 import org.hibernate.service.spi.Configurable;
@@ -64,7 +43,7 @@ import org.hibernate.service.spi.Stoppable;
 public class DriverManagerConnectionProviderImpl
 		implements ConnectionProvider, Configurable, Stoppable, ServiceRegistryAwareService {
 
-	private static final CoreMessageLogger log = CoreLogging.messageLogger( DriverManagerConnectionProviderImpl.class );
+	private static final ConnectionPoolingLogger log = ConnectionPoolingLogger.CONNECTIONS_LOGGER;
 
 	public static final String MIN_SIZE = "hibernate.connection.min_pool_size";
 	public static final String INITIAL_SIZE = "hibernate.connection.initial_pool_size";
@@ -73,10 +52,9 @@ public class DriverManagerConnectionProviderImpl
 
 	private boolean active = true;
 
-	private ConcurrentLinkedQueue<Connection> connections = new ConcurrentLinkedQueue<Connection>();
 	private ConnectionCreator connectionCreator;
 	private ScheduledExecutorService executorService;
-
+	private PooledConnections pool;
 
 
 	// create the pool ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,60 +71,43 @@ public class DriverManagerConnectionProviderImpl
 		log.usingHibernateBuiltInConnectionPool();
 
 		connectionCreator = buildCreator( configurationValues );
+		pool = buildPool( configurationValues );
 
-		final int minSize = ConfigurationHelper.getInt( MIN_SIZE, configurationValues, 1 );
-		final int maxSize = ConfigurationHelper.getInt( AvailableSettings.POOL_SIZE, configurationValues, 20 );
-		final int initialSize = ConfigurationHelper.getInt( INITIAL_SIZE, configurationValues, minSize );
 		final long validationInterval = ConfigurationHelper.getLong( VALIDATION_INTERVAL, configurationValues, 30 );
-
-		log.hibernateConnectionPoolSize( maxSize, minSize );
-
-		log.debugf( "Initializing Connection pool with %s Connections", initialSize );
-		for ( int i = 0; i < initialSize; i++ ) {
-			connections.add( connectionCreator.createConnection() );
-		}
-
 		executorService = Executors.newSingleThreadScheduledExecutor();
 		executorService.scheduleWithFixedDelay(
 				new Runnable() {
 					private boolean primed;
 					@Override
 					public void run() {
-						int size = connections.size();
-
-						if ( !primed && size >= minSize ) {
-							// IMPL NOTE : the purpose of primed is to allow the pool to lazily reach its
-							// defined min-size.
-							log.debug( "Connection pool now considered primed; min-size will be maintained" );
-							primed = true;
-						}
-
-						if ( size < minSize && primed ) {
-							int numberToBeAdded = minSize - size;
-							log.debugf( "Adding %s Connections to the pool", numberToBeAdded );
-							for (int i = 0; i < numberToBeAdded; i++) {
-								connections.add( connectionCreator.createConnection() );
-							}
-						}
-						else if ( size > maxSize ) {
-							int numberToBeRemoved = size - maxSize;
-							log.debugf( "Removing %s Connections from the pool", numberToBeRemoved );
-							for ( int i = 0; i < numberToBeRemoved; i++ ) {
-								Connection connection = connections.poll();
-								try {
-									connection.close();
-								}
-								catch (SQLException e) {
-									log.unableToCloseConnection( e );
-								}
-							}
-						}
+						pool.validate();
 					}
 				},
 				validationInterval,
 				validationInterval,
 				TimeUnit.SECONDS
 		);
+	}
+
+	private PooledConnections buildPool(Map configurationValues) {
+		final boolean autoCommit = ConfigurationHelper.getBoolean(
+				AvailableSettings.AUTOCOMMIT,
+				configurationValues,
+				false
+		);
+		final int minSize = ConfigurationHelper.getInt( MIN_SIZE, configurationValues, 1 );
+		final int maxSize = ConfigurationHelper.getInt( AvailableSettings.POOL_SIZE, configurationValues, 20 );
+		final int initialSize = ConfigurationHelper.getInt( INITIAL_SIZE, configurationValues, minSize );
+
+		PooledConnections.Builder pooledConnectionBuilder = new PooledConnections.Builder(
+				connectionCreator,
+				autoCommit
+		);
+		pooledConnectionBuilder.initialSize( initialSize );
+		pooledConnectionBuilder.minSize( minSize );
+		pooledConnectionBuilder.maxSize( maxSize );
+
+		return pooledConnectionBuilder.build();
 	}
 
 	private ConnectionCreator buildCreator(Map configurationValues) {
@@ -180,9 +141,9 @@ public class DriverManagerConnectionProviderImpl
 		log.autoCommitMode( autoCommit );
 		connectionCreatorBuilder.setAutoCommit( autoCommit );
 
-		final Integer isolation = ConfigurationHelper.getInteger( AvailableSettings.ISOLATION, configurationValues );
+		final Integer isolation = ConnectionProviderInitiator.extractIsolation( configurationValues );
 		if ( isolation != null ) {
-			log.jdbcIsolationLevel( Environment.isolationLevelToString( isolation ) );
+			log.jdbcIsolationLevel( ConnectionProviderInitiator.toIsolationNiceName( isolation ) );
 		}
 		connectionCreatorBuilder.setIsolation( isolation );
 
@@ -210,12 +171,7 @@ public class DriverManagerConnectionProviderImpl
 			return (Driver) Class.forName( driverClassName ).newInstance();
 		}
 		catch ( Exception e1 ) {
-			try{
-				return (Driver) ReflectHelper.classForName( driverClassName ).newInstance();
-			}
-			catch ( Exception e2 ) {
-				throw new ServiceException( "Specified JDBC Driver " + driverClassName + " could not be loaded", e2 );
-			}
+			throw new ServiceException( "Specified JDBC Driver " + driverClassName + " could not be loaded", e1 );
 		}
 	}
 
@@ -228,12 +184,11 @@ public class DriverManagerConnectionProviderImpl
 			throw new HibernateException( "Connection pool is no longer active" );
 		}
 
-		Connection connection;
-		if ( (connection = connections.poll()) == null ) {
-			connection = connectionCreator.createConnection();
+		Connection conn = pool.poll();
+		if ( conn == null ) {
+			conn = connectionCreator.createConnection();
 		}
-
-		return connection;
+		return conn;
 	}
 
 	@Override
@@ -242,9 +197,8 @@ public class DriverManagerConnectionProviderImpl
 			return;
 		}
 
-		this.connections.offer( conn );
+		pool.add( conn );
 	}
-
 
 	@Override
 	public boolean supportsAggressiveRelease() {
@@ -287,17 +241,15 @@ public class DriverManagerConnectionProviderImpl
 		}
 		executorService = null;
 
-		for ( Connection connection : connections ) {
-			try {
-				connection.close();
-			}
-			catch (SQLException e) {
-				log.unableToClosePooledConnection( e );
-			}
+		try {
+			pool.close();
+		}
+		catch (SQLException e) {
+			log.unableToClosePooledConnection( e );
 		}
 	}
 
-
+	//CHECKSTYLE:START_ALLOW_FINALIZER
 	@Override
 	protected void finalize() throws Throwable {
 		if ( active ) {
@@ -305,5 +257,6 @@ public class DriverManagerConnectionProviderImpl
 		}
 		super.finalize();
 	}
+	//CHECKSTYLE:END_ALLOW_FINALIZER
 
 }

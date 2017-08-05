@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.loader.collection.plan;
 
@@ -30,6 +12,8 @@ import java.sql.SQLException;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
+import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
 import org.hibernate.engine.spi.QueryParameters;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.CoreLogging;
@@ -57,24 +41,26 @@ public abstract class AbstractLoadPlanBasedCollectionInitializer
 
 	private final QueryableCollection collectionPersister;
 	private final LoadQueryDetails staticLoadQuery;
+	private final LockOptions lockOptions;
 
 	public AbstractLoadPlanBasedCollectionInitializer(
 			QueryableCollection collectionPersister,
 			QueryBuildingParameters buildingParameters) {
 		super( collectionPersister.getFactory() );
 		this.collectionPersister = collectionPersister;
+		this.lockOptions = buildingParameters.getLockMode() != null
+				? new LockOptions( buildingParameters.getLockMode() )
+				: buildingParameters.getLockOptions();
 
 		final FetchStyleLoadPlanBuildingAssociationVisitationStrategy strategy =
 				new FetchStyleLoadPlanBuildingAssociationVisitationStrategy(
 						collectionPersister.getFactory(),
 						buildingParameters.getQueryInfluencers(),
-						buildingParameters.getLockMode() != null
-								? buildingParameters.getLockMode()
-								: buildingParameters.getLockOptions().getLockMode()
+						this.lockOptions.getLockMode()
 		);
 
 		final LoadPlan plan = MetamodelDrivenLoadPlanBuilder.buildRootCollectionLoadPlan( strategy, collectionPersister );
-		this.staticLoadQuery = BatchingLoadQueryDetailsFactory.makeCollectionLoadQueryDetails(
+		this.staticLoadQuery = BatchingLoadQueryDetailsFactory.INSTANCE.makeCollectionLoadQueryDetails(
 				collectionPersister,
 				plan,
 				buildingParameters
@@ -96,6 +82,8 @@ public abstract class AbstractLoadPlanBasedCollectionInitializer
 			qp.setPositionalParameterTypes( new Type[]{ collectionPersister.getKeyType() } );
 			qp.setPositionalParameterValues( ids );
 			qp.setCollectionKeys( ids );
+
+			qp.setLockOptions( lockOptions );
 
 			executeLoad(
 					session,

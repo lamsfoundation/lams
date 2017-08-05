@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.util.Args;
 
 /**
  * A self contained, repeatable entity that obtains its content from a byte array.
@@ -53,11 +54,10 @@ public class ByteArrayEntity extends AbstractHttpEntity implements Cloneable {
     /**
      * @since 4.2
      */
+    @SuppressWarnings("deprecation")
     public ByteArrayEntity(final byte[] b, final ContentType contentType) {
         super();
-        if (b == null) {
-            throw new IllegalArgumentException("Source byte array may not be null");
-        }
+        Args.notNull(b, "Source byte array");
         this.content = b;
         this.b = b;
         this.off = 0;
@@ -70,11 +70,10 @@ public class ByteArrayEntity extends AbstractHttpEntity implements Cloneable {
     /**
      * @since 4.2
      */
-    public ByteArrayEntity(final byte[] b, int off, int len, final ContentType contentType) {
+    @SuppressWarnings("deprecation")
+    public ByteArrayEntity(final byte[] b, final int off, final int len, final ContentType contentType) {
         super();
-        if (b == null) {
-            throw new IllegalArgumentException("Source byte array may not be null");
-        }
+        Args.notNull(b, "Source byte array");
         if ((off < 0) || (off > b.length) || (len < 0) ||
                 ((off + len) < 0) || ((off + len) > b.length)) {
             throw new IndexOutOfBoundsException("off: " + off + " len: " + len + " b.length: " + b.length);
@@ -92,26 +91,28 @@ public class ByteArrayEntity extends AbstractHttpEntity implements Cloneable {
         this(b, null);
     }
 
-    public ByteArrayEntity(final byte[] b, int off, int len) {
+    public ByteArrayEntity(final byte[] b, final int off, final int len) {
         this(b, off, len, null);
     }
 
+    @Override
     public boolean isRepeatable() {
         return true;
     }
 
+    @Override
     public long getContentLength() {
         return this.len;
     }
 
+    @Override
     public InputStream getContent() {
         return new ByteArrayInputStream(this.b, this.off, this.len);
     }
 
+    @Override
     public void writeTo(final OutputStream outstream) throws IOException {
-        if (outstream == null) {
-            throw new IllegalArgumentException("Output stream may not be null");
-        }
+        Args.notNull(outstream, "Output stream");
         outstream.write(this.b, this.off, this.len);
         outstream.flush();
     }
@@ -120,8 +121,9 @@ public class ByteArrayEntity extends AbstractHttpEntity implements Cloneable {
     /**
      * Tells that this entity is not streaming.
      *
-     * @return <code>false</code>
+     * @return {@code false}
      */
+    @Override
     public boolean isStreaming() {
         return false;
     }

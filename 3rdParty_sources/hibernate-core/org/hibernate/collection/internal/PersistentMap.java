@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.collection.internal;
 
@@ -587,59 +570,42 @@ public class PersistentMap extends AbstractPersistentCollection implements Map {
 		}
 	}
 
-	final class Put implements DelayedOperation {
+	abstract class AbstractMapValueDelayedOperation extends AbstractValueDelayedOperation {
 		private Object index;
-		private Object value;
-		private Object old;
-		
-		public Put(Object index, Object value, Object old) {
+
+		protected AbstractMapValueDelayedOperation(Object index, Object addedValue, Object orphan) {
+			super( addedValue, orphan );
 			this.index = index;
-			this.value = value;
-			this.old = old;
 		}
 
-		@Override
-		@SuppressWarnings("unchecked")
-		public void operate() {
-			map.put( index, value );
-		}
-
-		@Override
-		@SuppressWarnings("unchecked")
-		public Object getAddedInstance() {
-			return value;
-		}
-
-		@Override
-		@SuppressWarnings("unchecked")
-		public Object getOrphan() {
-			return old;
+		protected final Object getIndex() {
+			return index;
 		}
 	}
 
-	final class Remove implements DelayedOperation {
-		private Object index;
-		private Object old;
-		
-		public Remove(Object index, Object old) {
-			this.index = index;
-			this.old = old;
+	final class Put extends AbstractMapValueDelayedOperation {
+
+		public Put(Object index, Object addedValue, Object orphan) {
+			super( index, addedValue, orphan );
 		}
 
 		@Override
 		@SuppressWarnings("unchecked")
 		public void operate() {
-			map.remove( index );
+			map.put( getIndex(), getAddedInstance() );
+		}
+	}
+
+	final class Remove extends AbstractMapValueDelayedOperation {
+
+		public Remove(Object index, Object orphan) {
+			super( index, null, orphan );
 		}
 
 		@Override
-		public Object getAddedInstance() {
-			return null;
-		}
-
-		@Override
-		public Object getOrphan() {
-			return old;
+		@SuppressWarnings("unchecked")
+		public void operate() {
+			map.remove( getIndex() );
 		}
 	}
 }

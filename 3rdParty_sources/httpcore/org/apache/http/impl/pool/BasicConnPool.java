@@ -31,43 +31,52 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpHost;
 import org.apache.http.annotation.ThreadSafe;
+import org.apache.http.config.ConnectionConfig;
+import org.apache.http.config.SocketConfig;
 import org.apache.http.params.HttpParams;
 import org.apache.http.pool.AbstractConnPool;
 import org.apache.http.pool.ConnFactory;
-import org.apache.http.pool.ConnPool;
 
 /**
- * A very basic {@link ConnPool} implementation that represents a pool
- * of blocking {@link HttpClientConnection} connections identified by
- * an {@link HttpHost} instance. Please note this pool implementation
- * does not support complex routes via a proxy cannot differentiate between
- * direct and proxied connections.
- * <p/>
- * The following parameters can be used to customize the behavior of this
- * class:
- * <ul>
- *  <li>{@link org.apache.http.params.CoreProtocolPNames#HTTP_ELEMENT_CHARSET}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#TCP_NODELAY}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#SO_TIMEOUT}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#SO_LINGER}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#SOCKET_BUFFER_SIZE}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#MAX_LINE_LENGTH}</li>
- * </ul>
+ * A very basic {@link org.apache.http.pool.ConnPool} implementation that
+ * represents a pool of blocking {@link HttpClientConnection} connections
+ * identified by an {@link HttpHost} instance. Please note this pool
+ * implementation does not support complex routes via a proxy cannot
+ * differentiate between direct and proxied connections.
  *
  * @see HttpHost
  * @since 4.2
  */
+@SuppressWarnings("deprecation")
 @ThreadSafe
 public class BasicConnPool extends AbstractConnPool<HttpHost, HttpClientConnection, BasicPoolEntry> {
 
-    private static AtomicLong COUNTER = new AtomicLong();
+    private static final AtomicLong COUNTER = new AtomicLong();
 
     public BasicConnPool(final ConnFactory<HttpHost, HttpClientConnection> connFactory) {
         super(connFactory, 2, 20);
     }
 
+    /**
+     * @deprecated (4.3) use {@link BasicConnPool#BasicConnPool(SocketConfig, ConnectionConfig)}
+     */
+    @Deprecated
     public BasicConnPool(final HttpParams params) {
         super(new BasicConnFactory(params), 2, 20);
+    }
+
+    /**
+     * @since 4.3
+     */
+    public BasicConnPool(final SocketConfig sconfig, final ConnectionConfig cconfig) {
+        super(new BasicConnFactory(sconfig, cconfig), 2, 20);
+    }
+
+    /**
+     * @since 4.3
+     */
+    public BasicConnPool() {
+        super(new BasicConnFactory(SocketConfig.DEFAULT, ConnectionConfig.DEFAULT), 2, 20);
     }
 
     @Override
@@ -75,6 +84,11 @@ public class BasicConnPool extends AbstractConnPool<HttpHost, HttpClientConnecti
             final HttpHost host,
             final HttpClientConnection conn) {
         return new BasicPoolEntry(Long.toString(COUNTER.getAndIncrement()), host, conn);
+    }
+
+    @Override
+    protected boolean validate(final BasicPoolEntry entry) {
+        return !entry.getConnection().isStale();
     }
 
 }

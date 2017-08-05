@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.internal.util;
 
@@ -35,10 +17,9 @@ import java.io.OutputStream;
 import java.io.Serializable;
 
 import org.hibernate.Hibernate;
+import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.type.SerializationException;
-
-import org.jboss.logging.Logger;
 
 /**
  * <p>Assists with the serialization process and performs additional functionality based
@@ -49,7 +30,7 @@ import org.jboss.logging.Logger;
  * <li>Serialize managing finally and IOException
  * <li>Deserialize managing finally and IOException
  * </ul>
- *
+ * <p/>
  * <p>This class throws exceptions for invalid <code>null</code> inputs.
  * Each method documents its behaviour in more detail.</p>
  *
@@ -63,8 +44,7 @@ import org.jboss.logging.Logger;
  * @since 1.0
  */
 public final class SerializationHelper {
-
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, SerializationHelper.class.getName());
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( SerializationHelper.class );
 
 	private SerializationHelper() {
 	}
@@ -74,7 +54,7 @@ public final class SerializationHelper {
 
 	/**
 	 * <p>Deep clone an <code>Object</code> using serialization.</p>
-	 *
+	 * <p/>
 	 * <p>This is many times slower than writing clone methods by hand
 	 * on all objects in your object graph. However, for complex object
 	 * graphs, or for those that don't support deep cloning this can
@@ -100,11 +80,11 @@ public final class SerializationHelper {
 
 	/**
 	 * <p>Serializes an <code>Object</code> to the specified stream.</p>
-	 *
+	 * <p/>
 	 * <p>The stream will be closed once the object is written.
 	 * This avoids the need for a finally clause, and maybe also exception
 	 * handling, in the application code.</p>
-	 *
+	 * <p/>
 	 * <p>The stream passed in is not buffered internally within this method.
 	 * This is the responsibility of your application if desired.</p>
 	 *
@@ -135,7 +115,7 @@ public final class SerializationHelper {
 			out.writeObject( obj );
 
 		}
-		catch ( IOException ex ) {
+		catch (IOException ex) {
 			throw new SerializationException( "could not serialize", ex );
 		}
 		finally {
@@ -144,7 +124,7 @@ public final class SerializationHelper {
 					out.close();
 				}
 			}
-			catch ( IOException ignored ) {
+			catch (IOException ignored) {
 			}
 		}
 	}
@@ -181,7 +161,7 @@ public final class SerializationHelper {
 	 * @throws IllegalArgumentException if <code>inputStream</code> is <code>null</code>
 	 * @throws SerializationException (runtime) if the serialization fails
 	 */
-	public static Object deserialize(InputStream inputStream) throws SerializationException {
+	public static <T> T deserialize(InputStream inputStream) throws SerializationException {
 		return doDeserialize( inputStream, defaultClassLoader(), hibernateClassLoader(), null );
 	}
 
@@ -191,7 +171,7 @@ public final class SerializationHelper {
 	 * @return The current TCCL
 	 */
 	public static ClassLoader defaultClassLoader() {
-		return ClassLoaderHelper.getContextClassLoader();
+		return Thread.currentThread().getContextClassLoader();
 	}
 
 	public static ClassLoader hibernateClassLoader() {
@@ -222,7 +202,8 @@ public final class SerializationHelper {
 		return doDeserialize( inputStream, loader, defaultClassLoader(), hibernateClassLoader() );
 	}
 
-	public static Object doDeserialize(
+	@SuppressWarnings("unchecked")
+	public static <T> T doDeserialize(
 			InputStream inputStream,
 			ClassLoader loader,
 			ClassLoader fallbackLoader1,
@@ -241,24 +222,24 @@ public final class SerializationHelper {
 					fallbackLoader2
 			);
 			try {
-				return in.readObject();
+				return (T) in.readObject();
 			}
-			catch ( ClassNotFoundException e ) {
+			catch (ClassNotFoundException e) {
 				throw new SerializationException( "could not deserialize", e );
 			}
-			catch ( IOException e ) {
+			catch (IOException e) {
 				throw new SerializationException( "could not deserialize", e );
 			}
 			finally {
 				try {
 					in.close();
 				}
-				catch ( IOException ignore ) {
+				catch (IOException ignore) {
 					// ignore
 				}
 			}
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SerializationException( "could not deserialize", e );
 		}
 	}
@@ -342,7 +323,7 @@ public final class SerializationHelper {
 			try {
 				return Class.forName( className, false, loader1 );
 			}
-			catch ( ClassNotFoundException e ) {
+			catch (ClassNotFoundException e) {
 				LOG.trace( "Unable to locate class using given classloader" );
 			}
 
@@ -350,7 +331,7 @@ public final class SerializationHelper {
 				try {
 					return Class.forName( className, false, loader2 );
 				}
-				catch ( ClassNotFoundException e ) {
+				catch (ClassNotFoundException e) {
 					LOG.trace( "Unable to locate class using given classloader" );
 				}
 			}
@@ -359,7 +340,7 @@ public final class SerializationHelper {
 				try {
 					return Class.forName( className, false, loader3 );
 				}
-				catch ( ClassNotFoundException e ) {
+				catch (ClassNotFoundException e) {
 					LOG.trace( "Unable to locate class using given classloader" );
 				}
 			}
@@ -370,8 +351,10 @@ public final class SerializationHelper {
 		}
 
 		private boolean different(ClassLoader one, ClassLoader other) {
-            if (one == null) return other != null;
-            return !one.equals(other);
+			if ( one == null ) {
+				return other != null;
+			}
+			return !one.equals( other );
 		}
 	}
 }

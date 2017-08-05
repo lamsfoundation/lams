@@ -61,7 +61,7 @@ public class WebSocketFramePriority implements FramePriority<WebSocketChannel, S
                         return false;
                     }
                 }
-                if(order == newFrame && newFrame.isWritesShutdown()) {
+                if(order == newFrame && newFrame.isFinalFragment()) {
                     strictOrderQueue.poll();
                 }
             }
@@ -83,7 +83,21 @@ public class WebSocketFramePriority implements FramePriority<WebSocketChannel, S
             } else if (newFrame.getType() == WebSocketFrameType.PING ||
                     newFrame.getType() == WebSocketFrameType.PONG) {
                 //add at the start of the queue
-                pendingFrames.add(1, newFrame);
+                int index = 1; //index = 1 because the very first frame may be half written out already
+                boolean done = false;
+                //insert before the first frame that is not a ping or pong
+                while (index < pendingFrames.size()) {
+                    WebSocketFrameType type = pendingFrames.get(index).getType();
+                    if(type != WebSocketFrameType.PING && type != WebSocketFrameType.PONG) {
+                        pendingFrames.add(index, newFrame);
+                        done = true;
+                        break;
+                    }
+                    index++;
+                }
+                if(!done) {
+                    pendingFrames.add(newFrame);
+                }
             } else {
                 pendingFrames.add(newFrame);
             }
@@ -100,7 +114,7 @@ public class WebSocketFramePriority implements FramePriority<WebSocketChannel, S
             if (currentFragmentedSender != newFrame) {
                 return false;
             } else {
-                if (newFrame.isWritesShutdown()) {
+                if (newFrame.isFinalFragment()) {
                     currentFragmentedSender = null;
                 }
                 pendingFrames.add(newFrame);

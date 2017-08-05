@@ -1,29 +1,13 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cfg;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import javax.persistence.Convert;
 import javax.persistence.Converts;
@@ -42,6 +26,8 @@ import org.hibernate.annotations.ManyToAny;
 import org.hibernate.annotations.MapKeyType;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.boot.model.source.spi.AttributePath;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.StringHelper;
@@ -75,13 +61,17 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 			XClass clazzToProcess,
 			XProperty property,
 			PropertyHolder parentPropertyHolder,
-			Mappings mappings) {
-		super( path, parentPropertyHolder, clazzToProcess, mappings );
+			MetadataBuildingContext context) {
+		super( path, parentPropertyHolder, clazzToProcess, context );
 		this.collection = collection;
 		setCurrentProperty( property );
 
 		this.elementAttributeConversionInfoMap = new HashMap<String, AttributeConversionInfo>();
 		this.keyAttributeConversionInfoMap = new HashMap<String, AttributeConversionInfo>();
+	}
+
+	public Collection getCollectionBinding() {
+		return collection;
 	}
 
 	private void buildAttributeConversionInfoMaps(
@@ -138,6 +128,7 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 		}
 
 		if ( StringHelper.isEmpty( info.getAttributeName() ) ) {
+			// the @Convert did not name an attribute...
 			if ( canElementBeConverted && canKeyBeConverted ) {
 				throw new IllegalStateException(
 						"@Convert placed on Map attribute [" + collection.getRole()
@@ -153,28 +144,74 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 			// if neither, we should not be here...
 		}
 		else {
+			// the @Convert named an attribute...
+
+			// we have different "resolution rules" based on whether element and key can be converted
+			final String keyPath;
+			final String elementPath;
+
 			if ( canElementBeConverted && canKeyBeConverted ) {
-				// specified attributeName needs to have 'key.' or 'value.' prefix
-				if ( info.getAttributeName().startsWith( "key." ) ) {
-					keyAttributeConversionInfoMap.put(
-							info.getAttributeName().substring( 4 ),
-							info
-					);
-				}
-				else if ( info.getAttributeName().startsWith( "value." ) ) {
-					elementAttributeConversionInfoMap.put(
-							info.getAttributeName().substring( 6 ),
-							info
-					);
-				}
-				else {
+				keyPath = removePrefix( info.getAttributeName(), "key" );
+				elementPath = removePrefix( info.getAttributeName(), "value" );
+
+				if ( keyPath == null && elementPath == null ) {
+					// specified attributeName needs to have 'key.' or 'value.' prefix
 					throw new IllegalStateException(
 							"@Convert placed on Map attribute [" + collection.getRole()
 									+ "] must define attributeName of 'key' or 'value'"
 					);
 				}
 			}
+			else if ( canKeyBeConverted ) {
+				keyPath = removePrefix( info.getAttributeName(), "key", info.getAttributeName() );
+				elementPath = null;
+			}
+			else {
+				keyPath = null;
+				elementPath = removePrefix( info.getAttributeName(), "value", info.getAttributeName() );
+			}
+
+			if ( keyPath != null ) {
+				keyAttributeConversionInfoMap.put( keyPath, info );
+			}
+			else if ( elementPath != null ) {
+				elementAttributeConversionInfoMap.put( elementPath, info );
+			}
+			else {
+				// specified attributeName needs to have 'key.' or 'value.' prefix
+				throw new IllegalStateException(
+						String.format(
+								Locale.ROOT,
+								"Could not determine how to apply @Convert(attributeName='%s') to collection [%s]",
+								info.getAttributeName(),
+								collection.getRole()
+						)
+				);
+			}
 		}
+	}
+
+	/**
+	 * Check if path has the given prefix and remove it.
+	 *
+	 * @param path Path.
+	 * @param prefix Prefix.
+	 * @return Path without prefix, or null, if path did not have the prefix.
+	 */
+	private String removePrefix(String path, String prefix) {
+		return removePrefix( path, prefix, null );
+	}
+
+	private String removePrefix(String path, String prefix, String defaultValue) {
+		if ( path.equals(prefix) ) {
+			return "";
+		}
+
+		if (path.startsWith(prefix + ".")) {
+			return path.substring( prefix.length() + 1 );
+		}
+
+		return defaultValue;
 	}
 
 	@Override
@@ -214,8 +251,17 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 
 	@Override
 	protected AttributeConversionInfo locateAttributeConversionInfo(String path) {
-		// todo : implement
-		return null;
+		final String key = removePrefix( path, "key" );
+		if ( key != null ) {
+			return keyAttributeConversionInfoMap.get( key );
+		}
+
+		final String element = removePrefix( path, "element" );
+		if ( element != null ) {
+			return elementAttributeConversionInfoMap.get( element );
+		}
+
+		return elementAttributeConversionInfoMap.get( path );
 	}
 
 	public String getClassName() {
@@ -356,7 +402,7 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 
 		final Class elementClass = determineElementClass( elementXClass );
 		if ( elementClass != null ) {
-			for ( AttributeConverterDefinition attributeConverterDefinition : getMappings().getAttributeConverters() ) {
+			for ( AttributeConverterDefinition attributeConverterDefinition : getContext().getMetadataCollector().getAttributeConverters() ) {
 				if ( ! attributeConverterDefinition.isAutoApply() ) {
 					continue;
 				}
@@ -378,7 +424,7 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 	private Class determineElementClass(XClass elementXClass) {
 		if ( elementXClass != null ) {
 			try {
-				return getMappings().getReflectionManager().toClass( elementXClass );
+				return getContext().getBuildingOptions().getReflectionManager().toClass( elementXClass );
 			}
 			catch (Exception e) {
 				log.debugf(
@@ -430,7 +476,7 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 
 		final Class elementClass = determineKeyClass( keyXClass );
 		if ( elementClass != null ) {
-			for ( AttributeConverterDefinition attributeConverterDefinition : getMappings().getAttributeConverters() ) {
+			for ( AttributeConverterDefinition attributeConverterDefinition : getContext().getMetadataCollector().getAttributeConverters() ) {
 				if ( ! attributeConverterDefinition.isAutoApply() ) {
 					continue;
 				}
@@ -452,7 +498,7 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 	private Class determineKeyClass(XClass keyXClass) {
 		if ( keyXClass != null ) {
 			try {
-				return getMappings().getReflectionManager().toClass( keyXClass );
+				return getContext().getBuildingOptions().getReflectionManager().toClass( keyXClass );
 			}
 			catch (Exception e) {
 				log.debugf(

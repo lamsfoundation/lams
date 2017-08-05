@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.type.descriptor.java;
 
@@ -53,18 +36,22 @@ public class BlobTypeDescriptor extends AbstractTypeDescriptor<Blob> {
 	public static class BlobMutabilityPlan implements MutabilityPlan<Blob> {
 		public static final BlobMutabilityPlan INSTANCE = new BlobMutabilityPlan();
 
+		@Override
 		public boolean isMutable() {
 			return false;
 		}
 
+		@Override
 		public Blob deepCopy(Blob value) {
 			return value;
 		}
 
+		@Override
 		public Serializable disassemble(Blob value) {
 			throw new UnsupportedOperationException( "Blobs are not cacheable" );
 		}
 
+		@Override
 		public Blob assemble(Serializable cached) {
 			throw new UnsupportedOperationException( "Blobs are not cacheable" );
 		}
@@ -74,9 +61,7 @@ public class BlobTypeDescriptor extends AbstractTypeDescriptor<Blob> {
 		super( Blob.class, BlobMutabilityPlan.INSTANCE );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public String toString(Blob value) {
 		final byte[] bytes;
 		try {
@@ -88,9 +73,7 @@ public class BlobTypeDescriptor extends AbstractTypeDescriptor<Blob> {
 		return PrimitiveByteArrayTypeDescriptor.INSTANCE.toString( bytes );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public Blob fromString(String string) {
 		return BlobProxy.generateProxy( PrimitiveByteArrayTypeDescriptor.INSTANCE.fromString( string ) );
 	}
@@ -111,6 +94,7 @@ public class BlobTypeDescriptor extends AbstractTypeDescriptor<Blob> {
 		return one == another;
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked" })
 	public <X> X unwrap(Blob value, Class<X> type, WrapperOptions options) {
 		if ( value == null ) {
@@ -152,6 +136,7 @@ public class BlobTypeDescriptor extends AbstractTypeDescriptor<Blob> {
 		throw unknownUnwrap( type );
 	}
 
+	@Override
 	public <X> Blob wrap(X value, WrapperOptions options) {
 		if ( value == null ) {
 			return null;

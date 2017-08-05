@@ -18,7 +18,6 @@
 
 package io.undertow.servlet.spec;
 
-import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -212,10 +211,27 @@ public class HttpSessionImpl implements HttpSession {
     }
 
     public Session getSession() {
-        if(System.getSecurityManager() != null) {
-            AccessController.checkPermission(PERMISSION);
+        SecurityManager sm = System.getSecurityManager();
+        if(sm != null) {
+            sm.checkPermission(PERMISSION);
         }
         return session;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        HttpSessionImpl that = (HttpSessionImpl) o;
+
+        return session.getId().equals(that.session.getId());
+
+    }
+
+    @Override
+    public int hashCode() {
+        return session.getId().hashCode();
     }
 
     public boolean isInvalid() {

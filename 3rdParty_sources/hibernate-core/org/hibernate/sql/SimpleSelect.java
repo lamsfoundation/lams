@@ -1,28 +1,11 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.sql;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,16 +34,16 @@ public class SimpleSelect {
 	private String tableName;
 	private String orderBy;
 	private Dialect dialect;
-	private LockOptions lockOptions = new LockOptions( LockMode.READ);
+	private LockOptions lockOptions = new LockOptions( LockMode.READ );
 	private String comment;
 
-	private List columns = new ArrayList();
-	private Map aliases = new HashMap();
-	private List whereTokens = new ArrayList();
+	private List<String> columns = new ArrayList<String>();
+	private Map<String, String> aliases = new HashMap<String, String>();
+	private List<String> whereTokens = new ArrayList<String>();
 
 	public SimpleSelect addColumns(String[] columnNames, String[] columnAliases) {
-		for ( int i=0; i<columnNames.length; i++ ) {
-			if ( columnNames[i]!=null  ) {
+		for ( int i = 0; i < columnNames.length; i++ ) {
+			if ( columnNames[i] != null ) {
 				addColumn( columnNames[i], columnAliases[i] );
 			}
 		}
@@ -68,8 +51,8 @@ public class SimpleSelect {
 	}
 
 	public SimpleSelect addColumns(String[] columns, String[] aliases, boolean[] ignore) {
-		for ( int i=0; i<ignore.length; i++ ) {
-			if ( !ignore[i] && columns[i]!=null ) {
+		for ( int i = 0; i < ignore.length; i++ ) {
+			if ( !ignore[i] && columns[i] != null ) {
 				addColumn( columns[i], aliases[i] );
 			}
 		}
@@ -77,20 +60,23 @@ public class SimpleSelect {
 	}
 
 	public SimpleSelect addColumns(String[] columnNames) {
-		for ( int i=0; i<columnNames.length; i++ ) {
-			if ( columnNames[i]!=null ) addColumn( columnNames[i] );
+		for ( String columnName : columnNames ) {
+			if ( columnName != null ) {
+				addColumn( columnName );
+			}
 		}
 		return this;
 	}
+
 	public SimpleSelect addColumn(String columnName) {
-		columns.add(columnName);
+		columns.add( columnName );
 		//aliases.put( columnName, DEFAULT_ALIAS.toAliasString(columnName) );
 		return this;
 	}
 
 	public SimpleSelect addColumn(String columnName, String alias) {
-		columns.add(columnName);
-		aliases.put(columnName, alias);
+		columns.add( columnName );
+		aliases.put( columnName, alias );
 		return this;
 	}
 
@@ -99,8 +85,8 @@ public class SimpleSelect {
 		return this;
 	}
 
-	public SimpleSelect setLockOptions( LockOptions lockOptions ) {
-	   LockOptions.copy(lockOptions, this.lockOptions);
+	public SimpleSelect setLockOptions(LockOptions lockOptions) {
+		LockOptions.copy( lockOptions, this.lockOptions );
 		return this;
 	}
 
@@ -110,13 +96,13 @@ public class SimpleSelect {
 	}
 
 	public SimpleSelect addWhereToken(String token) {
-		whereTokens.add(token);
+		whereTokens.add( token );
 		return this;
 	}
-	
+
 	private void and() {
-		if ( whereTokens.size()>0 ) {
-			whereTokens.add("and");
+		if ( whereTokens.size() > 0 ) {
+			whereTokens.add( "and" );
 		}
 	}
 
@@ -133,61 +119,67 @@ public class SimpleSelect {
 	}
 
 	public SimpleSelect addCondition(String[] lhs, String op, String[] rhs) {
-		for ( int i=0; i<lhs.length; i++ ) {
+		for ( int i = 0; i < lhs.length; i++ ) {
 			addCondition( lhs[i], op, rhs[i] );
 		}
 		return this;
 	}
 
 	public SimpleSelect addCondition(String[] lhs, String condition) {
-		for ( int i=0; i<lhs.length; i++ ) {
-			if ( lhs[i]!=null ) addCondition( lhs[i], condition );
+		for ( String lh : lhs ) {
+			if ( lh != null ) {
+				addCondition( lh, condition );
+			}
 		}
 		return this;
 	}
 
 	public String toStatementString() {
-		StringBuilder buf = new StringBuilder( 
-				columns.size()*10 + 
-				tableName.length() + 
-				whereTokens.size() * 10 + 
-				10 
-			);
-		
-		if ( comment!=null ) {
-			buf.append("/* ").append(comment).append(" */ ");
+		StringBuilder buf = new StringBuilder(
+				columns.size() * 10 +
+						tableName.length() +
+						whereTokens.size() * 10 +
+						10
+		);
+
+		if ( comment != null ) {
+			buf.append( "/* " ).append( comment ).append( " */ " );
 		}
-		
-		buf.append("select ");
-		Set uniqueColumns = new HashSet();
-		Iterator iter = columns.iterator();
+
+		buf.append( "select " );
+		Set<String> uniqueColumns = new HashSet<String>();
+		Iterator<String> iter = columns.iterator();
 		boolean appendComma = false;
 		while ( iter.hasNext() ) {
-			String col = (String) iter.next();
-			String alias = (String) aliases.get(col);
-			if ( uniqueColumns.add(alias==null ? col : alias) ) {
-				if (appendComma) buf.append(", ");
-				buf.append(col);
-				if ( alias!=null && !alias.equals(col) ) {
-					buf.append(" as ")
-						.append(alias);
+			String col = iter.next();
+			String alias = aliases.get( col );
+			if ( uniqueColumns.add( alias == null ? col : alias ) ) {
+				if ( appendComma ) {
+					buf.append( ", " );
+				}
+				buf.append( col );
+				if ( alias != null && !alias.equals( col ) ) {
+					buf.append( " as " )
+							.append( alias );
 				}
 				appendComma = true;
 			}
 		}
-		
-		buf.append(" from ")
-			.append( dialect.appendLockHint(lockOptions, tableName) );
-		
+
+		buf.append( " from " )
+				.append( dialect.appendLockHint( lockOptions, tableName ) );
+
 		if ( whereTokens.size() > 0 ) {
-			buf.append(" where ")
-				.append( toWhereClause() );
+			buf.append( " where " )
+					.append( toWhereClause() );
 		}
-		
-		if (orderBy!=null) buf.append(orderBy);
-		
-		if (lockOptions!=null) {
-			buf.append( dialect.getForUpdateString(lockOptions) );
+
+		if ( orderBy != null ) {
+			buf.append( orderBy );
+		}
+
+		if ( lockOptions != null ) {
+			buf = new StringBuilder(dialect.applyLocksToSql( buf.toString(), lockOptions, null ) );
 		}
 
 		return dialect.transformSelectString( buf.toString() );
@@ -195,10 +187,12 @@ public class SimpleSelect {
 
 	public String toWhereClause() {
 		StringBuilder buf = new StringBuilder( whereTokens.size() * 5 );
-		Iterator iter = whereTokens.iterator();
+		Iterator<String> iter = whereTokens.iterator();
 		while ( iter.hasNext() ) {
 			buf.append( iter.next() );
-			if ( iter.hasNext() ) buf.append(' ');
+			if ( iter.hasNext() ) {
+				buf.append( ' ' );
+			}
 		}
 		return buf.toString();
 	}

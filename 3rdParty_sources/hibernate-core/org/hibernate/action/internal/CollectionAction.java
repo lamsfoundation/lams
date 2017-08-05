@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.action.internal;
 
@@ -29,7 +12,7 @@ import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.action.spi.Executable;
 import org.hibernate.cache.CacheException;
-import org.hibernate.cache.spi.CacheKey;
+import org.hibernate.cache.spi.access.CollectionRegionAccessStrategy;
 import org.hibernate.cache.spi.access.SoftLock;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -93,12 +76,14 @@ public abstract class CollectionAction implements Executable, Serializable, Comp
 		// bidirectional association and it is one of the earlier entity actions which actually updates
 		// the database (this action is responsible for second-level cache invalidation only)
 		if ( persister.hasCache() ) {
-			final CacheKey ck = session.generateCacheKey(
+			final CollectionRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+			final Object ck = cache.generateCacheKey(
 					key,
-					persister.getKeyType(),
-					persister.getRole()
+					persister,
+					session.getFactory(),
+					session.getTenantIdentifier()
 			);
-			final SoftLock lock = persister.getCacheAccessStrategy().lockItem( ck, null );
+			final SoftLock lock = cache.lockItem( session, ck, null );
 			// the old behavior used key as opposed to getKey()
 			afterTransactionProcess = new CacheCleanupProcess( key, persister, lock );
 		}
@@ -144,12 +129,14 @@ public abstract class CollectionAction implements Executable, Serializable, Comp
 
 	protected final void evict() throws CacheException {
 		if ( persister.hasCache() ) {
-			final CacheKey ck = session.generateCacheKey(
+			final CollectionRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+			final Object ck = cache.generateCacheKey(
 					key, 
-					persister.getKeyType(), 
-					persister.getRole()
+					persister,
+					session.getFactory(),
+					session.getTenantIdentifier()
 			);
-			persister.getCacheAccessStrategy().remove( ck );
+			cache.remove( session, ck);
 		}
 	}
 
@@ -186,12 +173,14 @@ public abstract class CollectionAction implements Executable, Serializable, Comp
 
 		@Override
 		public void doAfterTransactionCompletion(boolean success, SessionImplementor session) {
-			final CacheKey ck = session.generateCacheKey(
+			final CollectionRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+			final Object ck = cache.generateCacheKey(
 					key,
-					persister.getKeyType(),
-					persister.getRole()
+					persister,
+					session.getFactory(),
+					session.getTenantIdentifier()
 			);
-			persister.getCacheAccessStrategy().unlockItem( ck, lock );
+			cache.unlockItem( session, ck, lock );
 		}
 	}
 
@@ -207,9 +196,3 @@ public abstract class CollectionAction implements Executable, Serializable, Comp
 		return (EventSource) getSession();
 	}
 }
-
-
-
-
-
-

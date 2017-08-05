@@ -39,6 +39,9 @@
  */
 package javax.websocket;
 
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ServiceLoader;
 
 /**
@@ -62,12 +65,25 @@ public abstract class ContainerProvider {
      * @return an implementation provided instance of type WebSocketContainer
      */
     public static WebSocketContainer getWebSocketContainer() {
-         WebSocketContainer wsc = null;
+        if(System.getSecurityManager() == null) {
+            return getWebSocketContainerImpl();
+        } else {
+            return AccessController.doPrivileged(new PrivilegedAction<WebSocketContainer>() {
+                @Override
+                public WebSocketContainer run() {
+                    return getWebSocketContainerImpl();
+                }
+            });
+        }
+    }
+
+    private static WebSocketContainer getWebSocketContainerImpl() {
+        WebSocketContainer wsc = null;
         for (ContainerProvider impl : ServiceLoader.load(ContainerProvider.class)) {
             wsc = impl.getContainer();
             if (wsc != null) {
                 return wsc;
-            } 
+            }
         }
         if (wsc == null) {
             throw new RuntimeException("Could not find an implementation class.");
@@ -75,7 +91,7 @@ public abstract class ContainerProvider {
             throw new RuntimeException("Could not find an implementation class with a non-null WebSocketContainer.");
         }
     }
- 
+
     /**
      * Load the container implementation.
      * @return the implementation class

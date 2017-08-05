@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.id;
 
@@ -29,15 +12,15 @@ import java.util.UUID;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.dialect.Dialect;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
+import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.id.uuid.StandardRandomStrategy;
+import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.Type;
 import org.hibernate.type.descriptor.java.UUIDTypeDescriptor;
-
-import org.jboss.logging.Logger;
 
 /**
  * An {@link IdentifierGenerator} which generates {@link UUID} values using a pluggable
@@ -60,7 +43,7 @@ public class UUIDGenerator implements IdentifierGenerator, Configurable {
 	public static final String UUID_GEN_STRATEGY = "uuid_gen_strategy";
 	public static final String UUID_GEN_STRATEGY_CLASS = "uuid_gen_strategy_class";
 
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, UUIDGenerator.class.getName());
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( UUIDGenerator.class );
 
 	private UUIDGenerationStrategy strategy;
 	private UUIDTypeDescriptor.ValueTransformer valueTransformer;
@@ -72,7 +55,8 @@ public class UUIDGenerator implements IdentifierGenerator, Configurable {
 		return generator;
 	}
 
-	public void configure(Type type, Properties params, Dialect d) throws MappingException {
+	@Override
+	public void configure(Type type, Properties params, ServiceRegistry serviceRegistry) throws MappingException {
 		// check first for the strategy instance
 		strategy = (UUIDGenerationStrategy) params.get( UUID_GEN_STRATEGY );
 		if ( strategy == null ) {
@@ -80,16 +64,17 @@ public class UUIDGenerator implements IdentifierGenerator, Configurable {
 			final String strategyClassName = params.getProperty( UUID_GEN_STRATEGY_CLASS );
 			if ( strategyClassName != null ) {
 				try {
-					final Class strategyClass = ReflectHelper.classForName( strategyClassName );
+					final ClassLoaderService cls = serviceRegistry.getService( ClassLoaderService.class );
+					final Class strategyClass = cls.classForName( strategyClassName );
 					try {
 						strategy = (UUIDGenerationStrategy) strategyClass.newInstance();
 					}
 					catch ( Exception ignore ) {
-                        LOG.unableToInstantiateUuidGenerationStrategy(ignore);
+						LOG.unableToInstantiateUuidGenerationStrategy(ignore);
 					}
 				}
-				catch ( ClassNotFoundException ignore ) {
-                    LOG.unableToLocateUuidGenerationStrategy(strategyClassName);
+				catch ( ClassLoadingException ignore ) {
+					LOG.unableToLocateUuidGenerationStrategy( strategyClassName );
 				}
 			}
 		}

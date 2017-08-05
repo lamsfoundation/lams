@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.spi;
 
@@ -27,10 +10,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -81,32 +63,151 @@ public class ActionQueue {
 
 	private UnresolvedEntityInsertActions unresolvedInsertions;
 
+	// NOTE: ExecutableList fields must be instantiated via ListProvider#init or #getOrInit
+	//       to ensure that they are instantiated consistently.
+
 	// Object insertions, updates, and deletions have list semantics because
 	// they must happen in the right order so as to respect referential
 	// integrity
-	private final ExecutableList<AbstractEntityInsertAction> insertions;
-	private final ExecutableList<EntityDeleteAction> deletions;
-	private final ExecutableList<EntityUpdateAction> updates;
+	private ExecutableList<AbstractEntityInsertAction> insertions;
+	private ExecutableList<EntityDeleteAction> deletions;
+	private ExecutableList<EntityUpdateAction> updates;
 
 	// Actually the semantics of the next three are really "Bag"
 	// Note that, unlike objects, collection insertions, updates,
 	// deletions are not really remembered between flushes. We
 	// just re-use the same Lists for convenience.
-	private final ExecutableList<CollectionRecreateAction> collectionCreations;
-	private final ExecutableList<CollectionUpdateAction> collectionUpdates;
-	private final ExecutableList<QueuedOperationCollectionAction> collectionQueuedOps;
-	private final ExecutableList<CollectionRemoveAction> collectionRemovals;
+	private ExecutableList<CollectionRecreateAction> collectionCreations;
+	private ExecutableList<CollectionUpdateAction> collectionUpdates;
+	private ExecutableList<QueuedOperationCollectionAction> collectionQueuedOps;
+	private ExecutableList<CollectionRemoveAction> collectionRemovals;
 	
 	// TODO: The removeOrphan concept is a temporary "hack" for HHH-6484.  This should be removed once action/task
 	// ordering is improved.
-	private final ExecutableList<OrphanRemovalAction> orphanRemovals;
+	private ExecutableList<OrphanRemovalAction> orphanRemovals;
 
-	// an immutable array holding all 7 ExecutionLists in execution order
-	private final List<ExecutableList<?>> executableLists;
 
 	private transient boolean isTransactionCoordinatorShared;
 	private AfterTransactionCompletionProcessQueue afterTransactionProcesses;
 	private BeforeTransactionCompletionProcessQueue beforeTransactionProcesses;
+
+	/**
+	 * An LinkedHashMap containing providers for all the ExecutableLists, inserted in execution order
+	 */
+	private static final LinkedHashMap<Class<? extends Executable>,ListProvider> EXECUTABLE_LISTS_MAP;
+	static {
+		EXECUTABLE_LISTS_MAP = new LinkedHashMap<Class<? extends Executable>,ListProvider>( 8 );
+
+		EXECUTABLE_LISTS_MAP.put(
+				OrphanRemovalAction.class,
+				new ListProvider<OrphanRemovalAction>() {
+					ExecutableList<OrphanRemovalAction> get(ActionQueue instance) {
+						return instance.orphanRemovals;
+					}
+					ExecutableList<OrphanRemovalAction> init(ActionQueue instance) {
+						// OrphanRemovalAction executables never require sorting.
+						return instance.orphanRemovals = new ExecutableList<OrphanRemovalAction>( false );
+					}
+				}
+		);
+		EXECUTABLE_LISTS_MAP.put(
+				AbstractEntityInsertAction.class,
+				new ListProvider<AbstractEntityInsertAction>() {
+					ExecutableList<AbstractEntityInsertAction> get(ActionQueue instance) {
+						return instance.insertions;
+					}
+					ExecutableList<AbstractEntityInsertAction> init(ActionQueue instance) {
+						if ( instance.isOrderInsertsEnabled() ) {
+							return instance.insertions = new ExecutableList<AbstractEntityInsertAction>(
+									new InsertActionSorter()
+							);
+						}
+						else {
+							return instance.insertions = new ExecutableList<AbstractEntityInsertAction>(
+									false
+							);
+						}
+					}
+				}
+		);
+		EXECUTABLE_LISTS_MAP.put(
+				EntityUpdateAction.class,
+				new ListProvider<EntityUpdateAction>() {
+					ExecutableList<EntityUpdateAction> get(ActionQueue instance) {
+						return instance.updates;
+					}
+					ExecutableList<EntityUpdateAction> init(ActionQueue instance) {
+						return instance.updates = new ExecutableList<EntityUpdateAction>(
+								instance.isOrderUpdatesEnabled()
+						);
+					}
+				}
+		);
+		EXECUTABLE_LISTS_MAP.put(
+				QueuedOperationCollectionAction.class,
+				new ListProvider<QueuedOperationCollectionAction>() {
+					ExecutableList<QueuedOperationCollectionAction> get(ActionQueue instance) {
+						return instance.collectionQueuedOps;
+					}
+					ExecutableList<QueuedOperationCollectionAction> init(ActionQueue instance) {
+						return instance.collectionQueuedOps = new ExecutableList<QueuedOperationCollectionAction>(
+								instance.isOrderUpdatesEnabled()
+						);
+					}
+				}
+		);
+		EXECUTABLE_LISTS_MAP.put(
+				CollectionRemoveAction.class,
+				new ListProvider<CollectionRemoveAction>() {
+					ExecutableList<CollectionRemoveAction> get(ActionQueue instance) {
+						return instance.collectionRemovals;
+					}
+					ExecutableList<CollectionRemoveAction> init(ActionQueue instance) {
+						return instance.collectionRemovals = new ExecutableList<CollectionRemoveAction>(
+								instance.isOrderUpdatesEnabled()
+						);
+					}
+				}
+		);
+		EXECUTABLE_LISTS_MAP.put(
+				CollectionUpdateAction.class,
+				new ListProvider<CollectionUpdateAction>() {
+					ExecutableList<CollectionUpdateAction> get(ActionQueue instance) {
+						return instance.collectionUpdates;
+					}
+					ExecutableList<CollectionUpdateAction> init(ActionQueue instance) {
+						return instance.collectionUpdates = new ExecutableList<CollectionUpdateAction>(
+								instance.isOrderUpdatesEnabled()
+						);
+					}
+				}
+		);
+		EXECUTABLE_LISTS_MAP.put(
+				CollectionRecreateAction.class,
+				new ListProvider<CollectionRecreateAction>() {
+					ExecutableList<CollectionRecreateAction> get(ActionQueue instance) {
+						return instance.collectionCreations;
+					}
+					ExecutableList<CollectionRecreateAction> init(ActionQueue instance) {
+						return instance.collectionCreations = new ExecutableList<CollectionRecreateAction>(
+								instance.isOrderUpdatesEnabled()
+						);
+					}
+				}
+		);
+		EXECUTABLE_LISTS_MAP.put(
+				EntityDeleteAction.class,
+				new ListProvider<EntityDeleteAction>() {
+					ExecutableList<EntityDeleteAction> get(ActionQueue instance) {
+						return instance.deletions;
+					}
+					ExecutableList<EntityDeleteAction> init(ActionQueue instance) {
+						// EntityDeleteAction executables never require sorting.
+						return instance.deletions = new ExecutableList<EntityDeleteAction>( false );
+					}
+				}
+		);
+	}
 
 	/**
 	 * Constructs an action queue bound to the given session.
@@ -115,45 +216,19 @@ public class ActionQueue {
 	 */
 	public ActionQueue(SessionImplementor session) {
 		this.session = session;
-
-		unresolvedInsertions = new UnresolvedEntityInsertActions();
-
-		insertions = new ExecutableList<AbstractEntityInsertAction>( new InsertActionSorter() );
-		deletions = new ExecutableList<EntityDeleteAction>();
-		updates = new ExecutableList<EntityUpdateAction>();
-
-		collectionCreations = new ExecutableList<CollectionRecreateAction>();
-		collectionRemovals = new ExecutableList<CollectionRemoveAction>();
-		collectionUpdates = new ExecutableList<CollectionUpdateAction>();
-		collectionQueuedOps = new ExecutableList<QueuedOperationCollectionAction>();
-		
-		orphanRemovals = new ExecutableList<OrphanRemovalAction>();
-
-		// Important: these lists are in execution order
-		List<ExecutableList<?>> tmp = new ArrayList<ExecutableList<?>>( 7 );
-		tmp.add( orphanRemovals );
-		tmp.add( insertions );
-		tmp.add( updates );
-		// do before actions are handled in the other collection queues
-		tmp.add( collectionQueuedOps );
-		tmp.add( collectionRemovals );
-		tmp.add( collectionUpdates );
-		tmp.add( collectionCreations );
-		tmp.add( deletions );
-
-		executableLists = Collections.unmodifiableList( tmp );
-
 		isTransactionCoordinatorShared = false;
-		afterTransactionProcesses = new AfterTransactionCompletionProcessQueue( session );
-		beforeTransactionProcesses = new BeforeTransactionCompletionProcessQueue( session );
-
 	}
 
 	public void clear() {
-		for ( ExecutableList<?> l : executableLists ) {
-			l.clear();
+		for ( ListProvider listProvider : EXECUTABLE_LISTS_MAP.values() ) {
+			ExecutableList<?> l = listProvider.get( this );
+			if( l != null ) {
+				l.clear();
+			}
 		}
-		unresolvedInsertions.clear();
+		if( unresolvedInsertions != null ) {
+			unresolvedInsertions.clear();
+		}
 	}
 
 	/**
@@ -183,6 +258,9 @@ public class ActionQueue {
 				LOG.tracev( "Adding insert with non-nullable, transient entities; insert=[{0}], dependencies=[{1}]", insert,
 							nonNullableTransientDependencies.toLoggableString( insert.getSession() ) );
 			}
+			if( unresolvedInsertions == null ) {
+				unresolvedInsertions = new UnresolvedEntityInsertActions();
+			}
 			unresolvedInsertions.addUnresolvedEntityInsertAction( insert, nonNullableTransientDependencies );
 		}
 	}
@@ -196,12 +274,19 @@ public class ActionQueue {
 		}
 		else {
 			LOG.trace( "Adding resolved non-early insert action." );
-			insertions.add( insert );
+			addAction( AbstractEntityInsertAction.class, insert );
 		}
 		insert.makeEntityManaged();
-		for ( AbstractEntityInsertAction resolvedAction : unresolvedInsertions.resolveDependentActions( insert.getInstance(), session ) ) {
-			addResolvedEntityInsertAction( resolvedAction );
+		if( unresolvedInsertions != null ) {
+			for (AbstractEntityInsertAction resolvedAction : unresolvedInsertions.resolveDependentActions(insert.getInstance(), session)) {
+				addResolvedEntityInsertAction(resolvedAction);
+			}
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T extends Executable & Comparable & Serializable> void addAction(Class<T> executableClass, T action) {
+		EXECUTABLE_LISTS_MAP.get( executableClass ).getOrInit( this ).add( action );
 	}
 
 	/**
@@ -220,7 +305,7 @@ public class ActionQueue {
 	 * @param action The action representing the entity deletion
 	 */
 	public void addAction(EntityDeleteAction action) {
-		deletions.add( action );
+		addAction( EntityDeleteAction.class, action );
 	}
 
 	/**
@@ -229,7 +314,7 @@ public class ActionQueue {
 	 * @param action The action representing the orphan removal
 	 */
 	public void addAction(OrphanRemovalAction action) {
-		orphanRemovals.add( action );
+		addAction( OrphanRemovalAction.class, action );
 	}
 
 	/**
@@ -238,7 +323,7 @@ public class ActionQueue {
 	 * @param action The action representing the entity update
 	 */
 	public void addAction(EntityUpdateAction action) {
-		updates.add( action );
+		addAction( EntityUpdateAction.class, action );
 	}
 
 	/**
@@ -247,7 +332,7 @@ public class ActionQueue {
 	 * @param action The action representing the (re)creation of a collection
 	 */
 	public void addAction(CollectionRecreateAction action) {
-		collectionCreations.add( action );
+		addAction( CollectionRecreateAction.class, action );
 	}
 
 	/**
@@ -256,7 +341,7 @@ public class ActionQueue {
 	 * @param action The action representing the removal of a collection
 	 */
 	public void addAction(CollectionRemoveAction action) {
-		collectionRemovals.add( action );
+		addAction( CollectionRemoveAction.class, action );
 	}
 
 	/**
@@ -265,7 +350,7 @@ public class ActionQueue {
 	 * @param action The action representing the update of a collection
 	 */
 	public void addAction(CollectionUpdateAction action) {
-		collectionUpdates.add( action );
+		addAction( CollectionUpdateAction.class, action );
 	}
 
 	/**
@@ -274,7 +359,7 @@ public class ActionQueue {
 	 * @param action The action representing the queued operation
 	 */
 	public void addAction(QueuedOperationCollectionAction action) {
-		collectionQueuedOps.add( action );
+		addAction( QueuedOperationCollectionAction.class, action );
 	}
 
 	/**
@@ -287,11 +372,21 @@ public class ActionQueue {
 	}
 
 	private void registerCleanupActions(Executable executable) {
-		beforeTransactionProcesses.register( executable.getBeforeTransactionCompletionProcess() );
-		if ( session.getFactory().getSettings().isQueryCacheEnabled() ) {
+		if( executable.getBeforeTransactionCompletionProcess() != null ) {
+			if( beforeTransactionProcesses == null ) {
+				beforeTransactionProcesses = new BeforeTransactionCompletionProcessQueue( session );
+			}
+			beforeTransactionProcesses.register(executable.getBeforeTransactionCompletionProcess());
+		}
+		if ( session.getFactory().getSessionFactoryOptions().isQueryCacheEnabled() ) {
 			invalidateSpaces( executable.getPropertySpaces() );
 		}
-		afterTransactionProcesses.register( executable.getAfterTransactionCompletionProcess() );
+		if( executable.getAfterTransactionCompletionProcess() != null ) {
+			if( afterTransactionProcesses == null ) {
+				afterTransactionProcesses = new AfterTransactionCompletionProcessQueue( session );
+			}
+			afterTransactionProcesses.register(executable.getAfterTransactionCompletionProcess());
+		}
 	}
 
 	/**
@@ -301,7 +396,7 @@ public class ActionQueue {
 	 * transient entity; false, otherwise
 	 */
 	public boolean hasUnresolvedEntityInsertActions() {
-		return !unresolvedInsertions.isEmpty();
+		return unresolvedInsertions != null && !unresolvedInsertions.isEmpty();
 	}
 
 	/**
@@ -315,14 +410,22 @@ public class ActionQueue {
 	 * the first unresolved entity insert action.
 	 */
 	public void checkNoUnresolvedActionsAfterOperation() throws PropertyValueException {
-		unresolvedInsertions.checkNoUnresolvedActionsAfterOperation();
+		if(unresolvedInsertions != null) {
+			unresolvedInsertions.checkNoUnresolvedActionsAfterOperation();
+		}
 	}
 
 	public void registerProcess(AfterTransactionCompletionProcess process) {
+		if( afterTransactionProcesses == null ) {
+			afterTransactionProcesses = new AfterTransactionCompletionProcessQueue( session );
+		}
 		afterTransactionProcesses.register( process );
 	}
 
 	public void registerProcess(BeforeTransactionCompletionProcess process) {
+		if( beforeTransactionProcesses == null ) {
+			beforeTransactionProcesses = new BeforeTransactionCompletionProcessQueue( session );
+		}
 		beforeTransactionProcesses.register( process );
 	}
 
@@ -332,7 +435,9 @@ public class ActionQueue {
 	 * @throws HibernateException error executing queued insertion actions.
 	 */
 	public void executeInserts() throws HibernateException {
-		executeActions( insertions );
+		if ( insertions != null && !insertions.isEmpty() ) {
+			executeActions( insertions );
+		}
 	}
 
 	/**
@@ -341,12 +446,15 @@ public class ActionQueue {
 	 * @throws HibernateException error executing queued actions.
 	 */
 	public void executeActions() throws HibernateException {
-		if ( !unresolvedInsertions.isEmpty() ) {
+		if ( hasUnresolvedEntityInsertActions() ) {
 			throw new IllegalStateException( "About to execute actions, but there are unresolved entity insert actions." );
 		}
 
-		for ( ExecutableList<?> l : executableLists ) {
-			executeActions( l );
+		for ( ListProvider listProvider : EXECUTABLE_LISTS_MAP.values() ) {
+			ExecutableList<?> l = listProvider.get( this );
+			if ( l != null && !l.isEmpty() ) {
+				executeActions( l );
+			}
 		}
 	}
 
@@ -363,6 +471,9 @@ public class ActionQueue {
 	}
 
 	private void prepareActions(ExecutableList<?> queue) throws HibernateException {
+		if( queue == null ) {
+			return;
+		}
 		for ( Executable executable : queue ) {
 			executable.beforeExecutions();
 		}
@@ -376,7 +487,9 @@ public class ActionQueue {
 	public void afterTransactionCompletion(boolean success) {
 		if ( !isTransactionCoordinatorShared ) {
 			// Execute completion actions only in transaction owner (aka parent session).
-			afterTransactionProcesses.afterTransactionCompletion( success );
+			if( afterTransactionProcesses != null ) {
+				afterTransactionProcesses.afterTransactionCompletion(success);
+			}
 		}
 	}
 
@@ -386,7 +499,9 @@ public class ActionQueue {
 	public void beforeTransactionCompletion() {
 		if ( !isTransactionCoordinatorShared ) {
 			// Execute completion actions only in transaction owner (aka parent session).
-			beforeTransactionProcesses.beforeTransactionCompletion();
+			if( beforeTransactionProcesses != null ) {
+				beforeTransactionProcesses.beforeTransactionCompletion();
+			}
 		}
 	}
 
@@ -396,7 +511,7 @@ public class ActionQueue {
 	 * @return {@code true} if insertions or deletions are currently queued; {@code false} otherwise.
 	 */
 	public boolean areInsertionsOrDeletionsQueued() {
-		return !insertions.isEmpty() || !unresolvedInsertions.isEmpty() || !deletions.isEmpty() || !orphanRemovals.isEmpty();
+		return ( insertions != null && !insertions.isEmpty() ) || hasUnresolvedEntityInsertActions() || (deletions != null && !deletions.isEmpty()) || (orphanRemovals != null && !orphanRemovals.isEmpty());
 	}
 
 	/**
@@ -410,16 +525,20 @@ public class ActionQueue {
 		if ( tables.isEmpty() ) {
 			return false;
 		}
-		for ( ExecutableList<?> l : executableLists ) {
+		for ( ListProvider listProvider : EXECUTABLE_LISTS_MAP.values() ) {
+			ExecutableList<?> l = listProvider.get( this );
 			if ( areTablesToBeUpdated( l, tables ) ) {
 				return true;
 			}
+		}
+		if(unresolvedInsertions == null) {
+			return false;
 		}
 		return areTablesToBeUpdated( unresolvedInsertions, tables );
 	}
 
 	private static boolean areTablesToBeUpdated(ExecutableList<?> actions, @SuppressWarnings("rawtypes") Set tableSpaces) {
-		if ( actions.isEmpty() ) {
+		if ( actions == null || actions.isEmpty() ) {
 			return false;
 		}
 
@@ -463,13 +582,23 @@ public class ActionQueue {
 					e.execute();
 				}
 				finally {
-					beforeTransactionProcesses.register( e.getBeforeTransactionCompletionProcess() );
-					afterTransactionProcesses.register( e.getAfterTransactionCompletionProcess() );
+					if( e.getBeforeTransactionCompletionProcess() != null ) {
+						if( beforeTransactionProcesses == null ) {
+							beforeTransactionProcesses = new BeforeTransactionCompletionProcessQueue( session );
+						}
+						beforeTransactionProcesses.register(e.getBeforeTransactionCompletionProcess());
+					}
+					if( e.getAfterTransactionCompletionProcess() != null ) {
+						if( afterTransactionProcesses == null ) {
+							afterTransactionProcesses = new AfterTransactionCompletionProcessQueue( session );
+						}
+						afterTransactionProcesses.register(e.getAfterTransactionCompletionProcess());
+					}
 				}
 			}
 		}
 		finally {
-			if ( session.getFactory().getSettings().isQueryCacheEnabled() ) {
+			if ( session.getFactory().getSessionFactoryOptions().isQueryCacheEnabled() ) {
 				// Strictly speaking, only a subset of the list may have been processed if a RuntimeException occurs.
 				// We still invalidate all spaces. I don't see this as a big deal - after all, RuntimeExceptions are
 				// unexpected.
@@ -479,7 +608,7 @@ public class ActionQueue {
 		}
 
 		list.clear();
-		session.getTransactionCoordinator().getJdbcCoordinator().executeBatch();
+		session.getJdbcCoordinator().executeBatch();
 	}
 
 	/**
@@ -502,6 +631,9 @@ public class ActionQueue {
 	private void invalidateSpaces(Serializable... spaces) {
 		if ( spaces != null && spaces.length > 0 ) {
 			for ( Serializable s : spaces ) {
+				if( afterTransactionProcesses == null ) {
+					afterTransactionProcesses = new AfterTransactionCompletionProcessQueue( session );
+				}
 				afterTransactionProcesses.addSpaceToInvalidate( (String) s );
 			}
 			// Performance win: If we are processing an ExecutableList, this will only be called once
@@ -516,43 +648,70 @@ public class ActionQueue {
 	 */
 	@Override
 	public String toString() {
-		return "ActionQueue[insertions=" + insertions
-				+ " updates=" + updates
-				+ " deletions=" + deletions
-				+ " orphanRemovals=" + orphanRemovals
-				+ " collectionCreations=" + collectionCreations
-				+ " collectionRemovals=" + collectionRemovals
-				+ " collectionUpdates=" + collectionUpdates
-				+ " collectionQueuedOps=" + collectionQueuedOps
+		return "ActionQueue[insertions=" + toString(insertions)
+				+ " updates=" + toString(updates)
+				+ " deletions=" + toString(deletions)
+				+ " orphanRemovals=" + toString(orphanRemovals)
+				+ " collectionCreations=" + toString(collectionCreations)
+				+ " collectionRemovals=" + toString(collectionRemovals)
+				+ " collectionUpdates=" + toString(collectionUpdates)
+				+ " collectionQueuedOps=" + toString(collectionQueuedOps)
 				+ " unresolvedInsertDependencies=" + unresolvedInsertions
 				+ "]";
 	}
 
+	private static String toString(ExecutableList q) {
+		return q == null ? "ExecutableList{size=0}" : q.toString();
+	}
+
 	public int numberOfCollectionRemovals() {
+		if( collectionRemovals == null ) {
+			return 0;
+		}
 		return collectionRemovals.size();
 	}
 
 	public int numberOfCollectionUpdates() {
+		if( collectionUpdates == null ) {
+			return 0;
+		}
 		return collectionUpdates.size();
 	}
 
 	public int numberOfCollectionCreations() {
+		if( collectionCreations == null ) {
+			return 0;
+		}
 		return collectionCreations.size();
 	}
 
 	public int numberOfDeletions() {
-		return deletions.size() + orphanRemovals.size();
+		int del = deletions == null ? 0 : deletions.size();
+		int orph = orphanRemovals == null ? 0 : orphanRemovals.size();
+		return del + orph;
 	}
 
 	public int numberOfUpdates() {
+		if( updates == null ) {
+			return 0;
+		}
 		return updates.size();
 	}
 
 	public int numberOfInsertions() {
+		if( insertions == null ) {
+			return 0;
+		}
 		return insertions.size();
 	}
 
 	public TransactionCompletionProcesses getTransactionCompletionProcesses() {
+		if( beforeTransactionProcesses == null ) {
+			beforeTransactionProcesses = new BeforeTransactionCompletionProcessQueue( session );
+		}
+		if( afterTransactionProcesses == null ) {
+			afterTransactionProcesses = new AfterTransactionCompletionProcessQueue( session );
+		}
 		return new TransactionCompletionProcesses( beforeTransactionProcesses, afterTransactionProcesses );
 	}
 
@@ -571,48 +730,76 @@ public class ActionQueue {
 	}
 
 	public void sortCollectionActions() {
-		if ( session.getFactory().getSettings().isOrderUpdatesEnabled() ) {
+		if ( isOrderUpdatesEnabled() ) {
 			// sort the updates by fk
-			collectionCreations.sort();
-			collectionUpdates.sort();
-			collectionQueuedOps.sort();
-			collectionRemovals.sort();
+			if( collectionCreations != null ) {
+				collectionCreations.sort();
+			}
+			if( collectionUpdates != null ) {
+				collectionUpdates.sort();
+			}
+			if( collectionQueuedOps != null ) {
+				collectionQueuedOps.sort();
+			}
+			if( collectionRemovals != null ) {
+				collectionRemovals.sort();
+			}
 		}
 	}
 
 	public void sortActions() {
-		if ( session.getFactory().getSettings().isOrderUpdatesEnabled() ) {
+		if ( isOrderUpdatesEnabled() && updates != null ) {
 			// sort the updates by pk
 			updates.sort();
 		}
-		if ( session.getFactory().getSettings().isOrderInsertsEnabled() ) {
+		if ( isOrderInsertsEnabled() && insertions != null ) {
 			insertions.sort();
 		}
 	}
 
+	private boolean isOrderUpdatesEnabled() {
+		return session.getFactory().getSessionFactoryOptions().isOrderUpdatesEnabled();
+	}
+
+	private boolean isOrderInsertsEnabled() {
+		return session.getFactory().getSessionFactoryOptions().isOrderInsertsEnabled();
+	}
+
 	public void clearFromFlushNeededCheck(int previousCollectionRemovalSize) {
-		collectionCreations.clear();
-		collectionUpdates.clear();
-		collectionQueuedOps.clear();
-		updates.clear();
+		if( collectionCreations != null ) {
+			collectionCreations.clear();
+		}
+		if( collectionUpdates != null ) {
+			collectionUpdates.clear();
+		}
+		if( collectionQueuedOps != null ) {
+			collectionQueuedOps.clear();
+		}
+		if( updates != null) {
+			updates.clear();
+		}
 		// collection deletions are a special case since update() can add
 		// deletions of collections not loaded by the session.
-		if ( collectionRemovals.size() > previousCollectionRemovalSize ) {
+		if ( collectionRemovals != null && collectionRemovals.size() > previousCollectionRemovalSize ) {
 			collectionRemovals.removeLastN( collectionRemovals.size() - previousCollectionRemovalSize );
 		}
 	}
 
+	@SuppressWarnings("SimplifiableConditionalExpression")
 	public boolean hasAfterTransactionActions() {
-		return isTransactionCoordinatorShared ? false : afterTransactionProcesses.hasActions();
+		return isTransactionCoordinatorShared ? false : afterTransactionProcesses != null && afterTransactionProcesses.hasActions();
 	}
 
+	@SuppressWarnings("SimplifiableConditionalExpression")
 	public boolean hasBeforeTransactionActions() {
-		return isTransactionCoordinatorShared ? false : beforeTransactionProcesses.hasActions();
+		return isTransactionCoordinatorShared ? false : beforeTransactionProcesses != null && beforeTransactionProcesses.hasActions();
 	}
 
 	public boolean hasAnyQueuedActions() {
-		return !updates.isEmpty() || !insertions.isEmpty() || !unresolvedInsertions.isEmpty() || !deletions.isEmpty() || !collectionUpdates.isEmpty()
-				|| !collectionQueuedOps.isEmpty() || !collectionRemovals.isEmpty() || !collectionCreations.isEmpty();
+		return ( updates != null && !updates.isEmpty() ) || ( insertions != null && !insertions.isEmpty() ) || hasUnresolvedEntityInsertActions()
+				|| ( deletions != null && !deletions.isEmpty()) || ( collectionUpdates != null && !collectionUpdates.isEmpty() )
+				|| ( collectionQueuedOps != null && !collectionQueuedOps.isEmpty() ) || ( collectionRemovals != null && !collectionRemovals.isEmpty() )
+				|| ( collectionCreations != null && !collectionCreations.isEmpty() );
 	}
 
 	public void unScheduleDeletion(EntityEntry entry, Object rescuedEntity) {
@@ -622,18 +809,22 @@ public class ActionQueue {
 				rescuedEntity = initializer.getImplementation( session );
 			}
 		}
-		for ( int i = 0; i < deletions.size(); i++ ) {
-			EntityDeleteAction action = deletions.get( i );
-			if ( action.getInstance() == rescuedEntity ) {
-				deletions.remove( i );
-				return;
+		if( deletions != null ) {
+			for ( int i = 0; i < deletions.size(); i++ ) {
+				EntityDeleteAction action = deletions.get(i);
+				if (action.getInstance() == rescuedEntity) {
+					deletions.remove(i);
+					return;
+				}
 			}
 		}
-		for ( int i = 0; i < orphanRemovals.size(); i++ ) {
-			EntityDeleteAction action = orphanRemovals.get( i );
-			if ( action.getInstance() == rescuedEntity ) {
-				orphanRemovals.remove( i );
-				return;
+		if( orphanRemovals != null ) {
+			for ( int i = 0; i < orphanRemovals.size(); i++ ) {
+				EntityDeleteAction action = orphanRemovals.get(i);
+				if (action.getInstance() == rescuedEntity) {
+					orphanRemovals.remove(i);
+					return;
+				}
 			}
 		}
 		throw new AssertionFailure( "Unable to perform un-delete for instance " + entry.getEntityName() );
@@ -647,11 +838,20 @@ public class ActionQueue {
 	 */
 	public void serialize(ObjectOutputStream oos) throws IOException {
 		LOG.trace( "Serializing action-queue" );
-
+		if( unresolvedInsertions == null ) {
+			unresolvedInsertions = new UnresolvedEntityInsertActions();
+		}
 		unresolvedInsertions.serialize( oos );
 
-		for ( ExecutableList<?> l : executableLists ) {
-			l.writeExternal( oos );
+		for ( ListProvider p : EXECUTABLE_LISTS_MAP.values() ) {
+			ExecutableList<?> l = p.get(this);
+			if( l == null ) {
+				oos.writeBoolean(false);
+			}
+			else {
+				oos.writeBoolean( true );
+				l.writeExternal( oos );
+			}
 		}
 	}
 
@@ -665,15 +865,28 @@ public class ActionQueue {
 	 * @throws ClassNotFoundException Generally means we were unable to locate user classes.
 	 */
 	public static ActionQueue deserialize(ObjectInputStream ois, SessionImplementor session) throws IOException, ClassNotFoundException {
-		LOG.trace( "Deserializing action-queue" );
+		final boolean traceEnabled = LOG.isTraceEnabled();
+		if ( traceEnabled ) {
+			LOG.trace("Deserializing action-queue");
+		}
 		ActionQueue rtn = new ActionQueue( session );
 
 		rtn.unresolvedInsertions = UnresolvedEntityInsertActions.deserialize( ois, session );
 
-		for ( ExecutableList<?> l : rtn.executableLists ) {
-			l.readExternal( ois );
-			LOG.tracev( "Deserialized [{0}] entries", l.size() );
-			l.afterDeserialize( session );
+		for ( ListProvider provider : EXECUTABLE_LISTS_MAP.values() ) {
+			ExecutableList<?> l = provider.get(rtn);
+			boolean notNull = ois.readBoolean();
+			if( notNull ) {
+				if(l == null) {
+					l = provider.init(rtn);
+				}
+				l.readExternal( ois );
+
+				if ( traceEnabled ) {
+					LOG.tracev( "Deserialized [{0}] entries", l.size() );
+				}
+				l.afterDeserialize( session );
+			}
 		}
 
 		return rtn;
@@ -752,7 +965,7 @@ public class ActionQueue {
 				}
 			}
 
-			if ( session.getFactory().getSettings().isQueryCacheEnabled() ) {
+			if ( session.getFactory().getSessionFactoryOptions().isQueryCacheEnabled() ) {
 				session.getFactory().getUpdateTimestampsCache().invalidate(
 						querySpacesToInvalidate.toArray( new String[querySpacesToInvalidate.size()] ),
 						session
@@ -903,4 +1116,16 @@ public class ActionQueue {
 
 	}
 
+
+	private static abstract class ListProvider<T extends Executable & Comparable & Serializable> {
+		abstract ExecutableList<T> get(ActionQueue instance);
+		abstract ExecutableList<T> init(ActionQueue instance);
+		ExecutableList<T> getOrInit( ActionQueue instance ) {
+			ExecutableList<T> list = get( instance );
+			if ( list == null ) {
+				list = init( instance );
+			}
+			return list;
+		}
+	}
 }

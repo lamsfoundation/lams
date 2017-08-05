@@ -136,7 +136,7 @@ public class RequestDumpingHandler implements HttpHandler {
                         sb.append("            header=" + header.getHeaderName() + "=" + value + "\n");
                     }
                 }
-                sb.append("            status=" + exchange.getResponseCode() + "\n");
+                sb.append("            status=" + exchange.getStatusCode() + "\n");
                 sb.append("==============================================================");
 
                 nextListener.proceed();
@@ -175,6 +175,7 @@ public class RequestDumpingHandler implements HttpHandler {
 
         @Override
         public HandlerWrapper build(Map<String, Object> config) {
+
             return new Wrapper();
         }
 

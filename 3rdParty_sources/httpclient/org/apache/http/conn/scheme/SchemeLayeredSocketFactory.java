@@ -37,7 +37,11 @@ import org.apache.http.params.HttpParams;
  * Extended {@link SchemeSocketFactory} interface for layered sockets such as SSL/TLS.
  *
  * @since 4.2
+ *
+ * @deprecated (4.3) use {@link
+ *   org.apache.http.conn.socket.LayeredConnectionSocketFactory}
  */
+@Deprecated
 public interface SchemeLayeredSocketFactory extends SchemeSocketFactory {
 
     /**

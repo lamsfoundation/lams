@@ -18,11 +18,11 @@
 
 package io.undertow.server.protocol.ajp;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.security.cert.CertificateException;
-import java.util.HashMap;
 import java.util.Map;
 
 import io.undertow.server.BasicSSLSessionInfo;
@@ -31,7 +31,7 @@ import io.undertow.util.HttpString;
 /**
  * @author Stuart Douglas
  */
-class AjpRequestParseState extends AbstractAjpParseState {
+class AjpRequestParseState {
 
     //states
     public static final int BEGIN = 0;
@@ -50,7 +50,6 @@ class AjpRequestParseState extends AbstractAjpParseState {
     public static final int READING_HEADERS = 13;
     public static final int READING_ATTRIBUTES = 14;
     public static final int DONE = 15;
-    public static final String AJP_REMOTE_PORT = "AJP_REMOTE_PORT";
 
     int state;
 
@@ -65,20 +64,51 @@ class AjpRequestParseState extends AbstractAjpParseState {
     String currentAttribute;
 
     //TODO: can there be more than one attribute?
-    Map<String, String> attributes = new HashMap<>();
+    Map<String, String> attributes;
 
     String remoteAddress;
+    int remotePort = -1;
     int serverPort = 80;
     String serverAddress;
 
+    /**
+     * The length of the string being read
+     */
+    public int stringLength = -1;
+
+    /**
+     * The current string being read
+     */
+    private byte[] currentString = new byte[16];
+    private int currentStringLength = 0;
+
+    /**
+     * when reading the first byte of an integer this stores the first value. It is set to -1 to signify that
+     * the first byte has not been read yet.
+     */
+    public int currentIntegerPart = -1;
+
+    boolean containsUrlCharacters = false;
+    public int readHeaders = 0;
+    public String sslSessionId;
+    public String sslCipher;
+    public String sslCert;
+    public String sslKeySize;
+
+    public void reset() {
+        stringLength = -1;
+        currentStringLength = 0;
+        currentIntegerPart = -1;
+        readHeaders = 0;
+    }
     public boolean isComplete() {
         return state == 15;
     }
 
     BasicSSLSessionInfo createSslSessionInfo() {
-        String sessionId = attributes.get(AjpRequestParser.SSL_SESSION);
-        String cypher = attributes.get(AjpRequestParser.SSL_CIPHER);
-        String cert = attributes.get(AjpRequestParser.SSL_CERT);
+        String sessionId = sslSessionId;
+        String cypher = sslCipher;
+        String cert = sslCert;
         if (cert == null && sessionId == null) {
             return null;
         }
@@ -95,14 +125,7 @@ class AjpRequestParseState extends AbstractAjpParseState {
         if (remoteAddress == null) {
             return null;
         }
-        String portString = attributes.get(AJP_REMOTE_PORT);
-        int port = 0;
-        if (portString != null) {
-            try {
-                port = Integer.parseInt(portString);
-            } catch (IllegalArgumentException e) {
-            }
-        }
+        int port = remotePort > 0 ? remotePort : 0;
         try {
             InetAddress address = InetAddress.getByName(remoteAddress);
             return new InetSocketAddress(address, port);
@@ -116,5 +139,24 @@ class AjpRequestParseState extends AbstractAjpParseState {
             return null;
         }
         return InetSocketAddress.createUnresolved(serverAddress, serverPort);
+    }
+
+    public void addStringByte(byte b) {
+        if(currentString.length == currentStringLength) {
+            byte[] old = currentString;
+            currentString = new byte[currentStringLength + 16];
+            System.arraycopy(old, 0, currentString, 0, currentStringLength);
+        }
+        currentString[currentStringLength++] = b;
+    }
+
+    public String getStringAndClear(String charset) throws UnsupportedEncodingException {
+        String ret = new String(currentString, 0, currentStringLength, charset);
+        currentStringLength = 0;
+        return ret;
+    }
+
+    public int getCurrentStringLength() {
+        return currentStringLength;
     }
 }

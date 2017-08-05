@@ -19,29 +19,23 @@
 package io.undertow.server.protocol.ajp;
 
 import io.undertow.UndertowMessages;
-import io.undertow.conduits.ReadDataStreamSourceConduit;
 import io.undertow.server.AbstractServerConnection;
 import io.undertow.server.BasicSSLSessionInfo;
-import io.undertow.server.ExchangeCompletionListener;
-import io.undertow.server.protocol.http.HttpContinue;
+import io.undertow.server.HttpUpgradeListener;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.SSLSessionInfo;
 import io.undertow.util.DateUtils;
-import io.undertow.util.Headers;
-import io.undertow.util.HttpString;
 import org.xnio.OptionMap;
-import org.xnio.Pool;
+import io.undertow.connector.ByteBufferPool;
 import org.xnio.StreamConnection;
 import org.xnio.conduits.ConduitStreamSinkChannel;
 import org.xnio.conduits.StreamSinkConduit;
 import org.xnio.conduits.WriteReadyHandler;
 
-import java.nio.ByteBuffer;
-
 /**
  * A server-side AJP connection.
- * <p/>
+ * <p>
  *
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  */
@@ -50,34 +44,19 @@ public final class AjpServerConnection extends AbstractServerConnection {
     private WriteReadyHandler.ChannelListenerHandler<ConduitStreamSinkChannel> writeReadyHandler;
     private AjpReadListener ajpReadListener;
 
-    public AjpServerConnection(StreamConnection channel, Pool<ByteBuffer> bufferPool, HttpHandler rootHandler, OptionMap undertowOptions, int bufferSize) {
+    public AjpServerConnection(StreamConnection channel, ByteBufferPool bufferPool, HttpHandler rootHandler, OptionMap undertowOptions, int bufferSize) {
         super(channel, bufferPool, rootHandler, undertowOptions, bufferSize);
         this.writeReadyHandler = new WriteReadyHandler.ChannelListenerHandler<>(channel.getSinkChannel());
     }
 
     @Override
     public HttpServerExchange sendOutOfBandResponse(HttpServerExchange exchange) {
-        if (exchange == null || !HttpContinue.requiresContinueResponse(exchange)) {
-            throw UndertowMessages.MESSAGES.outOfBandResponseOnlyAllowedFor100Continue();
-        }
-        final ConduitState state = resetChannel();
-        HttpServerExchange newExchange = new HttpServerExchange(this);
-        for (HttpString header : exchange.getRequestHeaders().getHeaderNames()) {
-            newExchange.getRequestHeaders().putAll(header, exchange.getRequestHeaders().get(header));
-        }
-        newExchange.setProtocol(exchange.getProtocol());
-        newExchange.setRequestMethod(exchange.getRequestMethod());
-        newExchange.setRequestPath(exchange.getRequestPath());
-        newExchange.getRequestHeaders().put(Headers.CONNECTION, Headers.KEEP_ALIVE.toString());
-        newExchange.getRequestHeaders().put(Headers.CONTENT_LENGTH, 0);
+        throw UndertowMessages.MESSAGES.outOfBandResponseNotSupported();
+    }
 
-        newExchange.addExchangeCompleteListener(new ExchangeCompletionListener() {
-            @Override
-            public void exchangeEvent(HttpServerExchange exchange, NextListener nextListener) {
-                restoreChannel(state);
-            }
-        });
-        return newExchange;
+    @Override
+    public boolean isContinueResponseSupported() {
+        return false;
     }
 
     @Override
@@ -120,11 +99,7 @@ public final class AjpServerConnection extends AbstractServerConnection {
 
     @Override
     protected StreamConnection upgradeChannel() {
-        resetChannel();
-        if (extraBytes != null) {
-            channel.getSourceChannel().setConduit(new ReadDataStreamSourceConduit(channel.getSourceChannel().getConduit(), this));
-        }
-        return channel;
+        throw UndertowMessages.MESSAGES.upgradeNotSupported();
     }
 
     @Override
@@ -135,7 +110,12 @@ public final class AjpServerConnection extends AbstractServerConnection {
 
     @Override
     protected boolean isUpgradeSupported() {
-        return true; //TODO: should we support this?
+        return false;
+    }
+
+    @Override
+    protected boolean isConnectSupported() {
+        return false;
     }
 
     void setAjpReadListener(AjpReadListener ajpReadListener) {
@@ -147,7 +127,17 @@ public final class AjpServerConnection extends AbstractServerConnection {
         ajpReadListener.exchangeComplete(exchange);
     }
 
+    @Override
+    protected void setConnectListener(HttpUpgradeListener connectListener) {
+        throw UndertowMessages.MESSAGES.connectNotSupported();
+    }
+
     void setCurrentExchange(HttpServerExchange exchange) {
         this.current = exchange;
+    }
+
+    @Override
+    public String getTransportProtocol() {
+        return "ajp";
     }
 }

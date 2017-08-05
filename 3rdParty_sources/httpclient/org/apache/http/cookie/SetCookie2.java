@@ -27,9 +27,14 @@
 
 package org.apache.http.cookie;
 
+import org.apache.http.annotation.Obsolete;
+
 /**
- * This interface represents a <code>Set-Cookie2</code> response header sent by the
+ * This interface represents a {@code Set-Cookie2} response header sent by the
  * origin server to the HTTP agent in order to maintain a conversational state.
+ * <p>
+ * Please do not use methods marked as @Obsolete. They have been rendered
+ * obsolete by RFC 6265
  *
  * @since 4.0
  */
@@ -39,21 +44,24 @@ public interface SetCookie2 extends SetCookie {
      * If a user agent (web browser) presents this cookie to a user, the
      * cookie's purpose will be described by the information at this URL.
      */
+    @Obsolete
     void setCommentURL(String commentURL);
 
     /**
      * Sets the Port attribute. It restricts the ports to which a cookie
      * may be returned in a Cookie request header.
      */
+    @Obsolete
     void setPorts(int[] ports);
 
     /**
      * Set the Discard attribute.
      *
-     * Note: <tt>Discard</tt> attribute overrides <tt>Max-age</tt>.
+     * Note: {@code Discard} attribute overrides {@code Max-age}.
      *
      * @see #isPersistent()
      */
+    @Obsolete
     void setDiscard(boolean discard);
 
 }

@@ -36,14 +36,16 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 
+import org.apache.http.Consts;
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.http.io.BufferInfo;
-import org.apache.http.io.SessionOutputBuffer;
 import org.apache.http.io.HttpTransportMetrics;
+import org.apache.http.io.SessionOutputBuffer;
 import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.Args;
 import org.apache.http.util.ByteArrayBuffer;
 import org.apache.http.util.CharArrayBuffer;
 
@@ -54,63 +56,73 @@ import org.apache.http.util.CharArrayBuffer;
  * <p>
  * {@link #writeLine(CharArrayBuffer)} and {@link #writeLine(String)} methods
  * of this class use CR-LF as a line delimiter.
- * <p>
- * The following parameters can be used to customize the behavior of this
- * class:
- * <ul>
- *  <li>{@link org.apache.http.params.CoreProtocolPNames#HTTP_ELEMENT_CHARSET}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#MIN_CHUNK_LIMIT}</li>
- * </ul>
- * <p>
  *
  * @since 4.0
+ *
+ * @deprecated (4.3) use {@link SessionOutputBufferImpl}
  */
 @NotThreadSafe
+@Deprecated
 public abstract class AbstractSessionOutputBuffer implements SessionOutputBuffer, BufferInfo {
 
-    private static final Charset ASCII = Charset.forName("US-ASCII");
     private static final byte[] CRLF = new byte[] {HTTP.CR, HTTP.LF};
 
     private OutputStream outstream;
     private ByteArrayBuffer buffer;
-
     private Charset charset;
+    private boolean ascii;
+    private int minChunkLimit;
+    private HttpTransportMetricsImpl metrics;
+    private CodingErrorAction onMalformedCharAction;
+    private CodingErrorAction onUnmappableCharAction;
+
     private CharsetEncoder encoder;
     private ByteBuffer bbuf;
-    private boolean ascii = true;
-    private int minChunkLimit = 512;
 
-    private HttpTransportMetricsImpl metrics;
-
-    private CodingErrorAction onMalformedInputAction;
-    private CodingErrorAction onUnMappableInputAction;
-
-    /**
-     * Initializes this session output buffer.
-     *
-     * @param outstream the destination output stream.
-     * @param buffersize the size of the internal buffer.
-     * @param params HTTP parameters.
-     */
-    protected void init(final OutputStream outstream, int buffersize, final HttpParams params) {
-        if (outstream == null) {
-            throw new IllegalArgumentException("Input stream may not be null");
-        }
-        if (buffersize <= 0) {
-            throw new IllegalArgumentException("Buffer size may not be negative or zero");
-        }
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
+    protected AbstractSessionOutputBuffer(
+            final OutputStream outstream,
+            final int buffersize,
+            final Charset charset,
+            final int minChunkLimit,
+            final CodingErrorAction malformedCharAction,
+            final CodingErrorAction unmappableCharAction) {
+        super();
+        Args.notNull(outstream, "Input stream");
+        Args.notNegative(buffersize, "Buffer size");
         this.outstream = outstream;
         this.buffer = new ByteArrayBuffer(buffersize);
-        this.charset = Charset.forName(HttpProtocolParams.getHttpElementCharset(params));
-        this.ascii = this.charset.equals(ASCII);
+        this.charset = charset != null ? charset : Consts.ASCII;
+        this.ascii = this.charset.equals(Consts.ASCII);
+        this.encoder = null;
+        this.minChunkLimit = minChunkLimit >= 0 ? minChunkLimit : 512;
+        this.metrics = createTransportMetrics();
+        this.onMalformedCharAction = malformedCharAction != null ? malformedCharAction :
+            CodingErrorAction.REPORT;
+        this.onUnmappableCharAction = unmappableCharAction != null? unmappableCharAction :
+            CodingErrorAction.REPORT;
+    }
+
+    public AbstractSessionOutputBuffer() {
+    }
+
+    protected void init(final OutputStream outstream, final int buffersize, final HttpParams params) {
+        Args.notNull(outstream, "Input stream");
+        Args.notNegative(buffersize, "Buffer size");
+        Args.notNull(params, "HTTP parameters");
+        this.outstream = outstream;
+        this.buffer = new ByteArrayBuffer(buffersize);
+        final String charset = (String) params.getParameter(CoreProtocolPNames.HTTP_ELEMENT_CHARSET);
+        this.charset = charset != null ? Charset.forName(charset) : Consts.ASCII;
+        this.ascii = this.charset.equals(Consts.ASCII);
         this.encoder = null;
         this.minChunkLimit = params.getIntParameter(CoreConnectionPNames.MIN_CHUNK_LIMIT, 512);
         this.metrics = createTransportMetrics();
-        this.onMalformedInputAction = HttpProtocolParams.getMalformedInputAction(params);
-        this.onUnMappableInputAction = HttpProtocolParams.getUnmappableInputAction(params);
+        final CodingErrorAction a1 = (CodingErrorAction) params.getParameter(
+                CoreProtocolPNames.HTTP_MALFORMED_INPUT_ACTION);
+        this.onMalformedCharAction = a1 != null ? a1 : CodingErrorAction.REPORT;
+        final CodingErrorAction a2 = (CodingErrorAction) params.getParameter(
+                CoreProtocolPNames.HTTP_UNMAPPABLE_INPUT_ACTION);
+        this.onUnmappableCharAction = a2 != null? a2 : CodingErrorAction.REPORT;
     }
 
     /**
@@ -142,7 +154,7 @@ public abstract class AbstractSessionOutputBuffer implements SessionOutputBuffer
     }
 
     protected void flushBuffer() throws IOException {
-        int len = this.buffer.length();
+        final int len = this.buffer.length();
         if (len > 0) {
             this.outstream.write(this.buffer.buffer(), 0, len);
             this.buffer.clear();
@@ -155,7 +167,7 @@ public abstract class AbstractSessionOutputBuffer implements SessionOutputBuffer
         this.outstream.flush();
     }
 
-    public void write(final byte[] b, int off, int len) throws IOException {
+    public void write(final byte[] b, final int off, final int len) throws IOException {
         if (b == null) {
             return;
         }
@@ -170,7 +182,7 @@ public abstract class AbstractSessionOutputBuffer implements SessionOutputBuffer
             this.metrics.incrementBytesTransferred(len);
         } else {
             // Do not let the buffer grow unnecessarily
-            int freecapacity = this.buffer.capacity() - this.buffer.length();
+            final int freecapacity = this.buffer.capacity() - this.buffer.length();
             if (len > freecapacity) {
                 // flush the buffer
                 flushBuffer();
@@ -187,7 +199,7 @@ public abstract class AbstractSessionOutputBuffer implements SessionOutputBuffer
         write(b, 0, b.length);
     }
 
-    public void write(int b) throws IOException {
+    public void write(final int b) throws IOException {
         if (this.buffer.isFull()) {
             flushBuffer();
         }
@@ -213,7 +225,7 @@ public abstract class AbstractSessionOutputBuffer implements SessionOutputBuffer
                     write(s.charAt(i));
                 }
             } else {
-                CharBuffer cbuf = CharBuffer.wrap(s);
+                final CharBuffer cbuf = CharBuffer.wrap(s);
                 writeEncoded(cbuf);
             }
         }
@@ -249,7 +261,7 @@ public abstract class AbstractSessionOutputBuffer implements SessionOutputBuffer
                 remaining -= chunk;
             }
         } else {
-            CharBuffer cbuf = CharBuffer.wrap(charbuffer.buffer(), 0, charbuffer.length());
+            final CharBuffer cbuf = CharBuffer.wrap(charbuffer.buffer(), 0, charbuffer.length());
             writeEncoded(cbuf);
         }
         write(CRLF);
@@ -261,18 +273,18 @@ public abstract class AbstractSessionOutputBuffer implements SessionOutputBuffer
         }
         if (this.encoder == null) {
             this.encoder = this.charset.newEncoder();
-            this.encoder.onMalformedInput(this.onMalformedInputAction);
-            this.encoder.onUnmappableCharacter(this.onUnMappableInputAction);
+            this.encoder.onMalformedInput(this.onMalformedCharAction);
+            this.encoder.onUnmappableCharacter(this.onUnmappableCharAction);
         }
         if (this.bbuf == null) {
             this.bbuf = ByteBuffer.allocate(1024);
         }
         this.encoder.reset();
         while (cbuf.hasRemaining()) {
-            CoderResult result = this.encoder.encode(cbuf, this.bbuf, true);
+            final CoderResult result = this.encoder.encode(cbuf, this.bbuf, true);
             handleEncodingResult(result);
         }
-        CoderResult result = this.encoder.flush(this.bbuf);
+        final CoderResult result = this.encoder.flush(this.bbuf);
         handleEncodingResult(result);
         this.bbuf.clear();
     }

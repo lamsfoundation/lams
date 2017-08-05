@@ -33,8 +33,10 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpMessage;
 
 /**
- * Abstract message parser intended to build HTTP messages from an arbitrary
- * data source.
+ * Abstract message parser intended to build HTTP messages from an arbitrary data source.
+ *
+ * @param <T>
+ *            {@link HttpMessage} or a subclass
  *
  * @since 4.0
  */

@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal.classic;
 
@@ -37,6 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -83,7 +66,7 @@ import org.hibernate.type.Type;
  * query string to SQL.
  */
 public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator {
-    private static final CoreMessageLogger LOG = CoreLogging.messageLogger( QueryTranslatorImpl.class );
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( QueryTranslatorImpl.class );
 
 	private static final String[] NO_RETURN_ALIASES = new String[] {};
 
@@ -155,9 +138,9 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	 */
 	public QueryTranslatorImpl(
 			String queryIdentifier,
-	        String queryString,
-	        Map enabledFilters,
-	        SessionFactoryImplementor factory) {
+			String queryString,
+			Map enabledFilters,
+			SessionFactoryImplementor factory) {
 		super( factory );
 		this.queryIdentifier = queryIdentifier;
 		this.queryString = queryString;
@@ -172,9 +155,9 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	 * @param factory The session factory.
 	 */
 	public QueryTranslatorImpl(
-	        String queryString,
-	        Map enabledFilters,
-	        SessionFactoryImplementor factory) {
+			String queryString,
+			Map enabledFilters,
+			SessionFactoryImplementor factory) {
 		this( queryString, queryString, enabledFilters, factory );
 	}
 
@@ -237,13 +220,15 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	private void compile() throws QueryException, MappingException {
 		LOG.trace( "Compiling query" );
 		try {
-			ParserHelper.parse( new PreprocessingParser( tokenReplacements ),
+			ParserHelper.parse(
+					new PreprocessingParser( tokenReplacements ),
 					queryString,
 					ParserHelper.HQL_SEPARATORS,
-					this );
+					this
+			);
 			renderSQL();
 		}
-		catch ( QueryException qe ) {
+		catch (QueryException qe) {
 			if ( qe.getQueryString() == null ) {
 				throw qe.wrapWithQueryString( queryString );
 			}
@@ -251,10 +236,10 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 				throw qe;
 			}
 		}
-		catch ( MappingException me ) {
+		catch (MappingException me) {
 			throw me;
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			LOG.debug( "Unexpected query compilation problem", e );
 			e.printStackTrace();
 			throw new QueryException( "Incorrect query syntax", queryString, e );
@@ -267,12 +252,12 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	}
 
 	@Override
-    public String getSQLString() {
+	public String getSQLString() {
 		return sqlString;
 	}
 
 	public List<String> collectSqlStrings() {
-		return ArrayHelper.toList( new String[] { sqlString } );
+		return ArrayHelper.toList( new String[] {sqlString} );
 	}
 
 	public String getQueryString() {
@@ -285,7 +270,7 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	 * @return an array of <tt>EntityPersister</tt>s.
 	 */
 	@Override
-    protected Loadable[] getEntityPersisters() {
+	protected Loadable[] getEntityPersisters() {
 		return persisters;
 	}
 
@@ -319,7 +304,7 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	}
 
 	public String getAliasName(String alias) {
-		String name = ( String ) aliasNames.get( alias );
+		String name = (String) aliasNames.get( alias );
 		if ( name == null ) {
 			if ( superQuery != null ) {
 				name = superQuery.getAliasName( alias );
@@ -334,14 +319,20 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	String unalias(String path) {
 		String alias = StringHelper.root( path );
 		String name = getAliasName( alias );
-        if (name != null) return name + path.substring(alias.length());
-        return path;
+		if ( name != null ) {
+			return name + path.substring( alias.length() );
+		}
+		return path;
 	}
 
 	void addEntityToFetch(String name, String oneToOneOwnerName, AssociationType ownerAssociationType) {
 		addEntityToFetch( name );
-		if ( oneToOneOwnerName != null ) oneToOneOwnerNames.put( name, oneToOneOwnerName );
-		if ( ownerAssociationType != null ) uniqueKeyOwnerReferences.put( name, ownerAssociationType );
+		if ( oneToOneOwnerName != null ) {
+			oneToOneOwnerNames.put( name, oneToOneOwnerName );
+		}
+		if ( ownerAssociationType != null ) {
+			uniqueKeyOwnerReferences.put( name, ownerAssociationType );
+		}
 	}
 
 	private void addEntityToFetch(String name) {
@@ -361,7 +352,7 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	}
 
 	private String getType(String name) {
-		String type = ( String ) typeMap.get( name );
+		String type = (String) typeMap.get( name );
 		if ( type == null && superQuery != null ) {
 			type = superQuery.getType( name );
 		}
@@ -369,7 +360,7 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	}
 
 	private String getRole(String name) {
-		String role = ( String ) collections.get( name );
+		String role = (String) collections.get( name );
 		if ( role == null && superQuery != null ) {
 			role = superQuery.getRole( name );
 		}
@@ -381,12 +372,14 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 				typeMap.containsKey( name ) ||
 				collections.containsKey( name ) || (
 				superQuery != null && superQuery.isName( name )
-				);
+		);
 	}
 
 	PropertyMapping getPropertyMapping(String name) throws QueryException {
 		PropertyMapping decorator = getDecoratedPropertyMapping( name );
-		if ( decorator != null ) return decorator;
+		if ( decorator != null ) {
+			return decorator;
+		}
 
 		String type = getType( name );
 		if ( type == null ) {
@@ -398,13 +391,15 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 		}
 		else {
 			Queryable persister = getEntityPersister( type );
-			if ( persister == null ) throw new QueryException( "persistent class not found: " + type );
+			if ( persister == null ) {
+				throw new QueryException( "persistent class not found: " + type );
+			}
 			return persister;
 		}
 	}
 
 	private PropertyMapping getDecoratedPropertyMapping(String name) {
-		return ( PropertyMapping ) decoratedPropertyMappings.get( name );
+		return (PropertyMapping) decoratedPropertyMappings.get( name );
 	}
 
 	void decoratePropertyMapping(String name, PropertyMapping mapping) {
@@ -414,7 +409,9 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	private Queryable getEntityPersisterForName(String name) throws QueryException {
 		String type = getType( name );
 		Queryable persister = getEntityPersister( type );
-		if ( persister == null ) throw new QueryException( "persistent class not found: " + type );
+		if ( persister == null ) {
+			throw new QueryException( "persistent class not found: " + type );
+		}
 		return persister;
 	}
 
@@ -424,30 +421,30 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 			return null;
 		}
 		try {
-			return ( Queryable ) getFactory().getEntityPersister( importedClassName );
+			return (Queryable) getFactory().getEntityPersister( importedClassName );
 		}
-		catch ( MappingException me ) {
+		catch (MappingException me) {
 			return null;
 		}
 	}
 
 	Queryable getEntityPersister(String entityName) throws QueryException {
 		try {
-			return ( Queryable ) getFactory().getEntityPersister( entityName );
+			return (Queryable) getFactory().getEntityPersister( entityName );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw new QueryException( "persistent class not found: " + entityName );
 		}
 	}
 
 	QueryableCollection getCollectionPersister(String role) throws QueryException {
 		try {
-			return ( QueryableCollection ) getFactory().getCollectionPersister( role );
+			return (QueryableCollection) getFactory().getCollectionPersister( role );
 		}
-		catch ( ClassCastException cce ) {
+		catch (ClassCastException cce) {
 			throw new QueryException( "collection role is not queryable: " + role );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw new QueryException( "collection role not found: " + role );
 		}
 	}
@@ -524,11 +521,15 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	}
 
 	void addJoin(String name, JoinSequence joinSequence) throws QueryException {
-		if ( !joins.containsKey( name ) ) joins.put( name, joinSequence );
+		if ( !joins.containsKey( name ) ) {
+			joins.put( name, joinSequence );
+		}
 	}
 
 	void addNamedParameter(String name) {
-		if ( superQuery != null ) superQuery.addNamedParameter( name );
+		if ( superQuery != null ) {
+			superQuery.addNamedParameter( name );
+		}
 		Integer loc = parameterCount++;
 		Object o = namedParameters.get( name );
 		if ( o == null ) {
@@ -541,19 +542,21 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 			namedParameters.put( name, list );
 		}
 		else {
-			( ( ArrayList ) o ).add( loc );
+			( (ArrayList) o ).add( loc );
 		}
 	}
 
 	@Override
-    public int[] getNamedParameterLocs(String name) throws QueryException {
+	public int[] getNamedParameterLocs(String name) throws QueryException {
 		Object o = namedParameters.get( name );
 		if ( o == null ) {
 			throw new QueryException( ERROR_NAMED_PARAMETER_DOES_NOT_APPEAR + name, queryString );
 		}
-		if ( o instanceof Integer ) return new int[] { (Integer) o };
+		if ( o instanceof Integer ) {
+			return new int[] {(Integer) o};
+		}
 		else {
-			return ArrayHelper.toIntArray( ( ArrayList ) o );
+			return ArrayHelper.toIntArray( (ArrayList) o );
 		}
 	}
 
@@ -580,21 +583,27 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 		suffixes = new String[size];
 		includeInSelect = new boolean[size];
 		for ( int i = 0; i < size; i++ ) {
-			String name = ( String ) returnedTypes.get( i );
+			String name = (String) returnedTypes.get( i );
 			//if ( !isName(name) ) throw new QueryException("unknown type: " + name);
 			persisters[i] = getEntityPersisterForName( name );
 			// TODO: cannot use generateSuffixes() - it handles the initial suffix differently.
 			suffixes[i] = ( size == 1 ) ? "" : Integer.toString( i ) + '_';
 			names[i] = name;
 			includeInSelect[i] = !entitiesToFetch.contains( name );
-			if ( includeInSelect[i] ) selectLength++;
-			if ( name.equals( collectionOwnerName ) ) collectionOwnerColumn = i;
-			String oneToOneOwner = ( String ) oneToOneOwnerNames.get( name );
+			if ( includeInSelect[i] ) {
+				selectLength++;
+			}
+			if ( name.equals( collectionOwnerName ) ) {
+				collectionOwnerColumn = i;
+			}
+			String oneToOneOwner = (String) oneToOneOwnerNames.get( name );
 			owners[i] = ( oneToOneOwner == null ) ? -1 : returnedTypes.indexOf( oneToOneOwner );
 			ownerAssociationTypes[i] = (EntityType) uniqueKeyOwnerReferences.get( name );
 		}
 
-		if ( ArrayHelper.isAllNegative( owners ) ) owners = null;
+		if ( ArrayHelper.isAllNegative( owners ) ) {
+			owners = null;
+		}
 
 		String scalarSelect = renderScalarSelect(); //Must be done here because of side-effect! yuck...
 
@@ -603,7 +612,7 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 
 		returnTypes = new Type[scalarSize];
 		for ( int i = 0; i < scalarSize; i++ ) {
-			returnTypes[i] = ( Type ) scalarTypes.get( i );
+			returnTypes[i] = (Type) scalarTypes.get( i );
 		}
 
 		QuerySelect sql = new QuerySelect( getFactory().getDialect() );
@@ -618,7 +627,9 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 			sql.addSelectFragmentString( collectionPersister.selectFragment( fetchName, "__" ) );
 		}
 
-		if ( hasScalars || shallowQuery ) sql.addSelectFragmentString( scalarSelect );
+		if ( hasScalars || shallowQuery ) {
+			sql.addSelectFragmentString( scalarSelect );
+		}
 
 		//TODO: for some dialects it would be appropriate to add the renderOrderByPropertiesSelect() to other select strings
 		mergeJoins( sql.getJoinFragment() );
@@ -638,18 +649,20 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 		// initialize the Set of queried identifier spaces (ie. tables)
 		Iterator iter = collections.values().iterator();
 		while ( iter.hasNext() ) {
-			CollectionPersister p = getCollectionPersister( ( String ) iter.next() );
+			CollectionPersister p = getCollectionPersister( (String) iter.next() );
 			addQuerySpaces( p.getCollectionSpaces() );
 		}
 		iter = typeMap.keySet().iterator();
 		while ( iter.hasNext() ) {
-			Queryable p = getEntityPersisterForName( ( String ) iter.next() );
+			Queryable p = getEntityPersisterForName( (String) iter.next() );
 			addQuerySpaces( p.getQuerySpaces() );
 		}
 
 		sqlString = sql.toQueryString();
 
-		if ( holderClass != null ) holderConstructor = ReflectHelper.getConstructor( holderClass, returnTypes );
+		if ( holderClass != null ) {
+			holderConstructor = ReflectHelper.getConstructor( holderClass, returnTypes );
+		}
 
 		if ( hasScalars ) {
 			actualReturnTypes = returnTypes;
@@ -672,7 +685,7 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 		int size = returnedTypes.size();
 
 		for ( int k = 0; k < size; k++ ) {
-			String name = ( String ) returnedTypes.get( k );
+			String name = (String) returnedTypes.get( k );
 			String suffix = size == 1 ? "" : Integer.toString( k ) + '_';
 			sql.addSelectFragmentString( persisters[k].identifierSelectFragment( name, suffix ) );
 		}
@@ -699,7 +712,7 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 		int size = returnedTypes.size();
 		for ( int k = 0; k < size; k++ ) {
 			String suffix = size == 1 ? "" : Integer.toString( k ) + '_';
-			String name = ( String ) returnedTypes.get( k );
+			String name = (String) returnedTypes.get( k );
 			sql.addSelectFragmentString( persisters[k].propertySelectFragment( name, suffix, false ) );
 		}
 	}
@@ -719,14 +732,21 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 			for ( int k = 0; k < size; k++ ) {
 
 				scalarTypes.add(
-						getFactory().getTypeResolver().getTypeFactory().manyToOne( persisters[k].getEntityName(), shallowQuery )
+						getFactory().getTypeResolver().getTypeFactory().manyToOne(
+								persisters[k].getEntityName(),
+								shallowQuery
+						)
 				);
 
 				String[] idColumnNames = persisters[k].getIdentifierColumnNames();
 				for ( int i = 0; i < idColumnNames.length; i++ ) {
 					buf.append( returnedTypes.get( k ) ).append( '.' ).append( idColumnNames[i] );
-					if ( !isSubselect ) buf.append( " as " ).append( NameGenerator.scalarName( k, i ) );
-					if ( i != idColumnNames.length - 1 || k != size - 1 ) buf.append( ", " );
+					if ( !isSubselect ) {
+						buf.append( " as " ).append( NameGenerator.scalarName( k, i ) );
+					}
+					if ( i != idColumnNames.length - 1 || k != size - 1 ) {
+						buf.append( ", " );
+					}
 				}
 
 			}
@@ -741,7 +761,7 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 			while ( iter.hasNext() ) {
 				Object next = iter.next();
 				if ( next instanceof String ) {
-					String token = ( String ) next;
+					String token = (String) next;
 
 					if ( "(".equals( token ) ) {
 						parenCount++;
@@ -750,7 +770,7 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 						parenCount--;
 					}
 
-					String lc = token.toLowerCase();
+					String lc = token.toLowerCase( Locale.ROOT );
 					if ( lc.equals( ", " ) ) {
 						if ( nolast ) {
 							nolast = false;
@@ -758,8 +778,7 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 						else {
 							if ( !isSubselect && parenCount == 0 ) {
 								int x = c++;
-								buf.append( " as " )
-										.append( NameGenerator.scalarName( x, 0 ) );
+								buf.append( " as " ).append( NameGenerator.scalarName( x, 0 ) );
 							}
 						}
 					}
@@ -770,22 +789,22 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 				}
 				else {
 					nolast = true;
-					String[] tokens = ( String[] ) next;
+					String[] tokens = (String[]) next;
 					for ( int i = 0; i < tokens.length; i++ ) {
 						buf.append( tokens[i] );
 						if ( !isSubselect ) {
-							buf.append( " as " )
-									.append( NameGenerator.scalarName( c, i ) );
+							buf.append( " as " ).append( NameGenerator.scalarName( c, i ) );
 						}
-						if ( i != tokens.length - 1 ) buf.append( ", " );
+						if ( i != tokens.length - 1 ) {
+							buf.append( ", " );
+						}
 					}
 					c++;
 				}
 			}
 			if ( !isSubselect && !nolast ) {
 				int x = c++;
-				buf.append( " as " )
-						.append( NameGenerator.scalarName( x, 0 ) );
+				buf.append( " as " ).append( NameGenerator.scalarName( x, 0 ) );
 			}
 
 		}
@@ -797,15 +816,16 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 
 		Iterator iter = joins.entrySet().iterator();
 		while ( iter.hasNext() ) {
-			Map.Entry me = ( Map.Entry ) iter.next();
-			String name = ( String ) me.getKey();
-			JoinSequence join = ( JoinSequence ) me.getValue();
-			join.setSelector( new JoinSequence.Selector() {
-				public boolean includeSubclasses(String alias) {
-					boolean include = returnedTypes.contains( alias ) && !isShallowQuery();
-					return include;
-				}
-			} );
+			Map.Entry me = (Map.Entry) iter.next();
+			String name = (String) me.getKey();
+			JoinSequence join = (JoinSequence) me.getValue();
+			join.setSelector(
+					new JoinSequence.Selector() {
+						public boolean includeSubclasses(String alias) {
+							return returnedTypes.contains( alias ) && !isShallowQuery();
+						}
+					}
+			);
 
 			if ( typeMap.containsKey( name ) ) {
 				ojf.addFragment( join.toJoinFragment( enabledFilters, true ) );
@@ -813,10 +833,6 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 			else if ( collections.containsKey( name ) ) {
 				ojf.addFragment( join.toJoinFragment( enabledFilters, true ) );
 			}
-			else {
-				//name from a super query (a bit inelegant that it shows up here)
-			}
-
 		}
 
 	}
@@ -836,7 +852,9 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 
 	void addQuerySpaces(Serializable[] spaces) {
 		Collections.addAll( querySpaces, spaces );
-		if ( superQuery != null ) superQuery.addQuerySpaces( spaces );
+		if ( superQuery != null ) {
+			superQuery.addQuerySpaces( spaces );
+		}
 	}
 
 	void setDistinct(boolean distinct) {
@@ -847,17 +865,14 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 		return superQuery != null;
 	}
 
-	/**
-	 * Overrides method from Loader
-	 */
 	@Override
-    public CollectionPersister[] getCollectionPersisters() {
-		return collectionPersister == null ? null : new CollectionPersister[] { collectionPersister };
+	public CollectionPersister[] getCollectionPersisters() {
+		return collectionPersister == null ? null : new CollectionPersister[] {collectionPersister};
 	}
 
 	@Override
-    protected String[] getCollectionSuffixes() {
-		return collectionPersister == null ? null : new String[] { "__" };
+	protected String[] getCollectionSuffixes() {
+		return collectionPersister == null ? null : new String[] {"__"};
 	}
 
 	void setCollectionToFetch(String role, String name, String ownerName, String entityName)
@@ -871,12 +886,12 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	}
 
 	@Override
-    protected String[] getSuffixes() {
+	protected String[] getSuffixes() {
 		return suffixes;
 	}
 
 	@Override
-    protected String[] getAliases() {
+	protected String[] getAliases() {
 		return names;
 	}
 
@@ -905,28 +920,30 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 			//many-to-many
 			addCollection( collectionName, collectionRole );
 			try {
-				join.addJoin( ( AssociationType ) persister.getElementType(),
+				join.addJoin(
+						(AssociationType) persister.getElementType(),
 						elementName,
 						JoinType.INNER_JOIN,
-						persister.getElementColumnNames(collectionName) );
+						persister.getElementColumnNames( collectionName )
+				);
 			}
-			catch ( MappingException me ) {
+			catch (MappingException me) {
 				throw new QueryException( me );
 			}
 		}
 		join.addCondition( collectionName, keyColumnNames, " = ?" );
 		//if ( persister.hasWhere() ) join.addCondition( persister.getSQLWhereString(collectionName) );
-		EntityType elemType = ( EntityType ) collectionElementType;
+		EntityType elemType = (EntityType) collectionElementType;
 		addFrom( elementName, elemType.getAssociatedEntityName(), join );
 
 	}
 
 	String getPathAlias(String path) {
-		return ( String ) pathAliases.get( path );
+		return (String) pathAliases.get( path );
 	}
 
 	JoinSequence getPathJoin(String path) {
-		return ( JoinSequence ) pathJoins.get( path );
+		return (JoinSequence) pathJoins.get( path );
 	}
 
 	void addPathAliasAndJoin(String path, String alias, JoinSequence joinSequence) {
@@ -949,15 +966,33 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 
 		boolean stats = session.getFactory().getStatistics().isStatisticsEnabled();
 		long startTime = 0;
-		if ( stats ) startTime = System.nanoTime();
+		if ( stats ) {
+			startTime = System.nanoTime();
+		}
 
 		try {
 			final List<AfterLoadAction> afterLoadActions = new ArrayList<AfterLoadAction>();
-			final SqlStatementWrapper wrapper = executeQueryStatement( queryParameters, false, afterLoadActions, session );
+			final SqlStatementWrapper wrapper = executeQueryStatement(
+					queryParameters,
+					false,
+					afterLoadActions,
+					session
+			);
 			final ResultSet rs = wrapper.getResultSet();
 			final PreparedStatement st = (PreparedStatement) wrapper.getStatement();
-			HolderInstantiator hi = HolderInstantiator.createClassicHolderInstantiator(holderConstructor, queryParameters.getResultTransformer());
-			Iterator result = new IteratorImpl( rs, st, session, queryParameters.isReadOnly( session ), returnTypes, getColumnNames(), hi );
+			HolderInstantiator hi = HolderInstantiator.createClassicHolderInstantiator(
+					holderConstructor,
+					queryParameters.getResultTransformer()
+			);
+			Iterator result = new IteratorImpl(
+					rs,
+					st,
+					session,
+					queryParameters.isReadOnly( session ),
+					returnTypes,
+					getColumnNames(),
+					hi
+			);
 
 			if ( stats ) {
 				final long endTime = System.nanoTime();
@@ -966,31 +1001,31 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 						"HQL: " + queryString,
 						0,
 						milliseconds
-					);
+				);
 			}
 
 			return result;
 
 		}
-		catch ( SQLException sqle ) {
+		catch (SQLException sqle) {
 			throw getFactory().getSQLExceptionHelper().convert(
 					sqle,
 					"could not execute query using iterate",
 					getSQLString()
-				);
+			);
 		}
 
 	}
 
 	public int executeUpdate(QueryParameters queryParameters, SessionImplementor session) throws HibernateException {
-		throw new UnsupportedOperationException( "Not supported!  Use the AST translator...");
+		throw new UnsupportedOperationException( "Not supported!  Use the AST translator..." );
 	}
 
 	@Override
-    protected boolean[] includeInResultRow() {
+	protected boolean[] includeInResultRow() {
 		boolean[] isResultReturned = includeInSelect;
 		if ( hasScalars ) {
-			isResultReturned = new boolean[ returnedTypes.size() ];
+			isResultReturned = new boolean[returnedTypes.size()];
 			Arrays.fill( isResultReturned, true );
 		}
 		return isResultReturned;
@@ -998,7 +1033,7 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 
 
 	@Override
-    protected ResultTransformer resolveResultTransformer(ResultTransformer resultTransformer) {
+	protected ResultTransformer resolveResultTransformer(ResultTransformer resultTransformer) {
 		return HolderInstantiator.resolveClassicResultTransformer(
 				holderConstructor,
 				resultTransformer
@@ -1006,17 +1041,21 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	}
 
 	@Override
-    protected Object getResultColumnOrRow(Object[] row, ResultTransformer transformer, ResultSet rs, SessionImplementor session)
+	protected Object getResultColumnOrRow(
+			Object[] row,
+			ResultTransformer transformer,
+			ResultSet rs,
+			SessionImplementor session)
 			throws SQLException, HibernateException {
 		Object[] resultRow = getResultRow( row, rs, session );
 		return ( holderClass == null && resultRow.length == 1 ?
-				resultRow[ 0 ] :
+				resultRow[0] :
 				resultRow
 		);
 	}
 
 	@Override
-    protected Object[] getResultRow(Object[] row, ResultSet rs, SessionImplementor session)
+	protected Object[] getResultRow(Object[] row, ResultSet rs, SessionImplementor session)
 			throws SQLException, HibernateException {
 		Object[] resultRow;
 		if ( hasScalars ) {
@@ -1034,14 +1073,14 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	}
 
 	@Override
-    protected List getResultList(List results, ResultTransformer resultTransformer) throws QueryException {
+	protected List getResultList(List results, ResultTransformer resultTransformer) throws QueryException {
 		if ( holderClass != null ) {
 			for ( int i = 0; i < results.size(); i++ ) {
-				Object[] row = ( Object[] ) results.get( i );
+				Object[] row = (Object[]) results.get( i );
 				try {
 					results.set( i, holderConstructor.newInstance( row ) );
 				}
-				catch ( Exception e ) {
+				catch (Exception e) {
 					throw new QueryException( "could not instantiate: " + holderClass, e );
 				}
 			}
@@ -1057,7 +1096,9 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 			Object[] result = new Object[selectLength];
 			int j = 0;
 			for ( int i = 0; i < row.length; i++ ) {
-				if ( includeInSelect[i] ) result[j++] = row[i];
+				if ( includeInSelect[i] ) {
+					result[j++] = row[i];
+				}
 			}
 			return result;
 		}
@@ -1068,36 +1109,40 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	}
 
 	@Override
-    protected LockMode[] getLockModes(LockOptions lockOptions) {
+	protected LockMode[] getLockModes(LockOptions lockOptions) {
 
 		// unfortunately this stuff can't be cached because
 		// it is per-invocation, not constant for the
 		// QueryTranslator instance
 		HashMap nameLockOptions = new HashMap();
-		if ( lockOptions == null) {
+		if ( lockOptions == null ) {
 			lockOptions = LockOptions.NONE;
 		}
 
 		if ( lockOptions.getAliasLockCount() > 0 ) {
 			Iterator iter = lockOptions.getAliasLockIterator();
 			while ( iter.hasNext() ) {
-				Map.Entry me = ( Map.Entry ) iter.next();
-				nameLockOptions.put( getAliasName( ( String ) me.getKey() ),
-						me.getValue() );
+				Map.Entry me = (Map.Entry) iter.next();
+				nameLockOptions.put(
+						getAliasName( (String) me.getKey() ),
+						me.getValue()
+				);
 			}
 		}
 		LockMode[] lockModesArray = new LockMode[names.length];
 		for ( int i = 0; i < names.length; i++ ) {
-			LockMode lm = ( LockMode ) nameLockOptions.get( names[i] );
+			LockMode lm = (LockMode) nameLockOptions.get( names[i] );
 			//if ( lm == null ) lm = LockOptions.NONE;
-			if ( lm == null ) lm = lockOptions.getLockMode();
+			if ( lm == null ) {
+				lm = lockOptions.getLockMode();
+			}
 			lockModesArray[i] = lm;
 		}
 		return lockModesArray;
 	}
 
 	@Override
-    protected String applyLocks(
+	protected String applyLocks(
 			String sql,
 			QueryParameters parameters,
 			Dialect dialect,
@@ -1106,18 +1151,18 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 		final LockOptions lockOptions = parameters.getLockOptions();
 		final String result;
 		if ( lockOptions == null ||
-			( lockOptions.getLockMode() == LockMode.NONE && lockOptions.getAliasLockCount() == 0 ) ) {
+				( lockOptions.getLockMode() == LockMode.NONE && lockOptions.getAliasLockCount() == 0 ) ) {
 			return sql;
 		}
 		else {
 			LockOptions locks = new LockOptions();
-			locks.setLockMode(lockOptions.getLockMode());
-			locks.setTimeOut(lockOptions.getTimeOut());
-			locks.setScope(lockOptions.getScope());
+			locks.setLockMode( lockOptions.getLockMode() );
+			locks.setTimeOut( lockOptions.getTimeOut() );
+			locks.setScope( lockOptions.getScope() );
 			Iterator iter = lockOptions.getAliasLockIterator();
 			while ( iter.hasNext() ) {
-				Map.Entry me = ( Map.Entry ) iter.next();
-				locks.setAliasSpecificLockMode( getAliasName( ( String ) me.getKey() ), (LockMode) me.getValue() );
+				Map.Entry me = (Map.Entry) iter.next();
+				locks.setAliasSpecificLockMode( getAliasName( (String) me.getKey() ), (LockMode) me.getValue() );
 			}
 			Map keyColumnNames = null;
 			if ( dialect.forUpdateOfColumns() ) {
@@ -1133,13 +1178,13 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	}
 
 	@Override
-    protected boolean upgradeLocks() {
+	protected boolean upgradeLocks() {
 		return true;
 	}
 
 	@Override
-    protected int[] getCollectionOwners() {
-		return new int[] { collectionOwnerColumn };
+	protected int[] getCollectionOwners() {
+		return new int[] {collectionOwnerColumn};
 	}
 
 	protected boolean isCompiled() {
@@ -1147,17 +1192,17 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 	}
 
 	@Override
-    public String toString() {
+	public String toString() {
 		return queryString;
 	}
 
 	@Override
-    protected int[] getOwners() {
+	protected int[] getOwners() {
 		return owners;
 	}
 
 	@Override
-    protected EntityType[] getOwnerAssociationTypes() {
+	protected EntityType[] getOwnerAssociationTypes() {
 		return ownerAssociationTypes;
 	}
 
@@ -1169,22 +1214,23 @@ public class QueryTranslatorImpl extends BasicLoader implements FilterTranslator
 		return enabledFilters;
 	}
 
-	public ScrollableResults scroll(final QueryParameters queryParameters,
-									final SessionImplementor session)
-			throws HibernateException {
+	public ScrollableResults scroll(
+			final QueryParameters queryParameters,
+			final SessionImplementor session) throws HibernateException {
 		HolderInstantiator hi = HolderInstantiator.createClassicHolderInstantiator(
-				holderConstructor, queryParameters.getResultTransformer()
+				holderConstructor,
+				queryParameters.getResultTransformer()
 		);
 		return scroll( queryParameters, returnTypes, hi, session );
 	}
 
 	@Override
-    public String getQueryIdentifier() {
+	public String getQueryIdentifier() {
 		return queryIdentifier;
 	}
 
 	@Override
-    protected boolean isSubselectLoadingEnabled() {
+	protected boolean isSubselectLoadingEnabled() {
 		return hasSubselectLoadableCollections();
 	}
 

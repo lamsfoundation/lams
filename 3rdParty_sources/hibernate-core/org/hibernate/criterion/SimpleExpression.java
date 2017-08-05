@@ -1,29 +1,13 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, 2012, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.criterion;
 
 import java.sql.Types;
+import java.util.Locale;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -89,7 +73,8 @@ public class SimpleExpression implements Criterion {
 		final SessionFactoryImplementor factory = criteriaQuery.getFactory();
 		final int[] sqlTypes = type.sqlTypes( factory );
 		for ( int i = 0; i < columns.length; i++ ) {
-			final boolean lower = ignoreCase && (sqlTypes[i] == Types.VARCHAR || sqlTypes[i] == Types.CHAR);
+			final boolean lower = ignoreCase && (sqlTypes[i] == Types.VARCHAR || sqlTypes[i] == Types.CHAR || 
+					sqlTypes[i] == Types.NVARCHAR || sqlTypes[i] == Types.NCHAR);
 			if ( lower ) {
 				fragment.append( factory.getDialect().getLowercaseFunction() ).append( '(' );
 			}
@@ -111,7 +96,7 @@ public class SimpleExpression implements Criterion {
 
 	@Override
 	public TypedValue[] getTypedValues(Criteria criteria, CriteriaQuery criteriaQuery) throws HibernateException {
-		final Object casedValue = ignoreCase ? value.toString().toLowerCase() : value;
+		final Object casedValue = ignoreCase ? value.toString().toLowerCase(Locale.ROOT) : value;
 		return new TypedValue[] { criteriaQuery.getTypedValue( criteria, propertyName, casedValue ) };
 	}
 

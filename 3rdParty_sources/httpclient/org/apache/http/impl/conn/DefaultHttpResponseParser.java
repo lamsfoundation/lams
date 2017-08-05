@@ -29,8 +29,6 @@ package org.apache.http.impl.conn;
 
 import java.io.IOException;
 
-import org.apache.http.annotation.ThreadSafe;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpException;
@@ -39,26 +37,25 @@ import org.apache.http.HttpResponseFactory;
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.ProtocolException;
 import org.apache.http.StatusLine;
+import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.config.MessageConstraints;
+import org.apache.http.impl.DefaultHttpResponseFactory;
 import org.apache.http.impl.io.AbstractMessageParser;
 import org.apache.http.io.SessionInputBuffer;
 import org.apache.http.message.LineParser;
 import org.apache.http.message.ParserCursor;
 import org.apache.http.params.HttpParams;
+import org.apache.http.util.Args;
 import org.apache.http.util.CharArrayBuffer;
 
 /**
- * Default HTTP response parser implementation.
- * <p>
- * The following parameters can be used to customize the behavior of this
- * class:
- * <ul>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#MAX_HEADER_COUNT}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#MAX_LINE_LENGTH}</li>
- * </ul>
+ * Lenient HTTP response parser implementation that can skip malformed data until
+ * a valid HTTP response message head is encountered.
  *
  * @since 4.2
  */
-@ThreadSafe // no public methods
+@SuppressWarnings("deprecation")
+@NotThreadSafe
 public class DefaultHttpResponseParser extends AbstractMessageParser<HttpResponse> {
 
     private final Log log = LogFactory.getLog(getClass());
@@ -66,18 +63,69 @@ public class DefaultHttpResponseParser extends AbstractMessageParser<HttpRespons
     private final HttpResponseFactory responseFactory;
     private final CharArrayBuffer lineBuf;
 
+    /**
+     * @deprecated (4.3) use {@link DefaultHttpResponseParser#DefaultHttpResponseParser(
+     *   SessionInputBuffer, LineParser, HttpResponseFactory, MessageConstraints)}
+     */
+    @Deprecated
     public DefaultHttpResponseParser(
             final SessionInputBuffer buffer,
             final LineParser parser,
             final HttpResponseFactory responseFactory,
             final HttpParams params) {
         super(buffer, parser, params);
-        if (responseFactory == null) {
-            throw new IllegalArgumentException
-                ("Response factory may not be null");
-        }
+        Args.notNull(responseFactory, "Response factory");
         this.responseFactory = responseFactory;
         this.lineBuf = new CharArrayBuffer(128);
+    }
+
+    /**
+     * Creates new instance of DefaultHttpResponseParser.
+     *
+     * @param buffer the session input buffer.
+     * @param lineParser the line parser. If {@code null}
+     *   {@link org.apache.http.message.BasicLineParser#INSTANCE} will be used.
+     * @param responseFactory HTTP response factory. If {@code null}
+     *   {@link DefaultHttpResponseFactory#INSTANCE} will be used.
+     * @param constraints the message constraints. If {@code null}
+     *   {@link MessageConstraints#DEFAULT} will be used.
+     *
+     * @since 4.3
+     */
+    public DefaultHttpResponseParser(
+            final SessionInputBuffer buffer,
+            final LineParser lineParser,
+            final HttpResponseFactory responseFactory,
+            final MessageConstraints constraints) {
+        super(buffer, lineParser, constraints);
+        this.responseFactory = responseFactory != null ? responseFactory :
+                DefaultHttpResponseFactory.INSTANCE;
+        this.lineBuf = new CharArrayBuffer(128);
+    }
+
+    /**
+     * Creates new instance of DefaultHttpResponseParser.
+     *
+     * @param buffer the session input buffer.
+     * @param constraints the message constraints. If {@code null}
+     *   {@link MessageConstraints#DEFAULT} will be used.
+     *
+     * @since 4.3
+     */
+    public DefaultHttpResponseParser(
+        final SessionInputBuffer buffer, final MessageConstraints constraints) {
+        this(buffer, null, null, constraints);
+    }
+
+    /**
+     * Creates new instance of DefaultHttpResponseParser.
+     *
+     * @param buffer the session input buffer.
+     *
+     * @since 4.3
+     */
+    public DefaultHttpResponseParser(final SessionInputBuffer buffer) {
+        this(buffer, null, null, MessageConstraints.DEFAULT);
     }
 
     @Override
@@ -89,7 +137,7 @@ public class DefaultHttpResponseParser extends AbstractMessageParser<HttpRespons
         do {
             // clear the buffer
             this.lineBuf.clear();
-            int i = sessionBuffer.readLine(this.lineBuf);
+            final int i = sessionBuffer.readLine(this.lineBuf);
             if (i == -1 && count == 0) {
                 // The server just dropped connection on us
                 throw new NoHttpResponseException("The target server failed to respond");
@@ -109,12 +157,12 @@ public class DefaultHttpResponseParser extends AbstractMessageParser<HttpRespons
             count++;
         } while(true);
         //create the status line from the status string
-        StatusLine statusline = lineParser.parseStatusLine(this.lineBuf, cursor);
+        final StatusLine statusline = lineParser.parseStatusLine(this.lineBuf, cursor);
         return this.responseFactory.newHttpResponse(statusline, null);
     }
 
-    protected boolean reject(CharArrayBuffer line, int count) {
+    protected boolean reject(final CharArrayBuffer line, final int count) {
         return false;
     }
-    
+
 }

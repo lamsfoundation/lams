@@ -33,12 +33,11 @@ import io.undertow.server.HttpHandler;
 import io.undertow.servlet.UndertowServletLogger;
 import io.undertow.servlet.api.InstanceHandle;
 import io.undertow.servlet.core.ManagedServlet;
-import io.undertow.servlet.spec.AsyncContextImpl;
 import io.undertow.util.StatusCodes;
 
 /**
  * The handler that is responsible for invoking the servlet
- * <p/>
+ * <p>
  * TODO: do we want to move lifecycle considerations out of this handler?
  *
  * @author Stuart Douglas
@@ -60,7 +59,7 @@ public class ServletHandler implements HttpHandler {
     public void handleRequest(final HttpServerExchange exchange) throws IOException, ServletException {
         if (managedServlet.isPermanentlyUnavailable()) {
             UndertowServletLogger.REQUEST_LOGGER.debugf("Returning 404 for servlet %s due to permanent unavailability", managedServlet.getServletInfo().getName());
-            exchange.setResponseCode(StatusCodes.NOT_FOUND);
+            exchange.setStatusCode(StatusCodes.NOT_FOUND);
             return;
         }
 
@@ -68,16 +67,16 @@ public class ServletHandler implements HttpHandler {
         if (until != 0) {
             UndertowServletLogger.REQUEST_LOGGER.debugf("Returning 503 for servlet %s due to temporary unavailability", managedServlet.getServletInfo().getName());
             if (System.currentTimeMillis() < until) {
-                exchange.setResponseCode(StatusCodes.SERVICE_UNAVAILABLE);
+                exchange.setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);
                 return;
             } else {
                 unavailableUntilUpdater.compareAndSet(this, until, 0);
             }
         }
-        if(!managedServlet.getServletInfo().isAsyncSupported()) {
-            exchange.putAttachment(AsyncContextImpl.ASYNC_SUPPORTED, false);
-        }
         final ServletRequestContext servletRequestContext = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+        if(!managedServlet.getServletInfo().isAsyncSupported()) {
+            servletRequestContext.setAsyncSupported(false);
+        }
         ServletRequest request = servletRequestContext.getServletRequest();
         ServletResponse response = servletRequestContext.getServletResponse();
         InstanceHandle<? extends Servlet> servlet = null;
@@ -100,11 +99,11 @@ public class ServletHandler implements HttpHandler {
                 UndertowServletLogger.REQUEST_LOGGER.stoppingServletDueToPermanentUnavailability(managedServlet.getServletInfo().getName(), e);
                 managedServlet.stop();
                 managedServlet.setPermanentlyUnavailable(true);
-                exchange.setResponseCode(StatusCodes.NOT_FOUND);
+                exchange.setStatusCode(StatusCodes.NOT_FOUND);
             } else {
                 unavailableUntilUpdater.set(this, System.currentTimeMillis() + e.getUnavailableSeconds() * 1000);
                 UndertowServletLogger.REQUEST_LOGGER.stoppingServletUntilDueToTemporaryUnavailability(managedServlet.getServletInfo().getName(), new Date(until), e);
-                exchange.setResponseCode(StatusCodes.SERVICE_UNAVAILABLE);
+                exchange.setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);
             }
         } finally {
             if(servlet != null) {

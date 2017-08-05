@@ -27,9 +27,14 @@
 
 package org.apache.http.entity;
 
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.http.Consts;
 import org.apache.http.Header;
@@ -38,19 +43,27 @@ import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
 import org.apache.http.annotation.Immutable;
+import org.apache.http.message.BasicHeaderValueFormatter;
 import org.apache.http.message.BasicHeaderValueParser;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.message.ParserCursor;
+import org.apache.http.util.Args;
+import org.apache.http.util.CharArrayBuffer;
+import org.apache.http.util.TextUtils;
 
 /**
  * Content type information consisting of a MIME type and an optional charset.
- * <p/>
+ * <p>
  * This class makes no attempts to verify validity of the MIME type.
  * The input parameters of the {@link #create(String, String)} method, however, may not
- * contain characters <">, <;>, <,> reserved by the HTTP specification.
+ * contain characters {@code <">, <;>, <,>} reserved by the HTTP specification.
  *
  * @since 4.2
  */
 @Immutable
-public final class ContentType {
+public final class ContentType implements Serializable {
+
+    private static final long serialVersionUID = -7768694718232371896L;
 
     // constants
     public static final ContentType APPLICATION_ATOM_XML = create(
@@ -84,17 +97,23 @@ public final class ContentType {
 
     private final String mimeType;
     private final Charset charset;
+    private final NameValuePair[] params;
 
-    /**
-     * Given a MIME type and a character set, constructs a ContentType.
-     * @param mimeType The MIME type to use for the ContentType header.
-     * @param charset The optional character set to use with the ContentType header.
-     * @throws  UnsupportedCharsetException
-     *          If no support for the named charset is available in this Java virtual machine
-     */
-    ContentType(final String mimeType, final Charset charset) {
+    ContentType(
+            final String mimeType,
+            final Charset charset) {
         this.mimeType = mimeType;
         this.charset = charset;
+        this.params = null;
+    }
+
+    ContentType(
+            final String mimeType,
+            final Charset charset,
+            final NameValuePair[] params) {
+        this.mimeType = mimeType;
+        this.charset = charset;
+        this.params = params;
     }
 
     public String getMimeType() {
@@ -106,14 +125,33 @@ public final class ContentType {
     }
 
     /**
-     * Converts a ContentType to a string which can be used as a ContentType header.
-     * If a charset is provided by the ContentType, it will be included in the string.
+     * @since 4.3
+     */
+    public String getParameter(final String name) {
+        Args.notEmpty(name, "Parameter name");
+        if (this.params == null) {
+            return null;
+        }
+        for (final NameValuePair param: this.params) {
+            if (param.getName().equalsIgnoreCase(name)) {
+                return param.getValue();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Generates textual representation of this content type which can be used as the value
+     * of a {@code Content-Type} header.
      */
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder();
+        final CharArrayBuffer buf = new CharArrayBuffer(64);
         buf.append(this.mimeType);
-        if (this.charset != null) {
+        if (this.params != null) {
+            buf.append("; ");
+            BasicHeaderValueFormatter.INSTANCE.formatParameters(buf, this.params, false);
+        } else if (this.charset != null) {
             buf.append("; charset=");
             buf.append(this.charset.name());
         }
@@ -122,7 +160,7 @@ public final class ContentType {
 
     private static boolean valid(final String s) {
         for (int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
+            final char ch = s.charAt(i);
             if (ch == '"' || ch == ',' || ch == ';') {
                 return false;
             }
@@ -133,118 +171,249 @@ public final class ContentType {
     /**
      * Creates a new instance of {@link ContentType}.
      *
-     * @param mimeType MIME type. It may not be <code>null</code> or empty. It may not contain
-     *        characters <">, <;>, <,> reserved by the HTTP specification.
+     * @param mimeType MIME type. It may not be {@code null} or empty. It may not contain
+     *        characters {@code <">, <;>, <,>} reserved by the HTTP specification.
      * @param charset charset.
      * @return content type
      */
     public static ContentType create(final String mimeType, final Charset charset) {
-        if (mimeType == null) {
-            throw new IllegalArgumentException("MIME type may not be null");
-        }
-        String type = mimeType.trim().toLowerCase(Locale.US);
-        if (type.length() == 0) {
-            throw new IllegalArgumentException("MIME type may not be empty");
-        }
-        if (!valid(type)) {
-            throw new IllegalArgumentException("MIME type may not contain reserved characters");
-        }
+        final String type = Args.notBlank(mimeType, "MIME type").toLowerCase(Locale.ROOT);
+        Args.check(valid(type), "MIME type may not contain reserved characters");
         return new ContentType(type, charset);
     }
 
     /**
      * Creates a new instance of {@link ContentType} without a charset.
      *
-     * @param mimeType MIME type. It may not be <code>null</code> or empty. It may not contain
-     *        characters <">, <;>, <,> reserved by the HTTP specification.
+     * @param mimeType MIME type. It may not be {@code null} or empty. It may not contain
+     *        characters {@code <">, <;>, <,>} reserved by the HTTP specification.
      * @return content type
      */
     public static ContentType create(final String mimeType) {
         return new ContentType(mimeType, (Charset) null);
     }
-    
+
     /**
      * Creates a new instance of {@link ContentType}.
      *
-     * @param mimeType MIME type. It may not be <code>null</code> or empty. It may not contain
-     *        characters <">, <;>, <,> reserved by the HTTP specification.
-     * @param charset charset. It may not contain characters <">, <;>, <,> reserved by the HTTP
+     * @param mimeType MIME type. It may not be {@code null} or empty. It may not contain
+     *        characters {@code <">, <;>, <,>} reserved by the HTTP specification.
+     * @param charset charset. It may not contain characters {@code <">, <;>, <,>} reserved by the HTTP
      *        specification. This parameter is optional.
      * @return content type
+     * @throws UnsupportedCharsetException Thrown when the named charset is not available in
+     * this instance of the Java virtual machine
      */
     public static ContentType create(
             final String mimeType, final String charset) throws UnsupportedCharsetException {
-        return create(mimeType, charset != null ? Charset.forName(charset) : null);
+        return create(mimeType, !TextUtils.isBlank(charset) ? Charset.forName(charset) : null);
     }
 
-    private static ContentType create(final HeaderElement helem) {
-        String mimeType = helem.getName();
-        String charset = null;
-        NameValuePair param = helem.getParameterByName("charset");
-        if (param != null) {
-            charset = param.getValue();
+    private static ContentType create(final HeaderElement helem, final boolean strict) {
+        return create(helem.getName(), helem.getParameters(), strict);
+    }
+
+    private static ContentType create(final String mimeType, final NameValuePair[] params, final boolean strict) {
+        Charset charset = null;
+        for (final NameValuePair param: params) {
+            if (param.getName().equalsIgnoreCase("charset")) {
+                final String s = param.getValue();
+                if (!TextUtils.isBlank(s)) {
+                    try {
+                        charset =  Charset.forName(s);
+                    } catch (UnsupportedCharsetException ex) {
+                        if (strict) {
+                            throw ex;
+                        }
+                    }
+                }
+                break;
+            }
         }
-        return create(mimeType, charset);
+        return new ContentType(mimeType, charset, params != null && params.length > 0 ? params : null);
     }
 
     /**
-     * Parses textual representation of <code>Content-Type</code> value.
+     * Creates a new instance of {@link ContentType} with the given parameters.
+     *
+     * @param mimeType MIME type. It may not be {@code null} or empty. It may not contain
+     *        characters {@code <">, <;>, <,>} reserved by the HTTP specification.
+     * @param params parameters.
+     * @return content type
+     *
+     * @since 4.4
+     */
+    public static ContentType create(
+            final String mimeType, final NameValuePair... params) throws UnsupportedCharsetException {
+        final String type = Args.notBlank(mimeType, "MIME type").toLowerCase(Locale.ROOT);
+        Args.check(valid(type), "MIME type may not contain reserved characters");
+        return create(mimeType, params, true);
+    }
+
+    /**
+     * Parses textual representation of {@code Content-Type} value.
      *
      * @param s text
      * @return content type
      * @throws ParseException if the given text does not represent a valid
-     * <code>Content-Type</code> value.
+     * {@code Content-Type} value.
+     * @throws UnsupportedCharsetException Thrown when the named charset is not available in
+     * this instance of the Java virtual machine
      */
     public static ContentType parse(
             final String s) throws ParseException, UnsupportedCharsetException {
-        if (s == null) {
-            throw new IllegalArgumentException("Content type may not be null");
-        }
-        HeaderElement[] elements = BasicHeaderValueParser.parseElements(s, null);
+        Args.notNull(s, "Content type");
+        final CharArrayBuffer buf = new CharArrayBuffer(s.length());
+        buf.append(s);
+        final ParserCursor cursor = new ParserCursor(0, s.length());
+        final HeaderElement[] elements = BasicHeaderValueParser.INSTANCE.parseElements(buf, cursor);
         if (elements.length > 0) {
-            return create(elements[0]);
+            return create(elements[0], true);
         } else {
             throw new ParseException("Invalid content type: " + s);
         }
     }
 
     /**
-     * Extracts <code>Content-Type</code> value from {@link HttpEntity} exactly as
-     * specified by the <code>Content-Type</code> header of the entity. Returns <code>null</code>
+     * Extracts {@code Content-Type} value from {@link HttpEntity} exactly as
+     * specified by the {@code Content-Type} header of the entity. Returns {@code null}
      * if not specified.
      *
      * @param entity HTTP entity
      * @return content type
      * @throws ParseException if the given text does not represent a valid
-     * <code>Content-Type</code> value.
+     * {@code Content-Type} value.
+     * @throws UnsupportedCharsetException Thrown when the named charset is not available in
+     * this instance of the Java virtual machine
      */
     public static ContentType get(
             final HttpEntity entity) throws ParseException, UnsupportedCharsetException {
         if (entity == null) {
             return null;
         }
-        Header header = entity.getContentType();
+        final Header header = entity.getContentType();
         if (header != null) {
-            HeaderElement[] elements = header.getElements();
+            final HeaderElement[] elements = header.getElements();
             if (elements.length > 0) {
-                return create(elements[0]);
+                return create(elements[0], true);
             }
         }
         return null;
     }
 
     /**
-     * Extracts <code>Content-Type</code> value from {@link HttpEntity} or returns default value
-     * if not explicitly specified.
+     * Extracts {@code Content-Type} value from {@link HttpEntity}. Returns {@code null}
+     * if not specified or incorrect (could not be parsed)..
+     *
+     * @param entity HTTP entity
+     * @return content type
+     *
+     * @since 4.4
+     *
+     */
+    public static ContentType getLenient(final HttpEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        final Header header = entity.getContentType();
+        if (header != null) {
+            try {
+                final HeaderElement[] elements = header.getElements();
+                if (elements.length > 0) {
+                    return create(elements[0], false);
+                }
+            } catch (ParseException ex) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Extracts {@code Content-Type} value from {@link HttpEntity} or returns the default value
+     * {@link #DEFAULT_TEXT} if not explicitly specified.
      *
      * @param entity HTTP entity
      * @return content type
      * @throws ParseException if the given text does not represent a valid
-     * <code>Content-Type</code> value.
+     * {@code Content-Type} value.
+     * @throws UnsupportedCharsetException Thrown when the named charset is not available in
+     * this instance of the Java virtual machine
      */
-    public static ContentType getOrDefault(final HttpEntity entity) throws ParseException {
-        ContentType contentType = get(entity);
+    public static ContentType getOrDefault(
+            final HttpEntity entity) throws ParseException, UnsupportedCharsetException {
+        final ContentType contentType = get(entity);
         return contentType != null ? contentType : DEFAULT_TEXT;
+    }
+
+    /**
+     * Extracts {@code Content-Type} value from {@link HttpEntity} or returns the default value
+     * {@link #DEFAULT_TEXT} if not explicitly specified or incorrect (could not be parsed).
+     *
+     * @param entity HTTP entity
+     * @return content type
+     *
+     * @since 4.4
+     */
+    public static ContentType getLenientOrDefault(
+            final HttpEntity entity) throws ParseException, UnsupportedCharsetException {
+        final ContentType contentType = get(entity);
+        return contentType != null ? contentType : DEFAULT_TEXT;
+    }
+
+    /**
+     * Creates a new instance with this MIME type and the given Charset.
+     *
+     * @param charset charset
+     * @return a new instance with this MIME type and the given Charset.
+     * @since 4.3
+     */
+    public ContentType withCharset(final Charset charset) {
+        return create(this.getMimeType(), charset);
+    }
+
+    /**
+     * Creates a new instance with this MIME type and the given Charset name.
+     *
+     * @param charset name
+     * @return a new instance with this MIME type and the given Charset name.
+     * @throws UnsupportedCharsetException Thrown when the named charset is not available in
+     * this instance of the Java virtual machine
+     * @since 4.3
+     */
+    public ContentType withCharset(final String charset) {
+        return create(this.getMimeType(), charset);
+    }
+
+    /**
+     * Creates a new instance with this MIME type and the given parameters.
+     *
+     * @param params
+     * @return a new instance with this MIME type and the given parameters.
+     * @since 4.4
+     */
+    public ContentType withParameters(
+            final NameValuePair... params) throws UnsupportedCharsetException {
+        if (params.length == 0) {
+            return this;
+        }
+        final Map<String, String> paramMap = new LinkedHashMap<String, String>();
+        if (this.params != null) {
+            for (NameValuePair param: this.params) {
+                paramMap.put(param.getName(), param.getValue());
+            }
+        }
+        for (NameValuePair param: params) {
+            paramMap.put(param.getName(), param.getValue());
+        }
+        final List<NameValuePair> newParams = new ArrayList<NameValuePair>(paramMap.size() + 1);
+        if (this.charset != null && !paramMap.containsKey("charset")) {
+            newParams.add(new BasicNameValuePair("charset", this.charset.name()));
+        }
+        for (Map.Entry<String, String> entry: paramMap.entrySet()) {
+            newParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+        }
+        return create(this.getMimeType(), newParams.toArray(new NameValuePair[newParams.size()]), true);
     }
 
 }

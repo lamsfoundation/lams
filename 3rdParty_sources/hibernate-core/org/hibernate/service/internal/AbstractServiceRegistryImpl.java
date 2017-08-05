@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.service.internal;
 
@@ -28,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.boot.registry.BootstrapServiceRegistry;
 import org.hibernate.cfg.Environment;
@@ -53,6 +37,7 @@ import org.hibernate.service.spi.Stoppable;
  * Basic implementation of the ServiceRegistry and ServiceRegistryImplementor contracts
  *
  * @author Steve Ebersole
+ * @author Sanne Grinovero
  */
 public abstract class AbstractServiceRegistryImpl
 		implements ServiceRegistryImplementor, ServiceBinding.ServiceLifecycleOwner {
@@ -65,15 +50,23 @@ public abstract class AbstractServiceRegistryImpl
 	private final boolean allowCrawling;
 
 	private final ConcurrentServiceBinding<Class,ServiceBinding> serviceBindingMap = new ConcurrentServiceBinding<Class,ServiceBinding>();
-	private ConcurrentServiceBinding<Class,Class> roleXref;
+	private final ConcurrentServiceBinding<Class,Class> roleXref = new ConcurrentServiceBinding<Class,Class>();
+	// The services stored in initializedServiceByRole are completely initialized
+	// (i.e., configured, dependencies injected, and started)
+	private final ConcurrentServiceBinding<Class,Service> initializedServiceByRole = new ConcurrentServiceBinding<Class, Service>();
 
 	// IMPL NOTE : the list used for ordered destruction.  Cannot used map above because we need to
 	// iterate it in reverse order which is only available through ListIterator
 	// assume 20 services for initial sizing
+	// All access guarded by synchronization on the serviceBindingList itself.
 	private final List<ServiceBinding> serviceBindingList = CollectionHelper.arrayList( 20 );
 
+	// Guarded by synchronization on this.
 	private boolean autoCloseRegistry;
+	// Guarded by synchronization on this.
 	private Set<ServiceRegistryImplementor> childRegistries;
+
+	private final AtomicBoolean active = new AtomicBoolean( true );
 
 	@SuppressWarnings( {"UnusedDeclaration"})
 	protected AbstractServiceRegistryImpl() {
@@ -160,11 +153,9 @@ public abstract class AbstractServiceRegistryImpl
 		}
 
 		// look for a previously resolved alternate registration
-		if ( roleXref != null ) {
-			final Class alternative = roleXref.get( serviceRole );
-			if ( alternative != null ) {
-				return serviceBindingMap.get( alternative );
-			}
+		final Class alternative = roleXref.get( serviceRole );
+		if ( alternative != null ) {
+			return serviceBindingMap.get( alternative );
 		}
 
 		// perform a crawl looking for an alternate registration
@@ -188,25 +179,37 @@ public abstract class AbstractServiceRegistryImpl
 	}
 
 	private void registerAlternate(Class alternate, Class target) {
-		if ( roleXref == null ) {
-			roleXref = new ConcurrentServiceBinding<Class,Class>();
-		}
 		roleXref.put( alternate, target );
 	}
 
 	@Override
 	public <R extends Service> R getService(Class<R> serviceRole) {
-		final ServiceBinding<R> serviceBinding = locateServiceBinding( serviceRole );
-		if ( serviceBinding == null ) {
-			throw new UnknownServiceException( serviceRole );
+		// TODO: should an exception be thrown if active == false???
+		R service = serviceRole.cast( initializedServiceByRole.get( serviceRole ) );
+		if ( service != null ) {
+			return service;
 		}
 
-		R service = serviceBinding.getService();
-		if ( service == null ) {
-			service = initializeService( serviceBinding );
-		}
+		//Any service initialization needs synchronization
+		synchronized ( this ) {
+			// Check again after having acquired the lock:
+			service = serviceRole.cast( initializedServiceByRole.get( serviceRole ) );
+			if ( service != null ) {
+				return service;
+			}
 
-		return service;
+			final ServiceBinding<R> serviceBinding = locateServiceBinding( serviceRole );
+			if ( serviceBinding == null ) {
+				throw new UnknownServiceException( serviceRole );
+			}
+			service = serviceBinding.getService();
+			if ( service == null ) {
+				service = initializeService( serviceBinding );
+			}
+			// add the service only after it is completely initialized
+			initializedServiceByRole.put( serviceRole, service );
+			return service;
+		}
 	}
 
 	protected <R extends Service> void registerService(ServiceBinding<R> serviceBinding, R service) {
@@ -285,7 +288,7 @@ public abstract class AbstractServiceRegistryImpl
 			}
 		}
 		catch (NullPointerException e) {
-            log.error( "NPE injecting service deps : " + service.getClass().getName() );
+			log.error( "NPE injecting service deps : " + service.getClass().getName() );
 		}
 	}
 
@@ -337,35 +340,33 @@ public abstract class AbstractServiceRegistryImpl
 		}
 	}
 
-	private boolean active = true;
-
 	public boolean isActive() {
-		return active;
+		return active.get();
 	}
 
 	@Override
-    @SuppressWarnings( {"unchecked"})
-	public void destroy() {
-		if ( !active ) {
-			return;
-		}
-
-		active = false;
-		try {
-			synchronized (serviceBindingList) {
-				ListIterator<ServiceBinding> serviceBindingsIterator = serviceBindingList.listIterator(
-						serviceBindingList.size()
-				);
-				while ( serviceBindingsIterator.hasPrevious() ) {
-					final ServiceBinding serviceBinding = serviceBindingsIterator.previous();
-					serviceBinding.getLifecycleOwner().stopService( serviceBinding );
+	@SuppressWarnings( {"unchecked"})
+	public synchronized void destroy() {
+		if ( active.compareAndSet( true, false ) ) {
+			try {
+				//First thing, make sure that the fast path read is disabled so that
+				//threads not owning the synchronization lock can't get an invalid Service:
+				initializedServiceByRole.clear();
+				synchronized (serviceBindingList) {
+					ListIterator<ServiceBinding> serviceBindingsIterator = serviceBindingList.listIterator(
+							serviceBindingList.size()
+					);
+					while ( serviceBindingsIterator.hasPrevious() ) {
+						final ServiceBinding serviceBinding = serviceBindingsIterator.previous();
+						serviceBinding.getLifecycleOwner().stopService( serviceBinding );
+					}
+					serviceBindingList.clear();
 				}
-				serviceBindingList.clear();
+				serviceBindingMap.clear();
 			}
-			serviceBindingMap.clear();
-		}
-		finally {
-			parent.deRegisterChild( this );
+			finally {
+				parent.deRegisterChild( this );
+			}
 		}
 	}
 
@@ -383,7 +384,7 @@ public abstract class AbstractServiceRegistryImpl
 	}
 
 	@Override
-	public void registerChild(ServiceRegistryImplementor child) {
+	public synchronized void registerChild(ServiceRegistryImplementor child) {
 		if ( childRegistries == null ) {
 			childRegistries = new HashSet<ServiceRegistryImplementor>();
 		}
@@ -396,7 +397,7 @@ public abstract class AbstractServiceRegistryImpl
 	}
 
 	@Override
-	public void deRegisterChild(ServiceRegistryImplementor child) {
+	public synchronized void deRegisterChild(ServiceRegistryImplementor child) {
 		if ( childRegistries == null ) {
 			throw new IllegalStateException( "No child ServiceRegistry registrations found" );
 		}

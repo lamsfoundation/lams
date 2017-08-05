@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.type;
 
@@ -29,10 +12,10 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
+import org.hibernate.engine.jdbc.Size;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.util.compare.EqualsHelper;
-import org.hibernate.metamodel.relational.Size;
 
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -62,10 +45,6 @@ public abstract class AbstractType implements Type {
 		return false;
 	}
 	
-	public boolean isXMLElement() {
-		return false;
-	}
-
 	public int compare(Object x, Object y) {
 		return ( (Comparable) x ).compareTo(y);
 	}
@@ -145,16 +124,6 @@ public abstract class AbstractType implements Type {
 		return getHashCode(x );
 	}
 	
-	protected static void replaceNode(Node container, Element value) {
-		if ( container!=value ) { //not really necessary, I guess...
-			Element parent = container.getParent();
-			container.detach();
-			value.setName( container.getName() );
-			value.detach();
-			parent.add(value);
-		}
-	}
-	
 	public Type getSemiResolvedType(SessionFactoryImplementor factory) {
 		return this;
 	}
@@ -173,7 +142,7 @@ public abstract class AbstractType implements Type {
 			include = atype.getForeignKeyDirection()==foreignKeyDirection;
 		}
 		else {
-			include = ForeignKeyDirection.FOREIGN_KEY_FROM_PARENT==foreignKeyDirection;
+			include = ForeignKeyDirection.FROM_PARENT ==foreignKeyDirection;
 		}
 		return include ? replace(original, target, session, owner, copyCache) : target;
 	}

@@ -18,26 +18,8 @@
 
 package io.undertow.server.handlers.proxy;
 
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.security.cert.CertificateEncodingException;
-import javax.security.cert.X509Certificate;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.channels.Channel;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 import io.undertow.UndertowLogger;
+import io.undertow.UndertowOptions;
 import io.undertow.attribute.ExchangeAttribute;
 import io.undertow.attribute.ExchangeAttributes;
 import io.undertow.client.ClientCallback;
@@ -47,6 +29,7 @@ import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
 import io.undertow.client.ContinueNotification;
 import io.undertow.client.ProxiedRequestAttachments;
+import io.undertow.client.PushCallback;
 import io.undertow.io.IoCallback;
 import io.undertow.io.Sender;
 import io.undertow.server.ExchangeCompletionListener;
@@ -67,8 +50,10 @@ import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
+import io.undertow.util.NetworkUtils;
 import io.undertow.util.SameThreadExecutor;
 import io.undertow.util.StatusCodes;
+import io.undertow.util.Transfer;
 import org.jboss.logging.Logger;
 import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
@@ -78,9 +63,31 @@ import org.xnio.StreamConnection;
 import org.xnio.XnioExecutor;
 import org.xnio.channels.StreamSinkChannel;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.security.cert.CertificateEncodingException;
+import javax.security.cert.X509Certificate;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channel;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 /**
  * An HTTP handler which proxies content to a remote server.
- * <p/>
+ * <p>
  * This handler acts like a filter. The {@link ProxyClient} has a chance to decide if it
  * knows how to proxy the request. If it does then it will provide a connection that can
  * used to connect to the remote server, otherwise the next handler will be invoked and the
@@ -90,9 +97,11 @@ import org.xnio.channels.StreamSinkChannel;
  */
 public final class ProxyHandler implements HttpHandler {
 
-    private static final Logger log = Logger.getLogger(ProxyHandler.class);
+    private static final int DEFAULT_MAX_RETRY_ATTEMPTS = Integer.getInteger("io.undertow.server.handlers.proxy.maxRetries", 1);
 
-    public static final String UTF_8 = "UTF-8";
+    private static final Logger log = Logger.getLogger(ProxyHandler.class.getPackage().getName());
+
+    public static final String UTF_8 = StandardCharsets.UTF_8.name();
     private final ProxyClient proxyClient;
     private final int maxRequestTime;
 
@@ -109,25 +118,39 @@ public final class ProxyHandler implements HttpHandler {
 
     private final boolean rewriteHostHeader;
     private final boolean reuseXForwarded;
+    private final int maxConnectionRetries;
 
     public ProxyHandler(ProxyClient proxyClient, int maxRequestTime, HttpHandler next) {
         this(proxyClient, maxRequestTime, next, false, false);
     }
 
-  /**
-   *
-   * @param proxyClient the client to use to make the proxy call
+    /**
+     *
+     * @param proxyClient the client to use to make the proxy call
+     * @param maxRequestTime the maximum amount of time to allow the request to be processed
+     * @param next the next handler in line
+     * @param rewriteHostHeader should the HOST header be rewritten to use the target host of the call.
+     * @param reuseXForwarded should any existing X-Forwarded-For header be used or should it be overwritten.
+     */
+      public ProxyHandler(ProxyClient proxyClient, int maxRequestTime, HttpHandler next, boolean rewriteHostHeader, boolean reuseXForwarded) {
+          this(proxyClient, maxRequestTime, next, rewriteHostHeader, reuseXForwarded, DEFAULT_MAX_RETRY_ATTEMPTS);
+      }
+
+    /**
+   *  @param proxyClient the client to use to make the proxy call
    * @param maxRequestTime the maximum amount of time to allow the request to be processed
-   * @param next the next handler in line
-   * @param rewriteHostHeader should the HOST header be rewritten to use the target host of the call.
-   * @param reuseXForwarded should any existing X-Forwarded-For header be used or should it be overwritten.
-   */
-    public ProxyHandler(ProxyClient proxyClient, int maxRequestTime, HttpHandler next, boolean rewriteHostHeader, boolean reuseXForwarded) {
+     * @param next the next handler in line
+     * @param rewriteHostHeader should the HOST header be rewritten to use the target host of the call.
+     * @param reuseXForwarded should any existing X-Forwarded-For header be used or should it be overwritten.
+     * @param maxConnectionRetries
+     */
+    public ProxyHandler(ProxyClient proxyClient, int maxRequestTime, HttpHandler next, boolean rewriteHostHeader, boolean reuseXForwarded, int maxConnectionRetries) {
         this.proxyClient = proxyClient;
         this.maxRequestTime = maxRequestTime;
         this.next = next;
         this.rewriteHostHeader = rewriteHostHeader;
         this.reuseXForwarded = reuseXForwarded;
+        this.maxConnectionRetries = maxConnectionRetries;
     }
 
 
@@ -142,9 +165,8 @@ public final class ProxyHandler implements HttpHandler {
             next.handleRequest(exchange);
             return;
         }
-        final int maxRetryAttempts = 0; // TODO make this configurable, or just take from the error policy?
         final long timeout = maxRequestTime > 0 ? System.currentTimeMillis() + maxRequestTime : 0;
-        final ProxyClientHandler clientHandler = new ProxyClientHandler(exchange, target, timeout, maxRetryAttempts);
+        final ProxyClientHandler clientHandler = new ProxyClientHandler(exchange, target, timeout, maxConnectionRetries);
         if (timeout > 0) {
             final XnioExecutor.Key key = exchange.getIoThread().executeAfter(new Runnable() {
                 @Override
@@ -193,7 +215,7 @@ public final class ProxyHandler implements HttpHandler {
     /**
      * Adds a request header to the outgoing request. If the header resolves to null or an empty string
      * it will not be added, however any existing header with the same name will be removed.
-     * <p/>
+     * <p>
      * The attribute value will be parsed, and the resulting exchange attribute will be used to create the actual header
      * value.
      *
@@ -292,7 +314,7 @@ public final class ProxyHandler implements HttpHandler {
             if (exchange.isResponseStarted()) {
                 IoUtils.safeClose(exchange.getConnection());
             } else {
-                exchange.setResponseCode(StatusCodes.SERVICE_UNAVAILABLE);
+                exchange.setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);
                 exchange.endExchange();
             }
         }
@@ -301,15 +323,15 @@ public final class ProxyHandler implements HttpHandler {
             final ProxyConnection connectionAttachment = exchange.getAttachment(CONNECTION);
             if (connectionAttachment != null) {
                 ClientConnection clientConnection = connectionAttachment.getConnection();
-                UndertowLogger.REQUEST_LOGGER.timingOutRequest(clientConnection.getPeerAddress() + "" + exchange.getRequestURI());
+                UndertowLogger.PROXY_REQUEST_LOGGER.timingOutRequest(clientConnection.getPeerAddress() + "" + exchange.getRequestURI());
                 IoUtils.safeClose(clientConnection);
             } else {
-                UndertowLogger.REQUEST_LOGGER.timingOutRequest(exchange.getRequestURI());
+                UndertowLogger.PROXY_REQUEST_LOGGER.timingOutRequest(exchange.getRequestURI());
             }
             if (exchange.isResponseStarted()) {
                 IoUtils.safeClose(exchange.getConnection());
             } else {
-                exchange.setResponseCode(StatusCodes.SERVICE_UNAVAILABLE);
+                exchange.setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);
                 exchange.endExchange();
             }
         }
@@ -323,7 +345,7 @@ public final class ProxyHandler implements HttpHandler {
         private final boolean rewriteHostHeader;
         private final boolean reuseXForwarded;
 
-        public ProxyAction(final ProxyConnection clientConnection, final HttpServerExchange exchange, Map<HttpString, ExchangeAttribute> requestHeaders,
+        ProxyAction(final ProxyConnection clientConnection, final HttpServerExchange exchange, Map<HttpString, ExchangeAttribute> requestHeaders,
                            boolean rewriteHostHeader, boolean reuseXForwarded) {
             this.clientConnection = clientConnection;
             this.exchange = exchange;
@@ -337,45 +359,27 @@ public final class ProxyHandler implements HttpHandler {
             final ClientRequest request = new ClientRequest();
 
             StringBuilder requestURI = new StringBuilder();
-            try {
-                if (exchange.getRelativePath().isEmpty()) {
-                    requestURI.append(encodeUrlPart(clientConnection.getTargetPath()));
-                } else {
-                    if (clientConnection.getTargetPath().endsWith("/")) {
-                        requestURI.append(clientConnection.getTargetPath().substring(0, clientConnection.getTargetPath().length() - 1));
-                        requestURI.append(encodeUrlPart(exchange.getRelativePath()));
-                    } else {
-                        requestURI = requestURI.append(clientConnection.getTargetPath());
-                        requestURI.append(encodeUrlPart(exchange.getRelativePath()));
-                    }
+            if(!clientConnection.getTargetPath().isEmpty() && !clientConnection.getTargetPath().equals("/")) {
+                requestURI.append(clientConnection.getTargetPath());
+            }
+            String targetURI = exchange.getRequestURI();
+            if(exchange.isHostIncludedInRequestURI()) {
+                int uriPart = targetURI.indexOf("//");
+                if(uriPart != -1) {
+                    uriPart = targetURI.indexOf("/", uriPart);
+                    targetURI = targetURI.substring(uriPart);
                 }
-                boolean first = true;
-                if (!exchange.getPathParameters().isEmpty()) {
-                    requestURI.append(';');
-                    for (Map.Entry<String, Deque<String>> entry : exchange.getPathParameters().entrySet()) {
-                        if (first) {
-                            first = false;
-                        } else {
-                            requestURI.append('&');
-                        }
-                        for (String val : entry.getValue()) {
-                            requestURI.append(URLEncoder.encode(entry.getKey(), UTF_8));
-                            requestURI.append('=');
-                            requestURI.append(URLEncoder.encode(val, UTF_8));
-                        }
-                    }
-                }
+            }
 
-                String qs = exchange.getQueryString();
-                if (qs != null && !qs.isEmpty()) {
-                    requestURI.append('?');
-                    requestURI.append(qs);
-                }
-            } catch (UnsupportedEncodingException e) {
-                //impossible
-                exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
-                exchange.endExchange();
-                return;
+            if(!exchange.getResolvedPath().isEmpty() && targetURI.startsWith(exchange.getResolvedPath())) {
+                targetURI = targetURI.substring(exchange.getResolvedPath().length());
+            }
+            requestURI.append(targetURI);
+
+            String qs = exchange.getQueryString();
+            if (qs != null && !qs.isEmpty()) {
+                requestURI.append('?');
+                requestURI.append(qs);
             }
             request.setPath(requestURI.toString())
                     .setMethod(exchange.getRequestMethod());
@@ -386,6 +390,11 @@ public final class ProxyHandler implements HttpHandler {
             if (!exchange.isPersistent()) {
                 //just because the client side is non-persistent
                 //we don't want to close the connection to the backend
+                outboundRequestHeaders.put(Headers.CONNECTION, "keep-alive");
+            }
+            if("h2c".equals(exchange.getRequestHeaders().getFirst(Headers.UPGRADE))) {
+                //we don't allow h2c upgrade requests to be passed through to the backend
+                exchange.getRequestHeaders().remove(Headers.UPGRADE);
                 outboundRequestHeaders.put(Headers.CONNECTION, "keep-alive");
             }
 
@@ -419,6 +428,12 @@ public final class ProxyHandler implements HttpHandler {
                 request.getRequestHeaders().put(Headers.X_FORWARDED_FOR, remoteHost);
             }
 
+            //if we don't support push set a header saying so
+            //this is non standard, and a problem with the HTTP2 spec, but they did not want to listen
+            if(!exchange.getConnection().isPushSupported() && clientConnection.getConnection().isPushSupported()) {
+                request.getRequestHeaders().put(Headers.X_DISABLE_PUSH, "true");
+            }
+
             // Set the protocol header and attachment
             if(reuseXForwarded && exchange.getRequestHeaders().contains(Headers.X_FORWARDED_PROTO)) {
                 final String proto = exchange.getRequestHeaders().getFirst(Headers.X_FORWARDED_PROTO);
@@ -441,7 +456,7 @@ public final class ProxyHandler implements HttpHandler {
             if(!exchange.getRequestHeaders().contains(Headers.X_FORWARDED_HOST)) {
                 final String hostName = exchange.getHostName();
                 if(hostName != null) {
-                    request.getRequestHeaders().put(Headers.X_FORWARDED_HOST, hostName);
+                    request.getRequestHeaders().put(Headers.X_FORWARDED_HOST, NetworkUtils.formatPossibleIpv6Address(hostName));
                 }
             }
 
@@ -456,7 +471,7 @@ public final class ProxyHandler implements HttpHandler {
                     request.putAttachment(ProxiedRequestAttachments.SERVER_PORT, port);
                 }
             } else {
-                int port = exchange.getConnection().getLocalAddress(InetSocketAddress.class).getPort();
+                int port = exchange.getHostPort();
                 request.getRequestHeaders().put(Headers.X_FORWARDED_PORT, port);
                 request.putAttachment(ProxiedRequestAttachments.SERVER_PORT, port);
             }
@@ -469,11 +484,7 @@ public final class ProxyHandler implements HttpHandler {
                     if (peerCertificates.length > 0) {
                         request.putAttachment(ProxiedRequestAttachments.SSL_CERT, Certificates.toPem(peerCertificates[0]));
                     }
-                } catch (SSLPeerUnverifiedException e) {
-                    //ignore
-                } catch (CertificateEncodingException e) {
-                    //ignore
-                } catch (RenegotiationRequiredException e) {
+                } catch (SSLPeerUnverifiedException | CertificateEncodingException | RenegotiationRequiredException e) {
                     //ignore
                 }
                 request.putAttachment(ProxiedRequestAttachments.SSL_CYPHER, sslSessionInfo.getCipherSuite());
@@ -485,11 +496,16 @@ public final class ProxyHandler implements HttpHandler {
                 request.getRequestHeaders().put(Headers.HOST, targetAddress.getHostString() + ":" + targetAddress.getPort());
                 request.getRequestHeaders().put(Headers.X_FORWARDED_HOST, exchange.getRequestHeaders().getFirst(Headers.HOST));
             }
-
+            if(log.isDebugEnabled()) {
+                log.debugf("Sending request %s to target %s for exchange %s", request, remoteHost, exchange);
+            }
             clientConnection.getConnection().sendRequest(request, new ClientCallback<ClientExchange>() {
                 @Override
                 public void completed(final ClientExchange result) {
 
+                    if(log.isDebugEnabled()) {
+                        log.debugf("Sent request %s to target %s for exchange %s", request, remoteHost, exchange);
+                    }
                     result.putAttachment(EXCHANGE, exchange);
 
                     boolean requiresContinueResponse = HttpContinue.requiresContinueResponse(exchange);
@@ -497,6 +513,9 @@ public final class ProxyHandler implements HttpHandler {
                         result.setContinueHandler(new ContinueNotification() {
                             @Override
                             public void handleContinue(final ClientExchange clientExchange) {
+                                if(log.isDebugEnabled()) {
+                                    log.debugf("Relieved continue response to request %s to target %s for exchange %s", request, remoteHost, exchange);
+                                }
                                 HttpContinue.sendContinueResponse(exchange, new IoCallback() {
                                     @Override
                                     public void onComplete(final HttpServerExchange exchange, final Sender sender) {
@@ -506,12 +525,41 @@ public final class ProxyHandler implements HttpHandler {
                                     @Override
                                     public void onException(final HttpServerExchange exchange, final Sender sender, final IOException exception) {
                                         IoUtils.safeClose(clientConnection.getConnection());
+                                        exchange.endExchange();
+                                        UndertowLogger.REQUEST_IO_LOGGER.ioException(exception);
                                     }
                                 });
                             }
                         });
-
                     }
+
+                    //handle server push
+                    if(exchange.getConnection().isPushSupported() && result.getConnection().isPushSupported()) {
+                        result.setPushHandler(new PushCallback() {
+                            @Override
+                            public boolean handlePush(ClientExchange originalRequest, final ClientExchange pushedRequest) {
+
+                                if(log.isDebugEnabled()) {
+                                    log.debugf("Sending push request %s received from %s to target %s for exchange %s", pushedRequest.getRequest(), request, remoteHost, exchange);
+                                }
+                                final ClientRequest request = pushedRequest.getRequest();
+                                exchange.getConnection().pushResource(request.getPath(), request.getMethod(), request.getRequestHeaders(), new HttpHandler() {
+                                    @Override
+                                    public void handleRequest(final HttpServerExchange exchange) throws Exception {
+                                        String path = request.getPath();
+                                        int i = path.indexOf("?");
+                                        if(i > 0) {
+                                            path = path.substring(0, i);
+                                        }
+
+                                        exchange.dispatch(SameThreadExecutor.INSTANCE, new ProxyAction(new ProxyConnection(pushedRequest.getConnection(), path), exchange, requestHeaders, rewriteHostHeader, reuseXForwarded));
+                                    }
+                                });
+                                return true;
+                            }
+                        });
+                    }
+
 
                     result.setResponseListener(new ResponseCallback(exchange));
                     final IoExceptionHandler handler = new IoExceptionHandler(exchange, clientConnection.getConnection());
@@ -521,7 +569,7 @@ public final class ProxyHandler implements HttpHandler {
                                 result.getRequestChannel().getWriteSetter().set(ChannelListeners.flushingChannelListener(new ChannelListener<StreamSinkChannel>() {
                                     @Override
                                     public void handleEvent(StreamSinkChannel channel) {
-                                        ChannelListeners.initiateTransfer(Long.MAX_VALUE, exchange.getRequestChannel(), result.getRequestChannel(), ChannelListeners.closingChannelListener(), new HTTPTrailerChannelListener(exchange, result), handler, handler, exchange.getConnection().getBufferPool());
+                                        Transfer.initiateTransfer(exchange.getRequestChannel(), result.getRequestChannel(), ChannelListeners.closingChannelListener(), new HTTPTrailerChannelListener(exchange, result), handler, handler, exchange.getConnection().getByteBufferPool());
 
                                     }
                                 }, handler));
@@ -532,7 +580,7 @@ public final class ProxyHandler implements HttpHandler {
                             handler.handleException(result.getRequestChannel(), e);
                         }
                     }
-                    ChannelListeners.initiateTransfer(Long.MAX_VALUE, exchange.getRequestChannel(), result.getRequestChannel(), ChannelListeners.closingChannelListener(), new HTTPTrailerChannelListener(exchange, result), handler, handler, exchange.getConnection().getBufferPool());
+                    Transfer.initiateTransfer(exchange.getRequestChannel(), result.getRequestChannel(), ChannelListeners.closingChannelListener(), new HTTPTrailerChannelListener(exchange, result), handler, handler, exchange.getConnection().getByteBufferPool());
 
                 }
 
@@ -540,7 +588,7 @@ public final class ProxyHandler implements HttpHandler {
                 public void failed(IOException e) {
                     UndertowLogger.PROXY_REQUEST_LOGGER.proxyRequestFailed(exchange.getRequestURI(), e);
                     if (!exchange.isResponseStarted()) {
-                        exchange.setResponseCode(StatusCodes.SERVICE_UNAVAILABLE);
+                        exchange.setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);
                         exchange.endExchange();
                     } else {
                         IoUtils.safeClose(exchange.getConnection());
@@ -562,23 +610,33 @@ public final class ProxyHandler implements HttpHandler {
 
         @Override
         public void completed(final ClientExchange result) {
-            HttpServerExchange exchange = result.getAttachment(EXCHANGE);
+
             final ClientResponse response = result.getResponse();
+
+            if(log.isDebugEnabled()) {
+                log.debugf("Received response %s for request %s for exchange %s", response, result.getRequest(), exchange);
+            }
             final HeaderMap inboundResponseHeaders = response.getResponseHeaders();
             final HeaderMap outboundResponseHeaders = exchange.getResponseHeaders();
-            exchange.setResponseCode(response.getResponseCode());
+            exchange.setStatusCode(response.getResponseCode());
             copyHeaders(outboundResponseHeaders, inboundResponseHeaders);
 
             if (exchange.isUpgrade()) {
+
                 exchange.upgradeChannel(new HttpUpgradeListener() {
                     @Override
                     public void handleUpgrade(StreamConnection streamConnection, HttpServerExchange exchange) {
+
+                        if(log.isDebugEnabled()) {
+                            log.debugf("Upgraded request %s to for exchange %s", result.getRequest(), exchange);
+                        }
                         StreamConnection clientChannel = null;
                         try {
                             clientChannel = result.getConnection().performUpgrade();
 
-                            ChannelListeners.initiateTransfer(Long.MAX_VALUE, clientChannel.getSourceChannel(), streamConnection.getSinkChannel(), ChannelListeners.closingChannelListener(), ChannelListeners.<StreamSinkChannel>writeShutdownChannelListener(ChannelListeners.<StreamSinkChannel>flushingChannelListener(ChannelListeners.closingChannelListener(), ChannelListeners.closingChannelExceptionHandler()), ChannelListeners.closingChannelExceptionHandler()), ChannelListeners.closingChannelExceptionHandler(), ChannelListeners.closingChannelExceptionHandler(), result.getConnection().getBufferPool());
-                            ChannelListeners.initiateTransfer(Long.MAX_VALUE, streamConnection.getSourceChannel(), clientChannel.getSinkChannel(), ChannelListeners.closingChannelListener(), ChannelListeners.<StreamSinkChannel>writeShutdownChannelListener(ChannelListeners.<StreamSinkChannel>flushingChannelListener(ChannelListeners.closingChannelListener(), ChannelListeners.closingChannelExceptionHandler()), ChannelListeners.closingChannelExceptionHandler()), ChannelListeners.closingChannelExceptionHandler(), ChannelListeners.closingChannelExceptionHandler(), result.getConnection().getBufferPool());
+                            final ClosingExceptionHandler handler = new ClosingExceptionHandler(streamConnection, clientChannel);
+                            Transfer.initiateTransfer(clientChannel.getSourceChannel(), streamConnection.getSinkChannel(), ChannelListeners.closingChannelListener(), ChannelListeners.writeShutdownChannelListener(ChannelListeners.<StreamSinkChannel>flushingChannelListener(ChannelListeners.closingChannelListener(), ChannelListeners.closingChannelExceptionHandler()), ChannelListeners.closingChannelExceptionHandler()), handler, handler, result.getConnection().getBufferPool());
+                            Transfer.initiateTransfer(streamConnection.getSourceChannel(), clientChannel.getSinkChannel(), ChannelListeners.closingChannelListener(), ChannelListeners.writeShutdownChannelListener(ChannelListeners.<StreamSinkChannel>flushingChannelListener(ChannelListeners.closingChannelListener(), ChannelListeners.closingChannelExceptionHandler()), ChannelListeners.closingChannelExceptionHandler()), handler, handler, result.getConnection().getBufferPool());
 
                         } catch (IOException e) {
                             IoUtils.safeClose(streamConnection, clientChannel);
@@ -586,16 +644,15 @@ public final class ProxyHandler implements HttpHandler {
                     }
                 });
             }
-            IoExceptionHandler handler = new IoExceptionHandler(exchange, result.getConnection());
-            ChannelListeners.initiateTransfer(Long.MAX_VALUE, result.getResponseChannel(), exchange.getResponseChannel(), ChannelListeners.closingChannelListener(), new HTTPTrailerChannelListener(result, exchange), handler, handler, exchange.getConnection().getBufferPool());
-
+            final IoExceptionHandler handler = new IoExceptionHandler(exchange, result.getConnection());
+            Transfer.initiateTransfer(result.getResponseChannel(), exchange.getResponseChannel(), ChannelListeners.closingChannelListener(), new HTTPTrailerChannelListener(result, exchange), handler, handler, exchange.getConnection().getByteBufferPool());
         }
 
         @Override
         public void failed(IOException e) {
             UndertowLogger.PROXY_REQUEST_LOGGER.proxyRequestFailed(exchange.getRequestURI(), e);
             if (!exchange.isResponseStarted()) {
-                exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
+                exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
                 exchange.endExchange();
             } else {
                 IoUtils.safeClose(exchange.getConnection());
@@ -622,7 +679,7 @@ public final class ProxyHandler implements HttpHandler {
             try {
                 channel.shutdownWrites();
                 if (!channel.flush()) {
-                    channel.getWriteSetter().set(ChannelListeners.<StreamSinkChannel>flushingChannelListener(new ChannelListener<StreamSinkChannel>() {
+                    channel.getWriteSetter().set(ChannelListeners.flushingChannelListener(new ChannelListener<StreamSinkChannel>() {
                         @Override
                         public void handleEvent(StreamSinkChannel channel) {
                             channel.suspendWrites();
@@ -655,19 +712,40 @@ public final class ProxyHandler implements HttpHandler {
         @Override
         public void handleException(Channel channel, IOException exception) {
             IoUtils.safeClose(channel);
+            IoUtils.safeClose(clientConnection);
             if (exchange.isResponseStarted()) {
-                IoUtils.safeClose(clientConnection);
                 UndertowLogger.REQUEST_IO_LOGGER.debug("Exception reading from target server", exception);
                 if (!exchange.isResponseStarted()) {
-                    exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
+                    exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
                     exchange.endExchange();
                 } else {
                     IoUtils.safeClose(exchange.getConnection());
                 }
             } else {
-                exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
+                UndertowLogger.REQUEST_IO_LOGGER.ioException(exception);
+                exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
                 exchange.endExchange();
             }
+        }
+    }
+
+    public int getMaxConnectionRetries() {
+        return maxConnectionRetries;
+    }
+
+    private static final class ClosingExceptionHandler implements ChannelExceptionHandler<Channel> {
+
+        private final Closeable[] toClose;
+
+        private ClosingExceptionHandler(Closeable... toClose) {
+            this.toClose = toClose;
+        }
+
+
+        @Override
+        public void handleException(Channel channel, IOException exception) {
+            IoUtils.safeClose(channel);
+            IoUtils.safeClose(toClose);
         }
     }
 
@@ -678,58 +756,39 @@ public final class ProxyHandler implements HttpHandler {
      *
      * @return
      */
-    private static String encodeUrlPart(final String part) throws UnsupportedEncodingException {
+    private static String encodeUrlPart(final String part, HttpServerExchange exchange) throws UnsupportedEncodingException {
         //we need to go through and check part by part that a section does not need encoding
-
-        int pos = 0;
-        for (int i = 0; i < part.length(); ++i) {
+        StringBuilder sb = null;
+        Charset charset = null;
+        for(int i = 0; i < part.length(); ++i) {
             char c = part.charAt(i);
-            if (c == '/') {
-                if (pos != i) {
-                    String original = part.substring(pos, i - 1);
-                    String encoded = URLEncoder.encode(original, UTF_8);
-                    if (!encoded.equals(original)) {
-                        return realEncode(part, pos);
+            if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') ||
+                    c == '.' || c == '-' || c == '*' || c == '_' || c == '/') {
+                if(sb != null) {
+                    sb.append(c);
+                }
+            } else {
+                if(sb == null) {
+                    sb = new StringBuilder(part.substring(0, i));
+                    charset = Charset.forName(exchange.getConnection().getUndertowOptions().get(UndertowOptions.URL_CHARSET, UTF_8));
+                }
+                if(c < 127 && charset.name().equals(UTF_8)) {
+                    //minor optimisation
+                    sb.append('%');
+                    sb.append(Integer.toHexString(c));
+                } else {
+                    ByteBuffer bytes = charset.encode(Character.toString(c));
+                    while (bytes.hasRemaining()) {
+                        byte b = bytes.get();
+                        sb.append('%');
+                        sb.append(Integer.toHexString(b & 0xFF));
                     }
                 }
-                pos = i + 1;
-            } else if (c == ' ') {
-                return realEncode(part, pos);
             }
         }
-        if (pos != part.length()) {
-            String original = part.substring(pos);
-            String encoded = URLEncoder.encode(original, UTF_8);
-            if (!encoded.equals(original)) {
-                return realEncode(part, pos);
-            }
-        }
-        return part;
+
+        return sb == null ? part : sb.toString();
     }
-
-    private static String realEncode(String part, int startPos) throws UnsupportedEncodingException {
-        StringBuilder sb = new StringBuilder();
-        sb.append(part.substring(0, startPos));
-        int pos = startPos;
-        for (int i = startPos; i < part.length(); ++i) {
-            char c = part.charAt(i);
-            if (c == '/') {
-                if (pos != i) {
-                    String original = part.substring(pos, i - 1);
-                    String encoded = URLEncoder.encode(original, UTF_8);
-                    sb.append(encoded);
-                    sb.append('/');
-                    pos = i + 1;
-                }
-            }
-        }
-
-        String original = part.substring(pos);
-        String encoded = URLEncoder.encode(original, UTF_8);
-        sb.append(encoded);
-        return sb.toString();
-    }
-
 
     public static class Builder implements HandlerBuilder {
 
@@ -740,7 +799,10 @@ public final class ProxyHandler implements HttpHandler {
 
         @Override
         public Map<String, Class<?>> parameters() {
-            return Collections.<String, Class<?>>singletonMap("hosts", String[].class);
+            Map<String, Class<?>> params = new HashMap<>();
+            params.put("hosts", String[].class);
+            params.put("rewrite-host-header", Boolean.class);
+            return params;
         }
 
         @Override
@@ -764,7 +826,8 @@ public final class ProxyHandler implements HttpHandler {
                     throw new RuntimeException(e);
                 }
             }
-            return new Wrapper(uris);
+            Boolean rewriteHostHeader = (Boolean) config.get("rewrite-host-header");
+            return new Wrapper(uris, rewriteHostHeader);
         }
 
     }
@@ -772,19 +835,27 @@ public final class ProxyHandler implements HttpHandler {
     private static class Wrapper implements HandlerWrapper {
 
         private final List<URI> uris;
+        private final boolean rewriteHostHeader;
 
-        private Wrapper(List<URI> uris) {
+        private Wrapper(List<URI> uris, Boolean rewriteHostHeader) {
             this.uris = uris;
+            this.rewriteHostHeader = rewriteHostHeader != null && rewriteHostHeader;
         }
 
         @Override
         public HttpHandler wrap(HttpHandler handler) {
 
-            LoadBalancingProxyClient loadBalancingProxyClient = new LoadBalancingProxyClient();
-            for(URI url : uris) {
-                loadBalancingProxyClient.addHost(url);
+            final ProxyClient proxyClient;
+            if (uris.size() == 1) {
+                proxyClient = new SimpleProxyClientProvider(uris.get(0));
+            } else {
+                final LoadBalancingProxyClient loadBalancingProxyClient = new LoadBalancingProxyClient();
+                for (URI url : uris) {
+                    loadBalancingProxyClient.addHost(url);
+                }
+                proxyClient = loadBalancingProxyClient;
             }
-            return new ProxyHandler(loadBalancingProxyClient, handler);
+            return new ProxyHandler(proxyClient, -1, handler, rewriteHostHeader, false);
         }
     }
 }

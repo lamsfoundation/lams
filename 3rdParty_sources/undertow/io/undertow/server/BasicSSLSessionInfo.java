@@ -23,13 +23,14 @@ import io.undertow.util.FlexBase64;
 import org.xnio.SslClientAuthMode;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import javax.security.cert.CertificateException;
 import javax.security.cert.X509Certificate;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.security.cert.Certificate;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 /**
  * Basic SSL session information. This information is generally provided by a front end proxy.
@@ -38,12 +39,10 @@ import java.security.cert.Certificate;
  */
 public class BasicSSLSessionInfo implements SSLSessionInfo {
 
-    private static final Charset US_ASCII = Charset.forName("US-ASCII");
-
     private final byte[] sessionId;
     private final String cypherSuite;
-    private final java.security.cert.Certificate peerCertificate;
-    private final X509Certificate certificate;
+    private final java.security.cert.Certificate[] peerCertificate;
+    private final X509Certificate[] certificate;
 
     /**
      *
@@ -59,10 +58,16 @@ public class BasicSSLSessionInfo implements SSLSessionInfo {
 
         if (certificate != null) {
             java.security.cert.CertificateFactory cf = java.security.cert.CertificateFactory.getInstance("X.509");
-            byte[] certificateBytes = certificate.getBytes(US_ASCII);
+            byte[] certificateBytes = certificate.getBytes(StandardCharsets.US_ASCII);
             ByteArrayInputStream stream = new ByteArrayInputStream(certificateBytes);
-            peerCertificate = cf.generateCertificate(stream);
-            this.certificate = X509Certificate.getInstance(certificateBytes);
+            Collection<? extends java.security.cert.Certificate> certCol = cf.generateCertificates(stream);
+            this.peerCertificate = new java.security.cert.Certificate[certCol.size()];
+            this.certificate = new X509Certificate[certCol.size()];
+            int i=0;
+            for(java.security.cert.Certificate cert : certCol) {
+                this.peerCertificate[i] = cert;
+                this.certificate[i++] = X509Certificate.getInstance(cert.getEncoded());
+            }
         } else {
             this.peerCertificate = null;
             this.certificate = null;
@@ -100,7 +105,7 @@ public class BasicSSLSessionInfo implements SSLSessionInfo {
         if (certificate == null) {
             throw UndertowMessages.MESSAGES.peerUnverified();
         }
-        return new Certificate[]{peerCertificate};
+        return peerCertificate;
     }
 
     @Override
@@ -108,7 +113,7 @@ public class BasicSSLSessionInfo implements SSLSessionInfo {
         if (certificate == null) {
             throw UndertowMessages.MESSAGES.peerUnverified();
         }
-        return new X509Certificate[]{certificate};
+        return certificate;
     }
 
     @Override
@@ -116,6 +121,10 @@ public class BasicSSLSessionInfo implements SSLSessionInfo {
         throw UndertowMessages.MESSAGES.renegotiationNotSupported();
     }
 
+    @Override
+    public SSLSession getSSLSession() {
+        return null;
+    }
 
     private static byte[] base64Decode(String sessionId) {
         try {

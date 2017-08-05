@@ -33,11 +33,12 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.annotation.Immutable;
+import org.apache.http.util.Args;
 
 /**
- * RequestConnControl is responsible for adding <code>Connection</code> header
+ * RequestConnControl is responsible for adding {@code Connection} header
  * to the outgoing requests, which is essential for managing persistence of
- * <code>HTTP/1.0</code> connections. This interceptor is recommended for
+ * {@code HTTP/1.0} connections. This interceptor is recommended for
  * client side protocol processors.
  *
  * @since 4.0
@@ -49,13 +50,12 @@ public class RequestConnControl implements HttpRequestInterceptor {
         super();
     }
 
+    @Override
     public void process(final HttpRequest request, final HttpContext context)
             throws HttpException, IOException {
-        if (request == null) {
-            throw new IllegalArgumentException("HTTP request may not be null");
-        }
+        Args.notNull(request, "HTTP request");
 
-        String method = request.getRequestLine().getMethod();
+        final String method = request.getRequestLine().getMethod();
         if (method.equalsIgnoreCase("CONNECT")) {
             return;
         }

@@ -35,6 +35,7 @@ import org.apache.http.HeaderElement;
 import org.apache.http.HeaderElementIterator;
 import org.apache.http.HeaderIterator;
 import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.util.Args;
 import org.apache.http.util.CharArrayBuffer;
 
 /**
@@ -58,19 +59,13 @@ public class BasicHeaderElementIterator implements HeaderElementIterator {
     public BasicHeaderElementIterator(
             final HeaderIterator headerIterator,
             final HeaderValueParser parser) {
-        if (headerIterator == null) {
-            throw new IllegalArgumentException("Header iterator may not be null");
-        }
-        if (parser == null) {
-            throw new IllegalArgumentException("Parser may not be null");
-        }
-        this.headerIt = headerIterator;
-        this.parser = parser;
+        this.headerIt = Args.notNull(headerIterator, "Header iterator");
+        this.parser = Args.notNull(parser, "Parser");
     }
 
 
     public BasicHeaderElementIterator(final HeaderIterator headerIterator) {
-        this(headerIterator, BasicHeaderValueParser.DEFAULT);
+        this(headerIterator, BasicHeaderValueParser.INSTANCE);
     }
 
 
@@ -78,14 +73,14 @@ public class BasicHeaderElementIterator implements HeaderElementIterator {
         this.cursor = null;
         this.buffer = null;
         while (this.headerIt.hasNext()) {
-            Header h = this.headerIt.nextHeader();
+            final Header h = this.headerIt.nextHeader();
             if (h instanceof FormattedHeader) {
                 this.buffer = ((FormattedHeader) h).getBuffer();
                 this.cursor = new ParserCursor(0, this.buffer.length());
                 this.cursor.updatePos(((FormattedHeader) h).getValuePos());
                 break;
             } else {
-                String value = h.getValue();
+                final String value = h.getValue();
                 if (value != null) {
                     this.buffer = new CharArrayBuffer(value.length());
                     this.buffer.append(value);
@@ -107,7 +102,7 @@ public class BasicHeaderElementIterator implements HeaderElementIterator {
             if (this.cursor != null) {
                 // loop while there is data in the buffer
                 while (!this.cursor.atEnd()) {
-                    HeaderElement e = this.parser.parseHeaderElement(this.buffer, this.cursor);
+                    final HeaderElement e = this.parser.parseHeaderElement(this.buffer, this.cursor);
                     if (!(e.getName().length() == 0 && e.getValue() == null)) {
                         // Found something
                         this.currentElement = e;
@@ -124,6 +119,7 @@ public class BasicHeaderElementIterator implements HeaderElementIterator {
         }
     }
 
+    @Override
     public boolean hasNext() {
         if (this.currentElement == null) {
             parseNextElement();
@@ -131,6 +127,7 @@ public class BasicHeaderElementIterator implements HeaderElementIterator {
         return this.currentElement != null;
     }
 
+    @Override
     public HeaderElement nextElement() throws NoSuchElementException {
         if (this.currentElement == null) {
             parseNextElement();
@@ -140,15 +137,17 @@ public class BasicHeaderElementIterator implements HeaderElementIterator {
             throw new NoSuchElementException("No more header elements available");
         }
 
-        HeaderElement element = this.currentElement;
+        final HeaderElement element = this.currentElement;
         this.currentElement = null;
         return element;
     }
 
+    @Override
     public final Object next() throws NoSuchElementException {
         return nextElement();
     }
 
+    @Override
     public void remove() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Remove not supported");
     }

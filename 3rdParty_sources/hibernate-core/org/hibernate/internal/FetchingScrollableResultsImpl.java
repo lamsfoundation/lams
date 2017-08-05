@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.internal;
 
@@ -56,18 +39,18 @@ public class FetchingScrollableResultsImpl extends AbstractScrollableResults {
 	 * @param holderInstantiator Ugh
 	 */
 	public FetchingScrollableResultsImpl(
-	        ResultSet rs,
-	        PreparedStatement ps,
-	        SessionImplementor sess,
-	        Loader loader,
-	        QueryParameters queryParameters,
-	        Type[] types,
-	        HolderInstantiator holderInstantiator) {
+			ResultSet rs,
+			PreparedStatement ps,
+			SessionImplementor sess,
+			Loader loader,
+			QueryParameters queryParameters,
+			Type[] types,
+			HolderInstantiator holderInstantiator) {
 		super( rs, ps, sess, loader, queryParameters, types, holderInstantiator );
 	}
 
 	@Override
-    protected Object[] getCurrentRow() {
+	protected Object[] getCurrentRow() {
 		return currentRow;
 	}
 
@@ -97,15 +80,15 @@ public class FetchingScrollableResultsImpl extends AbstractScrollableResults {
 		try {
 			afterLast = getResultSet().isAfterLast();
 		}
-		catch( SQLException e ) {
+		catch (SQLException e) {
 			throw getSession().getFactory().getSQLExceptionHelper().convert(
-			        e,
-			        "exception calling isAfterLast()"
+					e,
+					"exception calling isAfterLast()"
 			);
 		}
 
 		currentPosition++;
-		currentRow = new Object[] { row };
+		currentRow = new Object[] {row};
 
 		if ( afterLast ) {
 			if ( maxPosition == null ) {
@@ -132,10 +115,10 @@ public class FetchingScrollableResultsImpl extends AbstractScrollableResults {
 				getSession(),
 				getQueryParameters(),
 				false,
-		        ( maxPosition != null && currentPosition > maxPosition )
+				( maxPosition != null && currentPosition > maxPosition )
 		);
 
-		currentRow = new Object[] { loadResult };
+		currentRow = new Object[] {loadResult};
 		currentPosition--;
 
 		afterScrollOperation();
@@ -196,7 +179,7 @@ public class FetchingScrollableResultsImpl extends AbstractScrollableResults {
 					more = next();
 				}
 			}
-			catch( SQLException e ) {
+			catch (SQLException e) {
 				throw getSession().getFactory().getSQLExceptionHelper().convert(
 						e,
 						"exception calling isAfterLast()"
@@ -224,10 +207,10 @@ public class FetchingScrollableResultsImpl extends AbstractScrollableResults {
 		try {
 			getResultSet().beforeFirst();
 		}
-		catch( SQLException e ) {
+		catch (SQLException e) {
 			throw getSession().getFactory().getSQLExceptionHelper().convert(
-			        e,
-			        "exception calling beforeFirst()"
+					e,
+					"exception calling beforeFirst()"
 			);
 		}
 		currentRow = null;
@@ -274,12 +257,12 @@ public class FetchingScrollableResultsImpl extends AbstractScrollableResults {
 
 	private boolean isResultSetEmpty() {
 		try {
-			return currentPosition == 0 && ! getResultSet().isBeforeFirst() && ! getResultSet().isAfterLast();
+			return currentPosition == 0 && !getResultSet().isBeforeFirst() && !getResultSet().isAfterLast();
 		}
-		catch( SQLException e ) {
+		catch (SQLException e) {
 			throw getSession().getFactory().getSQLExceptionHelper().convert(
-			        e,
-			        "Could not determine if resultset is empty due to exception calling isBeforeFirst or isAfterLast()"
+					e,
+					"Could not determine if resultset is empty due to exception calling isBeforeFirst or isAfterLast()"
 			);
 		}
 	}

@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.tuple.component;
 
@@ -31,6 +13,7 @@ import java.util.Map;
 
 import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
+import org.hibernate.boot.spi.MetadataBuildingOptions;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.Property;
 import org.hibernate.tuple.PropertyFactory;
@@ -58,7 +41,7 @@ public class ComponentMetamodel implements Serializable {
 	private final Map propertyIndexes = new HashMap();
 
 //	public ComponentMetamodel(Component component, SessionFactoryImplementor sessionFactory) {
-	public ComponentMetamodel(Component component) {
+	public ComponentMetamodel(Component component, MetadataBuildingOptions metadataBuildingOptions) {
 //		this.sessionFactory = sessionFactory;
 		this.role = component.getRoleName();
 		this.isKey = component.isKey();
@@ -76,7 +59,7 @@ public class ComponentMetamodel implements Serializable {
 		entityMode = component.hasPojoRepresentation() ? EntityMode.POJO : EntityMode.MAP;
 
 		// todo : move this to SF per HHH-3517; also see HHH-1907 and ComponentMetamodel
-		final ComponentTuplizerFactory componentTuplizerFactory = new ComponentTuplizerFactory();
+		final ComponentTuplizerFactory componentTuplizerFactory = new ComponentTuplizerFactory( metadataBuildingOptions );
 		final String tuplizerClassName = component.getTuplizerImplClassName( entityMode );
 		this.componentTuplizer = tuplizerClassName == null ? componentTuplizerFactory.constructDefaultTuplizer(
 				entityMode,

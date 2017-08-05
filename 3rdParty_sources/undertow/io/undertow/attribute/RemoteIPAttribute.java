@@ -30,7 +30,6 @@ import io.undertow.server.HttpServerExchange;
 public class RemoteIPAttribute implements ExchangeAttribute {
 
     public static final String REMOTE_IP_SHORT = "%a";
-    public static final String REMOTE_HOST_NAME_SHORT = "%h";
     public static final String REMOTE_IP = "%{REMOTE_IP}";
 
     public static final ExchangeAttribute INSTANCE = new RemoteIPAttribute();
@@ -59,7 +58,7 @@ public class RemoteIPAttribute implements ExchangeAttribute {
 
         @Override
         public ExchangeAttribute build(final String token) {
-            if (token.equals(REMOTE_IP) || token.equals(REMOTE_IP_SHORT) || token.equals(REMOTE_HOST_NAME_SHORT)) {
+            if (token.equals(REMOTE_IP) || token.equals(REMOTE_IP_SHORT)) {
                 return RemoteIPAttribute.INSTANCE;
             }
             return null;

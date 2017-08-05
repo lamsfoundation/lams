@@ -30,8 +30,6 @@ package org.apache.http.client.protocol;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.http.annotation.Immutable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
@@ -39,6 +37,7 @@ import org.apache.http.HeaderIterator;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.annotation.Immutable;
 import org.apache.http.client.CookieStore;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.cookie.CookieOrigin;
@@ -46,6 +45,7 @@ import org.apache.http.cookie.CookieSpec;
 import org.apache.http.cookie.MalformedCookieException;
 import org.apache.http.cookie.SM;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.Args;
 
 /**
  * Response interceptor that populates the current {@link CookieStore} with data
@@ -62,32 +62,28 @@ public class ResponseProcessCookies implements HttpResponseInterceptor {
         super();
     }
 
+    @Override
     public void process(final HttpResponse response, final HttpContext context)
             throws HttpException, IOException {
-        if (response == null) {
-            throw new IllegalArgumentException("HTTP request may not be null");
-        }
-        if (context == null) {
-            throw new IllegalArgumentException("HTTP context may not be null");
-        }
+        Args.notNull(response, "HTTP request");
+        Args.notNull(context, "HTTP context");
+
+        final HttpClientContext clientContext = HttpClientContext.adapt(context);
 
         // Obtain actual CookieSpec instance
-        CookieSpec cookieSpec = (CookieSpec) context.getAttribute(
-                ClientContext.COOKIE_SPEC);
+        final CookieSpec cookieSpec = clientContext.getCookieSpec();
         if (cookieSpec == null) {
             this.log.debug("Cookie spec not specified in HTTP context");
             return;
         }
         // Obtain cookie store
-        CookieStore cookieStore = (CookieStore) context.getAttribute(
-                ClientContext.COOKIE_STORE);
+        final CookieStore cookieStore = clientContext.getCookieStore();
         if (cookieStore == null) {
             this.log.debug("Cookie store not specified in HTTP context");
             return;
         }
         // Obtain actual CookieOrigin instance
-        CookieOrigin cookieOrigin = (CookieOrigin) context.getAttribute(
-                ClientContext.COOKIE_ORIGIN);
+        final CookieOrigin cookieOrigin = clientContext.getCookieOrigin();
         if (cookieOrigin == null) {
             this.log.debug("Cookie origin not specified in HTTP context");
             return;
@@ -110,32 +106,54 @@ public class ResponseProcessCookies implements HttpResponseInterceptor {
             final CookieOrigin cookieOrigin,
             final CookieStore cookieStore) {
         while (iterator.hasNext()) {
-            Header header = iterator.nextHeader();
+            final Header header = iterator.nextHeader();
             try {
-                List<Cookie> cookies = cookieSpec.parse(header, cookieOrigin);
-                for (Cookie cookie : cookies) {
+                final List<Cookie> cookies = cookieSpec.parse(header, cookieOrigin);
+                for (final Cookie cookie : cookies) {
                     try {
                         cookieSpec.validate(cookie, cookieOrigin);
                         cookieStore.addCookie(cookie);
 
                         if (this.log.isDebugEnabled()) {
-                            this.log.debug("Cookie accepted: \""
-                                    + cookie + "\". ");
+                            this.log.debug("Cookie accepted [" + formatCooke(cookie) + "]");
                         }
-                    } catch (MalformedCookieException ex) {
+                    } catch (final MalformedCookieException ex) {
                         if (this.log.isWarnEnabled()) {
-                            this.log.warn("Cookie rejected: \""
-                                    + cookie + "\". " + ex.getMessage());
+                            this.log.warn("Cookie rejected [" + formatCooke(cookie) + "] "
+                                    + ex.getMessage());
                         }
                     }
                 }
-            } catch (MalformedCookieException ex) {
+            } catch (final MalformedCookieException ex) {
                 if (this.log.isWarnEnabled()) {
                     this.log.warn("Invalid cookie header: \""
                             + header + "\". " + ex.getMessage());
                 }
             }
         }
+    }
+
+    private static String formatCooke(final Cookie cookie) {
+        final StringBuilder buf = new StringBuilder();
+        buf.append(cookie.getName());
+        buf.append("=\"");
+        String v = cookie.getValue();
+        if (v != null) {
+            if (v.length() > 100) {
+                v = v.substring(0, 100) + "...";
+            }
+            buf.append(v);
+        }
+        buf.append("\"");
+        buf.append(", version:");
+        buf.append(Integer.toString(cookie.getVersion()));
+        buf.append(", domain:");
+        buf.append(cookie.getDomain());
+        buf.append(", path:");
+        buf.append(cookie.getPath());
+        buf.append(", expiry:");
+        buf.append(cookie.getExpiryDate());
+        return buf.toString();
     }
 
 }

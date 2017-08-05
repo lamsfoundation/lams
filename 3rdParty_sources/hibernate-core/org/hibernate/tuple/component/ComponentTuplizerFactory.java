@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.tuple.component;
 
@@ -30,6 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
+import org.hibernate.boot.internal.ClassLoaderAccessImpl;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
+import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
+import org.hibernate.boot.spi.ClassLoaderAccess;
+import org.hibernate.boot.spi.MetadataBuildingOptions;
 import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.mapping.Component;
 
@@ -42,6 +30,15 @@ public class ComponentTuplizerFactory implements Serializable {
 	private static final Class[] COMPONENT_TUP_CTOR_SIG = new Class[] { Component.class };
 
 	private Map<EntityMode,Class<? extends ComponentTuplizer>> defaultImplClassByMode = buildBaseMapping();
+
+	private final ClassLoaderAccess classLoaderAccess;
+
+	public ComponentTuplizerFactory(MetadataBuildingOptions metadataBuildingOptions) {
+		classLoaderAccess = new ClassLoaderAccessImpl(
+				metadataBuildingOptions.getTempClassLoader(),
+				metadataBuildingOptions.getServiceRegistry().getService( ClassLoaderService.class )
+		);
+	}
 
 	/**
 	 * Method allowing registration of the tuplizer class to use as default for a particular entity-mode.
@@ -73,10 +70,10 @@ public class ComponentTuplizerFactory implements Serializable {
 	@SuppressWarnings({ "unchecked" })
 	public ComponentTuplizer constructTuplizer(String tuplizerClassName, Component metadata) {
 		try {
-			Class<? extends ComponentTuplizer> tuplizerClass = ReflectHelper.classForName( tuplizerClassName );
+			Class<? extends ComponentTuplizer> tuplizerClass = classLoaderAccess.classForName( tuplizerClassName );
 			return constructTuplizer( tuplizerClass, metadata );
 		}
-		catch ( ClassNotFoundException e ) {
+		catch ( ClassLoadingException e ) {
 			throw new HibernateException( "Could not locate specified tuplizer class [" + tuplizerClassName + "]" );
 		}
 	}
@@ -131,6 +128,7 @@ public class ComponentTuplizerFactory implements Serializable {
 		return getProperConstructor( tuplizerClass ) != null;
 	}
 
+	@SuppressWarnings("unchecked")
 	private Constructor<? extends ComponentTuplizer> getProperConstructor(Class<? extends ComponentTuplizer> clazz) {
 		Constructor<? extends ComponentTuplizer> constructor = null;
 		try {

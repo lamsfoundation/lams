@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.mapping;
 
@@ -27,39 +10,69 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.hibernate.boot.model.naming.Identifier;
+import org.hibernate.boot.model.relational.Namespace;
 import org.hibernate.internal.util.collections.JoinedIterator;
 
 /**
  * @author Gavin King
  */
+@SuppressWarnings("unchecked")
 public class DenormalizedTable extends Table {
-	
+
 	private final Table includedTable;
-	
+
 	public DenormalizedTable(Table includedTable) {
 		this.includedTable = includedTable;
 		includedTable.setHasDenormalizedTables();
 	}
-	
+
+	public DenormalizedTable(Namespace namespace, Identifier physicalTableName, boolean isAbstract, Table includedTable) {
+		super( namespace, physicalTableName, isAbstract );
+		this.includedTable = includedTable;
+		includedTable.setHasDenormalizedTables();
+	}
+
+	public DenormalizedTable(
+			Namespace namespace,
+			Identifier physicalTableName,
+			String subselectFragment,
+			boolean isAbstract,
+			Table includedTable) {
+		super( namespace, physicalTableName, subselectFragment, isAbstract );
+		this.includedTable = includedTable;
+		includedTable.setHasDenormalizedTables();
+	}
+
+	public DenormalizedTable(Namespace namespace, String subselect, boolean isAbstract, Table includedTable) {
+		super( namespace, subselect, isAbstract );
+		this.includedTable = includedTable;
+		includedTable.setHasDenormalizedTables();
+	}
+
 	@Override
-    public void createForeignKeys() {
+	public void createForeignKeys() {
 		includedTable.createForeignKeys();
 		Iterator iter = includedTable.getForeignKeyIterator();
 		while ( iter.hasNext() ) {
 			ForeignKey fk = (ForeignKey) iter.next();
-			createForeignKey( 
-					Constraint.generateName( fk.generatedConstraintNamePrefix(), this, fk.getColumns() ),
-					fk.getColumns(), 
+			createForeignKey(
+					Constraint.generateName(
+							fk.generatedConstraintNamePrefix(),
+							this,
+							fk.getColumns()
+					),
+					fk.getColumns(),
 					fk.getReferencedEntityName(),
 					fk.getReferencedColumns()
-				);
+			);
 		}
 	}
 
 	@Override
-    public Column getColumn(Column column) {
+	public Column getColumn(Column column) {
 		Column superColumn = super.getColumn( column );
-		if (superColumn != null) {
+		if ( superColumn != null ) {
 			return superColumn;
 		}
 		else {
@@ -67,26 +80,36 @@ public class DenormalizedTable extends Table {
 		}
 	}
 
+	public Column getColumn(Identifier name) {
+		Column superColumn = super.getColumn( name );
+		if ( superColumn != null ) {
+			return superColumn;
+		}
+		else {
+			return includedTable.getColumn( name );
+		}
+	}
+
 	@Override
-    public Iterator getColumnIterator() {
+	public Iterator getColumnIterator() {
 		return new JoinedIterator(
 				includedTable.getColumnIterator(),
 				super.getColumnIterator()
-			);
+		);
 	}
 
 	@Override
-    public boolean containsColumn(Column column) {
-		return super.containsColumn(column) || includedTable.containsColumn(column);
+	public boolean containsColumn(Column column) {
+		return super.containsColumn( column ) || includedTable.containsColumn( column );
 	}
 
 	@Override
-    public PrimaryKey getPrimaryKey() {
+	public PrimaryKey getPrimaryKey() {
 		return includedTable.getPrimaryKey();
 	}
 
 	@Override
-    public Iterator getUniqueKeyIterator() {
+	public Iterator getUniqueKeyIterator() {
 		Iterator iter = includedTable.getUniqueKeyIterator();
 		while ( iter.hasNext() ) {
 			UniqueKey uk = (UniqueKey) iter.next();
@@ -96,21 +119,24 @@ public class DenormalizedTable extends Table {
 	}
 
 	@Override
-    public Iterator getIndexIterator() {
+	public Iterator getIndexIterator() {
 		List indexes = new ArrayList();
 		Iterator iter = includedTable.getIndexIterator();
 		while ( iter.hasNext() ) {
 			Index parentIndex = (Index) iter.next();
 			Index index = new Index();
 			index.setName( getName() + parentIndex.getName() );
-			index.setTable(this);
+			index.setTable( this );
 			index.addColumns( parentIndex.getColumnIterator() );
 			indexes.add( index );
 		}
 		return new JoinedIterator(
 				indexes.iterator(),
 				super.getIndexIterator()
-			);
+		);
 	}
 
+	public Table getIncludedTable() {
+		return includedTable;
+	}
 }

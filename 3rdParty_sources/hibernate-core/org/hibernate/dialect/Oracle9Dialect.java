@@ -1,32 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.dialect;
-
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
 
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.function.NoArgSQLFunction;
@@ -36,11 +14,20 @@ import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.dialect.function.VarArgsSQLFunction;
 import org.hibernate.exception.spi.TemplatedViolatedConstraintNameExtracter;
 import org.hibernate.exception.spi.ViolatedConstraintNameExtracter;
+import org.hibernate.hql.spi.id.IdTableSupportStandardImpl;
+import org.hibernate.hql.spi.id.MultiTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.global.GlobalTemporaryTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.local.AfterUseAction;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.JdbcExceptionHelper;
 import org.hibernate.type.StandardBasicTypes;
-
 import org.jboss.logging.Logger;
+
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Locale;
 
 /**
  * An SQL dialect for Oracle 9 (uses ANSI-style syntax where possible).
@@ -94,6 +81,7 @@ public class Oracle9Dialect extends Dialect {
 		getDefaultProperties().setProperty( Environment.USE_GET_GENERATED_KEYS, "false" );
 		getDefaultProperties().setProperty( Environment.USE_STREAMS_FOR_BINARY, "true" );
 		getDefaultProperties().setProperty( Environment.STATEMENT_BATCH_SIZE, DEFAULT_BATCH_SIZE );
+		getDefaultProperties().setProperty( Environment.BATCH_VERSIONED_DATA, "false" );
 
 		registerFunction( "abs", new StandardSQLFunction( "abs" ) );
 		registerFunction( "sign", new StandardSQLFunction( "sign", StandardBasicTypes.INTEGER ) );
@@ -242,7 +230,7 @@ public class Oracle9Dialect extends Dialect {
 
 		sql = sql.trim();
 		boolean isForUpdate = false;
-		if ( sql.toLowerCase().endsWith( " for update" ) ) {
+		if ( sql.toLowerCase(Locale.ROOT).endsWith( " for update" ) ) {
 			sql = sql.substring( 0, sql.length() - 11 );
 			isForUpdate = true;
 		}
@@ -311,7 +299,7 @@ public class Oracle9Dialect extends Dialect {
 
 	private static final ViolatedConstraintNameExtracter EXTRACTER = new TemplatedViolatedConstraintNameExtracter() {
 		@Override
-		public String extractConstraintName(SQLException sqle) {
+		protected String doExtractConstraintName(SQLException sqle) throws NumberFormatException {
 			final int errorCode = JdbcExceptionHelper.extractErrorCode( sqle );
 			if ( errorCode == 1 || errorCode == 2291 || errorCode == 2292 ) {
 				return extractUsingTemplate( "constraint (", ") violated", sqle.getMessage() );
@@ -351,29 +339,27 @@ public class Oracle9Dialect extends Dialect {
 	}
 
 	@Override
-	public boolean supportsTemporaryTables() {
-		return true;
-	}
+	public MultiTableBulkIdStrategy getDefaultMultiTableBulkIdStrategy() {
+		return new GlobalTemporaryTableBulkIdStrategy(
+				new IdTableSupportStandardImpl() {
+					@Override
+					public String generateIdTableName(String baseName) {
+						final String name = super.generateIdTableName( baseName );
+						return name.length() > 30 ? name.substring( 0, 30 ) : name;
+					}
 
-	@Override
-	public String generateTemporaryTableName(String baseTableName) {
-		final String name = super.generateTemporaryTableName( baseTableName );
-		return name.length() > 30 ? name.substring( 1, 30 ) : name;
-	}
+					@Override
+					public String getCreateIdTableCommand() {
+						return "create global temporary table";
+					}
 
-	@Override
-	public String getCreateTemporaryTableString() {
-		return "create global temporary table";
-	}
-
-	@Override
-	public String getCreateTemporaryTablePostfix() {
-		return "on commit delete rows";
-	}
-
-	@Override
-	public boolean dropTemporaryTableAfterUse() {
-		return false;
+					@Override
+					public String getCreateIdTableStatementOptions() {
+						return "on commit delete rows";
+					}
+				},
+				AfterUseAction.CLEAN
+		);
 	}
 
 	@Override
@@ -409,5 +395,10 @@ public class Oracle9Dialect extends Dialect {
 	@Override
 	public String getNotExpression(String expression) {
 		return "not (" + expression + ")";
+	}
+
+	@Override
+	public boolean canCreateSchema() {
+		return false;
 	}
 }

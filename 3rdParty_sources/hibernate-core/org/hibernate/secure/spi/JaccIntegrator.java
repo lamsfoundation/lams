@@ -1,39 +1,22 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.secure.spi;
 
 import java.util.Map;
 
+import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.DuplicationStrategy;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.ServiceContributingIntegrator;
-import org.hibernate.metamodel.source.MetadataImplementor;
 import org.hibernate.secure.internal.DisabledJaccServiceImpl;
 import org.hibernate.secure.internal.JaccPreDeleteEventListener;
 import org.hibernate.secure.internal.JaccPreInsertEventListener;
@@ -75,10 +58,17 @@ public class JaccIntegrator implements ServiceContributingIntegrator {
 
 	@Override
 	public void integrate(
-			Configuration configuration,
+			Metadata metadata,
 			SessionFactoryImplementor sessionFactory,
 			SessionFactoryServiceRegistry serviceRegistry) {
-		doIntegration( configuration.getProperties(), configuration.getJaccPermissionDeclarations(), serviceRegistry );
+		doIntegration(
+				serviceRegistry.getService( ConfigurationService.class ).getSettings(),
+				// pass no permissions here, because atm actually injecting the
+				// permissions into the JaccService is handled on SessionFactoryImpl via
+				// the org.hibernate.boot.cfgxml.spi.CfgXmlAccessService
+				null,
+				serviceRegistry
+		);
 	}
 
 	private void doIntegration(
@@ -114,14 +104,6 @@ public class JaccIntegrator implements ServiceContributingIntegrator {
 		eventListenerRegistry.prependListeners( EventType.PRE_INSERT, new JaccPreInsertEventListener() );
 		eventListenerRegistry.prependListeners( EventType.PRE_UPDATE, new JaccPreUpdateEventListener() );
 		eventListenerRegistry.prependListeners( EventType.PRE_LOAD, new JaccPreLoadEventListener() );
-	}
-
-	@Override
-	public void integrate(
-			MetadataImplementor metadata,
-			SessionFactoryImplementor sessionFactory,
-			SessionFactoryServiceRegistry serviceRegistry) {
-		doIntegration( sessionFactory.getProperties(), null, serviceRegistry );
 	}
 
 	@Override

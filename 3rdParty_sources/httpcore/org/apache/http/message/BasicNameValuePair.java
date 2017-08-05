@@ -31,6 +31,7 @@ import java.io.Serializable;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.annotation.Immutable;
+import org.apache.http.util.Args;
 import org.apache.http.util.LangUtils;
 
 /**
@@ -54,17 +55,16 @@ public class BasicNameValuePair implements NameValuePair, Cloneable, Serializabl
      */
     public BasicNameValuePair(final String name, final String value) {
         super();
-        if (name == null) {
-            throw new IllegalArgumentException("Name may not be null");
-        }
-        this.name = name;
+        this.name = Args.notNull(name, "Name");
         this.value = value;
     }
 
+    @Override
     public String getName() {
         return this.name;
     }
 
+    @Override
     public String getValue() {
         return this.value;
     }
@@ -75,26 +75,26 @@ public class BasicNameValuePair implements NameValuePair, Cloneable, Serializabl
 
         if (this.value == null) {
             return name;
-        } else {
-            int len = this.name.length() + 1 + this.value.length();
-            StringBuilder buffer = new StringBuilder(len);
-            buffer.append(this.name);
-            buffer.append("=");
-            buffer.append(this.value);
-            return buffer.toString();
         }
+        final int len = this.name.length() + 1 + this.value.length();
+        final StringBuilder buffer = new StringBuilder(len);
+        buffer.append(this.name);
+        buffer.append("=");
+        buffer.append(this.value);
+        return buffer.toString();
     }
 
     @Override
     public boolean equals(final Object object) {
-        if (this == object) return true;
+        if (this == object) {
+            return true;
+        }
         if (object instanceof NameValuePair) {
-            BasicNameValuePair that = (BasicNameValuePair) object;
+            final BasicNameValuePair that = (BasicNameValuePair) object;
             return this.name.equals(that.name)
                   && LangUtils.equals(this.value, that.value);
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

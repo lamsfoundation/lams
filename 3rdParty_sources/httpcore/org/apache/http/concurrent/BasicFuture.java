@@ -26,13 +26,15 @@
  */
 package org.apache.http.concurrent;
 
+import org.apache.http.util.Args;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Basic implementation of the {@link Future} interface. <tt>BasicFuture<tt>
+ * Basic implementation of the {@link Future} interface. {@code BasicFuture}
  * can be put into a completed state by invoking any of the following methods:
  * {@link #cancel()}, {@link #failed(Exception)}, or {@link #completed(Object)}.
  *
@@ -53,10 +55,12 @@ public class BasicFuture<T> implements Future<T>, Cancellable {
         this.callback = callback;
     }
 
+    @Override
     public boolean isCancelled() {
         return this.cancelled;
     }
 
+    @Override
     public boolean isDone() {
         return this.completed;
     }
@@ -68,6 +72,7 @@ public class BasicFuture<T> implements Future<T>, Cancellable {
         return this.result;
     }
 
+    @Override
     public synchronized T get() throws InterruptedException, ExecutionException {
         while (!this.completed) {
             wait();
@@ -75,10 +80,12 @@ public class BasicFuture<T> implements Future<T>, Cancellable {
         return getResult();
     }
 
-    public synchronized T get(long timeout, final TimeUnit unit)
+    @Override
+    public synchronized T get(final long timeout, final TimeUnit unit)
             throws InterruptedException, ExecutionException, TimeoutException {
-        long msecs = unit.toMillis(timeout);
-        long startTime = (msecs <= 0) ? 0 : System.currentTimeMillis();
+        Args.notNull(unit, "Time unit");
+        final long msecs = unit.toMillis(timeout);
+        final long startTime = (msecs <= 0) ? 0 : System.currentTimeMillis();
         long waitTime = msecs;
         if (this.completed) {
             return getResult();
@@ -99,45 +106,53 @@ public class BasicFuture<T> implements Future<T>, Cancellable {
         }
     }
 
-    public synchronized boolean completed(final T result) {
-        if (this.completed) {
-            return false;
+    public boolean completed(final T result) {
+        synchronized(this) {
+            if (this.completed) {
+                return false;
+            }
+            this.completed = true;
+            this.result = result;
+            notifyAll();
         }
-        this.completed = true;
-        this.result = result;
         if (this.callback != null) {
             this.callback.completed(result);
         }
-        notifyAll();
         return true;
     }
 
-    public synchronized boolean failed(final Exception exception) {
-        if (this.completed) {
-            return false;
+    public boolean failed(final Exception exception) {
+        synchronized(this) {
+            if (this.completed) {
+                return false;
+            }
+            this.completed = true;
+            this.ex = exception;
+            notifyAll();
         }
-        this.completed = true;
-        this.ex = exception;
         if (this.callback != null) {
             this.callback.failed(exception);
         }
-        notifyAll();
         return true;
     }
 
-    public synchronized boolean cancel(boolean mayInterruptIfRunning) {
-        if (this.completed) {
-            return false;
+    @Override
+    public boolean cancel(final boolean mayInterruptIfRunning) {
+        synchronized(this) {
+            if (this.completed) {
+                return false;
+            }
+            this.completed = true;
+            this.cancelled = true;
+            notifyAll();
         }
-        this.completed = true;
-        this.cancelled = true;
         if (this.callback != null) {
             this.callback.cancelled();
         }
-        notifyAll();
         return true;
     }
 
+    @Override
     public boolean cancel() {
         return cancel(true);
     }

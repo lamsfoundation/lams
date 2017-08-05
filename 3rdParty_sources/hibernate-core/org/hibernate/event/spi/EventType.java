@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.event.spi;
 
@@ -29,6 +12,7 @@ import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.HibernateException;
 
@@ -37,7 +21,10 @@ import org.hibernate.HibernateException;
  *
  * @author Steve Ebersole
  */
-public class EventType<T> {
+public final class EventType<T> {
+
+	private static AtomicInteger typeCounter = new AtomicInteger( 0 );
+
 	public static final EventType<LoadEventListener> LOAD = create( "load", LoadEventListener.class );
 	public static final EventType<ResolveNaturalIdEventListener> RESOLVE_NATURAL_ID = create( "resolve-natural-id", ResolveNaturalIdEventListener.class );
 
@@ -148,13 +135,14 @@ public class EventType<T> {
 		return EVENT_TYPE_BY_NAME_MAP.values();
 	}
 
-
 	private final String eventName;
 	private final Class<? extends T> baseListenerInterface;
+	private final int ordinal;
 
 	private EventType(String eventName, Class<? extends T> baseListenerInterface) {
 		this.eventName = eventName;
 		this.baseListenerInterface = baseListenerInterface;
+		this.ordinal = typeCounter.getAndIncrement();
 	}
 
 	public String eventName() {
@@ -169,4 +157,17 @@ public class EventType<T> {
 	public String toString() {
 		return eventName();
 	}
+
+	/**
+	 * EventType is effectively an enumeration. Since there is a known, limited number of possible types, we expose an
+	 * ordinal for each in order to be able to efficiently do associations elsewhere in the codebase (array vs. Map)
+	 *
+	 * For the total number of types, see {@link #values()}
+	 *
+	 * @return An unique ordinal for this {@link EventType}, starting at 0 and up to the number of distinct events
+	 */
+	public int ordinal() {
+		return ordinal;
+	}
+
 }

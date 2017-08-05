@@ -36,6 +36,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 
 import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.util.Args;
 
 /**
  * A streamed entity that obtains its content from a {@link Serializable}.
@@ -60,12 +61,9 @@ public class SerializableEntity extends AbstractHttpEntity {
      *        stored in an internal buffer
      * @throws IOException in case of an I/O error
      */
-    public SerializableEntity(Serializable ser, boolean bufferize) throws IOException {
+    public SerializableEntity(final Serializable ser, final boolean bufferize) throws IOException {
         super();
-        if (ser == null) {
-            throw new IllegalArgumentException("Source object may not be null");
-        }
-
+        Args.notNull(ser, "Source object");
         if (bufferize) {
             createBytes(ser);
         } else {
@@ -73,14 +71,24 @@ public class SerializableEntity extends AbstractHttpEntity {
         }
     }
 
-    private void createBytes(Serializable ser) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream out = new ObjectOutputStream(baos);
+    /**
+     * @since 4.3
+     */
+    public SerializableEntity(final Serializable ser) {
+        super();
+        Args.notNull(ser, "Source object");
+        this.objRef = ser;
+    }
+
+    private void createBytes(final Serializable ser) throws IOException {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ObjectOutputStream out = new ObjectOutputStream(baos);
         out.writeObject(ser);
         out.flush();
         this.objSer = baos.toByteArray();
     }
 
+    @Override
     public InputStream getContent() throws IOException, IllegalStateException {
         if (this.objSer == null) {
             createBytes(this.objRef);
@@ -88,6 +96,7 @@ public class SerializableEntity extends AbstractHttpEntity {
         return new ByteArrayInputStream(this.objSer);
     }
 
+    @Override
     public long getContentLength() {
         if (this.objSer ==  null) {
             return -1;
@@ -96,21 +105,21 @@ public class SerializableEntity extends AbstractHttpEntity {
         }
     }
 
+    @Override
     public boolean isRepeatable() {
         return true;
     }
 
+    @Override
     public boolean isStreaming() {
         return this.objSer == null;
     }
 
-    public void writeTo(OutputStream outstream) throws IOException {
-        if (outstream == null) {
-            throw new IllegalArgumentException("Output stream may not be null");
-        }
-
+    @Override
+    public void writeTo(final OutputStream outstream) throws IOException {
+        Args.notNull(outstream, "Output stream");
         if (this.objSer == null) {
-            ObjectOutputStream out = new ObjectOutputStream(outstream);
+            final ObjectOutputStream out = new ObjectOutputStream(outstream);
             out.writeObject(this.objRef);
             out.flush();
         } else {

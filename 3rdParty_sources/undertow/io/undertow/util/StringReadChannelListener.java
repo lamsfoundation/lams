@@ -21,16 +21,18 @@ package io.undertow.util;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import io.undertow.connector.PooledByteBuffer;
+import io.undertow.server.XnioByteBufferPool;
 import io.undertow.websockets.core.UTF8Output;
 import org.xnio.ChannelListener;
 import org.xnio.IoUtils;
+import io.undertow.connector.ByteBufferPool;
 import org.xnio.Pool;
-import org.xnio.Pooled;
 import org.xnio.channels.StreamSourceChannel;
 
 /**
  * Simple utility class for reading a string
- * <p/>
+ * <p>
  * todo: handle unicode properly
  *
  * @author Stuart Douglas
@@ -38,15 +40,20 @@ import org.xnio.channels.StreamSourceChannel;
 public abstract class StringReadChannelListener implements ChannelListener<StreamSourceChannel> {
 
     private final UTF8Output string = new UTF8Output();
-    private final Pool<ByteBuffer> bufferPool;
+    private final ByteBufferPool bufferPool;
 
-    public StringReadChannelListener(final Pool<ByteBuffer> bufferPool) {
+    public StringReadChannelListener(final ByteBufferPool bufferPool) {
         this.bufferPool = bufferPool;
     }
 
+    @Deprecated
+    public StringReadChannelListener(final Pool<ByteBuffer> bufferPool) {
+        this.bufferPool = new XnioByteBufferPool(bufferPool);
+    }
+
     public void setup(final StreamSourceChannel channel) {
-        Pooled<ByteBuffer> resource = bufferPool.allocate();
-        ByteBuffer buffer = resource.getResource();
+        PooledByteBuffer resource = bufferPool.allocate();
+        ByteBuffer buffer = resource.getBuffer();
         try {
             int r = 0;
             do {
@@ -65,14 +72,14 @@ public abstract class StringReadChannelListener implements ChannelListener<Strea
         } catch (IOException e) {
             error(e);
         } finally {
-            resource.free();
+            resource.close();
         }
     }
 
     @Override
     public void handleEvent(final StreamSourceChannel channel) {
-        Pooled<ByteBuffer> resource = bufferPool.allocate();
-        ByteBuffer buffer = resource.getResource();
+        PooledByteBuffer resource = bufferPool.allocate();
+        ByteBuffer buffer = resource.getBuffer();
         try {
             int r = 0;
             do {
@@ -90,7 +97,7 @@ public abstract class StringReadChannelListener implements ChannelListener<Strea
         } catch (IOException e) {
             error(e);
         } finally {
-            resource.free();
+            resource.close();
         }
     }
 

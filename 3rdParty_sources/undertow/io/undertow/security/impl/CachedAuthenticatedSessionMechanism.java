@@ -22,14 +22,30 @@ import io.undertow.security.api.AuthenticatedSessionManager.AuthenticatedSession
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.SecurityContext;
 import io.undertow.security.idm.Account;
+import io.undertow.security.idm.IdentityManager;
 import io.undertow.server.HttpServerExchange;
 
 /**
- * An {@link AuthenticationMechanism} which uses any cached {@link AuthenticationSession}s.
+ * An {@link AuthenticationMechanism} which uses any cached {@link AuthenticatedSession}s.
  *
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
 public class CachedAuthenticatedSessionMechanism implements AuthenticationMechanism {
+
+    private final IdentityManager identityManager;
+
+    public CachedAuthenticatedSessionMechanism() {
+        this(null);
+    }
+
+    public CachedAuthenticatedSessionMechanism(final IdentityManager identityManager) {
+        this.identityManager = identityManager;
+    }
+
+    @SuppressWarnings("deprecation")
+    private IdentityManager getIdentityManager(SecurityContext securityContext) {
+        return identityManager != null ? identityManager : securityContext.getIdentityManager();
+    }
 
     @Override
     public AuthenticationMechanismOutcome authenticate(HttpServerExchange exchange, SecurityContext securityContext) {
@@ -44,7 +60,7 @@ public class CachedAuthenticatedSessionMechanism implements AuthenticationMechan
     public AuthenticationMechanismOutcome runCached(final HttpServerExchange exchange, final SecurityContext securityContext, final AuthenticatedSessionManager sessionManager) {
         AuthenticatedSession authSession = sessionManager.lookupSession(exchange);
         if (authSession != null) {
-            Account account = securityContext.getIdentityManager().verify(authSession.getAccount());
+            Account account = getIdentityManager(securityContext).verify(authSession.getAccount());
             if (account != null) {
                 securityContext.authenticationComplete(account, authSession.getMechanism(), false);
                 return AuthenticationMechanismOutcome.AUTHENTICATED;

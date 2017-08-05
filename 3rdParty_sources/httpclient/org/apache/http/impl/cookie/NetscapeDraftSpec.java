@@ -30,59 +30,58 @@ package org.apache.http.impl.cookie;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.annotation.NotThreadSafe;
-
 import org.apache.http.FormattedHeader;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
-import org.apache.http.cookie.ClientCookie;
+import org.apache.http.annotation.Obsolete;
+import org.apache.http.annotation.ThreadSafe;
+import org.apache.http.cookie.CommonCookieAttributeHandler;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.cookie.CookieOrigin;
-import org.apache.http.cookie.CookieSpec;
 import org.apache.http.cookie.MalformedCookieException;
 import org.apache.http.cookie.SM;
 import org.apache.http.message.BufferedHeader;
 import org.apache.http.message.ParserCursor;
+import org.apache.http.util.Args;
 import org.apache.http.util.CharArrayBuffer;
 
 /**
- * This {@link CookieSpec} implementation conforms to the original draft
- * specification published by Netscape Communications. It should be avoided
- * unless absolutely necessary for compatibility with legacy code.
+ * This {@link org.apache.http.cookie.CookieSpec} implementation conforms to
+ * the original draft specification published by Netscape Communications.
+ * It should be avoided unless absolutely necessary for compatibility with
+ * legacy applications.
+ * <p>
+ * Rendered obsolete by {@link org.apache.http.impl.cookie.RFC6265LaxSpec}.
  *
  * @since 4.0
+ * @see org.apache.http.impl.cookie.RFC6265LaxSpec
  */
-@NotThreadSafe // superclass is @NotThreadSafe
+@Obsolete
+@ThreadSafe
 public class NetscapeDraftSpec extends CookieSpecBase {
 
     protected static final String EXPIRES_PATTERN = "EEE, dd-MMM-yy HH:mm:ss z";
 
-    private final String[] datepatterns;
-
     /** Default constructor */
     public NetscapeDraftSpec(final String[] datepatterns) {
-        super();
-        if (datepatterns != null) {
-            this.datepatterns = datepatterns.clone();
-        } else {
-            this.datepatterns = new String[] { EXPIRES_PATTERN };
-        }
-        registerAttribHandler(ClientCookie.PATH_ATTR, new BasicPathHandler());
-        registerAttribHandler(ClientCookie.DOMAIN_ATTR, new NetscapeDomainHandler());
-        registerAttribHandler(ClientCookie.MAX_AGE_ATTR, new BasicMaxAgeHandler());
-        registerAttribHandler(ClientCookie.SECURE_ATTR, new BasicSecureHandler());
-        registerAttribHandler(ClientCookie.COMMENT_ATTR, new BasicCommentHandler());
-        registerAttribHandler(ClientCookie.EXPIRES_ATTR, new BasicExpiresHandler(
-                this.datepatterns));
+        super(new BasicPathHandler(),
+                new NetscapeDomainHandler(),
+                new BasicSecureHandler(),
+                new BasicCommentHandler(),
+                new BasicExpiresHandler(
+                        datepatterns != null ? datepatterns.clone() : new String[]{EXPIRES_PATTERN}));
     }
 
-    /** Default constructor */
+    NetscapeDraftSpec(final CommonCookieAttributeHandler... handlers) {
+        super(handlers);
+    }
+
     public NetscapeDraftSpec() {
-        this(null);
+        this((String[]) null);
     }
 
     /**
-      * Parses the Set-Cookie value into an array of <tt>Cookie</tt>s.
+      * Parses the Set-Cookie value into an array of {@code Cookie}s.
       *
       * <p>Syntax of the Set-Cookie HTTP Response Header:</p>
       *
@@ -95,38 +94,35 @@ public class NetscapeDraftSpec extends CookieSpecBase {
       * </PRE>
       *
       * <p>Please note that the Netscape draft specification does not fully conform to the HTTP
-      * header format. Comma character if present in <code>Set-Cookie</code> will not be treated
+      * header format. Comma character if present in {@code Set-Cookie} will not be treated
       * as a header element separator</p>
       *
       * @see <a href="http://web.archive.org/web/20020803110822/http://wp.netscape.com/newsref/std/cookie_spec.html">
       *  The Cookie Spec.</a>
       *
-      * @param header the <tt>Set-Cookie</tt> received from the server
-      * @return an array of <tt>Cookie</tt>s parsed from the Set-Cookie value
+      * @param header the {@code Set-Cookie} received from the server
+      * @return an array of {@code Cookie}s parsed from the Set-Cookie value
       * @throws MalformedCookieException if an exception occurs during parsing
       */
+    @Override
     public List<Cookie> parse(final Header header, final CookieOrigin origin)
             throws MalformedCookieException {
-        if (header == null) {
-            throw new IllegalArgumentException("Header may not be null");
-        }
-        if (origin == null) {
-            throw new IllegalArgumentException("Cookie origin may not be null");
-        }
+        Args.notNull(header, "Header");
+        Args.notNull(origin, "Cookie origin");
         if (!header.getName().equalsIgnoreCase(SM.SET_COOKIE)) {
             throw new MalformedCookieException("Unrecognized cookie header '"
                     + header.toString() + "'");
         }
-        NetscapeDraftHeaderParser parser = NetscapeDraftHeaderParser.DEFAULT;
-        CharArrayBuffer buffer;
-        ParserCursor cursor;
+        final NetscapeDraftHeaderParser parser = NetscapeDraftHeaderParser.DEFAULT;
+        final CharArrayBuffer buffer;
+        final ParserCursor cursor;
         if (header instanceof FormattedHeader) {
             buffer = ((FormattedHeader) header).getBuffer();
             cursor = new ParserCursor(
                     ((FormattedHeader) header).getValuePos(),
                     buffer.length());
         } else {
-            String s = header.getValue();
+            final String s = header.getValue();
             if (s == null) {
                 throw new MalformedCookieException("Header value is null");
             }
@@ -137,37 +133,35 @@ public class NetscapeDraftSpec extends CookieSpecBase {
         return parse(new HeaderElement[] { parser.parseHeader(buffer, cursor) }, origin);
     }
 
+    @Override
     public List<Header> formatCookies(final List<Cookie> cookies) {
-        if (cookies == null) {
-            throw new IllegalArgumentException("List of cookies may not be null");
-        }
-        if (cookies.isEmpty()) {
-            throw new IllegalArgumentException("List of cookies may not be empty");
-        }
-        CharArrayBuffer buffer = new CharArrayBuffer(20 * cookies.size());
+        Args.notEmpty(cookies, "List of cookies");
+        final CharArrayBuffer buffer = new CharArrayBuffer(20 * cookies.size());
         buffer.append(SM.COOKIE);
         buffer.append(": ");
         for (int i = 0; i < cookies.size(); i++) {
-            Cookie cookie = cookies.get(i);
+            final Cookie cookie = cookies.get(i);
             if (i > 0) {
                 buffer.append("; ");
             }
             buffer.append(cookie.getName());
-            String s = cookie.getValue();
+            final String s = cookie.getValue();
             if (s != null) {
                 buffer.append("=");
                 buffer.append(s);
             }
         }
-        List<Header> headers = new ArrayList<Header>(1);
+        final List<Header> headers = new ArrayList<Header>(1);
         headers.add(new BufferedHeader(buffer));
         return headers;
     }
 
+    @Override
     public int getVersion() {
         return 0;
     }
 
+    @Override
     public Header getVersionHeader() {
         return null;
     }

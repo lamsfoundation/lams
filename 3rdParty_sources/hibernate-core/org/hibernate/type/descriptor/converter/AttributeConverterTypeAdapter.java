@@ -1,32 +1,17 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.type.descriptor.converter;
 
 import javax.persistence.AttributeConverter;
 
 import org.hibernate.type.AbstractSingleColumnStandardBasicType;
+import org.hibernate.type.descriptor.java.ImmutableMutabilityPlan;
 import org.hibernate.type.descriptor.java.JavaTypeDescriptor;
+import org.hibernate.type.descriptor.java.MutabilityPlan;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
 import org.jboss.logging.Logger;
@@ -39,14 +24,21 @@ import org.jboss.logging.Logger;
 public class AttributeConverterTypeAdapter<T> extends AbstractSingleColumnStandardBasicType<T> {
 	private static final Logger log = Logger.getLogger( AttributeConverterTypeAdapter.class );
 
+	public static final String NAME_PREFIX = "converted::";
+
 	private final String name;
+	private final String description;
 
 	private final Class modelType;
 	private final Class jdbcType;
 	private final AttributeConverter<? extends T,?> attributeConverter;
 
+	private final MutabilityPlan<T> mutabilityPlan;
+
+	@SuppressWarnings("unchecked")
 	public AttributeConverterTypeAdapter(
 			String name,
+			String description,
 			AttributeConverter<? extends T,?> attributeConverter,
 			SqlTypeDescriptor sqlTypeDescriptorAdapter,
 			Class modelType,
@@ -54,9 +46,15 @@ public class AttributeConverterTypeAdapter<T> extends AbstractSingleColumnStanda
 			JavaTypeDescriptor<T> entityAttributeJavaTypeDescriptor) {
 		super( sqlTypeDescriptorAdapter, entityAttributeJavaTypeDescriptor );
 		this.name = name;
+		this.description = description;
 		this.modelType = modelType;
 		this.jdbcType = jdbcType;
 		this.attributeConverter = attributeConverter;
+
+		this.mutabilityPlan =
+				entityAttributeJavaTypeDescriptor.getMutabilityPlan().isMutable() ?
+						new AttributeConverterMutabilityPlanImpl<T>( attributeConverter ) :
+						ImmutableMutabilityPlan.INSTANCE;
 
 		log.debug( "Created AttributeConverterTypeAdapter -> " + name );
 	}
@@ -76,5 +74,15 @@ public class AttributeConverterTypeAdapter<T> extends AbstractSingleColumnStanda
 
 	public AttributeConverter<? extends T,?> getAttributeConverter() {
 		return attributeConverter;
+	}
+
+	@Override
+	protected MutabilityPlan<T> getMutabilityPlan() {
+		return mutabilityPlan;
+	}
+
+	@Override
+	public String toString() {
+		return description;
 	}
 }
