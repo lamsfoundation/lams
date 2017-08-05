@@ -42,7 +42,6 @@
  	        </c:choose>
 
 			<div class="pull-right">
-			<lams:Portrait userId="${msgDto.authorUserId}"/>
 			<span class="${textClass}"> 
 			  <c:if test='${(sessionMap.mode == "teacher") || (not hidden)}'>
 					<c:set var="author" value="${msgDto.author}" />
@@ -52,10 +51,9 @@
 						</c:set>
 					</c:if>
 					<span id="author"><c:out value="${author}" escapeXml="true" /></span>						
-				-
-				<lams:Date value="${msgDto.message.updated}" timeago="true"/>
 				</c:if>
 			</span>
+			<lams:Portrait userId="${msgDto.authorUserId}"/>
 			</div>
 			<h5 class="${textClass}">
 			<c:choose>
@@ -67,6 +65,7 @@
 				</c:otherwise>
 			</c:choose>
 			</h5>
+			<lams:Date value="${msgDto.message.updated}" timeago="true"/>
 		</div>
 	</div> <!--  end of panel-heading -->
 

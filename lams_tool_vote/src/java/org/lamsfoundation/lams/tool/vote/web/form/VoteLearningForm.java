@@ -109,6 +109,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 
     protected boolean isUserLeader;
     protected String groupLeaderName;
+    protected String groupLeaderUserId;
 
     /**
      * @return Returns the learningMode.
@@ -959,6 +960,14 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 
     public void setGroupLeaderName(String groupLeaderName) {
 	this.groupLeaderName = groupLeaderName;
+    }
+
+    public String getGroupLeaderUserId() {
+	return groupLeaderUserId;
+    }
+
+    public void setGroupLeaderUserId(String groupLeaderUserId) {
+	this.groupLeaderUserId = groupLeaderUserId;
     }
 
     public boolean isUserLeader() {

@@ -108,6 +108,19 @@
   }
 }
 
+// Typography
+
+// [converter] $parent hack
+@mixin text-emphasis-variant($parent, $color) {
+  #{$parent} {
+    color: $color;
+  }
+  a#{$parent}:hover,
+  a#{$parent}:focus {
+    color: darken($color, 10%);
+  }
+}
+
 // Generic avatars used in place of profile pictures
 @mixin portrait($size) {
 	width: $size;
@@ -116,12 +129,14 @@
 }
 
 // Generic avatars used in place of profile pictures
-@mixin portrait-generic($fontsize) {
+@mixin portrait-generic($height) {
   display: inline-block;
+  height: $height;
+  vertical-align: middle;
   &:before {
   content: "\f2be";
   font-family: FontAwesome;
   font-style: normal;
-  font-size: $fontsize;
+  font-size: $height - 4;
   font-weight: normal;
 } }

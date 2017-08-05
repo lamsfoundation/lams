@@ -3,7 +3,7 @@ body {
 	width: 100%;
 	overflow-x: hidden;
 	font-size: 13px;
-	background: url(/lams/images/css/light-fabric.jpg);
+	background: $stripes_background;
 }
 html {
 	height: 100%;
@@ -13,8 +13,8 @@ html {
 	width: 220px;
 	z-index: 10;
 	height: 100%;
-	background: $brand-primary-darker;
-	color: $gray-lighter;
+	background: $main_offcanvas_background;
+    color: $main_offcanvas_color;
 }
 .courses-title {
     text-overflow: ellipsis;
@@ -116,7 +116,7 @@ a:hover, a:focus {
 	background: $main_offcanvas_link;
 }
 #offcanvas .active > a {
-    color: $body-bg;
+    color: $main_offcanvas_link_color;
 }
 #offcanvas td.active {
     border-right: 10px solid $brand-primary-bright;
@@ -124,10 +124,11 @@ a:hover, a:focus {
 }
 .offcanvas-logo {
 	padding: 20px 0px 15px 25px;
-    background-color: $brand-primary-darkest;
+    background-color: $main_offcanvas_logo_background;
 }
-.offcanvas-logo img{
-	width: 100px;
+.offcanvas-logo .logo {
+    background: url($offcanvas_logo) no-repeat center left;
+    height: $offcanvas_height;
 }
 .offcanvas-header {
 	padding: 15px 0px 0px 0px;
@@ -142,7 +143,7 @@ a:hover, a:focus {
 	padding: 2px 5px;
 	line-height: 1;
 	border: 1px solid rgba(221, 226, 232, 0.49);
-	background: $brand-primary-darkest; 
+	background: $main_offcanvas_search_background; 
 	color: $main_fav_org_link;
 }
 .offcanvas-search .form-control::-webkit-input-placeholder { /* WebKit, Blink, Edge */
@@ -549,7 +550,7 @@ a.sorting {
 	border-bottom: $border-thin-default;
 }
 .course-header i{
-	font-size: 16px;
+	font-size: 15px;
 }
 
 .j-course-contents {

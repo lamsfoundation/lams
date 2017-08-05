@@ -34,6 +34,7 @@
 			<html:hidden property="userID" />
 			<html:hidden property="userLeader" />
 			<html:hidden property="groupLeaderName" />
+			<html:hidden property="groupLeaderUserId" />
 			<html:hidden property="useSelectLeaderToolOuput" />
 
 			<div class="panel">

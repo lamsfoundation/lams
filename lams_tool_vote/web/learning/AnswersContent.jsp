@@ -132,6 +132,7 @@
 		<html:hidden property="showResults" />
 		<html:hidden property="userLeader" />
 		<html:hidden property="groupLeaderName" />
+		<html:hidden property="groupLeaderUserId" />
 		<html:hidden property="useSelectLeaderToolOuput" />
 
 
@@ -141,11 +142,7 @@
 
 			<!-- Announcements and advanced settings -->
 			<c:if test="${formBean.useSelectLeaderToolOuput}">
-				<lams:Alert id="groupLeader" type="info" close="false">
-					<fmt:message key="label.group.leader">
-						<fmt:param>${formBean.groupLeaderName}</fmt:param>
-					</fmt:message>
-				</lams:Alert>
+				<lams:LeaderDisplay idName="groupLeader" username="${formBean.groupLeaderName}" userId="${formBean.groupLeaderUserId}"/>
 			</c:if>
 
 			<c:if test="${not empty voteGeneralLearnerFlowDTO.submissionDeadline}">

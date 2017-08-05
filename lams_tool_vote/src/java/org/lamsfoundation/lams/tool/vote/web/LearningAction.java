@@ -658,6 +658,9 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	String groupLeaderName = request.getParameter(ATTR_GROUP_LEADER_NAME);
 	voteLearningForm.setGroupLeaderName(groupLeaderName);
 
+	String groupLeaderUserId = request.getParameter(ATTR_GROUP_LEADER_USER_ID);
+	voteLearningForm.setGroupLeaderUserId(groupLeaderUserId);
+
 	boolean isUserLeader = WebUtil.readBooleanParam(request, "userLeader");
 	voteLearningForm.setIsUserLeader(isUserLeader);
     }
@@ -822,6 +825,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	    // store group leader information
 	    voteLearningForm.setGroupLeaderName(groupLeader.getFullname());
+	    voteLearningForm.setGroupLeaderUserId(groupLeader.getQueUsrId() != null ? groupLeader.getQueUsrId().toString() : "");
 	    boolean isUserLeader = voteService.isUserGroupLeader(user, new Long(toolSessionID));
 	    voteLearningForm.setIsUserLeader(isUserLeader);
 	}

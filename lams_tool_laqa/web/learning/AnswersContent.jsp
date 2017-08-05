@@ -223,11 +223,7 @@
 		</c:if>
 
 		<c:if test="${isLeadershipEnabled}">
-			<lams:Alert type="info" id="leader-enabled" close="false">
-				<fmt:message key="label.group.leader">
-					<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
-				</fmt:message>
-			</lams:Alert>
+			<lams:LeaderDisplay idName="leader-enabled" username="${sessionMap.groupLeader.fullname}" userId="${sessionMap.groupLeader.queUsrId}"/>
 		</c:if>
 
 		<!-- End advanced settings and notices -->

@@ -143,8 +143,7 @@
         <div class="offcanvas-scroll-area">
         
 			<div class="offcanvas-logo">
-				<div>
-					<img alt="LAMS" src="images/svg/lams_logo_white.svg">
+				<div class="logo">
 				</div>
 				<a class="offcanvas-toggle"><i class="icon-remove fa fa-bars fa-lg"></i></a>
 			</div>

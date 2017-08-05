@@ -65,7 +65,7 @@
           </h4>
         </div>
         <div class="panel-body ${bgClass}" id="pb-msg${commentDto.comment.uid}">
-	      <div class="pull-left roffset5"><lams:Portrait userId="${commentDto.authorUserId}"/></div>
+	      <div class="pull-left roffset10"><lams:Portrait userId="${commentDto.authorUserId}"/></div>
           <c:if
                 test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
             <lams:out value="${commentDto.comment.body}" escapeHtml="true" />
