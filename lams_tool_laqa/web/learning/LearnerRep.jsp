@@ -301,14 +301,7 @@
 		<!-- End Announcements and advanced settings -->
 
 		<c:if test="${isLeadershipEnabled}">
-			<c:set var="fullName">
-				<c:out value="${sessionMap.groupLeader.fullname}" escapeXml="true" />
-			</c:set>
-			<h4>
-				<fmt:message key="label.group.leader">
-					<fmt:param>${fullName}</fmt:param>
-				</fmt:message>
-			</h4>
+			<lams:LeaderDisplay idName="leader-enabled" username="${sessionMap.groupLeader.fullname}" userId="${sessionMap.groupLeader.queUsrId}"/>
 		</c:if>
 
 		<h4>

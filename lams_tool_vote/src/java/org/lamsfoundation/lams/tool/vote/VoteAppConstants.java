@@ -93,7 +93,7 @@ public interface VoteAppConstants {
     public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
     public static final String ATTR_GROUP_USERS = "groupUsers";
     public static final String ATTR_GROUP_LEADER_NAME = "groupLeaderName";
-
+    public static final String ATTR_GROUP_LEADER_USER_ID  = "groupLeaderUserId";
     /*
      * refers to number of questions presented initially, we have a single record for default content
      */

@@ -291,12 +291,7 @@
 		</c:if>
 
 		<c:if test="${isLeadershipEnabled}">
-			<lams:Alert id="ratings-info" type="info" close="true">
-				<fmt:message key="label.group.leader">
-					<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
-				</fmt:message>
-
-			</lams:Alert>
+			<lams:LeaderDisplay idName="ratings-info" username="${sessionMap.groupLeader.fullname}" userId="${sessionMap.groupLeader.queUsrId}"/>
 		</c:if>
 
 		<h4>

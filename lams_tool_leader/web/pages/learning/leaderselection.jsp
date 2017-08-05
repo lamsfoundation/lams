@@ -81,10 +81,7 @@
 
 	<c:choose>
 		<c:when test="${not empty groupLeader}">
-			<h4>
-				<fmt:message key="label.group.leader" /> &nbsp;
-				<mark><c:out value="${groupLeader.firstName} ${groupLeader.lastName}" escapeXml="true" /></mark>
-			</h4>
+			<lams:LeaderDisplay username="${groupLeader.firstName} ${groupLeader.lastName}" userId="${groupLeader.userId}"/>
 		</c:when>
 		<c:otherwise>
 			<lams:Alert type="warning" id="no-leader" close="false">

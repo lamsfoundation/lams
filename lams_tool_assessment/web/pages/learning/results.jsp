@@ -80,11 +80,7 @@
 		</c:if>
 		
 		<c:if test="${isLeadershipEnabled}">
-			<h4>
-				<fmt:message key="label.group.leader" >
-					<fmt:param>${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}</fmt:param>
-				</fmt:message>
-			</h4>
+			<lams:LeaderDisplay username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
 		</c:if>
 		
 		<%@ include file="/common/messages.jsp"%>

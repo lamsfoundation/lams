@@ -46,6 +46,7 @@
 		<html:hidden property="showResults" />
 		<html:hidden property="userLeader" />
 		<html:hidden property="groupLeaderName" />
+		<html:hidden property="groupLeaderUserId" />
 		<html:hidden property="useSelectLeaderToolOuput" />
 
 		<lams:Page type="learner" title="${voteGeneralLearnerFlowDTO.activityTitle}">
@@ -57,11 +58,7 @@
 			</c:if>
 
 			<c:if test="${isLeadershipEnabled}">
-				<lams:Alert id="leaderEnabled" type="info" close="false">
-					<fmt:message key="label.group.leader">
-						<fmt:param>${formBean.groupLeaderName}</fmt:param>
-					</fmt:message>
-				</lams:Alert>
+				<lams:LeaderDisplay idName="leaderEnabled" username="${formBean.groupLeaderName}" userId="${formBean.groupLeaderUserId}"/>
 			</c:if>
 
 			<div class="row">

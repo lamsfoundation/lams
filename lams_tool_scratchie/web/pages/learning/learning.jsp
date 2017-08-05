@@ -165,13 +165,7 @@
 
 	<lams:Page type="learner" title="${scratchie.title}">
 
-		<h4>
-			<fmt:message key="label.group.leader">
-				<fmt:param>
-					<mark><c:out value="${sessionMap.groupLeaderName}" escapeXml="true" /></mark>
-				</fmt:param>
-			</fmt:message>
-		</h4>
+		<lams:LeaderDisplay username="${sessionMap.groupLeaderName}" userId="${sessionMap.groupLeaderUserId}"/>
 
 		<div class="panel">
 			<c:out value="${scratchie.instructions}" escapeXml="false" />
