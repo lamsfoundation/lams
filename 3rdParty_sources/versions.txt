@@ -17,6 +17,8 @@ Apache POI 3.16
 
 Commons Digester 2.1
 
+Commons Fileupload 1.3.3
+
 Commons Lang 2.6
 
 Commons IO 2.4
