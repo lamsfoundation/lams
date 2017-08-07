@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,12 +89,21 @@ public abstract class ScopedProxyUtils {
 	}
 
 	/**
-	 * Generates the bean name that is used within the scoped proxy to reference the target bean.
+	 * Generate the bean name that is used within the scoped proxy to reference the target bean.
 	 * @param originalBeanName the original name of bean
 	 * @return the generated bean to be used to reference the target bean
 	 */
 	public static String getTargetBeanName(String originalBeanName) {
 		return TARGET_NAME_PREFIX + originalBeanName;
+	}
+
+	/**
+	 * Specify if the {@code beanName} is the name of a bean that references the target
+	 * bean within a scoped proxy.
+	 * @since 4.1.4
+	 */
+	public static boolean isScopedTarget(String beanName) {
+		return (beanName != null && beanName.startsWith(TARGET_NAME_PREFIX));
 	}
 
 }

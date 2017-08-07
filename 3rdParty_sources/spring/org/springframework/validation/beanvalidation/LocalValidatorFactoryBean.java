@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,13 @@ import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.Validation;
+import javax.validation.ValidationException;
+import javax.validation.ValidationProviderResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
+import javax.validation.bootstrap.GenericBootstrap;
+import javax.validation.bootstrap.ProviderSpecificBootstrap;
 
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 
@@ -51,9 +55,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * This is the central class for {@code javax.validation} (JSR-303) setup
- * in a Spring application context: It bootstraps a {@code javax.validation.ValidationFactory}
- * and exposes it through the Spring {@link org.springframework.validation.Validator} interface
+ * This is the central class for {@code javax.validation} (JSR-303) setup in a Spring
+ * application context: It bootstraps a {@code javax.validation.ValidationFactory} and
+ * exposes it through the Spring {@link org.springframework.validation.Validator} interface
  * as well as through the JSR-303 {@link javax.validation.Validator} interface and the
  * {@link javax.validation.ValidatorFactory} interface itself.
  *
@@ -64,13 +68,14 @@ import org.springframework.util.ReflectionUtils;
  * into any target dependency of type {@link org.springframework.validation.Validator}!
  *
  * <p><b>As of Spring 4.0, this class supports Bean Validation 1.0 and 1.1, with special support
- * for Hibernate Validator 4.3 and 5.0</b> (see {@link #setValidationMessageSource}).
+ * for Hibernate Validator 4.3 and 5.x</b> (see {@link #setValidationMessageSource}).
  *
  * <p>Note that Bean Validation 1.1's {@code #forExecutables} method isn't supported: We do not
  * expect that method to be called by application code; consider {@link MethodValidationInterceptor}
  * instead. If you really need programmatic {@code #forExecutables} access, inject this class as
  * a {@link ValidatorFactory} and call {@link #getValidator()} on it, then {@code #forExecutables}
  * on the returned native {@link Validator} reference instead of directly on this class.
+ * Alternatively, call {@code #unwrap(Validator.class) which will also provide the native object.
  *
  * <p>This class is also being used by Spring's MVC configuration namespace, in case of the
  * {@code javax.validation} API being present but no explicit Validator having been configured.
@@ -91,6 +96,8 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 
 	@SuppressWarnings("rawtypes")
 	private Class providerClass;
+
+	private ValidationProviderResolver validationProviderResolver;
 
 	private MessageInterpolator messageInterpolator;
 
@@ -118,6 +125,15 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 	@SuppressWarnings("rawtypes")
 	public void setProviderClass(Class providerClass) {
 		this.providerClass = providerClass;
+	}
+
+	/**
+	 * Specify a JSR-303 {@link ValidationProviderResolver} for bootstrapping the
+	 * provider of choice, as an alternative to {@code META-INF} driven resolution.
+	 * @since 4.3
+	 */
+	public void setValidationProviderResolver(ValidationProviderResolver validationProviderResolver) {
+		this.validationProviderResolver = validationProviderResolver;
 	}
 
 	/**
@@ -216,11 +232,34 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 
 
 	@Override
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	public void afterPropertiesSet() {
-		@SuppressWarnings({"rawtypes", "unchecked"})
-		Configuration<?> configuration = (this.providerClass != null ?
-				Validation.byProvider(this.providerClass).configure() :
-				Validation.byDefaultProvider().configure());
+		Configuration<?> configuration;
+		if (this.providerClass != null) {
+			ProviderSpecificBootstrap bootstrap = Validation.byProvider(this.providerClass);
+			if (this.validationProviderResolver != null) {
+				bootstrap = bootstrap.providerResolver(this.validationProviderResolver);
+			}
+			configuration = bootstrap.configure();
+		}
+		else {
+			GenericBootstrap bootstrap = Validation.byDefaultProvider();
+			if (this.validationProviderResolver != null) {
+				bootstrap = bootstrap.providerResolver(this.validationProviderResolver);
+			}
+			configuration = bootstrap.configure();
+		}
+
+		// Try Hibernate Validator 5.2's externalClassLoader(ClassLoader) method
+		if (this.applicationContext != null) {
+			try {
+				Method eclMethod = configuration.getClass().getMethod("externalClassLoader", ClassLoader.class);
+				ReflectionUtils.invokeMethod(eclMethod, configuration, this.applicationContext.getClassLoader());
+			}
+			catch (NoSuchMethodException ex) {
+				// Ignore - no Hibernate Validator 5.2+ or similar provider
+			}
+		}
 
 		MessageInterpolator targetInterpolator = this.messageInterpolator;
 		if (targetInterpolator == null) {
@@ -359,6 +398,30 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 		Assert.notNull(this.validatorFactory, "No target ValidatorFactory set");
 		return this.validatorFactory.getConstraintValidatorFactory();
 	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T unwrap(Class<T> type) {
+		if (type == null || !ValidatorFactory.class.isAssignableFrom(type)) {
+			try {
+				return super.unwrap(type);
+			}
+			catch (ValidationException ex) {
+				// ignore - we'll try ValidatorFactory unwrapping next
+			}
+		}
+		try {
+			return this.validatorFactory.unwrap(type);
+		}
+		catch (ValidationException ex) {
+			// ignore if just being asked for ValidatorFactory
+			if (ValidatorFactory.class == type) {
+				return (T) this.validatorFactory;
+			}
+			throw ex;
+		}
+	}
+
 
 	public void close() {
 		if (closeMethod != null && this.validatorFactory != null) {

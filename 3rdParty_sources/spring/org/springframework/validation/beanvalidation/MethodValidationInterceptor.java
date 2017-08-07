@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.validation.beanvalidation;
 
 import java.lang.reflect.Method;
 import java.util.Set;
-
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
@@ -28,7 +27,10 @@ import javax.validation.ValidatorFactory;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.hibernate.validator.HibernateValidator;
+
+import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.annotation.Validated;
 
@@ -47,8 +49,8 @@ import org.springframework.validation.annotation.Validated;
  * of that class. By default, JSR-303 will validate against its default group only.
  *
  * <p>As of Spring 4.0, this functionality requires either a Bean Validation 1.1 provider
- * (such as Hibernate Validator 5.0) or the Bean Validation 1.0 API with Hibernate Validator
- * 4.2 or 4.3. The actual provider will be autodetected and automatically adapted.
+ * (such as Hibernate Validator 5.x) or the Bean Validation 1.0 API with Hibernate Validator
+ * 4.3. The actual provider will be autodetected and automatically adapted.
  *
  * @author Juergen Hoeller
  * @since 3.1
@@ -111,24 +113,42 @@ public class MethodValidationInterceptor implements MethodInterceptor {
 	@SuppressWarnings("unchecked")
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		Class<?>[] groups = determineValidationGroups(invocation);
+
 		if (forExecutablesMethod != null) {
-			Object executableValidator = ReflectionUtils.invokeMethod(forExecutablesMethod, this.validator);
-			Set<ConstraintViolation<?>> result = (Set<ConstraintViolation<?>>)
-					ReflectionUtils.invokeMethod(validateParametersMethod, executableValidator,
-							invocation.getThis(), invocation.getMethod(), invocation.getArguments(), groups);
+			// Standard Bean Validation 1.1 API
+			Object execVal = ReflectionUtils.invokeMethod(forExecutablesMethod, this.validator);
+			Method methodToValidate = invocation.getMethod();
+			Set<ConstraintViolation<?>> result;
+
+			try {
+				result = (Set<ConstraintViolation<?>>) ReflectionUtils.invokeMethod(validateParametersMethod,
+						execVal, invocation.getThis(), methodToValidate, invocation.getArguments(), groups);
+			}
+			catch (IllegalArgumentException ex) {
+				// Probably a generic type mismatch between interface and impl as reported in SPR-12237 / HV-1011
+				// Let's try to find the bridged method on the implementation class...
+				methodToValidate = BridgeMethodResolver.findBridgedMethod(
+						ClassUtils.getMostSpecificMethod(invocation.getMethod(), invocation.getThis().getClass()));
+				result = (Set<ConstraintViolation<?>>) ReflectionUtils.invokeMethod(validateParametersMethod,
+						execVal, invocation.getThis(), methodToValidate, invocation.getArguments(), groups);
+			}
 			if (!result.isEmpty()) {
 				throw new ConstraintViolationException(result);
 			}
+
 			Object returnValue = invocation.proceed();
-			result = (Set<ConstraintViolation<?>>)
-					ReflectionUtils.invokeMethod(validateReturnValueMethod, executableValidator,
-							invocation.getThis(), invocation.getMethod(), returnValue, groups);
+
+			result = (Set<ConstraintViolation<?>>) ReflectionUtils.invokeMethod(validateReturnValueMethod,
+					execVal, invocation.getThis(), methodToValidate, returnValue, groups);
 			if (!result.isEmpty()) {
 				throw new ConstraintViolationException(result);
 			}
+
 			return returnValue;
 		}
+
 		else {
+			// Hibernate Validator 4.3's native API
 			return HibernateValidatorDelegate.invokeWithinValidation(invocation, this.validator, groups);
 		}
 	}
@@ -141,13 +161,16 @@ public class MethodValidationInterceptor implements MethodInterceptor {
 	 * @return the applicable validation groups as a Class array
 	 */
 	protected Class<?>[] determineValidationGroups(MethodInvocation invocation) {
-		Validated valid = AnnotationUtils.findAnnotation(invocation.getThis().getClass(), Validated.class);
-		return (valid != null ? valid.value() : new Class<?>[0]);
+		Validated validatedAnn = AnnotationUtils.findAnnotation(invocation.getMethod(), Validated.class);
+		if (validatedAnn == null) {
+			validatedAnn = AnnotationUtils.findAnnotation(invocation.getThis().getClass(), Validated.class);
+		}
+		return (validatedAnn != null ? validatedAnn.value() : new Class<?>[0]);
 	}
 
 
 	/**
-	 * Inner class to avoid a hard-coded Hibernate Validator 4.2/4.3 dependency.
+	 * Inner class to avoid a hard-coded Hibernate Validator 4.3 dependency.
 	 */
 	private static class HibernateValidatorDelegate {
 
@@ -159,9 +182,11 @@ public class MethodValidationInterceptor implements MethodInterceptor {
 		public static Object invokeWithinValidation(MethodInvocation invocation, Validator validator, Class<?>[] groups)
 				throws Throwable {
 
-			org.hibernate.validator.method.MethodValidator methodValidator = validator.unwrap(org.hibernate.validator.method.MethodValidator.class);
-			Set<org.hibernate.validator.method.MethodConstraintViolation<Object>> result = methodValidator.validateAllParameters(
-					invocation.getThis(), invocation.getMethod(), invocation.getArguments(), groups);
+			org.hibernate.validator.method.MethodValidator methodValidator =
+					validator.unwrap(org.hibernate.validator.method.MethodValidator.class);
+			Set<org.hibernate.validator.method.MethodConstraintViolation<Object>> result =
+					methodValidator.validateAllParameters(
+							invocation.getThis(), invocation.getMethod(), invocation.getArguments(), groups);
 			if (!result.isEmpty()) {
 				throw new org.hibernate.validator.method.MethodConstraintViolationException(result);
 			}
@@ -174,4 +199,5 @@ public class MethodValidationInterceptor implements MethodInterceptor {
 			return returnValue;
 		}
 	}
+
 }

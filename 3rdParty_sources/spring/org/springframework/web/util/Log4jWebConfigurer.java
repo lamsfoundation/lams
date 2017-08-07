@@ -19,7 +19,6 @@ package org.springframework.web.util;
 import java.io.FileNotFoundException;
 import javax.servlet.ServletContext;
 
-import org.springframework.util.Log4jConfigurer;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
@@ -93,7 +92,10 @@ import org.springframework.util.StringUtils;
  * @since 12.08.2003
  * @see org.springframework.util.Log4jConfigurer
  * @see Log4jConfigListener
+ * @deprecated as of Spring 4.2.1, in favor of Apache Log4j 2
+ * (following Apache's EOL declaration for log4j 1.x)
  */
+@Deprecated
 public abstract class Log4jWebConfigurer {
 
 	/** Parameter specifying the location of the log4j config file */
@@ -127,8 +129,7 @@ public abstract class Log4jWebConfigurer {
 
 				// Leave a URL (e.g. "classpath:" or "file:") as-is.
 				if (!ResourceUtils.isUrl(location)) {
-					// Consider a plain file path as relative to the web
-					// application root directory.
+					// Consider a plain file path as relative to the web application root directory.
 					location = WebUtils.getRealPath(servletContext, location);
 				}
 
@@ -142,7 +143,7 @@ public abstract class Log4jWebConfigurer {
 					// checking the file in the background.
 					try {
 						long refreshInterval = Long.parseLong(intervalString);
-						Log4jConfigurer.initLogging(location, refreshInterval);
+						org.springframework.util.Log4jConfigurer.initLogging(location, refreshInterval);
 					}
 					catch (NumberFormatException ex) {
 						throw new IllegalArgumentException("Invalid 'log4jRefreshInterval' parameter: " + ex.getMessage());
@@ -150,7 +151,7 @@ public abstract class Log4jWebConfigurer {
 				}
 				else {
 					// Initialize without refresh check, i.e. without log4j's watchdog thread.
-					Log4jConfigurer.initLogging(location);
+					org.springframework.util.Log4jConfigurer.initLogging(location);
 				}
 			}
 			catch (FileNotFoundException ex) {
@@ -168,7 +169,7 @@ public abstract class Log4jWebConfigurer {
 	public static void shutdownLogging(ServletContext servletContext) {
 		servletContext.log("Shutting down log4j");
 		try {
-			Log4jConfigurer.shutdownLogging();
+			org.springframework.util.Log4jConfigurer.shutdownLogging();
 		}
 		finally {
 			// Remove the web app root system property.

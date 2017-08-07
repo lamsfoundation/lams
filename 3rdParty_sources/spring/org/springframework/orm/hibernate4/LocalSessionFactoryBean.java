@@ -25,7 +25,6 @@ import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
 import org.hibernate.cache.spi.RegionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.NamingStrategy;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
@@ -37,6 +36,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternUtils;
+import org.springframework.core.type.filter.TypeFilter;
 
 /**
  * {@link org.springframework.beans.factory.FactoryBean} that creates a Hibernate
@@ -85,7 +85,8 @@ public class LocalSessionFactoryBean extends HibernateExceptionTranslator
 
 	private Interceptor entityInterceptor;
 
-	private NamingStrategy namingStrategy;
+	@SuppressWarnings("deprecation")
+	private org.hibernate.cfg.NamingStrategy namingStrategy;
 
 	private Object jtaTransactionManager;
 
@@ -94,6 +95,8 @@ public class LocalSessionFactoryBean extends HibernateExceptionTranslator
 	private Object currentTenantIdentifierResolver;
 
 	private RegionFactory cacheRegionFactory;
+
+	private TypeFilter[] entityTypeFilters;
 
 	private Properties hibernateProperties;
 
@@ -219,7 +222,8 @@ public class LocalSessionFactoryBean extends HibernateExceptionTranslator
 	 * physical column and table names given the info in the mapping document.
 	 * @see org.hibernate.cfg.Configuration#setNamingStrategy
 	 */
-	public void setNamingStrategy(NamingStrategy namingStrategy) {
+	@SuppressWarnings("deprecation")
+	public void setNamingStrategy(org.hibernate.cfg.NamingStrategy namingStrategy) {
 		this.namingStrategy = namingStrategy;
 	}
 
@@ -238,6 +242,7 @@ public class LocalSessionFactoryBean extends HibernateExceptionTranslator
 	 * on to the SessionFactory: as an instance, a Class, or a String class name.
 	 * <p>Note that the package location of the {@code MultiTenantConnectionProvider}
 	 * interface changed between Hibernate 4.2 and 4.3. This method accepts both variants.
+	 * @since 4.0
 	 * @see LocalSessionFactoryBuilder#setMultiTenantConnectionProvider
 	 */
 	public void setMultiTenantConnectionProvider(Object multiTenantConnectionProvider) {
@@ -247,6 +252,7 @@ public class LocalSessionFactoryBean extends HibernateExceptionTranslator
 	/**
 	 * Set a Hibernate 4.1/4.2/4.3 {@code CurrentTenantIdentifierResolver} to be passed
 	 * on to the SessionFactory: as an instance, a Class, or a String class name.
+	 * @since 4.0
 	 * @see LocalSessionFactoryBuilder#setCurrentTenantIdentifierResolver
 	 */
 	public void setCurrentTenantIdentifierResolver(Object currentTenantIdentifierResolver) {
@@ -258,11 +264,24 @@ public class LocalSessionFactoryBean extends HibernateExceptionTranslator
 	 * Allows for using a Spring-managed RegionFactory instance.
 	 * <p>Note: If this is set, the Hibernate settings should not define a
 	 * cache provider to avoid meaningless double configuration.
+	 * @since 4.0
 	 * @see org.hibernate.cache.spi.RegionFactory
 	 * @see LocalSessionFactoryBuilder#setCacheRegionFactory
 	 */
 	public void setCacheRegionFactory(RegionFactory cacheRegionFactory) {
 		this.cacheRegionFactory = cacheRegionFactory;
+	}
+
+	/**
+	 * Specify custom type filters for Spring-based scanning for entity classes.
+	 * <p>Default is to search all specified packages for classes annotated with
+	 * {@code @javax.persistence.Entity}, {@code @javax.persistence.Embeddable}
+	 * or {@code @javax.persistence.MappedSuperclass}.
+	 * @since 4.1
+	 * @see #setPackagesToScan
+	 */
+	public void setEntityTypeFilters(TypeFilter... entityTypeFilters) {
+		this.entityTypeFilters = entityTypeFilters;
 	}
 
 	/**
@@ -393,6 +412,10 @@ public class LocalSessionFactoryBean extends HibernateExceptionTranslator
 
 		if (this.cacheRegionFactory != null) {
 			sfb.setCacheRegionFactory(this.cacheRegionFactory);
+		}
+
+		if (this.entityTypeFilters != null) {
+			sfb.setEntityTypeFilters(this.entityTypeFilters);
 		}
 
 		if (this.hibernateProperties != null) {

@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import javax.transaction.TransactionManager;
 
 import org.apache.commons.logging.Log;
@@ -31,9 +30,8 @@ import org.hibernate.usertype.UserType;
 import org.hibernate.util.EqualsHelper;
 
 import org.springframework.jdbc.support.lob.LobCreator;
-import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.jdbc.support.lob.LobCreatorUtils;
-import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
+import org.springframework.jdbc.support.lob.LobHandler;
 
 /**
  * Abstract base class for Hibernate UserType implementations that map to LOBs.
@@ -53,7 +51,9 @@ import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
  * @see org.springframework.jdbc.support.lob.LobCreator
  * @see org.springframework.orm.hibernate3.LocalSessionFactoryBean#setLobHandler
  * @see org.springframework.orm.hibernate3.LocalSessionFactoryBean#setJtaTransactionManager
+ * @deprecated as of Spring 4.3, in favor of Hibernate 4.x/5.x
  */
+@Deprecated
 public abstract class AbstractLobType implements UserType {
 
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -70,8 +70,8 @@ public abstract class AbstractLobType implements UserType {
 	 * @see org.springframework.orm.hibernate3.LocalSessionFactoryBean#getConfigTimeTransactionManager
 	 */
 	protected AbstractLobType() {
-		this(LocalSessionFactoryBean.getConfigTimeLobHandler(),
-			LocalSessionFactoryBean.getConfigTimeTransactionManager());
+		this(org.springframework.orm.hibernate3.LocalSessionFactoryBean.getConfigTimeLobHandler(),
+				org.springframework.orm.hibernate3.LocalSessionFactoryBean.getConfigTimeTransactionManager());
 	}
 
 	/**

@@ -44,7 +44,7 @@ Quartz 2.2.1
 
 Servlet API 3.1
 
-Spring 4.0.6
+Spring 4.3.10
 
 Struts 1.2.9
 

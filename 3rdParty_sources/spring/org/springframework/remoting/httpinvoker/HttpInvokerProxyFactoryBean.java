@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 the original author or authors.
+ * Copyright 2002-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,12 @@ import org.springframework.beans.factory.FactoryBean;
  * expense of being tied to Java. Nevertheless, it is as easy to set up as
  * Hessian and Burlap, which is its main advantage compared to RMI.
  *
+ * <p><b>WARNING: Be aware of vulnerabilities due to unsafe Java deserialization:
+ * Manipulated input streams could lead to unwanted code execution on the server
+ * during the deserialization step. As a consequence, do not expose HTTP invoker
+ * endpoints to untrusted clients but rather just between your own services.</b>
+ * In general, we strongly recommend any other message format (e.g. JSON) instead.
+ *
  * @author Juergen Hoeller
  * @since 1.1
  * @see #setServiceInterface
@@ -47,8 +53,7 @@ import org.springframework.beans.factory.FactoryBean;
  * @see org.springframework.remoting.caucho.HessianProxyFactoryBean
  * @see org.springframework.remoting.caucho.BurlapProxyFactoryBean
  */
-public class HttpInvokerProxyFactoryBean extends HttpInvokerClientInterceptor
-		implements FactoryBean<Object> {
+public class HttpInvokerProxyFactoryBean extends HttpInvokerClientInterceptor implements FactoryBean<Object> {
 
 	private Object serviceProxy;
 

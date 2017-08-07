@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -49,12 +51,13 @@ import org.springframework.web.util.HierarchicalUriComponents.PathComponent;
  * @author Rossen Stoyanchev
  * @author Phillip Webb
  * @author Oliver Gierke
+ * @author Brian Clozel
  * @since 3.1
  * @see #newInstance()
  * @see #fromPath(String)
  * @see #fromUri(URI)
  */
-public class UriComponentsBuilder {
+public class UriComponentsBuilder implements Cloneable {
 
 	private static final Pattern QUERY_PARAM_PATTERN = Pattern.compile("([^&=]+)(=?)([^&]+)?");
 
@@ -62,7 +65,7 @@ public class UriComponentsBuilder {
 
 	private static final String HTTP_PATTERN = "(?i)(http|https):";
 
-	private static final String USERINFO_PATTERN = "([^@/]*)";
+	private static final String USERINFO_PATTERN = "([^@\\[/?#]*)";
 
 	private static final String HOST_IPV4_PATTERN = "[^\\[/?#:]*";
 
@@ -70,7 +73,7 @@ public class UriComponentsBuilder {
 
 	private static final String HOST_PATTERN = "(" + HOST_IPV6_PATTERN + "|" + HOST_IPV4_PATTERN + ")";
 
-	private static final String PORT_PATTERN = "(\\d*)";
+	private static final String PORT_PATTERN = "(\\d*(?:\\{[^/]+?\\})?)";
 
 	private static final String PATH_PATTERN = "([^?#]*)";
 
@@ -87,6 +90,10 @@ public class UriComponentsBuilder {
 			"^" + HTTP_PATTERN + "(//(" + USERINFO_PATTERN + "@)?" + HOST_PATTERN + "(:" + PORT_PATTERN + ")?" + ")?" +
 					PATH_PATTERN + "(\\?" + LAST_PATTERN + ")?");
 
+	private static final Pattern FORWARDED_HOST_PATTERN = Pattern.compile("host=\"?([^;,\"]+)\"?");
+
+	private static final Pattern FORWARDED_PROTO_PATTERN = Pattern.compile("proto=\"?([^;,\"]+)\"?");
+
 
 	private String scheme;
 
@@ -96,9 +103,9 @@ public class UriComponentsBuilder {
 
 	private String host;
 
-	private int port = -1;
+	private String port;
 
-	private CompositePathComponentBuilder pathBuilder = new CompositePathComponentBuilder();
+	private CompositePathComponentBuilder pathBuilder;
 
 	private final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
 
@@ -112,13 +119,30 @@ public class UriComponentsBuilder {
 	 * @see #fromUri(URI)
 	 */
 	protected UriComponentsBuilder() {
+		this.pathBuilder = new CompositePathComponentBuilder();
+	}
+
+	/**
+	 * Create a deep copy of the given UriComponentsBuilder.
+	 * @param other the other builder to copy from
+	 * @since 4.1.3
+	 */
+	protected UriComponentsBuilder(UriComponentsBuilder other) {
+		this.scheme = other.scheme;
+		this.ssp = other.ssp;
+		this.userInfo = other.userInfo;
+		this.host = other.host;
+		this.port = other.port;
+		this.pathBuilder = other.pathBuilder.cloneBuilder();
+		this.queryParams.putAll(other.queryParams);
+		this.fragment = other.fragment;
 	}
 
 
 	// Factory methods
 
 	/**
-	 * Returns a new, empty builder.
+	 * Create a new, empty builder.
 	 * @return the new {@code UriComponentsBuilder}
 	 */
 	public static UriComponentsBuilder newInstance() {
@@ -126,7 +150,7 @@ public class UriComponentsBuilder {
 	}
 
 	/**
-	 * Returns a builder that is initialized with the given path.
+	 * Create a builder that is initialized with the given path.
 	 * @param path the path to initialize with
 	 * @return the new {@code UriComponentsBuilder}
 	 */
@@ -137,7 +161,7 @@ public class UriComponentsBuilder {
 	}
 
 	/**
-	 * Returns a builder that is initialized with the given {@code URI}.
+	 * Create a builder that is initialized with the given {@code URI}.
 	 * @param uri the URI to initialize with
 	 * @return the new {@code UriComponentsBuilder}
 	 */
@@ -148,7 +172,7 @@ public class UriComponentsBuilder {
 	}
 
 	/**
-	 * Returns a builder that is initialized with the given URI string.
+	 * Create a builder that is initialized with the given URI string.
 	 * <p><strong>Note:</strong> The presence of reserved characters can prevent
 	 * correct parsing of the URI string. For example if a query parameter
 	 * contains {@code '='} or {@code '&'} characters, the query string cannot
@@ -162,21 +186,21 @@ public class UriComponentsBuilder {
 	 * @return the new {@code UriComponentsBuilder}
 	 */
 	public static UriComponentsBuilder fromUriString(String uri) {
-		Assert.hasLength(uri, "'uri' must not be empty");
-		Matcher m = URI_PATTERN.matcher(uri);
-		if (m.matches()) {
+		Assert.notNull(uri, "URI must not be null");
+		Matcher matcher = URI_PATTERN.matcher(uri);
+		if (matcher.matches()) {
 			UriComponentsBuilder builder = new UriComponentsBuilder();
-			String scheme = m.group(2);
-			String userInfo = m.group(5);
-			String host = m.group(6);
-			String port = m.group(8);
-			String path = m.group(9);
-			String query = m.group(11);
-			String fragment = m.group(13);
+			String scheme = matcher.group(2);
+			String userInfo = matcher.group(5);
+			String host = matcher.group(6);
+			String port = matcher.group(8);
+			String path = matcher.group(9);
+			String query = matcher.group(11);
+			String fragment = matcher.group(13);
 			boolean opaque = false;
 			if (StringUtils.hasLength(scheme)) {
-				String s = uri.substring(scheme.length());
-				if (!s.startsWith(":/")) {
+				String rest = uri.substring(scheme.length());
+				if (!rest.startsWith(":/")) {
 					opaque = true;
 				}
 			}
@@ -192,7 +216,7 @@ public class UriComponentsBuilder {
 				builder.userInfo(userInfo);
 				builder.host(host);
 				if (StringUtils.hasLength(port)) {
-					builder.port(Integer.parseInt(port));
+					builder.port(port);
 				}
 				builder.path(path);
 				builder.query(query);
@@ -208,7 +232,7 @@ public class UriComponentsBuilder {
 	}
 
 	/**
-	 * Creates a new {@code UriComponents} object from the string HTTP URL.
+	 * Create a URI components builder from the given HTTP URL String.
 	 * <p><strong>Note:</strong> The presence of reserved characters can prevent
 	 * correct parsing of the URI string. For example if a query parameter
 	 * contains {@code '='} or {@code '&'} characters, the query string cannot
@@ -222,30 +246,67 @@ public class UriComponentsBuilder {
 	 * @return the URI components of the URI
 	 */
 	public static UriComponentsBuilder fromHttpUrl(String httpUrl) {
-		Assert.notNull(httpUrl, "'httpUrl' must not be null");
-		Matcher m = HTTP_URL_PATTERN.matcher(httpUrl);
-		if (m.matches()) {
+		Assert.notNull(httpUrl, "HTTP URL must not be null");
+		Matcher matcher = HTTP_URL_PATTERN.matcher(httpUrl);
+		if (matcher.matches()) {
 			UriComponentsBuilder builder = new UriComponentsBuilder();
-
-			String scheme = m.group(1);
-			builder.scheme((scheme != null) ? scheme.toLowerCase() : scheme);
-			builder.userInfo(m.group(4));
-			String host = m.group(5);
+			String scheme = matcher.group(1);
+			builder.scheme(scheme != null ? scheme.toLowerCase() : null);
+			builder.userInfo(matcher.group(4));
+			String host = matcher.group(5);
 			if (StringUtils.hasLength(scheme) && !StringUtils.hasLength(host)) {
 				throw new IllegalArgumentException("[" + httpUrl + "] is not a valid HTTP URL");
 			}
 			builder.host(host);
-			String port = m.group(7);
+			String port = matcher.group(7);
 			if (StringUtils.hasLength(port)) {
-				builder.port(Integer.parseInt(port));
+				builder.port(port);
 			}
-			builder.path(m.group(8));
-			builder.query(m.group(10));
-
+			builder.path(matcher.group(8));
+			builder.query(matcher.group(10));
 			return builder;
 		}
 		else {
 			throw new IllegalArgumentException("[" + httpUrl + "] is not a valid HTTP URL");
+		}
+	}
+
+	/**
+	 * Create a new {@code UriComponents} object from the URI associated with
+	 * the given HttpRequest while also overlaying with values from the headers
+	 * "Forwarded" (<a href="http://tools.ietf.org/html/rfc7239">RFC 7239</a>),
+	 * or "X-Forwarded-Host", "X-Forwarded-Port", and "X-Forwarded-Proto" if
+	 * "Forwarded" is not found.
+	 * @param request the source request
+	 * @return the URI components of the URI
+	 * @since 4.1.5
+	 */
+	public static UriComponentsBuilder fromHttpRequest(HttpRequest request) {
+		return fromUri(request.getURI()).adaptFromForwardedHeaders(request.getHeaders());
+	}
+
+	/**
+	 * Create an instance by parsing the "Origin" header of an HTTP request.
+	 * @see <a href="https://tools.ietf.org/html/rfc6454">RFC 6454</a>
+	 */
+	public static UriComponentsBuilder fromOriginHeader(String origin) {
+		Matcher matcher = URI_PATTERN.matcher(origin);
+		if (matcher.matches()) {
+			UriComponentsBuilder builder = new UriComponentsBuilder();
+			String scheme = matcher.group(2);
+			String host = matcher.group(6);
+			String port = matcher.group(8);
+			if (StringUtils.hasLength(scheme)) {
+				builder.scheme(scheme);
+			}
+			builder.host(host);
+			if (StringUtils.hasLength(port)) {
+				builder.port(port);
+			}
+			return builder;
+		}
+		else {
+			throw new IllegalArgumentException("[" + origin + "] is not a valid \"Origin\" header value");
 		}
 	}
 
@@ -264,7 +325,7 @@ public class UriComponentsBuilder {
 	 * Build a {@code UriComponents} instance from the various components
 	 * contained in this builder.
 	 * @param encoded whether all the components set in this builder are
-	 * encoded ({@code true}) or not ({@code false}).
+	 * encoded ({@code true}) or not ({@code false})
 	 * @return the URI components
 	 */
 	public UriComponents build(boolean encoded) {
@@ -299,6 +360,17 @@ public class UriComponentsBuilder {
 		return build(false).expand(uriVariableValues);
 	}
 
+	/**
+	 * Build a URI String. This is a shortcut method which combines calls
+	 * to {@link #build()}, then {@link UriComponents#encode()} and finally
+	 * {@link UriComponents#toUriString()}.
+	 * @since 4.1
+	 * @see UriComponents#toUriString()
+	 */
+	public String toUriString() {
+		return build(false).encode().toUriString();
+	}
+
 
 	// URI components methods
 
@@ -308,7 +380,7 @@ public class UriComponentsBuilder {
 	 * @return this UriComponentsBuilder
 	 */
 	public UriComponentsBuilder uri(URI uri) {
-		Assert.notNull(uri, "'uri' must not be null");
+		Assert.notNull(uri, "URI must not be null");
 		this.scheme = uri.getScheme();
 		if (uri.isOpaque()) {
 			this.ssp = uri.getRawSchemeSpecificPart();
@@ -322,7 +394,7 @@ public class UriComponentsBuilder {
 				this.host = uri.getHost();
 			}
 			if (uri.getPort() != -1) {
-				this.port = uri.getPort();
+				this.port = String.valueOf(uri.getPort());
 			}
 			if (StringUtils.hasLength(uri.getRawPath())) {
 				this.pathBuilder = new CompositePathComponentBuilder(uri.getRawPath());
@@ -337,18 +409,6 @@ public class UriComponentsBuilder {
 			this.fragment = uri.getRawFragment();
 		}
 		return this;
-	}
-
-	private void resetHierarchicalComponents() {
-		this.userInfo = null;
-		this.host = null;
-		this.port = -1;
-		this.pathBuilder = new CompositePathComponentBuilder();
-		this.queryParams.clear();
-	}
-
-	private void resetSchemeSpecificPart() {
-		this.ssp = null;
 	}
 
 	/**
@@ -368,41 +428,8 @@ public class UriComponentsBuilder {
 	 * @return this UriComponentsBuilder
 	 */
 	public UriComponentsBuilder uriComponents(UriComponents uriComponents) {
-		Assert.notNull(uriComponents, "'uriComponents' must not be null");
-		this.scheme = uriComponents.getScheme();
-		if (uriComponents instanceof OpaqueUriComponents) {
-			this.ssp = uriComponents.getSchemeSpecificPart();
-			resetHierarchicalComponents();
-		}
-		else {
-			if (uriComponents.getUserInfo() != null) {
-				this.userInfo = uriComponents.getUserInfo();
-			}
-			if (uriComponents.getHost() != null) {
-				this.host = uriComponents.getHost();
-			}
-			if (uriComponents.getPort() != -1) {
-				this.port = uriComponents.getPort();
-			}
-			if (StringUtils.hasLength(uriComponents.getPath())) {
-				List<String> segments = uriComponents.getPathSegments();
-				if (segments.isEmpty()) {
-					// Perhaps "/"
-					this.pathBuilder.addPath(uriComponents.getPath());
-				}
-				else {
-					this.pathBuilder.addPathSegments(segments.toArray(new String[segments.size()]));
-				}
-			}
-			if (!uriComponents.getQueryParams().isEmpty()) {
-				this.queryParams.clear();
-				this.queryParams.putAll(uriComponents.getQueryParams());
-			}
-			resetSchemeSpecificPart();
-		}
-		if (uriComponents.getFragment() != null) {
-			this.fragment = uriComponents.getFragment();
-		}
+		Assert.notNull(uriComponents, "UriComponents must not be null");
+		uriComponents.copyToUriComponentsBuilder(this);
 		return this;
 	}
 
@@ -450,7 +477,20 @@ public class UriComponentsBuilder {
 	 * @return this UriComponentsBuilder
 	 */
 	public UriComponentsBuilder port(int port) {
-		Assert.isTrue(port >= -1, "'port' must not be < -1");
+		Assert.isTrue(port >= -1, "Port must be >= -1");
+		this.port = String.valueOf(port);
+		resetSchemeSpecificPart();
+		return this;
+	}
+
+	/**
+	 * Set the URI port. Use this method only when the port needs to be
+	 * parameterized with a URI variable. Otherwise use {@link #port(int)}.
+	 * Passing {@code null} will clear the port of this builder.
+	 * @param port the URI port
+	 * @return this UriComponentsBuilder
+	 */
+	public UriComponentsBuilder port(String port) {
 		this.port = port;
 		resetSchemeSpecificPart();
 		return this;
@@ -480,13 +520,13 @@ public class UriComponentsBuilder {
 	}
 
 	/**
-	 * Append the given path segments to the existing path of this builder.
-	 * Each given path segment may contain URI template variables.
+	 * Append path segments to the existing path. Each path segment may contain
+	 * URI template variables and should not contain any slashes.
+	 * Use {@code path("/")} subsequently to ensure a trailing slash.
 	 * @param pathSegments the URI path segments
 	 * @return this UriComponentsBuilder
 	 */
 	public UriComponentsBuilder pathSegment(String... pathSegments) throws IllegalArgumentException {
-		Assert.notNull(pathSegments, "'segments' must not be null");
 		this.pathBuilder.addPathSegments(pathSegments);
 		resetSchemeSpecificPart();
 		return this;
@@ -501,21 +541,21 @@ public class UriComponentsBuilder {
 	 * be parsed unambiguously. Such values should be substituted for URI
 	 * variables to enable correct parsing:
 	 * <pre class="code">
-	 * String uriString = &quot;/hotels/42?filter={value}&quot;;
-	 * UriComponentsBuilder.fromUriString(uriString).buildAndExpand(&quot;hot&amp;cold&quot;);
+	 * UriComponentsBuilder.fromUriString(&quot;/hotels/42&quot;)
+	 * 	.query(&quot;filter={value}&quot;)
+	 * 	.buildAndExpand(&quot;hot&amp;cold&quot;);
 	 * </pre>
 	 * @param query the query string
 	 * @return this UriComponentsBuilder
 	 */
 	public UriComponentsBuilder query(String query) {
 		if (query != null) {
-			Matcher m = QUERY_PARAM_PATTERN.matcher(query);
-			while (m.find()) {
-				String name = m.group(1);
-				String eq = m.group(2);
-				String value = m.group(3);
-				queryParam(name, (value != null ? value :
-					(StringUtils.hasLength(eq) ? "" : null)));
+			Matcher matcher = QUERY_PARAM_PATTERN.matcher(query);
+			while (matcher.find()) {
+				String name = matcher.group(1);
+				String eq = matcher.group(2);
+				String value = matcher.group(3);
+				queryParam(name, (value != null ? value : (StringUtils.hasLength(eq) ? "" : null)));
 			}
 		}
 		else {
@@ -547,10 +587,10 @@ public class UriComponentsBuilder {
 	 * @return this UriComponentsBuilder
 	 */
 	public UriComponentsBuilder queryParam(String name, Object... values) {
-		Assert.notNull(name, "'name' must not be null");
+		Assert.notNull(name, "Name must not be null");
 		if (!ObjectUtils.isEmpty(values)) {
 			for (Object value : values) {
-				String valueAsString = value != null ? value.toString() : null;
+				String valueAsString = (value != null ? value.toString() : null);
 				this.queryParams.add(name, valueAsString);
 			}
 		}
@@ -565,10 +605,12 @@ public class UriComponentsBuilder {
 	 * Add the given query parameters.
 	 * @param params the params
 	 * @return this UriComponentsBuilder
+	 * @since 4.0
 	 */
 	public UriComponentsBuilder queryParams(MultiValueMap<String, String> params) {
-		Assert.notNull(params, "'params' must not be null");
-		this.queryParams.putAll(params);
+		if (params != null) {
+			this.queryParams.putAll(params);
+		}
 		return this;
 	}
 
@@ -580,12 +622,26 @@ public class UriComponentsBuilder {
 	 * @return this UriComponentsBuilder
 	 */
 	public UriComponentsBuilder replaceQueryParam(String name, Object... values) {
-		Assert.notNull(name, "'name' must not be null");
+		Assert.notNull(name, "Name must not be null");
 		this.queryParams.remove(name);
 		if (!ObjectUtils.isEmpty(values)) {
 			queryParam(name, values);
 		}
 		resetSchemeSpecificPart();
+		return this;
+	}
+
+	/**
+	 * Set the query parameter values overriding all existing query values.
+	 * @param params the query parameter name
+	 * @return this UriComponentsBuilder
+	 * @since 4.2
+	 */
+	public UriComponentsBuilder replaceQueryParams(MultiValueMap<String, String> params) {
+		this.queryParams.clear();
+		if (params != null) {
+			this.queryParams.putAll(params);
+		}
 		return this;
 	}
 
@@ -597,7 +653,7 @@ public class UriComponentsBuilder {
 	 */
 	public UriComponentsBuilder fragment(String fragment) {
 		if (fragment != null) {
-			Assert.hasLength(fragment, "'fragment' must not be empty");
+			Assert.hasLength(fragment, "Fragment must not be empty");
 			this.fragment = fragment;
 		}
 		else {
@@ -606,16 +662,109 @@ public class UriComponentsBuilder {
 		return this;
 	}
 
+	/**
+	 * Adapt this builder's scheme+host+port from the given headers, specifically
+	 * "Forwarded" (<a href="http://tools.ietf.org/html/rfc7239">RFC 7239</a>,
+	 * or "X-Forwarded-Host", "X-Forwarded-Port", and "X-Forwarded-Proto" if
+	 * "Forwarded" is not found.
+	 * @param headers the HTTP headers to consider
+	 * @return this UriComponentsBuilder
+	 * @since 4.2.7
+	 */
+	UriComponentsBuilder adaptFromForwardedHeaders(HttpHeaders headers) {
+		String forwardedHeader = headers.getFirst("Forwarded");
+		if (StringUtils.hasText(forwardedHeader)) {
+			String forwardedToUse = StringUtils.tokenizeToStringArray(forwardedHeader, ",")[0];
+			Matcher matcher = FORWARDED_HOST_PATTERN.matcher(forwardedToUse);
+			if (matcher.find()) {
+				adaptForwardedHost(matcher.group(1).trim());
+			}
+			matcher = FORWARDED_PROTO_PATTERN.matcher(forwardedToUse);
+			if (matcher.find()) {
+				scheme(matcher.group(1).trim());
+			}
+		}
+		else {
+			String hostHeader = headers.getFirst("X-Forwarded-Host");
+			if (StringUtils.hasText(hostHeader)) {
+				adaptForwardedHost(StringUtils.tokenizeToStringArray(hostHeader, ",")[0]);
+			}
+
+			String portHeader = headers.getFirst("X-Forwarded-Port");
+			if (StringUtils.hasText(portHeader)) {
+				port(Integer.parseInt(StringUtils.tokenizeToStringArray(portHeader, ",")[0]));
+			}
+
+			String protocolHeader = headers.getFirst("X-Forwarded-Proto");
+			if (StringUtils.hasText(protocolHeader)) {
+				scheme(StringUtils.tokenizeToStringArray(protocolHeader, ",")[0]);
+			}
+		}
+
+		if ((this.scheme.equals("http") && "80".equals(this.port)) ||
+				(this.scheme.equals("https") && "443".equals(this.port))) {
+			this.port = null;
+		}
+
+		return this;
+	}
+
+	private void adaptForwardedHost(String hostToUse) {
+		int portSeparatorIdx = hostToUse.lastIndexOf(":");
+		if (portSeparatorIdx > hostToUse.lastIndexOf("]")) {
+			host(hostToUse.substring(0, portSeparatorIdx));
+			port(Integer.parseInt(hostToUse.substring(portSeparatorIdx + 1)));
+		}
+		else {
+			host(hostToUse);
+			port(null);
+		}
+	}
+
+	private void resetHierarchicalComponents() {
+		this.userInfo = null;
+		this.host = null;
+		this.port = null;
+		this.pathBuilder = new CompositePathComponentBuilder();
+		this.queryParams.clear();
+	}
+
+	private void resetSchemeSpecificPart() {
+		this.ssp = null;
+	}
+
+
+	/**
+	 * Public declaration of Object's {@code clone()} method.
+	 * Delegates to {@link #cloneBuilder()}.
+	 * @see Object#clone()
+	 */
+	@Override
+	public Object clone() {
+		return cloneBuilder();
+	}
+
+	/**
+	 * Clone this {@code UriComponentsBuilder}.
+	 * @return the cloned {@code UriComponentsBuilder} object
+	 * @since 4.2.7
+	 */
+	public UriComponentsBuilder cloneBuilder() {
+		return new UriComponentsBuilder(this);
+	}
+
 
 	private interface PathComponentBuilder {
 
 		PathComponent build();
+
+		PathComponentBuilder cloneBuilder();
 	}
 
 
 	private static class CompositePathComponentBuilder implements PathComponentBuilder {
 
-		private final LinkedList<PathComponentBuilder> componentBuilders = new LinkedList<PathComponentBuilder>();
+		private final LinkedList<PathComponentBuilder> builders = new LinkedList<PathComponentBuilder>();
 
 		public CompositePathComponentBuilder() {
 		}
@@ -630,7 +779,7 @@ public class UriComponentsBuilder {
 				FullPathComponentBuilder fpBuilder = getLastBuilder(FullPathComponentBuilder.class);
 				if (psBuilder == null) {
 					psBuilder = new PathSegmentComponentBuilder();
-					this.componentBuilders.add(psBuilder);
+					this.builders.add(psBuilder);
 					if (fpBuilder != null) {
 						fpBuilder.removeTrailingSlash();
 					}
@@ -648,7 +797,7 @@ public class UriComponentsBuilder {
 				}
 				if (fpBuilder == null) {
 					fpBuilder = new FullPathComponentBuilder();
-					this.componentBuilders.add(fpBuilder);
+					this.builders.add(fpBuilder);
 				}
 				fpBuilder.append(path);
 			}
@@ -656,8 +805,8 @@ public class UriComponentsBuilder {
 
 		@SuppressWarnings("unchecked")
 		private <T> T getLastBuilder(Class<T> builderClass) {
-			if (!this.componentBuilders.isEmpty()) {
-				PathComponentBuilder last = this.componentBuilders.getLast();
+			if (!this.builders.isEmpty()) {
+				PathComponentBuilder last = this.builders.getLast();
 				if (builderClass.isInstance(last)) {
 					return (T) last;
 				}
@@ -667,9 +816,9 @@ public class UriComponentsBuilder {
 
 		@Override
 		public PathComponent build() {
-			int size = this.componentBuilders.size();
+			int size = this.builders.size();
 			List<PathComponent> components = new ArrayList<PathComponent>(size);
-			for (PathComponentBuilder componentBuilder : this.componentBuilders) {
+			for (PathComponentBuilder componentBuilder : this.builders) {
 				PathComponent pathComponent = componentBuilder.build();
 				if (pathComponent != null) {
 					components.add(pathComponent);
@@ -682,6 +831,15 @@ public class UriComponentsBuilder {
 				return components.get(0);
 			}
 			return new HierarchicalUriComponents.PathComponentComposite(components);
+		}
+
+		@Override
+		public CompositePathComponentBuilder cloneBuilder() {
+			CompositePathComponentBuilder compositeBuilder = new CompositePathComponentBuilder();
+			for (PathComponentBuilder builder : this.builders) {
+				compositeBuilder.builders.add(builder.cloneBuilder());
+			}
+			return compositeBuilder;
 		}
 	}
 
@@ -699,7 +857,14 @@ public class UriComponentsBuilder {
 			if (this.path.length() == 0) {
 				return null;
 			}
-			String path = this.path.toString().replace("//", "/");
+			String path = this.path.toString();
+			while (true) {
+				int index = path.indexOf("//");
+				if (index == -1) {
+					break;
+				}
+				path = path.substring(0, index) + path.substring(index + 1);
+			}
 			return new HierarchicalUriComponents.FullPathComponent(path);
 		}
 
@@ -708,6 +873,13 @@ public class UriComponentsBuilder {
 			if (this.path.charAt(index) == '/') {
 				this.path.deleteCharAt(index);
 			}
+		}
+
+		@Override
+		public FullPathComponentBuilder cloneBuilder() {
+			FullPathComponentBuilder builder = new FullPathComponentBuilder();
+			builder.append(this.path.toString());
+			return builder;
 		}
 	}
 
@@ -728,6 +900,13 @@ public class UriComponentsBuilder {
 		public PathComponent build() {
 			return (this.pathSegments.isEmpty() ? null :
 					new HierarchicalUriComponents.PathSegmentComponent(this.pathSegments));
+		}
+
+		@Override
+		public PathSegmentComponentBuilder cloneBuilder() {
+			PathSegmentComponentBuilder builder = new PathSegmentComponentBuilder();
+			builder.pathSegments.addAll(this.pathSegments);
+			return builder;
 		}
 	}
 
