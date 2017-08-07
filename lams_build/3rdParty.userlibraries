@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <eclipse-userlibraries version="2">
     <library name="3rdParty" systemlibrary="false">
-        <archive path="/lams_build/lib/apache-poi/poi-3.10-FINAL-20140208.jar"/>
-        <archive path="/lams_build/lib/apache-poi/poi-ooxml-3.10-FINAL-20140208.jar"/>
-        <archive path="/lams_build/lib/apache-poi/poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
         <archive path="/lams_build/lib/autopatch/autopatch-1.4.2-lams.jar"/>
         <archive path="/lams_build/lib/basiclti-util/basiclti-util-1.2.0.jar"/>
         <archive path="/lams_build/lib/basiclti-util/oauth-20100527.jar"/>
@@ -38,5 +35,8 @@
         <archive path="/lams_build/lib/lucene/lucene-queryparser-4.10.2.jar" source="/3rdParty_sources/lucene"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-5.1.43-bin.jar" source="/3rdParty_sources/mysql-connector"/>
         <archive path="/lams_build/lib/apache-poi/xmlbeans-2.6.0.jar"/>
+        <archive path="/lams_build/lib/apache-poi/poi-3.16.jar" source="/3rdParty_sources/poi"/>
+        <archive path="/lams_build/lib/apache-poi/poi-ooxml-3.16.jar" source="/3rdParty_sources/poi"/>
+        <archive path="/lams_build/lib/apache-poi/poi-ooxml-schemas-3.16.jar" source="/3rdParty_sources/poi"/>
     </library>
 </eclipse-userlibraries>
