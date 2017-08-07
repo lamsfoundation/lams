@@ -37,9 +37,6 @@ jLaTexMath 1.0.6
 
 JSP API 2.3
 
-lucene 2.4.0
-contains lucene-snowball 2.4.0
-
 MySQL Connector/J 5.1.43
 
 oauth 20100527
