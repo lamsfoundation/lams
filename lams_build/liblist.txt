@@ -41,16 +41,15 @@ odmg              odmg-3.0.jar                          3.0
 
 quartz			  quartz-2.2.1.jar						2.2.1			   	   Apache License 2.0			 Terracotta						  For running scheduled jobs
 
-spring            spring-core-4.0.6.RELEASE.jar			4.0.6				   Apache License 2.0			GoPivotal						  programming and configuration model for modern Java-based enterprise applications
-				  spring-beans-4.0.6.RELEASE.jar
-				  spring-context-4.0.6.RELEASE.jar
-				  spring-context-support-4.0.6.RELEASE.jar
-				  spring-expression-4.0.6.RELEASE.jar
-				  spring-jdbc-4.0.6.RELEASE.jar
-				  spring-orm-4.0.6.RELEASE.jar
-				  spring-tx-4.0.6.RELEASE.jar
-				  spring-web-4.0.6.RELEASE.jar
-				  aopalliance.jar						1.0					   Public Domain				 AOP Alliance
+spring            spring-core-4.3.10.RELEASE.jar		4.3.10				   Apache License 2.0			 Pivotal						  programming and configuration model for modern Java-based enterprise applications
+				  spring-beans-4.3.10.RELEASE.jar
+				  spring-context-4.3.10.RELEASE.jar
+				  spring-context-support-4.3.10.RELEASE.jar
+				  spring-expression-4.3.10.RELEASE.jar
+				  spring-jdbc-4.3.10.RELEASE.jar
+				  spring-orm-4.3.10.RELEASE.jar
+				  spring-tx-4.3.10.RELEASE.jar
+				  spring-web-4.3.10.RELEASE.jar
 
 struts            jakarta-oro.jar                       2.0.7                  Apache License 2.0            Apache						      regular expressions
 				  struts.jar                            1.2.7                  Apache License 2.0            Apache						      Struts Framework
