@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2013, 2017, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -70,6 +70,8 @@ import com.mysql.jdbc.ServerPreparedStatement;
 import com.mysql.jdbc.SingleByteCharsetConverter;
 import com.mysql.jdbc.StatementImpl;
 import com.mysql.jdbc.StatementInterceptorV2;
+import com.mysql.jdbc.Util;
+import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 import com.mysql.jdbc.log.Log;
 import com.mysql.jdbc.log.LogFactory;
 import com.mysql.jdbc.profiler.ProfilerEventHandler;
@@ -84,7 +86,7 @@ import com.mysql.jdbc.profiler.ProfilerEventHandler;
  */
 public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl implements FabricMySQLConnection, FabricMySQLConnectionProperties {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 5845485979107347258L;
 
     private Log log;
 
@@ -134,6 +136,20 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
     // Synchronized Set that holds temporary "locks" on ReplicationConnectionGroups being synced.
     // These locks are used to prevent simultaneous syncing of the state of the current group's servers.
     private static final Set<String> replConnGroupLocks = Collections.synchronizedSet(new HashSet<String>());
+
+    private static final Class<?> JDBC4_NON_TRANSIENT_CONN_EXCEPTION;
+
+    static {
+        Class<?> clazz = null;
+        try {
+            if (Util.isJdbc4()) {
+                clazz = Class.forName("com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException");
+            }
+        } catch (ClassNotFoundException e) {
+            // no-op
+        }
+        JDBC4_NON_TRANSIENT_CONN_EXCEPTION = clazz;
+    }
 
     public FabricMySQLConnectionProxy(Properties props) throws SQLException {
         // first, handle and remove Fabric-specific properties.  once fabricShardKey et al are ConnectionProperty instances this will be unnecessary
@@ -190,15 +206,14 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
                     getExceptionInterceptor(), this);
         }
 
+        // initialize log before any further calls that might actually use it
+        this.log = LogFactory.getLogger(getLogger(), "FabricMySQLConnectionProxy", null);
+
         setShardTable(this.fabricShardTable);
         setShardKey(this.fabricShardKey);
 
         setServerGroupName(this.fabricServerGroup);
-
-        this.log = LogFactory.getLogger(getLogger(), "FabricMySQLConnectionProxy", null);
     }
-
-    private boolean intercepting = false; // prevent recursion
 
     /**
      * Deal with an exception thrown on an underlying connection. We only consider connection exceptions (SQL State 08xxx). We internally handle a possible
@@ -208,19 +223,21 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
      * @param conn
      * @param group
      * @param hostname
-     * @param port
+     * @param portNumber
      * @throws FabricCommunicationException
      */
-    synchronized SQLException interceptException(SQLException sqlEx, Connection conn, String groupName, String hostname, String port)
+    synchronized SQLException interceptException(SQLException sqlEx, Connection conn, String groupName, String hostname, String portNumber)
             throws FabricCommunicationException {
-        // we are only concerned with connection failures, skip anything else
-        if (sqlEx.getSQLState() != null && !(sqlEx.getSQLState().startsWith("08")
-                        || com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException.class.isAssignableFrom(sqlEx.getClass()))) {
+        // we are only concerned with connection failures to MySQL servers, skip anything else including connection failures to Fabric
+        if ((sqlEx.getSQLState() == null || !sqlEx.getSQLState().startsWith("08"))
+                && !MySQLNonTransientConnectionException.class.isAssignableFrom(sqlEx.getClass())
+                && (JDBC4_NON_TRANSIENT_CONN_EXCEPTION == null || !JDBC4_NON_TRANSIENT_CONN_EXCEPTION.isAssignableFrom(sqlEx.getClass()))
+                || sqlEx.getCause() != null && FabricCommunicationException.class.isAssignableFrom(sqlEx.getCause().getClass())) {
             return null;
         }
 
         // find the Server corresponding to this connection
-        Server currentServer = this.serverGroup.getServer(hostname + ":" + port);
+        Server currentServer = this.serverGroup.getServer(hostname + ":" + portNumber);
 
         // we have already failed over or dealt with this connection, let the exception propagate
         if (currentServer == null) {
@@ -237,7 +254,7 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
             try {
                 // refresh group status. (after reporting the error. error reporting may trigger a failover)
                 try {
-                    this.fabricConnection.refreshState();
+                    this.fabricConnection.refreshStatePassive();
                     setCurrentServerGroup(this.serverGroup.getName());
                 } catch (SQLException ex) {
                     return SQLError.createSQLException("Unable to refresh Fabric state. Failover impossible", SQLError.SQL_STATE_CONNECTION_FAILURE, ex, null);
@@ -264,12 +281,7 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
      */
     private void refreshStateIfNecessary() throws SQLException {
         if (this.fabricConnection.isStateExpired()) {
-            try {
-                this.fabricConnection.refreshState();
-            } catch (FabricCommunicationException ex) {
-                throw SQLError.createSQLException("Unable to establish connection to the Fabric server", SQLError.SQL_STATE_CONNECTION_REJECTED, ex,
-                        getExceptionInterceptor(), this);
-            }
+            this.fabricConnection.refreshStatePassive();
             if (this.serverGroup != null) {
                 setCurrentServerGroup(this.serverGroup.getName());
             }
@@ -326,22 +338,16 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
             String db = this.database;
             if (shardTable.contains(".")) {
                 String pair[] = shardTable.split("\\.");
-                table = pair[0];
-                db = pair[1];
+                db = pair[0];
+                table = pair[1];
             }
-            try {
-                this.shardMapping = this.fabricConnection.getShardMapping(db, table);
-                if (this.shardMapping == null) {
-                    throw SQLError.createSQLException("Shard mapping not found for table `" + shardTable + "'", SQLError.SQL_STATE_ILLEGAL_ARGUMENT, null,
-                            getExceptionInterceptor(), this);
-                }
-                // default to global group
-                setCurrentServerGroup(this.shardMapping.getGlobalGroupName());
-
-            } catch (FabricCommunicationException ex) {
-                throw SQLError.createSQLException("Fabric communication failure.", SQLError.SQL_STATE_COMMUNICATION_LINK_FAILURE, ex, getExceptionInterceptor(),
-                        this);
+            this.shardMapping = this.fabricConnection.getShardMapping(db, table);
+            if (this.shardMapping == null) {
+                throw SQLError.createSQLException("Shard mapping not found for table `" + shardTable + "'", SQLError.SQL_STATE_ILLEGAL_ARGUMENT, null,
+                        getExceptionInterceptor(), this);
             }
+            // default to global group
+            setCurrentServerGroup(this.shardMapping.getGlobalGroupName());
         }
     }
 
@@ -402,24 +408,18 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
 
         this.currentConnection = null;
 
-        try {
-            // choose shard mapping if necessary
-            if (this.shardMapping == null) {
-                if (this.fabricConnection.getShardMapping(this.database, tableName) != null) {
-                    setShardTable(tableName);
-                }
-            } else { // make sure we aren't in conflict with the chosen shard mapping
-                ShardMapping mappingForTableName = this.fabricConnection.getShardMapping(this.database, tableName);
-                if (mappingForTableName != null && !mappingForTableName.equals(this.shardMapping)) {
-                    throw SQLError.createSQLException("Cross-shard query not allowed", SQLError.SQL_STATE_ILLEGAL_ARGUMENT, null, getExceptionInterceptor(),
-                            this);
-                }
+        // choose shard mapping if necessary
+        if (this.shardMapping == null) {
+            if (this.fabricConnection.getShardMapping(this.database, tableName) != null) {
+                setShardTable(tableName);
             }
-            this.queryTables.add(tableName);
-        } catch (FabricCommunicationException ex) {
-            throw SQLError.createSQLException("Fabric communication failure.", SQLError.SQL_STATE_COMMUNICATION_LINK_FAILURE, ex, getExceptionInterceptor(),
-                    this);
+        } else { // make sure we aren't in conflict with the chosen shard mapping
+            ShardMapping mappingForTableName = this.fabricConnection.getShardMapping(this.database, tableName);
+            if (mappingForTableName != null && !mappingForTableName.equals(this.shardMapping)) {
+                throw SQLError.createSQLException("Cross-shard query not allowed", SQLError.SQL_STATE_ILLEGAL_ARGUMENT, null, getExceptionInterceptor(), this);
+            }
         }
+        this.queryTables.add(tableName);
     }
 
     /**
@@ -433,14 +433,7 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
      * Change the server group to the given named group.
      */
     protected void setCurrentServerGroup(String serverGroupName) throws SQLException {
-        this.serverGroup = null;
-
-        try {
-            this.serverGroup = this.fabricConnection.getServerGroup(serverGroupName);
-        } catch (FabricCommunicationException ex) {
-            throw SQLError.createSQLException("Fabric communication failure.", SQLError.SQL_STATE_COMMUNICATION_LINK_FAILURE, ex, getExceptionInterceptor(),
-                    this);
-        }
+        this.serverGroup = this.fabricConnection.getServerGroup(serverGroupName);
 
         if (this.serverGroup == null) {
             throw SQLError.createSQLException("Cannot find server group: `" + serverGroupName + "'", SQLError.SQL_STATE_ILLEGAL_ARGUMENT, null,
@@ -473,15 +466,15 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
      * instead the {@link LoadBalancedConnectionProxy} for either the
      * master or slaves.
      */
-    protected MySQLConnection getActiveMySQLConnection() throws SQLException {
+    protected MySQLConnection getActiveMySQLConnectionChecked() throws SQLException {
         ReplicationConnection c = (ReplicationConnection) getActiveConnection();
         MySQLConnection mc = (MySQLConnection) c.getCurrentConnection();
         return mc;
     }
 
-    protected MySQLConnection getActiveMySQLConnectionPassive() {
+    public MySQLConnection getActiveMySQLConnection() {
         try {
-            return getActiveMySQLConnection();
+            return getActiveMySQLConnectionChecked();
         } catch (SQLException ex) {
             throw new IllegalStateException("Unable to determine active connection", ex);
         }
@@ -508,8 +501,8 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
             currentMasterString = replConnGroup.getMasterHosts().iterator().next();
         }
         // check if master has changed
-        if (currentMasterString != null &&
-                (this.serverGroup.getMaster() == null || !currentMasterString.equals(this.serverGroup.getMaster().getHostPortString()))) {
+        if (currentMasterString != null
+                && (this.serverGroup.getMaster() == null || !currentMasterString.equals(this.serverGroup.getMaster().getHostPortString()))) {
             // old master is gone (there may be a new one) (closeGently=false)
             try {
                 replConnGroup.removeMasterHost(currentMasterString, false);
@@ -606,6 +599,7 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
         info.setProperty(NonRegisteringDriver.DBNAME_PROPERTY_KEY, getCatalog());
         info.setProperty("connectionAttributes", "fabricHaGroup:" + this.serverGroup.getName());
         info.setProperty("retriesAllDown", "1");
+        info.setProperty("allowMasterDownConnections", "true");
         info.setProperty("allowSlaveDownConnections", "true");
         info.setProperty("readFromMasterWhenNoSlaves", "true");
         this.currentConnection = ReplicationConnectionProxy.createProxyInstance(masterHost, info, slaveHosts, info);
@@ -730,7 +724,7 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
     }
 
     public MySQLConnection getMultiHostSafeProxy() {
-        return getActiveMySQLConnectionPassive();
+        return getActiveMySQLConnection();
     }
 
     ////////////////////////////////////////////////////////
@@ -897,30 +891,30 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
 
     public ResultSetInternalMethods execSQL(StatementImpl callingStatement, String sql, int maxRows, Buffer packet, int resultSetType, int resultSetConcurrency,
             boolean streamResults, String catalog, Field[] cachedMetadata) throws SQLException {
-        return getActiveMySQLConnection().execSQL(callingStatement, sql, maxRows, packet, resultSetType, resultSetConcurrency, streamResults, catalog,
+        return getActiveMySQLConnectionChecked().execSQL(callingStatement, sql, maxRows, packet, resultSetType, resultSetConcurrency, streamResults, catalog,
                 cachedMetadata);
     }
 
     public ResultSetInternalMethods execSQL(StatementImpl callingStatement, String sql, int maxRows, Buffer packet, int resultSetType, int resultSetConcurrency,
             boolean streamResults, String catalog, Field[] cachedMetadata, boolean isBatch) throws SQLException {
-        return getActiveMySQLConnection().execSQL(callingStatement, sql, maxRows, packet, resultSetType, resultSetConcurrency, streamResults, catalog,
+        return getActiveMySQLConnectionChecked().execSQL(callingStatement, sql, maxRows, packet, resultSetType, resultSetConcurrency, streamResults, catalog,
                 cachedMetadata, isBatch);
     }
 
     public String extractSqlFromPacket(String possibleSqlQuery, Buffer queryPacket, int endOfQueryPacketPosition) throws SQLException {
-        return getActiveMySQLConnection().extractSqlFromPacket(possibleSqlQuery, queryPacket, endOfQueryPacketPosition);
+        return getActiveMySQLConnectionChecked().extractSqlFromPacket(possibleSqlQuery, queryPacket, endOfQueryPacketPosition);
     }
 
     public StringBuilder generateConnectionCommentBlock(StringBuilder buf) {
-        return getActiveMySQLConnectionPassive().generateConnectionCommentBlock(buf);
+        return getActiveMySQLConnection().generateConnectionCommentBlock(buf);
     }
 
     public MysqlIO getIO() throws SQLException {
-        return getActiveMySQLConnection().getIO();
+        return getActiveMySQLConnectionChecked().getIO();
     }
 
     public Calendar getCalendarInstanceForSessionOrNew() {
-        return getActiveMySQLConnectionPassive().getCalendarInstanceForSessionOrNew();
+        return getActiveMySQLConnection().getCalendarInstanceForSessionOrNew();
     }
 
     /**
@@ -932,11 +926,11 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
     }
 
     public String getServerCharset() {
-        return getActiveMySQLConnectionPassive().getServerCharset();
+        return getActiveMySQLConnection().getServerCharset();
     }
 
     public TimeZone getServerTimezoneTZ() {
-        return getActiveMySQLConnectionPassive().getServerTimezoneTZ();
+        return getActiveMySQLConnection().getServerTimezoneTZ();
     }
 
     /**
@@ -966,11 +960,11 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
     }
 
     public String getCharacterSetMetadata() {
-        return getActiveMySQLConnectionPassive().getCharacterSetMetadata();
+        return getActiveMySQLConnection().getCharacterSetMetadata();
     }
 
     public java.sql.Statement getMetadataSafeStatement() throws SQLException {
-        return getActiveMySQLConnection().getMetadataSafeStatement();
+        return getActiveMySQLConnectionChecked().getMetadataSafeStatement();
     }
 
     /**
@@ -1022,10 +1016,12 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
         throw SQLError.createSQLFeatureNotSupportedException();
     }
 
+    @Deprecated
     public void clearHasTriedMaster() {
         // no-op
     }
 
+    @Deprecated
     public boolean hasTriedMaster() {
         return false;
     }
@@ -2742,6 +2738,7 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
     public void setFailedOver(boolean flag) {
     }
 
+    @Deprecated
     public void setPreferSlaveDuringFailover(boolean flag) {
     }
 
@@ -2851,11 +2848,15 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
             return null;
         }
 
-        return getActiveConnectionPassive().getExceptionInterceptor();
+        return this.currentConnection.getExceptionInterceptor();
     }
 
     public String getHost() {
         return null;
+    }
+
+    public String getHostPortPair() {
+        return getActiveMySQLConnection().getHostPortPair();
     }
 
     public long getId() {
@@ -2954,10 +2955,11 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
     }
 
     public boolean lowerCaseTableNames() {
-        return false;
+        return getActiveMySQLConnection().lowerCaseTableNames();
     }
 
     /**
+     * 
      * @param stmt
      */
     public void maxRowsChanged(com.mysql.jdbc.Statement stmt) {
@@ -2982,7 +2984,7 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
     }
 
     public boolean serverSupportsConvertFn() throws SQLException {
-        return false;
+        return getActiveMySQLConnectionChecked().serverSupportsConvertFn();
     }
 
     public void setReadInfoMsgEnabled(boolean flag) {
@@ -2992,7 +2994,7 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
     }
 
     public boolean storesLowerCaseTableName() {
-        return false;
+        return getActiveMySQLConnection().storesLowerCaseTableName();
     }
 
     public void throwConnectionClosedException() throws SQLException {
@@ -3002,6 +3004,7 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
     }
 
     /**
+     * 
      * @param stmt
      * @throws SQLException
      */
@@ -3024,6 +3027,11 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
         return null;
     }
 
+    /**
+     * 
+     * @param name
+     * @return
+     */
     public String getClientInfo(String name) {
         return null;
     }
@@ -3040,12 +3048,12 @@ public class FabricMySQLConnectionProxy extends ConnectionPropertiesImpl impleme
         return null;
     }
 
-    public SQLWarning getWarnings() {
-        return null;
+    public SQLWarning getWarnings() throws SQLException {
+        return getActiveMySQLConnectionChecked().getWarnings();
     }
 
-    public String nativeSQL(String sql) {
-        return null;
+    public String nativeSQL(String sql) throws SQLException {
+        return getActiveMySQLConnectionChecked().nativeSQL(sql);
     }
 
     public ProfilerEventHandler getProfilerEventHandlerInstance() {

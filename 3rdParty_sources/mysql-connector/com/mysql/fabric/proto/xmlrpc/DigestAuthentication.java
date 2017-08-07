@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -38,6 +38,8 @@ import java.util.Random;
  */
 public class DigestAuthentication {
 
+    private static Random random = new Random();
+
     /**
      * Get the digest challenge header by connecting to the resource
      * with no credentials.
@@ -59,8 +61,8 @@ public class DigestAuthentication {
                 }
             } else if (400 == conn.getResponseCode()) {
                 // 400 usually means that auth is disabled on the Fabric node
-                throw new IOException("Fabric returns status 400. If authentication is disabled on the Fabric node, " +
-                        "omit the `fabricUsername' and `fabricPassword' properties from your connection.");
+                throw new IOException("Fabric returns status 400. If authentication is disabled on the Fabric node, "
+                        + "omit the `fabricUsername' and `fabricPassword' properties from your connection.");
             } else {
                 throw ex;
             }
@@ -163,10 +165,11 @@ public class DigestAuthentication {
      * value used in the digest calculation. Same as Python. (no
      * motivation given for this algorithm)
      */
+    @SuppressWarnings("deprecation")
     public static String generateCnonce(String nonce, String nc) {
         // Random string, keep it in basic printable ASCII range
         byte buf[] = new byte[8];
-        new Random().nextBytes(buf);
+        random.nextBytes(buf);
         for (int i = 0; i < 8; ++i) {
             buf[i] = (byte) (0x20 + (buf[i] % 95));
         }

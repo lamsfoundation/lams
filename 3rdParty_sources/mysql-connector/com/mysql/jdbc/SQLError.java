@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2002, 2015, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2002, 2017, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -55,7 +55,7 @@ public class SQLError {
     // SQL-92
     public static final String SQL_STATE_WARNING = "01000";
     public static final String SQL_STATE_DISCONNECT_ERROR = "01002";
-    public static final String SQL_STATE_DATE_TRUNCATED = "01004";
+    public static final String SQL_STATE_DATA_TRUNCATED = "01004";
     public static final String SQL_STATE_PRIVILEGE_NOT_REVOKED = "01006";
     public static final String SQL_STATE_NO_DATA = "02000";
     public static final String SQL_STATE_WRONG_NO_OF_PARAMETERS = "07001";
@@ -145,8 +145,8 @@ public class SQLError {
     static {
         if (Util.isJdbc4()) {
             try {
-                JDBC_4_COMMUNICATIONS_EXCEPTION_CTOR = Class.forName("com.mysql.jdbc.exceptions.jdbc4.CommunicationsException").getConstructor(
-                        new Class[] { MySQLConnection.class, Long.TYPE, Long.TYPE, Exception.class });
+                JDBC_4_COMMUNICATIONS_EXCEPTION_CTOR = Class.forName("com.mysql.jdbc.exceptions.jdbc4.CommunicationsException")
+                        .getConstructor(new Class[] { MySQLConnection.class, Long.TYPE, Long.TYPE, Exception.class });
             } catch (SecurityException e) {
                 throw new RuntimeException(e);
             } catch (NoSuchMethodException e) {
@@ -160,7 +160,7 @@ public class SQLError {
 
         sqlStateMessages = new HashMap<String, String>();
         sqlStateMessages.put(SQL_STATE_DISCONNECT_ERROR, Messages.getString("SQLError.35"));
-        sqlStateMessages.put(SQL_STATE_DATE_TRUNCATED, Messages.getString("SQLError.36"));
+        sqlStateMessages.put(SQL_STATE_DATA_TRUNCATED, Messages.getString("SQLError.36"));
         sqlStateMessages.put(SQL_STATE_PRIVILEGE_NOT_REVOKED, Messages.getString("SQLError.37"));
         sqlStateMessages.put(SQL_STATE_INVALID_CONNECTION_ATTRIBUTE, Messages.getString("SQLError.38"));
         sqlStateMessages.put(SQL_STATE_ERROR_IN_ROW, Messages.getString("SQLError.39"));
@@ -874,10 +874,11 @@ public class SQLError {
     }
 
     public static SQLException createSQLException(String message, String sqlState, Throwable cause, ExceptionInterceptor interceptor, Connection conn) {
-        SQLException sqlEx = createSQLException(message, sqlState, interceptor);
-
-        sqlEx.initCause(cause);
-
+        SQLException sqlEx = createSQLException(message, sqlState, null);
+        if (sqlEx.getCause() == null) {
+            sqlEx.initCause(cause);
+        }
+        // Run through the exception interceptor after setting the init cause.
         return runThroughExceptionInterceptor(interceptor, sqlEx, conn);
     }
 
@@ -907,51 +908,57 @@ public class SQLError {
                         if (!Util.isJdbc4()) {
                             sqlEx = new MySQLTransientConnectionException(message, sqlState, vendorErrorCode);
                         } else {
-                            sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLTransientConnectionException", new Class[] {
-                                    String.class, String.class, Integer.TYPE }, new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) },
-                                    interceptor);
+                            sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLTransientConnectionException",
+                                    new Class[] { String.class, String.class, Integer.TYPE },
+                                    new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) }, interceptor);
                         }
                     } else if (!Util.isJdbc4()) {
                         sqlEx = new MySQLNonTransientConnectionException(message, sqlState, vendorErrorCode);
                     } else {
-                        sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException", new Class[] {
-                                String.class, String.class, Integer.TYPE }, new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) }, interceptor);
+                        sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException",
+                                new Class[] { String.class, String.class, Integer.TYPE }, new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) },
+                                interceptor);
                     }
                 } else if (sqlState.startsWith("22")) {
                     if (!Util.isJdbc4()) {
                         sqlEx = new MySQLDataException(message, sqlState, vendorErrorCode);
                     } else {
-                        sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLDataException", new Class[] { String.class, String.class,
-                                Integer.TYPE }, new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) }, interceptor);
+                        sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLDataException",
+                                new Class[] { String.class, String.class, Integer.TYPE }, new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) },
+                                interceptor);
                     }
                 } else if (sqlState.startsWith("23")) {
 
                     if (!Util.isJdbc4()) {
                         sqlEx = new MySQLIntegrityConstraintViolationException(message, sqlState, vendorErrorCode);
                     } else {
-                        sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException", new Class[] {
-                                String.class, String.class, Integer.TYPE }, new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) }, interceptor);
+                        sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException",
+                                new Class[] { String.class, String.class, Integer.TYPE }, new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) },
+                                interceptor);
                     }
                 } else if (sqlState.startsWith("42")) {
                     if (!Util.isJdbc4()) {
                         sqlEx = new MySQLSyntaxErrorException(message, sqlState, vendorErrorCode);
                     } else {
-                        sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException", new Class[] { String.class,
-                                String.class, Integer.TYPE }, new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) }, interceptor);
+                        sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException",
+                                new Class[] { String.class, String.class, Integer.TYPE }, new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) },
+                                interceptor);
                     }
                 } else if (sqlState.startsWith("40")) {
                     if (!Util.isJdbc4()) {
                         sqlEx = new MySQLTransactionRollbackException(message, sqlState, vendorErrorCode);
                     } else {
-                        sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException", new Class[] {
-                                String.class, String.class, Integer.TYPE }, new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) }, interceptor);
+                        sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException",
+                                new Class[] { String.class, String.class, Integer.TYPE }, new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) },
+                                interceptor);
                     }
                 } else if (sqlState.startsWith("70100")) {
                     if (!Util.isJdbc4()) {
                         sqlEx = new MySQLQueryInterruptedException(message, sqlState, vendorErrorCode);
                     } else {
-                        sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLQueryInterruptedException", new Class[] { String.class,
-                                String.class, Integer.TYPE }, new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) }, interceptor);
+                        sqlEx = (SQLException) Util.getInstance("com.mysql.jdbc.exceptions.jdbc4.MySQLQueryInterruptedException",
+                                new Class[] { String.class, String.class, Integer.TYPE }, new Object[] { message, sqlState, Integer.valueOf(vendorErrorCode) },
+                                interceptor);
                     }
                 } else {
                     sqlEx = new SQLException(message, sqlState, vendorErrorCode);
@@ -962,8 +969,9 @@ public class SQLError {
 
             return runThroughExceptionInterceptor(interceptor, sqlEx, conn);
         } catch (SQLException sqlEx) {
-            SQLException unexpectedEx = new SQLException("Unable to create correct SQLException class instance, error class/codes may be incorrect. Reason: "
-                    + Util.stackTraceToString(sqlEx), SQL_STATE_GENERAL_ERROR);
+            SQLException unexpectedEx = new SQLException(
+                    "Unable to create correct SQLException class instance, error class/codes may be incorrect. Reason: " + Util.stackTraceToString(sqlEx),
+                    SQL_STATE_GENERAL_ERROR);
 
             return runThroughExceptionInterceptor(interceptor, unexpectedEx, conn);
         }
@@ -1073,8 +1081,8 @@ public class SQLError {
                 Object[] timingInfo = { Long.valueOf(timeSinceLastPacketReceivedMs), Long.valueOf(timeSinceLastPacketSentMs) };
                 exceptionMessageBuf.append(Messages.getString("CommunicationsException.ServerPacketTimingInfo", timingInfo));
             } else {
-                exceptionMessageBuf.append(Messages.getString("CommunicationsException.ServerPacketTimingInfoNoRecv",
-                        new Object[] { Long.valueOf(timeSinceLastPacketSentMs) }));
+                exceptionMessageBuf.append(
+                        Messages.getString("CommunicationsException.ServerPacketTimingInfoNoRecv", new Object[] { Long.valueOf(timeSinceLastPacketSentMs) }));
             }
 
             if (timeoutMessageBuf != null) {
@@ -1090,7 +1098,6 @@ public class SQLError {
             // Attempt to determine the reason for the underlying exception (we can only make a best-guess here)
             //
 
-            Throwable cause;
             if (underlyingException instanceof BindException) {
                 if (conn.getLocalSocketAddress() != null && !Util.interfaceExists(conn.getLocalSocketAddress())) {
                     exceptionMessageBuf.append(Messages.getString("CommunicationsException.LocalSocketAddressNotAvailable"));
@@ -1147,13 +1154,15 @@ public class SQLError {
      * @param updateCounts
      * @param interceptor
      */
-    public static SQLException createBatchUpdateException(SQLException underlyingEx, long[] updateCounts, ExceptionInterceptor interceptor) throws SQLException {
+    public static SQLException createBatchUpdateException(SQLException underlyingEx, long[] updateCounts, ExceptionInterceptor interceptor)
+            throws SQLException {
         SQLException newEx;
 
         if (Util.isJdbc42()) {
-            newEx = (SQLException) Util.getInstance("java.sql.BatchUpdateException", new Class[] { String.class, String.class, int.class, long[].class,
-                    Throwable.class }, new Object[] { underlyingEx.getMessage(), underlyingEx.getSQLState(), underlyingEx.getErrorCode(), updateCounts,
-                    underlyingEx }, interceptor);
+            newEx = (SQLException) Util.getInstance("java.sql.BatchUpdateException",
+                    new Class[] { String.class, String.class, int.class, long[].class, Throwable.class },
+                    new Object[] { underlyingEx.getMessage(), underlyingEx.getSQLState(), underlyingEx.getErrorCode(), updateCounts, underlyingEx },
+                    interceptor);
         } else { // return pre-JDBC4.2 BatchUpdateException (updateCounts are limited to int[])
             newEx = new BatchUpdateException(underlyingEx.getMessage(), underlyingEx.getSQLState(), underlyingEx.getErrorCode(),
                     Util.truncateAndConvertToInt(updateCounts));
@@ -1188,8 +1197,8 @@ public class SQLError {
         SQLException newEx;
 
         if (Util.isJdbc4()) {
-            newEx = (SQLException) Util.getInstance("java.sql.SQLFeatureNotSupportedException", new Class[] { String.class, String.class }, new Object[] {
-                    message, sqlState }, interceptor);
+            newEx = (SQLException) Util.getInstance("java.sql.SQLFeatureNotSupportedException", new Class[] { String.class, String.class },
+                    new Object[] { message, sqlState }, interceptor);
         } else {
             newEx = new NotImplemented();
         }

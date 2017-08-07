@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2002, 2015, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2002, 2017, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -219,7 +219,21 @@ public class CallableStatement extends PreparedStatement implements java.sql.Cal
 
             while (paramTypesRs.next()) {
                 String paramName = paramTypesRs.getString(4);
-                int inOutModifier = paramTypesRs.getInt(5);
+                int inOutModifier;
+                switch (paramTypesRs.getInt(5)) {
+                    case DatabaseMetaData.procedureColumnIn:
+                        inOutModifier = ParameterMetaData.parameterModeIn;
+                        break;
+                    case DatabaseMetaData.procedureColumnInOut:
+                        inOutModifier = ParameterMetaData.parameterModeInOut;
+                        break;
+                    case DatabaseMetaData.procedureColumnOut:
+                    case DatabaseMetaData.procedureColumnReturn:
+                        inOutModifier = ParameterMetaData.parameterModeOut;
+                        break;
+                    default:
+                        inOutModifier = ParameterMetaData.parameterModeUnknown;
+                }
 
                 boolean isOutParameter = false;
                 boolean isInParameter = false;
@@ -1365,12 +1379,11 @@ public class CallableStatement extends PreparedStatement implements java.sql.Cal
                 throw SQLError.createSQLException(Messages.getString("CallableStatement.2"), SQLError.SQL_STATE_ILLEGAL_ARGUMENT, getExceptionInterceptor());
             }
 
-            if (this.paramInfo == null) {
+            CallableStatementParam namedParamInfo;
+            if (this.paramInfo == null || (namedParamInfo = this.paramInfo.getParameter(paramName)) == null) {
                 throw SQLError.createSQLException(Messages.getString("CallableStatement.3") + paramName + Messages.getString("CallableStatement.4"),
                         SQLError.SQL_STATE_ILLEGAL_ARGUMENT, getExceptionInterceptor());
             }
-
-            CallableStatementParam namedParamInfo = this.paramInfo.getParameter(paramName);
 
             if (forOut && !namedParamInfo.isOut) {
                 throw SQLError.createSQLException(Messages.getString("CallableStatement.5") + paramName + Messages.getString("CallableStatement.6"),
@@ -2137,7 +2150,9 @@ public class CallableStatement extends PreparedStatement implements java.sql.Cal
                             }
 
                             if (!found) {
-                                throw SQLError.createSQLException("boo!", "S1000", this.connection.getExceptionInterceptor());
+                                throw SQLError.createSQLException(
+                                        Messages.getString("CallableStatement.21") + outParamInfo.paramName + Messages.getString("CallableStatement.22"),
+                                        SQLError.SQL_STATE_ILLEGAL_ARGUMENT, getExceptionInterceptor());
                             }
                         }
 

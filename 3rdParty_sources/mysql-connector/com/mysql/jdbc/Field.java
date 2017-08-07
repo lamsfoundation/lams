@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2002, 2017, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -152,7 +152,7 @@ public class Field {
         boolean isFromFunction = this.originalTableNameLength == 0;
 
         if (this.mysqlType == MysqlDefs.FIELD_TYPE_BLOB) {
-            if (this.connection != null && this.connection.getBlobsAreStrings() || (this.connection.getFunctionsNeverReturnBlobs() && isFromFunction)) {
+            if (this.connection.getBlobsAreStrings() || (this.connection.getFunctionsNeverReturnBlobs() && isFromFunction)) {
                 this.sqlType = Types.VARCHAR;
                 this.mysqlType = MysqlDefs.FIELD_TYPE_VARCHAR;
             } else if (this.collationIndex == CharsetMapping.MYSQL_COLLATION_INDEX_binary || !this.connection.versionMeetsMinimum(4, 1, 0)) {
@@ -190,13 +190,18 @@ public class Field {
                 this.encoding = "UTF-16";
             }
 
+            // MySQL encodes JSON data with utf8mb4.
+            if (this.mysqlType == MysqlDefs.FIELD_TYPE_JSON) {
+                this.encoding = "UTF-8";
+            }
+
             // Handle VARBINARY/BINARY (server doesn't have a different type for this
 
             boolean isBinary = isBinary();
 
             if (this.connection.versionMeetsMinimum(4, 1, 0) && this.mysqlType == MysqlDefs.FIELD_TYPE_VAR_STRING && isBinary
                     && this.collationIndex == CharsetMapping.MYSQL_COLLATION_INDEX_binary) {
-                if (this.connection != null && (this.connection.getFunctionsNeverReturnBlobs() && isFromFunction)) {
+                if (this.connection.getFunctionsNeverReturnBlobs() && isFromFunction) {
                     this.sqlType = Types.VARCHAR;
                     this.mysqlType = MysqlDefs.FIELD_TYPE_VARCHAR;
                 } else if (this.isOpaqueBinary()) {
@@ -217,19 +222,12 @@ public class Field {
             }
 
             if (this.mysqlType == MysqlDefs.FIELD_TYPE_BIT) {
-                this.isSingleBit = (this.length == 0);
+                this.isSingleBit = this.length == 0
+                        || this.length == 1 && (this.connection.versionMeetsMinimum(5, 0, 21) || this.connection.versionMeetsMinimum(5, 1, 10));
 
-                if (this.connection != null && (this.connection.versionMeetsMinimum(5, 0, 21) || this.connection.versionMeetsMinimum(5, 1, 10))
-                        && this.length == 1) {
-                    this.isSingleBit = true;
-                }
-
-                if (this.isSingleBit) {
-                    this.sqlType = Types.BIT;
-                } else {
-                    this.sqlType = Types.VARBINARY;
-                    this.colFlag |= 128; // we need to pretend this is a full
-                    this.colFlag |= 16; // binary blob
+                if (!this.isSingleBit) {
+                    this.colFlag |= 128; // Pretend this is a full binary(128) and blob(16) so that this field is de-serializable.
+                    this.colFlag |= 16;
                     isBinary = true;
                 }
             }
@@ -330,8 +328,8 @@ public class Field {
     /**
      * Constructor used when communicating with pre 4.1 servers
      */
-    Field(MySQLConnection conn, byte[] buffer, int nameStart, int nameLength, int tableNameStart, int tableNameLength, int length, int mysqlType,
-            short colFlag, int colDecimals) throws SQLException {
+    Field(MySQLConnection conn, byte[] buffer, int nameStart, int nameLength, int tableNameStart, int tableNameLength, int length, int mysqlType, short colFlag,
+            int colDecimals) throws SQLException {
         this(conn, buffer, -1, -1, tableNameStart, tableNameLength, -1, -1, nameStart, nameLength, -1, -1, length, mysqlType, colFlag, colDecimals, -1, -1,
                 NO_CHARSET_INFO);
     }
@@ -610,6 +608,10 @@ public class Field {
             return null;
         }
 
+        if (stringLength == 0) {
+            return "";
+        }
+
         String stringVal = null;
 
         if (this.connection != null) {
@@ -781,8 +783,8 @@ public class Field {
     }
 
     private boolean isNativeDateTimeType() {
-        return (this.mysqlType == MysqlDefs.FIELD_TYPE_DATE || this.mysqlType == MysqlDefs.FIELD_TYPE_NEWDATE
-                || this.mysqlType == MysqlDefs.FIELD_TYPE_DATETIME || this.mysqlType == MysqlDefs.FIELD_TYPE_TIME || this.mysqlType == MysqlDefs.FIELD_TYPE_TIMESTAMP);
+        return (this.mysqlType == MysqlDefs.FIELD_TYPE_DATE || this.mysqlType == MysqlDefs.FIELD_TYPE_NEWDATE || this.mysqlType == MysqlDefs.FIELD_TYPE_DATETIME
+                || this.mysqlType == MysqlDefs.FIELD_TYPE_TIME || this.mysqlType == MysqlDefs.FIELD_TYPE_TIMESTAMP);
     }
 
     public void setConnection(MySQLConnection conn) {

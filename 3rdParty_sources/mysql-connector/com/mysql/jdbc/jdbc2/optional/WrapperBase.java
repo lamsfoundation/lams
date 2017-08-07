@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2002, 2017, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -32,6 +32,7 @@ import java.util.Map;
 
 import com.mysql.jdbc.ExceptionInterceptor;
 import com.mysql.jdbc.SQLError;
+import com.mysql.jdbc.Util;
 
 /**
  * Base class for all wrapped instances created by LogicalHandle
@@ -57,7 +58,7 @@ abstract class WrapperBase {
         throw sqlEx;
     }
 
-    protected Map unwrappedInterfaces = null;
+    protected Map<Class<?>, Object> unwrappedInterfaces = null;
     protected ExceptionInterceptor exceptionInterceptor;
 
     protected WrapperBase(MysqlPooledConnection pooledConnection) {
@@ -73,6 +74,11 @@ abstract class WrapperBase {
         }
 
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            if ("equals".equals(method.getName())) {
+                // Let args[0] "unwrap" to its InvocationHandler if it is a proxy.
+                return args[0].equals(this);
+            }
+
             Object result = null;
 
             try {
@@ -104,7 +110,7 @@ abstract class WrapperBase {
             Class<?>[] interfaces = clazz.getInterfaces();
 
             for (Class<?> iclass : interfaces) {
-                String packageName = iclass.getPackage().getName();
+                String packageName = Util.getPackageName(iclass);
 
                 if ("java.sql".equals(packageName) || "javax.sql".equals(packageName)) {
                     return Proxy.newProxyInstance(toProxy.getClass().getClassLoader(), interfaces, new ConnectionErrorFiringInvocationHandler(toProxy));

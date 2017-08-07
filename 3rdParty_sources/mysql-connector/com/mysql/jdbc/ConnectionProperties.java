@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2002, 2015, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2002, 2017, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -1158,6 +1158,10 @@ public interface ConnectionProperties {
 
     public void setLoadBalanceStrategy(String strategy);
 
+    public String getServerAffinityOrder();
+
+    public void setServerAffinityOrder(String hostsList);
+
     public boolean getTcpNoDelay();
 
     public void setTcpNoDelay(boolean flag);
@@ -1331,6 +1335,10 @@ public interface ConnectionProperties {
     public boolean getLoadBalanceEnableJMX();
 
     public void setLoadBalanceEnableJMX(boolean loadBalanceEnableJMX);
+
+    public void setLoadBalanceHostRemovalGracePeriod(int loadBalanceHostRemovalGracePeriod) throws SQLException;
+
+    public int getLoadBalanceHostRemovalGracePeriod();
 
     public void setLoadBalanceAutoCommitStatementThreshold(int loadBalanceAutoCommitStatementThreshold) throws SQLException;
 

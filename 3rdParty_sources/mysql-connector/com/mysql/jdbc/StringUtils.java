@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2002, 2015, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2002, 2017, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -37,6 +37,7 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -64,32 +65,32 @@ public class StringUtils {
     /**
      * Search mode: skip between markers, skip block comments, skip line comments and skip white space.
      */
-    public static final Set<SearchMode> SEARCH_MODE__MRK_COM_WS = Collections.unmodifiableSet(EnumSet.of(SearchMode.SKIP_BETWEEN_MARKERS,
-            SearchMode.SKIP_BLOCK_COMMENTS, SearchMode.SKIP_LINE_COMMENTS, SearchMode.SKIP_WHITE_SPACE));
+    public static final Set<SearchMode> SEARCH_MODE__MRK_COM_WS = Collections.unmodifiableSet(
+            EnumSet.of(SearchMode.SKIP_BETWEEN_MARKERS, SearchMode.SKIP_BLOCK_COMMENTS, SearchMode.SKIP_LINE_COMMENTS, SearchMode.SKIP_WHITE_SPACE));
 
     /**
      * Search mode: allow backslash escape, skip block comments, skip line comments and skip white space.
      */
-    public static final Set<SearchMode> SEARCH_MODE__BSESC_COM_WS = Collections.unmodifiableSet(EnumSet.of(SearchMode.ALLOW_BACKSLASH_ESCAPE,
-            SearchMode.SKIP_BLOCK_COMMENTS, SearchMode.SKIP_LINE_COMMENTS, SearchMode.SKIP_WHITE_SPACE));
+    public static final Set<SearchMode> SEARCH_MODE__BSESC_COM_WS = Collections.unmodifiableSet(
+            EnumSet.of(SearchMode.ALLOW_BACKSLASH_ESCAPE, SearchMode.SKIP_BLOCK_COMMENTS, SearchMode.SKIP_LINE_COMMENTS, SearchMode.SKIP_WHITE_SPACE));
 
     /**
      * Search mode: allow backslash escape, skip between markers and skip white space.
      */
-    public static final Set<SearchMode> SEARCH_MODE__BSESC_MRK_WS = Collections.unmodifiableSet(EnumSet.of(SearchMode.ALLOW_BACKSLASH_ESCAPE,
-            SearchMode.SKIP_BETWEEN_MARKERS, SearchMode.SKIP_WHITE_SPACE));
+    public static final Set<SearchMode> SEARCH_MODE__BSESC_MRK_WS = Collections
+            .unmodifiableSet(EnumSet.of(SearchMode.ALLOW_BACKSLASH_ESCAPE, SearchMode.SKIP_BETWEEN_MARKERS, SearchMode.SKIP_WHITE_SPACE));
 
     /**
      * Search mode: skip block comments, skip line comments and skip white space.
      */
-    public static final Set<SearchMode> SEARCH_MODE__COM_WS = Collections.unmodifiableSet(EnumSet.of(SearchMode.SKIP_BLOCK_COMMENTS,
-            SearchMode.SKIP_LINE_COMMENTS, SearchMode.SKIP_WHITE_SPACE));
+    public static final Set<SearchMode> SEARCH_MODE__COM_WS = Collections
+            .unmodifiableSet(EnumSet.of(SearchMode.SKIP_BLOCK_COMMENTS, SearchMode.SKIP_LINE_COMMENTS, SearchMode.SKIP_WHITE_SPACE));
 
     /**
      * Search mode: skip between markers and skip white space.
      */
-    public static final Set<SearchMode> SEARCH_MODE__MRK_WS = Collections.unmodifiableSet(EnumSet.of(SearchMode.SKIP_BETWEEN_MARKERS,
-            SearchMode.SKIP_WHITE_SPACE));
+    public static final Set<SearchMode> SEARCH_MODE__MRK_WS = Collections
+            .unmodifiableSet(EnumSet.of(SearchMode.SKIP_BETWEEN_MARKERS, SearchMode.SKIP_WHITE_SPACE));
 
     /**
      * Empty search mode.
@@ -107,11 +108,13 @@ public class StringUtils {
 
     private static Method toPlainStringMethod;
 
-    static final int WILD_COMPARE_MATCH_NO_WILD = 0;
+    private static final int WILD_COMPARE_MATCH = 0;
+    private static final int WILD_COMPARE_CONTINUE_WITH_WILD = 1;
+    private static final int WILD_COMPARE_NO_MATCH = -1;
 
-    static final int WILD_COMPARE_MATCH_WITH_WILD = 1;
-
-    static final int WILD_COMPARE_NO_MATCH = -1;
+    static final char WILDCARD_MANY = '%';
+    static final char WILDCARD_ONE = '_';
+    static final char WILDCARD_ESCAPE = '\\';
 
     private static final ConcurrentHashMap<String, Charset> charsetsByAlias = new ConcurrentHashMap<String, Charset>();
 
@@ -125,7 +128,11 @@ public class StringUtils {
 
             if (cs == null) {
                 cs = Charset.forName(alias);
-                charsetsByAlias.putIfAbsent(alias, cs);
+                Charset oldCs = charsetsByAlias.putIfAbsent(alias, cs);
+                if (oldCs != null) {
+                    // if the previous value was recently set by another thread we return it instead of value we found here
+                    cs = oldCs;
+                }
             }
 
             return cs;
@@ -1044,7 +1051,7 @@ public class StringUtils {
             int wc = 0;
             boolean match = true;
             while (++wc < searchForWordsCount && match) {
-                int positionOfNextWord = indexOfNextChar(startingPositionForNextWord, searchInLength - 1, searchIn, null, null, searchMode2);
+                int positionOfNextWord = indexOfNextChar(startingPositionForNextWord, searchInLength - 1, searchIn, null, null, null, searchMode2);
                 if (startingPositionForNextWord == positionOfNextWord || !startsWithIgnoreCase(searchIn, positionOfNextWord, searchForSequence[wc])) {
                     // either no gap between words or match failed
                     match = false;
@@ -1081,6 +1088,33 @@ public class StringUtils {
      */
     public static int indexOfIgnoreCase(int startingPosition, String searchIn, String searchFor, String openingMarkers, String closingMarkers,
             Set<SearchMode> searchMode) {
+        return indexOfIgnoreCase(startingPosition, searchIn, searchFor, openingMarkers, closingMarkers, "", searchMode);
+    }
+
+    /**
+     * Finds the position of a substring within a string, ignoring case, with the option to skip text delimited by given markers or within comments.
+     * 
+     * @param startingPosition
+     *            the position to start the search from
+     * @param searchIn
+     *            the string to search in
+     * @param searchFor
+     *            the string to search for
+     * @param openingMarkers
+     *            characters which delimit the beginning of a text block to skip
+     * @param closingMarkers
+     *            characters which delimit the end of a text block to skip
+     * @param overridingMarkers
+     *            the subset of <code>openingMarkers</code> that override the remaining markers, e.g., if <code>openingMarkers = "'("</code> and
+     *            <code>overridingMarkers = "'"</code> then the block between the outer parenthesis in <code>"start ('max('); end"</code> is strictly consumed,
+     *            otherwise the suffix <code>" end"</code> would end up being consumed too in the process of handling the nested parenthesis.
+     * @param searchMode
+     *            a <code>Set</code>, ideally an <code>EnumSet</code>, containing the flags from the enum <code>StringUtils.SearchMode</code> that determine the
+     *            behavior of the search
+     * @return the position where <code>searchFor</code> is found within <code>searchIn</code> starting from <code>startingPosition</code>.
+     */
+    public static int indexOfIgnoreCase(int startingPosition, String searchIn, String searchFor, String openingMarkers, String closingMarkers,
+            String overridingMarkers, Set<SearchMode> searchMode) {
         if (searchIn == null || searchFor == null) {
             return -1;
         }
@@ -1093,9 +1127,18 @@ public class StringUtils {
             return -1;
         }
 
-        if (searchMode.contains(SearchMode.SKIP_BETWEEN_MARKERS)
-                && (openingMarkers == null || closingMarkers == null || openingMarkers.length() != closingMarkers.length())) {
-            throw new IllegalArgumentException(Messages.getString("StringUtils.15", new String[] { openingMarkers, closingMarkers }));
+        if (searchMode.contains(SearchMode.SKIP_BETWEEN_MARKERS)) {
+            if (openingMarkers == null || closingMarkers == null || openingMarkers.length() != closingMarkers.length()) {
+                throw new IllegalArgumentException(Messages.getString("StringUtils.15", new String[] { openingMarkers, closingMarkers }));
+            }
+            if (overridingMarkers == null) {
+                throw new IllegalArgumentException(Messages.getString("StringUtils.16", new String[] { overridingMarkers, openingMarkers }));
+            }
+            for (char c : overridingMarkers.toCharArray()) {
+                if (openingMarkers.indexOf(c) == -1) {
+                    throw new IllegalArgumentException(Messages.getString("StringUtils.16", new String[] { overridingMarkers, openingMarkers }));
+                }
+            }
         }
 
         // Some locales don't follow upper-case rule, so need to check both
@@ -1109,7 +1152,7 @@ public class StringUtils {
         }
 
         for (int i = startingPosition; i <= stopSearchingAt; i++) {
-            i = indexOfNextChar(i, stopSearchingAt, searchIn, openingMarkers, closingMarkers, searchMode);
+            i = indexOfNextChar(i, stopSearchingAt, searchIn, openingMarkers, closingMarkers, overridingMarkers, searchMode);
 
             if (i == -1) {
                 return -1;
@@ -1144,7 +1187,7 @@ public class StringUtils {
      * @return the position where <code>searchFor</code> is found within <code>searchIn</code> starting from <code>startingPosition</code>.
      */
     private static int indexOfNextChar(int startingPosition, int stopPosition, String searchIn, String openingMarkers, String closingMarkers,
-            Set<SearchMode> searchMode) {
+            String overridingMarkers, Set<SearchMode> searchMode) {
         if (searchIn == null) {
             return -1;
         }
@@ -1178,8 +1221,25 @@ public class StringUtils {
                 int nestedMarkersCount = 0;
                 char openingMarker = c0;
                 char closingMarker = closingMarkers.charAt(markerIndex);
+                boolean outerIsAnOverridingMarker = overridingMarkers.indexOf(openingMarker) != -1;
                 while (++i <= stopPosition && ((c0 = searchIn.charAt(i)) != closingMarker || nestedMarkersCount != 0)) {
-                    if (c0 == openingMarker) {
+                    if (!outerIsAnOverridingMarker && overridingMarkers.indexOf(c0) != -1) {
+                        // there is an overriding marker that needs to be consumed before returning to the previous marker
+                        int overridingMarkerIndex = openingMarkers.indexOf(c0); // overridingMarkers must be a sub-list of openingMarkers
+                        int overridingNestedMarkersCount = 0;
+                        char overridingOpeningMarker = c0;
+                        char overridingClosingMarker = closingMarkers.charAt(overridingMarkerIndex);
+                        while (++i <= stopPosition && ((c0 = searchIn.charAt(i)) != overridingClosingMarker || overridingNestedMarkersCount != 0)) {
+                            // do as before, but this marker can't be overridden
+                            if (c0 == overridingOpeningMarker) {
+                                overridingNestedMarkersCount++;
+                            } else if (c0 == overridingClosingMarker) {
+                                overridingNestedMarkersCount--;
+                            } else if (searchMode.contains(SearchMode.ALLOW_BACKSLASH_ESCAPE) && c0 == '\\') {
+                                i++; // next char is escaped, skip it
+                            }
+                        }
+                    } else if (c0 == openingMarker) {
                         nestedMarkersCount++;
                     } else if (c0 == closingMarker) {
                         nestedMarkersCount--;
@@ -1195,7 +1255,8 @@ public class StringUtils {
                 if (c2 != '!') {
                     // comments block found, skip until end of block ("*/") (backslash escape doesn't work on comments)
                     i++; // move to next char ('*')
-                    while (++i <= stopPosition && (searchIn.charAt(i) != '*' || (i + 1 < searchInLength ? searchIn.charAt(i + 1) : Character.MIN_VALUE) != '/')) {
+                    while (++i <= stopPosition
+                            && (searchIn.charAt(i) != '*' || (i + 1 < searchInLength ? searchIn.charAt(i + 1) : Character.MIN_VALUE) != '/')) {
                         // continue
                     }
                     i++; // move to next char ('/')
@@ -1228,7 +1289,8 @@ public class StringUtils {
                 c2 = i + 2 < searchInLength ? searchIn.charAt(i + 2) : Character.MIN_VALUE;
 
             } else if (searchMode.contains(SearchMode.SKIP_LINE_COMMENTS)
-                    && ((c0 == '-' && c1 == '-' && (Character.isWhitespace(c2) || (dashDashCommentImmediateEnd = c2 == ';') || c2 == Character.MIN_VALUE)) || c0 == '#')) {
+                    && ((c0 == '-' && c1 == '-' && (Character.isWhitespace(c2) || (dashDashCommentImmediateEnd = c2 == ';') || c2 == Character.MIN_VALUE))
+                            || c0 == '#')) {
                 if (dashDashCommentImmediateEnd) {
                     // comments line found but closed immediately by query delimiter marker
                     i++; // move to next char ('-')
@@ -1308,12 +1370,16 @@ public class StringUtils {
     }
 
     /**
-     * Splits stringToSplit into a list, using the given delimiter
+     * Splits stringToSplit into a list, using the given delimiter and skipping all between the given markers.
      * 
      * @param stringToSplit
      *            the string to split
      * @param delimiter
      *            the string to split on
+     * @param openingMarkers
+     *            characters which delimit the beginning of a text block to skip
+     * @param closingMarkers
+     *            characters which delimit the end of a text block to skip
      * @param trim
      *            should the split strings be whitespace trimmed?
      * 
@@ -1321,7 +1387,34 @@ public class StringUtils {
      * 
      * @throws IllegalArgumentException
      */
-    public static List<String> split(String stringToSplit, String delimiter, String markers, String markerCloses, boolean trim) {
+    public static List<String> split(String stringToSplit, String delimiter, String openingMarkers, String closingMarkers, boolean trim) {
+        return split(stringToSplit, delimiter, openingMarkers, closingMarkers, "", trim);
+    }
+
+    /**
+     * Splits stringToSplit into a list, using the given delimiter and skipping all between the given markers.
+     * 
+     * @param stringToSplit
+     *            the string to split
+     * @param delimiter
+     *            the string to split on
+     * @param openingMarkers
+     *            characters which delimit the beginning of a text block to skip
+     * @param closingMarkers
+     *            characters which delimit the end of a text block to skip
+     * @param overridingMarkers
+     *            the subset of <code>openingMarkers</code> that override the remaining markers, e.g., if <code>openingMarkers = "'("</code> and
+     *            <code>overridingMarkers = "'"</code> then the block between the outer parenthesis in <code>"start ('max('); end"</code> is strictly consumed,
+     *            otherwise the suffix <code>" end"</code> would end up being consumed too in the process of handling the nested parenthesis.
+     * @param trim
+     *            should the split strings be whitespace trimmed?
+     * 
+     * @return the list of strings, split by delimiter
+     * 
+     * @throws IllegalArgumentException
+     */
+    public static List<String> split(String stringToSplit, String delimiter, String openingMarkers, String closingMarkers, String overridingMarkers,
+            boolean trim) {
         if (stringToSplit == null) {
             return new ArrayList<String>();
         }
@@ -1335,7 +1428,8 @@ public class StringUtils {
 
         List<String> splitTokens = new ArrayList<String>();
 
-        while ((delimPos = indexOfIgnoreCase(currentPos, stringToSplit, delimiter, markers, markerCloses, SEARCH_MODE__MRK_COM_WS)) != -1) {
+        while ((delimPos = indexOfIgnoreCase(currentPos, stringToSplit, delimiter, openingMarkers, closingMarkers, overridingMarkers,
+                SEARCH_MODE__MRK_COM_WS)) != -1) {
             String token = stringToSplit.substring(currentPos, delimPos);
 
             if (trim) {
@@ -1559,95 +1653,93 @@ public class StringUtils {
     }
 
     /**
-     * Compares searchIn against searchForWildcard with wildcards (heavily
-     * borrowed from strings/ctype-simple.c in the server sources)
+     * Compares searchIn against searchForWildcard with wildcards, in a case insensitive manner.
      * 
      * @param searchIn
      *            the string to search in
-     * @param searchForWildcard
-     *            the string to search for, using the 'standard' SQL wildcard
-     *            chars of '%' and '_'
-     * 
-     * @return WILD_COMPARE_MATCH_NO_WILD if matched, WILD_COMPARE_NO_MATCH if
-     *         not matched with wildcard, WILD_COMPARE_MATCH_WITH_WILD if
-     *         matched with wildcard
+     * @param searchFor
+     *            the string to search for, using the 'standard' SQL wildcard chars of '%' and '_'
      */
-    public static int wildCompare(String searchIn, String searchForWildcard) {
-        if ((searchIn == null) || (searchForWildcard == null)) {
+    public static boolean wildCompareIgnoreCase(String searchIn, String searchFor) {
+        return wildCompareInternal(searchIn, searchFor) == WILD_COMPARE_MATCH;
+    }
+
+    /**
+     * Compares searchIn against searchForWildcard with wildcards (heavily borrowed from strings/ctype-simple.c in the server sources)
+     * 
+     * This method does a single passage matching for normal characters and WILDCARD_ONE (_), and recursive matching for WILDCARD_MANY (%) which may be repeated
+     * for as many anchor chars are found.
+     * 
+     * @param searchIn
+     *            the string to search in
+     * @param searchFor
+     *            the string to search for, using the 'standard' SQL wildcard chars of '%' and '_'
+     * 
+     * @return WILD_COMPARE_MATCH if matched, WILD_COMPARE_NO_MATCH if not matched, WILD_COMPARE_CONTINUE_WITH_WILD if not matched yet, but it may in one of
+     *         following recursion rounds
+     */
+    private static int wildCompareInternal(String searchIn, String searchFor) {
+        if ((searchIn == null) || (searchFor == null)) {
             return WILD_COMPARE_NO_MATCH;
         }
 
-        if (searchForWildcard.equals("%")) {
-
-            return WILD_COMPARE_MATCH_WITH_WILD;
+        if (searchFor.equals("%")) {
+            return WILD_COMPARE_MATCH;
         }
 
-        int result = WILD_COMPARE_NO_MATCH; /* Not found, using wildcards */
-
-        char wildcardMany = '%';
-        char wildcardOne = '_';
-        char wildcardEscape = '\\';
-
         int searchForPos = 0;
-        int searchForEnd = searchForWildcard.length();
+        int searchForEnd = searchFor.length();
 
         int searchInPos = 0;
         int searchInEnd = searchIn.length();
 
-        while (searchForPos != searchForEnd) {
-            char wildstrChar = searchForWildcard.charAt(searchForPos);
+        int result = WILD_COMPARE_NO_MATCH; /* Not found, using wildcards */
 
-            while ((searchForWildcard.charAt(searchForPos) != wildcardMany) && (wildstrChar != wildcardOne)) {
-                if ((searchForWildcard.charAt(searchForPos) == wildcardEscape) && ((searchForPos + 1) != searchForEnd)) {
+        while (searchForPos != searchForEnd) {
+            while ((searchFor.charAt(searchForPos) != WILDCARD_MANY) && (searchFor.charAt(searchForPos) != WILDCARD_ONE)) {
+                if ((searchFor.charAt(searchForPos) == WILDCARD_ESCAPE) && ((searchForPos + 1) != searchForEnd)) {
                     searchForPos++;
                 }
 
                 if ((searchInPos == searchInEnd)
-                        || (Character.toUpperCase(searchForWildcard.charAt(searchForPos++)) != Character.toUpperCase(searchIn.charAt(searchInPos++)))) {
-                    return WILD_COMPARE_MATCH_WITH_WILD; /* No match */
+                        || (Character.toUpperCase(searchFor.charAt(searchForPos++)) != Character.toUpperCase(searchIn.charAt(searchInPos++)))) {
+                    return WILD_COMPARE_CONTINUE_WITH_WILD; /* No match */
                 }
 
                 if (searchForPos == searchForEnd) {
-                    return ((searchInPos != searchInEnd) ? WILD_COMPARE_MATCH_WITH_WILD : WILD_COMPARE_MATCH_NO_WILD); /* Match if both are at end */
+                    return ((searchInPos != searchInEnd) ? WILD_COMPARE_CONTINUE_WITH_WILD : WILD_COMPARE_MATCH); /* Match if both are at end */
                 }
 
-                result = WILD_COMPARE_MATCH_WITH_WILD; /* Found an anchor char */
+                result = WILD_COMPARE_CONTINUE_WITH_WILD; /* Found an anchor char */
             }
 
-            if (searchForWildcard.charAt(searchForPos) == wildcardOne) {
+            if (searchFor.charAt(searchForPos) == WILDCARD_ONE) {
                 do {
                     if (searchInPos == searchInEnd) { /* Skip one char if possible */
-
-                        return (result);
+                        return result;
                     }
-
                     searchInPos++;
-                } while ((++searchForPos < searchForEnd) && (searchForWildcard.charAt(searchForPos) == wildcardOne));
+                } while ((++searchForPos < searchForEnd) && (searchFor.charAt(searchForPos) == WILDCARD_ONE));
 
                 if (searchForPos == searchForEnd) {
                     break;
                 }
             }
 
-            if (searchForWildcard.charAt(searchForPos) == wildcardMany) { /* Found w_many */
-
-                char cmp;
-
+            if (searchFor.charAt(searchForPos) == WILDCARD_MANY) { /* Found w_many */
                 searchForPos++;
 
                 /* Remove any '%' and '_' from the wild search string */
                 for (; searchForPos != searchForEnd; searchForPos++) {
-                    if (searchForWildcard.charAt(searchForPos) == wildcardMany) {
+                    if (searchFor.charAt(searchForPos) == WILDCARD_MANY) {
                         continue;
                     }
 
-                    if (searchForWildcard.charAt(searchForPos) == wildcardOne) {
-                        if (searchInPos == searchInEnd) {
-                            return (WILD_COMPARE_NO_MATCH);
+                    if (searchFor.charAt(searchForPos) == WILDCARD_ONE) {
+                        if (searchInPos == searchInEnd) { /* Skip one char if possible */
+                            return WILD_COMPARE_NO_MATCH;
                         }
-
                         searchInPos++;
-
                         continue;
                     }
 
@@ -1655,15 +1747,16 @@ public class StringUtils {
                 }
 
                 if (searchForPos == searchForEnd) {
-                    return WILD_COMPARE_MATCH_NO_WILD; /* Ok if w_many is last */
+                    return WILD_COMPARE_MATCH; /* Ok if w_many is last */
                 }
 
                 if (searchInPos == searchInEnd) {
                     return WILD_COMPARE_NO_MATCH;
                 }
 
-                if (((cmp = searchForWildcard.charAt(searchForPos)) == wildcardEscape) && ((searchForPos + 1) != searchForEnd)) {
-                    cmp = searchForWildcard.charAt(++searchForPos);
+                char cmp;
+                if (((cmp = searchFor.charAt(searchForPos)) == WILDCARD_ESCAPE) && ((searchForPos + 1) != searchForEnd)) {
+                    cmp = searchFor.charAt(++searchForPos);
                 }
 
                 searchForPos++;
@@ -1671,26 +1764,24 @@ public class StringUtils {
                 do {
                     while ((searchInPos != searchInEnd) && (Character.toUpperCase(searchIn.charAt(searchInPos)) != Character.toUpperCase(cmp))) {
                         searchInPos++;
-                    }
+                    } /* Searches for an anchor char */
 
                     if (searchInPos++ == searchInEnd) {
                         return WILD_COMPARE_NO_MATCH;
                     }
 
-                    {
-                        int tmp = wildCompare(searchIn, searchForWildcard);
-
-                        if (tmp <= 0) {
-                            return (tmp);
-                        }
+                    int tmp = wildCompareInternal(searchIn.substring(searchInPos), searchFor.substring(searchForPos));
+                    if (tmp <= 0) {
+                        return tmp;
                     }
-                } while ((searchInPos != searchInEnd) && (searchForWildcard.charAt(0) != wildcardMany));
+
+                } while (searchInPos != searchInEnd);
 
                 return WILD_COMPARE_NO_MATCH;
             }
         }
 
-        return ((searchInPos != searchInEnd) ? WILD_COMPARE_MATCH_WITH_WILD : WILD_COMPARE_MATCH_NO_WILD);
+        return ((searchInPos != searchInEnd) ? WILD_COMPARE_CONTINUE_WITH_WILD : WILD_COMPARE_MATCH);
     }
 
     static byte[] s2b(String s, MySQLConnection conn) throws SQLException {
@@ -1799,9 +1890,7 @@ public class StringUtils {
         try {
             while ((currentChar = sourceReader.read()) != -1) {
 
-                if (false && currentChar == '\\') {
-                    escaped = !escaped;
-                } else if (markerTypeFound != -1 && currentChar == stringCloses.charAt(markerTypeFound) && !escaped) {
+                if (markerTypeFound != -1 && currentChar == stringCloses.charAt(markerTypeFound) && !escaped) {
                     contextMarker = Character.MIN_VALUE;
                     markerTypeFound = -1;
                 } else if ((ind = stringOpens.indexOf(currentChar)) != -1 && !escaped && contextMarker == Character.MIN_VALUE) {
@@ -1847,7 +1936,7 @@ public class StringUtils {
                         strBuilder.append('-');
 
                         if (currentChar != -1) {
-                            strBuilder.append(currentChar);
+                            strBuilder.append((char) currentChar);
                         }
 
                         continue;
@@ -1891,69 +1980,42 @@ public class StringUtils {
     }
 
     /**
-     * Next we check if there is anything to split. If so
-     * we return result in form of "database";"name"
-     * If string is NULL or wildcard (%), returns null and exits.
+     * Splits an entity identifier into its parts (database and entity name) and returns a list containing the two elements. If the identifier doesn't contain
+     * the database part then the argument <code>catalog</code> is used in its place and <code>source</code> corresponds to the full entity name.
+     * If argument <code>source</code> is NULL or wildcard (%), returns an empty list.
      * 
-     * @param src
+     * @param source
      *            the source string
-     * @param cat
+     * @param catalog
      *            Catalog, if available
-     * @param quotId
-     *            quoteId as defined on server
+     * @param quoteId
+     *            quote character as defined on server
      * @param isNoBslashEscSet
-     *            Is our connection in BackSlashEscape mode
+     *            is our connection in no BackSlashEscape mode
      * @return the input string with all comment-delimited data removed
      */
-    public static List<String> splitDBdotName(String src, String cat, String quotId, boolean isNoBslashEscSet) {
-        if ((src == null) || (src.equals("%"))) {
-            return new ArrayList<String>();
+    public static List<String> splitDBdotName(String source, String catalog, String quoteId, boolean isNoBslashEscSet) {
+        if ((source == null) || (source.equals("%"))) {
+            return Collections.emptyList();
         }
 
-        boolean isQuoted = StringUtils.indexOfIgnoreCase(0, src, quotId) > -1;
-
-        String retval = src;
-        String tmpCat = cat;
-        //I.e., what if database is named `MyDatabase 1.0.0`... thus trueDotIndex
-        int trueDotIndex = -1;
-        if (!" ".equals(quotId)) {
-            //Presumably, if there is a database name attached and it contains dots, then it should be quoted so we first check for that
-            if (isQuoted) {
-                trueDotIndex = StringUtils.indexOfIgnoreCase(0, retval, quotId + "." + quotId);
-            } else {
-                // NOT quoted, fetch first DOT
-                // ex: cStmt = this.conn.prepareCall("{call bug57022.procbug57022(?, ?)}");
-                trueDotIndex = StringUtils.indexOfIgnoreCase(0, retval, ".");
-            }
+        int dotIndex = -1;
+        if (" ".equals(quoteId)) {
+            dotIndex = source.indexOf(".");
         } else {
-            trueDotIndex = retval.indexOf(".");
+            dotIndex = indexOfIgnoreCase(0, source, ".", quoteId, quoteId, isNoBslashEscSet ? SEARCH_MODE__MRK_WS : SEARCH_MODE__BSESC_MRK_WS);
         }
 
-        List<String> retTokens = new ArrayList<String>(2);
-
-        if (trueDotIndex != -1) {
-            //There is a catalog attached
-            if (isQuoted) {
-                tmpCat = StringUtils.toString(StringUtils.stripEnclosure(retval.substring(0, trueDotIndex + 1).getBytes(), quotId, quotId));
-                if (StringUtils.startsWithIgnoreCaseAndWs(tmpCat, quotId)) {
-                    tmpCat = tmpCat.substring(1, tmpCat.length() - 1);
-                }
-
-                retval = retval.substring(trueDotIndex + 2);
-                retval = StringUtils.toString(StringUtils.stripEnclosure(retval.getBytes(), quotId, quotId));
-            } else {
-                //NOT quoted, adjust indexOf
-                tmpCat = retval.substring(0, trueDotIndex);
-                retval = retval.substring(trueDotIndex + 1);
-            }
+        String database = catalog;
+        String entityName;
+        if (dotIndex != -1) {
+            database = unQuoteIdentifier(source.substring(0, dotIndex), quoteId);
+            entityName = unQuoteIdentifier(source.substring(dotIndex + 1), quoteId);
         } else {
-            //No catalog attached, strip retval and return
-            retval = StringUtils.toString(StringUtils.stripEnclosure(retval.getBytes(), quotId, quotId));
+            entityName = unQuoteIdentifier(source, quoteId);
         }
 
-        retTokens.add(tmpCat);
-        retTokens.add(retval);
-        return retTokens;
+        return Arrays.asList(database, entityName);
     }
 
     public static boolean isEmptyOrWhitespaceOnly(String str) {
@@ -2354,5 +2416,25 @@ public class StringUtils {
         asBytes[encodedLen] = 0;
 
         return asBytes;
+    }
+
+    /**
+     * Checks is the CharSequence contains digits only. No leading sign and thousands or decimal separators are allowed.
+     * 
+     * @param cs
+     *            The CharSequence to check.
+     * @return
+     *         {@code true} if the CharSequence not empty and contains only digits, {@code false} otherwise.
+     */
+    public static boolean isStrictlyNumeric(CharSequence cs) {
+        if (cs == null || cs.length() == 0) {
+            return false;
+        }
+        for (int i = 0; i < cs.length(); i++) {
+            if (!Character.isDigit(cs.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

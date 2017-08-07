@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2002, 2015, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2002, 2016, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -101,10 +101,13 @@ public class NonRegisteringDriver implements java.sql.Driver {
     }
 
     static {
-        AbandonedConnectionCleanupThread referenceThread = new AbandonedConnectionCleanupThread();
-        referenceThread.setDaemon(true);
-        referenceThread.start();
+        try {
+            Class.forName(AbandonedConnectionCleanupThread.class.getName());
+        } catch (ClassNotFoundException e) {
+            // ignore
+        }
     }
+
     /**
      * Key used to retreive the database value from the properties instance
      * passed to the driver.
@@ -193,7 +196,7 @@ public class NonRegisteringDriver implements java.sql.Driver {
 
         String[] splitValues = new String[2];
 
-        if (StringUtils.startsWithIgnoreCaseAndWs(hostPortPair, "address")) {
+        if (StringUtils.startsWithIgnoreCaseAndWs(hostPortPair, "address=")) {
             splitValues[HOST_NAME_INDEX] = hostPortPair.trim();
             splitValues[PORT_NUMBER_INDEX] = null;
 
@@ -594,6 +597,7 @@ public class NonRegisteringDriver implements java.sql.Driver {
         return false;
     }
 
+    @SuppressWarnings("deprecation")
     public Properties parseURL(String url, Properties defaults) throws java.sql.SQLException {
         Properties urlProps = (defaults != null) ? new Properties(defaults) : new Properties();
 
@@ -712,14 +716,17 @@ public class NonRegisteringDriver implements java.sql.Driver {
 
                 urlProps = propTransformer.transformProperties(urlProps);
             } catch (InstantiationException e) {
-                throw SQLError.createSQLException("Unable to create properties transform instance '" + propertiesTransformClassName
-                        + "' due to underlying exception: " + e.toString(), SQLError.SQL_STATE_INVALID_CONNECTION_ATTRIBUTE, null);
+                throw SQLError.createSQLException(
+                        "Unable to create properties transform instance '" + propertiesTransformClassName + "' due to underlying exception: " + e.toString(),
+                        SQLError.SQL_STATE_INVALID_CONNECTION_ATTRIBUTE, null);
             } catch (IllegalAccessException e) {
-                throw SQLError.createSQLException("Unable to create properties transform instance '" + propertiesTransformClassName
-                        + "' due to underlying exception: " + e.toString(), SQLError.SQL_STATE_INVALID_CONNECTION_ATTRIBUTE, null);
+                throw SQLError.createSQLException(
+                        "Unable to create properties transform instance '" + propertiesTransformClassName + "' due to underlying exception: " + e.toString(),
+                        SQLError.SQL_STATE_INVALID_CONNECTION_ATTRIBUTE, null);
             } catch (ClassNotFoundException e) {
-                throw SQLError.createSQLException("Unable to create properties transform instance '" + propertiesTransformClassName
-                        + "' due to underlying exception: " + e.toString(), SQLError.SQL_STATE_INVALID_CONNECTION_ATTRIBUTE, null);
+                throw SQLError.createSQLException(
+                        "Unable to create properties transform instance '" + propertiesTransformClassName + "' due to underlying exception: " + e.toString(),
+                        SQLError.SQL_STATE_INVALID_CONNECTION_ATTRIBUTE, null);
             }
         }
 
@@ -769,8 +776,9 @@ public class NonRegisteringDriver implements java.sql.Driver {
                     }
                     configProps.load(configAsStream);
                 } catch (IOException ioEx) {
-                    SQLException sqlEx = SQLError.createSQLException("Unable to load configuration template '" + configName
-                            + "' due to underlying IOException: " + ioEx, SQLError.SQL_STATE_INVALID_CONNECTION_ATTRIBUTE, null);
+                    SQLException sqlEx = SQLError.createSQLException(
+                            "Unable to load configuration template '" + configName + "' due to underlying IOException: " + ioEx,
+                            SQLError.SQL_STATE_INVALID_CONNECTION_ATTRIBUTE, null);
                     sqlEx.initCause(ioEx);
 
                     throw sqlEx;

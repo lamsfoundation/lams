@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -100,12 +100,8 @@ public class FabricMultiTenantConnectionProvider implements MultiTenantConnectio
      */
     public Connection getConnection(String tenantIdentifier) throws SQLException {
         String serverGroupName = this.shardMapping.getGroupNameForKey(tenantIdentifier);
-        try {
-            ServerGroup serverGroup = this.fabricConnection.getServerGroup(serverGroupName);
-            return getReadWriteConnectionFromServerGroup(serverGroup);
-        } catch (FabricCommunicationException ex) {
-            throw new RuntimeException(ex);
-        }
+        ServerGroup serverGroup = this.fabricConnection.getServerGroup(serverGroupName);
+        return getReadWriteConnectionFromServerGroup(serverGroup);
     }
 
     /**
@@ -135,6 +131,7 @@ public class FabricMultiTenantConnectionProvider implements MultiTenantConnectio
         return false;
     }
 
+    @SuppressWarnings("rawtypes")
     public boolean isUnwrappableAs(Class unwrapType) {
         return false;
     }
