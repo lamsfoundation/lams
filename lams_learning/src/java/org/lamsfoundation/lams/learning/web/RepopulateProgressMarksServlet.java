@@ -63,7 +63,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.orm.hibernate4.SessionHolder;
+import org.springframework.orm.hibernate5.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;

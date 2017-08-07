@@ -178,7 +178,7 @@
                 <logger category="org.springframework.transaction.jta">
                     <level name="INFO"/>
                 </logger>
-                <logger category="org.springframework.orm.hibernate4">
+                <logger category="org.springframework.orm.hibernate5">
                     <level name="INFO"/>
                 </logger>
                 <logger category="org.springframework.beans.factory.annotation">

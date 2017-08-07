@@ -28,8 +28,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.orm.hibernate4.SessionFactoryUtils;
-import org.springframework.orm.hibernate4.support.OpenSessionInViewFilter;
+import org.springframework.orm.hibernate5.SessionFactoryUtils;
+import org.springframework.orm.hibernate5.support.OpenSessionInViewFilter;
 
 /**
  *
@@ -55,7 +55,7 @@ public class CustomizedOpenSessionInViewFilter extends OpenSessionInViewFilter {
      * @return the Session to use
      * @throws DataAccessResourceFailureException
      *             if the Session could not be created
-     * @see org.springframework.orm.hibernate4.SessionFactoryUtils#getSession(SessionFactory, boolean)
+     * @see org.springframework.orm.hibernate5.SessionFactoryUtils#getSession(SessionFactory, boolean)
      * @see org.hibernate.FlushMode#NEVER
      */
     @Override

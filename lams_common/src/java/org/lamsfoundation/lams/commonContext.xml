@@ -14,7 +14,7 @@
  	<!-- Hibernate SessionFactory. Since LAMS 2.3 it is used in all tools and other parts of LAMS,
  		 rather than several local Session Factiories.
  	-->
-	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="dataSource"/></property>
 		<property name="mappingLocations">
 			<list>

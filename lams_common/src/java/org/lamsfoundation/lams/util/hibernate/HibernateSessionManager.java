@@ -5,7 +5,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.context.internal.ManagedSessionContext;
 import org.lamsfoundation.lams.web.session.SessionManager;
-import org.springframework.orm.hibernate4.SessionHolder;
+import org.springframework.orm.hibernate5.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
