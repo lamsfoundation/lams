@@ -33,6 +33,8 @@ httpunit 1.7
 
 JBoss Web 2.1.3
 
+jLaTexMath 1.0.6
+
 JSP API 2.3
 
 lucene 2.4.0
