@@ -41,7 +41,6 @@
 			<include name="org/slf4j/main/slf4j-api-*.jar" />
 			<include name="org/slf4j/impl/main/slf4j-jboss-logmanager-*.jar" />
 			<include name="org/slf4j/jcl-over-slf4j/main/jcl-over-slf4j-*.jar" /> <!-- Alias for Commons Logging -->
-			<include name="org/apache/xerces/main/xercesImpl-*.jar" />
 			<include name="javax/xml/rpc/api/main/jboss-jaxrpc-api*.jar" />
 			<include name="javax/mail/api/main/javax.mail-*.jar" />
 			<include name="org/jboss/remoting-jmx/main/remoting-jmx-*.jar" />
