@@ -13,6 +13,8 @@ Apache HttpClient 4.5
 
 Apache HttpCore 4.4.1
 
+Apache POI 3.16
+
 Commons Lang 2.6
 
 Commons IO 2.4
