@@ -33,7 +33,7 @@
         <archive javadoc="http://docs.spring.io/spring/docs/4.3.10.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-context-support-4.3.10.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive javadoc="http://docs.spring.io/spring/docs/4.3.10.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-aop-4.3.10.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive path="/lams_build/lib/xstream/xstream-1.5.0-SNAPSHOT.jar" source="/3rdParty_sources/xstream"/>
-        <archive path="/lams_build/lib/quartz/quartz-2.2.1.jar" source="/3rdParty_sources/quartz"/>
+        <archive path="/lams_build/lib/quartz/quartz-2.2.3.jar" source="/3rdParty_sources/quartz"/>
         <archive path="/lams_build/lib/lucene/lucene-core-4.10.2.jar" source="/3rdParty_sources/lucene"/>
         <archive path="/lams_build/lib/lucene/lucene-analyzers-common-4.10.2.jar" source="/3rdParty_sources/lucene"/>
         <archive path="/lams_build/lib/lucene/lucene-queryparser-4.10.2.jar" source="/3rdParty_sources/lucene"/>
