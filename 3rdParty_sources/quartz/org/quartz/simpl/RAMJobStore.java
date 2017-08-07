@@ -1387,7 +1387,7 @@ public class RAMJobStore implements JobStore {
             List<OperableTrigger> result = new ArrayList<OperableTrigger>();
             Set<JobKey> acquiredJobKeysForNoConcurrentExec = new HashSet<JobKey>();
             Set<TriggerWrapper> excludedTriggers = new HashSet<TriggerWrapper>();
-            long firstAcquiredTriggerFireTime = 0;
+            long batchEnd = noLaterThan;
             
             // return empty list if store has no triggers.
             if (timeTriggers.size() == 0)
@@ -1416,7 +1416,7 @@ public class RAMJobStore implements JobStore {
                     continue;
                 }
 
-                if (tw.getTrigger().getNextFireTime().getTime() > noLaterThan + timeWindow) {
+                if (tw.getTrigger().getNextFireTime().getTime() > batchEnd) {
                     timeTriggers.add(tw);
                     break;
                 }
@@ -1437,14 +1437,14 @@ public class RAMJobStore implements JobStore {
                 tw.state = TriggerWrapper.STATE_ACQUIRED;
                 tw.trigger.setFireInstanceId(getFiredTriggerRecordId());
                 OperableTrigger trig = (OperableTrigger) tw.trigger.clone();
+                if (result.isEmpty()) {
+                    batchEnd = Math.max(tw.trigger.getNextFireTime().getTime(), System.currentTimeMillis()) + timeWindow;
+                }
                 result.add(trig);
-                if(firstAcquiredTriggerFireTime == 0)
-                    firstAcquiredTriggerFireTime = tw.trigger.getNextFireTime().getTime();
-
                 if (result.size() == maxCount)
                     break;
             }
-            
+
             // If we did excluded triggers to prevent ACQUIRE state due to DisallowConcurrentExecution, we need to add them back to store.
             if (excludedTriggers.size() > 0)
                 timeTriggers.addAll(excludedTriggers);

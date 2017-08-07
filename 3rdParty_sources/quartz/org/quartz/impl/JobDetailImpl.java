@@ -429,7 +429,8 @@ public class JobDetailImpl implements Cloneable, java.io.Serializable, JobDetail
 
     @Override
     public int hashCode() {
-        return getKey().hashCode();
+        JobKey key = getKey();
+        return key == null ? 0 : getKey().hashCode();
     }
     
     @Override

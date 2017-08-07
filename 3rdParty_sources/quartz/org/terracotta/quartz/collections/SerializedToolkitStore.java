@@ -192,6 +192,26 @@ public class SerializedToolkitStore<K, V extends Serializable> implements Toolki
     return this.toolkitStore.replace(serializeToString(key), value);
   }
 
+  @Override
+  public boolean isBulkLoadEnabled() {
+    return this.toolkitStore.isBulkLoadEnabled();
+  }
+
+  @Override
+  public boolean isNodeBulkLoadEnabled() {
+    return this.toolkitStore.isNodeBulkLoadEnabled();
+  }
+
+  @Override
+  public void setNodeBulkLoadEnabled(boolean enabledBulkLoad) {
+    this.toolkitStore.setNodeBulkLoadEnabled(enabledBulkLoad);
+  }
+
+  @Override
+  public void waitUntilBulkLoadComplete() throws InterruptedException {
+    this.toolkitStore.waitUntilBulkLoadComplete();
+  }
+
   private static class ToolkitEntrySet<K, V> implements Set<java.util.Map.Entry<K, V>> {
     private final Set<java.util.Map.Entry<String, V>> set;
 

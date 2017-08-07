@@ -383,45 +383,26 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
      * @see #processFileAndScheduleJobs(String, org.quartz.Scheduler)
      */
     protected String getSystemIdForFileName(String fileName) {
-        InputStream fileInputStream = null;
-        try {
-            String urlPath = null;
-            
-            File file = new File(fileName); // files in filesystem
-            if (!file.exists()) {
-                URL url = getURL(fileName);
-                if (url != null) {
-                    try {
-                        urlPath = URLDecoder.decode(url.getPath(), "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        log.warn("Unable to decode file path URL", e);
-                    } 
-                    try {
-                        fileInputStream = url.openStream();
-                    } catch (IOException ignore) {
-                    }
-                }        
-            } else {
-                try {              
-                    fileInputStream = new FileInputStream(file);
-                }catch (FileNotFoundException ignore) {
-                }
+        File file = new File(fileName); // files in filesystem
+        if (file.exists()) {
+            try {
+                new FileInputStream(file).close();
+                return file.toURI().toString();
+            }catch (IOException ignore) {
+                return fileName;
             }
-            
-            if (fileInputStream == null) {
-                log.debug("Unable to resolve '" + fileName + "' to full path, so using it as is for system id.");
+        } else {
+            URL url = getURL(fileName);
+            if (url == null) {
                 return fileName;
             } else {
-                return (urlPath != null) ? urlPath : file.getAbsolutePath();
-            }
-        } finally {
-            try {
-                if (fileInputStream != null) {
-                    fileInputStream.close();
+                try {
+                    url.openStream().close();
+                    return url.toString();
+                } catch (IOException ignore) {
+                    return fileName;
                 }
-            } catch (IOException ioe) {
-                log.warn("Error closing jobs file: " + fileName, ioe);
-            }
+            }      
         }
     }
 

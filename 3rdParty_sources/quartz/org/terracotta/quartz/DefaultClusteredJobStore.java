@@ -1532,7 +1532,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     Set<JobKey> acquiredJobKeysForNoConcurrentExec = new HashSet<JobKey>();
     Set<TriggerWrapper> excludedTriggers = new HashSet<TriggerWrapper>();
     JobPersistenceException caughtJpe = null;
-    long firstAcquiredTriggerFireTime = 0;
+    long batchEnd = noLaterThan;
 
     try {
       while (true) {
@@ -1552,17 +1552,6 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
           continue;
         }
 
-        // it's possible that we've selected triggers way outside of the max fire ahead time for batches
-        // (up to idleWaitTime + fireAheadTime) so we need to make sure not to include such triggers.
-        // So we select from the first next trigger to fire up until the max fire ahead time after that...
-        // which will perfectly honor the fireAheadTime window because the no firing will occur until
-        // the first acquired trigger's fire time arrives.
-        if (firstAcquiredTriggerFireTime > 0
-            && tw.getNextFireTime().getTime() > (firstAcquiredTriggerFireTime + timeWindow)) {
-          source.add(tw);
-          break;
-        }
-
         if (applyMisfire(tw)) {
           if (tw.getNextFireTime() != null) {
             source.add(tw);
@@ -1570,7 +1559,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
           continue;
         }
 
-        if (tw.getNextFireTime().getTime() > noLaterThan + timeWindow) {
+        if (tw.getNextFireTime().getTime() > batchEnd) {
           source.add(tw);
           break;
         }
@@ -1581,8 +1570,11 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
           }
           acquiredJobKeysForNoConcurrentExec.add(tw.getJobKey());
         }
+
+        if (wrappers.isEmpty()) {
+            batchEnd = Math.max(tw.getNextFireTime().getTime(), System.currentTimeMillis()) + timeWindow;
+        }
         wrappers.add(tw);
-        if (firstAcquiredTriggerFireTime == 0) firstAcquiredTriggerFireTime = tw.getNextFireTime().getTime();
         if (wrappers.size() == maxCount) {
           break;
         }
