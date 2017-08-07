@@ -270,6 +270,9 @@ public class AuthoringActivityDTO extends BaseDTO {
     /*******************************************************************************************************************
      * Constructors
      ******************************************************************************************************************/
+    public AuthoringActivityDTO() {
+    }
+    
     public AuthoringActivityDTO(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings,
 	    String languageCode) {
 	activityID = activity.getActivityId();

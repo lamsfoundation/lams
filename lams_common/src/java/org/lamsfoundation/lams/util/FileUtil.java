@@ -57,7 +57,7 @@ import org.w3c.dom.Document;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
-import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
@@ -67,7 +67,8 @@ public class FileUtil {
     private static Logger log = Logger.getLogger(FileUtil.class);
 
     public static final String ENCODING_UTF_8 = "UTF8";
-    public static final SimpleDateFormat EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    public static final SimpleDateFormat EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT = new SimpleDateFormat(
+	    "dd/MM/yyyy HH:mm:ss");
     public static final SimpleDateFormat EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     public static final String LAMS_WWW_SECURE_DIR = "secure";
@@ -690,7 +691,7 @@ public class FileUtil {
     public static Object getObjectFromXML(XStream xStream, String fullFilePath) throws IOException {
 
 	Reader file = null;
-	XStream conversionXml = xStream != null ? xStream : new XStream(new SunUnsafeReflectionProvider());
+	XStream conversionXml = xStream != null ? xStream : new XStream(new StaxDriver());
 	// allow parsing all classes
 	conversionXml.addPermission(AnyTypePermission.ANY);
 	ConversionException finalException = null;

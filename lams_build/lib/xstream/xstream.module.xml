@@ -29,9 +29,10 @@
   <dependencies>
   	<system>
   		<paths>
-  			<path name="sun/misc" />
+  			<path name="javax/xml/stream" />
+  			<path name="javax/xml/transform" />
+  			<path name="javax/xml/namespace" />
   		</paths>
   	</system>
-    <module name="org.xmlpull"/>
   </dependencies>
 </module>

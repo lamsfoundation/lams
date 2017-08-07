@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mindmap.service;
 
 import java.util.ArrayList;
@@ -79,7 +78,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
@@ -90,7 +89,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     private static Logger logger = Logger.getLogger(MindmapService.class.getName());
 
-    private final XStream xstream = new XStream(new SunUnsafeReflectionProvider());
+    private final XStream xstream = new XStream(new StaxDriver());
 
     private IMindmapDAO mindmapDAO = null;
     private IMindmapSessionDAO mindmapSessionDAO = null;
@@ -167,10 +166,10 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getMindmapOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -383,7 +382,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     @Override
     public String getLanguageXML() {
-	ArrayList<String> languageCollection = new ArrayList<String>();
+	ArrayList<String> languageCollection = new ArrayList<>();
 	languageCollection.add(new String("local.title"));
 	languageCollection.add(new String("local.delete_question"));
 	languageCollection.add(new String("local.yes"));
@@ -447,13 +446,13 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    return;
 	}
 
-	List<MindmapNode> nodesToDelete = new LinkedList<MindmapNode>();
+	List<MindmapNode> nodesToDelete = new LinkedList<>();
 	for (MindmapSession session : (Set<MindmapSession>) mindmap.getMindmapSessions()) {
 	    List<MindmapNode> nodes = mindmapNodeDAO.getMindmapNodesBySessionIdAndUserId(session.getSessionId(),
 		    userId.longValue());
 
 	    for (MindmapNode node : nodes) {
-		List<MindmapNode> descendants = new LinkedList<MindmapNode>();
+		List<MindmapNode> descendants = new LinkedList<>();
 		if ((node.getUser() != null) && node.getUser().getUserId().equals(userId.longValue())
 			&& !nodesToDelete.contains(node)
 			&& userOwnsChildrenNodes(node, userId.longValue(), descendants)) {
@@ -858,10 +857,10 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     public void setMindmapNodeDAO(IMindmapNodeDAO mindmapNodeDAO) {

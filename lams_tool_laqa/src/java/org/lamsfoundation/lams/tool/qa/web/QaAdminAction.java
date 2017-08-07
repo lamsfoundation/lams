@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
@@ -56,7 +55,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
@@ -199,7 +198,7 @@ public class QaAdminAction extends LamsDispatchAction {
     @SuppressWarnings("unchecked")
     public void updateWizardFromXML(String xmlStr) {
 	//SortedSet<QaWizardCategory> currentCategories = getQaWizardCategories();
-	SortedSet<QaWizardCategory> newCategories = new TreeSet<QaWizardCategory>();
+	SortedSet<QaWizardCategory> newCategories = new TreeSet<>();
 	try {
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder db = dbf.newDocumentBuilder();
@@ -298,13 +297,13 @@ public class QaAdminAction extends LamsDispatchAction {
 	}
 
 	// now start the export
-	SortedSet<QaWizardCategory> exportCategories = new TreeSet<QaWizardCategory>();
+	SortedSet<QaWizardCategory> exportCategories = new TreeSet<>();
 	for (QaWizardCategory category : getQaWizardCategories()) {
 	    exportCategories.add((QaWizardCategory) category.clone());
 	}
 
 	// exporting XML
-	XStream designXml = new XStream(new SunUnsafeReflectionProvider());
+	XStream designXml = new XStream(new StaxDriver());
 	designXml.addPermission(AnyTypePermission.ANY);
 	String exportXml = designXml.toXML(exportCategories);
 
@@ -373,7 +372,7 @@ public class QaAdminAction extends LamsDispatchAction {
 	// Now perform the import
 	try {
 	    String xml = new String(adminForm.getImportFile().getFileData());
-	    XStream conversionXml = new XStream(new SunUnsafeReflectionProvider());
+	    XStream conversionXml = new XStream(new StaxDriver());
 	    conversionXml.addPermission(AnyTypePermission.ANY);
 	    SortedSet<QaWizardCategory> exportCategories = (SortedSet<QaWizardCategory>) conversionXml.fromXML(xml);
 

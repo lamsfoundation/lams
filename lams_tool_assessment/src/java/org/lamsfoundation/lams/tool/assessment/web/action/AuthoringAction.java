@@ -90,7 +90,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
@@ -119,7 +119,7 @@ public class AuthoringAction extends Action {
 
 	    assessment.setDefineLater(true);
 	    service.saveOrUpdateAssessment(assessment);
-	    
+
 	    //audit log the teacher has started editing activity in monitor
 	    service.auditLogStartEditingActivityInMonitor(contentId);
 
@@ -225,7 +225,7 @@ public class AuthoringAction extends Action {
 	AssessmentForm assessmentForm = (AssessmentForm) form;
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	assessmentForm.setSessionMapID(sessionMap.getSessionID());
 
@@ -246,11 +246,11 @@ public class AuthoringAction extends Action {
 	    AuthoringAction.log.error(e);
 	    throw new ServletException(e);
 	}
-	
+
 	if (assessment.getQuestions() != null) {
 	    questions = new ArrayList<AssessmentQuestion>(assessment.getQuestions());
 	} else {
-	    questions = new ArrayList<AssessmentQuestion>();
+	    questions = new ArrayList<>();
 	}
 
 	// init assessment question list
@@ -339,9 +339,8 @@ public class AuthoringAction extends Action {
 	    }
 	}
 
-	Set<AssessmentQuestion> oldQuestions = (assessmentPO == null) ? new HashSet<AssessmentQuestion>()
-		: assessmentPO.getQuestions();
-	Set<QuestionReference> oldReferences = (assessmentPO == null) ? new HashSet<QuestionReference>()
+	Set<AssessmentQuestion> oldQuestions = (assessmentPO == null) ? new HashSet<>() : assessmentPO.getQuestions();
+	Set<QuestionReference> oldReferences = (assessmentPO == null) ? new HashSet<>()
 		: assessmentPO.getQuestionReferences();
 	AssessmentUser assessmentUser = null;
 
@@ -386,7 +385,7 @@ public class AuthoringAction extends Action {
 
 	// ************************* Handle assessment questions *******************
 	// Handle assessment questions
-	Set<AssessmentQuestion> questions = new LinkedHashSet<AssessmentQuestion>();
+	Set<AssessmentQuestion> questions = new LinkedHashSet<>();
 	Set<AssessmentQuestion> newQuestions = getQuestionList(sessionMap);
 	for (AssessmentQuestion question : newQuestions) {
 	    removeNewLineCharacters(question);
@@ -464,7 +463,7 @@ public class AuthoringAction extends Action {
 	questionForm.setPenaltyFactor("0");
 	questionForm.setAnswerRequired(true);
 
-	List<AssessmentQuestionOption> optionList = new ArrayList<AssessmentQuestionOption>();
+	List<AssessmentQuestionOption> optionList = new ArrayList<>();
 	for (int i = 0; i < AssessmentConstants.INITIAL_OPTIONS_NUMBER; i++) {
 	    AssessmentQuestionOption option = new AssessmentQuestionOption();
 	    option.setSequenceId(i + 1);
@@ -473,7 +472,7 @@ public class AuthoringAction extends Action {
 	}
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 
-	List<AssessmentUnit> unitList = new ArrayList<AssessmentUnit>();
+	List<AssessmentUnit> unitList = new ArrayList<>();
 	AssessmentUnit unit = new AssessmentUnit();
 	unit.setSequenceId(1);
 	unit.setMultiplier(1);
@@ -515,7 +514,7 @@ public class AuthoringAction extends Action {
 	AssessmentQuestion question = null;
 	if (questionIdx != -1) {
 	    SortedSet<AssessmentQuestion> assessmentList = getQuestionList(sessionMap);
-	    List<AssessmentQuestion> rList = new ArrayList<AssessmentQuestion>(assessmentList);
+	    List<AssessmentQuestion> rList = new ArrayList<>(assessmentList);
 	    question = rList.get(questionIdx);
 	    if (question != null) {
 		AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
@@ -611,8 +610,7 @@ public class AuthoringAction extends Action {
 
 		String correctAnswer = null;
 		if (question.getAnswers() != null) {
-		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
-			    new SequencableComparator());
+		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
 		    int orderId = 0;
 		    for (Answer answer : question.getAnswers()) {
 			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
@@ -671,8 +669,7 @@ public class AuthoringAction extends Action {
 		    }
 		    questionGrade = new Double(Math.round(totalScore)).intValue();
 
-		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
-			    new SequencableComparator());
+		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
 		    int orderId = 1;
 		    for (Answer answer : question.getAnswers()) {
 			String answerText = answer.getText();
@@ -730,8 +727,7 @@ public class AuthoringAction extends Action {
 		    }
 		    questionGrade = new Double(Math.round(totalScore)).intValue();
 
-		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
-			    new SequencableComparator());
+		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
 		    int orderId = 1;
 		    for (int answerIndex = 0; answerIndex < question.getAnswers().size(); answerIndex++) {
 			// QTI allows answers without a match, but LAMS assessment tool does not
@@ -764,8 +760,7 @@ public class AuthoringAction extends Action {
 
 		String correctAnswer = null;
 		if (question.getAnswers() != null) {
-		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
-			    new SequencableComparator());
+		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
 		    int orderId = 1;
 		    for (Answer answer : question.getAnswers()) {
 			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
@@ -840,10 +835,10 @@ public class AuthoringAction extends Action {
 		.getAttribute(sessionMapID);
 
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	List<Question> questions = new LinkedList<Question>();
+	List<Question> questions = new LinkedList<>();
 	for (AssessmentQuestion assessmentQuestion : questionList) {
 	    Question question = new Question();
-	    List<Answer> answers = new ArrayList<Answer>();
+	    List<Answer> answers = new ArrayList<>();
 
 	    switch (assessmentQuestion.getType()) {
 
@@ -860,10 +855,12 @@ public class AuthoringAction extends Action {
 			}
 
 			Float correctAnswerScore = correctAnswerCount > 0
-				? new Integer(100 / correctAnswerCount).floatValue() : null;
+				? new Integer(100 / correctAnswerCount).floatValue()
+				: null;
 			int incorrectAnswerCount = assessmentQuestion.getOptions().size() - correctAnswerCount;
 			Float incorrectAnswerScore = incorrectAnswerCount > 0
-				? new Integer(-100 / incorrectAnswerCount).floatValue() : null;
+				? new Integer(-100 / incorrectAnswerCount).floatValue()
+				: null;
 
 			for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
 			    Answer answer = new Answer();
@@ -885,8 +882,9 @@ public class AuthoringAction extends Action {
 			    boolean isCorrectAnswer = assessmentAnswer.getGrade() == 1F;
 
 			    answer.setText(assessmentAnswer.getOptionString());
-			    answer.setScore(isCorrectAnswer
-				    ? new Integer(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
+			    answer.setScore(
+				    isCorrectAnswer ? new Integer(assessmentQuestion.getDefaultGrade()).floatValue()
+					    : 0);
 			    answer.setFeedback(isCorrectAnswer ? assessmentQuestion.getFeedbackOnCorrect()
 				    : assessmentQuestion.getFeedbackOnIncorrect());
 
@@ -1021,7 +1019,7 @@ public class AuthoringAction extends Action {
 	int questionIdx = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
 	if (questionIdx != -1) {
 	    SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	    List<AssessmentQuestion> rList = new ArrayList<AssessmentQuestion>(questionList);
+	    List<AssessmentQuestion> rList = new ArrayList<>(questionList);
 	    AssessmentQuestion question = rList.remove(questionIdx);
 	    questionList.clear();
 	    questionList.addAll(rList);
@@ -1143,7 +1141,7 @@ public class AuthoringAction extends Action {
 		.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
 	if (questionReferenceIdx != -1) {
 	    SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
-	    List<QuestionReference> rList = new ArrayList<QuestionReference>(questionReferences);
+	    List<QuestionReference> rList = new ArrayList<>(questionReferences);
 	    QuestionReference questionReference = rList.remove(questionReferenceIdx);
 	    questionReferences.clear();
 	    questionReferences.addAll(rList);
@@ -1197,7 +1195,7 @@ public class AuthoringAction extends Action {
 		.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
 	if (questionReferenceIdx != -1) {
 	    SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
-	    List<QuestionReference> rList = new ArrayList<QuestionReference>(references);
+	    List<QuestionReference> rList = new ArrayList<>(references);
 	    // get current and the target item, and switch their sequnece
 	    QuestionReference reference = rList.get(questionReferenceIdx);
 	    QuestionReference repReference;
@@ -1241,10 +1239,10 @@ public class AuthoringAction extends Action {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	SortedSet<AssessmentQuestion> oldQuestions = getQuestionList(sessionMap);
 
-	List<String> toolsErrorMsgs = new ArrayList<String>();
+	List<String> toolsErrorMsgs = new ArrayList<>();
 	try {
 	    File designFile = null;
-	    Map<String, String> params = new HashMap<String, String>();
+	    Map<String, String> params = new HashMap<>();
 	    String filename = null;
 
 	    String uploadPath = FileUtil.createTempDirectory("_uploaded_2questions_xml");
@@ -1272,7 +1270,8 @@ public class AuthoringAction extends Action {
 
 	    String filename2 = designFile.getName();
 	    String fileExtension = (filename2 != null) && (filename2.length() >= 4)
-		    ? filename2.substring(filename2.length() - 4) : "";
+		    ? filename2.substring(filename2.length() - 4)
+		    : "";
 	    if (!fileExtension.equalsIgnoreCase(".xml")) {
 		throw new RuntimeException("Wrong file extension. Xml is expected");
 	    }
@@ -1323,14 +1322,14 @@ public class AuthoringAction extends Action {
 	String errors = null;
 	if (assessment != null) {
 	    try {
-		ArrayList<AssessmentQuestion> questionsToExport = new ArrayList<AssessmentQuestion>();
+		ArrayList<AssessmentQuestion> questionsToExport = new ArrayList<>();
 
 		for (AssessmentQuestion question : getQuestionList(sessionMap)) {
 		    AssessmentQuestion clonedQuestion = (AssessmentQuestion) question.clone();
 		    questionsToExport.add(clonedQuestion);
 		}
 		// exporting XML
-		XStream designXml = new XStream(new SunUnsafeReflectionProvider());
+		XStream designXml = new XStream(new StaxDriver());
 		designXml.addPermission(AnyTypePermission.ANY);
 		String resultedXml = designXml.toXML(questionsToExport);
 
@@ -1422,7 +1421,7 @@ public class AuthoringAction extends Action {
 	Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
 	int optionIndex = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
-	    List<AssessmentQuestionOption> rList = new ArrayList<AssessmentQuestionOption>(optionList);
+	    List<AssessmentQuestionOption> rList = new ArrayList<>(optionList);
 	    AssessmentQuestionOption question = rList.remove(optionIndex);
 	    optionList.clear();
 	    optionList.addAll(rList);
@@ -1469,7 +1468,7 @@ public class AuthoringAction extends Action {
 
 	int optionIndex = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
-	    List<AssessmentQuestionOption> rList = new ArrayList<AssessmentQuestionOption>(optionList);
+	    List<AssessmentQuestionOption> rList = new ArrayList<>(optionList);
 
 	    // get current and the target item, and switch their sequnece
 	    AssessmentQuestionOption option = rList.get(optionIndex);
@@ -1540,8 +1539,7 @@ public class AuthoringAction extends Action {
 	Assessment assessment = assessmentForm.getAssessment();
 
 	// initial Overall feedbacks list
-	SortedSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<AssessmentOverallFeedback>(
-		new SequencableComparator());
+	SortedSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<>(new SequencableComparator());
 	if (!assessment.getOverallFeedbacks().isEmpty()) {
 	    overallFeedbackList.addAll(assessment.getOverallFeedbacks());
 	} else {
@@ -1595,12 +1593,12 @@ public class AuthoringAction extends Action {
     private void reinitializeAvailableQuestions(SessionMap<String, Object> sessionMap) {
 	SortedSet<AssessmentQuestion> bankQuestions = getQuestionList(sessionMap);
 	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
-	Set<AssessmentQuestion> questionsFromList = new LinkedHashSet<AssessmentQuestion>();
+	Set<AssessmentQuestion> questionsFromList = new LinkedHashSet<>();
 	for (QuestionReference reference : references) {
 	    questionsFromList.add(reference.getQuestion());
 	}
 
-	Set<AssessmentQuestion> availableQuestions = new TreeSet<AssessmentQuestion>(new SequencableComparator());
+	Set<AssessmentQuestion> availableQuestions = new TreeSet<>(new SequencableComparator());
 	availableQuestions.addAll(CollectionUtils.subtract(bankQuestions, questionsFromList));
 
 	sessionMap.put(AssessmentConstants.ATTR_AVAILABLE_QUESTIONS, availableQuestions);
@@ -1625,7 +1623,7 @@ public class AuthoringAction extends Action {
 	SortedSet<AssessmentQuestion> list = (SortedSet<AssessmentQuestion>) sessionMap
 		.get(AssessmentConstants.ATTR_QUESTION_LIST);
 	if (list == null) {
-	    list = new TreeSet<AssessmentQuestion>(new SequencableComparator());
+	    list = new TreeSet<>(new SequencableComparator());
 	    sessionMap.put(AssessmentConstants.ATTR_QUESTION_LIST, list);
 	}
 	return list;
@@ -1641,7 +1639,7 @@ public class AuthoringAction extends Action {
 	SortedSet<QuestionReference> list = (SortedSet<QuestionReference>) sessionMap
 		.get(AssessmentConstants.ATTR_QUESTION_REFERENCES);
 	if (list == null) {
-	    list = new TreeSet<QuestionReference>(new SequencableComparator());
+	    list = new TreeSet<>(new SequencableComparator());
 	    sessionMap.put(AssessmentConstants.ATTR_QUESTION_REFERENCES, list);
 	}
 	return list;
@@ -1806,7 +1804,7 @@ public class AuthoringAction extends Action {
 	    question.setSequenceId(maxSeq);
 	    questionList.add(question);
 	} else { // edit
-	    List<AssessmentQuestion> rList = new ArrayList<AssessmentQuestion>(questionList);
+	    List<AssessmentQuestion> rList = new ArrayList<>(questionList);
 	    question = rList.get(questionIdx);
 	}
 	short type = questionForm.getQuestionType();
@@ -1822,7 +1820,8 @@ public class AuthoringAction extends Action {
 	if (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    question.setMultipleAnswersAllowed(questionForm.isMultipleAnswersAllowed());
 	    boolean incorrectAnswerNullifiesMark = questionForm.isMultipleAnswersAllowed()
-		    ? questionForm.isIncorrectAnswerNullifiesMark() : false;
+		    ? questionForm.isIncorrectAnswerNullifiesMark()
+		    : false;
 	    question.setIncorrectAnswerNullifiesMark(incorrectAnswerNullifiesMark);
 	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	    question.setShuffle(questionForm.isShuffle());
@@ -1866,7 +1865,7 @@ public class AuthoringAction extends Action {
 		|| (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL)
 		|| (type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)) {
 	    Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, true);
-	    Set<AssessmentQuestionOption> options = new LinkedHashSet<AssessmentQuestionOption>();
+	    Set<AssessmentQuestionOption> options = new LinkedHashSet<>();
 	    int seqId = 0;
 	    for (AssessmentQuestionOption option : optionList) {
 		option.setSequenceId(seqId++);
@@ -1877,7 +1876,7 @@ public class AuthoringAction extends Action {
 	// set units
 	if (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
 	    Set<AssessmentUnit> unitList = getUnitsFromRequest(request, true);
-	    Set<AssessmentUnit> units = new LinkedHashSet<AssessmentUnit>();
+	    Set<AssessmentUnit> units = new LinkedHashSet<>();
 	    int seqId = 0;
 	    for (AssessmentUnit unit : unitList) {
 		unit.setSequenceId(seqId++);
@@ -1928,8 +1927,7 @@ public class AuthoringAction extends Action {
 	int questionType = WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE);
 	Integer correctOptionIndex = (paramMap.get(AssessmentConstants.ATTR_OPTION_CORRECT) == null) ? null
 		: NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_OPTION_CORRECT));
-	TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
-		new SequencableComparator());
+	TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
 	for (int i = 0; i < count; i++) {
 	    if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
 		    || (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)) {
@@ -2028,7 +2026,7 @@ public class AuthoringAction extends Action {
 	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_UNIT_LIST);
 
 	int count = NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_UNIT_COUNT));
-	TreeSet<AssessmentUnit> unitList = new TreeSet<AssessmentUnit>(new SequencableComparator());
+	TreeSet<AssessmentUnit> unitList = new TreeSet<>(new SequencableComparator());
 	for (int i = 0; i < count; i++) {
 	    String unitStr = paramMap.get(AssessmentConstants.ATTR_UNIT_UNIT_PREFIX + i);
 	    if (StringUtils.isBlank(unitStr) && isForSaving) {
@@ -2055,8 +2053,7 @@ public class AuthoringAction extends Action {
     private TreeSet<AssessmentOverallFeedback> getOverallFeedbacksFromRequest(HttpServletRequest request,
 	    boolean skipBlankOverallFeedbacks) {
 	int count = NumberUtils.toInt(request.getParameter(AssessmentConstants.ATTR_OVERALL_FEEDBACK_COUNT));
-	TreeSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<AssessmentOverallFeedback>(
-		new SequencableComparator());
+	TreeSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<>(new SequencableComparator());
 	for (int i = 0; i < count; i++) {
 	    String gradeBoundaryStr = request
 		    .getParameter(AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i);
@@ -2089,8 +2086,7 @@ public class AuthoringAction extends Action {
 	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_OVERALL_FEEDBACK_LIST);
 
 	int count = NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_COUNT));
-	TreeSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<AssessmentOverallFeedback>(
-		new SequencableComparator());
+	TreeSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<>(new SequencableComparator());
 	for (int i = 0; i < count; i++) {
 	    String gradeBoundaryStr = paramMap.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i);
 	    String feedback = paramMap.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_FEEDBACK_PREFIX + i);
@@ -2126,7 +2122,7 @@ public class AuthoringAction extends Action {
 	}
 
 	String[] params = list.split("&");
-	Map<String, String> paramMap = new HashMap<String, String>();
+	Map<String, String> paramMap = new HashMap<>();
 	String[] pair;
 	for (String item : params) {
 	    pair = item.split("=");

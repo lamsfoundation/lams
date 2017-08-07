@@ -124,7 +124,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
@@ -1181,7 +1181,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	    PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	    // exporting XML
-	    XStream designXml = new XStream(new SunUnsafeReflectionProvider());
+	    XStream designXml = new XStream(new StaxDriver());
 	    designXml.addPermission(AnyTypePermission.ANY);
 	    // do not serialize node's owner
 	    designXml.omitField(PedagogicalPlannerSequenceNode.class, "user");
