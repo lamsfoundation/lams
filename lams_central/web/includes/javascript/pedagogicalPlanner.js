@@ -290,19 +290,6 @@
   	 document.getElementById("fileArea").style.display = document.getElementById("hasSubnodesType").checked ? "none" : "block";
   }
   
-  function filterNodes(url,doFilter){
-  	if (doFilter){
-  		url += "&filterText="+document.getElementById("filterText").value;
-  	}
-  	document.location.href=url;
-  }
-  
-  function filterNodesOnEnter(url){
-	  if (window.event && window.event.keyCode == 13){
-	  	filterNodes(url,true);
-	  }
-  }
-  
   function collapseActivity(id, action){
 	  $('.collapsible'+id).hide();
 	  $('#activity'+id).hide('slow', function () {
