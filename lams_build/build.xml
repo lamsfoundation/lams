@@ -503,7 +503,7 @@
 		
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/validator/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
-				<include name="commons-validator.jar" />
+				<include name="commons-validator-*.jar" />
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/validator/main/module.xml"

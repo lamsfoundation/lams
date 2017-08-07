@@ -19,6 +19,8 @@ Commons Lang 2.6
 
 Commons IO 2.4
 
+Commons Validator 1.6
+
 gson 2.2.4
 
 Hibernate Core 5.0.10
