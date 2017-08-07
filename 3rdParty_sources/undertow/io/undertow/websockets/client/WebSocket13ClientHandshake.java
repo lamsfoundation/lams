@@ -23,19 +23,24 @@ import io.undertow.util.Headers;
 import io.undertow.websockets.WebSocketExtension;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSocketMessages;
-import io.undertow.websockets.core.WebSocketUtils;
 import io.undertow.websockets.core.WebSocketVersion;
 import io.undertow.websockets.core.protocol.version13.WebSocket13Channel;
-import org.xnio.Pool;
+import io.undertow.websockets.extensions.CompositeExtensionFunction;
+import io.undertow.websockets.extensions.ExtensionFunction;
+import io.undertow.websockets.extensions.ExtensionHandshake;
+import io.undertow.websockets.extensions.NoopExtensionFunction;
+import org.xnio.OptionMap;
+import io.undertow.connector.ByteBufferPool;
 import org.xnio.StreamConnection;
 import org.xnio.http.ExtendedHandshakeChecker;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +48,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Stuart Douglas
@@ -52,19 +58,37 @@ public class WebSocket13ClientHandshake extends WebSocketClientHandshake {
     public static final String MAGIC_NUMBER = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
     private final WebSocketClientNegotiation negotiation;
+    private final Set<ExtensionHandshake> extensions;
 
-    public WebSocket13ClientHandshake(final URI url, WebSocketClientNegotiation negotiation) {
+    public WebSocket13ClientHandshake(final URI url, WebSocketClientNegotiation negotiation, Set<ExtensionHandshake> extensions) {
         super(url);
         this.negotiation = negotiation;
+        this.extensions = extensions == null ? Collections.<ExtensionHandshake>emptySet() : extensions;
     }
 
     public WebSocket13ClientHandshake(final URI url) {
-        this(url, null);
+        this(url, null, null);
     }
 
     @Override
-    public WebSocketChannel createChannel(final StreamConnection channel, final String wsUri, final Pool<ByteBuffer> bufferPool) {
-        return new WebSocket13Channel(channel, bufferPool, wsUri, negotiation != null ? negotiation.getSelectedSubProtocol() : "", true, false, new HashSet<WebSocketChannel>());
+    public WebSocketChannel createChannel(final StreamConnection channel, final String wsUri, final ByteBufferPool bufferPool, OptionMap options) {
+        if (negotiation != null && negotiation.getSelectedExtensions() != null && !negotiation.getSelectedExtensions().isEmpty()) {
+
+            List<WebSocketExtension> selected = negotiation.getSelectedExtensions();
+            List<ExtensionFunction> negotiated = new ArrayList<>();
+            if (selected != null && !selected.isEmpty()) {
+                for (WebSocketExtension ext : selected) {
+                    for (ExtensionHandshake extHandshake : extensions) {
+                        if (ext.getName().equals(extHandshake.getName())) {
+                            negotiated.add(extHandshake.create());
+                        }
+                    }
+                }
+            }
+            return new WebSocket13Channel(channel, bufferPool, wsUri, negotiation.getSelectedSubProtocol(), true, !negotiated.isEmpty(), CompositeExtensionFunction.compose(negotiated), new HashSet<WebSocketChannel>(), options);
+        } else {
+            return new WebSocket13Channel(channel, bufferPool, wsUri, negotiation != null ? negotiation.getSelectedSubProtocol() : "", true, false, NoopExtensionFunction.INSTANCE, new HashSet<WebSocketChannel>(), options);
+        }
     }
 
 
@@ -98,8 +122,13 @@ public class WebSocket13ClientHandshake extends WebSocketClientHandshake {
                     for (WebSocketExtension.Parameter param : next.getParameters()) {
                         sb.append("; ");
                         sb.append(param.getName());
-                        sb.append("=");
-                        sb.append(param.getValue());
+                        /*
+                            Extensions can have parameters without values
+                         */
+                        if (param.getValue() != null && param.getValue().length() > 0) {
+                            sb.append("=");
+                            sb.append(param.getValue());
+                        }
                     }
                     if (it.hasNext()) {
                         sb.append(", ");
@@ -183,7 +212,7 @@ public class WebSocket13ClientHandshake extends WebSocketClientHandshake {
             final String concat = nonceBase64 + MAGIC_NUMBER;
             final MessageDigest digest = MessageDigest.getInstance("SHA1");
 
-            digest.update(concat.getBytes(WebSocketUtils.UTF_8));
+            digest.update(concat.getBytes(StandardCharsets.UTF_8));
             final byte[] bytes = digest.digest();
             return FlexBase64.encodeString(bytes, false);
         } catch (NoSuchAlgorithmException e) {

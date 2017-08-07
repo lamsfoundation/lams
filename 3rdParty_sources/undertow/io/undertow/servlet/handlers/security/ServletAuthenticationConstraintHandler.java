@@ -19,6 +19,7 @@ package io.undertow.servlet.handlers.security;
 
 import java.util.List;
 
+import io.undertow.UndertowLogger;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.security.handlers.AuthenticationConstraintHandler;
@@ -41,6 +42,10 @@ public class ServletAuthenticationConstraintHandler extends AuthenticationConstr
 
     @Override
     protected boolean isAuthenticationRequired(final HttpServerExchange exchange) {
+        //j_security_check always requires auth
+        if (exchange.getRelativePath().endsWith(ServletFormAuthenticationMechanism.DEFAULT_POST_LOCATION)) {
+            return true;
+        }
         List<SingleConstraintMatch> constraints = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY).getRequiredConstrains();
 
         /*
@@ -62,7 +67,9 @@ public class ServletAuthenticationConstraintHandler extends AuthenticationConstr
                 authenticationRequired = true;
             }
         }
-
+        if(authenticationRequired) {
+            UndertowLogger.SECURITY_LOGGER.debugf("Authenticating required for request %s", exchange);
+        }
         return authenticationRequired;
     }
 

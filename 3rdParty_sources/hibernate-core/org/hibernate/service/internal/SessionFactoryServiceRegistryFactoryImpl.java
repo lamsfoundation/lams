@@ -1,38 +1,19 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.service.internal;
 
-import org.hibernate.cfg.Configuration;
+import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.metamodel.source.MetadataImplementor;
-import org.hibernate.service.Service;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.service.spi.SessionFactoryServiceRegistryFactory;
 
 /**
- * Acts as a {@link Service} in the {@link org.hibernate.boot.registry.internal.StandardServiceRegistryImpl} whose function is as a factory for
- * {@link SessionFactoryServiceRegistryImpl} implementations.
+ * Acts as a service in the {@link org.hibernate.boot.registry.internal.StandardServiceRegistryImpl} whose
+ * function is to act as a factory for {@link SessionFactoryServiceRegistryImpl} implementations.
  *
  * @author Steve Ebersole
  */
@@ -46,15 +27,7 @@ public class SessionFactoryServiceRegistryFactoryImpl implements SessionFactoryS
 	@Override
 	public SessionFactoryServiceRegistryImpl buildServiceRegistry(
 			SessionFactoryImplementor sessionFactory,
-			Configuration configuration) {
-		return new SessionFactoryServiceRegistryImpl( theBasicServiceRegistry, sessionFactory, configuration );
+			SessionFactoryOptions options) {
+		return new SessionFactoryServiceRegistryImpl( theBasicServiceRegistry, sessionFactory, options );
 	}
-
-	@Override
-	public SessionFactoryServiceRegistryImpl buildServiceRegistry(
-			SessionFactoryImplementor sessionFactory,
-			MetadataImplementor metadata) {
-		return new SessionFactoryServiceRegistryImpl( theBasicServiceRegistry, sessionFactory, metadata );
-	}
-
 }

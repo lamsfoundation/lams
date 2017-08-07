@@ -21,6 +21,7 @@ package io.undertow.predicate;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.PathMatcher;
@@ -32,7 +33,7 @@ class PathPrefixPredicate implements Predicate {
 
     private final PathMatcher<Boolean> pathMatcher;
 
-    public PathPrefixPredicate(final String... paths) {
+    PathPrefixPredicate(final String... paths) {
         PathMatcher<Boolean> matcher = new PathMatcher<>();
         for(String path : paths) {
             if(!path.startsWith("/")) {
@@ -52,9 +53,10 @@ class PathPrefixPredicate implements Predicate {
         boolean matches = result.getValue() == Boolean.TRUE;
         if(matches) {
             Map<String, Object> context = value.getAttachment(PREDICATE_CONTEXT);
-            if(context != null) {
-                context.put("remaining", result.getRemaining());
+            if(context == null) {
+                value.putAttachment(PREDICATE_CONTEXT, context = new TreeMap<>());
             }
+            context.put("remaining", result.getRemaining());
         }
         return matches;
     }

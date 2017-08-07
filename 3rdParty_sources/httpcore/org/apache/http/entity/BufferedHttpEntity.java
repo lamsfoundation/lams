@@ -34,6 +34,7 @@ import java.io.OutputStream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.util.Args;
 import org.apache.http.util.EntityUtils;
 
 /**
@@ -70,7 +71,7 @@ public class BufferedHttpEntity extends HttpEntityWrapper {
         if (this.buffer != null) {
             return this.buffer.length;
         } else {
-            return wrappedEntity.getContentLength();
+            return super.getContentLength();
         }
     }
 
@@ -79,24 +80,24 @@ public class BufferedHttpEntity extends HttpEntityWrapper {
         if (this.buffer != null) {
             return new ByteArrayInputStream(this.buffer);
         } else {
-            return wrappedEntity.getContent();
+            return super.getContent();
         }
     }
 
     /**
      * Tells that this entity does not have to be chunked.
      *
-     * @return  <code>false</code>
+     * @return  {@code false}
      */
     @Override
     public boolean isChunked() {
-        return (buffer == null) && wrappedEntity.isChunked();
+        return (buffer == null) && super.isChunked();
     }
 
     /**
      * Tells that this entity is repeatable.
      *
-     * @return  <code>true</code>
+     * @return  {@code true}
      */
     @Override
     public boolean isRepeatable() {
@@ -106,13 +107,11 @@ public class BufferedHttpEntity extends HttpEntityWrapper {
 
     @Override
     public void writeTo(final OutputStream outstream) throws IOException {
-        if (outstream == null) {
-            throw new IllegalArgumentException("Output stream may not be null");
-        }
+        Args.notNull(outstream, "Output stream");
         if (this.buffer != null) {
             outstream.write(this.buffer);
         } else {
-            wrappedEntity.writeTo(outstream);
+            super.writeTo(outstream);
         }
     }
 
@@ -120,7 +119,7 @@ public class BufferedHttpEntity extends HttpEntityWrapper {
     // non-javadoc, see interface HttpEntity
     @Override
     public boolean isStreaming() {
-        return (buffer == null) && wrappedEntity.isStreaming();
+        return (buffer == null) && super.isStreaming();
     }
 
 } // class BufferedHttpEntity

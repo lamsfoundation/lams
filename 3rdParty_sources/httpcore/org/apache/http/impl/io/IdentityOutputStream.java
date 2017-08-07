@@ -32,6 +32,7 @@ import java.io.OutputStream;
 
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.http.io.SessionOutputBuffer;
+import org.apache.http.util.Args;
 
 /**
  * Output stream that writes data without any transformation. The end of
@@ -58,10 +59,7 @@ public class IdentityOutputStream extends OutputStream {
 
     public IdentityOutputStream(final SessionOutputBuffer out) {
         super();
-        if (out == null) {
-            throw new IllegalArgumentException("Session output buffer may not be null");
-        }
-        this.out = out;
+        this.out = Args.notNull(out, "Session output buffer");
     }
 
     /**
@@ -83,7 +81,7 @@ public class IdentityOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
+    public void write(final byte[] b, final int off, final int len) throws IOException {
         if (this.closed) {
             throw new IOException("Attempted write to closed stream.");
         }
@@ -91,12 +89,12 @@ public class IdentityOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(byte[] b) throws IOException {
+    public void write(final byte[] b) throws IOException {
         write(b, 0, b.length);
     }
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(final int b) throws IOException {
         if (this.closed) {
             throw new IOException("Attempted write to closed stream.");
         }

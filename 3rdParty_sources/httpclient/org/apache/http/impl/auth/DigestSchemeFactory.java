@@ -27,23 +27,47 @@
 
 package org.apache.http.impl.auth;
 
-import org.apache.http.annotation.Immutable;
+import java.nio.charset.Charset;
 
+import org.apache.http.annotation.Immutable;
 import org.apache.http.auth.AuthScheme;
 import org.apache.http.auth.AuthSchemeFactory;
+import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HttpContext;
 
 /**
- * {@link AuthSchemeFactory} implementation that creates and initializes
+ * {@link AuthSchemeProvider} implementation that creates and initializes
  * {@link DigestScheme} instances.
  *
  * @since 4.0
  */
 @Immutable
-public class DigestSchemeFactory implements AuthSchemeFactory {
+@SuppressWarnings("deprecation")
+public class DigestSchemeFactory implements AuthSchemeFactory, AuthSchemeProvider {
 
+    private final Charset charset;
+
+    /**
+     * @since 4.3
+     */
+    public DigestSchemeFactory(final Charset charset) {
+        super();
+        this.charset = charset;
+    }
+
+    public DigestSchemeFactory() {
+        this(null);
+    }
+
+    @Override
     public AuthScheme newInstance(final HttpParams params) {
         return new DigestScheme();
+    }
+
+    @Override
+    public AuthScheme create(final HttpContext context) {
+        return new DigestScheme(this.charset);
     }
 
 }

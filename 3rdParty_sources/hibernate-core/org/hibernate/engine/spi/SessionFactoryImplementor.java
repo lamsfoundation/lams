@@ -1,28 +1,12 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.spi;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -38,12 +22,12 @@ import org.hibernate.SessionFactoryObserver;
 import org.hibernate.cache.spi.QueryCache;
 import org.hibernate.cache.spi.Region;
 import org.hibernate.cache.spi.UpdateTimestampsCache;
+import org.hibernate.cache.spi.access.RegionAccessStrategy;
 import org.hibernate.cfg.Settings;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.function.SQLFunctionRegistry;
 import org.hibernate.engine.ResultSetMappingDefinition;
-import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.hibernate.engine.profile.FetchProfile;
@@ -69,21 +53,21 @@ import org.hibernate.type.TypeResolver;
  */
 public interface SessionFactoryImplementor extends Mapping, SessionFactory {
 	@Override
-	public SessionBuilderImplementor withOptions();
+	SessionBuilderImplementor withOptions();
 
 	/**
 	 * Retrieve the {@link Type} resolver associated with this factory.
 	 *
 	 * @return The type resolver
 	 */
-	public TypeResolver getTypeResolver();
+	TypeResolver getTypeResolver();
 
 	/**
 	 * Get a copy of the Properties used to configure this session factory.
 	 *
 	 * @return The properties.
 	 */
-	public Properties getProperties();
+	Properties getProperties();
 
 	/**
 	 * Get the persister for the named entity
@@ -92,14 +76,14 @@ public interface SessionFactoryImplementor extends Mapping, SessionFactory {
 	 * @return The persister
 	 * @throws MappingException Indicates persister could not be found with that name.
 	 */
-	public EntityPersister getEntityPersister(String entityName) throws MappingException;
+	EntityPersister getEntityPersister(String entityName) throws MappingException;
 
 	/**
 	 * Get all entity persisters as a Map, which entity name its the key and the persister is the value.
 	 *
 	 * @return The Map contains all entity persisters.
 	 */
-	public Map<String,EntityPersister> getEntityPersisters();
+	Map<String,EntityPersister> getEntityPersisters();
 
 	/**
 	 * Get the persister object for a collection role.
@@ -109,20 +93,24 @@ public interface SessionFactoryImplementor extends Mapping, SessionFactory {
 	 * @return The persister
 	 * @throws MappingException Indicates persister could not be found with that role.
 	 */
-	public CollectionPersister getCollectionPersister(String role) throws MappingException;
+	CollectionPersister getCollectionPersister(String role) throws MappingException;
 
 	/**
 	 * Get all collection persisters as a Map, which collection role as the key and the persister is the value.
 	 *
 	 * @return The Map contains all collection persisters.
 	 */
-	public Map<String, CollectionPersister> getCollectionPersisters();
+	Map<String, CollectionPersister> getCollectionPersisters();
 
 	/**
 	 * Get the JdbcServices.
+	 *
 	 * @return the JdbcServices
+	 *
+	 * @deprecated since 5.0; use {@link #getServiceRegistry()} instead to locate the JdbcServices
 	 */
-	public JdbcServices getJdbcServices();
+	@Deprecated
+	JdbcServices getJdbcServices();
 
 	/**
 	 * Get the SQL dialect.
@@ -131,80 +119,70 @@ public interface SessionFactoryImplementor extends Mapping, SessionFactory {
 	 *
 	 * @return The dialect
 	 */
-	public Dialect getDialect();
+	Dialect getDialect();
 
 	/**
 	 * Get the factory scoped interceptor for this factory.
 	 *
 	 * @return The factory scope interceptor, or null if none.
 	 */
-	public Interceptor getInterceptor();
+	Interceptor getInterceptor();
 
-	public QueryPlanCache getQueryPlanCache();
+	QueryPlanCache getQueryPlanCache();
 
 	/**
 	 * Get the return types of a query
 	 */
-	public Type[] getReturnTypes(String queryString) throws HibernateException;
+	Type[] getReturnTypes(String queryString) throws HibernateException;
 
 	/**
 	 * Get the return aliases of a query
 	 */
-	public String[] getReturnAliases(String queryString) throws HibernateException;
+	String[] getReturnAliases(String queryString) throws HibernateException;
 
-	/**
-	 * Get the connection provider
-	 *
-	 * @deprecated Access to connections via {@link org.hibernate.engine.jdbc.spi.JdbcConnectionAccess} should
-	 * be preferred over access via {@link ConnectionProvider}, whenever possible.
-	 * {@link org.hibernate.engine.jdbc.spi.JdbcConnectionAccess} is tied to the Hibernate Session to
-	 * properly account for contextual information.  See {@link SessionImplementor#getJdbcConnectionAccess()}
-	 */
-	@Deprecated
-	public ConnectionProvider getConnectionProvider();
 	/**
 	 * Get the names of all persistent classes that implement/extend the given interface/class
 	 */
-	public String[] getImplementors(String className) throws MappingException;
+	String[] getImplementors(String className) throws MappingException;
 	/**
 	 * Get a class name, using query language imports
 	 */
-	public String getImportedClassName(String name);
+	String getImportedClassName(String name);
 
 	/**
 	 * Get the default query cache
 	 */
-	public QueryCache getQueryCache();
+	QueryCache getQueryCache();
 	/**
 	 * Get a particular named query cache, or the default cache
 	 * @param regionName the name of the cache region, or null for the default query cache
 	 * @return the existing cache, or a newly created cache if none by that region name
 	 */
-	public QueryCache getQueryCache(String regionName) throws HibernateException;
+	QueryCache getQueryCache(String regionName) throws HibernateException;
 
 	/**
 	 * Get the cache of table update timestamps
 	 */
-	public UpdateTimestampsCache getUpdateTimestampsCache();
+	UpdateTimestampsCache getUpdateTimestampsCache();
 	/**
 	 * Statistics SPI
 	 */
-	public StatisticsImplementor getStatisticsImplementor();
+	StatisticsImplementor getStatisticsImplementor();
 
-	public NamedQueryDefinition getNamedQuery(String queryName);
+	NamedQueryDefinition getNamedQuery(String queryName);
 
-	public void registerNamedQueryDefinition(String name, NamedQueryDefinition definition);
+	void registerNamedQueryDefinition(String name, NamedQueryDefinition definition);
 
-	public NamedSQLQueryDefinition getNamedSQLQuery(String queryName);
+	NamedSQLQueryDefinition getNamedSQLQuery(String queryName);
 
-	public void registerNamedSQLQueryDefinition(String name, NamedSQLQueryDefinition definition);
+	void registerNamedSQLQueryDefinition(String name, NamedSQLQueryDefinition definition);
 
-	public ResultSetMappingDefinition getResultSetMapping(String name);
+	ResultSetMappingDefinition getResultSetMapping(String name);
 
 	/**
 	 * Get the identifier generator for the hierarchy
 	 */
-	public IdentifierGenerator getIdentifierGenerator(String rootEntityName);
+	IdentifierGenerator getIdentifierGenerator(String rootEntityName);
 
 	/**
 	 * Get a named second-level cache region
@@ -212,7 +190,14 @@ public interface SessionFactoryImplementor extends Mapping, SessionFactory {
 	 * @param regionName The name of the region to retrieve.
 	 * @return The region
 	 */
-	public Region getSecondLevelCacheRegion(String regionName);
+	Region getSecondLevelCacheRegion(String regionName);
+
+	/**
+	 * Get access strategy to second-level cache region
+	 * @param regionName
+	 * @return
+	 */
+	RegionAccessStrategy getSecondLevelCacheRegionAccessStrategy(String regionName);
 	
 	/**
 	 * Get a named naturalId cache region
@@ -220,7 +205,14 @@ public interface SessionFactoryImplementor extends Mapping, SessionFactory {
 	 * @param regionName The name of the region to retrieve.
 	 * @return The region
 	 */
-	public Region getNaturalIdCacheRegion(String regionName);
+	Region getNaturalIdCacheRegion(String regionName);
+
+	/**
+	 * Get access strategy to naturalId cache region
+	 * @param regionName
+	 * @return
+	 */
+	RegionAccessStrategy getNaturalIdCacheRegionAccessStrategy(String regionName);
 
 	/**
 	 * Get a map of all the second level cache regions currently maintained in
@@ -229,30 +221,41 @@ public interface SessionFactoryImplementor extends Mapping, SessionFactory {
 	 *
 	 * @return The map of regions
 	 */
-	public Map getAllSecondLevelCacheRegions();
+	Map getAllSecondLevelCacheRegions();
 
 	/**
 	 * Retrieves the SQLExceptionConverter in effect for this SessionFactory.
 	 *
 	 * @return The SQLExceptionConverter for this SessionFactory.
 	 *
+	 * @deprecated since 5.0; use {@link JdbcServices#getSqlExceptionHelper()} ->
+	 * {@link SqlExceptionHelper#getSqlExceptionConverter()} instead as obtained from {@link #getServiceRegistry()}
 	 */
-	public SQLExceptionConverter getSQLExceptionConverter();
-	   // TODO: deprecate???
+	@Deprecated
+	SQLExceptionConverter getSQLExceptionConverter();
 
 	/**
 	 * Retrieves the SqlExceptionHelper in effect for this SessionFactory.
 	 *
 	 * @return The SqlExceptionHelper for this SessionFactory.
+	 *
+	 * @deprecated since 5.0; use {@link JdbcServices#getSqlExceptionHelper()} instead as
+	 * obtained from {@link #getServiceRegistry()}
 	 */
-	public SqlExceptionHelper getSQLExceptionHelper();
-
-	public Settings getSettings();
+	@Deprecated
+	SqlExceptionHelper getSQLExceptionHelper();
 
 	/**
-	 * Get a nontransactional "current" session for Hibernate EntityManager
+	 * @deprecated since 5.0; use {@link #getSessionFactoryOptions()} instead
 	 */
-	public Session openTemporarySession() throws HibernateException;
+	@Deprecated
+	@SuppressWarnings("deprecation")
+	Settings getSettings();
+
+	/**
+	 * Get a non-transactional "current" session for Hibernate EntityManager
+	 */
+	Session openTemporarySession() throws HibernateException;
 
 	/**
 	 * Retrieves a set of all the collection roles in which the given entity
@@ -261,11 +264,11 @@ public interface SessionFactoryImplementor extends Mapping, SessionFactory {
 	 * @param entityName The entity name for which to get the collection roles.
 	 * @return set of all the collection roles in which the given entityName participates.
 	 */
-	public Set<String> getCollectionRolesByEntityParticipant(String entityName);
+	Set<String> getCollectionRolesByEntityParticipant(String entityName);
 
-	public EntityNotFoundDelegate getEntityNotFoundDelegate();
+	EntityNotFoundDelegate getEntityNotFoundDelegate();
 
-	public SQLFunctionRegistry getSqlFunctionRegistry();
+	SQLFunctionRegistry getSqlFunctionRegistry();
 
 	/**
 	 * Retrieve fetch profile by name.
@@ -273,22 +276,55 @@ public interface SessionFactoryImplementor extends Mapping, SessionFactory {
 	 * @param name The name of the profile to retrieve.
 	 * @return The profile definition
 	 */
-	public FetchProfile getFetchProfile(String name);
+	FetchProfile getFetchProfile(String name);
 
-	public ServiceRegistryImplementor getServiceRegistry();
+	ServiceRegistryImplementor getServiceRegistry();
 
-	public void addObserver(SessionFactoryObserver observer);
+	void addObserver(SessionFactoryObserver observer);
 
-	public CustomEntityDirtinessStrategy getCustomEntityDirtinessStrategy();
+	CustomEntityDirtinessStrategy getCustomEntityDirtinessStrategy();
 
-	public CurrentTenantIdentifierResolver getCurrentTenantIdentifierResolver();
+	CurrentTenantIdentifierResolver getCurrentTenantIdentifierResolver();
 
 	/**
 	 * Provides access to the named query repository
 	 *
 	 * @return The repository for named query definitions
 	 */
-	public NamedQueryRepository getNamedQueryRepository();
+	NamedQueryRepository getNamedQueryRepository();
 
 	Iterable<EntityNameResolver> iterateEntityNameResolvers();
+
+	/**
+	 * Locate an EntityPersister by the entity class.  The passed Class might refer to either
+	 * the entity name directly, or it might name a proxy interface for the entity.  This
+	 * method accounts for both, preferring the direct named entity name.
+	 *
+	 * @param byClass The concrete Class or proxy interface for the entity to locate the persister for.
+	 *
+	 * @return The located EntityPersister, never {@code null}
+	 *
+	 * @throws org.hibernate.UnknownEntityTypeException If a matching EntityPersister cannot be located
+	 */
+	EntityPersister locateEntityPersister(Class byClass);
+
+	/**
+	 * Locate the entity persister by name.
+	 *
+	 * @param byName The entity name
+	 *
+	 * @return The located EntityPersister, never {@code null}
+	 *
+	 * @throws org.hibernate.UnknownEntityTypeException If a matching EntityPersister cannot be located
+	 */
+	EntityPersister locateEntityPersister(String byName);
+
+	/**
+	 * Contract for resolving this SessionFactory on deserialization
+	 */
+	interface DeserializationResolver<T extends SessionFactoryImplementor> extends Serializable {
+		T resolve();
+	}
+
+	DeserializationResolver getDeserializationResolver();
 }

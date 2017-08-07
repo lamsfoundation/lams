@@ -1,27 +1,11 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.loader;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -90,10 +74,10 @@ public final class OuterJoinableAssociation {
 		this.lhsColumns = lhsColumns;
 		this.rhsAlias = rhsAlias;
 		this.joinType = joinType;
-		this.joinable = joinableType.getAssociatedJoinable(factory);
-		this.rhsColumns = JoinHelper.getRHSColumnNames(joinableType, factory);
-		this.on = joinableType.getOnCondition(rhsAlias, factory, enabledFilters)
-			+ ( withClause == null || withClause.trim().length() == 0 ? "" : " and ( " + withClause + " )" );
+		this.joinable = joinableType.getAssociatedJoinable( factory );
+		this.rhsColumns = JoinHelper.getRHSColumnNames( joinableType, factory );
+		this.on = joinableType.getOnCondition( rhsAlias, factory, enabledFilters )
+				+ ( withClause == null || withClause.trim().length() == 0 ? "" : " and ( " + withClause + " )" );
 		this.hasRestriction = hasRestriction;
 		this.enabledFilters = enabledFilters; // needed later for many-to-many/filter application
 	}
@@ -119,7 +103,7 @@ public final class OuterJoinableAssociation {
 	}
 
 	private boolean isOneToOne() {
-		if ( joinableType.isEntityType() )  {
+		if ( joinableType.isEntityType() ) {
 			EntityType etype = (EntityType) joinableType;
 			return etype.isOneToOne() /*&& etype.isReferenceToPrimaryKey()*/;
 		}
@@ -127,11 +111,11 @@ public final class OuterJoinableAssociation {
 			return false;
 		}
 	}
-	
+
 	public AssociationType getJoinableType() {
 		return joinableType;
 	}
-	
+
 	public String getRHSUniqueKeyName() {
 		return joinableType.getRHSUniqueKeyPropertyName();
 	}
@@ -150,7 +134,7 @@ public final class OuterJoinableAssociation {
 
 	public int getOwner(final List associations) {
 		if ( isOneToOne() || isCollection() ) {
-			return getPosition(lhsAlias, associations);
+			return getPosition( lhsAlias, associations );
 		}
 		else {
 			return -1;
@@ -163,10 +147,12 @@ public final class OuterJoinableAssociation {
 	 */
 	private static int getPosition(String lhsAlias, List associations) {
 		int result = 0;
-		for ( int i=0; i<associations.size(); i++ ) {
-			OuterJoinableAssociation oj = (OuterJoinableAssociation) associations.get(i);
+		for ( Object association : associations ) {
+			final OuterJoinableAssociation oj = (OuterJoinableAssociation) association;
 			if ( oj.getJoinable().consumesEntityAlias() /*|| oj.getJoinable().consumesCollectionAlias() */ ) {
-				if ( oj.rhsAlias.equals(lhsAlias) ) return result;
+				if ( oj.rhsAlias.equals( lhsAlias ) ) {
+					return result;
+				}
 				result++;
 			}
 		}
@@ -175,29 +161,29 @@ public final class OuterJoinableAssociation {
 
 	public void addJoins(JoinFragment outerjoin) throws MappingException {
 		outerjoin.addJoin(
-			joinable.getTableName(),
-			rhsAlias,
-			lhsColumns,
-			rhsColumns,
-			joinType,
-			on
+				joinable.getTableName(),
+				rhsAlias,
+				lhsColumns,
+				rhsColumns,
+				joinType,
+				on
 		);
 		outerjoin.addJoins(
-			joinable.fromJoinFragment(rhsAlias, false, true),
-			joinable.whereJoinFragment(rhsAlias, false, true)
+				joinable.fromJoinFragment( rhsAlias, false, true ),
+				joinable.whereJoinFragment( rhsAlias, false, true )
 		);
 	}
 
 	public void validateJoin(String path) throws MappingException {
-		if ( rhsColumns==null || lhsColumns==null
-				|| lhsColumns.length!=rhsColumns.length || lhsColumns.length==0 ) {
-			throw new MappingException("invalid join columns for association: " + path);
+		if ( rhsColumns == null || lhsColumns == null
+				|| lhsColumns.length != rhsColumns.length || lhsColumns.length == 0 ) {
+			throw new MappingException( "invalid join columns for association: " + path );
 		}
 	}
 
 	public boolean isManyToManyWith(OuterJoinableAssociation other) {
 		if ( joinable.isCollection() ) {
-			QueryableCollection persister = ( QueryableCollection ) joinable;
+			QueryableCollection persister = (QueryableCollection) joinable;
 			if ( persister.isManyToMany() ) {
 				return persister.getElementType() == other.getJoinableType();
 			}
@@ -210,19 +196,19 @@ public final class OuterJoinableAssociation {
 		String condition = "".equals( manyToManyFilter )
 				? on
 				: "".equals( on )
-						? manyToManyFilter
-						: on + " and " + manyToManyFilter;
+				? manyToManyFilter
+				: on + " and " + manyToManyFilter;
 		outerjoin.addJoin(
-		        joinable.getTableName(),
-		        rhsAlias,
-		        lhsColumns,
-		        rhsColumns,
-		        joinType,
-		        condition
+				joinable.getTableName(),
+				rhsAlias,
+				lhsColumns,
+				rhsColumns,
+				joinType,
+				condition
 		);
 		outerjoin.addJoins(
-			joinable.fromJoinFragment(rhsAlias, false, true),
-			joinable.whereJoinFragment(rhsAlias, false, true)
+				joinable.fromJoinFragment( rhsAlias, false, true ),
+				joinable.whereJoinFragment( rhsAlias, false, true )
 		);
 	}
 }

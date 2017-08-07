@@ -1,59 +1,46 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.boot.registry.classloading.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.internal.CoreLogging;
-import org.hibernate.internal.util.ClassLoaderHelper;
-import org.jboss.logging.Logger;
+import org.hibernate.internal.CoreMessageLogger;
 
 /**
  * Standard implementation of the service for interacting with class loaders
  *
  * @author Steve Ebersole
+ * @author Sanne Grinovero
  */
 public class ClassLoaderServiceImpl implements ClassLoaderService {
-	private static final Logger log = CoreLogging.logger( ClassLoaderServiceImpl.class );
 
-	private final Map<Class, ServiceLoader> serviceLoaders = new HashMap<Class, ServiceLoader>();
-	private AggregatedClassLoader aggregatedClassLoader;
+	private static final CoreMessageLogger log = CoreLogging.messageLogger( ClassLoaderServiceImpl.class );
+
+	private final ConcurrentMap<Class, ServiceLoader> serviceLoaders = new ConcurrentHashMap<Class, ServiceLoader>();
+	private volatile AggregatedClassLoader aggregatedClassLoader;
 
 	/**
 	 * Constructs a ClassLoaderServiceImpl with standard set-up
@@ -163,7 +150,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
 	private static ClassLoader locateTCCL() {
 		try {
-			return ClassLoaderHelper.getContextClassLoader();
+			return Thread.currentThread().getContextClassLoader();
 		}
 		catch (Exception e) {
 			return null;
@@ -171,7 +158,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 	}
 
 	private static class AggregatedClassLoader extends ClassLoader {
-		private ClassLoader[] individualClassLoaders;
+		private final ClassLoader[] individualClassLoaders;
 
 		private AggregatedClassLoader(final LinkedHashSet<ClassLoader> orderedClassLoaderSet) {
 			super( null );
@@ -223,23 +210,25 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 				}
 				catch (Exception ignore) {
 				}
+				catch (LinkageError ignore) {
+				}
 			}
 
 			throw new ClassNotFoundException( "Could not load requested class : " + name );
 		}
 
-		public void destroy() {
-			individualClassLoaders = null;
-		}
 	}
 
 	@Override
 	@SuppressWarnings({"unchecked"})
 	public <T> Class<T> classForName(String className) {
 		try {
-			return (Class<T>) Class.forName( className, true, aggregatedClassLoader );
+			return (Class<T>) Class.forName( className, true, getAggregatedClassLoader() );
 		}
 		catch (Exception e) {
+			throw new ClassLoadingException( "Unable to load class [" + className + "]", e );
+		}
+		catch (LinkageError e) {
 			throw new ClassLoadingException( "Unable to load class [" + className + "]", e );
 		}
 	}
@@ -254,7 +243,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 		}
 
 		try {
-			return aggregatedClassLoader.getResource( name );
+			return getAggregatedClassLoader().getResource( name );
 		}
 		catch (Exception ignore) {
 		}
@@ -274,7 +263,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
 		try {
 			log.tracef( "trying via [ClassLoader.getResourceAsStream(\"%s\")]", name );
-			final InputStream stream = aggregatedClassLoader.getResourceAsStream( name );
+			final InputStream stream = getAggregatedClassLoader().getResourceAsStream( name );
 			if ( stream != null ) {
 				return stream;
 			}
@@ -294,7 +283,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
 			try {
 				log.tracef( "trying via [ClassLoader.getResourceAsStream(\"%s\")]", stripped );
-				final InputStream stream = aggregatedClassLoader.getResourceAsStream( stripped );
+				final InputStream stream = getAggregatedClassLoader().getResourceAsStream( stripped );
 				if ( stream != null ) {
 					return stream;
 				}
@@ -310,7 +299,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 	public List<URL> locateResources(String name) {
 		final ArrayList<URL> urls = new ArrayList<URL>();
 		try {
-			final Enumeration<URL> urlEnumeration = aggregatedClassLoader.getResources( name );
+			final Enumeration<URL> urlEnumeration = getAggregatedClassLoader().getResources( name );
 			if ( urlEnumeration != null && urlEnumeration.hasMoreElements() ) {
 				while ( urlEnumeration.hasMoreElements() ) {
 					urls.add( urlEnumeration.nextElement() );
@@ -325,16 +314,12 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <S> LinkedHashSet<S> loadJavaServices(Class<S> serviceContract) {
-		ServiceLoader<S> serviceLoader;
-		if ( serviceLoaders.containsKey( serviceContract ) ) {
-			serviceLoader = serviceLoaders.get( serviceContract );
-		}
-		else {
-			serviceLoader = ServiceLoader.load( serviceContract, aggregatedClassLoader );
+	public <S> Collection<S> loadJavaServices(Class<S> serviceContract) {
+		ServiceLoader<S> serviceLoader = serviceLoaders.get( serviceContract );
+		if ( serviceLoader == null ) {
+			serviceLoader = ServiceLoader.load( serviceContract, getAggregatedClassLoader() );
 			serviceLoaders.put( serviceContract, serviceLoader );
 		}
-
 		final LinkedHashSet<S> services = new LinkedHashSet<S>();
 		for ( S service : serviceLoader ) {
 			services.add( service );
@@ -343,91 +328,36 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T generateProxy(InvocationHandler handler, Class... interfaces) {
+		return (T) Proxy.newProxyInstance(
+				getAggregatedClassLoader(),
+				interfaces,
+				handler
+		);
+	}
+
+	@Override
+	public <T> T workWithClassLoader(Work<T> work) {
+		return work.doWork( getAggregatedClassLoader() );
+	}
+
+	private ClassLoader getAggregatedClassLoader() {
+		final ClassLoader aggregated = this.aggregatedClassLoader;
+		if ( aggregated == null ) {
+			throw log.usingStoppedClassLoaderService();
+		}
+		return aggregated;
+	}
+
+	@Override
 	public void stop() {
 		for ( ServiceLoader serviceLoader : serviceLoaders.values() ) {
 			serviceLoader.reload(); // clear service loader providers
 		}
 		serviceLoaders.clear();
-
-		if ( aggregatedClassLoader != null ) {
-			aggregatedClassLoader.destroy();
-			aggregatedClassLoader = null;
-		}
-	}
-
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// completely temporary !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-	/**
-	 * Hack around continued (temporary) need to sometimes set the TCCL for code we call that expects it.
-	 *
-	 * @param <T> The result type
-	 */
-	public static interface Work<T> {
-		/**
-		 * The work to be performed with the TCCL set
-		 *
-		 * @return The result of the work
-		 */
-		public T perform();
-	}
-
-	/**
-	 * Perform some discrete work with with the TCCL set to our aggregated ClassLoader
-	 *
-	 * @param work The discrete work to be done
-	 * @param <T> The type of the work result
-	 *
-	 * @return The work result.
-	 */
-	public <T> T withTccl(Work<T> work) {
-		final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-
-		boolean set = false;
-
-		try {
-			Thread.currentThread().setContextClassLoader(
-					new TcclSafeAggregatedClassLoader( aggregatedClassLoader, tccl ) );
-			set = true;
-		}
-		catch (Exception ignore) {
-		}
-
-		try {
-			return work.perform();
-		}
-		finally {
-			if ( set ) {
-				Thread.currentThread().setContextClassLoader( tccl );
-			}
-		}
-
-	}
-	
-	// TODO: Remove in ORM 5!  See HHH-8818
-	private class TcclSafeAggregatedClassLoader extends ClassLoader {
-		private final AggregatedClassLoader aggregatedClassLoader;
-		
-		private TcclSafeAggregatedClassLoader(AggregatedClassLoader aggregatedClassLoader, ClassLoader tccl) {
-			super(tccl);
-			this.aggregatedClassLoader = aggregatedClassLoader;
-		}
-		
-		@Override
-		public Enumeration<URL> getResources(String name) throws IOException {
-			return aggregatedClassLoader.getResources( name );
-		}
-
-		@Override
-		protected URL findResource(String name) {
-			return aggregatedClassLoader.findResource( name );
-		}
-
-		@Override
-		protected Class<?> findClass(String name) throws ClassNotFoundException {
-			return aggregatedClassLoader.findClass( name );
-		}
+		//Avoid ClassLoader leaks
+		this.aggregatedClassLoader = null;
 	}
 
 }

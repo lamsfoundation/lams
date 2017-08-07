@@ -1,28 +1,13 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.mapping;
+
 import java.io.Serializable;
+import java.util.Locale;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
@@ -34,6 +19,7 @@ import org.hibernate.sql.Template;
 
 /**
  * A column of a relational database table
+ *
  * @author Gavin King
  */
 public class Column implements Selectable, Serializable, Cloneable {
@@ -42,13 +28,13 @@ public class Column implements Selectable, Serializable, Cloneable {
 	public static final int DEFAULT_PRECISION = 19;
 	public static final int DEFAULT_SCALE = 2;
 
-	private int length=DEFAULT_LENGTH;
-	private int precision=DEFAULT_PRECISION;
-	private int scale=DEFAULT_SCALE;
+	private int length = DEFAULT_LENGTH;
+	private int precision = DEFAULT_PRECISION;
+	private int scale = DEFAULT_SCALE;
 	private Value value;
 	private int typeIndex;
 	private String name;
-	private boolean nullable=true;
+	private boolean nullable = true;
 	private boolean unique;
 	private String sqlType;
 	private Integer sqlTypeCode;
@@ -64,38 +50,45 @@ public class Column implements Selectable, Serializable, Cloneable {
 	}
 
 	public Column(String columnName) {
-		setName(columnName);
+		setName( columnName );
 	}
 
 	public int getLength() {
 		return length;
 	}
+
 	public void setLength(int length) {
 		this.length = length;
 	}
+
 	public Value getValue() {
 		return value;
 	}
+
 	public void setValue(Value value) {
-		this.value= value;
+		this.value = value;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		if (
-			StringHelper.isNotEmpty( name ) &&
-			Dialect.QUOTE.indexOf( name.charAt(0) ) > -1 //TODO: deprecated, remove eventually
-		) {
-			quoted=true;
-			this.name=name.substring( 1, name.length()-1 );
+				StringHelper.isNotEmpty( name ) &&
+						Dialect.QUOTE.indexOf( name.charAt( 0 ) ) > -1 //TODO: deprecated, remove eventually
+				) {
+			quoted = true;
+			this.name = name.substring( 1, name.length() - 1 );
 		}
 		else {
 			this.name = name;
 		}
 	}
 
-	/** returns quoted name as it would be in the mapping file. */
+	/**
+	 * returns quoted name as it would be in the mapping file.
+	 */
 	public String getQuotedName() {
 		return quoted ?
 				"`" + name + "`" :
@@ -104,14 +97,14 @@ public class Column implements Selectable, Serializable, Cloneable {
 
 	public String getQuotedName(Dialect d) {
 		return quoted ?
-			d.openQuote() + name + d.closeQuote() :
-			name;
+				d.openQuote() + name + d.closeQuote() :
+				name;
 	}
-	
+
 	@Override
 	public String getAlias(Dialect dialect) {
 		final int lastLetter = StringHelper.lastIndexOfLetter( name );
-		final String suffix = Integer.toString(uniqueInteger) + '_';
+		final String suffix = Integer.toString( uniqueInteger ) + '_';
 
 		String alias = name;
 		if ( lastLetter == -1 ) {
@@ -122,12 +115,15 @@ public class Column implements Selectable, Serializable, Cloneable {
 		}
 
 		boolean useRawName = name.length() + suffix.length() <= dialect.getMaxAliasLength()
-				&& !quoted && !name.toLowerCase().equals( "rowid" );
+				&& !quoted && !name.toLowerCase( Locale.ROOT ).equals( "rowid" );
 		if ( !useRawName ) {
 			if ( suffix.length() >= dialect.getMaxAliasLength() ) {
-				throw new MappingException( String.format(
-						"Unique suffix [%s] length must be less than maximum [%d]",
-						suffix, dialect.getMaxAliasLength() ) );
+				throw new MappingException(
+						String.format(
+								"Unique suffix [%s] length must be less than maximum [%d]",
+								suffix, dialect.getMaxAliasLength()
+						)
+				);
 			}
 			if ( alias.length() + suffix.length() > dialect.getMaxAliasLength() ) {
 				alias = alias.substring( 0, dialect.getMaxAliasLength() - suffix.length() );
@@ -135,13 +131,13 @@ public class Column implements Selectable, Serializable, Cloneable {
 		}
 		return alias + suffix;
 	}
-	
+
 	/**
 	 * Generate a column alias that is unique across multiple tables
 	 */
 	@Override
 	public String getAlias(Dialect dialect, Table table) {
-		return getAlias(dialect) + table.getUniqueInteger() + '_';
+		return getAlias( dialect ) + table.getUniqueInteger() + '_';
 	}
 
 	public boolean isNullable() {
@@ -149,12 +145,13 @@ public class Column implements Selectable, Serializable, Cloneable {
 	}
 
 	public void setNullable(boolean nullable) {
-		this.nullable=nullable;
+		this.nullable = nullable;
 	}
 
 	public int getTypeIndex() {
 		return typeIndex;
 	}
+
 	public void setTypeIndex(int typeIndex) {
 		this.typeIndex = typeIndex;
 	}
@@ -167,8 +164,8 @@ public class Column implements Selectable, Serializable, Cloneable {
 	public int hashCode() {
 		//used also for generation of FK names!
 		return isQuoted() ?
-			name.hashCode() :
-			name.toLowerCase().hashCode();
+				name.hashCode() :
+				name.toLowerCase( Locale.ROOT ).hashCode();
 	}
 
 	@Override
@@ -176,60 +173,65 @@ public class Column implements Selectable, Serializable, Cloneable {
 		return object instanceof Column && equals( (Column) object );
 	}
 
+	@SuppressWarnings("SimplifiableIfStatement")
 	public boolean equals(Column column) {
-		if (null == column) return false;
-		if (this == column) return true;
+		if ( null == column ) {
+			return false;
+		}
+		if ( this == column ) {
+			return true;
+		}
 
-		return isQuoted() ? 
-			name.equals(column.name) :
-			name.equalsIgnoreCase(column.name);
+		return isQuoted() ?
+				name.equals( column.name ) :
+				name.equalsIgnoreCase( column.name );
 	}
 
-    public int getSqlTypeCode(Mapping mapping) throws MappingException {
-        org.hibernate.type.Type type = getValue().getType();
-        try {
-            int sqlTypeCode = type.sqlTypes( mapping )[getTypeIndex()];
-            if ( getSqlTypeCode() != null && getSqlTypeCode() != sqlTypeCode ) {
-                throw new MappingException( "SQLType code's does not match. mapped as " + sqlTypeCode + " but is " + getSqlTypeCode() );
-            }
-            return sqlTypeCode;
-        }
-        catch ( Exception e ) {
-            throw new MappingException(
-                    "Could not determine type for column " +
-                            name +
-                            " of type " +
-                            type.getClass().getName() +
-                            ": " +
-                            e.getClass().getName(),
-                    e
-            );
-        }
-    }
+	public int getSqlTypeCode(Mapping mapping) throws MappingException {
+		org.hibernate.type.Type type = getValue().getType();
+		try {
+			int sqlTypeCode = type.sqlTypes( mapping )[getTypeIndex()];
+			if ( getSqlTypeCode() != null && getSqlTypeCode() != sqlTypeCode ) {
+				throw new MappingException( "SQLType code's does not match. mapped as " + sqlTypeCode + " but is " + getSqlTypeCode() );
+			}
+			return sqlTypeCode;
+		}
+		catch (Exception e) {
+			throw new MappingException(
+					"Could not determine type for column " +
+							name +
+							" of type " +
+							type.getClass().getName() +
+							": " +
+							e.getClass().getName(),
+					e
+			);
+		}
+	}
 
-    /**
-     * Returns the underlying columns sqltypecode.
-     * If null, it is because the sqltype code is unknown.
-     *
-     * Use #getSqlTypeCode(Mapping) to retreive the sqltypecode used
-     * for the columns associated Value/Type.
-     *
-     * @return sqlTypeCode if it is set, otherwise null.
-     */
-    public Integer getSqlTypeCode() {
-        return sqlTypeCode;
-    }
+	/**
+	 * Returns the underlying columns sqltypecode.
+	 * If null, it is because the sqltype code is unknown.
+	 * <p/>
+	 * Use #getSqlTypeCode(Mapping) to retreive the sqltypecode used
+	 * for the columns associated Value/Type.
+	 *
+	 * @return sqlTypeCode if it is set, otherwise null.
+	 */
+	public Integer getSqlTypeCode() {
+		return sqlTypeCode;
+	}
 
-    public void setSqlTypeCode(Integer typeCode) {
-        sqlTypeCode=typeCode;
-    }
+	public void setSqlTypeCode(Integer typeCode) {
+		sqlTypeCode = typeCode;
+	}
 
-    public String getSqlType(Dialect dialect, Mapping mapping) throws HibernateException {
-        if ( sqlType == null ) {
-            sqlType = dialect.getTypeName( getSqlTypeCode( mapping ), getLength(), getPrecision(), getScale() );
-        }
-        return sqlType;
-    }
+	public String getSqlType(Dialect dialect, Mapping mapping) throws HibernateException {
+		if ( sqlType == null ) {
+			sqlType = dialect.getTypeName( getSqlTypeCode( mapping ), getLength(), getPrecision(), getScale() );
+		}
+		return sqlType;
+	}
 
 	public String getSqlType() {
 		return sqlType;
@@ -261,7 +263,7 @@ public class Column implements Selectable, Serializable, Cloneable {
 	}
 
 	public boolean hasCheckConstraint() {
-		return checkConstraint!=null;
+		return checkConstraint != null;
 	}
 
 	@Override
@@ -278,7 +280,7 @@ public class Column implements Selectable, Serializable, Cloneable {
 	public String getReadExpr(Dialect dialect) {
 		return hasCustomRead() ? customRead : getQuotedName( dialect );
 	}
-	
+
 	public String getWriteExpr() {
 		return ( customWrite != null && customWrite.length() > 0 ) ? customWrite : "?";
 	}
@@ -290,17 +292,18 @@ public class Column implements Selectable, Serializable, Cloneable {
 
 	@Override
 	public String getText(Dialect d) {
-		return getQuotedName(d);
+		return getQuotedName( d );
 	}
 
 	@Override
 	public String getText() {
 		return getName();
 	}
-	
+
 	public int getPrecision() {
 		return precision;
 	}
+
 	public void setPrecision(int scale) {
 		this.precision = scale;
 	}
@@ -308,6 +311,7 @@ public class Column implements Selectable, Serializable, Cloneable {
 	public int getScale() {
 		return scale;
 	}
+
 	public void setScale(int scale) {
 		this.scale = scale;
 	}
@@ -345,7 +349,7 @@ public class Column implements Selectable, Serializable, Cloneable {
 	}
 
 	public String getCanonicalName() {
-		return quoted ? name : name.toLowerCase();
+		return quoted ? name : name.toLowerCase( Locale.ROOT );
 	}
 
 	/**

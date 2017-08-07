@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.mapping;
 
@@ -33,67 +16,86 @@ import javax.persistence.AttributeConverter;
 import org.hibernate.FetchMode;
 import org.hibernate.MappingException;
 import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
+import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.cfg.AttributeConverterDefinition;
-import org.hibernate.cfg.Environment;
-import org.hibernate.cfg.Mappings;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.config.spi.ConfigurationService;
+import org.hibernate.engine.config.spi.StandardConverters;
 import org.hibernate.engine.spi.Mapping;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.IdentityGenerator;
 import org.hibernate.id.PersistentIdentifierGenerator;
 import org.hibernate.id.factory.IdentifierGeneratorFactory;
+import org.hibernate.internal.CoreLogging;
+import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.type.BinaryType;
+import org.hibernate.type.RowVersionType;
 import org.hibernate.type.Type;
 import org.hibernate.type.descriptor.converter.AttributeConverterSqlTypeDescriptorAdapter;
 import org.hibernate.type.descriptor.converter.AttributeConverterTypeAdapter;
 import org.hibernate.type.descriptor.java.JavaTypeDescriptor;
 import org.hibernate.type.descriptor.java.JavaTypeDescriptorRegistry;
 import org.hibernate.type.descriptor.sql.JdbcTypeJavaClassMappings;
+import org.hibernate.type.descriptor.sql.NationalizedTypeMappings;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptorRegistry;
 import org.hibernate.usertype.DynamicParameterizedType;
-
-import org.jboss.logging.Logger;
 
 /**
  * Any value that maps to columns.
  * @author Gavin King
  */
 public class SimpleValue implements KeyValue {
-	private static final Logger log = Logger.getLogger( SimpleValue.class );
+	private static final CoreMessageLogger log = CoreLogging.messageLogger( SimpleValue.class );
 
 	public static final String DEFAULT_ID_GEN_STRATEGY = "assigned";
 
-	private final Mappings mappings;
+	private final MetadataImplementor metadata;
 
 	private final List<Selectable> columns = new ArrayList<Selectable>();
+	private final List<Boolean> insertability = new ArrayList<Boolean>();
+	private final List<Boolean> updatability = new ArrayList<Boolean>();
 
 	private String typeName;
+	private Properties typeParameters;
+	private boolean isVersion;
+	private boolean isNationalized;
+
 	private Properties identifierGeneratorProperties;
 	private String identifierGeneratorStrategy = DEFAULT_ID_GEN_STRATEGY;
 	private String nullValue;
 	private Table table;
 	private String foreignKeyName;
 	private boolean alternateUniqueKey;
-	private Properties typeParameters;
 	private boolean cascadeDeleteEnabled;
 
 	private AttributeConverterDefinition attributeConverterDefinition;
 	private Type type;
 
-	public SimpleValue(Mappings mappings) {
-		this.mappings = mappings;
+	public SimpleValue(MetadataImplementor metadata) {
+		this.metadata = metadata;
 	}
 
-	public SimpleValue(Mappings mappings, Table table) {
-		this( mappings );
+	public SimpleValue(MetadataImplementor metadata, Table table) {
+		this( metadata );
 		this.table = table;
 	}
 
-	public Mappings getMappings() {
-		return mappings;
+	public MetadataImplementor getMetadata() {
+		return metadata;
 	}
 
+	@Override
+	public ServiceRegistry getServiceRegistry() {
+		return getMetadata().getMetadataBuildingOptions().getServiceRegistry();
+	}
+
+	@Override
 	public boolean isCascadeDeleteEnabled() {
 		return cascadeDeleteEnabled;
 	}
@@ -103,45 +105,106 @@ public class SimpleValue implements KeyValue {
 	}
 	
 	public void addColumn(Column column) {
-		if ( !columns.contains(column) ) columns.add(column);
-		column.setValue(this);
-		column.setTypeIndex( columns.size()-1 );
+		addColumn( column, true, true );
 	}
-	
+
+	public void addColumn(Column column, boolean isInsertable, boolean isUpdatable) {
+		int index = columns.indexOf( column );
+		if ( index == -1 ) {
+			columns.add(column);
+			insertability.add( isInsertable );
+			updatability.add( isUpdatable );
+		}
+		else {
+			if ( insertability.get( index ) != isInsertable ) {
+				throw new IllegalStateException( "Same column is added more than once with different values for isInsertable" );
+			}
+			if ( updatability.get( index ) != isUpdatable ) {
+				throw new IllegalStateException( "Same column is added more than once with different values for isUpdatable" );
+			}
+		}
+		column.setValue( this );
+		column.setTypeIndex( columns.size() - 1 );
+	}
+
 	public void addFormula(Formula formula) {
-		columns.add(formula);
+		columns.add( formula );
+		insertability.add( false );
+		updatability.add( false );
 	}
-	
+
+	@Override
 	public boolean hasFormula() {
 		Iterator iter = getColumnIterator();
 		while ( iter.hasNext() ) {
 			Object o = iter.next();
-			if (o instanceof Formula) return true;
+			if (o instanceof Formula) {
+				return true;
+			}
 		}
 		return false;
 	}
 
+	@Override
 	public int getColumnSpan() {
 		return columns.size();
 	}
+
+	@Override
 	public Iterator<Selectable> getColumnIterator() {
 		return columns.iterator();
 	}
+
 	public List getConstraintColumns() {
 		return columns;
 	}
+
 	public String getTypeName() {
 		return typeName;
 	}
-	public void setTypeName(String type) {
-		this.typeName = type;
+
+	public void setTypeName(String typeName) {
+		if ( typeName != null && typeName.startsWith( AttributeConverterTypeAdapter.NAME_PREFIX ) ) {
+			final String converterClassName = typeName.substring( AttributeConverterTypeAdapter.NAME_PREFIX.length() );
+			final ClassLoaderService cls = getMetadata().getMetadataBuildingOptions()
+					.getServiceRegistry()
+					.getService( ClassLoaderService.class );
+			try {
+				final Class<AttributeConverter> converterClass = cls.classForName( converterClassName );
+				attributeConverterDefinition = new AttributeConverterDefinition( converterClass.newInstance(), false );
+				return;
+			}
+			catch (Exception e) {
+				log.logBadHbmAttributeConverterType( typeName, e.getMessage() );
+			}
+		}
+
+		this.typeName = typeName;
 	}
+
+	public void makeVersion() {
+		this.isVersion = true;
+	}
+
+	public boolean isVersion() {
+		return isVersion;
+	}
+	public void makeNationalized() {
+		this.isNationalized = true;
+	}
+
+	public boolean isNationalized() {
+		return isNationalized;
+	}
+
 	public void setTable(Table table) {
 		this.table = table;
 	}
 
+	@Override
 	public void createForeignKey() throws MappingException {}
 
+	@Override
 	public void createForeignKeyOfEntity(String entityName) {
 		if ( !hasFormula() && !"none".equals(getForeignKeyName())) {
 			ForeignKey fk = table.createForeignKey( getForeignKeyName(), getConstraintColumns(), entityName );
@@ -149,13 +212,20 @@ public class SimpleValue implements KeyValue {
 		}
 	}
 
+	private IdentifierGenerator identifierGenerator;
+
+	@Override
 	public IdentifierGenerator createIdentifierGenerator(
 			IdentifierGeneratorFactory identifierGeneratorFactory,
 			Dialect dialect, 
 			String defaultCatalog, 
 			String defaultSchema, 
 			RootClass rootClass) throws MappingException {
-		
+
+		if ( identifierGenerator != null ) {
+			return identifierGenerator;
+		}
+
 		Properties params = new Properties();
 		
 		//if the hibernate-mapping did not specify a schema/catalog, use the defaults
@@ -191,7 +261,9 @@ public class SimpleValue implements KeyValue {
 			while ( iter.hasNext() ) {
 				Table table= (Table) iter.next();
 				tables.append( table.getQuotedName(dialect) );
-				if ( iter.hasNext() ) tables.append(", ");
+				if ( iter.hasNext() ) {
+					tables.append(", ");
+				}
 			}
 			params.setProperty( PersistentIdentifierGenerator.TABLES, tables.toString() );
 		}
@@ -204,14 +276,24 @@ public class SimpleValue implements KeyValue {
 		}
 
 		// TODO : we should pass along all settings once "config lifecycle" is hashed out...
+		final ConfigurationService cs = metadata.getMetadataBuildingOptions().getServiceRegistry()
+				.getService( ConfigurationService.class );
+
 		params.put(
-				Environment.PREFER_POOLED_VALUES_LO,
-				mappings.getConfigurationProperties().getProperty( Environment.PREFER_POOLED_VALUES_LO, "false" )
+				AvailableSettings.PREFER_POOLED_VALUES_LO,
+				cs.getSetting( AvailableSettings.PREFER_POOLED_VALUES_LO, StandardConverters.BOOLEAN, false )
 		);
+		if ( cs.getSettings().get( AvailableSettings.PREFERRED_POOLED_OPTIMIZER ) != null ) {
+			params.put(
+					AvailableSettings.PREFERRED_POOLED_OPTIMIZER,
+					cs.getSettings().get( AvailableSettings.PREFERRED_POOLED_OPTIMIZER )
+			);
+		}
 
 		identifierGeneratorFactory.setDialect( dialect );
-		return identifierGeneratorFactory.createIdentifierGenerator( identifierGeneratorStrategy, getType(), params );
-		
+		identifierGenerator = identifierGeneratorFactory.createIdentifierGenerator( identifierGeneratorStrategy, getType(), params );
+
+		return identifierGenerator;
 	}
 
 	public boolean isUpdateable() {
@@ -290,16 +372,22 @@ public class SimpleValue implements KeyValue {
 	}
 
 	public boolean isNullable() {
-		if ( hasFormula() ) return true;
-		boolean nullable = true;
-		Iterator iter = getColumnIterator();
-		while ( iter.hasNext() ) {
-			if ( !( (Column) iter.next() ).isNullable() ) {
-				nullable = false;
-				return nullable; //shortcut
+		Iterator itr = getColumnIterator();
+		while ( itr.hasNext() ) {
+			final Object selectable = itr.next();
+			if ( selectable instanceof Formula ) {
+				// if there are *any* formulas, then the Value overall is
+				// considered nullable
+				return true;
+			}
+			else if ( !( (Column) selectable ).isNullable() ) {
+				// if there is a single non-nullable column, the Value
+				// overall is considered non-nullable.
+				return false;
 			}
 		}
-		return nullable;
+		// nullable by default
+		return true;
 	}
 
 	public boolean isSimpleValue() {
@@ -318,13 +406,20 @@ public class SimpleValue implements KeyValue {
 		if ( typeName == null ) {
 			throw new MappingException( "No type name" );
 		}
+
 		if ( typeParameters != null
 				&& Boolean.valueOf( typeParameters.getProperty( DynamicParameterizedType.IS_DYNAMIC ) )
 				&& typeParameters.get( DynamicParameterizedType.PARAMETER_TYPE ) == null ) {
 			createParameterImpl();
 		}
 
-		Type result = mappings.getTypeResolver().heuristicType( typeName, typeParameters );
+		Type result = metadata.getTypeResolver().heuristicType( typeName, typeParameters );
+		// if this is a byte[] version/timestamp, then we need to use RowVersionType
+		// instead of BinaryType (HHH-10413)
+		if ( isVersion && BinaryType.class.isInstance( result ) ) {
+			log.debug( "version is BinaryType; changing to RowVersionType" );
+			result = RowVersionType.INSTANCE;
+		}
 		if ( result == null ) {
 			String msg = "Could not determine type for: " + typeName;
 			if ( table != null ) {
@@ -357,9 +452,13 @@ public class SimpleValue implements KeyValue {
 			// look for SqlTypeDescriptor and JavaTypeDescriptor individually and create the BasicType (well, really
 			// keep a registry of [SqlTypeDescriptor,JavaTypeDescriptor] -> BasicType...)
 			if ( className == null ) {
-				throw new MappingException( "you must specify types for a dynamic entity: " + propertyName );
+				throw new MappingException( "Attribute types for a dynamic entity must be explicitly specified: " + propertyName );
 			}
-			typeName = ReflectHelper.reflectedPropertyClass( className, propertyName ).getName();
+			typeName = ReflectHelper.reflectedPropertyClass( className, propertyName, metadata.getMetadataBuildingOptions().getServiceRegistry().getService( ClassLoaderService.class ) ).getName();
+			// todo : to fully support isNationalized here we need do the process hinted at above
+			// 		essentially, much of the logic from #buildAttributeConverterTypeAdapter wrt resolving
+			//		a (1) SqlTypeDescriptor, a (2) JavaTypeDescriptor and dynamically building a BasicType
+			// 		combining them.
 			return;
 		}
 
@@ -419,7 +518,10 @@ public class SimpleValue implements KeyValue {
 		//		corresponding to the AttributeConverter's declared "databaseColumnJavaType" (how we read that value out
 		// 		of ResultSets).  See JdbcTypeJavaClassMappings for details.  Again, given example, this should return
 		// 		VARCHAR/CHAR
-		final int jdbcTypeCode = JdbcTypeJavaClassMappings.INSTANCE.determineJdbcTypeCodeForJavaClass( databaseColumnJavaType );
+		int jdbcTypeCode = JdbcTypeJavaClassMappings.INSTANCE.determineJdbcTypeCodeForJavaClass( databaseColumnJavaType );
+		if ( isNationalized() ) {
+			jdbcTypeCode = NationalizedTypeMappings.INSTANCE.getCorrespondingNationalizedCode( jdbcTypeCode );
+		}
 		// find the standard SqlTypeDescriptor for that JDBC type code.
 		final SqlTypeDescriptor sqlTypeDescriptor = SqlTypeDescriptorRegistry.INSTANCE.getDescriptor( jdbcTypeCode );
 		// find the JavaTypeDescriptor representing the "intermediate database type representation".  Back to the
@@ -435,13 +537,15 @@ public class SimpleValue implements KeyValue {
 
 		// todo : cache the AttributeConverterTypeAdapter in case that AttributeConverter is applied multiple times.
 
-		final String name = String.format(
+		final String name = AttributeConverterTypeAdapter.NAME_PREFIX + attributeConverterDefinition.getAttributeConverter().getClass().getName();
+		final String description = String.format(
 				"BasicType adapter for AttributeConverter<%s,%s>",
 				entityAttributeJavaType.getSimpleName(),
 				databaseColumnJavaType.getSimpleName()
 		);
 		return new AttributeConverterTypeAdapter(
 				name,
+				description,
 				attributeConverterDefinition.getAttributeConverter(),
 				sqlTypeDescriptorAdapter,
 				entityAttributeJavaType,
@@ -462,8 +566,16 @@ public class SimpleValue implements KeyValue {
 		return typeParameters;
 	}
 
+	public void copyTypeFrom( SimpleValue sourceValue ) {
+		setTypeName( sourceValue.getTypeName() );
+		setTypeParameters( sourceValue.getTypeParameters() );
+
+		type = sourceValue.type;
+		attributeConverterDefinition = sourceValue.attributeConverterDefinition;
+	}
+
 	@Override
-    public String toString() {
+	public String toString() {
 		return getClass().getName() + '(' + columns.toString() + ')';
 	}
 
@@ -472,18 +584,20 @@ public class SimpleValue implements KeyValue {
 	}
 	
 	public boolean[] getColumnInsertability() {
-		boolean[] result = new boolean[ getColumnSpan() ];
-		int i = 0;
-		Iterator iter = getColumnIterator();
-		while ( iter.hasNext() ) {
-			Selectable s = (Selectable) iter.next();
-			result[i++] = !s.isFormula();
-		}
-		return result;
+		return extractBooleansFromList( insertability );
 	}
 	
 	public boolean[] getColumnUpdateability() {
-		return getColumnInsertability();
+		return extractBooleansFromList( updatability );
+	}
+
+	private static boolean[] extractBooleansFromList(List<Boolean> list) {
+		final boolean[] array = new boolean[ list.size() ];
+		int i = 0;
+		for ( Boolean value : list ) {
+			array[ i++ ] = value;
+		}
+		return array;
 	}
 
 	public void setJpaAttributeConverterDefinition(AttributeConverterDefinition attributeConverterDefinition) {
@@ -506,10 +620,13 @@ public class SimpleValue implements KeyValue {
 					? null
 					: xProperty.getAnnotations();
 
+			final ClassLoaderService classLoaderService = getMetadata().getMetadataBuildingOptions()
+					.getServiceRegistry()
+					.getService( ClassLoaderService.class );
 			typeParameters.put(
 					DynamicParameterizedType.PARAMETER_TYPE,
 					new ParameterTypeImpl(
-							ReflectHelper.classForName(
+							classLoaderService.classForName(
 									typeParameters.getProperty( DynamicParameterizedType.RETURNED_CLASS )
 							),
 							annotations,
@@ -521,12 +638,12 @@ public class SimpleValue implements KeyValue {
 					)
 			);
 		}
-		catch ( ClassNotFoundException cnfe ) {
-			throw new MappingException( "Could not create DynamicParameterizedType for type: " + typeName, cnfe );
+		catch ( ClassLoadingException e ) {
+			throw new MappingException( "Could not create DynamicParameterizedType for type: " + typeName, e );
 		}
 	}
 
-	private final class ParameterTypeImpl implements DynamicParameterizedType.ParameterType {
+	private static final class ParameterTypeImpl implements DynamicParameterizedType.ParameterType {
 
 		private final Class returnedClass;
 		private final Annotation[] annotationsMethod;

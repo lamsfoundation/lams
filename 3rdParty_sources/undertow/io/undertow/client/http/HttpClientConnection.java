@@ -19,20 +19,32 @@
 package io.undertow.client.http;
 
 import io.undertow.UndertowLogger;
+import io.undertow.UndertowOptions;
 import io.undertow.client.ClientCallback;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientExchange;
 import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
+import io.undertow.client.ClientStatistics;
 import io.undertow.client.UndertowClientMessages;
+import io.undertow.client.http2.Http2ClearClientProvider;
+import io.undertow.client.http2.Http2ClientConnection;
+import io.undertow.conduits.ByteActivityCallback;
+import io.undertow.conduits.BytesReceivedStreamSourceConduit;
+import io.undertow.conduits.BytesSentStreamSinkConduit;
 import io.undertow.conduits.ChunkedStreamSinkConduit;
 import io.undertow.conduits.ChunkedStreamSourceConduit;
 import io.undertow.conduits.ConduitListener;
 import io.undertow.conduits.FixedLengthStreamSourceConduit;
+import io.undertow.protocols.http2.Http2Channel;
+import io.undertow.server.Connectors;
+import io.undertow.server.protocol.http.HttpContinue;
 import io.undertow.util.AbstractAttachable;
+import io.undertow.util.ConnectionUtils;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
+import io.undertow.util.PooledAdaptor;
 import io.undertow.util.Protocols;
 import io.undertow.util.StatusCodes;
 import org.xnio.ChannelExceptionHandler;
@@ -40,8 +52,8 @@ import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
 import org.xnio.Option;
 import org.xnio.OptionMap;
-import org.xnio.Pool;
-import org.xnio.Pooled;
+import io.undertow.connector.ByteBufferPool;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.StreamConnection;
 import org.xnio.XnioIoThread;
 import org.xnio.XnioWorker;
@@ -51,6 +63,7 @@ import org.xnio.conduits.ConduitStreamSourceChannel;
 import org.xnio.conduits.PushBackStreamSourceConduit;
 import org.xnio.conduits.StreamSinkConduit;
 import org.xnio.conduits.StreamSourceConduit;
+import org.xnio.ssl.SslConnection;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -58,7 +71,9 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static io.undertow.client.UndertowClientMessages.MESSAGES;
 import static io.undertow.util.Headers.CLOSE;
@@ -98,7 +113,8 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
     private final PushBackStreamSourceConduit pushBackStreamSourceConduit;
     private final ClientReadListener clientReadListener = new ClientReadListener();
 
-    private final Pool<ByteBuffer> bufferPool;
+    private final ByteBufferPool bufferPool;
+    private PooledByteBuffer pooledBuffer;
     private final StreamSinkConduit originalSinkConduit;
 
     private static final int UPGRADED = 1 << 28;
@@ -108,10 +124,40 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
     private int count = 0;
 
     private int state;
-
     private final ChannelListener.SimpleSetter<HttpClientConnection> closeSetter = new ChannelListener.SimpleSetter<>();
 
-    HttpClientConnection(final StreamConnection connection, final OptionMap options, final Pool<ByteBuffer> bufferPool) {
+    private final ClientStatistics clientStatistics;
+    private int requestCount;
+    private int read, written;
+    private boolean http2Tried = false;
+    private boolean http2UpgradeReceived = false;
+
+    /**
+     * The actual connection if this has been upgraded to h2c
+     */
+    private ClientConnection http2Delegate;
+    private final List<ChannelListener<ClientConnection>> closeListeners = new CopyOnWriteArrayList<>();
+
+    HttpClientConnection(final StreamConnection connection, final OptionMap options, final ByteBufferPool bufferPool) {
+
+        //first we set up statistics, if required
+        if(options.get(UndertowOptions.ENABLE_STATISTICS, false)) {
+            clientStatistics = new ClientStatisticsImpl();
+            connection.getSinkChannel().setConduit(new BytesSentStreamSinkConduit(connection.getSinkChannel().getConduit(), new ByteActivityCallback() {
+                @Override
+                public void activity(long bytes) {
+                    written+=bytes;
+                }
+            }));
+            connection.getSourceChannel().setConduit(new BytesReceivedStreamSourceConduit(connection.getSourceChannel().getConduit(), new ByteActivityCallback() {
+                @Override
+                public void activity(long bytes) {
+                    read+=bytes;
+                }
+            }));
+        } else {
+            clientStatistics = null;
+        }
         this.options = options;
         this.connection = connection;
         this.pushBackStreamSourceConduit = new PushBackStreamSourceConduit(connection.getSourceChannel().getConduit());
@@ -124,12 +170,21 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
             public void handleEvent(StreamConnection channel) {
                 HttpClientConnection.this.state |= CLOSED;
                 ChannelListeners.invokeChannelListener(HttpClientConnection.this, closeSetter.get());
+                try {
+                    if (pooledBuffer != null) {
+                        pooledBuffer.close();
+                    }
+                } catch (Throwable ignored){}
+
+                for(ChannelListener<ClientConnection> listener : closeListeners) {
+                    listener.handleEvent(HttpClientConnection.this);
+                }
             }
         });
     }
 
     @Override
-    public Pool<ByteBuffer> getBufferPool() {
+    public ByteBufferPool getBufferPool() {
         return bufferPool;
     }
 
@@ -175,38 +230,103 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
 
     @Override
     public boolean isOpen() {
+        if(http2Delegate != null) {
+            return http2Delegate.isOpen();
+        }
         return connection.isOpen() && allAreClear(state, CLOSE_REQ | CLOSED);
     }
 
     @Override
     public boolean supportsOption(Option<?> option) {
+        if(http2Delegate != null) {
+            return http2Delegate.supportsOption(option);
+        }
         return connection.supportsOption(option);
     }
 
 
     @Override
     public <T> T getOption(Option<T> option) throws IOException {
+        if(http2Delegate != null) {
+            return http2Delegate.getOption(option);
+        }
         return connection.getOption(option);
     }
 
     @Override
     public <T> T setOption(Option<T> option, T value) throws IllegalArgumentException, IOException {
+        if(http2Delegate != null) {
+            return http2Delegate.setOption(option, value);
+        }
         return connection.setOption(option, value);
     }
 
     @Override
     public boolean isUpgraded() {
+        if(http2Delegate != null) {
+            return http2Delegate.isUpgraded();
+        }
         return anyAreSet(state, UPGRADE_REQUESTED | UPGRADED);
     }
 
     @Override
+    public boolean isPushSupported() {
+        if(http2Delegate != null) {
+            return http2Delegate.isPushSupported();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isMultiplexingSupported() {
+        if(http2Delegate != null) {
+            return http2Delegate.isMultiplexingSupported();
+        }
+        return false;
+    }
+
+    @Override
+    public ClientStatistics getStatistics() {
+        if(http2Delegate != null) {
+            return http2Delegate.getStatistics();
+        }
+        return clientStatistics;
+    }
+
+    @Override
+    public boolean isUpgradeSupported() {
+        if(http2Delegate != null) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void addCloseListener(ChannelListener<ClientConnection> listener) {
+        closeListeners.add(listener);
+    }
+
+    @Override
     public void sendRequest(final ClientRequest request, final ClientCallback<ClientExchange> clientCallback) {
+        if(http2Delegate != null) {
+            http2Delegate.sendRequest(request, clientCallback);
+            return;
+        }
         count++;
         if (anyAreSet(state, UPGRADE_REQUESTED | UPGRADED | CLOSE_REQ | CLOSED)) {
             clientCallback.failed(UndertowClientMessages.MESSAGES.invalidConnectionState());
             return;
         }
         final HttpClientExchange httpClientExchange = new HttpClientExchange(clientCallback, request, this);
+        boolean ssl = this.connection instanceof SslConnection;
+        if(!ssl && !http2Tried && options.get(UndertowOptions.ENABLE_HTTP2, false) && !request.getRequestHeaders().contains(Headers.UPGRADE) && request.getMethod().equals(Methods.GET)) {
+            //this is the first request, as we want to try a HTTP2 upgrade
+            request.getRequestHeaders().put(new HttpString("HTTP2-Settings"), Http2ClearClientProvider.createSettingsFrame(options, bufferPool));
+            request.getRequestHeaders().put(Headers.UPGRADE, Http2Channel.CLEARTEXT_UPGRADE_STRING);
+            request.getRequestHeaders().put(Headers.CONNECTION, "Upgrade, HTTP2-Settings");
+            http2Tried = true;
+        }
+
         if (currentRequest == null) {
             initiateRequest(httpClientExchange);
         } else {
@@ -215,6 +335,7 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
     }
 
     private void initiateRequest(HttpClientExchange httpClientExchange) {
+        this.requestCount++;
         currentRequest = httpClientExchange;
         pendingResponse = new HttpResponseBuilder();
         ClientRequest request = httpClientExchange.getRequest();
@@ -231,6 +352,10 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
             state |= CLOSE_REQ;
         }
         if (request.getRequestHeaders().contains(UPGRADE)) {
+            state |= UPGRADE_REQUESTED;
+        }
+        if(request.getMethod().equals(Methods.CONNECT)) {
+            //we treat CONNECT like upgrade requests
             state |= UPGRADE_REQUESTED;
         }
 
@@ -269,7 +394,7 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
         }
         sinkChannel.setConduit(conduit);
 
-        httpClientExchange.invokeReadReadyCallback(httpClientExchange);
+        httpClientExchange.invokeReadReadyCallback();
         if (!hasContent) {
             //if there is no content we flush the response channel.
             //otherwise it is up to the user
@@ -282,6 +407,7 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
                             handleError(exception);
                         }
                     }));
+                    sinkChannel.resumeWrites();
                 }
             } catch (IOException e) {
                 handleError(e);
@@ -296,28 +422,32 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
     }
 
     public StreamConnection performUpgrade() throws IOException {
-
         // Upgrade the connection
         // Set the upgraded flag already to prevent new requests after this one
         if (allAreSet(state, UPGRADED | CLOSE_REQ | CLOSED)) {
             throw new IOException(UndertowClientMessages.MESSAGES.connectionClosed());
         }
         state |= UPGRADED;
+        connection.getSinkChannel().setConduit(originalSinkConduit);
+        connection.getSourceChannel().setConduit(pushBackStreamSourceConduit);
         return connection;
     }
 
     public void close() throws IOException {
+        if(http2Delegate != null) {
+            http2Delegate.close();
+        }
         if (anyAreSet(state, CLOSED)) {
             return;
         }
         state |= CLOSED | CLOSE_REQ;
-        connection.close();
+        ConnectionUtils.cleanClose(connection);
     }
 
     /**
      * Notification that the current request is finished
      */
-    public void requestDone() {
+    public void exchangeDone() {
 
         connection.getSinkChannel().setConduit(originalSinkConduit);
         connection.getSourceChannel().setConduit(pushBackStreamSourceConduit);
@@ -346,13 +476,19 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
         }
     }
 
+    public void requestDataSent() {
+        if(http2UpgradeReceived) {
+            doHttp2Upgrade();
+        }
+    }
+
     class ClientReadListener implements ChannelListener<StreamSourceChannel> {
 
         public void handleEvent(StreamSourceChannel channel) {
 
             HttpResponseBuilder builder = pendingResponse;
-            final Pooled<ByteBuffer> pooled = bufferPool.allocate();
-            final ByteBuffer buffer = pooled.getResource();
+            final PooledByteBuffer pooled = bufferPool.allocate();
+            final ByteBuffer buffer = pooled.getBuffer();
             boolean free = true;
 
             try {
@@ -412,7 +548,7 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
                     HttpResponseParser.INSTANCE.handle(buffer, state, builder);
                     if (buffer.hasRemaining()) {
                         free = false;
-                        pushBackStreamSourceConduit.pushBack(pooled);
+                        pushBackStreamSourceConduit.pushBack(new PooledAdaptor(pooled));
                     }
 
                 } while (!state.isComplete());
@@ -424,18 +560,32 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
                 //check if an upgrade worked
                 if (anyAreSet(HttpClientConnection.this.state, UPGRADE_REQUESTED)) {
                     if ((connectionString == null || !UPGRADE.equalToString(connectionString)) && !response.getResponseHeaders().contains(UPGRADE)) {
-                        //just unset the upgrade requested flag
-                        HttpClientConnection.this.state &= ~UPGRADE_REQUESTED;
+                        if(!currentRequest.getRequest().getMethod().equals(Methods.CONNECT) || response.getResponseCode() != 200) { //make sure it was not actually a connect request
+                            //just unset the upgrade requested flag
+                            HttpClientConnection.this.state &= ~UPGRADE_REQUESTED;
+                        }
                     }
                 }
 
                 if(connectionString != null) {
                     if (HttpString.tryFromString(connectionString).equals(Headers.CLOSE)) {
                         HttpClientConnection.this.state |= CLOSE_REQ;
+                        //we are going to close, kill any queued connections
+                        HttpClientExchange ex = pendingQueue.poll();
+                        while (ex != null) {
+                            ex.setFailed(new IOException(UndertowClientMessages.MESSAGES.connectionClosed()));
+                            ex = pendingQueue.poll();
+                        }
                     }
                 }
+                if(response.getResponseCode() == StatusCodes.SWITCHING_PROTOCOLS && Http2Channel.CLEARTEXT_UPGRADE_STRING.equals(response.getResponseHeaders().getFirst(Headers.UPGRADE))) {
+                    //http2 upgrade
 
-                if (builder.getStatusCode() == StatusCodes.CONTINUE) {
+                    http2UpgradeReceived = true;
+                    if(currentRequest.isRequestDataSent()) {
+                        doHttp2Upgrade();
+                    }
+                } else if (builder.getStatusCode() == StatusCodes.CONTINUE) {
                     pendingResponse = new HttpResponseBuilder();
                     currentRequest.setContinueResponse(response);
                 } else {
@@ -444,6 +594,18 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
                     channel.suspendReads();
                     pendingResponse = null;
                     currentRequest.setResponse(response);
+                    if(response.getResponseCode() == StatusCodes.EXPECTATION_FAILED) {
+                        if(HttpContinue.requiresContinueResponse(currentRequest.getRequest().getRequestHeaders())) {
+                            HttpClientConnection.this.state |= CLOSE_REQ;
+                            ConduitStreamSinkChannel sinkChannel = HttpClientConnection.this.connection.getSinkChannel();
+                            sinkChannel.shutdownWrites();
+                            if(!sinkChannel.flush()) {
+                                sinkChannel.setWriteListener(ChannelListeners.flushingChannelListener(null, null));
+                                sinkChannel.resumeWrites();
+                            }
+                            currentRequest.terminateRequest();
+                        }
+                    }
                 }
 
 
@@ -452,10 +614,35 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
                 safeClose(connection);
                 currentRequest.setFailed(new IOException(e));
             } finally {
-                if (free) pooled.free();
+                if (free) {
+                    pooled.close();
+                    pooledBuffer = null;
+                } else {
+                    pooledBuffer = pooled;
+                }
             }
 
 
+        }
+    }
+
+    protected void doHttp2Upgrade() {
+        try {
+            StreamConnection connectedStreamChannel = this.performUpgrade();
+            Http2Channel http2Channel = new Http2Channel(connectedStreamChannel, null, bufferPool, null, true, true, options);
+            Http2ClientConnection http2ClientConnection = new Http2ClientConnection(http2Channel, currentRequest.getResponseCallback(), currentRequest.getRequest(), currentRequest.getRequest().getRequestHeaders().getFirst(Headers.HOST), clientStatistics);
+            http2ClientConnection.getCloseSetter().set(new ChannelListener<ClientConnection>() {
+                @Override
+                public void handleEvent(ClientConnection channel) {
+                    ChannelListeners.invokeChannelListener(HttpClientConnection.this, HttpClientConnection.this.closeSetter.get());
+                }
+            });
+            http2Delegate = http2ClientConnection;
+            connectedStreamChannel.getSourceChannel().wakeupReads(); //make sure the read listener is immediately invoked, as it may not happen if data is pushed back
+            currentRequest = null;
+        } catch (IOException e) {
+            UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+            safeClose(this);
         }
     }
 
@@ -475,10 +662,35 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
                 handleError(new IOException(e));
                 throw e;
             }
-        } else if (response.getProtocol().equals(Protocols.HTTP_1_1)) {
+        } else if (response.getProtocol().equals(Protocols.HTTP_1_1) && !Connectors.isEntityBodyAllowed(response.getResponseCode())) {
             connection.getSourceChannel().setConduit(new FixedLengthStreamSourceConduit(connection.getSourceChannel().getConduit(), 0, responseFinishedListener));
         } else {
             state |= CLOSE_REQ;
+        }
+    }
+
+    private class ClientStatisticsImpl implements ClientStatistics {
+
+        @Override
+        public long getRequests() {
+            return requestCount;
+        }
+
+        @Override
+        public long getRead() {
+            return read;
+        }
+
+        @Override
+        public long getWritten() {
+            return written;
+        }
+
+        @Override
+        public void reset() {
+            read = 0;
+            written = 0;
+            requestCount = 0;
         }
     }
 }

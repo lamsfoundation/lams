@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.spi;
 
@@ -27,7 +10,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
@@ -53,18 +35,20 @@ import org.hibernate.SimpleNaturalIdLoadAccess;
 import org.hibernate.Transaction;
 import org.hibernate.TypeHelper;
 import org.hibernate.UnknownProfileException;
-import org.hibernate.cache.spi.CacheKey;
 import org.hibernate.collection.spi.PersistentCollection;
-import org.hibernate.engine.jdbc.spi.JdbcConnectionAccess;
+import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
+import org.hibernate.engine.jdbc.spi.JdbcCoordinator;
 import org.hibernate.engine.query.spi.sql.NativeSQLQuerySpecification;
-import org.hibernate.engine.transaction.spi.TransactionCoordinator;
+import org.hibernate.internal.WrapperOptionsImpl;
 import org.hibernate.jdbc.ReturningWork;
 import org.hibernate.jdbc.Work;
 import org.hibernate.loader.custom.CustomQuery;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.procedure.ProcedureCall;
+import org.hibernate.resource.transaction.TransactionCoordinator;
 import org.hibernate.stat.SessionStatistics;
-import org.hibernate.type.Type;
+import org.hibernate.type.descriptor.WrapperOptions;
+import org.hibernate.type.descriptor.WrapperOptionsContext;
 
 /**
  * This class is meant to be extended.
@@ -76,7 +60,7 @@ import org.hibernate.type.Type;
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public class SessionDelegatorBaseImpl implements SessionImplementor, Session {
+public class SessionDelegatorBaseImpl implements SessionImplementor, Session, WrapperOptionsContext {
 
 	protected final SessionImplementor sessionImplementor;
 	protected final Session session;
@@ -112,11 +96,6 @@ public class SessionDelegatorBaseImpl implements SessionImplementor, Session {
 	@Override
 	public EntityKey generateEntityKey(Serializable id, EntityPersister persister) {
 		return sessionImplementor.generateEntityKey( id, persister );
-	}
-
-	@Override
-	public CacheKey generateCacheKey(Serializable id, Type type, String entityOrRoleName) {
-		return sessionImplementor.generateCacheKey( id, type, entityOrRoleName );
 	}
 
 	@Override
@@ -250,21 +229,6 @@ public class SessionDelegatorBaseImpl implements SessionImplementor, Session {
 	}
 
 	@Override
-	public Object getFilterParameterValue(String filterParameterName) {
-		return sessionImplementor.getFilterParameterValue( filterParameterName );
-	}
-
-	@Override
-	public Type getFilterParameterType(String filterParameterName) {
-		return sessionImplementor.getFilterParameterType( filterParameterName );
-	}
-
-	@Override
-	public Map getEnabledFilters() {
-		return sessionImplementor.getEnabledFilters();
-	}
-
-	@Override
 	public int getDontFlushFromFind() {
 		return sessionImplementor.getDontFlushFromFind();
 	}
@@ -345,23 +309,28 @@ public class SessionDelegatorBaseImpl implements SessionImplementor, Session {
 	}
 
 	@Override
-	public String getFetchProfile() {
-		return sessionImplementor.getFetchProfile();
-	}
-
-	@Override
-	public void setFetchProfile(String name) {
-		sessionImplementor.setFetchProfile( name );
-	}
-
-	@Override
 	public TransactionCoordinator getTransactionCoordinator() {
 		return sessionImplementor.getTransactionCoordinator();
 	}
 
 	@Override
+	public JdbcCoordinator getJdbcCoordinator() {
+		return sessionImplementor.getJdbcCoordinator();
+	}
+
+	@Override
 	public boolean isClosed() {
 		return sessionImplementor.isClosed();
+	}
+
+	@Override
+	public boolean shouldAutoClose() {
+		return sessionImplementor.shouldAutoClose();
+	}
+
+	@Override
+	public boolean isAutoCloseSessionEnabled() {
+		return sessionImplementor.isAutoCloseSessionEnabled();
 	}
 
 	@Override
@@ -457,8 +426,8 @@ public class SessionDelegatorBaseImpl implements SessionImplementor, Session {
 	}
 
 	@Override
-	public Connection close() throws HibernateException {
-		return session.close();
+	public void close() throws HibernateException {
+		session.close();
 	}
 
 	@Override
@@ -497,12 +466,12 @@ public class SessionDelegatorBaseImpl implements SessionImplementor, Session {
 	}
 
 	@Override
-	public Object load(Class theClass, Serializable id, LockMode lockMode) {
+	public <T> T load(Class<T> theClass, Serializable id, LockMode lockMode) {
 		return session.load( theClass, id, lockMode );
 	}
 
 	@Override
-	public Object load(Class theClass, Serializable id, LockOptions lockOptions) {
+	public <T> T load(Class<T> theClass, Serializable id, LockOptions lockOptions) {
 		return session.load( theClass, id, lockOptions );
 	}
 
@@ -517,7 +486,7 @@ public class SessionDelegatorBaseImpl implements SessionImplementor, Session {
 	}
 
 	@Override
-	public Object load(Class theClass, Serializable id) {
+	public <T> T load(Class<T> theClass, Serializable id) {
 		return session.load( theClass, id );
 	}
 
@@ -657,18 +626,18 @@ public class SessionDelegatorBaseImpl implements SessionImplementor, Session {
 	}
 
 	@Override
-	public Object get(Class clazz, Serializable id) {
-		return session.get( clazz, id );
+	public <T> T get(Class<T> theClass, Serializable id) {
+		return session.get( theClass, id );
 	}
 
 	@Override
-	public Object get(Class clazz, Serializable id, LockMode lockMode) {
-		return session.get( clazz, id, lockMode );
+	public <T> T get(Class<T> theClass, Serializable id, LockMode lockMode) {
+		return session.get( theClass, id, lockMode );
 	}
 
 	@Override
-	public Object get(Class clazz, Serializable id, LockOptions lockOptions) {
-		return session.get( clazz, id, lockOptions );
+	public <T> T get(Class<T> theClass, Serializable id, LockOptions lockOptions) {
+		return session.get( theClass, id, lockOptions );
 	}
 
 	@Override
@@ -697,7 +666,7 @@ public class SessionDelegatorBaseImpl implements SessionImplementor, Session {
 	}
 
 	@Override
-	public IdentifierLoadAccess byId(Class entityClass) {
+	public <T> IdentifierLoadAccess<T> byId(Class<T> entityClass) {
 		return session.byId( entityClass );
 	}
 
@@ -707,7 +676,7 @@ public class SessionDelegatorBaseImpl implements SessionImplementor, Session {
 	}
 
 	@Override
-	public NaturalIdLoadAccess byNaturalId(Class entityClass) {
+	public <T> NaturalIdLoadAccess<T> byNaturalId(Class<T> entityClass) {
 		return session.byNaturalId( entityClass );
 	}
 
@@ -717,7 +686,7 @@ public class SessionDelegatorBaseImpl implements SessionImplementor, Session {
 	}
 
 	@Override
-	public SimpleNaturalIdLoadAccess bySimpleNaturalId(Class entityClass) {
+	public <T> SimpleNaturalIdLoadAccess<T> bySimpleNaturalId(Class<T> entityClass) {
 		return session.bySimpleNaturalId( entityClass );
 	}
 
@@ -799,5 +768,18 @@ public class SessionDelegatorBaseImpl implements SessionImplementor, Session {
 	@Override
 	public void addEventListeners(SessionEventListener... listeners) {
 		session.addEventListeners( listeners );
+	}
+
+	@Override
+	public WrapperOptions getWrapperOptions() {
+		if ( sessionImplementor instanceof WrapperOptionsContext ) {
+			return ( (WrapperOptionsContext) sessionImplementor ).getWrapperOptions();
+		}
+		else if ( session instanceof WrapperOptionsContext ) {
+			return ( (WrapperOptionsContext) session ).getWrapperOptions();
+		}
+		else {
+			return new WrapperOptionsImpl( sessionImplementor );
+		}
 	}
 }

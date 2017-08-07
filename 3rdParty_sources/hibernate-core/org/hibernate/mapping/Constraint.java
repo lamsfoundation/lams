@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.mapping;
 import java.io.Serializable;
@@ -31,9 +14,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import org.hibernate.HibernateException;
 import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.boot.model.relational.Exportable;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.Mapping;
 
@@ -43,7 +28,7 @@ import org.hibernate.engine.spi.Mapping;
  * @author Gavin King
  * @author Brett Meyer
  */
-public abstract class Constraint implements RelationalModel, Serializable {
+public abstract class Constraint implements RelationalModel, Exportable, Serializable {
 
 	private String name;
 	private final ArrayList<Column> columns = new ArrayList<Column>();
@@ -62,11 +47,7 @@ public abstract class Constraint implements RelationalModel, Serializable {
 	 * a unique hash using the table and column names.
 	 * Static so the name can be generated prior to creating the Constraint.
 	 * They're cached, keyed by name, in multiple locations.
-	 * 
-	 * @param prefix
-	 *            Appended to the beginning of the generated name
-	 * @param table
-	 * @param columns
+	 *
 	 * @return String The generated name
 	 */
 	public static String generateName(String prefix, Table table, Column... columns) {
@@ -83,18 +64,14 @@ public abstract class Constraint implements RelationalModel, Serializable {
 		Arrays.sort( alphabeticalColumns, ColumnComparator.INSTANCE );
 		for ( Column column : alphabeticalColumns ) {
 			String columnName = column == null ? "" : column.getName();
-			sb.append( "column`" + columnName + "`" );
+			sb.append( "column`" ).append( columnName ).append( "`" );
 		}
 		return prefix + hashedName( sb.toString() );
 	}
 
 	/**
 	 * Helper method for {@link #generateName(String, Table, Column...)}.
-	 * 
-	 * @param prefix
-	 *            Appended to the beginning of the generated name
-	 * @param table
-	 * @param columns
+	 *
 	 * @return String The generated name
 	 */
 	public static String generateName(String prefix, Table table, List<Column> columns) {
@@ -137,18 +114,21 @@ public abstract class Constraint implements RelationalModel, Serializable {
 	}
 
 	public void addColumn(Column column) {
-		if ( !columns.contains( column ) ) columns.add( column );
+		if ( !columns.contains( column ) ) {
+			columns.add( column );
+		}
 	}
 
 	public void addColumns(Iterator columnIterator) {
 		while ( columnIterator.hasNext() ) {
 			Selectable col = (Selectable) columnIterator.next();
-			if ( !col.isFormula() ) addColumn( (Column) col );
+			if ( !col.isFormula() ) {
+				addColumn( (Column) col );
+			}
 		}
 	}
 
 	/**
-	 * @param column
 	 * @return true if this constraint already contains a column with same name.
 	 */
 	public boolean containsColumn(Column column) {
@@ -185,12 +165,12 @@ public abstract class Constraint implements RelationalModel, Serializable {
 
 	public String sqlDropString(Dialect dialect, String defaultCatalog, String defaultSchema) {
 		if ( isGenerated( dialect ) ) {
-			return new StringBuilder()
-					.append( "alter table " )
-					.append( getTable().getQualifiedName( dialect, defaultCatalog, defaultSchema ) )
-					.append( " drop constraint " )
-					.append( dialect.quote( getName() ) )
-					.toString();
+			return String.format(
+					Locale.ROOT,
+					"alter table %s drop constraint %s",
+					getTable().getQualifiedName( dialect, defaultCatalog, defaultSchema ),
+					dialect.quote( getName() )
+			);
 		}
 		else {
 			return null;
@@ -204,21 +184,22 @@ public abstract class Constraint implements RelationalModel, Serializable {
 			// empty string.  Prevent blank "alter table" statements.
 			String constraintString = sqlConstraintString( dialect, getName(), defaultCatalog, defaultSchema );
 			if ( !StringHelper.isEmpty( constraintString ) ) {
-				StringBuilder buf = new StringBuilder( "alter table " )
-						.append( getTable().getQualifiedName( dialect, defaultCatalog, defaultSchema ) )
-						.append( constraintString );
-				return buf.toString();
+				return "alter table " + getTable().getQualifiedName( dialect, defaultCatalog, defaultSchema )
+						+ constraintString;
 			}
 		}
 		return null;
 	}
 
-	public List getColumns() {
+	public List<Column> getColumns() {
 		return columns;
 	}
 
-	public abstract String sqlConstraintString(Dialect d, String constraintName, String defaultCatalog,
-											   String defaultSchema);
+	public abstract String sqlConstraintString(
+			Dialect d,
+			String constraintName,
+			String defaultCatalog,
+			String defaultSchema);
 
 	public String toString() {
 		return getClass().getName() + '(' + getTable().getName() + getColumns() + ") as " + name;

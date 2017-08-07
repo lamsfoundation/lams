@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.dialect;
 
@@ -30,14 +13,24 @@ import java.sql.Types;
 
 import org.hibernate.JDBCException;
 import org.hibernate.NullPrecedence;
+import org.hibernate.boot.TempTableDdlTransactionHandling;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.function.NoArgSQLFunction;
 import org.hibernate.dialect.function.StandardSQLFunction;
+import org.hibernate.dialect.pagination.AbstractLimitHandler;
+import org.hibernate.dialect.pagination.LimitHandler;
+import org.hibernate.dialect.pagination.LimitHelper;
+import org.hibernate.engine.spi.RowSelection;
 import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.exception.spi.SQLExceptionConversionDelegate;
+import org.hibernate.hql.spi.id.IdTableSupportStandardImpl;
+import org.hibernate.hql.spi.id.MultiTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.local.AfterUseAction;
+import org.hibernate.hql.spi.id.local.LocalTemporaryTableBulkIdStrategy;
 import org.hibernate.internal.util.JdbcExceptionHelper;
 import org.hibernate.internal.util.StringHelper;
+import org.hibernate.mapping.Column;
 import org.hibernate.type.StandardBasicTypes;
 
 /**
@@ -47,6 +40,19 @@ import org.hibernate.type.StandardBasicTypes;
  */
 @SuppressWarnings("deprecation")
 public class MySQLDialect extends Dialect {
+
+	private static final LimitHandler LIMIT_HANDLER = new AbstractLimitHandler() {
+		@Override
+		public String processSql(String sql, RowSelection selection) {
+			final boolean hasOffset = LimitHelper.hasFirstRow( selection );
+			return sql + (hasOffset ? " limit ?, ?" : " limit ?");
+		}
+
+		@Override
+		public boolean supportsLimit() {
+			return true;
+		}
+	};
 
 	/**
 	 * Constructs a MySQLDialect
@@ -252,6 +258,11 @@ public class MySQLDialect extends Dialect {
 	}
 
 	@Override
+	public LimitHandler getLimitHandler() {
+		return LIMIT_HANDLER;
+	}
+
+	@Override
 	public String getLimitString(String sql, boolean hasOffset) {
 		return sql + (hasOffset ? " limit ?, ?" : " limit ?");
 	}
@@ -264,6 +275,36 @@ public class MySQLDialect extends Dialect {
 	@Override
 	public char openQuote() {
 		return '`';
+	}
+
+	@Override
+	public boolean canCreateCatalog() {
+		return true;
+	}
+
+	@Override
+	public String[] getCreateCatalogCommand(String catalogName) {
+		return new String[] { "create database " + catalogName };
+	}
+
+	@Override
+	public String[] getDropCatalogCommand(String catalogName) {
+		return new String[] { "drop database " + catalogName };
+	}
+
+	@Override
+	public boolean canCreateSchema() {
+		return false;
+	}
+
+	@Override
+	public String[] getCreateSchemaCommand(String schemaName) {
+		throw new UnsupportedOperationException( "MySQL does not support dropping creating/dropping schemas in the JDBC sense" );
+	}
+
+	@Override
+	public String[] getDropSchemaCommand(String schemaName) {
+		throw new UnsupportedOperationException( "MySQL does not support dropping creating/dropping schemas in the JDBC sense" );
 	}
 
 	@Override
@@ -292,25 +333,22 @@ public class MySQLDialect extends Dialect {
 	}
 
 	@Override
-	public boolean supportsTemporaryTables() {
-		return true;
-	}
+	public MultiTableBulkIdStrategy getDefaultMultiTableBulkIdStrategy() {
+		return new LocalTemporaryTableBulkIdStrategy(
+				new IdTableSupportStandardImpl() {
+					@Override
+					public String getCreateIdTableCommand() {
+						return "create temporary table if not exists";
+					}
 
-	@Override
-	public String getCreateTemporaryTableString() {
-		return "create temporary table if not exists";
-	}
-
-	@Override
-	public String getDropTemporaryTableString() {
-		return "drop temporary table";
-	}
-
-	@Override
-	public Boolean performTemporaryTableDDLInIsolation() {
-		// because we [drop *temporary* table...] we do not
-		// have to doAfterTransactionCompletion these in isolation.
-		return Boolean.FALSE;
+					@Override
+					public String getDropIdTableCommand() {
+						return "drop temporary table";
+					}
+				},
+				AfterUseAction.DROP,
+				TempTableDdlTransactionHandling.NONE
+		);
 	}
 
 	@Override
@@ -319,11 +357,13 @@ public class MySQLDialect extends Dialect {
 			case Types.INTEGER:
 			case Types.BIGINT:
 			case Types.SMALLINT:
-				return "signed";
+				return smallIntegerCastTarget();
 			case Types.FLOAT:
+			case Types.REAL: {
+				return floatingPointNumberCastTarget();
+			}
 			case Types.NUMERIC:
-			case Types.REAL:
-				return "decimal";
+				return fixedPointNumberCastTarget();
 			case Types.VARCHAR:
 				return "char";
 			case Types.VARBINARY:
@@ -331,6 +371,37 @@ public class MySQLDialect extends Dialect {
 			default:
 				return super.getCastTypeName( code );
 		}
+	}
+
+	/**
+	 * Determine the cast target for {@link Types#INTEGER}, {@link Types#BIGINT} and {@link Types#SMALLINT}
+	 *
+	 * @return The proper cast target type.
+	 */
+	protected String smallIntegerCastTarget() {
+		return "signed";
+	}
+
+	/**
+	 * Determine the cast target for {@link Types#FLOAT} and {@link Types#REAL} (DOUBLE)
+	 *
+	 * @return The proper cast target type.
+	 */
+	protected String floatingPointNumberCastTarget() {
+		// MySQL does not allow casting to DOUBLE nor FLOAT, so we have to cast these as DECIMAL.
+		// MariaDB does allow casting to DOUBLE, although not FLOAT.
+		return fixedPointNumberCastTarget();
+	}
+
+	/**
+	 * Determine the cast target for {@link Types#NUMERIC}
+	 *
+	 * @return The proper cast target type.
+	 */
+	protected String fixedPointNumberCastTarget() {
+		// NOTE : the precision/scale are somewhat arbitrary choices, but MySQL/MariaDB
+		// effectively require *some* values
+		return "decimal(" + Column.DEFAULT_PRECISION + "," + Column.DEFAULT_SCALE + ")";
 	}
 
 	@Override

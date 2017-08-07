@@ -30,18 +30,20 @@ package org.apache.http.protocol;
 /**
  * HttpRequestHandlerResolver can be used to resolve an instance of
  * {@link HttpRequestHandler} matching a particular request URI. Usually the
- * resolved request handler will be used to process the request with the
+ * mapped request handler will be used to process the request with the
  * specified request URI.
  *
  * @since 4.0
+ * @deprecated see {@link HttpRequestHandlerMapper}
  */
+@Deprecated
 public interface HttpRequestHandlerResolver {
 
     /**
      * Looks up a handler matching the given request URI.
      *
      * @param requestURI the request URI
-     * @return HTTP request handler or <code>null</code> if no match
+     * @return HTTP request handler or {@code null} if no match
      * is found.
      */
     HttpRequestHandler lookup(String requestURI);

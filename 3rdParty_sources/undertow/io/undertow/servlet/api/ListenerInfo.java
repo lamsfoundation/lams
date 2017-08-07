@@ -32,7 +32,7 @@ public class ListenerInfo {
 
 
     private final Class<? extends EventListener> listenerClass;
-    private final InstanceFactory<? extends EventListener> instanceFactory;
+    private volatile InstanceFactory<? extends EventListener> instanceFactory;
 
     public ListenerInfo(final Class<? extends EventListener> listenerClass, final InstanceFactory<? extends EventListener> instanceFactory) {
         this.listenerClass = listenerClass;
@@ -58,7 +58,18 @@ public class ListenerInfo {
         return instanceFactory;
     }
 
+    public void setInstanceFactory(InstanceFactory<? extends EventListener> instanceFactory) {
+        this.instanceFactory = instanceFactory;
+    }
+
     public Class<?> getListenerClass() {
         return listenerClass;
+    }
+
+    @Override
+    public String toString() {
+        return "ListenerInfo{" +
+                "listenerClass=" + listenerClass +
+                '}';
     }
 }

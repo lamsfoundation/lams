@@ -24,17 +24,16 @@ import io.undertow.util.DateUtils;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 import io.undertow.util.URLUtils;
-import org.xnio.Pooled;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.channels.StreamSourceChannel;
 
-import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
 /**
  * This class provides the connector part of the {@link HttpServerExchange} API.
- * <p/>
+ * <p>
  * It contains methods that logically belong on the exchange, however should only be used
  * by connector implementations.
  *
@@ -64,14 +63,14 @@ public class Connectors {
      * @param exchange The HTTP server exchange
      * @param buffers  The buffers to attach
      */
-    public static void ungetRequestBytes(final HttpServerExchange exchange, Pooled<ByteBuffer>... buffers) {
-        Pooled<ByteBuffer>[] existing = exchange.getAttachment(HttpServerExchange.BUFFERED_REQUEST_DATA);
-        Pooled<ByteBuffer>[] newArray;
+    public static void ungetRequestBytes(final HttpServerExchange exchange, PooledByteBuffer... buffers) {
+        PooledByteBuffer[] existing = exchange.getAttachment(HttpServerExchange.BUFFERED_REQUEST_DATA);
+        PooledByteBuffer[] newArray;
         if (existing == null) {
-            newArray = new Pooled[buffers.length];
+            newArray = new PooledByteBuffer[buffers.length];
             System.arraycopy(buffers, 0, newArray, 0, buffers.length);
         } else {
-            newArray = new Pooled[existing.length + buffers.length];
+            newArray = new PooledByteBuffer[existing.length + buffers.length];
             System.arraycopy(existing, 0, newArray, 0, existing.length);
             System.arraycopy(buffers, 0, newArray, existing.length, buffers.length);
         }
@@ -79,11 +78,11 @@ public class Connectors {
         exchange.addExchangeCompleteListener(new ExchangeCompletionListener() {
             @Override
             public void exchangeEvent(HttpServerExchange exchange, NextListener nextListener) {
-                Pooled<ByteBuffer>[] bufs = exchange.getAttachment(HttpServerExchange.BUFFERED_REQUEST_DATA);
+                PooledByteBuffer[] bufs = exchange.getAttachment(HttpServerExchange.BUFFERED_REQUEST_DATA);
                 if (bufs != null) {
-                    for (Pooled<ByteBuffer> i : bufs) {
+                    for (PooledByteBuffer i : bufs) {
                         if(i != null) {
-                            i.free();
+                            i.close();
                         }
                     }
                 }
@@ -98,6 +97,10 @@ public class Connectors {
 
     public static void terminateResponse(final HttpServerExchange exchange) {
         exchange.terminateResponse();
+    }
+
+    public static void resetRequestChannel(final HttpServerExchange exchange) {
+        exchange.resetRequestChannel();
     }
 
     private static String getCookieString(final Cookie cookie) {
@@ -201,7 +204,10 @@ public class Connectors {
             boolean resumed = exchange.runResumeReadWrite();
             if (exchange.isDispatched()) {
                 if (resumed) {
-                    throw new RuntimeException("resumed and dispatched");
+                    UndertowLogger.REQUEST_LOGGER.resumedAndDispatched();
+                    exchange.setStatusCode(500);
+                    exchange.endExchange();
+                    return;
                 }
                 final Runnable dispatchTask = exchange.getDispatchTask();
                 Executor executor = exchange.getDispatchExecutor();
@@ -215,11 +221,12 @@ public class Connectors {
                 exchange.endExchange();
             }
         } catch (Throwable t) {
+            exchange.putAttachment(DefaultResponseListener.EXCEPTION, t);
             exchange.setInCall(false);
             if (!exchange.isResponseStarted()) {
-                exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
+                exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
             }
-            UndertowLogger.REQUEST_LOGGER.errorf(t, "Undertow request failed %s", exchange);
+            UndertowLogger.REQUEST_LOGGER.undertowRequestFailed(t, exchange);
             exchange.endExchange();
         }
     }
@@ -302,7 +309,11 @@ public class Connectors {
     }
 
     public static boolean isEntityBodyAllowed(HttpServerExchange exchange){
-        int code = exchange.getResponseCode();
+        int code = exchange.getStatusCode();
+        return isEntityBodyAllowed(code);
+    }
+
+    public static boolean isEntityBodyAllowed(int code) {
         if(code >= 100 && code < 200) {
             return false;
         }
@@ -310,5 +321,9 @@ public class Connectors {
             return false;
         }
         return true;
+    }
+
+    public static void updateResponseBytesSent(HttpServerExchange exchange, long bytes) {
+        exchange.updateBytesSent(bytes);
     }
 }

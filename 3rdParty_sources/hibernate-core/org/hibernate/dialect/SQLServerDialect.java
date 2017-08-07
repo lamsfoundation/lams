@@ -1,35 +1,21 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.dialect;
 
 import java.sql.Types;
+import java.util.Locale;
 
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.dialect.function.AnsiTrimEmulationFunction;
 import org.hibernate.dialect.function.SQLFunctionTemplate;
 import org.hibernate.dialect.function.StandardSQLFunction;
+import org.hibernate.dialect.pagination.LimitHandler;
+import org.hibernate.dialect.pagination.TopLimitHandler;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.descriptor.sql.SmallIntTypeDescriptor;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
@@ -42,6 +28,8 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 @SuppressWarnings("deprecation")
 public class SQLServerDialect extends AbstractTransactSQLDialect {
 	private static final int PARAM_LIST_SIZE_LIMIT = 2100;
+
+	private final LimitHandler limitHandler;
 
 	/**
 	 * Constructs a SQLServerDialect
@@ -65,6 +53,8 @@ public class SQLServerDialect extends AbstractTransactSQLDialect {
 		registerFunction( "trim", new AnsiTrimEmulationFunction() );
 
 		registerKeyword( "top" );
+
+		this.limitHandler = new TopLimitHandler( false, false );
 	}
 
 	@Override
@@ -73,8 +63,8 @@ public class SQLServerDialect extends AbstractTransactSQLDialect {
 	}
 
 	static int getAfterSelectInsertPoint(String sql) {
-		final int selectIndex = sql.toLowerCase().indexOf( "select" );
-		final int selectDistinctIndex = sql.toLowerCase().indexOf( "select distinct" );
+		final int selectIndex = sql.toLowerCase(Locale.ROOT).indexOf( "select" );
+		final int selectDistinctIndex = sql.toLowerCase(Locale.ROOT).indexOf( "select distinct" );
 		return selectIndex + (selectDistinctIndex == selectIndex ? 15 : 6);
 	}
 
@@ -97,6 +87,11 @@ public class SQLServerDialect extends AbstractTransactSQLDialect {
 	@Override
 	public String appendIdentitySelectToInsert(String insertSQL) {
 		return insertSQL + " select scope_identity()";
+	}
+
+	@Override
+	public LimitHandler getLimitHandler() {
+		return limitHandler;
 	}
 
 	@Override
@@ -208,5 +203,5 @@ public class SQLServerDialect extends AbstractTransactSQLDialect {
 	public int getInExpressionCountLimit() {
 		return PARAM_LIST_SIZE_LIMIT;
 	}
+	
 }
-

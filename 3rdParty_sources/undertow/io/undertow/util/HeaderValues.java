@@ -59,10 +59,10 @@ public final class HeaderValues extends AbstractCollection<String> implements De
     public void clear() {
         final byte size = this.size;
         if (size == 0) return;
-        clearInternal(size);
+        clearInternal();
     }
 
-    private void clearInternal(byte size) {
+    private void clearInternal() {
         final Object value = this.value;
         if (value instanceof String[]) {
             final String[] strings = (String[]) value;
@@ -411,7 +411,9 @@ public final class HeaderValues extends AbstractCollection<String> implements De
         if (index < 0 || index > size) throw new IndexOutOfBoundsException();
         final Iterator<? extends String> iterator = c.iterator();
         boolean result = false;
-        while (iterator.hasNext()) { result |= offer(index, iterator.next()); }
+        while (iterator.hasNext()) {
+            result |= offer(index, iterator.next());
+        }
         return result;
     }
 
@@ -428,7 +430,9 @@ public final class HeaderValues extends AbstractCollection<String> implements De
 
     public String[] toArray() {
         int size = this.size;
-        if (size == 0) { return NO_STRINGS; }
+        if (size == 0) {
+            return NO_STRINGS;
+        }
         final Object v = this.value;
         if (v instanceof String) return new String[] { (String) v };
         final String[] list = (String[]) v;
@@ -450,7 +454,7 @@ public final class HeaderValues extends AbstractCollection<String> implements De
         final Object[] target = inLen < size ? Arrays.copyOfRange(a, inLen, inLen + size) : a;
         final Object v = this.value;
         if (v instanceof String) {
-            target[0] = (T)v;
+            target[0] = v;
         } else {
             System.arraycopy(v, 0, target, 0, size);
         }
@@ -570,9 +574,8 @@ public final class HeaderValues extends AbstractCollection<String> implements De
     }
 
     public boolean addAll(final Collection<? extends String> c) {
-        Iterator<? extends String> it = c.iterator();
-        while (it.hasNext()) {
-            add(it.next());
+        for (String s : c) {
+            add(s);
         }
         return !c.isEmpty();
     }

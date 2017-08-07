@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.jdbc;
 
@@ -34,9 +16,8 @@ import org.hibernate.StaleStateException;
 import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.hibernate.engine.spi.ExecuteUpdateResultCheckStyle;
 import org.hibernate.exception.GenericJDBCException;
+import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
-
-import org.jboss.logging.Logger;
 
 /**
  * Holds various often used {@link Expectation} definitions.
@@ -44,8 +25,8 @@ import org.jboss.logging.Logger;
  * @author Steve Ebersole
  */
 public class Expectations {
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( Expectations.class );
 
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, Expectations.class.getName());
 	private static SqlExceptionHelper sqlExceptionHelper = new SqlExceptionHelper();
 
 	public static final int USUAL_EXPECTED_COUNT = 1;
@@ -75,17 +56,24 @@ public class Expectations {
 		}
 
 		private void checkBatched(int rowCount, int batchPosition) {
-            if (rowCount == -2) LOG.debugf("Success of batch update unknown: %s", batchPosition);
-            else if (rowCount == -3) throw new BatchFailedException("Batch update failed: " + batchPosition);
+			if ( rowCount == -2 ) {
+				LOG.debugf( "Success of batch update unknown: %s", batchPosition );
+			}
+			else if ( rowCount == -3 ) {
+				throw new BatchFailedException( "Batch update failed: " + batchPosition );
+			}
 			else {
-                if (expectedRowCount > rowCount) throw new StaleStateException(
-                                                                               "Batch update returned unexpected row count from update ["
-                                                                               + batchPosition + "]; actual row count: " + rowCount
-                                                                               + "; expected: " + expectedRowCount);
+				if ( expectedRowCount > rowCount ) {
+					throw new StaleStateException(
+							"Batch update returned unexpected row count from update ["
+									+ batchPosition + "]; actual row count: " + rowCount
+									+ "; expected: " + expectedRowCount
+					);
+				}
 				if ( expectedRowCount < rowCount ) {
 					String msg = "Batch update returned unexpected row count from update [" +
-					             batchPosition + "]; actual row count: " + rowCount +
-					             "; expected: " + expectedRowCount;
+							batchPosition + "]; actual row count: " + rowCount +
+							"; expected: " + expectedRowCount;
 					throw new BatchedTooManyRowsAffectedException( msg, expectedRowCount, rowCount, batchPosition );
 				}
 			}
@@ -118,38 +106,41 @@ public class Expectations {
 
 	public static class BasicParamExpectation extends BasicExpectation {
 		private final int parameterPosition;
+
 		protected BasicParamExpectation(int expectedRowCount, int parameterPosition) {
 			super( expectedRowCount );
 			this.parameterPosition = parameterPosition;
 		}
 
 		@Override
-        public int prepare(PreparedStatement statement) throws SQLException, HibernateException {
+		public int prepare(PreparedStatement statement) throws SQLException, HibernateException {
 			toCallableStatement( statement ).registerOutParameter( parameterPosition, Types.NUMERIC );
 			return 1;
 		}
 
 		@Override
-        public boolean canBeBatched() {
+		public boolean canBeBatched() {
 			return false;
 		}
 
 		@Override
-        protected int determineRowCount(int reportedRowCount, PreparedStatement statement) {
+		protected int determineRowCount(int reportedRowCount, PreparedStatement statement) {
 			try {
 				return toCallableStatement( statement ).getInt( parameterPosition );
 			}
-			catch( SQLException sqle ) {
+			catch (SQLException sqle) {
 				sqlExceptionHelper.logExceptions( sqle, "could not extract row counts from CallableStatement" );
 				throw new GenericJDBCException( "could not extract row counts from CallableStatement", sqle );
 			}
 		}
 
 		private CallableStatement toCallableStatement(PreparedStatement statement) {
-			if ( ! CallableStatement.class.isInstance( statement ) ) {
-				throw new HibernateException( "BasicParamExpectation operates exclusively on CallableStatements : " + statement.getClass() );
+			if ( !CallableStatement.class.isInstance( statement ) ) {
+				throw new HibernateException(
+						"BasicParamExpectation operates exclusively on CallableStatements : " + statement.getClass()
+				);
 			}
-			return ( CallableStatement ) statement;
+			return (CallableStatement) statement;
 		}
 	}
 

@@ -24,8 +24,11 @@ import io.undertow.UndertowOptions;
 import io.undertow.channels.DetachableStreamSinkChannel;
 import io.undertow.channels.DetachableStreamSourceChannel;
 import io.undertow.conduits.EmptyStreamSourceConduit;
+import io.undertow.io.AsyncReceiverImpl;
 import io.undertow.io.AsyncSenderImpl;
+import io.undertow.io.BlockingReceiverImpl;
 import io.undertow.io.BlockingSenderImpl;
+import io.undertow.io.Receiver;
 import io.undertow.io.Sender;
 import io.undertow.io.UndertowInputStream;
 import io.undertow.io.UndertowOutputStream;
@@ -48,7 +51,7 @@ import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
 import org.xnio.IoUtils;
-import org.xnio.Pooled;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.XnioIoThread;
 import org.xnio.channels.Channels;
 import org.xnio.channels.Configurable;
@@ -67,7 +70,6 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
-import java.security.AccessController;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
@@ -96,9 +98,20 @@ public final class HttpServerExchange extends AbstractAttachable {
     private static final String ISO_8859_1 = "ISO-8859-1";
 
     /**
+     * The HTTP reason phrase to send. This is an attachment rather than a field as it is rarely used. If this is not set
+     * a generic description from the RFC is used instead.
+     */
+    private static final AttachmentKey<String> REASON_PHRASE = AttachmentKey.create(String.class);
+
+    /**
      * The attachment key that buffered request data is attached under.
      */
-    static final AttachmentKey<Pooled<ByteBuffer>[]> BUFFERED_REQUEST_DATA = AttachmentKey.create(Pooled[].class);
+    static final AttachmentKey<PooledByteBuffer[]> BUFFERED_REQUEST_DATA = AttachmentKey.create(PooledByteBuffer[].class);
+
+    /**
+     * Attachment key that can be used to hold additional request attributes
+     */
+    public static final AttachmentKey<Map<String, String>> REQUEST_ATTRIBUTES = AttachmentKey.create(Map.class);
 
     private final ServerConnection connection;
     private final HeaderMap requestHeaders;
@@ -140,9 +153,9 @@ public final class HttpServerExchange extends AbstractAttachable {
 
     /**
      * The original request URI. This will include the host name if it was specified by the client.
-     * <p/>
+     * <p>
      * This is not decoded in any way, and does not include the query string.
-     * <p/>
+     * <p>
      * Examples:
      * GET http://localhost:8080/myFile.jsf?foo=bar HTTP/1.1 -> 'http://localhost:8080/myFile.jsf'
      * POST /my+File.jsf?foo=bar HTTP/1.1 -> '/my+File.jsf'
@@ -151,9 +164,9 @@ public final class HttpServerExchange extends AbstractAttachable {
 
     /**
      * The request path. This will be decoded by the server, and does not include the query string.
-     * <p/>
+     * <p>
      * This path is not canonicalised, so care must be taken to ensure that escape attacks are not possible.
-     * <p/>
+     * <p>
      * Examples:
      * GET http://localhost:8080/b/../my+File.jsf?foo=bar HTTP/1.1 -> '/b/../my+File.jsf'
      * POST /my+File.jsf?foo=bar HTTP/1.1 -> '/my File.jsf'
@@ -163,7 +176,7 @@ public final class HttpServerExchange extends AbstractAttachable {
     /**
      * The remaining unresolved portion of request path. If a {@link io.undertow.server.handlers.CanonicalPathHandler} is
      * installed this will be canonicalised.
-     * <p/>
+     * <p>
      * Initially this will be equal to {@link #requestPath}, however it will be modified as handlers resolve the path.
      */
     private String relativePath;
@@ -185,6 +198,7 @@ public final class HttpServerExchange extends AbstractAttachable {
     private ConduitWrapper<StreamSinkConduit>[] responseWrappers;
 
     private Sender sender;
+    private Receiver receiver;
 
     private long requestStartTime = -1;
 
@@ -192,12 +206,12 @@ public final class HttpServerExchange extends AbstractAttachable {
     /**
      * The maximum entity size. This can be modified before the request stream is obtained, however once the request
      * stream is obtained this cannot be modified further.
-     * <p/>
+     * <p>
      * The default value for this is determined by the {@link io.undertow.UndertowOptions#MAX_ENTITY_SIZE} option. A value
      * of 0 indicates that this is unbounded.
-     * <p/>
+     * <p>
      * If this entity size is exceeded the request channel will be forcibly closed.
-     * <p/>
+     * <p>
      * TODO: integrate this with HTTP 100-continue responses, to make it possible to send a 417 rather than just forcibly
      * closing the channel.
      *
@@ -252,7 +266,7 @@ public final class HttpServerExchange extends AbstractAttachable {
     /**
      * If this flag is set it means that the request has been dispatched,
      * and will not be ending when the call stack returns.
-     * <p/>
+     * <p>
      * This could be because it is being dispatched to a worker thread from
      * an IO thread, or because resume(Reads/Writes) has been called.
      */
@@ -266,18 +280,31 @@ public final class HttpServerExchange extends AbstractAttachable {
     /**
      * If this flag is set then the request is current running through a
      * handler chain.
-     * <p/>
+     * <p>
      * This will be true most of the time, this only time this will return
      * false is when performing async operations outside the scope of a call to
      * {@link Connectors#executeRootHandler(HttpHandler, HttpServerExchange)},
      * such as when performing async IO.
-     * <p/>
+     * <p>
      * If this is true then when the call stack returns the exchange will either be dispatched,
      * or the exchange will be ended.
      */
     private static final int FLAG_IN_CALL = 1 << 17;
+    /**
+     * Flag that indicates that reads should be resumed when the call stack returns.
+     */
     private static final int FLAG_SHOULD_RESUME_READS = 1 << 18;
-    private static final int FLAG_SHOLD_RESUME_WRITES = 1 << 19;
+
+    /**
+     * Flag that indicates that writes should be resumed when the call stack returns
+     */
+    private static final int FLAG_SHOULD_RESUME_WRITES = 1 << 19;
+
+    /**
+     * Flag that indicates that the request channel has been reset, and {@link #getRequestChannel()} can be called again
+     */
+    private static final int FLAG_REQUEST_RESET= 1 << 20;
+
     /**
      * The source address for the request. If this is null then the actual source address from the channel is used
      */
@@ -390,12 +417,12 @@ public final class HttpServerExchange extends AbstractAttachable {
     /**
      * The original request URI. This will include the host name, protocol etc
      * if it was specified by the client.
-     * <p/>
+     * <p>
      * This is not decoded in any way, and does not include the query string.
-     * <p/>
+     * <p>
      * Examples:
-     * GET http://localhost:8080/myFile.jsf?foo=bar HTTP/1.1 -> 'http://localhost:8080/myFile.jsf'
-     * POST /my+File.jsf?foo=bar HTTP/1.1 -> '/my+File.jsf'
+     * GET http://localhost:8080/myFile.jsf?foo=bar HTTP/1.1 -&gt; 'http://localhost:8080/myFile.jsf'
+     * POST /my+File.jsf?foo=bar HTTP/1.1 -&gt; '/my+File.jsf'
      */
     public String getRequestURI() {
         return requestURI;
@@ -430,9 +457,9 @@ public final class HttpServerExchange extends AbstractAttachable {
     /**
      * If a request was submitted to the server with a full URI instead of just a path this
      * will return true. For example:
-     * <p/>
-     * GET http://localhost:8080/b/../my+File.jsf?foo=bar HTTP/1.1 -> true
-     * POST /my+File.jsf?foo=bar HTTP/1.1 -> false
+     * <p>
+     * GET http://localhost:8080/b/../my+File.jsf?foo=bar HTTP/1.1 -&gt; true
+     * POST /my+File.jsf?foo=bar HTTP/1.1 -&gt; false
      *
      * @return <code>true</code> If the request URI contains the host part of the URI
      */
@@ -443,12 +470,12 @@ public final class HttpServerExchange extends AbstractAttachable {
 
     /**
      * The request path. This will be decoded by the server, and does not include the query string.
-     * <p/>
+     * <p>
      * This path is not canonicalised, so care must be taken to ensure that escape attacks are not possible.
-     * <p/>
+     * <p>
      * Examples:
-     * GET http://localhost:8080/b/../my+File.jsf?foo=bar HTTP/1.1 -> '/b/../my+File.jsf'
-     * POST /my+File.jsf?foo=bar HTTP/1.1 -> '/my File.jsf'
+     * GET http://localhost:8080/b/../my+File.jsf?foo=bar HTTP/1.1 -&gt; '/b/../my+File.jsf'
+     * POST /my+File.jsf?foo=bar HTTP/1.1 -&gt; '/my File.jsf'
      */
     public String getRequestPath() {
         return requestPath;
@@ -466,7 +493,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
     /**
      * Get the request relative path.  This is the path which should be evaluated by the current handler.
-     * <p/>
+     * <p>
      * If the {@link io.undertow.server.handlers.CanonicalPathHandler} is installed in the current chain
      * then this path with be canonicalized
      *
@@ -521,7 +548,7 @@ public final class HttpServerExchange extends AbstractAttachable {
     /**
      * Reconstructs the complete URL as seen by the user. This includes scheme, host name etc,
      * but does not include query string.
-     * <p/>
+     * <p>
      * This is not decoded.
      */
     public String getRequestURL() {
@@ -568,7 +595,7 @@ public final class HttpServerExchange extends AbstractAttachable {
     /**
      * Return the host that this request was sent to, in general this will be the
      * value of the Host header, minus the port specifier.
-     * <p/>
+     * <p>
      * If this resolves to an IPv6 address it will not be enclosed by square brackets.
      * Care must be taken when constructing URLs based on this method to ensure IPv6 URLs
      * are handled correctly.
@@ -592,7 +619,7 @@ public final class HttpServerExchange extends AbstractAttachable {
     /**
      * Return the host, and also the port if this request was sent to a non-standard port. In general
      * this will just be the value of the Host header.
-     * <p/>
+     * <p>
      * If this resolves to an IPv6 address it *will*  be enclosed by square brackets. The return
      * value of this method is suitable for inclusion in a URL.
      *
@@ -667,7 +694,7 @@ public final class HttpServerExchange extends AbstractAttachable {
      * @return True if this exchange represents an upgrade response
      */
     public boolean isUpgrade() {
-        return getResponseCode() == StatusCodes.SWITCHING_PROTOCOLS;
+        return getStatusCode() == StatusCodes.SWITCHING_PROTOCOLS;
     }
 
     /**
@@ -675,7 +702,21 @@ public final class HttpServerExchange extends AbstractAttachable {
      * @return The number of bytes sent in the entity body
      */
     public long getResponseBytesSent() {
-        return responseBytesSent;
+        if(Connectors.isEntityBodyAllowed(this) && !getRequestMethod().equals(Methods.HEAD)) {
+            return responseBytesSent;
+        } else {
+            return 0; //body is not allowed, even if we attempt to write it will be ignored
+        }
+    }
+
+    /**
+     * Updates the number of response bytes sent. Used when compression is in use
+     * @param bytes The number of bytes to increase the response size by. May be negative
+     */
+    void updateBytesSent(long bytes) {
+        if(Connectors.isEntityBodyAllowed(this) && !getRequestMethod().equals(Methods.HEAD)) {
+            responseBytesSent += bytes;
+        }
     }
 
     public HttpServerExchange setPersistent(final boolean persistent) {
@@ -708,7 +749,7 @@ public final class HttpServerExchange extends AbstractAttachable {
     /**
      * Dispatches this request to the XNIO worker thread pool. Once the call stack returns
      * the given runnable will be submitted to the executor.
-     * <p/>
+     * <p>
      * In general handlers should first check the value of {@link #isInIoThread()} before
      * calling this method, and only dispatch if the request is actually running in the IO
      * thread.
@@ -724,7 +765,7 @@ public final class HttpServerExchange extends AbstractAttachable {
     /**
      * Dispatches this request to the given executor. Once the call stack returns
      * the given runnable will be submitted to the executor.
-     * <p/>
+     * <p>
      * In general handlers should first check the value of {@link #isInIoThread()} before
      * calling this method, and only dispatch if the request is actually running in the IO
      * thread.
@@ -738,6 +779,9 @@ public final class HttpServerExchange extends AbstractAttachable {
         }
         if (isInCall()) {
             state |= FLAG_DISPATCHED;
+            if(anyAreSet(state, FLAG_SHOULD_RESUME_READS | FLAG_SHOULD_RESUME_WRITES)) {
+                throw UndertowMessages.MESSAGES.resumedAndDispatched();
+            }
             this.dispatchTask = runnable;
         } else {
             if (executor == null) {
@@ -821,8 +865,12 @@ public final class HttpServerExchange extends AbstractAttachable {
         if (!connection.isUpgradeSupported()) {
             throw UndertowMessages.MESSAGES.upgradeNotSupported();
         }
+        if(!getRequestHeaders().contains(Headers.UPGRADE)) {
+            throw UndertowMessages.MESSAGES.notAnUpgradeRequest();
+        }
+        UndertowLogger.REQUEST_LOGGER.debugf("Upgrading request %s", this);
         connection.setUpgradeListener(listener);
-        setResponseCode(StatusCodes.SWITCHING_PROTOCOLS);
+        setStatusCode(StatusCodes.SWITCHING_PROTOCOLS);
         getResponseHeaders().put(Headers.CONNECTION, Headers.UPGRADE_STRING);
         return this;
     }
@@ -840,15 +888,33 @@ public final class HttpServerExchange extends AbstractAttachable {
         if (!connection.isUpgradeSupported()) {
             throw UndertowMessages.MESSAGES.upgradeNotSupported();
         }
+        UndertowLogger.REQUEST_LOGGER.debugf("Upgrading request %s", this);
         connection.setUpgradeListener(listener);
-        setResponseCode(StatusCodes.SWITCHING_PROTOCOLS);
+        setStatusCode(StatusCodes.SWITCHING_PROTOCOLS);
         final HeaderMap headers = getResponseHeaders();
         headers.put(Headers.UPGRADE, productName);
         headers.put(Headers.CONNECTION, Headers.UPGRADE_STRING);
         return this;
     }
 
+    /**
+     *
+     * @param connectListener
+     * @return
+     */
+    public HttpServerExchange acceptConnectRequest(HttpUpgradeListener connectListener) {
+        if(!getRequestMethod().equals(Methods.CONNECT)) {
+            throw UndertowMessages.MESSAGES.notAConnectRequest();
+        }
+        connection.setConnectListener(connectListener);
+        return this;
+    }
+
+
     public HttpServerExchange addExchangeCompleteListener(final ExchangeCompletionListener listener) {
+        if(isComplete() || this.exchangeCompletionListenersCount == -1) {
+            throw UndertowMessages.MESSAGES.exchangeAlreadyComplete();
+        }
         final int exchangeCompletionListenersCount = this.exchangeCompletionListenersCount++;
         ExchangeCompletionListener[] exchangeCompleteListeners = this.exchangeCompleteListeners;
         if (exchangeCompleteListeners == null || exchangeCompleteListeners.length == exchangeCompletionListenersCount) {
@@ -904,9 +970,9 @@ public final class HttpServerExchange extends AbstractAttachable {
     }
 
     /**
-     * Get the source address of the HTTP request.
+     * Get the destination address of the HTTP request.
      *
-     * @return the source address of the HTTP request
+     * @return the destination address of the HTTP request
      */
     public InetSocketAddress getDestinationAddress() {
         if (destinationAddress != null) {
@@ -1091,6 +1157,10 @@ public final class HttpServerExchange extends AbstractAttachable {
      */
     public StreamSourceChannel getRequestChannel() {
         if (requestChannel != null) {
+            if(anyAreSet(state, FLAG_REQUEST_RESET)) {
+                state &= ~FLAG_REQUEST_RESET;
+                return requestChannel;
+            }
             return null;
         }
         if (anyAreSet(state, FLAG_REQUEST_TERMINATED)) {
@@ -1106,8 +1176,12 @@ public final class HttpServerExchange extends AbstractAttachable {
         return requestChannel = new ReadDispatchChannel(sourceChannel);
     }
 
+    void resetRequestChannel() {
+        state |= FLAG_REQUEST_RESET;
+    }
+
     public boolean isRequestChannelAvailable() {
-        return requestChannel == null;
+        return requestChannel == null || anyAreSet(state, FLAG_REQUEST_RESET);
     }
 
     /**
@@ -1125,6 +1199,10 @@ public final class HttpServerExchange extends AbstractAttachable {
      * @return true if the request is complete
      */
     public boolean isRequestComplete() {
+        PooledByteBuffer[] data = getAttachment(BUFFERED_REQUEST_DATA);
+        if(data != null) {
+            return false;
+        }
         return allAreSet(state, FLAG_REQUEST_TERMINATED);
     }
 
@@ -1171,18 +1249,18 @@ public final class HttpServerExchange extends AbstractAttachable {
      * In order to close the channel you must first call {@link org.xnio.channels.StreamSinkChannel#shutdownWrites()},
      * and then call {@link org.xnio.channels.StreamSinkChannel#flush()} until it returns true. Alternatively you can
      * call {@link #endExchange()}, which will close the channel as part of its cleanup.
-     * <p/>
+     * <p>
      * Closing a fixed-length response before the corresponding number of bytes has been written will cause the connection
      * to be reset and subsequent requests to fail; thus it is important to ensure that the proper content length is
      * delivered when one is specified.  The response channel may not be writable until after the response headers have
      * been sent.
-     * <p/>
+     * <p>
      * If this method is not called then an empty or default response body will be used, depending on the response code set.
-     * <p/>
+     * <p>
      * The returned channel will begin to write out headers when the first write request is initiated, or when
      * {@link org.xnio.channels.StreamSinkChannel#shutdownWrites()} is called on the channel with no content being written.
      * Once the channel is acquired, however, the response code and headers may not be modified.
-     * <p/>
+     * <p>
      *
      * @return the response channel, or {@code null} if another party already acquired the channel
      */
@@ -1209,7 +1287,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
     /**
      * Get the response sender.
-     * <p/>
+     * <p>
      * For blocking exchanges this will return a sender that uses the underlying output stream.
      *
      * @return the response sender, or {@code null} if another party already acquired the channel or the sender
@@ -1225,6 +1303,16 @@ public final class HttpServerExchange extends AbstractAttachable {
         return sender = new AsyncSenderImpl(this);
     }
 
+    public Receiver getRequestReceiver() {
+        if(blockingHttpExchange != null) {
+            return blockingHttpExchange.getReceiver();
+        }
+        if(receiver != null) {
+            return receiver;
+        }
+        return receiver = new AsyncReceiverImpl(this);
+    }
+
     /**
      * @return <code>true</code> if {@link #getResponseChannel()} has not been called
      */
@@ -1232,23 +1320,79 @@ public final class HttpServerExchange extends AbstractAttachable {
         return responseChannel == null;
     }
 
+
     /**
-     * Change the response code for this response.  If not specified, the code will be a {@code 200}.  Setting
-     * the response code after the response headers have been transmitted has no effect.
+     * Get the status code.
      *
-     * @param responseCode the new code
+     * @see #getStatusCode()
+     * @return the status code
+     */
+    @Deprecated
+    public int getResponseCode() {
+        return state & MASK_RESPONSE_CODE;
+    }
+
+    /**
+     * Change the status code for this response.  If not specified, the code will be a {@code 200}.  Setting
+     * the status code after the response headers have been transmitted has no effect.
+     *
+     * @see #setStatusCode(int)
+     * @param statusCode the new code
      * @throws IllegalStateException if a response or upgrade was already sent
      */
-    public HttpServerExchange setResponseCode(final int responseCode) {
-        if (responseCode < 0 || responseCode > 999) {
+    @Deprecated
+    public HttpServerExchange setResponseCode(final int statusCode) {
+        return setStatusCode(statusCode);
+    }
+
+    /**
+     * Get the status code.
+     *
+     * @return the status code
+     */
+    public int getStatusCode() {
+        return state & MASK_RESPONSE_CODE;
+    }
+
+    /**
+     * Change the status code for this response.  If not specified, the code will be a {@code 200}.  Setting
+     * the status code after the response headers have been transmitted has no effect.
+     *
+     * @param statusCode the new code
+     * @throws IllegalStateException if a response or upgrade was already sent
+     */
+    public HttpServerExchange setStatusCode(final int statusCode) {
+        if (statusCode < 0 || statusCode > 999) {
             throw new IllegalArgumentException("Invalid response code");
         }
         int oldVal = state;
         if (allAreSet(oldVal, FLAG_RESPONSE_SENT)) {
             throw UndertowMessages.MESSAGES.responseAlreadyStarted();
         }
-        this.state = oldVal & ~MASK_RESPONSE_CODE | responseCode & MASK_RESPONSE_CODE;
+        this.state = oldVal & ~MASK_RESPONSE_CODE | statusCode & MASK_RESPONSE_CODE;
         return this;
+    }
+
+    /**
+     * Sets the HTTP reason phrase. Depending on the protocol this may or may not be honoured. In particular HTTP2
+     * has removed support for the reason phrase.
+     *
+     * This method should only be used to interact with legacy frameworks that give special meaning to the reason phrase.
+     *
+     * @param message The status message
+     * @return this exchange
+     */
+    public HttpServerExchange setReasonPhrase(String message) {
+        putAttachment(REASON_PHRASE, message);
+        return this;
+    }
+
+    /**
+     *
+     * @return The current reason phrase
+     */
+    public String getReasonPhrase() {
+        return getAttachment(REASON_PHRASE);
     }
 
     /**
@@ -1296,7 +1440,7 @@ public final class HttpServerExchange extends AbstractAttachable {
     /**
      * Calling this method puts the exchange in blocking mode, and creates a
      * {@link BlockingHttpExchange} object to store the streams.
-     * <p/>
+     * <p>
      * When an exchange is in blocking mode the input stream methods become
      * available, other than that there is presently no major difference
      * between blocking an non-blocking modes.
@@ -1312,11 +1456,11 @@ public final class HttpServerExchange extends AbstractAttachable {
     /**
      * Calling this method puts the exchange in blocking mode, using the given
      * blocking exchange as the source of the streams.
-     * <p/>
+     * <p>
      * When an exchange is in blocking mode the input stream methods become
      * available, other than that there is presently no major difference
      * between blocking an non-blocking modes.
-     * <p/>
+     * <p>
      * Note that this method may be called multiple times with different
      * exchange objects, to allow handlers to modify the streams
      * that are being used.
@@ -1361,15 +1505,6 @@ public final class HttpServerExchange extends AbstractAttachable {
     }
 
     /**
-     * Get the response code.
-     *
-     * @return the response code
-     */
-    public int getResponseCode() {
-        return state & MASK_RESPONSE_CODE;
-    }
-
-    /**
      * Force the codec to treat the response as fully written.  Should only be invoked by handlers which downgrade
      * the socket or implement a transfer coding.
      */
@@ -1403,10 +1538,10 @@ public final class HttpServerExchange extends AbstractAttachable {
 
     /**
      * Ends the exchange by fully draining the request channel, and flushing the response channel.
-     * <p/>
+     * <p>
      * This can result in handoff to an XNIO worker, so after this method is called the exchange should
      * not be modified by the caller.
-     * <p/>
+     * <p>
      * If the exchange is already complete this method is a noop
      */
     public HttpServerExchange endExchange() {
@@ -1470,7 +1605,7 @@ public final class HttpServerExchange extends AbstractAttachable {
                         //so we attempt to drain, and if we have not drained anything then we
                         //assume the server has not sent any data
 
-                        if (getResponseCode() != StatusCodes.EXPECTATION_FAILED || totalRead > 0) {
+                        if (getStatusCode() != StatusCodes.EXPECTATION_FAILED || totalRead > 0) {
                             requestChannel.getReadSetter().set(ChannelListeners.drainListener(Long.MAX_VALUE,
                                     new ChannelListener<StreamSourceChannel>() {
                                         @Override
@@ -1620,10 +1755,30 @@ public final class HttpServerExchange extends AbstractAttachable {
     }
 
     public void setSecurityContext(SecurityContext securityContext) {
-        if(System.getSecurityManager() != null) {
-            AccessController.checkPermission(SET_SECURITY_CONTEXT);
+        SecurityManager sm = System.getSecurityManager();
+        if(sm != null) {
+            sm.checkPermission(SET_SECURITY_CONTEXT);
         }
         this.securityContext = securityContext;
+    }
+
+    /**
+     * Adds a listener that will be invoked on response commit
+     *
+     * @param listener The response listener
+     */
+    public void addResponseCommitListener(final ResponseCommitListener listener) {
+
+        //technically it is possible to modify the exchange after the response conduit has been created
+        //as the response channel should not be retrieved until it is about to be written to
+        //if we get complaints about this we can add support for it, however it makes the exchange bigger and the connectors more complex
+        addResponseWrapper(new ConduitWrapper<StreamSinkConduit>() {
+            @Override
+            public StreamSinkConduit wrap(ConduitFactory<StreamSinkConduit> factory, HttpServerExchange exchange) {
+                listener.beforeCommit(exchange);
+                return factory.create();
+            }
+        });
     }
 
     /**
@@ -1633,7 +1788,7 @@ public final class HttpServerExchange extends AbstractAttachable {
      */
     boolean runResumeReadWrite() {
         boolean ret = false;
-        if(anyAreSet(state, FLAG_SHOLD_RESUME_WRITES)) {
+        if(anyAreSet(state, FLAG_SHOULD_RESUME_WRITES)) {
             responseChannel.runResume();
             ret = true;
         }
@@ -1641,7 +1796,7 @@ public final class HttpServerExchange extends AbstractAttachable {
             requestChannel.runResume();
             ret = true;
         }
-        state &= ~(FLAG_SHOULD_RESUME_READS | FLAG_SHOLD_RESUME_WRITES);
+        state &= ~(FLAG_SHOULD_RESUME_READS | FLAG_SHOULD_RESUME_WRITES);
         return ret;
     }
 
@@ -1650,7 +1805,7 @@ public final class HttpServerExchange extends AbstractAttachable {
         private final HttpServerExchange exchange;
         private int i;
 
-        public ExchangeCompleteNextListener(final ExchangeCompletionListener[] list, final HttpServerExchange exchange, int i) {
+        ExchangeCompleteNextListener(final ExchangeCompletionListener[] list, final HttpServerExchange exchange, int i) {
             this.list = list;
             this.exchange = exchange;
             this.i = i;
@@ -1708,6 +1863,11 @@ public final class HttpServerExchange extends AbstractAttachable {
                 getOutputStream().close();
             }
         }
+
+        @Override
+        public Receiver getReceiver() {
+            return new BlockingReceiverImpl(exchange, getInputStream());
+        }
     }
 
     /**
@@ -1723,7 +1883,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         private boolean wakeup;
 
-        public WriteDispatchChannel(final ConduitStreamSinkChannel delegate) {
+        WriteDispatchChannel(final ConduitStreamSinkChannel delegate) {
             super(delegate);
         }
 
@@ -1734,12 +1894,12 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public void resumeWrites() {
-            if (isFinished()) {
-                return;
-            }
             if (isInCall()) {
-                state |= FLAG_SHOLD_RESUME_WRITES;
-            } else {
+                state |= FLAG_SHOULD_RESUME_WRITES;
+                if(anyAreSet(state, FLAG_DISPATCHED)) {
+                    throw UndertowMessages.MESSAGES.resumedAndDispatched();
+                }
+            } else if(!isFinished()){
                 delegate.resumeWrites();
             }
         }
@@ -1751,7 +1911,10 @@ public final class HttpServerExchange extends AbstractAttachable {
             }
             if (isInCall()) {
                 wakeup = true;
-                state |= FLAG_SHOLD_RESUME_WRITES;
+                state |= FLAG_SHOULD_RESUME_WRITES;
+                if(anyAreSet(state, FLAG_DISPATCHED)) {
+                    throw UndertowMessages.MESSAGES.resumedAndDispatched();
+                }
             } else {
                 delegate.wakeupWrites();
             }
@@ -1759,16 +1922,20 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public boolean isWriteResumed() {
-            return anyAreSet(state, FLAG_SHOLD_RESUME_WRITES) || super.isWriteResumed();
+            return anyAreSet(state, FLAG_SHOULD_RESUME_WRITES) || super.isWriteResumed();
         }
 
         public void runResume() {
-            if (!isFinished() && isWriteResumed()) {
-                if (wakeup) {
-                    wakeup = false;
-                    delegate.wakeupWrites();
+            if (isWriteResumed()) {
+                if(isFinished()) {
+                    invokeListener();
                 } else {
-                    delegate.resumeWrites();
+                    if (wakeup) {
+                        wakeup = false;
+                        delegate.wakeupWrites();
+                    } else {
+                        delegate.resumeWrites();
+                    }
                 }
             } else if(wakeup) {
                 wakeup = false;
@@ -1806,14 +1973,18 @@ public final class HttpServerExchange extends AbstractAttachable {
         @Override
         public long transferFrom(FileChannel src, long position, long count) throws IOException {
             long l = super.transferFrom(src, position, count);
-            responseBytesSent += l;
+            if(l > 0) {
+                responseBytesSent += l;
+            }
             return l;
         }
 
         @Override
         public long transferFrom(StreamSourceChannel source, long count, ByteBuffer throughBuffer) throws IOException {
             long l = super.transferFrom(source, count, throughBuffer);
-            responseBytesSent += l;
+            if(l > 0) {
+                responseBytesSent += l;
+            }
             return l;
         }
 
@@ -1876,7 +2047,7 @@ public final class HttpServerExchange extends AbstractAttachable {
         private boolean readsResumed = false;
 
 
-        public ReadDispatchChannel(final ConduitStreamSourceChannel delegate) {
+        ReadDispatchChannel(final ConduitStreamSourceChannel delegate) {
             super(delegate);
         }
 
@@ -1888,20 +2059,24 @@ public final class HttpServerExchange extends AbstractAttachable {
         @Override
         public void resumeReads() {
             readsResumed = true;
-            if (isFinished()) {
-                return;
-            }
             if (isInCall()) {
                 state |= FLAG_SHOULD_RESUME_READS;
-            } else {
+                if(anyAreSet(state, FLAG_DISPATCHED)) {
+                    throw UndertowMessages.MESSAGES.resumedAndDispatched();
+                }
+            } else if (!isFinished()) {
                 delegate.resumeReads();
             }
+
         }
 
         public void wakeupReads() {
             if (isInCall()) {
                 wakeup = true;
                 state |= FLAG_SHOULD_RESUME_READS;
+                if(anyAreSet(state, FLAG_DISPATCHED)) {
+                    throw UndertowMessages.MESSAGES.resumedAndDispatched();
+                }
             } else {
                 if(isFinished()) {
                     invokeListener();
@@ -1934,7 +2109,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public long transferTo(long position, long count, FileChannel target) throws IOException {
-            Pooled<ByteBuffer>[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
+            PooledByteBuffer[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
             if (buffered == null) {
                 return super.transferTo(position, count, target);
             }
@@ -1946,7 +2121,7 @@ public final class HttpServerExchange extends AbstractAttachable {
             if(Thread.currentThread() == getIoThread()) {
                 throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
             }
-            Pooled<ByteBuffer>[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
+            PooledByteBuffer[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
             if (buffered == null) {
                 super.awaitReadable();
             }
@@ -1960,7 +2135,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public long transferTo(long count, ByteBuffer throughBuffer, StreamSinkChannel target) throws IOException {
-            Pooled<ByteBuffer>[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
+            PooledByteBuffer[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
             if (buffered == null) {
                 return super.transferTo(count, throughBuffer, target);
             }
@@ -1969,14 +2144,14 @@ public final class HttpServerExchange extends AbstractAttachable {
             throughBuffer.limit(0);
             long copied = 0;
             for (int i = 0; i < buffered.length; ++i) {
-                Pooled<ByteBuffer> pooled = buffered[i];
+                PooledByteBuffer pooled = buffered[i];
                 if (pooled != null) {
-                    final ByteBuffer buf = pooled.getResource();
+                    final ByteBuffer buf = pooled.getBuffer();
                     if (buf.hasRemaining()) {
                         int res = target.write(buf);
 
                         if (!buf.hasRemaining()) {
-                            pooled.free();
+                            pooled.close();
                             buffered[i] = null;
                         }
                         if (res == 0) {
@@ -1985,7 +2160,7 @@ public final class HttpServerExchange extends AbstractAttachable {
                             copied += res;
                         }
                     } else {
-                        pooled.free();
+                        pooled.close();
                         buffered[i] = null;
                     }
                 }
@@ -2003,7 +2178,7 @@ public final class HttpServerExchange extends AbstractAttachable {
             if(Thread.currentThread() == getIoThread()) {
                 throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
             }
-            Pooled<ByteBuffer>[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
+            PooledByteBuffer[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
             if (buffered == null) {
                 super.awaitReadable(time, timeUnit);
             }
@@ -2011,26 +2186,26 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public long read(ByteBuffer[] dsts, int offset, int length) throws IOException {
-            Pooled<ByteBuffer>[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
+            PooledByteBuffer[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
             if (buffered == null) {
                 return super.read(dsts, offset, length);
             }
             long copied = 0;
             for (int i = 0; i < buffered.length; ++i) {
-                Pooled<ByteBuffer> pooled = buffered[i];
+                PooledByteBuffer pooled = buffered[i];
                 if (pooled != null) {
-                    final ByteBuffer buf = pooled.getResource();
+                    final ByteBuffer buf = pooled.getBuffer();
                     if (buf.hasRemaining()) {
                         copied += Buffers.copy(dsts, offset, length, buf);
                         if (!buf.hasRemaining()) {
-                            pooled.free();
+                            pooled.close();
                             buffered[i] = null;
                         }
                         if (!Buffers.hasRemaining(dsts, offset, length)) {
                             return copied;
                         }
                     } else {
-                        pooled.free();
+                        pooled.close();
                         buffered[i] = null;
                     }
                 }
@@ -2050,7 +2225,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public boolean isOpen() {
-            Pooled<ByteBuffer>[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
+            PooledByteBuffer[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
             if (buffered != null) {
                 return true;
             }
@@ -2059,11 +2234,11 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public void close() throws IOException {
-            Pooled<ByteBuffer>[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
+            PooledByteBuffer[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
             if (buffered != null) {
-                for (Pooled<ByteBuffer> pooled : buffered) {
+                for (PooledByteBuffer pooled : buffered) {
                     if (pooled != null) {
-                        pooled.free();
+                        pooled.close();
                     }
                 }
             }
@@ -2073,7 +2248,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public boolean isReadResumed() {
-            Pooled<ByteBuffer>[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
+            PooledByteBuffer[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
             if (buffered != null) {
                 return readsResumed;
             }
@@ -2085,26 +2260,26 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public int read(ByteBuffer dst) throws IOException {
-            Pooled<ByteBuffer>[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
+            PooledByteBuffer[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
             if (buffered == null) {
                 return super.read(dst);
             }
             int copied = 0;
             for (int i = 0; i < buffered.length; ++i) {
-                Pooled<ByteBuffer> pooled = buffered[i];
+                PooledByteBuffer pooled = buffered[i];
                 if (pooled != null) {
-                    final ByteBuffer buf = pooled.getResource();
+                    final ByteBuffer buf = pooled.getBuffer();
                     if (buf.hasRemaining()) {
                         copied += Buffers.copy(dst, buf);
                         if (!buf.hasRemaining()) {
-                            pooled.free();
+                            pooled.close();
                             buffered[i] = null;
                         }
                         if (!dst.hasRemaining()) {
                             return copied;
                         }
                     } else {
-                        pooled.free();
+                        pooled.close();
                         buffered[i] = null;
                     }
                 }
@@ -2119,11 +2294,15 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         public void runResume() {
             if (isReadResumed()) {
-                if (wakeup) {
-                    wakeup = false;
-                    delegate.wakeupReads();
+                if(isFinished()) {
+                    invokeListener();
                 } else {
-                    delegate.resumeReads();
+                    if (wakeup) {
+                        wakeup = false;
+                        delegate.wakeupReads();
+                    } else {
+                        delegate.resumeReads();
+                    }
                 }
             } else if(wakeup) {
                 wakeup = false;
@@ -2184,6 +2363,6 @@ public final class HttpServerExchange extends AbstractAttachable {
 
     @Override
     public String toString() {
-        return "HttpServerExchange{ " + getRequestMethod().toString() + " " + getRequestURI() + '}';
+        return "HttpServerExchange{ " + getRequestMethod().toString() + " " + getRequestURI() + " request " + requestHeaders + " response " + responseHeaders + '}';
     }
 }

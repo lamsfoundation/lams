@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.query.spi;
 
@@ -78,7 +61,7 @@ public class HQLQueryPlan implements Serializable {
 	/**
 	* We'll check the trace level only once per instance
 	*/
-	private final boolean TRACE_ENABLED = LOG.isTraceEnabled();
+	private final boolean traceEnabled = LOG.isTraceEnabled();
 
 	/**
 	 * Constructs a HQLQueryPlan
@@ -121,8 +104,9 @@ public class HQLQueryPlan implements Serializable {
 		final Set<Serializable> combinedQuerySpaces = new HashSet<Serializable>();
 
 		final boolean hasCollectionRole = (collectionRole == null);
-		final Map querySubstitutions = factory.getSettings().getQuerySubstitutions();
-		final QueryTranslatorFactory queryTranslatorFactory = factory.getSettings().getQueryTranslatorFactory();
+		final Map querySubstitutions = factory.getSessionFactoryOptions().getQuerySubstitutions();
+		final QueryTranslatorFactory queryTranslatorFactory = factory.getServiceRegistry().getService( QueryTranslatorFactory.class );
+
 
 		for ( int i=0; i<length; i++ ) {
 			if ( hasCollectionRole ) {
@@ -205,7 +189,7 @@ public class HQLQueryPlan implements Serializable {
 	public List performList(
 			QueryParameters queryParameters,
 			SessionImplementor session) throws HibernateException {
-		if ( TRACE_ENABLED ) {
+		if ( traceEnabled ) {
 			LOG.tracev( "Find: {0}", getSourceQuery() );
 			queryParameters.traceParameters( session.getFactory() );
 		}
@@ -227,9 +211,19 @@ public class HQLQueryPlan implements Serializable {
 			queryParametersToUse = queryParameters;
 		}
 
+		//fast path to avoid unnecessary allocation and copying
+		if ( translators.length == 1 ) {
+			return translators[0].list( session, queryParametersToUse );
+		}
 		final int guessedResultSize = guessResultSize( rowSelection );
 		final List combinedResults = new ArrayList( guessedResultSize );
-		final IdentitySet distinction = new IdentitySet( guessedResultSize );
+		final IdentitySet distinction;
+		if ( needsLimit ) {
+			distinction = new IdentitySet( guessedResultSize );
+		}
+		else {
+			distinction = null;
+		}
 		int includedCount = -1;
 		translator_loop:
 		for ( QueryTranslator translator : translators ) {
@@ -276,7 +270,8 @@ public class HQLQueryPlan implements Serializable {
 	 * @param rowSelection
 	 * @return a reasonable size to use for allocation
 	 */
-	private final int guessResultSize(RowSelection rowSelection) {
+	@SuppressWarnings("UnnecessaryUnboxing")
+	private int guessResultSize(RowSelection rowSelection) {
 		if ( rowSelection != null ) {
 			final int maxReasonableAllocation = rowSelection.getFetchSize() != null ? rowSelection.getFetchSize().intValue() : 100;
 			if ( rowSelection.getMaxRows() != null && rowSelection.getMaxRows().intValue() > 0 ) {
@@ -303,7 +298,7 @@ public class HQLQueryPlan implements Serializable {
 	public Iterator performIterate(
 			QueryParameters queryParameters,
 			EventSource session) throws HibernateException {
-		if ( TRACE_ENABLED ) {
+		if ( traceEnabled ) {
 			LOG.tracev( "Iterate: {0}", getSourceQuery() );
 			queryParameters.traceParameters( session.getFactory() );
 		}
@@ -341,7 +336,7 @@ public class HQLQueryPlan implements Serializable {
 	public ScrollableResults performScroll(
 			QueryParameters queryParameters,
 			SessionImplementor session) throws HibernateException {
-		if ( TRACE_ENABLED ) {
+		if ( traceEnabled ) {
 			LOG.tracev( "Iterate: {0}", getSourceQuery() );
 			queryParameters.traceParameters( session.getFactory() );
 		}
@@ -367,7 +362,7 @@ public class HQLQueryPlan implements Serializable {
 	 */
 	public int performExecuteUpdate(QueryParameters queryParameters, SessionImplementor session)
 			throws HibernateException {
-		if ( TRACE_ENABLED ) {
+		if ( traceEnabled ) {
 			LOG.tracev( "Execute update: {0}", getSourceQuery() );
 			queryParameters.traceParameters( session.getFactory() );
 		}
@@ -382,10 +377,10 @@ public class HQLQueryPlan implements Serializable {
 	}
 
 	private ParameterMetadata buildParameterMetadata(ParameterTranslations parameterTranslations, String hql) {
-		final long start = TRACE_ENABLED ? System.nanoTime() : 0;
+		final long start = traceEnabled ? System.nanoTime() : 0;
 		final ParamLocationRecognizer recognizer = ParamLocationRecognizer.parseLocations( hql );
 
-		if ( TRACE_ENABLED ) {
+		if ( traceEnabled ) {
 			final long end = System.nanoTime();
 			LOG.tracev( "HQL param location recognition took {0} nanoseconds ({1})", ( end - start ), hql );
 		}

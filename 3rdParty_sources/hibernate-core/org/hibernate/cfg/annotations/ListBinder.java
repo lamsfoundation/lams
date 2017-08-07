@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cfg.annotations;
 
@@ -31,10 +14,10 @@ import org.hibernate.annotations.OrderBy;
 import org.hibernate.annotations.Sort;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.cfg.CollectionSecondPass;
 import org.hibernate.cfg.Ejb3Column;
 import org.hibernate.cfg.Ejb3JoinColumn;
-import org.hibernate.cfg.Mappings;
 import org.hibernate.cfg.PropertyHolder;
 import org.hibernate.cfg.PropertyHolderBuilder;
 import org.hibernate.cfg.SecondPass;
@@ -65,7 +48,7 @@ public class ListBinder extends CollectionBinder {
 
 	@Override
 	protected Collection createCollection(PersistentClass persistentClass) {
-		return new org.hibernate.mapping.List( getMappings(), persistentClass );
+		return new org.hibernate.mapping.List( getBuildingContext().getMetadataCollector(), persistentClass );
 	}
 
 	@Override
@@ -94,27 +77,39 @@ public class ListBinder extends CollectionBinder {
 			final boolean ignoreNotFound,
 			final boolean unique,
 			final TableBinder assocTableBinder,
-			final Mappings mappings) {
-		return new CollectionSecondPass( mappings, ListBinder.this.collection ) {
+			final MetadataBuildingContext buildingContext) {
+		return new CollectionSecondPass( getBuildingContext(), ListBinder.this.collection ) {
 			@Override
             public void secondPass(Map persistentClasses, Map inheritedMetas)
 					throws MappingException {
 				bindStarToManySecondPass(
-						persistentClasses, collType, fkJoinColumns, keyColumns, inverseColumns, elementColumns,
-						isEmbedded, property, unique, assocTableBinder, ignoreNotFound, mappings
+						persistentClasses,
+						collType,
+						fkJoinColumns,
+						keyColumns,
+						inverseColumns,
+						elementColumns,
+						isEmbedded,
+						property,
+						unique,
+						assocTableBinder,
+						ignoreNotFound,
+						buildingContext
 				);
-				bindIndex( mappings );
+				bindIndex( buildingContext );
 			}
 		};
 	}
 
-	private void bindIndex(final Mappings mappings) {
+	private void bindIndex(final MetadataBuildingContext buildingContext) {
 		if ( !indexColumn.isImplicit() ) {
 			PropertyHolder valueHolder = PropertyHolderBuilder.buildPropertyHolder(
 					this.collection,
 					StringHelper.qualify( this.collection.getRole(), "key" ),
 					null,
-					null, propertyHolder, mappings
+					null,
+					propertyHolder,
+					getBuildingContext()
 			);
 			List list = (List) this.collection;
 			if ( !list.isOneToMany() ) indexColumn.forceNotNull();
@@ -122,14 +117,14 @@ public class ListBinder extends CollectionBinder {
 			SimpleValueBinder value = new SimpleValueBinder();
 			value.setColumns( new Ejb3Column[] { indexColumn } );
 			value.setExplicitType( "integer" );
-			value.setMappings( mappings );
+			value.setBuildingContext( getBuildingContext() );
 			SimpleValue indexValue = value.make();
 			indexColumn.linkWithValue( indexValue );
 			list.setIndex( indexValue );
 			list.setBaseIndex( indexColumn.getBase() );
 			if ( list.isOneToMany() && !list.getKey().isNullable() && !list.isInverse() ) {
 				String entityName = ( (OneToMany) list.getElement() ).getReferencedEntityName();
-				PersistentClass referenced = mappings.getClass( entityName );
+				PersistentClass referenced = buildingContext.getMetadataCollector().getEntityBinding( entityName );
 				IndexBackref ib = new IndexBackref();
 				ib.setName( '_' + propertyName + "IndexBackref" );
 				ib.setUpdateable( false );

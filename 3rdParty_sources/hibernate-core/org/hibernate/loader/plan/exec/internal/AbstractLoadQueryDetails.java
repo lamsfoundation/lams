@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.loader.plan.exec.internal;
 
@@ -27,10 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.loader.MultipleBagFetchException;
 import org.hibernate.loader.plan.build.spi.LoadPlanTreePrinter;
-import org.hibernate.loader.plan.exec.internal.AliasResolutionContextImpl;
-import org.hibernate.loader.plan.exec.internal.FetchStats;
-import org.hibernate.loader.plan.exec.internal.LoadQueryJoinAndFetchProcessor;
 import org.hibernate.loader.plan.exec.process.internal.ResultSetProcessorImpl;
 import org.hibernate.loader.plan.exec.process.spi.CollectionReferenceInitializer;
 import org.hibernate.loader.plan.exec.process.spi.EntityReferenceInitializer;
@@ -40,6 +21,7 @@ import org.hibernate.loader.plan.exec.query.internal.SelectStatementBuilder;
 import org.hibernate.loader.plan.exec.query.spi.QueryBuildingParameters;
 import org.hibernate.loader.plan.exec.spi.AliasResolutionContext;
 import org.hibernate.loader.plan.exec.spi.LoadQueryDetails;
+import org.hibernate.loader.plan.spi.CollectionAttributeFetch;
 import org.hibernate.loader.plan.spi.CollectionReturn;
 import org.hibernate.loader.plan.spi.FetchSource;
 import org.hibernate.loader.plan.spi.LoadPlan;
@@ -63,14 +45,9 @@ public abstract class AbstractLoadQueryDetails implements LoadQueryDetails {
 
 	/**
 	 * @param rootReturn The root return reference we are processing
-	 * @param select The SelectStatementBuilder
-	 * @param helper The Join/Fetch helper
 	 * @param factory The SessionFactory
 	 * @param buildingParameters The query building context
-	 * @param rootAlias The table alias to use
-	 * @param rootLoadable The persister
-	 * @param readerCollector Collector for EntityReferenceInitializer and CollectionReferenceInitializer references
-	*/
+	 */
 	protected AbstractLoadQueryDetails(
 			LoadPlan loadPlan,
 			AliasResolutionContextImpl aliasResolutionContext,
@@ -193,16 +170,35 @@ public abstract class AbstractLoadQueryDetails implements LoadQueryDetails {
 			// TODO: what about index???
 		}
 
+		if ( fetchStats != null && fetchStats.getJoinedBagAttributeFetches().size() > 1 ) {
+			final List<String> bagRoles = new ArrayList<String>();
+			for ( CollectionAttributeFetch bagFetch : fetchStats.getJoinedBagAttributeFetches() ) {
+				bagRoles.add( bagFetch.getCollectionPersister().getRole() );
+			}
+			throw new MultipleBagFetchException( bagRoles );
+		}
+
 		LoadPlanTreePrinter.INSTANCE.logTree( loadPlan, queryProcessor.getAliasResolutionContext() );
 
 		this.sqlStatement = select.toStatementString();
 		this.resultSetProcessor = new ResultSetProcessorImpl(
 				loadPlan,
+				queryProcessor.getAliasResolutionContext(),
 				getReaderCollector().buildRowReader(),
-				fetchStats != null && fetchStats.hasSubselectFetches()
+				shouldUseOptionalEntityInstance(),
+				isSubselectLoadingEnabled( fetchStats )
 		);
 	}
 
+	/**
+	 * Is subselect loading enabled?
+	 *
+	 * @param fetchStats the fetch stats; may be null
+	 * @return {@code true} if subselect loading is enabled; {@code false} otherwise.
+	 */
+	protected abstract boolean isSubselectLoadingEnabled(FetchStats fetchStats);
+
+	protected abstract boolean shouldUseOptionalEntityInstance();
 	protected abstract ReaderCollector getReaderCollector();
 	protected abstract QuerySpace getRootQuerySpace();
 	protected abstract String getRootTableAlias();
@@ -278,15 +274,18 @@ public abstract class AbstractLoadQueryDetails implements LoadQueryDetails {
 			entityReferenceInitializers.add( entityReferenceInitializer );
 		}
 
+		@Override
 		public final List<EntityReferenceInitializer> getEntityReferenceInitializers() {
 			return entityReferenceInitializers;
 		}
 
+		@Override
 		public List<CollectionReferenceInitializer> getArrayReferenceInitializers() {
 			return arrayReferenceInitializers;
 
 		}
 
+		@Override
 		public List<CollectionReferenceInitializer> getNonArrayCollectionReferenceInitializers() {
 			return collectionReferenceInitializers;
 		}

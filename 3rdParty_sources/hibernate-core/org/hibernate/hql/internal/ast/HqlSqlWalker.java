@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal.ast;
 
@@ -96,6 +78,7 @@ import org.hibernate.persister.entity.Queryable;
 import org.hibernate.sql.JoinType;
 import org.hibernate.type.AssociationType;
 import org.hibernate.type.ComponentType;
+import org.hibernate.type.CompositeType;
 import org.hibernate.type.DbTimestampType;
 import org.hibernate.type.Type;
 import org.hibernate.type.VersionType;
@@ -150,6 +133,8 @@ public class HqlSqlWalker extends HqlSqlBaseWalker implements ErrorReporter, Par
 	private ArrayList assignmentSpecifications = new ArrayList();
 
 	private JoinType impliedJoinType = JoinType.INNER_JOIN;
+
+	private boolean inEntityGraph;
 
 	/**
 	 * Create a new tree transformer.
@@ -282,6 +267,10 @@ public class HqlSqlWalker extends HqlSqlBaseWalker implements ErrorReporter, Par
 		return collectionFilterRole;
 	}
 
+	public boolean isInEntityGraph() {
+		return inEntityGraph;
+	}
+
 	public SessionFactoryHelper getSessionFactoryHelper() {
 		return sessionFactoryHelper;
 	}
@@ -401,7 +390,7 @@ public class HqlSqlWalker extends HqlSqlBaseWalker implements ErrorReporter, Par
 					null,
 					false
 			);
-			fromElement = factory.createComponentJoin( (ComponentType) dot.getDataType() );
+			fromElement = factory.createComponentJoin( (CompositeType) dot.getDataType() );
 		}
 		else {
 			fromElement = dot.getImpliedJoin();
@@ -673,9 +662,16 @@ public class HqlSqlWalker extends HqlSqlBaseWalker implements ErrorReporter, Par
 
 			// Add in the EntityGraph attribute nodes.
 			if ( queryTranslatorImpl.getEntityGraphQueryHint() != null ) {
-				qn.getFromClause().getFromElements().addAll(
-						queryTranslatorImpl.getEntityGraphQueryHint().toFromElements( qn.getFromClause(), this )
-				);
+				final boolean oldInEntityGraph = inEntityGraph;
+				try {
+					inEntityGraph = true;
+					qn.getFromClause().getFromElements().addAll(
+							queryTranslatorImpl.getEntityGraphQueryHint().toFromElements( qn.getFromClause(), this )
+					);
+				}
+				finally {
+					inEntityGraph = oldInEntityGraph;
+				}
 			}
 
 			if ( !explicitSelect ) {
@@ -994,10 +990,11 @@ public class HqlSqlWalker extends HqlSqlBaseWalker implements ErrorReporter, Par
 			);
 		}
 		LOG.warnf(
-				"[DEPRECATION] Encountered positional parameter near line %s, column %s.  Positional parameter " +
+				"[DEPRECATION] Encountered positional parameter near line %s, column %s in HQL: [%s].  Positional parameter " +
 						"are considered deprecated; use named parameters or JPA-style positional parameters instead.",
 				inputNode.getLine(),
-				inputNode.getColumn()
+				inputNode.getColumn(),
+				queryTranslatorImpl.getQueryString()
 		);
 		ParameterNode parameter = (ParameterNode) astFactory.create( PARAM, "?" );
 		PositionalParameterSpecification paramSpec = new PositionalParameterSpecification(

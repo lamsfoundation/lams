@@ -18,6 +18,7 @@
 
 package io.undertow.websockets.core;
 
+import io.undertow.util.ImmediatePooledByteBuffer;
 import org.xnio.Buffers;
 import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
@@ -26,7 +27,7 @@ import org.xnio.XnioExecutor;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import static org.xnio.ChannelListeners.flushingChannelListener;
@@ -36,275 +37,465 @@ import static org.xnio.ChannelListeners.flushingChannelListener;
  */
 public class WebSockets {
 
-    private static final Charset utf8 = Charset.forName("UTF-8");
-
     /**
      * Sends a complete text message, invoking the callback when complete
      *
-     * @param message
-     * @param wsChannel
-     * @param callback
+     * @param message The text to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendText(final String message, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
-        final ByteBuffer data = ByteBuffer.wrap(message.getBytes(utf8));
-        sendInternal(new ByteBuffer[]{data}, WebSocketFrameType.TEXT, wsChannel, callback, -1);
+        sendText(message, wsChannel, callback, null);
     }
 
     /**
      * Sends a complete text message, invoking the callback when complete
      *
-     * @param message
-     * @param wsChannel
-     * @param callback
+     * @param message The text to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendText(final String message, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context) {
+        final ByteBuffer data = ByteBuffer.wrap(message.getBytes(StandardCharsets.UTF_8));
+        sendInternal(data, WebSocketFrameType.TEXT, wsChannel, callback, context, -1);
+    }
+
+    /**
+     * Sends a complete text message, invoking the callback when complete
+     *
+     * @param message The text to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      * @param timeoutmillis the timeout in milliseconds
      */
     public static void sendText(final String message, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback, long timeoutmillis) {
-        final ByteBuffer data = ByteBuffer.wrap(message.getBytes(utf8));
-        sendInternal(new ByteBuffer[]{data}, WebSocketFrameType.TEXT, wsChannel, callback, timeoutmillis);
+        sendText(message, wsChannel, callback, null, timeoutmillis);
     }
 
     /**
      * Sends a complete text message, invoking the callback when complete
      *
-     * @param message
-     * @param wsChannel
-     * @param callback
+     * @param message The text to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     * @param timeoutmillis the timeout in milliseconds
+     */
+    public static <T> void sendText(final String message, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context, long timeoutmillis) {
+        final ByteBuffer data = ByteBuffer.wrap(message.getBytes(StandardCharsets.UTF_8));
+        sendInternal(data, WebSocketFrameType.TEXT, wsChannel, callback, context, timeoutmillis);
+    }
+
+    /**
+     * Sends a complete text message, invoking the callback when complete
+     *
+     * @param message The text to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendText(final ByteBuffer message, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
-        sendInternal(new ByteBuffer[]{message}, WebSocketFrameType.TEXT, wsChannel, callback, -1);
+        sendInternal(message, WebSocketFrameType.TEXT, wsChannel, callback, null, -1);
     }
 
     /**
      * Sends a complete text message, invoking the callback when complete
      *
-     * @param message
-     * @param wsChannel
-     * @param callback
+     * @param message The text to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendText(final ByteBuffer message, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context) {
+        sendInternal(message, WebSocketFrameType.TEXT, wsChannel, callback, context, -1);
+    }
+
+    /**
+     * Sends a complete text message, invoking the callback when complete
+     *
+     * @param message The text to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendText(final ByteBuffer message, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback, long timeoutmillis) {
-        sendInternal(new ByteBuffer[]{message}, WebSocketFrameType.TEXT, wsChannel, callback, timeoutmillis);
+        sendInternal(message, WebSocketFrameType.TEXT, wsChannel, callback, null, timeoutmillis);
     }
-
 
     /**
      * Sends a complete text message, invoking the callback when complete
      *
-     * @param message
-     * @param wsChannel
+     * @param message The text to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendText(final ByteBuffer message, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context, long timeoutmillis) {
+        sendInternal(message, WebSocketFrameType.TEXT, wsChannel, callback, context, timeoutmillis);
+    }
+
+    /**
+     * Sends a complete text message, invoking the callback when complete
+     *
+     * @param message The text to send
+     * @param wsChannel The web socket channel
      */
     public static void sendTextBlocking(final String message, final WebSocketChannel wsChannel) throws IOException {
-        final ByteBuffer data = ByteBuffer.wrap(message.getBytes(utf8));
-        sendBlockingInternal(new ByteBuffer[]{data}, WebSocketFrameType.TEXT, wsChannel);
+        final ByteBuffer data = ByteBuffer.wrap(message.getBytes(StandardCharsets.UTF_8));
+        sendBlockingInternal(data, WebSocketFrameType.TEXT, wsChannel);
     }
 
     /**
      * Sends a complete text message, invoking the callback when complete
      *
-     * @param message
-     * @param wsChannel
+     * @param message The text to send
+     * @param wsChannel The web socket channel
      */
     public static void sendTextBlocking(final ByteBuffer message, final WebSocketChannel wsChannel) throws IOException {
-        sendBlockingInternal(new ByteBuffer[]{message}, WebSocketFrameType.TEXT, wsChannel);
+        sendBlockingInternal(message, WebSocketFrameType.TEXT, wsChannel);
     }
 
     /**
      * Sends a complete ping message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendPing(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
-        sendInternal(new ByteBuffer[]{data}, WebSocketFrameType.PING, wsChannel, callback, -1);
+        sendInternal(data, WebSocketFrameType.PING, wsChannel, callback, null, -1);
     }
 
     /**
      * Sends a complete ping message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendPing(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context) {
+        sendInternal(data, WebSocketFrameType.PING, wsChannel, callback, context, -1);
+    }
+
+    /**
+     * Sends a complete ping message, invoking the callback when complete
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendPing(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback, long timeoutmillis) {
-        sendInternal(new ByteBuffer[]{data}, WebSocketFrameType.PING, wsChannel, callback, timeoutmillis);
+        sendInternal(data, WebSocketFrameType.PING, wsChannel, callback, null, timeoutmillis);
     }
 
     /**
      * Sends a complete ping message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendPing(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context, long timeoutmillis) {
+        sendInternal(data, WebSocketFrameType.PING, wsChannel, callback, context, timeoutmillis);
+    }
+
+    /**
+     * Sends a complete ping message, invoking the callback when complete
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendPing(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
-        sendInternal(data, WebSocketFrameType.PING, wsChannel, callback, -1);
+        sendInternal(mergeBuffers(data), WebSocketFrameType.PING, wsChannel, callback, null, -1);
     }
 
     /**
      * Sends a complete ping message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendPing(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context) {
+        sendInternal(mergeBuffers(data), WebSocketFrameType.PING, wsChannel, callback, context, -1);
+    }
+
+    /**
+     * Sends a complete ping message, invoking the callback when complete
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendPing(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback, long timeoutmillis) {
-        sendInternal(data, WebSocketFrameType.PING, wsChannel, callback, timeoutmillis);
+        sendInternal(mergeBuffers(data), WebSocketFrameType.PING, wsChannel, callback, null, timeoutmillis);
+    }
+
+    /**
+     * Sends a complete ping message, invoking the callback when complete
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendPing(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context, long timeoutmillis) {
+        sendInternal(mergeBuffers(data), WebSocketFrameType.PING, wsChannel, callback, context, timeoutmillis);
     }
 
     /**
      * Sends a complete ping message using blocking IO
      *
-     * @param data
-     * @param wsChannel
+     * @param data The data to send
+     * @param wsChannel The web socket channel
      */
     public static void sendPingBlocking(final ByteBuffer data, final WebSocketChannel wsChannel) throws IOException {
-        sendBlockingInternal(new ByteBuffer[]{data}, WebSocketFrameType.PING, wsChannel);
-    }
-
-    /**
-     * Sends a complete ping message using blocking IO
-     *
-     * @param data
-     * @param wsChannel
-     */
-    public static void sendPingBlocking(final ByteBuffer[] data, final WebSocketChannel wsChannel) throws IOException {
         sendBlockingInternal(data, WebSocketFrameType.PING, wsChannel);
     }
 
     /**
+     * Sends a complete ping message using blocking IO
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     */
+    public static void sendPingBlocking(final ByteBuffer[] data, final WebSocketChannel wsChannel) throws IOException {
+        sendBlockingInternal(mergeBuffers(data), WebSocketFrameType.PING, wsChannel);
+    }
+
+    /**
      * Sends a complete pong message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendPong(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
-        sendInternal(new ByteBuffer[]{data}, WebSocketFrameType.PONG, wsChannel, callback, -1);
+        sendInternal(data, WebSocketFrameType.PONG, wsChannel, callback, null, -1);
     }
 
     /**
      * Sends a complete pong message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendPong(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context) {
+        sendInternal(data, WebSocketFrameType.PONG, wsChannel, callback, context, -1);
+    }
+
+    /**
+     * Sends a complete pong message, invoking the callback when complete
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendPong(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback, long timeoutmillis) {
-        sendInternal(new ByteBuffer[]{data}, WebSocketFrameType.PONG, wsChannel, callback, timeoutmillis);
+        sendInternal(data, WebSocketFrameType.PONG, wsChannel, callback, null, timeoutmillis);
     }
-
 
     /**
      * Sends a complete pong message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendPong(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context, long timeoutmillis) {
+        sendInternal(data, WebSocketFrameType.PONG, wsChannel, callback, context, timeoutmillis);
+    }
+
+    /**
+     * Sends a complete pong message, invoking the callback when complete
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendPong(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
-        sendInternal(data, WebSocketFrameType.PONG, wsChannel, callback, -1);
+        sendInternal(mergeBuffers(data), WebSocketFrameType.PONG, wsChannel, callback, null, -1);
     }
 
     /**
      * Sends a complete pong message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendPong(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context) {
+        sendInternal(mergeBuffers(data), WebSocketFrameType.PONG, wsChannel, callback, context, -1);
+    }
+
+    /**
+     * Sends a complete pong message, invoking the callback when complete
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendPong(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback, long timeoutmillis) {
-        sendInternal(data, WebSocketFrameType.PONG, wsChannel, callback, timeoutmillis);
+        sendInternal(mergeBuffers(data), WebSocketFrameType.PONG, wsChannel, callback, null, timeoutmillis);
     }
+
     /**
-     * Sends a complete pong message using blocking IO
+     * Sends a complete pong message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
      */
-    public static void sendPongBlocking(final ByteBuffer data, final WebSocketChannel wsChannel) throws IOException {
-        sendBlockingInternal(new ByteBuffer[]{data}, WebSocketFrameType.PONG, wsChannel);
+    public static <T> void sendPong(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context, long timeoutmillis) {
+        sendInternal(mergeBuffers(data), WebSocketFrameType.PONG, wsChannel, callback, context, timeoutmillis);
     }
 
     /**
      * Sends a complete pong message using blocking IO
      *
-     * @param data
-     * @param wsChannel
+     * @param data The data to send
+     * @param wsChannel The web socket channel
      */
-    public static void sendPongBlocking(final ByteBuffer[] data, final WebSocketChannel wsChannel) throws IOException {
+    public static void sendPongBlocking(final ByteBuffer data, final WebSocketChannel wsChannel) throws IOException {
         sendBlockingInternal(data, WebSocketFrameType.PONG, wsChannel);
     }
 
     /**
+     * Sends a complete pong message using blocking IO
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     */
+    public static void sendPongBlocking(final ByteBuffer[] data, final WebSocketChannel wsChannel) throws IOException {
+        sendBlockingInternal(mergeBuffers(data), WebSocketFrameType.PONG, wsChannel);
+    }
+
+    /**
      * Sends a complete text message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendBinary(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
-        sendInternal(new ByteBuffer[]{data}, WebSocketFrameType.BINARY, wsChannel, callback, -1);
+        sendInternal(data, WebSocketFrameType.BINARY, wsChannel, callback, null, -1);
     }
 
     /**
      * Sends a complete text message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendBinary(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context) {
+        sendInternal(data, WebSocketFrameType.BINARY, wsChannel, callback, context, -1);
+    }
+
+    /**
+     * Sends a complete text message, invoking the callback when complete
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendBinary(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback, long timeoutmillis) {
-        sendInternal(new ByteBuffer[]{data}, WebSocketFrameType.BINARY, wsChannel, callback, timeoutmillis);
+        sendInternal(data, WebSocketFrameType.BINARY, wsChannel, callback, null, timeoutmillis);
     }
 
     /**
      * Sends a complete text message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendBinary(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context, long timeoutmillis) {
+        sendInternal(data, WebSocketFrameType.BINARY, wsChannel, callback, context, timeoutmillis);
+    }
+
+    /**
+     * Sends a complete text message, invoking the callback when complete
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendBinary(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
-        sendInternal(data, WebSocketFrameType.BINARY, wsChannel, callback, -1);
+        sendInternal(mergeBuffers(data), WebSocketFrameType.BINARY, wsChannel, callback, null, -1);
     }
 
     /**
      * Sends a complete text message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendBinary(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context) {
+        sendInternal(mergeBuffers(data), WebSocketFrameType.BINARY, wsChannel, callback, context, -1);
+    }
+
+    /**
+     * Sends a complete text message, invoking the callback when complete
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendBinary(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback, long timeoutmillis) {
-        sendInternal(data, WebSocketFrameType.BINARY, wsChannel, callback, timeoutmillis);
+        sendInternal(mergeBuffers(data), WebSocketFrameType.BINARY, wsChannel, callback, null, timeoutmillis);
+    }
+
+    /**
+     * Sends a complete text message, invoking the callback when complete
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendBinary(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context, long timeoutmillis) {
+        sendInternal(mergeBuffers(data), WebSocketFrameType.BINARY, wsChannel, callback, context, timeoutmillis);
     }
 
     /**
      * Sends a complete binary message using blocking IO
      *
-     * @param data
-     * @param wsChannel
+     * @param data The data to send
+     * @param wsChannel The web socket channel
      */
     public static void sendBinaryBlocking(final ByteBuffer data, final WebSocketChannel wsChannel) throws IOException {
-        sendBlockingInternal(new ByteBuffer[]{data}, WebSocketFrameType.BINARY, wsChannel);
+        sendBlockingInternal(data, WebSocketFrameType.BINARY, wsChannel);
     }
 
     /**
      * Sends a complete binary message using blocking IO
      *
-     * @param data
-     * @param wsChannel
+     * @param data The data to send
+     * @param wsChannel The web socket channel
      */
     public static void sendBinaryBlocking(final ByteBuffer[] data, final WebSocketChannel wsChannel) throws IOException {
-        sendBlockingInternal(data, WebSocketFrameType.BINARY, wsChannel);
+        sendBlockingInternal(mergeBuffers(data), WebSocketFrameType.BINARY, wsChannel);
     }
 
     /**
      * Sends a complete close message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendClose(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
         CloseMessage sm = new CloseMessage(data);
@@ -314,22 +505,47 @@ public class WebSockets {
     /**
      * Sends a complete close message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
-     * @param callback
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendClose(final ByteBuffer data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context) {
+        CloseMessage sm = new CloseMessage(data);
+        sendClose(sm, wsChannel, callback, context);
+    }
+
+    /**
+     * Sends a complete close message, invoking the callback when complete
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendClose(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
         CloseMessage sm = new CloseMessage(data);
         sendClose(sm, wsChannel, callback);
     }
 
+    /**
+     * Sends a complete close message, invoking the callback when complete
+     *
+     * @param data The data to send
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendClose(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context) {
+        CloseMessage sm = new CloseMessage(data);
+        sendClose(sm, wsChannel, callback, context);
+    }
 
     /**
      * Sends a complete close message, invoking the callback when complete
      *
      * @param code The close code
-     * @param wsChannel
-     * @param callback
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendClose(final int code, String reason, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
         sendClose(new CloseMessage(code, reason), wsChannel, callback);
@@ -338,32 +554,56 @@ public class WebSockets {
     /**
      * Sends a complete close message, invoking the callback when complete
      *
+     * @param code The close code
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendClose(final int code, String reason, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context) {
+        sendClose(new CloseMessage(code, reason), wsChannel, callback, context);
+    }
+
+    /**
+     * Sends a complete close message, invoking the callback when complete
+     *
      * @param closeMessage The close message
-     * @param wsChannel
-     * @param callback
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
      */
     public static void sendClose(final CloseMessage closeMessage, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
+        sendClose(closeMessage, wsChannel, callback, null);
+    }
+
+    /**
+     * Sends a complete close message, invoking the callback when complete
+     *
+     * @param closeMessage The close message
+     * @param wsChannel The web socket channel
+     * @param callback The callback to invoke on completion
+     * @param context The context object that will be passed to the callback on completion
+     */
+    public static <T> void sendClose(final CloseMessage closeMessage, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context) {
         wsChannel.setCloseCode(closeMessage.getCode());
         wsChannel.setCloseReason(closeMessage.getReason());
-        sendInternal(new ByteBuffer[]{closeMessage.toByteBuffer()}, WebSocketFrameType.CLOSE, wsChannel, callback, -1);
+        sendInternal(closeMessage.toByteBuffer(), WebSocketFrameType.CLOSE, wsChannel, callback, context, -1);
     }
 
     /**
      * Sends a complete close message, invoking the callback when complete
      *
      * @param closeMessage the close message
-     * @param wsChannel
+     * @param wsChannel The web socket channel
      */
     public static void sendCloseBlocking(final CloseMessage closeMessage, final WebSocketChannel wsChannel) throws IOException {
         wsChannel.setCloseReason(closeMessage.getReason());
         wsChannel.setCloseCode(closeMessage.getCode());
-        sendBlockingInternal(new ByteBuffer[]{closeMessage.toByteBuffer()}, WebSocketFrameType.CLOSE, wsChannel);
+        sendBlockingInternal(closeMessage.toByteBuffer(), WebSocketFrameType.CLOSE, wsChannel);
     }
     /**
      * Sends a complete close message, invoking the callback when complete
      *
      * @param code
-     * @param wsChannel
+     * @param wsChannel The web socket channel
      */
     public static void sendCloseBlocking(final int code, String reason, final WebSocketChannel wsChannel) throws IOException {
         sendCloseBlocking(new CloseMessage(code, reason), wsChannel);
@@ -371,8 +611,8 @@ public class WebSockets {
     /**
      * Sends a complete close message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
+     * @param data The data to send
+     * @param wsChannel The web socket channel
      */
     public static void sendCloseBlocking(final ByteBuffer data, final WebSocketChannel wsChannel) throws IOException {
         sendCloseBlocking(new CloseMessage(data), wsChannel);
@@ -381,18 +621,21 @@ public class WebSockets {
     /**
      * Sends a complete close message, invoking the callback when complete
      *
-     * @param data
-     * @param wsChannel
+     * @param data The data to send
+     * @param wsChannel The web socket channel
      */
     public static void sendCloseBlocking(final ByteBuffer[] data, final WebSocketChannel wsChannel) throws IOException {
         sendCloseBlocking(new CloseMessage(data), wsChannel);
     }
 
-    private static void sendInternal(final ByteBuffer[] data, WebSocketFrameType type, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback, long timeoutmillis) {
+    private static <T> void sendInternal(final ByteBuffer data, WebSocketFrameType type, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, T context, long timeoutmillis) {
         try {
-            long totalData = Buffers.remaining(data);
-            StreamSinkFrameChannel channel = wsChannel.send(type, totalData);
-            sendData(data, wsChannel, callback, channel, null, timeoutmillis);
+            StreamSinkFrameChannel channel = wsChannel.send(type);
+            // TODO chunk data into some MTU-like thing to control packet size
+            if(!channel.send(new ImmediatePooledByteBuffer(data))) {
+                throw WebSocketMessages.MESSAGES.unableToSendOnNewChannel();
+            }
+            flushChannelAsync(wsChannel, callback, channel, context, timeoutmillis);
         } catch (IOException e) {
             if (callback != null) {
                 callback.onError(wsChannel, null, e);
@@ -400,52 +643,6 @@ public class WebSockets {
                 IoUtils.safeClose(wsChannel);
             }
         }
-    }
-
-    private static <T> void sendData(final ByteBuffer[] data, final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, StreamSinkFrameChannel channel, final T context, long timeoutmillis) throws IOException {
-        boolean hasRemaining = true;
-        while (hasRemaining) {
-            long res = channel.write(data);
-            hasRemaining = Buffers.hasRemaining(data);
-            if (res == 0 && hasRemaining) {
-                channel.getWriteSetter().set(new ChannelListener<StreamSinkFrameChannel>() {
-                    @Override
-                    public void handleEvent(StreamSinkFrameChannel channel) {
-                        do {
-                            try {
-                                long res = channel.write(data);
-                                if (res == 0) {
-                                    return;
-                                }
-                            } catch (IOException e) {
-                                handleIoException(channel, e, callback, context, wsChannel);
-                                return;
-                            }
-                        } while (Buffers.hasRemaining(data));
-                        channel.suspendWrites();
-                        try {
-                            flushChannelAsync(wsChannel, callback, channel, context, -1);//timeout has already been setup
-                        } catch (IOException e) {
-                            handleIoException(channel, e, callback, context, wsChannel);
-                        }
-                    }
-                });
-                channel.resumeWrites();
-                if(timeoutmillis > 0) {
-                    setupTimeout(channel, timeoutmillis);
-                }
-                return;
-            }
-        }
-        flushChannelAsync(wsChannel, callback, channel, context, timeoutmillis);
-    }
-
-    private static <T> void handleIoException(StreamSinkFrameChannel channel, IOException e, WebSocketCallback<T> callback, T context, WebSocketChannel wsChannel) {
-        if (callback != null) {
-            callback.onError(channel.getWebSocketChannel(), context, e);
-        }
-        IoUtils.safeClose(wsChannel);
-        channel.suspendWrites();
     }
 
     private static <T> void flushChannelAsync(final WebSocketChannel wsChannel, final WebSocketCallback<T> callback, StreamSinkFrameChannel channel, final T context, long timeoutmillis) throws IOException {
@@ -462,6 +659,9 @@ public class WebSockets {
                             if (type == WebSocketFrameType.CLOSE && wsChannel.isCloseFrameReceived()) {
                                 IoUtils.safeClose(wsChannel);
                             }
+                            //we explicitly set the channel to null, as in some situations this
+                            //listener may get invoked twice
+                            channel.getWriteSetter().set(null);
                         }
                     }, new ChannelExceptionHandler<StreamSinkFrameChannel>() {
                         @Override
@@ -469,9 +669,10 @@ public class WebSockets {
                             if (callback != null) {
                                 callback.onError(wsChannel, context, exception);
                             }
-                            if (type == WebSocketFrameType.CLOSE && wsChannel.isCloseFrameReceived()) {
-                                IoUtils.safeClose(wsChannel);
-                            }
+                            IoUtils.safeClose(channel, wsChannel);
+                            //we explicitly set the channel to null, as in some situations this
+                            //listener may get invoked twice
+                            channel.getWriteSetter().set(null);
                         }
                     }
             ));
@@ -483,9 +684,6 @@ public class WebSockets {
         }
         if (callback != null) {
             callback.complete(wsChannel, context);
-        }
-        if (type == WebSocketFrameType.CLOSE && wsChannel.isCloseFrameReceived()) {
-            IoUtils.safeClose(wsChannel);
         }
     }
 
@@ -506,16 +704,11 @@ public class WebSockets {
         });
     }
 
-    private static void sendBlockingInternal(final ByteBuffer[] data, WebSocketFrameType type, final WebSocketChannel wsChannel) throws IOException {
-        long totalData = Buffers.remaining(data);
-        StreamSinkFrameChannel channel = wsChannel.send(type, totalData);
-        for (ByteBuffer buf : data) {
-            while (buf.hasRemaining()) {
-                int res = channel.write(buf);
-                if (res == 0) {
-                    channel.awaitWritable();
-                }
-            }
+    private static void sendBlockingInternal(final ByteBuffer data, WebSocketFrameType type, final WebSocketChannel wsChannel) throws IOException {
+        StreamSinkFrameChannel channel = wsChannel.send(type);
+        // TODO chunk data into some MTU-like thing to control packet size
+        if(!channel.send(new ImmediatePooledByteBuffer(data))) {
+            throw WebSocketMessages.MESSAGES.unableToSendOnNewChannel();
         }
         channel.shutdownWrites();
         while (!channel.flush()) {

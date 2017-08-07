@@ -1,30 +1,13 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal.classic;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,10 +20,10 @@ import org.hibernate.internal.util.StringHelper;
  */
 public class PreprocessingParser implements Parser {
 
-	private static final Set HQL_OPERATORS;
+	private static final Set<String> HQL_OPERATORS;
 
 	static {
-		HQL_OPERATORS = new HashSet();
+		HQL_OPERATORS = new HashSet<String>();
 		HQL_OPERATORS.add( "<=" );
 		HQL_OPERATORS.add( ">=" );
 		HQL_OPERATORS.add( "=>" );
@@ -84,10 +67,14 @@ public class PreprocessingParser implements Parser {
 			}
 			quoted = !quoted;
 		}
-		if ( quoted ) return;
+		if ( quoted ) {
+			return;
+		}
 
 		//ignore whitespace
-		if ( ParserHelper.isWhitespace( token ) ) return;
+		if ( ParserHelper.isWhitespace( token ) ) {
+			return;
+		}
 
 		//do replacements
 		String substoken = ( String ) replacements.get( token );
@@ -107,7 +94,7 @@ public class PreprocessingParser implements Parser {
 			}
 		}
 		else {
-			String prop = CollectionProperties.getNormalizedPropertyName( token.toLowerCase() );
+			String prop = CollectionProperties.getNormalizedPropertyName( token.toLowerCase(Locale.ROOT) );
 			if ( prop != null ) {
 				currentCollectionProp = prop;
 				return;
@@ -123,7 +110,7 @@ public class PreprocessingParser implements Parser {
 			String doubleToken = ( token.length() > 1 ) ?
 					lastToken + ' ' + token :
 					lastToken + token;
-			if ( HQL_OPERATORS.contains( doubleToken.toLowerCase() ) ) {
+			if ( HQL_OPERATORS.contains( doubleToken.toLowerCase(Locale.ROOT) ) ) {
 				parser.token( doubleToken, q );
 				lastToken = null;
 			}
@@ -141,16 +128,12 @@ public class PreprocessingParser implements Parser {
 	}
 
 	public void end(QueryTranslatorImpl q) throws QueryException {
-		if ( lastToken != null ) parser.token( lastToken, q );
+		if ( lastToken != null ) {
+			parser.token( lastToken, q );
+		}
 		parser.end( q );
 		lastToken = null;
 		currentCollectionProp = null;
 	}
 
 }
-
-
-
-
-
-

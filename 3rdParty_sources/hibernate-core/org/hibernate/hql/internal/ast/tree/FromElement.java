@@ -1,30 +1,13 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal.ast.tree;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -62,7 +45,7 @@ import org.hibernate.type.Type;
  * @author josh
  */
 public class FromElement extends HqlSqlWalkerNode implements DisplayableNode, ParameterContainer {
-    private static final CoreMessageLogger LOG = CoreLogging.messageLogger( FromElement.class );
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( FromElement.class );
 
 	private String className;
 	private String classAlias;
@@ -82,7 +65,7 @@ public class FromElement extends HqlSqlWalkerNode implements DisplayableNode, Pa
 	private boolean initialized;
 	private FromElementType elementType;
 	private boolean useWhereFragment = true;
-	private List destinations = new LinkedList();
+	private List<FromElement> destinations;
 	private boolean manyToMany;
 	private String withClauseFragment;
 	private String withClauseJoinAlias;
@@ -132,19 +115,24 @@ public class FromElement extends HqlSqlWalkerNode implements DisplayableNode, Pa
 	}
 
 	public void initializeEntity(
-	        FromClause fromClause,
-	        String className,
-	        EntityPersister persister,
-	        EntityType type,
-	        String classAlias,
-	        String tableAlias) {
+			FromClause fromClause,
+			String className,
+			EntityPersister persister,
+			EntityType type,
+			String classAlias,
+			String tableAlias) {
 		doInitialize( fromClause, tableAlias, className, classAlias, persister, type );
 		this.sequence = fromClause.nextFromElementCounter();
 		initialized = true;
 	}
 
-	private void doInitialize(FromClause fromClause, String tableAlias, String className, String classAlias,
-							  EntityPersister persister, EntityType type) {
+	private void doInitialize(
+			FromClause fromClause,
+			String tableAlias,
+			String className,
+			String classAlias,
+			EntityPersister persister,
+			EntityType type) {
 		if ( initialized ) {
 			throw new IllegalStateException( "Already initialized!!" );
 		}
@@ -163,7 +151,7 @@ public class FromElement extends HqlSqlWalkerNode implements DisplayableNode, Pa
 	}
 
 	@Override
-    public Type getDataType() {
+	public Type getDataType() {
 		return elementType.getDataType();
 	}
 
@@ -231,6 +219,14 @@ public class FromElement extends HqlSqlWalkerNode implements DisplayableNode, Pa
 		return elementType.renderPropertySelect( size, k, isAllPropertyFetch );
 	}
 
+	public String renderMapKeyPropertySelectFragment(int size, int k) {
+		return elementType.renderMapKeyPropertySelectFragment( size, k );
+	}
+
+	public String renderMapEntryPropertySelectFragment(int size, int k) {
+		return elementType.renderMapEntryPropertySelectFragment( size, k );
+	}
+
 	String renderCollectionSelectFragment(int size, int k) {
 		return elementType.renderCollectionSelectFragment( size, k );
 	}
@@ -293,12 +289,12 @@ public class FromElement extends HqlSqlWalkerNode implements DisplayableNode, Pa
 	}
 
 	@Override
-    public int hashCode() {
+	public int hashCode() {
 		return super.hashCode();
 	}
 
 	@Override
-    public boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		return super.equals( obj );
 	}
 
@@ -312,8 +308,9 @@ public class FromElement extends HqlSqlWalkerNode implements DisplayableNode, Pa
 	}
 
 	public void setIncludeSubclasses(boolean includeSubclasses) {
-		if ( !includeSubclasses && isDereferencedBySuperclassOrSubclassProperty() && LOG.isTraceEnabled() )
+		if ( !includeSubclasses && isDereferencedBySuperclassOrSubclassProperty() && LOG.isTraceEnabled() ) {
 			LOG.trace( "Attempt to disable subclass-inclusions : ", new Exception( "Stack-trace source" ) );
+		}
 		this.includeSubclasses = includeSubclasses;
 	}
 
@@ -403,7 +400,7 @@ public class FromElement extends HqlSqlWalkerNode implements DisplayableNode, Pa
 				ASTUtil.appendSibling( origin, this );
 			}
 			else {
-				if ( !getWalker().isInFrom() && !getWalker().isInSelect() ) {
+				if ( !getWalker().isInFrom() && !getWalker().isInSelect() && !getWalker().isInEntityGraph()) {
 					getFromClause().addChild( this );
 				}
 				else {
@@ -427,11 +424,19 @@ public class FromElement extends HqlSqlWalkerNode implements DisplayableNode, Pa
 	}
 
 	private void addDestination(FromElement fromElement) {
+		if ( destinations == null ) {
+			destinations = new LinkedList<FromElement>();
+		}
 		destinations.add( fromElement );
 	}
 
-	public List getDestinations() {
-		return destinations;
+	public List<FromElement> getDestinations() {
+		if ( destinations == null ) {
+			return Collections.emptyList();
+		}
+		else {
+			return destinations;
+		}
 	}
 
 	public FromElement getOrigin() {
@@ -510,6 +515,10 @@ public class FromElement extends HqlSqlWalkerNode implements DisplayableNode, Pa
 
 	public PropertyMapping getPropertyMapping(String propertyName) {
 		return elementType.getPropertyMapping( propertyName );
+	}
+
+	public CollectionPropertyReference getCollectionPropertyReference(String propertyName) {
+		return elementType.getCollectionPropertyReference( propertyName );
 	}
 
 	public void setFetch(boolean fetch) {

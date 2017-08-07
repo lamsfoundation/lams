@@ -33,37 +33,38 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.annotation.Immutable;
-import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.Args;
 
 /**
- * ResponseServer is responsible for adding <code>Server</code> header. This
+ * ResponseServer is responsible for adding {@code Server} header. This
  * interceptor is recommended for server side protocol processors.
- * <p>
- * The following parameters can be used to customize the behavior of this
- * class:
- * <ul>
- *  <li>{@link org.apache.http.params.CoreProtocolPNames#ORIGIN_SERVER}</li>
- * </ul>
  *
  * @since 4.0
  */
 @Immutable
 public class ResponseServer implements HttpResponseInterceptor {
 
-    public ResponseServer() {
+    private final String originServer;
+
+    /**
+     * @since 4.3
+     */
+    public ResponseServer(final String originServer) {
         super();
+        this.originServer = originServer;
     }
 
+    public ResponseServer() {
+        this(null);
+    }
+
+    @Override
     public void process(final HttpResponse response, final HttpContext context)
             throws HttpException, IOException {
-        if (response == null) {
-            throw new IllegalArgumentException("HTTP request may not be null");
-        }
+        Args.notNull(response, "HTTP response");
         if (!response.containsHeader(HTTP.SERVER_HEADER)) {
-            String s = (String) response.getParams().getParameter(
-                    CoreProtocolPNames.ORIGIN_SERVER);
-            if (s != null) {
-                response.addHeader(HTTP.SERVER_HEADER, s);
+            if (this.originServer != null) {
+                response.addHeader(HTTP.SERVER_HEADER, this.originServer);
             }
         }
     }

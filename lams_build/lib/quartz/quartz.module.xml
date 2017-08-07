@@ -22,7 +22,7 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.3" name="org.quartz">
+<module xmlns="urn:jboss:module:1.5" name="org.quartz">
   <resources>
     <resource-root path="quartz-2.2.1.jar"/>
   </resources>

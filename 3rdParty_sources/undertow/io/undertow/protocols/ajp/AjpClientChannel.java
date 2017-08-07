@@ -25,10 +25,12 @@ import static io.undertow.protocols.ajp.AjpConstants.FRAME_TYPE_SEND_HEADERS;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
 import org.xnio.ChannelListener;
 import org.xnio.IoUtils;
-import org.xnio.Pool;
-import org.xnio.Pooled;
+import org.xnio.OptionMap;
+import io.undertow.connector.ByteBufferPool;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.StreamConnection;
 
 import io.undertow.UndertowLogger;
@@ -47,7 +49,7 @@ import io.undertow.util.HttpString;
  */
 public class AjpClientChannel extends AbstractFramedChannel<AjpClientChannel, AbstractAjpClientStreamSourceChannel, AbstractAjpClientStreamSinkChannel> {
 
-    private final AbstractAjpParser ajpParser;
+    private final AjpResponseParser ajpParser;
 
     private AjpClientResponseStreamSourceChannel source;
     private AjpClientRequestClientStreamSinkChannel sink;
@@ -66,13 +68,13 @@ public class AjpClientChannel extends AbstractFramedChannel<AjpClientChannel, Ab
      *                               Be aware that it already must be "upgraded".
      * @param bufferPool             The {@link org.xnio.Pool} which will be used to acquire {@link java.nio.ByteBuffer}'s from.
      */
-    public AjpClientChannel(StreamConnection connectedStreamChannel, Pool<ByteBuffer> bufferPool) {
-        super(connectedStreamChannel, bufferPool, AjpClientFramePriority.INSTANCE, null);
+    public AjpClientChannel(StreamConnection connectedStreamChannel, ByteBufferPool bufferPool, OptionMap settings) {
+        super(connectedStreamChannel, bufferPool, AjpClientFramePriority.INSTANCE, null, settings);
         ajpParser = new AjpResponseParser();
     }
 
     @Override
-    protected AbstractAjpClientStreamSourceChannel createChannel(FrameHeaderData frameHeaderData, Pooled<ByteBuffer> frameData) throws IOException {
+    protected AbstractAjpClientStreamSourceChannel createChannel(FrameHeaderData frameHeaderData, PooledByteBuffer frameData) throws IOException {
         if (frameHeaderData instanceof SendHeadersResponse) {
             SendHeadersResponse h = (SendHeadersResponse) frameHeaderData;
             AjpClientResponseStreamSourceChannel sourceChannel = new AjpClientResponseStreamSourceChannel(this, h.headers, h.statusCode, h.reasonPhrase, frameData, (int) frameHeaderData.getFrameLength());
@@ -81,10 +83,10 @@ public class AjpClientChannel extends AbstractFramedChannel<AjpClientChannel, Ab
         } else if (frameHeaderData instanceof RequestBodyChunk) {
             RequestBodyChunk r = (RequestBodyChunk) frameHeaderData;
             this.sink.chunkRequested(r.getLength());
-            frameData.free();
+            frameData.close();
             return null;
         } else {
-            frameData.free();
+            frameData.close();
             throw new RuntimeException("TODO: unknown frame");
         }
 
@@ -95,7 +97,7 @@ public class AjpClientChannel extends AbstractFramedChannel<AjpClientChannel, Ab
         ajpParser.parse(data);
         if (ajpParser.isComplete()) {
             try {
-                AjpResponseParser parser = (AjpResponseParser) ajpParser;
+                AjpResponseParser parser = ajpParser;
                 if (parser.prefix == FRAME_TYPE_SEND_HEADERS) {
                     return new SendHeadersResponse(parser.statusCode, parser.reasonPhrase, parser.headers);
                 } else if (parser.prefix == FRAME_TYPE_REQUEST_BODY_CHUNK) {
@@ -165,6 +167,10 @@ public class AjpClientChannel extends AbstractFramedChannel<AjpClientChannel, Ab
     @Override
     protected void closeSubChannels() {
         IoUtils.safeClose(source, sink);
+    }
+
+    protected OptionMap getSettings() {
+        return super.getSettings();
     }
 
     void sinkDone() {

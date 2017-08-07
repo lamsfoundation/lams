@@ -35,7 +35,7 @@ public class FilterInfo implements Cloneable {
 
     private final Class<? extends Filter> filterClass;
     private final String name;
-    private final InstanceFactory<? extends Filter> instanceFactory;
+    private volatile InstanceFactory<? extends Filter> instanceFactory;
 
     private final Map<String, String> initParams = new HashMap<>();
     private volatile boolean asyncSupported;
@@ -101,6 +101,10 @@ public class FilterInfo implements Cloneable {
         return instanceFactory;
     }
 
+    public void setInstanceFactory(InstanceFactory<? extends Filter> instanceFactory) {
+        this.instanceFactory = instanceFactory;
+    }
+
     public FilterInfo addInitParam(final String name, final String value) {
         initParams.put(name, value);
         return this;
@@ -119,5 +123,11 @@ public class FilterInfo implements Cloneable {
         return this;
     }
 
-
+    @Override
+    public String toString() {
+        return "FilterInfo{" +
+                "filterClass=" + filterClass +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

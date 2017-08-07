@@ -1,20 +1,21 @@
 /*
  * ====================================================================
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  * ====================================================================
  *
  * This software consists of voluntary contributions made by many
@@ -23,16 +24,19 @@
  * <http://www.apache.org/>.
  *
  */
-
 package org.apache.http.client.utils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Locale;
 import java.util.Stack;
 
-import org.apache.http.annotation.Immutable;
-
 import org.apache.http.HttpHost;
+import org.apache.http.annotation.Immutable;
+import org.apache.http.conn.routing.RouteInfo;
+import org.apache.http.util.Args;
+import org.apache.http.util.TextUtils;
 
 /**
  * A collection of utilities for {@link URI URIs}, to workaround
@@ -75,11 +79,11 @@ public class URIUtils {
     public static URI createURI(
             final String scheme,
             final String host,
-            int port,
+            final int port,
             final String path,
             final String query,
             final String fragment) throws URISyntaxException {
-        StringBuilder buffer = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
         if (host != null) {
             if (scheme != null) {
                 buffer.append(scheme);
@@ -112,7 +116,7 @@ public class URIUtils {
      * A convenience method for creating a new {@link URI} whose scheme, host
      * and port are taken from the target host, but whose path, query and
      * fragment are taken from the existing URI. The fragment is only used if
-     * dropFragment is false.
+     * dropFragment is false. The path is set to "/" if not explicitly specified.
      *
      * @param uri
      *            Contains the path, query and fragment to use.
@@ -127,11 +131,12 @@ public class URIUtils {
     public static URI rewriteURI(
             final URI uri,
             final HttpHost target,
-            boolean dropFragment) throws URISyntaxException {
-        if (uri == null) {
-            throw new IllegalArgumentException("URI may not be null");
+            final boolean dropFragment) throws URISyntaxException {
+        Args.notNull(uri, "URI");
+        if (uri.isOpaque()) {
+            return uri;
         }
-        URIBuilder uribuilder = new URIBuilder(uri);
+        final URIBuilder uribuilder = new URIBuilder(uri);
         if (target != null) {
             uribuilder.setScheme(target.getSchemeName());
             uribuilder.setHost(target.getHostName());
@@ -143,6 +148,9 @@ public class URIUtils {
         }
         if (dropFragment) {
             uribuilder.setFragment(null);
+        }
+        if (TextUtils.isEmpty(uribuilder.getPath())) {
+            uribuilder.setPath("/");
         }
         return uribuilder.build();
     }
@@ -161,7 +169,8 @@ public class URIUtils {
     /**
      * A convenience method that creates a new {@link URI} whose scheme, host, port, path,
      * query are taken from the existing URI, dropping any fragment or user-information.
-     * The existing URI is returned unmodified if it has no fragment or user-information.
+     * The path is set to "/" if not explicitly specified. The existing URI is returned
+     * unmodified if it has no fragment or user-information and has a path.
      *
      * @param uri
      *            original URI.
@@ -169,118 +178,156 @@ public class URIUtils {
      *             If the resulting URI is invalid.
      */
     public static URI rewriteURI(final URI uri) throws URISyntaxException {
-        if (uri == null) {
-            throw new IllegalArgumentException("URI may not be null");
-        }
-        if (uri.getFragment() != null || uri.getUserInfo() != null) {
-            return new URIBuilder(uri).setFragment(null).setUserInfo(null).build();
-        } else {
+        Args.notNull(uri, "URI");
+        if (uri.isOpaque()) {
             return uri;
+        }
+        final URIBuilder uribuilder = new URIBuilder(uri);
+        if (uribuilder.getUserInfo() != null) {
+            uribuilder.setUserInfo(null);
+        }
+        if (TextUtils.isEmpty(uribuilder.getPath())) {
+            uribuilder.setPath("/");
+        }
+        if (uribuilder.getHost() != null) {
+            uribuilder.setHost(uribuilder.getHost().toLowerCase(Locale.ROOT));
+        }
+        uribuilder.setFragment(null);
+        return uribuilder.build();
+    }
+
+    /**
+     * A convenience method that optionally converts the original {@link java.net.URI} either
+     * to a relative or an absolute form as required by the specified route.
+     *
+     * @param uri
+     *            original URI.
+     * @throws URISyntaxException
+     *             If the resulting URI is invalid.
+     *
+     * @since 4.4
+     */
+    public static URI rewriteURIForRoute(final URI uri, final RouteInfo route) throws URISyntaxException {
+        if (uri == null) {
+            return null;
+        }
+        if (route.getProxyHost() != null && !route.isTunnelled()) {
+            // Make sure the request URI is absolute
+            if (!uri.isAbsolute()) {
+                final HttpHost target = route.getTargetHost();
+                return rewriteURI(uri, target, true);
+            } else {
+                return rewriteURI(uri);
+            }
+        } else {
+            // Make sure the request URI is relative
+            if (uri.isAbsolute()) {
+                return rewriteURI(uri, null, true);
+            } else {
+                return rewriteURI(uri);
+            }
         }
     }
 
     /**
      * Resolves a URI reference against a base URI. Work-around for bug in
-     * java.net.URI (<http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4708535>)
+     * java.net.URI (http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4708535)
      *
      * @param baseURI the base URI
      * @param reference the URI reference
      * @return the resulting URI
      */
     public static URI resolve(final URI baseURI, final String reference) {
-        return URIUtils.resolve(baseURI, URI.create(reference));
+        return resolve(baseURI, URI.create(reference));
     }
 
     /**
      * Resolves a URI reference against a base URI. Work-around for bugs in
-     * java.net.URI (e.g. <http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4708535>)
+     * java.net.URI (e.g. http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4708535)
      *
      * @param baseURI the base URI
      * @param reference the URI reference
      * @return the resulting URI
      */
-    public static URI resolve(final URI baseURI, URI reference){
-        if (baseURI == null) {
-            throw new IllegalArgumentException("Base URI may nor be null");
-        }
-        if (reference == null) {
-            throw new IllegalArgumentException("Reference URI may nor be null");
-        }
-        String s = reference.toString();
+    public static URI resolve(final URI baseURI, final URI reference){
+        Args.notNull(baseURI, "Base URI");
+        Args.notNull(reference, "Reference URI");
+        final String s = reference.toASCIIString();
         if (s.startsWith("?")) {
-            return resolveReferenceStartingWithQueryString(baseURI, reference);
+            String baseUri = baseURI.toASCIIString();
+            final int i = baseUri.indexOf('?');
+            baseUri = i > -1 ? baseUri.substring(0, i) : baseUri;
+            return URI.create(baseUri + s);
         }
-        boolean emptyReference = s.length() == 0;
+        final boolean emptyReference = s.isEmpty();
+        URI resolved;
         if (emptyReference) {
-            reference = URI.create("#");
+            resolved = baseURI.resolve(URI.create("#"));
+            final String resolvedString = resolved.toASCIIString();
+            resolved = URI.create(resolvedString.substring(0, resolvedString.indexOf('#')));
+        } else {
+            resolved = baseURI.resolve(reference);
         }
-        URI resolved = baseURI.resolve(reference);
-        if (emptyReference) {
-            String resolvedString = resolved.toString();
-            resolved = URI.create(resolvedString.substring(0,
-                resolvedString.indexOf('#')));
+        try {
+            return normalizeSyntax(resolved);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
         }
-        return removeDotSegments(resolved);
     }
 
     /**
-     * Resolves a reference starting with a query string.
-     *
-     * @param baseURI the base URI
-     * @param reference the URI reference starting with a query string
-     * @return the resulting URI
-     */
-    private static URI resolveReferenceStartingWithQueryString(
-            final URI baseURI, final URI reference) {
-        String baseUri = baseURI.toString();
-        baseUri = baseUri.indexOf('?') > -1 ?
-            baseUri.substring(0, baseUri.indexOf('?')) : baseUri;
-        return URI.create(baseUri + reference.toString());
-    }
-
-    /**
-     * Removes dot segments according to RFC 3986, section 5.2.4
+     * Removes dot segments according to RFC 3986, section 5.2.4 and
+     * Syntax-Based Normalization according to RFC 3986, section 6.2.2.
      *
      * @param uri the original URI
      * @return the URI without dot segments
      */
-    private static URI removeDotSegments(URI uri) {
-        String path = uri.getPath();
-        if ((path == null) || (path.indexOf("/.") == -1)) {
-            // No dot segments to remove
+    static URI normalizeSyntax(final URI uri) throws URISyntaxException {
+        if (uri.isOpaque() || uri.getAuthority() == null) {
+            // opaque and file: URIs
             return uri;
         }
-        String[] inputSegments = path.split("/");
-        Stack<String> outputSegments = new Stack<String>();
-        for (int i = 0; i < inputSegments.length; i++) {
-            if ((inputSegments[i].length() == 0)
-                || (".".equals(inputSegments[i]))) {
-                // Do nothing
-            } else if ("..".equals(inputSegments[i])) {
-                if (!outputSegments.isEmpty()) {
-                    outputSegments.pop();
+        Args.check(uri.isAbsolute(), "Base URI must be absolute");
+        final URIBuilder builder = new URIBuilder(uri);
+        final String path = builder.getPath();
+        if (path != null && !path.equals("/")) {
+            final String[] inputSegments = path.split("/");
+            final Stack<String> outputSegments = new Stack<String>();
+            for (final String inputSegment : inputSegments) {
+                if ((inputSegment.isEmpty()) || (".".equals(inputSegment))) {
+                    // Do nothing
+                } else if ("..".equals(inputSegment)) {
+                    if (!outputSegments.isEmpty()) {
+                        outputSegments.pop();
+                    }
+                } else {
+                    outputSegments.push(inputSegment);
                 }
-            } else {
-                outputSegments.push(inputSegments[i]);
             }
+            final StringBuilder outputBuffer = new StringBuilder();
+            for (final String outputSegment : outputSegments) {
+                outputBuffer.append('/').append(outputSegment);
+            }
+            if (path.lastIndexOf('/') == path.length() - 1) {
+                // path.endsWith("/") || path.equals("")
+                outputBuffer.append('/');
+            }
+            builder.setPath(outputBuffer.toString());
         }
-        StringBuilder outputBuffer = new StringBuilder();
-        for (String outputSegment : outputSegments) {
-            outputBuffer.append('/').append(outputSegment);
+        if (builder.getScheme() != null) {
+            builder.setScheme(builder.getScheme().toLowerCase(Locale.ROOT));
         }
-        try {
-            return new URI(uri.getScheme(), uri.getAuthority(),
-                outputBuffer.toString(), uri.getQuery(), uri.getFragment());
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
+        if (builder.getHost() != null) {
+            builder.setHost(builder.getHost().toLowerCase(Locale.ROOT));
         }
+        return builder.build();
     }
 
     /**
      * Extracts target host from the given {@link URI}.
      *
      * @param uri
-     * @return the target host if the URI is absolute or <code>null</null> if the URI is
+     * @return the target host if the URI is absolute or {@code null} if the URI is
      * relative or does not contain a valid host name.
      *
      * @since 4.1
@@ -298,7 +345,7 @@ public class URIUtils {
                 host = uri.getAuthority();
                 if (host != null) {
                     // Strip off any leading user credentials
-                    int at = host.indexOf('@');
+                    final int at = host.indexOf('@');
                     if (at >= 0) {
                         if (host.length() > at+1 ) {
                             host = host.substring(at+1);
@@ -308,9 +355,9 @@ public class URIUtils {
                     }
                     // Extract the port suffix, if present
                     if (host != null) {
-                        int colon = host.indexOf(':');
+                        final int colon = host.indexOf(':');
                         if (colon >= 0) {
-                            int pos = colon + 1;
+                            final int pos = colon + 1;
                             int len = 0;
                             for (int i = pos; i < host.length(); i++) {
                                 if (Character.isDigit(host.charAt(i))) {
@@ -322,7 +369,7 @@ public class URIUtils {
                             if (len > 0) {
                                 try {
                                     port = Integer.parseInt(host.substring(pos, pos + len));
-                                } catch (NumberFormatException ex) {
+                                } catch (final NumberFormatException ex) {
                                 }
                             }
                             host = host.substring(0, colon);
@@ -330,12 +377,61 @@ public class URIUtils {
                     }
                 }
             }
-            String scheme = uri.getScheme();
-            if (host != null) {
-                target = new HttpHost(host, port, scheme);
+            final String scheme = uri.getScheme();
+            if (!TextUtils.isBlank(host)) {
+                try {
+                    target = new HttpHost(host, port, scheme);
+                } catch (IllegalArgumentException ignore) {
+                }
             }
         }
         return target;
+    }
+
+    /**
+     * Derives the interpreted (absolute) URI that was used to generate the last
+     * request. This is done by extracting the request-uri and target origin for
+     * the last request and scanning all the redirect locations for the last
+     * fragment identifier, then combining the result into a {@link URI}.
+     *
+     * @param originalURI
+     *            original request before any redirects
+     * @param target
+     *            if the last URI is relative, it is resolved against this target,
+     *            or {@code null} if not available.
+     * @param redirects
+     *            collection of redirect locations since the original request
+     *            or {@code null} if not available.
+     * @return interpreted (absolute) URI
+     */
+    public static URI resolve(
+            final URI originalURI,
+            final HttpHost target,
+            final List<URI> redirects) throws URISyntaxException {
+        Args.notNull(originalURI, "Request URI");
+        final URIBuilder uribuilder;
+        if (redirects == null || redirects.isEmpty()) {
+            uribuilder = new URIBuilder(originalURI);
+        } else {
+            uribuilder = new URIBuilder(redirects.get(redirects.size() - 1));
+            String frag = uribuilder.getFragment();
+            // read interpreted fragment identifier from redirect locations
+            for (int i = redirects.size() - 1; frag == null && i >= 0; i--) {
+                frag = redirects.get(i).getFragment();
+            }
+            uribuilder.setFragment(frag);
+        }
+        // read interpreted fragment identifier from original request
+        if (uribuilder.getFragment() == null) {
+            uribuilder.setFragment(originalURI.getFragment());
+        }
+        // last target origin
+        if (target != null && !uribuilder.isAbsolute()) {
+            uribuilder.setScheme(target.getSchemeName());
+            uribuilder.setHost(target.getHostName());
+            uribuilder.setPort(target.getPort());
+        }
+        return uribuilder.build();
     }
 
     /**

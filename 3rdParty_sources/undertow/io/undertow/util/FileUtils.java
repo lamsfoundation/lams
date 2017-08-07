@@ -19,16 +19,14 @@
 package io.undertow.util;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  * @author Stuart Douglas
@@ -52,104 +50,45 @@ public class FileUtils {
         }
     }
 
-    public static String readFile(final File file) {
-        try {
-            return readFile(new FileInputStream(file));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static String readFile(InputStream file) {
-        BufferedInputStream stream = null;
-        try {
-            stream = new BufferedInputStream(file);
+        try (BufferedInputStream stream = new BufferedInputStream(file)) {
             byte[] buff = new byte[1024];
             StringBuilder builder = new StringBuilder();
-            int read = -1;
+            int read;
             while ((read = stream.read(buff)) != -1) {
                 builder.append(new String(buff, 0, read));
             }
             return builder.toString();
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            if (stream != null) {
+        }
+    }
+
+    public static void deleteRecursive(final Path directory) throws IOException {
+        if(!Files.isDirectory(directory)) {
+            return;
+        }
+        Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 try {
-                    stream.close();
+                    Files.delete(file);
                 } catch (IOException e) {
-                    //ignore
+                    // ignored
                 }
+                return FileVisitResult.CONTINUE;
             }
-        }
-    }
 
-
-    public static File getFileOrCheckParentsIfNotFound(String baseStr, String path) throws FileNotFoundException {
-        //File f = new File( System.getProperty("jbossas.project.dir", "../../..") );
-        File base = new File(baseStr);
-        if (!base.exists()) {
-            throw new FileNotFoundException("Base path not found: " + base.getPath());
-        }
-        base = base.getAbsoluteFile();
-
-        File f = new File(base, path);
-        if (f.exists())
-            return f;
-
-        File fLast = f;
-        while (!f.exists()) {
-            int slash = path.lastIndexOf(File.separatorChar);
-            if (slash <= 0)  // no slash or "/xxx"
-                throw new FileNotFoundException("Path not found: " + f.getPath());
-            path = path.substring(0, slash);
-            fLast = f;
-            f = new File(base, path);
-        }
-        // When first existing is found, report the last non-existent.
-        throw new FileNotFoundException("Path not found: " + fLast.getPath());
-    }
-
-
-    public static void copyFile(final File src, final File dest) throws IOException {
-        final InputStream in = new BufferedInputStream(new FileInputStream(src));
-        try {
-            copyFile(in, dest);
-        } finally {
-            close(in);
-        }
-    }
-
-    public static void copyFile(final InputStream in, final File dest) throws IOException {
-        dest.getParentFile().mkdirs();
-        final OutputStream out = new BufferedOutputStream(new FileOutputStream(dest));
-        try {
-            int i = in.read();
-            while (i != -1) {
-                out.write(i);
-                i = in.read();
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                try {
+                    Files.delete(dir);
+                } catch (IOException e) {
+                    // ignored
+                }
+                return FileVisitResult.CONTINUE;
             }
-        } finally {
-            close(out);
-        }
+
+        });
     }
-
-
-    public static void close(Closeable closeable) {
-        try {
-            closeable.close();
-        } catch (IOException ignore) {
-        }
-    }
-
-    public static void deleteRecursive(final File file) {
-        File[] files = file.listFiles();
-        if (files != null) {
-            for (File f : files) {
-                deleteRecursive(f);
-            }
-        }
-        file.delete();
-    }
-
 }

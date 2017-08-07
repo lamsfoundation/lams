@@ -18,8 +18,11 @@
 
 package io.undertow.servlet.handlers.security;
 
+import static io.undertow.util.StatusCodes.OK;
+
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.AuthenticationMechanismFactory;
+import io.undertow.security.idm.IdentityManager;
 import io.undertow.security.impl.FormAuthenticationMechanism;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormParserFactory;
@@ -35,6 +38,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.Map;
@@ -49,24 +54,39 @@ public class ServletFormAuthenticationMechanism extends FormAuthenticationMechan
 
     private static final String SESSION_KEY = "io.undertow.servlet.form.auth.redirect.location";
 
-    public static final Factory FACTORY = new Factory();
+    public static final String SAVE_ORIGINAL_REQUEST = "save-original-request";
+
+    private final boolean saveOriginalRequest;
 
     @Deprecated
     public ServletFormAuthenticationMechanism(final String name, final String loginPage, final String errorPage) {
         super(name, loginPage, errorPage);
+        this.saveOriginalRequest = true;
     }
 
     @Deprecated
     public ServletFormAuthenticationMechanism(final String name, final String loginPage, final String errorPage, final String postLocation) {
         super(name, loginPage, errorPage, postLocation);
+        this.saveOriginalRequest = true;
     }
 
     public ServletFormAuthenticationMechanism(FormParserFactory formParserFactory, String name, String loginPage, String errorPage, String postLocation) {
         super(formParserFactory, name, loginPage, errorPage, postLocation);
+        this.saveOriginalRequest = true;
     }
 
     public ServletFormAuthenticationMechanism(FormParserFactory formParserFactory, String name, String loginPage, String errorPage) {
         super(formParserFactory, name, loginPage, errorPage);
+        this.saveOriginalRequest = true;
+    }
+
+    public ServletFormAuthenticationMechanism(FormParserFactory formParserFactory, String name, String loginPage, String errorPage, IdentityManager identityManager) {
+        super(formParserFactory, name, loginPage, errorPage, identityManager);
+        this.saveOriginalRequest = true;
+    }
+    public ServletFormAuthenticationMechanism(FormParserFactory formParserFactory, String name, String loginPage, String errorPage, IdentityManager identityManager, boolean saveOriginalRequest) {
+        super(formParserFactory, name, loginPage, errorPage, identityManager);
+        this.saveOriginalRequest = saveOriginalRequest;
     }
 
     @Override
@@ -80,19 +100,25 @@ public class ServletFormAuthenticationMechanism extends FormAuthenticationMechan
         exchange.getResponseHeaders().add(Headers.PRAGMA, "no-cache");
         exchange.getResponseHeaders().add(Headers.EXPIRES, "0");
 
+        final FormResponseWrapper respWrapper = exchange.getStatusCode() != OK && resp instanceof HttpServletResponse
+                ? new FormResponseWrapper((HttpServletResponse) resp) : null;
 
         try {
-            disp.forward(req, resp);
+            disp.forward(req, respWrapper != null ? respWrapper : resp);
         } catch (ServletException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return null;
+
+        return respWrapper != null ? respWrapper.getStatus() : null;
     }
 
     @Override
     protected void storeInitialLocation(final HttpServerExchange exchange) {
+        if(!saveOriginalRequest) {
+            return;
+        }
         final ServletRequestContext servletRequestContext = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
         HttpSessionImpl httpSession = servletRequestContext.getCurrentServletContext().getSession(exchange, true);
         Session session;
@@ -129,10 +155,46 @@ public class ServletFormAuthenticationMechanism extends FormAuthenticationMechan
 
     }
 
+    private static class FormResponseWrapper extends HttpServletResponseWrapper {
+
+        private int status = OK;
+
+        private FormResponseWrapper(final HttpServletResponse wrapped) {
+            super(wrapped);
+        }
+
+        @Override
+        public void setStatus(int sc, String sm) {
+            status = sc;
+        }
+
+        @Override
+        public void setStatus(int sc) {
+            status = sc;
+        }
+
+        @Override
+        public int getStatus() {
+            return status;
+        }
+
+    }
+
     public static class Factory implements AuthenticationMechanismFactory {
+
+        private final IdentityManager identityManager;
+
+        public Factory(IdentityManager identityManager) {
+            this.identityManager = identityManager;
+        }
+
         @Override
         public AuthenticationMechanism create(String mechanismName, FormParserFactory formParserFactory, Map<String, String> properties) {
-            return new ServletFormAuthenticationMechanism(formParserFactory, mechanismName, properties.get(LOGIN_PAGE), properties.get(ERROR_PAGE));
+            boolean saveOriginal = true;
+            if(properties.containsKey(SAVE_ORIGINAL_REQUEST)) {
+                saveOriginal = Boolean.parseBoolean(properties.get(SAVE_ORIGINAL_REQUEST));
+            }
+            return new ServletFormAuthenticationMechanism(formParserFactory, mechanismName, properties.get(LOGIN_PAGE), properties.get(ERROR_PAGE), identityManager, saveOriginal);
         }
     }
 }

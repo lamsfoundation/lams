@@ -26,6 +26,7 @@ import io.undertow.client.ClientExchange;
 import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
 import io.undertow.client.ContinueNotification;
+import io.undertow.client.PushCallback;
 import io.undertow.util.AbstractAttachable;
 import io.undertow.util.Headers;
 import org.xnio.channels.StreamSinkChannel;
@@ -56,7 +57,7 @@ class HttpClientExchange extends AbstractAttachable implements ClientExchange {
     private static final int REQUEST_TERMINATED = 1;
     private static final int RESPONSE_TERMINATED = 1 << 1;
 
-    public HttpClientExchange(ClientCallback<ClientExchange> readyCallback, ClientRequest request, HttpClientConnection clientConnection) {
+    HttpClientExchange(ClientCallback<ClientExchange> readyCallback, ClientRequest request, HttpClientConnection clientConnection) {
         this.readyCallback = readyCallback;
         this.request = request;
         this.clientConnection = clientConnection;
@@ -72,16 +73,27 @@ class HttpClientExchange extends AbstractAttachable implements ClientExchange {
     }
 
     void terminateRequest() {
+        if(anyAreSet(state, REQUEST_TERMINATED)) {
+            return;
+        }
         state |= REQUEST_TERMINATED;
+        clientConnection.requestDataSent();
         if (anyAreSet(state, RESPONSE_TERMINATED)) {
-            clientConnection.requestDone();
+            clientConnection.exchangeDone();
         }
     }
 
+    boolean isRequestDataSent() {
+        return anyAreSet(state, REQUEST_TERMINATED);
+    }
+
     void terminateResponse() {
+        if(anyAreSet(state, RESPONSE_TERMINATED)) {
+            return;
+        }
         state |= RESPONSE_TERMINATED;
         if (anyAreSet(state, REQUEST_TERMINATED)) {
-            clientConnection.requestDone();
+            clientConnection.exchangeDone();
         }
     }
 
@@ -119,6 +131,11 @@ class HttpClientExchange extends AbstractAttachable implements ClientExchange {
     @Override
     public void setContinueHandler(ContinueNotification continueHandler) {
         this.continueNotification = continueHandler;
+    }
+
+    @Override
+    public void setPushHandler(PushCallback pushCallback) {
+
     }
 
     void setFailed(IOException e) {
@@ -173,9 +190,13 @@ class HttpClientExchange extends AbstractAttachable implements ClientExchange {
         return clientConnection;
     }
 
-    void invokeReadReadyCallback(final ClientExchange result) {
+    ClientCallback<ClientExchange> getResponseCallback() {
+        return responseCallback;
+    }
+
+    void invokeReadReadyCallback() {
         if(readyCallback != null) {
-            readyCallback.completed(result);
+            readyCallback.completed(this);
             readyCallback = null;
         }
     }

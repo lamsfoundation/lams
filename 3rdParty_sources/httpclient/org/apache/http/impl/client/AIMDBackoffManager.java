@@ -1,20 +1,21 @@
 /*
  * ====================================================================
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  * ====================================================================
  *
  * This software consists of voluntary contributions made by many
@@ -31,9 +32,10 @@ import java.util.Map;
 import org.apache.http.client.BackoffManager;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.pool.ConnPoolControl;
+import org.apache.http.util.Args;
 
 /**
- * <p>The <code>AIMDBackoffManager</code> applies an additive increase,
+ * <p>The {@code AIMDBackoffManager} applies an additive increase,
  * multiplicative decrease (AIMD) to managing a dynamic limit to
  * the number of connections allowed to a given host. You may want
  * to experiment with the settings for the cooldown periods and the
@@ -63,72 +65,79 @@ public class AIMDBackoffManager implements BackoffManager {
     private int cap = 2; // Per RFC 2616 sec 8.1.4
 
     /**
-     * Creates an <code>AIMDBackoffManager</code> to manage
+     * Creates an {@code AIMDBackoffManager} to manage
      * per-host connection pool sizes represented by the
      * given {@link ConnPoolControl}.
      * @param connPerRoute per-host routing maximums to
      *   be managed
      */
-    public AIMDBackoffManager(ConnPoolControl<HttpRoute> connPerRoute) {
+    public AIMDBackoffManager(final ConnPoolControl<HttpRoute> connPerRoute) {
         this(connPerRoute, new SystemClock());
     }
 
-    AIMDBackoffManager(ConnPoolControl<HttpRoute> connPerRoute, Clock clock) {
+    AIMDBackoffManager(final ConnPoolControl<HttpRoute> connPerRoute, final Clock clock) {
         this.clock = clock;
         this.connPerRoute = connPerRoute;
         this.lastRouteProbes = new HashMap<HttpRoute,Long>();
         this.lastRouteBackoffs = new HashMap<HttpRoute,Long>();
     }
 
-    public void backOff(HttpRoute route) {
+    @Override
+    public void backOff(final HttpRoute route) {
         synchronized(connPerRoute) {
-            int curr = connPerRoute.getMaxPerRoute(route);
-            Long lastUpdate = getLastUpdate(lastRouteBackoffs, route);
-            long now = clock.getCurrentTime();
-            if (now - lastUpdate.longValue() < coolDown) return;
+            final int curr = connPerRoute.getMaxPerRoute(route);
+            final Long lastUpdate = getLastUpdate(lastRouteBackoffs, route);
+            final long now = clock.getCurrentTime();
+            if (now - lastUpdate.longValue() < coolDown) {
+                return;
+            }
             connPerRoute.setMaxPerRoute(route, getBackedOffPoolSize(curr));
             lastRouteBackoffs.put(route, Long.valueOf(now));
         }
     }
 
-    private int getBackedOffPoolSize(int curr) {
-        if (curr <= 1) return 1;
+    private int getBackedOffPoolSize(final int curr) {
+        if (curr <= 1) {
+            return 1;
+        }
         return (int)(Math.floor(backoffFactor * curr));
     }
 
-    public void probe(HttpRoute route) {
+    @Override
+    public void probe(final HttpRoute route) {
         synchronized(connPerRoute) {
-            int curr = connPerRoute.getMaxPerRoute(route);
-            int max = (curr >= cap) ? cap : curr + 1;
-            Long lastProbe = getLastUpdate(lastRouteProbes, route);
-            Long lastBackoff = getLastUpdate(lastRouteBackoffs, route);
-            long now = clock.getCurrentTime();
-            if (now - lastProbe.longValue() < coolDown || now - lastBackoff.longValue() < coolDown)
+            final int curr = connPerRoute.getMaxPerRoute(route);
+            final int max = (curr >= cap) ? cap : curr + 1;
+            final Long lastProbe = getLastUpdate(lastRouteProbes, route);
+            final Long lastBackoff = getLastUpdate(lastRouteBackoffs, route);
+            final long now = clock.getCurrentTime();
+            if (now - lastProbe.longValue() < coolDown || now - lastBackoff.longValue() < coolDown) {
                 return;
+            }
             connPerRoute.setMaxPerRoute(route, max);
             lastRouteProbes.put(route, Long.valueOf(now));
         }
     }
 
-    private Long getLastUpdate(Map<HttpRoute,Long> updates, HttpRoute route) {
+    private Long getLastUpdate(final Map<HttpRoute,Long> updates, final HttpRoute route) {
         Long lastUpdate = updates.get(route);
-        if (lastUpdate == null) lastUpdate = Long.valueOf(0L);
+        if (lastUpdate == null) {
+            lastUpdate = Long.valueOf(0L);
+        }
         return lastUpdate;
     }
 
     /**
      * Sets the factor to use when backing off; the new
      * per-host limit will be roughly the current max times
-     * this factor. <code>Math.floor</code> is applied in the
+     * this factor. {@code Math.floor} is applied in the
      * case of non-integer outcomes to ensure we actually
      * decrease the pool size. Pool sizes are never decreased
      * below 1, however. Defaults to 0.5.
      * @param d must be between 0.0 and 1.0, exclusive.
      */
-    public void setBackoffFactor(double d) {
-        if (d <= 0.0 || d >= 1.0) {
-            throw new IllegalArgumentException("backoffFactor must be 0.0 < f < 1.0");
-        }
+    public void setBackoffFactor(final double d) {
+        Args.check(d > 0.0 && d < 1.0, "Backoff factor must be 0.0 < f < 1.0");
         backoffFactor = d;
     }
 
@@ -139,22 +148,18 @@ public class AIMDBackoffManager implements BackoffManager {
      * to 5000L (5 seconds).
      * @param l must be positive
      */
-    public void setCooldownMillis(long l) {
-        if (coolDown <= 0) {
-            throw new IllegalArgumentException("cooldownMillis must be positive");
-        }
+    public void setCooldownMillis(final long l) {
+        Args.positive(coolDown, "Cool down");
         coolDown = l;
     }
 
     /**
      * Sets the absolute maximum per-host connection pool size to
      * probe up to; defaults to 2 (the default per-host max).
-     * @param cap must be >= 1
+     * @param cap must be &gt;= 1
      */
-    public void setPerHostConnectionCap(int cap) {
-        if (cap < 1) {
-            throw new IllegalArgumentException("perHostConnectionCap must be >= 1");
-        }
+    public void setPerHostConnectionCap(final int cap) {
+        Args.positive(cap, "Per host connection cap");
         this.cap = cap;
     }
 

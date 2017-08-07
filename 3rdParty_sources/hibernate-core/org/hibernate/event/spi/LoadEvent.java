@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.event.spi;
 
@@ -62,6 +45,7 @@ public class LoadEvent extends AbstractEvent {
 	private LockOptions lockOptions;
 	private boolean isAssociationFetch;
 	private Object result;
+	private PostLoadEvent postLoadEvent;
 
 	public LoadEvent(Serializable entityId, Object instanceToLoad, EventSource source) {
 		this( entityId, null, instanceToLoad, DEFAULT_LOCK_OPTIONS, false, source );
@@ -121,6 +105,7 @@ public class LoadEvent extends AbstractEvent {
 		this.instanceToLoad = instanceToLoad;
 		this.lockOptions = lockOptions;
 		this.isAssociationFetch = isAssociationFetch;
+		this.postLoadEvent = new PostLoadEvent( source );
 	}
 
 	public Serializable getEntityId() {
@@ -196,5 +181,13 @@ public class LoadEvent extends AbstractEvent {
 
 	public void setResult(Object result) {
 		this.result = result;
+	}
+
+	public PostLoadEvent getPostLoadEvent() {
+		return postLoadEvent;
+	}
+
+	public void setPostLoadEvent(PostLoadEvent postLoadEvent) {
+		this.postLoadEvent = postLoadEvent;
 	}
 }

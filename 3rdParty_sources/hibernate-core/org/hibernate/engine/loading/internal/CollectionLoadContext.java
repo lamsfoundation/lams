@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.loading.internal;
 
@@ -34,7 +17,7 @@ import java.util.Set;
 import org.hibernate.CacheMode;
 import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
-import org.hibernate.cache.spi.CacheKey;
+import org.hibernate.cache.spi.access.CollectionRegionAccessStrategy;
 import org.hibernate.cache.spi.entry.CollectionCacheEntry;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.CollectionEntry;
@@ -304,14 +287,12 @@ public class CollectionLoadContext {
 			LOG.debugf( "Caching collection: %s", MessageHelper.collectionInfoString( persister, lce.getCollection(), lce.getKey(), session ) );
 		}
 
-		if ( !session.getEnabledFilters().isEmpty() && persister.isAffectedByEnabledFilters( session ) ) {
+		if ( !session.getLoadQueryInfluencers().getEnabledFilters().isEmpty() && persister.isAffectedByEnabledFilters( session ) ) {
 			// some filters affecting the collection are enabled on the session, so do not do the put into the cache.
 			if ( debugEnabled ) {
 				LOG.debug( "Refusing to add to cache due to enabled filters" );
 			}
-			// todo : add the notion of enabled filters to the CacheKey to differentiate filtered collections from non-filtered;
-			//      but CacheKey is currently used for both collections and entities; would ideally need to define two seperate ones;
-			//      currently this works in conjuction with the check on
+			// todo : add the notion of enabled filters to the cache key to differentiate filtered collections from non-filtered;
 			//      DefaultInitializeCollectionEventHandler.initializeCollectionFromCache() (which makes sure to not read from
 			//      cache with enabled filters).
 			// EARLY EXIT!!!!!
@@ -349,7 +330,13 @@ public class CollectionLoadContext {
 		}
 
 		final CollectionCacheEntry entry = new CollectionCacheEntry( lce.getCollection(), persister );
-		final CacheKey cacheKey = session.generateCacheKey( lce.getKey(), persister.getKeyType(), persister.getRole() );
+		final CollectionRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+		final Object cacheKey = cache.generateCacheKey(
+				lce.getKey(),
+				persister,
+				session.getFactory(),
+				session.getTenantIdentifier()
+		);
 
 		boolean isPutFromLoad = true;
 		if ( persister.getElementType().isAssociationType() ) {
@@ -366,7 +353,8 @@ public class CollectionLoadContext {
 		if (isPutFromLoad) {
 			try {
 				session.getEventListenerManager().cachePutStart();
-				final boolean put = persister.getCacheAccessStrategy().putFromLoad(
+				final boolean put = cache.putFromLoad(
+						session,
 						cacheKey,
 						persister.getCacheEntryStructure().structure( entry ),
 						session.getTimestamp(),

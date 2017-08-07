@@ -19,6 +19,7 @@
 package io.undertow.server.protocol.ajp;
 
 import io.undertow.UndertowMessages;
+import io.undertow.UndertowOptions;
 import io.undertow.conduits.AbstractFramedStreamSinkConduit;
 import io.undertow.conduits.ConduitListener;
 import io.undertow.server.Connectors;
@@ -30,8 +31,8 @@ import io.undertow.util.StatusCodes;
 import org.jboss.logging.Logger;
 import org.xnio.Buffers;
 import org.xnio.IoUtils;
-import org.xnio.Pool;
-import org.xnio.Pooled;
+import io.undertow.connector.ByteBufferPool;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.channels.StreamSourceChannel;
 import org.xnio.conduits.ConduitWritableByteChannel;
 import org.xnio.conduits.StreamSinkConduit;
@@ -59,9 +60,11 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
 
     private static final Logger log = Logger.getLogger("io.undertow.server.channel.ajp.response");
 
-    private static final int MAX_DATA_SIZE = 8184;
+    private static final int DEFAULT_MAX_DATA_SIZE = 8192;
 
     private static final Map<HttpString, Integer> HEADER_MAP;
+
+    private static final ByteBuffer FLUSH_PACKET = ByteBuffer.allocateDirect(8);
 
     static {
         final Map<HttpString, Integer> headers = new HashMap<>();
@@ -77,6 +80,16 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
         headers.put(Headers.STATUS, 0xA00A);
         headers.put(Headers.WWW_AUTHENTICATE, 0xA00B);
         HEADER_MAP = Collections.unmodifiableMap(headers);
+
+        FLUSH_PACKET.put((byte) 'A');
+        FLUSH_PACKET.put((byte) 'B');
+        FLUSH_PACKET.put((byte) 0);
+        FLUSH_PACKET.put((byte) 4);
+        FLUSH_PACKET.put((byte) 3);
+        FLUSH_PACKET.put((byte) 0);
+        FLUSH_PACKET.put((byte) 0);
+        FLUSH_PACKET.put((byte) 0);
+        FLUSH_PACKET.flip();
     }
 
     private static final int FLAG_START = 1; //indicates that the header has not been generated yet.
@@ -84,6 +97,7 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
     private static final int FLAG_WRITE_READ_BODY_CHUNK_FROM_LISTENER = 1 << 3;
     private static final int FLAG_WRITE_SHUTDOWN = 1 << 4;
     private static final int FLAG_READS_DONE = 1 << 5;
+    private static final int FLAG_FLUSH_QUEUED = 1 << 6;
 
     private static final ByteBuffer CLOSE_FRAME_PERSISTENT;
     private static final ByteBuffer CLOSE_FRAME_NON_PERSISTENT;
@@ -106,7 +120,7 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
     }
 
 
-    private final Pool<ByteBuffer> pool;
+    private final ByteBufferPool pool;
 
     /**
      * State flags
@@ -119,7 +133,7 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
 
     private final boolean headRequest;
 
-    AjpServerResponseConduit(final StreamSinkConduit next, final Pool<ByteBuffer> pool, final HttpServerExchange exchange, ConduitListener<? super AjpServerResponseConduit> finishListener, boolean headRequest) {
+    AjpServerResponseConduit(final StreamSinkConduit next, final ByteBufferPool pool, final HttpServerExchange exchange, ConduitListener<? super AjpServerResponseConduit> finishListener, boolean headRequest) {
         super(next);
         this.pool = pool;
         this.exchange = exchange;
@@ -158,20 +172,28 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
         int oldState = this.state;
         if (anyAreSet(oldState, FLAG_START)) {
 
-            Pooled<ByteBuffer>[] byteBuffers = null;
+            PooledByteBuffer[] byteBuffers = null;
 
             //merge the cookies into the header map
             Connectors.flattenCookies(exchange);
 
-            Pooled<ByteBuffer> pooled = pool.allocate();
-            ByteBuffer buffer = pooled.getResource();
+            PooledByteBuffer pooled = pool.allocate();
+            ByteBuffer buffer = pooled.getBuffer();
             buffer.put((byte) 'A');
             buffer.put((byte) 'B');
             buffer.put((byte) 0); //we fill the size in later
             buffer.put((byte) 0);
             buffer.put((byte) 4);
-            putInt(buffer, exchange.getResponseCode());
-            putString(buffer, StatusCodes.getReason(exchange.getResponseCode()));
+            putInt(buffer, exchange.getStatusCode());
+            String reason = exchange.getReasonPhrase();
+            if(reason == null) {
+                reason = StatusCodes.getReason(exchange.getStatusCode());
+            }
+            if(reason.length() + 4 > buffer.remaining()) {
+                pooled.close();
+                throw UndertowMessages.MESSAGES.reasonPhraseToLargeForBuffer(reason);
+            }
+            putString(buffer, reason);
 
             int headers = 0;
             //we need to count the headers
@@ -189,16 +211,16 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
                         //if there is not enough room in the buffer we need to allocate more
                         buffer.flip();
                         if(byteBuffers == null) {
-                            byteBuffers = new Pooled[2];
+                            byteBuffers = new PooledByteBuffer[2];
                             byteBuffers[0] = pooled;
                         } else {
-                            Pooled<ByteBuffer>[] old = byteBuffers;
-                            byteBuffers = new Pooled[old.length + 1];
+                            PooledByteBuffer[] old = byteBuffers;
+                            byteBuffers = new PooledByteBuffer[old.length + 1];
                             System.arraycopy(old, 0, byteBuffers, 0, old.length);
                         }
                         pooled = pool.allocate();
                         byteBuffers[byteBuffers.length - 1] = pooled;
-                        buffer = pooled.getResource();
+                        buffer = pooled.getBuffer();
                     }
 
                     Integer headerCode = HEADER_MAP.get(header);
@@ -219,7 +241,7 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
             } else {
                 ByteBuffer[] bufs = new ByteBuffer[byteBuffers.length];
                 for(int i = 0; i < bufs.length; ++i) {
-                    bufs[i] = byteBuffers[i].getResource();
+                    bufs[i] = byteBuffers[i].getBuffer();
                 }
                 int dataLength = (int) (Buffers.remaining(bufs) - 4);
                 bufs[0].put(2, (byte) ((dataLength >> 8) & 0xFF));
@@ -243,7 +265,7 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
         if(queuedDataLength() > 0) {
             //if there is data in the queue we flush and return
             //otherwise the queue can grow indefinitely
-            if(!flush()) {
+            if(!flushQueuedData()) {
                 return 0;
             }
         }
@@ -255,8 +277,9 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
         }
         int limit = src.limit();
         try {
-            if (src.remaining() > MAX_DATA_SIZE) {
-                src.limit(src.position() + MAX_DATA_SIZE);
+            int maxData = exchange.getConnection().getUndertowOptions().get(UndertowOptions.MAX_AJP_PACKET_SIZE, DEFAULT_MAX_DATA_SIZE) - 8;
+            if (src.remaining() > maxData) {
+                src.limit(src.position() + maxData);
             }
             final int writeSize = src.remaining();
             final ByteBuffer[] buffers = createHeader(src);
@@ -274,14 +297,14 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
                 } else if (r == 0) {
                     //we need to copy all the remaining bytes
                     //TODO: this assumes the buffer is big enough
-                    Pooled<ByteBuffer> newPooledBuffer = pool.allocate();
+                    PooledByteBuffer newPooledBuffer = pool.allocate();
                     while (src.hasRemaining()) {
-                        newPooledBuffer.getResource().put(src);
+                        newPooledBuffer.getBuffer().put(src);
                     }
-                    newPooledBuffer.getResource().flip();
+                    newPooledBuffer.getBuffer().flip();
                     ByteBuffer[] savedBuffers = new ByteBuffer[3];
                     savedBuffers[0] = buffers[0];
-                    savedBuffers[1] = newPooledBuffer.getResource();
+                    savedBuffers[1] = newPooledBuffer.getBuffer();
                     savedBuffers[2] = buffers[2];
                     queueFrame(new PooledBufferFrameCallback(newPooledBuffer), savedBuffers);
                     return originalPayloadSize;
@@ -370,6 +393,24 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
         next.resumeWrites();
     }
 
+    public boolean flush() throws IOException {
+        processAJPHeader();
+        if(allAreClear(state, FLAG_FLUSH_QUEUED) && !isWritesTerminated()) {
+            queueFrame(new FrameCallBack() {
+                @Override
+                public void done() {
+                    state &= ~FLAG_FLUSH_QUEUED;
+                }
+
+                @Override
+                public void failed(IOException e) {
+
+                }
+            }, FLUSH_PACKET.duplicate());
+            state |= FLAG_FLUSH_QUEUED;
+        }
+        return flushQueuedData();
+    }
     public boolean isWriteResumed() {
         return anyAreSet(state, FLAG_WRITE_RESUMED);
     }
@@ -441,7 +482,7 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
         public void writeReady() {
             if (anyAreSet(state, FLAG_WRITE_READ_BODY_CHUNK_FROM_LISTENER)) {
                 try {
-                    flush();
+                    flushQueuedData();
                 } catch (IOException e) {
                     log.debug("Error flushing when doing async READ_BODY_CHUNK flush", e);
                 }

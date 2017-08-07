@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.spi;
 
@@ -31,7 +14,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.hibernate.EntityMode;
-import org.hibernate.cache.spi.CacheKey;
+import org.hibernate.cache.spi.access.CollectionRegionAccessStrategy;
+import org.hibernate.cache.spi.access.EntityRegionAccessStrategy;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.internal.CacheHelper;
 import org.hibernate.internal.CoreLogging;
@@ -218,13 +202,16 @@ public class BatchFetchQueue {
 	}
 
 	private boolean isCached(EntityKey entityKey, EntityPersister persister) {
+		final SessionImplementor session = context.getSession();
 		if ( context.getSession().getCacheMode().isGetEnabled() && persister.hasCache() ) {
-			final CacheKey key = context.getSession().generateCacheKey(
+			final EntityRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+			final Object key = cache.generateCacheKey(
 					entityKey.getIdentifier(),
-					persister.getIdentifierType(),
-					entityKey.getEntityName()
+					persister,
+					session.getFactory(),
+					session.getTenantIdentifier()
 			);
-			return CacheHelper.fromSharedCache( context.getSession(), key, persister.getCacheAccessStrategy() ) != null;
+			return CacheHelper.fromSharedCache( session, key, cache ) != null;
 		}
 		return false;
 	}
@@ -331,14 +318,18 @@ public class BatchFetchQueue {
 	}
 
 	private boolean isCached(Serializable collectionKey, CollectionPersister persister) {
-		if ( context.getSession().getCacheMode().isGetEnabled() && persister.hasCache() ) {
-			CacheKey cacheKey = context.getSession().generateCacheKey(
+		SessionImplementor session = context.getSession();
+		if ( session.getCacheMode().isGetEnabled() && persister.hasCache() ) {
+			CollectionRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+			Object cacheKey = cache.generateCacheKey(
 					collectionKey,
-					persister.getKeyType(),
-					persister.getRole()
+					persister,
+					session.getFactory(),
+					session.getTenantIdentifier()
 			);
-			return CacheHelper.fromSharedCache( context.getSession(), cacheKey, persister.getCacheAccessStrategy() ) != null;
+			return CacheHelper.fromSharedCache( session, cacheKey, cache ) != null;
 		}
 		return false;
 	}
+
 }

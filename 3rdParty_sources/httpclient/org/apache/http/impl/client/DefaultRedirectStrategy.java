@@ -29,8 +29,7 @@ package org.apache.http.impl.client;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import org.apache.http.annotation.Immutable;
+import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,27 +39,33 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.ProtocolException;
+import org.apache.http.annotation.Immutable;
 import org.apache.http.client.CircularRedirectException;
 import org.apache.http.client.RedirectStrategy;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.utils.URIUtils;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.ExecutionContext;
+import org.apache.http.util.Args;
+import org.apache.http.util.Asserts;
+import org.apache.http.util.TextUtils;
 
 /**
  * Default implementation of {@link RedirectStrategy}. This strategy honors the restrictions
  * on automatic redirection of entity enclosing methods such as POST and PUT imposed by the
- * HTTP specification. <tt>302 Moved Temporarily</tt>, <tt>301 Moved Permanently</tt> and
- * <tt>307 Temporary Redirect</tt> status codes will result in an automatic redirect of
+ * HTTP specification. {@code 302 Moved Temporarily}, {@code 301 Moved Permanently} and
+ * {@code 307 Temporary Redirect} status codes will result in an automatic redirect of
  * HEAD and GET methods only. POST and PUT methods will not be automatically redirected
  * as requiring user confirmation.
- * <p/>
+ * <p>
  * The restriction on automatic redirection of POST methods can be relaxed by using
  * {@link LaxRedirectStrategy} instead of {@link DefaultRedirectStrategy}.
+ * </p>
  *
  * @see LaxRedirectStrategy
  * @since 4.1
@@ -70,7 +75,13 @@ public class DefaultRedirectStrategy implements RedirectStrategy {
 
     private final Log log = LogFactory.getLog(getClass());
 
+    /**
+     * @deprecated (4.3) use {@link org.apache.http.client.protocol.HttpClientContext#REDIRECT_LOCATIONS}.
+     */
+    @Deprecated
     public static final String REDIRECT_LOCATIONS = "http.protocol.redirect-locations";
+
+    public static final DefaultRedirectStrategy INSTANCE = new DefaultRedirectStrategy();
 
     /**
      * Redirectable methods.
@@ -84,20 +95,17 @@ public class DefaultRedirectStrategy implements RedirectStrategy {
         super();
     }
 
+    @Override
     public boolean isRedirected(
             final HttpRequest request,
             final HttpResponse response,
             final HttpContext context) throws ProtocolException {
-        if (request == null) {
-            throw new IllegalArgumentException("HTTP request may not be null");
-        }
-        if (response == null) {
-            throw new IllegalArgumentException("HTTP response may not be null");
-        }
+        Args.notNull(request, "HTTP request");
+        Args.notNull(response, "HTTP response");
 
-        int statusCode = response.getStatusLine().getStatusCode();
-        String method = request.getRequestLine().getMethod();
-        Header locationHeader = response.getFirstHeader("location");
+        final int statusCode = response.getStatusLine().getStatusCode();
+        final String method = request.getRequestLine().getMethod();
+        final Header locationHeader = response.getFirstHeader("location");
         switch (statusCode) {
         case HttpStatus.SC_MOVED_TEMPORARILY:
             return isRedirectable(method) && locationHeader != null;
@@ -115,62 +123,55 @@ public class DefaultRedirectStrategy implements RedirectStrategy {
             final HttpRequest request,
             final HttpResponse response,
             final HttpContext context) throws ProtocolException {
-        if (request == null) {
-            throw new IllegalArgumentException("HTTP request may not be null");
-        }
-        if (response == null) {
-            throw new IllegalArgumentException("HTTP response may not be null");
-        }
-        if (context == null) {
-            throw new IllegalArgumentException("HTTP context may not be null");
-        }
+        Args.notNull(request, "HTTP request");
+        Args.notNull(response, "HTTP response");
+        Args.notNull(context, "HTTP context");
+
+        final HttpClientContext clientContext = HttpClientContext.adapt(context);
+
         //get the location header to find out where to redirect to
-        Header locationHeader = response.getFirstHeader("location");
+        final Header locationHeader = response.getFirstHeader("location");
         if (locationHeader == null) {
             // got a redirect response, but no location header
             throw new ProtocolException(
                     "Received redirect response " + response.getStatusLine()
                     + " but no location header");
         }
-        String location = locationHeader.getValue();
+        final String location = locationHeader.getValue();
         if (this.log.isDebugEnabled()) {
             this.log.debug("Redirect requested to location '" + location + "'");
         }
 
+        final RequestConfig config = clientContext.getRequestConfig();
+
         URI uri = createLocationURI(location);
 
-        HttpParams params = request.getParams();
         // rfc2616 demands the location value be a complete URI
         // Location       = "Location" ":" absoluteURI
         try {
-            // Drop fragment
-            uri = URIUtils.rewriteURI(uri);
             if (!uri.isAbsolute()) {
-                if (params.isParameterTrue(ClientPNames.REJECT_RELATIVE_REDIRECT)) {
+                if (!config.isRelativeRedirectsAllowed()) {
                     throw new ProtocolException("Relative redirect location '"
                             + uri + "' not allowed");
                 }
                 // Adjust location URI
-                HttpHost target = (HttpHost) context.getAttribute(ExecutionContext.HTTP_TARGET_HOST);
-                if (target == null) {
-                    throw new IllegalStateException("Target host not available " +
-                            "in the HTTP context");
-                }
-                URI requestURI = new URI(request.getRequestLine().getUri());
-                URI absoluteRequestURI = URIUtils.rewriteURI(requestURI, target, true);
+                final HttpHost target = clientContext.getTargetHost();
+                Asserts.notNull(target, "Target host");
+                final URI requestURI = new URI(request.getRequestLine().getUri());
+                final URI absoluteRequestURI = URIUtils.rewriteURI(requestURI, target, false);
                 uri = URIUtils.resolve(absoluteRequestURI, uri);
             }
-        } catch (URISyntaxException ex) {
+        } catch (final URISyntaxException ex) {
             throw new ProtocolException(ex.getMessage(), ex);
         }
 
-        RedirectLocations redirectLocations = (RedirectLocations) context.getAttribute(
-                REDIRECT_LOCATIONS);
+        RedirectLocations redirectLocations = (RedirectLocations) clientContext.getAttribute(
+                HttpClientContext.REDIRECT_LOCATIONS);
         if (redirectLocations == null) {
             redirectLocations = new RedirectLocations();
-            context.setAttribute(REDIRECT_LOCATIONS, redirectLocations);
+            context.setAttribute(HttpClientContext.REDIRECT_LOCATIONS, redirectLocations);
         }
-        if (params.isParameterFalse(ClientPNames.ALLOW_CIRCULAR_REDIRECTS)) {
+        if (!config.isCircularRedirectsAllowed()) {
             if (redirectLocations.contains(uri)) {
                 throw new CircularRedirectException("Circular redirect to '" + uri + "'");
             }
@@ -184,8 +185,17 @@ public class DefaultRedirectStrategy implements RedirectStrategy {
      */
     protected URI createLocationURI(final String location) throws ProtocolException {
         try {
-            return new URI(location).normalize();
-        } catch (URISyntaxException ex) {
+            final URIBuilder b = new URIBuilder(new URI(location).normalize());
+            final String host = b.getHost();
+            if (host != null) {
+                b.setHost(host.toLowerCase(Locale.ROOT));
+            }
+            final String path = b.getPath();
+            if (TextUtils.isEmpty(path)) {
+                b.setPath("/");
+            }
+            return b.build();
+        } catch (final URISyntaxException ex) {
             throw new ProtocolException("Invalid redirect URI: " + location, ex);
         }
     }
@@ -194,7 +204,7 @@ public class DefaultRedirectStrategy implements RedirectStrategy {
      * @since 4.2
      */
     protected boolean isRedirectable(final String method) {
-        for (String m: REDIRECT_METHODS) {
+        for (final String m: REDIRECT_METHODS) {
             if (m.equalsIgnoreCase(method)) {
                 return true;
             }
@@ -202,16 +212,24 @@ public class DefaultRedirectStrategy implements RedirectStrategy {
         return false;
     }
 
+    @Override
     public HttpUriRequest getRedirect(
             final HttpRequest request,
             final HttpResponse response,
             final HttpContext context) throws ProtocolException {
-        URI uri = getLocationURI(request, response, context);
-        String method = request.getRequestLine().getMethod();
+        final URI uri = getLocationURI(request, response, context);
+        final String method = request.getRequestLine().getMethod();
         if (method.equalsIgnoreCase(HttpHead.METHOD_NAME)) {
             return new HttpHead(uri);
-        } else {
+        } else if (method.equalsIgnoreCase(HttpGet.METHOD_NAME)) {
             return new HttpGet(uri);
+        } else {
+            final int status = response.getStatusLine().getStatusCode();
+            if (status == HttpStatus.SC_TEMPORARY_REDIRECT) {
+                return RequestBuilder.copy(request).setUri(uri).build();
+            } else {
+                return new HttpGet(uri);
+            }
         }
     }
 

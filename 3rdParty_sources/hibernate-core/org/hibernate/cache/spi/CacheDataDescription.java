@@ -1,29 +1,14 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cache.spi;
 
 import java.util.Comparator;
+
+import org.hibernate.type.Type;
 
 /**
  * Describes attributes regarding the type of data to be cached.
@@ -41,7 +26,8 @@ public interface CacheDataDescription {
 	/**
 	 * Is the data to be cached considered versioned?
 	 *
-	 * If {@code true}, it is illegal for {@link #getVersionComparator} to return {@code null}.
+	 * If {@code true}, it is illegal for {@link #getVersionComparator} to return {@code null}
+	 * or an instance of {@link org.hibernate.type.descriptor.java.IncomparableComparator}.
 	 *
 	 * @return {@code true} if the data is versioned; {@code false} otherwise.
 	 */
@@ -54,4 +40,10 @@ public interface CacheDataDescription {
 	 * @return The comparator for versions, or {@code null}
 	 */
 	public Comparator getVersionComparator();
+
+	/**
+	 * @return Type of the key that will be used as the key in the cache, or {@code null} if the natural comparison
+	 * ({@link Object#hashCode()} and {@link Object#equals(Object)} methods should be used.
+	 */
+	Type getKeyType();
 }

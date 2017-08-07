@@ -1,29 +1,13 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.type;
 
 import java.io.Serializable;
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,7 +22,7 @@ import org.hibernate.engine.spi.Mapping;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.util.collections.ArrayHelper;
-import org.hibernate.metamodel.relational.Size;
+import org.hibernate.engine.jdbc.Size;
 import org.hibernate.usertype.EnhancedUserType;
 import org.hibernate.usertype.LoggableUserType;
 import org.hibernate.usertype.Sized;
@@ -56,7 +40,7 @@ import org.dom4j.Node;
  */
 public class CustomType
 		extends AbstractType
-		implements IdentifierType, DiscriminatorType, VersionType, BasicType, StringRepresentableType {
+		implements IdentifierType, DiscriminatorType, VersionType, BasicType, StringRepresentableType, ProcedureParameterNamedBinder, ProcedureParameterExtractionAware {
 
 	private final UserType userType;
 	private final String name;
@@ -207,15 +191,6 @@ public class CustomType
 		return ( (UserVersionType) userType ).seed( session );
 	}
 
-	public Object fromXMLNode(Node xml, Mapping factory) throws HibernateException {
-		return fromXMLString( xml.getText(), factory );
-	}
-
-	public void setToXMLNode(Node node, Object value, SessionFactoryImplementor factory)
-			throws HibernateException {
-		node.setText( toXMLString(value, factory) );
-	}
-
 	public String toLoggableString(Object value, SessionFactoryImplementor factory)
 			throws HibernateException {
 		if ( value == null ) {
@@ -275,5 +250,59 @@ public class CustomType
 						EnhancedUserType.class.getName()
 				)
 		);
+	}
+
+	@Override
+	public boolean canDoSetting() {
+		if ( ProcedureParameterNamedBinder.class.isInstance( userType ) ) {
+			return ((ProcedureParameterNamedBinder) userType).canDoSetting();
+		}
+		return false;
+	}
+
+	@Override
+	public void nullSafeSet(
+			CallableStatement statement, Object value, String name, SessionImplementor session) throws SQLException {
+		if ( canDoSetting() ) {
+			((ProcedureParameterNamedBinder) userType).nullSafeSet( statement, value, name, session );
+		}
+		else {
+			throw new UnsupportedOperationException(
+					"Type [" + userType + "] does support parameter binding by name"
+			);
+		}
+	}
+
+	@Override
+	public boolean canDoExtraction() {
+		if ( ProcedureParameterExtractionAware.class.isInstance( userType ) ) {
+			return ((ProcedureParameterExtractionAware) userType).canDoExtraction();
+		}
+		return false;
+	}
+
+	@Override
+	public Object extract(CallableStatement statement, int startIndex, SessionImplementor session) throws SQLException {
+		if ( canDoExtraction() ) {
+			return ((ProcedureParameterExtractionAware) userType).extract( statement, startIndex, session );
+		}
+		else {
+			throw new UnsupportedOperationException(
+					"Type [" + userType + "] does support parameter value extraction"
+			);
+		}
+	}
+
+	@Override
+	public Object extract(CallableStatement statement, String[] paramNames, SessionImplementor session)
+			throws SQLException {
+		if ( canDoExtraction() ) {
+			return ((ProcedureParameterExtractionAware) userType).extract( statement, paramNames, session );
+		}
+		else {
+			throw new UnsupportedOperationException(
+					"Type [" + userType + "] does support parameter value extraction"
+			);
+		}
 	}
 }

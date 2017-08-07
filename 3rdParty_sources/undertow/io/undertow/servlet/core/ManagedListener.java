@@ -71,16 +71,19 @@ public class ManagedListener implements Lifecycle {
 
     public EventListener instance() {
         if (!started) {
-            try {
-                start();
-            } catch (ServletException e) {
-                throw new RuntimeException(e);
-            }
+            throw UndertowServletMessages.MESSAGES.listenerIsNotStarted();
         }
         return handle.getInstance();
     }
 
     public boolean isProgramatic() {
         return programatic;
+    }
+
+    @Override
+    public String toString() {
+        return "ManagedListener{" +
+                "listenerInfo=" + listenerInfo +
+                '}';
     }
 }

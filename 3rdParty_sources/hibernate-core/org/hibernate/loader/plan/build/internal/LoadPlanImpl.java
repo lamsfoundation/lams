@@ -1,47 +1,24 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.loader.plan.build.internal;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.internal.CoreLogging;
 import org.hibernate.loader.plan.spi.CollectionReturn;
 import org.hibernate.loader.plan.spi.EntityReturn;
 import org.hibernate.loader.plan.spi.LoadPlan;
-import org.hibernate.loader.plan.spi.QuerySpace;
 import org.hibernate.loader.plan.spi.QuerySpaces;
 import org.hibernate.loader.plan.spi.Return;
-
-import org.jboss.logging.Logger;
 
 /**
  * @author Steve Ebersole
  */
 public class LoadPlanImpl implements LoadPlan {
-	private static final Logger log = CoreLogging.logger( LoadPlanImpl.class );
-
 	private final List<? extends Return> returns;
 	private final QuerySpaces querySpaces;
 	private final Disposition disposition;
@@ -62,7 +39,7 @@ public class LoadPlanImpl implements LoadPlan {
 	 * Creates a {@link Disposition#ENTITY_LOADER} LoadPlan.
 	 *
 	 * @param rootReturn The EntityReturn representation of the entity being loaded.
-	 * @param querySpaces The QuerySpaces containing all the {@link QuerySpace} references
+	 * @param querySpaces The QuerySpaces containing all the query space references
 	 *                    required for <code>rootReturn</code> and joined entity, collection,
 	 *                    and composite references.
 	 */
@@ -74,7 +51,7 @@ public class LoadPlanImpl implements LoadPlan {
 	 * Creates a {@link Disposition#COLLECTION_INITIALIZER} LoadPlan.
 	 *
 	 * @param rootReturn The CollectionReturn representation of the collection being initialized.
-	 * @param querySpaces The QuerySpaces containing all the {@link QuerySpace} references
+	 * @param querySpaces The QuerySpaces containing all the query space references
 	 *                    required for <code>rootReturn</code> and joined entity, collection,
 	 *                    and composite references.
 	 */
@@ -86,7 +63,7 @@ public class LoadPlanImpl implements LoadPlan {
 	 * Creates a {@link Disposition#MIXED} LoadPlan.
 	 *
 	 * @param returns The mixed Return references
-	 * @param querySpaces The QuerySpaces containing all the {@link QuerySpace} references
+	 * @param querySpaces The QuerySpaces containing all the query space references
 	 *                    required for <code>rootReturn</code> and joined entity, collection,
 	 *                    and composite references.
 	 * @param areLazyAttributesForceFetched Should lazy attributes (bytecode enhanced laziness) be fetched also?  This

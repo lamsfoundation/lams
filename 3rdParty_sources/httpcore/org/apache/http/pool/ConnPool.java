@@ -31,7 +31,7 @@ import java.util.concurrent.Future;
 import org.apache.http.concurrent.FutureCallback;
 
 /**
- * <tt>ConnPool</tt> represents a shared pool connections can be leased from
+ * {@code ConnPool} represents a shared pool connections can be leased from
  * and released back to.
  *
  * @param <T> the route type that represents the opposite endpoint of a pooled
@@ -49,7 +49,7 @@ public interface ConnPool<T, E> {
      * @param state arbitrary object that represents a particular state
      *  (usually a security principal or a unique token identifying
      *  the user whose credentials have been used while establishing the connection).
-     *  May be <code>null</code>.
+     *  May be {@code null}.
      * @param callback operation completion callback.
      *
      * @return future for a leased pool entry.

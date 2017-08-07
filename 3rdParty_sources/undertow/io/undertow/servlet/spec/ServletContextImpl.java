@@ -15,11 +15,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.undertow.servlet.spec;
 
 import io.undertow.Version;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.cache.LRUCache;
 import io.undertow.server.handlers.resource.Resource;
 import io.undertow.server.session.PathParameterSessionConfig;
 import io.undertow.server.session.Session;
@@ -40,12 +40,14 @@ import io.undertow.servlet.api.ServletContainer;
 import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.api.ServletSecurityInfo;
 import io.undertow.servlet.api.SessionConfigWrapper;
+import io.undertow.servlet.api.ThreadSetupHandler;
 import io.undertow.servlet.api.TransportGuaranteeType;
 import io.undertow.servlet.core.ApplicationListeners;
 import io.undertow.servlet.core.ManagedListener;
 import io.undertow.servlet.core.ManagedServlet;
 import io.undertow.servlet.handlers.ServletChain;
 import io.undertow.servlet.handlers.ServletHandler;
+import io.undertow.servlet.handlers.ServletRequestContext;
 import io.undertow.servlet.util.EmptyEnumeration;
 import io.undertow.servlet.util.ImmediateInstanceFactory;
 import io.undertow.servlet.util.IteratorEnumeration;
@@ -58,6 +60,7 @@ import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.ReadListener;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
@@ -65,6 +68,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 import javax.servlet.SessionTrackingMode;
+import javax.servlet.WriteListener;
 import javax.servlet.annotation.HttpMethodConstraint;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.ServletSecurity;
@@ -77,6 +81,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
@@ -102,7 +108,7 @@ public class ServletContextImpl implements ServletContext {
 
     private final ServletContainer servletContainer;
     private final Deployment deployment;
-    private DeploymentInfo deploymentInfo;
+    private volatile DeploymentInfo deploymentInfo;
     private final ConcurrentMap<String, Object> attributes;
     private final SessionCookieConfigImpl sessionCookieConfig;
     private final AttachmentKey<HttpSessionImpl> sessionAttachmentKey = AttachmentKey.create(HttpSessionImpl.class);
@@ -112,7 +118,15 @@ public class ServletContextImpl implements ServletContext {
     private volatile boolean initialized = false;
     private int filterMappingUrlPatternInsertPosition = 0;
     private int filterMappingServletNameInsertPosition = 0;
+    private final LRUCache<String, ContentTypeInfo> contentTypeCache;
 
+    //I don't think these really belong here, but there is not really anywhere else for them
+    //maybe we should move them into a separate class
+    private final ThreadSetupHandler.Action<Void, WriteListener> onWritePossibleTask;
+    private final ThreadSetupHandler.Action<Void, Runnable> runnableTask;
+    private final ThreadSetupHandler.Action<Void, ReadListener> onDataAvailableTask;
+    private final ThreadSetupHandler.Action<Void, ReadListener> onAllDataReadTask;
+    private final ThreadSetupHandler.Action<Void, ThreadSetupHandler.Action<Void, Object>> invokeActionTask;
 
     public ServletContextImpl(final ServletContainer servletContainer, final Deployment deployment) {
         this.servletContainer = servletContainer;
@@ -126,6 +140,42 @@ public class ServletContextImpl implements ServletContext {
             this.attributes = deploymentInfo.getServletContextAttributeBackingMap();
         }
         attributes.putAll(deployment.getDeploymentInfo().getServletContextAttributes());
+        this.contentTypeCache = new LRUCache<>(deployment.getDeploymentInfo().getContentTypeCacheSize(), -1, true);
+        this.onWritePossibleTask = deployment.createThreadSetupAction(new ThreadSetupHandler.Action<Void, WriteListener>() {
+            @Override
+            public Void call(HttpServerExchange exchange, WriteListener context) throws Exception {
+                context.onWritePossible();
+                return null;
+            }
+        });
+        this.runnableTask = new ThreadSetupHandler.Action<Void, Runnable>() {
+            @Override
+            public Void call(HttpServerExchange exchange, Runnable context) throws Exception {
+                context.run();
+                return null;
+            }
+        };
+        this.onDataAvailableTask = deployment.createThreadSetupAction(new ThreadSetupHandler.Action<Void, ReadListener>() {
+            @Override
+            public Void call(HttpServerExchange exchange, ReadListener context) throws Exception {
+                context.onDataAvailable();
+                return null;
+            }
+        });
+        this.onAllDataReadTask = deployment.createThreadSetupAction(new ThreadSetupHandler.Action<Void, ReadListener>() {
+            @Override
+            public Void call(HttpServerExchange exchange, ReadListener context) throws Exception {
+                context.onAllDataRead();
+                return null;
+            }
+        });
+        this.invokeActionTask = deployment.createThreadSetupAction(new ThreadSetupHandler.Action<Void, ThreadSetupHandler.Action<Void, Object>>() {
+            @Override
+            public Void call(HttpServerExchange exchange, ThreadSetupHandler.Action<Void, Object> context) throws Exception {
+                context.call(exchange, null);
+                return null;
+            }
+        });
     }
 
     public void initDone() {
@@ -147,13 +197,13 @@ public class ServletContextImpl implements ServletContext {
         if (wrapper != null) {
             sessionConfig = wrapper.wrap(sessionConfig, deployment);
         }
-        this.sessionConfig = sessionConfig;
+        this.sessionConfig = new ServletContextSessionConfig(sessionConfig);
     }
 
     @Override
     public String getContextPath() {
         String contextPath = deploymentInfo.getContextPath();
-        if(contextPath.equals("/")) {
+        if (contextPath.equals("/")) {
             return "";
         }
         return contextPath;
@@ -190,11 +240,15 @@ public class ServletContextImpl implements ServletContext {
 
     @Override
     public String getMimeType(final String file) {
-        int pos = file.lastIndexOf('.');
-        if (pos == -1) {
-            return deployment.getMimeExtensionMappings().get(file);
+        if(file == null) {
+            return null;
         }
-        return deployment.getMimeExtensionMappings().get(file.substring(pos + 1));
+        String lower = file.toLowerCase(Locale.ENGLISH);
+        int pos = lower.lastIndexOf('.');
+        if (pos == -1) {
+            return null; //no extension
+        }
+        return deployment.getMimeExtensionMappings().get(lower.substring(pos + 1));
     }
 
     @Override
@@ -210,15 +264,15 @@ public class ServletContextImpl implements ServletContext {
         }
         final Set<String> resources = new HashSet<>();
         for (Resource res : resource.list()) {
-            File file = res.getFile();
+            Path file = res.getFilePath();
             if (file != null) {
-                File base = res.getResourceManagerRoot();
+                Path base = res.getResourceManagerRootPath();
                 if (base == null) {
-                    resources.add(file.getPath()); //not much else we can do here
+                    resources.add(file.toString()); //not much else we can do here
                 } else {
-                    String filePath = file.getAbsolutePath().substring(base.getAbsolutePath().length());
+                    String filePath = file.toAbsolutePath().toString().substring(base.toAbsolutePath().toString().length());
                     filePath = filePath.replace('\\', '/'); //for windows systems
-                    if (file.isDirectory()) {
+                    if (Files.isDirectory(file)) {
                         filePath = filePath + "/";
                     }
                     resources.add(filePath);
@@ -321,20 +375,36 @@ public class ServletContextImpl implements ServletContext {
             return null;
         }
         String canonicalPath = CanonicalPathUtils.canonicalize(path);
-        Resource resource = null;
+        Resource resource;
         try {
             resource = deploymentInfo.getResourceManager().getResource(canonicalPath);
+
+            if (resource == null) {
+                //UNDERTOW-373 even though the resource does not exist we still need to return a path
+                Resource deploymentRoot = deploymentInfo.getResourceManager().getResource("/");
+                if(deploymentRoot == null) {
+                    return null;
+                }
+                Path root = deploymentRoot.getFilePath();
+                if(root == null) {
+                    return null;
+                }
+                if(!canonicalPath.startsWith("/")) {
+                    canonicalPath = "/" + canonicalPath;
+                }
+                if(File.separatorChar != '/') {
+                    canonicalPath = canonicalPath.replace('/', File.separatorChar);
+                }
+                return root.toAbsolutePath().toString() + canonicalPath;
+            }
         } catch (IOException e) {
             return null;
         }
-        if (resource == null) {
-            return null;
-        }
-        File file = resource.getFile();
+        Path file = resource.getFilePath();
         if (file == null) {
             return null;
         }
-        return file.getAbsolutePath();
+        return file.toAbsolutePath().toString();
     }
 
     @Override
@@ -415,13 +485,16 @@ public class ServletContextImpl implements ServletContext {
             if (deploymentInfo.getServlets().containsKey(servletName)) {
                 return null;
             }
-            ServletInfo servlet = new ServletInfo(servletName, (Class<? extends Servlet>) deploymentInfo.getClassLoader().loadClass(className));
+            Class<? extends Servlet> servletClass=(Class<? extends Servlet>) deploymentInfo.getClassLoader().loadClass(className);
+            ServletInfo servlet = new ServletInfo(servletName, servletClass, deploymentInfo.getClassIntrospecter().createInstanceFactory(servletClass));
             readServletAnnotations(servlet);
             deploymentInfo.addServlet(servlet);
             ServletHandler handler = deployment.getServlets().addServlet(servlet);
             return new ServletRegistrationImpl(servlet, handler.getManagedServlet(), deployment);
         } catch (ClassNotFoundException e) {
             throw UndertowServletMessages.MESSAGES.cannotLoadClass(className, e);
+        } catch (NoSuchMethodException e) {
+            throw UndertowServletMessages.MESSAGES.couldNotCreateFactory(className,e);
         }
     }
 
@@ -440,19 +513,22 @@ public class ServletContextImpl implements ServletContext {
     }
 
     @Override
-    public ServletRegistration.Dynamic addServlet(final String servletName, final Class<? extends Servlet> servletClass) {
+    public ServletRegistration.Dynamic addServlet(final String servletName, final Class<? extends Servlet> servletClass){
         ensureNotProgramaticListener();
         ensureNotInitialized();
         if (deploymentInfo.getServlets().containsKey(servletName)) {
             return null;
         }
-        ServletInfo servlet = new ServletInfo(servletName, servletClass);
-        readServletAnnotations(servlet);
-        deploymentInfo.addServlet(servlet);
-        ServletHandler handler = deployment.getServlets().addServlet(servlet);
-        return new ServletRegistrationImpl(servlet, handler.getManagedServlet(), deployment);
+        try {
+            ServletInfo servlet = new ServletInfo(servletName, servletClass, deploymentInfo.getClassIntrospecter().createInstanceFactory(servletClass));
+            readServletAnnotations(servlet);
+            deploymentInfo.addServlet(servlet);
+            ServletHandler handler = deployment.getServlets().addServlet(servlet);
+            return new ServletRegistrationImpl(servlet, handler.getManagedServlet(), deployment);
+        } catch (NoSuchMethodException e) {
+            throw UndertowServletMessages.MESSAGES.couldNotCreateFactory(servletClass.getName(),e);
+        }
     }
-
 
     @Override
     public <T extends Servlet> T createServlet(final Class<T> clazz) throws ServletException {
@@ -492,12 +568,15 @@ public class ServletContextImpl implements ServletContext {
             return null;
         }
         try {
-            FilterInfo filter = new FilterInfo(filterName, (Class<? extends Filter>) deploymentInfo.getClassLoader().loadClass(className));
+            Class<? extends Filter> filterClass=(Class<? extends Filter>) deploymentInfo.getClassLoader().loadClass(className);
+            FilterInfo filter = new FilterInfo(filterName, filterClass, deploymentInfo.getClassIntrospecter().createInstanceFactory(filterClass));
             deploymentInfo.addFilter(filter);
             deployment.getFilters().addFilter(filter);
             return new FilterRegistrationImpl(filter, deployment, this);
         } catch (ClassNotFoundException e) {
             throw UndertowServletMessages.MESSAGES.cannotLoadClass(className, e);
+        }catch (NoSuchMethodException e) {
+            throw UndertowServletMessages.MESSAGES.couldNotCreateFactory(className,e);
         }
     }
 
@@ -523,10 +602,14 @@ public class ServletContextImpl implements ServletContext {
         if (deploymentInfo.getFilters().containsKey(filterName)) {
             return null;
         }
-        FilterInfo filter = new FilterInfo(filterName, filterClass);
-        deploymentInfo.addFilter(filter);
-        deployment.getFilters().addFilter(filter);
-        return new FilterRegistrationImpl(filter, deployment, this);
+        try {
+            FilterInfo filter = new FilterInfo(filterName, filterClass,deploymentInfo.getClassIntrospecter().createInstanceFactory(filterClass));
+            deploymentInfo.addFilter(filter);
+            deployment.getFilters().addFilter(filter);
+            return new FilterRegistrationImpl(filter, deployment, this);
+        } catch (NoSuchMethodException e) {
+            throw UndertowServletMessages.MESSAGES.couldNotCreateFactory(filterClass.getName(),e);
+        }
     }
 
     @Override
@@ -602,8 +685,8 @@ public class ServletContextImpl implements ServletContext {
     public <T extends EventListener> void addListener(final T t) {
         ensureNotInitialized();
         ensureNotProgramaticListener();
-        if (ApplicationListeners.listenerState() != NO_LISTENER &&
-                ServletContextListener.class.isAssignableFrom(t.getClass())) {
+        if (ApplicationListeners.listenerState() != NO_LISTENER
+                && ServletContextListener.class.isAssignableFrom(t.getClass())) {
             throw UndertowServletMessages.MESSAGES.cannotAddServletContextListener();
         }
         ListenerInfo listener = new ListenerInfo(t.getClass(), new ImmediateInstanceFactory<EventListener>(t));
@@ -615,8 +698,8 @@ public class ServletContextImpl implements ServletContext {
     public void addListener(final Class<? extends EventListener> listenerClass) {
         ensureNotInitialized();
         ensureNotProgramaticListener();
-        if (ApplicationListeners.listenerState() != NO_LISTENER &&
-                ServletContextListener.class.isAssignableFrom(listenerClass)) {
+        if (ApplicationListeners.listenerState() != NO_LISTENER
+                && ServletContextListener.class.isAssignableFrom(listenerClass)) {
             throw UndertowServletMessages.MESSAGES.cannotAddServletContextListener();
         }
         InstanceFactory<? extends EventListener> factory = null;
@@ -774,7 +857,52 @@ public class ServletContextImpl implements ServletContext {
         this.sessionTrackingModes = sessionTrackingModes;
     }
 
+    void invokeOnWritePossible(HttpServerExchange exchange, WriteListener listener) {
+        try {
+            this.onWritePossibleTask.call(exchange, listener);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    void invokeOnAllDataRead(HttpServerExchange exchange, ReadListener listener) {
+        try {
+            this.onAllDataReadTask.call(exchange, listener);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    void invokeOnDataAvailable(HttpServerExchange exchange, ReadListener listener) {
+        try {
+            this.onDataAvailableTask.call(exchange, listener);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    void invokeAction(HttpServerExchange exchange, ThreadSetupHandler.Action<Void, Object> listener) {
+        try {
+            this.invokeActionTask.call(exchange, listener);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    void invokeRunnable(HttpServerExchange exchange, Runnable runnable) {
+        final boolean setupRequired = SecurityActions.currentServletRequestContext() == null;
+        if(setupRequired) {
+            try {
+                this.runnableTask.call(exchange, runnable);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            runnable.run();
+        }
+    }
     private static final class ReadServletAnnotationsTask implements PrivilegedAction<Void> {
+
         private final ServletInfo servletInfo;
         private final DeploymentInfo deploymentInfo;
 
@@ -820,12 +948,12 @@ public class ServletContextImpl implements ServletContext {
     void addMappingForServletNames(FilterInfo filterInfo, final EnumSet<DispatcherType> dispatcherTypes, final boolean isMatchAfter, final String... servletNames) {
         DeploymentInfo deploymentInfo = deployment.getDeploymentInfo();
 
-        for(final String servlet : servletNames){
-            if(isMatchAfter) {
-                if(dispatcherTypes == null || dispatcherTypes.isEmpty()) {
+        for (final String servlet : servletNames) {
+            if (isMatchAfter) {
+                if (dispatcherTypes == null || dispatcherTypes.isEmpty()) {
                     deploymentInfo.addFilterServletNameMapping(filterInfo.getName(), servlet, DispatcherType.REQUEST);
                 } else {
-                    for(final DispatcherType dispatcher : dispatcherTypes) {
+                    for (final DispatcherType dispatcher : dispatcherTypes) {
                         deploymentInfo.addFilterServletNameMapping(filterInfo.getName(), servlet, dispatcher);
                     }
                 }
@@ -844,12 +972,12 @@ public class ServletContextImpl implements ServletContext {
 
     void addMappingForUrlPatterns(FilterInfo filterInfo, final EnumSet<DispatcherType> dispatcherTypes, final boolean isMatchAfter, final String... urlPatterns) {
         DeploymentInfo deploymentInfo = deployment.getDeploymentInfo();
-        for(final String url : urlPatterns){
-            if(isMatchAfter) {
-                if(dispatcherTypes == null || dispatcherTypes.isEmpty()) {
+        for (final String url : urlPatterns) {
+            if (isMatchAfter) {
+                if (dispatcherTypes == null || dispatcherTypes.isEmpty()) {
                     deploymentInfo.addFilterUrlMapping(filterInfo.getName(), url, DispatcherType.REQUEST);
                 } else {
-                    for(final DispatcherType dispatcher : dispatcherTypes) {
+                    for (final DispatcherType dispatcher : dispatcherTypes) {
                         deploymentInfo.addFilterUrlMapping(filterInfo.getName(), url, dispatcher);
                     }
                 }
@@ -864,5 +992,120 @@ public class ServletContextImpl implements ServletContext {
             }
         }
         deployment.getServletPaths().invalidate();
+    }
+
+    ContentTypeInfo parseContentType(String type) {
+        ContentTypeInfo existing = contentTypeCache.get(type);
+        if(existing != null) {
+            return existing;
+        }
+        String contentType = type;
+        String charset = null;
+
+        int split = type.indexOf(";");
+        if (split != -1) {
+            int pos = type.indexOf("charset=");
+            if (pos != -1) {
+                int i = pos + "charset=".length();
+                do {
+                    char c = type.charAt(i);
+                    if (c == ' ' || c == '\t' || c == ';') {
+                        break;
+                    }
+                    ++i;
+                } while (i < type.length());
+                charset = type.substring(pos + "charset=".length(), i);
+                //it is valid for the charset to be enclosed in quotes
+                if (charset.startsWith("\"") && charset.endsWith("\"") && charset.length() > 1) {
+                    charset = charset.substring(1, charset.length() - 1);
+                }
+
+                int charsetStart = pos;
+                while (type.charAt(--charsetStart) != ';' && charsetStart > 0) {
+                }
+                StringBuilder contentTypeBuilder = new StringBuilder();
+                contentTypeBuilder.append(type.substring(0, charsetStart));
+                if (i != type.length()) {
+                    contentTypeBuilder.append(type.substring(i));
+                }
+                contentType = contentTypeBuilder.toString();
+            }
+            //strip any trailing semicolon
+            for (int i = contentType.length() - 1; i >= 0; --i) {
+                char c = contentType.charAt(i);
+                if (c == ' ' || c == '\t') {
+                    continue;
+                }
+                if (c == ';') {
+                    contentType = contentType.substring(0, i);
+                }
+                break;
+            }
+        }
+        if(charset == null) {
+            existing = new ContentTypeInfo(contentType, null, contentType);
+        } else {
+            existing = new ContentTypeInfo(contentType + ";charset=" + charset, charset,  contentType);
+        }
+        contentTypeCache.add(type, existing);
+        return existing;
+    }
+
+    /**
+     * This is a bit of a hack to make sure than an invalidated session ID is not re-used. It also allows {@link io.undertow.servlet.handlers.ServletRequestContext#getOverridenSessionId()} to be used.
+     */
+    static final class ServletContextSessionConfig implements SessionConfig {
+
+        private final AttachmentKey<String> INVALIDATED = AttachmentKey.create(String.class);
+
+        private final SessionConfig delegate;
+
+        private ServletContextSessionConfig(SessionConfig delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public void setSessionId(HttpServerExchange exchange, String sessionId) {
+            delegate.setSessionId(exchange, sessionId);
+        }
+
+        @Override
+        public void clearSession(HttpServerExchange exchange, String sessionId) {
+            exchange.putAttachment(INVALIDATED, sessionId);
+            delegate.clearSession(exchange, sessionId);
+        }
+
+        @Override
+        public String findSessionId(HttpServerExchange exchange) {
+            String invalidated = exchange.getAttachment(INVALIDATED);
+            ServletRequestContext src = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+            final String current;
+            if(src.getOverridenSessionId() == null) {
+                current = delegate.findSessionId(exchange);
+            } else {
+                current = src.getOverridenSessionId();
+            }
+            if(invalidated == null) {
+                return current;
+            }
+            if(invalidated.equals(current)) {
+                return null;
+            }
+            return current;
+        }
+
+        @Override
+        public SessionCookieSource sessionCookieSource(HttpServerExchange exchange) {
+            return delegate.sessionCookieSource(exchange);
+        }
+
+        @Override
+        public String rewriteUrl(String originalUrl, String sessionId) {
+            return delegate.rewriteUrl(originalUrl, sessionId);
+        }
+
+        public SessionConfig getDelegate() {
+            return delegate;
+        }
     }
 }

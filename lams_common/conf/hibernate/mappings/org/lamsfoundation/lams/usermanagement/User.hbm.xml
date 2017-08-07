@@ -66,7 +66,7 @@
 			</meta>
 		</property>
 		<property name="twoFactorAuthenticationSecret" type="java.lang.String" column="two_factor_auth_secret"
-			not-null="true" length="64">
+			not-null="false" length="64">
 			<meta attribute="field-description">
 				@hibernate.property
 				column="two_factor_auth_secret"

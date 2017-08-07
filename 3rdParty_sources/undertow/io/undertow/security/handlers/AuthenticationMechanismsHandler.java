@@ -20,6 +20,7 @@ package io.undertow.security.handlers;
 
 import io.undertow.Handlers;
 import io.undertow.security.api.AuthenticationMechanism;
+import io.undertow.security.api.AuthenticationMechanismContext;
 import io.undertow.security.api.SecurityContext;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -36,23 +37,24 @@ import java.util.List;
 public class AuthenticationMechanismsHandler implements HttpHandler {
 
     private volatile HttpHandler next = ResponseCodeHandler.HANDLE_404;
-    private final List<AuthenticationMechanism> authenticationMechanisms;
+    private final AuthenticationMechanism[] authenticationMechanisms;
 
     public AuthenticationMechanismsHandler(final HttpHandler next, final List<AuthenticationMechanism> authenticationMechanisms) {
         this.next = next;
-        this.authenticationMechanisms = authenticationMechanisms;
+        this.authenticationMechanisms = authenticationMechanisms.toArray(new AuthenticationMechanism[authenticationMechanisms.size()]);
     }
 
     public AuthenticationMechanismsHandler(final List<AuthenticationMechanism> authenticationHandlers) {
-        this.authenticationMechanisms = authenticationHandlers;
+        this.authenticationMechanisms = authenticationHandlers.toArray(new AuthenticationMechanism[authenticationHandlers.size()]);
     }
 
     @Override
     public void handleRequest(final HttpServerExchange exchange) throws Exception {
         final SecurityContext sc = exchange.getSecurityContext();
-        if(sc != null) {
-            for(AuthenticationMechanism mechanism : authenticationMechanisms) {
-                sc.addAuthenticationMechanism(mechanism);
+        if(sc != null && sc instanceof AuthenticationMechanismContext) {
+            AuthenticationMechanismContext amc = (AuthenticationMechanismContext) sc;
+            for(int i = 0; i < authenticationMechanisms.length; ++i) {
+                amc.addAuthenticationMechanism(authenticationMechanisms[i]);
             }
         }
         next.handleRequest(exchange);

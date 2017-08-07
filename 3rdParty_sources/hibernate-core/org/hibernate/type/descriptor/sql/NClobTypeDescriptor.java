@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2012, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.type.descriptor.sql;
 
@@ -57,9 +40,9 @@ public abstract class NClobTypeDescriptor implements SqlTypeDescriptor {
 	public <X> ValueExtractor<X> getExtractor(final JavaTypeDescriptor<X> javaTypeDescriptor) {
 		return new BasicExtractor<X>( javaTypeDescriptor, this ) {
 			@Override
-            protected X doExtract(ResultSet rs, String name, WrapperOptions options) throws SQLException {
-                return javaTypeDescriptor.wrap( rs.getNClob( name ), options );
-            }
+			protected X doExtract(ResultSet rs, String name, WrapperOptions options) throws SQLException {
+				return javaTypeDescriptor.wrap( rs.getNClob( name ), options );
+			}
 
 			@Override
 			protected X doExtract(CallableStatement statement, int index, WrapperOptions options)
@@ -78,59 +61,85 @@ public abstract class NClobTypeDescriptor implements SqlTypeDescriptor {
 	protected abstract <X> BasicBinder<X> getNClobBinder(JavaTypeDescriptor<X> javaTypeDescriptor);
 
 	@Override
-    public <X> ValueBinder<X> getBinder(JavaTypeDescriptor<X> javaTypeDescriptor) {
+	public <X> ValueBinder<X> getBinder(JavaTypeDescriptor<X> javaTypeDescriptor) {
 		return getNClobBinder( javaTypeDescriptor );
 	}
 
 
-	public static final NClobTypeDescriptor DEFAULT =
-			new NClobTypeDescriptor() {
-				{
-					SqlTypeDescriptorRegistry.INSTANCE.addDescriptor( this );
+	public static final NClobTypeDescriptor DEFAULT = new NClobTypeDescriptor() {
+		@Override
+		public <X> BasicBinder<X> getNClobBinder(final JavaTypeDescriptor<X> javaTypeDescriptor) {
+			return new BasicBinder<X>( javaTypeDescriptor, this ) {
+				@Override
+				protected void doBind(PreparedStatement st, X value, int index, WrapperOptions options)
+						throws SQLException {
+					if ( options.useStreamForLobBinding() ) {
+						STREAM_BINDING.getNClobBinder( javaTypeDescriptor ).doBind( st, value, index, options );
+					}
+					else {
+						NCLOB_BINDING.getNClobBinder( javaTypeDescriptor ).doBind( st, value, index, options );
+					}
 				}
 
 				@Override
-                public <X> BasicBinder<X> getNClobBinder(final JavaTypeDescriptor<X> javaTypeDescriptor) {
-					return new BasicBinder<X>( javaTypeDescriptor, this ) {
-						@Override
-						protected void doBind(PreparedStatement st, X value, int index, WrapperOptions options) throws SQLException {
-							if ( options.useStreamForLobBinding() ) {
-								STREAM_BINDING.getNClobBinder( javaTypeDescriptor ).doBind( st, value, index, options );
-							}
-							else {
-								NCLOB_BINDING.getNClobBinder( javaTypeDescriptor ).doBind( st, value, index, options );
-							}
-						}
-					};
+				protected void doBind(CallableStatement st, X value, String name, WrapperOptions options)
+						throws SQLException {
+					if ( options.useStreamForLobBinding() ) {
+						STREAM_BINDING.getNClobBinder( javaTypeDescriptor ).doBind( st, value, name, options );
+					}
+					else {
+						NCLOB_BINDING.getNClobBinder( javaTypeDescriptor ).doBind( st, value, name, options );
+					}
 				}
 			};
+		}
+	};
 
-	public static final NClobTypeDescriptor NCLOB_BINDING =
-			new NClobTypeDescriptor() {
+	public static final NClobTypeDescriptor NCLOB_BINDING = new NClobTypeDescriptor() {
+		@Override
+		public <X> BasicBinder<X> getNClobBinder(final JavaTypeDescriptor<X> javaTypeDescriptor) {
+			return new BasicBinder<X>( javaTypeDescriptor, this ) {
 				@Override
-                public <X> BasicBinder<X> getNClobBinder(final JavaTypeDescriptor<X> javaTypeDescriptor) {
-					return new BasicBinder<X>( javaTypeDescriptor, this ) {
-						@Override
-						protected void doBind(PreparedStatement st, X value, int index, WrapperOptions options)
-								throws SQLException {
-							st.setNClob( index, javaTypeDescriptor.unwrap( value, NClob.class, options ) );
-						}
-					};
+				protected void doBind(PreparedStatement st, X value, int index, WrapperOptions options)
+						throws SQLException {
+					st.setNClob( index, javaTypeDescriptor.unwrap( value, NClob.class, options ) );
 				}
-			};
 
-	public static final NClobTypeDescriptor STREAM_BINDING =
-			new NClobTypeDescriptor() {
 				@Override
-                public <X> BasicBinder<X> getNClobBinder(final JavaTypeDescriptor<X> javaTypeDescriptor) {
-					return new BasicBinder<X>( javaTypeDescriptor, this ) {
-						@Override
-						protected void doBind(PreparedStatement st, X value, int index, WrapperOptions options)
-								throws SQLException {
-							final CharacterStream characterStream = javaTypeDescriptor.unwrap( value, CharacterStream.class, options );
-							st.setCharacterStream( index, characterStream.asReader(), characterStream.getLength() );
-						}
-					};
+				protected void doBind(CallableStatement st, X value, String name, WrapperOptions options)
+						throws SQLException {
+					st.setNClob( name, javaTypeDescriptor.unwrap( value, NClob.class, options ) );
 				}
 			};
+		}
+	};
+
+	public static final NClobTypeDescriptor STREAM_BINDING = new NClobTypeDescriptor() {
+		@Override
+		public <X> BasicBinder<X> getNClobBinder(final JavaTypeDescriptor<X> javaTypeDescriptor) {
+			return new BasicBinder<X>( javaTypeDescriptor, this ) {
+				@Override
+				protected void doBind(PreparedStatement st, X value, int index, WrapperOptions options)
+						throws SQLException {
+					final CharacterStream characterStream = javaTypeDescriptor.unwrap(
+							value,
+							CharacterStream.class,
+							options
+					);
+					st.setCharacterStream( index, characterStream.asReader(), characterStream.getLength() );
+				}
+
+				@Override
+				protected void doBind(CallableStatement st, X value, String name, WrapperOptions options)
+						throws SQLException {
+					final CharacterStream characterStream = javaTypeDescriptor.unwrap(
+							value,
+							CharacterStream.class,
+							options
+					);
+					st.setCharacterStream( name, characterStream.asReader(), characterStream.getLength() );
+				}
+			};
+		}
+	};
 }

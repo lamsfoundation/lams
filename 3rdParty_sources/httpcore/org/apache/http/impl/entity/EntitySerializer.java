@@ -39,6 +39,7 @@ import org.apache.http.impl.io.ChunkedOutputStream;
 import org.apache.http.impl.io.ContentLengthOutputStream;
 import org.apache.http.impl.io.IdentityOutputStream;
 import org.apache.http.io.SessionOutputBuffer;
+import org.apache.http.util.Args;
 
 /**
  * HTTP entity serializer.
@@ -54,18 +55,18 @@ import org.apache.http.io.SessionOutputBuffer;
  * using a transfer coding based on properties on the HTTP message.
  *
  * @since 4.0
+ *
+ * @deprecated (4.3) use {@link org.apache.http.impl.BHttpConnectionBase}
  */
 @Immutable // assuming injected dependencies are immutable
+@Deprecated
 public class EntitySerializer {
 
     private final ContentLengthStrategy lenStrategy;
 
     public EntitySerializer(final ContentLengthStrategy lenStrategy) {
         super();
-        if (lenStrategy == null) {
-            throw new IllegalArgumentException("Content length strategy may not be null");
-        }
-        this.lenStrategy = lenStrategy;
+        this.lenStrategy = Args.notNull(lenStrategy, "Content length strategy");
     }
 
     /**
@@ -85,7 +86,7 @@ public class EntitySerializer {
     protected OutputStream doSerialize(
             final SessionOutputBuffer outbuffer,
             final HttpMessage message) throws HttpException, IOException {
-        long len = this.lenStrategy.determineLength(message);
+        final long len = this.lenStrategy.determineLength(message);
         if (len == ContentLengthStrategy.CHUNKED) {
             return new ChunkedOutputStream(outbuffer);
         } else if (len == ContentLengthStrategy.IDENTITY) {
@@ -109,16 +110,10 @@ public class EntitySerializer {
             final SessionOutputBuffer outbuffer,
             final HttpMessage message,
             final HttpEntity entity) throws HttpException, IOException {
-        if (outbuffer == null) {
-            throw new IllegalArgumentException("Session output buffer may not be null");
-        }
-        if (message == null) {
-            throw new IllegalArgumentException("HTTP message may not be null");
-        }
-        if (entity == null) {
-            throw new IllegalArgumentException("HTTP entity may not be null");
-        }
-        OutputStream outstream = doSerialize(outbuffer, message);
+        Args.notNull(outbuffer, "Session output buffer");
+        Args.notNull(message, "HTTP message");
+        Args.notNull(entity, "HTTP entity");
+        final OutputStream outstream = doSerialize(outbuffer, message);
         entity.writeTo(outstream);
         outstream.close();
     }

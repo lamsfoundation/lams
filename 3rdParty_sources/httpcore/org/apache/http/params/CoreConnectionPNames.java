@@ -31,11 +31,15 @@ package org.apache.http.params;
  * Defines parameter names for connections in HttpCore.
  *
  * @since 4.0
+ *
+ * @deprecated (4.3) use configuration classes provided 'org.apache.http.config'
+ *  and 'org.apache.http.client.config'
  */
+@Deprecated
 public interface CoreConnectionPNames {
 
     /**
-     * Defines the socket timeout (<code>SO_TIMEOUT</code>) in milliseconds,
+     * Defines the socket timeout ({@code SO_TIMEOUT}) in milliseconds,
      * which is the timeout for waiting for data  or, put differently,
      * a maximum period inactivity between two consecutive data packets).
      * A timeout value of zero is interpreted as an infinite timeout.
@@ -71,8 +75,8 @@ public interface CoreConnectionPNames {
 
     /**
      * Sets SO_LINGER with the specified linger time in seconds. The maximum
-     * timeout value is platform specific. Value <code>0</code> implies that
-     * the option is disabled. Value <code>-1</code> implies that the JRE
+     * timeout value is platform specific. Value {@code 0} implies that
+     * the option is disabled. Value {@code -1} implies that the JRE
      * default is used. The setting only affects the socket close operation.
      * <p>
      * This parameter expects a value of type {@link Integer}.

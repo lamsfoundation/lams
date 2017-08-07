@@ -27,24 +27,25 @@
 
 package org.apache.http.protocol;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.annotation.ThreadSafe;
+import org.apache.http.util.Args;
 
 /**
  * Default implementation of {@link HttpContext}.
  * <p>
- * Please note methods of this class are not synchronized and therefore may
- * be threading unsafe.
+ * Please note instances of this class can be thread unsafe if the
+ * parent context is not thread safe.
  *
  * @since 4.0
  */
-@NotThreadSafe
+@ThreadSafe
 public class BasicHttpContext implements HttpContext {
 
     private final HttpContext parentContext;
-    private Map<String, Object> map = null;
+    private final Map<String, Object> map;
 
     public BasicHttpContext() {
         this(null);
@@ -52,59 +53,46 @@ public class BasicHttpContext implements HttpContext {
 
     public BasicHttpContext(final HttpContext parentContext) {
         super();
+        this.map = new ConcurrentHashMap<String, Object>();
         this.parentContext = parentContext;
     }
 
+    @Override
     public Object getAttribute(final String id) {
-        if (id == null) {
-            throw new IllegalArgumentException("Id may not be null");
-        }
-        Object obj = null;
-        if (this.map != null) {
-            obj = this.map.get(id);
-        }
+        Args.notNull(id, "Id");
+        Object obj = this.map.get(id);
         if (obj == null && this.parentContext != null) {
             obj = this.parentContext.getAttribute(id);
         }
         return obj;
     }
 
+    @Override
     public void setAttribute(final String id, final Object obj) {
-        if (id == null) {
-            throw new IllegalArgumentException("Id may not be null");
+        Args.notNull(id, "Id");
+        if (obj != null) {
+            this.map.put(id, obj);
+        } else {
+            this.map.remove(id);
         }
-        if (this.map == null) {
-            this.map = new HashMap<String, Object>();
-        }
-        this.map.put(id, obj);
     }
 
+    @Override
     public Object removeAttribute(final String id) {
-        if (id == null) {
-            throw new IllegalArgumentException("Id may not be null");
-        }
-        if (this.map != null) {
-            return this.map.remove(id);
-        } else {
-            return null;
-        }
+        Args.notNull(id, "Id");
+        return this.map.remove(id);
     }
 
     /**
      * @since 4.2
      */
     public void clear() {
-        if (this.map != null) {
-            this.map.clear();
-        }
+        this.map.clear();
     }
 
     @Override
     public String toString() {
-        if (this.map != null) {
-            return this.map.toString();
-        } else {
-            return "{}";
-        }
+        return this.map.toString();
     }
+
 }

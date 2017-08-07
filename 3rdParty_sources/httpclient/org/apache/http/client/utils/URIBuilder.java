@@ -1,20 +1,21 @@
 /*
  * ====================================================================
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  * ====================================================================
  *
  * This software consists of voluntary contributions made by many
@@ -23,7 +24,6 @@
  * <http://www.apache.org/>.
  *
  */
-
 package org.apache.http.client.utils;
 
 import java.net.URI;
@@ -40,7 +40,7 @@ import org.apache.http.conn.util.InetAddressUtils;
 import org.apache.http.message.BasicNameValuePair;
 
 /**
- * {@link URI} builder for HTTP requests.
+ * Builder for {@link URI} instances.
  *
  * @since 4.2
  */
@@ -58,6 +58,8 @@ public class URIBuilder {
     private String encodedPath;
     private String encodedQuery;
     private List<NameValuePair> queryParams;
+    private String query;
+    private Charset charset;
     private String fragment;
     private String encodedFragment;
 
@@ -71,7 +73,7 @@ public class URIBuilder {
 
     /**
      * Construct an instance from the string which must be a valid URI.
-     * 
+     *
      * @param string a valid URI in string form
      * @throws URISyntaxException if the input is not a valid URI
      */
@@ -89,8 +91,23 @@ public class URIBuilder {
         digestURI(uri);
     }
 
+    /**
+     * @since 4.4
+     */
+    public URIBuilder setCharset(final Charset charset) {
+        this.charset = charset;
+        return this;
+    }
+
+    /**
+     * @since 4.4
+     */
+    public Charset getCharset() {
+        return charset;
+    }
+
     private List <NameValuePair> parseQuery(final String query, final Charset charset) {
-        if (query != null && query.length() > 0) {
+        if (query != null && !query.isEmpty()) {
             return URLEncodedUtils.parse(query, charset);
         }
         return null;
@@ -102,9 +119,9 @@ public class URIBuilder {
     public URI build() throws URISyntaxException {
         return new URI(buildString());
     }
-    
+
     private String buildString() {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         if (this.scheme != null) {
             sb.append(this.scheme).append(':');
         }
@@ -137,13 +154,15 @@ public class URIBuilder {
             if (this.encodedQuery != null) {
                 sb.append("?").append(this.encodedQuery);
             } else if (this.queryParams != null) {
-                sb.append("?").append(encodeQuery(this.queryParams));
+                sb.append("?").append(encodeUrlForm(this.queryParams));
+            } else if (this.query != null) {
+                sb.append("?").append(encodeUric(this.query));
             }
         }
         if (this.encodedFragment != null) {
             sb.append("#").append(this.encodedFragment);
         } else if (this.fragment != null) {
-            sb.append("#").append(encodeFragment(this.fragment));
+            sb.append("#").append(encodeUric(this.fragment));
         }
         return sb.toString();
     }
@@ -159,25 +178,25 @@ public class URIBuilder {
         this.encodedPath = uri.getRawPath();
         this.path = uri.getPath();
         this.encodedQuery = uri.getRawQuery();
-        this.queryParams = parseQuery(uri.getRawQuery(), Consts.UTF_8);
+        this.queryParams = parseQuery(uri.getRawQuery(), this.charset != null ? this.charset : Consts.UTF_8);
         this.encodedFragment = uri.getRawFragment();
         this.fragment = uri.getFragment();
     }
 
     private String encodeUserInfo(final String userInfo) {
-        return URLEncodedUtils.encUserInfo(userInfo, Consts.UTF_8);
+        return URLEncodedUtils.encUserInfo(userInfo, this.charset != null ? this.charset : Consts.UTF_8);
     }
 
     private String encodePath(final String path) {
-        return URLEncodedUtils.encPath(path, Consts.UTF_8);
+        return URLEncodedUtils.encPath(path, this.charset != null ? this.charset : Consts.UTF_8);
     }
 
-    private String encodeQuery(final List<NameValuePair> params) {
-        return URLEncodedUtils.format(params, Consts.UTF_8);
+    private String encodeUrlForm(final List<NameValuePair> params) {
+        return URLEncodedUtils.format(params, this.charset != null ? this.charset : Consts.UTF_8);
     }
 
-    private String encodeFragment(final String fragment) {
-        return URLEncodedUtils.encFragment(fragment, Consts.UTF_8);
+    private String encodeUric(final String fragment) {
+        return URLEncodedUtils.encUric(fragment, this.charset != null ? this.charset : Consts.UTF_8);
     }
 
     /**
@@ -243,6 +262,7 @@ public class URIBuilder {
      */
     public URIBuilder removeQuery() {
         this.queryParams = null;
+        this.query = null;
         this.encodedQuery = null;
         this.encodedSchemeSpecificPart = null;
         return this;
@@ -252,17 +272,96 @@ public class URIBuilder {
      * Sets URI query.
      * <p>
      * The value is expected to be encoded form data.
+     *
+     * @deprecated (4.3) use {@link #setParameters(List)} or {@link #setParameters(NameValuePair...)}
+     *
+     * @see URLEncodedUtils#parse
      */
+    @Deprecated
     public URIBuilder setQuery(final String query) {
-        this.queryParams = parseQuery(query, Consts.UTF_8);
+        this.queryParams = parseQuery(query, this.charset != null ? this.charset : Consts.UTF_8);
+        this.query = null;
         this.encodedQuery = null;
         this.encodedSchemeSpecificPart = null;
         return this;
     }
 
     /**
+     * Sets URI query parameters. The parameter name / values are expected to be unescaped
+     * and may contain non ASCII characters.
+     * <p>
+     * Please note query parameters and custom query component are mutually exclusive. This method
+     * will remove custom query if present.
+     * </p>
+     *
+     * @since 4.3
+     */
+    public URIBuilder setParameters(final List <NameValuePair> nvps) {
+        if (this.queryParams == null) {
+            this.queryParams = new ArrayList<NameValuePair>();
+        } else {
+            this.queryParams.clear();
+        }
+        this.queryParams.addAll(nvps);
+        this.encodedQuery = null;
+        this.encodedSchemeSpecificPart = null;
+        this.query = null;
+        return this;
+    }
+
+    /**
+     * Adds URI query parameters. The parameter name / values are expected to be unescaped
+     * and may contain non ASCII characters.
+     * <p>
+     * Please note query parameters and custom query component are mutually exclusive. This method
+     * will remove custom query if present.
+     * </p>
+     *
+     * @since 4.3
+     */
+    public URIBuilder addParameters(final List <NameValuePair> nvps) {
+        if (this.queryParams == null) {
+            this.queryParams = new ArrayList<NameValuePair>();
+        }
+        this.queryParams.addAll(nvps);
+        this.encodedQuery = null;
+        this.encodedSchemeSpecificPart = null;
+        this.query = null;
+        return this;
+    }
+
+    /**
+     * Sets URI query parameters. The parameter name / values are expected to be unescaped
+     * and may contain non ASCII characters.
+     * <p>
+     * Please note query parameters and custom query component are mutually exclusive. This method
+     * will remove custom query if present.
+     * </p>
+     *
+     * @since 4.3
+     */
+    public URIBuilder setParameters(final NameValuePair... nvps) {
+        if (this.queryParams == null) {
+            this.queryParams = new ArrayList<NameValuePair>();
+        } else {
+            this.queryParams.clear();
+        }
+        for (final NameValuePair nvp: nvps) {
+            this.queryParams.add(nvp);
+        }
+        this.encodedQuery = null;
+        this.encodedSchemeSpecificPart = null;
+        this.query = null;
+        return this;
+    }
+
+    /**
      * Adds parameter to URI query. The parameter name and value are expected to be unescaped
      * and may contain non ASCII characters.
+     * <p>
+     * Please note query parameters and custom query component are mutually exclusive. This method
+     * will remove custom query if present.
+     * </p>
      */
     public URIBuilder addParameter(final String param, final String value) {
         if (this.queryParams == null) {
@@ -271,20 +370,25 @@ public class URIBuilder {
         this.queryParams.add(new BasicNameValuePair(param, value));
         this.encodedQuery = null;
         this.encodedSchemeSpecificPart = null;
+        this.query = null;
         return this;
     }
 
     /**
      * Sets parameter of URI query overriding existing value if set. The parameter name and value
      * are expected to be unescaped and may contain non ASCII characters.
+     * <p>
+     * Please note query parameters and custom query component are mutually exclusive. This method
+     * will remove custom query if present.
+     * </p>
      */
     public URIBuilder setParameter(final String param, final String value) {
         if (this.queryParams == null) {
             this.queryParams = new ArrayList<NameValuePair>();
         }
         if (!this.queryParams.isEmpty()) {
-            for (Iterator<NameValuePair> it = this.queryParams.iterator(); it.hasNext(); ) {
-                NameValuePair nvp = it.next();
+            for (final Iterator<NameValuePair> it = this.queryParams.iterator(); it.hasNext(); ) {
+                final NameValuePair nvp = it.next();
                 if (nvp.getName().equals(param)) {
                     it.remove();
                 }
@@ -293,6 +397,37 @@ public class URIBuilder {
         this.queryParams.add(new BasicNameValuePair(param, value));
         this.encodedQuery = null;
         this.encodedSchemeSpecificPart = null;
+        this.query = null;
+        return this;
+    }
+
+    /**
+     * Clears URI query parameters.
+     *
+     * @since 4.3
+     */
+    public URIBuilder clearParameters() {
+        this.queryParams = null;
+        this.encodedQuery = null;
+        this.encodedSchemeSpecificPart = null;
+        return this;
+    }
+
+    /**
+     * Sets custom URI query. The value is expected to be unescaped and may contain non ASCII
+     * characters.
+     * <p>
+     * Please note query parameters and custom query component are mutually exclusive. This method
+     * will remove query parameters if present.
+     * </p>
+     *
+     * @since 4.3
+     */
+    public URIBuilder setCustomQuery(final String query) {
+        this.query = query;
+        this.encodedQuery = null;
+        this.encodedSchemeSpecificPart = null;
+        this.queryParams = null;
         return this;
     }
 
@@ -304,6 +439,20 @@ public class URIBuilder {
         this.fragment = fragment;
         this.encodedFragment = null;
         return this;
+    }
+
+    /**
+     * @since 4.3
+     */
+    public boolean isAbsolute() {
+        return this.scheme != null;
+    }
+
+    /**
+     * @since 4.3
+     */
+    public boolean isOpaque() {
+        return this.path == null;
     }
 
     public String getScheme() {
@@ -343,20 +492,21 @@ public class URIBuilder {
         return buildString();
     }
 
-    private static String normalizePath(String path) {
-        if (path == null) {
+    private static String normalizePath(final String path) {
+        String s = path;
+        if (s == null) {
             return null;
         }
         int n = 0;
-        for (; n < path.length(); n++) {
-            if (path.charAt(n) != '/') {
+        for (; n < s.length(); n++) {
+            if (s.charAt(n) != '/') {
                 break;
             }
         }
         if (n > 1) {
-            path = path.substring(n - 1);
+            s = s.substring(n - 1);
         }
-        return path;
+        return s;
     }
 
 }

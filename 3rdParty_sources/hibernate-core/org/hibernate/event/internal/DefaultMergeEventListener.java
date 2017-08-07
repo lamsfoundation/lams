@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2014, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.event.internal;
 
@@ -40,6 +23,7 @@ import org.hibernate.engine.spi.CascadingAction;
 import org.hibernate.engine.spi.CascadingActions;
 import org.hibernate.engine.spi.EntityEntry;
 import org.hibernate.engine.spi.EntityKey;
+import org.hibernate.engine.spi.SelfDirtinessTracker;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.event.spi.EntityCopyObserver;
@@ -246,14 +230,14 @@ public class DefaultMergeEventListener extends AbstractSaveEventListener impleme
 		// copy created before we actually copy
 		//cascadeOnMerge(event, persister, entity, copyCache, Cascades.CASCADE_BEFORE_MERGE);
 		super.cascadeBeforeSave( source, persister, entity, copyCache );
-		copyValues( persister, entity, copy, source, copyCache, ForeignKeyDirection.FOREIGN_KEY_FROM_PARENT );
+		copyValues( persister, entity, copy, source, copyCache, ForeignKeyDirection.FROM_PARENT );
 
 		saveTransientEntity( copy, entityName, event.getRequestedId(), source, copyCache );
 
 		// cascade first, so that all unsaved objects get their
 		// copy created before we actually copy
 		super.cascadeAfterSave( source, persister, entity, copyCache );
-		copyValues( persister, entity, copy, source, copyCache, ForeignKeyDirection.FOREIGN_KEY_TO_PARENT );
+		copyValues( persister, entity, copy, source, copyCache, ForeignKeyDirection.TO_PARENT );
 
 		event.setResult( copy );
 	}
@@ -297,14 +281,14 @@ public class DefaultMergeEventListener extends AbstractSaveEventListener impleme
 			}
 		}
 
-		String previousFetchProfile = source.getFetchProfile();
-		source.setFetchProfile( "merge" );
+		String previousFetchProfile = source.getLoadQueryInfluencers().getInternalFetchProfile();
+		source.getLoadQueryInfluencers().setInternalFetchProfile( "merge" );
 		//we must clone embedded composite identifiers, or
 		//we will get back the same instance that we pass in
 		final Serializable clonedIdentifier = (Serializable) persister.getIdentifierType()
 				.deepCopy( id, source.getFactory() );
 		final Object result = source.get( entityName, clonedIdentifier );
-		source.setFetchProfile( previousFetchProfile );
+		source.getLoadQueryInfluencers().setInternalFetchProfile( previousFetchProfile );
 
 		if ( result == null ) {
 			//TODO: we should throw an exception if we really *know* for sure
@@ -356,6 +340,16 @@ public class DefaultMergeEventListener extends AbstractSaveEventListener impleme
 			FieldInterceptor interceptor = persister.getInstrumentationMetadata().extractInterceptor( target );
 			if ( interceptor != null ) {
 				interceptor.dirty();
+			}
+		}
+
+		// for enhanced entities, copy over the dirty attributes
+		if ( entity instanceof SelfDirtinessTracker && target instanceof SelfDirtinessTracker ) {
+			// clear, because setting the embedded attributes dirties them
+			( (SelfDirtinessTracker) target ).$$_hibernate_clearDirtyAttributes();
+
+			for ( String fieldName : ( (SelfDirtinessTracker) entity ).$$_hibernate_getDirtyAttributes() ) {
+				( (SelfDirtinessTracker) target ).$$_hibernate_trackChange( fieldName );
 			}
 		}
 	}
@@ -426,7 +420,7 @@ public class DefaultMergeEventListener extends AbstractSaveEventListener impleme
 
 		final Object[] copiedValues;
 
-		if ( foreignKeyDirection == ForeignKeyDirection.FOREIGN_KEY_TO_PARENT ) {
+		if ( foreignKeyDirection == ForeignKeyDirection.TO_PARENT ) {
 			// this is the second pass through on a merge op, so here we limit the
 			// replacement to associations types (value types were already replaced
 			// during the first pass)
@@ -471,7 +465,10 @@ public class DefaultMergeEventListener extends AbstractSaveEventListener impleme
 	) {
 		source.getPersistenceContext().incrementCascadeLevel();
 		try {
-			new Cascade( getCascadeAction(), CascadePoint.BEFORE_MERGE, source ).cascade(
+			Cascade.cascade(
+					getCascadeAction(),
+					CascadePoint.BEFORE_MERGE,
+					source,
 					persister,
 					entity,
 					copyCache

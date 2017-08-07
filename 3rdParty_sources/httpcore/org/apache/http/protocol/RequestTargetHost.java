@@ -37,12 +37,13 @@ import org.apache.http.HttpInetConnection;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpVersion;
-import org.apache.http.ProtocolVersion;
 import org.apache.http.ProtocolException;
+import org.apache.http.ProtocolVersion;
 import org.apache.http.annotation.Immutable;
+import org.apache.http.util.Args;
 
 /**
- * RequestTargetHost is responsible for adding <code>Host</code> header. This
+ * RequestTargetHost is responsible for adding {@code Host} header. This
  * interceptor is required for client side protocol processors.
  *
  * @since 4.0
@@ -54,32 +55,28 @@ public class RequestTargetHost implements HttpRequestInterceptor {
         super();
     }
 
+    @Override
     public void process(final HttpRequest request, final HttpContext context)
             throws HttpException, IOException {
-        if (request == null) {
-            throw new IllegalArgumentException("HTTP request may not be null");
-        }
-        if (context == null) {
-            throw new IllegalArgumentException("HTTP context may not be null");
-        }
+        Args.notNull(request, "HTTP request");
 
-        ProtocolVersion ver = request.getRequestLine().getProtocolVersion();
-        String method = request.getRequestLine().getMethod();
+        final HttpCoreContext corecontext = HttpCoreContext.adapt(context);
+
+        final ProtocolVersion ver = request.getRequestLine().getProtocolVersion();
+        final String method = request.getRequestLine().getMethod();
         if (method.equalsIgnoreCase("CONNECT") && ver.lessEquals(HttpVersion.HTTP_1_0)) {
             return;
         }
 
         if (!request.containsHeader(HTTP.TARGET_HOST)) {
-            HttpHost targethost = (HttpHost) context
-                .getAttribute(ExecutionContext.HTTP_TARGET_HOST);
+            HttpHost targethost = corecontext.getTargetHost();
             if (targethost == null) {
-                HttpConnection conn = (HttpConnection) context
-                    .getAttribute(ExecutionContext.HTTP_CONNECTION);
+                final HttpConnection conn = corecontext.getConnection();
                 if (conn instanceof HttpInetConnection) {
                     // Populate the context with a default HTTP host based on the
                     // inet address of the target host
-                    InetAddress address = ((HttpInetConnection) conn).getRemoteAddress();
-                    int port = ((HttpInetConnection) conn).getRemotePort();
+                    final InetAddress address = ((HttpInetConnection) conn).getRemoteAddress();
+                    final int port = ((HttpInetConnection) conn).getRemotePort();
                     if (address != null) {
                         targethost = new HttpHost(address.getHostName(), port);
                     }

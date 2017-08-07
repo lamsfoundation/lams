@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.id;
 
@@ -31,11 +14,18 @@ import java.util.Properties;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.cfg.ObjectNameNormalizer;
+import org.hibernate.boot.model.naming.ObjectNameNormalizer;
+import org.hibernate.boot.model.relational.Database;
+import org.hibernate.boot.model.relational.Namespace;
+import org.hibernate.boot.model.relational.QualifiedName;
+import org.hibernate.boot.model.relational.QualifiedNameParser;
+import org.hibernate.boot.model.relational.Sequence;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.log.DeprecationLogger;
 import org.hibernate.internal.util.config.ConfigurationHelper;
-import org.hibernate.mapping.Table;
+import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.Type;
 
 import org.jboss.logging.Logger;
@@ -50,11 +40,14 @@ import org.jboss.logging.Logger;
  *
  * @see SequenceHiLoGenerator
  * @author Gavin King
+ *
+ * @deprecated Use {@link org.hibernate.id.enhanced.SequenceStyleGenerator} instead
  */
+@Deprecated
 public class SequenceGenerator
 		implements PersistentIdentifierGenerator, BulkInsertionCapableIdentifierGenerator, Configurable {
 
-    private static final Logger LOG = Logger.getLogger( SequenceGenerator.class.getName() );
+	private static final Logger LOG = Logger.getLogger( SequenceGenerator.class.getName() );
 
 	/**
 	 * The sequence parameter
@@ -64,11 +57,15 @@ public class SequenceGenerator
 	/**
 	 * The parameters parameter, appended to the create sequence DDL.
 	 * For example (Oracle): <tt>INCREMENT BY 1 START WITH 1 MAXVALUE 100 NOCACHE</tt>.
+	 *
+	 * @deprecated No longer supported.  To specify initial-value or increment use the
+	 * org.hibernate.id.enhanced.SequenceStyleGenerator generator instead.
 	 */
+	@Deprecated
 	public static final String PARAMETERS = "parameters";
 
+	private QualifiedName logicalQualifiedSequenceName;
 	private String sequenceName;
-	private String parameters;
 	private Type identifierType;
 	private String sql;
 
@@ -85,29 +82,26 @@ public class SequenceGenerator
 	}
 
 	@Override
-	public void configure(Type type, Properties params, Dialect dialect) throws MappingException {
-		ObjectNameNormalizer normalizer = ( ObjectNameNormalizer ) params.get( IDENTIFIER_NORMALIZER );
-		sequenceName = normalizer.normalizeIdentifierQuoting(
-				ConfigurationHelper.getString( SEQUENCE, params, "hibernate_sequence" )
-		);
-		parameters = params.getProperty( PARAMETERS );
+	@SuppressWarnings("StatementWithEmptyBody")
+	public void configure(Type type, Properties params, ServiceRegistry serviceRegistry) throws MappingException {
+		DeprecationLogger.DEPRECATION_LOGGER.deprecatedSequenceGenerator( getClass().getName() );
 
-		if ( sequenceName.indexOf( '.' ) < 0 ) {
-			final String schemaName = normalizer.normalizeIdentifierQuoting( params.getProperty( SCHEMA ) );
-			final String catalogName = normalizer.normalizeIdentifierQuoting( params.getProperty( CATALOG ) );
-			sequenceName = Table.qualify(
-					dialect.quote( catalogName ),
-					dialect.quote( schemaName ),
-					dialect.quote( sequenceName )
+		identifierType = type;
+
+		final ObjectNameNormalizer normalizer = (ObjectNameNormalizer) params.get( IDENTIFIER_NORMALIZER );
+		logicalQualifiedSequenceName = QualifiedNameParser.INSTANCE.parse(
+				ConfigurationHelper.getString( SEQUENCE, params, "hibernate_sequence" ),
+				normalizer.normalizeIdentifierQuoting( params.getProperty( CATALOG ) ),
+				normalizer.normalizeIdentifierQuoting( params.getProperty( SCHEMA ) )
+		);
+
+		if ( params.containsKey( PARAMETERS ) ) {
+			LOG.warn(
+					"Use of 'parameters' config setting is no longer supported; " +
+							"to specify initial-value or increment use the " +
+							"org.hibernate.id.enhanced.SequenceStyleGenerator generator instead."
 			);
 		}
-		else {
-			// if already qualified there is not much we can do in a portable manner so we pass it
-			// through and assume the user has set up the name correctly.
-		}
-
-		this.identifierType = type;
-		sql = dialect.getSequenceNextValString( sequenceName );
 	}
 
 	@Override
@@ -117,9 +111,9 @@ public class SequenceGenerator
 
 	protected IntegralDataTypeHolder generateHolder(SessionImplementor session) {
 		try {
-			PreparedStatement st = session.getTransactionCoordinator().getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
+			PreparedStatement st = session.getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
 			try {
-				ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().extract( st );
+				ResultSet rs = session.getJdbcCoordinator().getResultSetReturn().extract( st );
 				try {
 					rs.next();
 					IntegralDataTypeHolder result = buildHolder();
@@ -128,11 +122,12 @@ public class SequenceGenerator
 					return result;
 				}
 				finally {
-					session.getTransactionCoordinator().getJdbcCoordinator().release( rs, st );
+					session.getJdbcCoordinator().getResourceRegistry().release( rs, st );
 				}
 			}
 			finally {
-				session.getTransactionCoordinator().getJdbcCoordinator().release( st );
+				session.getJdbcCoordinator().getResourceRegistry().release( st );
+				session.getJdbcCoordinator().afterStatementExecution();
 			}
 
 		}
@@ -152,16 +147,12 @@ public class SequenceGenerator
 	@Override
 	@SuppressWarnings( {"deprecation"})
 	public String[] sqlCreateStrings(Dialect dialect) throws HibernateException {
-		String[] ddl = dialect.getCreateSequenceStrings( sequenceName );
-		if ( parameters != null ) {
-			ddl[ddl.length - 1] += ' ' + parameters;
-		}
-		return ddl;
+		return dialect.getCreateSequenceStrings( sequenceName, 1, 1 );
 	}
 
 	@Override
 	public String[] sqlDropStrings(Dialect dialect) throws HibernateException {
-		return dialect.getDropSequenceStrings(sequenceName);
+		return dialect.getDropSequenceStrings( sequenceName );
 	}
 
 	@Override
@@ -172,5 +163,33 @@ public class SequenceGenerator
 	@Override
 	public String determineBulkInsertionIdentifierGenerationSelectFragment(Dialect dialect) {
 		return dialect.getSelectSequenceNextValString( getSequenceName() );
+	}
+
+	@Override
+	public void registerExportables(Database database) {
+		final Namespace namespace = database.locateNamespace(
+				logicalQualifiedSequenceName.getCatalogName(),
+				logicalQualifiedSequenceName.getSchemaName()
+		);
+		Sequence sequence = namespace.locateSequence( logicalQualifiedSequenceName.getObjectName() );
+		if ( sequence != null ) {
+			sequence.validate( 1, 1 );
+		}
+		else {
+			sequence = namespace.createSequence(
+					logicalQualifiedSequenceName.getObjectName(),
+					1,
+					1
+			);
+		}
+
+		final JdbcEnvironment jdbcEnvironment = database.getJdbcEnvironment();
+		final Dialect dialect = jdbcEnvironment.getDialect();
+
+		this.sequenceName = jdbcEnvironment.getQualifiedObjectNameFormatter().format(
+				sequence.getName(),
+				dialect
+		);
+		this.sql = jdbcEnvironment.getDialect().getSequenceNextValString( sequenceName );
 	}
 }

@@ -18,18 +18,6 @@
 
 package io.undertow.server.handlers.resource;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.ByteBuffer;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
 import io.undertow.UndertowLogger;
 import io.undertow.io.IoCallback;
 import io.undertow.io.Sender;
@@ -40,10 +28,25 @@ import io.undertow.util.MimeMappings;
 import io.undertow.util.StatusCodes;
 import org.xnio.IoUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.ByteBuffer;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * @author Stuart Douglas
  */
-public class URLResource implements Resource {
+public class URLResource implements Resource, RangeAwareResource {
 
     private final URL url;
     private final URLConnection connection;
@@ -90,10 +93,10 @@ public class URLResource implements Resource {
 
     @Override
     public boolean isDirectory() {
-        File file = getFile();
-        if(file != null) {
-            return file.isDirectory();
-        } else if(url.getPath().endsWith("/")) {
+        Path file = getFilePath();
+        if (file != null) {
+            return Files.isDirectory(file);
+        } else if (url.getPath().endsWith("/")) {
             return true;
         }
         return false;
@@ -102,14 +105,16 @@ public class URLResource implements Resource {
     @Override
     public List<Resource> list() {
         List<Resource> result = new LinkedList<>();
-        File file = getFile();
+        Path file = getFilePath();
         try {
             if (file != null) {
-                for (File f : file.listFiles()) {
-                    result.add(new URLResource(f.toURI().toURL(), connection, f.getPath()));
+                try(DirectoryStream<Path> stream = Files.newDirectoryStream(file)) {
+                    for (Path child : stream) {
+                        result.add(new URLResource(child.toUri().toURL(), connection, child.toString()));
+                    }
                 }
             }
-        } catch (MalformedURLException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return result;
@@ -126,20 +131,33 @@ public class URLResource implements Resource {
     }
 
     @Override
-    public void serve(final Sender sender, final HttpServerExchange exchange, final IoCallback completionCallback) {
+    public void serve(Sender sender, HttpServerExchange exchange, IoCallback completionCallback) {
+        serveImpl(sender, exchange, -1, -1, false, completionCallback);
+    }
+
+    public void serveImpl(final Sender sender, final HttpServerExchange exchange, final long start, final long end, final boolean range, final IoCallback completionCallback) {
 
         class ServerTask implements Runnable, IoCallback {
 
             private InputStream inputStream;
             private byte[] buffer;
 
+            long toSkip = start;
+            long remaining = end - start + 1;
+
             @Override
             public void run() {
+                if (range && remaining == 0) {
+                    //we are done, just return
+                    IoUtils.safeClose(inputStream);
+                    completionCallback.onComplete(exchange, sender);
+                    return;
+                }
                 if (inputStream == null) {
                     try {
                         inputStream = url.openStream();
                     } catch (IOException e) {
-                        exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
+                        exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
                         return;
                     }
                     buffer = new byte[1024];//TODO: we should be pooling these
@@ -152,7 +170,29 @@ public class URLResource implements Resource {
                         completionCallback.onComplete(exchange, sender);
                         return;
                     }
-                    sender.send(ByteBuffer.wrap(buffer, 0, res), this);
+                    int bufferStart = 0;
+                    int length = res;
+                    if (range && toSkip > 0) {
+                        //skip to the start of the requested range
+                        //not super efficient, but what can you do
+                        while (toSkip > res) {
+                            toSkip -= res;
+                            res = inputStream.read(buffer);
+                            if (res == -1) {
+                                //we are done, just return
+                                IoUtils.safeClose(inputStream);
+                                completionCallback.onComplete(exchange, sender);
+                                return;
+                            }
+                        }
+                        bufferStart = (int) toSkip;
+                        length -= toSkip;
+                        toSkip = 0;
+                    }
+                    if (range && length > remaining) {
+                        length = (int) remaining;
+                    }
+                    sender.send(ByteBuffer.wrap(buffer, bufferStart, length), this);
                 } catch (IOException e) {
                     onException(exchange, sender, e);
                 }
@@ -173,7 +213,7 @@ public class URLResource implements Resource {
                 UndertowLogger.REQUEST_IO_LOGGER.ioException(exception);
                 IoUtils.safeClose(inputStream);
                 if (!exchange.isResponseStarted()) {
-                    exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
+                    exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
                 }
                 completionCallback.onException(exchange, sender, exception);
             }
@@ -199,9 +239,15 @@ public class URLResource implements Resource {
 
     @Override
     public File getFile() {
-        if(url.getProtocol().equals("file")) {
+        Path path = getFilePath();
+        return path != null ? path.toFile() : null;
+    }
+
+    @Override
+    public Path getFilePath() {
+        if (url.getProtocol().equals("file")) {
             try {
-                return new File(url.toURI());
+                return Paths.get(url.toURI());
             } catch (URISyntaxException e) {
                 return null;
             }
@@ -215,7 +261,22 @@ public class URLResource implements Resource {
     }
 
     @Override
+    public Path getResourceManagerRootPath() {
+        return null;
+    }
+
+    @Override
     public URL getUrl() {
         return url;
+    }
+
+    @Override
+    public void serveRange(Sender sender, HttpServerExchange exchange, long start, long end, IoCallback completionCallback) {
+        serveImpl(sender, exchange, start, end, true, completionCallback);
+    }
+
+    @Override
+    public boolean isRangeSupported() {
+        return true;
     }
 }

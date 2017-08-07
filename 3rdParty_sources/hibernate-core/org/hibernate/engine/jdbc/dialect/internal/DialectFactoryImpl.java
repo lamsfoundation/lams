@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.jdbc.dialect.internal;
 
@@ -63,21 +46,34 @@ public class DialectFactoryImpl implements DialectFactory, ServiceRegistryAwareS
 
 	@Override
 	public Dialect buildDialect(Map configValues, DialectResolutionInfoSource resolutionInfoSource) throws HibernateException {
-		final String dialectName = (String) configValues.get( AvailableSettings.DIALECT );
-		if ( !StringHelper.isEmpty( dialectName ) ) {
-			return constructDialect( dialectName );
+		final Object dialectReference = configValues.get( AvailableSettings.DIALECT );
+		if ( !isEmpty( dialectReference ) ) {
+			return constructDialect( dialectReference );
 		}
 		else {
 			return determineDialect( resolutionInfoSource );
 		}
 	}
 
-	private Dialect constructDialect(String dialectName) {
+	@SuppressWarnings("SimplifiableIfStatement")
+	private boolean isEmpty(Object dialectReference) {
+		if ( dialectReference != null ) {
+			// the referenced value is not null
+			if ( dialectReference instanceof String ) {
+				// if it is a String, it might still be empty though...
+				return StringHelper.isEmpty( (String) dialectReference );
+			}
+			return false;
+		}
+		return true;
+	}
+
+	private Dialect constructDialect(Object dialectReference) {
 		final Dialect dialect;
 		try {
-			dialect = strategySelector.resolveStrategy( Dialect.class, dialectName );
+			dialect = strategySelector.resolveStrategy( Dialect.class, dialectReference );
 			if ( dialect == null ) {
-				throw new HibernateException( "Unable to construct requested dialect [" + dialectName+ "]" );
+				throw new HibernateException( "Unable to construct requested dialect [" + dialectReference + "]" );
 			}
 			return dialect;
 		}
@@ -85,7 +81,7 @@ public class DialectFactoryImpl implements DialectFactory, ServiceRegistryAwareS
 			throw e;
 		}
 		catch (Exception e) {
-			throw new HibernateException( "Unable to construct requested dialect [" + dialectName+ "]", e );
+			throw new HibernateException( "Unable to construct requested dialect [" + dialectReference + "]", e );
 		}
 	}
 

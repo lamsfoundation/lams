@@ -41,16 +41,16 @@ import java.util.Set;
 
 /**
  * Handler that sets SSL information on the connection based on the following headers:
- * <p/>
+ * <p>
  * <ul>
  * <li>SSL_CLIENT_CERT</li>
  * <li>SSL_CIPHER</li>
  * <li>SSL_SESSION_ID</li>
  * </ul>
- * <p/>
+ * <p>
  * If this handler is present in the chain it will always override the SSL session information,
  * even if these headers are not present.
- * <p/>
+ * <p>
  * This handler MUST only be used on servers that are behind a reverse proxy, where the reverse proxy
  * has been configured to always set these header for EVERY request (or strip existing headers with these
  * names if no SSL information is present). Otherwise it may be possible for a malicious client to spoof
@@ -99,9 +99,7 @@ public class SSLHeaderHandler implements HttpHandler {
                 exchange.setRequestScheme(HTTPS);
                 exchange.getConnection().setSslSessionInfo(info);
                 exchange.addExchangeCompleteListener(CLEAR_SSL_LISTENER);
-            } catch (java.security.cert.CertificateException e) {
-                UndertowLogger.REQUEST_LOGGER.debugf(e, "Could not create certificate from header %s", clientCert);
-            } catch (CertificateException e) {
+            } catch (java.security.cert.CertificateException | CertificateException e) {
                 UndertowLogger.REQUEST_LOGGER.debugf(e, "Could not create certificate from header %s", clientCert);
             }
         }

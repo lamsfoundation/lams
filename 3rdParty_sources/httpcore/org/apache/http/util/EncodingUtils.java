@@ -51,22 +51,14 @@ public final class EncodingUtils {
      */
     public static String getString(
         final byte[] data,
-        int offset,
-        int length,
-        String charset
-    ) {
-
-        if (data == null) {
-            throw new IllegalArgumentException("Parameter may not be null");
-        }
-
-        if (charset == null || charset.length() == 0) {
-            throw new IllegalArgumentException("charset may not be null or empty");
-        }
-
+        final int offset,
+        final int length,
+        final String charset) {
+        Args.notNull(data, "Input");
+        Args.notEmpty(charset, "Charset");
         try {
             return new String(data, offset, length, charset);
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             return new String(data, offset, length);
         }
     }
@@ -82,9 +74,7 @@ public final class EncodingUtils {
      * @return The result of the conversion.
      */
     public static String getString(final byte[] data, final String charset) {
-        if (data == null) {
-            throw new IllegalArgumentException("Parameter may not be null");
-        }
+        Args.notNull(data, "Input");
         return getString(data, 0, data.length, charset);
     }
 
@@ -97,18 +87,11 @@ public final class EncodingUtils {
      * @return The resulting byte array.
      */
     public static byte[] getBytes(final String data, final String charset) {
-
-        if (data == null) {
-            throw new IllegalArgumentException("data may not be null");
-        }
-
-        if (charset == null || charset.length() == 0) {
-            throw new IllegalArgumentException("charset may not be null or empty");
-        }
-
+        Args.notNull(data, "Input");
+        Args.notEmpty(charset, "Charset");
         try {
             return data.getBytes(charset);
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             return data.getBytes();
         }
     }
@@ -120,16 +103,8 @@ public final class EncodingUtils {
      * @return The string as a byte array.
      */
     public static byte[] getAsciiBytes(final String data) {
-
-        if (data == null) {
-            throw new IllegalArgumentException("Parameter may not be null");
-        }
-
-        try {
-            return data.getBytes(Consts.ASCII.name());
-        } catch (UnsupportedEncodingException e) {
-            throw new Error("HttpClient requires ASCII support");
-        }
+        Args.notNull(data, "Input");
+        return data.getBytes(Consts.ASCII);
     }
 
     /**
@@ -142,17 +117,9 @@ public final class EncodingUtils {
      * @param length the number of bytes to encode
      * @return The string representation of the byte array
      */
-    public static String getAsciiString(final byte[] data, int offset, int length) {
-
-        if (data == null) {
-            throw new IllegalArgumentException("Parameter may not be null");
-        }
-
-        try {
-            return new String(data, offset, length, Consts.ASCII.name());
-        } catch (UnsupportedEncodingException e) {
-            throw new Error("HttpClient requires ASCII support");
-        }
+    public static String getAsciiString(final byte[] data, final int offset, final int length) {
+        Args.notNull(data, "Input");
+        return new String(data, offset, length, Consts.ASCII);
     }
 
     /**
@@ -164,9 +131,7 @@ public final class EncodingUtils {
      * @return The string representation of the byte array
      */
     public static String getAsciiString(final byte[] data) {
-        if (data == null) {
-            throw new IllegalArgumentException("Parameter may not be null");
-        }
+        Args.notNull(data, "Input");
         return getAsciiString(data, 0, data.length);
     }
 

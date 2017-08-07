@@ -31,15 +31,16 @@ public class BytesSentAttribute implements ExchangeAttribute {
     public static final String BYTES_SENT_SHORT_LOWER = "%b";
     public static final String BYTES_SENT = "%{BYTES_SENT}";
 
-    private final String attribute;
+    private final boolean dashIfZero;
 
-    public BytesSentAttribute(final String attribute) {
-        this.attribute = attribute;
+    public BytesSentAttribute(boolean dashIfZero) {
+        this.dashIfZero = dashIfZero;
     }
+
 
     @Override
     public String readAttribute(final HttpServerExchange exchange) {
-        if (attribute.equals(BYTES_SENT_SHORT_LOWER))  {
+        if (dashIfZero )  {
             long bytesSent = exchange.getResponseBytesSent();
             return bytesSent == 0 ? "-" : Long.toString(bytesSent);
         } else {
@@ -61,8 +62,11 @@ public class BytesSentAttribute implements ExchangeAttribute {
 
         @Override
         public ExchangeAttribute build(final String token) {
-            if (token.equals(BYTES_SENT) || token.equals(BYTES_SENT_SHORT_UPPER) || token.equals(BYTES_SENT_SHORT_LOWER)) {
-                return new BytesSentAttribute(token);
+            if(token.equals(BYTES_SENT_SHORT_LOWER)) {
+                return new BytesSentAttribute(true);
+            }
+            if (token.equals(BYTES_SENT) || token.equals(BYTES_SENT_SHORT_UPPER)) {
+                return new BytesSentAttribute(false);
             }
             return null;
         }

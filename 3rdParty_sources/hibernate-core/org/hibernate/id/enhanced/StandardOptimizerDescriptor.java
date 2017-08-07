@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.id.enhanced;
 
@@ -55,7 +38,12 @@ public enum StandardOptimizerDescriptor {
 	 * Describes the optimizer for use with tables/sequences that store the chunk information.  Here, specifically the
 	 * lo value is stored in the database.
 	 */
-	POOLED_LO( "pooled-lo", PooledLoOptimizer.class, true );
+	POOLED_LO( "pooled-lo", PooledLoOptimizer.class, true ),
+	/**
+	 * Describes the optimizer for use with tables/sequences that store the chunk information.  Here, specifically the
+	 * lo value is stored in the database and ThreadLocal used to cache the generation state.
+	 */
+	POOLED_LOTL( "pooled-lotl", PooledLoThreadLocalOptimizer.class, true );
 
 	private static final Logger log = Logger.getLogger( StandardOptimizerDescriptor.class );
 
@@ -63,11 +51,11 @@ public enum StandardOptimizerDescriptor {
 	private final Class<? extends Optimizer> optimizerClass;
 	private final boolean isPooled;
 
-	private StandardOptimizerDescriptor(String externalName, Class<? extends Optimizer> optimizerClass) {
+	StandardOptimizerDescriptor(String externalName, Class<? extends Optimizer> optimizerClass) {
 		this( externalName, optimizerClass, false );
 	}
 
-	private StandardOptimizerDescriptor(String externalName, Class<? extends Optimizer> optimizerClass, boolean pooled) {
+	StandardOptimizerDescriptor(String externalName, Class<? extends Optimizer> optimizerClass, boolean pooled) {
 		this.externalName = externalName;
 		this.optimizerClass = optimizerClass;
 		this.isPooled = pooled;
@@ -112,6 +100,9 @@ public enum StandardOptimizerDescriptor {
 		}
 		else if ( POOLED_LO.externalName.equals( externalName ) ) {
 			return POOLED_LO;
+		}
+		else if ( POOLED_LOTL.externalName.equals( externalName ) ) {
+			return POOLED_LOTL;
 		}
 		else {
 			log.debugf( "Unknown optimizer key [%s]; returning null assuming Optimizer impl class name", externalName );

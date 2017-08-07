@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import io.undertow.UndertowMessages;
 import io.undertow.server.HttpServerExchange;
@@ -31,7 +32,7 @@ import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
 import org.xnio.IoUtils;
-import org.xnio.Pooled;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.channels.StreamSinkChannel;
 
 /**
@@ -39,12 +40,10 @@ import org.xnio.channels.StreamSinkChannel;
  */
 public class AsyncSenderImpl implements Sender {
 
-    private static final Charset utf8 = Charset.forName("UTF-8");
-
     private StreamSinkChannel channel;
     private final HttpServerExchange exchange;
     private ByteBuffer[] buffer;
-    private Pooled[] pooledBuffers = null;
+    private PooledByteBuffer[] pooledBuffers = null;
     private FileChannel fileChannel;
     private IoCallback callback;
     private boolean inCallback;
@@ -118,6 +117,9 @@ public class AsyncSenderImpl implements Sender {
         if (callback == null) {
             throw UndertowMessages.MESSAGES.argumentCannotBeNull("callback");
         }
+        if(exchange.isResponseComplete()) {
+            throw UndertowMessages.MESSAGES.responseComplete();
+        }
         if (this.buffer != null || this.fileChannel != null) {
             throw UndertowMessages.MESSAGES.dataAlreadyQueued();
         }
@@ -169,6 +171,10 @@ public class AsyncSenderImpl implements Sender {
     public void send(final ByteBuffer[] buffer, final IoCallback callback) {
         if (callback == null) {
             throw UndertowMessages.MESSAGES.argumentCannotBeNull("callback");
+        }
+
+        if(exchange.isResponseComplete()) {
+            throw UndertowMessages.MESSAGES.responseComplete();
         }
         if (this.buffer != null) {
             throw UndertowMessages.MESSAGES.dataAlreadyQueued();
@@ -226,6 +232,10 @@ public class AsyncSenderImpl implements Sender {
         if (callback == null) {
             throw UndertowMessages.MESSAGES.argumentCannotBeNull("callback");
         }
+
+        if(exchange.isResponseComplete()) {
+            throw UndertowMessages.MESSAGES.responseComplete();
+        }
         if (this.fileChannel != null || this.buffer != null) {
             throw UndertowMessages.MESSAGES.dataAlreadyQueued();
         }
@@ -258,11 +268,15 @@ public class AsyncSenderImpl implements Sender {
 
     @Override
     public void send(final String data, final IoCallback callback) {
-        send(data, utf8, callback);
+        send(data, StandardCharsets.UTF_8, callback);
     }
 
     @Override
     public void send(final String data, final Charset charset, final IoCallback callback) {
+
+        if(exchange.isResponseComplete()) {
+            throw UndertowMessages.MESSAGES.responseComplete();
+        }
         ByteBuffer bytes = ByteBuffer.wrap(data.getBytes(charset));
         if (bytes.remaining() == 0) {
             callback.onComplete(exchange, this);
@@ -270,16 +284,16 @@ public class AsyncSenderImpl implements Sender {
             int i = 0;
             ByteBuffer[] bufs = null;
             while (bytes.hasRemaining()) {
-                Pooled<ByteBuffer> pooled = exchange.getConnection().getBufferPool().allocate();
+                PooledByteBuffer pooled = exchange.getConnection().getByteBufferPool().allocate();
                 if (bufs == null) {
-                    int noBufs = (bytes.remaining() + pooled.getResource().remaining() - 1) / pooled.getResource().remaining(); //round up division trick
-                    pooledBuffers = new Pooled[noBufs];
+                    int noBufs = (bytes.remaining() + pooled.getBuffer().remaining() - 1) / pooled.getBuffer().remaining(); //round up division trick
+                    pooledBuffers = new PooledByteBuffer[noBufs];
                     bufs = new ByteBuffer[noBufs];
                 }
                 pooledBuffers[i] = pooled;
-                bufs[i] = pooled.getResource();
-                Buffers.copy(pooled.getResource(), bytes);
-                pooled.getResource().flip();
+                bufs[i] = pooled.getBuffer();
+                Buffers.copy(pooled.getBuffer(), bytes);
+                pooled.getBuffer().flip();
                 ++i;
             }
             send(bufs, callback);
@@ -357,8 +371,8 @@ public class AsyncSenderImpl implements Sender {
     private void invokeOnComplete() {
         for (; ; ) {
             if (pooledBuffers != null) {
-                for (Pooled buffer : pooledBuffers) {
-                    buffer.free();
+                for (PooledByteBuffer buffer : pooledBuffers) {
+                    buffer.close();
                 }
                 pooledBuffers = null;
             }
@@ -414,8 +428,8 @@ public class AsyncSenderImpl implements Sender {
     private void invokeOnException(IoCallback callback, IOException e) {
 
         if (pooledBuffers != null) {
-            for (Pooled buffer : pooledBuffers) {
-                buffer.free();
+            for (PooledByteBuffer buffer : pooledBuffers) {
+                buffer.close();
             }
             pooledBuffers = null;
         }

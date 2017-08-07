@@ -31,7 +31,7 @@ import io.undertow.util.Headers;
 import io.undertow.util.SameThreadExecutor;
 import org.xnio.ChannelListener;
 import org.xnio.IoUtils;
-import org.xnio.Pooled;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.channels.StreamSourceChannel;
 
 /**
@@ -41,7 +41,7 @@ import org.xnio.channels.StreamSourceChannel;
  *
  * @author Stuart Douglas
  */
-public class FormEncodedDataDefinition implements FormParserFactory.ParserDefinition {
+public class FormEncodedDataDefinition implements FormParserFactory.ParserDefinition<FormEncodedDataDefinition> {
 
     public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
     private String defaultEncoding = "ISO-8859-1";
@@ -63,6 +63,7 @@ public class FormEncodedDataDefinition implements FormParserFactory.ParserDefini
                     charset = cs;
                 }
             }
+            UndertowLogger.REQUEST_LOGGER.tracef("Created form encoded parser for %s", exchange);
             return new FormEncodedDataParser(charset, exchange);
         }
         return null;
@@ -125,9 +126,9 @@ public class FormEncodedDataDefinition implements FormParserFactory.ParserDefini
 
         private void doParse(final StreamSourceChannel channel) throws IOException {
             int c = 0;
-            final Pooled<ByteBuffer> pooled = exchange.getConnection().getBufferPool().allocate();
+            final PooledByteBuffer pooled = exchange.getConnection().getByteBufferPool().allocate();
             try {
-                final ByteBuffer buffer = pooled.getResource();
+                final ByteBuffer buffer = pooled.getBuffer();
                 do {
                     buffer.clear();
                     c = channel.read(buffer);
@@ -210,7 +211,7 @@ public class FormEncodedDataDefinition implements FormParserFactory.ParserDefini
                     exchange.putAttachment(FORM_DATA, data);
                 }
             } finally {
-                pooled.free();
+                pooled.close();
             }
         }
 

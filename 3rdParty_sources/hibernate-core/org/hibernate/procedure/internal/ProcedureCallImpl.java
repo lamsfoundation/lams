@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2012, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.procedure.internal;
 
@@ -38,7 +21,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.QueryException;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.hibernate.engine.ResultSetMappingDefinition;
-import org.hibernate.engine.jdbc.spi.ExtractedDatabaseMetaData;
+import org.hibernate.engine.jdbc.env.spi.ExtractedDatabaseMetaData;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.query.spi.sql.NativeSQLQueryReturn;
 import org.hibernate.engine.spi.QueryParameters;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -311,11 +295,12 @@ public class ProcedureCallImpl extends AbstractBasicQueryContractImpl implements
 		}
 		if ( parameterStrategy == ParameterStrategy.UNKNOWN ) {
 			// protect to only do this check once
-			final ExtractedDatabaseMetaData databaseMetaData = getSession().getTransactionCoordinator()
+			final ExtractedDatabaseMetaData databaseMetaData = getSession()
 					.getJdbcCoordinator()
-					.getLogicalConnection()
-					.getJdbcServices()
-					.getExtractedMetaDataSupport();
+					.getJdbcSessionOwner()
+					.getJdbcSessionContext()
+					.getServiceRegistry().getService( JdbcEnvironment.class )
+					.getExtractedDatabaseMetaData();
 			if ( ! databaseMetaData.supportsNamedParameters() ) {
 				LOG.unsupportedNamedParameters();
 			}
@@ -404,7 +389,7 @@ public class ProcedureCallImpl extends AbstractBasicQueryContractImpl implements
 		);
 
 		try {
-			final CallableStatement statement = (CallableStatement) getSession().getTransactionCoordinator()
+			final CallableStatement statement = (CallableStatement) getSession()
 					.getJdbcCoordinator()
 					.getStatementPreparer()
 					.prepareStatement( call, true );

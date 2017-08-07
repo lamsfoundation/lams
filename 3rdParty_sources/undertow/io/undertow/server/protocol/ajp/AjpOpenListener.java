@@ -21,19 +21,27 @@ package io.undertow.server.protocol.ajp;
 import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
 import io.undertow.UndertowOptions;
+import io.undertow.conduits.BytesReceivedStreamSourceConduit;
+import io.undertow.conduits.BytesSentStreamSinkConduit;
 import io.undertow.conduits.ReadTimeoutStreamSourceConduit;
 import io.undertow.conduits.WriteTimeoutStreamSinkConduit;
+import io.undertow.server.ConnectorStatistics;
+import io.undertow.server.ConnectorStatisticsImpl;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.OpenListener;
+import io.undertow.server.ServerConnection;
+import io.undertow.server.XnioByteBufferPool;
 import org.xnio.IoUtils;
 import org.xnio.OptionMap;
 import org.xnio.Options;
+import io.undertow.connector.ByteBufferPool;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.Pool;
-import org.xnio.Pooled;
 import org.xnio.StreamConnection;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 import static io.undertow.UndertowOptions.DECODE_URL;
 import static io.undertow.UndertowOptions.URL_CHARSET;
@@ -43,8 +51,7 @@ import static io.undertow.UndertowOptions.URL_CHARSET;
  */
 public class AjpOpenListener implements OpenListener {
 
-    public static final String UTF_8 = "UTF-8";
-    private final Pool<ByteBuffer> bufferPool;
+    private final ByteBufferPool bufferPool;
     private final int bufferSize;
 
     private volatile String scheme;
@@ -55,26 +62,37 @@ public class AjpOpenListener implements OpenListener {
 
     private final AjpRequestParser parser;
 
-    @Deprecated
-    public AjpOpenListener(final Pool<ByteBuffer> pool, final int bufferSize) {
-        this(pool, OptionMap.EMPTY);
-    }
+    private volatile boolean statisticsEnabled;
+    private final ConnectorStatisticsImpl connectorStatistics;
 
-    @Deprecated
-    public AjpOpenListener(final Pool<ByteBuffer> pool, final OptionMap undertowOptions, final int bufferSize) {
-        this(pool, undertowOptions);
-    }
+    private final ServerConnection.CloseListener closeListener = new ServerConnection.CloseListener() {
+        @Override
+        public void closed(ServerConnection connection) {
+            connectorStatistics.decrementConnectionCount();
+        }
+    };
+
     public AjpOpenListener(final Pool<ByteBuffer> pool) {
         this(pool, OptionMap.EMPTY);
     }
 
     public AjpOpenListener(final Pool<ByteBuffer> pool, final OptionMap undertowOptions) {
+        this(new XnioByteBufferPool(pool), undertowOptions);
+    }
+
+    public AjpOpenListener(final ByteBufferPool pool) {
+        this(pool, OptionMap.EMPTY);
+    }
+
+    public AjpOpenListener(final ByteBufferPool pool, final OptionMap undertowOptions) {
         this.undertowOptions = undertowOptions;
         this.bufferPool = pool;
-        Pooled<ByteBuffer> buf = pool.allocate();
-        this.bufferSize = buf.getResource().remaining();
-        buf.free();
-        parser = new AjpRequestParser(undertowOptions.get(URL_CHARSET, UTF_8), undertowOptions.get(DECODE_URL, true));
+        PooledByteBuffer buf = pool.allocate();
+        this.bufferSize = buf.getBuffer().remaining();
+        buf.close();
+        parser = new AjpRequestParser(undertowOptions.get(URL_CHARSET, StandardCharsets.UTF_8.name()), undertowOptions.get(DECODE_URL, true));
+        connectorStatistics = new ConnectorStatisticsImpl();
+        statisticsEnabled = undertowOptions.get(UndertowOptions.ENABLE_CONNECTOR_STATISTICS, false);
     }
 
     @Override
@@ -108,9 +126,17 @@ public class AjpOpenListener implements OpenListener {
             IoUtils.safeClose(channel);
             UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
         }
+        if(statisticsEnabled) {
+            channel.getSinkChannel().setConduit(new BytesSentStreamSinkConduit(channel.getSinkChannel().getConduit(), connectorStatistics.sentAccumulator()));
+            channel.getSourceChannel().setConduit(new BytesReceivedStreamSourceConduit(channel.getSourceChannel().getConduit(), connectorStatistics.receivedAccumulator()));
+            connectorStatistics.incrementConnectionCount();
+        }
 
         AjpServerConnection connection = new AjpServerConnection(channel, bufferPool, rootHandler, undertowOptions, bufferSize);
-        AjpReadListener readListener = new AjpReadListener(connection, scheme, parser);
+        AjpReadListener readListener = new AjpReadListener(connection, scheme, parser, statisticsEnabled ? connectorStatistics : null);
+        if(statisticsEnabled) {
+            connection.addCloseListener(closeListener);
+        }
         connection.setAjpReadListener(readListener);
         readListener.startRequest();
         channel.getSourceChannel().setReadListener(readListener);
@@ -138,11 +164,20 @@ public class AjpOpenListener implements OpenListener {
             throw UndertowMessages.MESSAGES.argumentCannotBeNull("undertowOptions");
         }
         this.undertowOptions = undertowOptions;
+        statisticsEnabled = undertowOptions.get(UndertowOptions.ENABLE_CONNECTOR_STATISTICS, false);
     }
 
     @Override
-    public Pool<ByteBuffer> getBufferPool() {
+    public ByteBufferPool getBufferPool() {
         return bufferPool;
+    }
+
+    @Override
+    public ConnectorStatistics getConnectorStatistics() {
+        if(statisticsEnabled) {
+            return connectorStatistics;
+        }
+        return null;
     }
 
     public String getScheme() {

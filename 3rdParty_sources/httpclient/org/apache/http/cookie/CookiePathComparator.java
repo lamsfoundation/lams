@@ -34,7 +34,7 @@ import org.apache.http.annotation.Immutable;
 
 /**
  * This cookie comparator ensures that multiple cookies satisfying
- * a common criteria are ordered in the <tt>Cookie</tt> header such
+ * a common criteria are ordered in the {@code Cookie} header such
  * that those with more specific Path attributes precede those with
  * less specific.
  *
@@ -50,6 +50,8 @@ import org.apache.http.annotation.Immutable;
 @Immutable
 public class CookiePathComparator implements Serializable, Comparator<Cookie> {
 
+    public static final CookiePathComparator INSTANCE = new CookiePathComparator();
+
     private static final long serialVersionUID = 7523645369616405818L;
 
     private String normalizePath(final Cookie cookie) {
@@ -63,9 +65,10 @@ public class CookiePathComparator implements Serializable, Comparator<Cookie> {
         return path;
     }
 
+    @Override
     public int compare(final Cookie c1, final Cookie c2) {
-        String path1 = normalizePath(c1);
-        String path2 = normalizePath(c2);
+        final String path1 = normalizePath(c1);
+        final String path2 = normalizePath(c2);
         if (path1.equals(path2)) {
             return 0;
         } else if (path1.startsWith(path2)) {

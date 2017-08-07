@@ -1,35 +1,19 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.transform;
+
 import java.util.Arrays;
 
 import org.hibernate.HibernateException;
-import org.hibernate.property.ChainedPropertyAccessor;
-import org.hibernate.property.PropertyAccessor;
-import org.hibernate.property.PropertyAccessorFactory;
-import org.hibernate.property.Setter;
+import org.hibernate.property.access.internal.PropertyAccessStrategyBasicImpl;
+import org.hibernate.property.access.internal.PropertyAccessStrategyChainedImpl;
+import org.hibernate.property.access.internal.PropertyAccessStrategyFieldImpl;
+import org.hibernate.property.access.internal.PropertyAccessStrategyMapImpl;
+import org.hibernate.property.access.spi.Setter;
 
 /**
  * Result transformer that allows to transform a result to
@@ -106,11 +90,10 @@ public class AliasToBeanResultTransformer extends AliasedTupleSubsetResultTransf
 	}
 
 	private void initialize(String[] aliases) {
-		PropertyAccessor propertyAccessor = new ChainedPropertyAccessor(
-				new PropertyAccessor[] {
-						PropertyAccessorFactory.getPropertyAccessor( resultClass, null ),
-						PropertyAccessorFactory.getPropertyAccessor( "field" )
-				}
+		PropertyAccessStrategyChainedImpl propertyAccessStrategy = new PropertyAccessStrategyChainedImpl(
+				PropertyAccessStrategyBasicImpl.INSTANCE,
+				PropertyAccessStrategyFieldImpl.INSTANCE,
+				PropertyAccessStrategyMapImpl.INSTANCE
 		);
 		this.aliases = new String[ aliases.length ];
 		setters = new Setter[ aliases.length ];
@@ -118,7 +101,7 @@ public class AliasToBeanResultTransformer extends AliasedTupleSubsetResultTransf
 			String alias = aliases[ i ];
 			if ( alias != null ) {
 				this.aliases[ i ] = alias;
-				setters[ i ] = propertyAccessor.getSetter( resultClass, alias );
+				setters[ i ] = propertyAccessStrategy.buildPropertyAccess( resultClass, alias ).getSetter();
 			}
 		}
 		isInitialized = true;

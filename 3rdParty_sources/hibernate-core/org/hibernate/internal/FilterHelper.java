@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.internal;
 
@@ -43,7 +25,7 @@ public class FilterHelper {
 	private final String[] filterNames;
 	private final String[] filterConditions;
 	private final boolean[] filterAutoAliasFlags;
-	private final Map<String,String>[] filterAliasTableMaps;
+	private final Map<String, String>[] filterAliasTableMaps;
 
 	/**
 	 * The map of defined filters.  This is expected to be in format
@@ -65,7 +47,7 @@ public class FilterHelper {
 			filterNames[filterCount] = filter.getName();
 			filterConditions[filterCount] = filter.getCondition();
 			filterAliasTableMaps[filterCount] = filter.getAliasTableMap( factory );
-			if ( (filterAliasTableMaps[filterCount].isEmpty() || isTableFromPersistentClass( filterAliasTableMaps[filterCount] )) && filter
+			if ( ( filterAliasTableMaps[filterCount].isEmpty() || isTableFromPersistentClass( filterAliasTableMaps[filterCount] ) ) && filter
 					.useAutoAliasInjection() ) {
 				filterConditions[filterCount] = Template.renderWhereStringTemplate(
 						filter.getCondition(),
@@ -83,9 +65,9 @@ public class FilterHelper {
 			filterCount++;
 		}
 	}
-	
-	private static boolean isTableFromPersistentClass(Map<String,String> aliasTableMap){
-		return aliasTableMap.size() == 1 && aliasTableMap.containsKey(null);
+
+	private static boolean isTableFromPersistentClass(Map<String, String> aliasTableMap) {
+		return aliasTableMap.size() == 1 && aliasTableMap.containsKey( null );
 	}
 
 	public boolean isAffectedBy(Map enabledFilters) {
@@ -116,17 +98,26 @@ public class FilterHelper {
 			}
 		}
 	}
-	
-	private String render(FilterAliasGenerator aliasGenerator, int filterIndex){
-		Map<String,String> aliasTableMap = filterAliasTableMaps[filterIndex];
+
+	private String render(FilterAliasGenerator aliasGenerator, int filterIndex) {
+		Map<String, String> aliasTableMap = filterAliasTableMaps[filterIndex];
 		String condition = filterConditions[filterIndex];
-		if (filterAutoAliasFlags[filterIndex]){
-			return StringHelper.replace(condition, FilterImpl.MARKER, aliasGenerator.getAlias(aliasTableMap.get(null)));
-		} else if (isTableFromPersistentClass(aliasTableMap)){
-			return condition.replace("{alias}", aliasGenerator.getAlias(aliasTableMap.get(null)));
-		} else {
-			for (Map.Entry<String, String> entry : aliasTableMap.entrySet()){
-				condition = condition.replace("{"+entry.getKey()+"}", aliasGenerator.getAlias(entry.getValue()));
+		if ( filterAutoAliasFlags[filterIndex] ) {
+			return StringHelper.replace(
+					condition,
+					FilterImpl.MARKER,
+					aliasGenerator.getAlias( aliasTableMap.get( null ) )
+			);
+		}
+		else if ( isTableFromPersistentClass( aliasTableMap ) ) {
+			return condition.replace( "{alias}", aliasGenerator.getAlias( aliasTableMap.get( null ) ) );
+		}
+		else {
+			for ( Map.Entry<String, String> entry : aliasTableMap.entrySet() ) {
+				condition = condition.replace(
+						"{" + entry.getKey() + "}",
+						aliasGenerator.getAlias( entry.getValue() )
+				);
 			}
 			return condition;
 		}

@@ -32,11 +32,12 @@ import java.io.OutputStream;
 
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.http.io.SessionOutputBuffer;
+import org.apache.http.util.Args;
 
 /**
  * Output stream that cuts off after a defined number of bytes. This class
  * is used to send content of HTTP messages where the end of the content entity
- * is determined by the value of the <code>Content-Length header</code>.
+ * is determined by the value of the {@code Content-Length header}.
  * Entities transferred using this stream can be maximum {@link Long#MAX_VALUE}
  * long.
  * <p>
@@ -76,16 +77,10 @@ public class ContentLengthOutputStream extends OutputStream {
      *
      * @since 4.0
      */
-    public ContentLengthOutputStream(final SessionOutputBuffer out, long contentLength) {
+    public ContentLengthOutputStream(final SessionOutputBuffer out, final long contentLength) {
         super();
-        if (out == null) {
-            throw new IllegalArgumentException("Session output buffer may not be null");
-        }
-        if (contentLength < 0) {
-            throw new IllegalArgumentException("Content length may not be negative");
-        }
-        this.out = out;
-        this.contentLength = contentLength;
+        this.out = Args.notNull(out, "Session output buffer");
+        this.contentLength = Args.notNegative(contentLength, "Content length");
     }
 
     /**
@@ -107,27 +102,28 @@ public class ContentLengthOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
+    public void write(final byte[] b, final int off, final int len) throws IOException {
         if (this.closed) {
             throw new IOException("Attempted write to closed stream.");
         }
         if (this.total < this.contentLength) {
-            long max = this.contentLength - this.total;
-            if (len > max) {
-                len = (int) max;
+            final long max = this.contentLength - this.total;
+            int chunk = len;
+            if (chunk > max) {
+                chunk = (int) max;
             }
-            this.out.write(b, off, len);
-            this.total += len;
+            this.out.write(b, off, chunk);
+            this.total += chunk;
         }
     }
 
     @Override
-    public void write(byte[] b) throws IOException {
+    public void write(final byte[] b) throws IOException {
         write(b, 0, b.length);
     }
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(final int b) throws IOException {
         if (this.closed) {
             throw new IOException("Attempted write to closed stream.");
         }

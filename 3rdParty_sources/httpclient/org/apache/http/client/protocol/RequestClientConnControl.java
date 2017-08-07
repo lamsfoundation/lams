@@ -31,21 +31,19 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.annotation.Immutable;
-
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.conn.HttpRoutedConnection;
-import org.apache.http.conn.routing.HttpRoute;
-import org.apache.http.protocol.ExecutionContext;
+import org.apache.http.annotation.Immutable;
+import org.apache.http.conn.routing.RouteInfo;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.Args;
 
 /**
- * This protocol interceptor is responsible for adding <code>Connection</code>
- * or <code>Proxy-Connection</code> headers to the outgoing requests, which
- * is essential for managing persistence of <code>HTTP/1.0</code> connections.
+ * This protocol interceptor is responsible for adding {@code Connection}
+ * or {@code Proxy-Connection} headers to the outgoing requests, which
+ * is essential for managing persistence of {@code HTTP/1.0} connections.
  *
  * @since 4.0
  */
@@ -60,27 +58,25 @@ public class RequestClientConnControl implements HttpRequestInterceptor {
         super();
     }
 
+    @Override
     public void process(final HttpRequest request, final HttpContext context)
             throws HttpException, IOException {
-        if (request == null) {
-            throw new IllegalArgumentException("HTTP request may not be null");
-        }
+        Args.notNull(request, "HTTP request");
 
-        String method = request.getRequestLine().getMethod();
+        final String method = request.getRequestLine().getMethod();
         if (method.equalsIgnoreCase("CONNECT")) {
             request.setHeader(PROXY_CONN_DIRECTIVE, HTTP.CONN_KEEP_ALIVE);
             return;
         }
 
+        final HttpClientContext clientContext = HttpClientContext.adapt(context);
+
         // Obtain the client connection (required)
-        HttpRoutedConnection conn = (HttpRoutedConnection) context.getAttribute(
-                ExecutionContext.HTTP_CONNECTION);
-        if (conn == null) {
-            this.log.debug("HTTP connection not set in the context");
+        final RouteInfo route = clientContext.getHttpRoute();
+        if (route == null) {
+            this.log.debug("Connection route not set in the context");
             return;
         }
-
-        HttpRoute route = conn.getRoute();
 
         if (route.getHopCount() == 1 || route.isTunnelled()) {
             if (!request.containsHeader(HTTP.CONN_DIRECTIVE)) {

@@ -19,81 +19,104 @@
 package io.undertow.util;
 
 import io.undertow.UndertowMessages;
-import org.xnio.Pooled;
+import io.undertow.connector.PooledByteBuffer;
 
+import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
+ * A reference counted pooled implementation, that basically consists of a main buffer, that can be sliced off into smaller buffers,
+ * and the underlying buffer will not be freed until all the slices and the main buffer itself have also been freed.
+ *
+ * This also supports the notion of un-freeing the main buffer. Basically this allows the buffer be re-used, so if only a small slice of the
+ * buffer was used for read operations the main buffer can potentially be re-used. This prevents buffer exhaustion attacks where content
+ * is sent in many small packets, and you end up allocating a large number of buffers to hold a small amount of data.
+ *
  * @author Stuart Douglas
  */
-public class ReferenceCountedPooled<T> implements Pooled<T> {
+public class ReferenceCountedPooled implements PooledByteBuffer {
 
-    private final Pooled<T> underlying;
+    private final PooledByteBuffer underlying;
     @SuppressWarnings("unused")
     private volatile int referenceCount;
-    private volatile boolean discard = false;
     boolean mainFreed = false;
+    private ByteBuffer slice = null;
+    private final FreeNotifier freeNotifier;
 
     private static final AtomicIntegerFieldUpdater<ReferenceCountedPooled> referenceCountUpdater = AtomicIntegerFieldUpdater.newUpdater(ReferenceCountedPooled.class, "referenceCount");
 
-    public ReferenceCountedPooled(Pooled<T> underlying, int referenceCount) {
+    public ReferenceCountedPooled(PooledByteBuffer underlying, int referenceCount) {
+        this(underlying, referenceCount, null);
+    }
+
+    public ReferenceCountedPooled(PooledByteBuffer underlying, int referenceCount, FreeNotifier freeNotifier) {
         this.underlying = underlying;
         this.referenceCount = referenceCount;
-    }
-
-    @Override
-    public void discard() {
-        this.discard = true;
-        if(referenceCountUpdater.decrementAndGet(this) == 0) {
-            underlying.discard();
-        }
-
-    }
-
-    @Override
-    public void free() {
-        if(mainFreed) {
-            throw UndertowMessages.MESSAGES.bufferAlreadyFreed();
-        }
-        mainFreed = true;
-        freeInternal();
-    }
-    public void freeInternal() {
-        if(referenceCountUpdater.decrementAndGet(this) == 0) {
-            if(discard) {
-                underlying.discard();
-            } else {
-                underlying.free();
-            }
-        }
-    }
-
-    @Override
-    public T getResource() throws IllegalStateException {
-        return underlying.getResource();
+        this.freeNotifier = freeNotifier;
     }
 
     @Override
     public void close() {
-        free();
+        if(mainFreed) {
+            return;
+        }
+        mainFreed = true;
+        freeInternal();
     }
 
-    public Pooled<T> createView(final T newValue) {
+    @Override
+    public boolean isOpen() {
+        return !mainFreed;
+    }
+
+    public boolean isFreed() {
+        return mainFreed;
+    }
+
+    public boolean tryUnfree() {
+        int refs;
+        do {
+            refs  = referenceCountUpdater.get(this);
+            if(refs <= 0) {
+                 return false;
+            }
+        } while (!referenceCountUpdater.compareAndSet(this, refs, refs + 1));
+        ByteBuffer resource = slice != null ? slice : underlying.getBuffer();
+        resource.position(resource.limit());
+        resource.limit(resource.capacity());
+        slice = resource.slice();
+        mainFreed = false;
+        return true;
+    }
+
+    private void freeInternal() {
+        if(referenceCountUpdater.decrementAndGet(this) == 0) {
+            underlying.close();
+            if(freeNotifier != null) {
+                freeNotifier.freed();
+            }
+        }
+    }
+
+    @Override
+    public ByteBuffer getBuffer() throws IllegalStateException {
+        if(mainFreed) {
+            throw UndertowMessages.MESSAGES.bufferAlreadyFreed();
+        }
+        if(slice != null) {
+            return slice;
+        }
+        return underlying.getBuffer();
+    }
+
+    public PooledByteBuffer createView(final ByteBuffer newValue) {
         increaseReferenceCount();
-        return new Pooled<T>() {
+        return new PooledByteBuffer() {
 
             boolean free = false;
 
             @Override
-            public void discard() {
-                if(!free) {
-                    free = true;
-                    ReferenceCountedPooled.this.freeInternal();
-                }
-            }
-
-            @Override
-            public void free() {
+            public void close() {
                 //make sure that a given view can only be freed once
                 if(!free) {
                     free = true;
@@ -102,7 +125,12 @@ public class ReferenceCountedPooled<T> implements Pooled<T> {
             }
 
             @Override
-            public T getResource() throws IllegalStateException {
+            public boolean isOpen() {
+                return !free;
+            }
+
+            @Override
+            public ByteBuffer getBuffer() throws IllegalStateException {
                 if(free) {
                     throw UndertowMessages.MESSAGES.bufferAlreadyFreed();
                 }
@@ -110,8 +138,14 @@ public class ReferenceCountedPooled<T> implements Pooled<T> {
             }
 
             @Override
-            public void close() {
-                free();
+            public String toString() {
+                return "ReferenceCountedPooled$view{" +
+                        "free=" + free +
+                        "underlying=" + underlying +
+                        ", referenceCount=" + referenceCount +
+                        ", mainFreed=" + mainFreed +
+                        ", slice=" + slice +
+                        '}';
             }
         };
     }
@@ -126,5 +160,19 @@ public class ReferenceCountedPooled<T> implements Pooled<T> {
                 throw UndertowMessages.MESSAGES.objectWasFreed();
             }
         } while (!referenceCountUpdater.compareAndSet(this, val, val + 1));
+    }
+
+    public interface FreeNotifier {
+        void freed();
+    }
+
+    @Override
+    public String toString() {
+        return "ReferenceCountedPooled{" +
+                "underlying=" + underlying +
+                ", referenceCount=" + referenceCount +
+                ", mainFreed=" + mainFreed +
+                ", slice=" + slice +
+                '}';
     }
 }

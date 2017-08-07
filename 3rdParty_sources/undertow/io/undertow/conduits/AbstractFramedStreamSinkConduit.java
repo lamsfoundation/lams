@@ -21,7 +21,7 @@ package io.undertow.conduits;
 import io.undertow.UndertowMessages;
 import org.xnio.Buffers;
 import org.xnio.IoUtils;
-import org.xnio.Pooled;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.channels.StreamSourceChannel;
 import org.xnio.conduits.AbstractStreamSinkConduit;
 import org.xnio.conduits.ConduitWritableByteChannel;
@@ -40,7 +40,7 @@ import static org.xnio.Bits.anyAreSet;
 /**
  * Utility class to ease the implementation of framed protocols. This call provides a queue of frames, and a callback
  * that can be invoked when a frame event occurs.
- * <p/>
+ * <p>
  * When a write takes place all frames are attempted to be written out at once via a gathering write. Frames can be
  * queued via {@link #queueFrame(io.undertow.conduits.AbstractFramedStreamSinkConduit.FrameCallBack, java.nio.ByteBuffer...)}.
  *
@@ -205,8 +205,7 @@ public class AbstractFramedStreamSinkConduit extends AbstractStreamSinkConduit<S
         next.terminateWrites();
     }
 
-    @Override
-    public boolean flush() throws IOException {
+    protected boolean flushQueuedData() throws IOException {
         if (queuedData > 0) {
             doWrite(null, 0, 0);
         }
@@ -231,6 +230,10 @@ public class AbstractFramedStreamSinkConduit extends AbstractStreamSinkConduit<S
         }
     }
 
+    protected boolean isWritesTerminated() {
+        return anyAreSet(state, FLAG_WRITES_TERMINATED);
+    }
+
     protected void queueCloseFrames() {
 
     }
@@ -241,7 +244,7 @@ public class AbstractFramedStreamSinkConduit extends AbstractStreamSinkConduit<S
 
     /**
      * Interface that is called when a frame event takes place. The events are:
-     * <p/>
+     * <p>
      * <ul>
      * <li>
      * Done - The fame has been written out
@@ -278,36 +281,36 @@ public class AbstractFramedStreamSinkConduit extends AbstractStreamSinkConduit<S
 
     protected class PooledBufferFrameCallback implements FrameCallBack {
 
-        private final Pooled<ByteBuffer> buffer;
+        private final PooledByteBuffer buffer;
 
-        public PooledBufferFrameCallback(Pooled<ByteBuffer> buffer) {
+        public PooledBufferFrameCallback(PooledByteBuffer buffer) {
             this.buffer = buffer;
         }
 
         @Override
         public void done() {
-            buffer.free();
+            buffer.close();
         }
 
         @Override
         public void failed(IOException e) {
-            buffer.free();
+            buffer.close();
         }
     }
 
 
     protected class PooledBuffersFrameCallback implements FrameCallBack {
 
-        private final Pooled[] buffers;
+        private final PooledByteBuffer[] buffers;
 
-        public PooledBuffersFrameCallback(Pooled... buffers) {
+        public PooledBuffersFrameCallback(PooledByteBuffer... buffers) {
             this.buffers = buffers;
         }
 
         @Override
         public void done() {
-            for (Pooled buffer : buffers) {
-                buffer.free();
+            for (PooledByteBuffer buffer : buffers) {
+                buffer.close();
             }
         }
 

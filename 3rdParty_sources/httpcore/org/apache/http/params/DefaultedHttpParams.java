@@ -30,7 +30,7 @@ package org.apache.http.params;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.http.params.HttpParams;
+import org.apache.http.util.Args;
 
 /**
  * {@link HttpParams} implementation that delegates resolution of a parameter
@@ -39,7 +39,11 @@ import org.apache.http.params.HttpParams;
  * whereas the default collection is treated as read-only.
  *
  * @since 4.0
+ *
+ * @deprecated (4.3) use configuration classes provided 'org.apache.http.config'
+ *  and 'org.apache.http.client.config'
  */
+@Deprecated
 public final class DefaultedHttpParams extends AbstractHttpParams {
 
     private final HttpParams local;
@@ -53,21 +57,15 @@ public final class DefaultedHttpParams extends AbstractHttpParams {
      */
     public DefaultedHttpParams(final HttpParams local, final HttpParams defaults) {
         super();
-        if (local == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
-        this.local = local;
+        this.local = Args.notNull(local, "Local HTTP parameters");
         this.defaults = defaults;
     }
 
     /**
      * Creates a copy of the local collection with the same default
-     *
-     * @deprecated (4.1)
      */
-    @Deprecated
     public HttpParams copy() {
-        HttpParams clone = this.local.copy();
+        final HttpParams clone = this.local.copy();
         return new DefaultedHttpParams(clone, this.defaults);
     }
 
@@ -103,9 +101,7 @@ public final class DefaultedHttpParams extends AbstractHttpParams {
     /**
      *
      * @return the default HttpParams collection
-     * @deprecated (4.1.1) do not use, will be removed in a later version
      */
-    @Deprecated
     public HttpParams getDefaults() {
         return this.defaults;
     }
@@ -117,13 +113,13 @@ public final class DefaultedHttpParams extends AbstractHttpParams {
      * Changes to the underlying HttpParams intances are not reflected
      * in the set - it is a snapshot.
      *
-     * @return the combined set of names, as a Set<String>
+     * @return the combined set of names, as a Set&lt;String&gt;
      * @since 4.2
      * @throws UnsupportedOperationException if either the local or default HttpParams instances do not implement HttpParamsNames
      */
     @Override
     public Set<String> getNames() {
-        Set<String> combined = new HashSet<String>(getNames(defaults));
+        final Set<String> combined = new HashSet<String>(getNames(defaults));
         combined.addAll(getNames(this.local));
         return combined ;
     }
@@ -134,7 +130,7 @@ public final class DefaultedHttpParams extends AbstractHttpParams {
      * Changes to the underlying HttpParams are not reflected
      * in the set - it is a snapshot.
      *
-     * @return the names, as a Set<String>
+     * @return the names, as a Set&lt;String&gt;
      * @since 4.2
      * @throws UnsupportedOperationException if the default HttpParams instance does not implement HttpParamsNames
      */
@@ -148,7 +144,7 @@ public final class DefaultedHttpParams extends AbstractHttpParams {
      * Changes to the underlying HttpParams are not reflected
      * in the set - it is a snapshot.
      *
-     * @return the names, as a Set<String>
+     * @return the names, as a Set&lt;String&gt;
      * @since 4.2
      * @throws UnsupportedOperationException if the local HttpParams instance does not implement HttpParamsNames
      */
@@ -157,7 +153,7 @@ public final class DefaultedHttpParams extends AbstractHttpParams {
     }
 
     // Helper method
-    private Set<String> getNames(HttpParams params) {
+    private Set<String> getNames(final HttpParams params) {
         if (params instanceof HttpParamsNames) {
             return ((HttpParamsNames) params).getNames();
         }

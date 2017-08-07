@@ -27,27 +27,33 @@
 package org.apache.http.impl.cookie;
 
 import org.apache.http.annotation.Immutable;
-
+import org.apache.http.cookie.ClientCookie;
+import org.apache.http.cookie.CommonCookieAttributeHandler;
 import org.apache.http.cookie.MalformedCookieException;
 import org.apache.http.cookie.SetCookie;
+import org.apache.http.util.Args;
 
 /**
  *
  * @since 4.0
  */
 @Immutable
-public class BasicCommentHandler extends AbstractCookieAttributeHandler {
+public class BasicCommentHandler extends AbstractCookieAttributeHandler implements CommonCookieAttributeHandler {
 
     public BasicCommentHandler() {
         super();
     }
 
+    @Override
     public void parse(final SetCookie cookie, final String value)
             throws MalformedCookieException {
-        if (cookie == null) {
-            throw new IllegalArgumentException("Cookie may not be null");
-        }
+        Args.notNull(cookie, "Cookie");
         cookie.setComment(value);
+    }
+
+    @Override
+    public String getAttributeName() {
+        return ClientCookie.COMMENT_ATTR;
     }
 
 }

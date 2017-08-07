@@ -26,6 +26,7 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.JvmRouteHandler;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.AccessControlListHandler;
+import io.undertow.server.handlers.LearningPushHandler;
 import io.undertow.server.handlers.DateHandler;
 import io.undertow.server.handlers.DisableCacheHandler;
 import io.undertow.server.handlers.ExceptionHandler;
@@ -54,6 +55,8 @@ import io.undertow.server.handlers.proxy.ProxyClient;
 import io.undertow.server.handlers.proxy.ProxyHandler;
 import io.undertow.server.handlers.resource.ResourceHandler;
 import io.undertow.server.handlers.resource.ResourceManager;
+import io.undertow.server.handlers.sse.ServerSentEventConnectionCallback;
+import io.undertow.server.handlers.sse.ServerSentEventHandler;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.WebSocketProtocolHandshakeHandler;
 
@@ -184,6 +187,25 @@ public class Handlers {
     }
 
     /**
+     * A handler for server sent events
+     *
+     *
+     * @param callback The server sent events callback
+     * @return A new server sent events handler
+     */
+    public static ServerSentEventHandler serverSentEvents(ServerSentEventConnectionCallback callback) {
+        return new ServerSentEventHandler(callback);
+    }
+
+    /**
+     * A handler for server sent events
+     *
+     * @return A new server sent events handler
+     */
+    public static ServerSentEventHandler serverSentEvents() {
+        return new ServerSentEventHandler();
+    }
+    /**
      * Return a new resource handler
      *
      * @param resourceManager The resource manager to use
@@ -206,7 +228,7 @@ public class Handlers {
     /**
      * Returns a new HTTP trace handler. This handler will handle HTTP TRACE
      * requests as per the RFC.
-     * <p/>
+     * <p>
      * WARNING: enabling trace requests may leak information, in general it is recommended that
      * these be disabled for security reasons.
      *
@@ -273,6 +295,20 @@ public class Handlers {
         return new SetHeaderHandler(next, headerName, headerValue);
     }
 
+
+    /**
+     * Returns a handler that sets a response header
+     *
+     * @param next        The next handler in the chain
+     * @param headerName  The name of the header
+     * @param headerValue The header value
+     * @return A new set header handler
+     */
+    public static SetHeaderHandler header(final HttpHandler next, final String headerName, final ExchangeAttribute headerValue) {
+        return new SetHeaderHandler(next, headerName, headerValue);
+    }
+
+
     /**
      * Returns a new handler that can allow or deny access to a resource based on IP address
      *
@@ -335,9 +371,9 @@ public class Handlers {
 
     /**
      * A handler that will decode the URL, query parameters and to the specified charset.
-     * <p/>
+     * <p>
      * If you are using this handler you must set the {@link io.undertow.UndertowOptions#DECODE_URL} parameter to false.
-     * <p/>
+     * <p>
      * This is not as efficient as using the parsers built in UTF-8 decoder. Unless you need to decode to something other
      * than UTF-8 you should rely on the parsers decoding instead.
      *
@@ -513,6 +549,29 @@ public class Handlers {
      */
     public static ResponseRateLimitingHandler responseRateLimitingHandler(HttpHandler next, int bytes,long time, TimeUnit timeUnit) {
         return new ResponseRateLimitingHandler(next, bytes, time, timeUnit);
+    }
+
+    /**
+     * Creates a handler that automatically learns which resources to push based on the referer header
+     *
+     * @param maxEntries The maximum number of entries to store
+     * @param maxAge The maximum age of the entries
+     * @param next The next handler
+     * @return A caching push handler
+     */
+    public static LearningPushHandler learningPushHandler(int maxEntries, int maxAge, HttpHandler next) {
+        return new LearningPushHandler(maxEntries, maxAge, next);
+    }
+
+    /**
+     * Creates a handler that automatically learns which resources to push based on the referer header
+     *
+     * @param maxEntries The maximum number of entries to store
+     * @param next The next handler
+     * @return A caching push handler
+     */
+    public static LearningPushHandler learningPushHandler(int maxEntries, HttpHandler next) {
+        return new LearningPushHandler(maxEntries, -1, next);
     }
 
     private Handlers() {

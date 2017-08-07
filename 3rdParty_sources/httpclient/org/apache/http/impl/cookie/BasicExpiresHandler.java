@@ -26,43 +26,49 @@
  */
 package org.apache.http.impl.cookie;
 
-import org.apache.http.annotation.Immutable;
+import java.util.Date;
 
+import org.apache.http.annotation.Immutable;
+import org.apache.http.client.utils.DateUtils;
+import org.apache.http.cookie.ClientCookie;
+import org.apache.http.cookie.CommonCookieAttributeHandler;
 import org.apache.http.cookie.MalformedCookieException;
 import org.apache.http.cookie.SetCookie;
-
+import org.apache.http.util.Args;
 
 /**
  *
  * @since 4.0
  */
 @Immutable
-public class BasicExpiresHandler extends AbstractCookieAttributeHandler {
+public class BasicExpiresHandler extends AbstractCookieAttributeHandler implements CommonCookieAttributeHandler {
 
     /** Valid date patterns */
     private final String[] datepatterns;
 
     public BasicExpiresHandler(final String[] datepatterns) {
-        if (datepatterns == null) {
-            throw new IllegalArgumentException("Array of date patterns may not be null");
-        }
+        Args.notNull(datepatterns, "Array of date patterns");
         this.datepatterns = datepatterns;
     }
 
+    @Override
     public void parse(final SetCookie cookie, final String value)
             throws MalformedCookieException {
-        if (cookie == null) {
-            throw new IllegalArgumentException("Cookie may not be null");
-        }
+        Args.notNull(cookie, "Cookie");
         if (value == null) {
-            throw new MalformedCookieException("Missing value for expires attribute");
+            throw new MalformedCookieException("Missing value for 'expires' attribute");
         }
-        try {
-            cookie.setExpiryDate(DateUtils.parseDate(value, this.datepatterns));
-        } catch (DateParseException dpe) {
-            throw new MalformedCookieException("Unable to parse expires attribute: "
-                + value);
+        final Date expiry = DateUtils.parseDate(value, this.datepatterns);
+        if (expiry == null) {
+            throw new MalformedCookieException("Invalid 'expires' attribute: "
+                    + value);
         }
+        cookie.setExpiryDate(expiry);
+    }
+
+    @Override
+    public String getAttributeName() {
+        return ClientCookie.EXPIRES_ATTR;
     }
 
 }

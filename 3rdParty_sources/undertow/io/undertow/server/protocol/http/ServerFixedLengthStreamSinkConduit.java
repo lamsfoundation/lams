@@ -46,8 +46,14 @@ public class ServerFixedLengthStreamSinkConduit extends AbstractFixedLengthStrea
         super.reset(contentLength, !exchange.isPersistent());
     }
 
+    void clearExchange(){
+        this.exchange = null;
+    }
+
     @Override
     protected void channelFinished() {
-        Connectors.terminateResponse(exchange);
+        if(exchange != null) {
+            Connectors.terminateResponse(exchange);
+        }
     }
 }

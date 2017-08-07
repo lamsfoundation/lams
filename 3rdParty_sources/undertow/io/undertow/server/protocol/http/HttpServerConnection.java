@@ -23,6 +23,7 @@ import io.undertow.conduits.ReadDataStreamSourceConduit;
 import io.undertow.server.AbstractServerConnection;
 import io.undertow.server.ConduitWrapper;
 import io.undertow.server.ConnectionSSLSessionInfo;
+import io.undertow.server.ConnectorStatisticsImpl;
 import io.undertow.server.Connectors;
 import io.undertow.server.ExchangeCompletionListener;
 import io.undertow.server.HttpHandler;
@@ -33,10 +34,11 @@ import io.undertow.server.ServerConnection;
 import io.undertow.util.ConduitFactory;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
-import io.undertow.util.ImmediatePooled;
+import io.undertow.util.ImmediatePooledByteBuffer;
+import io.undertow.util.Methods;
 import org.xnio.OptionMap;
-import org.xnio.Pool;
-import org.xnio.Pooled;
+import io.undertow.connector.ByteBufferPool;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.StreamConnection;
 import org.xnio.channels.SslChannel;
 import org.xnio.conduits.StreamSinkConduit;
@@ -46,7 +48,7 @@ import java.nio.ByteBuffer;
 
 /**
  * A server-side HTTP connection.
- * <p/>
+ * <p>
  * Note that the lifecycle of the server connection is tied to the underlying TCP connection. Even if the channel
  * is upgraded the connection is not considered closed until the upgraded channel is closed.
  *
@@ -62,8 +64,9 @@ public final class HttpServerConnection extends AbstractServerConnection {
     private ReadDataStreamSourceConduit readDataStreamSourceConduit;
 
     private HttpUpgradeListener upgradeListener;
+    private boolean connectHandled;
 
-    public HttpServerConnection(StreamConnection channel, final Pool<ByteBuffer> bufferPool, final HttpHandler rootHandler, final OptionMap undertowOptions, final int bufferSize) {
+    public HttpServerConnection(StreamConnection channel, final ByteBufferPool bufferPool, final HttpHandler rootHandler, final OptionMap undertowOptions, final int bufferSize, final ConnectorStatisticsImpl connectorStatistics) {
         super(channel, bufferPool, rootHandler, undertowOptions, bufferSize);
         if (channel instanceof SslChannel) {
             sslSessionInfo = new ConnectionSSLSessionInfo(((SslChannel) channel), this);
@@ -76,6 +79,9 @@ public final class HttpServerConnection extends AbstractServerConnection {
         addCloseListener(new CloseListener() {
             @Override
             public void closed(ServerConnection connection) {
+                if(connectorStatistics != null) {
+                    connectorStatistics.decrementConnectionCount();
+                }
                 responseConduit.freeBuffers();
             }
         });
@@ -105,7 +111,7 @@ public final class HttpServerConnection extends AbstractServerConnection {
             @Override
             public StreamSinkConduit wrap(ConduitFactory<StreamSinkConduit> factory, HttpServerExchange exchange) {
 
-                ServerFixedLengthStreamSinkConduit fixed = new ServerFixedLengthStreamSinkConduit(new HttpResponseConduit(getSinkChannel().getConduit(), getBufferPool(), exchange), false, false);
+                ServerFixedLengthStreamSinkConduit fixed = new ServerFixedLengthStreamSinkConduit(new HttpResponseConduit(getSinkChannel().getConduit(), getByteBufferPool(), exchange), false, false);
                 fixed.reset(0, exchange);
                 return fixed;
             }
@@ -123,6 +129,11 @@ public final class HttpServerConnection extends AbstractServerConnection {
     }
 
     @Override
+    public boolean isContinueResponseSupported() {
+        return true;
+    }
+
+    @Override
     public void terminateRequestChannel(HttpServerExchange exchange) {
 
     }
@@ -133,20 +144,20 @@ public final class HttpServerConnection extends AbstractServerConnection {
      *
      * @param unget The buffer to push back
      */
-    public void ungetRequestBytes(final Pooled<ByteBuffer> unget) {
+    public void ungetRequestBytes(final PooledByteBuffer unget) {
         if (getExtraBytes() == null) {
             setExtraBytes(unget);
         } else {
-            Pooled<ByteBuffer> eb = getExtraBytes();
-            ByteBuffer buf = eb.getResource();
-            final ByteBuffer ugBuffer = unget.getResource();
+            PooledByteBuffer eb = getExtraBytes();
+            ByteBuffer buf = eb.getBuffer();
+            final ByteBuffer ugBuffer = unget.getBuffer();
 
             if (ugBuffer.limit() - ugBuffer.remaining() > buf.remaining()) {
                 //stuff the existing data after the data we are ungetting
                 ugBuffer.compact();
                 ugBuffer.put(buf);
                 ugBuffer.flip();
-                eb.free();
+                eb.close();
                 setExtraBytes(unget);
             } else {
                 //TODO: this is horrible, but should not happen often
@@ -154,10 +165,10 @@ public final class HttpServerConnection extends AbstractServerConnection {
                 int first = ugBuffer.remaining();
                 ugBuffer.get(data, 0, ugBuffer.remaining());
                 buf.get(data, first, buf.remaining());
-                eb.free();
-                unget.free();
+                eb.close();
+                unget.close();
                 final ByteBuffer newBuffer = ByteBuffer.wrap(data);
-                setExtraBytes(new ImmediatePooled<>(newBuffer));
+                setExtraBytes(new ImmediatePooledByteBuffer(newBuffer));
             }
         }
     }
@@ -190,11 +201,21 @@ public final class HttpServerConnection extends AbstractServerConnection {
 
     @Override
     protected StreamSinkConduit getSinkConduit(HttpServerExchange exchange, StreamSinkConduit conduit) {
+        if(exchange.getRequestMethod().equals(Methods.CONNECT) && !connectHandled) {
+            //make sure that any unhandled CONNECT requests result in a connection close
+            exchange.setPersistent(false);
+            exchange.getResponseHeaders().put(Headers.CONNECTION, "close");
+        }
         return HttpTransferEncoding.createSinkConduit(exchange);
     }
 
     @Override
     protected boolean isUpgradeSupported() {
+        return true;
+    }
+
+    @Override
+    protected boolean isConnectSupported() {
         return true;
     }
 
@@ -204,6 +225,9 @@ public final class HttpServerConnection extends AbstractServerConnection {
 
     @Override
     protected void exchangeComplete(HttpServerExchange exchange) {
+        if(fixedLengthStreamSinkConduit != null) {
+            fixedLengthStreamSinkConduit.clearExchange();
+        }
         if (pipelineBuffer == null) {
             readListener.exchangeComplete(exchange);
         } else {
@@ -240,6 +264,12 @@ public final class HttpServerConnection extends AbstractServerConnection {
         this.upgradeListener = upgradeListener;
     }
 
+    @Override
+    protected void setConnectListener(HttpUpgradeListener connectListener) {
+        this.upgradeListener = connectListener;
+        connectHandled = true;
+    }
+
     void setCurrentExchange(HttpServerExchange exchange) {
         this.current = exchange;
     }
@@ -248,5 +278,14 @@ public final class HttpServerConnection extends AbstractServerConnection {
         this.pipelineBuffer = pipelineBuffer;
         this.responseConduit = new HttpResponseConduit(pipelineBuffer, bufferPool);
         this.fixedLengthStreamSinkConduit = new ServerFixedLengthStreamSinkConduit(responseConduit, false, false);
+    }
+
+    @Override
+    public String getTransportProtocol() {
+        return "http/1.1";
+    }
+
+    boolean isConnectHandled() {
+        return connectHandled;
     }
 }

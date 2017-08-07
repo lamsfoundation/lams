@@ -30,6 +30,7 @@ package org.apache.http.message;
 import org.apache.http.HeaderElement;
 import org.apache.http.NameValuePair;
 import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.util.Args;
 import org.apache.http.util.LangUtils;
 
 /**
@@ -48,8 +49,8 @@ public class BasicHeaderElement implements HeaderElement, Cloneable {
      * Constructor with name, value and parameters.
      *
      * @param name header element name
-     * @param value header element value. May be <tt>null</tt>
-     * @param parameters header element parameters. May be <tt>null</tt>.
+     * @param value header element value. May be {@code null}
+     * @param parameters header element parameters. May be {@code null}.
      *   Parameters are copied by reference, not by value
      */
     public BasicHeaderElement(
@@ -57,10 +58,7 @@ public class BasicHeaderElement implements HeaderElement, Cloneable {
             final String value,
             final NameValuePair[] parameters) {
         super();
-        if (name == null) {
-            throw new IllegalArgumentException("Name may not be null");
-        }
-        this.name = name;
+        this.name = Args.notNull(name, "Name");
         this.value = value;
         if (parameters != null) {
             this.parameters = parameters;
@@ -73,40 +71,43 @@ public class BasicHeaderElement implements HeaderElement, Cloneable {
      * Constructor with name and value.
      *
      * @param name header element name
-     * @param value header element value. May be <tt>null</tt>
+     * @param value header element value. May be {@code null}
      */
     public BasicHeaderElement(final String name, final String value) {
        this(name, value, null);
     }
 
+    @Override
     public String getName() {
         return this.name;
     }
 
+    @Override
     public String getValue() {
         return this.value;
     }
 
+    @Override
     public NameValuePair[] getParameters() {
         return this.parameters.clone();
     }
 
+    @Override
     public int getParameterCount() {
         return this.parameters.length;
     }
 
-    public NameValuePair getParameter(int index) {
+    @Override
+    public NameValuePair getParameter(final int index) {
         // ArrayIndexOutOfBoundsException is appropriate
         return this.parameters[index];
     }
 
+    @Override
     public NameValuePair getParameterByName(final String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("Name may not be null");
-        }
+        Args.notNull(name, "Name");
         NameValuePair found = null;
-        for (int i = 0; i < this.parameters.length; i++) {
-            NameValuePair current = this.parameters[ i ];
+        for (final NameValuePair current : this.parameters) {
             if (current.getName().equalsIgnoreCase(name)) {
                 found = current;
                 break;
@@ -117,9 +118,11 @@ public class BasicHeaderElement implements HeaderElement, Cloneable {
 
     @Override
     public boolean equals(final Object object) {
-        if (this == object) return true;
+        if (this == object) {
+            return true;
+        }
         if (object instanceof HeaderElement) {
-            BasicHeaderElement that = (BasicHeaderElement) object;
+            final BasicHeaderElement that = (BasicHeaderElement) object;
             return this.name.equals(that.name)
                 && LangUtils.equals(this.value, that.value)
                 && LangUtils.equals(this.parameters, that.parameters);
@@ -133,23 +136,23 @@ public class BasicHeaderElement implements HeaderElement, Cloneable {
         int hash = LangUtils.HASH_SEED;
         hash = LangUtils.hashCode(hash, this.name);
         hash = LangUtils.hashCode(hash, this.value);
-        for (int i = 0; i < this.parameters.length; i++) {
-            hash = LangUtils.hashCode(hash, this.parameters[i]);
+        for (final NameValuePair parameter : this.parameters) {
+            hash = LangUtils.hashCode(hash, parameter);
         }
         return hash;
     }
 
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
         buffer.append(this.name);
         if (this.value != null) {
             buffer.append("=");
             buffer.append(this.value);
         }
-        for (int i = 0; i < this.parameters.length; i++) {
+        for (final NameValuePair parameter : this.parameters) {
             buffer.append("; ");
-            buffer.append(this.parameters[i]);
+            buffer.append(parameter);
         }
         return buffer.toString();
     }

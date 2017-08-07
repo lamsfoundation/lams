@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.loader.plan.build.internal;
 
@@ -31,17 +14,20 @@ import org.hibernate.engine.FetchTiming;
 import org.hibernate.engine.spi.LoadQueryInfluencers;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.internal.CoreLogging;
-import org.hibernate.loader.plan.build.spi.LoadPlanBuildingAssociationVisitationStrategy;
 import org.hibernate.loader.plan.spi.CollectionReturn;
 import org.hibernate.loader.plan.spi.EntityReturn;
 import org.hibernate.loader.plan.spi.LoadPlan;
 import org.hibernate.loader.plan.spi.Return;
 import org.hibernate.persister.walking.spi.AssociationAttributeDefinition;
+import org.hibernate.persister.walking.spi.EncapsulatedEntityIdentifierDefinition;
+import org.hibernate.persister.walking.spi.EntityIdentifierDefinition;
+import org.hibernate.persister.walking.spi.NonEncapsulatedEntityIdentifierDefinition;
+import org.hibernate.persister.walking.spi.WalkingException;
 
 import org.jboss.logging.Logger;
 
 /**
- * {@link LoadPlanBuildingAssociationVisitationStrategy} implementation used for building LoadPlans based on metamodel-defined fetching.  Built
+ * LoadPlanBuildingAssociationVisitationStrategy implementation used for building LoadPlans based on metamodel-defined fetching.  Built
  * LoadPlans contain a single root return object, either an {@link EntityReturn} or a {@link CollectionReturn}.
  *
  * @author Steve Ebersole
@@ -54,6 +40,9 @@ public class FetchStyleLoadPlanBuildingAssociationVisitationStrategy
 	private final LockMode lockMode;
 
 	private Return rootReturn;
+
+	// flag that indicates whether executing handleAssociationAttribute() should be vetoed;
+	private boolean vetoHandleAssociationAttribute;
 
 	/**
 	 * Constructs a FetchStyleLoadPlanBuildingAssociationVisitationStrategy.
@@ -87,6 +76,73 @@ public class FetchStyleLoadPlanBuildingAssociationVisitationStrategy
 			throw new HibernateException( "Root return already identified" );
 		}
 		this.rootReturn = rootReturn;
+	}
+
+	@Override
+	public void startingEntityIdentifier(EntityIdentifierDefinition identifierDefinition ) {
+		if ( vetoHandleAssociationAttribute ) {
+			throw new WalkingException( "vetoHandleAssociationAttribute is true when starting startingEntityIdentifier()" );
+		}
+		vetoHandleAssociationAttribute = shouldVetoHandleAssociationAttributeInId(
+				rootReturn,
+				identifierDefinition
+		);
+		super.startingEntityIdentifier( identifierDefinition );
+	}
+
+	@Override
+	public void finishingEntityIdentifier(EntityIdentifierDefinition identifierDefinition) {
+		super.finishingEntityIdentifier( identifierDefinition );
+		if ( vetoHandleAssociationAttribute !=
+				shouldVetoHandleAssociationAttributeInId( rootReturn, identifierDefinition ) ) {
+			throw new WalkingException(
+					"vetoHandleAssociationAttribute has unexpected value: " + vetoHandleAssociationAttribute
+			);
+		}
+		vetoHandleAssociationAttribute = false;
+	}
+
+	private static boolean shouldVetoHandleAssociationAttributeInId(
+			Return rootReturn,
+			EntityIdentifierDefinition identifierDefinition) {
+		// only check the identifierDefinition for a root EntityReturn.
+		if ( EntityReturn.class.isInstance( rootReturn ) ) {
+			final EntityIdentifierDefinition rootEntityIdentifierDefinition =
+					( (EntityReturn) rootReturn ).getEntityPersister().getEntityKeyDefinition();
+			if ( rootEntityIdentifierDefinition == identifierDefinition ) {
+				// There are 2 cases where an association in an ID should not be "handled":
+				// 1) a composite, encapsulated ID (e.g., @EmbeddedId). In this case, the ID is provided
+				//    by the application by Session#get or EntityManager#find. Hibernate uses the
+				//    provided ID "as is".
+				// 2) a non-encapsulated ID without an @IdClass. In this case, the application provides
+				//    an instance of the entity with the ID properties initialized. Hibernate uses
+				//    the provided ID properties "as is".
+				// In these two cases, it is important that associations in the ID not be "handled"
+				// (i.e, joined); doing so can result in unexpected results.
+				if ( rootEntityIdentifierDefinition.isEncapsulated() ) {
+					final EncapsulatedEntityIdentifierDefinition encapsulated =
+							(EncapsulatedEntityIdentifierDefinition ) rootEntityIdentifierDefinition;
+					if ( encapsulated.getAttributeDefinition().getType().isComponentType() ) {
+						// This is 1) (@EmbeddedId).
+						return true;
+					}
+				}
+				else {
+					final NonEncapsulatedEntityIdentifierDefinition nonEncapsulated =
+							(NonEncapsulatedEntityIdentifierDefinition) rootEntityIdentifierDefinition;
+					if ( nonEncapsulated.getSeparateIdentifierMappingClass() == null ) {
+						// This is 2) (a non-encapsulated ID without an @IdClass)
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	@Override
+	protected boolean handleAssociationAttribute(AssociationAttributeDefinition attributeDefinition) {
+		return !vetoHandleAssociationAttribute && super.handleAssociationAttribute( attributeDefinition );
 	}
 
 	@Override
@@ -129,7 +185,7 @@ public class FetchStyleLoadPlanBuildingAssociationVisitationStrategy
 			return new FetchStrategy( fetchStrategy.getTiming(), FetchStyle.SELECT );
 		}
 
-		final Integer maxFetchDepth = sessionFactory().getSettings().getMaximumFetchDepth();
+		final Integer maxFetchDepth = sessionFactory().getSessionFactoryOptions().getMaximumFetchDepth();
 		if ( maxFetchDepth != null && currentDepth() > maxFetchDepth ) {
 			return new FetchStrategy( fetchStrategy.getTiming(), FetchStyle.SELECT );
 		}

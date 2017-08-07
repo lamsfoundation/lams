@@ -18,11 +18,13 @@
 
 package io.undertow.server.handlers;
 
+import io.undertow.UndertowLogger;
 import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.builder.HandlerBuilder;
 import io.undertow.util.Headers;
+import io.undertow.util.NetworkUtils;
 
 import java.net.InetSocketAddress;
 import java.util.Collections;
@@ -31,7 +33,7 @@ import java.util.Set;
 
 /**
  * Handler that sets the peer address to the value of the X-Forwarded-For header.
- * <p/>
+ * <p>
  * This should only be used behind a proxy that always sets this header, otherwise it
  * is possible for an attacker to forge their peer address;
  *
@@ -67,17 +69,39 @@ public class ProxyPeerAddressHandler implements HttpHandler {
         String forwardedPort = exchange.getRequestHeaders().getFirst(Headers.X_FORWARDED_PORT);
         if (forwardedHost != null) {
             int index = forwardedHost.indexOf(',');
-            final String value;
+            String value;
             if (index == -1) {
                 value = forwardedHost;
             } else {
                 value = forwardedHost.substring(0, index);
             }
-            int port = 0;
+            if(value.startsWith("[")) {
+                int end = value.lastIndexOf("]");
+                if(end == -1 ) {
+                    end = 0;
+                }
+                index = value.indexOf(":", end);
+                if(index != -1) {
+                    forwardedPort = value.substring(index + 1);
+                    value = value.substring(0, index);
+                }
+            } else {
+                index = value.lastIndexOf(":");
+                if(index != -1) {
+                    forwardedPort = value.substring(index + 1);
+                    value = value.substring(0, index);
+                }
+            }
+            int port = 80;
             if(forwardedPort != null) {
-                port = Integer.parseInt(forwardedPort);
+                try {
+                    port = Integer.parseInt(forwardedPort);
+                } catch (NumberFormatException ignore) {
+                    UndertowLogger.REQUEST_LOGGER.debugf("Cannot parse port: %s", forwardedPort);
+                }
             }
             exchange.setDestinationAddress(InetSocketAddress.createUnresolved(value, port));
+            exchange.getRequestHeaders().put(Headers.HOST, NetworkUtils.formatPossibleIpv6Address(value) + ":" + port);
         }
         next.handleRequest(exchange);
     }

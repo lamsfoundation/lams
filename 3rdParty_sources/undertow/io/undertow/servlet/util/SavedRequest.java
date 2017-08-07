@@ -29,7 +29,7 @@ import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
-import io.undertow.util.ImmediatePooled;
+import io.undertow.util.ImmediatePooledByteBuffer;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -101,7 +101,7 @@ public class SavedRequest implements Serializable {
                         }
                         headers.putAll(entry.getHeaderName(), entry);
                     }
-                    SavedRequest request = new SavedRequest(buffer, read, exchange.getRequestMethod(), exchange.getRequestPath(), exchange.getRequestHeaders());
+                    SavedRequest request = new SavedRequest(buffer, read, exchange.getRequestMethod(), exchange.getRelativePath(), exchange.getRequestHeaders());
                     final ServletRequestContext sc = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
                     HttpSessionImpl session = sc.getCurrentServletContext().getSession(exchange, true);
                     Session underlyingSession;
@@ -129,10 +129,10 @@ public class SavedRequest implements Serializable {
             }
             SavedRequest request = (SavedRequest) underlyingSession.getAttribute(SESSION_KEY);
             if(request != null) {
-                if(request.requestPath.equals(exchange.getRequestPath()) && exchange.isRequestComplete()) {
+                if(request.requestPath.equals(exchange.getRelativePath()) && exchange.isRequestComplete()) {
                     UndertowLogger.REQUEST_LOGGER.debugf("restoring request body for request to %s", request.requestPath);
                     exchange.setRequestMethod(request.method);
-                    Connectors.ungetRequestBytes(exchange, new ImmediatePooled<>(ByteBuffer.wrap(request.data, 0, request.dataLength)));
+                    Connectors.ungetRequestBytes(exchange, new ImmediatePooledByteBuffer(ByteBuffer.wrap(request.data, 0, request.dataLength)));
                     underlyingSession.removeAttribute(SESSION_KEY);
                     //clear the existing header map of everything except the connection header
                     //TODO: are there other headers we should preserve?

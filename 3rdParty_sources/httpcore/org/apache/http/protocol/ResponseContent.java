@@ -35,14 +35,15 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
-import org.apache.http.ProtocolVersion;
 import org.apache.http.ProtocolException;
+import org.apache.http.ProtocolVersion;
 import org.apache.http.annotation.Immutable;
+import org.apache.http.util.Args;
 
 /**
  * ResponseContent is the most important interceptor for outgoing responses.
  * It is responsible for delimiting content length by adding
- * <code>Content-Length</code> or <code>Transfer-Content</code> headers based
+ * {@code Content-Length} or {@code Transfer-Content} headers based
  * on the properties of the enclosed entity and the protocol version.
  * This interceptor is required for correct functioning of server side protocol
  * processors.
@@ -55,7 +56,7 @@ public class ResponseContent implements HttpResponseInterceptor {
     private final boolean overwrite;
 
     /**
-     * Default constructor. The <code>Content-Length</code> or <code>Transfer-Encoding</code>
+     * Default constructor. The {@code Content-Length} or {@code Transfer-Encoding}
      * will cause the interceptor to throw {@link ProtocolException} if already present in the
      * response message.
      */
@@ -66,15 +67,15 @@ public class ResponseContent implements HttpResponseInterceptor {
     /**
      * Constructor that can be used to fine-tune behavior of this interceptor.
      *
-     * @param overwrite If set to <code>true</code> the <code>Content-Length</code> and
-     * <code>Transfer-Encoding</code> headers will be created or updated if already present.
-     * If set to <code>false</code> the <code>Content-Length</code> and
-     * <code>Transfer-Encoding</code> headers will cause the interceptor to throw
+     * @param overwrite If set to {@code true} the {@code Content-Length} and
+     * {@code Transfer-Encoding} headers will be created or updated if already present.
+     * If set to {@code false} the {@code Content-Length} and
+     * {@code Transfer-Encoding} headers will cause the interceptor to throw
      * {@link ProtocolException} if already present in the response message.
-     * 
+     *
      * @since 4.2
      */
-     public ResponseContent(boolean overwrite) {
+     public ResponseContent(final boolean overwrite) {
          super();
          this.overwrite = overwrite;
     }
@@ -86,11 +87,10 @@ public class ResponseContent implements HttpResponseInterceptor {
      * @throws ProtocolException If either the Content-Length or Transfer-Encoding headers are found.
      * @throws IllegalArgumentException If the response is null.
      */
+    @Override
     public void process(final HttpResponse response, final HttpContext context)
             throws HttpException, IOException {
-        if (response == null) {
-            throw new IllegalArgumentException("HTTP response may not be null");
-        }
+        Args.notNull(response, "HTTP response");
         if (this.overwrite) {
             response.removeHeaders(HTTP.TRANSFER_ENCODING);
             response.removeHeaders(HTTP.CONTENT_LEN);
@@ -102,10 +102,10 @@ public class ResponseContent implements HttpResponseInterceptor {
                 throw new ProtocolException("Content-Length header already present");
             }
         }
-        ProtocolVersion ver = response.getStatusLine().getProtocolVersion();
-        HttpEntity entity = response.getEntity();
+        final ProtocolVersion ver = response.getStatusLine().getProtocolVersion();
+        final HttpEntity entity = response.getEntity();
         if (entity != null) {
-            long len = entity.getContentLength();
+            final long len = entity.getContentLength();
             if (entity.isChunked() && !ver.lessEquals(HttpVersion.HTTP_1_0)) {
                 response.addHeader(HTTP.TRANSFER_ENCODING, HTTP.CHUNK_CODING);
             } else if (len >= 0) {
@@ -122,7 +122,7 @@ public class ResponseContent implements HttpResponseInterceptor {
                 response.addHeader(entity.getContentEncoding());
             }
         } else {
-            int status = response.getStatusLine().getStatusCode();
+            final int status = response.getStatusLine().getStatusCode();
             if (status != HttpStatus.SC_NO_CONTENT
                     && status != HttpStatus.SC_NOT_MODIFIED
                     && status != HttpStatus.SC_RESET_CONTENT) {

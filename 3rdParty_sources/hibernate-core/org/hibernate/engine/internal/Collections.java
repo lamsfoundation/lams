@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.internal;
 
@@ -60,7 +43,7 @@ public final class Collections {
 	 * @param session The session
 	 */
 	public static void processUnreachableCollection(PersistentCollection coll, SessionImplementor session) {
-		if ( coll.getOwner()==null ) {
+		if ( coll.getOwner() == null ) {
 			processNeverReferencedCollection( coll, session );
 		}
 		else {
@@ -90,7 +73,7 @@ public final class Collections {
 				// the owning entity may have been deleted and its identifier unset due to
 				// identifier-rollback; in which case, try to look up its identifier from
 				// the persistence context
-				if ( session.getFactory().getSettings().isIdentifierRollbackEnabled() ) {
+				if ( session.getFactory().getSessionFactoryOptions().isIdentifierRollbackEnabled() ) {
 					final EntityEntry ownerEntry = persistenceContext.getEntry( coll.getOwner() );
 					if ( ownerEntry != null ) {
 						ownerId = ownerEntry.getId();
@@ -173,40 +156,74 @@ public final class Collections {
 			);
 		}
 
-		// The CollectionEntry.isReached() stuff is just to detect any silly users
-		// who set up circular or shared references between/to collections.
-		if ( ce.isReached() ) {
-			// We've been here before
-			throw new HibernateException(
-					"Found shared references to a collection: " + type.getRole()
-			);
-		}
-		ce.setReached( true );
-
 		final SessionFactoryImplementor factory = session.getFactory();
 		final CollectionPersister persister = factory.getCollectionPersister( type.getRole() );
+
 		ce.setCurrentPersister( persister );
 		//TODO: better to pass the id in as an argument?
 		ce.setCurrentKey( type.getKeyOfOwner( entity, session ) );
 
-		if ( LOG.isDebugEnabled() ) {
-			if ( collection.wasInitialized() ) {
-				LOG.debugf(
-						"Collection found: %s, was: %s (initialized)",
-						MessageHelper.collectionInfoString( persister, collection, ce.getCurrentKey(), session ),
-						MessageHelper.collectionInfoString( ce.getLoadedPersister(), collection, ce.getLoadedKey(), session )
-				);
-			}
-			else {
-				LOG.debugf(
-						"Collection found: %s, was: %s (uninitialized)",
-						MessageHelper.collectionInfoString( persister, collection, ce.getCurrentKey(), session ),
-						MessageHelper.collectionInfoString( ce.getLoadedPersister(), collection, ce.getLoadedKey(), session )
-				);
-			}
+		final boolean isBytecodeEnhanced =
+				persister.getOwnerEntityPersister().getEntityMetamodel().isLazyLoadingBytecodeEnhanced();
+		if ( isBytecodeEnhanced && !collection.wasInitialized() ) {
+			// skip it
+			LOG.debugf(
+					"Skipping uninitialized bytecode-lazy collection: %s",
+					MessageHelper.collectionInfoString( persister, collection, ce.getCurrentKey(), session )
+			);
+			ce.setReached( true );
+			ce.setProcessed( true );
 		}
+		else {
+			// The CollectionEntry.isReached() stuff is just to detect any silly users
+			// who set up circular or shared references between/to collections.
+			if ( ce.isReached() ) {
+				// We've been here beforeQuery
+				throw new HibernateException(
+						"Found shared references to a collection: " + type.getRole()
+				);
+			}
+			ce.setReached( true );
 
-		prepareCollectionForUpdate( collection, ce, factory );
+			if ( LOG.isDebugEnabled() ) {
+				if ( collection.wasInitialized() ) {
+					LOG.debugf(
+							"Collection found: %s, was: %s (initialized)",
+							MessageHelper.collectionInfoString(
+									persister,
+									collection,
+									ce.getCurrentKey(),
+									session
+							),
+							MessageHelper.collectionInfoString(
+									ce.getLoadedPersister(),
+									collection,
+									ce.getLoadedKey(),
+									session
+							)
+					);
+				}
+				else {
+					LOG.debugf(
+							"Collection found: %s, was: %s (uninitialized)",
+							MessageHelper.collectionInfoString(
+									persister,
+									collection,
+									ce.getCurrentKey(),
+									session
+							),
+							MessageHelper.collectionInfoString(
+									ce.getLoadedPersister(),
+									collection,
+									ce.getLoadedKey(),
+									session
+							)
+					);
+				}
+			}
+
+			prepareCollectionForUpdate( collection, ce, factory );
+		}
 	}
 
 	/**

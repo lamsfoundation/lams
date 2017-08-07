@@ -22,14 +22,16 @@ import io.undertow.util.Headers;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSocketVersion;
 import io.undertow.websockets.core.protocol.version07.Hybi07Handshake;
+import io.undertow.websockets.extensions.CompositeExtensionFunction;
+import io.undertow.websockets.extensions.ExtensionFunction;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
 import org.xnio.IoUtils;
-import org.xnio.Pool;
+import io.undertow.connector.ByteBufferPool;
 import org.xnio.StreamConnection;
 
-import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -70,7 +72,8 @@ public class Hybi13Handshake extends Hybi07Handshake {
     }
 
     @Override
-    public WebSocketChannel createChannel(WebSocketHttpExchange exchange, final StreamConnection channel, final Pool<ByteBuffer> pool) {
-        return new WebSocket13Channel(channel, pool, getWebSocketLocation(exchange), exchange.getResponseHeader(Headers.SEC_WEB_SOCKET_PROTOCOL_STRING), false, allowExtensions, exchange.getPeerConnections());
+    public WebSocketChannel createChannel(WebSocketHttpExchange exchange, final StreamConnection channel, final ByteBufferPool pool) {
+        List<ExtensionFunction> extensionFunctions = initExtensions(exchange);
+        return new WebSocket13Channel(channel, pool, getWebSocketLocation(exchange), exchange.getResponseHeader(Headers.SEC_WEB_SOCKET_PROTOCOL_STRING), false, !extensionFunctions.isEmpty(), CompositeExtensionFunction.compose(extensionFunctions), exchange.getPeerConnections(), exchange.getOptions());
     }
 }

@@ -1,26 +1,13 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
- * JBoss, Home of Professional Open Source
- * Copyright 2013 Red Hat Inc. and/or its affiliates and other contributors
- * as indicated by the @authors tag. All rights reserved.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
  *
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.query.spi;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +22,7 @@ import org.hibernate.hql.internal.ast.HqlSqlWalker;
 import org.hibernate.hql.internal.ast.tree.FromClause;
 import org.hibernate.hql.internal.ast.tree.FromElement;
 import org.hibernate.hql.internal.ast.tree.FromElementFactory;
+import org.hibernate.hql.internal.ast.tree.ImpliedFromElement;
 import org.hibernate.persister.collection.QueryableCollection;
 import org.hibernate.sql.JoinType;
 import org.hibernate.type.CollectionType;
@@ -60,13 +48,14 @@ public class EntityGraphQueryHint {
 		Map<String, FromElement> explicitFetches = new HashMap<String, FromElement>();
 		for ( Object o : fromClause.getFromElements() ) {
 			final FromElement fromElement = (FromElement) o;
-			if ( fromElement.getRole() != null ) {
+			if ( fromElement.getRole() != null  && ! (fromElement instanceof ImpliedFromElement) ) {
 				explicitFetches.put( fromElement.getRole(), fromElement );
 			}
 		}
 
 		return getFromElements(
-				originEntityGraph.getAttributeNodes(),
+				fromClause.getLevel() == FromClause.ROOT_LEVEL ? originEntityGraph.getAttributeNodes():
+					Collections.emptyList(),
 				fromClause.getFromElement(),
 				fromClause,
 				walker,
@@ -95,8 +84,9 @@ public class EntityGraphQueryHint {
 			final Type propertyType = origin.getPropertyType( attributeName, attributeName );
 
 			try {
-				FromElement fromElement = null;
-				if ( !explicitFetches.containsKey( role ) ) {
+				FromElement fromElement = explicitFetches.get( role );
+				boolean explicitFromElement = false;
+				if ( fromElement == null ) {
 					if ( propertyType.isEntityType() ) {
 						final EntityType entityType = (EntityType) propertyType;
 
@@ -138,9 +128,16 @@ public class EntityGraphQueryHint {
 						);
 					}
 				}
+				else {
+					explicitFromElement = true;
+					fromElement.setInProjectionList( true );
+					fromElement.setFetch( true );
+				}
 
 				if ( fromElement != null ) {
-					fromElements.add( fromElement );
+					if( !explicitFromElement ){
+						fromElements.add( fromElement );
+					}
 
 					// recurse into subgraphs
 					for ( Subgraph<?> subgraph : attributeNode.getSubgraphs().values() ) {

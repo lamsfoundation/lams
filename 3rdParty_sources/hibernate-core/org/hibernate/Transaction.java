@@ -1,31 +1,14 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2007-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate;
 
 import javax.transaction.Synchronization;
 
-import org.hibernate.engine.transaction.spi.LocalStatus;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 
 /**
  * Defines the contract for abstracting applications from the configured underlying means of transaction management.
@@ -44,12 +27,6 @@ import org.hibernate.engine.transaction.spi.LocalStatus;
  * @author Steve Ebersole
  */
 public interface Transaction {
-	/**
-	 * Is this transaction the initiator of any underlying transaction?
-	 *
-	 * @return {@code true} if this transaction initiated the underlying transaction; {@code false} otherwise.
-	 */
-	public boolean isInitiator();
 
 	/**
 	 * Begin this transaction.  No-op if the transaction has already been begun.  Note that this is not necessarily
@@ -57,16 +34,16 @@ public interface Transaction {
 	 *
 	 * @throws HibernateException Indicates a problem beginning the transaction.
 	 */
-	public void begin();
+	void begin();
 
 	/**
 	 * Commit this transaction.  This might entail a number of things depending on the context:<ul>
 	 *     <li>
-	 *         If this transaction is the {@link #isInitiator initiator}, {@link Session#flush} the {@link Session}
-	 *         with which it is associated (unless {@link Session} is in {@link FlushMode#MANUAL}).
+	 *         If the underlying transaction was initiated from this Transaction the Session will be flushed,
+	 *         unless the Session is in {@link FlushMode#MANUAL} FlushMode.
 	 *     </li>
 	 *     <li>
-	 *         If this transaction is the {@link #isInitiator initiator}, commit the underlying transaction.
+	 *         If the underlying transaction was initiated from this Transaction, commit the underlying transaction.
 	 *     </li>
 	 *     <li>
 	 *         Coordinate various callbacks
@@ -75,7 +52,7 @@ public interface Transaction {
 	 *
 	 * @throws HibernateException Indicates a problem committing the transaction.
 	 */
-	public void commit();
+	void commit();
 
 	/**
 	 * Rollback this transaction.  Either rolls back the underlying transaction or ensures it cannot later commit
@@ -83,7 +60,7 @@ public interface Transaction {
 	 *
 	 * @throws HibernateException Indicates a problem rolling back the transaction.
 	 */
-	public void rollback();
+	void rollback();
 
 	/**
 	 * Get the current local status of this transaction.
@@ -93,58 +70,7 @@ public interface Transaction {
 	 *
 	 * @return The current local status.
 	 */
-	public LocalStatus getLocalStatus();
-
-	/**
-	 * Is this transaction still active?
-	 * <p/>
-	 * Answers on a best effort basis.  For example, in the case of JDBC based transactions we cannot know that a
-	 * transaction is active when it is initiated directly through the JDBC {@link java.sql.Connection}, only when
-	 * it is initiated from here.
-	 *
-	 * @return {@code true} if the transaction is still active; {@code false} otherwise.
-	 *
-	 * @throws HibernateException Indicates a problem checking the transaction status.
-	 */
-	public boolean isActive();
-
-	/**
-	 * Is Hibernate participating in the underlying transaction?
-	 * <p/>
-	 * Generally speaking this will be the same as {@link #isActive()}.
-	 * 
-	 * @return {@code true} if Hibernate is known to be participating in the underlying transaction; {@code false}
-	 * otherwise.
-	 */
-	public boolean isParticipating();
-
-	/**
-	 * Was this transaction committed?
-	 * <p/>
-	 * Answers on a best effort basis.  For example, in the case of JDBC based transactions we cannot know that a
-	 * transaction was committed when the commit was performed directly through the JDBC {@link java.sql.Connection},
-	 * only when the commit was done from this.
-	 *
-	 * @return {@code true} if the transaction is rolled back; {@code false} otherwise.
-	 *
-	 * @throws HibernateException Indicates a problem checking the transaction status.
-	 */
-	@SuppressWarnings( {"UnusedDeclaration"})
-	public boolean wasCommitted();
-
-	/**
-	 * Was this transaction rolled back or set to rollback only?
-	 * <p/>
-	 * Answers on a best effort basis.  For example, in the case of JDBC based transactions we cannot know that a
-	 * transaction was rolled back when rollback was performed directly through the JDBC {@link java.sql.Connection},
-	 * only when it was rolled back  from here.
-	 *
-	 * @return {@literal true} if the transaction is rolled back; {@literal false} otherwise.
-	 *
-	 * @throws HibernateException Indicates a problem checking the transaction status.
-	 */
-	@SuppressWarnings( {"UnusedDeclaration"})
-	public boolean wasRolledBack();
+	TransactionStatus getStatus();
 
 	/**
 	 * Register a user synchronization callback for this transaction.
@@ -153,19 +79,25 @@ public interface Transaction {
 	 *
 	 * @throws HibernateException Indicates a problem registering the synchronization.
 	 */
-	public void registerSynchronization(Synchronization synchronization) throws HibernateException;
+	void registerSynchronization(Synchronization synchronization) throws HibernateException;
 
 	/**
 	 * Set the transaction timeout for any transaction started by a subsequent call to {@link #begin} on this instance.
 	 *
 	 * @param seconds The number of seconds before a timeout.
 	 */
-	public void setTimeout(int seconds);
+	void setTimeout(int seconds);
 
 	/**
 	 * Retrieve the transaction timeout set for this transaction.  A negative indicates no timeout has been set.
 	 *
 	 * @return The timeout, in seconds.
 	 */
-	public int getTimeout();
+	int getTimeout();
+
+	/**
+	 * Make a best effort to mark the underlying transaction for rollback only.
+	 */
+	void markRollbackOnly();
+
 }

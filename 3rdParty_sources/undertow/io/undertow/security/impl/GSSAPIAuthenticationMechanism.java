@@ -28,6 +28,7 @@ import java.util.List;
 import javax.security.auth.Subject;
 import javax.security.auth.kerberos.KerberosPrincipal;
 
+import io.undertow.UndertowLogger;
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.GSSAPIServerSubjectFactory;
 import io.undertow.security.api.SecurityContext;
@@ -39,10 +40,12 @@ import io.undertow.server.ServerConnection;
 import io.undertow.server.handlers.proxy.ExclusivityChecker;
 import io.undertow.util.AttachmentKey;
 import io.undertow.util.FlexBase64;
+
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
+import org.ietf.jgss.Oid;
 
 import static io.undertow.util.Headers.AUTHORIZATION;
 import static io.undertow.util.Headers.HOST;
@@ -52,10 +55,10 @@ import static io.undertow.util.StatusCodes.UNAUTHORIZED;
 
 /**
  * {@link io.undertow.security.api.AuthenticationMechanism} for GSSAPI / SPNEGO based authentication.
- * <p/>
+ * <p>
  * GSSAPI authentication is associated with the HTTP connection, as long as a connection is being re-used allow the
  * authentication state to be re-used.
- * <p/>
+ * <p>
  * TODO - May consider an option to allow it to also be associated with the underlying session but that has it's own risks so
  * would need to come with a warning.
  *
@@ -82,12 +85,41 @@ public class GSSAPIAuthenticationMechanism implements AuthenticationMechanism {
 
     private static final String NEGOTIATION_PLAIN = NEGOTIATE.toString();
     private static final String NEGOTIATE_PREFIX = NEGOTIATE + " ";
-    private final String name = "SPNEGO";
 
+    private static final Oid[] DEFAULT_MECHANISMS;
+
+    static {
+        try {
+            Oid spnego = new Oid("1.3.6.1.5.5.2");
+            Oid kerberos = new Oid("1.2.840.113554.1.2.2");
+            DEFAULT_MECHANISMS = new Oid[] { spnego, kerberos };
+        } catch (GSSException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final String name = "SPNEGO";
+    private final IdentityManager identityManager;
     private final GSSAPIServerSubjectFactory subjectFactory;
+    private final Oid[] mechanisms;
+
+    public GSSAPIAuthenticationMechanism(final GSSAPIServerSubjectFactory subjectFactory, IdentityManager identityManager, Oid ...supportedMechanisms) {
+        this.subjectFactory = subjectFactory;
+        this.identityManager = identityManager;
+        this.mechanisms = supportedMechanisms;
+    }
+
+    public GSSAPIAuthenticationMechanism(final GSSAPIServerSubjectFactory subjectFactory, Oid ...supportedMechanisms) {
+        this(subjectFactory, null, supportedMechanisms);
+    }
 
     public GSSAPIAuthenticationMechanism(final GSSAPIServerSubjectFactory subjectFactory) {
-        this.subjectFactory = subjectFactory;
+        this(subjectFactory, DEFAULT_MECHANISMS);
+    }
+
+    @SuppressWarnings("deprecation")
+    private IdentityManager getIdentityManager(SecurityContext securityContext) {
+        return identityManager != null ? identityManager : securityContext.getIdentityManager();
     }
 
     @Override
@@ -96,14 +128,18 @@ public class GSSAPIAuthenticationMechanism implements AuthenticationMechanism {
         ServerConnection connection = exchange.getConnection();
         NegotiationContext negContext = connection.getAttachment(NegotiationContext.ATTACHMENT_KEY);
         if (negContext != null) {
+
+            UndertowLogger.SECURITY_LOGGER.debugf("Existing negotiation context found for %s", exchange);
             exchange.putAttachment(NegotiationContext.ATTACHMENT_KEY, negContext);
             if (negContext.isEstablished()) {
-                IdentityManager identityManager = securityContext.getIdentityManager();
+                IdentityManager identityManager = getIdentityManager(securityContext);
                 final Account account = identityManager.verify(new GSSContextCredential(negContext.getGssContext()));
                 if (account != null) {
                     securityContext.authenticationComplete(account, name, false);
+                    UndertowLogger.SECURITY_LOGGER.debugf("Authenticated as user %s with existing GSSAPI negotiation context for %s", account.getPrincipal().getName(), exchange);
                     return AuthenticationMechanismOutcome.AUTHENTICATED;
                 } else {
+                    UndertowLogger.SECURITY_LOGGER.debugf("Failed to authenticate with existing GSSAPI negotiation context for %s", exchange);
                     return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
                 }
             }
@@ -156,6 +192,7 @@ public class GSSAPIAuthenticationMechanism implements AuthenticationMechanism {
 
         exchange.getResponseHeaders().add(WWW_AUTHENTICATE, header);
 
+        UndertowLogger.SECURITY_LOGGER.debugf("Sending GSSAPI challenge for %s", exchange);
         return new ChallengeResult(true, UNAUTHORIZED);
     }
 
@@ -178,7 +215,9 @@ public class GSSAPIAuthenticationMechanism implements AuthenticationMechanism {
     private String getHostName(final HttpServerExchange exchange) {
         String hostName = exchange.getRequestHeaders().getFirst(HOST);
         if (hostName != null) {
-            if (hostName.contains(":")) {
+            if (hostName.startsWith("[") && hostName.contains("]")) {
+                hostName = hostName.substring(0, hostName.indexOf(']') + 1);
+            } else if (hostName.contains(":")) {
                 hostName = hostName.substring(0, hostName.indexOf(":"));
             }
             return hostName;
@@ -213,7 +252,10 @@ public class GSSAPIAuthenticationMechanism implements AuthenticationMechanism {
             GSSContext gssContext = negContext.getGssContext();
             if (gssContext == null) {
                 GSSManager manager = GSSManager.getInstance();
-                gssContext = manager.createContext((GSSCredential) null);
+
+                GSSCredential credential = manager.createCredential(null, GSSCredential.INDEFINITE_LIFETIME, mechanisms, GSSCredential.ACCEPT_ONLY);
+
+                gssContext = manager.createContext(credential);
 
                 negContext.setGssContext(gssContext);
             }

@@ -25,9 +25,9 @@ import java.util.Set;
 
 /**
  * Interface that manages sessions.
- * <p/>
+ * <p>
  * The session manager is responsible for maintaining session state.
- * <p/>
+ * <p>
  * As part of session creation the session manager MUST attempt to retrieve the {@link SessionCookieConfig} from
  * the {@link HttpServerExchange} and use it to set the session cookie. The frees up the session manager from
  * needing to know details of the cookie configuration. When invalidating a session the session manager MUST
@@ -58,14 +58,19 @@ public interface SessionManager {
     /**
      * Creates a new session. Any {@link SessionListener}s registered with this manager will be notified
      * of the session creation.
-     * <p/>
+     * <p>
      * This method *MUST* call {@link SessionConfig#findSessionId(io.undertow.server.HttpServerExchange)} (io.undertow.server.HttpServerExchange)} first to
      * determine if an existing session ID is present in the exchange. If this id is present then it must be used
      * as the new session ID. If a session with this ID already exists then an {@link IllegalStateException} must be
      * thrown.
-     * <p/>
-     * <p/>
+     * <p>
+     * <p>
      * This requirement exists to allow forwards across servlet contexts to work correctly.
+     *
+     * The session manager is responsible for making sure that a newly created session is accessible to later calls to
+     * {@link #getSession(io.undertow.server.HttpServerExchange, SessionConfig)} from the same request. It is recommended
+     * that a non static attachment key be used to store the newly created session as an attachment. The attachment key
+     * must be static to prevent different session managers from interfering with each other.
      *
      * @return The created session
      */
@@ -122,4 +127,9 @@ public interface SessionManager {
      * passive
      */
     Set<String> getAllSessions();
+
+    /**
+     * Returns the statistics for this session manager, or null, if statistics are not supported.
+     */
+    SessionManagerStatistics getStatistics();
 }

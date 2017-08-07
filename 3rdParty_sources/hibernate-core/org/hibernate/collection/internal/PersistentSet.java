@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.collection.internal;
 
@@ -477,51 +460,29 @@ public class PersistentSet extends AbstractPersistentCollection implements java.
 		}
 	}
 
-	final class SimpleAdd implements DelayedOperation {
-		private Object value;
-		
-		public SimpleAdd(Object value) {
-			this.value = value;
+	final class SimpleAdd extends AbstractValueDelayedOperation {
+
+		public SimpleAdd(Object addedValue) {
+			super( addedValue, null );
 		}
 
 		@Override
 		@SuppressWarnings("unchecked")
 		public void operate() {
-			set.add( value );
-		}
-
-		@Override
-		public Object getAddedInstance() {
-			return value;
-		}
-
-		@Override
-		public Object getOrphan() {
-			return null;
+			set.add( getAddedInstance() );
 		}
 	}
 
-	final class SimpleRemove implements DelayedOperation {
-		private Object value;
-		
-		public SimpleRemove(Object value) {
-			this.value = value;
+	final class SimpleRemove extends AbstractValueDelayedOperation {
+
+		public SimpleRemove(Object orphan) {
+			super( null, orphan );
 		}
 
 		@Override
 		@SuppressWarnings("unchecked")
 		public void operate() {
-			set.remove( value );
-		}
-
-		@Override
-		public Object getAddedInstance() {
-			return null;
-		}
-
-		@Override
-		public Object getOrphan() {
-			return value;
+			set.remove( getOrphan() );
 		}
 	}
 }

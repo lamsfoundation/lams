@@ -51,6 +51,7 @@ public final class HttpString implements Comparable<HttpString>, Serializable {
     static {
         try {
             hashCodeField = HttpString.class.getDeclaredField("hashCode");
+            hashCodeField.setAccessible(true);
         } catch (NoSuchFieldException e) {
             throw new NoSuchFieldError(e.getMessage());
         }
@@ -108,7 +109,7 @@ public final class HttpString implements Comparable<HttpString>, Serializable {
         for (int i = 0; i < len; i++) {
             char c = string.charAt(i);
             if (c > 0xff) {
-                throw new IllegalArgumentException("Invalid string contents");
+                throw new IllegalArgumentException("Invalid string contents " + string);
             }
             bytes[i] = (byte) c;
         }
@@ -132,6 +133,10 @@ public final class HttpString implements Comparable<HttpString>, Serializable {
      * @return the HTTP string, or {@code null} if the string is not in a compatible encoding
      */
     public static HttpString tryFromString(String string) {
+        HttpString cached = Headers.fromCache(string);
+        if(cached != null) {
+            return cached;
+        }
         final int len = string.length();
         final byte[] bytes = new byte[len];
         for (int i = 0; i < len; i++) {
@@ -267,7 +272,18 @@ public final class HttpString implements Comparable<HttpString>, Serializable {
      */
     @Override
     public boolean equals(final Object other) {
-        return other == this || other instanceof HttpString && equals((HttpString) other);
+        if(other == this) {
+            return true;
+        }
+        if(!(other instanceof HttpString)) {
+            return false;
+        }
+        HttpString otherString = (HttpString) other;
+        if(orderInt > 0 && otherString.orderInt > 0) {
+            //if the order int is set for both of them and different then we know they are different strings
+            return false;
+        }
+        return bytesAreEqual(bytes, otherString.bytes);
     }
 
     /**

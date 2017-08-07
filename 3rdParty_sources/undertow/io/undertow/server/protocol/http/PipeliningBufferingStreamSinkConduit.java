@@ -30,8 +30,8 @@ import io.undertow.server.HttpServerExchange;
 import org.xnio.Buffers;
 import org.xnio.ChannelListener;
 import org.xnio.IoUtils;
-import org.xnio.Pool;
-import org.xnio.Pooled;
+import io.undertow.connector.ByteBufferPool;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.StreamConnection;
 import org.xnio.channels.StreamSourceChannel;
 import org.xnio.conduits.AbstractStreamSinkConduit;
@@ -46,7 +46,7 @@ import static org.xnio.Bits.anyAreSet;
 /**
  * A buffer that is used when processing pipelined requests, that allows the server to
  * buffer multiple responses into a single write() call.
- * <p/>
+ * <p>
  * This can improve performance when pipelining requests.
  *
  * @author Stuart Douglas
@@ -61,10 +61,10 @@ public class PipeliningBufferingStreamSinkConduit extends AbstractStreamSinkCond
 
     private int state;
 
-    private final Pool<ByteBuffer> pool;
-    private Pooled<ByteBuffer> buffer;
+    private final ByteBufferPool pool;
+    private PooledByteBuffer buffer;
 
-    public PipeliningBufferingStreamSinkConduit(StreamSinkConduit next, final Pool<ByteBuffer> pool) {
+    public PipeliningBufferingStreamSinkConduit(StreamSinkConduit next, final ByteBufferPool pool) {
         super(next);
         this.pool = pool;
     }
@@ -93,11 +93,11 @@ public class PipeliningBufferingStreamSinkConduit extends AbstractStreamSinkCond
                 return 0;
             }
         }
-        Pooled<ByteBuffer> pooled = this.buffer;
+        PooledByteBuffer pooled = this.buffer;
         if (pooled == null) {
             this.buffer = pooled = pool.allocate();
         }
-        final ByteBuffer buffer = pooled.getResource();
+        final ByteBuffer buffer = pooled.getBuffer();
 
         long total = Buffers.remaining(srcs, offset, length);
 
@@ -121,11 +121,11 @@ public class PipeliningBufferingStreamSinkConduit extends AbstractStreamSinkCond
                 return 0;
             }
         }
-        Pooled<ByteBuffer> pooled = this.buffer;
+        PooledByteBuffer pooled = this.buffer;
         if (pooled == null) {
             this.buffer = pooled = pool.allocate();
         }
-        final ByteBuffer buffer = pooled.getResource();
+        final ByteBuffer buffer = pooled.getBuffer();
         if (buffer.remaining() > src.remaining()) {
             int put = src.remaining();
             buffer.put(src);
@@ -146,12 +146,12 @@ public class PipeliningBufferingStreamSinkConduit extends AbstractStreamSinkCond
     }
 
     private long flushBufferWithUserData(final ByteBuffer[] byteBuffers, int offset, int length) throws IOException {
-        final ByteBuffer byteBuffer = buffer.getResource();
+        final ByteBuffer byteBuffer = buffer.getBuffer();
         if (byteBuffer.position() == 0) {
             try {
                 return next.write(byteBuffers, offset, length);
             } finally {
-                buffer.free();
+                buffer.close();
                 buffer = null;
             }
         }
@@ -176,7 +176,7 @@ public class PipeliningBufferingStreamSinkConduit extends AbstractStreamSinkCond
             written += res;
             if (res == 0) {
                 if (written > originalBufferedRemaining) {
-                    buffer.free();
+                    buffer.close();
                     this.buffer = null;
                     state &= ~FLUSHING;
                     return written - originalBufferedRemaining;
@@ -184,7 +184,7 @@ public class PipeliningBufferingStreamSinkConduit extends AbstractStreamSinkCond
                 return 0;
             }
         } while (written < toWrite);
-        buffer.free();
+        buffer.close();
         this.buffer = null;
         state &= ~FLUSHING;
         return written - originalBufferedRemaining;
@@ -192,17 +192,17 @@ public class PipeliningBufferingStreamSinkConduit extends AbstractStreamSinkCond
 
     /**
      * Flushes the cached data.
-     * <p/>
+     * <p>
      * This should be called when a read thread fails to read any more request data, to make sure that any
      * buffered data is flushed after the last pipelined request.
-     * <p/>
+     * <p>
      * If this returns false the read thread should suspend reads and resume writes
      *
      * @return <code>true</code> If the flush succeeded, false otherwise
      * @throws IOException
      */
     public boolean flushPipelinedData() throws IOException {
-        if (buffer == null || (buffer.getResource().position() == 0 && allAreClear(state, FLUSHING))) {
+        if (buffer == null || (buffer.getBuffer().position() == 0 && allAreClear(state, FLUSHING))) {
             return next.flush();
         }
         return flushBuffer();
@@ -210,8 +210,6 @@ public class PipeliningBufferingStreamSinkConduit extends AbstractStreamSinkCond
 
     /**
      * Gets the channel wrapper that implements the buffering
-     *
-     * @return The channel wrapper
      */
     public void setupPipelineBuffer(final HttpServerExchange exchange) {
         ((HttpServerConnection) exchange.getConnection()).getChannel().getSinkChannel().setConduit(this);
@@ -221,7 +219,7 @@ public class PipeliningBufferingStreamSinkConduit extends AbstractStreamSinkCond
         if (buffer == null) {
             return next.flush();
         }
-        final ByteBuffer byteBuffer = buffer.getResource();
+        final ByteBuffer byteBuffer = buffer.getBuffer();
         if (!anyAreSet(state, FLUSHING)) {
             state |= FLUSHING;
             byteBuffer.flip();
@@ -234,7 +232,7 @@ public class PipeliningBufferingStreamSinkConduit extends AbstractStreamSinkCond
         if (!next.flush()) {
             return false;
         }
-        buffer.free();
+        buffer.close();
         this.buffer = null;
         state &= ~FLUSHING;
         return true;
@@ -243,7 +241,7 @@ public class PipeliningBufferingStreamSinkConduit extends AbstractStreamSinkCond
     @Override
     public void awaitWritable(long time, TimeUnit timeUnit) throws IOException {
         if (buffer != null) {
-            if (buffer.getResource().hasRemaining()) {
+            if (buffer.getBuffer().hasRemaining()) {
                 return;
             }
         }
@@ -253,7 +251,7 @@ public class PipeliningBufferingStreamSinkConduit extends AbstractStreamSinkCond
     @Override
     public void awaitWritable() throws IOException {
         if (buffer != null) {
-            if (buffer.getResource().hasRemaining()) {
+            if (buffer.getBuffer().hasRemaining()) {
                 return;
             }
             next.awaitWritable();
@@ -290,7 +288,7 @@ public class PipeliningBufferingStreamSinkConduit extends AbstractStreamSinkCond
             next.truncateWrites();
         } finally {
             if (buffer != null) {
-                buffer.free();
+                buffer.close();
             }
         }
     }

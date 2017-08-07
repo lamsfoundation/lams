@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.spi;
 
@@ -29,6 +12,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.event.spi.EventSource;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.type.CollectionType;
+import org.hibernate.type.Type;
 
 /**
  * A session action that may be cascaded from parent entity to its children
@@ -49,7 +33,7 @@ public interface CascadingAction {
 	 * @param isCascadeDeleteEnabled Are cascading deletes enabled.
 	 * @throws HibernateException
 	 */
-	public void cascade(
+	void cascade(
 			EventSource session,
 			Object child,
 			String entityName,
@@ -65,7 +49,7 @@ public interface CascadingAction {
 	 * @param collection The collection instance.
 	 * @return The children iterator.
 	 */
-	public Iterator getCascadableChildrenIterator(
+	Iterator getCascadableChildrenIterator(
 			EventSource session,
 			CollectionType collectionType,
 			Object collection);
@@ -75,7 +59,7 @@ public interface CascadingAction {
 	 *
 	 * @return True if this action can lead to deletions of orphans.
 	 */
-	public boolean deleteOrphans();
+	boolean deleteOrphans();
 
 
 	/**
@@ -83,22 +67,22 @@ public interface CascadingAction {
 	 *
 	 * @return True if this action requires no-cascade verification; false otherwise.
 	 */
-	public boolean requiresNoCascadeChecking();
+	boolean requiresNoCascadeChecking();
 
 	/**
 	 * Called (in the case of {@link #requiresNoCascadeChecking} returning true) to validate
 	 * that no cascade on the given property is considered a valid semantic.
 	 *
 	 * @param session The session witin which the cascade is occurring.
-	 * @param child The property value
 	 * @param parent The property value owner
 	 * @param persister The entity persister for the owner
+	 * @param propertyType The property type
 	 * @param propertyIndex The index of the property within the owner.
 	 */
-	public void noCascade(EventSource session, Object child, Object parent, EntityPersister persister, int propertyIndex);
+	void noCascade(EventSource session, Object parent, EntityPersister persister, Type propertyType, int propertyIndex);
 
 	/**
 	 * Should this action be performed (or noCascade consulted) in the case of lazy properties.
 	 */
-	public boolean performOnLazyProperty();
+	boolean performOnLazyProperty();
 }

@@ -20,6 +20,7 @@ package io.undertow.server.session;
 
 import java.util.Map;
 
+import io.undertow.UndertowLogger;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.CookieImpl;
@@ -62,7 +63,7 @@ public class SessionCookieConfig implements SessionConfig {
             cookie.setMaxAge(maxAge);
         }
         exchange.setResponseCookie(cookie);
-        exchange.getRequestCookies().put(cookieName, cookie);
+        UndertowLogger.SESSION_LOGGER.tracef("Setting session cookie session id %s on %s", sessionId, exchange);
     }
 
     @Override
@@ -75,7 +76,7 @@ public class SessionCookieConfig implements SessionConfig {
                 .setHttpOnly(httpOnly)
                 .setMaxAge(0);
         exchange.setResponseCookie(cookie);
-        exchange.getRequestCookies().remove(cookieName);
+        UndertowLogger.SESSION_LOGGER.tracef("Clearing session cookie session id %s on %s", sessionId, exchange);
     }
 
     @Override
@@ -84,6 +85,7 @@ public class SessionCookieConfig implements SessionConfig {
         if (cookies != null) {
             Cookie sessionId = cookies.get(cookieName);
             if (sessionId != null) {
+                UndertowLogger.SESSION_LOGGER.tracef("Found session cookie session id %s on %s", sessionId, exchange);
                 return sessionId.getValue();
             }
         }

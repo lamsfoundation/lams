@@ -30,29 +30,32 @@ package org.apache.http.impl.client;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.http.annotation.NotThreadSafe;
-
 import org.apache.http.HttpRequest;
 import org.apache.http.ProtocolException;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.RequestLine;
+import org.apache.http.annotation.NotThreadSafe;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.AbstractHttpMessage;
 import org.apache.http.message.BasicRequestLine;
 import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.util.Args;
 
 /**
  * A wrapper class for {@link HttpRequest}s that can be used to change
  * properties of the current request without modifying the original
  * object.
- * </p>
+ * <p>
  * This class is also capable of resetting the request headers to
  * the state of the original request.
- *
+ * </p>
  *
  * @since 4.0
+ *
+ * @deprecated (4.3) do not use.
  */
 @NotThreadSafe
+@Deprecated
 public class RequestWrapper extends AbstractHttpMessage implements HttpUriRequest {
 
     private final HttpRequest original;
@@ -64,9 +67,7 @@ public class RequestWrapper extends AbstractHttpMessage implements HttpUriReques
 
     public RequestWrapper(final HttpRequest request) throws ProtocolException {
         super();
-        if (request == null) {
-            throw new IllegalArgumentException("HTTP request may not be null");
-        }
+        Args.notNull(request, "HTTP request");
         this.original = request;
         setParams(request.getParams());
         setHeaders(request.getAllHeaders());
@@ -76,10 +77,10 @@ public class RequestWrapper extends AbstractHttpMessage implements HttpUriReques
             this.method = ((HttpUriRequest) request).getMethod();
             this.version = null;
         } else {
-            RequestLine requestLine = request.getRequestLine();
+            final RequestLine requestLine = request.getRequestLine();
             try {
                 this.uri = new URI(requestLine.getUri());
-            } catch (URISyntaxException ex) {
+            } catch (final URISyntaxException ex) {
                 throw new ProtocolException("Invalid request URI: "
                         + requestLine.getUri(), ex);
             }
@@ -95,17 +96,17 @@ public class RequestWrapper extends AbstractHttpMessage implements HttpUriReques
         setHeaders(this.original.getAllHeaders());
     }
 
+    @Override
     public String getMethod() {
         return this.method;
     }
 
     public void setMethod(final String method) {
-        if (method == null) {
-            throw new IllegalArgumentException("Method name may not be null");
-        }
+        Args.notNull(method, "Method name");
         this.method = method;
     }
 
+    @Override
     public ProtocolVersion getProtocolVersion() {
         if (this.version == null) {
             this.version = HttpProtocolParams.getVersion(getParams());
@@ -118,6 +119,7 @@ public class RequestWrapper extends AbstractHttpMessage implements HttpUriReques
     }
 
 
+    @Override
     public URI getURI() {
         return this.uri;
     }
@@ -126,23 +128,25 @@ public class RequestWrapper extends AbstractHttpMessage implements HttpUriReques
         this.uri = uri;
     }
 
+    @Override
     public RequestLine getRequestLine() {
-        String method = getMethod();
-        ProtocolVersion ver = getProtocolVersion();
+        final ProtocolVersion ver = getProtocolVersion();
         String uritext = null;
         if (uri != null) {
             uritext = uri.toASCIIString();
         }
-        if (uritext == null || uritext.length() == 0) {
+        if (uritext == null || uritext.isEmpty()) {
             uritext = "/";
         }
-        return new BasicRequestLine(method, uritext, ver);
+        return new BasicRequestLine(getMethod(), uritext, ver);
     }
 
+    @Override
     public void abort() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean isAborted() {
         return false;
     }

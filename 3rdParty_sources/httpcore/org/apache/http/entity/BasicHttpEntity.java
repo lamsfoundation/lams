@@ -32,6 +32,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.impl.io.EmptyInputStream;
+import org.apache.http.util.Args;
+import org.apache.http.util.Asserts;
 
 /**
  * A generic streamed, non-repeatable entity that obtains its content
@@ -55,6 +58,7 @@ public class BasicHttpEntity extends AbstractHttpEntity {
         this.length = -1;
     }
 
+    @Override
     public long getContentLength() {
         return this.length;
     }
@@ -68,19 +72,18 @@ public class BasicHttpEntity extends AbstractHttpEntity {
      * @throws IllegalStateException
      *          if the content has not been provided
      */
+    @Override
     public InputStream getContent() throws IllegalStateException {
-        if (this.content == null) {
-            throw new IllegalStateException("Content has not been provided");
-        }
+        Asserts.check(this.content != null, "Content has not been provided");
         return this.content;
-
     }
 
     /**
      * Tells that this entity is not repeatable.
      *
-     * @return <code>false</code>
+     * @return {@code false}
      */
+    @Override
     public boolean isRepeatable() {
         return false;
     }
@@ -91,7 +94,7 @@ public class BasicHttpEntity extends AbstractHttpEntity {
      * @param len       the number of bytes in the content, or
      *                  a negative number to indicate an unknown length
      */
-    public void setContentLength(long len) {
+    public void setContentLength(final long len) {
         this.length = len;
     }
 
@@ -105,14 +108,13 @@ public class BasicHttpEntity extends AbstractHttpEntity {
         this.content = instream;
     }
 
+    @Override
     public void writeTo(final OutputStream outstream) throws IOException {
-        if (outstream == null) {
-            throw new IllegalArgumentException("Output stream may not be null");
-        }
-        InputStream instream = getContent();
+        Args.notNull(outstream, "Output stream");
+        final InputStream instream = getContent();
         try {
             int l;
-            byte[] tmp = new byte[2048];
+            final byte[] tmp = new byte[OUTPUT_BUFFER_SIZE];
             while ((l = instream.read(tmp)) != -1) {
                 outstream.write(tmp, 0, l);
             }
@@ -121,22 +123,9 @@ public class BasicHttpEntity extends AbstractHttpEntity {
         }
     }
 
-    public boolean isStreaming() {
-        return this.content != null;
-    }
-
-    /**
-     * Closes the content InputStream.
-     *
-     * @deprecated (4.1) Either use {@link #getContent()} and call {@link java.io.InputStream#close()} on that;
-     * otherwise call {@link #writeTo(OutputStream)} which is required to free the resources.
-     */
-    @Deprecated
     @Override
-    public void consumeContent() throws IOException {
-        if (content != null) {
-            content.close(); // reads to the end of the entity
-        }
+    public boolean isStreaming() {
+        return this.content != null && this.content != EmptyInputStream.INSTANCE;
     }
 
 }

@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.mapping;
 
@@ -29,20 +12,20 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.hibernate.MappingException;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.engine.spi.Mapping;
+import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.internal.util.collections.SingletonIterator;
 
-import org.jboss.logging.Logger;
-
 /**
  * The root class of an inheritance hierarchy
+ *
  * @author Gavin King
  */
 public class RootClass extends PersistentClass implements TableOwner {
-
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, RootClass.class.getName());
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( RootClass.class );
 
 	public static final String DEFAULT_IDENTIFIER_COLUMN_NAME = "id";
 	public static final String DEFAULT_DISCRIMINATOR_COLUMN_NAME = "class";
@@ -67,32 +50,38 @@ public class RootClass extends PersistentClass implements TableOwner {
 	private int nextSubclassId;
 	private Property declaredIdentifierProperty;
 	private Property declaredVersion;
+	private boolean cachingExplicitlyRequested;
+
+	public RootClass(MetadataBuildingContext metadataBuildingContext) {
+		super( metadataBuildingContext );
+	}
 
 	@Override
-    int nextSubclassId() {
+	int nextSubclassId() {
 		return ++nextSubclassId;
 	}
 
 	@Override
-    public int getSubclassId() {
+	public int getSubclassId() {
 		return 0;
 	}
 
 	public void setTable(Table table) {
-		this.table=table;
+		this.table = table;
 	}
+
 	@Override
-    public Table getTable() {
+	public Table getTable() {
 		return table;
 	}
 
 	@Override
-    public Property getIdentifierProperty() {
+	public Property getIdentifierProperty() {
 		return identifierProperty;
 	}
 
 	@Override
-    public Property getDeclaredIdentifierProperty() {
+	public Property getDeclaredIdentifierProperty() {
 		return declaredIdentifierProperty;
 	}
 
@@ -101,25 +90,27 @@ public class RootClass extends PersistentClass implements TableOwner {
 	}
 
 	@Override
-    public KeyValue getIdentifier() {
+	public KeyValue getIdentifier() {
 		return identifier;
-	}
-	@Override
-    public boolean hasIdentifierProperty() {
-		return identifierProperty!=null;
 	}
 
 	@Override
-    public Value getDiscriminator() {
+	public boolean hasIdentifierProperty() {
+		return identifierProperty != null;
+	}
+
+	@Override
+	public Value getDiscriminator() {
 		return discriminator;
 	}
 
 	@Override
-    public boolean isInherited() {
+	public boolean isInherited() {
 		return false;
 	}
+
 	@Override
-    public boolean isPolymorphic() {
+	public boolean isPolymorphic() {
 		return polymorphic;
 	}
 
@@ -128,41 +119,43 @@ public class RootClass extends PersistentClass implements TableOwner {
 	}
 
 	@Override
-    public RootClass getRootClass() {
+	public RootClass getRootClass() {
 		return this;
 	}
 
 	@Override
-    public Iterator getPropertyClosureIterator() {
+	public Iterator getPropertyClosureIterator() {
 		return getPropertyIterator();
 	}
+
 	@Override
-    public Iterator getTableClosureIterator() {
+	public Iterator getTableClosureIterator() {
 		return new SingletonIterator( getTable() );
 	}
+
 	@Override
-    public Iterator getKeyClosureIterator() {
+	public Iterator getKeyClosureIterator() {
 		return new SingletonIterator( getKey() );
 	}
 
 	@Override
-    public void addSubclass(Subclass subclass) throws MappingException {
-		super.addSubclass(subclass);
-		setPolymorphic(true);
+	public void addSubclass(Subclass subclass) throws MappingException {
+		super.addSubclass( subclass );
+		setPolymorphic( true );
 	}
 
 	@Override
-    public boolean isExplicitPolymorphism() {
+	public boolean isExplicitPolymorphism() {
 		return explicitPolymorphism;
 	}
 
 	@Override
-    public Property getVersion() {
+	public Property getVersion() {
 		return version;
 	}
 
 	@Override
-    public Property getDeclaredVersion() {
+	public Property getDeclaredVersion() {
 		return declaredVersion;
 	}
 
@@ -173,42 +166,44 @@ public class RootClass extends PersistentClass implements TableOwner {
 	public void setVersion(Property version) {
 		this.version = version;
 	}
+
 	@Override
-    public boolean isVersioned() {
-		return version!=null;
+	public boolean isVersioned() {
+		return version != null;
 	}
 
 	@Override
-    public boolean isMutable() {
+	public boolean isMutable() {
 		return mutable;
 	}
+
 	@Override
-    public boolean hasEmbeddedIdentifier() {
+	public boolean hasEmbeddedIdentifier() {
 		return embeddedIdentifier;
 	}
 
 	@Override
-    public Class getEntityPersisterClass() {
+	public Class getEntityPersisterClass() {
 		return entityPersisterClass;
 	}
 
 	@Override
-    public Table getRootTable() {
+	public Table getRootTable() {
 		return getTable();
 	}
 
 	@Override
-    public void setEntityPersisterClass(Class persister) {
+	public void setEntityPersisterClass(Class persister) {
 		this.entityPersisterClass = persister;
 	}
 
 	@Override
-    public PersistentClass getSuperclass() {
+	public PersistentClass getSuperclass() {
 		return null;
 	}
 
 	@Override
-    public KeyValue getKey() {
+	public KeyValue getKey() {
 		return getIdentifier();
 	}
 
@@ -230,7 +225,7 @@ public class RootClass extends PersistentClass implements TableOwner {
 
 	public void setIdentifierProperty(Property identifierProperty) {
 		this.identifierProperty = identifierProperty;
-		identifierProperty.setPersistentClass(this);
+		identifierProperty.setPersistentClass( this );
 
 	}
 
@@ -239,7 +234,7 @@ public class RootClass extends PersistentClass implements TableOwner {
 	}
 
 	@Override
-    public boolean isDiscriminatorInsertable() {
+	public boolean isDiscriminatorInsertable() {
 		return discriminatorInsertable;
 	}
 
@@ -248,7 +243,7 @@ public class RootClass extends PersistentClass implements TableOwner {
 	}
 
 	@Override
-    public boolean isForceDiscriminator() {
+	public boolean isForceDiscriminator() {
 		return forceDiscriminator;
 	}
 
@@ -257,7 +252,7 @@ public class RootClass extends PersistentClass implements TableOwner {
 	}
 
 	@Override
-    public String getWhere() {
+	public String getWhere() {
 		return where;
 	}
 
@@ -266,14 +261,14 @@ public class RootClass extends PersistentClass implements TableOwner {
 	}
 
 	@Override
-    public void validate(Mapping mapping) throws MappingException {
-		super.validate(mapping);
-		if ( !getIdentifier().isValid(mapping) ) {
+	public void validate(Mapping mapping) throws MappingException {
+		super.validate( mapping );
+		if ( !getIdentifier().isValid( mapping ) ) {
 			throw new MappingException(
-				"identifier mapping has wrong number of columns: " +
-				getEntityName() +
-				" type: " +
-				getIdentifier().getType().getName()
+					"identifier mapping has wrong number of columns: " +
+							getEntityName() +
+							" type: " +
+							getIdentifier().getType().getName()
 			);
 		}
 		checkCompositeIdentifier();
@@ -284,18 +279,26 @@ public class RootClass extends PersistentClass implements TableOwner {
 			Component id = (Component) getIdentifier();
 			if ( !id.isDynamic() ) {
 				final Class idClass = id.getComponentClass();
-				final String idComponendClassName = idClass.getName();
-                if (idClass != null && !ReflectHelper.overridesEquals(idClass)) LOG.compositeIdClassDoesNotOverrideEquals( idComponendClassName );
-                if (!ReflectHelper.overridesHashCode(idClass)) LOG.compositeIdClassDoesNotOverrideHashCode( idComponendClassName );
-                if (!Serializable.class.isAssignableFrom(idClass)) throw new MappingException(
-                                                                                              "Composite-id class must implement Serializable: "
-                                                                                              + idComponendClassName);
+				if ( idClass != null ) {
+					final String idComponentClassName = idClass.getName();
+					if ( !ReflectHelper.overridesEquals( idClass ) ) {
+						LOG.compositeIdClassDoesNotOverrideEquals( idComponentClassName );
+					}
+					if ( !ReflectHelper.overridesHashCode( idClass ) ) {
+						LOG.compositeIdClassDoesNotOverrideHashCode( idComponentClassName );
+					}
+					if ( !Serializable.class.isAssignableFrom( idClass ) ) {
+						throw new MappingException(
+								"Composite-id class must implement Serializable: " + idComponentClassName
+						);
+					}
+				}
 			}
 		}
 	}
 
 	@Override
-    public String getCacheConcurrencyStrategy() {
+	public String getCacheConcurrencyStrategy() {
 		return cacheConcurrencyStrategy;
 	}
 
@@ -304,22 +307,24 @@ public class RootClass extends PersistentClass implements TableOwner {
 	}
 
 	public String getCacheRegionName() {
-		return cacheRegionName==null ? getEntityName() : cacheRegionName;
+		return cacheRegionName == null ? getEntityName() : cacheRegionName;
 	}
+
 	public void setCacheRegionName(String cacheRegionName) {
 		this.cacheRegionName = cacheRegionName;
 	}
-	
+
 	@Override
 	public String getNaturalIdCacheRegionName() {
 		return naturalIdCacheRegionName;
 	}
+
 	public void setNaturalIdCacheRegionName(String naturalIdCacheRegionName) {
 		this.naturalIdCacheRegionName = naturalIdCacheRegionName;
 	}
-	
+
 	@Override
-    public boolean isLazyPropertiesCacheable() {
+	public boolean isLazyPropertiesCacheable() {
 		return lazyPropertiesCacheable;
 	}
 
@@ -328,27 +333,38 @@ public class RootClass extends PersistentClass implements TableOwner {
 	}
 
 	@Override
-    public boolean isJoinedSubclass() {
+	public boolean isJoinedSubclass() {
 		return false;
 	}
 
 	@Override
-    public java.util.Set getSynchronizedTables() {
+	public java.util.Set getSynchronizedTables() {
 		return synchronizedTables;
 	}
 
-	public Set getIdentityTables() {
-		Set tables = new HashSet();
+	@SuppressWarnings("UnnecessaryUnboxing")
+	public Set<Table> getIdentityTables() {
+		Set<Table> tables = new HashSet<Table>();
 		Iterator iter = getSubclassClosureIterator();
 		while ( iter.hasNext() ) {
 			PersistentClass clazz = (PersistentClass) iter.next();
-			if ( clazz.isAbstract() == null || !clazz.isAbstract().booleanValue() ) tables.add( clazz.getIdentityTable() );
+			if ( clazz.isAbstract() == null || !clazz.isAbstract().booleanValue() ) {
+				tables.add( clazz.getIdentityTable() );
+			}
 		}
 		return tables;
 	}
 
 	@Override
-    public Object accept(PersistentClassVisitor mv) {
-		return mv.accept(this);
+	public Object accept(PersistentClassVisitor mv) {
+		return mv.accept( this );
+	}
+
+	public void setCachingExplicitlyRequested(boolean explicitlyRequested) {
+		this.cachingExplicitlyRequested = explicitlyRequested;
+	}
+
+	public boolean isCachingExplicitlyRequested() {
+		return cachingExplicitlyRequested;
 	}
 }

@@ -1,20 +1,21 @@
 /*
  * ====================================================================
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  * ====================================================================
  *
  * This software consists of voluntary contributions made by many
@@ -23,12 +24,12 @@
  * <http://www.apache.org/>.
  *
  */
-
 package org.apache.http.auth;
 
 import java.util.Queue;
 
 import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.util.Args;
 
 /**
  * This class provides detailed information about the state of the authentication process.
@@ -108,12 +109,8 @@ public class AuthState {
      * @since 4.2
      */
     public void update(final AuthScheme authScheme, final Credentials credentials) {
-        if (authScheme == null) {
-            throw new IllegalArgumentException("Auth scheme may not be null or empty");
-        }
-        if (credentials == null) {
-            throw new IllegalArgumentException("Credentials may not be null or empty");
-        }
+        Args.notNull(authScheme, "Auth scheme");
+        Args.notNull(credentials, "Credentials");
         this.authScheme = authScheme;
         this.credentials = credentials;
         this.authOptions = null;
@@ -129,7 +126,7 @@ public class AuthState {
     }
 
     /**
-     * Returns <code>true</code> if {@link AuthOption}s are available, <code>false</code>
+     * Returns {@code true} if {@link AuthOption}s are available, {@code false}
      * otherwise.
      *
      * @since 4.2
@@ -146,9 +143,7 @@ public class AuthState {
      * @since 4.2
      */
     public void update(final Queue<AuthOption> authOptions) {
-        if (authOptions == null || authOptions.isEmpty()) {
-            throw new IllegalArgumentException("Queue of auth options may not be null or empty");
-        }
+        Args.notEmpty(authOptions, "Queue of auth options");
         this.authOptions = authOptions;
         this.authScheme = null;
         this.credentials = null;
@@ -159,7 +154,7 @@ public class AuthState {
      *
      * @deprecated (4.2)  use {@link #reset()}
      */
-    @Deprecated 
+    @Deprecated
     public void invalidate() {
         reset();
     }
@@ -179,7 +174,7 @@ public class AuthState {
      *
      * @deprecated (4.2)  use {@link #update(AuthScheme, Credentials)}
      */
-    @Deprecated 
+    @Deprecated
     public void setAuthScheme(final AuthScheme authScheme) {
         if (authScheme == null) {
             reset();
@@ -203,7 +198,7 @@ public class AuthState {
     /**
      * Returns actual {@link AuthScope} if available
      *
-     * @return actual authentication scope if available, <code>null</code otherwise
+     * @return actual authentication scope if available, {@code null} otherwise
      *
      * @deprecated (4.2)  do not use.
      */
@@ -226,7 +221,7 @@ public class AuthState {
 
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
         buffer.append("state:").append(this.state).append(";");
         if (this.authScheme != null) {
             buffer.append("auth scheme:").append(this.authScheme.getSchemeName()).append(";");

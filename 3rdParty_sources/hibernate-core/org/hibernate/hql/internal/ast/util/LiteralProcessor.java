@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal.ast.util;
 
@@ -31,11 +13,13 @@ import java.text.DecimalFormat;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.QueryException;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.hql.internal.antlr.HqlSqlTokenTypes;
 import org.hibernate.hql.internal.antlr.SqlTokenTypes;
 import org.hibernate.hql.internal.ast.HqlSqlWalker;
 import org.hibernate.hql.internal.ast.InvalidPathException;
+import org.hibernate.hql.internal.ast.tree.BooleanLiteralNode;
 import org.hibernate.hql.internal.ast.tree.DotNode;
 import org.hibernate.hql.internal.ast.tree.FromClause;
 import org.hibernate.hql.internal.ast.tree.IdentNode;
@@ -51,6 +35,7 @@ import org.jboss.logging.Logger;
 
 import antlr.SemanticException;
 import antlr.collections.AST;
+import java.util.Locale;
 
 /**
  * A delegate that handles literals and constants for HqlSqlWalker, performing the token replacement functions and
@@ -124,7 +109,7 @@ public class LiteralProcessor implements HqlSqlTokenTypes {
 			setSQLValue( node, text, discrim );
 		}
 		else {
-			Object value = ReflectHelper.getConstantValue( text );
+			Object value = ReflectHelper.getConstantValue( text, walker.getSessionFactoryHelper().getFactory().getServiceRegistry().getService( ClassLoaderService.class ) );
 			if ( value == null ) {
 				throw new InvalidPathException( "Invalid path: '" + text + "'" );
 			}
@@ -200,17 +185,14 @@ public class LiteralProcessor implements HqlSqlTokenTypes {
 	}
 
 	public void processBoolean(AST constant) {
-		// TODO: something much better - look at the type of the other expression!
-		// TODO: Have comparisonExpression and/or arithmeticExpression rules complete the resolution of boolean nodes.
 		String replacement = (String) walker.getTokenReplacements().get( constant.getText() );
 		if ( replacement != null ) {
 			constant.setText( replacement );
 		}
-		else {
-			boolean bool = "true".equals( constant.getText().toLowerCase() );
-			Dialect dialect = walker.getSessionFactoryHelper().getFactory().getDialect();
-			constant.setText( dialect.toBooleanValueString( bool ) );
-		}
+	}
+
+	public void processNull(AST constant) {
+		constant.setText( "null" );
 	}
 
 	private void processLiteral(AST constant) {

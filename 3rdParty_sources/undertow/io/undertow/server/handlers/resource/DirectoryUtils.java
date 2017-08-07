@@ -21,10 +21,19 @@ package io.undertow.server.handlers.resource;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import io.undertow.UndertowLogger;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.DateUtils;
+import io.undertow.util.ETag;
+import io.undertow.util.ETagUtils;
+import io.undertow.util.FlexBase64;
 import io.undertow.util.Headers;
 import io.undertow.util.Methods;
 import io.undertow.util.RedirectBuilder;
@@ -45,17 +54,30 @@ public class DirectoryUtils {
     public static boolean sendRequestedBlobs(HttpServerExchange exchange) {
         ByteBuffer buffer = null;
         String type = null;
+        String etag = null;
+        String quotedEtag = null;
         if ("css".equals(exchange.getQueryString())) {
             buffer = Blobs.FILE_CSS_BUFFER.duplicate();
             type = "text/css";
+            etag = Blobs.FILE_CSS_ETAG;
+            quotedEtag = Blobs.FILE_CSS_ETAG_QUOTED;
         } else if ("js".equals(exchange.getQueryString())) {
             buffer = Blobs.FILE_JS_BUFFER.duplicate();
             type = "application/javascript";
+            etag = Blobs.FILE_JS_ETAG;
+            quotedEtag = Blobs.FILE_JS_ETAG_QUOTED;
         }
 
         if (buffer != null) {
+
+            if(!ETagUtils.handleIfNoneMatch(exchange, new ETag(false, etag), false)) {
+                exchange.setStatusCode(StatusCodes.NOT_MODIFIED);
+                return true;
+            }
+
             exchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, String.valueOf(buffer.limit()));
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, type);
+            exchange.getResponseHeaders().put(Headers.ETAG, quotedEtag);
             if (Methods.HEAD.equals(exchange.getRequestMethod())) {
                 exchange.endExchange();
                 return true;
@@ -102,7 +124,7 @@ public class DirectoryUtils {
         }
 
 
-        SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss", Locale.US);
         int i = 0;
         if (parent != null) {
             i++;
@@ -131,25 +153,26 @@ public class DirectoryUtils {
     public static void renderDirectoryListing(HttpServerExchange exchange, Resource resource) {
         String requestPath = exchange.getRequestPath();
         if (! requestPath.endsWith("/")) {
-            exchange.setResponseCode(StatusCodes.FOUND);
+            exchange.setStatusCode(StatusCodes.FOUND);
             exchange.getResponseHeaders().put(Headers.LOCATION, RedirectBuilder.redirect(exchange, exchange.getRelativePath() + "/", true));
             exchange.endExchange();
             return;
         }
-        String resolvedPath = exchange.getResolvedPath();
 
         StringBuilder builder = renderDirectoryListing(requestPath, resource);
 
         try {
-            ByteBuffer output = ByteBuffer.wrap(builder.toString().getBytes("UTF-8"));
-            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html");
+            ByteBuffer output = ByteBuffer.wrap(builder.toString().getBytes(StandardCharsets.UTF_8));
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html; charset=UTF-8");
             exchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, String.valueOf(output.limit()));
+            exchange.getResponseHeaders().put(Headers.LAST_MODIFIED, DateUtils.toDateString(new Date()));
+            exchange.getResponseHeaders().put(Headers.CACHE_CONTROL, "must-revalidate");
             Channels.writeBlocking(exchange.getResponseChannel(), output);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         } catch (IOException e) {
             UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
-            exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
+            exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
         }
 
         exchange.endExchange();
@@ -238,6 +261,8 @@ public class DirectoryUtils {
                   "        document.documentElement.style.overflowY=\"auto\";\n" +
                   "    }\n" +
                   "}";
+          public static final String FILE_JS_ETAG = md5(FILE_JS.getBytes(StandardCharsets.US_ASCII));
+          public static final String FILE_JS_ETAG_QUOTED = '"' + FILE_JS_ETAG + '"';
           public static final String FILE_CSS =
                   "body {\n" +
                   "    font-family: \"Lucida Grande\", \"Lucida Sans Unicode\", \"Trebuchet MS\", Helvetica, Arial, Verdana, sans-serif;\n" +
@@ -341,18 +366,21 @@ public class DirectoryUtils {
                   "a.file {\n" +
                   "    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXZwQWcAAAAQAAAAEABcxq3DAAABM0lEQVQ4y5WSTW6DMBCF3xvzc4wuOEIO0kVAuUB7vJ4g3KBdoHSRROomEpusUaoAcaYLfmKoqVRLIxnJ7/M3YwJVBcknACv8b+1U9SvoP1bXa/3WNDVIAQmQBLsNOEsGQYAwDNcARgDqusbl+wIRA2NkBEyqP0s+kCOAQhhjICJdkaDIJDwEvQAhH+G+SHagWTsi4jHoAWYIOxYDZDjnb8Fn4Akvz6AHcAbx3Tp5ETwI3RwckyVtv4Fr4VEe9qq6bDB5tlnYWou2bWGtRRRF6jdwAm5Za1FVFc7nM0QERVG8A9hPDRaGpapomgZlWSJJEuR5ftpsNq8ADr9amC+SuN/vuN1uIIntdnvKsuwZwKf2wxgBxpjpX+dA4jjW4/H4kabpixt2AbvAmDX+XnsAB509ww+A8mAar+XXgQAAAABJRU5ErkJggg==') left center no-repeat;\n" +
                   "}";
+        public static final String FILE_CSS_ETAG = md5(FILE_CSS.getBytes(StandardCharsets.US_ASCII));
+        public static final String FILE_CSS_ETAG_QUOTED = '"' + FILE_CSS_ETAG + '"';
+
 
         public static final ByteBuffer FILE_CSS_BUFFER;
         public static final ByteBuffer FILE_JS_BUFFER;
 
         static {
             try {
-                byte[] bytes = FILE_CSS.getBytes("US-ASCII");
+                byte[] bytes = FILE_CSS.getBytes(StandardCharsets.US_ASCII);
                 FILE_CSS_BUFFER = ByteBuffer.allocateDirect(bytes.length);
                 FILE_CSS_BUFFER.put(bytes);
                 FILE_CSS_BUFFER.flip();
 
-                bytes = FILE_JS.getBytes("US-ASCII");
+                bytes = FILE_JS.getBytes(StandardCharsets.US_ASCII);
                 FILE_JS_BUFFER = ByteBuffer.allocateDirect(bytes.length);
                 FILE_JS_BUFFER.put(bytes);
                 FILE_JS_BUFFER.flip();
@@ -362,4 +390,21 @@ public class DirectoryUtils {
         }
 
     }
+
+
+    /**
+     * Generate the MD5 hash out of the given {@link ByteBuffer}
+     */
+    private static String md5(byte[] buffer) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(buffer);
+            byte[] digest = md.digest();
+            return new String(FlexBase64.encodeBytes(digest, 0, digest.length, false));
+        } catch (NoSuchAlgorithmException e) {
+            // Should never happen
+            throw new InternalError("MD5 not supported on this platform");
+        }
+    }
+
 }

@@ -20,6 +20,7 @@ package io.undertow.util;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -43,6 +44,7 @@ public class MimeMappings {
         defaultMappings.put("jpg", "image/jpeg");
         defaultMappings.put("jpe", "image/jpeg");
         defaultMappings.put("jpeg", "image/jpeg");
+        defaultMappings.put("bmp", "image/bmp");
         defaultMappings.put("js", "application/javascript");
         defaultMappings.put("png", "image/png");
         defaultMappings.put("java", "text/plain");
@@ -126,9 +128,9 @@ public class MimeMappings {
 
         /* Add XML related MIMEs */
 
-        defaultMappings.put("xml", "text/xml");
+        defaultMappings.put("xml", "application/xml");
         defaultMappings.put("xhtml", "application/xhtml+xml");
-        defaultMappings.put("xsl", "text/xml");
+        defaultMappings.put("xsl", "application/xml");
         defaultMappings.put("svg", "image/svg+xml");
         defaultMappings.put("svgz", "image/svg+xml");
         defaultMappings.put("wbmp", "image/vnd.wap.wbmp");
@@ -164,8 +166,9 @@ public class MimeMappings {
             }
         }
 
-        public void addMapping(final String extension, final String contentType) {
-            mappings.put(extension, contentType);
+        public Builder addMapping(final String extension, final String contentType) {
+            mappings.put(extension.toLowerCase(Locale.ENGLISH), contentType);
+            return this;
         }
 
         public MimeMappings build() {
@@ -174,7 +177,7 @@ public class MimeMappings {
     }
 
     public String getMimeType(final String extension) {
-        return mappings.get(extension);
+        return mappings.get(extension.toLowerCase(Locale.ENGLISH));
     }
 
 }

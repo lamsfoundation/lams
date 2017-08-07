@@ -28,8 +28,7 @@
 		deploy-learning-libraries --> Deploys complex Tools
 		lams-cruise               --> Runs full LAMS redeployment
 		lams-cruise-min-tools     --> Runs full LAMS redeployment with minimal Tools set
-		slim-jboss                --> Removes unused JBoss files
-		slim-jboss-revert         --> Puts back JBoss files removed in slimming process
+		slim-wildfly              --> Removes unused WidlFly files
 			
 		If you want to run full deployment, execute lams-cruise.
 		</echo>
@@ -686,11 +685,11 @@
 		 use them till migration to Wildfly 9.x
 		 It will be placed back if deploy-cluster is run. -->
 		<copy todir="${server.home}/backup/undertow"
-			  overwrite="false" verbose="true">
+			  overwrite="false" verbose="true" failonerror="false">
 			<fileset dir="${server.home}/modules/system/layers/base/org/wildfly/clustering/web/undertow" />
 		</copy>
 		
-		<delete>
+		<delete failonerror="false">
 			<fileset dir="${server.home}/modules/system/layers/base/org/wildfly/clustering/web/undertow" />
 		</delete>
 		
@@ -831,7 +830,7 @@
 	</target>
 	
 
-	<target name="slim-wildfly" description="Removes unnecessary files from Wildfly 8.2; do not run twice!">
+	<target name="slim-wildfly" description="Removes unnecessary files from Wildfly 10.1; do not run twice!">
 		<delete includeemptydirs="true" verbose="true" failonerror="false">
 			<!-- Domain version of server. Standalone is used. -->
 			<fileset dir="${server.home}/domain/" />
@@ -852,6 +851,9 @@
 				<include name="run*"/>
 				<include name="vault*"/>
 				<include name="ws*"/>
+				<include name="*.ps1"/>
+				<include name="launcher.jar"/>
+				<include name="product.conf"/>
 			</fileset>
 			<!-- Config files -->
 			<fileset dir="${server.home}/standalone/configuration/">
@@ -859,24 +861,29 @@
 			</fileset>
 			<!-- Libraries -->
 			<fileset dir="${server.home}/modules/system/layers/base/">
+				<include name="ch/"/>
 				<include name="com/fasterxml/jackson/"/>
+				<include name="com/google/guava/"/>
 				<include name="com/h2database/"/>
+				<include name="com/microsoft/"/>
 				<include name="gnu/"/>
+				<include name="nu/"/>
 				<include name="org/apache/avro/"/>
 				<include name="org/apache/lucene/main/"/>
+				<include name="org/apache/lucene/internal/"/>
 				<include name="org/apache/openjpa/"/>
 				<include name="org/codehaus/jackson/"/>
 				<include name="org/codehaus/jettison/"/>
-				<include name="org/eclipse/"/>
-				<include name="org/hibernate/3/"/>
+				<include name="org/eclipse/persistence/"/>
+				<include name="org/fusesource/"/>
 				<include name="org/hibernate/4.1/"/>
+				<include name="org/hibernate/4.3/"/>
+				<include name="org/hibernate/5.0/"/>
+				<include name="org/hibernate/jipijapa-hibernate4-3/"/>
 				<include name="org/hibernate/envers/"/>
 				<include name="org/hibernate/hql/"/>
 				<include name="org/hibernate/search/"/>
-				<include name="org/infinispan/lucene/"/>
-				<include name="org/infinispan/query/main/"/>
 				<include name="org/jberet/"/>
-				<include name="org/jboss/as/aggregate/"/>
 				<include name="org/jboss/as/appclient/"/>
 				<include name="org/jboss/as/clustering/ejb3/"/>
 				<include name="org/jboss/as/clustering/web/"/>
@@ -916,7 +923,9 @@
 				<include name="org/jboss/ws/saaj-impl/"/>
 				<include name="org/jboss/ws/tools/"/>
 				<include name="org/jboss/xb/"/>
+				<include name="org/jsoup/"/>
 				<include name="org/osgi/"/>
+				<include name="org/opensaml/"/>
 				<include name="org/picketlink/"/>
 				<include name="org/wildfly/extension/batch/"/>
 				<include name="org/wildfly/extension/mod_cluster/"/>
@@ -924,6 +933,7 @@
 				<include name="org/wildfly/jberet/"/>
 				<include name="org/wildfly/mod_cluster/"/>
 				<include name="org/yaml/"/>
+				<include name="sun/scripting/"/>
 			</fileset>
 			<!-- Default content -->
 			<fileset dir="${server.home}">

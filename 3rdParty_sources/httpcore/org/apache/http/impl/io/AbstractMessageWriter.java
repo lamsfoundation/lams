@@ -36,9 +36,10 @@ import org.apache.http.HttpMessage;
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.http.io.HttpMessageWriter;
 import org.apache.http.io.SessionOutputBuffer;
-import org.apache.http.message.LineFormatter;
 import org.apache.http.message.BasicLineFormatter;
+import org.apache.http.message.LineFormatter;
 import org.apache.http.params.HttpParams;
+import org.apache.http.util.Args;
 import org.apache.http.util.CharArrayBuffer;
 
 /**
@@ -47,6 +48,7 @@ import org.apache.http.util.CharArrayBuffer;
  *
  * @since 4.0
  */
+@SuppressWarnings("deprecation")
 @NotThreadSafe
 public abstract class AbstractMessageWriter<T extends HttpMessage> implements HttpMessageWriter<T> {
 
@@ -60,18 +62,37 @@ public abstract class AbstractMessageWriter<T extends HttpMessage> implements Ht
      * @param buffer the session output buffer.
      * @param formatter the line formatter.
      * @param params HTTP parameters.
+     *
+     * @deprecated (4.3) use
+     *   {@link AbstractMessageWriter#AbstractMessageWriter(SessionOutputBuffer, LineFormatter)}
      */
+    @Deprecated
     public AbstractMessageWriter(final SessionOutputBuffer buffer,
                                  final LineFormatter formatter,
                                  final HttpParams params) {
         super();
-        if (buffer == null) {
-            throw new IllegalArgumentException("Session input buffer may not be null");
-        }
+        Args.notNull(buffer, "Session input buffer");
         this.sessionBuffer = buffer;
         this.lineBuf = new CharArrayBuffer(128);
-        this.lineFormatter = (formatter != null) ?
-            formatter : BasicLineFormatter.DEFAULT;
+        this.lineFormatter = (formatter != null) ? formatter : BasicLineFormatter.INSTANCE;
+    }
+
+    /**
+     * Creates an instance of AbstractMessageWriter.
+     *
+     * @param buffer the session output buffer.
+     * @param formatter the line formatter If {@code null} {@link BasicLineFormatter#INSTANCE}
+     *   will be used.
+     *
+     * @since 4.3
+     */
+    public AbstractMessageWriter(
+            final SessionOutputBuffer buffer,
+            final LineFormatter formatter) {
+        super();
+        this.sessionBuffer = Args.notNull(buffer, "Session input buffer");
+        this.lineFormatter = (formatter != null) ? formatter : BasicLineFormatter.INSTANCE;
+        this.lineBuf = new CharArrayBuffer(128);
     }
 
     /**
@@ -83,13 +104,12 @@ public abstract class AbstractMessageWriter<T extends HttpMessage> implements Ht
      */
     protected abstract void writeHeadLine(T message) throws IOException;
 
+    @Override
     public void write(final T message) throws IOException, HttpException {
-        if (message == null) {
-            throw new IllegalArgumentException("HTTP message may not be null");
-        }
+        Args.notNull(message, "HTTP message");
         writeHeadLine(message);
-        for (HeaderIterator it = message.headerIterator(); it.hasNext(); ) {
-            Header header = it.nextHeader();
+        for (final HeaderIterator it = message.headerIterator(); it.hasNext(); ) {
+            final Header header = it.nextHeader();
             this.sessionBuffer.writeLine
                 (lineFormatter.formatHeader(this.lineBuf, header));
         }

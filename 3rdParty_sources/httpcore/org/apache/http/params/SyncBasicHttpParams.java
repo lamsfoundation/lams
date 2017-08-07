@@ -22,8 +22,8 @@
  * individuals on behalf of the Apache Software Foundation.  For more
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
+ *
  */
-
 package org.apache.http.params;
 
 import org.apache.http.annotation.ThreadSafe;
@@ -32,8 +32,12 @@ import org.apache.http.annotation.ThreadSafe;
  * Thread-safe extension of the {@link BasicHttpParams}.
  *
  * @since 4.1
+ *
+ * @deprecated (4.3) use configuration classes provided 'org.apache.http.config'
+ *  and 'org.apache.http.client.config'
  */
 @ThreadSafe
+@Deprecated
 public class SyncBasicHttpParams extends BasicHttpParams {
 
     private static final long serialVersionUID = 5387834869062660642L;

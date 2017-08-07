@@ -38,6 +38,7 @@ import io.undertow.servlet.handlers.ServletPathMatch;
 import io.undertow.servlet.handlers.ServletRequestContext;
 import io.undertow.servlet.util.EmptyEnumeration;
 import io.undertow.servlet.util.IteratorEnumeration;
+import io.undertow.util.AttachmentKey;
 import io.undertow.util.CanonicalPathUtils;
 import io.undertow.util.DateUtils;
 import io.undertow.util.HeaderMap;
@@ -114,6 +115,8 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
     private Charset characterEncoding;
     private boolean readStarted;
     private SessionConfig.SessionCookieSource sessionCookieSource;
+
+    public static final AttachmentKey<Boolean> SECURE_REQUEST = AttachmentKey.create(Boolean.class);
 
     public HttpServletRequestImpl(final HttpServerExchange exchange, final ServletContextImpl servletContext) {
         this.exchange = exchange;
@@ -304,6 +307,9 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
     @Override
     public String getRequestedSessionId() {
         SessionConfig config = originalServletContext.getSessionConfig();
+        if(config instanceof ServletContextImpl.ServletContextSessionConfig) {
+            return ((ServletContextImpl.ServletContextSessionConfig)config).getDelegate().findSessionId(exchange);
+        }
         return config.findSessionId(exchange);
     }
 
@@ -373,7 +379,13 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
     @Override
     public boolean isRequestedSessionIdValid() {
         HttpSessionImpl session = servletContext.getSession(originalServletContext, exchange, false);
-        return session != null;
+        if(session == null) {
+            return false;
+        }
+        if(session.isInvalid()) {
+            return false;
+        }
+        return session.getId().equals(getRequestedSessionId());
     }
 
     @Override
@@ -408,7 +420,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
                 throw UndertowServletMessages.MESSAGES.authenticationFailed();
             }
         } else {
-            if(!exchange.isResponseStarted() && exchange.getResponseCode() == 200) {
+            if(!exchange.isResponseStarted() && exchange.getStatusCode() == 200) {
                 throw UndertowServletMessages.MESSAGES.authenticationFailed();
             } else {
                 return false;
@@ -477,7 +489,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
         try {
             InstanceFactory<T> factory = servletContext.getDeployment().getDeploymentInfo().getClassIntrospecter().createInstanceFactory(handlerClass);
             final InstanceHandle<T> instance = factory.createInstance();
-            exchange.upgradeChannel(new ServletUpgradeListener<>(instance, servletContext.getDeployment().getThreadSetupAction(), exchange));
+            exchange.upgradeChannel(new ServletUpgradeListener<>(instance, servletContext.getDeployment(), exchange));
             return instance.getInstance();
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
@@ -498,7 +510,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
                 if(formData != null) {
                     for (final String namedPart : formData) {
                         for (FormData.FormValue part : formData.get(namedPart)) {
-                            parts.add(new PartImpl(namedPart, part, requestContext.getOriginalServletPathMatch().getServletChain().getManagedServlet().getServletInfo().getMultipartConfig(), servletContext));
+                            parts.add(new PartImpl(namedPart, part, requestContext.getOriginalServletPathMatch().getServletChain().getManagedServlet().getMultipartConfig(), servletContext));
                         }
                     }
                 }
@@ -717,7 +729,6 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
                         }
                     } else {
                         final ArrayList<String> values = new ArrayList<>();
-                        int i = 0;
                         for (final FormData.FormValue v : val) {
                             if(!v.isFile()) {
                                 values.add(v.getValue());
@@ -868,6 +879,10 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
 
     @Override
     public boolean isSecure() {
+        Boolean secure = exchange.getAttachment(SECURE_REQUEST);
+        if(secure != null && secure) {
+            return true;
+        }
         return getScheme().equalsIgnoreCase(HTTPS);
     }
 
@@ -970,8 +985,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
 
     @Override
     public boolean isAsyncSupported() {
-        Boolean supported = exchange.getAttachment(AsyncContextImpl.ASYNC_SUPPORTED);
-        return supported == null || supported;
+        return exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY).isAsyncSupported();
     }
 
     @Override
@@ -1074,7 +1088,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
 
     private SessionConfig.SessionCookieSource sessionCookieSource() {
         HttpSession session = getSession(false);
-        if(session == null || session.isNew()) {
+        if(session == null) {
             return SessionConfig.SessionCookieSource.NONE;
         }
         if(sessionCookieSource == null) {

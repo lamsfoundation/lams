@@ -33,20 +33,27 @@ import org.apache.http.annotation.Immutable;
 
 /**
  * The HostnameVerifier that works the same way as Curl and Firefox.
- * <p/>
+ * <p>
  * The hostname must match either the first CN, or any of the subject-alts.
  * A wildcard can occur in the CN, and in any of the subject-alts.
- * <p/>
+ * </p>
+ * <p>
  * The only difference between BROWSER_COMPATIBLE and STRICT is that a wildcard
  * (such as "*.foo.com") with BROWSER_COMPATIBLE matches all subdomains,
  * including "a.b.foo.com".
- *
+ * </p>
  *
  * @since 4.0
+ *
+ * @deprecated (4.4) Use {@link org.apache.http.conn.ssl.DefaultHostnameVerifier}
  */
 @Immutable
+@Deprecated
 public class BrowserCompatHostnameVerifier extends AbstractVerifier {
 
+    public static final BrowserCompatHostnameVerifier INSTANCE = new BrowserCompatHostnameVerifier();
+
+    @Override
     public final void verify(
             final String host,
             final String[] cns,

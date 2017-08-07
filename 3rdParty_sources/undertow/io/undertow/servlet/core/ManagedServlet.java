@@ -18,7 +18,8 @@
 
 package io.undertow.servlet.core;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import javax.servlet.MultipartConfigElement;
@@ -32,6 +33,7 @@ import io.undertow.server.handlers.form.FormParserFactory;
 import io.undertow.server.handlers.form.MultiPartParserDefinition;
 import io.undertow.server.handlers.resource.ResourceChangeListener;
 import io.undertow.server.handlers.resource.ResourceManager;
+import io.undertow.servlet.UndertowServletLogger;
 import io.undertow.servlet.UndertowServletMessages;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.InstanceFactory;
@@ -57,6 +59,7 @@ public class ManagedServlet implements Lifecycle {
 
     private long maxRequestSize;
     private FormParserFactory formParserFactory;
+    private MultipartConfigElement multipartConfig;
 
     public ManagedServlet(final ServletInfo servletInfo, final ServletContextImpl servletContext) {
         this.servletInfo = servletInfo;
@@ -72,24 +75,29 @@ public class ManagedServlet implements Lifecycle {
     public void setupMultipart(ServletContextImpl servletContext) {
         FormEncodedDataDefinition formDataParser = new FormEncodedDataDefinition()
                 .setDefaultEncoding(servletContext.getDeployment().getDeploymentInfo().getDefaultEncoding());
-        if (servletInfo.getMultipartConfig() != null) {
+        MultipartConfigElement multipartConfig = servletInfo.getMultipartConfig();
+        if(multipartConfig == null) {
+            multipartConfig = servletContext.getDeployment().getDeploymentInfo().getDefaultMultipartConfig();
+        }
+        this.multipartConfig = multipartConfig;
+        if (multipartConfig != null) {
             //todo: fileSizeThreshold
-            MultipartConfigElement config = servletInfo.getMultipartConfig();
+            MultipartConfigElement config = multipartConfig;
             if (config.getMaxRequestSize() != -1) {
                 maxRequestSize = config.getMaxRequestSize();
             } else {
                 maxRequestSize = -1;
             }
-            final File tempDir;
+            final Path tempDir;
             if(config.getLocation() == null || config.getLocation().isEmpty()) {
-                tempDir = servletContext.getDeployment().getDeploymentInfo().getTempDir();
+                tempDir = servletContext.getDeployment().getDeploymentInfo().getTempPath();
             } else {
                 String location = config.getLocation();
-                File locFile = new File(location);
+                Path locFile = Paths.get(location);
                 if(locFile.isAbsolute()) {
                     tempDir = locFile;
                 } else {
-                    tempDir = new File(servletContext.getDeployment().getDeploymentInfo().getTempDir(), location);
+                    tempDir = servletContext.getDeployment().getDeploymentInfo().getTempPath().resolve(location);
                 }
             }
 
@@ -180,6 +188,17 @@ public class ManagedServlet implements Lifecycle {
         return formParserFactory;
     }
 
+    public MultipartConfigElement getMultipartConfig() {
+        return multipartConfig;
+    }
+
+    @Override
+    public String toString() {
+        return "ManagedServlet{" +
+                "servletInfo=" + servletInfo +
+                '}';
+    }
+
     /**
      * interface used to abstract the difference between single thread model servlets and normal servlets
      */
@@ -203,6 +222,17 @@ public class ManagedServlet implements Lifecycle {
         private volatile InstanceHandle<? extends Servlet> handle;
         private volatile Servlet instance;
         private ResourceChangeListener changeListener;
+        private final InstanceHandle<Servlet> instanceHandle = new InstanceHandle<Servlet>() {
+            @Override
+            public Servlet getInstance() {
+                return instance;
+            }
+
+            @Override
+            public void release() {
+
+            }
+        };
 
         DefaultInstanceStrategy(final InstanceFactory<? extends Servlet> factory, final ServletInfo servletInfo, final ServletContextImpl servletContext) {
             this.factory = factory;
@@ -241,23 +271,13 @@ public class ManagedServlet implements Lifecycle {
             List<LifecycleInterceptor> interceptors = servletContext.getDeployment().getDeploymentInfo().getLifecycleInterceptors();
             try {
                 new LifecyleInterceptorInvocation(interceptors, servletInfo, instance).proceed();
-            } catch (ServletException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                UndertowServletLogger.ROOT_LOGGER.failedToDestroy(servletInfo, e);
             }
         }
 
         public InstanceHandle<? extends Servlet> getServlet() {
-            return new InstanceHandle<Servlet>() {
-                @Override
-                public Servlet getInstance() {
-                    return instance;
-                }
-
-                @Override
-                public void release() {
-
-                }
-            };
+            return instanceHandle;
         }
     }
 
@@ -278,8 +298,11 @@ public class ManagedServlet implements Lifecycle {
         }
 
         @Override
-        public void start() {
-
+        public void start() throws ServletException {
+            if(servletInfo.getLoadOnStartup() != null) {
+                //see UNDERTOW-734, make sure init method is called for load on startup
+                getServlet().release();
+            }
         }
 
         @Override

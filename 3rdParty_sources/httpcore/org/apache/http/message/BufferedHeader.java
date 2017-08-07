@@ -33,6 +33,7 @@ import org.apache.http.FormattedHeader;
 import org.apache.http.HeaderElement;
 import org.apache.http.ParseException;
 import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.util.Args;
 import org.apache.http.util.CharArrayBuffer;
 
 /**
@@ -75,16 +76,13 @@ public class BufferedHeader implements FormattedHeader, Cloneable, Serializable 
         throws ParseException {
 
         super();
-        if (buffer == null) {
-            throw new IllegalArgumentException
-                ("Char array buffer may not be null");
-        }
-        int colon = buffer.indexOf(':');
+        Args.notNull(buffer, "Char array buffer");
+        final int colon = buffer.indexOf(':');
         if (colon == -1) {
             throw new ParseException
                 ("Invalid header: " + buffer.toString());
         }
-        String s = buffer.substringTrimmed(0, colon);
+        final String s = buffer.substringTrimmed(0, colon);
         if (s.length() == 0) {
             throw new ParseException
                 ("Invalid header: " + buffer.toString());
@@ -95,25 +93,29 @@ public class BufferedHeader implements FormattedHeader, Cloneable, Serializable 
     }
 
 
+    @Override
     public String getName() {
         return this.name;
     }
 
+    @Override
     public String getValue() {
         return this.buffer.substringTrimmed(this.valuePos, this.buffer.length());
     }
 
+    @Override
     public HeaderElement[] getElements() throws ParseException {
-        ParserCursor cursor = new ParserCursor(0, this.buffer.length());
+        final ParserCursor cursor = new ParserCursor(0, this.buffer.length());
         cursor.updatePos(this.valuePos);
-        return BasicHeaderValueParser.DEFAULT
-            .parseElements(this.buffer, cursor);
+        return BasicHeaderValueParser.INSTANCE.parseElements(this.buffer, cursor);
     }
 
+    @Override
     public int getValuePos() {
         return this.valuePos;
     }
 
+    @Override
     public CharArrayBuffer getBuffer() {
         return this.buffer;
     }

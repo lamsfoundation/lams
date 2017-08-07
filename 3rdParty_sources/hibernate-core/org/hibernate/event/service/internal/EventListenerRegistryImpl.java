@@ -1,30 +1,12 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.event.service.internal;
 
 import java.lang.reflect.Array;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -97,11 +79,11 @@ import static org.hibernate.event.spi.EventType.UPDATE;
 public class EventListenerRegistryImpl implements EventListenerRegistry {
 	private Map<Class,Object> listenerClassToInstanceMap = new HashMap<Class, Object>();
 
-	private Map<EventType,EventListenerGroupImpl> registeredEventListenersMap = prepareListenerMap();
+	private EventListenerGroupImpl[] registeredEventListeners = prepareListenerAssociation();
 
 	@SuppressWarnings({ "unchecked" })
 	public <T> EventListenerGroupImpl<T> getEventListenerGroup(EventType<T> eventType) {
-		EventListenerGroupImpl<T> listeners = registeredEventListenersMap.get( eventType );
+		EventListenerGroupImpl<T> listeners = registeredEventListeners[ eventType.ordinal() ];
 		if ( listeners == null ) {
 			throw new HibernateException( "Unable to find listeners for type [" + eventType.eventName() + "]" );
 		}
@@ -110,8 +92,10 @@ public class EventListenerRegistryImpl implements EventListenerRegistry {
 
 	@Override
 	public void addDuplicationStrategy(DuplicationStrategy strategy) {
-		for ( EventListenerGroupImpl group : registeredEventListenersMap.values() ) {
-			group.addDuplicationStrategy( strategy );
+		for ( EventListenerGroupImpl group : registeredEventListeners ) {
+			if ( group != null ) {
+				group.addDuplicationStrategy( strategy );
+			}
 		}
 	}
 
@@ -182,252 +166,252 @@ public class EventListenerRegistryImpl implements EventListenerRegistry {
 		getEventListenerGroup( type ).prependListeners( listeners );
 	}
 
-	private static Map<EventType,EventListenerGroupImpl> prepareListenerMap() {
-		final Map<EventType,EventListenerGroupImpl> workMap = new HashMap<EventType, EventListenerGroupImpl>();
+	private static EventListenerGroupImpl[] prepareListenerAssociation() {
+		EventListenerGroupImpl[] listenerArray = new EventListenerGroupImpl[ EventType.values().size() ];
 
 		// auto-flush listeners
 		prepareListeners(
 				AUTO_FLUSH,
 				new DefaultAutoFlushEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// create listeners
 		prepareListeners(
 				PERSIST,
 				new DefaultPersistEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// create-onflush listeners
 		prepareListeners(
 				PERSIST_ONFLUSH,
 				new DefaultPersistOnFlushEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// delete listeners
 		prepareListeners(
 				DELETE,
 				new DefaultDeleteEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// dirty-check listeners
 		prepareListeners(
 				DIRTY_CHECK,
 				new DefaultDirtyCheckEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// evict listeners
 		prepareListeners(
 				EVICT,
 				new DefaultEvictEventListener(),
-				workMap
+				listenerArray
 		);
 
 		prepareListeners(
 				CLEAR,
-				workMap
+				listenerArray
 		);
 
 		// flush listeners
 		prepareListeners(
 				FLUSH,
 				new DefaultFlushEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// flush-entity listeners
 		prepareListeners(
 				FLUSH_ENTITY,
 				new DefaultFlushEntityEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// load listeners
 		prepareListeners(
 				LOAD,
 				new DefaultLoadEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// resolve natural-id listeners
 		prepareListeners( 
 				RESOLVE_NATURAL_ID, 
 				new DefaultResolveNaturalIdEventListener(), 
-				workMap 
+				listenerArray
 		);
 
 		// load-collection listeners
 		prepareListeners(
 				INIT_COLLECTION,
 				new DefaultInitializeCollectionEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// lock listeners
 		prepareListeners(
 				LOCK,
 				new DefaultLockEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// merge listeners
 		prepareListeners(
 				MERGE,
 				new DefaultMergeEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// pre-collection-recreate listeners
 		prepareListeners(
 				PRE_COLLECTION_RECREATE,
-				workMap
+				listenerArray
 		);
 
 		// pre-collection-remove listeners
 		prepareListeners(
 				PRE_COLLECTION_REMOVE,
-				workMap
+				listenerArray
 		);
 
 		// pre-collection-update listeners
 		prepareListeners(
 				PRE_COLLECTION_UPDATE,
-				workMap
+				listenerArray
 		);
 
 		// pre-delete listeners
 		prepareListeners(
 				PRE_DELETE,
-				workMap
+				listenerArray
 		);
 
 		// pre-insert listeners
 		prepareListeners(
 				PRE_INSERT,
-				workMap
+				listenerArray
 		);
 
 		// pre-load listeners
 		prepareListeners(
 				PRE_LOAD,
 				new DefaultPreLoadEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// pre-update listeners
 		prepareListeners(
 				PRE_UPDATE,
-				workMap
+				listenerArray
 		);
 
 		// post-collection-recreate listeners
 		prepareListeners(
 				POST_COLLECTION_RECREATE,
-				workMap
+				listenerArray
 		);
 
 		// post-collection-remove listeners
 		prepareListeners(
 				POST_COLLECTION_REMOVE,
-				workMap
+				listenerArray
 		);
 
 		// post-collection-update listeners
 		prepareListeners(
 				POST_COLLECTION_UPDATE,
-				workMap
+				listenerArray
 		);
 
 		// post-commit-delete listeners
 		prepareListeners(
 				POST_COMMIT_DELETE,
-				workMap
+				listenerArray
 		);
 
 		// post-commit-insert listeners
 		prepareListeners(
 				POST_COMMIT_INSERT,
-				workMap
+				listenerArray
 		);
 
 		// post-commit-update listeners
 		prepareListeners(
 				POST_COMMIT_UPDATE,
-				workMap
+				listenerArray
 		);
 
 		// post-delete listeners
 		prepareListeners(
 				POST_DELETE,
-				workMap
+				listenerArray
 		);
 
 		// post-insert listeners
 		prepareListeners(
 				POST_INSERT,
-				workMap
+				listenerArray
 		);
 
 		// post-load listeners
 		prepareListeners(
 				POST_LOAD,
 				new DefaultPostLoadEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// post-update listeners
 		prepareListeners(
 				POST_UPDATE,
-				workMap
+				listenerArray
 		);
 
 		// update listeners
 		prepareListeners(
 				UPDATE,
 				new DefaultUpdateEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// refresh listeners
 		prepareListeners(
 				REFRESH,
 				new DefaultRefreshEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// replicate listeners
 		prepareListeners(
 				REPLICATE,
 				new DefaultReplicateEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// save listeners
 		prepareListeners(
 				SAVE,
 				new DefaultSaveEventListener(),
-				workMap
+				listenerArray
 		);
 
 		// save-update listeners
 		prepareListeners(
 				SAVE_UPDATE,
 				new DefaultSaveOrUpdateEventListener(),
-				workMap
+				listenerArray
 		);
 
-		return Collections.unmodifiableMap( workMap );
+		return listenerArray;
 	}
 
-	private static <T> void prepareListeners(EventType<T> type, Map<EventType,EventListenerGroupImpl> map) {
-		prepareListeners( type, null, map );
+	private static <T> void prepareListeners(EventType<T> type, EventListenerGroupImpl[] listenerArray) {
+		prepareListeners( type, null, listenerArray );
 	}
 
-	private static <T> void prepareListeners(EventType<T> type, T defaultListener, Map<EventType,EventListenerGroupImpl> map) {
+	private static <T> void prepareListeners(EventType<T> type, T defaultListener, EventListenerGroupImpl[] listenerArray) {
 		final EventListenerGroupImpl<T> listenerGroup;
 		if ( type == EventType.POST_COMMIT_DELETE
 				|| type == EventType.POST_COMMIT_INSERT
@@ -441,7 +425,7 @@ public class EventListenerRegistryImpl implements EventListenerRegistry {
 		if ( defaultListener != null ) {
 			listenerGroup.appendListener( defaultListener );
 		}
-		map.put( type, listenerGroup  );
+		listenerArray[ type.ordinal() ] = listenerGroup;
 	}
 
 }

@@ -23,7 +23,10 @@ import io.undertow.io.IoCallback;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.AttachmentKey;
+import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
+import io.undertow.util.HttpString;
+import io.undertow.util.Protocols;
 import io.undertow.util.StatusCodes;
 import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
@@ -32,18 +35,30 @@ import org.xnio.channels.StreamSinkChannel;
 
 import java.io.IOException;
 import java.nio.channels.Channel;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Class that provides support for dealing with HTTP 100 (Continue) responses.
- * <p/>
+ * <p>
  * Note that if a client is pipelining some requests and sending continue for others this
  * could cause problems if the pipelining buffer is enabled.
  *
  * @author Stuart Douglas
  */
 public class HttpContinue {
+
+    private static final Set<HttpString> COMPATIBLE_PROTOCOLS;
+
+    static {
+        Set<HttpString> compat = new HashSet<>();
+        compat.add(Protocols.HTTP_1_1);
+        compat.add(Protocols.HTTP_2_0);
+        COMPATIBLE_PROTOCOLS = Collections.unmodifiableSet(compat);
+    }
 
     public static final String CONTINUE = "100-continue";
 
@@ -56,7 +71,7 @@ public class HttpContinue {
      * @return <code>true</code> if the server needs to send a continue response
      */
     public static boolean requiresContinueResponse(final HttpServerExchange exchange) {
-        if (!exchange.isHttp11() || exchange.isResponseStarted() || exchange.getAttachment(ALREADY_SENT) != null) {
+        if (!COMPATIBLE_PROTOCOLS.contains(exchange.getProtocol()) || exchange.isResponseStarted() || !exchange.getConnection().isContinueResponseSupported() || exchange.getAttachment(ALREADY_SENT) != null) {
             return false;
         }
         if (exchange.getConnection() instanceof HttpServerConnection) {
@@ -66,7 +81,12 @@ public class HttpContinue {
                 return false;
             }
         }
-        List<String> expect = exchange.getRequestHeaders().get(Headers.EXPECT);
+        HeaderMap requestHeaders = exchange.getRequestHeaders();
+        return requiresContinueResponse(requestHeaders);
+    }
+
+    public static boolean requiresContinueResponse(HeaderMap requestHeaders) {
+        List<String> expect = requestHeaders.get(Headers.EXPECT);
         if (expect != null) {
             for (String header : expect) {
                 if (header.equalsIgnoreCase(CONTINUE)) {
@@ -76,6 +96,7 @@ public class HttpContinue {
         }
         return false;
     }
+
 
     /**
      * Sends a continuation using async IO, and calls back when it is complete.
@@ -123,7 +144,7 @@ public class HttpContinue {
 
         HttpServerExchange newExchange = exchange.getConnection().sendOutOfBandResponse(exchange);
         exchange.putAttachment(ALREADY_SENT, true);
-        newExchange.setResponseCode(StatusCodes.CONTINUE);
+        newExchange.setStatusCode(StatusCodes.CONTINUE);
         newExchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, 0);
         final StreamSinkChannel responseChannel = newExchange.getResponseChannel();
         return new ContinueResponseSender() {
@@ -164,7 +185,7 @@ public class HttpContinue {
         }
         HttpServerExchange newExchange = exchange.getConnection().sendOutOfBandResponse(exchange);
         exchange.putAttachment(ALREADY_SENT, true);
-        newExchange.setResponseCode(StatusCodes.CONTINUE);
+        newExchange.setStatusCode(StatusCodes.CONTINUE);
         newExchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, 0);
         newExchange.startBlocking();
         newExchange.getOutputStream().close();
@@ -177,7 +198,7 @@ public class HttpContinue {
      * @param exchange The exchange to reject
      */
     public static void rejectExchange(final HttpServerExchange exchange) {
-        exchange.setResponseCode(StatusCodes.EXPECTATION_FAILED);
+        exchange.setStatusCode(StatusCodes.EXPECTATION_FAILED);
         exchange.setPersistent(false);
         exchange.endExchange();
     }
@@ -190,7 +211,7 @@ public class HttpContinue {
         }
         HttpServerExchange newExchange = exchange.getConnection().sendOutOfBandResponse(exchange);
         exchange.putAttachment(ALREADY_SENT, true);
-        newExchange.setResponseCode(StatusCodes.CONTINUE);
+        newExchange.setStatusCode(StatusCodes.CONTINUE);
         newExchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, 0);
         final StreamSinkChannel responseChannel = newExchange.getResponseChannel();
         try {

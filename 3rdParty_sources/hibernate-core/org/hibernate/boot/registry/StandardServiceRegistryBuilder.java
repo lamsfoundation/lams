@@ -1,42 +1,26 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2012, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.boot.registry;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.boot.cfgxml.internal.ConfigLoader;
+import org.hibernate.boot.cfgxml.spi.LoadedConfig;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.boot.registry.internal.StandardServiceRegistryImpl;
 import org.hibernate.cfg.Environment;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.integrator.spi.IntegratorService;
-import org.hibernate.internal.jaxb.cfg.JaxbHibernateConfiguration;
 import org.hibernate.internal.util.config.ConfigurationHelper;
-import org.hibernate.service.ConfigLoader;
 import org.hibernate.service.Service;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.StandardServiceInitiators;
@@ -65,12 +49,13 @@ public class StandardServiceRegistryBuilder {
 
 	private final BootstrapServiceRegistry bootstrapServiceRegistry;
 	private final ConfigLoader configLoader;
+	private final LoadedConfig aggregatedCfgXml;
 
 	/**
 	 * Create a default builder.
 	 */
 	public StandardServiceRegistryBuilder() {
-		this( new BootstrapServiceRegistryBuilder().build() );
+		this( new BootstrapServiceRegistryBuilder().enableAutoClose().build() );
 	}
 
 	/**
@@ -79,9 +64,26 @@ public class StandardServiceRegistryBuilder {
 	 * @param bootstrapServiceRegistry Provided bootstrap registry to use.
 	 */
 	public StandardServiceRegistryBuilder(BootstrapServiceRegistry bootstrapServiceRegistry) {
+		this( bootstrapServiceRegistry,  LoadedConfig.baseline() );
+	}
+
+	/**
+	 * Create a builder with the specified bootstrap services.
+	 *
+	 * @param bootstrapServiceRegistry Provided bootstrap registry to use.
+	 */
+	public StandardServiceRegistryBuilder(BootstrapServiceRegistry bootstrapServiceRegistry, LoadedConfig loadedConfigBaseline) {
 		this.settings = Environment.getProperties();
 		this.bootstrapServiceRegistry = bootstrapServiceRegistry;
 		this.configLoader = new ConfigLoader( bootstrapServiceRegistry );
+		this.aggregatedCfgXml = loadedConfigBaseline;
+	}
+
+	/**
+	 * Intended for internal testing use only!!
+	 */
+	public LoadedConfig getAggregatedCfgXml() {
+		return aggregatedCfgXml;
 	}
 
 	/**
@@ -119,6 +121,25 @@ public class StandardServiceRegistryBuilder {
 	}
 
 	/**
+	 * Read settings from a {@link java.util.Properties} file by File reference
+	 *
+	 * Differs from {@link #configure()} and {@link #configure(String)} in that here we expect to read a
+	 * {@link java.util.Properties} file while for {@link #configure} we read the XML variant.
+	 *
+	 * @param file The properties File reference
+	 *
+	 * @return this, for method chaining
+	 *
+	 * @see #configure()
+	 * @see #configure(String)
+	 */
+	@SuppressWarnings( {"unchecked"})
+	public StandardServiceRegistryBuilder loadProperties(File file) {
+		settings.putAll( configLoader.loadProperties( file ) );
+		return this;
+	}
+
+	/**
 	 * Read setting information from an XML file using the standard resource location.
 	 *
 	 * @return this, for method chaining
@@ -137,15 +158,23 @@ public class StandardServiceRegistryBuilder {
 	 * @param resourceName The named resource
 	 *
 	 * @return this, for method chaining
-	 *
-	 * @see #loadProperties(String)
 	 */
-	@SuppressWarnings( {"unchecked"})
 	public StandardServiceRegistryBuilder configure(String resourceName) {
-		final JaxbHibernateConfiguration configurationElement = configLoader.loadConfigXmlResource( resourceName );
-		for ( JaxbHibernateConfiguration.JaxbSessionFactory.JaxbProperty xmlProperty : configurationElement.getSessionFactory().getProperty() ) {
-			settings.put( xmlProperty.getName(), xmlProperty.getValue() );
-		}
+		return configure( configLoader.loadConfigXmlResource( resourceName ) );
+	}
+
+	public StandardServiceRegistryBuilder configure(File configurationFile) {
+		return configure( configLoader.loadConfigXmlFile( configurationFile ) );
+	}
+
+	public StandardServiceRegistryBuilder configure(URL url) {
+		return configure( configLoader.loadConfigXmlUrl( url ) );
+	}
+
+	@SuppressWarnings( {"unchecked"})
+	public StandardServiceRegistryBuilder configure(LoadedConfig loadedConfig) {
+		aggregatedCfgXml.merge( loadedConfig );
+		settings.putAll( loadedConfig.getConfigurationValues() );
 
 		return this;
 	}
@@ -240,13 +269,14 @@ public class StandardServiceRegistryBuilder {
 	 */
 	@SuppressWarnings("unchecked")
 	public StandardServiceRegistry build() {
-		final Map<?,?> settingsCopy = new HashMap();
-		settingsCopy.putAll( settings );
-		Environment.verifyProperties( settingsCopy );
-		ConfigurationHelper.resolvePlaceHolders( settingsCopy );
-
 		applyServiceContributingIntegrators();
 		applyServiceContributors();
+
+		final Map settingsCopy = new HashMap();
+		settingsCopy.putAll( settings );
+		settingsCopy.put( org.hibernate.boot.cfgxml.spi.CfgXmlAccessService.LOADED_CONFIG_KEY, aggregatedCfgXml );
+		Environment.verifyProperties( settingsCopy );
+		ConfigurationHelper.resolvePlaceHolders( settingsCopy );
 
 		return new StandardServiceRegistryImpl(
 				autoCloseRegistry,
@@ -267,7 +297,7 @@ public class StandardServiceRegistryBuilder {
 	}
 
 	private void applyServiceContributors() {
-		final LinkedHashSet<ServiceContributor> serviceContributors =
+		final Iterable<ServiceContributor> serviceContributors =
 				bootstrapServiceRegistry.getService( ClassLoaderService.class )
 						.loadJavaServices( ServiceContributor.class );
 
@@ -283,7 +313,7 @@ public class StandardServiceRegistryBuilder {
 	 * @return The settings map.
 	 *
 	 * @deprecated Temporarily exposed since Configuration is still around and much code still uses Configuration.
-	 * This allows code to configure the builder and access that to configure Configuration object (used from HEM atm).
+	 * This allows code to configure the builder and access that to configure Configuration object.
 	 */
 	@Deprecated
 	public Map getSettings() {
@@ -296,6 +326,10 @@ public class StandardServiceRegistryBuilder {
 	 * @param serviceRegistry The registry to be closed.
 	 */
 	public static void destroy(ServiceRegistry serviceRegistry) {
+		if ( serviceRegistry == null ) {
+			return;
+		}
+
 		( (StandardServiceRegistryImpl) serviceRegistry ).destroy();
 	}
 }
