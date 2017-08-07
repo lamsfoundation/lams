@@ -643,15 +643,6 @@
 			  file="lib/googleauth/googleauth.module.xml" overwrite="true" verbose="true" />		
 		
 		
-		<copy todir="${server.home}/modules/system/layers/base/org/apache/xmlcommons/main" overwrite="true" verbose="true">
-			<fileset dir="lib/xml-commons">
-				<include name="xml-apis*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/apache/xmlcommons/main/module.xml"
-			  file="lib/xml-commons/xmlcommons.module.xml" overwrite="true" verbose="true" />
-		
-		
 		
 		<copy todir="${server.home}/modules/system/layers/base/org/xmlpull/main" overwrite="true" verbose="true">
 			<fileset dir="lib/xstream">
