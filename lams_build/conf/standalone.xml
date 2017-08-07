@@ -183,16 +183,6 @@
                 </handlers>
             </logger>
 
-            <logger
-                category="org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter"
-                use-parent-handlers="false">
-                <level name="INFO" />
-                <handlers>
-                    <handler name="LAMSFILE" />
-                    <handler name="LAMSCONSOLE" />
-                </handlers>
-            </logger>
-
             <logger category="org.lamsfoundation.lams.util.audit"
                 use-parent-handlers="false">
                 <level name="INFO" />

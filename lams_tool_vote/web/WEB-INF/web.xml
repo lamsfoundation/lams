@@ -41,7 +41,7 @@
 	<filter>
 		<filter-name>hibernateFilter</filter-name>
 		<filter-class>
-			org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter
+			org.springframework.orm.hibernate5.support.OpenSessionInViewFilter
 		</filter-class>
 		<init-param>
 			<param-name>sessionFactoryBeanName</param-name>
