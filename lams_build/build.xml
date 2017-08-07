@@ -495,7 +495,7 @@
 			
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/fileupload/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
-				<include name="commons-fileupload.jar" />
+				<include name="commons-fileupload-*.jar" />
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/fileupload/main/module.xml"
@@ -555,16 +555,6 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/json/simple/main/module.xml"
 			  file="lib/json/json-simple.module.xml" overwrite="true" verbose="true" />
-		
-		
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/apache/lucene/4.10" overwrite="true" verbose="true">
-			<fileset dir="lib/lucene">
-				<include name="lucene-*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/apache/lucene/4.10/module.xml"
-			  file="lib/lucene/lucene.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
