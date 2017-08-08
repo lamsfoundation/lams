@@ -67,7 +67,6 @@ import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
@@ -135,6 +134,10 @@ public class LearningAction extends Action {
 	if (param.equals("checkLeaderProgress")) {
 	    return checkLeaderProgress(mapping, form, request, response);
 	}
+	if (param.equals("getSecondsLeft")) {
+	    return getSecondsLeft(mapping, form, request, response);
+	}
+	
 	// ================ Reflection =======================
 	if (param.equals("newReflection")) {
 	    return newReflection(mapping, form, request, response);
@@ -293,7 +296,7 @@ public class LearningAction extends Action {
 	//time limit
 	boolean isTimeLimitEnabled = hasEditRight && !showResults && assessment.getTimeLimit() != 0;
 	long secondsLeft = isTimeLimitEnabled ? service.getSecondsLeft(assessment, user) : 0;
-	request.setAttribute(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
+	sessionMap.put(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
 	boolean isTimeLimitNotLaunched = (lastResult == null) || (lastResult.getTimeLimitLaunchedDate() == null);
 	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, isTimeLimitNotLaunched);
 
@@ -489,7 +492,7 @@ public class LearningAction extends Action {
 	    storeUserAnswersIntoDatabase(sessionMap, true);
 
 	    long secondsLeft = service.getSecondsLeft(assessment, user);
-	    request.setAttribute(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
+	    sessionMap.put(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
 	    
 	    // use redirect to prevent form resubmission
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(AssessmentConstants.LEARNING));
@@ -497,6 +500,32 @@ public class LearningAction extends Action {
 	    redirect.addParameter(AssessmentConstants.ATTR_IS_ANSWERS_VALIDATION_FAILED, isAnswersValidationFailed);
 	    return redirect;
 	}
+    }
+
+    /**
+     * Ajax call to get the remaining seconds. Needed when the page is reloaded in the browser to check with the server
+     * what the current values should be! Otherwise the learner can keep hitting reload after a page change or submit
+     * all (when questions are spread across pages) and increase their time!
+     * @return
+     * @throws JSONException 
+     * @throws IOException 
+     */
+    private ActionForward getSecondsLeft(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response)
+	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, JSONException, IOException {
+
+	IAssessmentService service = getAssessmentService();
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
+	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
+	long secondsLeft = service.getSecondsLeft(assessment, user);
+	JSONObject JSONObject = new JSONObject();
+	JSONObject.put(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
+	response.setContentType("application/x-json;charset=utf-8");
+	response.getWriter().print(JSONObject);
+	return null;	    
     }
 
     /**
@@ -641,7 +670,7 @@ public class LearningAction extends Action {
 
 	    // time limit feature
 	    sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, true);
-	    request.setAttribute(AssessmentConstants.ATTR_SECONDS_LEFT, assessment.getTimeLimit() * 60);
+	    sessionMap.put(AssessmentConstants.ATTR_SECONDS_LEFT, assessment.getTimeLimit() * 60);
 
 	    return mapping.findForward(AssessmentConstants.LEARNING);
 	}
@@ -1013,15 +1042,18 @@ public class LearningAction extends Action {
 		if ((questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ESSAY)
 			&& (questionDto.getMinWordsLimit() > 0)) {
 
-		    String answer = new String(questionDto.getAnswerString());
-
-		    boolean isMinWordsLimitReached = ValidationUtil.isMinWordsLimitReached(answer,
-			    questionDto.getMinWordsLimit(), questionDto.isAllowRichEditor());
-
-		    // check min words limit is reached
-		    if (!isMinWordsLimitReached) {
+		    if ( questionDto.getAnswerString() == null ) {
 			isAllQuestionsReachedMinWordsLimit = false;
 			break;
+			
+		    } else {
+			boolean isMinWordsLimitReached = ValidationUtil.isMinWordsLimitReached(questionDto.getAnswerString(),
+				questionDto.getMinWordsLimit(), questionDto.isAllowRichEditor());
+			// check min words limit is reached
+			if (!isMinWordsLimitReached) {
+			    isAllQuestionsReachedMinWordsLimit = false;
+			    break;
+			}
 		    }
 
 		}

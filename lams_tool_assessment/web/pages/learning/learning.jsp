@@ -20,6 +20,7 @@
 	<c:set var="isResubmitAllowed" value="${sessionMap.isResubmitAllowed}" />
 	<c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
 	<c:set var="isTimeLimitEnabled" value="${hasEditRight && assessment.getTimeLimit() != 0}" />
+	<c:set var="secondsLeft" value="${sessionMap.secondsLeft}"/>
 	<c:set var="result" value="${sessionMap.assessmentResult}" />
 	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
 	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
@@ -153,7 +154,18 @@
 					},
 					description: "<div id='countdown-label'><fmt:message key='label.learning.countdown.time.left' /></div>"
 				});
-			}
+				
+				<%--  double check if we have the correct number of seconds left in case user has clicked refresh --%>
+				$.ajax({
+		            url: '<c:url value="/learning/getSecondsLeft.do"/>',
+		            data: 'sessionMapID=${sessionMapID}',
+		            dataType: 'json',
+		            type: 'post',
+		            success: function (json) {
+		            		$('#countdown').countdown('option', 'until', json.secondsLeft+'S');
+		            }
+			   });
+			}		
 		</c:if>
 		
 		//autosave feature
