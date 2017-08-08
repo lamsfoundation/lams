@@ -247,6 +247,11 @@
 			parameter="checkLeaderProgress" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
 		</action>		
+		<action path="/learning/getSecondsLeft"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
+			parameter="getSecondsLeft" >
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>		
 		<action path="/learning/resubmit"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
 			parameter="resubmit" >
