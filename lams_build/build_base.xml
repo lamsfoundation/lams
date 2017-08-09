@@ -383,19 +383,51 @@
  	        </fileset>
             <mapper from="*.scss" to="*.css" type="glob"/>
         </apply>
-		<echo>Copying css files from build area to web/css directory. The .map files are not copied. </echo>
+	    <ant target="_css.minify.copy"/>
+	    	<ant target="_css.nominify.copy"/>
+	</target>
+	
+	<target name="_css.minify.copy"  if="${css.minify}">
+		<echo> Minifying Files </echo>
+	    <apply executable="java" parallel="false">
+	        <fileset dir="${basedir}/build/css">
+		        	<include name="*.css"/>
+		        	<exclude name="*-min.css"/>
+		    </fileset>
+	        <arg line="-jar"/>
+	        <arg path="${yuicompressor}"/>
+	         <srcfile/>
+	        <arg line="-o"/>
+	        <mapper type="glob" from="*.css" to="${basedir}/build/css/*-min.css"/>
+	        <targetfile/>
+	    </apply>
+    		<echo>Copying css files from build area to web/css directory. The .map files are not copied. </echo>
 	 	<copy todir="${scss.css.dir}" verbose="true">
 			<fileset dir="${basedir}/build/css" erroronmissingdir="false">
 				<include name="*.css"/>
 			</fileset>
+		    <mapper type="glob" from="*-min.css" to="*.css"/>
+	 	</copy>
+	</target>
+
+	<target name="_css.nominify.copy" unless="${css.minify}">
+    		<echo>Copying css files from build area to web/css directory. The .map files are not copied. </echo>
+	 	<copy todir="${scss.css.dir}" verbose="true">
+			<fileset dir="${basedir}/build/css" erroronmissingdir="false">
+				<include name="*.css"/>
+		        	<exclude name="*-min.css"/>
+			</fileset>
+		    <mapper type="glob" from="*.css" to="*.css"/>
 	 	</copy>
 	</target>
 
 	<target name="_sass.build.clean">
-		<delete dir="${basedir}/build/css" quiet="true" />
+		<delete>
+    			<fileset dir="${basedir}/build/css" includes="*.css"/>
+		</delete>
 	</target>
-		
-    <target name="sass.compile" description="Creates css files from scss (sass) files">
+	
+    <target name="sass.compile" description="Creates css files from scss (sass) files"  depends="_sass.build.clean">
 		<echo>Compiling ALL .sccs files from ${scss.css.dir} using ${sass_exec_file}</echo>
 		<mkdir dir="${basedir}/build/css" />
 		<touch verbose="true">
