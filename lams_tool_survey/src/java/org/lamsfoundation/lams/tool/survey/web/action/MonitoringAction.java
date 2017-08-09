@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.survey.web.action;
 
 import java.io.IOException;
@@ -53,9 +52,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
@@ -67,6 +63,7 @@ import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -74,6 +71,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class MonitoringAction extends Action {
 
@@ -89,7 +90,7 @@ public class MonitoringAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 	String param = mapping.getParameter();
 
 	if (param.equals("summary")) {
@@ -123,7 +124,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Summary page action.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -178,7 +179,8 @@ public class MonitoringAction extends Action {
 	    MonitoringAction.log.info("Time:" + tzSubmissionDeadline.getTime());
 	    // store submission deadline to sessionMap
 	    sessionMap.put(SurveyConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
-	    sessionMap.put(SurveyConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	    sessionMap.put(SurveyConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
 	return mapping.findForward(SurveyConstants.SUCCESS);
@@ -198,7 +200,7 @@ public class MonitoringAction extends Action {
     }
 
     private ActionForward getAnswersJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long questionUid = WebUtil.readLongParam(request, SurveyConstants.ATTR_QUESTION_UID);
@@ -220,20 +222,21 @@ public class MonitoringAction extends Action {
 	List<Object[]> users = service.getQuestionAnswersForTablesorter(sessionId, questionUid, page, size, sorting,
 		searchString);
 
-	JSONArray rows = new JSONArray();
-	JSONObject responsedata = new JSONObject();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
+	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
 	responsedata.put("total_rows", service.getCountUsersBySession(sessionId, searchString));
 
 	for (Object[] userAndAnswers : users) {
 
-	    JSONObject responseRow = new JSONObject();
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
 	    SurveyUser user = (SurveyUser) userAndAnswers[0];
 	    responseRow.put(SurveyConstants.ATTR_USER_NAME,
 		    StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
 
 	    if (userAndAnswers.length > 1 && userAndAnswers[1] != null) {
-		responseRow.put("choices", SurveyWebUtils.getChoiceList((String) userAndAnswers[1]));
+		responseRow.put("choices",
+			JsonUtil.readArray(SurveyWebUtils.getChoiceList((String) userAndAnswers[1])));
 	    }
 	    if (userAndAnswers.length > 2 && userAndAnswers[2] != null) {
 		// Data is handled differently in learner depending on whether
@@ -253,9 +256,9 @@ public class MonitoringAction extends Action {
 		}
 		responseRow.put("answerText", answer);
 	    }
-	    rows.put(responseRow);
+	    rows.add(responseRow);
 	}
-	responsedata.put("rows", rows);
+	responsedata.set("rows", rows);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(new String(responsedata.toString()));
 	return null;
@@ -274,7 +277,7 @@ public class MonitoringAction extends Action {
     }
 
     private ActionForward getReflectionsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -293,13 +296,13 @@ public class MonitoringAction extends Action {
 	ISurveyService service = getSurveyService();
 	List<Object[]> users = service.getUserReflectionsForTablesorter(sessionId, page, size, sorting, searchString);
 
-	JSONArray rows = new JSONArray();
-	JSONObject responsedata = new JSONObject();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
+	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
 	responsedata.put("total_rows", service.getCountUsersBySession(sessionId, searchString));
 
 	for (Object[] userAndReflection : users) {
 
-	    JSONObject responseRow = new JSONObject();
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
 	    SurveyUser user = (SurveyUser) userAndReflection[0];
 	    responseRow.put(SurveyConstants.ATTR_USER_NAME,
@@ -310,9 +313,9 @@ public class MonitoringAction extends Action {
 		responseRow.put(SurveyConstants.ATTR_REFLECTION, reflection.replaceAll("\n", "<br>"));
 	    }
 
-	    rows.put(responseRow);
+	    rows.add(responseRow);
 	}
-	responsedata.put("rows", rows);
+	responsedata.set("rows", rows);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(new String(responsedata.toString()));
 	return null;
@@ -320,7 +323,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Export Excel format survey data.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -517,13 +520,13 @@ public class MonitoringAction extends Action {
 
     /**
      * Set Submission Deadline
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -553,7 +556,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Removes all the html tags from a string
-     * 
+     *
      * @param string
      * @return
      */

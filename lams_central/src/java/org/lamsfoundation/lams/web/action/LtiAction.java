@@ -15,7 +15,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
-import org.apache.tomcat.util.json.JSONException;
+
 import org.imsglobal.lti.BasicLTIConstants;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
@@ -70,7 +70,7 @@ public class LtiAction extends LamsDispatchAction {
      * pages
      */
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, UserAccessDeniedException, JSONException,
+	    HttpServletResponse response) throws IOException, UserAccessDeniedException,
 	    RepositoryCheckedException, UserInfoFetchException, UserInfoValidationException {
 	initServices();
 	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
@@ -120,7 +120,7 @@ public class LtiAction extends LamsDispatchAction {
      * design and start a lesson.
      */
     public ActionForward addLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, UserAccessDeniedException, JSONException,
+	    HttpServletResponse response) throws IOException, UserAccessDeniedException,
 	    RepositoryCheckedException, UserInfoFetchException, UserInfoValidationException {
 	initServices();
 	Integer userId = getUser().getUserID();
@@ -156,7 +156,7 @@ public class LtiAction extends LamsDispatchAction {
      * Starts a lesson. Then prompts to learnerMonitor page.
      */
     public ActionForward startLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, UserAccessDeniedException, JSONException,
+	    HttpServletResponse response) throws IOException, UserAccessDeniedException,
 	    RepositoryCheckedException, UserInfoValidationException, UserInfoFetchException {
 	initServices();
 	Integer userId = getUser().getUserID();
@@ -211,7 +211,7 @@ public class LtiAction extends LamsDispatchAction {
      * Once lesson was created, start showing learnerMonitor page to everybody regardless of his role.
      */
     public ActionForward learnerMonitor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, UserAccessDeniedException, JSONException,
+	    HttpServletResponse response) throws IOException, UserAccessDeniedException,
 	    RepositoryCheckedException, UserInfoValidationException, UserInfoFetchException {
 	initServices();
 	Integer userId = getUser().getUserID();

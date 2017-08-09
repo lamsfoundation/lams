@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.assessment.service;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -48,9 +49,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -111,6 +109,10 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Andrey Balan
@@ -428,7 +430,7 @@ public class AssessmentServiceImpl
     @Override
     public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) {
 	Set<AssessmentQuestion> questions = assessment.getQuestions();
-	
+
 	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());
 	if (lastResult != null) {
 
@@ -457,7 +459,7 @@ public class AssessmentServiceImpl
 		assessmentResultDao.saveObject(lastResult);
 		return;
 
-	    // mark previous attempt as being not the latest any longer
+		// mark previous attempt as being not the latest any longer
 	    } else {
 		lastResult.setLatest(false);
 		assessmentResultDao.saveObject(lastResult);
@@ -528,7 +530,8 @@ public class AssessmentServiceImpl
 	    for (QuestionDTO questionDto : questionsForOnePage) {
 
 		// in case single MarkHedging question needs to be stored -- search for that question
-		if ((singleMarkHedgingQuestionUid != null) && !questionDto.getUid().equals(singleMarkHedgingQuestionUid)) {
+		if ((singleMarkHedgingQuestionUid != null)
+			&& !questionDto.getUid().equals(singleMarkHedgingQuestionUid)) {
 		    continue;
 		}
 
@@ -585,13 +588,14 @@ public class AssessmentServiceImpl
      * @param isAutosave
      *            in case of autosave there is no need to calculate marks
      * @return grade that user scored by answering that question
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
-    private float storeUserAnswer(AssessmentResult assessmentResult, QuestionDTO questionDto, boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private float storeUserAnswer(AssessmentResult assessmentResult, QuestionDTO questionDto, boolean isAutosave)
+	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	Assessment assessment = assessmentResult.getAssessment();
-	
+
 	AssessmentQuestionResult questionResult = null;
 	// get questionResult from DB instance of AssessmentResult
 	for (AssessmentQuestionResult questionResultIter : assessmentResult.getQuestionResults()) {
@@ -599,10 +603,9 @@ public class AssessmentServiceImpl
 		questionResult = questionResultIter;
 	    }
 	}
-	
-	//if teacher edited content in monitor (modified question) it led to removal if autosaved questionResult 
-	if (assessment.isContentModifiedInMonitor(assessmentResult.getStartDate())
-		 && questionResult == null) {
+
+	//if teacher edited content in monitor (modified question) it led to removal if autosaved questionResult
+	if (assessment.isContentModifiedInMonitor(assessmentResult.getStartDate()) && questionResult == null) {
 	    //update questionDto
 	    AssessmentQuestion modifiedQuestion = assessmentQuestionDao.getByUid(questionDto.getUid());
 	    QuestionDTO updatedQuestionDto = modifiedQuestion.getQuestionDTO();
@@ -691,7 +694,8 @@ public class AssessmentServiceImpl
 			    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
 		}
 		boolean isAnswerMatchedCurrentOption = (questionDto.getAnswerString() != null)
-			? pattern.matcher(questionDto.getAnswerString().trim()).matches() : false;
+			? pattern.matcher(questionDto.getAnswerString().trim()).matches()
+			: false;
 
 		if (isAnswerMatchedCurrentOption) {
 		    mark = optionDto.getGrade() * maxMark;
@@ -707,7 +711,8 @@ public class AssessmentServiceImpl
 		    boolean isAnswerMatchedCurrentOption = false;
 		    try {
 			float answerFloat = Float.valueOf(questionDto.getAnswerString());
-			isAnswerMatchedCurrentOption = ((answerFloat >= (optionDto.getOptionFloat() - optionDto.getAcceptedError()))
+			isAnswerMatchedCurrentOption = ((answerFloat >= (optionDto.getOptionFloat()
+				- optionDto.getAcceptedError()))
 				&& (answerFloat <= (optionDto.getOptionFloat() + optionDto.getAcceptedError())));
 		    } catch (Exception e) {
 		    }
@@ -725,7 +730,8 @@ public class AssessmentServiceImpl
 				    answerFloat = answerFloat / unit.getMultiplier();
 				    isAnswerMatchedCurrentOption = ((answerFloat >= (optionDto.getOptionFloat()
 					    - optionDto.getAcceptedError()))
-					    && (answerFloat <= (optionDto.getOptionFloat() + optionDto.getAcceptedError())));
+					    && (answerFloat <= (optionDto.getOptionFloat()
+						    + optionDto.getAcceptedError())));
 				    if (isAnswerMatchedCurrentOption) {
 					break;
 				    }
@@ -743,15 +749,16 @@ public class AssessmentServiceImpl
 	    }
 
 	} else if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
-	    if ((questionDto.getAnswerBoolean() == questionDto.getCorrectAnswer()) && (questionDto.getAnswerString() != null)) {
+	    if ((questionDto.getAnswerBoolean() == questionDto.getCorrectAnswer())
+		    && (questionDto.getAnswerString() != null)) {
 		mark = maxMark;
 	    }
 
 	} else if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 	    float maxMarkForCorrectAnswer = maxMark / questionDto.getOptionDtos().size();
-	    TreeSet<OptionDTO> correctOptionSet = new TreeSet<OptionDTO>(new SequencableComparator());
+	    TreeSet<OptionDTO> correctOptionSet = new TreeSet<>(new SequencableComparator());
 	    correctOptionSet.addAll(questionDto.getOptionDtos());
-	    ArrayList<OptionDTO> correctOptionList = new ArrayList<OptionDTO>(correctOptionSet);
+	    ArrayList<OptionDTO> correctOptionList = new ArrayList<>(correctOptionSet);
 	    int i = 0;
 	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		if (optionDto.getUid() == correctOptionList.get(i++).getUid()) {
@@ -920,7 +927,7 @@ public class AssessmentServiceImpl
 
     @Override
     public List<ReflectDTO> getReflectList(Long contentId) {
-	List<ReflectDTO> reflectList = new LinkedList<ReflectDTO>();
+	List<ReflectDTO> reflectList = new LinkedList<>();
 
 	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
 	for (AssessmentSession session : sessionList) {
@@ -971,7 +978,7 @@ public class AssessmentServiceImpl
 
     @Override
     public List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics) {
-	List<SessionDTO> sessionDtos = new ArrayList<SessionDTO>();
+	List<SessionDTO> sessionDtos = new ArrayList<>();
 
 	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
 	for (AssessmentSession session : sessionList) {
@@ -979,14 +986,20 @@ public class AssessmentServiceImpl
 	    SessionDTO sessionDto = new SessionDTO(sessionId, session.getSessionName());
 
 	    //for statistics tab
-	    if ( includeStatistics ) {
+	    if (includeStatistics) {
 		int countUsers = assessmentUserDao.getCountUsersBySession(sessionId, "");
 		sessionDto.setNumberLearners(countUsers);
 		Object[] markStats = assessmentUserDao.getStatsMarksBySession(sessionId);
-		if ( markStats != null ) {
-		    sessionDto.setMinMark(markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[0], (Locale)null, 2) : "0.00");
-		    sessionDto.setAvgMark(markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[1], (Locale)null, 2) : "0.00");
-		    sessionDto.setMaxMark(markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[2], (Locale)null, 2) : "0.00");
+		if (markStats != null) {
+		    sessionDto.setMinMark(markStats[0] != null
+			    ? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
+			    : "0.00");
+		    sessionDto.setAvgMark(markStats[1] != null
+			    ? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
+			    : "0.00");
+		    sessionDto.setMaxMark(markStats[2] != null
+			    ? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
+			    : "0.00");
 		}
 	    }
 
@@ -1000,20 +1013,26 @@ public class AssessmentServiceImpl
     public LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId) {
 	LeaderResultsDTO newDto = new LeaderResultsDTO(contentId);
 	Object[] markStats = assessmentUserDao.getStatsMarksForLeaders(contentId);
-	if ( markStats != null ) {
-	    newDto.setMinMark(markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[0], (Locale)null, 2) : "0.00");
-	    newDto.setAvgMark(markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[1], (Locale)null, 2) : "0.00");
-	    newDto.setMaxMark(markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[2], (Locale)null, 2) : "0.00");
-	    newDto.setNumberGroupsLeaderFinished((Integer)markStats[3]);
+	if (markStats != null) {
+	    newDto.setMinMark(
+		    markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setAvgMark(
+		    markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setMaxMark(
+		    markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setNumberGroupsLeaderFinished((Integer) markStats[3]);
 	}
 	return newDto;
     }
-    
+
     @Override
     public AssessmentResultDTO getUserMasterDetail(Long sessionId, Long userId) {
 	AssessmentResultDTO resultDto = new AssessmentResultDTO();
 	resultDto.setSessionId(sessionId);
-	
+
 	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultByUser(sessionId,
 		userId);
 	if (lastFinishedResult != null) {
@@ -1022,13 +1041,13 @@ public class AssessmentServiceImpl
 	    Set<AssessmentQuestionResult> questionResults = lastFinishedResult.getQuestionResults();
 
 	    //prepare list of the questions to display in user master detail table, filtering out questions that aren't supposed to be answered
-	    SortedSet<AssessmentQuestionResult> questionResultsToDisplay = new TreeSet<AssessmentQuestionResult>(
+	    SortedSet<AssessmentQuestionResult> questionResultsToDisplay = new TreeSet<>(
 		    new AssessmentQuestionResultComparator());
 	    //in case there is at least one random question - we need to show all questions
 	    if (assessment.hasRandomQuestion()) {
 		questionResultsToDisplay.addAll(questionResults);
 
-	    //otherwise show only questions from the question list
+		//otherwise show only questions from the question list
 	    } else {
 		for (QuestionReference reference : questionReferences) {
 		    for (AssessmentQuestionResult questionResult : questionResults) {
@@ -1050,7 +1069,7 @@ public class AssessmentServiceImpl
     @Override
     public UserSummary getUserSummary(Long contentId, Long userId, Long sessionId) {
 	Assessment assessment = assessmentDao.getByContentId(contentId);
-	
+
 	UserSummary userSummary = new UserSummary();
 	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 	userSummary.setUser(user);
@@ -1065,11 +1084,11 @@ public class AssessmentServiceImpl
 	if (lastFinishedResult != null) {
 	    userSummary.setLastAttemptGrade(lastFinishedResult.getGrade());
 	}
-	
+
 	if (!results.isEmpty()) {
 
 	    //prepare list of the questions to display, filtering out questions that aren't supposed to be answered
-	    Set<AssessmentQuestion> questions = new TreeSet<AssessmentQuestion>();
+	    Set<AssessmentQuestion> questions = new TreeSet<>();
 	    //in case there is at least one random question - we need to show all questions in a drop down select
 	    if (assessment.hasRandomQuestion()) {
 		questions.addAll(assessment.getQuestions());
@@ -1082,12 +1101,12 @@ public class AssessmentServiceImpl
 	    }
 
 	    //prepare list of UserSummaryItems
-	    ArrayList<UserSummaryItem> userSummaryItems = new ArrayList<UserSummaryItem>();
+	    ArrayList<UserSummaryItem> userSummaryItems = new ArrayList<>();
 	    for (AssessmentQuestion question : questions) {
 		UserSummaryItem userSummaryItem = new UserSummaryItem(question);
 
 		//find all questionResults that correspond to the current question
-		List<AssessmentQuestionResult> questionResults = new ArrayList<AssessmentQuestionResult>();
+		List<AssessmentQuestionResult> questionResults = new ArrayList<>();
 		for (AssessmentResult result : results) {
 		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
 			if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
@@ -1122,27 +1141,27 @@ public class AssessmentServiceImpl
 
     @Override
     public Map<Long, QuestionSummary> getQuestionSummaryForExport(Assessment assessment) {
-	Map<Long, QuestionSummary> questionSummaries = new LinkedHashMap<Long, QuestionSummary>();
+	Map<Long, QuestionSummary> questionSummaries = new LinkedHashMap<>();
 
 	if (assessment.getQuestions() == null) {
 	    return questionSummaries;
 	}
 
-	SortedSet<AssessmentSession> sessions = new TreeSet<AssessmentSession>(new AssessmentSessionComparator());
+	SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
 	sessions.addAll(assessmentSessionDao.getByContentId(assessment.getContentId()));
 
 	List<AssessmentResult> assessmentResults = assessmentResultDao
 		.getLastFinishedAssessmentResults(assessment.getContentId());
-	Map<Long, AssessmentResult> userUidToResultMap = new HashMap<Long, AssessmentResult>();
+	Map<Long, AssessmentResult> userUidToResultMap = new HashMap<>();
 	for (AssessmentResult assessmentResult : assessmentResults) {
 	    userUidToResultMap.put(assessmentResult.getUser().getUid(), assessmentResult);
 	}
 
-	Map<Long, List<AssessmentUser>> sessionIdToUsersMap = new HashMap<Long, List<AssessmentUser>>();
+	Map<Long, List<AssessmentUser>> sessionIdToUsersMap = new HashMap<>();
 	for (AssessmentSession session : sessions) {
 
 	    Long sessionId = session.getSessionId();
-	    List<AssessmentUser> users = new ArrayList<AssessmentUser>();
+	    List<AssessmentUser> users = new ArrayList<>();
 
 	    // in case of leader aware tool show only leaders' responses
 	    if (assessment.isUseSelectLeaderToolOuput()) {
@@ -1162,14 +1181,14 @@ public class AssessmentServiceImpl
 	    QuestionSummary questionSummary = new QuestionSummary();
 	    questionSummary.setQuestion(question);
 
-	    List<List<AssessmentQuestionResult>> questionResults = new ArrayList<List<AssessmentQuestionResult>>();
+	    List<List<AssessmentQuestionResult>> questionResults = new ArrayList<>();
 
 	    for (AssessmentSession session : sessions) {
 
 		Long sessionId = session.getSessionId();
 		List<AssessmentUser> users = sessionIdToUsersMap.get(sessionId);
 
-		ArrayList<AssessmentQuestionResult> sessionQuestionResults = new ArrayList<AssessmentQuestionResult>();
+		ArrayList<AssessmentQuestionResult> sessionQuestionResults = new ArrayList<>();
 		for (AssessmentUser user : users) {
 		    AssessmentResult assessmentResult = userUidToResultMap.get(user.getUid());
 		    AssessmentQuestionResult questionResult = null;
@@ -1218,12 +1237,12 @@ public class AssessmentServiceImpl
     @Override
     public LinkedHashMap<String, ExcelCell[][]> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos,
 	    boolean showUserNames) {
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
 	final ExcelCell[] EMPTY_ROW = new ExcelCell[0];
 
 	// -------------- First tab: Summary ----------------------------------------------------
 	if (showUserNames) {
-	    ArrayList<ExcelCell[]> summaryTab = new ArrayList<ExcelCell[]>();
+	    ArrayList<ExcelCell[]> summaryTab = new ArrayList<>();
 
 	    if (sessionDtos != null) {
 		for (SessionDTO sessionDTO : sessionDtos) {
@@ -1234,8 +1253,8 @@ public class AssessmentServiceImpl
 		    ExcelCell[] sessionTitle = new ExcelCell[1];
 		    sessionTitle[0] = new ExcelCell(sessionDTO.getSessionName(), true);
 		    summaryTab.add(sessionTitle);
-		    
-		    List<AssessmentUserDTO> userDtos = new ArrayList<AssessmentUserDTO>();
+
+		    List<AssessmentUserDTO> userDtos = new ArrayList<>();
 		    // in case of UseSelectLeaderToolOuput - display only one user
 		    if (assessment.isUseSelectLeaderToolOuput()) {
 
@@ -1261,12 +1280,15 @@ public class AssessmentServiceImpl
 			userDtos = getPagedUsersBySession(sessionId, 0, countSessionUsers, "userName", "ASC", "");
 		    }
 
-		    ArrayList<ExcelCell[]> summaryTabLearnerList = new ArrayList<ExcelCell[]>();
-			    
+		    ArrayList<ExcelCell[]> summaryTabLearnerList = new ArrayList<>();
+
 		    ExcelCell[] summaryRowTitle = new ExcelCell[3];
-		    summaryRowTitle[0] = new ExcelCell(getMessage("label.export.user.id"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    summaryRowTitle[1] = new ExcelCell(getMessage("label.monitoring.summary.user.name"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    summaryRowTitle[2] = new ExcelCell(getMessage("label.monitoring.summary.total"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    summaryRowTitle[0] = new ExcelCell(getMessage("label.export.user.id"), true,
+			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    summaryRowTitle[1] = new ExcelCell(getMessage("label.monitoring.summary.user.name"), true,
+			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    summaryRowTitle[2] = new ExcelCell(getMessage("label.monitoring.summary.total"), true,
+			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		    summaryTabLearnerList.add(summaryRowTitle);
 
 		    float minGrade = -9999999;
@@ -1281,18 +1303,22 @@ public class AssessmentServiceImpl
 			userResultRow[2] = new ExcelCell(grade, false);
 			summaryTabLearnerList.add(userResultRow);
 
-			if ( grade < minGrade || minGrade == -9999999  )
+			if (grade < minGrade || minGrade == -9999999) {
 			    minGrade = grade;
-			if ( grade > maxGrade )
+			}
+			if (grade > maxGrade) {
 			    maxGrade = grade;
+			}
 		    }
-		    if ( minGrade == -9999999)
+		    if (minGrade == -9999999) {
 			minGrade = 0;
+		    }
 
-		    LinkedHashMap<String, Integer> markSummary = getMarksSummaryForSession(userDtos, minGrade, maxGrade, 10);
+		    LinkedHashMap<String, Integer> markSummary = getMarksSummaryForSession(userDtos, minGrade, maxGrade,
+			    10);
 		    // work out total marks so we can do percentages. need as float for the correct divisions
 		    int totalNumEntries = 0;
-		    for ( Map.Entry<String, Integer> entry : markSummary.entrySet() ) {
+		    for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
 			totalNumEntries += entry.getValue();
 		    }
 
@@ -1304,25 +1330,29 @@ public class AssessmentServiceImpl
 		    summaryTab.add(minMaxRow);
 		    minMaxRow = new ExcelCell[2];
 		    minMaxRow[0] = new ExcelCell(getMessage("label.lowest.mark"), true);
-		    minMaxRow[1] = new ExcelCell((double)minGrade, false);
+		    minMaxRow[1] = new ExcelCell((double) minGrade, false);
 		    summaryTab.add(minMaxRow);
 		    minMaxRow = new ExcelCell[2];
 		    minMaxRow[0] = new ExcelCell(getMessage("label.highest.mark"), true);
-		    minMaxRow[1] = new ExcelCell((double)maxGrade, false);
+		    minMaxRow[1] = new ExcelCell((double) maxGrade, false);
 		    summaryTab.add(minMaxRow);
-		    
+
 		    summaryTab.add(EMPTY_ROW);
 		    ExcelCell[] binSummaryRow = new ExcelCell[3];
-		    binSummaryRow[0] = new ExcelCell(getMessage("label.authoring.basic.list.header.mark"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    binSummaryRow[1] = new ExcelCell(getMessage("label.number.learners"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    binSummaryRow[2] = new ExcelCell(getMessage("label.percentage"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    binSummaryRow[0] = new ExcelCell(getMessage("label.authoring.basic.list.header.mark"), true,
+			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    binSummaryRow[1] = new ExcelCell(getMessage("label.number.learners"), true,
+			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    binSummaryRow[2] = new ExcelCell(getMessage("label.percentage"), true,
+			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		    summaryTab.add(binSummaryRow);
-		    float totalNumEntriesAsFloat = (float) totalNumEntries; 
-		    for ( Map.Entry<String, Integer> entry : markSummary.entrySet() ) {
+		    float totalNumEntriesAsFloat = totalNumEntries;
+		    for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
 			binSummaryRow = new ExcelCell[3];
-			binSummaryRow[0] = new ExcelCell(entry.getKey(),false);
-			binSummaryRow[1] = new ExcelCell(entry.getValue(),false);
-			binSummaryRow[2] = new ExcelCell(Math.round(entry.getValue() / totalNumEntriesAsFloat * 100),false);
+			binSummaryRow[0] = new ExcelCell(entry.getKey(), false);
+			binSummaryRow[1] = new ExcelCell(entry.getValue(), false);
+			binSummaryRow[2] = new ExcelCell(Math.round(entry.getValue() / totalNumEntriesAsFloat * 100),
+				false);
 			summaryTab.add(binSummaryRow);
 		    }
 		    summaryTab.add(EMPTY_ROW);
@@ -1339,7 +1369,7 @@ public class AssessmentServiceImpl
 	// ------------------------------------------------------------------
 	// -------------- Second tab: Question Summary ----------------------
 
-	ArrayList<ExcelCell[]> questionSummaryTab = new ArrayList<ExcelCell[]>();
+	ArrayList<ExcelCell[]> questionSummaryTab = new ArrayList<>();
 
 	// Create the question summary
 	ExcelCell[] summaryTitle = new ExcelCell[1];
@@ -1379,13 +1409,13 @@ public class AssessmentServiceImpl
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 
 	    int questionNumber = 1;
-	    
+
 	    for (AssessmentQuestion question : questions) {
 		int colsNum = showUserNames ? 10 : 9;
 
 		ExcelCell[] questionTitle = new ExcelCell[1];
-		questionTitle[0] = new ExcelCell(getMessage("label.monitoring.question.summary.question") + " "
-			+ questionNumber++, true);
+		questionTitle[0] = new ExcelCell(
+			getMessage("label.monitoring.question.summary.question") + " " + questionNumber++, true);
 		questionSummaryTab.add(questionTitle);
 
 		// set up the summary table data for the top of the question area.
@@ -1395,15 +1425,15 @@ public class AssessmentServiceImpl
 			|| question.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE;
 		// For MC, Numeric & Short Answer Key is optionUid, Value is number of answers
 		// For True/False Key 0 is false and Key 1 is true
-		Map<Long, Integer> summaryOfAnswers = new HashMap<Long, Integer>();
+		Map<Long, Integer> summaryOfAnswers = new HashMap<>();
 		Integer summaryNACount = 0;
 		Long trueKey = 1L;
 		Long falseKey = 0L;
 		if (doSummaryTable) {
 		    questionSummaryTab.add(startSummaryTable(question, summaryOfAnswers, trueKey, falseKey));
 		}
-		
-		ArrayList<ExcelCell[]> questionSummaryTabTemp = new ArrayList<ExcelCell[]>();
+
+		ArrayList<ExcelCell[]> questionSummaryTabTemp = new ArrayList<>();
 
 		//add question title row
 		if (question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
@@ -1485,9 +1515,10 @@ public class AssessmentServiceImpl
 			} else {
 			    userResultRow[count++] = new ExcelCell(
 				    AssessmentEscapeUtils.printResponsesForExcelExport(questionResult), false);
-			    
-			    if ( doSummaryTable ) { 
-				summaryNACount = updateSummaryCounts(question, questionResult, summaryOfAnswers, summaryNACount);
+
+			    if (doSummaryTable) {
+				summaryNACount = updateSummaryCounts(question, questionResult, summaryOfAnswers,
+					summaryNACount);
 			    }
 
 			}
@@ -1515,10 +1546,11 @@ public class AssessmentServiceImpl
 		}
 
 		if (doSummaryTable) {
-		    questionSummaryTab.add(outputSummaryTable(question, summaryOfAnswers, summaryNACount, trueKey, falseKey));
+		    questionSummaryTab
+			    .add(outputSummaryTable(question, summaryOfAnswers, summaryNACount, trueKey, falseKey));
 		    questionSummaryTab.add(EMPTY_ROW);
 		}
-		
+
 		// Calculating the averages
 		ExcelCell[] averageRow;
 
@@ -1554,7 +1586,7 @@ public class AssessmentServiceImpl
 		questionSummaryTab.addAll(questionSummaryTabTemp);
 		questionSummaryTab.add(averageRow);
 		questionSummaryTab.add(EMPTY_ROW);
-		
+
 	    }
 
 	}
@@ -1564,7 +1596,7 @@ public class AssessmentServiceImpl
 	// ------------------------------------------------------------------
 	// -------------- Third tab: User Summary ---------------------------
 
-	ArrayList<ExcelCell[]> userSummaryTab = new ArrayList<ExcelCell[]>();
+	ArrayList<ExcelCell[]> userSummaryTab = new ArrayList<>();
 
 	// Create the question summary
 	ExcelCell[] userSummaryTitle = new ExcelCell[1];
@@ -1572,16 +1604,21 @@ public class AssessmentServiceImpl
 	userSummaryTab.add(userSummaryTitle);
 
 	ExcelCell[] summaryRowTitle = new ExcelCell[5];
-	summaryRowTitle[0] = new ExcelCell(getMessage("label.monitoring.question.summary.question"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	summaryRowTitle[1] = new ExcelCell(getMessage("label.authoring.basic.list.header.type"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	summaryRowTitle[2] = new ExcelCell(getMessage("label.authoring.basic.penalty.factor"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	summaryRowTitle[3] = new ExcelCell(getMessage("label.monitoring.question.summary.default.mark"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	summaryRowTitle[4] = new ExcelCell(getMessage("label.monitoring.question.summary.average.mark"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[0] = new ExcelCell(getMessage("label.monitoring.question.summary.question"), true,
+		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[1] = new ExcelCell(getMessage("label.authoring.basic.list.header.type"), true,
+		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[2] = new ExcelCell(getMessage("label.authoring.basic.penalty.factor"), true,
+		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[3] = new ExcelCell(getMessage("label.monitoring.question.summary.default.mark"), true,
+		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[4] = new ExcelCell(getMessage("label.monitoring.question.summary.average.mark"), true,
+		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	userSummaryTab.add(summaryRowTitle);
 	Float totalGradesPossible = new Float(0);
 	Float totalAverage = new Float(0);
 	if (assessment.getQuestionReferences() != null) {
-	    Set<QuestionReference> questionReferences = new TreeSet<QuestionReference>(new SequencableComparator());
+	    Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 	    questionReferences.addAll(assessment.getQuestionReferences());
 
 	    int randomQuestionsCount = 1;
@@ -1637,7 +1674,7 @@ public class AssessmentServiceImpl
 	if (sessionDtos != null) {
 	    List<AssessmentResult> assessmentResults = assessmentResultDao
 		    .getLastFinishedAssessmentResults(assessment.getContentId());
-	    Map<Long, AssessmentResult> userUidToResultMap = new HashMap<Long, AssessmentResult>();
+	    Map<Long, AssessmentResult> userUidToResultMap = new HashMap<>();
 	    for (AssessmentResult assessmentResult : assessmentResults) {
 		userUidToResultMap.put(assessmentResult.getUser().getUid(), assessmentResult);
 	    }
@@ -1749,30 +1786,26 @@ public class AssessmentServiceImpl
 	    summaryTable = new ExcelCell[question.getOptions().size() + 1];
 	    for (AssessmentQuestionOption option : question.getOptions()) {
 		summaryOfAnswers.put(option.getUid(), 0);
-		StringBuilder bldr = new StringBuilder(getMessage("label.authoring.basic.option.answer"))
-			.append(" ")
-			.append(i + 1)
-			.append(" - ");
-		if ( question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL ) {
-		    bldr.append(option.getOptionFloat())
-		    	.append(" +- ")
-		    	.append(option.getAcceptedError());
+		StringBuilder bldr = new StringBuilder(getMessage("label.authoring.basic.option.answer")).append(" ")
+			.append(i + 1).append(" - ");
+		if (question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+		    bldr.append(option.getOptionFloat()).append(" +- ").append(option.getAcceptedError());
 		} else {
 		    bldr.append(option.getOptionString().replaceAll("\\<.*?\\>", ""));
 		}
 		summaryTable[i] = new ExcelCell(bldr.toString(), false);
 		i++;
 	    }
-	    if ( question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE ) {
-		summaryTable[i++] = new ExcelCell(getMessage("label.not.answered"), false); 
+	    if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+		summaryTable[i++] = new ExcelCell(getMessage("label.not.answered"), false);
 	    } else {
-		summaryTable[i++] = new ExcelCell(getMessage("label.other"), false); 
+		summaryTable[i++] = new ExcelCell(getMessage("label.other"), false);
 	    }
 	} else {
 	    summaryTable = new ExcelCell[3];
 	    summaryTable[0] = new ExcelCell(getMessage("label.authoring.true.false.true"), false);
 	    summaryTable[1] = new ExcelCell(getMessage("label.authoring.true.false.false"), false);
-	    summaryTable[2] = new ExcelCell(getMessage("label.not.answered"), false); 
+	    summaryTable[2] = new ExcelCell(getMessage("label.not.answered"), false);
 	    summaryOfAnswers.put(trueKey, 0);
 	    summaryOfAnswers.put(falseKey, 0);
 	}
@@ -1789,11 +1822,10 @@ public class AssessmentServiceImpl
 		    if (optionAnswer.getAnswerBoolean()) {
 			Integer currentCount = summaryOfAnswers.get(optionAnswer.getOptionUid());
 			if (currentCount == null) {
-			    log.error("Assessment Export: Unable to count answer in summary, refers to an unexpected option. QuestionResult "
-				    + questionResult.getUid()
-				    + " OptionUid "
-				    + optionAnswer.getOptionUid()
-				    + " question " + question.getUid());
+			    log.error(
+				    "Assessment Export: Unable to count answer in summary, refers to an unexpected option. QuestionResult "
+					    + questionResult.getUid() + " OptionUid " + optionAnswer.getOptionUid()
+					    + " question " + question.getUid());
 			} else {
 			    summaryOfAnswers.put(optionAnswer.getOptionUid(), currentCount + 1);
 			    foundOption = true;
@@ -1810,12 +1842,10 @@ public class AssessmentServiceImpl
 	    if (submittedUid != null) {
 		Integer currentCount = summaryOfAnswers.get(submittedUid);
 		if (currentCount == null) {
-		    log.error("Assessment Export: Unable to count answer in summary, refers to an unexpected option. QuestionResult "
-			    + questionResult.getUid()
-			    + " submittedOptionUid "
-			    + submittedUid
-			    + " question "
-			    + question.getUid());
+		    log.error(
+			    "Assessment Export: Unable to count answer in summary, refers to an unexpected option. QuestionResult "
+				    + questionResult.getUid() + " submittedOptionUid " + submittedUid + " question "
+				    + question.getUid());
 		} else {
 		    summaryOfAnswers.put(submittedUid, currentCount + 1);
 		}
@@ -1836,39 +1866,38 @@ public class AssessmentServiceImpl
 
     private String valueAsPercentage(Integer value, int total) {
 	Double percentage = (double) value / total * 100;
-	return NumberUtil.formatLocalisedNumber(percentage, (Locale)null, 2) + "%";
-    } 
-    
+	return NumberUtil.formatLocalisedNumber(percentage, (Locale) null, 2) + "%";
+    }
+
     private ExcelCell[] outputSummaryTable(AssessmentQuestion question, Map<Long, Integer> summaryOfAnswers,
 	    Integer summaryNACount, Long trueKey, Long falseKey) {
-	ExcelCell[] summaryTable = new ExcelCell[summaryOfAnswers.size()+1];
+	ExcelCell[] summaryTable = new ExcelCell[summaryOfAnswers.size() + 1];
 	int total = summaryNACount;
-	for ( int value : summaryOfAnswers.values() ) {
-	total += value;
+	for (int value : summaryOfAnswers.values()) {
+	    total += value;
 	}
 	int i = 0;
 	if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE
 		|| question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
-		|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL ) {
-	for (AssessmentQuestionOption option : question.getOptions()) {
-	    summaryTable[i] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(option.getUid()), total), false);
-	    if ( option.getGrade() > 0 ) {
-		summaryTable[i].setColor(IndexedColors.GREEN);
+		|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+	    for (AssessmentQuestionOption option : question.getOptions()) {
+		summaryTable[i] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(option.getUid()), total), false);
+		if (option.getGrade() > 0) {
+		    summaryTable[i].setColor(IndexedColors.GREEN);
+		}
+		i++;
 	    }
-	    i++;
-	}
-	summaryTable[i++] = new ExcelCell(valueAsPercentage(summaryNACount, total), false);
+	    summaryTable[i++] = new ExcelCell(valueAsPercentage(summaryNACount, total), false);
 	} else {
-	summaryTable = new ExcelCell[3];
-	summaryTable[0] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(trueKey), total), false);
-	summaryTable[1] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(falseKey), total), false);
-	summaryTable[2] = new ExcelCell(valueAsPercentage(summaryNACount,total), false);
-	summaryTable[question.getCorrectAnswer() ? 0 : 1].setColor(IndexedColors.GREEN);
+	    summaryTable = new ExcelCell[3];
+	    summaryTable[0] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(trueKey), total), false);
+	    summaryTable[1] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(falseKey), total), false);
+	    summaryTable[2] = new ExcelCell(valueAsPercentage(summaryNACount, total), false);
+	    summaryTable[question.getCorrectAnswer() ? 0 : 1].setColor(IndexedColors.GREEN);
 	}
 	return summaryTable;
     }
 
- 
     /**
      * Used only for excell export (for getUserSummaryData() method).
      */
@@ -1909,11 +1938,11 @@ public class AssessmentServiceImpl
 
 	// When changing a mark for user and isUseSelectLeaderToolOuput is true, the mark should be propagated to all
 	// students within the group
-	List<AssessmentUser> users = new ArrayList<AssessmentUser>();
+	List<AssessmentUser> users = new ArrayList<>();
 	if (assessment.isUseSelectLeaderToolOuput()) {
 	    users = getUsersBySession(toolSessionId);
 	} else {
-	    users = new ArrayList<AssessmentUser>();
+	    users = new ArrayList<>();
 	    AssessmentUser user = assessmentResult.getUser();
 	    users.add(user);
 	}
@@ -1957,7 +1986,7 @@ public class AssessmentServiceImpl
 	    List<QuestionReference> deletedReferences) {
 
 	// create list of modified questions
-	List<AssessmentQuestion> modifiedQuestions = new ArrayList<AssessmentQuestion>();
+	List<AssessmentQuestion> modifiedQuestions = new ArrayList<>();
 	for (AssessmentQuestion oldQuestion : oldQuestions) {
 	    for (AssessmentQuestion newQuestion : newQuestions) {
 		if (oldQuestion.getUid().equals(newQuestion.getUid())) {
@@ -2003,7 +2032,7 @@ public class AssessmentServiceImpl
 
 	// create list of modified references
 	// modifiedReferences holds pairs newReference -> oldReference.getDefaultGrade()
-	Map<QuestionReference, Integer> modifiedReferences = new HashMap<QuestionReference, Integer>();
+	Map<QuestionReference, Integer> modifiedReferences = new HashMap<>();
 	for (QuestionReference oldReference : oldReferences) {
 	    for (QuestionReference newReference : newReferences) {
 		if (oldReference.getUid().equals(newReference.getUid())
@@ -2014,7 +2043,7 @@ public class AssessmentServiceImpl
 	}
 
 	// create list of added references
-	List<QuestionReference> addedReferences = new ArrayList<QuestionReference>();
+	List<QuestionReference> addedReferences = new ArrayList<>();
 	for (QuestionReference newReference : newReferences) {
 	    boolean isNewReferenceMetInOldReferences = false;
 
@@ -2042,7 +2071,7 @@ public class AssessmentServiceImpl
 			user.getUserId());
 		AssessmentResult lastFinishedAssessmentResult = (assessmentResults.isEmpty()) ? null
 			: assessmentResults.get(assessmentResults.size() - 1);
-		
+
 		//add autosave assessmentResult as well
 		AssessmentResult lastAssessmentResult = getLastAssessmentResult(assessment.getUid(), user.getUserId());
 		if (lastAssessmentResult != null && lastAssessmentResult.getFinishDate() == null) {
@@ -2123,7 +2152,7 @@ public class AssessmentServiceImpl
 		    }
 
 		    // find all question answers from random question reference
-		    ArrayList<AssessmentQuestionResult> nonRandomQuestionAnswers = new ArrayList<AssessmentQuestionResult>();
+		    ArrayList<AssessmentQuestionResult> nonRandomQuestionAnswers = new ArrayList<>();
 		    for (AssessmentQuestionResult questionAnswer : questionAnswers) {
 			for (QuestionReference reference : newReferences) {
 			    if (!reference.isRandomQuestion() && questionAnswer.getAssessmentQuestion().getUid()
@@ -2231,7 +2260,7 @@ public class AssessmentServiceImpl
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
@@ -2258,7 +2287,6 @@ public class AssessmentServiceImpl
 	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }
 
-    
     @Override
     public List<Number> getMarksArray(Long sessionId) {
 	return assessmentUserDao.getRawUserMarksBySession(sessionId);
@@ -2269,66 +2297,70 @@ public class AssessmentServiceImpl
 	return assessmentUserDao.getRawLeaderMarksByToolContentId(toolContentId);
     }
 
-    private LinkedHashMap<String, Integer> getMarksSummaryForSession(List<AssessmentUserDTO> userDtos, float minGrade, float maxGrade, Integer numBuckets) {
+    private LinkedHashMap<String, Integer> getMarksSummaryForSession(List<AssessmentUserDTO> userDtos, float minGrade,
+	    float maxGrade, Integer numBuckets) {
 
-	LinkedHashMap<String, Integer> summary = new LinkedHashMap<String, Integer>();
-	TreeMap<Integer, Integer> inProgress = new TreeMap<Integer, Integer>();
-	
-	if ( numBuckets == null )
+	LinkedHashMap<String, Integer> summary = new LinkedHashMap<>();
+	TreeMap<Integer, Integer> inProgress = new TreeMap<>();
+
+	if (numBuckets == null) {
 	    numBuckets = 10;
-	
+	}
+
 	int bucketSize = 1;
-	int intMinGrade = (int)Math.floor(minGrade);
+	int intMinGrade = (int) Math.floor(minGrade);
 	float gradeDifference = maxGrade - minGrade;
-	if ( gradeDifference <= 10 ) {
-	    for ( int i= intMinGrade; i <= (int)Math.ceil(maxGrade); i++ ) {
+	if (gradeDifference <= 10) {
+	    for (int i = intMinGrade; i <= (int) Math.ceil(maxGrade); i++) {
 		inProgress.put(i, 0);
 	    }
 	} else {
 	    int intGradeDifference = (int) Math.ceil(gradeDifference);
-	    bucketSize = (int) Math.ceil(intGradeDifference / numBuckets); 
-	    for ( int i=intMinGrade; i <= maxGrade; i = i+bucketSize ) {
+	    bucketSize = (int) Math.ceil(intGradeDifference / numBuckets);
+	    for (int i = intMinGrade; i <= maxGrade; i = i + bucketSize) {
 		inProgress.put(i, 0);
 	    }
 	}
-	
+
 	for (AssessmentUserDTO userDto : userDtos) {
 	    float grade = userDto.getGrade();
 	    int bucketStart = intMinGrade;
-	    int bucketStop = bucketStart+bucketSize;
+	    int bucketStop = bucketStart + bucketSize;
 	    boolean looking = true;
-	    while ( bucketStart <= maxGrade && looking ) {
-		if ( grade >= bucketStart && grade < bucketStop ) {
+	    while (bucketStart <= maxGrade && looking) {
+		if (grade >= bucketStart && grade < bucketStop) {
 		    inProgress.put(bucketStart, inProgress.get(bucketStart) + 1);
 		    looking = false;
 		} else {
 		    bucketStart = bucketStop;
-		    bucketStop = bucketStart+bucketSize;
+		    bucketStop = bucketStart + bucketSize;
 		}
 	    }
 	}
-	
-	for ( Map.Entry<Integer, Integer> entry : inProgress.entrySet() ) {
+
+	for (Map.Entry<Integer, Integer> entry : inProgress.entrySet()) {
 	    String key;
-	    if ( bucketSize == 1 )
+	    if (bucketSize == 1) {
 		key = entry.getKey().toString();
-	    else {
-		if ( maxGrade >= entry.getKey() && maxGrade <= entry.getKey()+bucketSize-1) {
-		    if ( (int)maxGrade == entry.getKey() )
-			key = NumberUtil.formatLocalisedNumber(maxGrade, (Locale)null, 2);    
-		    else 
+	    } else {
+		if (maxGrade >= entry.getKey() && maxGrade <= entry.getKey() + bucketSize - 1) {
+		    if ((int) maxGrade == entry.getKey()) {
+			key = NumberUtil.formatLocalisedNumber(maxGrade, (Locale) null, 2);
+		    } else {
 			key = new StringBuilder().append(entry.getKey()).append(" - ")
-		    		.append(NumberUtil.formatLocalisedNumber(maxGrade, (Locale)null, 2)).toString();
+				.append(NumberUtil.formatLocalisedNumber(maxGrade, (Locale) null, 2)).toString();
+		    }
 		} else {
-		    key = new StringBuilder().append(entry.getKey()).append(" - ").append(entry.getKey()+bucketSize-.01).toString();
+		    key = new StringBuilder().append(entry.getKey()).append(" - ")
+			    .append(entry.getKey() + bucketSize - .01).toString();
 		}
 	    }
 	    summary.put(key, entry.getValue());
 	}
-	
+
 	return summary;
     }
-    
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -2765,16 +2797,19 @@ public class AssessmentServiceImpl
 	Date startDate = null;
 	Date finishDate = null;
 	for (AssessmentResult result : results) {
-	    if (startDate == null || (result.getStartDate() != null && result.getStartDate().before(startDate)))
+	    if (startDate == null || (result.getStartDate() != null && result.getStartDate().before(startDate))) {
 		startDate = result.getStartDate();
-	    if (finishDate == null || (result.getFinishDate() != null && result.getFinishDate().after(finishDate)))
+	    }
+	    if (finishDate == null || (result.getFinishDate() != null && result.getFinishDate().after(finishDate))) {
 		finishDate = result.getFinishDate();
+	    }
 	}
 
-	if (learner.isSessionFinished())
+	if (learner.isSessionFinished()) {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, finishDate);
-	else
+	} else {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
+	}
     }
     // ****************** REST methods *************************
 
@@ -2782,99 +2817,106 @@ public class AssessmentServiceImpl
      * Rest call to create a new Assessment content. Required fields in toolContentJSON: "title", "instructions",
      * "questions", "firstName", "lastName", "lastName", "questions" and "references".
      *
-     * The questions entry should be a JSONArray containing JSON objects, which in turn must contain "questionTitle",
+     * The questions entry should be a ArrayNode containing JSON objects, which in turn must contain "questionTitle",
      * "questionText", "displayOrder" (Integer), "type" (Integer). If the type is Multiple Choice, Numerical or Matching
-     * Pairs then a JSONArray "answers" is required.
+     * Pairs then a ArrayNode "answers" is required.
      *
-     * The answers entry should be JSONArray containing JSON objects, which in turn must contain "answerText" or
+     * The answers entry should be ArrayNode containing JSON objects, which in turn must contain "answerText" or
      * "answerFloat", "displayOrder" (Integer), "grade" (Integer).
      *
-     * The references entry should be a JSONArray containing JSON objects, which in turn must contain "displayOrder"
+     * The references entry should be a ArrayNode containing JSON objects, which in turn must contain "displayOrder"
      * (Integer), "questionDisplayOrder" (Integer - to match to the question). It may also have "defaultGrade" (Integer)
      * and "randomQuestion" (Boolean)
+     *
+     * @throws IOException
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON)
+	    throws IOException {
 
 	Assessment assessment = new Assessment();
 	assessment.setContentId(toolContentID);
-	assessment.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	assessment.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	assessment.setTitle(toolContentJSON.get(RestTags.TITLE).asText());
+	assessment.setInstructions(toolContentJSON.get(RestTags.INSTRUCTIONS).asText());
 	assessment.setCreated(new Date());
 
-	assessment.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	assessment.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
-	assessment.setAllowGradesAfterAttempt(JsonUtil.opt(toolContentJSON, "allowGradesAfterAttempt", Boolean.FALSE));
-	assessment.setAllowHistoryResponses(JsonUtil.opt(toolContentJSON, "allowHistoryResponses", Boolean.FALSE));
+	assessment.setReflectOnActivity(
+		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	assessment.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	assessment.setAllowGradesAfterAttempt(
+		JsonUtil.optBoolean(toolContentJSON, "allowGradesAfterAttempt", Boolean.FALSE));
+	assessment
+		.setAllowHistoryResponses(JsonUtil.optBoolean(toolContentJSON, "allowHistoryResponses", Boolean.FALSE));
 	assessment.setAllowOverallFeedbackAfterQuestion(
-		JsonUtil.opt(toolContentJSON, "allowOverallFeedbackAfterQuestion", Boolean.FALSE));
-	assessment.setAllowQuestionFeedback(JsonUtil.opt(toolContentJSON, "allowQuestionFeedback", Boolean.FALSE));
+		JsonUtil.optBoolean(toolContentJSON, "allowOverallFeedbackAfterQuestion", Boolean.FALSE));
+	assessment
+		.setAllowQuestionFeedback(JsonUtil.optBoolean(toolContentJSON, "allowQuestionFeedback", Boolean.FALSE));
 	assessment.setAllowRightAnswersAfterQuestion(
-		JsonUtil.opt(toolContentJSON, "allowRightAnswersAfterQuestion", Boolean.FALSE));
+		JsonUtil.optBoolean(toolContentJSON, "allowRightAnswersAfterQuestion", Boolean.FALSE));
 	assessment.setAllowWrongAnswersAfterQuestion(
-		JsonUtil.opt(toolContentJSON, "allowWrongAnswersAfterQuestion", Boolean.FALSE));
-	assessment.setAttemptsAllowed(JsonUtil.opt(toolContentJSON, "attemptsAllows", 1));
+		JsonUtil.optBoolean(toolContentJSON, "allowWrongAnswersAfterQuestion", Boolean.FALSE));
+	assessment.setAttemptsAllowed(JsonUtil.optInt(toolContentJSON, "attemptsAllows", 1));
 	assessment.setDefineLater(false);
-	assessment.setDisplaySummary(JsonUtil.opt(toolContentJSON, "displaySummary", Boolean.FALSE));
+	assessment.setDisplaySummary(JsonUtil.optBoolean(toolContentJSON, "displaySummary", Boolean.FALSE));
 	assessment.setNotifyTeachersOnAttemptCompletion(
-		JsonUtil.opt(toolContentJSON, "notifyTeachersOnAttemptCompletion", Boolean.FALSE));
-	assessment.setNumbered(JsonUtil.opt(toolContentJSON, "numbered", Boolean.TRUE));
-	assessment.setPassingMark(JsonUtil.opt(toolContentJSON, "passingMark", 0));
-	assessment.setQuestionsPerPage(JsonUtil.opt(toolContentJSON, "questionsPerPage", 0));
-	assessment.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, ""));
-	assessment.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	assessment.setShuffled(JsonUtil.opt(toolContentJSON, "shuffled", Boolean.FALSE));
-	assessment.setTimeLimit(JsonUtil.opt(toolContentJSON, "timeLimit", 0));
+		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnAttemptCompletion", Boolean.FALSE));
+	assessment.setNumbered(JsonUtil.optBoolean(toolContentJSON, "numbered", Boolean.TRUE));
+	assessment.setPassingMark(JsonUtil.optInt(toolContentJSON, "passingMark", 0));
+	assessment.setQuestionsPerPage(JsonUtil.optInt(toolContentJSON, "questionsPerPage", 0));
+	assessment.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, ""));
+	assessment.setReflectOnActivity(
+		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	assessment.setShuffled(JsonUtil.optBoolean(toolContentJSON, "shuffled", Boolean.FALSE));
+	assessment.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
 	assessment.setUseSelectLeaderToolOuput(
-		JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+		JsonUtil.optBoolean(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
 	// submission deadline set in monitoring
 
 	if (toolContentJSON.has("overallFeedback")) {
-	    throw new JSONException(
+	    throw new IOException(
 		    "Assessment Tool does not support Overall Feedback for REST Authoring. " + toolContentJSON);
 	}
 
 	AssessmentUser assessmentUser = getUserByIDAndContent(userID.longValue(), toolContentID);
 	if (assessmentUser == null) {
 	    assessmentUser = new AssessmentUser();
-	    assessmentUser.setFirstName(toolContentJSON.getString("firstName"));
-	    assessmentUser.setLastName(toolContentJSON.getString("lastName"));
-	    assessmentUser.setLoginName(toolContentJSON.getString("loginName"));
+	    assessmentUser.setFirstName(toolContentJSON.get("firstName").asText());
+	    assessmentUser.setLastName(toolContentJSON.get("lastName").asText());
+	    assessmentUser.setLoginName(toolContentJSON.get("loginName").asText());
 	    assessmentUser.setAssessment(assessment);
 	}
 	assessment.setCreatedBy(assessmentUser);
 
 	// **************************** Set the question bank *********************
-	JSONArray questions = toolContentJSON.getJSONArray("questions");
+	ArrayNode questions = JsonUtil.optArray(toolContentJSON, "questions");
 	Set newQuestionSet = assessment.getQuestions(); // the Assessment constructor will set up the collection
-	for (int i = 0; i < questions.length(); i++) {
-	    JSONObject questionJSONData = (JSONObject) questions.get(i);
+	for (JsonNode questionJSONData : questions) {
 	    AssessmentQuestion question = new AssessmentQuestion();
-	    short type = (short) questionJSONData.getInt("type");
+	    short type = JsonUtil.optInt(questionJSONData, "type").shortValue();
 	    question.setType(type);
-	    question.setTitle(questionJSONData.getString(RestTags.QUESTION_TITLE));
-	    question.setQuestion(questionJSONData.getString(RestTags.QUESTION_TEXT));
-	    question.setSequenceId(questionJSONData.getInt(RestTags.DISPLAY_ORDER));
+	    question.setTitle(questionJSONData.get(RestTags.QUESTION_TITLE).asText());
+	    question.setQuestion(questionJSONData.get(RestTags.QUESTION_TEXT).asText());
+	    question.setSequenceId(JsonUtil.optInt(questionJSONData, RestTags.DISPLAY_ORDER));
 
-	    question.setAllowRichEditor(JsonUtil.opt(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
-	    question.setAnswerRequired(JsonUtil.opt(questionJSONData, "answerRequired", Boolean.FALSE));
-	    question.setCaseSensitive(JsonUtil.opt(questionJSONData, "caseSensitive", Boolean.FALSE));
-	    question.setCorrectAnswer(JsonUtil.opt(questionJSONData, "correctAnswer", Boolean.FALSE));
-	    question.setDefaultGrade(JsonUtil.opt(questionJSONData, "defaultGrade", 1));
-	    question.setFeedback(JsonUtil.opt(questionJSONData, "feedback", (String) null));
-	    question.setFeedbackOnCorrect(JsonUtil.opt(questionJSONData, "feedbackOnCorrect", (String) null));
-	    question.setFeedbackOnIncorrect(JsonUtil.opt(questionJSONData, "feedbackOnIncorrect", (String) null));
-	    question.setFeedbackOnPartiallyCorrect(
-		    JsonUtil.opt(questionJSONData, "feedbackOnPartiallyCorrect", (String) null));
-	    question.setGeneralFeedback(JsonUtil.opt(questionJSONData, "generalFeedback", ""));
-	    question.setMaxWordsLimit(JsonUtil.opt(questionJSONData, "maxWordsLimit", 0));
-	    question.setMinWordsLimit(JsonUtil.opt(questionJSONData, "minWordsLimit", 0));
-	    question.setMultipleAnswersAllowed(JsonUtil.opt(questionJSONData, "multipleAnswersAllowed", Boolean.FALSE));
+	    question.setAllowRichEditor(
+		    JsonUtil.optBoolean(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
+	    question.setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
+	    question.setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
+	    question.setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
+	    question.setDefaultGrade(JsonUtil.optInt(questionJSONData, "defaultGrade", 1));
+	    question.setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
+	    question.setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));
+	    question.setFeedbackOnIncorrect(JsonUtil.optString(questionJSONData, "feedbackOnIncorrect"));
+	    question.setFeedbackOnPartiallyCorrect(JsonUtil.optString(questionJSONData, "feedbackOnPartiallyCorrect"));
+	    question.setGeneralFeedback(JsonUtil.optString(questionJSONData, "generalFeedback", ""));
+	    question.setMaxWordsLimit(JsonUtil.optInt(questionJSONData, "maxWordsLimit", 0));
+	    question.setMinWordsLimit(JsonUtil.optInt(questionJSONData, "minWordsLimit", 0));
+	    question.setMultipleAnswersAllowed(
+		    JsonUtil.optBoolean(questionJSONData, "multipleAnswersAllowed", Boolean.FALSE));
 	    question.setIncorrectAnswerNullifiesMark(
-		    JsonUtil.opt(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
-	    question.setPenaltyFactor(Float.parseFloat(JsonUtil.opt(questionJSONData, "penaltyFactor", "0.0")));
+		    JsonUtil.optBoolean(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
+	    question.setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
 	    // question.setUnits(units); Needed for numerical type question
 
 	    if ((type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)
@@ -2883,22 +2925,21 @@ public class AssessmentServiceImpl
 		    || (type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)) {
 
 		if (!questionJSONData.has(RestTags.ANSWERS)) {
-		    throw new JSONException("REST Authoring is missing answers for a question of type " + type
-			    + ". Data:" + toolContentJSON);
+		    throw new IOException("REST Authoring is missing answers for a question of type " + type + ". Data:"
+			    + toolContentJSON);
 		}
 
-		Set<AssessmentQuestionOption> optionList = new LinkedHashSet<AssessmentQuestionOption>();
-		JSONArray optionsData = questionJSONData.getJSONArray(RestTags.ANSWERS);
-		for (int j = 0; j < optionsData.length(); j++) {
-		    JSONObject answerData = (JSONObject) optionsData.get(j);
+		Set<AssessmentQuestionOption> optionList = new LinkedHashSet<>();
+		ArrayNode optionsData = JsonUtil.optArray(questionJSONData, RestTags.ANSWERS);
+		for (JsonNode answerData : optionsData) {
 		    AssessmentQuestionOption option = new AssessmentQuestionOption();
-		    option.setSequenceId(answerData.getInt(RestTags.DISPLAY_ORDER));
-		    option.setGrade(Float.parseFloat(answerData.getString("grade")));
-		    option.setCorrect(Boolean.parseBoolean(JsonUtil.opt(answerData, "correct", "false")));
-		    option.setAcceptedError(Float.parseFloat(JsonUtil.opt(answerData, "acceptedError", "0.0")));
-		    option.setFeedback(JsonUtil.opt(answerData, "feedback", (String) null));
-		    option.setOptionString(JsonUtil.opt(answerData, RestTags.ANSWER_TEXT, (String) null));
-		    option.setOptionFloat(Float.parseFloat(JsonUtil.opt(answerData, "answerFloat", "0.0")));
+		    option.setSequenceId(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
+		    option.setGrade(answerData.get("grade").floatValue());
+		    option.setCorrect(JsonUtil.optBoolean(answerData, "correct", false));
+		    option.setAcceptedError(JsonUtil.optDouble(answerData, "acceptedError", 0.0).floatValue());
+		    option.setFeedback(JsonUtil.optString(answerData, "feedback"));
+		    option.setOptionString(JsonUtil.optString(answerData, RestTags.ANSWER_TEXT));
+		    option.setOptionFloat(JsonUtil.optDouble(answerData, "answerFloat", 0.0).floatValue());
 		    // option.setQuestion(question); can't find the use for this field yet!
 		    optionList.add(option);
 		}
@@ -2910,23 +2951,23 @@ public class AssessmentServiceImpl
 	}
 
 	// **************************** Now set up the references to the questions in the bank *********************
-	JSONArray references = toolContentJSON.getJSONArray("references");
+	ArrayNode references = JsonUtil.optArray(toolContentJSON, "references");
 	Set newReferenceSet = assessment.getQuestionReferences(); // the Assessment constructor will set up the
-								  // collection
-	for (int i = 0; i < references.length(); i++) {
-	    JSONObject referenceJSONData = (JSONObject) references.get(i);
+
+	;// collection
+	for (JsonNode referenceJSONData : references) {
 	    QuestionReference reference = new QuestionReference();
 	    reference.setType((short) 0);
-	    reference.setDefaultGrade(JsonUtil.opt(referenceJSONData, "defaultGrade", 1));
-	    reference.setSequenceId(referenceJSONData.getInt(RestTags.DISPLAY_ORDER));
+	    reference.setDefaultGrade(JsonUtil.optInt(referenceJSONData, "defaultGrade", 1));
+	    reference.setSequenceId(JsonUtil.optInt(referenceJSONData, RestTags.DISPLAY_ORDER));
 	    AssessmentQuestion matchingQuestion = matchQuestion(newQuestionSet,
-		    referenceJSONData.getInt("questionDisplayOrder"));
+		    JsonUtil.optInt(referenceJSONData, "questionDisplayOrder"));
 	    if (matchingQuestion == null) {
-		throw new JSONException("Unable to find matching question for displayOrder "
+		throw new IOException("Unable to find matching question for displayOrder "
 			+ referenceJSONData.get("questionDisplayOrder") + ". Data:" + toolContentJSON);
 	    }
 	    reference.setQuestion(matchingQuestion);
-	    reference.setRandomQuestion(JsonUtil.opt(referenceJSONData, "randomQuestion", Boolean.FALSE));
+	    reference.setRandomQuestion(JsonUtil.optBoolean(referenceJSONData, "randomQuestion", Boolean.FALSE));
 	    reference.setTitle(null);
 	    newReferenceSet.add(reference);
 	}
@@ -2948,10 +2989,10 @@ public class AssessmentServiceImpl
     }
 
     // TODO Implement REST support for all types and then remove checkType method
-    void checkType(short type) throws JSONException {
+    void checkType(short type) throws IOException {
 	if ((type != AssessmentConstants.QUESTION_TYPE_ESSAY)
 		&& (type != AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)) {
-	    throw new JSONException(
+	    throw new IOException(
 		    "Assessment Tool does not support REST Authoring for anything but Essay Type and Multiple Choice. Found type "
 			    + type);
 	}

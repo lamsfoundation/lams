@@ -38,9 +38,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -85,6 +82,9 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Dapeng.Ni
@@ -225,13 +225,13 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     @Override
     public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
-	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
+	Map<Long, Set<ReflectDTO>> map = new HashMap<>();
 
 	List<SurveySession> sessionList = surveySessionDao.getByContentId(contentId);
 	for (SurveySession session : sessionList) {
 	    Long sessionId = session.getSessionId();
 	    boolean hasRefection = session.getSurvey().isReflectOnActivity();
-	    Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
+	    Set<ReflectDTO> list = new TreeSet<>(new ReflectDTOComparator());
 	    // get all users in this session
 	    List<SurveyUser> users = surveyUserDao.getBySessionID(sessionId);
 	    for (SurveyUser user : users) {
@@ -301,17 +301,17 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     @Override
     public List<AnswerDTO> getQuestionAnswers(Long sessionId, Long userUid) {
-	List<SurveyQuestion> questions = new ArrayList<SurveyQuestion>();
+	List<SurveyQuestion> questions = new ArrayList<>();
 	SurveySession session = surveySessionDao.getSessionBySessionId(sessionId);
 	if (session != null) {
 	    Survey survey = session.getSurvey();
 	    if (survey != null) {
-		questions = new ArrayList<SurveyQuestion>(survey.getQuestions());
+		questions = new ArrayList<>(survey.getQuestions());
 	    }
 	}
 
 	// set answer for this question acoording
-	List<AnswerDTO> answers = new ArrayList<AnswerDTO>();
+	List<AnswerDTO> answers = new ArrayList<>();
 	for (SurveyQuestion question : questions) {
 	    AnswerDTO answerDTO = new AnswerDTO(question);
 	    SurveyAnswer answer = surveyAnswerDao.getAnswer(question.getUid(), userUid);
@@ -350,7 +350,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	AnswerDTO answerDto = new AnswerDTO(question);
 
 	// create a map to hold Option UID and the counts for that choice
-	Map<Long, Integer> optMap = new HashMap<Long, Integer>();
+	Map<Long, Integer> optMap = new HashMap<>();
 
 	// total number of answers - used for the percentage calculations
 	int numberAnswers = 0;
@@ -405,7 +405,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     @Override
     public SortedMap<SurveySession, List<AnswerDTO>> getSummary(Long toolContentId) {
 
-	SortedMap<SurveySession, List<AnswerDTO>> summary = new TreeMap<SurveySession, List<AnswerDTO>>(
+	SortedMap<SurveySession, List<AnswerDTO>> summary = new TreeMap<>(
 		new SurveySessionComparator());
 
 	Survey survey = surveyDao.getByContentId(toolContentId);
@@ -414,7 +414,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	List<SurveySession> sessionList = surveySessionDao.getByContentId(toolContentId);
 	// iterator all sessions under this survey content, and get all questions and its answers.
 	for (SurveySession session : sessionList) {
-	    List<AnswerDTO> responseList = new ArrayList<AnswerDTO>();
+	    List<AnswerDTO> responseList = new ArrayList<>();
 	    for (SurveyQuestion question : questionList) {
 		AnswerDTO response = getQuestionResponse(session.getSessionId(), question.getUid());
 		responseList.add(response);
@@ -427,7 +427,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     @Override
     public SortedMap<SurveySession, Integer> getStatistic(Long contentId) {
-	SortedMap<SurveySession, Integer> result = new TreeMap<SurveySession, Integer>(new SurveySessionComparator());
+	SortedMap<SurveySession, Integer> result = new TreeMap<>(new SurveySessionComparator());
 
 	List<Object[]> stats = surveyUserDao.getStatisticsBySession(contentId);
 	for (Object[] stat : stats) {
@@ -450,7 +450,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	SurveySession session = surveySessionDao.getSessionBySessionId(toolSessionID);
 	List<SurveyUser> users = surveyUserDao.getBySessionID(toolSessionID);
 
-	Map<SurveySession, List<SurveyUser>> sessionToUsersMap = new HashMap<SurveySession, List<SurveyUser>>();
+	Map<SurveySession, List<SurveyUser>> sessionToUsersMap = new HashMap<>();
 	sessionToUsersMap.put(session, users);
 
 	return getExportSummary(sessionToUsersMap);
@@ -466,11 +466,11 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     private SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> getExportSummary(
 	    Map<SurveySession, List<SurveyUser>> sessionToUsersMap) {
 
-	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> summary = new TreeMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>>(
+	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> summary = new TreeMap<>(
 		new SurveySessionComparator());
 
 	// all questions
-	List<SurveyQuestion> questions = new ArrayList<SurveyQuestion>();
+	List<SurveyQuestion> questions = new ArrayList<>();
 	if (!sessionToUsersMap.isEmpty()) {
 	    SurveySession session = sessionToUsersMap.keySet().iterator().next();
 	    Survey survey = session.getSurvey();
@@ -480,14 +480,14 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	// traverse all sessions
 	for (SurveySession session : sessionToUsersMap.keySet()) {
 
-	    SortedMap<SurveyQuestion, List<AnswerDTO>> questionMap = new TreeMap<SurveyQuestion, List<AnswerDTO>>(
+	    SortedMap<SurveyQuestion, List<AnswerDTO>> questionMap = new TreeMap<>(
 		    new QuestionsComparator());
 
 	    // traverse all questions
 	    for (SurveyQuestion question : questions) {
 
 		List<SurveyUser> users = sessionToUsersMap.get(session);
-		List<AnswerDTO> answerDtos = new ArrayList<AnswerDTO>();
+		List<AnswerDTO> answerDtos = new ArrayList<>();
 
 		// if it's for a single user - query DB for only one answer for this current user
 		if (users.size() == 1) {
@@ -544,10 +544,10 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
@@ -850,10 +850,10 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getSurveyOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -955,7 +955,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return new ToolCompletionStatus(learner.isSessionFinished() ? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
-    
+
     // ****************** REST methods *************************
 
     /**
@@ -965,16 +965,15 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
      * (default true), showOnePage (default true), notifyTeachersOnAnswerSumbit (default false), showOtherUsersAnswers
      * (default false), reflectOnActivity, reflectInstructions, submissionDeadline
      *
-     * Questions must contain a JSONArray of JSONObject objects, which have the following mandatory fields:
-     * questionText, type (1=one answer,2=multiple answers,3=free text entry) and answers. Answers is a JSONArray of
+     * Questions must contain a ArrayNode of ObjectNode objects, which have the following mandatory fields:
+     * questionText, type (1=one answer,2=multiple answers,3=free text entry) and answers. Answers is a ArrayNode of
      * strings, which are the answer text. A question may also have the optional fields: allowOtherTextEntry (default
      * false), required (default true)
      *
      * There should be at least one question object in the Questions array and at least one option in the Options array.
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
 	Survey survey = new Survey();
 	Date updateDate = new Date();
@@ -982,45 +981,46 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	survey.setUpdated(updateDate);
 
 	survey.setContentId(toolContentID);
-	survey.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	survey.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	survey.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	survey.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 
 	survey.setContentInUse(false);
 	survey.setDefineLater(false);
-	survey.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.TRUE));
-	survey.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
-	survey.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	survey.setLockWhenFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.TRUE));
+	survey.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	survey.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	survey.setNotifyTeachersOnAnswerSumbit(
-		JsonUtil.opt(toolContentJSON, "notifyTeachersOnAnswerSumbit", Boolean.FALSE));
-	survey.setShowOnePage(JsonUtil.opt(toolContentJSON, "showOnePage", Boolean.TRUE));
-	survey.setShowOtherUsersAnswers(JsonUtil.opt(toolContentJSON, "showOtherUsersAnswers", Boolean.FALSE));
+		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnAnswerSumbit", Boolean.FALSE));
+	survey.setShowOnePage(JsonUtil.optBoolean(toolContentJSON, "showOnePage", Boolean.TRUE));
+	survey.setShowOtherUsersAnswers(JsonUtil.optBoolean(toolContentJSON, "showOtherUsersAnswers", Boolean.FALSE));
 
 	// submissionDeadline is set in monitoring
 
-	SurveyUser surveyUser = new SurveyUser(userID.longValue(), toolContentJSON.getString("firstName"),
-		toolContentJSON.getString("lastName"), toolContentJSON.getString("loginName"), survey);
+	SurveyUser surveyUser = new SurveyUser(userID.longValue(), JsonUtil.optString(toolContentJSON, "firstName"),
+		JsonUtil.optString(toolContentJSON, "lastName"), JsonUtil.optString(toolContentJSON, "loginName"),
+		survey);
 	survey.setCreatedBy(surveyUser);
 
 	// **************************** Handle Survey Questions *********************
 
-	JSONArray questions = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
-	for (int i = 0; i < questions.length(); i++) {
-	    JSONObject questionData = (JSONObject) questions.get(i);
+	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
+	for (int i = 0; i < questions.size(); i++) {
+	    ObjectNode questionData = (ObjectNode) questions.get(i);
 	    SurveyQuestion newQuestion = new SurveyQuestion();
 	    newQuestion.setCreateBy(surveyUser);
 	    newQuestion.setCreateDate(updateDate);
-	    newQuestion.setDescription(questionData.getString(RestTags.QUESTION_TEXT));
-	    newQuestion.setType((short) questionData.getInt("type"));
-	    newQuestion.setAppendText(JsonUtil.opt(questionData, "allowOtherTextEntry", Boolean.FALSE));
-	    Boolean required = JsonUtil.opt(questionData, "required", Boolean.TRUE);
+	    newQuestion.setDescription(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
+	    newQuestion.setType((short) questionData.get("type").asInt());
+	    newQuestion.setAppendText(JsonUtil.optBoolean(questionData, "allowOtherTextEntry", Boolean.FALSE));
+	    Boolean required = JsonUtil.optBoolean(questionData, "required", Boolean.TRUE);
 	    newQuestion.setOptional(!required);
 	    newQuestion.setSequenceId(i + 1); // sequence number starts at 1
 
-	    Set<SurveyOption> newOptions = new HashSet<SurveyOption>();
-	    JSONArray options = questionData.getJSONArray(RestTags.ANSWERS);
-	    for (int j = 0; j < options.length(); j++) {
+	    Set<SurveyOption> newOptions = new HashSet<>();
+	    ArrayNode options = JsonUtil.optArray(questionData, RestTags.ANSWERS);
+	    for (int j = 0; j < options.size(); j++) {
 		SurveyOption newOption = new SurveyOption();
-		newOption.setDescription(options.getString(j));
+		newOption.setDescription(options.get(j).asText());
 		newOption.setSequenceId(j); // sequence number starts at 0
 		newOptions.add(newOption);
 	    }

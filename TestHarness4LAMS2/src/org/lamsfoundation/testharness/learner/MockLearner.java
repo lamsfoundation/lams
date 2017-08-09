@@ -39,9 +39,9 @@ import java.util.regex.Pattern;
 import javax.websocket.MessageHandler;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
+
+
+
 import org.lamsfoundation.testharness.Call;
 import org.lamsfoundation.testharness.MockUser;
 import org.lamsfoundation.testharness.TestHarnessException;
@@ -560,7 +560,7 @@ public class MockLearner extends MockUser implements Runnable {
 	});
 
 	// send few messages to the whole group
-	JSONObject messageJSON = new JSONObject();
+	ObjectNode messageJSON = JsonNodeFactory.instance.objectNode();
 	try {
 	    messageJSON.put("toolSessionID", toolSessionID);
 	    messageJSON.put("toUser", "");
@@ -757,7 +757,7 @@ public class MockLearner extends MockUser implements Runnable {
 				log.debug(username + " received Scratchie " + toolSessionID + " message from server: "
 					+ message);
 				try {
-				    JSONObject responseJSON = new JSONObject(message);
+				    ObjectNode responseJSON = new ObjectNode(message);
 				    if (responseJSON.optBoolean("close")) {
 					// mark the activity as finished for everyone
 					SCRATCHIE_FINISHED_TOOL_CONTENT.add(toolSessionID);
@@ -836,13 +836,13 @@ public class MockLearner extends MockUser implements Runnable {
 			});
 
 		// send few version of reports
-		JSONObject requestJSON = new JSONObject();
+		ObjectNode requestJSON = JsonNodeFactory.instance.objectNode();
 		requestJSON.put("type", "submitReport");
 		for (short attempt = 0; attempt < SCRIBE_SUBMIT_REPORT_ATTEMPTS; attempt++) {
-		    JSONArray reportsJSON = new JSONArray();
+		    ArrayNode reportsJSON = JsonNodeFactory.instance.arrayNode();
 		    m = MockLearner.SCRIBE_REPORT_ENTRY_PATTERN.matcher(asText);
 		    while (m.find()) {
-			JSONObject reportJSON = new JSONObject();
+			ObjectNode reportJSON = JsonNodeFactory.instance.objectNode();
 			reportJSON.put("uid", m.group(1));
 			reportJSON.put("text", MockLearner.composeArbitraryText());
 			reportsJSON.put(reportJSON);
@@ -865,7 +865,7 @@ public class MockLearner extends MockUser implements Runnable {
 				log.debug(username + " (regular learner) received Scribe " + toolSessionID
 					+ " message from server: " + message);
 				try {
-				    JSONObject responseJSON = new JSONObject(message);
+				    ObjectNode responseJSON = new ObjectNode(message);
 				    if (responseJSON.optBoolean("close")) {
 					// mark the activity as finished for everyone
 					SCRIBE_FINISHED_TOOL_CONTENT.add(toolSessionID);
@@ -877,7 +877,7 @@ public class MockLearner extends MockUser implements Runnable {
 			});
 
 		// vote few times
-		JSONObject requestJSON = new JSONObject();
+		ObjectNode requestJSON = JsonNodeFactory.instance.objectNode();
 		requestJSON.put("type", "vote");
 		for (short attempt = 0; attempt < SCRIBE_SUBMIT_REPORT_ATTEMPTS
 			&& !SCRIBE_FINISHED_TOOL_CONTENT.contains(toolSessionID); attempt++) {

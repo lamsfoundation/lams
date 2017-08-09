@@ -43,14 +43,12 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONObject;
 import org.imsglobal.pox.IMSPOXRequest;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
-import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.ExtServer;
+import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
@@ -73,9 +71,13 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CSVUtil;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import oauth.signpost.exception.OAuthException;
 
@@ -97,14 +99,16 @@ public class IntegrationService implements IIntegrationService {
 
     /**
      * Returns integration server or LTI tool consumer by its human-entered server key/server id.
-     * 
-     * @param serverId server key/server id
-     * @param isIntegrationServer true in case this is an integration server, false - LTI tool consumer
+     *
+     * @param serverId
+     *            server key/server id
+     * @param isIntegrationServer
+     *            true in case this is an integration server, false - LTI tool consumer
      * @return
      */
     @Override
     public ExtServer getExtServer(String serverId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("serverid", serverId);
 	List<ExtServer> list = service.findByProperties(ExtServer.class, properties);
 	if (list == null || list.size() == 0) {
@@ -116,7 +120,7 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public ExtCourseClassMap getExtCourseClassMap(Integer sid, String extCourseId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("courseid", extCourseId);
 	properties.put("extServer.sid", sid);
 	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
@@ -130,9 +134,9 @@ public class IntegrationService implements IIntegrationService {
 
     // wrapper method for compatibility with original integration modules
     @Override
-    public ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap,
-	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method,
-	    Boolean prefix) throws UserInfoValidationException {
+    public ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
+	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method, Boolean prefix)
+	    throws UserInfoValidationException {
 
 	// Set the pretty course name if available, otherwise maintain the extCourseId
 	String courseName = "";
@@ -141,7 +145,7 @@ public class IntegrationService implements IIntegrationService {
 	} else {
 	    courseName = extCourseId;
 	}
-	
+
 	Boolean isTeacher = (StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR)
 		|| StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR));
 	return getExtCourseClassMap(extServer, userMap, extCourseId, courseName, countryIsoCode, langIsoCode,
@@ -150,8 +154,8 @@ public class IntegrationService implements IIntegrationService {
 
     // wrapper method for compatibility with original integration modules
     @Override
-    public ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap,
-	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method)
+    public ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
+	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method)
 	    throws UserInfoValidationException {
 	return getExtCourseClassMap(extServer, userMap, extCourseId, countryIsoCode, langIsoCode, prettyCourseName,
 		method, true);
@@ -160,9 +164,9 @@ public class IntegrationService implements IIntegrationService {
     // newer method which accepts course name, a parent org id, a flag for whether user should get
     // 'teacher' roles, and a flag for whether to use a prefix in the org's name
     @Override
-    public ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap,
-	    String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId,
-	    Boolean isTeacher, Boolean prefix) throws UserInfoValidationException {
+    public ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
+	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean isTeacher,
+	    Boolean prefix) throws UserInfoValidationException {
 	Organisation org;
 	User user = userMap.getUser();
 
@@ -231,7 +235,7 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public List<ExtUserUseridMap> getExtUserUseridMapByExtServer(ExtServer extServer) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("extServer.sid", extServer.getSid());
 	List list = service.findByProperties(ExtUserUseridMap.class, properties);
 	return list;
@@ -260,7 +264,7 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public ExtUserUseridMap getExistingExtUserUseridMap(ExtServer extServer, String extUsername) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("extServer.sid", extServer.getSid());
 	properties.put("extUsername", extUsername);
 	List<ExtUserUseridMap> list = service.findByProperties(ExtUserUseridMap.class, properties);
@@ -340,8 +344,8 @@ public class IntegrationService implements IIntegrationService {
 	}
     }
 
-    private Organisation createOrganisation(ExtServer extServer, User user, String extCourseId,
-	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean prefix)
+    private Organisation createOrganisation(ExtServer extServer, User user, String extCourseId, String extCourseName,
+	    String countryIsoCode, String langIsoCode, String parentOrgId, Boolean prefix)
 	    throws UserInfoValidationException {
 
 	Organisation org = new Organisation();
@@ -361,7 +365,7 @@ public class IntegrationService implements IIntegrationService {
 	org.setLocale(LanguageUtil.getSupportedLocale(langIsoCode, countryIsoCode));
 
 	org.setEnableCourseNotifications(true);
-	
+
 	// determine whether org will be a group or subgroup
 	Organisation parent = (Organisation) service.findById(Organisation.class, Integer.valueOf(parentOrgId));
 	if (parent != null) {
@@ -454,8 +458,7 @@ public class IntegrationService implements IIntegrationService {
 	return extUserUseridMap;
     }
 
-    private String[] getUserDataFromExtServer(ExtServer extServer, String extUsername)
-	    throws UserInfoFetchException {
+    private String[] getUserDataFromExtServer(ExtServer extServer, String extUsername) throws UserInfoFetchException {
 	// the callback url must contain %username%, %timestamp% and %hash%
 	// eg:
 	// "http://test100.ics.mq.edu.au/webapps/lams-plglamscontent-bb_bb60/UserData?uid=%username%&ts=%timestamp%&hash=%hash%";
@@ -521,14 +524,14 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public List<ExtServer> getAllExtServers() {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("serverTypeId", ExtServer.INTEGRATION_SERVER_TYPE);
 	return service.findByProperties(ExtServer.class, properties);
     }
-    
+
     @Override
     public List<ExtServer> getAllToolConsumers() {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("serverTypeId", ExtServer.LTI_CONSUMER_SERVER_TYPE);
 	return service.findByProperties(ExtServer.class, properties);
     }
@@ -537,7 +540,7 @@ public class IntegrationService implements IIntegrationService {
     @SuppressWarnings("unchecked")
     public List<ExtServerToolAdapterMap> getMappedServers(String toolSig) {
 
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("tool.toolSignature", toolSig);
 	return service.findByProperties(ExtServerToolAdapterMap.class, properties);
     }
@@ -545,7 +548,7 @@ public class IntegrationService implements IIntegrationService {
     @Override
     @SuppressWarnings("unchecked")
     public ExtServerToolAdapterMap getMappedServer(String serverId, String toolSig) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("tool.toolSignature", toolSig);
 	properties.put("extServer.serverid", serverId);
 	List ret = service.findByProperties(ExtServerToolAdapterMap.class, properties);
@@ -578,9 +581,10 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public void createExtServerLessonMap(Long lessonId, ExtServer extServer) {
-	createExtServerLessonMap(lessonId, null, extServer);;
+	createExtServerLessonMap(lessonId, null, extServer);
+	;
     }
-    
+
     @Override
     public void createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServer extServer) {
 	ExtServerLessonMap map = new ExtServerLessonMap();
@@ -622,20 +626,21 @@ public class IntegrationService implements IIntegrationService {
 				.replaceAll("%lessonid%", lessonId.toString()).replaceAll("%timestamp%", timestamp)
 				.replaceAll("%hash%", hash);
 			log.debug(lessonFinishCallbackUrl);
-			
-		    // in case of LTI Tool Consumer - create a new thread to report score back to LMS (in order to do this task in parallel not to slow down later work)
+
+			// in case of LTI Tool Consumer - create a new thread to report score back to LMS (in order to do this task in parallel not to slow down later work)
 		    } else {
-			
+
 			// calculate lesson's MaxPossibleMark
 			Long lessonMaxPossibleMark = toolService.getLessonMaxPossibleMark(lesson);
 			GradebookUserLesson gradebookUserLesson = gradebookService.getGradebookUserLesson(lessonId,
 				user.getUserId());
 			Double userTotalMark = (gradebookUserLesson == null) || (gradebookUserLesson.getMark() == null)
-				? null : gradebookUserLesson.getMark();
-			
+				? null
+				: gradebookUserLesson.getMark();
+
 			final String lessonFinishUrl = server.getLessonFinishUrl();
 			if (userTotalMark != null && StringUtils.isNotBlank(lessonFinishUrl)) {
-			    
+
 			    Double score = lessonMaxPossibleMark.equals(0L) ? 0 : userTotalMark / lessonMaxPossibleMark;
 			    final String scoreStr = (userTotalMark == null) || lessonMaxPossibleMark.equals(0L) ? ""
 				    : score.toString();
@@ -749,7 +754,7 @@ public class IntegrationService implements IIntegrationService {
 	String hash = hash(extServer, hashUsername, timestamp);
 
 	// set values for the parameters
-	HashMap<String, String> params = new HashMap<String, String>();
+	HashMap<String, String> params = new HashMap<>();
 	params.put("uid", hashUsername);
 	params.put("ts", timestamp);
 	params.put("hash", hash);
@@ -760,24 +765,21 @@ public class IntegrationService implements IIntegrationService {
 	BufferedReader isReader = new BufferedReader(new InputStreamReader(is));
 	String str = isReader.readLine();
 
-	JSONArray jsonGroups = new JSONArray(str);
-	List<ExtGroupDTO> extGroups = new ArrayList<ExtGroupDTO>();
-	for (int i = 0; i < jsonGroups.length(); i++) {
-	    JSONObject jsonGroup = jsonGroups.getJSONObject(i);
+	ArrayNode jsonGroups = JsonUtil.readArray(str);
+	List<ExtGroupDTO> extGroups = new ArrayList<>();
+	for (JsonNode jsonGroup : jsonGroups) {
 	    ExtGroupDTO group = new ExtGroupDTO();
-	    group.setGroupName(jsonGroup.getString("groupName"));
-	    group.setGroupId(jsonGroup.getString("groupId"));
+	    group.setGroupName(JsonUtil.optString(jsonGroup, "groupName"));
+	    group.setGroupId(JsonUtil.optString(jsonGroup, "groupId"));
 	    extGroups.add(group);
 
 	    // in case group info is also requested - provide selected groups' ids
 	    if (extGroupIds != null && extGroupIds.length > 0) {
-		ArrayList<User> users = new ArrayList<User>();
+		ArrayList<User> users = new ArrayList<>();
 
-		JSONArray jsonUsers = jsonGroup.getJSONArray("users");
-		for (int j = 0; j < jsonUsers.length(); j++) {
-		    JSONObject jsonUser = jsonUsers.getJSONObject(j);
-
-		    String extUsername = jsonUser.getString("userName");
+		ArrayNode jsonUsers = JsonUtil.optArray(jsonGroup, "users");
+		for (JsonNode jsonUser : jsonUsers) {
+		    String extUsername = JsonUtil.optString(jsonUser, "userName");
 
 		    ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(extServer, extUsername);
 
@@ -788,7 +790,7 @@ public class IntegrationService implements IIntegrationService {
 			// language>,<Locale country>
 			String[] userData = new String[14];
 			for (int k = 1; k <= 14; k++) {
-			    String userProperty = jsonUser.getString("" + k);
+			    String userProperty = JsonUtil.optString(jsonUser, "" + k);
 			    userData[k - 1] = userProperty;
 			}
 			String salt = HashUtil.salt();
@@ -812,35 +814,35 @@ public class IntegrationService implements IIntegrationService {
 
 		group.setUsers(users);
 	    } else {
-		group.setNumberUsers(jsonGroup.getInt("groupSize"));
+		group.setNumberUsers(JsonUtil.optInt(jsonGroup, "groupSize"));
 	    }
 
 	}
 
 	return extGroups;
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public ExtCourseClassMap getExtCourseClassMap(Integer sid, Long lessonId) {
 	Lesson lesson = lessonService.getLesson(lessonId);
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("extServer.sid", sid);
 	properties.put("organisation.organisationId", lesson.getOrganisation().getOrganisationId());
 	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
 	return list == null || list.isEmpty() ? null : list.get(0);
     }
-    
+
     @Override
     public ExtServerLessonMap getLtiConsumerLesson(String serverId, String resourceLinkId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("extServer.serverid", serverId);
 	properties.put("resourceLinkId", resourceLinkId);
 	List<ExtServerLessonMap> list = service.findByProperties(ExtServerLessonMap.class, properties);
-	
+
 	return (list == null || list.isEmpty()) ? null : list.get(0);
     }
-    
+
     private ExtServerLessonMap getExtServerLessonMap(Long lessonId) {
 	List list = service.findByProperty(ExtServerLessonMap.class, "lessonId", lessonId);
 	if ((list == null) || (list.size() == 0)) {
@@ -851,7 +853,7 @@ public class IntegrationService implements IIntegrationService {
     }
 
     private ExtUserUseridMap getExtUserUseridMapByUserId(ExtServer extServer, Integer userId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("extServer.sid", extServer.getSid());
 	properties.put("user.userId", userId);
 	List list = service.findByProperties(ExtUserUseridMap.class, properties);
@@ -878,17 +880,17 @@ public class IntegrationService implements IIntegrationService {
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
-    
+
     public ILessonService getLessonService() {
 	return lessonService;
     }
-    
+
     public void setGradebookService(IGradebookService gradebookService) {
 	this.gradebookService = gradebookService;
     }
-    
+
     public void setToolService(ILamsCoreToolService toolService) {
 	this.toolService = toolService;
     }
-    
+
 }

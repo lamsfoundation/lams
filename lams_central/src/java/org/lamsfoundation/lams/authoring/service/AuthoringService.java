@@ -44,8 +44,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.dao.IBaseDAO;
@@ -107,6 +105,7 @@ import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -114,6 +113,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Manpreet Minhas
@@ -403,7 +404,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	SortedMap<String, ToolOutputDefinition> defns = lamsCoreToolService.getOutputDefinitionsFromTool(toolContentID,
 		definitionType);
 
-	ArrayList<ToolOutputDefinitionDTO> defnDTOList = new ArrayList<ToolOutputDefinitionDTO>(
+	ArrayList<ToolOutputDefinitionDTO> defnDTOList = new ArrayList<>(
 		defns != null ? defns.size() : 0);
 	if (defns != null) {
 	    for (ToolOutputDefinition defn : defns.values()) {
@@ -1027,16 +1028,16 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      */
     private HashMap<Integer, Activity> updateDesignActivities(LearningDesign originalLearningDesign,
 	    LearningDesign newLearningDesign, int uiidOffset, String customCSV) {
-	HashMap<Integer, Activity> newActivities = new HashMap<Integer, Activity>(); // key
+	HashMap<Integer, Activity> newActivities = new HashMap<>(); // key
 	// is
 	// UIID
-	HashMap<Integer, Grouping> newGroupings = new HashMap<Integer, Grouping>(); // key
+	HashMap<Integer, Grouping> newGroupings = new HashMap<>(); // key
 	// is
 	// UIID
 
 	// as we create the activities, we need to record any "first child"
 	// UIID's for the sequence activity to process later
-	Map<Integer, SequenceActivity> firstChildUIIDToSequence = new HashMap<Integer, SequenceActivity>();
+	Map<Integer, SequenceActivity> firstChildUIIDToSequence = new HashMap<>();
 
 	Set oldParentActivities = originalLearningDesign.getParentActivities();
 	if (oldParentActivities != null) {
@@ -1115,7 +1116,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    }
 
 	    if ((activity.getInputActivities() != null) && (activity.getInputActivities().size() > 0)) {
-		Set<Activity> newInputActivities = new HashSet<Activity>();
+		Set<Activity> newInputActivities = new HashSet<>();
 		Iterator inputIter = activity.getInputActivities().iterator();
 		while (inputIter.hasNext()) {
 		    Activity elem = (Activity) inputIter.next();
@@ -1293,7 +1294,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      */
     public void updateDesignCompetences(LearningDesign originalLearningDesign, LearningDesign newLearningDesign,
 	    boolean insert) {
-	HashSet<Competence> newCompeteces = new HashSet<Competence>();
+	HashSet<Competence> newCompeteces = new HashSet<>();
 
 	Set<Competence> oldCompetences = originalLearningDesign.getCompetences();
 	if (oldCompetences != null) {
@@ -1340,7 +1341,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	for (Integer activityKey : newActivities.keySet()) {
 	    Activity activity = newActivities.get(activityKey);
 	    if (activity.isToolActivity()) {
-		Set<CompetenceMapping> newCompetenceMappings = new HashSet<CompetenceMapping>();
+		Set<CompetenceMapping> newCompetenceMappings = new HashSet<>();
 		ToolActivity newToolActivity = (ToolActivity) activity;
 		if (newToolActivity.getCompetenceMappings() != null) {
 		    for (CompetenceMapping competenceMapping : newToolActivity.getCompetenceMappings()) {
@@ -1398,7 +1399,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	for (Integer activityKey : newActivities.keySet()) {
 	    Activity activity = newActivities.get(activityKey);
 	    if (activity.isToolActivity()) {
-		Set<CompetenceMapping> newCompetenceMappings = new HashSet<CompetenceMapping>();
+		Set<CompetenceMapping> newCompetenceMappings = new HashSet<>();
 		ToolActivity newToolActivity = (ToolActivity) activity;
 		if (newToolActivity.getCompetenceMappings() != null) {
 		    for (CompetenceMapping competenceMapping : newToolActivity.getCompetenceMappings()) {
@@ -1479,8 +1480,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     @Override
-    public LearningDesign saveLearningDesignDetails(JSONObject ldJSON)
-	    throws UserException, JSONException, WorkspaceFolderException, ObjectExtractorException, ParseException {
+    public LearningDesign saveLearningDesignDetails(ObjectNode ldJSON)
+	    throws UserException, WorkspaceFolderException, ObjectExtractorException, ParseException {
 	User user = null;
 	Integer userID = AuthoringService.getUserId();
 	if (userID != null) {
@@ -1490,7 +1491,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    throw new UserException("UserID missing or user not found.");
 	}
 
-	Integer workspaceFolderID = ldJSON.getInt("workspaceFolderID");
+	Integer workspaceFolderID = JsonUtil.optInt(ldJSON, "workspaceFolderID");
 	WorkspaceFolder workspaceFolder = null;
 	boolean authorised = false;
 	if (workspaceFolderID != null) {
@@ -1498,7 +1499,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    authorised = workspaceManagementService.isUserAuthorizedToModifyFolderContents(workspaceFolderID, userID);
 	}
 
-	Long learningDesignId = ldJSON.optLong(AttributeNames.PARAM_LEARNINGDESIGN_ID);
+	Long learningDesignId = JsonUtil.optLong(ldJSON, AttributeNames.PARAM_LEARNINGDESIGN_ID);
 	LearningDesign existingLearningDesign = learningDesignId == null ? null
 		: learningDesignDAO.getLearningDesignById(learningDesignId);
 	if (!authorised && (existingLearningDesign != null)
@@ -1517,8 +1518,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	if (extractor.getMode().intValue() == 1) {
 	    // adding the customCSV to the call if it is present
-	    String customCSV = ldJSON.optString("customCSV");
-
+	    String customCSV = JsonUtil.optString(ldJSON, "customCSV");
 	    copyLearningDesignToolContent(design, design, design.getCopyTypeID(), customCSV);
 	}
 
@@ -1551,7 +1551,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     @Override
     public Vector<AuthoringActivityDTO> getToolActivities(Long learningDesignId, String languageCode) {
 	LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignId);
-	Vector<AuthoringActivityDTO> listOfAuthoringActivityDTOs = new Vector<AuthoringActivityDTO>();
+	Vector<AuthoringActivityDTO> listOfAuthoringActivityDTOs = new Vector<>();
 
 	for (Iterator i = learningDesign.getActivities().iterator(); i.hasNext();) {
 	    Activity currentActivity = (Activity) i.next();
@@ -1802,7 +1802,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     @Override
     public List<LearningDesignAccess> updateLearningDesignAccessByUser(Integer userId) {
 	List<LearningDesignAccess> accessList = learningDesignDAO.getAccessByUser(userId);
-	List<LearningDesignAccess> result = new LinkedList<LearningDesignAccess>();
+	List<LearningDesignAccess> result = new LinkedList<>();
 	for (LearningDesignAccess access : accessList) {
 	    LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(access.getLearningDesignId());
 	    if (learningDesign == null) {

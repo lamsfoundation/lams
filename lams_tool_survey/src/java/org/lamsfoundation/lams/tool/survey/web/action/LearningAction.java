@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.survey.web.action;
 
 import java.io.IOException;
@@ -50,9 +49,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionRedirect;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -80,6 +76,10 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  *
  * @author Steve.Ni
@@ -92,7 +92,7 @@ public class LearningAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 
 	String param = mapping.getParameter();
 	// -----------------------Survey Learner function ---------------------------
@@ -148,7 +148,7 @@ public class LearningAction extends Action {
 
 	AnswerForm answerForm = (AnswerForm) form;
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	String sessionMapID = sessionMap.getSessionID();
 	request.getSession().setAttribute(sessionMapID, sessionMap);
 	answerForm.setSessionMapID(sessionMapID);
@@ -307,7 +307,7 @@ public class LearningAction extends Action {
 	    }
 	}
 	// get current question index of total questions
-	int currIdx = new ArrayList<Integer>(surveyItemMap.keySet()).indexOf(questionSeqID) + 1;
+	int currIdx = new ArrayList<>(surveyItemMap.keySet()).indexOf(questionSeqID) + 1;
 	answerForm.setCurrentIdx(currIdx);
 	// failure tolerance
 	if (questionSeqID.equals(surveyItemMap.lastKey())) {
@@ -342,7 +342,7 @@ public class LearningAction extends Action {
 	}
 
 	// get current question index of total questions
-	int currIdx = new ArrayList<Integer>(surveyItemMap.keySet()).indexOf(questionSeqID) + 1;
+	int currIdx = new ArrayList<>(surveyItemMap.keySet()).indexOf(questionSeqID) + 1;
 	answerForm.setCurrentIdx(currIdx);
 
 	if (questionSeqID.equals(surveyItemMap.firstKey())) {
@@ -358,7 +358,7 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 	AnswerForm answerForm = (AnswerForm) form;
 	Integer questionSeqID = answerForm.getQuestionSeqID();
-	
+
 	String sessionMapID = answerForm.getSessionMapID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -366,21 +366,21 @@ public class LearningAction extends Action {
 	SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
 	Collection<AnswerDTO> surveyItemList = surveyItemMap.values();
 
-	if ( surveyItemList.size() < 2 || ( questionSeqID != null && questionSeqID > 0 ) ) {
+	if (surveyItemList.size() < 2 || (questionSeqID != null && questionSeqID > 0)) {
 	    answerForm.setPosition(SurveyConstants.POSITION_ONLY_ONE);
 	} else {
 	    answerForm.setPosition(SurveyConstants.POSITION_FIRST);
 	}
-	if ( questionSeqID == null || questionSeqID <= 0 ) {
+	if (questionSeqID == null || questionSeqID <= 0) {
 	    Boolean onePage = (Boolean) sessionMap.get(SurveyConstants.ATTR_SHOW_ON_ONE_PAGE);
-	    if ( ! onePage && surveyItemList.size() > 0) {
+	    if (!onePage && surveyItemList.size() > 0) {
 		answerForm.setQuestionSeqID(surveyItemMap.firstKey());
 		questionSeqID = surveyItemMap.firstKey();
 	    }
 	}
 
 	// get current question index of total questions
-	int currIdx = new ArrayList<Integer>(surveyItemMap.keySet()).indexOf(questionSeqID) + 1;
+	int currIdx = new ArrayList<>(surveyItemMap.keySet()).indexOf(questionSeqID) + 1;
 	answerForm.setCurrentIdx(currIdx);
 
 	return mapping.findForward(SurveyConstants.SUCCESS);
@@ -397,7 +397,7 @@ public class LearningAction extends Action {
 	SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	List<AnswerDTO> answerDtos = new ArrayList<AnswerDTO>();
+	List<AnswerDTO> answerDtos = new ArrayList<>();
 	for (SurveyQuestion question : surveyItemMap.values()) {
 	    AnswerDTO answerDto = service.getQuestionResponse(sessionId, question.getUid());
 	    answerDtos.add(answerDto);
@@ -417,7 +417,7 @@ public class LearningAction extends Action {
      * Get OpenResponses.
      */
     private ActionForward getOpenResponses(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 	ISurveyService service = getSurveyService();
 
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
@@ -437,22 +437,22 @@ public class LearningAction extends Action {
 
 	List<String> responses = service.getOpenResponsesForTablesorter(sessionId, questionUid, page, size, sorting);
 
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 
-	JSONObject responcedata = new JSONObject();
+	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
 	responcedata.put("total_rows", service.getCountResponsesBySessionAndQuestion(sessionId, questionUid));
 
 	for (String response : responses) {
-	    //JSONArray cell=new JSONArray();
+	    //ArrayNode cell=JsonNodeFactory.instance.arrayNode();
 	    //cell.put(StringEscapeUtils.escapeHtml(user.getFirstName()) + " " + StringEscapeUtils.escapeHtml(user.getLastName()) + " [" + StringEscapeUtils.escapeHtml(user.getLogin()) + "]");
 
-	    JSONObject responseRow = new JSONObject();
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 	    responseRow.put("answer", StringEscapeUtils.escapeCsv(response));
 //	    responseRow.put("attemptTime", response.getAttemptTime());
 
-	    rows.put(responseRow);
+	    rows.add(responseRow);
 	}
-	responcedata.put("rows", rows);
+	responcedata.set("rows", rows);
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responcedata.toString()));
 	return null;
@@ -485,7 +485,7 @@ public class LearningAction extends Action {
 	    return mapping.getInputForward();
 	}
 
-	List<SurveyAnswer> answerList = new ArrayList<SurveyAnswer>();
+	List<SurveyAnswer> answerList = new ArrayList<>();
 	for (AnswerDTO question : surveyItemList) {
 	    if (question.getAnswer() != null) {
 		question.getAnswer().setUser(surveyLearner);
@@ -723,7 +723,7 @@ public class LearningAction extends Action {
 	SortedMap<Integer, AnswerDTO> list = (SortedMap<Integer, AnswerDTO>) sessionMap
 		.get(SurveyConstants.ATTR_QUESTION_LIST);
 	if (list == null) {
-	    list = new TreeMap<Integer, AnswerDTO>(new IntegerComparator());
+	    list = new TreeMap<>(new IntegerComparator());
 	    sessionMap.put(SurveyConstants.ATTR_QUESTION_LIST, list);
 	}
 	return list;

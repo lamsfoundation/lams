@@ -43,9 +43,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
@@ -102,6 +99,9 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The POJO implementation of Voting service. All business logic of Voting tool is implemented in this class. It
@@ -255,21 +255,21 @@ public class VoteServicePOJO
 	    if (voteContent.isAllowText()) {
 		userEntries = voteUsrAttemptDAO.getSessionOpenTextUserEntries(toolSessionUid);
 	    } else {
-		userEntries = new ArrayList<VoteUsrAttempt>(0);
+		userEntries = new ArrayList<>(0);
 	    }
 	}
 
 	Long mapIndex = 1L;
 	int totalStandardVotesCount = 0;
 
-	Map<Long, Long> mapStandardUserCount = new TreeMap<Long, Long>(new VoteComparator());
-	Map<Long, String> mapStandardNominationsHTMLedContent = new TreeMap<Long, String>(new VoteComparator());
-	Map<Long, Long> mapStandardQuestionUid = new TreeMap<Long, Long>(new VoteComparator());
-	Map<Long, Long> mapStandardToolSessionUid = new TreeMap<Long, Long>(new VoteComparator());
-	Map<Long, String> mapStandardNominationsContent = new TreeMap<Long, String>(new VoteComparator());
-	Map<Long, Double> mapVoteRates = new TreeMap<Long, Double>(new VoteComparator());
+	Map<Long, Long> mapStandardUserCount = new TreeMap<>(new VoteComparator());
+	Map<Long, String> mapStandardNominationsHTMLedContent = new TreeMap<>(new VoteComparator());
+	Map<Long, Long> mapStandardQuestionUid = new TreeMap<>(new VoteComparator());
+	Map<Long, Long> mapStandardToolSessionUid = new TreeMap<>(new VoteComparator());
+	Map<Long, String> mapStandardNominationsContent = new TreeMap<>(new VoteComparator());
+	Map<Long, Double> mapVoteRates = new TreeMap<>(new VoteComparator());
 
-	for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+	for (VoteQueContent question : voteContent.getVoteQueContents()) {
 
 	    mapStandardNominationsHTMLedContent.put(mapIndex, question.getQuestion());
 	    String noHTMLNomination = VoteUtils.stripHTML(question.getQuestion());
@@ -322,10 +322,10 @@ public class VoteServicePOJO
     @Override
     public LinkedList<SessionDTO> getSessionDTOs(Long toolContentID) {
 
-	LinkedList<SessionDTO> sessionDTOs = new LinkedList<SessionDTO>();
+	LinkedList<SessionDTO> sessionDTOs = new LinkedList<>();
 
 	VoteContent voteContent = this.getVoteContent(toolContentID);
-	for (VoteSession session : (Set<VoteSession>) voteContent.getVoteSessions()) {
+	for (VoteSession session : voteContent.getVoteSessions()) {
 
 	    SessionDTO sessionDTO = new SessionDTO();
 	    sessionDTO.setSessionId(session.getVoteSessionId().toString());
@@ -336,13 +336,13 @@ public class VoteServicePOJO
 	    Long mapIndex = 1L;
 	    int totalStandardVotesCount = 0;
 
-	    Map<Long, Double> mapVoteRates = new TreeMap<Long, Double>(new VoteComparator());
-	    Map<Long, Long> mapStandardUserCount = new TreeMap<Long, Long>(new VoteComparator());
-	    Map<Long, String> mapStandardNominationsHTMLedContent = new TreeMap<Long, String>(new VoteComparator());
-	    Map<Long, Long> mapStandardQuestionUid = new TreeMap<Long, Long>(new VoteComparator());
-	    Map<Long, Long> mapStandardToolSessionUid = new TreeMap<Long, Long>(new VoteComparator());
+	    Map<Long, Double> mapVoteRates = new TreeMap<>(new VoteComparator());
+	    Map<Long, Long> mapStandardUserCount = new TreeMap<>(new VoteComparator());
+	    Map<Long, String> mapStandardNominationsHTMLedContent = new TreeMap<>(new VoteComparator());
+	    Map<Long, Long> mapStandardQuestionUid = new TreeMap<>(new VoteComparator());
+	    Map<Long, Long> mapStandardToolSessionUid = new TreeMap<>(new VoteComparator());
 
-	    for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+	    for (VoteQueContent question : voteContent.getVoteQueContents()) {
 		mapStandardNominationsHTMLedContent.put(mapIndex, question.getQuestion());
 
 		int votesCount = voteUsrAttemptDAO.getStandardAttemptsForQuestionContentAndSessionUid(question.getUid(),
@@ -394,21 +394,22 @@ public class VoteServicePOJO
 	    totalSessionDTO.setSessionId("0");
 	    totalSessionDTO.setSessionName(messageService.getMessage("label.all.groups.total"));
 
-	    List<VoteMonitoredAnswersDTO> totalOpenVotes = new ArrayList<VoteMonitoredAnswersDTO>();
+	    List<VoteMonitoredAnswersDTO> totalOpenVotes = new ArrayList<>();
 	    int totalPotentialUserCount = 0;
 	    int totalCompletedSessionUserCount = 0;
 	    int allSessionsVotesCount = 0;
-	    Map<Long, Long> totalMapStandardUserCount = new TreeMap<Long, Long>(new VoteComparator());
+	    Map<Long, Long> totalMapStandardUserCount = new TreeMap<>(new VoteComparator());
 	    for (SessionDTO sessionDTO : sessionDTOs) {
 
 		totalPotentialUserCount += sessionDTO.getSessionUserCount();
 		totalCompletedSessionUserCount += sessionDTO.getCompletedSessionUserCount();
 
 		Long mapIndex = 1L;
-		for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+		for (VoteQueContent question : voteContent.getVoteQueContents()) {
 		    Long votesCount = sessionDTO.getMapStandardUserCount().get(mapIndex);
 		    Long oldTotalVotesCount = (totalMapStandardUserCount.get(mapIndex) != null)
-			    ? totalMapStandardUserCount.get(mapIndex) : 0L;
+			    ? totalMapStandardUserCount.get(mapIndex)
+			    : 0L;
 		    totalMapStandardUserCount.put(mapIndex, oldTotalVotesCount + votesCount);
 
 		    allSessionsVotesCount += votesCount;
@@ -421,7 +422,8 @@ public class VoteServicePOJO
 		if (voteContent.isAllowText()) {
 		    Long votesCount = sessionDTO.getMapStandardUserCount().get(mapIndex);
 		    Long oldTotalVotesCount = (totalMapStandardUserCount.get(mapIndex) != null)
-			    ? totalMapStandardUserCount.get(mapIndex) : 0L;
+			    ? totalMapStandardUserCount.get(mapIndex)
+			    : 0L;
 		    totalMapStandardUserCount.put(mapIndex, oldTotalVotesCount + votesCount);
 
 		    allSessionsVotesCount += votesCount;
@@ -442,9 +444,9 @@ public class VoteServicePOJO
 
 	    // All groups total -- totalMapVoteRates part
 	    Long mapIndex = 1L;
-	    Map<Long, Double> totalMapVoteRates = new TreeMap<Long, Double>(new VoteComparator());
+	    Map<Long, Double> totalMapVoteRates = new TreeMap<>(new VoteComparator());
 	    int totalStandardVotesCount = 0;
-	    for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+	    for (VoteQueContent question : voteContent.getVoteQueContents()) {
 
 		Long votesCount = totalMapStandardUserCount.get(mapIndex);
 
@@ -474,10 +476,10 @@ public class VoteServicePOJO
     @Override
     public SortedSet<SummarySessionDTO> getMonitoringSessionDTOs(Long toolContentID) {
 
-	SortedSet<SummarySessionDTO> sessionDTOs = new TreeSet<SummarySessionDTO>();
+	SortedSet<SummarySessionDTO> sessionDTOs = new TreeSet<>();
 
 	VoteContent voteContent = this.getVoteContent(toolContentID);
-	for (VoteSession session : (Set<VoteSession>) voteContent.getVoteSessions()) {
+	for (VoteSession session : voteContent.getVoteSessions()) {
 
 	    SummarySessionDTO sessionDTO = new SummarySessionDTO();
 	    sessionDTO.setSessionName(session.getSession_name());
@@ -489,7 +491,7 @@ public class VoteServicePOJO
 
 	    int totalStandardVotesCount = 0;
 
-	    for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+	    for (VoteQueContent question : voteContent.getVoteQueContents()) {
 
 		SessionNominationDTO nominationDTO = new SessionNominationDTO();
 		nominationDTO.setQuestionUid(question.getUid());
@@ -527,7 +529,7 @@ public class VoteServicePOJO
 	    totalSessionDTO.setSessionName(messageService.getMessage("label.all.groups.total"));
 	    totalSessionDTO.setNominations(new TreeSet<SessionNominationDTO>());
 
-	    HashMap<Long, SessionNominationDTO> nominationsTotals = new HashMap<Long, SessionNominationDTO>();
+	    HashMap<Long, SessionNominationDTO> nominationsTotals = new HashMap<>();
 	    int totalOpenVotes = 0;
 	    int totalVotes = 0;
 	    for (SummarySessionDTO sessionDTO : sessionDTOs) {
@@ -585,7 +587,7 @@ public class VoteServicePOJO
     public List<VoteMonitoredAnswersDTO> getOpenVotes(Long voteContentUid, Long currentSessionId, Long userId) {
 	Set<String> userEntries = voteUsrAttemptDAO.getUserEntries(voteContentUid);
 
-	List<VoteMonitoredAnswersDTO> monitoredAnswersDTOs = new LinkedList<VoteMonitoredAnswersDTO>();
+	List<VoteMonitoredAnswersDTO> monitoredAnswersDTOs = new LinkedList<>();
 	for (String userEntry : userEntries) {
 
 	    if ((userEntry == null) || (userEntry.length() == 0)) {
@@ -596,7 +598,7 @@ public class VoteServicePOJO
 	    voteMonitoredAnswersDTO.setQuestion(userEntry);
 
 	    List<VoteUsrAttempt> userAttempts = voteUsrAttemptDAO.getUserAttempts(voteContentUid, userEntry);
-	    List<VoteMonitoredUserDTO> monitoredUserContainerDTOs = new LinkedList<VoteMonitoredUserDTO>();
+	    List<VoteMonitoredUserDTO> monitoredUserContainerDTOs = new LinkedList<>();
 
 	    for (VoteUsrAttempt voteUsrAttempt : userAttempts) {
 		VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
@@ -666,7 +668,7 @@ public class VoteServicePOJO
 
     @Override
     public List<ReflectionDTO> getReflectionData(VoteContent voteContent, Long userID) {
-	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<ReflectionDTO>();
+	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<>();
 
 	if (userID == null) {
 	    for (Iterator<VoteSession> sessionIter = voteContent.getVoteSessions().iterator(); sessionIter.hasNext();) {
@@ -746,7 +748,7 @@ public class VoteServicePOJO
 	List<VoteUsrAttempt> list = voteUsrAttemptDAO.getAttemptsForUserAndSessionUseOpenAnswer(userUid, sessionUid);
 
 	//String openAnswer = "";
-	Set<String> userEntries = new HashSet<String>();
+	Set<String> userEntries = new HashSet<>();
 	if ((list != null) && (list.size() > 0)) {
 	    Iterator<VoteUsrAttempt> listIterator = list.iterator();
 	    while (listIterator.hasNext()) {
@@ -831,7 +833,7 @@ public class VoteServicePOJO
 
     @Override
     public Map<String, String> buildQuestionMap(VoteContent voteContent, Collection<String> checkedOptions) {
-	Map<String, String> mapQuestionsContent = new TreeMap<String, String>(new VoteComparator());
+	Map<String, String> mapQuestionsContent = new TreeMap<>(new VoteComparator());
 	Set<VoteQueContent> questions = voteContent.getVoteQueContents();
 
 	// should we add questions from data flow from other activities?
@@ -1210,7 +1212,7 @@ public class VoteServicePOJO
 	    List<VoteQuestionDTO> questionDTOs, List<VoteQuestionDTO> deletedQuestions) {
 
 	// create list of modified questions
-	List<VoteQuestionDTO> modifiedQuestions = new ArrayList<VoteQuestionDTO>();
+	List<VoteQuestionDTO> modifiedQuestions = new ArrayList<>();
 	for (VoteQueContent oldQuestion : oldQuestions) {
 	    for (VoteQuestionDTO questionDTO : questionDTOs) {
 		if (oldQuestion.getUid().equals(questionDTO.getUid())) {
@@ -1313,7 +1315,7 @@ public class VoteServicePOJO
 	    return;
 	}
 
-	for (VoteSession session : (Set<VoteSession>) voteContent.getVoteSessions()) {
+	for (VoteSession session : voteContent.getVoteSessions()) {
 	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getVoteSessionId(),
 		    CoreNotebookConstants.NOTEBOOK_TOOL, VoteAppConstants.MY_SIGNATURE);
 	    for (NotebookEntry entry : entries) {
@@ -1337,7 +1339,7 @@ public class VoteServicePOJO
 	    return;
 	}
 
-	for (VoteSession session : (Set<VoteSession>) voteContent.getVoteSessions()) {
+	for (VoteSession session : voteContent.getVoteSessions()) {
 	    VoteQueUsr user = voteUserDAO.getVoteUserBySession(userId.longValue(), session.getUid());
 	    if (user != null) {
 		voteUsrAttemptDAO.removeAttemptsForUserandSession(user.getUid(), session.getUid());
@@ -1553,10 +1555,10 @@ public class VoteServicePOJO
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
@@ -1583,7 +1585,7 @@ public class VoteServicePOJO
     @Override
     public boolean isReadOnly(Long toolContentId) {
 	VoteContent voteContent = voteContentDAO.getVoteContentByContentId(toolContentId);
-	for (VoteSession session : (Set<VoteSession>) voteContent.getVoteSessions()) {
+	for (VoteSession session : voteContent.getVoteSessions()) {
 	    if (!session.getVoteQueUsers().isEmpty()) {
 		return true;
 	    }
@@ -1604,7 +1606,7 @@ public class VoteServicePOJO
 
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -1960,35 +1962,36 @@ public class VoteServicePOJO
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	
 	Date startDate = null;
 	Date endDate = null;
 	Set<VoteUsrAttempt> attempts = learner.getVoteUsrAttempts(); // expect only one
 	for (VoteUsrAttempt item : attempts) {
 	    Date newDate = item.getAttemptTime();
 	    if (newDate != null) {
-		if (startDate == null || newDate.before(startDate))
+		if (startDate == null || newDate.before(startDate)) {
 		    startDate = newDate;
-		if (endDate == null || newDate.after(endDate))
+		}
+		if (endDate == null || newDate.after(endDate)) {
 		    endDate = newDate;
+		}
 	    }
 	}
 
-	if (learner.isResponseFinalised())
+	if (learner.isResponseFinalised()) {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, endDate);
-	else
+	} else {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
+	}
     }
 
     // ****************** REST methods *************************
 
     /**
      * Rest call to create a new Vote content. Required fields in toolContentJSON: "title", "instructions", "answers".
-     * The "answers" entry should be a JSONArray of Strings.
+     * The "answers" entry should be a ArrayNode of Strings.
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 	if (VoteServicePOJO.logger.isDebugEnabled()) {
 	    logger.debug("Rest call to create a new Vote content for userID" + userID + " and toolContentID "
 		    + toolContentID);
@@ -1997,39 +2000,42 @@ public class VoteServicePOJO
 
 	VoteContent vote = new VoteContent();
 	vote.setVoteContentId(toolContentID);
-	vote.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	vote.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	vote.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	vote.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 	vote.setCreatedBy(userID);
 	vote.setCreationDate(updateDate);
 	vote.setUpdateDate(updateDate);
 
-	vote.setAllowText(JsonUtil.opt(toolContentJSON, "allowText", Boolean.FALSE));
+	vote.setAllowText(JsonUtil.optBoolean(toolContentJSON, "allowText", Boolean.FALSE));
 	vote.setDefineLater(false);
-	vote.setLockOnFinish(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	vote.setMaxNominationCount(JsonUtil.opt(toolContentJSON, "maxNominations", "1"));
-	vote.setMinNominationCount(JsonUtil.opt(toolContentJSON, "minNominations", "1"));
-	vote.setReflect(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	vote.setReflectionSubject(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
-	vote.setShowResults(JsonUtil.opt(toolContentJSON, "showResults", Boolean.TRUE));
+	vote.setLockOnFinish(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	vote.setMaxNominationCount(JsonUtil.optString(toolContentJSON, "maxNominations", "1"));
+	vote.setMinNominationCount(JsonUtil.optString(toolContentJSON, "minNominations", "1"));
+	vote.setReflect(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	vote.setReflectionSubject(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	vote.setShowResults(JsonUtil.optBoolean(toolContentJSON, "showResults", Boolean.TRUE));
 	vote.setUseSelectLeaderToolOuput(
-		JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+		JsonUtil.optBoolean(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
 
 	// Is the data flow functionality actually used anywhere?
-	vote.setAssignedDataFlowObject((Boolean) JsonUtil.opt(toolContentJSON, "assignedDataFlowObject", null));
-	vote.setExternalInputsAdded((Short) JsonUtil.opt(toolContentJSON, "externalInputsAdded", null));
-	vote.setMaxExternalInputs(JsonUtil.opt(toolContentJSON, "maxInputs", Short.valueOf("0")));
+	vote.setAssignedDataFlowObject(JsonUtil.optBoolean(toolContentJSON, "assignedDataFlowObject"));
+	Integer externalInputsAdded = JsonUtil.optInt(toolContentJSON, "externalInputsAdded");
+	if (externalInputsAdded != null) {
+	    vote.setExternalInputsAdded(externalInputsAdded.shortValue());
+	}
+	vote.setMaxExternalInputs(JsonUtil.optInt(toolContentJSON, "maxInputs", 0).shortValue());
 
 	// submissionDeadline is set in monitoring
 
 	// **************************** Nomination entries *********************
-	JSONArray answers = toolContentJSON.getJSONArray(RestTags.ANSWERS);
+	ArrayNode answers = JsonUtil.optArray(toolContentJSON, RestTags.ANSWERS);
 	//Set newAnswersSet = vote.getVoteQueContents();
-	for (int i = 0; i < answers.length(); i++) {
+	for (int i = 0; i < answers.size(); i++) {
 	    //  String answerJSONData = (String) answers.get(i);
 	    VoteQueContent answer = new VoteQueContent();
 	    answer.setDisplayOrder(i + 1);
 	    answer.setMcContent(vote);
-	    answer.setQuestion((String) answers.get(i));
+	    answer.setQuestion(answers.get(i).asText());
 	    answer.setVoteContent(vote);
 	    vote.getVoteQueContents().add(answer);
 	}

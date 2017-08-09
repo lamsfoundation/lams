@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.web.action;
 
 import java.io.IOException;
@@ -54,8 +53,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -67,7 +64,6 @@ import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
@@ -89,6 +85,9 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Andrey Balan
  */
@@ -99,7 +98,7 @@ public class LearningAction extends Action {
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, IllegalAccessException,
-	    InstantiationException, InvocationTargetException, NoSuchMethodException, JSONException {
+	    InstantiationException, InvocationTargetException, NoSuchMethodException {
 
 	String param = mapping.getParameter();
 	if (param.equals("start")) {
@@ -158,7 +157,7 @@ public class LearningAction extends Action {
 	    InvocationTargetException, NoSuchMethodException {
 
 	// initialize Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	// save toolContentID into HTTPSession
@@ -198,22 +197,25 @@ public class LearningAction extends Action {
 
 		return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER);
 	    }
-	    
+
 	    // forwards to the waitForLeader pages
 	    boolean isNonLeader = !user.getUserId().equals(groupLeader.getUserId());
 	    if (assessment.getTimeLimit() != 0 && isNonLeader && !user.isSessionFinished()) {
-		AssessmentResult lastLeaderResult = service.getLastAssessmentResult(assessment.getUid(), groupLeader.getUserId());
+		AssessmentResult lastLeaderResult = service.getLastAssessmentResult(assessment.getUid(),
+			groupLeader.getUserId());
 
 		//show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK button to launch time limit
 		if (lastLeaderResult == null || lastLeaderResult.getTimeLimitLaunchedDate() == null) {
-		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader.launch.time.limit");
+		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY,
+			    "label.waiting.for.leader.launch.time.limit");
 		    return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER_TIME_LIMIT);
-		}		
-		
+		}
+
 		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
 		boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(assessment, groupLeader);
 		if (isTimeLimitExceeded && !groupLeader.isSessionFinished()) {
-		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader.finish");
+		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY,
+			    "label.waiting.for.leader.finish");
 		    return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER_TIME_LIMIT);
 		}
 	    }
@@ -231,10 +233,10 @@ public class LearningAction extends Action {
 	boolean isUserLeader = service.isUserGroupLeader(user, new Long(toolSessionId));
 	sessionMap.put(AssessmentConstants.ATTR_IS_USER_LEADER, isUserLeader);
 
-	Set<QuestionReference> questionReferences = new TreeSet<QuestionReference>(new SequencableComparator());
+	Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 	questionReferences.addAll(assessment.getQuestionReferences());
-	HashMap<Long, AssessmentQuestion> questionToReferenceMap = new HashMap<Long, AssessmentQuestion>();
-	ArrayList<AssessmentQuestion> takenQuestion = new ArrayList<AssessmentQuestion>();
+	HashMap<Long, AssessmentQuestion> questionToReferenceMap = new HashMap<>();
+	ArrayList<AssessmentQuestion> takenQuestion = new ArrayList<>();
 
 	//add non-random questions
 	for (QuestionReference questionReference : questionReferences) {
@@ -289,7 +291,7 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ON, assessment.isReflectOnActivity());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_INSTRUCTION, assessment.getReflectInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ENTRY, entryText);
-	
+
 	//time limit
 	boolean isTimeLimitEnabled = hasEditRight && !showResults && assessment.getTimeLimit() != 0;
 	long secondsLeft = isTimeLimitEnabled ? service.getSecondsLeft(assessment, user) : 0;
@@ -325,10 +327,10 @@ public class LearningAction extends Action {
 	}
 
 	//sort questions
-	LinkedList<QuestionDTO> questionDtos = new LinkedList<QuestionDTO>();
+	LinkedList<QuestionDTO> questionDtos = new LinkedList<>();
 	for (QuestionReference questionReference : questionReferences) {
 	    AssessmentQuestion question = questionToReferenceMap.get(questionReference.getUid());
-	    
+
 	    QuestionDTO questionDto = question.getQuestionDTO();
 	    questionDto.setGrade(questionReference.getDefaultGrade());
 
@@ -337,45 +339,46 @@ public class LearningAction extends Action {
 
 	// shuffling
 	if (assessment.isShuffled()) {
-	    ArrayList<QuestionDTO> shuffledList = new ArrayList<QuestionDTO>(questionDtos);
+	    ArrayList<QuestionDTO> shuffledList = new ArrayList<>(questionDtos);
 	    Collections.shuffle(shuffledList);
-	    questionDtos = new LinkedList<QuestionDTO>(shuffledList);
+	    questionDtos = new LinkedList<>(shuffledList);
 	}
-	for (QuestionDTO questionDto : questionDtos) {	    
+	for (QuestionDTO questionDto : questionDtos) {
 	    if (questionDto.isShuffle() || (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING)) {
-		ArrayList<OptionDTO> shuffledList = new ArrayList<OptionDTO>(questionDto.getOptionDtos());
+		ArrayList<OptionDTO> shuffledList = new ArrayList<>(questionDto.getOptionDtos());
 		Collections.shuffle(shuffledList);
-		questionDto.setOptionDtos(new LinkedHashSet<OptionDTO>(shuffledList));
+		questionDto.setOptionDtos(new LinkedHashSet<>(shuffledList));
 	    }
 	    if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
 		//sort answer options alphanumerically (as per LDEV-4326)
-		ArrayList<OptionDTO> optionsSortedByOptionString = new ArrayList<OptionDTO>(
+		ArrayList<OptionDTO> optionsSortedByOptionString = new ArrayList<>(
 			questionDto.getOptionDtos());
 		optionsSortedByOptionString.sort(new Comparator<OptionDTO>() {
 		    @Override
 		    public int compare(OptionDTO o1, OptionDTO o2) {
 			String optionString1 = o1.getOptionString() != null ? o1.getOptionString() : "";
 			String optionString2 = o2.getOptionString() != null ? o2.getOptionString() : "";
-			
+
 			return AlphanumComparator.compareAlphnumerically(optionString1, optionString2);
 		    }
 		});
-		questionDto.setMatchingPairOptions(new LinkedHashSet<OptionDTO>(optionsSortedByOptionString));
+		questionDto.setMatchingPairOptions(new LinkedHashSet<>(optionsSortedByOptionString));
 	    }
 	}
 
 	//paging
-	List<Set<QuestionDTO>> pagedQuestionDtos = new ArrayList<Set<QuestionDTO>>();
+	List<Set<QuestionDTO>> pagedQuestionDtos = new ArrayList<>();
 	int maxQuestionsPerPage = ((assessment.getQuestionsPerPage() != 0) && hasEditRight)
-		? assessment.getQuestionsPerPage() : questionDtos.size();
-	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<QuestionDTO>();
+		? assessment.getQuestionsPerPage()
+		: questionDtos.size();
+	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<>();
 	pagedQuestionDtos.add(questionsForOnePage);
 	int count = 0;
 	for (QuestionDTO questionDto : questionDtos) {
 	    questionsForOnePage.add(questionDto);
 	    count++;
 	    if ((questionsForOnePage.size() == maxQuestionsPerPage) && (count != questionDtos.size())) {
-		questionsForOnePage = new LinkedHashSet<QuestionDTO>();
+		questionsForOnePage = new LinkedHashSet<>();
 		pagedQuestionDtos.add(questionsForOnePage);
 	    }
 	}
@@ -387,7 +390,7 @@ public class LearningAction extends Action {
 
 	// loadupLastAttempt for display purpose
 	loadupLastAttempt(sessionMap);
-	
+
 	if (showResults) {
 
 	    // display results page
@@ -403,12 +406,12 @@ public class LearningAction extends Action {
 	    return mapping.findForward(AssessmentConstants.LEARNING);
 	}
     }
- 
+
     /**
      * Checks Leader Progress
      */
     private ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 
 	IAssessmentService service = getAssessmentService();
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -420,32 +423,36 @@ public class LearningAction extends Action {
 	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(session.getAssessment(), leader);
 	boolean isLeaderResponseFinalized = leader.isSessionFinished();
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put("isPageRefreshRequested", isLeaderResponseFinalized || isTimeLimitExceeded);
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
+	ObjectNode.put("isPageRefreshRequested", isLeaderResponseFinalized || isTimeLimitExceeded);
 	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 	return null;
     }
 
     /**
      * Shows next page. It's available only to leaders as non-leaders see all questions on one page.
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     *
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
     private ActionForward nextPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	    HttpServletResponse response)
+	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	return nextPage(mapping, request, false, -1);
     }
-    
+
     /**
      * Auxiliary method to be called by nextPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-     * HttpServletResponse response) or submitAll. 
-     * 
+     * HttpServletResponse response) or submitAll.
+     *
      * @param mapping
      * @param request
-     * @param isAnswersValidationFailed submitAll() method may set it as true in case some of the pages miss required answers
-     * @param pageNumberWithUnasweredQuestions page number with questions required to be answered
+     * @param isAnswersValidationFailed
+     *            submitAll() method may set it as true in case some of the pages miss required answers
+     * @param pageNumberWithUnasweredQuestions
+     *            page number with questions required to be answered
      * @return
      */
     private ActionForward nextPage(ActionMapping mapping, HttpServletRequest request, boolean isAnswersValidationFailed,
@@ -481,7 +488,7 @@ public class LearningAction extends Action {
 	if (showResults) {
 	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	    return mapping.findForward(AssessmentConstants.SHOW_RESULTS);
-	    
+
 	} else {
 	    //get user answers from request and store them into sessionMap
 	    storeUserAnswersIntoSessionMap(request, oldPageNumber);
@@ -490,7 +497,7 @@ public class LearningAction extends Action {
 
 	    long secondsLeft = service.getSecondsLeft(assessment, user);
 	    request.setAttribute(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
-	    
+
 	    // use redirect to prevent form resubmission
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(AssessmentConstants.LEARNING));
 	    redirect.addParameter(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -501,12 +508,14 @@ public class LearningAction extends Action {
 
     /**
      * Handling submittion of MarkHedging type of Questions (in case of leader aware tool).
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     *
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
     private ActionForward submitSingleMarkHedgingQuestion(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	    HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	IAssessmentService service = getAssessmentService();
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -523,7 +532,8 @@ public class LearningAction extends Action {
 
 	// store results from sessionMap into DB
 	Long singleMarkHedgingQuestionUid = WebUtil.readLongParam(request, "singleMarkHedgingQuestionUid");
-	boolean isResultsStored = service.storeUserAnswers(assessment, userId, pagedQuestionDtos, singleMarkHedgingQuestionUid, false);
+	boolean isResultsStored = service.storeUserAnswers(assessment, userId, pagedQuestionDtos,
+		singleMarkHedgingQuestionUid, false);
 	// result was not stored in case user was prohibited from submitting (or autosubmitting) answers (e.g. when
 	// using 2 browsers). Then show last stored results
 	if (!isResultsStored) {
@@ -556,12 +566,14 @@ public class LearningAction extends Action {
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     *
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
     private ActionForward submitAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	    HttpServletResponse response)
+	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -593,7 +605,7 @@ public class LearningAction extends Action {
 
 	// populate info for displaying results page
 	showResults(mapping, sessionMap);
-	
+
 	//use redirect to prevent form resubmission
 	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(AssessmentConstants.SHOW_RESULTS));
 	redirect.addParameter(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -616,20 +628,20 @@ public class LearningAction extends Action {
 	AssessmentUser assessmentUser = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
 	Long userId = assessmentUser.getUserId();
 	service.unsetSessionFinished(toolSessionId, userId);
-	
+
 	Date lastAttemptStartingDate = service.getLastAssessmentResult(assessment.getUid(), userId).getStartDate();
-	
+
 	// set attempt started: create a new one + mark previous as not being the latest any longer
 	service.setAttemptStarted(assessment, assessmentUser, toolSessionId);
-	
+
 	// in case of content was modified in monitor - redirect to start.do in order to refresh info from the DB
 	if (assessment.isContentModifiedInMonitor(lastAttemptStartingDate)) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("learningStartMethod"));
 	    redirect.addParameter(AttributeNames.PARAM_MODE, mode.toString());
 	    redirect.addParameter(AssessmentConstants.PARAM_TOOL_SESSION_ID, toolSessionId);
 	    return redirect;
-	
-	//otherwise use data from SessionMap
+
+	    //otherwise use data from SessionMap
 	} else {
 
 	    sessionMap.put(AssessmentConstants.ATTR_SHOW_RESULTS, false);
@@ -714,7 +726,7 @@ public class LearningAction extends Action {
 
 	int optionIndex = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
-	    List<OptionDTO> rList = new ArrayList<OptionDTO>(optionDtoList);
+	    List<OptionDTO> rList = new ArrayList<>(optionDtoList);
 
 	    // get current and the target item, and switch their sequnece
 	    OptionDTO option = rList.remove(optionIndex);
@@ -725,7 +737,7 @@ public class LearningAction extends Action {
 	    }
 
 	    // put back list
-	    optionDtoList = new LinkedHashSet<OptionDTO>(rList);
+	    optionDtoList = new LinkedHashSet<>(rList);
 	    questionDto.setOptionDtos(optionDtoList);
 	}
 
@@ -736,12 +748,14 @@ public class LearningAction extends Action {
 
     /**
      * auto saves responses
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     *
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
     private ActionForward autoSaveAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	    HttpServletResponse response)
+	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	IAssessmentService service = getAssessmentService();
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -755,7 +769,7 @@ public class LearningAction extends Action {
 
 	return null;
     }
-    
+
     /**
      * Stores date when user has started activity with time limit
      */
@@ -765,11 +779,11 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
-	
+
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, false);
-	
+
 	service.launchTimeLimit(assessmentUid, userId);
 
 	return null;
@@ -844,7 +858,8 @@ public class LearningAction extends Action {
      * Get back user answers from request and store it into sessionMap.
      *
      * @param request
-     * @param pageNumber number of the page to process
+     * @param pageNumber
+     *            number of the page to process
      */
     private void storeUserAnswersIntoSessionMap(HttpServletRequest request, int pageNumber) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
@@ -963,7 +978,8 @@ public class LearningAction extends Action {
 		int questionType = questionDto.getType();
 
 		//enforce all hedging marks question type to be answered as well
-		if (questionDto.isAnswerRequired() || (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)) {
+		if (questionDto.isAnswerRequired()
+			|| (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)) {
 
 		    boolean isAnswered = false;
 
@@ -1045,7 +1061,7 @@ public class LearningAction extends Action {
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	IAssessmentService service = getAssessmentService();
-	
+
 	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userId);
 	if (dbResultCount > 0) {
 
@@ -1165,7 +1181,7 @@ public class LearningAction extends Action {
 			questionDto.setPenalty(questionResult.getPenalty());
 
 			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-			    
+
 			    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
 				if (optionDto.getUid().equals(optionAnswer.getOptionUid())) {
 				    optionDto.setAnswerBoolean(optionAnswer.getAnswerBoolean());
@@ -1177,7 +1193,7 @@ public class LearningAction extends Action {
 
 			//sort ordering type of question in order to show how learner has sorted them
 			if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-			    
+
 			    //don't sort ordering type of questions that haven't been submitted to not break their shuffled order
 			    boolean isOptionAnswersNeverSubmitted = true;
 			    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
@@ -1187,7 +1203,7 @@ public class LearningAction extends Action {
 			    }
 
 			    if (!isOptionAnswersNeverSubmitted) {
-				TreeSet<OptionDTO> orderedSet = new TreeSet<OptionDTO>(new AnswerIntComparator());
+				TreeSet<OptionDTO> orderedSet = new TreeSet<>(new AnswerIntComparator());
 				orderedSet.addAll(questionDto.getOptionDtos());
 				questionDto.setOptionDtos(orderedSet);
 			    }
@@ -1213,12 +1229,14 @@ public class LearningAction extends Action {
 
     /**
      * Store user answers in DB in last unfinished attempt and notify teachers about it.
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     *
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
-    private boolean storeUserAnswersIntoDatabase(SessionMap<String, Object> sessionMap, boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-	
+    private boolean storeUserAnswersIntoDatabase(SessionMap<String, Object> sessionMap, boolean isAutosave)
+	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	IAssessmentService service = getAssessmentService();
@@ -1226,7 +1244,7 @@ public class LearningAction extends Action {
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
-	
+
 	boolean isResultsStored = service.storeUserAnswers(assessment, userId, pagedQuestionDtos, null, isAutosave);
 
 	// notify teachers
@@ -1266,8 +1284,8 @@ public class LearningAction extends Action {
     private AssessmentUser getSpecifiedUser(IAssessmentService service, Long sessionId, Integer userId) {
 	AssessmentUser assessmentUser = service.getUserByIDAndSession(new Long(userId.intValue()), sessionId);
 	if (assessmentUser == null) {
-	    LearningAction.log
-		    .error("Unable to find specified user for assessment activity. Screens are likely to fail. SessionId="
+	    LearningAction.log.error(
+		    "Unable to find specified user for assessment activity. Screens are likely to fail. SessionId="
 			    + sessionId + " UserId=" + userId);
 	}
 	return assessmentUser;

@@ -14,8 +14,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -30,6 +28,10 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -55,7 +57,7 @@ public class FindUserLessonsAction extends DispatchAction {
 	}
 
 	String query = null;
-	List<User> users = new LinkedList<User>();
+	List<User> users = new LinkedList<>();
 	Organisation group = (Organisation) getUserManagementService().findById(Organisation.class, courseID);
 	// if an exact user was chosen from autocomplete list, display lessons just for him
 	Integer userID = WebUtil.readIntParam(request, "userID", true);
@@ -71,13 +73,13 @@ public class FindUserLessonsAction extends DispatchAction {
 	    }
 	}
 
-	Map<User, List<LessonDTO>> userLessonsMap = new HashMap<User, List<LessonDTO>>();
+	Map<User, List<LessonDTO>> userLessonsMap = new HashMap<>();
 	for (User user : users) {
 	    // get all lessons for 'user' in 'group' and add to lessons map
 	    List<Lesson> lessons = getLessonService().getLessonsByGroupAndUser(user.getUserId(),
 		    group.getOrganisationId());
 
-	    List<LessonDTO> lessonDTOs = new ArrayList<LessonDTO>();
+	    List<LessonDTO> lessonDTOs = new ArrayList<>();
 	    for (Lesson lesson : lessons) {
 		LessonDTO dto = new LessonDTO(lesson);
 		// flag to display monitor link only if user is staff member of lesson
@@ -108,12 +110,12 @@ public class FindUserLessonsAction extends DispatchAction {
 	Organisation rootOrg = (Organisation) getUserManagementService().findById(Organisation.class, courseID);
 
 	List<User> userSet = getUserManagementService().findUsers(query, rootOrg.getOrganisationId(), true);
-	JSONArray jsonArray = new JSONArray();
+	ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode();
 	for (User user : userSet) {
-	    JSONObject jsonObject = new JSONObject();
+	    ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 	    jsonObject.put("label", user.getFirstName() + " " + user.getLastName());
 	    jsonObject.put("value", user.getUserId());
-	    jsonArray.put(jsonObject);
+	    jsonArray.add(jsonObject);
 	}
 
 	response.setContentType("application/json;charset=utf-8");

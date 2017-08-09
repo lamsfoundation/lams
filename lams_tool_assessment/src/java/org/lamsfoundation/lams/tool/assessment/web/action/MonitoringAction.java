@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.web.action;
 
 import java.io.IOException;
@@ -47,9 +46,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -72,12 +68,17 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
@@ -86,7 +87,7 @@ public class MonitoringAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
 
 	String param = mapping.getParameter();
@@ -126,7 +127,7 @@ public class MonitoringAction extends Action {
 	if (param.equals("statistic")) {
 	    return statistic(mapping, form, request, response);
 	}
-	
+
 	return mapping.findForward(AssessmentConstants.ERROR);
     }
 
@@ -135,7 +136,7 @@ public class MonitoringAction extends Action {
 	initAssessmentService();
 
 	// initialize Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
@@ -153,7 +154,8 @@ public class MonitoringAction extends Action {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    request.setAttribute(AssessmentConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
-	    request.setAttribute(AssessmentConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	    request.setAttribute(AssessmentConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 
 	}
 
@@ -165,7 +167,7 @@ public class MonitoringAction extends Action {
 	}
 
 	//prepare list of the questions to display in question drop down menu, filtering out questions that aren't supposed to be answered
-	Set<AssessmentQuestion> questionList = new TreeSet<AssessmentQuestion>();
+	Set<AssessmentQuestion> questionList = new TreeSet<>();
 	//in case there is at least one random question - we need to show all questions in a drop down select
 	if (assessment.hasRandomQuestion()) {
 	    questionList.addAll(assessment.getQuestions());
@@ -178,7 +180,7 @@ public class MonitoringAction extends Action {
 	}
 
 	//prepare toolOutputDefinitions and activityEvaluation
-	List<String> toolOutputDefinitions = new ArrayList<String>();
+	List<String> toolOutputDefinitions = new ArrayList<>();
 	toolOutputDefinitions.add(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE);
 	toolOutputDefinitions.add(AssessmentConstants.OUTPUT_NAME_BEST_SCORE);
 	toolOutputDefinitions.add(AssessmentConstants.OUTPUT_NAME_FIRST_SCORE);
@@ -198,7 +200,7 @@ public class MonitoringAction extends Action {
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-    
+
     private ActionForward userMasterDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	initAssessmentService();
@@ -268,7 +270,7 @@ public class MonitoringAction extends Action {
      * @param request
      * @param response
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     private ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -309,7 +311,7 @@ public class MonitoringAction extends Action {
      * @throws IOException
      */
     private ActionForward setActivityEvaluation(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	initAssessmentService();
 
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
@@ -320,11 +322,11 @@ public class MonitoringAction extends Action {
 	String activityEvaluation = WebUtil.readStrParam(request, AssessmentConstants.ATTR_ACTIVITY_EVALUATION);
 	service.setActivityEvaluation(contentID, activityEvaluation);
 
-	// update the session ready for stats tab to be reloaded otherwise flicking between tabs 
+	// update the session ready for stats tab to be reloaded otherwise flicking between tabs
 	// causes the old value to be redisplayed
 	sessionMap.put(AssessmentConstants.ATTR_ACTIVITY_EVALUATION, activityEvaluation);
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("success", "true");
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(new String(responseJSON.toString()));
@@ -335,7 +337,7 @@ public class MonitoringAction extends Action {
      * Refreshes user list.
      */
     public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 	initAssessmentService();
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -354,7 +356,7 @@ public class MonitoringAction extends Action {
 	}
 	String searchString = WebUtil.readStrParam(request, "userName", true);
 
-	List<AssessmentUserDTO> userDtos = new ArrayList<AssessmentUserDTO>();
+	List<AssessmentUserDTO> userDtos = new ArrayList<>();
 	int countSessionUsers = 0;
 	//in case of UseSelectLeaderToolOuput - display only one user
 	if (assessment.isUseSelectLeaderToolOuput()) {
@@ -385,29 +387,29 @@ public class MonitoringAction extends Action {
 		Math.ceil(new Integer(countSessionUsers).doubleValue() / new Integer(rowLimit).doubleValue()))
 			.intValue();
 
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	int i = 1;
 	for (AssessmentUserDTO userDto : userDtos) {
 
-	    JSONArray userData = new JSONArray();
-	    userData.put(userDto.getUserId());
-	    userData.put(sessionId);
+	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
+	    userData.add(userDto.getUserId());
+	    userData.add(sessionId);
 	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " " + userDto.getLastName());
-	    userData.put(fullName);
-	    userData.put(userDto.getGrade());
+	    userData.add(fullName);
+	    userData.add(userDto.getGrade());
 
-	    JSONObject userRow = new JSONObject();
+	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);
-	    userRow.put("cell", userData);
+	    userRow.set("cell", userData);
 
-	    rows.put(userRow);
+	    rows.add(userRow);
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("total", totalPages);
 	responseJSON.put("page", page);
 	responseJSON.put("records", countSessionUsers);
-	responseJSON.put("rows", rows);
+	responseJSON.set("rows", rows);
 
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responseJSON.toString()));
@@ -418,7 +420,7 @@ public class MonitoringAction extends Action {
      * Refreshes user list.
      */
     public ActionForward getUsersByQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 	initAssessmentService();
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -438,7 +440,7 @@ public class MonitoringAction extends Action {
 	}
 	String searchString = WebUtil.readStrParam(request, "userName", true);
 
-	List<AssessmentUserDTO> userDtos = new ArrayList<AssessmentUserDTO>();
+	List<AssessmentUserDTO> userDtos = new ArrayList<>();
 	int countSessionUsers = 0;
 	//in case of UseSelectLeaderToolOuput - display only one user
 	if (assessment.isUseSelectLeaderToolOuput()) {
@@ -479,54 +481,54 @@ public class MonitoringAction extends Action {
 		Math.ceil(new Integer(countSessionUsers).doubleValue() / new Integer(rowLimit).doubleValue()))
 			.intValue();
 
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	int i = 1;
 	for (AssessmentUserDTO userDto : userDtos) {
 
 	    Long questionResultUid = userDto.getQuestionResultUid();
 	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " " + userDto.getLastName());
 
-	    JSONArray userData = new JSONArray();
+	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 	    if (questionResultUid != null) {
 		AssessmentQuestionResult questionResult = service.getAssessmentQuestionResultByUid(questionResultUid);
 
-		userData.put(questionResultUid);
-		userData.put(questionResult.getMaxMark());
-		userData.put(fullName);
-		userData.put(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
-		userData.put(questionResult.getMark());
+		userData.add(questionResultUid);
+		userData.add(questionResult.getMaxMark());
+		userData.add(fullName);
+		userData.add(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
+		userData.add(questionResult.getMark());
 
 	    } else {
-		userData.put("");
-		userData.put("");
-		userData.put(fullName);
-		userData.put("-");
-		userData.put("-");
+		userData.add("");
+		userData.add("");
+		userData.add(fullName);
+		userData.add("-");
+		userData.add("-");
 	    }
 
-	    JSONObject userRow = new JSONObject();
+	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);
-	    userRow.put("cell", userData);
+	    userRow.set("cell", userData);
 
-	    rows.put(userRow);
+	    rows.add(userRow);
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("total", totalPages);
 	responseJSON.put("page", page);
 	responseJSON.put("records", countSessionUsers);
-	responseJSON.put("rows", rows);
+	responseJSON.set("rows", rows);
 
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responseJSON.toString()));
 	return null;
     }
 
-   /**
+    /**
      * Get the mark summary with data arranged in bands. Can be displayed graphically or in a table.
      */
     private ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 
 	initAssessmentService();
 
@@ -538,21 +540,22 @@ public class MonitoringAction extends Action {
 	Long contentId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	List<Number> results = null;
-	
-	if ( assessment != null ) {
-	    if ( assessment.isUseSelectLeaderToolOuput() ) {
+
+	if (assessment != null) {
+	    if (assessment.isUseSelectLeaderToolOuput()) {
 		results = service.getMarksArrayForLeaders(contentId);
 	    } else {
 		Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.ATTR_TOOL_SESSION_ID);
 		results = service.getMarksArray(sessionId);
 	    }
 	}
-	
-	JSONObject responseJSON = new JSONObject();
-	if ( results != null )
-	    responseJSON.put("data", results);
-	else 
-	    responseJSON.put("data", new Float[0]);
+
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	if (results != null) {
+	    responseJSON.set("data", JsonUtil.readArray(results));
+	} else {
+	    responseJSON.set("data", JsonUtil.readArray(new Float[0]));
+	}
 
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().write(responseJSON.toString());
@@ -622,7 +625,7 @@ public class MonitoringAction extends Action {
 
 	return null;
     }
-    
+
     private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -634,8 +637,8 @@ public class MonitoringAction extends Action {
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = service.getAssessmentByContentId(contentId);
-	if ( assessment != null ) {
-	    if ( assessment.isUseSelectLeaderToolOuput() ) {
+	if (assessment != null) {
+	    if (assessment.isUseSelectLeaderToolOuput()) {
 		LeaderResultsDTO leaderDto = service.getLeaderResultsDTOForLeaders(contentId);
 		sessionMap.put("leaderDto", leaderDto);
 	    } else {
@@ -645,7 +648,6 @@ public class MonitoringAction extends Action {
 	}
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-
 
     // *************************************************************************************
     // Private method

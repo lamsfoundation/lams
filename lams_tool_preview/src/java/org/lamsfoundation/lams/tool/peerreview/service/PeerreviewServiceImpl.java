@@ -42,9 +42,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -88,6 +85,9 @@ import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.util.StringUtils;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Andrey Balan
@@ -224,7 +224,7 @@ public class PeerreviewServiceImpl
 
     @Override
     public List<GroupSummary> getGroupSummaries(Long contentId) {
-	List<GroupSummary> groupList = new ArrayList<GroupSummary>();
+	List<GroupSummary> groupList = new ArrayList<>();
 
 	// get all sessions in a peerreview and retrieve all peerreview items under this session
 	// plus initial peerreview items by author creating (resItemList)
@@ -246,7 +246,7 @@ public class PeerreviewServiceImpl
     public int getCountUsersBySession(final Long toolSessionId, final Long excludeUserId) {
 	return peerreviewUserDao.getCountUsersBySession(toolSessionId, excludeUserId);
     }
-    
+
     @Override
     public int getCountUsersBySession(final Long toolSessionId) {
 	return peerreviewUserDao.getCountUsersBySession(toolSessionId);
@@ -321,23 +321,25 @@ public class PeerreviewServiceImpl
 	if (user == null) {
 	    return;
 	}
-	
+
 	//If user is marked as hidden - it will automatically remove all rating left by him to prevent statistics mess up.
 	if (isHidden) {
 	    ratingService.removeUserCommitsByContent(toolContentId, user.getUserId().intValue());
 	}
-	
+
 	user.setHidden(isHidden);
 	peerreviewUserDao.saveObject(user);
     }
 
     @Override
-    public int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Map<Long, Float> newRatings) {
+    public int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId,
+	    Map<Long, Float> newRatings) {
 	return ratingService.rateItems(ratingCriteria, toolSessionId, userId, newRatings);
     }
 
     @Override
-    public void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId, String comment) {
+    public void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId,
+	    String comment) {
 	ratingService.commentItem(ratingCriteria, toolSessionId, userId, itemId, comment);
     }
 
@@ -362,7 +364,7 @@ public class PeerreviewServiceImpl
 	    int len = raw.length;
 	    StringBuilder description = new StringBuilder((String) raw[len - 2]).append(" ")
 		    .append((String) raw[len - 1]);
-	    raw[len - 1] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	    raw[len - 1] = StringEscapeUtils.escapeCsv(description.toString());
 	}
 	// if !getByUser -> is get current user's ratings from other users ->
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
@@ -370,9 +372,9 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public JSONArray getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, Long toolSessionId,
+    public ArrayNode getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, Long toolSessionId,
 	    RatingCriteria criteria, Long currentUserId, Integer page, Integer size, int sorting, String searchString,
-	    boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) throws JSONException {
+	    boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) {
 
 	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria,
 		currentUserId, page, size, sorting, searchString, getByUser, ratingService);
@@ -381,12 +383,12 @@ public class PeerreviewServiceImpl
 	    int len = raw.length;
 	    StringBuilder description = new StringBuilder((String) raw[len - 2]).append(" ")
 		    .append((String) raw[len - 1]);
-	    raw[len - 1] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	    raw[len - 1] = StringEscapeUtils.escapeCsv(description.toString());
 	}
 	// if !getByUser -> is get current user's ratings from other users ->
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
-	return ratingService.convertToStyledJSON(criteria, toolSessionId, currentUserId, !getByUser || getAllUsers, rawData,
-		needRatesPerUser);
+	return ratingService.convertToStyledJSON(criteria, toolSessionId, currentUserId, !getByUser || getAllUsers,
+		rawData, needRatesPerUser);
     }
 
     @Override
@@ -399,10 +401,10 @@ public class PeerreviewServiceImpl
 	List<Object[]> rawData = peerreviewUserDao.getDetailedRatingsComments(toolContentId, toolSessionId, criteriaId,
 		itemId);
 	for (Object[] raw : rawData) {
-	    raw[2] = (raw[2] == null ? null : numberFormat.format((Float) raw[2])); // format rating
+	    raw[2] = (raw[2] == null ? null : numberFormat.format(raw[2])); // format rating
 	    // format name
 	    StringBuilder description = new StringBuilder((String) raw[3]).append(" ").append((String) raw[4]);
-	    raw[4] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	    raw[4] = StringEscapeUtils.escapeCsv(description.toString());
 
 	}
 	return rawData;
@@ -418,7 +420,7 @@ public class PeerreviewServiceImpl
 	// raw data: user_id, comment_count, first_name, last_name
 	for (Object[] raw : rawData) {
 	    StringBuilder description = new StringBuilder((String) raw[2]).append(" ").append((String) raw[3]);
-	    raw[3] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	    raw[3] = StringEscapeUtils.escapeCsv(description.toString());
 	}
 
 	return rawData;
@@ -428,10 +430,10 @@ public class PeerreviewServiceImpl
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
@@ -452,7 +454,7 @@ public class PeerreviewServiceImpl
 
 	for (Object[] raw : rawData) {
 	    StringBuilder description = new StringBuilder((String) raw[1]).append(" ").append((String) raw[2]);
-	    raw[2] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	    raw[2] = StringEscapeUtils.escapeCsv(description.toString());
 	}
 
 	return rawData;
@@ -505,7 +507,8 @@ public class PeerreviewServiceImpl
 
 	for (RatingCriteria criteria : ratingCriterias) {
 	    int sorting = (criteria.isStarStyleRating() || criteria.isHedgeStyleRating())
-		    ? PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC : PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
+		    ? PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC
+		    : PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
 	    StyledCriteriaRatingDTO dto = getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, sessionId, criteria,
 		    user.getUserId(), false, sorting, null, true, false);
 	    generateRatingEntryForEmail(notificationMessage, criteria, dto);
@@ -535,7 +538,8 @@ public class PeerreviewServiceImpl
 			new Object[] { escapedTitle, StringUtils.replace(comments.toString(), "&lt;BR&gt;", "<BR>") }));
 	    } else {
 		String avgRating = dto.getRatingDtos().get(0).getAverageRating().length() > 0
-			? dto.getRatingDtos().get(0).getAverageRating() : "0";
+			? dto.getRatingDtos().get(0).getAverageRating()
+			: "0";
 		StringBuilder comments = null;
 		if (criteria.isStarStyleRating()) {
 		    if (criteria.isCommentsEnabled()) {
@@ -587,9 +591,10 @@ public class PeerreviewServiceImpl
     public int[] getNumberPossibleRatings(Long toolContentId, Long toolSessionId, Long userId) {
 	int[] retValue = new int[2];
 
-	ArrayList<Long> itemIds = new ArrayList<Long>(1);
+	ArrayList<Long> itemIds = new ArrayList<>(1);
 	itemIds.add(userId);
-	Map<Long, Long> numRatingsForUserMap = ratingService.countUsersRatedEachItem(toolContentId, toolSessionId, itemIds, -1);
+	Map<Long, Long> numRatingsForUserMap = ratingService.countUsersRatedEachItem(toolContentId, toolSessionId,
+		itemIds, -1);
 	Long numRatingsForUser = numRatingsForUserMap.get(userId);
 	retValue[0] = numRatingsForUser != null ? numRatingsForUser.intValue() : 0;
 
@@ -710,7 +715,7 @@ public class PeerreviewServiceImpl
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
-	return new TreeMap<String, ToolOutputDefinition>();
+	return new TreeMap<>();
     }
 
     @Override
@@ -884,17 +889,18 @@ public class PeerreviewServiceImpl
     @Override
     public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
-	return ratingService.getRatingCriteriaDtos(contentId, toolSessionId, itemIds, isCommentsByOtherUsersRequired, userId);
+	return ratingService.getRatingCriteriaDtos(contentId, toolSessionId, itemIds, isCommentsByOtherUsersRequired,
+		userId);
     }
 
     @Override
     public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId, boolean isCountUsersRatedEachItem) {
-	List<ItemRatingDTO> itemRatingDTOs = getRatingCriteriaDtos(contentId, toolSessionId, itemIds, isCommentsByOtherUsersRequired,
-		userId);
+	List<ItemRatingDTO> itemRatingDTOs = getRatingCriteriaDtos(contentId, toolSessionId, itemIds,
+		isCommentsByOtherUsersRequired, userId);
 
 	if (isCountUsersRatedEachItem) {
-	    Map<Long, Long> itemIdToRatedUsersCountMap = ratingService.countUsersRatedEachItem(contentId, toolSessionId, 
+	    Map<Long, Long> itemIdToRatedUsersCountMap = ratingService.countUsersRatedEachItem(contentId, toolSessionId,
 		    itemIds, userId.intValue());
 
 	    for (ItemRatingDTO itemRatingDTO : itemRatingDTOs) {
@@ -913,6 +919,7 @@ public class PeerreviewServiceImpl
 	return ratingService.getCountItemsRatedByUser(toolContentId, userId);
     }
 
+    @Override
     public int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId) {
 	return ratingService.getCountItemsRatedByUserByCriteria(criteriaId, userId);
     }
@@ -936,7 +943,7 @@ public class PeerreviewServiceImpl
 
     @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<String, ToolOutput>();
+	return new TreeMap<>();
     }
 
     @Override
@@ -946,7 +953,7 @@ public class PeerreviewServiceImpl
 
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -1027,25 +1034,26 @@ public class PeerreviewServiceImpl
 
     /**
      * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: title, instructions, peerreview,
-     * user fields firstName, lastName and loginName Peerreview must contain a JSONArray of JSONObject objects, which
+     * user fields firstName, lastName and loginName Peerreview must contain a ArrayNode of ObjectNode objects, which
      * have the following mandatory fields: title, description, type. If there are instructions for a peerreview, the
-     * instructions are a JSONArray of Strings. There should be at least one peerreview object in the peerreview array.
+     * instructions are a ArrayNode of Strings. There should be at least one peerreview object in the peerreview array.
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
 	Date updateDate = new Date();
 
 	Peerreview peerreview = new Peerreview();
 	peerreview.setContentId(toolContentID);
-	peerreview.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	peerreview.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	peerreview.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	peerreview.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 	peerreview.setCreated(updateDate);
 
-	peerreview.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	peerreview.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	peerreview.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
+	peerreview
+		.setLockWhenFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	peerreview.setReflectOnActivity(
+		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	peerreview.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 
 	peerreview.setContentInUse(false);
 	peerreview.setDefineLater(false);
@@ -1053,9 +1061,9 @@ public class PeerreviewServiceImpl
 	PeerreviewUser peerreviewUser = getUserByIDAndContent(userID.longValue(), toolContentID);
 	if (peerreviewUser == null) {
 	    peerreviewUser = new PeerreviewUser();
-	    peerreviewUser.setFirstName(toolContentJSON.getString("firstName"));
-	    peerreviewUser.setLastName(toolContentJSON.getString("lastName"));
-	    peerreviewUser.setLoginName(toolContentJSON.getString("loginName"));
+	    peerreviewUser.setFirstName(JsonUtil.optString(toolContentJSON, "firstName"));
+	    peerreviewUser.setLastName(JsonUtil.optString(toolContentJSON, "lastName"));
+	    peerreviewUser.setLoginName(JsonUtil.optString(toolContentJSON, "loginName"));
 	    // peerreviewUser.setPeerreview(content);
 	}
 

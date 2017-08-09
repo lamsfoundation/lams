@@ -44,9 +44,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.integration.dto.ExtGroupDTO;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
@@ -71,11 +68,18 @@ import org.lamsfoundation.lams.usermanagement.dto.OrganisationGroupingDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.AlphanumComparator;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class OrganisationGroupAction extends DispatchAction {
 
@@ -215,7 +219,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
 	request.setAttribute("canEdit", isGroupSuperuser || (activityId != null));
 
-	JSONObject orgGroupingJSON = new JSONObject();
+	ObjectNode orgGroupingJSON = JsonNodeFactory.instance.objectNode();
 	orgGroupingJSON.put("organisationId", organisationId);
 
 	Long orgGroupingId = WebUtil.readLongParam(request, "groupingId", true);
@@ -259,7 +263,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	boolean isUsedForBranching = (lessonGrouping != null) && lessonGrouping.isUsedForBranching();
 	request.setAttribute(GroupingAJAXAction.PARAM_USED_FOR_BRANCHING, isUsedForBranching);
 
-	JSONArray orgGroupsJSON = new JSONArray();
+	ArrayNode orgGroupsJSON = JsonNodeFactory.instance.arrayNode();
 	Collection<User> learners = null;
 
 	// if teacher selected groups from integrated server - show them
@@ -299,19 +303,19 @@ public class OrganisationGroupAction extends DispatchAction {
 		// sort groups by their name
 		Collections.sort(extGroups);
 		for (ExtGroupDTO extGroup : extGroups) {
-		    JSONObject groupJSON = new JSONObject();
+		    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 		    groupJSON.put("name", extGroup.getGroupName());
 		    groupJSON.put("groupId", extGroup.getGroupId());
 		    if (extGroup.getUsers() != null) {
 			for (User groupUser : (List<User>) extGroup.getUsers()) {
-			    JSONObject groupUserJSON = WebUtil.userToJSON(groupUser);
-			    groupJSON.append("users", groupUserJSON);
+			    ObjectNode groupUserJSON = WebUtil.userToJSON(groupUser);
+			    groupJSON.withArray("users").add(groupUserJSON);
 
 			    // remove the user who is already assigned to a group
 			    learners.remove(groupUser);
 			}
 		    }
-		    orgGroupsJSON.put(groupJSON);
+		    orgGroupsJSON.add(groupJSON);
 		}
 	    }
 
@@ -332,14 +336,14 @@ public class OrganisationGroupAction extends DispatchAction {
 	    orgGroupsJSON = getLessonGroupsDetails(lessonGroups, learners);
 	    request.setAttribute("skipInitialAssigning", true);
 	}
-	orgGroupingJSON.put("groups", orgGroupsJSON);
+	orgGroupingJSON.set("groups", orgGroupsJSON);
 	request.setAttribute("grouping", orgGroupingJSON);
 
 	// all the remaining users are unassigned to any group
-	JSONArray unassignedUsersJSON = new JSONArray();
+	ArrayNode unassignedUsersJSON = JsonNodeFactory.instance.arrayNode();
 	for (User unassignedUser : learners) {
-	    JSONObject unassignedUserJSON = WebUtil.userToJSON(unassignedUser);
-	    unassignedUsersJSON.put(unassignedUserJSON);
+	    ObjectNode unassignedUserJSON = WebUtil.userToJSON(unassignedUser);
+	    unassignedUsersJSON.add(unassignedUserJSON);
 	}
 	request.setAttribute("unassignedUsers", unassignedUsersJSON);
 
@@ -350,7 +354,7 @@ public class OrganisationGroupAction extends DispatchAction {
      * Saves a course grouping.
      */
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, InvalidParameterException, IOException {
+	    HttpServletResponse response) throws InvalidParameterException, IOException {
 	// check if user is allowed to edit groups
 	Integer userId = getUserDTO().getUserID();
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
@@ -367,38 +371,37 @@ public class OrganisationGroupAction extends DispatchAction {
 	}
 
 	// deserialize grouping
-	JSONObject orgGroupingJSON = new JSONObject(request.getParameter("grouping"));
+	ObjectNode orgGroupingJSON = new ObjectMapper().readValue(request.getParameter("grouping"), ObjectNode.class);
 	// check if already exists
-	Long orgGroupingId = orgGroupingJSON.optLong("groupingId");
+	Long orgGroupingId = orgGroupingJSON.get("groupingId").asLong();
 	if (orgGroupingId == 0L) {
 	    orgGroupingId = null;
 	}
 
 	// iterate over groups
 	List<OrganisationGroup> orgGroups = new LinkedList<>();
-	JSONArray orgGroupsJSON = orgGroupingJSON.optJSONArray("groups");
+	ArrayNode orgGroupsJSON = JsonUtil.optArray(orgGroupingJSON, "groups");
 	if (orgGroupsJSON != null) {
-	    for (int i = 0; i < orgGroupsJSON.length(); i++) {
+	    for (JsonNode orgGroupNode : orgGroupsJSON) {
 		// just overwrite existing groups; they will be updated if already exist
 		Set<User> users = new HashSet<>();
-		JSONObject orgGroupJSON = orgGroupsJSON.getJSONObject(i);
-		JSONArray usersJSON = orgGroupJSON.optJSONArray("users");
+		ObjectNode orgGroupJSON = (ObjectNode) orgGroupNode;
+		ArrayNode usersJSON = JsonUtil.optArray(orgGroupJSON, "users");
 		if (usersJSON != null) {
 		    // find user objects based on delivered IDs
-		    for (int j = 0; j < usersJSON.length(); j++) {
-			Integer learnerId = usersJSON.getInt(j);
-			User user = (User) getUserManagementService().findById(User.class, learnerId);
+		    for (JsonNode learnerId : usersJSON) {
+			User user = (User) getUserManagementService().findById(User.class, learnerId.asInt());
 			users.add(user);
 		    }
 		}
 
 		OrganisationGroup orgGroup = new OrganisationGroup();
-		Long orgGroupId = orgGroupJSON.optLong("groupId");
+		Long orgGroupId = JsonUtil.optLong(orgGroupJSON, "groupId");
 		if (orgGroupId > 0) {
 		    orgGroup.setGroupId(orgGroupId);
 		    orgGroup.setGroupingId(orgGroupingId);
 		}
-		orgGroup.setName(orgGroupJSON.optString("name", null));
+		orgGroup.setName(JsonUtil.optString(orgGroupJSON, "name"));
 		orgGroup.setUsers(users);
 
 		orgGroups.add(orgGroup);
@@ -415,7 +418,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	    orgGrouping.setOrganisationId(organisationId);
 	}
 	// update grouping name
-	String orgGroupingName = orgGroupingJSON.getString("name");
+	String orgGroupingName = JsonUtil.optString(orgGroupingJSON, "name");
 	orgGrouping.setName(orgGroupingName);
 
 	getUserManagementService().saveOrganisationGrouping(orgGrouping, orgGroups);
@@ -452,36 +455,36 @@ public class OrganisationGroupAction extends DispatchAction {
      * Fetches course and branching so they can get matched by user.
      */
     public ActionForward getGroupsForMapping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, JSONException {
+	    HttpServletResponse response) throws IOException {
 	Long orgGroupingId = WebUtil.readLongParam(request, "groupingId");
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
 	OrganisationGrouping orgGrouping = (OrganisationGrouping) getUserManagementService()
 		.findById(OrganisationGrouping.class, orgGroupingId);
-	JSONArray groupsJSON = new JSONArray();
+	ArrayNode groupsJSON = JsonNodeFactory.instance.arrayNode();
 	SortedSet<OrganisationGroup> orgGroups = new TreeSet<>(orgGrouping.getGroups());
 	for (OrganisationGroup group : orgGroups) {
-	    JSONObject groupJSON = new JSONObject();
+	    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 	    groupJSON.put("id", group.getGroupId());
 	    groupJSON.put("name", group.getName());
-	    groupsJSON.put(groupJSON);
+	    groupsJSON.add(groupJSON);
 	}
 	Activity activity = (Activity) getUserManagementService().findById(Activity.class, activityID);
 	Grouping grouping = activity.isGroupingActivity() ? ((GroupingActivity) activity).getCreateGrouping()
 		: ((BranchingActivity) activity).getGrouping();
 
-	JSONArray branchesJSON = new JSONArray();
+	ArrayNode branchesJSON = JsonNodeFactory.instance.arrayNode();
 	SortedSet<Group> groups = new TreeSet<>(grouping.getGroups());
 	for (Group group : groups) {
-	    JSONObject groupJSON = new JSONObject();
+	    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 	    groupJSON.put("id", group.getGroupId());
 	    groupJSON.put("name", group.getGroupName());
-	    branchesJSON.put(groupJSON);
+	    branchesJSON.add(groupJSON);
 	}
 
-	JSONObject responseJSON = new JSONObject();
-	responseJSON.put("branches", branchesJSON);
-	responseJSON.put("groups", groupsJSON);
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.set("branches", branchesJSON);
+	responseJSON.set("groups", groupsJSON);
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
@@ -492,12 +495,12 @@ public class OrganisationGroupAction extends DispatchAction {
      * Stores course groups to branching groups mapping.
      */
     public ActionForward saveGroupMappings(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, JSONException {
-	JSONArray groupMapping = new JSONArray(request.getParameter("mapping"));
-	for (int index = 0; index < groupMapping.length(); index++) {
-	    JSONObject entry = groupMapping.getJSONObject(index);
-	    Long orgGroupID = entry.getLong("groupID");
-	    Long branchingGroupID = entry.getLong("branchID");
+	    HttpServletResponse response) throws IOException {
+	ArrayNode groupMapping = JsonUtil.readArray(request.getParameter("mapping"));
+	for (JsonNode entryNode : groupMapping) {
+	    ObjectNode entry = (ObjectNode) entryNode;
+	    Long orgGroupID = JsonUtil.optLong(entry, "groupID");
+	    Long branchingGroupID = JsonUtil.optLong(entry, "branchID");
 	    OrganisationGroup orgGroup = (OrganisationGroup) getUserManagementService()
 		    .findById(OrganisationGroup.class, orgGroupID);
 	    Group branchingGroup = (Group) getUserManagementService().findById(Group.class, branchingGroupID);
@@ -514,28 +517,28 @@ public class OrganisationGroupAction extends DispatchAction {
     /**
      * Build JSON objects based on existing lesson-level groups.
      */
-    private JSONArray getLessonGroupsDetails(Set<Group> groups, Collection<User> learners) throws JSONException {
+    private ArrayNode getLessonGroupsDetails(Set<Group> groups, Collection<User> learners) {
 	// serialize database group objects into JSON
-	JSONArray groupsJSON = new JSONArray();
+	ArrayNode groupsJSON = JsonNodeFactory.instance.arrayNode();
 	if (groups != null) {
 	    // sort groups by their name
 	    List<Group> groupList = new LinkedList<>(groups);
 	    Collections.sort(groupList, new GroupComparator());
 	    for (Group group : groupList) {
-		JSONObject groupJSON = new JSONObject();
+		ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 		groupJSON.put("name", group.getGroupName());
 		groupJSON.put("groupId", group.getGroupId());
 		groupJSON.put("locked", !group.mayBeDeleted());
 		if (group.getUsers() != null) {
 		    for (User groupUser : group.getUsers()) {
-			JSONObject groupUserJSON = WebUtil.userToJSON(groupUser);
-			groupJSON.append("users", groupUserJSON);
+			ObjectNode groupUserJSON = WebUtil.userToJSON(groupUser);
+			groupJSON.withArray("users").add(groupUserJSON);
 
 			// remove the user who is already assigned to a group
 			learners.remove(groupUser);
 		    }
 		}
-		groupsJSON.put(groupJSON);
+		groupsJSON.add(groupJSON);
 	    }
 	}
 
@@ -545,8 +548,7 @@ public class OrganisationGroupAction extends DispatchAction {
     /**
      * Build JSON objects based on existing course-level groups.
      */
-    private JSONArray getOrgGroupsDetails(Set<OrganisationGroup> groups, Collection<User> learners)
-	    throws JSONException {
+    private ArrayNode getOrgGroupsDetails(Set<OrganisationGroup> groups, Collection<User> learners) {
 
 	final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<OrganisationGroup>() {
 	    @Override
@@ -560,25 +562,25 @@ public class OrganisationGroupAction extends DispatchAction {
 	};
 
 	// serialize database group objects into JSON
-	JSONArray groupsJSON = new JSONArray();
+	ArrayNode groupsJSON = JsonNodeFactory.instance.arrayNode();
 	if (groups != null) {
 	    // sort groups by their name
 	    List<OrganisationGroup> groupList = new LinkedList<>(groups);
 	    Collections.sort(groupList, ORG_GROUP_COMPARATOR);
 
 	    for (OrganisationGroup group : groupList) {
-		JSONObject groupJSON = new JSONObject();
+		ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 		groupJSON.put("name", group.getName());
 		groupJSON.put("groupId", group.getGroupId());
 		for (User groupUser : group.getUsers()) {
-		    JSONObject groupUserJSON = WebUtil.userToJSON(groupUser);
-		    groupJSON.append("users", groupUserJSON);
+		    ObjectNode groupUserJSON = WebUtil.userToJSON(groupUser);
+		    groupJSON.withArray("users").add(groupUserJSON);
 
 		    // remove the user who is already assigned to a group
 		    learners.remove(groupUser);
 		}
 
-		groupsJSON.put(groupJSON);
+		groupsJSON.add(groupJSON);
 	    }
 	}
 

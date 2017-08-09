@@ -45,6 +45,8 @@
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-gradebook.jar" sourcepath="/lams_gradebook"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/as/controller-client/main/wildfly-controller-client-2.2.0.Final.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/dmr/main/jboss-dmr-1.3.0.Final.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-core/main/jackson-core-2.7.4.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jackson"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.7.4.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jackson"/>
 	<classpathentry kind="output" path="bin"/>
 	<referencedentry kind="lib" path="/lams_build/lib/lams/lams.jar" sourcepath=""/>
 </classpath>

@@ -33,9 +33,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.OrgManageForm;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -54,6 +51,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * <p>
  * <a href="OrgManageAction.java.html"><i>View Source</i></a>
@@ -65,7 +66,6 @@ public class OrgManageAction extends LamsDispatchAction {
 
     private static IUserManagementService userManagementService;
 
-    @SuppressWarnings("unchecked")
     @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -156,7 +156,7 @@ public class OrgManageAction extends LamsDispatchAction {
      * Returns list of organisations for .
      */
     public ActionForward getOrgs(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 	initServices();
 
 	Integer parentOrgId = WebUtil.readIntParam(request, "parentOrgId");
@@ -198,14 +198,13 @@ public class OrgManageAction extends LamsDispatchAction {
 	List<Organisation> organisations = userManagementService.getPagedCourses(parentOrgId, typeId, stateId, page,
 		size, sortBy, sortOrder, searchString);
 
-	JSONObject responcedata = new JSONObject();
-	responcedata.put("total_rows", userManagementService.getCountCoursesByParentCourseAndTypeAndState(parentOrgId,
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("total_rows", userManagementService.getCountCoursesByParentCourseAndTypeAndState(parentOrgId,
 		typeId, stateId, searchString));
 
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	for (Organisation organisation : organisations) {
-
-	    JSONObject responseRow = new JSONObject();
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 	    responseRow.put("id", organisation.getOrganisationId());
 	    String orgName = organisation.getName() == null ? "" : organisation.getName();
 	    responseRow.put("name", StringEscapeUtils.escapeHtml(orgName));
@@ -214,11 +213,12 @@ public class OrgManageAction extends LamsDispatchAction {
 	    String orgDescription = organisation.getDescription() == null ? "" : organisation.getDescription();
 	    responseRow.put("description", StringEscapeUtils.escapeHtml(orgDescription));
 
-	    rows.put(responseRow);
+	    rows.add(responseRow);
 	}
-	responcedata.put("rows", rows);
+
+	responseJSON.set("rows", rows);
 	res.setContentType("application/json;charset=utf-8");
-	res.getWriter().print(new String(responcedata.toString()));
+	res.getWriter().print(responseJSON.toString());
 	return null;
     }
 

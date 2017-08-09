@@ -40,8 +40,6 @@ import javax.servlet.http.Cookie;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -70,7 +68,6 @@ import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranConfigItem;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.dokumaran.util.DokumaranToolContentHandler;
-import org.lamsfoundation.lams.tool.dokumaran.web.action.LearningWebsocketServer;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -80,6 +77,8 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.gjerull.etherpad.client.EPLiteClient;
 import net.gjerull.etherpad.client.EPLiteException;
@@ -275,14 +274,14 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public void launchTimeLimit(Long toolContentId) throws JSONException, IOException {
+    public void launchTimeLimit(Long toolContentId) throws IOException {
 	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
 	dokumaran.setTimeLimitLaunchedDate(new Date());
 	dokumaranDao.saveObject(dokumaran);
     }
 
     @Override
-    public void addOneMinute(Long toolContentId) throws JSONException, IOException {
+    public void addOneMinute(Long toolContentId) throws IOException {
 	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
 
 	int timeLimit = dokumaran.getTimeLimit();
@@ -1109,31 +1108,32 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     /**
      * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: title, instructions, dokumaran,
-     * user fields firstName, lastName and loginName Dokumaran must contain a JSONArray of JSONObject objects, which
+     * user fields firstName, lastName and loginName Dokumaran must contain a ArrayNode of ObjectNode objects, which
      * have the following mandatory fields: title, description, type. If there are instructions for a dokumaran, the
-     * instructions are a JSONArray of Strings. There should be at least one dokumaran object in the dokumaran array.
+     * instructions are a ArrayNode of Strings. There should be at least one dokumaran object in the dokumaran array.
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
 	Date updateDate = new Date();
 
 	Dokumaran dokumaran = new Dokumaran();
 	dokumaran.setContentId(toolContentID);
-	dokumaran.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	dokumaran.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	dokumaran.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	dokumaran.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 	dokumaran.setCreated(updateDate);
 
-	dokumaran.setTimeLimit(JsonUtil.opt(toolContentJSON, "timeLimit", 0));
-	dokumaran.setShowChat(JsonUtil.opt(toolContentJSON, "showChat", Boolean.FALSE));
-	dokumaran.setShowLineNumbers(JsonUtil.opt(toolContentJSON, "showLineNumbers", Boolean.FALSE));
-	dokumaran.setSharedPadId(JsonUtil.opt(toolContentJSON, "sharedPadId", (String) null));
-	dokumaran.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	dokumaran.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	dokumaran.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
-	dokumaran.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
-	dokumaran.setAllowMultipleLeaders(JsonUtil.opt(toolContentJSON, "allowMultipleLeaders", Boolean.FALSE));
+	dokumaran.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
+	dokumaran.setShowChat(JsonUtil.optBoolean(toolContentJSON, "showChat", Boolean.FALSE));
+	dokumaran.setShowLineNumbers(JsonUtil.optBoolean(toolContentJSON, "showLineNumbers", Boolean.FALSE));
+	dokumaran.setSharedPadId(JsonUtil.optString(toolContentJSON, "sharedPadId"));
+	dokumaran.setLockWhenFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	dokumaran.setReflectOnActivity(
+		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	dokumaran.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	dokumaran.setUseSelectLeaderToolOuput(
+		JsonUtil.optBoolean(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
+	dokumaran.setAllowMultipleLeaders(JsonUtil.optBoolean(toolContentJSON, "allowMultipleLeaders", Boolean.FALSE));
 
 	dokumaran.setContentInUse(false);
 	dokumaran.setDefineLater(false);
@@ -1141,9 +1141,9 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	DokumaranUser dokumaranUser = getUserByIDAndContent(userID.longValue(), toolContentID);
 	if (dokumaranUser == null) {
 	    dokumaranUser = new DokumaranUser();
-	    dokumaranUser.setFirstName(toolContentJSON.getString("firstName"));
-	    dokumaranUser.setLastName(toolContentJSON.getString("lastName"));
-	    dokumaranUser.setLoginName(toolContentJSON.getString("loginName"));
+	    dokumaranUser.setFirstName(JsonUtil.optString(toolContentJSON, "firstName"));
+	    dokumaranUser.setLastName(JsonUtil.optString(toolContentJSON, "lastName"));
+	    dokumaranUser.setLoginName(JsonUtil.optString(toolContentJSON, "loginName"));
 	    // dokumaranUser.setDokumaran(content);
 	}
 

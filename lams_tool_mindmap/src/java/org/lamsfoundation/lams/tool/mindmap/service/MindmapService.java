@@ -32,8 +32,6 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -77,6 +75,7 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
@@ -1007,22 +1006,21 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      * (default false), reflectOnActivity (default false), reflectInstructions
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
 	Mindmap content = new Mindmap();
 	Date updateDate = new Date();
 	content.setToolContentId(toolContentID);
 	content.setCreateDate(updateDate);
 	content.setUpdateDate(updateDate);
-	content.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	content.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	content.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	content.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 	content.setContentInUse(false);
 	content.setDefineLater(false);
-	content.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
-	content.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	content.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	content.setMultiUserMode(JsonUtil.opt(toolContentJSON, "multiUserMode", Boolean.FALSE));
+	content.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	content.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	content.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	content.setMultiUserMode(JsonUtil.optBoolean(toolContentJSON, "multiUserMode", Boolean.FALSE));
 
 	// createdBy and submissionDeadline are null in the database using the standard authoring module
 	// submissionDeadline is set in monitoring

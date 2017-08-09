@@ -36,8 +36,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -73,6 +71,8 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * An implementation of the IChatService interface.
@@ -202,7 +202,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -655,14 +655,14 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     /* Private methods */
-    private Map<Long, ChatMessageFilter> messageFilters = new ConcurrentHashMap<Long, ChatMessageFilter>();
+    private Map<Long, ChatMessageFilter> messageFilters = new ConcurrentHashMap<>();
 
     public IChatDAO getChatDAO() {
 	return chatDAO;
@@ -813,7 +813,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getChatOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
-    
+
     @Override
     public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
 	ChatUser learner = getUserByUserIdAndSessionId(learnerId, toolSessionId);
@@ -824,20 +824,23 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 	Date startDate = null;
 	Date endDate = learner.getLastPresence();
 	List<ChatMessage> messages = getMessagesForUser(learner);
-	for ( ChatMessage message : messages ) {
+	for (ChatMessage message : messages) {
 	    Date sendDate = message.getSendDate();
-	    if ( sendDate != null ) {
-		if ( startDate == null || sendDate.before(startDate) )
+	    if (sendDate != null) {
+		if (startDate == null || sendDate.before(startDate)) {
 		    startDate = sendDate;
-		if ( endDate == null || sendDate.after(endDate) )
+		}
+		if (endDate == null || sendDate.after(endDate)) {
 		    endDate = sendDate;
+		}
 	    }
 	}
-	
-	if (learner.isFinishedActivity())
+
+	if (learner.isFinishedActivity()) {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, endDate);
-	else
+	} else {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
+	}
     }
     // =========================================================================================
 
@@ -848,25 +851,24 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
      * fields reflectInstructions, lockWhenFinished, filterKeywords
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
 	Chat content = new Chat();
 	Date updateDate = new Date();
 	content.setCreateDate(updateDate);
 	content.setUpdateDate(updateDate);
 	content.setToolContentId(toolContentID);
-	content.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	content.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	content.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	content.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 	content.setCreateBy(userID.longValue());
 
 	content.setContentInUse(false);
 	content.setDefineLater(false);
-	content.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
-	content.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	content.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	content.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	content.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	content.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 
-	String filterKeywords = JsonUtil.opt(toolContentJSON, "filterKeywords", null);
+	String filterKeywords = JsonUtil.optString(toolContentJSON, "filterKeywords");
 	content.setFilteringEnabled((filterKeywords != null) && (filterKeywords.length() > 0));
 	content.setFilterKeywords(filterKeywords);
 	// submissionDeadline is set in monitoring

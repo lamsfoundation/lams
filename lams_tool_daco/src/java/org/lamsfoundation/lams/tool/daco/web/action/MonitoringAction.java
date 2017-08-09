@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.daco.web.action;
 
 import java.io.IOException;
@@ -46,9 +45,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
@@ -73,12 +69,16 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ParseException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException, ParseException {
 	String param = mapping.getParameter();
 
 	if (param.equals("summary")) {
@@ -200,7 +200,7 @@ public class MonitoringAction extends Action {
     }
 
     protected ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 
 	IDacoService service = getDacoService();
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID, true);
@@ -238,14 +238,14 @@ public class MonitoringAction extends Action {
 	List<Object[]> users = service.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
 		daco.isReflectOnActivity());
 
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 
-	JSONObject responsedata = new JSONObject();
+	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
 	responsedata.put("total_rows", service.getCountUsersBySession(sessionId, searchString));
 
 	for (Object[] userAndReflection : users) {
 
-	    JSONObject responseRow = new JSONObject();
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
 	    DacoUser user = (DacoUser) userAndReflection[0];
 
@@ -253,7 +253,7 @@ public class MonitoringAction extends Action {
 	    responseRow.put(DacoConstants.USER_FULL_NAME, StringEscapeUtils.escapeHtml(user.getFullName()));
 
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
-		responseRow.put(DacoConstants.RECORD_COUNT, userAndReflection[1]);
+		responseRow.put(DacoConstants.RECORD_COUNT, (Integer) userAndReflection[1]);
 	    } else {
 		responseRow.put(DacoConstants.RECORD_COUNT, 0);
 	    }
@@ -262,9 +262,9 @@ public class MonitoringAction extends Action {
 		responseRow.put(DacoConstants.NOTEBOOK_ENTRY,
 			StringEscapeUtils.escapeHtml((String) userAndReflection[2]));
 	    }
-	    rows.put(responseRow);
+	    rows.add(responseRow);
 	}
-	responsedata.put("rows", rows);
+	responsedata.set("rows", rows);
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responsedata.toString()));
 	return null;
@@ -317,7 +317,7 @@ public class MonitoringAction extends Action {
 	String dateHeader = service.getLocalisedMessage(DacoConstants.KEY_LABEL_EXPORT_FILE_DATE, null);
 
 	Set<DacoQuestion> questions = daco.getDacoQuestions();
-	HashMap<Long, Integer> questionUidToSpreadsheetColumnIndex = new HashMap<Long, Integer>();
+	HashMap<Long, Integer> questionUidToSpreadsheetColumnIndex = new HashMap<>();
 	// First two columns are "user" and date when was the answer added
 	int columnIndex = 2;
 	String[] columnNames = new String[questions.size() + 2];
@@ -336,7 +336,7 @@ public class MonitoringAction extends Action {
 	String latitudeHeader = service.getLocalisedMessage(DacoConstants.KEY_LABEL_LEARNING_LONGLAT_LATITUDE, null);
 	String latitudeUnit = service.getLocalisedMessage(DacoConstants.KEY_LABEL_LEARNING_LONGLAT_LATITUDE_UNIT, null);
 
-	List<Object[]> rows = new LinkedList<Object[]>();
+	List<Object[]> rows = new LinkedList<>();
 	// We get all sessions with all users with all their records from the given Daco content
 	List<MonitoringSummarySessionDTO> monitoringSummary = service.getSummaryForExport(daco.getContentId(), null);
 	// Get current user's locale to format numbers properly
@@ -394,7 +394,7 @@ public class MonitoringAction extends Action {
 				if (!StringUtils.isBlank(answerString)) {
 				    DacoQuestion question = answer.getQuestion();
 				    DacoQuestion currentQuestion = question;
-				    List<DacoAnswerOption> answerOptions = new LinkedList<DacoAnswerOption>(
+				    List<DacoAnswerOption> answerOptions = new LinkedList<>(
 					    question.getAnswerOptions());
 				    StringBuilder cellStringBuilder = new StringBuilder();
 				    // instead of number, we create a comma-separated string of chosen options
@@ -448,7 +448,7 @@ public class MonitoringAction extends Action {
 			    case DacoConstants.QUESTION_TYPE_RADIO:
 			    case DacoConstants.QUESTION_TYPE_DROPDOWN:
 				if (!StringUtils.isBlank(answerString)) {
-				    List<DacoAnswerOption> answerOptions = new LinkedList<DacoAnswerOption>(
+				    List<DacoAnswerOption> answerOptions = new LinkedList<>(
 					    answer.getQuestion().getAnswerOptions());
 				    try {
 					int chosenAnswer = Integer.parseInt(answerString) - 1;

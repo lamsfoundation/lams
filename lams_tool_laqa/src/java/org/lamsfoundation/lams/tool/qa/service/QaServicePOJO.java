@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.service;
 
 import java.util.ArrayList;
@@ -39,9 +38,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -94,6 +90,10 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The POJO implementation of Qa service. All business logics of Qa tool are implemented in this class. It translate the
@@ -438,7 +438,7 @@ public class QaServicePOJO
 	    List<QaQuestionDTO> questionDTOs, List<QaQuestionDTO> deletedQuestions) {
 
 	// create list of modified questions
-	List<QaQuestionDTO> modifiedQuestions = new ArrayList<QaQuestionDTO>();
+	List<QaQuestionDTO> modifiedQuestions = new ArrayList<>();
 	for (QaQueContent oldQuestion : oldQuestions) {
 	    for (QaQuestionDTO questionDTO : questionDTOs) {
 		if (oldQuestion.getUid().equals(questionDTO.getUid())) {
@@ -845,7 +845,7 @@ public class QaServicePOJO
     public boolean isCommentsEnabled(Long toolContentId) {
 	return ratingService.isCommentsEnabled(toolContentId);
     }
-    
+
     @Override
     public boolean isRatingsEnabled(QaContent qaContent) {
 	//check if allow rate answers is ON and also that there is at least one non-comments rating criteria available
@@ -865,7 +865,8 @@ public class QaServicePOJO
     @Override
     public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
-	return ratingService.getRatingCriteriaDtos(contentId, toolSessionId, itemIds, isCommentsByOtherUsersRequired, userId);
+	return ratingService.getRatingCriteriaDtos(contentId, toolSessionId, itemIds, isCommentsByOtherUsersRequired,
+		userId);
     }
 
     @Override
@@ -900,10 +901,10 @@ public class QaServicePOJO
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getQaOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -975,10 +976,10 @@ public class QaServicePOJO
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
@@ -1206,35 +1207,37 @@ public class QaServicePOJO
 	if (learner == null) {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
-	
+
 	Date startDate = null;
 	Date endDate = null;
 	Set<QaUsrResp> attempts = learner.getQaUsrResps();
 	for (QaUsrResp item : attempts) {
 	    Date newDate = item.getAttemptTime();
 	    if (newDate != null) {
-		if (startDate == null || newDate.before(startDate))
+		if (startDate == null || newDate.before(startDate)) {
 		    startDate = newDate;
-		if (endDate == null || newDate.after(endDate))
+		}
+		if (endDate == null || newDate.after(endDate)) {
 		    endDate = newDate;
+		}
 	    }
 	}
 
-	if (learner.isLearnerFinished())
+	if (learner.isLearnerFinished()) {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, endDate);
-	else
+	} else {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
+	}
     }
     // ****************** REST methods *************************
 
     /**
      * Rest call to create a new Q&A content. Required fields in toolContentJSON: title, instructions, questions. The
-     * questions entry should be JSONArray containing JSON objects, which in turn must contain "questionText",
+     * questions entry should be ArrayNode containing JSON objects, which in turn must contain "questionText",
      * "displayOrder" and may also contain feedback and required (boolean)
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
 	QaContent qa = new QaContent();
 	Date updateDate = new Date();
@@ -1244,26 +1247,26 @@ public class QaServicePOJO
 	qa.setCreatedBy(userID.longValue());
 
 	qa.setQaContentId(toolContentID);
-	qa.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	qa.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	qa.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	qa.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 
 	qa.setDefineLater(false);
 
-	qa.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	qa.setNoReeditAllowed(JsonUtil.opt(toolContentJSON, "noReeditAllowed", Boolean.FALSE));
-	qa.setAllowRichEditor(JsonUtil.opt(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
+	qa.setLockWhenFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	qa.setNoReeditAllowed(JsonUtil.optBoolean(toolContentJSON, "noReeditAllowed", Boolean.FALSE));
+	qa.setAllowRichEditor(JsonUtil.optBoolean(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
 	qa.setUseSelectLeaderToolOuput(
-		JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
-	qa.setMinimumRates(JsonUtil.opt(toolContentJSON, RestTags.MINIMUM_RATES, 0));
-	qa.setMaximumRates(JsonUtil.opt(toolContentJSON, RestTags.MAXIMUM_RATES, 0));
-	qa.setShowOtherAnswers(JsonUtil.opt(toolContentJSON, "showOtherAnswers", Boolean.TRUE));
-	qa.setUsernameVisible(JsonUtil.opt(toolContentJSON, "usernameVisible", Boolean.FALSE));
-	qa.setAllowRateAnswers(JsonUtil.opt(toolContentJSON, "allowRateAnswers", Boolean.FALSE));
+		JsonUtil.optBoolean(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+	qa.setMinimumRates(JsonUtil.optInt(toolContentJSON, RestTags.MINIMUM_RATES, 0));
+	qa.setMaximumRates(JsonUtil.optInt(toolContentJSON, RestTags.MAXIMUM_RATES, 0));
+	qa.setShowOtherAnswers(JsonUtil.optBoolean(toolContentJSON, "showOtherAnswers", Boolean.TRUE));
+	qa.setUsernameVisible(JsonUtil.optBoolean(toolContentJSON, "usernameVisible", Boolean.FALSE));
+	qa.setAllowRateAnswers(JsonUtil.optBoolean(toolContentJSON, "allowRateAnswers", Boolean.FALSE));
 	qa.setNotifyTeachersOnResponseSubmit(
-		JsonUtil.opt(toolContentJSON, "notifyTeachersOnResponseSubmit", Boolean.FALSE));
-	qa.setReflect(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	qa.setReflectionSubject(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
-	qa.setQuestionsSequenced(JsonUtil.opt(toolContentJSON, "questionsSequenced", Boolean.FALSE));
+		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnResponseSubmit", Boolean.FALSE));
+	qa.setReflect(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	qa.setReflectionSubject(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	qa.setQuestionsSequenced(JsonUtil.optBoolean(toolContentJSON, "questionsSequenced", Boolean.FALSE));
 
 	// submissionDeadline is set in monitoring
 	// qa.setMonitoringReportTitle(); Can't find this field in the database - assuming unused.
@@ -1272,18 +1275,16 @@ public class QaServicePOJO
 
 	saveOrUpdateQaContent(qa);
 	// Questions
-	JSONArray questions = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
-	for (int i = 0; i < questions.length(); i++) {
-	    JSONObject questionData = (JSONObject) questions.get(i);
-	    QaQueContent question = new QaQueContent(questionData.getString(RestTags.QUESTION_TEXT),
-		    questionData.getInt(RestTags.DISPLAY_ORDER), JsonUtil.opt(questionData, "feedback", (String) null),
-		    JsonUtil.opt(questionData, "required", Boolean.FALSE),
-		    JsonUtil.opt(questionData, "minWordsLimit", 0), qa);
+	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
+	for (JsonNode questionData : questions) {
+	    QaQueContent question = new QaQueContent(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT),
+		    JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER), JsonUtil.optString(questionData, "feedback"),
+		    JsonUtil.optBoolean(questionData, "required", Boolean.FALSE),
+		    JsonUtil.optInt(questionData, "minWordsLimit", 0), qa);
 	    saveOrUpdateQuestion(question);
 	}
 
 	// TODO
 	// qa.setConditions(conditions);
-
     }
 }

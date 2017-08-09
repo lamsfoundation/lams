@@ -34,9 +34,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
@@ -55,10 +52,15 @@ import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedExceptio
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Manpreet Minhas
@@ -279,7 +281,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     private Vector<FolderContentDTO> getFolderContentsInternal(User user, WorkspaceFolder workspaceFolder, Integer mode,
 	    String methodName, WorkspaceFolder skipFolder)
 	    throws UserAccessDeniedException, RepositoryCheckedException {
-	Vector<FolderContentDTO> contentDTO = new Vector<FolderContentDTO>();
+	Vector<FolderContentDTO> contentDTO = new Vector<>();
 	if (user != null) {
 	    Integer permissions = getPermissions(workspaceFolder, user);
 	    if (permissions != WorkspaceFolder.NO_ACCESS) {
@@ -334,22 +336,21 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     @Override
     public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns)
-	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
+	    throws IOException, UserAccessDeniedException, RepositoryCheckedException {
 	return getFolderContentsJSON(folderID, userID, allowInvalidDesigns, false, null);
     }
 
     @Override
     public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns,
-	    String designType)
-	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
+	    String designType) throws IOException, UserAccessDeniedException, RepositoryCheckedException {
 
 	return getFolderContentsJSON(folderID, userID, allowInvalidDesigns, false, designType);
     }
 
     public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns,
 	    boolean designsOnly, String designType)
-	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
-	JSONObject result = new JSONObject();
+	    throws IOException, UserAccessDeniedException, RepositoryCheckedException {
+	ObjectNode result = JsonNodeFactory.instance.objectNode();
 	Vector<FolderContentDTO> folderContents = null;
 
 	// folderID == null: get all user accessible folders
@@ -359,7 +360,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    FolderContentDTO userFolder = getUserWorkspaceFolder(userID);
 
 	    if (folderID == null) {
-		folderContents = new Vector<FolderContentDTO>(3);
+		folderContents = new Vector<>(3);
 
 		if (userFolder != null) {
 		    folderContents.add(userFolder);
@@ -407,7 +408,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	for (FolderContentDTO folderContent : folderContents) {
 	    String contentType = folderContent.getResourceType();
 	    if (FolderContentDTO.FOLDER.equals(contentType) && !designsOnly) {
-		JSONObject subfolderJSON = new JSONObject();
+		ObjectNode subfolderJSON = JsonNodeFactory.instance.objectNode();
 		subfolderJSON.put("name", folderContent.getName() == null ? "" : folderContent.getName());
 		subfolderJSON.put("isRunSequencesFolder",
 			WorkspaceFolder.RUN_SEQUENCES.equals(folderContent.getResourceTypeID() == null ? null
@@ -415,7 +416,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		subfolderJSON.put("folderID", folderContent.getResourceID().intValue());
 		subfolderJSON.put("canModify", WorkspaceFolder.OWNER_ACCESS.equals(folderContent.getPermissionCode())
 			|| ((user != null) && isSysAuthorAdmin(user)));
-		result.append("folders", subfolderJSON);
+		result.withArray("folders").add(subfolderJSON);
 	    } else if (FolderContentDTO.DESIGN.equals(contentType)) {
 		if (folderContent.getDesignType() == null) {
 		    folderContent.setDesignType(WorkspaceManagementService.DEFAULT_DESIGN_TYPE);
@@ -427,15 +428,15 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 			? folderContent.getDesignType().equals(WorkspaceManagementService.DEFAULT_DESIGN_TYPE)
 			: (designType.equals(WorkspaceManagementService.ALL_DESIGN_TYPES)
 				|| designType.equals(folderContent.getDesignType()))) {
-		    JSONObject learningDesignJSON = new JSONObject();
+		    ObjectNode learningDesignJSON = JsonNodeFactory.instance.objectNode();
 		    learningDesignJSON.put("name", folderContent.getName() == null ? "" : folderContent.getName());
 		    learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
-		    learningDesignJSON.putOpt("type", folderContent.getDesignType());
-		    learningDesignJSON.put("date", folderContent.getLastModifiedDateTime());
+		    JsonUtil.putOpt(learningDesignJSON, "type", folderContent.getDesignType());
+		    learningDesignJSON.put("date", folderContent.getLastModifiedDateTime().toString());
 		    learningDesignJSON.put("canModify",
 			    WorkspaceFolder.OWNER_ACCESS.equals(folderContent.getPermissionCode())
 				    || ((user != null) && isSysAuthorAdmin(user)));
-		    result.append("learningDesigns", learningDesignJSON);
+		    result.withArray("learningDesigns").add(learningDesignJSON);
 		}
 	    } else {
 		if (log.isDebugEnabled()) {
@@ -449,11 +450,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     @Override
     public String getPagedLearningDesignsJSON(Integer userID, boolean allowInvalidDesigns, String searchString,
-	    int page, int size, String sortName, String sortDate) throws JSONException, IOException {
-
-	JSONArray result = new JSONArray();
+	    int page, int size, String sortName, String sortDate) throws IOException {
+	ArrayNode resultJSON = JsonNodeFactory.instance.arrayNode();
 	Pattern searchPattern = searchString != null
-		? Pattern.compile(Pattern.quote(searchString), Pattern.CASE_INSENSITIVE) : null;
+		? Pattern.compile(Pattern.quote(searchString), Pattern.CASE_INSENSITIVE)
+		: null;
 	FolderContentDTO userFolder = getUserWorkspaceFolder(userID);
 	long numDesigns = 0;
 
@@ -481,27 +482,27 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    while (iterator.hasNext()) {
 		LearningDesign design = (LearningDesign) iterator.next();
 		if ((searchPattern == null) || (searchPattern.matcher(design.getTitle()).find())) {
-		    JSONObject learningDesignJSON = new JSONObject();
+		    ObjectNode learningDesignJSON = JsonNodeFactory.instance.objectNode();
 		    learningDesignJSON.put("name", StringEscapeUtils.escapeHtml(design.getTitle()));
 		    learningDesignJSON.put("learningDesignId", design.getLearningDesignId());
-		    learningDesignJSON.putOpt("type", design.getDesignType() != null ? design.getDesignType()
+		    learningDesignJSON.put("type", design.getDesignType() != null ? design.getDesignType()
 			    : WorkspaceManagementService.DEFAULT_DESIGN_TYPE);
-		    learningDesignJSON.put("date", design.getLastModifiedDateTime());
-		    result.put(learningDesignJSON);
+		    learningDesignJSON.put("date", design.getLastModifiedDateTime().toString());
+		    resultJSON.add(learningDesignJSON);
 		}
 	    }
 
 	    // what is the total number (so the pager knows whether to allow paging)
 	    // if we did a search, then no paging just return the whole lot.
 	    // otherwise need the whole count from the db.
-	    numDesigns = searchPattern != null ? result.length()
+	    numDesigns = searchPattern != null ? resultJSON.size()
 		    : learningDesignDAO.countAllLearningDesigns(folderId, !allowInvalidDesigns);
 	}
 
-	JSONObject completeResult = new JSONObject();
+	ObjectNode completeResult = JsonNodeFactory.instance.objectNode();
 	completeResult.put("total_rows", numDesigns);
-	if (result.length() > 0) {
-	    completeResult.put("rows", result);
+	if (resultJSON.size() > 0) {
+	    completeResult.set("rows", resultJSON);
 	}
 	return completeResult.toString();
     }
@@ -837,7 +838,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      */
     @Override
     public Vector getAccessibleOrganisationWorkspaceFolders(User user) throws IOException {
-	Vector<FolderContentDTO> folders = new Vector<FolderContentDTO>();
+	Vector<FolderContentDTO> folders = new Vector<>();
 
 	if (user != null) {
 	    // Get a list of organisations of which the given user is a member

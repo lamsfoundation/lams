@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.rest;
 
 import java.io.IOException;
@@ -33,8 +32,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
@@ -55,6 +52,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * Base class for LAMS REST servlets.
  *
@@ -73,15 +74,15 @@ public abstract class RestServlet extends HttpServlet {
     /**
      * Checks if the provided auth JSON is valid.
      */
-    private UserDTO authenticate(JSONObject authenticationJSON) {
+    private UserDTO authenticate(JsonNode authenticationJSON) {
 	User user = null;
 	try {
-	    String serverName = authenticationJSON.getString(LoginRequestDispatcher.PARAM_SERVER_ID);
+	    String serverName = authenticationJSON.get(LoginRequestDispatcher.PARAM_SERVER_ID).asText();
 	    ExtServer extServer = getIntegrationService().getExtServer(serverName);
-	    String userName = authenticationJSON.getString(LoginRequestDispatcher.PARAM_USER_ID);
-	    String method = authenticationJSON.getString(LoginRequestDispatcher.PARAM_METHOD).toLowerCase();
-	    String timestamp = authenticationJSON.getString(LoginRequestDispatcher.PARAM_TIMESTAMP);
-	    String hash = authenticationJSON.getString(LoginRequestDispatcher.PARAM_HASH);
+	    String userName = authenticationJSON.get(LoginRequestDispatcher.PARAM_USER_ID).asText();
+	    String method = authenticationJSON.get(LoginRequestDispatcher.PARAM_METHOD).asText().toLowerCase();
+	    String timestamp = authenticationJSON.get(LoginRequestDispatcher.PARAM_TIMESTAMP).asText();
+	    String hash = authenticationJSON.get(LoginRequestDispatcher.PARAM_HASH).asText();
 
 	    // Throws AuthenticationException if it fails
 	    Authenticator.authenticateLoginRequest(extServer, timestamp, userName, method, null, hash);
@@ -91,8 +92,6 @@ public abstract class RestServlet extends HttpServlet {
 	    // get concrete user
 	    user = (User) getUserManagementService().findById(User.class, user.getUserId());
 	    return user.getUserDTO();
-	} catch (JSONException e) {
-	    RestServlet.log.error("Error while reading authentication JSON", e);
 	} catch (AuthenticationException e) {
 	    RestServlet.log.error("The user was not authenticated", e);
 	} catch (UserInfoFetchException e) {
@@ -116,14 +115,8 @@ public abstract class RestServlet extends HttpServlet {
     protected final void doPost(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 	String requestBody = IOUtils.toString(request.getInputStream(), "UTF-8");
-	JSONObject requestJSON = null;
-	JSONObject authenticationJSON = null;
-	try {
-	    requestJSON = new JSONObject(requestBody);
-	    authenticationJSON = requestJSON.getJSONObject("auth");
-	} catch (JSONException e) {
-	    throw new IOException("Error while parsing REST request JSON", e);
-	}
+	ObjectNode requestJSON = new ObjectMapper().readValue(requestBody, ObjectNode.class);
+	JsonNode authenticationJSON = requestJSON.get("auth");
 
 	UserDTO userDTO = authenticate(authenticationJSON);
 	if (userDTO == null) {
@@ -162,7 +155,7 @@ public abstract class RestServlet extends HttpServlet {
 	}
     }
 
-    protected abstract void doPostInternal(JSONObject requestJSON, UserDTO userDTO, HttpServletResponse response)
+    protected abstract void doPostInternal(ObjectNode requestJSON, UserDTO userDTO, HttpServletResponse response)
 	    throws Exception;
 
     protected final IAuthoringService getAuthoringService() {

@@ -54,6 +54,8 @@
 			<include name="javax/websocket/api/main/jboss-websocket-api*.jar" />
 			<include name="org/jboss/as/controller-client/main/wildfly-controller-client-*.jar" />
 			<include name="org/jboss/dmr/main/jboss-dmr-*.jar" />
+			<include name="com/fasterxml/jackson/core/jackson-core/main/jackson-core-*.jar" />
+			<include name="com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">

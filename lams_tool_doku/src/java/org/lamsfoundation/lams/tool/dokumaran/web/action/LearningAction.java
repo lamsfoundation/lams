@@ -40,8 +40,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -65,6 +63,9 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Steve.Ni
  */
@@ -76,7 +77,8 @@ public class LearningAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException, DokumaranConfigurationException, URISyntaxException, DokumaranApplicationException {
+	    HttpServletResponse response) throws IOException, ServletException, DokumaranConfigurationException,
+	    URISyntaxException, DokumaranApplicationException {
 
 	String param = mapping.getParameter();
 	// -----------------------Dokumaran Learner function ---------------------------
@@ -106,15 +108,17 @@ public class LearningAction extends Action {
      * method run successfully.
      *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * @throws DokumaranConfigurationException 
-     * @throws URISyntaxException 
+     *
+     * @throws DokumaranConfigurationException
+     * @throws URISyntaxException
      *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws DokumaranConfigurationException, DokumaranApplicationException, URISyntaxException {
+	    HttpServletResponse response)
+	    throws DokumaranConfigurationException, DokumaranApplicationException, URISyntaxException {
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(DokumaranConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
@@ -147,14 +151,15 @@ public class LearningAction extends Action {
 
 	// support for leader select feature
 	List<DokumaranUser> leaders = dokumaran.isUseSelectLeaderToolOuput()
-		? service.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionId).longValue(), isFirstTimeAccess)
-		: new ArrayList<DokumaranUser>();
+		? service.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionId).longValue(),
+			isFirstTimeAccess)
+		: new ArrayList<>();
 	// forwards to the leaderSelection page
 	if (dokumaran.isUseSelectLeaderToolOuput() && leaders.isEmpty() && !mode.isTeacher()) {
-	
+
 	    // get group users and store it to request as DTO objects
 	    List<DokumaranUser> groupUsers = service.getUsersBySession(toolSessionId);
-	    List<User> groupUserDtos = new ArrayList<User>();
+	    List<User> groupUserDtos = new ArrayList<>();
 	    for (DokumaranUser groupUser : groupUsers) {
 		User groupUserDto = new User();
 		groupUserDto.setFirstName(groupUser.getFirstName());
@@ -169,7 +174,7 @@ public class LearningAction extends Action {
 	if (dokumaran.getTimeLimit() > 0 && dokumaran.getTimeLimitLaunchedDate() == null) {
 	    return mapping.findForward("waitForTimeLimitLaunch");
 	}
-	
+
 	boolean isUserLeader = (user != null) && service.isUserLeader(leaders, user.getUserId());
 
 	// check whether finish lock is on/off
@@ -184,7 +189,8 @@ public class LearningAction extends Action {
 	sessionMap.put(DokumaranConstants.ATTR_LOCK_ON_FINISH, dokumaran.getLockWhenFinished());
 	sessionMap.put(DokumaranConstants.ATTR_USER_FINISHED, (user != null) && user.isSessionFinished());
 	sessionMap.put(DokumaranConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
-	sessionMap.put(DokumaranConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, service.isLeaderResponseFinalized(leaders));
+	sessionMap.put(DokumaranConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED,
+		service.isLeaderResponseFinalized(leaders));
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 
@@ -216,23 +222,25 @@ public class LearningAction extends Action {
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	sessionMap.put(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
-	
+
 	// get the API key from the config table and add it to the session
-	DokumaranConfigItem etherpadServerUrlConfig = dokumaranService.getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
+	DokumaranConfigItem etherpadServerUrlConfig = dokumaranService
+		.getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
 	DokumaranConfigItem apiKeyConfig = dokumaranService.getConfigItem(DokumaranConfigItem.KEY_API_KEY);
-	if (apiKeyConfig == null || apiKeyConfig.getConfigValue() == null || etherpadServerUrlConfig == null || etherpadServerUrlConfig.getConfigValue() == null) {
+	if (apiKeyConfig == null || apiKeyConfig.getConfigValue() == null || etherpadServerUrlConfig == null
+		|| etherpadServerUrlConfig.getConfigValue() == null) {
 	    return mapping.findForward("notconfigured");
 	}
 	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
 	request.setAttribute(DokumaranConstants.KEY_ETHERPAD_SERVER_URL, etherpadServerUrl);
-	
+
 	//time limit
 	boolean isTimeLimitEnabled = hasEditRight && !finishedLock && dokumaran.getTimeLimit() != 0;
 	long secondsLeft = isTimeLimitEnabled ? service.getSecondsLeft(dokumaran) : 0;
 	request.setAttribute(DokumaranConstants.ATTR_SECONDS_LEFT, secondsLeft);
-	
+
 	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(dokumaran);
-	
+
 	String padId = session.getPadId();
 	//in case of non-leader or finished lock or isTimeLimitExceeded - show Etherpad in readonly mode
 	if (dokumaran.isUseSelectLeaderToolOuput() && !isUserLeader || finishedLock || isTimeLimitExceeded) {
@@ -243,7 +251,7 @@ public class LearningAction extends Action {
 	    }
 	}
 	request.setAttribute(DokumaranConstants.ATTR_PAD_ID, padId);
-	
+
 	//add new sessionID cookie in order to access pad
 	if (user != null) {
 	    Cookie etherpadSessionCookie = service.createEtherpadCookieForLearner(user, session);
@@ -252,22 +260,22 @@ public class LearningAction extends Action {
 
 	return mapping.findForward(DokumaranConstants.SUCCESS);
     }
-    
+
     /**
      * Checks Leader Progress
      */
     private ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 
 	IDokumaranService service = getDokumaranService();
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	boolean isLeaderResponseFinalized = service.isLeaderResponseFinalized(toolSessionId);
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put(DokumaranConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, isLeaderResponseFinalized);
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put(DokumaranConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, isLeaderResponseFinalized);
 	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(responseJSON);
 	return null;
     }
 
@@ -400,8 +408,8 @@ public class LearningAction extends Action {
     private DokumaranUser getSpecifiedUser(IDokumaranService service, Long sessionId, Integer userId) {
 	DokumaranUser dokumaranUser = service.getUserByIDAndSession(new Long(userId.intValue()), sessionId);
 	if (dokumaranUser == null) {
-	    LearningAction.log
-		    .error("Unable to find specified user for dokumaran activity. Screens are likely to fail. SessionId="
+	    LearningAction.log.error(
+		    "Unable to find specified user for dokumaran activity. Screens are likely to fail. SessionId="
 			    + sessionId + " UserId=" + userId);
 	}
 	return dokumaranUser;

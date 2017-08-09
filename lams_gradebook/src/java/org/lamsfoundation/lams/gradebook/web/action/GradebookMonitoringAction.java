@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook.web.action;
 
 import java.io.IOException;
@@ -39,8 +38,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
@@ -58,12 +55,16 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author lfoxton
@@ -104,7 +105,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	    LessonDetailsDTO lessonDetatilsDTO = lesson.getLessonDetails();
 	    request.setAttribute("lessonDetails", lessonDetatilsDTO);
 	    request.setAttribute("marksReleased", marksReleased);
-	    
+
 	    request.setAttribute("isInTabs", WebUtil.readBooleanParam(request, "isInTabs", false));
 
 	    return mapping.findForward("monitorgradebook");
@@ -371,7 +372,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
-	
+
 	boolean simplified = WebUtil.readBooleanParam(request, "simplified", false);
 
 	Organisation organisation = (Organisation) getUserService().findById(Organisation.class, organisationID);
@@ -401,12 +402,12 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
 	return null;
     }
-    
+
     /**
      * Get the raw marks for display in a histogram.
      */
     public ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonID, getUser().getUserID(),
@@ -416,12 +417,13 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	}
 
 	List<Number> results = getGradebookService().getMarksArray(lessonID);
-	
-	JSONObject responseJSON = new JSONObject();
-	if ( results != null )
-	    responseJSON.put("data", results);
-	else 
-	    responseJSON.put("data", new Float[0]);
+
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	if (results != null) {
+	    responseJSON.set("data", JsonUtil.readArray(results));
+	} else {
+	    responseJSON.set("data", JsonUtil.readArray(new Float[0]));
+	}
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
@@ -432,11 +434,6 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
     private UserDTO getUser() {
 	HttpSession ss = SessionManager.getSession();
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);
-    }
-
-    private ActionForward displayMessage(ActionMapping mapping, HttpServletRequest req, String messageKey) {
-	req.setAttribute("messageKey", messageKey);
-	return mapping.findForward("message");
     }
 
     private IUserManagementService getUserService() {

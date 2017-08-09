@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.admin.web;
 
 import java.io.IOException;
@@ -36,9 +35,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
+
+
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -46,6 +44,10 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author jliew
@@ -80,7 +82,7 @@ public class UserSearchAction extends LamsDispatchAction {
      * Returns list of paged users.
      */
     public ActionForward getPagedUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 	initServices();
 
 	// the organisation type of the children
@@ -120,13 +122,12 @@ public class UserSearchAction extends LamsDispatchAction {
 
 	List<UserDTO> userDtos = service.getAllUsersPaged(page, size, sortBy, sortOrder, searchString);
 
-	JSONObject responcedata = new JSONObject();
+	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
 	responcedata.put("total_rows", service.getCountUsers(searchString));
 
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	for (UserDTO userDto : userDtos) {
-
-	    JSONObject responseRow = new JSONObject();
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 	    responseRow.put("userId", userDto.getUserID());
 	    responseRow.put("login", StringEscapeUtils.escapeHtml(userDto.getLogin()));
 	    String firstName = userDto.getFirstName() == null ? "" : userDto.getFirstName();
@@ -136,9 +137,9 @@ public class UserSearchAction extends LamsDispatchAction {
 	    String email = userDto.getEmail() == null ? "" : userDto.getEmail();
 	    responseRow.put("email", StringEscapeUtils.escapeHtml(email));
 
-	    rows.put(responseRow);
+	    rows.add(responseRow);
 	}
-	responcedata.put("rows", rows);
+	responcedata.set("rows", rows);
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responcedata.toString()));
 	return null;

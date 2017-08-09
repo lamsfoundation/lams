@@ -20,12 +20,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.rest;
 
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
+import java.io.IOException;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public interface ToolRestManager {
-    void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException;
+    void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) throws IOException;
 }

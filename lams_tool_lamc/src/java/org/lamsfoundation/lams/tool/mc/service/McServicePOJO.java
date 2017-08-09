@@ -51,9 +51,6 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -110,6 +107,10 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -328,7 +329,7 @@ public class McServicePOJO
 	    // persist candidate answers
 	    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
 	    Set<McOptsContent> oldOptions = question.getMcOptionsContents();
-	    Set<McOptsContent> newOptions = new HashSet<McOptsContent>();
+	    Set<McOptsContent> newOptions = new HashSet<>();
 	    int displayOrderOption = 1;
 	    for (McOptionDTO optionDTO : optionDTOs) {
 
@@ -495,19 +496,19 @@ public class McServicePOJO
 
     @Override
     public List<AnswerDTO> getAnswersFromDatabase(McContent mcContent, McQueUsr user) {
-	List<AnswerDTO> answerDtos = new LinkedList<AnswerDTO>();
+	List<AnswerDTO> answerDtos = new LinkedList<>();
 	List<McQueContent> questions = this.getQuestionsByContentUid(mcContent.getUid());
 
 	for (McQueContent question : questions) {
 	    AnswerDTO answerDto = new AnswerDTO();
 	    Set<McOptsContent> optionSet = question.getMcOptionsContents();
-	    List<McOptsContent> optionList = new LinkedList<McOptsContent>(optionSet);
+	    List<McOptsContent> optionList = new LinkedList<>(optionSet);
 
 	    boolean randomize = mcContent.isRandomize();
 	    if (randomize) {
-		ArrayList<McOptsContent> shuffledList = new ArrayList<McOptsContent>(optionList);
+		ArrayList<McOptsContent> shuffledList = new ArrayList<>(optionList);
 		Collections.shuffle(shuffledList);
-		optionList = new LinkedList<McOptsContent>(shuffledList);
+		optionList = new LinkedList<>(shuffledList);
 	    }
 
 	    answerDto.setQuestion(question.getQuestion());
@@ -545,8 +546,8 @@ public class McServicePOJO
 
     @Override
     public List<McSessionMarkDTO> buildGroupsMarkData(McContent mcContent, boolean isFullAttemptDetailsRequired) {
-	List<McSessionMarkDTO> listMonitoredMarksContainerDTO = new LinkedList<McSessionMarkDTO>();
-	Set<McSession> sessions = new TreeSet<McSession>(new McSessionComparator());
+	List<McSessionMarkDTO> listMonitoredMarksContainerDTO = new LinkedList<>();
+	Set<McSession> sessions = new TreeSet<>(new McSessionComparator());
 	sessions.addAll(mcContent.getMcSessions());
 	int numQuestions = mcContent.getMcQueContents().size();
 
@@ -593,7 +594,8 @@ public class McServicePOJO
 		    for (McUsrAttempt attempt : finalizedUserAttempts) {
 			Integer displayOrder = attempt.getMcQueContent().getDisplayOrder();
 			int arrayIndex = (displayOrder != null) && (displayOrder.intValue() > 0)
-				? displayOrder.intValue() - 1 : 1;
+				? displayOrder.intValue() - 1
+				: 1;
 			if (userMarks[arrayIndex] == null) {
 
 			    // We get the mark for the attempt if the answer is correct and we don't allow
@@ -666,7 +668,7 @@ public class McServicePOJO
 		    e);
 	}
     }
-    
+
     @Override
     public List<ToolOutputDTO> getLearnerMarksByContentId(Long toolContentId) {
 	return mcUsrAttemptDAO.getLearnerMarksByContentId(toolContentId);
@@ -805,9 +807,9 @@ public class McServicePOJO
 	    List<McQuestionDTO> questionDTOs, List<McQuestionDTO> deletedQuestions) {
 
 	// create list of modified questions
-	List<McQuestionDTO> modifiedQuestions = new ArrayList<McQuestionDTO>();
+	List<McQuestionDTO> modifiedQuestions = new ArrayList<>();
 	// create list of modified question marks
-	List<McQuestionDTO> modifiedQuestionsMarksOnly = new ArrayList<McQuestionDTO>();
+	List<McQuestionDTO> modifiedQuestionsMarksOnly = new ArrayList<>();
 	for (McQueContent oldQuestion : oldQuestions) {
 	    for (McQuestionDTO questionDTO : questionDTOs) {
 		if (oldQuestion.getUid().equals(questionDTO.getUid())) {
@@ -1034,7 +1036,7 @@ public class McServicePOJO
 
 	row = sheet.createRow(rowCount++);
 	count = 1;
-	ArrayList<String> correctAnswers = new ArrayList<String>();
+	ArrayList<String> correctAnswers = new ArrayList<>();
 	cell = row.createCell(count++);
 	cell.setCellValue(messageService.getMessage("label.correct.answer"));
 	for (McQueContent question : questions) {
@@ -1061,7 +1063,7 @@ public class McServicePOJO
 	cell = row.createCell(count++);
 	cell.setCellValue(messageService.getMessage("label.learner"));
 
-	ArrayList<Integer> totalPercentList = new ArrayList<Integer>();
+	ArrayList<Integer> totalPercentList = new ArrayList<>();
 	int[] numberOfCorrectAnswersPerQuestion = new int[questions.size()];
 	for (McSessionMarkDTO sessionMarkDTO : sessionMarkDTOs) {
 	    Map<String, McUserMarkDTO> usersMarksMap = sessionMarkDTO.getUserMarks();
@@ -1528,7 +1530,7 @@ public class McServicePOJO
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return mcOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return mcOutputFactory.getToolOutputs(name, this, toolContentId);
@@ -1587,10 +1589,10 @@ public class McServicePOJO
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
@@ -1689,7 +1691,7 @@ public class McServicePOJO
 
     @Override
     public List<ReflectionDTO> getReflectionList(McContent mcContent, Long userID) {
-	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<ReflectionDTO>();
+	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<>();
 	if (userID == null) {
 	    // all users mode
 	    for (McSession mcSession : (Set<McSession>) mcContent.getMcSessions()) {
@@ -1826,40 +1828,49 @@ public class McServicePOJO
 	for (McUsrAttempt item : attempts) {
 	    Date newDate = item.getAttemptTime();
 	    if (newDate != null) {
-		if (startDate == null || newDate.before(startDate))
+		if (startDate == null || newDate.before(startDate)) {
 		    startDate = newDate;
-		if (endDate == null || newDate.after(endDate))
+		}
+		if (endDate == null || newDate.after(endDate)) {
 		    endDate = newDate;
+		}
 	    }
 	}
 
-	if (learner.isResponseFinalised())
+	if (learner.isResponseFinalised()) {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, endDate);
-	else
+	} else {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
+	}
     }
 
     @Override
     public LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId) {
 	LeaderResultsDTO newDto = new LeaderResultsDTO(contentId);
 	Object[] markStats = mcUserDAO.getStatsMarksForLeaders(contentId);
-	if ( markStats != null ) {
-	    newDto.setMinMark(markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[0], (Locale)null, 2) : "0.00");
-	    newDto.setAvgMark(markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[1], (Locale)null, 2) : "0.00");
-	    newDto.setMaxMark(markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[2], (Locale)null, 2) : "0.00");
-	    newDto.setNumberGroupsLeaderFinished((Integer)markStats[3]);
+	if (markStats != null) {
+	    newDto.setMinMark(
+		    markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setAvgMark(
+		    markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setMaxMark(
+		    markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setNumberGroupsLeaderFinished((Integer) markStats[3]);
 	}
 	return newDto;
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics) {
-	List<SessionDTO> sessionDtos = new ArrayList<SessionDTO>();
+	List<SessionDTO> sessionDtos = new ArrayList<>();
 
 	McContent mcContent = getMcContent(contentId);
 	if (mcContent != null) {
-	    Set<McSession> sessions = new TreeSet<McSession>(new McSessionComparator());
+	    Set<McSession> sessions = new TreeSet<>(new McSessionComparator());
 	    sessions.addAll(mcContent.getMcSessions());
 	    for (McSession session : sessions) {
 		SessionDTO sessionDto = new SessionDTO();
@@ -1872,11 +1883,14 @@ public class McServicePOJO
 		    Object[] markStats = mcUserDAO.getStatsMarksBySession(session.getMcSessionId());
 		    if (markStats != null) {
 			sessionDto.setMinMark(markStats[0] != null
-				? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2) : "0.00");
+				? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
+				: "0.00");
 			sessionDto.setAvgMark(markStats[1] != null
-				? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2) : "0.00");
+				? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
+				: "0.00");
 			sessionDto.setMaxMark(markStats[2] != null
-				? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2) : "0.00");
+				? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
+				: "0.00");
 		    }
 		}
 
@@ -1885,7 +1899,7 @@ public class McServicePOJO
 	}
 	return sessionDtos;
     }
-	
+
     @Override
     public List<Number> getMarksArray(Long sessionId) {
 	return mcUserDAO.getRawUserMarksBySession(sessionId);
@@ -1896,22 +1910,19 @@ public class McServicePOJO
 	return mcUserDAO.getRawLeaderMarksByToolContentId(toolContentId);
     }
 
-
-
     // ****************** REST methods *************************
 
     /**
      * Rest call to create a new Multiple Choice content. Required fields in toolContentJSON: "title", "instructions",
-     * "questions". The questions entry should be JSONArray containing JSON objects, which in turn must contain
-     * "questionText", "displayOrder" (Integer) and a JSONArray "answers". The answers entry should be JSONArray
+     * "questions". The questions entry should be ArrayNode containing JSON objects, which in turn must contain
+     * "questionText", "displayOrder" (Integer) and a ArrayNode "answers". The answers entry should be ArrayNode
      * containing JSON objects, which in turn must contain "answerText", "displayOrder" (Integer), "correct" (Boolean).
      *
      * Retries are controlled by lockWhenFinished, which defaults to true (no retries).
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
 	McContent mcq = new McContent();
 	Date updateDate = new Date();
@@ -1922,37 +1933,38 @@ public class McServicePOJO
 	mcq.setDefineLater(false);
 
 	mcq.setMcContentId(toolContentID);
-	mcq.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	mcq.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	mcq.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	mcq.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 
-	mcq.setRetries(JsonUtil.opt(toolContentJSON, "allowRetries", Boolean.FALSE));
+	mcq.setRetries(JsonUtil.optBoolean(toolContentJSON, "allowRetries", Boolean.FALSE));
 	mcq.setUseSelectLeaderToolOuput(
-		JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
-	mcq.setReflect(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	mcq.setReflectionSubject(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, ""));
-	mcq.setQuestionsSequenced(JsonUtil.opt(toolContentJSON, "questionsSequenced", Boolean.FALSE));
-	mcq.setRandomize(JsonUtil.opt(toolContentJSON, "randomize", Boolean.FALSE));
-	mcq.setShowReport(JsonUtil.opt(toolContentJSON, "showReport", Boolean.FALSE));
-	mcq.setDisplayAnswers(JsonUtil.opt(toolContentJSON, "displayAnswers", Boolean.FALSE));
-	mcq.setShowMarks(JsonUtil.opt(toolContentJSON, "showMarks", Boolean.FALSE));
-	mcq.setPrefixAnswersWithLetters(JsonUtil.opt(toolContentJSON, "prefixAnswersWithLetters", Boolean.TRUE));
-	mcq.setPassMark(JsonUtil.opt(toolContentJSON, "passMark", 0));
+		JsonUtil.optBoolean(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+	mcq.setReflect(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	mcq.setReflectionSubject(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, ""));
+	mcq.setQuestionsSequenced(JsonUtil.optBoolean(toolContentJSON, "questionsSequenced", Boolean.FALSE));
+	mcq.setRandomize(JsonUtil.optBoolean(toolContentJSON, "randomize", Boolean.FALSE));
+	mcq.setShowReport(JsonUtil.optBoolean(toolContentJSON, "showReport", Boolean.FALSE));
+	mcq.setDisplayAnswers(JsonUtil.optBoolean(toolContentJSON, "displayAnswers", Boolean.FALSE));
+	mcq.setShowMarks(JsonUtil.optBoolean(toolContentJSON, "showMarks", Boolean.FALSE));
+	mcq.setPrefixAnswersWithLetters(JsonUtil.optBoolean(toolContentJSON, "prefixAnswersWithLetters", Boolean.TRUE));
+	mcq.setPassMark(JsonUtil.optInt(toolContentJSON, "passMark", 0));
 	// submissionDeadline is set in monitoring
 
 	createMc(mcq);
 
 	// Questions
-	JSONArray questions = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
-	for (int i = 0; i < questions.length(); i++) {
-	    JSONObject questionData = (JSONObject) questions.get(i);
-	    McQueContent question = new McQueContent(questionData.getString(RestTags.QUESTION_TEXT),
-		    questionData.getInt(RestTags.DISPLAY_ORDER), 1, "", mcq, null, new HashSet<McOptsContent>());
+	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
+	for (JsonNode questionData : questions) {
+	    McQueContent question = new McQueContent(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT),
+		    JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER), 1, "", mcq, null,
+		    new HashSet<McOptsContent>());
 
-	    JSONArray optionsData = questionData.getJSONArray(RestTags.ANSWERS);
-	    for (int j = 0; j < optionsData.length(); j++) {
-		JSONObject optionData = (JSONObject) optionsData.get(j);
-		question.getMcOptionsContents().add(new McOptsContent(optionData.getInt(RestTags.DISPLAY_ORDER),
-			optionData.getBoolean(RestTags.CORRECT), optionData.getString(RestTags.ANSWER_TEXT), question));
+	    ArrayNode optionsData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
+	    for (JsonNode optionData : optionsData) {
+		question.getMcOptionsContents()
+			.add(new McOptsContent(JsonUtil.optInt(optionData, RestTags.DISPLAY_ORDER),
+				JsonUtil.optBoolean(optionData, RestTags.CORRECT),
+				JsonUtil.optString(optionData, RestTags.ANSWER_TEXT), question));
 	    }
 	    saveOrUpdateMcQueContent(question);
 	}

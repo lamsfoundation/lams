@@ -31,8 +31,6 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -70,6 +68,9 @@ import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionToolCont
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.JsonUtil;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * An implementation of the ILeaderselectionService interface.
@@ -332,7 +333,7 @@ public class LeaderselectionService
     /* ********** ILeaderselectionService Methods ********************************* */
 
     @Override
-    public void setGroupLeader(Long userUid, Long toolSessionId) throws JSONException, IOException {
+    public void setGroupLeader(Long userUid, Long toolSessionId) throws IOException {
 	if ((userUid == null) || (toolSessionId == null)) {
 	    return;
 	}
@@ -615,14 +616,13 @@ public class LeaderselectionService
      * Rest call to create a new Learner Selection content. Required fields in toolContentJSON: "title", "instructions".
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 	Date updateDate = new Date();
 
 	Leaderselection leaderselection = new Leaderselection();
 	leaderselection.setToolContentId(toolContentID);
-	leaderselection.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	leaderselection.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	leaderselection.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	leaderselection.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 	leaderselection.setCreateBy(userID.longValue());
 	leaderselection.setCreateDate(updateDate);
 	leaderselection.setUpdateDate(updateDate);

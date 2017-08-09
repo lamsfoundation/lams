@@ -50,6 +50,8 @@
   	  <module name="io.undertow.servlet" export="true" />
   	  <module name="org.joda.time" export="true" />
   	  <module name="javax.mail.api" export="true" />
+  	  <module name="com.fasterxml.jackson.core.jackson-core" export="true" />
+      <module name="com.fasterxml.jackson.core.jackson-databind" export="true" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>

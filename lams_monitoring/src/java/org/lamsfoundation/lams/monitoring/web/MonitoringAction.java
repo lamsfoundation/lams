@@ -52,9 +52,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.ObjectExtractor;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -89,6 +86,7 @@ import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -99,8 +97,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The action servlet that provide all the monitoring functionalities. It interact with the teacher via JSP monitoring
@@ -311,7 +310,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	// either all users participate in a lesson, or we split them among instances
 	List<User> lessonInstanceLearners = splitNumberLessons == null ? learners
-		: new ArrayList<User>((learners.size() / splitNumberLessons) + 1);
+		: new ArrayList<>((learners.size() / splitNumberLessons) + 1);
 	for (int lessonIndex = 1; lessonIndex <= (splitNumberLessons == null ? 1 : splitNumberLessons); lessonIndex++) {
 	    String lessonInstanceName = lessonName;
 	    String learnerGroupInstanceName = learnerGroupName;
@@ -330,11 +329,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 
 	    if (LamsDispatchAction.log.isDebugEnabled()) {
-		LamsDispatchAction.log
-			.debug("Creating lesson "
-				+ (splitNumberLessons == null ? ""
-					: "(" + lessonIndex + "/" + splitNumberLessons + ") ")
-				+ "\"" + lessonInstanceName + "\"");
+		LamsDispatchAction.log.debug("Creating lesson "
+			+ (splitNumberLessons == null ? "" : "(" + lessonIndex + "/" + splitNumberLessons + ") ") + "\""
+			+ lessonInstanceName + "\"");
 	    }
 
 	    Lesson lesson = null;
@@ -513,7 +510,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * @throws ServletException
      */
     public ActionForward removeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, JSONException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Integer userId = getUserId();
 	boolean permanently = WebUtil.readBooleanParam(request, "permanently", false);
@@ -525,7 +522,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	JSONObject jsonObject = new JSONObject();
+	ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 
 	try {
 	    // if this method throws an Exception, there will be no removeLesson=true in the JSON reply
@@ -559,7 +556,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * @throws JSONException
      */
     public ActionForward forceComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 	getAuditService();
 	// get parameters
 	Long activityId = null;
@@ -578,7 +575,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean removeLearnerContent = WebUtil.readBooleanParam(request,
 		MonitoringConstants.PARAM_REMOVE_LEARNER_CONTENT, false);
 
-	JSONObject jsonCommand = new JSONObject();
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
 	jsonCommand.put("message", getMessageService().getMessage("force.complete.learner.command.message"));
 	jsonCommand.put("redirectURL", "/lams/learning/learner.do?method=joinLesson&lessonID=" + lessonId);
 	String command = jsonCommand.toString();
@@ -619,7 +616,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * Get learners who are part of the lesson class.
      */
     public ActionForward getLessonLearners(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, JSONException {
+	    HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get lesson learners", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -635,15 +632,15 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	List<User> learners = getLessonService().getLessonLearners(lessonId, searchPhrase,
 		MonitoringAction.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringAction.USER_PAGE_SIZE, orderAscending);
-	JSONArray learnersJSON = new JSONArray();
+	ArrayNode learnersJSON = JsonNodeFactory.instance.arrayNode();
 	for (User learner : learners) {
-	    learnersJSON.put(WebUtil.userToJSON(learner));
+	    learnersJSON.add(WebUtil.userToJSON(learner));
 	}
 
 	Integer learnerCount = getLessonService().getCountLessonLearners(lessonId, searchPhrase);
 
-	JSONObject responseJSON = new JSONObject();
-	responseJSON.put("learners", learnersJSON);
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.set("learners", learnersJSON);
 	responseJSON.put("learnerCount", learnerCount);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
@@ -654,7 +651,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * Gets learners or monitors of the lesson and organisation containing it.
      */
     public ActionForward getClassMembers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, JSONException {
+	    HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get class members", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -672,7 +669,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    pageNumber = 1;
 	}
 	boolean orderAscending = WebUtil.readBooleanParam(request, "orderAscending", true);
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 
 	// find organisation users and whether they participate in the current lesson
 	Map<User, Boolean> users = getLessonService().getUsersWithLessonParticipation(lessonId, role, searchPhrase,
@@ -685,18 +682,18 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	responseJSON.put("userCount", userCount);
 
-	JSONArray usersJSON = new JSONArray();
+	ArrayNode usersJSON = JsonNodeFactory.instance.arrayNode();
 	for (Entry<User, Boolean> userEntry : users.entrySet()) {
 	    User user = userEntry.getKey();
-	    JSONObject userJSON = WebUtil.userToJSON(user);
+	    ObjectNode userJSON = WebUtil.userToJSON(user);
 	    userJSON.put("classMember", userEntry.getValue());
 	    // teacher can't remove lesson creator and himself from the lesson staff
 	    if (isMonitor && (creator.getUserId().equals(user.getUserId()) || currentUserId.equals(user.getUserId()))) {
 		userJSON.put("readonly", true);
 	    }
-	    usersJSON.put(userJSON);
+	    usersJSON.add(userJSON);
 	}
-	responseJSON.put("users", usersJSON);
+	responseJSON.set("users", usersJSON);
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
@@ -707,8 +704,8 @@ public class MonitoringAction extends LamsDispatchAction {
      * Gets users in JSON format who are at the given activity at the moment or finished the given lesson.
      */
     public ActionForward getCurrentLearners(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, JSONException {
-	JSONArray learnersJSON = new JSONArray();
+	    HttpServletResponse response) throws IOException {
+	ArrayNode learnersJSON = JsonNodeFactory.instance.arrayNode();
 	Integer learnerCount = null;
 
 	Integer pageNumber = WebUtil.readIntParam(request, "pageNumber", true);
@@ -729,7 +726,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		    MonitoringAction.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringAction.USER_PAGE_SIZE,
 		    orderAscending);
 	    for (User learner : learners) {
-		learnersJSON.put(WebUtil.userToJSON(learner));
+		learnersJSON.add(WebUtil.userToJSON(learner));
 	    }
 
 	    learnerCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
@@ -742,21 +739,21 @@ public class MonitoringAction extends LamsDispatchAction {
 		return null;
 	    }
 
-	    Set<Long> activities = new TreeSet<Long>();
+	    Set<Long> activities = new TreeSet<>();
 	    activities.add(activityId);
 
 	    List<User> learners = getMonitoringService().getLearnersByActivities(activities.toArray(new Long[] {}),
 		    MonitoringAction.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringAction.USER_PAGE_SIZE,
 		    orderAscending);
 	    for (User learner : learners) {
-		learnersJSON.put(WebUtil.userToJSON(learner));
+		learnersJSON.add(WebUtil.userToJSON(learner));
 	    }
 	    learnerCount = getMonitoringService().getCountLearnersCurrentActivities(new Long[] { activityId })
 		    .get(activityId);
 	}
 
-	JSONObject responseJSON = new JSONObject();
-	responseJSON.put("learners", learnersJSON);
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.set("learners", learnersJSON);
 	responseJSON.put("learnerCount", learnerCount);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
@@ -767,7 +764,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * Adds/removes learners and monitors to/from lesson class.
      */
     public ActionForward updateLessonClass(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, JSONException {
+	    HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "update lesson class", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -812,7 +809,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	String module = WebUtil.readStrParam(request, "module", false);
 
-	ArrayList<String> languageCollection = new ArrayList<String>();
+	ArrayList<String> languageCollection = new ArrayList<>();
 	if (module.equals("timechart")) {
 
 	    languageCollection.add(new String("sys.error"));
@@ -941,7 +938,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * Gets users whose progress bars will be displayed in Learner tab in Monitor.
      */
     public ActionForward getLearnerProgressPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get learner progress page", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -960,9 +957,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	List<User> learners = isProgressSorted
 		? getMonitoringService().getLearnersByMostProgress(lessonId, searchPhrase, 10, (pageNumber - 1) * 10)
 		: getLessonService().getLessonLearners(lessonId, searchPhrase, 10, (pageNumber - 1) * 10, true);
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	for (User learner : learners) {
-	    responseJSON.append("learners", WebUtil.userToJSON(learner));
+	    responseJSON.withArray("learners").add(WebUtil.userToJSON(learner));
 	}
 
 	// get all possible learners matching the given phrase, if any; used for max page number
@@ -976,7 +973,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * Produces data to update Lesson tab in Monitor.
      */
     public ActionForward getLessonDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, JSONException {
+	    HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -986,7 +983,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	LearningDesign learningDesign = lesson.getLearningDesign();
 
@@ -1010,8 +1007,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, false);
 	if (contributeActivities != null) {
-	    Gson gson = new GsonBuilder().create();
-	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
+	    responseJSON.set("contributeActivities", JsonUtil.readArray(contributeActivities));
 	}
 
 	response.setContentType("application/json;charset=utf-8");
@@ -1020,30 +1016,30 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     public ActionForward getLessonChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, JSONException {
+	    HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
 	Integer possibleLearnersCount = getLessonService().getCountLessonLearners(lessonId, null);
 	Integer completedLearnersCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
-	Integer startedLearnersCount = getLessonService().getCountActiveLessonLearners(lessonId)- completedLearnersCount;
-	Integer notCompletedLearnersCount = possibleLearnersCount - completedLearnersCount - startedLearnersCount ;
+	Integer startedLearnersCount = getLessonService().getCountActiveLessonLearners(lessonId)
+		- completedLearnersCount;
+	Integer notCompletedLearnersCount = possibleLearnersCount - completedLearnersCount - startedLearnersCount;
 
-	JSONObject responseJSON = new JSONObject();
-	JSONObject notStartedJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	ObjectNode notStartedJSON = JsonNodeFactory.instance.objectNode();
 	notStartedJSON.put("name", getMessageService().getMessage("lesson.chart.not.completed"));
 	notStartedJSON.put("value", Math.round(notCompletedLearnersCount.doubleValue() / possibleLearnersCount * 100));
-	responseJSON.append("data", notStartedJSON);
+	responseJSON.withArray("data").add(notStartedJSON);
 
-	JSONObject startedJSON = new JSONObject();
+	ObjectNode startedJSON = JsonNodeFactory.instance.objectNode();
 	startedJSON.put("name", getMessageService().getMessage("lesson.chart.started"));
-	startedJSON.put("value", Math
-		.round((startedLearnersCount.doubleValue()) / possibleLearnersCount * 100));
-	responseJSON.append("data", startedJSON);
+	startedJSON.put("value", Math.round((startedLearnersCount.doubleValue()) / possibleLearnersCount * 100));
+	responseJSON.withArray("data").add(startedJSON);
 
-	JSONObject completedJSON = new JSONObject();
+	ObjectNode completedJSON = JsonNodeFactory.instance.objectNode();
 	completedJSON.put("name", getMessageService().getMessage("lesson.chart.completed"));
 	completedJSON.put("value", Math.round(completedLearnersCount.doubleValue() / possibleLearnersCount * 100));
-	responseJSON.append("data", completedJSON);
+	responseJSON.withArray("data").add(completedJSON);
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
@@ -1055,7 +1051,7 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     @SuppressWarnings("unchecked")
     public ActionForward getLessonProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Integer monitorUserId = getUserId();
 	if (!getSecurityService().isLessonMonitor(lessonId, monitorUserId, "get lesson progress", false)) {
@@ -1068,7 +1064,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	LearningDesign learningDesign = lesson.getLearningDesign();
 	String contentFolderId = learningDesign.getContentFolderID();
 
-	Set<Activity> activities = new HashSet<Activity>();
+	Set<Activity> activities = new HashSet<>();
 	// filter activities that are interesting for further processing
 	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
 	    if (activity.isSequenceActivity()) {
@@ -1079,11 +1075,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	    activities.add(getMonitoringService().getActivityById(activity.getActivityId()));
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true);
 	if (contributeActivities != null) {
-	    Gson gson = new GsonBuilder().create();
-	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
+	    responseJSON.set("contributeActivities", JsonUtil.readArray(contributeActivities));
 	}
 
 	// check if the searched learner has started the lesson
@@ -1094,8 +1089,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	// Fetch number of learners at each activity
-	ArrayList<Long> activityIds = new ArrayList<Long>();
-	Set<Long> leaders = new TreeSet<Long>();
+	ArrayList<Long> activityIds = new ArrayList<>();
+	Set<Long> leaders = new TreeSet<>();
 	for (Activity activity : activities) {
 	    activityIds.add(activity.getActivityId());
 	    // find leaders from Leader Selection Tool
@@ -1111,10 +1106,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	Map<Long, Integer> learnerCounts = getMonitoringService()
 		.getCountLearnersCurrentActivities(activityIds.toArray(new Long[activityIds.size()]));
 
-	JSONArray activitiesJSON = new JSONArray();
+	ArrayNode activitiesJSON = JsonNodeFactory.instance.arrayNode();
 	for (Activity activity : activities) {
 	    Long activityId = activity.getActivityId();
-	    JSONObject activityJSON = new JSONObject();
+	    ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	    activityJSON.put("id", activityId);
 	    activityJSON.put("uiid", activity.getActivityUIID());
 	    activityJSON.put("title", activity.getTitle());
@@ -1177,23 +1172,23 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		// parse learners into JSON format
 		if (!latestLearners.isEmpty()) {
-		    JSONArray learnersJSON = new JSONArray();
+		    ArrayNode learnersJSON = JsonNodeFactory.instance.arrayNode();
 		    for (User learner : latestLearners) {
-			JSONObject userJSON = WebUtil.userToJSON(learner);
+			ObjectNode userJSON = WebUtil.userToJSON(learner);
 			if (leaders.contains(learner.getUserId().longValue())) {
 			    userJSON.put("leader", true);
 			}
-			learnersJSON.put(userJSON);
+			learnersJSON.add(userJSON);
 		    }
 
-		    activityJSON.put("learners", learnersJSON);
+		    activityJSON.set("learners", learnersJSON);
 		}
 	    }
 	    activityJSON.put("learnerCount", learnerCount);
 
-	    activitiesJSON.put(activityJSON);
+	    activitiesJSON.add(activityJSON);
 	}
-	responseJSON.put("activities", activitiesJSON);
+	responseJSON.set("activities", activitiesJSON);
 
 	// find learners who completed the lesson
 	List<User> completedLearners = getMonitoringService().getLearnersLatestCompleted(lessonId,
@@ -1212,25 +1207,25 @@ public class MonitoringAction extends LamsDispatchAction {
 		    completedLearners, MonitoringAction.LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT);
 	}
 	for (User learner : completedLearners) {
-	    JSONObject learnerJSON = WebUtil.userToJSON(learner);
+	    ObjectNode learnerJSON = WebUtil.userToJSON(learner);
 	    // no more details are needed for learners who completed the lesson
-	    responseJSON.append("completedLearners", learnerJSON);
+	    responseJSON.withArray("completedLearners").add(learnerJSON);
 	}
 
 	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId, null));
 
 	// on first fetch get transitions metadata so Monitoring can set their SVG elems IDs
 	if (WebUtil.readBooleanParam(request, "getTransitions", false)) {
-	    JSONArray transitions = new JSONArray();
+	    ArrayNode transitions = JsonNodeFactory.instance.arrayNode();
 	    for (Transition transition : (Set<Transition>) learningDesign.getTransitions()) {
-		JSONObject transitionJSON = new JSONObject();
+		ObjectNode transitionJSON = JsonNodeFactory.instance.objectNode();
 		transitionJSON.put("uiid", transition.getTransitionUIID());
 		transitionJSON.put("fromID", transition.getFromActivity().getActivityId());
 		transitionJSON.put("toID", transition.getToActivity().getActivityId());
 
-		transitions.put(transitionJSON);
+		transitions.add(transitionJSON);
 	    }
-	    responseJSON.put("transitions", transitions);
+	    responseJSON.set("transitions", transitions);
 	}
 
 	response.setContentType("application/json;charset=utf-8");
@@ -1265,13 +1260,13 @@ public class MonitoringAction extends LamsDispatchAction {
 		    true);
 	}
 
-	JSONArray responseJSON = new JSONArray();
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
 	for (User user : users) {
-	    JSONObject userJSON = new JSONObject();
+	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
 	    userJSON.put("label", user.getFirstName() + " " + user.getLastName() + " " + user.getLogin());
 	    userJSON.put("value", user.getUserId());
 
-	    responseJSON.put(userJSON);
+	    responseJSON.add(userJSON);
 	}
 
 	response.setContentType("application/json;charset=utf-8");
@@ -1539,7 +1534,7 @@ public class MonitoringAction extends LamsDispatchAction {
     private List<User> parseUserList(HttpServletRequest request, String paramName, Collection<User> users) {
 	String userIdList = request.getParameter(paramName);
 	String[] userIdArray = userIdList.split(",");
-	List<User> result = new ArrayList<User>(userIdArray.length);
+	List<User> result = new ArrayList<>(userIdArray.length);
 
 	for (User user : users) {
 	    Integer userId = user.getUserId();
@@ -1560,7 +1555,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	Lesson lesson = getLessonService().getLesson(lessonId);
 
 	if (contributeActivities != null) {
-	    List<ContributeActivityDTO> resultContributeActivities = new ArrayList<ContributeActivityDTO>();
+	    List<ContributeActivityDTO> resultContributeActivities = new ArrayList<>();
 	    for (ContributeActivityDTO contributeActivity : contributeActivities) {
 		if (contributeActivity.getContributeEntries() != null) {
 		    Iterator<ContributeActivityDTO.ContributeEntry> entryIterator = contributeActivity
@@ -1571,7 +1566,7 @@ public class MonitoringAction extends LamsDispatchAction {
 			// extra filtering for chosen branching: do not show in Sequence tab if all users were assigned
 			if (skipCompletedBranching
 				&& ContributionTypes.CHOSEN_BRANCHING.equals(contributeEntry.getContributionType())) {
-			    Set<User> learners = new HashSet<User>(lesson.getLessonClass().getLearners());
+			    Set<User> learners = new HashSet<>(lesson.getLessonClass().getLearners());
 			    ChosenBranchingActivity branching = (ChosenBranchingActivity) getMonitoringService()
 				    .getActivityById(contributeActivity.getActivityID());
 			    for (SequenceActivity branch : (Set<SequenceActivity>) branching.getActivities()) {
@@ -1607,7 +1602,7 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     private static List<User> insertHighlightedLearner(User searchedLearner, List<User> latestLearners, int limit) {
 	latestLearners.remove(searchedLearner);
-	LinkedList<User> updatedLatestLearners = new LinkedList<User>(latestLearners);
+	LinkedList<User> updatedLatestLearners = new LinkedList<>(latestLearners);
 	updatedLatestLearners.addFirst(searchedLearner);
 	if (updatedLatestLearners.size() > limit) {
 	    updatedLatestLearners.removeLast();

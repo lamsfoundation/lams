@@ -28,8 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.rating.ToolRatingManager;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
@@ -41,6 +39,8 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.util.ExcelCell;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * Interface that defines the contract that all Peerreview service provider must follow.
@@ -147,17 +147,18 @@ public interface IPeerreviewService extends ToolRatingManager {
 
     /**
      * Counts number of users in a session excluding specified user. Besides, it also *excludes all hidden users*.
-     * 
+     *
      * @param qaSessionId
      * @param excludeUserId
-     * @param includeHiddenUsers whether hidden users should be counted as well or not
+     * @param includeHiddenUsers
+     *            whether hidden users should be counted as well or not
      * @return
      */
     int getCountUsersBySession(final Long qaSessionId, final Long excludeUserId);
-    
+
     /**
      * Counts number of users in a specified session. It counts it regardless whether a user is hidden or not.
-     * 
+     *
      * @param toolSessionId
      * @return
      */
@@ -206,17 +207,17 @@ public interface IPeerreviewService extends ToolRatingManager {
      * class.
      *
      * Returns true if a check/update is triggered, returns false if a check is already underway.
-     * 
+     *
      * @param toolSessionId
      * @return
      * @throws Throwable
      */
     boolean createUsersFromLesson(Long toolSessionId) throws Throwable;
-    
+
     /**
      * Store user hidden status in a DB. If user is marked as hidden - it will automatically remove all rating left by
      * him to prevent statistics mess up.
-     * 
+     *
      * @param userUid
      * @param isHidden
      */
@@ -229,10 +230,10 @@ public interface IPeerreviewService extends ToolRatingManager {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);
@@ -240,67 +241,75 @@ public interface IPeerreviewService extends ToolRatingManager {
     int getCommentsMinWordsLimit(Long toolContentId);
 
     List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId);
-    
+
     /** Save the ratings for ranking and hedging. */
     int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Map<Long, Float> newRatings);
 
-    /** Save a comment made on a comment only page.  */
+    /** Save a comment made on a comment only page. */
     void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId, String comment);
 
     /** Get the details for a single criteria */
     RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId);
-    
+
     /**
      * It's a modification of org.lamsfoundation.lams.rating.ToolRatingManager.getRatingCriteriaDtos(Long contentId,
-     * Long toolSessionId, Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) method, added additional parameter
+     * Long toolSessionId, Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) method, added
+     * additional parameter
      * isCountUsersRatedEachItem.
      *
      */
     List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId, boolean isCountUsersRatedEachItem);
 
-    /** 
-     * Gets all the users in the session and any existing ratings for a given criteria. If you want to use the tablesorter
+    /**
+     * Gets all the users in the session and any existing ratings for a given criteria. If you want to use the
+     * tablesorter
      * set skipRatings to true and it will just get the main criteria details, then on the jsp page call a tablesorter
-     * function that call getUsersRatingsCommentsByCriteriaJSON, with the page and size are included. 
+     * function that call getUsersRatingsCommentsByCriteriaJSON, with the page and size are included.
      * Self rating === getAllUsers
      * If you want the ratings done *by* the user XYZ, set getByUser to true and currentUser id to XYZ's user id.
-     * If you want the ratings done *for* user XYZ,  set getByUser to true and currentUser id to XYZ's user id.
-     * user, set getByUser to false and set currentUserId to the current user id. 
+     * If you want the ratings done *for* user XYZ, set getByUser to true and currentUser id to XYZ's user id.
+     * user, set getByUser to false and set currentUserId to the current user id.
      */
-    StyledCriteriaRatingDTO getUsersRatingsCommentsByCriteriaIdDTO(Long toolContentId, Long toolSessionId, RatingCriteria criteria, 
-	    Long currentUserId, boolean skipRatings, int sorting,  String searchString, boolean getAllUsers, boolean getByUser);
-
-    /** 
-     * Gets all the users in the session and any existing ratings for a given criteria in JSON format. 
-     */
-    JSONArray getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long currentUserId, 
-	    Integer page, Integer size, int sorting,  String searchString, boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) throws JSONException ;
+    StyledCriteriaRatingDTO getUsersRatingsCommentsByCriteriaIdDTO(Long toolContentId, Long toolSessionId,
+	    RatingCriteria criteria, Long currentUserId, boolean skipRatings, int sorting, String searchString,
+	    boolean getAllUsers, boolean getByUser);
 
     /**
-     * Gets all the users in the session and the ratings / comments they have left for a particular learner. Used by monitoring.
+     * Gets all the users in the session and any existing ratings for a given criteria in JSON format.
      */
-    List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId );
-    
+    ArrayNode getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
+	    Long currentUserId, Integer page, Integer size, int sorting, String searchString, boolean getAllUsers,
+	    boolean getByUser, boolean needRatesPerUser);
+
+    /**
+     * Gets all the users in the session and the ratings / comments they have left for a particular learner. Used by
+     * monitoring.
+     */
+    List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId);
+
     /**
      * Gets all the users in the session and the number of comments that have been left for them. Used by monitoring.
      */
-    List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
-	    Integer page, Integer size, int sorting, String searchString);
-    
+    List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Integer page,
+	    Integer size, int sorting, String searchString);
+
     String getLocalisedMessage(String key, Object[] args);
-    
+
     /** Get the monitoring statistics */
     List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId);
-    
-    /** Get all the notebook entries for a session 
-     * 	Will return List<[user.user_id, user.first_name, user.first_name + user.last_name, notebook entry, notebook date]>
+
+    /**
+     * Get all the notebook entries for a session
+     * Will return List<[user.user_id, user.first_name, user.first_name + user.last_name, notebook entry, notebook
+     * date]>
      */
-    List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting, String searchString);
-    
+    List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting,
+	    String searchString);
+
     /**
      * Returns list of <userUid, userName> pairs. Used by monitor's manageUsers functionality.
-     * 
+     *
      * @param toolSessionId
      * @param page
      * @param size
@@ -318,9 +327,9 @@ public interface IPeerreviewService extends ToolRatingManager {
 
     /** Spreadsheet */
     LinkedHashMap<String, ExcelCell[][]> exportTeamReportSpreadsheet(Long toolContentId);
-    
+
     int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId);
-    
+
     /** For this user, there has be int[0] ratings out of a possible int[1] ratings */
     public int[] getNumberPossibleRatings(Long toolContentId, Long toolSessionId, Long userId);
 }

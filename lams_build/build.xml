@@ -510,17 +510,6 @@
 			  file="lib/jakarta-commons/validator.module.xml" overwrite="true" verbose="true" />
 		
 		
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/jboss/jbossweb/main" overwrite="true" verbose="true">
-			<fileset dir="lib/jboss">
-				<include name="jbossweb.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/jboss/jbossweb/main/module.xml"
-			  file="lib/jboss/jbossweb.module.xml" overwrite="true" verbose="true" />
-		
-		
-		
 		<!-- WildFly does not load all classes from JDK that LAMS needs (com/sun/org/apache/xerces/internal)
 		     We need our own, extended list -->
 		<copy tofile="${server.home}/modules/system/layers/base/sun/jdk/main/module.xml"
@@ -535,16 +524,6 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/scilab/forge/jlatexmath/main/module.xml"
 			  file="lib/jlatexmath/jlatexmath.module.xml" overwrite="true" verbose="true" />
-		
-		
-		
-		<copy todir="${server.home}/modules/system/layers/base/com/google/gson/main" overwrite="true" verbose="true">
-			<fileset dir="lib/json">
-				<include name="gson-*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/com/google/gson/main/module.xml"
-			  file="lib/json/gson.module.xml" overwrite="true" verbose="true" />
 
 		
 		
@@ -832,7 +811,6 @@
 			<!-- Libraries -->
 			<fileset dir="${server.home}/modules/system/layers/base/">
 				<include name="ch/"/>
-				<include name="com/fasterxml/jackson/"/>
 				<include name="com/google/guava/"/>
 				<include name="com/h2database/"/>
 				<include name="com/microsoft/"/>

@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.admin.web;
 
 import java.io.IOException;
@@ -42,9 +41,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
@@ -55,20 +51,20 @@ import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author jliew
- *
- *
- *
- *
- *
- *
  */
 public class ToolContentListAction extends Action {
 
@@ -134,14 +130,14 @@ public class ToolContentListAction extends Action {
 	List<LearningLibraryDTO> learningLibraryDTOs = getLearningDesignService().getAllLearningLibraryDetails(false,
 		getUserLanguage());
 	// this is filled when executing following method, for efficiency purposes
-	HashMap<Long, Boolean> learningLibraryValidity = new HashMap<Long, Boolean>(learningLibraryDTOs.size());
+	HashMap<Long, Boolean> learningLibraryValidity = new HashMap<>(learningLibraryDTOs.size());
 	ArrayList<LibraryActivityDTO> toolLibrary = filterMultipleToolEntries(learningLibraryDTOs,
 		learningLibraryValidity);
 	request.setAttribute(ToolContentListAction.ATTRIBUTE_LIBRARY, toolLibrary);
 	request.setAttribute(ToolContentListAction.ATTRIBUTE_VALIDITY, learningLibraryValidity);
 
 	// get tool versions
-	HashMap<Long, String> toolVersions = new HashMap<Long, String>();
+	HashMap<Long, String> toolVersions = new HashMap<>();
 	List<Tool> tools = getUserManagementService().findAll(Tool.class);
 	for (Tool tool : tools) {
 	    toolVersions.put(tool.getToolId(), tool.getToolVersion());
@@ -149,7 +145,7 @@ public class ToolContentListAction extends Action {
 	request.setAttribute(ToolContentListAction.ATTRIBUTE_TOOL_VERSIONS, toolVersions);
 
 	// get tool database versions
-	HashMap<String, Integer> dbVersions = new HashMap<String, Integer>();
+	HashMap<String, Integer> dbVersions = new HashMap<>();
 	Connection conn = getDataSource().getConnection();
 	PreparedStatement query = conn.prepareStatement(ToolContentListAction.QUERY_DATABASE_VERSIONS);
 	ResultSet results = query.executeQuery();
@@ -165,8 +161,8 @@ public class ToolContentListAction extends Action {
     @SuppressWarnings("unchecked")
     private ArrayList<LibraryActivityDTO> filterMultipleToolEntries(List<LearningLibraryDTO> learningLibraryDTOs,
 	    HashMap<Long, Boolean> learningLibraryValidity) {
-	ArrayList<LibraryActivityDTO> activeTools = new ArrayList<LibraryActivityDTO>();
-	ArrayList<LibraryActivityDTO> activeCombinedTools = new ArrayList<LibraryActivityDTO>();
+	ArrayList<LibraryActivityDTO> activeTools = new ArrayList<>();
+	ArrayList<LibraryActivityDTO> activeCombinedTools = new ArrayList<>();
 	for (LearningLibraryDTO learningLibraryDTO : learningLibraryDTOs) {
 	    // populate information about learning libary validity
 	    learningLibraryValidity.put(learningLibraryDTO.getLearningLibraryID(), learningLibraryDTO.getValidFlag());
@@ -235,33 +231,33 @@ public class ToolContentListAction extends Action {
      * Loads groups and libraries and displays the management dialog.
      */
     private ActionForward openLearningLibraryGroups(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	// build full list of available learning libraries
 	List<LearningLibraryDTO> learningLibraries = getLearningDesignService()
 		.getAllLearningLibraryDetails(getUserLanguage());
-	JSONArray learningLibrariesJSON = new JSONArray();
+	ArrayNode learningLibrariesJSON = JsonNodeFactory.instance.arrayNode();
 	for (LearningLibraryDTO learningLibrary : learningLibraries) {
-	    JSONObject learningLibraryJSON = new JSONObject();
+	    ObjectNode learningLibraryJSON = JsonNodeFactory.instance.objectNode();
 	    learningLibraryJSON.put("learningLibraryId", learningLibrary.getLearningLibraryID());
 	    learningLibraryJSON.put("title", learningLibrary.getTitle());
-	    learningLibrariesJSON.put(learningLibraryJSON);
+	    learningLibrariesJSON.add(learningLibraryJSON);
 	}
 	request.setAttribute("learningLibraries", learningLibrariesJSON.toString());
 
 	// build list of existing groups
 	List<LearningLibraryGroup> groups = getLearningDesignService().getLearningLibraryGroups();
-	JSONArray groupsJSON = new JSONArray();
+	ArrayNode groupsJSON = JsonNodeFactory.instance.arrayNode();
 	for (LearningLibraryGroup group : groups) {
-	    JSONObject groupJSON = new JSONObject();
+	    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 	    groupJSON.put("groupId", group.getGroupId());
 	    groupJSON.put("name", group.getName());
 	    for (LearningLibrary learningLibrary : group.getLearningLibraries()) {
-		JSONObject learningLibraryJSON = new JSONObject();
+		ObjectNode learningLibraryJSON = JsonNodeFactory.instance.objectNode();
 		learningLibraryJSON.put("learningLibraryId", learningLibrary.getLearningLibraryId());
 		learningLibraryJSON.put("title", learningLibrary.getTitle());
-		groupJSON.append("learningLibraries", learningLibraryJSON);
+		groupJSON.withArray("learningLibraries").add(learningLibraryJSON);
 	    }
-	    groupsJSON.put(groupJSON);
+	    groupsJSON.add(groupJSON);
 	}
 	request.setAttribute("groups", groupsJSON.toString());
 
@@ -269,27 +265,25 @@ public class ToolContentListAction extends Action {
     }
 
     private void saveLearningLibraryGroups(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	// extract groups from JSON and persist them
-	JSONArray groupsJSON = new JSONArray(request.getParameter("groups"));
-	List<LearningLibraryGroup> groups = new ArrayList<LearningLibraryGroup>(groupsJSON.length());
 
-	for (int groupIndex = 0; groupIndex < groupsJSON.length(); groupIndex++) {
+	ArrayNode groupsJSON = JsonUtil.readArray(request.getParameter("groups"));
+	List<LearningLibraryGroup> groups = new ArrayList<>(groupsJSON.size());
+	for (JsonNode groupJSON : groupsJSON) {
 	    LearningLibraryGroup group = new LearningLibraryGroup();
 	    groups.add(group);
 
-	    JSONObject groupJSON = groupsJSON.getJSONObject(groupIndex);
-	    long groupId = groupJSON.optLong("groupId");
+	    long groupId = groupJSON.get("groupId").asLong();
 	    if (groupId > 0) {
 		group.setGroupId(groupId);
 	    }
-	    group.setName(groupJSON.getString("name"));
+	    group.setName(groupJSON.get("name").asText(null));
 
 	    group.setLearningLibraries(new HashSet<LearningLibrary>());
-	    JSONArray learningLibrariesJSON = groupJSON.getJSONArray("learningLibraries");
-	    for (int learningLibraryIndex = 0; learningLibraryIndex < learningLibrariesJSON
-		    .length(); learningLibraryIndex++) {
-		long learningLibraryId = learningLibrariesJSON.getLong(learningLibraryIndex);
+	    ArrayNode learningLibrariesJSON = (ArrayNode) groupJSON.get("learningLibraries");
+	    for (JsonNode learningLibraryJSON : learningLibrariesJSON) {
+		long learningLibraryId = learningLibraryJSON.asLong();
 		LearningLibrary learningLibrary = getLearningDesignService().getLearningLibrary(learningLibraryId);
 		group.getLearningLibraries().add(learningLibrary);
 	    }

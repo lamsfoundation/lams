@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scribe.service;
 
 import java.util.ArrayList;
@@ -34,9 +33,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -70,6 +66,10 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * An implementation of the IScribeService interface.
@@ -148,17 +148,17 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 
     @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<String, ToolOutput>();
+	return new TreeMap<>();
     }
 
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -326,7 +326,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
-	return new TreeMap<String, ToolOutputDefinition>();
+	return new TreeMap<>();
     }
 
     @Override
@@ -489,15 +489,15 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void submitReport(Long toolSessionId, String userName, JSONObject requestJSON) throws JSONException {
+    public void submitReport(Long toolSessionId, String userName, ObjectNode requestJSON) {
 	ScribeSession scribeSession = getSessionBySessionId(toolSessionId);
 	ScribeUser scribe = scribeSession.getAppointedScribe();
 	if ((scribe == null) || !scribe.getLoginName().equals(userName)) {
@@ -509,11 +509,10 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	    saveOrUpdateScribeUser(learner);
 	}
 
-	JSONArray reportsJSON = requestJSON.getJSONArray("reports");
-	for (int reportIndex = 0; reportIndex < reportsJSON.length(); reportIndex++) {
-	    JSONObject reportJSON = reportsJSON.getJSONObject(reportIndex);
-	    Long uid = reportJSON.getLong("uid");
-	    String text = reportJSON.getString("text");
+	ArrayNode reportsJSON = JsonUtil.optArray(requestJSON, "reports");
+	for (JsonNode reportJSON : reportsJSON) {
+	    Long uid = JsonUtil.optLong(reportJSON, "uid");
+	    String text = JsonUtil.optString(reportJSON, "text");
 	    for (ScribeReportEntry report : (Set<ScribeReportEntry>) scribeSession.getScribeReportEntries()) {
 		if (report.getUid().equals(uid)) {
 		    report.setEntryText(text);
@@ -634,17 +633,16 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	return new ToolCompletionStatus(learner.isFinishedActivity() ? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
-    
+
     // ****************** REST methods *************************
 
     /**
      * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: "title", "instructions",
-     * "questions". Questions must contain a JSONArray of JSONObject objects, which have the following mandatory fields:
+     * "questions". Questions must contain a ArrayNode of ObjectNode objects, which have the following mandatory fields:
      * "displayOrder", "questionText" There must be at least one topic object in the "questions" array.
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
 	Date updateDate = new Date();
 
@@ -657,25 +655,24 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	scribe.setContentInUse(false);
 	scribe.setDefineLater(false);
 
-	scribe.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	scribe.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	scribe.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	scribe.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 
-	scribe.setAutoSelectScribe(JsonUtil.opt(toolContentJSON, "autoSelectScribe", Boolean.FALSE));
-	scribe.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	scribe.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
-	scribe.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	scribe.setShowAggregatedReports(JsonUtil.opt(toolContentJSON, "showAggregatedReports", Boolean.FALSE));
+	scribe.setAutoSelectScribe(JsonUtil.optBoolean(toolContentJSON, "autoSelectScribe", Boolean.FALSE));
+	scribe.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	scribe.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	scribe.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	scribe.setShowAggregatedReports(JsonUtil.optBoolean(toolContentJSON, "showAggregatedReports", Boolean.FALSE));
 
 	if (scribe.getScribeHeadings() == null) {
 	    scribe.setScribeHeadings(new HashSet());
 	}
 
-	JSONArray topics = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
-	for (int i = 0; i < topics.length(); i++) {
-	    JSONObject topic = topics.getJSONObject(i);
+	ArrayNode topics = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
+	for (JsonNode topic : topics) {
 	    ScribeHeading heading = new ScribeHeading();
-	    heading.setDisplayOrder(topic.getInt(RestTags.DISPLAY_ORDER));
-	    heading.setHeadingText(topic.getString(RestTags.QUESTION_TEXT));
+	    heading.setDisplayOrder(JsonUtil.optInt(topic, RestTags.DISPLAY_ORDER));
+	    heading.setHeadingText(JsonUtil.optString(topic, RestTags.QUESTION_TEXT));
 	    heading.setScribe(scribe);
 	    scribe.getScribeHeadings().add(heading);
 	}

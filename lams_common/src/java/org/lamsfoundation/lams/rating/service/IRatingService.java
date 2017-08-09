@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.rating.service;
 
 import java.util.Collection;
@@ -31,8 +29,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.rating.RatingException;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
@@ -41,16 +37,20 @@ import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 public interface IRatingService {
 
     void saveOrUpdateRating(Rating rating);
-    
-    /** 
+
+    /**
      * Save a group of ratings as the new ratings for this criteria, marking any existing ratings NULL.
      * Returns the number of "real" ratings, which should be newRatings.size.
+     * 
      * @return
      */
-    public int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Map<Long, Float> newRatings);
+    public int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId,
+	    Map<Long, Float> newRatings);
 
     /**
      * Read modified rating criterias from request, then update existing ones/add new ones/delete removed ones. Used on
@@ -64,19 +64,24 @@ public interface IRatingService {
     void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias, Long toolContentId);
 
     /**
-     * Save an already set up rating criteria. Only used when there will only ever be one anonymous criteria, like in Share Resources
+     * Save an already set up rating criteria. Only used when there will only ever be one anonymous criteria, like in
+     * Share Resources
+     * 
      * @param criteria
      * @return
      */
-    LearnerItemRatingCriteria saveLearnerItemRatingCriteria(Long toolContentId, String title, Integer orderId, int ratingStyle, boolean withComments, int minWordsInComment) throws RatingException;
-    
-    /** 
-     * Delete all the rating criteria linked to a tool content. This allows you to delete criteria created with saveToolStarRatingCriteria
+    LearnerItemRatingCriteria saveLearnerItemRatingCriteria(Long toolContentId, String title, Integer orderId,
+	    int ratingStyle, boolean withComments, int minWordsInComment) throws RatingException;
+
+    /**
+     * Delete all the rating criteria linked to a tool content. This allows you to delete criteria created with
+     * saveToolStarRatingCriteria
+     * 
      * @param toolContentId
      * @return
      */
     public int deleteAllRatingCriterias(Long toolContentId);
-    
+
     List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId);
 
     RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId);
@@ -117,7 +122,8 @@ public interface IRatingService {
      */
     List<Rating> getRatingsByItem(Long itemId);
 
-    ItemRatingCriteriaDTO rateItem(RatingCriteria criteria, Long toolSessionId, Integer userId, Long itemId, float ratingFloat);
+    ItemRatingCriteriaDTO rateItem(RatingCriteria criteria, Long toolSessionId, Integer userId, Long itemId,
+	    float ratingFloat);
 
     void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId, String comment);
 
@@ -136,27 +142,35 @@ public interface IRatingService {
 	    boolean isCommentsByOtherUsersRequired, Long userId);
 
     /**
-     *  Used by tools to get the ratings and comments relating to their items. To be used within SQL and supply the toolContentId as :toolContentId, 
-     *  criteria id as :ratingCriteriaId and current user id as :userId
-     *  If getByUser == true then returns data for all users, as left by the current user, otherwise gives the data for the current user as left by other users
-     *  See Peer Review for example usage.
+     * Used by tools to get the ratings and comments relating to their items. To be used within SQL and supply the
+     * toolContentId as :toolContentId,
+     * criteria id as :ratingCriteriaId and current user id as :userId
+     * If getByUser == true then returns data for all users, as left by the current user, otherwise gives the data for
+     * the current user as left by other users
+     * See Peer Review for example usage.
      */
     String getRatingSelectJoinSQL(Integer ratingStyle, boolean getByUser);
-    
-    /** 
-     * Convert the raw data from the database to StyledCriteriaRatingDTO and StyleRatingDTO. The rating service expects its own fields
-     * to be first in each Object array, and the last item in the array to be an item description (eg formatted user's name)
-     * Will go back to the database for the justification comment that would apply to hedging.
-     */
-    StyledCriteriaRatingDTO convertToStyledDTO(RatingCriteria ratingCriteria, Long currentUser, boolean includeCurrentUser, List<Object[]> rawDataRows);
 
-    /** 
-     * Convert the raw data from the database to JSON rows similar to StyleRatingDTO. The rating service expects its own fields
-     * to be first in each Object array, and the last item in the array to be an item description (eg formatted user's name)
+    /**
+     * Convert the raw data from the database to StyledCriteriaRatingDTO and StyleRatingDTO. The rating service expects
+     * its own fields
+     * to be first in each Object array, and the last item in the array to be an item description (eg formatted user's
+     * name)
      * Will go back to the database for the justification comment that would apply to hedging.
      */
-    JSONArray convertToStyledJSON(RatingCriteria ratingCriteria, Long toolSessionId, Long currentUserId, boolean includeCurrentUser, 
-	    List<Object[]> rawDataRows, boolean needRatesPerUser) throws JSONException;
+    StyledCriteriaRatingDTO convertToStyledDTO(RatingCriteria ratingCriteria, Long currentUser,
+	    boolean includeCurrentUser, List<Object[]> rawDataRows);
+
+    /**
+     * Convert the raw data from the database to JSON rows similar to StyleRatingDTO. The rating service expects its own
+     * fields
+     * to be first in each Object array, and the last item in the array to be an item description (eg formatted user's
+     * name)
+     * Will go back to the database for the justification comment that would apply to hedging.
+     */
+    ArrayNode convertToStyledJSON(RatingCriteria ratingCriteria, Long toolSessionId, Long currentUserId,
+	    boolean includeCurrentUser, List<Object[]> rawDataRows, boolean needRatesPerUser);
+
     /**
      * Returns number of images rated by specified user in a current activity. It counts comments as ratings. This
      * method is applicable only for RatingCriterias of LEARNER_ITEM_CRITERIA_TYPE type.
@@ -168,15 +182,17 @@ public interface IRatingService {
     int getCountItemsRatedByUser(final Long toolContentId, final Integer userId);
 
     /**
-     * Returns number of items rated by specified user in a current activity, for a particular criteria. It counts comments as ratings
-     * iff it is a comment rating. This method is applicable only for RatingCriterias of LEARNER_ITEM_CRITERIA_TYPE type.
+     * Returns number of items rated by specified user in a current activity, for a particular criteria. It counts
+     * comments as ratings
+     * iff it is a comment rating. This method is applicable only for RatingCriterias of LEARNER_ITEM_CRITERIA_TYPE
+     * type.
      *
      * @param toolContentId
      * @param userId
      * @return
      */
     int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId);
-    
+
     /**
      * Removes all ratings and comments left by the specified user.
      * 
@@ -185,9 +201,10 @@ public interface IRatingService {
      * @return
      */
     void removeUserCommitsByContent(final Long contentId, final Integer userId);
-    
+
     /**
-     * Count how many users rated and commented each item, limiting them to a single session if toolSessionId is not null
+     * Count how many users rated and commented each item, limiting them to a single session if toolSessionId is not
+     * null
      * Used only if the tool's request it.
      *
      * @param contentId
@@ -195,10 +212,10 @@ public interface IRatingService {
      * @param excludeUserId
      * @return
      */
-    Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Long toolSessionId, final Collection<Long> itemIds,
-	    Integer excludeUserId);
-    
-    Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Long toolSessionId, final Collection<Long> itemIds,
-	    Integer excludeUserId);
+    Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Long toolSessionId,
+	    final Collection<Long> itemIds, Integer excludeUserId);
+
+    Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Long toolSessionId,
+	    final Collection<Long> itemIds, Integer excludeUserId);
 
 }

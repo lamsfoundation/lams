@@ -19,7 +19,6 @@ USA
 http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
@@ -47,9 +46,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionRedirect;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
@@ -79,6 +75,10 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Ozgur Demirtas
@@ -193,7 +193,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	/* mapAnswers will be used in the viewAllAnswers screen */
 	if (sessionMap == null) {
-	    sessionMap = new SessionMap<String, Object>();
+	    sessionMap = new SessionMap<>();
 	}
 
 	sessionMap.put(QaAppConstants.MAP_ALL_RESULTS_KEY, mapAnswers);
@@ -218,7 +218,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     }
 
     public ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -227,10 +227,10 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean isLeaderResponseFinalized = leader.isResponseFinalized();
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
+	ObjectNode.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
 	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 	return null;
     }
 
@@ -374,8 +374,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    generalLearnerFlowDTO.setHttpSessionID(httpSessionID);
 
 	    /** Set up the data for the view all answers screen */
-	    QaLearningAction.refreshSummaryData(request, qaContent, qaSession, QaLearningAction.qaService, httpSessionID, user,
-		    generalLearnerFlowDTO);
+	    QaLearningAction.refreshSummaryData(request, qaContent, qaSession, QaLearningAction.qaService,
+		    httpSessionID, user, generalLearnerFlowDTO);
 
 	    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 	    generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(false).toString());
@@ -456,8 +456,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	qaLearningForm.resetUserActions();
 	qaLearningForm.setSubmitAnswersContent(null);
 
-	QaLearningAction.refreshSummaryData(request, qaContent, qaSession, QaLearningAction.qaService, httpSessionID, user,
-		generalLearnerFlowDTO);
+	QaLearningAction.refreshSummaryData(request, qaContent, qaSession, QaLearningAction.qaService, httpSessionID,
+		user, generalLearnerFlowDTO);
 
 	generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(false).toString());
@@ -798,8 +798,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	generalLearnerFlowDTO.setNotebookEntry(entryText);
 	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
 
-	QaLearningAction.refreshSummaryData(request, qaContent, qaSession, QaLearningAction.qaService, httpSessionID, qaQueUsr,
-		generalLearnerFlowDTO);
+	QaLearningAction.refreshSummaryData(request, qaContent, qaSession, QaLearningAction.qaService, httpSessionID,
+		qaQueUsr, generalLearnerFlowDTO);
 
 	boolean isLearnerFinished = qaQueUsr.isLearnerFinished();
 	generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(isLearnerFinished).toString());
@@ -928,8 +928,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
      * User id is needed if isUserNamesVisible is false && learnerRequest is true, as it is required to work out if the
      * data being analysed is the current user.
      */
-    public static void refreshSummaryData(HttpServletRequest request, QaContent qaContent, QaSession qaSession, IQaService qaService,
-	    String httpSessionID, QaQueUsr user, GeneralLearnerFlowDTO generalLearnerFlowDTO) {
+    public static void refreshSummaryData(HttpServletRequest request, QaContent qaContent, QaSession qaSession,
+	    IQaService qaService, String httpSessionID, QaQueUsr user, GeneralLearnerFlowDTO generalLearnerFlowDTO) {
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
@@ -945,26 +945,26 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	int commentsMinWordsLimit = 0;
 	boolean isCommentsEnabled = false;
 	int countRatedQuestions = 0;
-	if (qaContent.isAllowRateAnswers() ) {
+	if (qaContent.isAllowRateAnswers()) {
 
-	    if ( userResponses.isEmpty()) {
+	    if (userResponses.isEmpty()) {
 		Set<LearnerItemRatingCriteria> criterias = qaContent.getRatingCriterias();
-		for ( LearnerItemRatingCriteria criteria : criterias ) {
-		    if ( criteria.isCommentRating() ) {
+		for (LearnerItemRatingCriteria criteria : criterias) {
+		    if (criteria.isCommentRating()) {
 			isCommentsEnabled = true;
 			break;
 		    }
 		}
-		
+
 	    } else {
-		// create itemIds list 
-		List<Long> itemIds = new LinkedList<Long>();
+		// create itemIds list
+		List<Long> itemIds = new LinkedList<>();
 		for (QaUsrResp responseIter : userResponses) {
 		    itemIds.add(responseIter.getResponseId());
 		}
 
-		List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(), qaSession.getQaSessionId(), itemIds,
-			true, userId);
+		List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(),
+			qaSession.getQaSessionId(), itemIds, true, userId);
 		sessionMap.put(AttributeNames.ATTR_ITEM_RATING_DTOS, itemRatingDtos);
 
 		if (itemRatingDtos.size() > 0) {
@@ -991,9 +991,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		countRatedQuestions = qaService.getCountItemsRatedByUser(qaContent.getQaContentId(), userId.intValue());
 	    }
 	}
-	
+
 	request.setAttribute(TOOL_SESSION_ID, qaSession.getQaSessionId());
-	
+
 	sessionMap.put("commentsMinWordsLimit", commentsMinWordsLimit);
 	sessionMap.put("isCommentsEnabled", isCommentsEnabled);
 	sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
@@ -1006,14 +1006,14 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
      * Refreshes user list.
      */
     public ActionForward getResponses(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 	initializeQAService();
 
 	// teacher timezone
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	TimeZone userTimeZone = userDto.getTimeZone();
-	
+
 	boolean isAllowRateAnswers = WebUtil.readBooleanParam(request, "isAllowRateAnswers");
 	boolean isAllowRichEditor = WebUtil.readBooleanParam(request, "isAllowRichEditor");
 	boolean isOnlyLeadersIncluded = WebUtil.readBooleanParam(request, "isOnlyLeadersIncluded", false);
@@ -1049,8 +1049,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	List<QaUsrResp> responses = QaLearningAction.qaService.getResponsesForTablesorter(qaContentId, qaSessionId,
 		questionUid, userId, isOnlyLeadersIncluded, page, size, sorting, searchString);
 
-	JSONObject responcedata = new JSONObject();
-	JSONArray rows = new JSONArray();
+	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 
 	responcedata.put("total_rows", QaLearningAction.qaService.getCountResponsesBySessionAndQuestion(qaSessionId,
 		questionUid, userId, isOnlyLeadersIncluded, searchString));
@@ -1060,7 +1060,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	List<ItemRatingDTO> itemRatingDtos = null;
 	if (isAllowRateAnswers && !responses.isEmpty()) {
 	    //create itemIds list
-	    List<Long> itemIds = new LinkedList<Long>();
+	    List<Long> itemIds = new LinkedList<>();
 	    for (QaUsrResp response : responses) {
 		itemIds.add(response.getResponseId());
 	    }
@@ -1079,19 +1079,23 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	for (QaUsrResp response : responses) {
 	    QaQueUsr user = response.getQaQueUser();
 
-	    /*  LDEV-3891: This code has been commented out, as the escapeCsv puts double quotes in the string, which goes through to the 
-	     * client and wrecks img src entries. It appears the browser cannot process the string with all the double quotes. 
-	     * This is the second time it is being fixed - the escapeCsv was removed in LDEV-3448 and then added back in 
-	     * when Peer Review was added (LDEV-3480). If escapeCsv needs to be added in again, make sure it does not break 
+	    /*
+	     * LDEV-3891: This code has been commented out, as the escapeCsv puts double quotes in the string, which
+	     * goes through to the
+	     * client and wrecks img src entries. It appears the browser cannot process the string with all the double
+	     * quotes.
+	     * This is the second time it is being fixed - the escapeCsv was removed in LDEV-3448 and then added back in
+	     * when Peer Review was added (LDEV-3480). If escapeCsv needs to be added in again, make sure it does not
+	     * break
 	     * learner added images being seen in monitoring.
-	    //remove leading and trailing quotes
-	    String answer = StringEscapeUtils.escapeCsv(response.getAnswer());
-	    if (isAllowRichEditor && answer.startsWith("\"") && answer.length() >= 3) {
-		answer = answer.substring(1, answer.length() - 1);
-	    }
+	     * //remove leading and trailing quotes
+	     * String answer = StringEscapeUtils.escapeCsv(response.getAnswer());
+	     * if (isAllowRichEditor && answer.startsWith("\"") && answer.length() >= 3) {
+	     * answer = answer.substring(1, answer.length() - 1);
+	     * }
 	     */
 
-	    JSONObject responseRow = new JSONObject();
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 	    responseRow.put("responseUid", response.getResponseId().toString());
 	    responseRow.put("answer", response.getAnswer());
 	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFullname()));
@@ -1102,7 +1106,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    // in the server time zone.
 	    Date attemptTime = response.getAttemptTime();
 	    responseRow.put("attemptTime", DateUtil.convertToStringForJSON(attemptTime, request.getLocale()));
-	    responseRow.put("timeAgo", DateUtil.convertToStringForTimeagoJSON(attemptTime)); 
+	    responseRow.put("timeAgo", DateUtil.convertToStringForTimeagoJSON(attemptTime));
 
 	    if (isAllowRateAnswers) {
 
@@ -1118,18 +1122,18 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		boolean isItemAuthoredByUser = response.getQaQueUser().getQueUsrId().equals(userId);
 		responseRow.put("isItemAuthoredByUser", isItemAuthoredByUser);
 
-		JSONArray criteriasRows = new JSONArray();
+		ArrayNode criteriasRows = JsonNodeFactory.instance.arrayNode();
 		for (ItemRatingCriteriaDTO criteriaDto : itemRatingDto.getCriteriaDtos()) {
-		    JSONObject criteriasRow = new JSONObject();
+		    ObjectNode criteriasRow = JsonNodeFactory.instance.objectNode();
 		    criteriasRow.put("ratingCriteriaId", criteriaDto.getRatingCriteria().getRatingCriteriaId());
 		    criteriasRow.put("title", criteriaDto.getRatingCriteria().getTitle());
 		    criteriasRow.put("averageRating", criteriaDto.getAverageRating());
 		    criteriasRow.put("numberOfVotes", criteriaDto.getNumberOfVotes());
 		    criteriasRow.put("userRating", criteriaDto.getUserRating());
 
-		    criteriasRows.put(criteriasRow);
+		    criteriasRows.add(criteriasRow);
 		}
-		responseRow.put("criteriaDtos", criteriasRows);
+		responseRow.set("criteriaDtos", criteriasRows);
 
 		//handle comments
 		responseRow.put("commentsCriteriaId", itemRatingDto.getCommentsCriteriaId());
@@ -1138,9 +1142,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		responseRow.put("commentPostedByUser", commentPostedByUser);
 		if (itemRatingDto.getCommentDtos() != null) {
 
-		    JSONArray comments = new JSONArray();
+		    ArrayNode comments = JsonNodeFactory.instance.arrayNode();
 		    for (RatingCommentDTO commentDto : itemRatingDto.getCommentDtos()) {
-			JSONObject comment = new JSONObject();
+			ObjectNode comment = JsonNodeFactory.instance.objectNode();
 			comment.put("comment", StringEscapeUtils.escapeCsv(commentDto.getComment()));
 
 			if (isMonitoring) {
@@ -1152,15 +1156,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 			    comment.put("userFullName", StringEscapeUtils.escapeCsv(commentDto.getUserFullName()));
 			}
 
-			comments.put(comment);
+			comments.add(comment);
 		    }
-		    responseRow.put("comments", comments);
+		    responseRow.set("comments", comments);
 		}
 	    }
 
-	    rows.put(responseRow);
+	    rows.add(responseRow);
 	}
-	responcedata.put("rows", rows);
+	responcedata.set("rows", rows);
 
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responcedata.toString()));

@@ -20,18 +20,24 @@ import javax.websocket.server.ServerEndpoint;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
+
+
+
 import org.lamsfoundation.lams.tool.scribe.model.ScribeReportEntry;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
 import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Receives, processes and sends Scribe reports and votes to Learners.
@@ -104,8 +110,8 @@ public class LearningWebsocketServer {
 	 * Feeds websockets with reports and votes.
 	 */
 	@SuppressWarnings("unchecked")
-	private static void send(Long toolSessionId, Session newWebsocket) throws JSONException, IOException {
-	    JSONObject responseJSON = new JSONObject();
+	private static void send(Long toolSessionId, Session newWebsocket) throws IOException {
+	    ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	    ScribeSessionCache sessionCache = LearningWebsocketServer.cache.get(toolSessionId);
 	    if (sessionCache == null) {
 		// first time run, create the cache
@@ -135,7 +141,7 @@ public class LearningWebsocketServer {
 		send = true;
 	    }
 
-	    JSONArray reportsJSON = new JSONArray();
+	    ArrayNode reportsJSON = JsonNodeFactory.instance.arrayNode();
 	    synchronized (sessionCache) {
 		for (ScribeReportEntry storedReport : (Set<ScribeReportEntry>) scribeSession.getScribeReportEntries()) {
 		    Long uid = storedReport.getUid();
@@ -149,15 +155,15 @@ public class LearningWebsocketServer {
 			// but to build hash each report char needs to be processed anyway
 			sessionCache.reports.put(uid, storedReportText);
 
-			JSONObject reportJSON = new JSONObject();
+			ObjectNode reportJSON = JsonNodeFactory.instance.objectNode();
 			reportJSON.put("uid", uid);
 			reportJSON.put("text", storedReportText);
-			reportsJSON.put(reportJSON);
+			reportsJSON.add(reportJSON);
 		    }
 		}
 	    }
-	    if (reportsJSON.length() > 0) {
-		responseJSON.put("reports", reportsJSON);
+	    if (reportsJSON.size() > 0) {
+		responseJSON.set("reports", reportsJSON);
 		send = true;
 	    }
 
@@ -206,7 +212,7 @@ public class LearningWebsocketServer {
      * Registeres the Learner for processing by SendWorker.
      */
     @OnOpen
-    public void registerUser(Session websocket) throws JSONException, IOException {
+    public void registerUser(Session websocket) throws IOException {
 	Long toolSessionId = Long
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
@@ -256,9 +262,12 @@ public class LearningWebsocketServer {
 
     /**
      * Receives a message sent by Learner via a websocket.
+     * 
+     * @throws IOException
+     * @throws JsonProcessingException
      */
     @OnMessage
-    public void receiveRequest(String input, Session websocket) throws JSONException {
+    public void receiveRequest(String input, Session websocket) throws JsonProcessingException, IOException {
 	if (StringUtils.isBlank(input)) {
 	    return;
 	}
@@ -267,8 +276,8 @@ public class LearningWebsocketServer {
 	    return;
 	}
 
-	JSONObject requestJSON = new JSONObject(input);
-	switch (requestJSON.getString("type")) {
+	ObjectNode requestJSON = JsonUtil.readObject(input);
+	switch (JsonUtil.optString(requestJSON, "type")) {
 	    case "vote":
 		LearningWebsocketServer.vote(websocket);
 		break;
@@ -296,7 +305,7 @@ public class LearningWebsocketServer {
     /**
      * The scribe has submitted a report.
      */
-    private static void submitReport(JSONObject requestJSON, Session websocket) throws JSONException {
+    private static void submitReport(ObjectNode requestJSON, Session websocket) {
 	Long toolSessionId = Long
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	String userName = websocket.getUserPrincipal().getName();
@@ -306,13 +315,13 @@ public class LearningWebsocketServer {
     /**
      * The scribe or a Monitor has force completed the activity. Browsers will refresh and display report summary.
      */
-    static void sendCloseRequest(Long toolSessionId) throws JSONException, IOException {
+    static void sendCloseRequest(Long toolSessionId) throws IOException {
 	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	if (sessionWebsockets == null) {
 	    return;
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("close", true);
 	String response = responseJSON.toString();
 
