@@ -39,16 +39,17 @@ import java.util.regex.Pattern;
 import javax.websocket.MessageHandler;
 
 import org.apache.log4j.Logger;
-
-
-
 import org.lamsfoundation.testharness.Call;
+import org.lamsfoundation.testharness.JsonUtil;
 import org.lamsfoundation.testharness.MockUser;
 import org.lamsfoundation.testharness.TestHarnessException;
 import org.lamsfoundation.testharness.TestUtil;
 import org.lamsfoundation.testharness.admin.MockAdmin;
 import org.xml.sax.SAXException;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.meterware.httpunit.Button;
 import com.meterware.httpunit.FormControl;
 import com.meterware.httpunit.WebForm;
@@ -98,7 +99,7 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String SCRATCHIE_IS_LEADER_SUBSTRING = "isUserLeader=true";
     private static final Pattern SCRATCHIE_TOOL_SESSION_ID_PATTERN = Pattern.compile("toolSessionID=' \\+ (\\d+)\\)");
     private static final String SCRATCHIE_FINISH_SESSION_SUBSTRING = "return finishSession()";
-    private static final Set<Long> SCRATCHIE_FINISHED_TOOL_CONTENT = new TreeSet<Long>();
+    private static final Set<Long> SCRATCHIE_FINISHED_TOOL_CONTENT = new TreeSet<>();
 
     private static final String CHAT_FINISH_SUBSTRING = "/lams/tool/lachat11/learning.do";
     private static final int CHAT_REPLIES = 3;
@@ -150,7 +151,7 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String SCRIBE_SUBMIT_REFLECTION_SUBSTRING = "value=\"submitReflection\"";
     private static final Pattern SCRIBE_REPORT_ENTRY_PATTERN = Pattern.compile("id=\"report-(\\d+)\"");
     private static final Pattern SCRIBE_TOOL_SESSION_ID_PATTERN = Pattern.compile("toolSessionID=' \\+ (\\d+)\\)");
-    private static final Set<Long> SCRIBE_FINISHED_TOOL_CONTENT = new TreeSet<Long>();
+    private static final Set<Long> SCRIBE_FINISHED_TOOL_CONTENT = new TreeSet<>();
     private static final short SCRIBE_SUBMIT_REPORT_ATTEMPTS = 3;
 
     private static int joinLessonUserCount = 0;
@@ -229,7 +230,7 @@ public class MockLearner extends MockUser implements Runnable {
     }
 
     private static Map<String, List<Button>> groupButtonsByName(Button[] btns, String buttonType) {
-	Map<String, List<Button>> buttonGroups = new HashMap<String, List<Button>>();
+	Map<String, List<Button>> buttonGroups = new HashMap<>();
 	if (btns != null) {
 	    for (Button btn : btns) {
 		if (buttonType.equals(btn.getType())) {
@@ -238,7 +239,7 @@ public class MockLearner extends MockUser implements Runnable {
 		    if (!buttonGroups.containsKey(name)) {
 			buttonGroups.get(name).add(btn);
 		    } else {
-			List<Button> buttons = new ArrayList<Button>();
+			List<Button> buttons = new ArrayList<>();
 			buttons.add(btn);
 			buttonGroups.put(name, buttons);
 		    }
@@ -561,20 +562,16 @@ public class MockLearner extends MockUser implements Runnable {
 
 	// send few messages to the whole group
 	ObjectNode messageJSON = JsonNodeFactory.instance.objectNode();
-	try {
-	    messageJSON.put("toolSessionID", toolSessionID);
-	    messageJSON.put("toUser", "");
-	    for (int replyIndex = 0; replyIndex < MockLearner.CHAT_REPLIES; replyIndex++) {
-		String message = MockLearner.composeArbitraryText();
-		messageJSON.put("message", message);
-		// send message to websocket
-		websocketClient.sendMessage(messageJSON.toString());
-		delay();
-	    }
-	    websocketClient.close();
-	} catch (JSONException e) {
-	    throw new IOException("Error while creating Chat JSON for websocket", e);
+	messageJSON.put("toolSessionID", toolSessionID);
+	messageJSON.put("toUser", "");
+	for (int replyIndex = 0; replyIndex < MockLearner.CHAT_REPLIES; replyIndex++) {
+	    String message = MockLearner.composeArbitraryText();
+	    messageJSON.put("message", message);
+	    // send message to websocket
+	    websocketClient.sendMessage(messageJSON.toString());
+	    delay();
 	}
+	websocketClient.close();
     }
 
     private WebResponse handleToolForum(WebResponse resp) throws SAXException, IOException {
@@ -702,12 +699,12 @@ public class MockLearner extends MockUser implements Runnable {
 	    if (isLeader) {
 		// find all answers on the page
 		m = MockLearner.SCRATCHIE_SCRATCH_PATTERN.matcher(asText);
-		Map<Long, List<Long>> uids = new TreeMap<Long, List<Long>>();
+		Map<Long, List<Long>> uids = new TreeMap<>();
 		while (m.find()) {
 		    Long questionID = Long.valueOf(m.group(1));
 		    List<Long> answerUids = uids.get(questionID);
 		    if (answerUids == null) {
-			answerUids = new ArrayList<Long>();
+			answerUids = new ArrayList<>();
 			uids.put(questionID, answerUids);
 		    }
 		    answerUids.add(Long.valueOf(m.group(2)));
@@ -757,8 +754,8 @@ public class MockLearner extends MockUser implements Runnable {
 				log.debug(username + " received Scratchie " + toolSessionID + " message from server: "
 					+ message);
 				try {
-				    ObjectNode responseJSON = new ObjectNode(message);
-				    if (responseJSON.optBoolean("close")) {
+				    ObjectNode responseJSON = JsonUtil.readObject(message);
+				    if (JsonUtil.optBoolean(responseJSON, "close")) {
 					// mark the activity as finished for everyone
 					SCRATCHIE_FINISHED_TOOL_CONTENT.add(toolSessionID);
 				    }
@@ -824,73 +821,68 @@ public class MockLearner extends MockUser implements Runnable {
 	String websocketURL = test.getTestSuite().getTargetServer().replace("http", "ws")
 		+ "/lams/tool/lascrb11/learningWebsocket?toolSessionID=" + toolSessionID;
 	String sessionID = wc.getCookieJar().getCookieValue("JSESSIONID");
-	try {
-	    if (isScribe) {
-		WebsocketClient websocketClient = new WebsocketClient(websocketURL, sessionID,
-			new MessageHandler.Whole<String>() {
-			    @Override
-			    public void onMessage(String message) {
-				log.debug(username + " (scribe) received Scribe " + toolSessionID
-					+ " message from server: " + message);
-			    }
-			});
+	if (isScribe) {
+	    WebsocketClient websocketClient = new WebsocketClient(websocketURL, sessionID,
+		    new MessageHandler.Whole<String>() {
+			@Override
+			public void onMessage(String message) {
+			    log.debug(username + " (scribe) received Scribe " + toolSessionID + " message from server: "
+				    + message);
+			}
+		    });
 
-		// send few version of reports
-		ObjectNode requestJSON = JsonNodeFactory.instance.objectNode();
-		requestJSON.put("type", "submitReport");
-		for (short attempt = 0; attempt < SCRIBE_SUBMIT_REPORT_ATTEMPTS; attempt++) {
-		    ArrayNode reportsJSON = JsonNodeFactory.instance.arrayNode();
-		    m = MockLearner.SCRIBE_REPORT_ENTRY_PATTERN.matcher(asText);
-		    while (m.find()) {
-			ObjectNode reportJSON = JsonNodeFactory.instance.objectNode();
-			reportJSON.put("uid", m.group(1));
-			reportJSON.put("text", MockLearner.composeArbitraryText());
-			reportsJSON.put(reportJSON);
-		    }
-		    requestJSON.put("reports", reportsJSON);
-		    websocketClient.sendMessage(requestJSON.toString());
-
-		    delay();
+	    // send few version of reports
+	    ObjectNode requestJSON = JsonNodeFactory.instance.objectNode();
+	    requestJSON.put("type", "submitReport");
+	    for (short attempt = 0; attempt < SCRIBE_SUBMIT_REPORT_ATTEMPTS; attempt++) {
+		ArrayNode reportsJSON = JsonNodeFactory.instance.arrayNode();
+		m = MockLearner.SCRIBE_REPORT_ENTRY_PATTERN.matcher(asText);
+		while (m.find()) {
+		    ObjectNode reportJSON = JsonNodeFactory.instance.objectNode();
+		    reportJSON.put("uid", m.group(1));
+		    reportJSON.put("text", MockLearner.composeArbitraryText());
+		    reportsJSON.add(reportJSON);
 		}
+		requestJSON.set("reports", reportsJSON);
+		websocketClient.sendMessage(requestJSON.toString());
 
-		websocketClient.close();
-		log.debug(username + " (scribe) force completes scribe " + toolSessionID);
-		return (WebResponse) new Call(wc, test, username + " the scribe force completes Scribe", form)
-			.execute();
-	    } else {
-		WebsocketClient websocketClient = new WebsocketClient(websocketURL, sessionID,
-			new MessageHandler.Whole<String>() {
-			    @Override
-			    public void onMessage(String message) {
-				log.debug(username + " (regular learner) received Scribe " + toolSessionID
-					+ " message from server: " + message);
-				try {
-				    ObjectNode responseJSON = new ObjectNode(message);
-				    if (responseJSON.optBoolean("close")) {
-					// mark the activity as finished for everyone
-					SCRIBE_FINISHED_TOOL_CONTENT.add(toolSessionID);
-				    }
-				} catch (JSONException e) {
-				    log.error("JSON exception in Scribe " + toolSessionID, e);
-				}
-			    }
-			});
-
-		// vote few times
-		ObjectNode requestJSON = JsonNodeFactory.instance.objectNode();
-		requestJSON.put("type", "vote");
-		for (short attempt = 0; attempt < SCRIBE_SUBMIT_REPORT_ATTEMPTS
-			&& !SCRIBE_FINISHED_TOOL_CONTENT.contains(toolSessionID); attempt++) {
-		    websocketClient.sendMessage(requestJSON.toString());
-		    delay();
-		}
-
-		websocketClient.close();
-		return (WebResponse) new Call(wc, test, username + " refreshes Scribe",
-			MockLearner.findURLInLocationHref(resp, SCRIBE_TOOL_SUBSTRING)).execute();
+		delay();
 	    }
-	} catch (JSONException e) {
-	    throw new IOException("Error while trying to create Scribe JSON for websocket", e);
+
+	    websocketClient.close();
+	    log.debug(username + " (scribe) force completes scribe " + toolSessionID);
+	    return (WebResponse) new Call(wc, test, username + " the scribe force completes Scribe", form).execute();
+	} else {
+	    WebsocketClient websocketClient = new WebsocketClient(websocketURL, sessionID,
+		    new MessageHandler.Whole<String>() {
+			@Override
+			public void onMessage(String message) {
+			    log.debug(username + " (regular learner) received Scribe " + toolSessionID
+				    + " message from server: " + message);
+			    try {
+				ObjectNode responseJSON = JsonUtil.readObject(message);
+				if (JsonUtil.optBoolean(responseJSON, "close")) {
+				    // mark the activity as finished for everyone
+				    SCRIBE_FINISHED_TOOL_CONTENT.add(toolSessionID);
+				}
+			    } catch (IOException e) {
+				log.error("JSON exception in Scribe " + toolSessionID, e);
+			    }
+			}
+		    });
+
+	    // vote few times
+	    ObjectNode requestJSON = JsonNodeFactory.instance.objectNode();
+	    requestJSON.put("type", "vote");
+	    for (short attempt = 0; attempt < SCRIBE_SUBMIT_REPORT_ATTEMPTS
+		    && !SCRIBE_FINISHED_TOOL_CONTENT.contains(toolSessionID); attempt++) {
+		websocketClient.sendMessage(requestJSON.toString());
+		delay();
+	    }
+
+	    websocketClient.close();
+	    return (WebResponse) new Call(wc, test, username + " refreshes Scribe",
+		    MockLearner.findURLInLocationHref(resp, SCRIBE_TOOL_SUBSTRING)).execute();
 	}
     }
 
@@ -899,7 +891,7 @@ public class MockLearner extends MockUser implements Runnable {
 	// check if current user is the leader
 	boolean hasEditRights = asText.contains(MockLearner.ASSESSMENT_HAS_EDIT_RIGHT_SUBSTRING);
 	Matcher m;
-	
+
 	boolean canFinish = asText.contains(MockLearner.ASSESSMENT_FINISH_BUTTON_SUBSTRING);
 	if (hasEditRights) {
 	    // this is a Leader or it is a non-Leader Assessmnt
@@ -946,7 +938,8 @@ public class MockLearner extends MockUser implements Runnable {
 	if (m.find()) {
 	    finishURL = m.group(1);
 	} else {
-	    throw new TestHarnessException("Finish URL "+MockLearner.ASSESSMENT_FINISH_PATTERN+" was not found in Assessment Tool");
+	    throw new TestHarnessException(
+		    "Finish URL " + MockLearner.ASSESSMENT_FINISH_PATTERN + " was not found in Assessment Tool");
 	}
 
 	return (WebResponse) new Call(wc, test, username + " finishes Assessment", finishURL).execute();

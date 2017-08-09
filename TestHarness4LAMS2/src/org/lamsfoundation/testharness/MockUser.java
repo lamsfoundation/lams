@@ -102,12 +102,18 @@ public class MockUser {
 	    resp = (WebResponse) new Call(wc, test, username + " login", fillForm(resp, 0, params)).execute();
 	    if (!MockUser.checkPageContains(resp, MockUser.INDEX_PAGE_FLAG)) {
 		MockUser.log.debug(resp.getText());
+		Thread.sleep(1000);
+		resp = (WebResponse) new Call(wc, test, username + " ping again", "").execute();
+		MockUser.log.debug(resp.getText());
 		throw new TestHarnessException(username + " failed to login with password " + password);
 	    }
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
 	} catch (SAXException e) {
 	    throw new RuntimeException(e);
+	} catch (InterruptedException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
 	}
     }
 
@@ -119,7 +125,7 @@ public class MockUser {
 	try {
 	    int seconds = 0;
 	    if (test.getMaxDelay() <= test.getMinDelay()) {// to avoid IllegalArgumentException in nextInt method on
-							       // Random object
+							   // Random object
 		seconds = test.getMinDelay();
 	    } else {
 		seconds = test.getMinDelay()
