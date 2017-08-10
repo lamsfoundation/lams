@@ -820,7 +820,6 @@
 				<include name="org/apache/lucene/main/"/>
 				<include name="org/apache/lucene/internal/"/>
 				<include name="org/apache/openjpa/"/>
-				<include name="org/codehaus/jackson/"/>
 				<include name="org/codehaus/jettison/"/>
 				<include name="org/eclipse/persistence/"/>
 				<include name="org/fusesource/"/>
