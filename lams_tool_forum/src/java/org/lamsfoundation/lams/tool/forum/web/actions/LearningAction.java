@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
 import java.io.IOException;
@@ -45,8 +44,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -82,6 +79,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * User: conradb Date: 24/06/2005 Time: 10:54:09
@@ -179,7 +179,7 @@ public class LearningAction extends Action {
 	if (sessionMapID != null) {
 	    sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	} else {
-	    sessionMap = new SessionMap<String, Object>();
+	    sessionMap = new SessionMap<>();
 	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	}
@@ -233,14 +233,14 @@ public class LearningAction extends Action {
 	sessionMap.put(ForumConstants.ATTR_LOCK_WHEN_FINISHED, forum.getLockWhenFinished());
 	sessionMap.put(ForumConstants.ATTR_USER_FINISHED, forumUser.isSessionFinished());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_EDIT, forum.isAllowEdit());
-	
+
 	sessionMap.put(ForumConstants.ATTR_ALLOW_UPLOAD, forum.isAllowUpload());
 	int uploadMaxFileSize = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
 	// it defaults to -1 if property was not found
 	if (uploadMaxFileSize > 0) {
 	    sessionMap.put(ForumConstants.ATTR_UPLOAD_MAX_FILE_SIZE, FileValidatorUtil.formatSize(uploadMaxFileSize));
 	}
-	
+
 	sessionMap.put(ForumConstants.ATTR_ALLOW_RATE_MESSAGES, forum.isAllowRateMessages());
 	sessionMap.put(ForumConstants.ATTR_MINIMUM_RATE, forum.getMinimumRate());
 	sessionMap.put(ForumConstants.ATTR_MAXIMUM_RATE, forum.getMaximumRate());
@@ -508,11 +508,12 @@ public class LearningAction extends Action {
 	// if coming from topic list, the toolSessionId is in the SessionMap.
 	// if coming from the monitoring statistics window, it is passed in as a parameter.
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
-	if ( toolSessionId != null ) {
+	if (toolSessionId != null) {
 	    sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	    String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE, true);
-	    if ( mode != null )
+	    if (mode != null) {
 		sessionMap.put(AttributeNames.PARAM_MODE, mode);
+	    }
 	} else {
 	    toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	}
@@ -825,9 +826,8 @@ public class LearningAction extends Action {
     /**
      * Create a replayed topic for a parent topic.
      */
-    private ActionForward replyTopicInline(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response)
-	    throws InterruptedException, JSONException, IOException {
+    private ActionForward replyTopicInline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws InterruptedException, IOException {
 
 	MessageForm messageForm = (MessageForm) form;
 	SessionMap sessionMap = getSessionMap(request, messageForm);
@@ -862,24 +862,23 @@ public class LearningAction extends Action {
 	boolean noMorePosts = forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply()
 		&& !forum.isAllowNewTopic() ? Boolean.TRUE : Boolean.FALSE;
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put(ForumConstants.ATTR_MESS_ID, newMessageSeq.getMessage().getUid());
-	JSONObject.put(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
-	JSONObject.put(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
-	JSONObject.put(ForumConstants.ATTR_THREAD_ID, newMessageSeq.getThreadMessage().getUid());
-	JSONObject.put(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
-	JSONObject.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
-	JSONObject.put(ForumConstants.ATTR_PARENT_TOPIC_ID, newMessageSeq.getMessage().getParent().getUid());
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
+	ObjectNode.put(ForumConstants.ATTR_MESS_ID, newMessageSeq.getMessage().getUid());
+	ObjectNode.put(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
+	ObjectNode.put(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
+	ObjectNode.put(ForumConstants.ATTR_THREAD_ID, newMessageSeq.getThreadMessage().getUid());
+	ObjectNode.put(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
+	ObjectNode.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
+	ObjectNode.put(ForumConstants.ATTR_PARENT_TOPIC_ID, newMessageSeq.getMessage().getParent().getUid());
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 	return null;
     }
 
     private void setMonitorMode(SessionMap<String, Object> sessionMap, Message message) {
 	message.setIsMonitor(ToolAccessMode.TEACHER.equals(sessionMap.get(AttributeNames.ATTR_MODE)));
     }
-    
-    
+
     /**
      * Display a editable form for a special topic in order to update it.
      *
@@ -1017,7 +1016,7 @@ public class LearningAction extends Action {
      * @throws IOException
      */
     public ActionForward updateTopicInline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws PersistenceException, JSONException, IOException {
+	    HttpServletResponse response) throws PersistenceException, IOException {
 
 	forumService = getForumManager();
 
@@ -1028,13 +1027,13 @@ public class LearningAction extends Action {
 
 	doUpdateTopic(request, messageForm, sessionMap, topicId, message);
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put(ForumConstants.ATTR_MESS_ID, topicId);
-	JSONObject.put(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
+	ObjectNode.put(ForumConstants.ATTR_MESS_ID, topicId);
+	ObjectNode.put(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 	Long rootTopicId = forumService.getRootTopicId(topicId);
-	JSONObject.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
+	ObjectNode.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 	return null;
     }
 
@@ -1094,7 +1093,7 @@ public class LearningAction extends Action {
      * @return
      */
     public ActionForward rateMessage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 
 	forumService = getForumManager();
 	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
@@ -1123,13 +1122,13 @@ public class LearningAction extends Action {
 	sessionMap.put(ForumConstants.ATTR_IS_MIN_RATINGS_COMPLETED, isMinRatingsCompleted);
 	sessionMap.put(ForumConstants.ATTR_NUM_OF_RATINGS, numOfRatings);
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put("averageRating", averageRatingDTO.getRating());
-	JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
-	JSONObject.put(ForumConstants.ATTR_NO_MORE_RATINGSS, noMoreRatings);
-	JSONObject.put(ForumConstants.ATTR_NUM_OF_RATINGS, numOfRatings);
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
+	ObjectNode.put("averageRating", averageRatingDTO.getRating());
+	ObjectNode.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
+	ObjectNode.put(ForumConstants.ATTR_NO_MORE_RATINGSS, noMoreRatings);
+	ObjectNode.put(ForumConstants.ATTR_NUM_OF_RATINGS, numOfRatings);
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 	return null;
     }
 

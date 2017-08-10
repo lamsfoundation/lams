@@ -28,8 +28,8 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
+
+
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -47,6 +47,8 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Manpreet Minhas
@@ -152,8 +154,8 @@ public interface IAuthoringService {
 	    boolean createNewLearningDesign, String newDesignName, Integer workspaceFolderID, String customCSV)
 	    throws UserException, LearningDesignException, WorkspaceFolderException, IOException;
 
-    LearningDesign saveLearningDesignDetails(JSONObject ldJSON)
-	    throws UserException, JSONException, WorkspaceFolderException, ObjectExtractorException, ParseException;
+    LearningDesign saveLearningDesignDetails(ObjectNode ldJSON)
+	    throws UserException, WorkspaceFolderException, ObjectExtractorException, ParseException;
 
     /**
      * Validate the learning design, updating the valid flag appropriately.

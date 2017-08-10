@@ -32,7 +32,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -46,9 +45,6 @@ import java.util.TreeSet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -115,6 +111,10 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Dapeng.Ni
@@ -310,7 +310,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
 	// add resource items from Authoring
 	Resource resource = session.getResource();
-	List<ResourceItem> items = new ArrayList<ResourceItem>();
+	List<ResourceItem> items = new ArrayList<>();
 	items.addAll(resource.getResourceItems());
 
 	// add resource items from ResourceSession
@@ -428,7 +428,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     @Override
     public List<SessionDTO> getSummary(Long contentId) {
-	List<SessionDTO> groupList = new ArrayList<SessionDTO>();
+	List<SessionDTO> groupList = new ArrayList<>();
 
 	Resource resource = resourceDao.getByContentId(contentId);
 
@@ -442,14 +442,14 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    group.setSessionId(session.getSessionId());
 	    group.setSessionName(session.getSessionName());
 
-	    Set<ResourceItem> items = new TreeSet<ResourceItem>(new ResourceItemComparator());
+	    Set<ResourceItem> items = new TreeSet<>(new ResourceItemComparator());
 	    // firstly, put all initial resource item into this group.
 	    items.addAll(resource.getResourceItems());
 	    // add this session's resource items
 	    items.addAll(session.getResourceItems());
 
 	    // item ids of items that could be rated.
-	    List<Long> itemsToRate = new ArrayList<Long>();
+	    List<Long> itemsToRate = new ArrayList<>();
 
 	    // get all item which is accessed by users in this session
 	    Map<Long, Integer> visitCountMap = resourceItemVisitDao.getSummary(contentId, session.getSessionId());
@@ -460,24 +460,25 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		    resourceItemDTO.setViewNumber(visitCountMap.get(item.getUid()).intValue());
 		}
 		group.getItems().add(resourceItemDTO);
-		if ( item.isAllowRating() ) {
+		if (item.isAllowRating()) {
 		    itemsToRate.add(item.getUid());
 		}
 	    }
-	    
+
 	    List<ItemRatingDTO> itemRatingDtos = null;
-	    if ( itemsToRate.size() > 0 ) {
-		itemRatingDtos = ratingService.getRatingCriteriaDtos(contentId, session.getSessionId(), itemsToRate, false, -1L);
+	    if (itemsToRate.size() > 0) {
+		itemRatingDtos = ratingService.getRatingCriteriaDtos(contentId, session.getSessionId(), itemsToRate,
+			false, -1L);
 		group.setAllowRating(true);
 	    } else {
 		group.setAllowRating(false);
 	    }
 
-	    for (ResourceItemDTO item: group.getItems()) {
+	    for (ResourceItemDTO item : group.getItems()) {
 		if (item.isAllowRating()) {
 		    // find corresponding itemRatingDto
-		    for ( ItemRatingDTO ratingDTO : itemRatingDtos ) {
-			if ( item.getItemUid().equals(ratingDTO.getItemId()) ) {
+		    for (ItemRatingDTO ratingDTO : itemRatingDtos) {
+			if (item.getItemUid().equals(ratingDTO.getItemId())) {
 			    item.setRatingDTO(ratingDTO);
 			    break;
 			}
@@ -493,7 +494,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     @Override
     public List<ReflectDTO> getReflectList(Long contentId) {
-	List<ReflectDTO> reflections = new LinkedList<ReflectDTO>();
+	List<ReflectDTO> reflections = new LinkedList<>();
 
 	List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
 	for (ResourceSession session : sessionList) {
@@ -529,7 +530,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    user.setAccessDate(visit.getAccessDate());
 	    user.setCompleteDate(visit.getCompleteDate());
 	    Date timeTaken = ((visit.getCompleteDate() != null) && (visit.getAccessDate() != null))
-		    ? new Date(visit.getCompleteDate().getTime() - visit.getAccessDate().getTime()) : null;
+		    ? new Date(visit.getCompleteDate().getTime() - visit.getAccessDate().getTime())
+		    : null;
 	    user.setTimeTaken(timeTaken);
 	    userList.add(user);
 	}
@@ -791,10 +793,10 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     // *******************************************************************************
@@ -867,13 +869,13 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		item.setCreateBy(user);
 		useRatings = useRatings || item.isAllowRating();
 	    }
-	    
+
 	    Set<LearnerItemRatingCriteria> criterias = toolContentObj.getRatingCriterias();
 	    if (criterias != null) {
 		for (LearnerItemRatingCriteria criteria : criterias) {
 		    criteria.setToolContentId(toolContentId);
 		}
-	    } 
+	    }
 
 	    resourceDao.saveObject(toolContentObj);
 	} catch (ImportToolContentException e) {
@@ -1091,7 +1093,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -1107,8 +1109,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     @Override
     public LearnerItemRatingCriteria createRatingCriteria(Long toolContentId) throws RatingException {
 	List<RatingCriteria> ratingCriterias = ratingService.getCriteriasByToolContentId(toolContentId);
-	if ( ratingCriterias == null || ratingCriterias.size() == 0 ) {
-	    return ratingService.saveLearnerItemRatingCriteria(toolContentId, null, 1, RatingCriteria.RATING_STYLE_STAR, false, 0);
+	if (ratingCriterias == null || ratingCriterias.size() == 0) {
+	    return ratingService.saveLearnerItemRatingCriteria(toolContentId, null, 1, RatingCriteria.RATING_STYLE_STAR,
+		    false, 0);
 	} else {
 	    return (LearnerItemRatingCriteria) ratingCriterias.get(0);
 	}
@@ -1118,9 +1121,10 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public int deleteRatingCriteria(Long toolContentId) {
 	return ratingService.deleteAllRatingCriterias(toolContentId);
     }
-    
+
     @Override
-    public List<ItemRatingDTO> getRatingCriteriaDtos(Long toolContentId, Long toolSessionId, Collection<Long> itemIds, Long userId) {
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long toolContentId, Long toolSessionId, Collection<Long> itemIds,
+	    Long userId) {
 	return ratingService.getRatingCriteriaDtos(toolContentId, toolSessionId, itemIds, false, userId);
     }
 
@@ -1229,45 +1233,49 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	if (learner == null) {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
-	
+
 	Object[] dates = resourceItemVisitDao.getDateRangeOfAccesses(learner.getUid(), toolSessionId);
-	if (learner.isSessionFinished())
-	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, (Date)dates[0], (Date)dates[1]);
-	else
-	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED,(Date) dates[0], null);
+	if (learner.isSessionFinished()) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, (Date) dates[0], (Date) dates[1]);
+	} else {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, (Date) dates[0], null);
+	}
     }
- 
+
     // ****************** REST methods *************************
 
     /**
      * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: title, instructions, resources,
-     * user fields firstName, lastName and loginName Resources must contain a JSONArray of JSONObject objects, which
+     * user fields firstName, lastName and loginName Resources must contain a ArrayNode of ObjectNode objects, which
      * have the following mandatory fields: title, description, type. If there are instructions for a resource, the
-     * instructions are a JSONArray of Strings. There should be at least one resource object in the resources array.
+     * instructions are a ArrayNode of Strings. There should be at least one resource object in the resources array.
+     * 
+     * @throws IOException
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON)
+	    throws IOException {
 
 	Date updateDate = new Date();
 
 	Resource resource = new Resource();
 	resource.setContentId(toolContentID);
-	resource.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	resource.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	resource.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	resource.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 	resource.setCreated(updateDate);
 
-	resource.setAllowAddFiles(JsonUtil.opt(toolContentJSON, "allowAddFiles", Boolean.FALSE));
-	resource.setAllowAddUrls(JsonUtil.opt(toolContentJSON, "allowAddUrls", Boolean.FALSE));
-	resource.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	resource.setMiniViewResourceNumber(JsonUtil.opt(toolContentJSON, "minViewResourceNumber", 0));
+	resource.setAllowAddFiles(JsonUtil.optBoolean(toolContentJSON, "allowAddFiles", Boolean.FALSE));
+	resource.setAllowAddUrls(JsonUtil.optBoolean(toolContentJSON, "allowAddUrls", Boolean.FALSE));
+	resource.setLockWhenFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	resource.setMiniViewResourceNumber(JsonUtil.optInt(toolContentJSON, "minViewResourceNumber", 0));
 	resource.setNotifyTeachersOnAssigmentSumbit(
-		JsonUtil.opt(toolContentJSON, "notifyTeachersOnAssigmentSubmit", Boolean.FALSE));
+		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnAssigmentSubmit", Boolean.FALSE));
 	resource.setNotifyTeachersOnAssigmentSumbit(
-		JsonUtil.opt(toolContentJSON, "notifyTeachersOnFileUpload", Boolean.FALSE));
-	resource.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	resource.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
-	resource.setRunAuto(JsonUtil.opt(toolContentJSON, "runAuto", Boolean.FALSE));
+		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnFileUpload", Boolean.FALSE));
+	resource.setReflectOnActivity(
+		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	resource.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	resource.setRunAuto(JsonUtil.optBoolean(toolContentJSON, "runAuto", Boolean.FALSE));
 
 	resource.setContentInUse(false);
 	resource.setDefineLater(false);
@@ -1275,45 +1283,44 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	ResourceUser resourceUser = getUserByIDAndContent(userID.longValue(), toolContentID);
 	if (resourceUser == null) {
 	    resourceUser = new ResourceUser();
-	    resourceUser.setFirstName(toolContentJSON.getString("firstName"));
-	    resourceUser.setLastName(toolContentJSON.getString("lastName"));
-	    resourceUser.setLoginName(toolContentJSON.getString("loginName"));
+	    resourceUser.setFirstName(JsonUtil.optString(toolContentJSON, "firstName"));
+	    resourceUser.setLastName(JsonUtil.optString(toolContentJSON, "lastName"));
+	    resourceUser.setLoginName(JsonUtil.optString(toolContentJSON, "loginName"));
 	    //   resourceUser.setResource(content);
 	}
 
 	resource.setCreatedBy(resourceUser);
 
 	// **************************** Handle topic *********************
-	JSONArray resources = toolContentJSON.getJSONArray("resources");
+	ArrayNode resources = JsonUtil.optArray(toolContentJSON, "resources");
 	Set itemList = new LinkedHashSet();
-	for (int i = 0; i < resources.length(); i++) {
-	    JSONObject itemData = (JSONObject) resources.get(i);
+	for (JsonNode itemData : resources) {
 	    ResourceItem item = new ResourceItem();
-	    item.setTitle(itemData.getString("title"));
-	    item.setType((short) itemData.getInt("type"));
+	    item.setTitle(JsonUtil.optString(itemData, "title"));
+	    item.setType(JsonUtil.optInt(itemData, "type").shortValue());
 	    item.setCreateBy(resourceUser);
 	    item.setCreateDate(updateDate);
 	    item.setComplete(false);
 	    item.setCreateByAuthor(true);
 	    item.setHide(false);
-	    item.setOrderId(itemData.getInt(RestTags.DISPLAY_ORDER));
+	    item.setOrderId(JsonUtil.optInt(itemData, RestTags.DISPLAY_ORDER));
 
-	    item.setDescription(JsonUtil.opt(itemData, "description", (String) null));
-	    item.setFileName(JsonUtil.opt(itemData, "name", (String) null));
-	    item.setFileType(JsonUtil.opt(itemData, "fileType", (String) null));
+	    item.setDescription(JsonUtil.optString(itemData, "description"));
+	    item.setFileName(JsonUtil.optString(itemData, "name"));
+	    item.setFileType(JsonUtil.optString(itemData, "fileType"));
 	    item.setFileUuid(JsonUtil.optLong(itemData, "crUuid"));
 	    item.setFileVersionId(JsonUtil.optLong(itemData, "crVersionId"));
-	    item.setImsSchema(JsonUtil.opt(itemData, "imsSchema", (String) null));
-	    item.setOrganizationXml(JsonUtil.opt(itemData, "organizationXml", (String) null));
-	    item.setOpenUrlNewWindow(JsonUtil.opt(itemData, "openUrlNewWindow", Boolean.FALSE));
-	    item.setUrl(JsonUtil.opt(itemData, "url", (String) null));
+	    item.setImsSchema(JsonUtil.optString(itemData, "imsSchema"));
+	    item.setOrganizationXml(JsonUtil.optString(itemData, "organizationXml"));
+	    item.setOpenUrlNewWindow(JsonUtil.optBoolean(itemData, "openUrlNewWindow", Boolean.FALSE));
+	    item.setUrl(JsonUtil.optString(itemData, "url"));
 
-	    JSONArray instructionStrings = itemData.getJSONArray("instructions");
-	    if ((instructionStrings != null) && (instructionStrings.length() > 0)) {
+	    ArrayNode instructionStrings = JsonUtil.optArray(itemData, "instructions");
+	    if ((instructionStrings != null) && (instructionStrings.size() > 0)) {
 		Set instructions = new LinkedHashSet();
-		for (int j = 0; j < instructionStrings.length(); j++) {
+		for (int j = 0; j < instructionStrings.size(); j++) {
 		    ResourceItemInstruction rii = new ResourceItemInstruction();
-		    rii.setDescription(instructionStrings.getString(j));
+		    rii.setDescription(instructionStrings.get(j).asText(null));
 		    rii.setSequenceId(j);
 		    instructions.add(rii);
 		}
@@ -1322,7 +1329,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	    // TODO files - need to save it somehow, validate the file size, etc. Needed for websites, files & LO
 	    if ((item.getFileName() != null) || (item.getFileUuid() != null)) {
-		throw new JSONException(
+		throw new IOException(
 			"Only URLS supported via REST interface currently - files and learning objects are not supported.");
 	    }
 
@@ -1335,6 +1342,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     }
 
+    @Override
     public void evict(Object object) {
 	resourceDao.releaseFromCache(object);
     }

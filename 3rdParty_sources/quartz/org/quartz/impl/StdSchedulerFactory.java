@@ -17,28 +17,7 @@
 
 package org.quartz.impl;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.security.AccessControlException;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Properties;
-
-import org.quartz.JobListener;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerConfigException;
-import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
-import org.quartz.TriggerListener;
+import org.quartz.*;
 import org.quartz.core.JobRunShellFactory;
 import org.quartz.core.QuartzScheduler;
 import org.quartz.core.QuartzSchedulerResources;
@@ -52,20 +31,22 @@ import org.quartz.impl.matchers.EverythingMatcher;
 import org.quartz.management.ManagementRESTServiceConfiguration;
 import org.quartz.simpl.RAMJobStore;
 import org.quartz.simpl.SimpleThreadPool;
-import org.quartz.spi.ClassLoadHelper;
-import org.quartz.spi.InstanceIdGenerator;
-import org.quartz.spi.JobFactory;
-import org.quartz.spi.JobStore;
-import org.quartz.spi.SchedulerPlugin;
-import org.quartz.spi.ThreadExecutor;
-import org.quartz.spi.ThreadPool;
-import org.quartz.utils.ConnectionProvider;
-import org.quartz.utils.DBConnectionManager;
-import org.quartz.utils.JNDIConnectionProvider;
-import org.quartz.utils.PoolingConnectionProvider;
-import org.quartz.utils.PropertiesParser;
+import org.quartz.spi.*;
+import org.quartz.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.*;
+import java.lang.reflect.Method;
+import java.security.AccessControlException;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Properties;
 
 /**
  * <p>
@@ -678,7 +659,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
         boolean threadsInheritInitalizersClassLoader =
             cfg.getBooleanProperty(PROP_SCHED_SCHEDULER_THREADS_INHERIT_CONTEXT_CLASS_LOADER_OF_INITIALIZING_THREAD);
 
-        boolean skipUpdateCheck = cfg.getBooleanProperty(PROP_SCHED_SKIP_UPDATE_CHECK, false);
+        boolean skipUpdateCheck = cfg.getBooleanProperty(PROP_SCHED_SKIP_UPDATE_CHECK, true);
         long batchTimeWindow = cfg.getLongProperty(PROP_SCHED_BATCH_TIME_WINDOW, 0L);
         int maxBatchSize = cfg.getIntProperty(PROP_SCHED_MAX_BATCH_SIZE, 1);
 
@@ -945,7 +926,11 @@ public class StdSchedulerFactory implements SchedulerFactory {
                     pp.getUnderlyingProperties().remove(
                             PROP_CONNECTION_PROVIDER_CLASS);
 
-                    setBeanProps(cp, pp.getUnderlyingProperties());
+                    if (cp instanceof PoolingConnectionProvider) {
+                        populateProviderWithExtraProps((PoolingConnectionProvider)cp, pp.getUnderlyingProperties());
+                    } else {
+                        setBeanProps(cp, pp.getUnderlyingProperties());
+                    }
                     cp.initialize();
                 } catch (Exception e) {
                     initException = new SchedulerException("ConnectionProvider class '" + cpClass
@@ -1014,7 +999,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
                         PoolingConnectionProvider cp = new PoolingConnectionProvider(pp.getUnderlyingProperties());
                         dbMgr = DBConnectionManager.getInstance();
                         dbMgr.addConnectionProvider(dsNames[i], cp);
-                    } catch (SQLException sqle) {
+
+                        // Populate the underlying C3P0 data source pool properties
+                        populateProviderWithExtraProps(cp, pp.getUnderlyingProperties());
+                    } catch (Exception sqle) {
                         initException = new SchedulerException(
                                 "Could not initialize DataSource: " + dsNames[i],
                                 sqle);
@@ -1364,6 +1352,24 @@ public class StdSchedulerFactory implements SchedulerFactory {
             shutdownFromInstantiateException(tp, qs, tpInited, qsInited);
             throw re;
         }
+    }
+
+    private void populateProviderWithExtraProps(PoolingConnectionProvider cp, Properties props) throws Exception {
+        Properties copyProps = new Properties();
+        copyProps.putAll(props);
+
+        // Remove all the default properties first (they don't always match to setter name, and they are already
+        // been set!)
+        copyProps.remove(PoolingConnectionProvider.DB_DRIVER);
+        copyProps.remove(PoolingConnectionProvider.DB_URL);
+        copyProps.remove(PoolingConnectionProvider.DB_USER);
+        copyProps.remove(PoolingConnectionProvider.DB_PASSWORD);
+        copyProps.remove(PoolingConnectionProvider.DB_IDLE_VALIDATION_SECONDS);
+        copyProps.remove(PoolingConnectionProvider.DB_MAX_CONNECTIONS);
+        copyProps.remove(PoolingConnectionProvider.DB_MAX_CACHED_STATEMENTS_PER_CONNECTION);
+        copyProps.remove(PoolingConnectionProvider.DB_VALIDATE_ON_CHECKOUT);
+        copyProps.remove(PoolingConnectionProvider.DB_VALIDATION_QUERY);
+        setBeanProps(cp.getDataSource(), copyProps);
     }
 
     private void shutdownFromInstantiateException(ThreadPool tp, QuartzScheduler qs, boolean tpInited, boolean qsInited) {

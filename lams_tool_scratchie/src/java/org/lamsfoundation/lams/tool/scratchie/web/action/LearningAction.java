@@ -47,8 +47,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
+
+
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -77,6 +77,9 @@ import org.quartz.SchedulerException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Andrey Balan
  */
@@ -89,7 +92,7 @@ public class LearningAction extends Action {
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response)
-	    throws IOException, ServletException, JSONException, ScratchieApplicationException, SchedulerException {
+	    throws IOException, ServletException, ScratchieApplicationException, SchedulerException {
 
 	String param = mapping.getParameter();
 	// -----------------------Scratchie Learner function ---------------------------
@@ -398,7 +401,7 @@ public class LearningAction extends Action {
      * @throws ScratchieApplicationException
      */
     private ActionForward recordItemScratched(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException, ScratchieApplicationException {
+	    HttpServletResponse response) throws IOException, ScratchieApplicationException {
 	initializeScratchieService();
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -426,10 +429,10 @@ public class LearningAction extends Action {
 	    return null;
 	}
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put(ScratchieConstants.ATTR_ANSWER_CORRECT, answer.isCorrect());
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
+	ObjectNode.put(ScratchieConstants.ATTR_ANSWER_CORRECT, answer.isCorrect());
 	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 
 	// create a new thread to record item scratched (in order to do this task in parallel not to slow down sending
 	// response back)
@@ -483,7 +486,7 @@ public class LearningAction extends Action {
      * @throws JSONException
      */
     private ActionForward showResults(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ScratchieApplicationException, JSONException, IOException {
+	    HttpServletResponse response) throws ScratchieApplicationException, IOException {
 	initializeScratchieService();
 	// get back SessionMap
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
@@ -545,7 +548,7 @@ public class LearningAction extends Action {
 
     private ActionForward like(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response)
-	    throws JSONException, IOException, ServletException, ScratchieApplicationException {
+	    throws IOException, ServletException, ScratchieApplicationException {
 	initializeScratchieService();
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
@@ -564,16 +567,16 @@ public class LearningAction extends Action {
 
 	boolean added = service.addLike(burningQuestionUid, sessionId);
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put("added", added);
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
+	ObjectNode.put("added", added);
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 	return null;
     }
 
     private ActionForward removeLike(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response)
-	    throws JSONException, IOException, ServletException, ScratchieApplicationException {
+	    throws IOException, ServletException, ScratchieApplicationException {
 	initializeScratchieService();
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
@@ -592,10 +595,10 @@ public class LearningAction extends Action {
 
 	service.removeLike(burningQuestionUid, sessionId);
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put("added", true);
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
+	ObjectNode.put("added", true);
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 	return null;
     }
 
@@ -645,7 +648,7 @@ public class LearningAction extends Action {
      * @throws JSONException
      */
     private ActionForward showBurningQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ScratchieApplicationException, JSONException, IOException {
+	    HttpServletResponse response) throws ScratchieApplicationException, IOException {
 	initializeScratchieService();
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -738,7 +741,7 @@ public class LearningAction extends Action {
      * @throws JSONException
      */
     private ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ScratchieApplicationException, JSONException, IOException {
+	    HttpServletResponse response) throws ScratchieApplicationException, IOException {
 
 	initializeScratchieService();
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);

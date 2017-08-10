@@ -495,7 +495,7 @@
 			
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/fileupload/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
-				<include name="commons-fileupload.jar" />
+				<include name="commons-fileupload-*.jar" />
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/fileupload/main/module.xml"
@@ -503,22 +503,11 @@
 		
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/validator/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
-				<include name="commons-validator.jar" />
+				<include name="commons-validator-*.jar" />
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/validator/main/module.xml"
 			  file="lib/jakarta-commons/validator.module.xml" overwrite="true" verbose="true" />
-		
-		
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/jboss/jbossweb/main" overwrite="true" verbose="true">
-			<fileset dir="lib/jboss">
-				<include name="jbossweb.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/jboss/jbossweb/main/module.xml"
-			  file="lib/jboss/jbossweb.module.xml" overwrite="true" verbose="true" />
-		
 		
 		
 		<!-- WildFly does not load all classes from JDK that LAMS needs (com/sun/org/apache/xerces/internal)
@@ -535,16 +524,6 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/scilab/forge/jlatexmath/main/module.xml"
 			  file="lib/jlatexmath/jlatexmath.module.xml" overwrite="true" verbose="true" />
-		
-		
-		
-		<copy todir="${server.home}/modules/system/layers/base/com/google/gson/main" overwrite="true" verbose="true">
-			<fileset dir="lib/json">
-				<include name="gson-*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/com/google/gson/main/module.xml"
-			  file="lib/json/gson.module.xml" overwrite="true" verbose="true" />
 
 		
 		
@@ -555,16 +534,6 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/json/simple/main/module.xml"
 			  file="lib/json/json-simple.module.xml" overwrite="true" verbose="true" />
-		
-		
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/apache/lucene/4.10" overwrite="true" verbose="true">
-			<fileset dir="lib/lucene">
-				<include name="lucene-*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/apache/lucene/4.10/module.xml"
-			  file="lib/lucene/lucene.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
@@ -642,26 +611,6 @@
 		<copy tofile="${server.home}/modules/system/layers/base/com/warrenstrange/googleauth/main/module.xml"
 			  file="lib/googleauth/googleauth.module.xml" overwrite="true" verbose="true" />		
 		
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/apache/xmlcommons/main" overwrite="true" verbose="true">
-			<fileset dir="lib/xml-commons">
-				<include name="xml-apis*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/apache/xmlcommons/main/module.xml"
-			  file="lib/xml-commons/xmlcommons.module.xml" overwrite="true" verbose="true" />
-		
-		
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/xmlpull/main" overwrite="true" verbose="true">
-			<fileset dir="lib/xstream">
-				<include name="xmlpull-*.jar" />
-				<include name="xpp*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/xmlpull/main/module.xml"
-			  file="lib/xstream/xmlpull.module.xml" overwrite="true" verbose="true" />
-				
 		
 		
 		<copy todir="${server.home}/modules/system/layers/base/com/thoughtworks/xstream/main" overwrite="true" verbose="true">
@@ -862,7 +811,6 @@
 			<!-- Libraries -->
 			<fileset dir="${server.home}/modules/system/layers/base/">
 				<include name="ch/"/>
-				<include name="com/fasterxml/jackson/"/>
 				<include name="com/google/guava/"/>
 				<include name="com/h2database/"/>
 				<include name="com/microsoft/"/>

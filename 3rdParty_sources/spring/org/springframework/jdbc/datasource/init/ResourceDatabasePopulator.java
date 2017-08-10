@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,24 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.sql.DataSource;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.EncodedResource;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
- * Populates or initializes a database from SQL scripts defined in external
- * resources.
+ * Populates, initializes, or cleans up a database using SQL scripts defined in
+ * external resources.
  *
- * <p>Call {@link #addScript(Resource)} to add a single SQL script location.
- * Call {@link #addScripts(Resource...)} to add multiple SQL script locations.
- * Call {@link #setSqlScriptEncoding(String)} to set the encoding for all added
- * scripts.
+ * <ul>
+ * <li>Call {@link #addScript} to add a single SQL script location.
+ * <li>Call {@link #addScripts} to add multiple SQL script locations.
+ * <li>Consult the setter methods in this class for further configuration options.
+ * <li>Call {@link #populate} or {@link #execute} to initialize or clean up the
+ * database using the configured scripts.
+ * </ul>
  *
  * @author Keith Donald
  * @author Dave Syer
@@ -42,10 +48,11 @@ import org.springframework.core.io.support.EncodedResource;
  * @author Chris Baldwin
  * @since 3.0
  * @see DatabasePopulatorUtils
+ * @see ScriptUtils
  */
 public class ResourceDatabasePopulator implements DatabasePopulator {
 
-	private List<Resource> scripts = new ArrayList<Resource>();
+	List<Resource> scripts = new ArrayList<Resource>();
 
 	private String sqlScriptEncoding;
 
@@ -73,12 +80,13 @@ public class ResourceDatabasePopulator implements DatabasePopulator {
 	/**
 	 * Construct a new {@code ResourceDatabasePopulator} with default settings
 	 * for the supplied scripts.
-	 * @param scripts the scripts to execute to initialize or populate the database
+	 * @param scripts the scripts to execute to initialize or clean up the database
+	 * (never {@code null})
 	 * @since 4.0.3
 	 */
 	public ResourceDatabasePopulator(Resource... scripts) {
 		this();
-		this.scripts = Arrays.asList(scripts);
+		setScripts(scripts);
 	}
 
 	/**
@@ -87,51 +95,65 @@ public class ResourceDatabasePopulator implements DatabasePopulator {
 	 * logged but not cause a failure
 	 * @param ignoreFailedDrops flag to indicate that a failed SQL {@code DROP}
 	 * statement can be ignored
-	 * @param sqlScriptEncoding the encoding for the supplied SQL scripts, if
-	 * different from the platform encoding; may be {@code null}
-	 * @param scripts the scripts to execute to initialize or populate the database
+	 * @param sqlScriptEncoding the encoding for the supplied SQL scripts; may
+	 * be {@code null} or <em>empty</em> to indicate platform encoding
+	 * @param scripts the scripts to execute to initialize or clean up the database
+	 * (never {@code null})
 	 * @since 4.0.3
 	 */
-	public ResourceDatabasePopulator(boolean continueOnError, boolean ignoreFailedDrops, String sqlScriptEncoding,
-			Resource... scripts) {
+	public ResourceDatabasePopulator(boolean continueOnError, boolean ignoreFailedDrops,
+			String sqlScriptEncoding, Resource... scripts) {
+
 		this(scripts);
 		this.continueOnError = continueOnError;
 		this.ignoreFailedDrops = ignoreFailedDrops;
-		this.sqlScriptEncoding = sqlScriptEncoding;
+		setSqlScriptEncoding(sqlScriptEncoding);
 	}
 
+
 	/**
-	 * Add a script to execute to initialize or populate the database.
-	 * @param script the path to an SQL script
+	 * Add a script to execute to initialize or clean up the database.
+	 * @param script the path to an SQL script (never {@code null})
 	 */
 	public void addScript(Resource script) {
+		Assert.notNull(script, "Script must not be null");
 		this.scripts.add(script);
 	}
 
 	/**
-	 * Add multiple scripts to execute to initialize or populate the database.
-	 * @param scripts the scripts to execute
+	 * Add multiple scripts to execute to initialize or clean up the database.
+	 * @param scripts the scripts to execute (never {@code null})
 	 */
 	public void addScripts(Resource... scripts) {
+		assertContentsOfScriptArray(scripts);
 		this.scripts.addAll(Arrays.asList(scripts));
 	}
 
 	/**
-	 * Set the scripts to execute to initialize or populate the database,
+	 * Set the scripts to execute to initialize or clean up the database,
 	 * replacing any previously added scripts.
-	 * @param scripts the scripts to execute
+	 * @param scripts the scripts to execute (never {@code null})
 	 */
 	public void setScripts(Resource... scripts) {
-		this.scripts = Arrays.asList(scripts);
+		assertContentsOfScriptArray(scripts);
+		// Ensure that the list is modifiable
+		this.scripts = new ArrayList<Resource>(Arrays.asList(scripts));
+	}
+
+	private void assertContentsOfScriptArray(Resource... scripts) {
+		Assert.notNull(scripts, "Scripts array must not be null");
+		Assert.noNullElements(scripts, "Scripts array must not contain null elements");
 	}
 
 	/**
-	 * Specify the encoding for SQL scripts, if different from the platform encoding.
-	 * @param sqlScriptEncoding the encoding used in scripts
+	 * Specify the encoding for the configured SQL scripts, if different from the
+	 * platform encoding.
+	 * @param sqlScriptEncoding the encoding used in scripts; may be {@code null}
+	 * or empty to indicate platform encoding
 	 * @see #addScript(Resource)
 	 */
 	public void setSqlScriptEncoding(String sqlScriptEncoding) {
-		this.sqlScriptEncoding = sqlScriptEncoding;
+		this.sqlScriptEncoding = StringUtils.hasText(sqlScriptEncoding) ? sqlScriptEncoding : null;
 	}
 
 	/**
@@ -159,10 +181,12 @@ public class ResourceDatabasePopulator implements DatabasePopulator {
 	 * scripts.
 	 * <p>Defaults to {@code "/*"}.
 	 * @param blockCommentStartDelimiter the start delimiter for block comments
+	 * (never {@code null} or empty)
 	 * @since 4.0.3
 	 * @see #setBlockCommentEndDelimiter
 	 */
 	public void setBlockCommentStartDelimiter(String blockCommentStartDelimiter) {
+		Assert.hasText(blockCommentStartDelimiter, "BlockCommentStartDelimiter must not be null or empty");
 		this.blockCommentStartDelimiter = blockCommentStartDelimiter;
 	}
 
@@ -171,10 +195,12 @@ public class ResourceDatabasePopulator implements DatabasePopulator {
 	 * scripts.
 	 * <p>Defaults to <code>"*&#47;"</code>.
 	 * @param blockCommentEndDelimiter the end delimiter for block comments
+	 * (never {@code null} or empty)
 	 * @since 4.0.3
 	 * @see #setBlockCommentStartDelimiter
 	 */
 	public void setBlockCommentEndDelimiter(String blockCommentEndDelimiter) {
+		Assert.hasText(blockCommentEndDelimiter, "BlockCommentEndDelimiter must not be null or empty");
 		this.blockCommentEndDelimiter = blockCommentEndDelimiter;
 	}
 
@@ -189,34 +215,42 @@ public class ResourceDatabasePopulator implements DatabasePopulator {
 
 	/**
 	 * Flag to indicate that a failed SQL {@code DROP} statement can be ignored.
-	 * <p>This is useful for non-embedded databases whose SQL dialect does not support an
-	 * {@code IF EXISTS} clause in a {@code DROP} statement.
+	 * <p>This is useful for a non-embedded database whose SQL dialect does not
+	 * support an {@code IF EXISTS} clause in a {@code DROP} statement.
 	 * <p>The default is {@code false} so that if the populator runs accidentally, it will
-	 * fail fast if the script starts with a {@code DROP} statement.
+	 * fail fast if a script starts with a {@code DROP} statement.
 	 * @param ignoreFailedDrops {@code true} if failed drop statements should be ignored
 	 */
 	public void setIgnoreFailedDrops(boolean ignoreFailedDrops) {
 		this.ignoreFailedDrops = ignoreFailedDrops;
 	}
 
+
 	/**
 	 * {@inheritDoc}
+	 * @see #execute(DataSource)
 	 */
 	@Override
 	public void populate(Connection connection) throws ScriptException {
+		Assert.notNull(connection, "Connection must not be null");
 		for (Resource script : this.scripts) {
-			ScriptUtils.executeSqlScript(connection, encodeScript(script), this.continueOnError,
-				this.ignoreFailedDrops, this.commentPrefix, this.separator, this.blockCommentStartDelimiter,
-				this.blockCommentEndDelimiter);
+			EncodedResource encodedScript = new EncodedResource(script, this.sqlScriptEncoding);
+			ScriptUtils.executeSqlScript(connection, encodedScript, this.continueOnError, this.ignoreFailedDrops,
+					this.commentPrefix, this.separator, this.blockCommentStartDelimiter, this.blockCommentEndDelimiter);
 		}
 	}
 
 	/**
-	 * {@link EncodedResource} is not a sub-type of {@link Resource}. Thus we
-	 * always need to wrap each script resource in an encoded resource.
+	 * Execute this {@code ResourceDatabasePopulator} against the given
+	 * {@link DataSource}.
+	 * <p>Delegates to {@link DatabasePopulatorUtils#execute}.
+	 * @param dataSource the {@code DataSource} to execute against (never {@code null})
+	 * @throws ScriptException if an error occurs
+	 * @since 4.1
+	 * @see #populate(Connection)
 	 */
-	private EncodedResource encodeScript(Resource script) {
-		return new EncodedResource(script, this.sqlScriptEncoding);
+	public void execute(DataSource dataSource) throws ScriptException {
+		DatabasePopulatorUtils.execute(this, dataSource);
 	}
 
 }

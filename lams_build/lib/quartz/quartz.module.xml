@@ -24,7 +24,7 @@
 
 <module xmlns="urn:jboss:module:1.5" name="org.quartz">
   <resources>
-    <resource-root path="quartz-2.2.1.jar"/>
+    <resource-root path="quartz-2.2.3.jar"/>
   </resources>
   
   <dependencies>

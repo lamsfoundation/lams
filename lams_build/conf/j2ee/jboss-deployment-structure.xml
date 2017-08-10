@@ -29,8 +29,6 @@
       <module name="org.apache.commons.fileupload" export="true" />
       <module name="org.apache.commons.validator" export="true" />
       <module name="org.apache.httpcomponents" export="true" />
-      <module name="org.apache.xmlcommons" export="true" />
-  	  <module name="org.apache.xerces" export="true" />
       <module name="org.infinispan" export="true" />
       <module name="org.imsglobal" export="true" />
       <module name="oauth.signpost" export="true" />
@@ -41,7 +39,6 @@
       <module name="org.scilab.forge.jlatexmath" export="true" />
       <module name="org.json.simple" export="true" />
       <module name="com.google.gson" export="true" />
-      <module name="org.apache.lucene" slot="4.10" export="true" />
       <module name="org.quartz" export="true" />
       <module name="org.springframework" export="true" meta-inf="export" />
       <module name="org.apache.struts" export="true" />
@@ -53,6 +50,8 @@
   	  <module name="io.undertow.servlet" export="true" />
   	  <module name="org.joda.time" export="true" />
   	  <module name="javax.mail.api" export="true" />
+  	  <module name="com.fasterxml.jackson.core.jackson-core" export="true" />
+      <module name="com.fasterxml.jackson.core.jackson-databind" export="true" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>

@@ -557,19 +557,8 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
      */
     @Override
     public Date computeFirstFireTime(org.quartz.Calendar calendar) {
-      Date sTime = getStartTime();
-      Date startTimeOfDayDate = getStartTimeOfDay().getTimeOfDayForDate(sTime);
-
-      if(DateBuilder.evenSecondDate(startTime).equals(startTimeOfDayDate)) {
-        return startTime;
-      }
-      else if (sTime.after(startTimeOfDayDate)) {
-        // If startTime is after the timeOfDay, then look for the next time
-        nextFireTime = getFireTimeAfter(sTime);
-      } else {
-        // If startTime is before the timeOfDay then advance to timeOfDay (and if necessary dayOfWeek)
-        nextFireTime = advanceToNextDayOfWeekIfNecessary(startTimeOfDayDate, false);
-      }
+        
+      nextFireTime = getFireTimeAfter(new Date(getStartTime().getTime() - 1000L));
       
       // Check calendar for date-time exclusion
       while (nextFireTime != null && calendar != null

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.notebook.web.actions;
 
 import java.io.IOException;
@@ -35,13 +34,9 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.notebook.dto.NotebookSessionsDTO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
@@ -58,16 +53,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-/**
- *
- *
- *
- *
- *
- */
-public class MonitoringAction extends LamsDispatchAction {
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-    private static Logger log = Logger.getLogger(MonitoringAction.class);
+public class MonitoringAction extends LamsDispatchAction {
     private static String noEntryText = null; // access via getNoEntryText()
 
     public INotebookService notebookService;
@@ -102,14 +92,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    request.setAttribute(NotebookConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
-	    request.setAttribute(NotebookConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	    request.setAttribute(NotebookConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
 	return mapping.findForward("success");
     }
 
     public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 
 	setupService();
 	Long toolSessionId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
@@ -134,13 +125,13 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	}
 
-	JSONObject responsedata = new JSONObject();
+	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
 	int totalRows = notebookService.getCountUsersBySession(toolSessionId, searchString);
 	responsedata.put("total_rows", totalRows);
 	responsedata.put("page", page);
 	responsedata.put("total", Math.ceil((float) totalRows / size));
 
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	// our code expects the first page to be 0 but jqgrid uses 1 for the first page.
 	List<Object[]> users = notebookService.getUsersForTablesorter(toolSessionId, page > 0 ? page - 1 : 0, size,
 		sorting, searchString);
@@ -150,7 +141,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	int id = 1;
 	for (Object[] userAndReflection : users) {
 
-	    JSONObject responseRow = new JSONObject();
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
 	    NotebookUser user = (NotebookUser) userAndReflection[0];
 	    responseRow.put("id", id++);
@@ -158,7 +149,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    responseRow.put(NotebookConstants.PARAM_NAME,
 		    StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
-		responseRow.put(NotebookConstants.PARAM_ENTRY, userAndReflection[1]);
+		responseRow.put(NotebookConstants.PARAM_ENTRY, (String) userAndReflection[1]);
 	    }
 	    if (user.getTeachersComment() != null && user.getTeachersComment().length() > 0) {
 		responseRow.put(NotebookConstants.PARAM_COMMENT, user.getTeachersComment());
@@ -168,14 +159,14 @@ public class MonitoringAction extends LamsDispatchAction {
 		Date modifiedDate = (Date) userAndReflection[2];
 		responseRow.put(NotebookConstants.PARAM_MODIFIED_DATE,
 			DateUtil.convertToStringForJSON(modifiedDate, request.getLocale()));
-		responseRow.put(NotebookConstants.PARAM_MODIFIED_DATE_TIMEAGO, 
+		responseRow.put(NotebookConstants.PARAM_MODIFIED_DATE_TIMEAGO,
 			DateUtil.convertToStringForTimeagoJSON(modifiedDate));
 	    } else {
 		responseRow.put(NotebookConstants.PARAM_MODIFIED_DATE, noEntry);
 	    }
-	    rows.put(responseRow);
+	    rows.add(responseRow);
 	}
-	responsedata.put("rows", rows);
+	responsedata.set("rows", rows);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(responsedata.toString());
 	return null;
@@ -224,7 +215,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * @param request
      * @param response
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {

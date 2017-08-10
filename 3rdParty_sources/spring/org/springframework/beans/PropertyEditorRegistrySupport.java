@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.beans;
 import java.beans.PropertyEditor;
 import java.io.File;
 import java.io.InputStream;
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -58,8 +59,10 @@ import org.springframework.beans.propertyeditors.FileEditor;
 import org.springframework.beans.propertyeditors.InputSourceEditor;
 import org.springframework.beans.propertyeditors.InputStreamEditor;
 import org.springframework.beans.propertyeditors.LocaleEditor;
+import org.springframework.beans.propertyeditors.PathEditor;
 import org.springframework.beans.propertyeditors.PatternEditor;
 import org.springframework.beans.propertyeditors.PropertiesEditor;
+import org.springframework.beans.propertyeditors.ReaderEditor;
 import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
 import org.springframework.beans.propertyeditors.TimeZoneEditor;
 import org.springframework.beans.propertyeditors.URIEditor;
@@ -85,11 +88,21 @@ import org.springframework.util.ClassUtils;
  */
 public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 
+	private static Class<?> pathClass;
+
 	private static Class<?> zoneIdClass;
 
 	static {
+		ClassLoader cl = PropertyEditorRegistrySupport.class.getClassLoader();
 		try {
-			zoneIdClass = ClassUtils.forName("java.time.ZoneId", PropertyEditorRegistrySupport.class.getClassLoader());
+			pathClass = ClassUtils.forName("java.nio.file.Path", cl);
+		}
+		catch (ClassNotFoundException ex) {
+			// Java 7 Path class not available
+			pathClass = null;
+		}
+		try {
+			zoneIdClass = ClassUtils.forName("java.time.ZoneId", cl);
 		}
 		catch (ClassNotFoundException ex) {
 			// Java 8 ZoneId class not available
@@ -209,8 +222,12 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 		this.defaultEditors.put(InputStream.class, new InputStreamEditor());
 		this.defaultEditors.put(InputSource.class, new InputSourceEditor());
 		this.defaultEditors.put(Locale.class, new LocaleEditor());
+		if (pathClass != null) {
+			this.defaultEditors.put(pathClass, new PathEditor());
+		}
 		this.defaultEditors.put(Pattern.class, new PatternEditor());
 		this.defaultEditors.put(Properties.class, new PropertiesEditor());
+		this.defaultEditors.put(Reader.class, new ReaderEditor());
 		this.defaultEditors.put(Resource[].class, new ResourceArrayPropertyEditor());
 		this.defaultEditors.put(TimeZone.class, new TimeZoneEditor());
 		this.defaultEditors.put(URI.class, new URIEditor());

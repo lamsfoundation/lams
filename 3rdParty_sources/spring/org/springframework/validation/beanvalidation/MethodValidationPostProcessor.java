@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import javax.validation.ValidatorFactory;
 import org.aopalliance.aop.Advice;
 
 import org.springframework.aop.Pointcut;
-import org.springframework.aop.framework.AbstractAdvisingBeanPostProcessor;
+import org.springframework.aop.framework.autoproxy.AbstractBeanFactoryAwareAdvisingPostProcessor;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
 import org.springframework.beans.factory.InitializingBean;
@@ -49,16 +49,18 @@ import org.springframework.validation.annotation.Validated;
  * as well. By default, JSR-303 will validate against its default group only.
  *
  * <p>As of Spring 4.0, this functionality requires either a Bean Validation 1.1 provider
- * (such as Hibernate Validator 5.0) or the Bean Validation 1.0 API with Hibernate Validator
- * 4.2 or 4.3. The actual provider will be autodetected and automatically adapted.
+ * (such as Hibernate Validator 5.x) or the Bean Validation 1.0 API with Hibernate Validator
+ * 4.3. The actual provider will be autodetected and automatically adapted.
  *
  * @author Juergen Hoeller
  * @since 3.1
  * @see MethodValidationInterceptor
+ * @see javax.validation.executable.ExecutableValidator
  * @see org.hibernate.validator.method.MethodValidator
  */
 @SuppressWarnings("serial")
-public class MethodValidationPostProcessor extends AbstractAdvisingBeanPostProcessor implements InitializingBean {
+public class MethodValidationPostProcessor extends AbstractBeanFactoryAwareAdvisingPostProcessor
+		implements InitializingBean {
 
 	private Class<? extends Annotation> validatedAnnotationType = Validated.class;
 
@@ -83,8 +85,12 @@ public class MethodValidationPostProcessor extends AbstractAdvisingBeanPostProce
 	 * <p>Default is the default ValidatorFactory's default Validator.
 	 */
 	public void setValidator(Validator validator) {
-		if(validator instanceof LocalValidatorFactoryBean) {
+		// Unwrap to the native Validator with forExecutables support
+		if (validator instanceof LocalValidatorFactoryBean) {
 			this.validator = ((LocalValidatorFactoryBean) validator).getValidator();
+		}
+		else if (validator instanceof SpringValidatorAdapter) {
+			this.validator = validator.unwrap(Validator.class);
 		}
 		else {
 			this.validator = validator;
@@ -101,12 +107,23 @@ public class MethodValidationPostProcessor extends AbstractAdvisingBeanPostProce
 		this.validator = validatorFactory.getValidator();
 	}
 
+
 	@Override
 	public void afterPropertiesSet() {
 		Pointcut pointcut = new AnnotationMatchingPointcut(this.validatedAnnotationType, true);
-		Advice advice = (this.validator != null ? new MethodValidationInterceptor(this.validator) :
-				new MethodValidationInterceptor());
-		this.advisor = new DefaultPointcutAdvisor(pointcut, advice);
+		this.advisor = new DefaultPointcutAdvisor(pointcut, createMethodValidationAdvice(this.validator));
+	}
+
+	/**
+	 * Create AOP advice for method validation purposes, to be applied
+	 * with a pointcut for the specified 'validated' annotation.
+	 * @param validator the JSR-303 Validator to delegate to
+	 * @return the interceptor to use (typically, but not necessarily,
+	 * a {@link MethodValidationInterceptor} or subclass thereof)
+	 * @since 4.2
+	 */
+	protected Advice createMethodValidationAdvice(Validator validator) {
+		return (validator != null ? new MethodValidationInterceptor(validator) : new MethodValidationInterceptor());
 	}
 
 }

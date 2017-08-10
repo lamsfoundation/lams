@@ -15,8 +15,8 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
+
+
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.service.IDokumaranService;
@@ -25,6 +25,9 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Sends time limit start and +1min events to learners.
@@ -110,7 +113,7 @@ public class LearningWebsocketServer {
      * Registeres the Learner for processing.
      */
     @OnOpen
-    public void registerUser(Session websocket) throws JSONException, IOException {
+    public void registerUser(Session websocket) throws IOException {
 	Long toolContentID = Long
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_CONTENT_ID).get(0));
 	Set<Session> toolContentWebsockets = websockets.get(toolContentID);
@@ -151,13 +154,13 @@ public class LearningWebsocketServer {
      * Monitor has added one more minute to the time limit. All learners will need
      * to add +1 minute to their countdown counters.
      */
-    private static void sendAddTimeRequest(Long toolContentId, int timeLimit) throws JSONException, IOException {
+    private static void sendAddTimeRequest(Long toolContentId, int timeLimit) throws IOException {
 	Set<Session> toolContentWebsockets = websockets.get(toolContentId);
 	if (toolContentWebsockets == null) {
 	    return;
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("addTime", timeLimit);
 	String response = responseJSON.toString();
 
@@ -172,13 +175,13 @@ public class LearningWebsocketServer {
      * Monitor has launched time limit. All learners will need to refresh the page in order to stop showing them
      * waitForTimeLimitLaunch page.
      */
-    private static void sendPageRefreshRequest(Long toolContentId) throws JSONException, IOException {
+    private static void sendPageRefreshRequest(Long toolContentId) throws IOException {
 	Set<Session> toolContentWebsockets = websockets.get(toolContentId);
 	if (toolContentWebsockets == null) {
 	    return;
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("pageRefresh", true);
 	String response = responseJSON.toString();
 

@@ -114,13 +114,6 @@
                         <handler name="LAMSCONSOLE"/>
                     </handlers>
                 </logger>
-                <logger category="org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter" use-parent-handlers="false">
-                    <level name="INFO"/>
-                    <handlers>
-                        <handler name="LAMSFILE"/>
-                        <handler name="LAMSCONSOLE"/>
-                    </handlers>
-                </logger>
                 <logger category="org.lamsfoundation.lams.util.audit" use-parent-handlers="false">
                     <level name="INFO"/>
                     <handlers>
@@ -178,7 +171,7 @@
                 <logger category="org.springframework.transaction.jta">
                     <level name="INFO"/>
                 </logger>
-                <logger category="org.springframework.orm.hibernate4">
+                <logger category="org.springframework.orm.hibernate5">
                     <level name="INFO"/>
                 </logger>
                 <logger category="org.springframework.beans.factory.annotation">

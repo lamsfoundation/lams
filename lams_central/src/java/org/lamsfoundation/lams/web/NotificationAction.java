@@ -34,9 +34,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.Event;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.events.Subscription;
@@ -46,6 +43,10 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Processes notification sent from Tools to users.
@@ -57,22 +58,22 @@ public class NotificationAction extends DispatchAction {
     private static IEventNotificationService eventNotificationService;
 
     public ActionForward getNotificationSubscriptions(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws JSONException, IOException {
+	    HttpServletResponse res) throws IOException {
 	Integer limit = WebUtil.readIntParam(req, "limit", true);
 	Integer offset = WebUtil.readIntParam(req, "offset", true);
 	List<Subscription> subscriptions = getEventNotificationService().getNotificationSubscriptions(null,
 		getUser().getUserID(), false, limit, offset);
-	JSONArray responseJSON = new JSONArray();
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
 	for (Subscription subscription : subscriptions) {
 	    Event event = subscription.getEvent();
-	    JSONObject subscriptionJSON = new JSONObject();
+	    ObjectNode subscriptionJSON = JsonNodeFactory.instance.objectNode();
 	    subscriptionJSON.put("subscriptionUid", subscription.getUid());
 	    subscriptionJSON.put("message", event.getMessage());
 	    subscriptionJSON.put("pending", subscription.getLastOperationMessage() == null);
-	    responseJSON.put(subscriptionJSON);
+	    responseJSON.add(subscriptionJSON);
 	}
 
-	if (responseJSON.length() > 0) {
+	if (responseJSON.size() > 0) {
 	    res.setContentType("application/json;charset=UTF-8");
 	    res.getWriter().print(responseJSON.toString());
 	}

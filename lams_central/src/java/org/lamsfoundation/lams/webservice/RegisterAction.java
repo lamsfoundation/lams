@@ -256,7 +256,7 @@ public class RegisterAction extends HttpServlet {
 	    }
 
 	    // add to all required organisations
-	    List learnerRole = new ArrayList();
+	    List<String> learnerRole = new ArrayList<String>();
 	    learnerRole.add(Role.ROLE_LEARNER.toString());
 	    for (Organisation organisationToJoin : organisationsToJoin) {
 		userManagementService.setRolesForUserOrganisation(user, organisationToJoin.getOrganisationId(),

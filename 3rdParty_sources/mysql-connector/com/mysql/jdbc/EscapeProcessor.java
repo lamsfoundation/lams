@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2002, 2015, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2002, 2016, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -29,7 +29,6 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -319,7 +318,7 @@ class EscapeProcessor {
                     }
                 }
 
-                if (conn != null && (!conn.getUseTimezone() || !conn.getUseLegacyDatetimeCode())) {
+                if (!conn.getUseTimezone() || !conn.getUseLegacyDatetimeCode()) {
                     newSql.append("'");
                     newSql.append(hour);
                     newSql.append(":");
@@ -329,13 +328,7 @@ class EscapeProcessor {
                     newSql.append(fractionalSecond);
                     newSql.append("'");
                 } else {
-                    Calendar sessionCalendar = null;
-
-                    if (conn != null) {
-                        sessionCalendar = conn.getCalendarInstanceForSessionOrNew();
-                    } else {
-                        sessionCalendar = new GregorianCalendar();
-                    }
+                    Calendar sessionCalendar = conn.getCalendarInstanceForSessionOrNew();
 
                     try {
                         int hourInt = Integer.parseInt(hour);
@@ -378,7 +371,7 @@ class EscapeProcessor {
             String argument = token.substring(startPos, endPos);
 
             try {
-                if (conn != null && !conn.getUseLegacyDatetimeCode()) {
+                if (!conn.getUseLegacyDatetimeCode()) {
                     Timestamp ts = Timestamp.valueOf(argument);
                     SimpleDateFormat tsdf = new SimpleDateFormat("''yyyy-MM-dd HH:mm:ss", Locale.US);
 
@@ -424,18 +417,11 @@ class EscapeProcessor {
                          * Thanks to Craig Longman for pointing out this bug
                          */
 
-                        if (conn != null && !conn.getUseTimezone() && !conn.getUseJDBCCompliantTimezoneShift()) {
+                        if (!conn.getUseTimezone() && !conn.getUseJDBCCompliantTimezoneShift()) {
                             newSql.append("'").append(year4).append("-").append(month2).append("-").append(day2).append(" ").append(hour).append(":")
                                     .append(minute).append(":").append(second).append(fractionalSecond).append("'");
                         } else {
-                            Calendar sessionCalendar;
-
-                            if (conn != null) {
-                                sessionCalendar = conn.getCalendarInstanceForSessionOrNew();
-                            } else {
-                                sessionCalendar = new GregorianCalendar();
-                                sessionCalendar.setTimeZone(TimeZone.getTimeZone("GMT"));
-                            }
+                            Calendar sessionCalendar = conn.getCalendarInstanceForSessionOrNew();
 
                             try {
                                 int year4Int = Integer.parseInt(year4);
@@ -532,8 +518,9 @@ class EscapeProcessor {
         int firstIndexOfParen = functionToken.indexOf("(");
 
         if (firstIndexOfParen == -1) {
-            throw SQLError.createSQLException("Syntax error while processing {fn convert (... , ...)} token, missing opening parenthesis in token '"
-                    + functionToken + "'.", SQLError.SQL_STATE_SYNTAX_ERROR, conn.getExceptionInterceptor());
+            throw SQLError.createSQLException(
+                    "Syntax error while processing {fn convert (... , ...)} token, missing opening parenthesis in token '" + functionToken + "'.",
+                    SQLError.SQL_STATE_SYNTAX_ERROR, conn.getExceptionInterceptor());
         }
 
         int indexOfComma = functionToken.lastIndexOf(",");
@@ -546,8 +533,9 @@ class EscapeProcessor {
         int indexOfCloseParen = functionToken.indexOf(')', indexOfComma);
 
         if (indexOfCloseParen == -1) {
-            throw SQLError.createSQLException("Syntax error while processing {fn convert (... , ...)} token, missing closing parenthesis in token '"
-                    + functionToken + "'.", SQLError.SQL_STATE_SYNTAX_ERROR, conn.getExceptionInterceptor());
+            throw SQLError.createSQLException(
+                    "Syntax error while processing {fn convert (... , ...)} token, missing closing parenthesis in token '" + functionToken + "'.",
+                    SQLError.SQL_STATE_SYNTAX_ERROR, conn.getExceptionInterceptor());
 
         }
 
@@ -571,9 +559,9 @@ class EscapeProcessor {
             // CAST/CONVERT, so we can't re-write some data type conversions (date,time,timestamp, datetime)
 
             if (newType == null) {
-                throw SQLError.createSQLException("Can't find conversion re-write for type '" + type
-                        + "' that is applicable for this server version while processing escape tokens.", SQLError.SQL_STATE_GENERAL_ERROR,
-                        conn.getExceptionInterceptor());
+                throw SQLError.createSQLException(
+                        "Can't find conversion re-write for type '" + type + "' that is applicable for this server version while processing escape tokens.",
+                        SQLError.SQL_STATE_GENERAL_ERROR, conn.getExceptionInterceptor());
             }
         }
 

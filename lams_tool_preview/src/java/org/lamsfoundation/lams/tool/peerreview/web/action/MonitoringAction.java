@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.peerreview.web.action;
 
 import java.io.IOException;
@@ -44,9 +43,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
@@ -56,6 +52,7 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -63,12 +60,17 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 	String param = mapping.getParameter();
 
 	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
@@ -119,7 +121,7 @@ public class MonitoringAction extends Action {
     private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	// save contentFolderID into session
@@ -138,10 +140,10 @@ public class MonitoringAction extends Action {
 	sessionMap.put(PeerreviewConstants.ATTR_PEERREVIEW, peerreview);
 	sessionMap.put(PeerreviewConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(PeerreviewConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
-	
+
 	List<RatingCriteria> criterias = service.getRatingCriterias(contentId);
 	request.setAttribute(PeerreviewConstants.ATTR_CRITERIAS, criterias);
-	
+
 	return mapping.findForward(PeerreviewConstants.SUCCESS);
     }
 
@@ -169,7 +171,7 @@ public class MonitoringAction extends Action {
      * Refreshes user list.
      */
     public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 	IPeerreviewService service = getPeerreviewService();
 
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
@@ -185,11 +187,12 @@ public class MonitoringAction extends Action {
 	String sortBy = WebUtil.readStrParam(request, PeerreviewConstants.PARAM_SIDX, true);
 
 	int sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC;
-	if ( criteria.isRankingStyleRating() )
+	if (criteria.isRankingStyleRating()) {
 	    sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
-	else if ( criteria.isCommentRating() )
+	} else if (criteria.isCommentRating()) {
 	    sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
-	    
+	}
+
 	if (sortBy != null && sortBy.equals(PeerreviewConstants.PARAM_SORT_NAME)) {
 	    if (sortOrder != null && sortOrder.equals(PeerreviewConstants.SORT_DESC)) {
 		sorting = PeerreviewConstants.SORT_BY_USERNAME_DESC;
@@ -208,14 +211,14 @@ public class MonitoringAction extends Action {
 
 	// in case of monitoring we show all results. in case of learning - don't show results from the current user
 	Long dummyUserId = -1L;
-	
-	JSONObject responcedata = new JSONObject();
-	int numUsersInSession = service.getCountUsersBySession(toolSessionId, dummyUserId);
-	responcedata.put("page", page + 1);
-	responcedata.put("total", Math.ceil((float) numUsersInSession / size));
-	responcedata.put("records", numUsersInSession);
 
-	JSONArray rows = new JSONArray();
+	ObjectNode responseData = JsonNodeFactory.instance.objectNode();
+	int numUsersInSession = service.getCountUsersBySession(toolSessionId, dummyUserId);
+	responseData.put("page", page + 1);
+	responseData.put("total", Math.ceil((float) numUsersInSession / size));
+	responseData.put("records", numUsersInSession);
+
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 
 	String emailResultsText = service.getLocalisedMessage("button.email.results", null);
 	if (criteria.isCommentRating()) {
@@ -225,81 +228,77 @@ public class MonitoringAction extends Action {
 
 	    for (int i = 0; i < rawRows.size(); i++) {
 		Object[] rawRow = rawRows.get(i);
-		JSONObject cell = new JSONObject();
-		cell.put("itemId", rawRow[0]);
-		cell.put("itemDescription", (String)rawRow[3]);
+		ObjectNode cell = JsonNodeFactory.instance.objectNode();
+		cell.put("itemId", (Long) rawRow[0]);
+		cell.put("itemDescription", (String) rawRow[3]);
 
 		Number numCommentsNumber = (Number) rawRow[1];
 		int numComments = numCommentsNumber != null ? numCommentsNumber.intValue() : 0;
 		if (numComments > 0) {
-		    cell.put("rating", service.getLocalisedMessage("label.monitoring.num.of.comments", new Object[] { numComments }));
+		    cell.put("rating", service.getLocalisedMessage("label.monitoring.num.of.comments",
+			    new Object[] { numComments }));
 		    cell.put("email", generateResultsButton(toolSessionId, rawRow[0], emailResultsText));
 		} else {
 		    cell.put("rating", "");
 		    cell.put("email", "");
 		}
 
-		JSONObject row = new JSONObject();
+		ObjectNode row = JsonNodeFactory.instance.objectNode();
 		row.put("id", "" + rawRow[0]);
-		row.put("cell", cell);
-		rows.put(row);
+		row.set("cell", cell);
+		rows.add(row);
 	    }
 	} else {
 	    // all other styles can use the "normal" routine and munge the JSON to suit jqgrid
-	    JSONArray rawRows = service.getUsersRatingsCommentsByCriteriaIdJSON(toolContentId, toolSessionId, criteria,
+	    ArrayNode rawRows = service.getUsersRatingsCommentsByCriteriaIdJSON(toolContentId, toolSessionId, criteria,
 		    dummyUserId, page, size, sorting, searchString, true, true, false);
-
-	    for (int i = 0; i < rawRows.length(); i++) {
-
-		JSONObject rawRow = rawRows.getJSONObject(i);
-
-		String averageRating = (String) rawRow.get("averageRating");
+	    for (JsonNode rawNode : rawRows) {
+		ObjectNode rawRow = (ObjectNode) rawNode;
+		String averageRating = JsonUtil.optString(rawRow, "averageRating");
 		Object numberOfVotes = rawRow.get("numberOfVotes");
 
 		if (averageRating != null && averageRating.length() > 0) {
 		    if (criteria.isStarStyleRating()) {
 			String starString = "<div class='rating-stars-holder'>";
-			starString += "<div class='rating-stars-disabled rating-stars-new' data-average='" + averageRating
-				+ "' data-id='" + criteriaId + "'>";
+			starString += "<div class='rating-stars-disabled rating-stars-new' data-average='"
+				+ averageRating + "' data-id='" + criteriaId + "'>";
 			starString += "</div>";
-			starString += "<div class='rating-stars-caption' id='rating-stars-caption-" + criteriaId + "' >";
-			String msg = service.getLocalisedMessage("label.average.rating", new Object[] { averageRating,
-				numberOfVotes });
+			starString += "<div class='rating-stars-caption' id='rating-stars-caption-" + criteriaId
+				+ "' >";
+			String msg = service.getLocalisedMessage("label.average.rating",
+				new Object[] { averageRating, numberOfVotes });
 			starString += msg;
 			starString += "</div>";
 			rawRow.put("rating", starString);
-			rawRow.put("email", generateResultsButton(toolSessionId, (Long) rawRow.get("itemId"), emailResultsText));
+			rawRow.put("email", generateResultsButton(toolSessionId, JsonUtil.optLong(rawRow, "itemId"),
+				emailResultsText));
 		    } else {
 			rawRow.put("rating", averageRating);
-			rawRow.put("email", generateResultsButton(toolSessionId, (Long) rawRow.get("itemId"), emailResultsText));
+			rawRow.put("email", generateResultsButton(toolSessionId, JsonUtil.optLong(rawRow, "itemId"),
+				emailResultsText));
 		    }
 		}
-		JSONObject row = new JSONObject();
+		ObjectNode row = JsonNodeFactory.instance.objectNode();
 		row.put("id", "" + rawRow.get("itemId"));
-		row.put("cell", rawRow);
-		rows.put(row);
+		row.set("cell", rawRow);
+		rows.add(row);
 	    }
 	}
-	responcedata.put("rows", rows);
+	responseData.set("rows", rows);
 
 	res.setContentType("application/json;charset=utf-8");
-	res.getWriter().print(new String(responcedata.toString()));
+	res.getWriter().print(new String(responseData.toString()));
 	return null;
     }
 
     private String generateResultsButton(Object toolSessionId, Object userId, String emailResultsText) {
-	return new StringBuilder("<a href=\"javascript:sendResultsForLearner(")
-		.append(toolSessionId)
-		.append(", ")
-		.append(userId)
-		.append(")\" class=\"btn btn-default btn-xs email-button\">")
-		.append(emailResultsText)
-		.append("</a>")
-		.toString();
+	return new StringBuilder("<a href=\"javascript:sendResultsForLearner(").append(toolSessionId).append(", ")
+		.append(userId).append(")\" class=\"btn btn-default btn-xs email-button\">").append(emailResultsText)
+		.append("</a>").toString();
     }
 
     private ActionForward getSubgridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	IPeerreviewService service = getPeerreviewService();
 
 	Long itemId = WebUtil.readLongParam(request, "itemId");
@@ -308,60 +307,61 @@ public class MonitoringAction extends Action {
 	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
 
 	// ratings left by others for this user
-	List<Object[]> ratings = service.getDetailedRatingsComments(toolContentId, toolSessionId, criteriaId, itemId );
+	List<Object[]> ratings = service.getDetailedRatingsComments(toolContentId, toolSessionId, criteriaId, itemId);
 	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
 	String title = StringEscapeUtils.escapeHtml(criteria.getTitle());
-	
+
 	// processed data from db is userId, comment, rating, first_name, escaped( firstname + last_name)
 	// if no rating or comment, then the entries will be null and not an empty string
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	int i = 0;
-	
-	for (Object[] ratingDetails : ratings) {
-	    if ( ratingDetails[2] != null ) {
-   		JSONArray userData = new JSONArray();
-    		userData.put(i);
-    		userData.put(ratingDetails[4]);
-    		userData.put(ratingDetails[2]);
-    		userData.put(title);
 
-    		JSONObject userRow = new JSONObject();
-    		userRow.put("id", i++);
-    		userRow.put("cell", userData);
-    
-    		rows.put(userRow);
+	for (Object[] ratingDetails : ratings) {
+	    if (ratingDetails[2] != null) {
+		ArrayNode userData = JsonNodeFactory.instance.arrayNode();
+		userData.add(i);
+		userData.add(JsonUtil.readObject(ratingDetails[4]));
+		userData.add(JsonUtil.readObject(ratingDetails[2]));
+		userData.add(title);
+
+		ObjectNode userRow = JsonNodeFactory.instance.objectNode();
+		userRow.put("id", i++);
+		userRow.set("cell", userData);
+
+		rows.add(userRow);
 	    }
 	}
 
-	if ( criteria.isCommentsEnabled() ) {
+	if (criteria.isCommentsEnabled()) {
 	    for (Object[] ratingDetails : ratings) {
 
 		// Show comment if comment has been left by user. Exclude the special case where it is a hedging rating
 		//  and the rating is not null - otherwise we end up putting the justification comment against entries that were not rated.
 		String comment = (String) ratingDetails[1];
-		if ( comment != null && ( ! criteria.isHedgeStyleRating() || ( criteria.isHedgeStyleRating() && ratingDetails[2] != null ) ) ) {
-		    JSONArray userData = new JSONArray();
-		    userData.put(i);
-		    userData.put(ratingDetails[4]);
+		if (comment != null && (!criteria.isHedgeStyleRating()
+			|| (criteria.isHedgeStyleRating() && ratingDetails[2] != null))) {
+		    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
+		    userData.add(i);
+		    userData.add(JsonUtil.readObject(ratingDetails[4]));
 		    String commentText = StringEscapeUtils.escapeHtml(comment);
 		    commentText = StringUtils.replace(commentText, "&lt;BR&gt;", "<BR/>");
-		    userData.put(commentText);
-		    userData.put("Comments");
+		    userData.add(commentText);
+		    userData.add("Comments");
 
-		    JSONObject userRow = new JSONObject();
+		    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 		    userRow.put("id", i++);
-		    userRow.put("cell", userData);
+		    userRow.set("cell", userData);
 
-		    rows.put(userRow); 
+		    rows.add(userRow);
 		}
 	    }
 	}
-	
-	JSONObject responseJSON = new JSONObject();
+
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("total", 1);
 	responseJSON.put("page", 1);
-	responseJSON.put("records", rows.length());
-	responseJSON.put("rows", rows);
+	responseJSON.put("records", rows.size());
+	responseJSON.set("rows", rows);
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
@@ -369,7 +369,7 @@ public class MonitoringAction extends Action {
     }
 
     private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {	
+	    HttpServletResponse response) {
 	IPeerreviewService service = getPeerreviewService();
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	Long toolContentId = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
@@ -377,7 +377,7 @@ public class MonitoringAction extends Action {
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(PeerreviewConstants.SUCCESS);
     }
-    
+
     private ActionForward reflections(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -388,12 +388,12 @@ public class MonitoringAction extends Action {
 
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 	request.setAttribute("toolSessionId", toolSessionId);
-	
+
 	return mapping.findForward(PeerreviewConstants.SUCCESS);
     }
 
     private ActionForward getReflections(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -409,7 +409,7 @@ public class MonitoringAction extends Action {
 	String sortBy = WebUtil.readStrParam(request, PeerreviewConstants.PARAM_SIDX, true);
 
 	int sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
-	    
+
 	if (sortBy != null && sortBy.equals(PeerreviewConstants.PARAM_SORT_NAME)) {
 	    if (sortOrder != null && sortOrder.equals(PeerreviewConstants.SORT_DESC)) {
 		sorting = PeerreviewConstants.SORT_BY_USERNAME_DESC;
@@ -426,54 +426,51 @@ public class MonitoringAction extends Action {
 
 	String searchString = WebUtil.readStrParam(request, "itemDescription", true);
 
-	// setting date format to ISO8601 for jquery.timeago 
-	DateFormat dateFormatterTimeAgo = new SimpleDateFormat(DateUtil.ISO8601_FORMAT); 
-	dateFormatterTimeAgo.setTimeZone(TimeZone.getTimeZone("GMT")); 
+	// setting date format to ISO8601 for jquery.timeago
+	DateFormat dateFormatterTimeAgo = new SimpleDateFormat(DateUtil.ISO8601_FORMAT);
+	dateFormatterTimeAgo.setTimeZone(TimeZone.getTimeZone("GMT"));
 
 	IPeerreviewService service = getPeerreviewService();
 	int sessionUserCount = service.getCountUsersBySession(toolSessionId, -1L);
-	
-	JSONObject responcedata = new JSONObject();
+
+	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
 	responcedata.put("page", page + 1);
 	responcedata.put("total", Math.ceil((float) sessionUserCount / size));
 	responcedata.put("records", sessionUserCount);
 
-	List<Object[]> nbEntryList = service.getUserNotebookEntriesForTablesorter(toolSessionId, 
-		page, size, sorting, searchString);
-	
+	List<Object[]> nbEntryList = service.getUserNotebookEntriesForTablesorter(toolSessionId, page, size, sorting,
+		searchString);
+
 	// processed data from db is user.user_id, user.first_name, escaped( first_name + last_name), notebook entry, notebook date
 	// if no rating or comment, then the entries will be null and not an empty string
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	int i = 0;
-	
+
 	for (Object[] nbEntry : nbEntryList) {
- 		JSONArray userData = new JSONArray();
-    		userData.put(nbEntry[0]);
+	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
+	    userData.add(JsonUtil.readObject(nbEntry[0]));
 
-    		Date entryTime = (Date) nbEntry[4]; 
-    		if ( entryTime == null ) {
-    		    userData.put((String)nbEntry[2]);
-    		} else {
-    		    StringBuilder nameField = new StringBuilder((String)nbEntry[2])
-			.append("<BR/>")
-			.append("<time class=\"timeago\" title=\"") 
-			.append(DateUtil.convertToStringForJSON(entryTime, request.getLocale())) 
-			.append("\" datetime=\"") 
-			.append(dateFormatterTimeAgo.format(entryTime)) 
-			.append("\"></time>");
-    		    userData.put(nameField.toString());
-    		}
-    		
-    		userData.put(StringEscapeUtils.escapeHtml((String)nbEntry[3]));
+	    Date entryTime = (Date) nbEntry[4];
+	    if (entryTime == null) {
+		userData.add((String) nbEntry[2]);
+	    } else {
+		StringBuilder nameField = new StringBuilder((String) nbEntry[2]).append("<BR/>")
+			.append("<time class=\"timeago\" title=\"")
+			.append(DateUtil.convertToStringForJSON(entryTime, request.getLocale()))
+			.append("\" datetime=\"").append(dateFormatterTimeAgo.format(entryTime)).append("\"></time>");
+		userData.add(nameField.toString());
+	    }
 
-    		JSONObject userRow = new JSONObject();
-    		userRow.put("id", i++);
-		userRow.put("cell", userData);
+	    userData.add(StringEscapeUtils.escapeHtml((String) nbEntry[3]));
 
-		rows.put(userRow);
+	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
+	    userRow.put("id", i++);
+	    userRow.set("cell", userData);
+
+	    rows.add(userRow);
 	}
 
-	responcedata.put("rows", rows);
+	responcedata.set("rows", rows);
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responcedata.toString());
@@ -481,17 +478,17 @@ public class MonitoringAction extends Action {
     }
 
     private ActionForward sendResultsToUser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	return sendResults(mapping, request, response, true);
     }
 
     private ActionForward sendResultsToSessionUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	return sendResults(mapping, request, response, false);
     }
 
-    private ActionForward sendResults(ActionMapping mapping, HttpServletRequest request,
-		    HttpServletResponse response, boolean oneUserOnly) throws JSONException, IOException {
+    private ActionForward sendResults(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
+	    boolean oneUserOnly) throws IOException {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -503,8 +500,8 @@ public class MonitoringAction extends Action {
 
 	IPeerreviewService service = getPeerreviewService();
 	int numEmailsSent = 0;
-	
-	if ( oneUserOnly) {
+
+	if (oneUserOnly) {
 	    Long userId = WebUtil.readLongParam(request, PeerreviewConstants.PARAM_USERID);
 	    numEmailsSent = service.emailReportToUser(contentId, toolSessionId, userId);
 	} else {
@@ -515,26 +512,27 @@ public class MonitoringAction extends Action {
 	response.getWriter().write(service.getLocalisedMessage("msg.results.sent", new Object[] { numEmailsSent }));
 	return null;
     }
-    
+
     /**
      * Exports Team Report into Excel spreadsheet.
-     * @throws ServletException 
-     * @throws IOException 
+     *
+     * @throws ServletException
+     * @throws IOException
      */
     private ActionForward exportTeamReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
-	
+
 	IPeerreviewService service = getPeerreviewService();
 	Long toolContentId = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 
 	Peerreview peerreview = service.getPeerreviewByContentId(toolContentId);
 	if (peerreview == null) {
 	    log.warn("Did not find Peer Review with toolContentId: " + toolContentId + " export content");
-	    return null; 
+	    return null;
 	}
-	
+
 	String fileName = peerreview.getTitle().replaceAll(" ", "_") + ".xlsx";
-	
+
 	try {
 	    fileName = FileUtil.encodeFilenameForDownload(request, fileName);
 
@@ -557,35 +555,35 @@ public class MonitoringAction extends Action {
 	    ExcelUtil.createExcel(out, dataToExport, "Exported on:", true);
 
 	} catch (IOException e) {
-	    log.error("exportTeamReportExcelSpreadsheet i/o error occured: "+e.getMessage(), e);
+	    log.error("exportTeamReportExcelSpreadsheet i/o error occured: " + e.getMessage(), e);
 	    throw new ServletException(e);
 	}
 
 	return null;
     }
-    
+
     private ActionForward manageUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
-	
+
 	IPeerreviewService service = getPeerreviewService();
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	
+
 	return mapping.findForward(PeerreviewConstants.SUCCESS);
     }
-    
+
     /**
      * Gets a paged set of data for stars or comments. These are directly saved to the database, not through
-     * LearnerAction like Ranking and Hedging. 
+     * LearnerAction like Ranking and Hedging.
      */
     private ActionForward getManageUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
-	
+	    HttpServletResponse res) throws IOException, ServletException {
+
 	IPeerreviewService service = getPeerreviewService();
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
-	
+
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, PeerreviewConstants.PARAM_PAGE) - 1;
 	int size = WebUtil.readIntParam(request, PeerreviewConstants.PARAM_ROWS);
@@ -601,36 +599,36 @@ public class MonitoringAction extends Action {
 	    }
 	}
 	String searchString = WebUtil.readStrParam(request, "userName", true);
-	
-	JSONObject responcedata = new JSONObject();
+
+	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
 
 	int numUsersInSession = service.getCountUsersBySession(toolSessionId);
 	responcedata.put("page", page + 1);
 	responcedata.put("total", Math.ceil((float) numUsersInSession / size));
 	responcedata.put("records", numUsersInSession);
-	
+
 	// gets the user
 	List<Object[]> rawRows = service.getPagedUsers(toolSessionId, page, size, sorting, searchString);
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	for (int i = 0; i < rawRows.size(); i++) {
 	    Object[] rawRow = rawRows.get(i);
-	    JSONObject cell = new JSONObject();
-	    cell.put("hidden", !(Boolean)rawRow[1]);
-	    cell.put("userUid", rawRow[0]);
+	    ObjectNode cell = JsonNodeFactory.instance.objectNode();
+	    cell.put("hidden", !(Boolean) rawRow[1]);
+	    cell.put("userUid", (Integer) rawRow[0]);
 	    cell.put("userName", (String) rawRow[2]);
 
-	    JSONObject row = new JSONObject();
+	    ObjectNode row = JsonNodeFactory.instance.objectNode();
 	    row.put("id", "" + rawRow[0]);
-	    row.put("cell", cell);
-	    rows.put(row);
+	    row.set("cell", cell);
+	    rows.add(row);
 	}
-	responcedata.put("rows", rows);
+	responcedata.set("rows", rows);
 
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responcedata.toString()));
 	return null;
     }
-    
+
     private ActionForward setUserHidden(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	IPeerreviewService service = getPeerreviewService();
@@ -638,11 +636,11 @@ public class MonitoringAction extends Action {
 	Long toolContentId = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 	Long userUid = WebUtil.readLongParam(request, "userUid");
 	boolean isHidden = !WebUtil.readBooleanParam(request, "hidden");
-	
+
 	service.setUserHidden(toolContentId, userUid, isHidden);
 	return null;
     }
-    
+
     // *************************************************************************************
     // Private method
     // *************************************************************************************

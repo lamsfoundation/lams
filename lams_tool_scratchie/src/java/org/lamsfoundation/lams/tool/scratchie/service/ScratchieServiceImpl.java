@@ -46,9 +46,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -104,6 +101,9 @@ import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Andrey Balan
@@ -518,7 +518,7 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public void setScratchingFinished(Long toolSessionId) throws JSONException, IOException {
+    public void setScratchingFinished(Long toolSessionId) throws IOException {
 	ScratchieSession session = this.getScratchieSessionBySessionId(toolSessionId);
 	session.setScratchingFinished(true);
 	scratchieSessionDao.saveObject(session);
@@ -2140,14 +2140,13 @@ public class ScratchieServiceImpl
 
     /**
      * Rest call to create a new Scratchie content. Required fields in toolContentJSON: "title", "instructions",
-     * "questions". The questions entry should be JSONArray containing JSON objects, which in turn must contain
-     * "questionText", "displayOrder" (Integer) and a JSONArray "answers". The answers entry should be JSONArray
+     * "questions". The questions entry should be ArrayNode containing JSON objects, which in turn must contain
+     * "questionText", "displayOrder" (Integer) and a ArrayNode "answers". The answers entry should be ArrayNode
      * containing JSON objects, which in turn must contain "answerText", "displayOrder" (Integer), "correct" (Boolean).
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
 	Scratchie scratchie = new Scratchie();
 	Date updateDate = new Date();
@@ -2157,43 +2156,44 @@ public class ScratchieServiceImpl
 	scratchie.setDefineLater(false);
 
 	scratchie.setContentId(toolContentID);
-	scratchie.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	scratchie.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	scratchie.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	scratchie.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 
-	scratchie.setBurningQuestionsEnabled(JsonUtil.opt(toolContentJSON, "burningQuestionsEnabled", false));
-	scratchie.setTimeLimit(JsonUtil.opt(toolContentJSON, "timeLimit", 0));
-	scratchie.setExtraPoint(JsonUtil.opt(toolContentJSON, "extraPoint", false));
-	scratchie.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	scratchie.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
+	scratchie.setBurningQuestionsEnabled(JsonUtil.optBoolean(toolContentJSON, "burningQuestionsEnabled", false));
+	scratchie.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
+	scratchie.setExtraPoint(JsonUtil.optBoolean(toolContentJSON, "extraPoint", false));
+	scratchie.setReflectOnActivity(
+		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	scratchie.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 
 	// Scratchie Items
 	Set<ScratchieItem> newItems = new LinkedHashSet<>();
 
-	JSONArray questions = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
-	for (int i = 0; i < questions.length(); i++) {
-	    JSONObject questionData = (JSONObject) questions.get(i);
+	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
+	for (int i = 0; i < questions.size(); i++) {
+	    ObjectNode questionData = (ObjectNode) questions.get(i);
 
 	    ScratchieItem item = new ScratchieItem();
 	    item.setCreateDate(updateDate);
 	    item.setCreateByAuthor(true);
-	    item.setOrderId(questionData.getInt(RestTags.DISPLAY_ORDER));
-	    item.setTitle(questionData.getString(RestTags.QUESTION_TITLE));
-	    item.setDescription(questionData.getString(RestTags.QUESTION_TEXT));
+	    item.setOrderId(JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER));
+	    item.setTitle(JsonUtil.optString(questionData, RestTags.QUESTION_TITLE));
+	    item.setDescription(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
 	    newItems.add(item);
 
 	    // set options
 	    Set<ScratchieAnswer> newAnswers = new LinkedHashSet<>();
 
-	    JSONArray answersData = questionData.getJSONArray(RestTags.ANSWERS);
-	    for (int j = 0; j < answersData.length(); j++) {
-		JSONObject answerData = (JSONObject) answersData.get(j);
+	    ArrayNode answersData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
+	    for (int j = 0; j < answersData.size(); j++) {
+		ObjectNode answerData = (ObjectNode) answersData.get(j);
 		ScratchieAnswer answer = new ScratchieAnswer();
 		// Removes redundant new line characters from options left by CKEditor (otherwise it will break
 		// Javascript in monitor). Copied from AuthoringAction.
-		String answerDescription = answerData.getString(RestTags.ANSWER_TEXT);
+		String answerDescription = JsonUtil.optString(answerData, RestTags.ANSWER_TEXT);
 		answer.setDescription(answerDescription != null ? answerDescription.replaceAll("[\n\r\f]", "") : "");
-		answer.setCorrect(answerData.getBoolean(RestTags.CORRECT));
-		answer.setOrderId(answerData.getInt(RestTags.DISPLAY_ORDER));
+		answer.setCorrect(JsonUtil.optBoolean(answerData, RestTags.CORRECT));
+		answer.setOrderId(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
 		answer.setScratchieItem(item);
 		newAnswers.add(answer);
 	    }
@@ -2204,7 +2204,5 @@ public class ScratchieServiceImpl
 
 	scratchie.setScratchieItems(newItems);
 	saveOrUpdateScratchie(scratchie);
-
     }
-
 }

@@ -29,7 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.tomcat.util.json.JSONException;
+
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
@@ -229,7 +229,7 @@ public interface IScratchieService {
      * @throws IOException 
      * @throws JSONException 
      */
-    void setScratchingFinished(Long toolSessionId) throws JSONException, IOException;
+    void setScratchingFinished(Long toolSessionId) throws IOException;
 
     /**
      * If success return next activity's url, otherwise return null.

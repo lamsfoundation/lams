@@ -36,8 +36,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.MessageResources;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
@@ -46,6 +44,9 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Display chart image by request.
@@ -75,25 +76,21 @@ public class ChartAction extends Action {
 	    return null;
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	Set<SurveyOption> options = answer.getOptions();
-	try {
-	    for (SurveyOption option : options) {
-		JSONObject nomination = new JSONObject();
-		// nominations' names and values go separately
-		nomination.put("name", option.getDescription());
-		nomination.put("value", (Number) option.getResponse());
-		responseJSON.append("data", nomination);
-	    }
+	for (SurveyOption option : options) {
+	    ObjectNode nomination = JsonNodeFactory.instance.objectNode();
+	    // nominations' names and values go separately
+	    nomination.put("name", option.getDescription());
+	    nomination.put("value", (Double) option.getResponse());
+	    responseJSON.withArray("data").add(nomination);
+	}
 
-	    if (answer.isAppendText()) {
-		JSONObject nomination = new JSONObject();
-		nomination.put("name", resource.getMessage(SurveyConstants.MSG_OPEN_RESPONSE));
-		nomination.put("value", (Number) answer.getOpenResponse());
-		responseJSON.append("data", nomination);
-	    }
-	} catch (JSONException e) {
-	    ChartAction.logger.error("Error while generating pie chart for Survey Tool: " + sessionId);
+	if (answer.isAppendText()) {
+	    ObjectNode nomination = JsonNodeFactory.instance.objectNode();
+	    nomination.put("name", resource.getMessage(SurveyConstants.MSG_OPEN_RESPONSE));
+	    nomination.put("value", (Double) answer.getOpenResponse());
+	    responseJSON.withArray("data").add(nomination);
 	}
 
 	response.setContentType("application/json;charset=utf-8");

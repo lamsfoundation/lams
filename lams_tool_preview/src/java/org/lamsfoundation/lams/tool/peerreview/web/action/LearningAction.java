@@ -46,9 +46,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
+
+
+
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -73,6 +73,9 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Steve.Ni
  */
@@ -82,7 +85,7 @@ public class LearningAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 
 	String param = mapping.getParameter();
 	// -----------------------Peerreview Learner function ---------------------------
@@ -471,7 +474,7 @@ public class LearningAction extends Action {
      * LearnerAction like Ranking and Hedging. 
      */
     public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 
 	IPeerreviewService service = getPeerreviewService();
 	
@@ -501,9 +504,9 @@ public class LearningAction extends Action {
 	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
 	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
 	
-	JSONObject responsedata = new JSONObject();
+	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
 	responsedata.put("total_rows", service.getCountUsersBySession(toolSessionId, peerreview.isSelfReview() ? -1 : userId));
-	responsedata.put("rows", service.getUsersRatingsCommentsByCriteriaIdJSON(toolContentId, toolSessionId, criteria, userId, 
+	responsedata.set("rows", service.getUsersRatingsCommentsByCriteriaIdJSON(toolContentId, toolSessionId, criteria, userId, 
 		page, size, sorting, null, peerreview.isSelfReview(), true, peerreview.getMaximumRatesPerUser() > 0 ));	
 	responsedata.put("countRatedItems", service.getCountItemsRatedByUserByCriteria(criteriaId, userId.intValue()));
 	    
@@ -634,12 +637,12 @@ public class LearningAction extends Action {
      *
      */
     public ActionForward submitComments(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 	return submitComments(mapping, form, request, response, false);
     }
     
     private ActionForward submitComments(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, boolean ajaxResponse) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response, boolean ajaxResponse) throws IOException, ServletException {
 
 	IPeerreviewService service = getPeerreviewService();
 
@@ -678,7 +681,7 @@ public class LearningAction extends Action {
 	}
 
 	if ( ajaxResponse ) {
-	    JSONObject responsedata = new JSONObject();
+	    ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
 	    int countRatedQuestions = service.getCountItemsRatedByUserByCriteria(criteriaId, user.getUserId().intValue());
 	    responsedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
 	    responsedata.put("countCommentsSaved", countCommentsSaved);
@@ -713,7 +716,7 @@ public class LearningAction extends Action {
     }
     
     public ActionForward submitCommentsAjax(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 	return submitComments( mapping,  form,  request, response, true);
     }
 

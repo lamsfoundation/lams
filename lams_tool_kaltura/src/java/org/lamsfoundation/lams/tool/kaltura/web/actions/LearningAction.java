@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.kaltura.web.actions;
 
 import java.io.IOException;
@@ -45,8 +44,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionRedirect;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -74,6 +71,9 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Andrey Balan
  *
@@ -99,7 +99,7 @@ public class LearningAction extends LamsDispatchAction {
 	initKalturaService();
 
 	// initialize Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	String sessionMapId = sessionMap.getSessionID();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(KalturaConstants.ATTR_SESSION_MAP_ID, sessionMapId);
@@ -263,7 +263,7 @@ public class LearningAction extends LamsDispatchAction {
      * Stores uploaded entryId(s).
      */
     public ActionForward saveNewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	initKalturaService();
 
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
@@ -274,7 +274,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	KalturaSession kalturaSession = service.getSessionBySessionId(toolSessionId);
 	Kaltura kaltura = kalturaSession.getKaltura();
-	TreeSet<KalturaItem> allItems = new TreeSet<KalturaItem>(new KalturaItemComparator());
+	TreeSet<KalturaItem> allItems = new TreeSet<>(new KalturaItemComparator());
 	allItems.addAll(kaltura.getKalturaItems());
 
 	// check user can upload item
@@ -316,10 +316,10 @@ public class LearningAction extends LamsDispatchAction {
 	item.setKalturaUid(kaltura.getUid());
 	service.saveKalturaItem(item);
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put(KalturaConstants.PARAM_ITEM_UID, item.getUid());
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
+	ObjectNode.put(KalturaConstants.PARAM_ITEM_UID, item.getUid());
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 	return null;
     }
 
@@ -387,7 +387,7 @@ public class LearningAction extends LamsDispatchAction {
      * @throws ToolException
      */
     public ActionForward rateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 
 	initKalturaService();
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
@@ -405,11 +405,11 @@ public class LearningAction extends LamsDispatchAction {
 	KalturaItem item = (KalturaItem) sessionMap.get(KalturaConstants.ATTR_ITEM);
 	item.setAverageRatingDto(averageRatingDto);
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put("averageRating", averageRatingDto.getRating());
-	JSONObject.put("numberOfVotes", averageRatingDto.getNumberOfVotes());
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
+	ObjectNode.put("averageRating", averageRatingDto.getRating());
+	ObjectNode.put("numberOfVotes", averageRatingDto.getNumberOfVotes());
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 	return null;
     }
 
@@ -523,7 +523,7 @@ public class LearningAction extends LamsDispatchAction {
     private TreeSet<KalturaItem> getItems(ToolAccessMode mode, Kaltura kaltura, Long toolSessionId, Long userId) {
 
 	// Create set of images, along with this filtering out items added by users from other groups
-	TreeSet<KalturaItem> items = new TreeSet<KalturaItem>(new KalturaItemComparator());
+	TreeSet<KalturaItem> items = new TreeSet<>(new KalturaItemComparator());
 	items.addAll(service.getGroupItems(kaltura.getToolContentId(), toolSessionId, userId, mode.isTeacher()));
 
 	for (KalturaItem item : items) {
@@ -564,7 +564,7 @@ public class LearningAction extends LamsDispatchAction {
      * Returns all comments done by teacher and learners of the specified group.
      */
     private Set<KalturaComment> getGroupComments(KalturaItem item, Long sessionId, ToolAccessMode mode) {
-	TreeSet<KalturaComment> comments = new TreeSet<KalturaComment>(new KalturaCommentComparator());
+	TreeSet<KalturaComment> comments = new TreeSet<>(new KalturaCommentComparator());
 	Set<KalturaComment> itemComments = item.getComments();
 
 	//only authored items can be seen by different groups

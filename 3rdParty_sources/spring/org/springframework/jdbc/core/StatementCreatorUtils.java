@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.jdbc.core;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -24,6 +25,7 @@ import java.sql.Clob;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Types;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -77,7 +79,7 @@ public abstract class StatementCreatorUtils {
 	public static final String IGNORE_GETPARAMETERTYPE_PROPERTY_NAME = "spring.jdbc.getParameterType.ignore";
 
 
-	static final boolean shouldIgnoreGetParameterType = SpringProperties.getFlag(IGNORE_GETPARAMETERTYPE_PROPERTY_NAME);
+	static final Boolean shouldIgnoreGetParameterType;
 
 	static final Set<String> driversWithNoSupportForGetParameterType =
 			Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>(1));
@@ -87,10 +89,11 @@ public abstract class StatementCreatorUtils {
 	private static final Map<Class<?>, Integer> javaTypeToSqlTypeMap = new HashMap<Class<?>, Integer>(32);
 
 	static {
-		/* JDBC 3.0 only - not compatible with e.g. MySQL at present
-		javaTypeToSqlTypeMap.put(boolean.class, new Integer(Types.BOOLEAN));
-		javaTypeToSqlTypeMap.put(Boolean.class, new Integer(Types.BOOLEAN));
-		*/
+		String propVal = SpringProperties.getProperty(IGNORE_GETPARAMETERTYPE_PROPERTY_NAME);
+		shouldIgnoreGetParameterType = (propVal != null ? Boolean.valueOf(propVal) : null);
+
+		javaTypeToSqlTypeMap.put(boolean.class, Types.BOOLEAN);
+		javaTypeToSqlTypeMap.put(Boolean.class, Types.BOOLEAN);
 		javaTypeToSqlTypeMap.put(byte.class, Types.TINYINT);
 		javaTypeToSqlTypeMap.put(Byte.class, Types.TINYINT);
 		javaTypeToSqlTypeMap.put(short.class, Types.SMALLINT);
@@ -241,23 +244,34 @@ public abstract class StatementCreatorUtils {
 	 * respecting database-specific peculiarities.
 	 */
 	private static void setNull(PreparedStatement ps, int paramIndex, int sqlType, String typeName) throws SQLException {
-		if (sqlType == SqlTypeValue.TYPE_UNKNOWN) {
+		if (sqlType == SqlTypeValue.TYPE_UNKNOWN || sqlType == Types.OTHER) {
 			boolean useSetObject = false;
 			Integer sqlTypeToUse = null;
 			DatabaseMetaData dbmd = null;
 			String jdbcDriverName = null;
-			boolean checkGetParameterType = !shouldIgnoreGetParameterType;
-			if (checkGetParameterType && !driversWithNoSupportForGetParameterType.isEmpty()) {
+			boolean tryGetParameterType = true;
+
+			if (shouldIgnoreGetParameterType == null) {
 				try {
 					dbmd = ps.getConnection().getMetaData();
 					jdbcDriverName = dbmd.getDriverName();
-					checkGetParameterType = !driversWithNoSupportForGetParameterType.contains(jdbcDriverName);
+					tryGetParameterType = !driversWithNoSupportForGetParameterType.contains(jdbcDriverName);
+					if (tryGetParameterType && jdbcDriverName.startsWith("Oracle")) {
+						// Avoid getParameterType use with Oracle 12c driver by default:
+						// needs to be explicitly activated through spring.jdbc.getParameterType.ignore=false
+						tryGetParameterType = false;
+						driversWithNoSupportForGetParameterType.add(jdbcDriverName);
+					}
 				}
 				catch (Throwable ex) {
 					logger.debug("Could not check connection metadata", ex);
 				}
 			}
-			if (checkGetParameterType) {
+			else {
+				tryGetParameterType = !shouldIgnoreGetParameterType;
+			}
+
+			if (tryGetParameterType) {
 				try {
 					sqlTypeToUse = ps.getParameterMetaData().getParameterType(paramIndex);
 				}
@@ -267,6 +281,7 @@ public abstract class StatementCreatorUtils {
 					}
 				}
 			}
+
 			if (sqlTypeToUse == null) {
 				// JDBC driver not compliant with JDBC 3.0 -> proceed with database-specific checks
 				sqlTypeToUse = Types.NULL;
@@ -277,12 +292,16 @@ public abstract class StatementCreatorUtils {
 					if (jdbcDriverName == null) {
 						jdbcDriverName = dbmd.getDriverName();
 					}
-					if (checkGetParameterType) {
+					if (shouldIgnoreGetParameterType == null) {
+						// Register JDBC driver with no support for getParameterType, except for the
+						// Oracle 12c driver where getParameterType fails for specific statements only
+						// (so an exception thrown above does not indicate general lack of support).
 						driversWithNoSupportForGetParameterType.add(jdbcDriverName);
 					}
 					String databaseProductName = dbmd.getDatabaseProductName();
 					if (databaseProductName.startsWith("Informix") ||
-							jdbcDriverName.startsWith("Microsoft SQL Server")) {
+							(jdbcDriverName.startsWith("Microsoft") && jdbcDriverName.contains("SQL Server"))) {
+							// "Microsoft SQL Server JDBC Driver 3.0" versus "Microsoft JDBC Driver 4.0 for SQL Server"
 						useSetObject = true;
 					}
 					else if (databaseProductName.startsWith("DB2") ||
@@ -320,9 +339,33 @@ public abstract class StatementCreatorUtils {
 		else if (inValue instanceof SqlValue) {
 			((SqlValue) inValue).setValue(ps, paramIndex);
 		}
-		else if (sqlType == Types.VARCHAR || sqlType == Types.LONGVARCHAR ||
-				(sqlType == Types.CLOB && isStringValue(inValue.getClass()))) {
+		else if (sqlType == Types.VARCHAR || sqlType == Types.NVARCHAR ||
+				sqlType == Types.LONGVARCHAR || sqlType == Types.LONGNVARCHAR) {
 			ps.setString(paramIndex, inValue.toString());
+		}
+		else if ((sqlType == Types.CLOB || sqlType == Types.NCLOB) && isStringValue(inValue.getClass())) {
+			String strVal = inValue.toString();
+			if (strVal.length() > 4000) {
+				// Necessary for older Oracle drivers, in particular when running against an Oracle 10 database.
+				// Should also work fine against other drivers/databases since it uses standard JDBC 4.0 API.
+				try {
+					if (sqlType == Types.NCLOB) {
+						ps.setNClob(paramIndex, new StringReader(strVal), strVal.length());
+					}
+					else {
+						ps.setClob(paramIndex, new StringReader(strVal), strVal.length());
+					}
+					return;
+				}
+				catch (AbstractMethodError err) {
+					logger.debug("JDBC driver does not implement JDBC 4.0 'setClob(int, Reader, long)' method", err);
+				}
+				catch (SQLFeatureNotSupportedException ex) {
+					logger.debug("JDBC driver does not support JDBC 4.0 'setClob(int, Reader, long)' method", ex);
+				}
+			}
+			// Fallback: regular setString binding
+			ps.setString(paramIndex, strVal);
 		}
 		else if (sqlType == Types.DECIMAL || sqlType == Types.NUMERIC) {
 			if (inValue instanceof BigDecimal) {
@@ -333,6 +376,14 @@ public abstract class StatementCreatorUtils {
 			}
 			else {
 				ps.setObject(paramIndex, inValue, sqlType);
+			}
+		}
+		else if (sqlType == Types.BOOLEAN) {
+			if (inValue instanceof Boolean) {
+				ps.setBoolean(paramIndex, (Boolean) inValue);
+			}
+			else {
+				ps.setObject(paramIndex, inValue, Types.BOOLEAN);
 			}
 		}
 		else if (sqlType == Types.DATE) {
@@ -386,7 +437,8 @@ public abstract class StatementCreatorUtils {
 				ps.setObject(paramIndex, inValue, Types.TIMESTAMP);
 			}
 		}
-		else if (sqlType == SqlTypeValue.TYPE_UNKNOWN) {
+		else if (sqlType == SqlTypeValue.TYPE_UNKNOWN || (sqlType == Types.OTHER &&
+				"Oracle".equals(ps.getConnection().getMetaData().getDatabaseProductName()))) {
 			if (isStringValue(inValue.getClass())) {
 				ps.setString(paramIndex, inValue.toString());
 			}

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2002, 2017, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -60,15 +60,15 @@ public final class MysqlDefs {
 
     static final int CONNECT = 11;
 
-    static final int CREATE_DB = 5;
+    static final int CREATE_DB = 5; // Not used; deprecated?
 
     static final int DEBUG = 13;
 
     static final int DELAYED_INSERT = 16;
 
-    static final int DROP_DB = 6;
+    static final int DROP_DB = 6; // Not used; deprecated?
 
-    static final int FIELD_LIST = 4;
+    static final int FIELD_LIST = 4; // Not used; deprecated in MySQL 5.7.11 and MySQL 8.0.0.
 
     static final int FIELD_TYPE_BIT = 16;
 
@@ -151,17 +151,17 @@ public final class MysqlDefs {
 
     static final int PING = 14;
 
-    static final int PROCESS_INFO = 10;
+    static final int PROCESS_INFO = 10; // Not used; deprecated in MySQL 5.7.11 and MySQL 8.0.0.
 
-    static final int PROCESS_KILL = 12;
+    static final int PROCESS_KILL = 12; // Not used; deprecated in MySQL 5.7.11 and MySQL 8.0.0.
 
     static final int QUERY = 3;
 
     static final int QUIT = 1;
 
-    static final int RELOAD = 7;
+    static final int RELOAD = 7; // Not used; deprecated in MySQL 5.7.11 and MySQL 8.0.0.
 
-    static final int SHUTDOWN = 8;
+    static final int SHUTDOWN = 8; // Deprecated in MySQL 5.7.9 and MySQL 8.0.0.
 
     //
     // Constants defined from mysql
@@ -425,6 +425,9 @@ public final class MysqlDefs {
             case MysqlDefs.FIELD_TYPE_INT24:
                 return "FIELD_TYPE_INT24";
 
+            case MysqlDefs.FIELD_TYPE_BIT:
+                return "FIELD_TYPE_BIT";
+
             case MysqlDefs.FIELD_TYPE_DATE:
                 return "FIELD_TYPE_DATE";
 
@@ -528,9 +531,9 @@ public final class MysqlDefs {
 
         while (mysqlTypes.hasNext()) {
             String mysqlTypeName = mysqlTypes.next();
-            buf.append(" WHEN ");
+            buf.append(" WHEN UPPER(");
             buf.append(mysqlTypeColumnName);
-            buf.append("='");
+            buf.append(")='");
             buf.append(mysqlTypeName);
             buf.append("' THEN ");
             buf.append(typesMap.get(mysqlTypeName));
@@ -541,7 +544,7 @@ public final class MysqlDefs {
                 buf.append(mysqlTypeColumnName);
                 buf.append("='");
                 buf.append(mysqlTypeName);
-                buf.append(" unsigned' THEN ");
+                buf.append(" UNSIGNED' THEN ");
                 buf.append(typesMap.get(mysqlTypeName));
             }
         }

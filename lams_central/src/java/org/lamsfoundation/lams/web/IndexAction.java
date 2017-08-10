@@ -38,9 +38,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -56,6 +53,10 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -74,7 +75,7 @@ public class IndexAction extends LamsDispatchAction {
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	setHeaderLinks(request);
+	IndexAction.setHeaderLinks(request);
 	setAdminLinks(request);
 
 	// check if this is user's first login; some action (like displaying a dialog for disabling tutorials) can be
@@ -111,25 +112,26 @@ public class IndexAction extends LamsDispatchAction {
 	    return mapping.findForward("editprofile");
 	} else if (StringUtils.equals(method, "password")) {
 	    return mapping.findForward("password");
-	}  else if (StringUtils.equals(method, "portrait")) {
+	} else if (StringUtils.equals(method, "portrait")) {
 	    return mapping.findForward("portrait");
 	} else if (StringUtils.equals(method, "lessons")) {
 	    return mapping.findForward("lessons");
 	}
-	
+
 	// only show the growl warning the first time after a user has logged in & if turned on in configuration
 	Boolean tzWarning = Configuration.getAsBoolean(ConfigurationKeys.SHOW_TIMEZONE_WARNING);
 	request.setAttribute("showTimezoneWarning", tzWarning);
 	request.setAttribute("showTimezoneWarningPopup", false);
-	if ( tzWarning ) {
+	if (tzWarning) {
 	    Boolean ssWarningShown = (Boolean) ss.getAttribute("timezoneWarningShown");
-	    if ( ! Boolean.TRUE.equals(ssWarningShown) ) {
+	    if (!Boolean.TRUE.equals(ssWarningShown)) {
 		ss.setAttribute("timezoneWarningShown", Boolean.TRUE);
 		request.setAttribute("showTimezoneWarningPopup", true);
 	    }
 	}
-    	    
-	List<Organisation> favoriteOrganisations = userManagementService.getFavoriteOrganisationsByUser(userDTO.getUserID());
+
+	List<Organisation> favoriteOrganisations = userManagementService
+		.getFavoriteOrganisationsByUser(userDTO.getUserID());
 	request.setAttribute("favoriteOrganisations", favoriteOrganisations);
 	request.setAttribute("activeOrgId", user.getLastVisitedOrganisationId());
 
@@ -137,9 +139,9 @@ public class IndexAction extends LamsDispatchAction {
     }
 
     private static void setHeaderLinks(HttpServletRequest request) {
-	List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
+	List<IndexLinkBean> headerLinks = new ArrayList<>();
 	if (request.isUserInRole(Role.AUTHOR)) {
-	    if (isPedagogicalPlannerAvailable()) {
+	    if (IndexAction.isPedagogicalPlannerAvailable()) {
 		headerLinks.add(new IndexLinkBean("index.planner", "javascript:openPedagogicalPlanner()"));
 	    }
 	    headerLinks.add(new IndexLinkBean("index.author", "javascript:showAuthoringDialog()"));
@@ -155,7 +157,7 @@ public class IndexAction extends LamsDispatchAction {
     }
 
     private void setAdminLinks(HttpServletRequest request) {
-	List<IndexLinkBean> adminLinks = new ArrayList<IndexLinkBean>();
+	List<IndexLinkBean> adminLinks = new ArrayList<>();
 	if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.GROUP_ADMIN)
 		|| request.isUserInRole(Role.GROUP_MANAGER)) {
 	    adminLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement("
@@ -171,10 +173,10 @@ public class IndexAction extends LamsDispatchAction {
      * Returns list of organisations for user. Used by offcanvas tablesorter on main.jsp.
      */
     public ActionForward getOrgs(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 	getUserManagementService();
 	User loggedInUser = getUserManagementService().getUserByLogin(request.getRemoteUser());
-	
+
 	Integer userId = loggedInUser.getUserId();
 	boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
 	String searchString = WebUtil.readStrParam(request, "fcol[1]", true);
@@ -195,27 +197,28 @@ public class IndexAction extends LamsDispatchAction {
 //
 //	}
 
-	List<OrganisationDTO> orgDtos = userManagementService.getActiveCoursesByUser(userId, isSysadmin, page, size, searchString);
+	List<OrganisationDTO> orgDtos = userManagementService.getActiveCoursesByUser(userId, isSysadmin, page, size,
+		searchString);
 
-	JSONObject responcedata = new JSONObject();
-	responcedata.put("total_rows", userManagementService.getCountActiveCoursesByUser(userId, isSysadmin, searchString));
+	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
+	responcedata.put("total_rows",
+		userManagementService.getCountActiveCoursesByUser(userId, isSysadmin, searchString));
 
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	for (OrganisationDTO orgDto : orgDtos) {
-
-	    JSONObject responseRow = new JSONObject();
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 	    responseRow.put("id", orgDto.getOrganisationID());
 	    String orgName = orgDto.getName() == null ? "" : orgDto.getName();
 	    responseRow.put("name", StringEscapeUtils.escapeHtml(orgName));
 
-	    rows.put(responseRow);
+	    rows.add(responseRow);
 	}
-	responcedata.put("rows", rows);
+	responcedata.set("rows", rows);
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responcedata.toString()));
 	return null;
     }
-    
+
     /**
      * Toggles whether organisation is marked as favorite.
      */
@@ -231,18 +234,18 @@ public class IndexAction extends LamsDispatchAction {
 
 	List<Organisation> favoriteOrganisations = userManagementService.getFavoriteOrganisationsByUser(userId);
 	request.setAttribute("favoriteOrganisations", favoriteOrganisations);
-	
+
 	String activeOrgId = request.getParameter("activeOrgId");
 	request.setAttribute("activeOrgId", activeOrgId);
 
 	return mapping.findForward("favoriteOrganisations");
     }
-    
+
     /**
      * Saves to DB last visited organisation. It's required for displaying some org on main.jsp next time user logs in.
      */
-    public ActionForward storeLastVisitedOrganisation(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException {
+    public ActionForward storeLastVisitedOrganisation(ActionMapping mapping, ActionForm form,
+	    HttpServletRequest request, HttpServletResponse res) throws IOException, ServletException {
 	getUserManagementService();
 	Integer lastVisitedOrganisationId = WebUtil.readIntParam(request, "orgId", false);
 
@@ -255,7 +258,7 @@ public class IndexAction extends LamsDispatchAction {
 
 	return null;
     }
-    
+
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);

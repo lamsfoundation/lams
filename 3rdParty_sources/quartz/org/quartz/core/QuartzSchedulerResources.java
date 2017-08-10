@@ -89,7 +89,7 @@ public class QuartzSchedulerResources {
 
     private ThreadExecutor threadExecutor;
 
-    private boolean runUpdateCheck = true;
+    private boolean runUpdateCheck = false;
 
     private long batchTimeWindow = 0;
 

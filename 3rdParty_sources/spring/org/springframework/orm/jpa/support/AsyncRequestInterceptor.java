@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,9 +16,12 @@
 
 package org.springframework.orm.jpa.support;
 
+import java.util.concurrent.Callable;
+import javax.persistence.EntityManagerFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -26,9 +29,6 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.async.CallableProcessingInterceptorAdapter;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.context.request.async.DeferredResultProcessingInterceptor;
-
-import javax.persistence.EntityManagerFactory;
-import java.util.concurrent.Callable;
 
 /**
  * An interceptor with asynchronous web requests used in OpenSessionInViewFilter and
@@ -41,8 +41,7 @@ import java.util.concurrent.Callable;
  * @author Rossen Stoyanchev
  * @since 3.2.5
  */
-public class AsyncRequestInterceptor extends CallableProcessingInterceptorAdapter
-		implements DeferredResultProcessingInterceptor {
+class AsyncRequestInterceptor extends CallableProcessingInterceptorAdapter implements DeferredResultProcessingInterceptor {
 
 	private static final Log logger = LogFactory.getLog(AsyncRequestInterceptor.class);
 
@@ -77,7 +76,7 @@ public class AsyncRequestInterceptor extends CallableProcessingInterceptorAdapte
 	@Override
 	public <T> Object handleTimeout(NativeWebRequest request, Callable<T> task) {
 		this.timeoutInProgress = true;
-		return RESULT_NONE; // give other interceptors a chance to handle the timeout
+		return RESULT_NONE;  // give other interceptors a chance to handle the timeout
 	}
 
 	@Override
@@ -95,19 +94,22 @@ public class AsyncRequestInterceptor extends CallableProcessingInterceptorAdapte
 
 	// Implementation of DeferredResultProcessingInterceptor methods
 
+	@Override
 	public <T> void beforeConcurrentHandling(NativeWebRequest request, DeferredResult<T> deferredResult) {
 	}
 
+	@Override
 	public <T> void preProcess(NativeWebRequest request, DeferredResult<T> deferredResult) {
 	}
 
+	@Override
 	public <T> void postProcess(NativeWebRequest request, DeferredResult<T> deferredResult, Object result) {
 	}
 
 	@Override
 	public <T> boolean handleTimeout(NativeWebRequest request, DeferredResult<T> deferredResult) {
 		this.timeoutInProgress = true;
-		return true; // give other interceptors a chance to handle the timeout
+		return true;  // give other interceptors a chance to handle the timeout
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -31,16 +32,19 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Provider;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.TypeConverter;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanCurrentlyInCreationException;
@@ -48,20 +52,30 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
 import org.springframework.beans.factory.CannotLoadBeanClassException;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InjectionPoint;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.SmartFactoryBean;
+import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.DependencyDescriptor;
+import org.springframework.beans.factory.config.NamedBeanHolder;
+import org.springframework.core.OrderComparator;
+import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.lang.UsesJava8;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.CompositeIterator;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -93,6 +107,7 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * @author Chris Beams
  * @author Phillip Webb
+ * @author Stephane Nicoll
  * @since 16 April 2001
  * @see StaticListableBeanFactory
  * @see PropertiesBeanDefinitionReader
@@ -102,9 +117,18 @@ import org.springframework.util.StringUtils;
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory
 		implements ConfigurableListableBeanFactory, BeanDefinitionRegistry, Serializable {
 
+	private static Class<?> javaUtilOptionalClass = null;
+
 	private static Class<?> javaxInjectProviderClass = null;
 
 	static {
+		try {
+			javaUtilOptionalClass =
+					ClassUtils.forName("java.util.Optional", DefaultListableBeanFactory.class.getClassLoader());
+		}
+		catch (ClassNotFoundException ex) {
+			// Java 8 not available - Optional references simply not supported then.
+		}
 		try {
 			javaxInjectProviderClass =
 					ClassUtils.forName("javax.inject.Provider", DefaultListableBeanFactory.class.getClassLoader());
@@ -135,25 +159,28 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private AutowireCandidateResolver autowireCandidateResolver = new SimpleAutowireCandidateResolver();
 
 	/** Map from dependency type to corresponding autowired value */
-	private final Map<Class<?>, Object> resolvableDependencies = new HashMap<Class<?>, Object>(16);
+	private final Map<Class<?>, Object> resolvableDependencies = new ConcurrentHashMap<Class<?>, Object>(16);
 
 	/** Map of bean definition objects, keyed by bean name */
-	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>(64);
+	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>(256);
 
-	/** Map of singleton and non-singleton bean names keyed by dependency type */
+	/** Map of singleton and non-singleton bean names, keyed by dependency type */
 	private final Map<Class<?>, String[]> allBeanNamesByType = new ConcurrentHashMap<Class<?>, String[]>(64);
 
-	/** Map of singleton-only bean names keyed by dependency type */
+	/** Map of singleton-only bean names, keyed by dependency type */
 	private final Map<Class<?>, String[]> singletonBeanNamesByType = new ConcurrentHashMap<Class<?>, String[]>(64);
 
 	/** List of bean definition names, in registration order */
-	private final List<String> beanDefinitionNames = new ArrayList<String>();
+	private volatile List<String> beanDefinitionNames = new ArrayList<String>(256);
 
-	/** Whether bean definition metadata may be cached for all beans */
-	private boolean configurationFrozen = false;
+	/** List of names of manually registered singletons, in registration order */
+	private volatile Set<String> manualSingletonNames = new LinkedHashSet<String>(16);
 
 	/** Cached array of bean definition names in case of frozen configuration */
-	private String[] frozenBeanDefinitionNames;
+	private volatile String[] frozenBeanDefinitionNames;
+
+	/** Whether bean definition metadata may be cached for all beans */
+	private volatile boolean configurationFrozen = false;
 
 
 	/**
@@ -187,6 +214,15 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
+	 * Return an id for serialization purposes, if specified, allowing this BeanFactory
+	 * to be deserialized from this id back into the BeanFactory object, if needed.
+	 * @since 4.1.2
+	 */
+	public String getSerializationId() {
+		return this.serializationId;
+	}
+
+	/**
 	 * Set whether it should be allowed to override bean definitions by registering
 	 * a different definition with the same name, automatically replacing the former.
 	 * If not, an exception will be thrown. This also applies to overriding aliases.
@@ -195,6 +231,15 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 */
 	public void setAllowBeanDefinitionOverriding(boolean allowBeanDefinitionOverriding) {
 		this.allowBeanDefinitionOverriding = allowBeanDefinitionOverriding;
+	}
+
+	/**
+	 * Return whether it should be allowed to override bean definitions by registering
+	 * a different definition with the same name, automatically replacing the former.
+	 * @since 4.1.2
+	 */
+	public boolean isAllowBeanDefinitionOverriding() {
+		return this.allowBeanDefinitionOverriding;
 	}
 
 	/**
@@ -212,7 +257,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
+	 * Return whether the factory is allowed to eagerly load bean classes
+	 * even for bean definitions that are marked as "lazy-init".
+	 * @since 4.1.2
+	 */
+	public boolean isAllowEagerClassLoading() {
+		return this.allowEagerClassLoading;
+	}
+
+	/**
 	 * Set a {@link java.util.Comparator} for dependency Lists and arrays.
+	 * @since 4.0
 	 * @see org.springframework.core.OrderComparator
 	 * @see org.springframework.core.annotation.AnnotationAwareOrderComparator
 	 */
@@ -222,6 +277,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	/**
 	 * Return the dependency comparator for this BeanFactory (may be {@code null}.
+	 * @since 4.0
 	 */
 	public Comparator<Object> getDependencyComparator() {
 		return this.dependencyComparator;
@@ -236,11 +292,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		Assert.notNull(autowireCandidateResolver, "AutowireCandidateResolver must not be null");
 		if (autowireCandidateResolver instanceof BeanFactoryAware) {
 			if (System.getSecurityManager() != null) {
-				final BeanFactory target = this;
 				AccessController.doPrivileged(new PrivilegedAction<Object>() {
 					@Override
 					public Object run() {
-						((BeanFactoryAware) autowireCandidateResolver).setBeanFactory(target);
+						((BeanFactoryAware) autowireCandidateResolver).setBeanFactory(DefaultListableBeanFactory.this);
 						return null;
 					}
 				}, getAccessControlContext());
@@ -267,58 +322,41 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			DefaultListableBeanFactory otherListableFactory = (DefaultListableBeanFactory) otherFactory;
 			this.allowBeanDefinitionOverriding = otherListableFactory.allowBeanDefinitionOverriding;
 			this.allowEagerClassLoading = otherListableFactory.allowEagerClassLoading;
-			this.autowireCandidateResolver = otherListableFactory.autowireCandidateResolver;
+			this.dependencyComparator = otherListableFactory.dependencyComparator;
+			// A clone of the AutowireCandidateResolver since it is potentially BeanFactoryAware...
+			setAutowireCandidateResolver(BeanUtils.instantiateClass(getAutowireCandidateResolver().getClass()));
+			// Make resolvable dependencies (e.g. ResourceLoader) available here as well...
 			this.resolvableDependencies.putAll(otherListableFactory.resolvableDependencies);
 		}
 	}
 
 
 	//---------------------------------------------------------------------
-	// Implementation of ListableBeanFactory interface
+	// Implementation of remaining BeanFactory methods
 	//---------------------------------------------------------------------
 
 	@Override
 	public <T> T getBean(Class<T> requiredType) throws BeansException {
-		Assert.notNull(requiredType, "Required type must not be null");
-		String[] beanNames = getBeanNamesForType(requiredType);
-		if (beanNames.length > 1) {
-			ArrayList<String> autowireCandidates = new ArrayList<String>();
-			for (String beanName : beanNames) {
-				if (getBeanDefinition(beanName).isAutowireCandidate()) {
-					autowireCandidates.add(beanName);
-				}
-			}
-			if (autowireCandidates.size() > 0) {
-				beanNames = autowireCandidates.toArray(new String[autowireCandidates.size()]);
-			}
-		}
-		if (beanNames.length == 1) {
-			return getBean(beanNames[0], requiredType);
-		}
-		else if (beanNames.length > 1) {
-			T primaryBean = null;
-			for (String beanName : beanNames) {
-				T beanInstance = getBean(beanName, requiredType);
-				if (isPrimary(beanName, beanInstance)) {
-					if (primaryBean != null) {
-						throw new NoUniqueBeanDefinitionException(requiredType, beanNames.length,
-								"more than one 'primary' bean found of required type: " + Arrays.asList(beanNames));
-					}
-					primaryBean = beanInstance;
-				}
-			}
-			if (primaryBean != null) {
-				return primaryBean;
-			}
-			throw new NoUniqueBeanDefinitionException(requiredType, beanNames);
-		}
-		else if (getParentBeanFactory() != null) {
-			return getParentBeanFactory().getBean(requiredType);
-		}
-		else {
-			throw new NoSuchBeanDefinitionException(requiredType);
-		}
+		return getBean(requiredType, (Object[]) null);
 	}
+
+	@Override
+	public <T> T getBean(Class<T> requiredType, Object... args) throws BeansException {
+		NamedBeanHolder<T> namedBean = resolveNamedBean(requiredType, args);
+		if (namedBean != null) {
+			return namedBean.getBeanInstance();
+		}
+		BeanFactory parent = getParentBeanFactory();
+		if (parent != null) {
+			return parent.getBean(requiredType, args);
+		}
+		throw new NoSuchBeanDefinitionException(requiredType);
+	}
+
+
+	//---------------------------------------------------------------------
+	// Implementation of ListableBeanFactory interface
+	//---------------------------------------------------------------------
 
 	@Override
 	public boolean containsBeanDefinition(String beanName) {
@@ -333,14 +371,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public String[] getBeanDefinitionNames() {
-		synchronized (this.beanDefinitionMap) {
-			if (this.frozenBeanDefinitionNames != null) {
-				return this.frozenBeanDefinitionNames;
-			}
-			else {
-				return StringUtils.toStringArray(this.beanDefinitionNames);
-			}
+		if (this.frozenBeanDefinitionNames != null) {
+			return this.frozenBeanDefinitionNames.clone();
 		}
+		else {
+			return StringUtils.toStringArray(this.beanDefinitionNames);
+		}
+	}
+
+	@Override
+	public String[] getBeanNamesForType(ResolvableType type) {
+		return doGetBeanNamesForType(type, true, true);
 	}
 
 	@Override
@@ -351,7 +392,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@Override
 	public String[] getBeanNamesForType(Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
 		if (!isConfigurationFrozen() || type == null || !allowEagerInit) {
-			return doGetBeanNamesForType(type, includeNonSingletons, allowEagerInit);
+			return doGetBeanNamesForType(ResolvableType.forRawClass(type), includeNonSingletons, allowEagerInit);
 		}
 		Map<Class<?>, String[]> cache =
 				(includeNonSingletons ? this.allBeanNamesByType : this.singletonBeanNamesByType);
@@ -359,19 +400,18 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		if (resolvedBeanNames != null) {
 			return resolvedBeanNames;
 		}
-		resolvedBeanNames = doGetBeanNamesForType(type, includeNonSingletons, allowEagerInit);
+		resolvedBeanNames = doGetBeanNamesForType(ResolvableType.forRawClass(type), includeNonSingletons, true);
 		if (ClassUtils.isCacheSafe(type, getBeanClassLoader())) {
 			cache.put(type, resolvedBeanNames);
 		}
 		return resolvedBeanNames;
 	}
 
-	private String[] doGetBeanNamesForType(Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
+	private String[] doGetBeanNamesForType(ResolvableType type, boolean includeNonSingletons, boolean allowEagerInit) {
 		List<String> result = new ArrayList<String>();
 
 		// Check all bean definitions.
-		String[] beanDefinitionNames = getBeanDefinitionNames();
-		for (String beanName : beanDefinitionNames) {
+		for (String beanName : this.beanDefinitionNames) {
 			// Only consider bean as eligible if the bean name
 			// is not defined as alias for some other bean.
 			if (!isAlias(beanName)) {
@@ -379,12 +419,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
 					// Only check bean definition if it is complete.
 					if (!mbd.isAbstract() && (allowEagerInit ||
-							((mbd.hasBeanClass() || !mbd.isLazyInit() || this.allowEagerClassLoading)) &&
+							((mbd.hasBeanClass() || !mbd.isLazyInit() || isAllowEagerClassLoading())) &&
 									!requiresEagerInitForType(mbd.getFactoryBeanName()))) {
 						// In case of FactoryBean, match object created by FactoryBean.
 						boolean isFactoryBean = isFactoryBean(beanName, mbd);
-						boolean matchFound = (allowEagerInit || !isFactoryBean || containsSingleton(beanName)) &&
-								(includeNonSingletons || isSingleton(beanName)) && isTypeMatch(beanName, type);
+						BeanDefinitionHolder dbd = mbd.getDecoratedDefinition();
+						boolean matchFound =
+								(allowEagerInit || !isFactoryBean ||
+										(dbd != null && !mbd.isLazyInit()) || containsSingleton(beanName)) &&
+								(includeNonSingletons ||
+										(dbd != null ? mbd.isSingleton() : isSingleton(beanName))) &&
+								isTypeMatch(beanName, type);
 						if (!matchFound && isFactoryBean) {
 							// In case of FactoryBean, try to match FactoryBean instance itself next.
 							beanName = FACTORY_BEAN_PREFIX + beanName;
@@ -418,11 +463,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
-		// Check singletons too, to catch manually registered singletons.
-		String[] singletonNames = getSingletonNames();
-		for (String beanName : singletonNames) {
-			// Only check if manually registered.
-			if (!containsBeanDefinition(beanName)) {
+		// Check manually registered singletons too.
+		for (String beanName : this.manualSingletonNames) {
+			try {
 				// In case of FactoryBean, match object created by FactoryBean.
 				if (isFactoryBean(beanName)) {
 					if ((includeNonSingletons || isSingleton(beanName)) && isTypeMatch(beanName, type)) {
@@ -436,6 +479,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				// Match raw bean instance (might be raw FactoryBean).
 				if (isTypeMatch(beanName, type)) {
 					result.add(beanName);
+				}
+			}
+			catch (NoSuchBeanDefinitionException ex) {
+				// Shouldn't happen - probably a result of circular reference resolution...
+				if (logger.isDebugEnabled()) {
+					logger.debug("Failed to check manually registered singleton with name '" + beanName + "'", ex);
 				}
 			}
 		}
@@ -493,13 +542,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@Override
 	public String[] getBeanNamesForAnnotation(Class<? extends Annotation> annotationType) {
 		List<String> results = new ArrayList<String>();
-		for (String beanName : getBeanDefinitionNames()) {
+		for (String beanName : this.beanDefinitionNames) {
 			BeanDefinition beanDefinition = getBeanDefinition(beanName);
 			if (!beanDefinition.isAbstract() && findAnnotationOnBean(beanName, annotationType) != null) {
 				results.add(beanName);
 			}
 		}
-		for (String beanName : getSingletonNames()) {
+		for (String beanName : this.manualSingletonNames) {
 			if (!results.contains(beanName) && findAnnotationOnBean(beanName, annotationType) != null) {
 				results.add(beanName);
 			}
@@ -509,17 +558,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType) {
-		Map<String, Object> results = new LinkedHashMap<String, Object>();
-		for (String beanName : getBeanDefinitionNames()) {
-			BeanDefinition beanDefinition = getBeanDefinition(beanName);
-			if (!beanDefinition.isAbstract() && findAnnotationOnBean(beanName, annotationType) != null) {
-				results.put(beanName, getBean(beanName));
-			}
-		}
-		for (String beanName : getSingletonNames()) {
-			if (!results.containsKey(beanName) && findAnnotationOnBean(beanName, annotationType) != null) {
-				results.put(beanName, getBean(beanName));
-			}
+		String[] beanNames = getBeanNamesForAnnotation(annotationType);
+		Map<String, Object> results = new LinkedHashMap<String, Object>(beanNames.length);
+		for (String beanName : beanNames) {
+			results.put(beanName, getBean(beanName));
 		}
 		return results;
 	}
@@ -558,10 +600,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public void registerResolvableDependency(Class<?> dependencyType, Object autowiredValue) {
-		Assert.notNull(dependencyType, "Type must not be null");
+		Assert.notNull(dependencyType, "Dependency type must not be null");
 		if (autowiredValue != null) {
-			Assert.isTrue((autowiredValue instanceof ObjectFactory || dependencyType.isInstance(autowiredValue)),
-					"Value [" + autowiredValue + "] does not implement specified type [" + dependencyType.getName() + "]");
+			if (!(autowiredValue instanceof ObjectFactory || dependencyType.isInstance(autowiredValue))) {
+				throw new IllegalArgumentException("Value [" + autowiredValue +
+						"] does not implement specified dependency type [" + dependencyType.getName() + "]");
+			}
 			this.resolvableDependencies.put(dependencyType, autowiredValue);
 		}
 	}
@@ -591,13 +635,15 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		else if (containsSingleton(beanName)) {
 			return isAutowireCandidate(beanName, new RootBeanDefinition(getType(beanName)), descriptor, resolver);
 		}
-		else if (getParentBeanFactory() instanceof DefaultListableBeanFactory) {
+
+		BeanFactory parent = getParentBeanFactory();
+		if (parent instanceof DefaultListableBeanFactory) {
 			// No bean definition found in this factory -> delegate to parent.
-			return ((DefaultListableBeanFactory) getParentBeanFactory()).isAutowireCandidate(beanName, descriptor, resolver);
+			return ((DefaultListableBeanFactory) parent).isAutowireCandidate(beanName, descriptor, resolver);
 		}
-		else if (getParentBeanFactory() instanceof ConfigurableListableBeanFactory) {
+		else if (parent instanceof ConfigurableListableBeanFactory) {
 			// If no DefaultListableBeanFactory, can't pass the resolver along.
-			return ((ConfigurableListableBeanFactory) getParentBeanFactory()).isAutowireCandidate(beanName, descriptor);
+			return ((ConfigurableListableBeanFactory) parent).isAutowireCandidate(beanName, descriptor);
 		}
 		else {
 			return true;
@@ -644,11 +690,23 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	@Override
+	public Iterator<String> getBeanNamesIterator() {
+		CompositeIterator<String> iterator = new CompositeIterator<String>();
+		iterator.add(this.beanDefinitionNames.iterator());
+		iterator.add(this.manualSingletonNames.iterator());
+		return iterator;
+	}
+
+	@Override
+	public void clearMetadataCache() {
+		super.clearMetadataCache();
+		clearByTypeCache();
+	}
+
+	@Override
 	public void freezeConfiguration() {
 		this.configurationFrozen = true;
-		synchronized (this.beanDefinitionMap) {
-			this.frozenBeanDefinitionNames = StringUtils.toStringArray(this.beanDefinitionNames);
-		}
+		this.frozenBeanDefinitionNames = StringUtils.toStringArray(this.beanDefinitionNames);
 	}
 
 	@Override
@@ -671,12 +729,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		if (this.logger.isDebugEnabled()) {
 			this.logger.debug("Pre-instantiating singletons in " + this);
 		}
-		List<String> beanNames;
-		synchronized (this.beanDefinitionMap) {
-			// Iterate over a copy to allow for init methods which in turn register new bean definitions.
-			// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
-			beanNames = new ArrayList<String>(this.beanDefinitionNames);
-		}
+
+		// Iterate over a copy to allow for init methods which in turn register new bean definitions.
+		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
+		List<String> beanNames = new ArrayList<String>(this.beanDefinitionNames);
+
+		// Trigger initialization of all non-lazy singleton beans...
 		for (String beanName : beanNames) {
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
@@ -704,6 +762,26 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 			}
 		}
+
+		// Trigger post-initialization callback for all applicable beans...
+		for (String beanName : beanNames) {
+			Object singletonInstance = getSingleton(beanName);
+			if (singletonInstance instanceof SmartInitializingSingleton) {
+				final SmartInitializingSingleton smartSingleton = (SmartInitializingSingleton) singletonInstance;
+				if (System.getSecurityManager() != null) {
+					AccessController.doPrivileged(new PrivilegedAction<Object>() {
+						@Override
+						public Object run() {
+							smartSingleton.afterSingletonsInstantiated();
+							return null;
+						}
+					}, getAccessControlContext());
+				}
+				else {
+					smartSingleton.afterSingletonsInstantiated();
+				}
+			}
+		}
 	}
 
 
@@ -728,54 +806,94 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
-		synchronized (this.beanDefinitionMap) {
-			BeanDefinition oldBeanDefinition = this.beanDefinitionMap.get(beanName);
-			if (oldBeanDefinition != null) {
-				if (!this.allowBeanDefinitionOverriding) {
-					throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
-							"Cannot register bean definition [" + beanDefinition + "] for bean '" + beanName +
-							"': There is already [" + oldBeanDefinition + "] bound.");
+		BeanDefinition oldBeanDefinition;
+
+		oldBeanDefinition = this.beanDefinitionMap.get(beanName);
+		if (oldBeanDefinition != null) {
+			if (!isAllowBeanDefinitionOverriding()) {
+				throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
+						"Cannot register bean definition [" + beanDefinition + "] for bean '" + beanName +
+						"': There is already [" + oldBeanDefinition + "] bound.");
+			}
+			else if (oldBeanDefinition.getRole() < beanDefinition.getRole()) {
+				// e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE
+				if (this.logger.isWarnEnabled()) {
+					this.logger.warn("Overriding user-defined bean definition for bean '" + beanName +
+							"' with a framework-generated bean definition: replacing [" +
+							oldBeanDefinition + "] with [" + beanDefinition + "]");
 				}
-				else if (oldBeanDefinition.getRole() < beanDefinition.getRole()) {
-					// e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE
-					if (this.logger.isWarnEnabled()) {
-						this.logger.warn("Overriding user-defined bean definition for bean '" + beanName +
-								" with a framework-generated bean definition ': replacing [" +
-								oldBeanDefinition + "] with [" + beanDefinition + "]");
-					}
+			}
+			else if (!beanDefinition.equals(oldBeanDefinition)) {
+				if (this.logger.isInfoEnabled()) {
+					this.logger.info("Overriding bean definition for bean '" + beanName +
+							"' with a different definition: replacing [" + oldBeanDefinition +
+							"] with [" + beanDefinition + "]");
 				}
-				else {
-					if (this.logger.isInfoEnabled()) {
-						this.logger.info("Overriding bean definition for bean '" + beanName +
-								"': replacing [" + oldBeanDefinition + "] with [" + beanDefinition + "]");
+			}
+			else {
+				if (this.logger.isDebugEnabled()) {
+					this.logger.debug("Overriding bean definition for bean '" + beanName +
+							"' with an equivalent definition: replacing [" + oldBeanDefinition +
+							"] with [" + beanDefinition + "]");
+				}
+			}
+			this.beanDefinitionMap.put(beanName, beanDefinition);
+		}
+		else {
+			if (hasBeanCreationStarted()) {
+				// Cannot modify startup-time collection elements anymore (for stable iteration)
+				synchronized (this.beanDefinitionMap) {
+					this.beanDefinitionMap.put(beanName, beanDefinition);
+					List<String> updatedDefinitions = new ArrayList<String>(this.beanDefinitionNames.size() + 1);
+					updatedDefinitions.addAll(this.beanDefinitionNames);
+					updatedDefinitions.add(beanName);
+					this.beanDefinitionNames = updatedDefinitions;
+					if (this.manualSingletonNames.contains(beanName)) {
+						Set<String> updatedSingletons = new LinkedHashSet<String>(this.manualSingletonNames);
+						updatedSingletons.remove(beanName);
+						this.manualSingletonNames = updatedSingletons;
 					}
 				}
 			}
 			else {
+				// Still in startup registration phase
+				this.beanDefinitionMap.put(beanName, beanDefinition);
 				this.beanDefinitionNames.add(beanName);
-				this.frozenBeanDefinitionNames = null;
+				this.manualSingletonNames.remove(beanName);
 			}
-			this.beanDefinitionMap.put(beanName, beanDefinition);
+			this.frozenBeanDefinitionNames = null;
 		}
 
-		resetBeanDefinition(beanName);
+		if (oldBeanDefinition != null || containsSingleton(beanName)) {
+			resetBeanDefinition(beanName);
+		}
 	}
 
 	@Override
 	public void removeBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
 		Assert.hasText(beanName, "'beanName' must not be empty");
 
-		synchronized (this.beanDefinitionMap) {
-			BeanDefinition bd = this.beanDefinitionMap.remove(beanName);
-			if (bd == null) {
-				if (this.logger.isTraceEnabled()) {
-					this.logger.trace("No bean named '" + beanName + "' found in " + this);
-				}
-				throw new NoSuchBeanDefinitionException(beanName);
+		BeanDefinition bd = this.beanDefinitionMap.remove(beanName);
+		if (bd == null) {
+			if (this.logger.isTraceEnabled()) {
+				this.logger.trace("No bean named '" + beanName + "' found in " + this);
 			}
-			this.beanDefinitionNames.remove(beanName);
-			this.frozenBeanDefinitionNames = null;
+			throw new NoSuchBeanDefinitionException(beanName);
 		}
+
+		if (hasBeanCreationStarted()) {
+			// Cannot modify startup-time collection elements anymore (for stable iteration)
+			synchronized (this.beanDefinitionMap) {
+				List<String> updatedDefinitions = new ArrayList<String>(this.beanDefinitionNames);
+				updatedDefinitions.remove(beanName);
+				this.beanDefinitionNames = updatedDefinitions;
+			}
+		}
+		else {
+			// Still in startup registration phase
+			this.beanDefinitionNames.remove(beanName);
+		}
+		this.frozenBeanDefinitionNames = null;
 
 		resetBeanDefinition(beanName);
 	}
@@ -794,9 +912,6 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// (e.g. the default StaticMessageSource in a StaticApplicationContext).
 		destroySingleton(beanName);
 
-		// Remove any assumptions about by-type mappings.
-		clearByTypeCache();
-
 		// Reset all bean definitions that have the given bean as parent (recursively).
 		for (String bdName : this.beanDefinitionNames) {
 			if (!beanName.equals(bdName)) {
@@ -813,18 +928,45 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 */
 	@Override
 	protected boolean allowAliasOverriding() {
-		return this.allowBeanDefinitionOverriding;
+		return isAllowBeanDefinitionOverriding();
 	}
 
 	@Override
 	public void registerSingleton(String beanName, Object singletonObject) throws IllegalStateException {
 		super.registerSingleton(beanName, singletonObject);
+
+		if (hasBeanCreationStarted()) {
+			// Cannot modify startup-time collection elements anymore (for stable iteration)
+			synchronized (this.beanDefinitionMap) {
+				if (!this.beanDefinitionMap.containsKey(beanName)) {
+					Set<String> updatedSingletons = new LinkedHashSet<String>(this.manualSingletonNames.size() + 1);
+					updatedSingletons.addAll(this.manualSingletonNames);
+					updatedSingletons.add(beanName);
+					this.manualSingletonNames = updatedSingletons;
+				}
+			}
+		}
+		else {
+			// Still in startup registration phase
+			if (!this.beanDefinitionMap.containsKey(beanName)) {
+				this.manualSingletonNames.add(beanName);
+			}
+		}
+
 		clearByTypeCache();
 	}
 
 	@Override
 	public void destroySingleton(String beanName) {
 		super.destroySingleton(beanName);
+		this.manualSingletonNames.remove(beanName);
+		clearByTypeCache();
+	}
+
+	@Override
+	public void destroySingletons() {
+		super.destroySingletons();
+		this.manualSingletonNames.clear();
 		clearByTypeCache();
 	}
 
@@ -842,20 +984,86 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	//---------------------------------------------------------------------
 
 	@Override
-	public Object resolveDependency(DependencyDescriptor descriptor, String beanName,
+	public <T> NamedBeanHolder<T> resolveNamedBean(Class<T> requiredType) throws BeansException {
+		NamedBeanHolder<T> namedBean = resolveNamedBean(requiredType, (Object[]) null);
+		if (namedBean != null) {
+			return namedBean;
+		}
+		BeanFactory parent = getParentBeanFactory();
+		if (parent instanceof AutowireCapableBeanFactory) {
+			return ((AutowireCapableBeanFactory) parent).resolveNamedBean(requiredType);
+		}
+		throw new NoSuchBeanDefinitionException(requiredType);
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> NamedBeanHolder<T> resolveNamedBean(Class<T> requiredType, Object... args) throws BeansException {
+		Assert.notNull(requiredType, "Required type must not be null");
+		String[] candidateNames = getBeanNamesForType(requiredType);
+
+		if (candidateNames.length > 1) {
+			List<String> autowireCandidates = new ArrayList<String>(candidateNames.length);
+			for (String beanName : candidateNames) {
+				if (!containsBeanDefinition(beanName) || getBeanDefinition(beanName).isAutowireCandidate()) {
+					autowireCandidates.add(beanName);
+				}
+			}
+			if (!autowireCandidates.isEmpty()) {
+				candidateNames = autowireCandidates.toArray(new String[autowireCandidates.size()]);
+			}
+		}
+
+		if (candidateNames.length == 1) {
+			String beanName = candidateNames[0];
+			return new NamedBeanHolder<T>(beanName, getBean(beanName, requiredType, args));
+		}
+		else if (candidateNames.length > 1) {
+			Map<String, Object> candidates = new LinkedHashMap<String, Object>(candidateNames.length);
+			for (String beanName : candidateNames) {
+				if (containsSingleton(beanName)) {
+					candidates.put(beanName, getBean(beanName, requiredType, args));
+				}
+				else {
+					candidates.put(beanName, getType(beanName));
+				}
+			}
+			String candidateName = determinePrimaryCandidate(candidates, requiredType);
+			if (candidateName == null) {
+				candidateName = determineHighestPriorityCandidate(candidates, requiredType);
+			}
+			if (candidateName != null) {
+				Object beanInstance = candidates.get(candidateName);
+				if (beanInstance instanceof Class) {
+					beanInstance = getBean(candidateName, requiredType, args);
+				}
+				return new NamedBeanHolder<T>(candidateName, (T) beanInstance);
+			}
+			throw new NoUniqueBeanDefinitionException(requiredType, candidates.keySet());
+		}
+
+		return null;
+	}
+
+	@Override
+	public Object resolveDependency(DependencyDescriptor descriptor, String requestingBeanName,
 			Set<String> autowiredBeanNames, TypeConverter typeConverter) throws BeansException {
 
 		descriptor.initParameterNameDiscovery(getParameterNameDiscoverer());
-		if (descriptor.getDependencyType().equals(ObjectFactory.class)) {
-			return new DependencyObjectFactory(descriptor, beanName);
+		if (javaUtilOptionalClass == descriptor.getDependencyType()) {
+			return new OptionalDependencyFactory().createOptionalDependency(descriptor, requestingBeanName);
 		}
-		else if (descriptor.getDependencyType().equals(javaxInjectProviderClass)) {
-			return new DependencyProviderFactory().createDependencyProvider(descriptor, beanName);
+		else if (ObjectFactory.class == descriptor.getDependencyType() ||
+				ObjectProvider.class == descriptor.getDependencyType()) {
+			return new DependencyObjectProvider(descriptor, requestingBeanName);
+		}
+		else if (javaxInjectProviderClass == descriptor.getDependencyType()) {
+			return new Jsr330ProviderFactory().createDependencyProvider(descriptor, requestingBeanName);
 		}
 		else {
-			Object result = getAutowireCandidateResolver().getLazyResolutionProxyIfNecessary(descriptor, beanName);
+			Object result = getAutowireCandidateResolver().getLazyResolutionProxyIfNecessary(
+					descriptor, requestingBeanName);
 			if (result == null) {
-				result = doResolveDependency(descriptor, beanName, autowiredBeanNames, typeConverter);
+				result = doResolveDependency(descriptor, requestingBeanName, autowiredBeanNames, typeConverter);
 			}
 			return result;
 		}
@@ -864,29 +1072,94 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	public Object doResolveDependency(DependencyDescriptor descriptor, String beanName,
 			Set<String> autowiredBeanNames, TypeConverter typeConverter) throws BeansException {
 
-		Class<?> type = descriptor.getDependencyType();
-		Object value = getAutowireCandidateResolver().getSuggestedValue(descriptor);
-		if (value != null) {
-			if (value instanceof String) {
-				String strVal = resolveEmbeddedValue((String) value);
-				BeanDefinition bd = (beanName != null && containsBean(beanName) ? getMergedBeanDefinition(beanName) : null);
-				value = evaluateBeanDefinitionString(strVal, bd);
+		InjectionPoint previousInjectionPoint = ConstructorResolver.setCurrentInjectionPoint(descriptor);
+		try {
+			Object shortcut = descriptor.resolveShortcut(this);
+			if (shortcut != null) {
+				return shortcut;
 			}
-			TypeConverter converter = (typeConverter != null ? typeConverter : getTypeConverter());
-			return (descriptor.getField() != null ?
-					converter.convertIfNecessary(value, type, descriptor.getField()) :
-					converter.convertIfNecessary(value, type, descriptor.getMethodParameter()));
-		}
 
+			Class<?> type = descriptor.getDependencyType();
+			Object value = getAutowireCandidateResolver().getSuggestedValue(descriptor);
+			if (value != null) {
+				if (value instanceof String) {
+					String strVal = resolveEmbeddedValue((String) value);
+					BeanDefinition bd = (beanName != null && containsBean(beanName) ? getMergedBeanDefinition(beanName) : null);
+					value = evaluateBeanDefinitionString(strVal, bd);
+				}
+				TypeConverter converter = (typeConverter != null ? typeConverter : getTypeConverter());
+				return (descriptor.getField() != null ?
+						converter.convertIfNecessary(value, type, descriptor.getField()) :
+						converter.convertIfNecessary(value, type, descriptor.getMethodParameter()));
+			}
+
+			Object multipleBeans = resolveMultipleBeans(descriptor, beanName, autowiredBeanNames, typeConverter);
+			if (multipleBeans != null) {
+				return multipleBeans;
+			}
+
+			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, type, descriptor);
+			if (matchingBeans.isEmpty()) {
+				if (isRequired(descriptor)) {
+					raiseNoMatchingBeanFound(type, descriptor.getResolvableType(), descriptor);
+				}
+				return null;
+			}
+
+			String autowiredBeanName;
+			Object instanceCandidate;
+
+			if (matchingBeans.size() > 1) {
+				autowiredBeanName = determineAutowireCandidate(matchingBeans, descriptor);
+				if (autowiredBeanName == null) {
+					if (isRequired(descriptor) || !indicatesMultipleBeans(type)) {
+						return descriptor.resolveNotUnique(type, matchingBeans);
+					}
+					else {
+						// In case of an optional Collection/Map, silently ignore a non-unique case:
+						// possibly it was meant to be an empty collection of multiple regular beans
+						// (before 4.3 in particular when we didn't even look for collection beans).
+						return null;
+					}
+				}
+				instanceCandidate = matchingBeans.get(autowiredBeanName);
+			}
+			else {
+				// We have exactly one match.
+				Map.Entry<String, Object> entry = matchingBeans.entrySet().iterator().next();
+				autowiredBeanName = entry.getKey();
+				instanceCandidate = entry.getValue();
+			}
+
+			if (autowiredBeanNames != null) {
+				autowiredBeanNames.add(autowiredBeanName);
+			}
+			return (instanceCandidate instanceof Class ?
+					descriptor.resolveCandidate(autowiredBeanName, type, this) : instanceCandidate);
+		}
+		finally {
+			ConstructorResolver.setCurrentInjectionPoint(previousInjectionPoint);
+		}
+	}
+
+	private Object resolveMultipleBeans(DependencyDescriptor descriptor, String beanName,
+			Set<String> autowiredBeanNames, TypeConverter typeConverter) {
+
+		Class<?> type = descriptor.getDependencyType();
 		if (type.isArray()) {
 			Class<?> componentType = type.getComponentType();
-			DependencyDescriptor targetDesc = new DependencyDescriptor(descriptor);
-			targetDesc.increaseNestingLevel();
-			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, componentType, targetDesc);
+			ResolvableType resolvableType = descriptor.getResolvableType();
+			Class<?> resolvedArrayType = resolvableType.resolve();
+			if (resolvedArrayType != null && resolvedArrayType != type) {
+				type = resolvedArrayType;
+				componentType = resolvableType.getComponentType().resolve();
+			}
+			if (componentType == null) {
+				return null;
+			}
+			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, componentType,
+					new MultiElementDescriptor(descriptor));
 			if (matchingBeans.isEmpty()) {
-				if (descriptor.isRequired()) {
-					raiseNoSuchBeanDefinitionException(componentType, "array of " + componentType.getName(), descriptor);
-				}
 				return null;
 			}
 			if (autowiredBeanNames != null) {
@@ -894,26 +1167,19 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 			TypeConverter converter = (typeConverter != null ? typeConverter : getTypeConverter());
 			Object result = converter.convertIfNecessary(matchingBeans.values(), type);
-			if (this.dependencyComparator != null && result instanceof Object[]) {
-				Arrays.sort((Object[]) result, this.dependencyComparator);
+			if (getDependencyComparator() != null && result instanceof Object[]) {
+				Arrays.sort((Object[]) result, adaptDependencyComparator(matchingBeans));
 			}
 			return result;
 		}
 		else if (Collection.class.isAssignableFrom(type) && type.isInterface()) {
-			Class<?> elementType = descriptor.getCollectionType();
+			Class<?> elementType = descriptor.getResolvableType().asCollection().resolveGeneric();
 			if (elementType == null) {
-				if (descriptor.isRequired()) {
-					throw new FatalBeanException("No element type declared for collection [" + type.getName() + "]");
-				}
 				return null;
 			}
-			DependencyDescriptor targetDesc = new DependencyDescriptor(descriptor);
-			targetDesc.increaseNestingLevel();
-			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, elementType, targetDesc);
+			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, elementType,
+					new MultiElementDescriptor(descriptor));
 			if (matchingBeans.isEmpty()) {
-				if (descriptor.isRequired()) {
-					raiseNoSuchBeanDefinitionException(elementType, "collection of " + elementType.getName(), descriptor);
-				}
 				return null;
 			}
 			if (autowiredBeanNames != null) {
@@ -921,34 +1187,24 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 			TypeConverter converter = (typeConverter != null ? typeConverter : getTypeConverter());
 			Object result = converter.convertIfNecessary(matchingBeans.values(), type);
-			if (this.dependencyComparator != null && result instanceof List) {
-				Collections.sort((List<?>) result, this.dependencyComparator);
+			if (getDependencyComparator() != null && result instanceof List) {
+				Collections.sort((List<?>) result, adaptDependencyComparator(matchingBeans));
 			}
 			return result;
 		}
-		else if (Map.class.isAssignableFrom(type) && type.isInterface()) {
-			Class<?> keyType = descriptor.getMapKeyType();
-			if (keyType == null || !String.class.isAssignableFrom(keyType)) {
-				if (descriptor.isRequired()) {
-					throw new FatalBeanException("Key type [" + keyType + "] of map [" + type.getName() +
-							"] must be assignable to [java.lang.String]");
-				}
+		else if (Map.class == type) {
+			ResolvableType mapType = descriptor.getResolvableType().asMap();
+			Class<?> keyType = mapType.resolveGeneric(0);
+			if (String.class != keyType) {
 				return null;
 			}
-			Class<?> valueType = descriptor.getMapValueType();
+			Class<?> valueType = mapType.resolveGeneric(1);
 			if (valueType == null) {
-				if (descriptor.isRequired()) {
-					throw new FatalBeanException("No value type declared for map [" + type.getName() + "]");
-				}
 				return null;
 			}
-			DependencyDescriptor targetDesc = new DependencyDescriptor(descriptor);
-			targetDesc.increaseNestingLevel();
-			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, valueType, targetDesc);
+			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, valueType,
+					new MultiElementDescriptor(descriptor));
 			if (matchingBeans.isEmpty()) {
-				if (descriptor.isRequired()) {
-					raiseNoSuchBeanDefinitionException(valueType, "map with value type " + valueType.getName(), descriptor);
-				}
 				return null;
 			}
 			if (autowiredBeanNames != null) {
@@ -957,30 +1213,39 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			return matchingBeans;
 		}
 		else {
-			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, type, descriptor);
-			if (matchingBeans.isEmpty()) {
-				if (descriptor.isRequired()) {
-					raiseNoSuchBeanDefinitionException(type, "", descriptor);
-				}
-				return null;
-			}
-			if (matchingBeans.size() > 1) {
-				String primaryBeanName = determinePrimaryCandidate(matchingBeans, descriptor);
-				if (primaryBeanName == null) {
-					throw new NoUniqueBeanDefinitionException(type, matchingBeans.keySet());
-				}
-				if (autowiredBeanNames != null) {
-					autowiredBeanNames.add(primaryBeanName);
-				}
-				return matchingBeans.get(primaryBeanName);
-			}
-			// We have exactly one match.
-			Map.Entry<String, Object> entry = matchingBeans.entrySet().iterator().next();
-			if (autowiredBeanNames != null) {
-				autowiredBeanNames.add(entry.getKey());
-			}
-			return entry.getValue();
+			return null;
 		}
+	}
+
+	private boolean isRequired(DependencyDescriptor descriptor) {
+		AutowireCandidateResolver resolver = getAutowireCandidateResolver();
+		return (resolver instanceof SimpleAutowireCandidateResolver ?
+				((SimpleAutowireCandidateResolver) resolver).isRequired(descriptor) :
+				descriptor.isRequired());
+	}
+
+	private boolean indicatesMultipleBeans(Class<?> type) {
+		return (type.isArray() || (type.isInterface() &&
+				(Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type))));
+	}
+
+	private Comparator<Object> adaptDependencyComparator(Map<String, Object> matchingBeans) {
+		Comparator<Object> comparator = getDependencyComparator();
+		if (comparator instanceof OrderComparator) {
+			return ((OrderComparator) comparator).withSourceProvider(
+					createFactoryAwareOrderSourceProvider(matchingBeans));
+		}
+		else {
+			return comparator;
+		}
+	}
+
+	private FactoryAwareOrderSourceProvider createFactoryAwareOrderSourceProvider(Map<String, Object> beans) {
+		IdentityHashMap<Object, String> instancesToBeanNames = new IdentityHashMap<Object, String>();
+		for (Map.Entry<String, Object> entry : beans.entrySet()) {
+			instancesToBeanNames.put(entry.getValue(), entry.getKey());
+		}
+		return new FactoryAwareOrderSourceProvider(instancesToBeanNames);
 	}
 
 	/**
@@ -1012,16 +1277,28 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 			}
 		}
-		for (String candidateName : candidateNames) {
-			if (!candidateName.equals(beanName) && isAutowireCandidate(candidateName, descriptor)) {
-				result.put(candidateName, getBean(candidateName));
+		for (String candidate : candidateNames) {
+			if (!isSelfReference(beanName, candidate) && isAutowireCandidate(candidate, descriptor)) {
+				addCandidateEntry(result, candidate, descriptor, requiredType);
 			}
 		}
-		if (result.isEmpty()) {
+		if (result.isEmpty() && !indicatesMultipleBeans(requiredType)) {
+			// Consider fallback matches if the first pass failed to find anything...
 			DependencyDescriptor fallbackDescriptor = descriptor.forFallbackMatch();
-			for (String candidateName : candidateNames) {
-				if (!candidateName.equals(beanName) && isAutowireCandidate(candidateName, fallbackDescriptor)) {
-					result.put(candidateName, getBean(candidateName));
+			for (String candidate : candidateNames) {
+				if (!isSelfReference(beanName, candidate) && isAutowireCandidate(candidate, fallbackDescriptor)) {
+					addCandidateEntry(result, candidate, descriptor, requiredType);
+				}
+			}
+			if (result.isEmpty()) {
+				// Consider self references as a final pass...
+				// but in the case of a dependency collection, not the very same bean itself.
+				for (String candidate : candidateNames) {
+					if (isSelfReference(beanName, candidate) &&
+							(!(descriptor instanceof MultiElementDescriptor) || !beanName.equals(candidate)) &&
+							isAutowireCandidate(candidate, fallbackDescriptor)) {
+						addCandidateEntry(result, candidate, descriptor, requiredType);
+					}
 				}
 			}
 		}
@@ -1029,27 +1306,72 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Determine the primary autowire candidate in the given set of beans.
-	 * @param candidateBeans a Map of candidate names and candidate instances
+	 * Add an entry to the candidate map: a bean instance if available or just the resolved
+	 * type, preventing early bean initialization ahead of primary candidate selection.
+	 */
+	private void addCandidateEntry(Map<String, Object> candidates, String candidateName,
+			DependencyDescriptor descriptor, Class<?> requiredType) {
+
+		if (descriptor instanceof MultiElementDescriptor || containsSingleton(candidateName)) {
+			candidates.put(candidateName, descriptor.resolveCandidate(candidateName, requiredType, this));
+		}
+		else {
+			candidates.put(candidateName, getType(candidateName));
+		}
+	}
+
+	/**
+	 * Determine the autowire candidate in the given set of beans.
+	 * <p>Looks for {@code @Primary} and {@code @Priority} (in that order).
+	 * @param candidates a Map of candidate names and candidate instances
 	 * that match the required type, as returned by {@link #findAutowireCandidates}
 	 * @param descriptor the target dependency to match against
-	 * @return the name of the primary candidate, or {@code null} if none found
+	 * @return the name of the autowire candidate, or {@code null} if none found
 	 */
-	protected String determinePrimaryCandidate(Map<String, Object> candidateBeans, DependencyDescriptor descriptor) {
+	protected String determineAutowireCandidate(Map<String, Object> candidates, DependencyDescriptor descriptor) {
+		Class<?> requiredType = descriptor.getDependencyType();
+		String primaryCandidate = determinePrimaryCandidate(candidates, requiredType);
+		if (primaryCandidate != null) {
+			return primaryCandidate;
+		}
+		String priorityCandidate = determineHighestPriorityCandidate(candidates, requiredType);
+		if (priorityCandidate != null) {
+			return priorityCandidate;
+		}
+		// Fallback
+		for (Map.Entry<String, Object> entry : candidates.entrySet()) {
+			String candidateName = entry.getKey();
+			Object beanInstance = entry.getValue();
+			if ((beanInstance != null && this.resolvableDependencies.containsValue(beanInstance)) ||
+					matchesBeanName(candidateName, descriptor.getDependencyName())) {
+				return candidateName;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Determine the primary candidate in the given set of beans.
+	 * @param candidates a Map of candidate names and candidate instances
+	 * (or candidate classes if not created yet) that match the required type
+	 * @param requiredType the target dependency type to match against
+	 * @return the name of the primary candidate, or {@code null} if none found
+	 * @see #isPrimary(String, Object)
+	 */
+	protected String determinePrimaryCandidate(Map<String, Object> candidates, Class<?> requiredType) {
 		String primaryBeanName = null;
-		String fallbackBeanName = null;
-		for (Map.Entry<String, Object> entry : candidateBeans.entrySet()) {
+		for (Map.Entry<String, Object> entry : candidates.entrySet()) {
 			String candidateBeanName = entry.getKey();
 			Object beanInstance = entry.getValue();
 			if (isPrimary(candidateBeanName, beanInstance)) {
 				if (primaryBeanName != null) {
 					boolean candidateLocal = containsBeanDefinition(candidateBeanName);
 					boolean primaryLocal = containsBeanDefinition(primaryBeanName);
-					if (candidateLocal == primaryLocal) {
-						throw new NoUniqueBeanDefinitionException(descriptor.getDependencyType(), candidateBeans.size(),
-								"more than one 'primary' bean found among candidates: " + candidateBeans.keySet());
+					if (candidateLocal && primaryLocal) {
+						throw new NoUniqueBeanDefinitionException(requiredType, candidates.size(),
+								"more than one 'primary' bean found among candidates: " + candidates.keySet());
 					}
-					else if (candidateLocal && !primaryLocal) {
+					else if (candidateLocal) {
 						primaryBeanName = candidateBeanName;
 					}
 				}
@@ -1057,29 +1379,84 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					primaryBeanName = candidateBeanName;
 				}
 			}
-			if (primaryBeanName == null &&
-					(this.resolvableDependencies.values().contains(beanInstance) ||
-							matchesBeanName(candidateBeanName, descriptor.getDependencyName()))) {
-				fallbackBeanName = candidateBeanName;
+		}
+		return primaryBeanName;
+	}
+
+	/**
+	 * Determine the candidate with the highest priority in the given set of beans.
+	 * <p>Based on {@code @javax.annotation.Priority}. As defined by the related
+	 * {@link org.springframework.core.Ordered} interface, the lowest value has
+	 * the highest priority.
+	 * @param candidates a Map of candidate names and candidate instances
+	 * (or candidate classes if not created yet) that match the required type
+	 * @param requiredType the target dependency type to match against
+	 * @return the name of the candidate with the highest priority,
+	 * or {@code null} if none found
+	 * @see #getPriority(Object)
+	 */
+	protected String determineHighestPriorityCandidate(Map<String, Object> candidates, Class<?> requiredType) {
+		String highestPriorityBeanName = null;
+		Integer highestPriority = null;
+		for (Map.Entry<String, Object> entry : candidates.entrySet()) {
+			String candidateBeanName = entry.getKey();
+			Object beanInstance = entry.getValue();
+			Integer candidatePriority = getPriority(beanInstance);
+			if (candidatePriority != null) {
+				if (highestPriorityBeanName != null) {
+					if (candidatePriority.equals(highestPriority)) {
+						throw new NoUniqueBeanDefinitionException(requiredType, candidates.size(),
+								"Multiple beans found with the same priority ('" + highestPriority +
+								"') among candidates: " + candidates.keySet());
+					}
+					else if (candidatePriority < highestPriority) {
+						highestPriorityBeanName = candidateBeanName;
+						highestPriority = candidatePriority;
+					}
+				}
+				else {
+					highestPriorityBeanName = candidateBeanName;
+					highestPriority = candidatePriority;
+				}
 			}
 		}
-		return (primaryBeanName != null ? primaryBeanName : fallbackBeanName);
+		return highestPriorityBeanName;
 	}
 
 	/**
 	 * Return whether the bean definition for the given bean name has been
 	 * marked as a primary bean.
 	 * @param beanName the name of the bean
-	 * @param beanInstance the corresponding bean instance
+	 * @param beanInstance the corresponding bean instance (can be null)
 	 * @return whether the given bean qualifies as primary
 	 */
 	protected boolean isPrimary(String beanName, Object beanInstance) {
 		if (containsBeanDefinition(beanName)) {
 			return getMergedLocalBeanDefinition(beanName).isPrimary();
 		}
-		BeanFactory parentFactory = getParentBeanFactory();
-		return (parentFactory instanceof DefaultListableBeanFactory &&
-				((DefaultListableBeanFactory) parentFactory).isPrimary(beanName, beanInstance));
+		BeanFactory parent = getParentBeanFactory();
+		return (parent instanceof DefaultListableBeanFactory &&
+				((DefaultListableBeanFactory) parent).isPrimary(beanName, beanInstance));
+	}
+
+	/**
+	 * Return the priority assigned for the given bean instance by
+	 * the {@code javax.annotation.Priority} annotation.
+	 * <p>The default implementation delegates to the specified
+	 * {@link #setDependencyComparator dependency comparator}, checking its
+	 * {@link OrderComparator#getPriority method} if it is an extension of
+	 * Spring's common {@link OrderComparator} - typically, an
+	 * {@link org.springframework.core.annotation.AnnotationAwareOrderComparator}.
+	 * If no such comparator is present, this implementation returns {@code null}.
+	 * @param beanInstance the bean instance to check (can be {@code null})
+	 * @return the priority assigned to that bean or {@code null} if none is set
+	 */
+	protected Integer getPriority(Object beanInstance) {
+		Comparator<Object> comparator = getDependencyComparator();
+		if (comparator instanceof OrderComparator) {
+			return ((OrderComparator) comparator).getPriority(beanInstance);
+		}
+		return null;
 	}
 
 	/**
@@ -1092,15 +1469,53 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Raise a NoSuchBeanDefinitionException for an unresolvable dependency.
+	 * Determine whether the given beanName/candidateName pair indicates a self reference,
+	 * i.e. whether the candidate points back to the original bean or to a factory method
+	 * on the original bean.
 	 */
-	private void raiseNoSuchBeanDefinitionException(
-			Class<?> type, String dependencyDescription, DependencyDescriptor descriptor)
-			throws NoSuchBeanDefinitionException {
+	private boolean isSelfReference(String beanName, String candidateName) {
+		return (beanName != null && candidateName != null &&
+				(beanName.equals(candidateName) || (containsBeanDefinition(candidateName) &&
+						beanName.equals(getMergedLocalBeanDefinition(candidateName).getFactoryBeanName()))));
+	}
 
-		throw new NoSuchBeanDefinitionException(type, dependencyDescription,
-				"expected at least 1 bean which qualifies as autowire candidate for this dependency. " +
+	/**
+	 * Raise a NoSuchBeanDefinitionException or BeanNotOfRequiredTypeException
+	 * for an unresolvable dependency.
+	 */
+	private void raiseNoMatchingBeanFound(
+			Class<?> type, ResolvableType resolvableType, DependencyDescriptor descriptor) throws BeansException {
+
+		checkBeanNotOfRequiredType(type, descriptor);
+
+		throw new NoSuchBeanDefinitionException(resolvableType,
+				"expected at least 1 bean which qualifies as autowire candidate. " +
 				"Dependency annotations: " + ObjectUtils.nullSafeToString(descriptor.getAnnotations()));
+	}
+
+	/**
+	 * Raise a BeanNotOfRequiredTypeException for an unresolvable dependency, if applicable,
+	 * i.e. if the target type of the bean would match but an exposed proxy doesn't.
+	 */
+	private void checkBeanNotOfRequiredType(Class<?> type, DependencyDescriptor descriptor) {
+		for (String beanName : this.beanDefinitionNames) {
+			RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
+			Class<?> targetType = mbd.getTargetType();
+			if (targetType != null && type.isAssignableFrom(targetType) &&
+					isAutowireCandidate(beanName, mbd, descriptor, getAutowireCandidateResolver())) {
+				// Probably a proxy interfering with target type match -> throw meaningful exception.
+				Object beanInstance = getSingleton(beanName, false);
+				Class<?> beanType = (beanInstance != null ? beanInstance.getClass() : predictBeanType(beanName, mbd));
+				if (!type.isAssignableFrom((beanType))) {
+					throw new BeanNotOfRequiredTypeException(beanName, type, beanType);
+				}
+			}
+		}
+
+		BeanFactory parent = getParentBeanFactory();
+		if (parent instanceof DefaultListableBeanFactory) {
+			((DefaultListableBeanFactory) parent).checkBeanNotOfRequiredType(type, descriptor);
+		}
 	}
 
 
@@ -1108,7 +1523,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	public String toString() {
 		StringBuilder sb = new StringBuilder(ObjectUtils.identityToString(this));
 		sb.append(": defining beans [");
-		sb.append(StringUtils.arrayToCommaDelimitedString(getBeanDefinitionNames()));
+		sb.append(StringUtils.collectionToCommaDelimitedString(this.beanDefinitionNames));
 		sb.append("]; ");
 		BeanFactory parent = getParentBeanFactory();
 		if (parent == null) {
@@ -1154,38 +1569,118 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		private Object readResolve() {
 			Reference<?> ref = serializableFactories.get(this.id);
-			if (ref == null) {
-				throw new IllegalStateException(
-						"Cannot deserialize BeanFactory with id " + this.id + ": no factory registered for this id");
+			if (ref != null) {
+				Object result = ref.get();
+				if (result != null) {
+					return result;
+				}
 			}
-			Object result = ref.get();
-			if (result == null) {
-				throw new IllegalStateException(
-						"Cannot deserialize BeanFactory with id " + this.id + ": factory has been garbage-collected");
-			}
-			return result;
+			// Lenient fallback: dummy factory in case of original factory not found...
+			return new DefaultListableBeanFactory();
 		}
 	}
 
 
 	/**
-	 * Serializable ObjectFactory for lazy resolution of a dependency.
+	 * Separate inner class for avoiding a hard dependency on the {@code javax.inject} API.
 	 */
-	private class DependencyObjectFactory implements ObjectFactory<Object>, Serializable {
+	@UsesJava8
+	private class OptionalDependencyFactory {
+
+		public Object createOptionalDependency(DependencyDescriptor descriptor, String beanName, final Object... args) {
+			DependencyDescriptor descriptorToUse = new NestedDependencyDescriptor(descriptor) {
+				@Override
+				public boolean isRequired() {
+					return false;
+				}
+				@Override
+				public Object resolveCandidate(String beanName, Class<?> requiredType, BeanFactory beanFactory) {
+					return (!ObjectUtils.isEmpty(args) ? beanFactory.getBean(beanName, requiredType, args) :
+							super.resolveCandidate(beanName, requiredType, beanFactory));
+				}
+			};
+			return Optional.ofNullable(doResolveDependency(descriptorToUse, beanName, null, null));
+		}
+	}
+
+
+	/**
+	 * Serializable ObjectFactory/ObjectProvider for lazy resolution of a dependency.
+	 */
+	private class DependencyObjectProvider implements ObjectProvider<Object>, Serializable {
 
 		private final DependencyDescriptor descriptor;
 
+		private final boolean optional;
+
 		private final String beanName;
 
-		public DependencyObjectFactory(DependencyDescriptor descriptor, String beanName) {
-			this.descriptor = new DependencyDescriptor(descriptor);
-			this.descriptor.increaseNestingLevel();
+		public DependencyObjectProvider(DependencyDescriptor descriptor, String beanName) {
+			this.descriptor = new NestedDependencyDescriptor(descriptor);
+			this.optional = (this.descriptor.getDependencyType() == javaUtilOptionalClass);
 			this.beanName = beanName;
 		}
 
 		@Override
 		public Object getObject() throws BeansException {
-			return doResolveDependency(this.descriptor, this.beanName, null, null);
+			if (this.optional) {
+				return new OptionalDependencyFactory().createOptionalDependency(this.descriptor, this.beanName);
+			}
+			else {
+				return doResolveDependency(this.descriptor, this.beanName, null, null);
+			}
+		}
+
+		@Override
+		public Object getObject(final Object... args) throws BeansException {
+			if (this.optional) {
+				return new OptionalDependencyFactory().createOptionalDependency(this.descriptor, this.beanName, args);
+			}
+			else {
+				DependencyDescriptor descriptorToUse = new DependencyDescriptor(descriptor) {
+					@Override
+					public Object resolveCandidate(String beanName, Class<?> requiredType, BeanFactory beanFactory) {
+						return ((AbstractBeanFactory) beanFactory).getBean(beanName, requiredType, args);
+					}
+				};
+				return doResolveDependency(descriptorToUse, this.beanName, null, null);
+			}
+		}
+
+		@Override
+		public Object getIfAvailable() throws BeansException {
+			if (this.optional) {
+				return new OptionalDependencyFactory().createOptionalDependency(this.descriptor, this.beanName);
+			}
+			else {
+				DependencyDescriptor descriptorToUse = new DependencyDescriptor(descriptor) {
+					@Override
+					public boolean isRequired() {
+						return false;
+					}
+				};
+				return doResolveDependency(descriptorToUse, this.beanName, null, null);
+			}
+		}
+
+		@Override
+		public Object getIfUnique() throws BeansException {
+			DependencyDescriptor descriptorToUse = new DependencyDescriptor(descriptor) {
+				@Override
+				public boolean isRequired() {
+					return false;
+				}
+				@Override
+				public Object resolveNotUnique(Class<?> type, Map<String, Object> matchingBeans) {
+					return null;
+				}
+			};
+			if (this.optional) {
+				return new OptionalDependencyFactory().createOptionalDependency(descriptorToUse, this.beanName);
+			}
+			else {
+				return doResolveDependency(descriptorToUse, this.beanName, null, null);
+			}
 		}
 	}
 
@@ -1193,9 +1688,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	/**
 	 * Serializable ObjectFactory for lazy resolution of a dependency.
 	 */
-	private class DependencyProvider extends DependencyObjectFactory implements Provider<Object> {
+	private class Jsr330DependencyProvider extends DependencyObjectProvider implements Provider<Object> {
 
-		public DependencyProvider(DependencyDescriptor descriptor, String beanName) {
+		public Jsr330DependencyProvider(DependencyDescriptor descriptor, String beanName) {
 			super(descriptor, beanName);
 		}
 
@@ -1209,10 +1704,72 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	/**
 	 * Separate inner class for avoiding a hard dependency on the {@code javax.inject} API.
 	 */
-	private class DependencyProviderFactory {
+	private class Jsr330ProviderFactory {
 
 		public Object createDependencyProvider(DependencyDescriptor descriptor, String beanName) {
-			return new DependencyProvider(descriptor, beanName);
+			return new Jsr330DependencyProvider(descriptor, beanName);
+		}
+	}
+
+
+	/**
+	 * An {@link org.springframework.core.OrderComparator.OrderSourceProvider} implementation
+	 * that is aware of the bean metadata of the instances to sort.
+	 * <p>Lookup for the method factory of an instance to sort, if any, and let the
+	 * comparator retrieve the {@link org.springframework.core.annotation.Order}
+	 * value defined on it. This essentially allows for the following construct:
+	 */
+	private class FactoryAwareOrderSourceProvider implements OrderComparator.OrderSourceProvider {
+
+		private final Map<Object, String> instancesToBeanNames;
+
+		public FactoryAwareOrderSourceProvider(Map<Object, String> instancesToBeanNames) {
+			this.instancesToBeanNames = instancesToBeanNames;
+		}
+
+		@Override
+		public Object getOrderSource(Object obj) {
+			RootBeanDefinition beanDefinition = getRootBeanDefinition(this.instancesToBeanNames.get(obj));
+			if (beanDefinition == null) {
+				return null;
+			}
+			List<Object> sources = new ArrayList<Object>(2);
+			Method factoryMethod = beanDefinition.getResolvedFactoryMethod();
+			if (factoryMethod != null) {
+				sources.add(factoryMethod);
+			}
+			Class<?> targetType = beanDefinition.getTargetType();
+			if (targetType != null && targetType != obj.getClass()) {
+				sources.add(targetType);
+			}
+			return sources.toArray(new Object[sources.size()]);
+		}
+
+		private RootBeanDefinition getRootBeanDefinition(String beanName) {
+			if (beanName != null && containsBeanDefinition(beanName)) {
+				BeanDefinition bd = getMergedBeanDefinition(beanName);
+				if (bd instanceof RootBeanDefinition) {
+					return (RootBeanDefinition) bd;
+				}
+			}
+			return null;
+		}
+	}
+
+
+	private static class NestedDependencyDescriptor extends DependencyDescriptor {
+
+		public NestedDependencyDescriptor(DependencyDescriptor original) {
+			super(original);
+			increaseNestingLevel();
+		}
+	}
+
+
+	private static class MultiElementDescriptor extends NestedDependencyDescriptor {
+
+		public MultiElementDescriptor(DependencyDescriptor original) {
+			super(original);
 		}
 	}
 

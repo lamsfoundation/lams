@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,11 +30,12 @@ import org.springframework.util.StringUtils;
  * @see SimpleKeyGenerator
  */
 @SuppressWarnings("serial")
-public final class SimpleKey implements Serializable {
+public class SimpleKey implements Serializable {
 
 	public static final SimpleKey EMPTY = new SimpleKey();
 
 	private final Object[] params;
+	private final int hashCode;
 
 
 	/**
@@ -45,8 +46,8 @@ public final class SimpleKey implements Serializable {
 		Assert.notNull(elements, "Elements must not be null");
 		this.params = new Object[elements.length];
 		System.arraycopy(elements, 0, this.params, 0, elements.length);
+		this.hashCode = Arrays.deepHashCode(this.params);
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -55,13 +56,13 @@ public final class SimpleKey implements Serializable {
 	}
 
 	@Override
-	public int hashCode() {
-		return Arrays.deepHashCode(this.params);
+	public final int hashCode() {
+		return this.hashCode;
 	}
 
 	@Override
 	public String toString() {
-		return "SimpleKey [" + StringUtils.arrayToCommaDelimitedString(this.params) + "]";
+		return getClass().getSimpleName() + " [" + StringUtils.arrayToCommaDelimitedString(this.params) + "]";
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2002, 2015, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2002, 2017, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -417,9 +417,10 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
         void setValue(int intValue, String valueAsString, ExceptionInterceptor exceptionInterceptor) throws SQLException {
             if (isRangeBased()) {
                 if ((intValue < getLowerBound()) || (intValue > getUpperBound())) {
-                    throw SQLError.createSQLException("The connection property '" + getPropertyName() + "' only accepts integer values in the range of "
-                            + getLowerBound() + " - " + getUpperBound() + ", the value '" + (valueAsString == null ? intValue : valueAsString)
-                            + "' exceeds this range.", SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+                    throw SQLError.createSQLException(
+                            "The connection property '" + getPropertyName() + "' only accepts integer values in the range of " + getLowerBound() + " - "
+                                    + getUpperBound() + ", the value '" + (valueAsString == null ? intValue : valueAsString) + "' exceeds this range.",
+                            SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
                 }
             }
 
@@ -451,9 +452,10 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
         void setValue(long longValue, String valueAsString, ExceptionInterceptor exceptionInterceptor) throws SQLException {
             if (isRangeBased()) {
                 if ((longValue < getLowerBound()) || (longValue > getUpperBound())) {
-                    throw SQLError.createSQLException("The connection property '" + getPropertyName() + "' only accepts long integer values in the range of "
-                            + getLowerBound() + " - " + getUpperBound() + ", the value '" + (valueAsString == null ? longValue : valueAsString)
-                            + "' exceeds this range.", SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+                    throw SQLError.createSQLException(
+                            "The connection property '" + getPropertyName() + "' only accepts long integer values in the range of " + getLowerBound() + " - "
+                                    + getUpperBound() + ", the value '" + (valueAsString == null ? longValue : valueAsString) + "' exceeds this range.",
+                            SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
                 }
             }
             this.valueAsObject = Long.valueOf(longValue);
@@ -684,6 +686,9 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
     private BooleanConnectionProperty autoClosePStmtStreams = new BooleanConnectionProperty("autoClosePStmtStreams", false,
             Messages.getString("ConnectionProperties.autoClosePstmtStreams"), "3.1.12", MISC_CATEGORY, Integer.MIN_VALUE);
 
+    private StringConnectionProperty replicationConnectionGroup = new StringConnectionProperty("replicationConnectionGroup", null,
+            Messages.getString("ConnectionProperties.replicationConnectionGroup"), "5.1.27", HA_CATEGORY, Integer.MIN_VALUE);
+
     private BooleanConnectionProperty allowMasterDownConnections = new BooleanConnectionProperty("allowMasterDownConnections", false,
             Messages.getString("ConnectionProperties.allowMasterDownConnections"), "5.1.27", HA_CATEGORY, Integer.MAX_VALUE);
 
@@ -721,7 +726,8 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
 
     private BooleanConnectionProperty functionsNeverReturnBlobs = new BooleanConnectionProperty("functionsNeverReturnBlobs", false,
             "Should the driver always treat data from functions returning BLOBs as Strings - specifically to work around dubious metadata "
-                    + "returned by the server for GROUP BY clauses?", "5.0.8", MISC_CATEGORY, Integer.MIN_VALUE);
+                    + "returned by the server for GROUP BY clauses?",
+            "5.0.8", MISC_CATEGORY, Integer.MIN_VALUE);
 
     private BooleanConnectionProperty cacheCallableStatements = new BooleanConnectionProperty("cacheCallableStmts", false,
             Messages.getString("ConnectionProperties.cacheCallableStatements"), "3.1.2", PERFORMANCE_CATEGORY, Integer.MIN_VALUE);
@@ -871,6 +877,9 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
     private StringConnectionProperty loadBalanceStrategy = new StringConnectionProperty("loadBalanceStrategy", "random", null,
             Messages.getString("ConnectionProperties.loadBalanceStrategy"), "5.0.6", PERFORMANCE_CATEGORY, Integer.MIN_VALUE);
 
+    private StringConnectionProperty serverAffinityOrder = new StringConnectionProperty("serverAffinityOrder", "", null,
+            Messages.getString("ConnectionProperties.serverAffinityOrder"), "5.1.4.", PERFORMANCE_CATEGORY, Integer.MIN_VALUE);
+
     private IntegerConnectionProperty loadBalanceBlacklistTimeout = new IntegerConnectionProperty("loadBalanceBlacklistTimeout", 0, 0, Integer.MAX_VALUE,
             Messages.getString("ConnectionProperties.loadBalanceBlacklistTimeout"), "5.1.0", MISC_CATEGORY, Integer.MIN_VALUE);
 
@@ -896,6 +905,9 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
     private BooleanConnectionProperty loadBalanceEnableJMX = new BooleanConnectionProperty("loadBalanceEnableJMX", false,
             Messages.getString("ConnectionProperties.loadBalanceEnableJMX"), "5.1.13", MISC_CATEGORY, Integer.MAX_VALUE);
 
+    private IntegerConnectionProperty loadBalanceHostRemovalGracePeriod = new IntegerConnectionProperty("loadBalanceHostRemovalGracePeriod", 15000, 0,
+            Integer.MAX_VALUE, Messages.getString("ConnectionProperties.loadBalanceHostRemovalGracePeriod"), "5.1.39", MISC_CATEGORY, Integer.MAX_VALUE);
+
     private StringConnectionProperty loadBalanceAutoCommitStatementRegex = new StringConnectionProperty("loadBalanceAutoCommitStatementRegex", null,
             Messages.getString("ConnectionProperties.loadBalanceAutoCommitStatementRegex"), "5.1.15", MISC_CATEGORY, Integer.MIN_VALUE);
 
@@ -908,8 +920,9 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
     private MemorySizeConnectionProperty locatorFetchBufferSize = new MemorySizeConnectionProperty("locatorFetchBufferSize", 1024 * 1024, 0, Integer.MAX_VALUE,
             Messages.getString("ConnectionProperties.locatorFetchBufferSize"), "3.2.1", PERFORMANCE_CATEGORY, Integer.MIN_VALUE);
 
-    private StringConnectionProperty loggerClassName = new StringConnectionProperty("logger", STANDARD_LOGGER_NAME, Messages.getString(
-            "ConnectionProperties.logger", new Object[] { Log.class.getName(), STANDARD_LOGGER_NAME }), "3.1.1", DEBUGING_PROFILING_CATEGORY, 0);
+    private StringConnectionProperty loggerClassName = new StringConnectionProperty("logger", STANDARD_LOGGER_NAME,
+            Messages.getString("ConnectionProperties.logger", new Object[] { Log.class.getName(), STANDARD_LOGGER_NAME }), "3.1.1", DEBUGING_PROFILING_CATEGORY,
+            0);
 
     private BooleanConnectionProperty logSlowQueries = new BooleanConnectionProperty("logSlowQueries", false,
             Messages.getString("ConnectionProperties.logSlowQueries"), "3.1.2", DEBUGING_PROFILING_CATEGORY, Integer.MIN_VALUE);
@@ -946,8 +959,8 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
             "When determining procedure parameter types for CallableStatements, and the connected user "
                     + " can't access procedure bodies through \"SHOW CREATE PROCEDURE\" or select on mysql.proc "
                     + " should the driver instead create basic metadata (all parameters reported as IN VARCHARs,"
-                    + " but allowing registerOutParameter() to be called on them anyway) instead of throwing an exception?", "5.0.3", MISC_CATEGORY,
-            Integer.MIN_VALUE);
+                    + " but allowing registerOutParameter() to be called on them anyway) instead of throwing an exception?",
+            "5.0.3", MISC_CATEGORY, Integer.MIN_VALUE);
 
     private BooleanConnectionProperty noDatetimeStringSync = new BooleanConnectionProperty("noDatetimeStringSync", false,
             Messages.getString("ConnectionProperties.noDatetimeStringSync"), "3.1.7", MISC_CATEGORY, Integer.MIN_VALUE);
@@ -1102,13 +1115,13 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
             "overrideSupportsIntegrityEnhancementFacility", false, Messages.getString("ConnectionProperties.overrideSupportsIEF"), "3.1.12", MISC_CATEGORY,
             Integer.MIN_VALUE);
 
-    private BooleanConnectionProperty tcpNoDelay = new BooleanConnectionProperty(StandardSocketFactory.TCP_NO_DELAY_PROPERTY_NAME, Boolean.valueOf(
-            StandardSocketFactory.TCP_NO_DELAY_DEFAULT_VALUE).booleanValue(), Messages.getString("ConnectionProperties.tcpNoDelay"), "5.0.7", NETWORK_CATEGORY,
-            Integer.MIN_VALUE);
-
-    private BooleanConnectionProperty tcpKeepAlive = new BooleanConnectionProperty(StandardSocketFactory.TCP_KEEP_ALIVE_PROPERTY_NAME, Boolean.valueOf(
-            StandardSocketFactory.TCP_KEEP_ALIVE_DEFAULT_VALUE).booleanValue(), Messages.getString("ConnectionProperties.tcpKeepAlive"), "5.0.7",
+    private BooleanConnectionProperty tcpNoDelay = new BooleanConnectionProperty(StandardSocketFactory.TCP_NO_DELAY_PROPERTY_NAME,
+            Boolean.valueOf(StandardSocketFactory.TCP_NO_DELAY_DEFAULT_VALUE).booleanValue(), Messages.getString("ConnectionProperties.tcpNoDelay"), "5.0.7",
             NETWORK_CATEGORY, Integer.MIN_VALUE);
+
+    private BooleanConnectionProperty tcpKeepAlive = new BooleanConnectionProperty(StandardSocketFactory.TCP_KEEP_ALIVE_PROPERTY_NAME,
+            Boolean.valueOf(StandardSocketFactory.TCP_KEEP_ALIVE_DEFAULT_VALUE).booleanValue(), Messages.getString("ConnectionProperties.tcpKeepAlive"),
+            "5.0.7", NETWORK_CATEGORY, Integer.MIN_VALUE);
 
     private IntegerConnectionProperty tcpRcvBuf = new IntegerConnectionProperty(StandardSocketFactory.TCP_RCV_BUF_PROPERTY_NAME,
             Integer.parseInt(StandardSocketFactory.TCP_RCV_BUF_DEFAULT_VALUE), 0, Integer.MAX_VALUE, Messages.getString("ConnectionProperties.tcpSoRcvBuf"),
@@ -1160,8 +1173,8 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
 
     private BooleanConnectionProperty useDirectRowUnpack = new BooleanConnectionProperty("useDirectRowUnpack", true,
             "Use newer result set row unpacking code that skips a copy from network buffers "
-                    + " to a MySQL packet instance and instead reads directly into the result set row data buffers.", "5.1.1", PERFORMANCE_CATEGORY,
-            Integer.MIN_VALUE);
+                    + " to a MySQL packet instance and instead reads directly into the result set row data buffers.",
+            "5.1.1", PERFORMANCE_CATEGORY, Integer.MIN_VALUE);
 
     private BooleanConnectionProperty useFastIntParsing = new BooleanConnectionProperty("useFastIntParsing", true,
             Messages.getString("ConnectionProperties.useFastIntParsing"), "3.1.4", PERFORMANCE_CATEGORY, Integer.MIN_VALUE);
@@ -1241,9 +1254,10 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
             Messages.getString("ConnectionProperties.yearIsDateType"), "3.1.9", MISC_CATEGORY, Integer.MIN_VALUE);
 
     private StringConnectionProperty zeroDateTimeBehavior = new StringConnectionProperty("zeroDateTimeBehavior", ZERO_DATETIME_BEHAVIOR_EXCEPTION,
-            new String[] { ZERO_DATETIME_BEHAVIOR_EXCEPTION, ZERO_DATETIME_BEHAVIOR_ROUND, ZERO_DATETIME_BEHAVIOR_CONVERT_TO_NULL }, Messages.getString(
-                    "ConnectionProperties.zeroDateTimeBehavior", new Object[] { ZERO_DATETIME_BEHAVIOR_EXCEPTION, ZERO_DATETIME_BEHAVIOR_ROUND,
-                            ZERO_DATETIME_BEHAVIOR_CONVERT_TO_NULL }), "3.1.4", MISC_CATEGORY, Integer.MIN_VALUE);
+            new String[] { ZERO_DATETIME_BEHAVIOR_EXCEPTION, ZERO_DATETIME_BEHAVIOR_ROUND, ZERO_DATETIME_BEHAVIOR_CONVERT_TO_NULL },
+            Messages.getString("ConnectionProperties.zeroDateTimeBehavior",
+                    new Object[] { ZERO_DATETIME_BEHAVIOR_EXCEPTION, ZERO_DATETIME_BEHAVIOR_ROUND, ZERO_DATETIME_BEHAVIOR_CONVERT_TO_NULL }),
+            "3.1.4", MISC_CATEGORY, Integer.MIN_VALUE);
 
     private BooleanConnectionProperty useJvmCharsetConverters = new BooleanConnectionProperty("useJvmCharsetConverters", false,
             Messages.getString("ConnectionProperties.useJvmCharsetConverters"), "5.0.1", PERFORMANCE_CATEGORY, Integer.MIN_VALUE);
@@ -1759,7 +1773,10 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
      * @see com.mysql.jdbc.IConnectionProperties#getElideSetAutoCommits()
      */
     public boolean getElideSetAutoCommits() {
-        return this.elideSetAutoCommits.getValueAsBoolean();
+        // Server Bug#66884 (SERVER_STATUS is always initiated with SERVER_STATUS_AUTOCOMMIT=1) invalidates this feature.
+        return false;
+        // TODO Turn this feature back on as soon as the server bug is fixed. Consider making it version specific.
+        // return this.elideSetAutoCommits.getValueAsBoolean();
     }
 
     /*
@@ -4379,6 +4396,14 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
         this.loadBalanceStrategy.setValue(strategy);
     }
 
+    public String getServerAffinityOrder() {
+        return this.serverAffinityOrder.getValueAsString();
+    }
+
+    public void setServerAffinityOrder(String hostsList) {
+        this.serverAffinityOrder.setValue(hostsList);
+    }
+
     public boolean getTcpNoDelay() {
         return this.tcpNoDelay.getValueAsBoolean();
     }
@@ -4672,7 +4697,6 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
 
     public void setLoadBalanceValidateConnectionOnSwapServer(boolean loadBalanceValidateConnectionOnSwapServer) {
         this.loadBalanceValidateConnectionOnSwapServer.setValue(loadBalanceValidateConnectionOnSwapServer);
-
     }
 
     public String getLoadBalanceConnectionGroup() {
@@ -4713,6 +4737,14 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
 
     public void setLoadBalanceEnableJMX(boolean loadBalanceEnableJMX) {
         this.loadBalanceEnableJMX.setValue(loadBalanceEnableJMX);
+    }
+
+    public void setLoadBalanceHostRemovalGracePeriod(int loadBalanceHostRemovalGracePeriod) throws SQLException {
+        this.loadBalanceHostRemovalGracePeriod.setValue(loadBalanceHostRemovalGracePeriod, getExceptionInterceptor());
+    }
+
+    public int getLoadBalanceHostRemovalGracePeriod() {
+        return this.loadBalanceHostRemovalGracePeriod.getValueAsInt();
     }
 
     public void setLoadBalanceAutoCommitStatementThreshold(int loadBalanceAutoCommitStatementThreshold) throws SQLException {
@@ -4765,7 +4797,6 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
 
     public void setDefaultAuthenticationPlugin(String defaultAuthenticationPlugin) {
         this.defaultAuthenticationPlugin.setValue(defaultAuthenticationPlugin);
-
     }
 
     public String getDefaultAuthenticationPlugin() {
@@ -4794,6 +4825,14 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
 
     public boolean getDisconnectOnExpiredPasswords() {
         return this.disconnectOnExpiredPasswords.getValueAsBoolean();
+    }
+
+    public String getReplicationConnectionGroup() {
+        return this.replicationConnectionGroup.getValueAsString();
+    }
+
+    public void setReplicationConnectionGroup(String replicationConnectionGroup) {
+        this.replicationConnectionGroup.setValue(replicationConnectionGroup);
     }
 
     public boolean getAllowMasterDownConnections() {
@@ -4826,7 +4865,6 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
 
     public void setReplicationEnableJMX(boolean replicationEnableJMX) {
         this.replicationEnableJMX.setValue(replicationEnableJMX);
-
     }
 
     public void setGetProceduresReturnsFunctions(boolean getProcedureReturnsFunctions) {
@@ -4851,8 +4889,7 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
 
     public void setServerRSAPublicKeyFile(String serverRSAPublicKeyFile) throws SQLException {
         if (this.serverRSAPublicKeyFile.getUpdateCount() > 0) {
-            throw SQLError.createSQLException(
-                    Messages.getString("ConnectionProperties.dynamicChangeIsNotAllowed", new Object[] { "'serverRSAPublicKeyFile'" }),
+            throw SQLError.createSQLException(Messages.getString("ConnectionProperties.dynamicChangeIsNotAllowed", new Object[] { "'serverRSAPublicKeyFile'" }),
                     SQLError.SQL_STATE_ILLEGAL_ARGUMENT, null);
         }
         this.serverRSAPublicKeyFile.setValue(serverRSAPublicKeyFile);

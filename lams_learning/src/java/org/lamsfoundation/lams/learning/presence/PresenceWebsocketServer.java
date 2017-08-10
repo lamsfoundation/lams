@@ -21,17 +21,20 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.presence.model.PresenceChatMessage;
 import org.lamsfoundation.lams.learning.presence.model.PresenceChatUser;
 import org.lamsfoundation.lams.learning.presence.service.IPresenceChatService;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Receives, processes and sends Lesson Chat messages to Learners.
@@ -108,6 +111,9 @@ public class PresenceWebsocketServer {
 
 	/**
 	 * Feeds opened websockets with messages and roster.
+	 *
+	 * @throws IOException
+	 * @throws JsonProcessingException
 	 */
 	private static void send(Long lessonId, String nickName) {
 	    Long lastSendTime = lastSendTimes.get(lessonId);
@@ -123,31 +129,32 @@ public class PresenceWebsocketServer {
 
 	    Set<Websocket> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
 	    Roster roster = PresenceWebsocketServer.rosters.get(lessonId);
-	    JSONArray rosterJSON = roster.getRosterJSON();
-	    for (Websocket websocket : lessonWebsockets) {
-		// if this run is meant only for one learner, skip the others
-		if ((nickName != null) && !nickName.equals(websocket.nickName)) {
-		    continue;
-		}
+	    try {
+		ArrayNode rosterJSON = roster.getRosterJSON();
+		for (Websocket websocket : lessonWebsockets) {
+		    // if this run is meant only for one learner, skip the others
+		    if ((nickName != null) && !nickName.equals(websocket.nickName)) {
+			continue;
+		    }
 
-		// the connection is valid, carry on
-		JSONObject responseJSON = new JSONObject();
+		    // the connection is valid, carry on
+		    ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 
-		try {
 		    // if it is just roster, skip messages
 		    if (roster.imEnabled) {
-			JSONArray messagesJSON = PresenceWebsocketServer.filterMessages(messages, websocket.nickName);
-			responseJSON.put("messages", messagesJSON);
+			ArrayNode messagesJSON = PresenceWebsocketServer.filterMessages(messages, websocket.nickName);
+			responseJSON.set("messages", messagesJSON);
 		    }
-		    responseJSON.put("roster", rosterJSON);
+		    responseJSON.set("roster", rosterJSON);
 
 		    // send the payload to the Learner's browser
 		    if (websocket.session.isOpen()) {
 			websocket.session.getBasicRemote().sendText(responseJSON.toString());
 		    }
-		} catch (Exception e) {
-		    PresenceWebsocketServer.log.error("Error while building message JSON", e);
+
 		}
+	    } catch (Exception e) {
+		PresenceWebsocketServer.log.error("Error while building message JSON", e);
 	    }
 	}
     }
@@ -172,8 +179,11 @@ public class PresenceWebsocketServer {
 
 	/**
 	 * Checks which Learners
+	 *
+	 * @throws IOException
+	 * @throws JsonProcessingException
 	 */
-	private JSONArray getRosterJSON() {
+	private ArrayNode getRosterJSON() throws JsonProcessingException, IOException {
 	    Set<String> localActiveUsers = new TreeSet<>();
 	    Set<Websocket> sessionWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
 	    // find out who is active locally
@@ -202,7 +212,7 @@ public class PresenceWebsocketServer {
 		activeUsers.addAll(localActiveUsers);
 	    }
 
-	    return new JSONArray(activeUsers);
+	    return JsonUtil.readArray(activeUsers);
 	}
     }
 
@@ -290,7 +300,7 @@ public class PresenceWebsocketServer {
      * @throws IOException
      */
     @OnMessage
-    public void receiveRequest(String input, Session session) throws JSONException, IOException {
+    public void receiveRequest(String input, Session session) throws IOException {
 	if (StringUtils.isBlank(input)) {
 	    return;
 	}
@@ -299,8 +309,8 @@ public class PresenceWebsocketServer {
 	    return;
 	}
 
-	JSONObject requestJSON = new JSONObject(input);
-	switch (requestJSON.getString("type")) {
+	ObjectNode requestJSON = JsonUtil.readObject(input);
+	switch (JsonUtil.optString(requestJSON, "type")) {
 	    case "message":
 		PresenceWebsocketServer.storeMessage(requestJSON, session);
 		break;
@@ -313,17 +323,17 @@ public class PresenceWebsocketServer {
     /**
      * Stores a message sent by a Learner.
      */
-    private static void storeMessage(JSONObject requestJSON, Session session) throws JSONException {
-	String message = requestJSON.getString("message");
+    private static void storeMessage(ObjectNode requestJSON, Session session) {
+	String message = JsonUtil.optString(requestJSON, "message");
 	if (StringUtils.isBlank(message)) {
 	    return;
 	}
-	Long lessonId = requestJSON.getLong("lessonID");
+	Long lessonId = JsonUtil.optLong(requestJSON, "lessonID");
 
 	// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 
 	String from = session.getRequestParameterMap().get("nickname").get(0);
-	String to = requestJSON.getString("to");
+	String to = JsonUtil.optString(requestJSON, "to");
 	if (StringUtils.isBlank(to)) {
 	    to = null;
 	}
@@ -343,10 +353,10 @@ public class PresenceWebsocketServer {
     /**
      * Sends the whole message history between the current and the chosen learner.
      */
-    private static void sendConversation(JSONObject requestJSON, Session session) throws JSONException, IOException {
-	Long lessonId = requestJSON.getLong("lessonID");
+    private static void sendConversation(ObjectNode requestJSON, Session session) throws IOException {
+	Long lessonId = JsonUtil.optLong(requestJSON, "lessonID");
 
-	String to = requestJSON.getString("to");
+	String to = JsonUtil.optString(requestJSON, "to");
 	String from = session.getRequestParameterMap().get("nickname").get(0);
 
 	// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
@@ -355,15 +365,15 @@ public class PresenceWebsocketServer {
 		HibernateSessionManager.openSession();
 		List<PresenceChatMessage> messages = PresenceWebsocketServer.getPresenceChatService()
 			.getMessagesByConversation(lessonId, from, to);
-		JSONArray messagesJSON = new JSONArray();
+		ArrayNode messagesJSON = JsonNodeFactory.instance.arrayNode();
 
 		for (PresenceChatMessage message : messages) {
-		    JSONObject messageJSON = PresenceWebsocketServer.buildMessageJSON(message);
-		    messagesJSON.put(messageJSON);
+		    ObjectNode messageJSON = PresenceWebsocketServer.buildMessageJSON(message);
+		    messagesJSON.add(messageJSON);
 		}
 
-		JSONObject responseJSON = new JSONObject();
-		responseJSON.put("messages", messagesJSON);
+		ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+		responseJSON.set("messages", messagesJSON);
 		// send the payload to the Learner's browser
 		session.getBasicRemote().sendText(responseJSON.toString());
 	    } catch (Exception e) {
@@ -377,26 +387,26 @@ public class PresenceWebsocketServer {
     /**
      * Filteres messages meant for the given user (group or personal).
      */
-    private static JSONArray filterMessages(List<PresenceChatMessage> messages, String nickName) throws JSONException {
-	JSONArray messagesJSON = new JSONArray();
+    private static ArrayNode filterMessages(List<PresenceChatMessage> messages, String nickName) {
+	ArrayNode messagesJSON = JsonNodeFactory.instance.arrayNode();
 
 	for (PresenceChatMessage message : messages) {
 	    String messageTo = message.getTo();
 	    if ((messageTo == null) || message.getTo().equals(nickName) || message.getFrom().equals(nickName)) {
-		JSONObject messageJSON = PresenceWebsocketServer.buildMessageJSON(message);
-		messagesJSON.put(messageJSON);
+		ObjectNode messageJSON = PresenceWebsocketServer.buildMessageJSON(message);
+		messagesJSON.add(messageJSON);
 	    }
 	}
 
 	return messagesJSON;
     }
 
-    private static JSONObject buildMessageJSON(PresenceChatMessage message) throws JSONException {
-	JSONObject messageJSON = new JSONObject();
+    private static ObjectNode buildMessageJSON(PresenceChatMessage message) {
+	ObjectNode messageJSON = JsonNodeFactory.instance.objectNode();
 	messageJSON.put("uid", message.getUid());
 	messageJSON.put("from", message.getFrom());
 	messageJSON.put("to", message.getTo());
-	messageJSON.put("dateSent", message.getDateSent());
+	messageJSON.put("dateSent", message.getDateSent().toString());
 	messageJSON.put("message", message.getMessage());
 	return messageJSON;
     }

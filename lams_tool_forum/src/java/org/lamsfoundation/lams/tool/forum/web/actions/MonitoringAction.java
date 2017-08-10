@@ -59,9 +59,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.config.ForwardConfig;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
@@ -86,6 +83,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class MonitoringAction extends Action {
 
@@ -221,7 +222,8 @@ public class MonitoringAction extends Action {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    sessionMap.put(ForumConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
-	    request.setAttribute(ForumConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	    request.setAttribute(ForumConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
 	boolean isGroupedActivity = forumService.isGroupedActivity(toolContentId);
@@ -232,7 +234,7 @@ public class MonitoringAction extends Action {
      * Refreshes user list.
      */
     public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 	forumService = getForumService();
 	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -295,14 +297,14 @@ public class MonitoringAction extends Action {
 	List<Object[]> users = forumService.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
 		forum.isReflectOnActivity());
 
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 
-	JSONObject responcedata = new JSONObject();
+	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
 	responcedata.put("total_rows", forumService.getCountUsersBySession(sessionId, searchString));
 
 	for (Object[] userAndReflection : users) {
 
-	    JSONObject responseRow = new JSONObject();
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
 	    ForumUser user = (ForumUser) userAndReflection[0];
 
@@ -338,9 +340,9 @@ public class MonitoringAction extends Action {
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
 		responseRow.put("notebookEntry", StringEscapeUtils.escapeHtml((String) userAndReflection[1]));
 	    }
-	    rows.put(responseRow);
+	    rows.add(responseRow);
 	}
-	responcedata.put("rows", rows);
+	responcedata.set("rows", rows);
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responcedata.toString()));
 	return null;
@@ -799,7 +801,7 @@ public class MonitoringAction extends Action {
 	    return mapping.findForward("success");
 
 	} else { // mark from view forum
-		     // display root topic rather than leaf one
+		 // display root topic rather than leaf one
 	    Long rootTopicId = forumService.getRootTopicId(msg.getUid());
 
 	    ForwardConfig redirectConfig = mapping.findForwardConfig("viewTopic");
@@ -820,7 +822,7 @@ public class MonitoringAction extends Action {
      * @param request
      * @param response
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -872,8 +874,7 @@ public class MonitoringAction extends Action {
      * @return
      */
     private Map<ForumUser, List<MessageDTO>> getTopicsSortedByAuthor(List<MessageDTO> topics) {
-	Map<ForumUser, List<MessageDTO>> topicsByUser = new TreeMap<>(
-		new ForumUserComparator());
+	Map<ForumUser, List<MessageDTO>> topicsByUser = new TreeMap<>(new ForumUserComparator());
 	for (MessageDTO topic : topics) {
 	    if (topic.getMessage().getIsAuthored()) {
 		continue;

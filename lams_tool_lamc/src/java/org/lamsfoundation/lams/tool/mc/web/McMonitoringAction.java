@@ -37,14 +37,10 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -62,18 +58,21 @@ import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * * @author Ozgur Demirtas
  */
 public class McMonitoringAction extends LamsDispatchAction {
-    private static Logger logger = Logger.getLogger(McMonitoringAction.class.getName());
-
     /**
      * displayAnswers
      */
@@ -82,11 +81,11 @@ public class McMonitoringAction extends LamsDispatchAction {
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	
+
 	McContent mcContent = mcService.getMcContent(new Long(strToolContentID));
 	mcContent.setDisplayAnswers(new Boolean(true));
 	mcService.updateMc(mcContent);
-	
+
 	// use redirect to prevent resubmition of the same request
 	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("monitoringStarterRedirect"));
 	redirect.addParameter(McAppConstants.TOOL_CONTENT_ID, strToolContentID);
@@ -173,7 +172,8 @@ public class McMonitoringAction extends LamsDispatchAction {
 
     /**
      * Set Submission Deadline
-     * @throws IOException 
+     *
+     * @throws IOException
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -214,14 +214,14 @@ public class McMonitoringAction extends LamsDispatchAction {
      * @throws IOException
      */
     public ActionForward setActivityEvaluation(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	IMcService service = McServiceProxy.getMcService(getServlet().getServletContext());
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String activityEvaluation = WebUtil.readStrParam(request, McAppConstants.ATTR_ACTIVITY_EVALUATION);
 	service.setActivityEvaluation(contentID, activityEvaluation);
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("success", "true");
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(new String(responseJSON.toString()));
@@ -270,7 +270,7 @@ public class McMonitoringAction extends LamsDispatchAction {
      * Return paged users for jqGrid.
      */
     public ActionForward getPagedUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -295,34 +295,34 @@ public class McMonitoringAction extends LamsDispatchAction {
 	int totalPages = new Double(
 		Math.ceil(new Integer(countVisitLogs).doubleValue() / new Integer(rowLimit).doubleValue())).intValue();
 
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	int i = 1;
 	for (McUserMarkDTO userDto : userDtos) {
 
-	    JSONArray visitLogData = new JSONArray();
+	    ArrayNode visitLogData = JsonNodeFactory.instance.arrayNode();
 	    Long userUid = Long.parseLong(userDto.getQueUsrId());
-	    visitLogData.put(userUid);
+	    visitLogData.add(userUid);
 	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
 	    if (groupLeader != null && groupLeader.getUid().equals(userUid)) {
 		fullName += " (" + mcService.getLocalizedMessage("label.monitoring.group.leader") + ")";
 	    }
 
-	    visitLogData.put(fullName);
+	    visitLogData.add(fullName);
 	    Long totalMark = (userDto.getTotalMark() == null) ? 0 : userDto.getTotalMark();
-	    visitLogData.put(totalMark);
+	    visitLogData.add(totalMark);
 
-	    JSONObject userRow = new JSONObject();
+	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);
-	    userRow.put("cell", visitLogData);
+	    userRow.set("cell", visitLogData);
 
-	    rows.put(userRow);
+	    rows.add(userRow);
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("total", totalPages);
 	responseJSON.put("page", page);
 	responseJSON.put("records", countVisitLogs);
-	responseJSON.put("rows", rows);
+	responseJSON.set("rows", rows);
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
@@ -343,39 +343,40 @@ public class McMonitoringAction extends LamsDispatchAction {
 
 	return null;
     }
-    
+
     /**
      * Get the mark summary with data arranged in bands. Can be displayed graphically or in a table.
      */
     public ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	McContent mcContent = mcService.getMcContent(contentID);
 	List<Number> results = null;
-	
-	if ( mcContent != null ) {
-	    if ( mcContent.isUseSelectLeaderToolOuput() ) {
+
+	if (mcContent != null) {
+	    if (mcContent.isUseSelectLeaderToolOuput()) {
 		results = mcService.getMarksArrayForLeaders(contentID);
 	    } else {
 		Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 		results = mcService.getMarksArray(sessionID);
 	    }
 	}
-	
-	JSONObject responseJSON = new JSONObject();
-	if ( results != null )
-	    responseJSON.put("data", results);
-	else 
-	    responseJSON.put("data", new Float[0]);
+
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	if (results != null) {
+	    responseJSON.set("data", JsonUtil.readArray(results));
+	} else {
+	    responseJSON.set("data", JsonUtil.readArray(new Float[0]));
+	}
 
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().write(responseJSON.toString());
 	return null;
 
     }
-    
+
     public ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -383,8 +384,8 @@ public class McMonitoringAction extends LamsDispatchAction {
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, contentID);
 	McContent mcContent = mcService.getMcContent(contentID);
-	if ( mcContent != null ) {
-	    if ( mcContent.isUseSelectLeaderToolOuput() ) {
+	if (mcContent != null) {
+	    if (mcContent.isUseSelectLeaderToolOuput()) {
 		LeaderResultsDTO leaderDto = mcService.getLeaderResultsDTOForLeaders(contentID);
 		request.setAttribute("leaderDto", leaderDto);
 	    } else {
@@ -393,9 +394,9 @@ public class McMonitoringAction extends LamsDispatchAction {
 	    }
 	    request.setAttribute("useSelectLeaderToolOutput", mcContent.isUseSelectLeaderToolOuput());
 	}
-	
+
 	// prepare toolOutputDefinitions and activityEvaluation
-	List<String> toolOutputDefinitions = new ArrayList<String>();
+	List<String> toolOutputDefinitions = new ArrayList<>();
 	toolOutputDefinitions.add(McAppConstants.OUTPUT_NAME_LEARNER_MARK);
 	toolOutputDefinitions.add(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT);
 	String activityEvaluation = mcService.getActivityEvaluation(contentID);
@@ -404,6 +405,5 @@ public class McMonitoringAction extends LamsDispatchAction {
 
 	return mapping.findForward(McAppConstants.STATISTICS);
     }
-
 
 }

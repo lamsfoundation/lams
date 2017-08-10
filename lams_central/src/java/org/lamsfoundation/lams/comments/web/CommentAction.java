@@ -36,8 +36,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.comments.Comment;
 import org.lamsfoundation.lams.comments.CommentConstants;
 import org.lamsfoundation.lams.comments.CommentLike;
@@ -57,6 +55,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Fiona Malikoff
@@ -157,7 +158,7 @@ public class CommentAction extends Action {
 	    sortBy = (Integer) sessionMap.get(CommentConstants.ATTR_SORT_BY);
 
 	} else {
-	    sessionMap = new SessionMap<String, Object>();
+	    sessionMap = new SessionMap<>();
 	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	    externalId = WebUtil.readLongParam(request, CommentConstants.ATTR_EXTERNAL_ID);
@@ -367,7 +368,7 @@ public class CommentAction extends Action {
      * Create a new comment (not a reply)
      */
     private ActionForward newComment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws InterruptedException, JSONException, IOException, ServletException {
+	    HttpServletResponse response) throws InterruptedException, IOException, ServletException {
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
@@ -379,19 +380,19 @@ public class CommentAction extends Action {
 	    commentText = commentText.trim();
 	}
 
-	JSONObject JSONObject;
+	ObjectNode responseJSON;
 
 	if (!validateText(commentText)) {
-	    JSONObject = getFailedValidationJSON();
-
+	    responseJSON = getFailedValidationJSON();
 	} else {
 
 	    commentService = getCommentService();
 
 	    User user = getCurrentUser(request);
 	    ToolAccessMode mode = WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE));
-	    boolean isMonitor = ToolAccessMode.TEACHER.equals(mode) && monitorInToolSession(externalId, user, sessionMap);
-	    if (!isMonitor && !learnerInToolSession(externalId, user) ) {
+	    boolean isMonitor = ToolAccessMode.TEACHER.equals(mode)
+		    && monitorInToolSession(externalId, user, sessionMap);
+	    if (!isMonitor && !learnerInToolSession(externalId, user)) {
 		throwException("New comment: User does not have the rights to access the comments. ", user.getLogin(),
 			externalId, externalType, externalSignature);
 	    }
@@ -401,15 +402,15 @@ public class CommentAction extends Action {
 	    // save message into database
 	    Comment newComment = commentService.createReply(rootSeq, commentText, user, isMonitor);
 
-	    JSONObject = new JSONObject();
-	    JSONObject.put(CommentConstants.ATTR_COMMENT_ID, newComment.getUid());
-	    JSONObject.put(CommentConstants.ATTR_THREAD_ID, newComment.getThreadComment().getUid());
-	    JSONObject.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	    JSONObject.put(CommentConstants.ATTR_PARENT_COMMENT_ID, newComment.getParent().getUid());
+	    responseJSON = JsonNodeFactory.instance.objectNode();
+	    responseJSON.put(CommentConstants.ATTR_COMMENT_ID, newComment.getUid());
+	    responseJSON.put(CommentConstants.ATTR_THREAD_ID, newComment.getThreadComment().getUid());
+	    responseJSON.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	    responseJSON.put(CommentConstants.ATTR_PARENT_COMMENT_ID, newComment.getParent().getUid());
 
 	}
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(responseJSON);
 	return null;
     }
 
@@ -436,7 +437,7 @@ public class CommentAction extends Action {
      * Create a reply to a parent topic.
      */
     private ActionForward replyTopicInline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws InterruptedException, JSONException, IOException, ServletException {
+	    HttpServletResponse response) throws InterruptedException, IOException, ServletException {
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
@@ -450,17 +451,17 @@ public class CommentAction extends Action {
 	    commentText = commentText.trim();
 	}
 
-	JSONObject JSONObject;
+	ObjectNode responseJSON;
 
 	if (!validateText(commentText)) {
-	    JSONObject = getFailedValidationJSON();
-
+	    responseJSON = getFailedValidationJSON();
 	} else {
 
 	    User user = getCurrentUser(request);
 	    ToolAccessMode mode = WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE));
-	    boolean isMonitor = ToolAccessMode.TEACHER.equals(mode) && monitorInToolSession(externalId, user, sessionMap);
-	    if (!isMonitor && !learnerInToolSession(externalId, user) ) {
+	    boolean isMonitor = ToolAccessMode.TEACHER.equals(mode)
+		    && monitorInToolSession(externalId, user, sessionMap);
+	    if (!isMonitor && !learnerInToolSession(externalId, user)) {
 		throwException("New comment: User does not have the rights to access the comments. ", user.getLogin(),
 			externalId, externalType, externalSignature);
 	    }
@@ -468,16 +469,16 @@ public class CommentAction extends Action {
 	    // save message into database
 	    Comment newComment = commentService.createReply(parentId, commentText.trim(), user, isMonitor);
 
-	    JSONObject = new JSONObject();
-	    JSONObject.put(CommentConstants.ATTR_COMMENT_ID, newComment.getUid());
-	    JSONObject.put(CommentConstants.ATTR_THREAD_ID, newComment.getThreadComment().getUid());
-	    JSONObject.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	    JSONObject.put(CommentConstants.ATTR_PARENT_COMMENT_ID, newComment.getParent().getUid());
+	    responseJSON = JsonNodeFactory.instance.objectNode();
+	    responseJSON.put(CommentConstants.ATTR_COMMENT_ID, newComment.getUid());
+	    responseJSON.put(CommentConstants.ATTR_THREAD_ID, newComment.getThreadComment().getUid());
+	    responseJSON.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	    responseJSON.put(CommentConstants.ATTR_PARENT_COMMENT_ID, newComment.getParent().getUid());
 
 	}
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(responseJSON);
 	return null;
     }
 
@@ -486,11 +487,11 @@ public class CommentAction extends Action {
 		&& commentText.length() < CommentConstants.MAX_BODY_LENGTH;
     }
 
-    private JSONObject getFailedValidationJSON() throws JSONException {
+    private ObjectNode getFailedValidationJSON() {
 	MessageService msgService = getCommentService().getMessageService();
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put(CommentConstants.ATTR_ERR_MESSAGE, msgService.getMessage(CommentConstants.KEY_BODY_VALIDATION));
-	return JSONObject;
+	ObjectNode resultJSON = JsonNodeFactory.instance.objectNode();
+	resultJSON.put(CommentConstants.ATTR_ERR_MESSAGE, msgService.getMessage(CommentConstants.KEY_BODY_VALIDATION));
+	return resultJSON;
     }
 
     /**
@@ -523,7 +524,7 @@ public class CommentAction extends Action {
      * @throws ServletException
      */
     public ActionForward updateTopicInline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException {
 
 	commentService = getCommentService();
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
@@ -538,10 +539,10 @@ public class CommentAction extends Action {
 	    commentText = commentText.trim();
 	}
 
-	JSONObject JSONObject;
+	ObjectNode ObjectNode;
 
 	if (!validateText(commentText)) {
-	    JSONObject = getFailedValidationJSON();
+	    ObjectNode = getFailedValidationJSON();
 
 	} else {
 
@@ -558,16 +559,16 @@ public class CommentAction extends Action {
 	    Comment updatedComment = commentService.updateComment(commentId, commentText, user, ToolAccessMode.TEACHER
 		    .equals(WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE))));
 
-	    JSONObject = new JSONObject();
-	    JSONObject.put(CommentConstants.ATTR_COMMENT_ID, commentId);
-	    JSONObject.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	    JSONObject.put(CommentConstants.ATTR_THREAD_ID, updatedComment.getThreadComment().getUid());
-	    JSONObject.put(CommentConstants.ATTR_PARENT_COMMENT_ID, updatedComment.getParent().getUid());
+	    ObjectNode = JsonNodeFactory.instance.objectNode();
+	    ObjectNode.put(CommentConstants.ATTR_COMMENT_ID, commentId);
+	    ObjectNode.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	    ObjectNode.put(CommentConstants.ATTR_THREAD_ID, updatedComment.getThreadComment().getUid());
+	    ObjectNode.put(CommentConstants.ATTR_PARENT_COMMENT_ID, updatedComment.getParent().getUid());
 
 	}
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 	return null;
     }
 
@@ -575,8 +576,7 @@ public class CommentAction extends Action {
      * Update the likes/dislikes
      */
     private ActionForward updateLikeCount(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, boolean isLike)
-	    throws InterruptedException, JSONException, IOException, ServletException {
+	    HttpServletResponse response, boolean isLike) throws InterruptedException, IOException, ServletException {
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long messageUid = WebUtil.readLongParam(request, CommentConstants.ATTR_COMMENT_ID);
@@ -594,11 +594,11 @@ public class CommentAction extends Action {
 
 	boolean added = commentService.addLike(messageUid, user, isLike ? CommentLike.LIKE : CommentLike.DISLIKE);
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put(CommentConstants.ATTR_COMMENT_ID, messageUid);
-	JSONObject.put(CommentConstants.ATTR_STATUS, added);
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put(CommentConstants.ATTR_COMMENT_ID, messageUid);
+	responseJSON.put(CommentConstants.ATTR_STATUS, added);
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(responseJSON);
 	return null;
     }
 
@@ -606,8 +606,7 @@ public class CommentAction extends Action {
      * Update hide flag
      */
     private ActionForward hideComment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, boolean isLike)
-	    throws InterruptedException, JSONException, IOException, ServletException {
+	    HttpServletResponse response, boolean isLike) throws InterruptedException, IOException, ServletException {
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long commentId = WebUtil.readLongParam(request, CommentConstants.ATTR_COMMENT_ID);
@@ -625,14 +624,14 @@ public class CommentAction extends Action {
 
 	Comment updatedComment = commentService.hideComment(commentId, user, status);
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put(CommentConstants.ATTR_COMMENT_ID, updatedComment.getUid());
-	JSONObject.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	JSONObject.put(CommentConstants.ATTR_THREAD_ID, updatedComment.getThreadComment().getUid());
-	JSONObject.put(CommentConstants.ATTR_PARENT_COMMENT_ID, updatedComment.getParent().getUid());
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put(CommentConstants.ATTR_COMMENT_ID, updatedComment.getUid());
+	responseJSON.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	responseJSON.put(CommentConstants.ATTR_THREAD_ID, updatedComment.getThreadComment().getUid());
+	responseJSON.put(CommentConstants.ATTR_PARENT_COMMENT_ID, updatedComment.getParent().getUid());
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(responseJSON);
 	return null;
     }
 
@@ -642,7 +641,7 @@ public class CommentAction extends Action {
      * @throws ServletException
      */
     public ActionForward makeSticky(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException {
 
 	commentService = getCommentService();
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
@@ -666,14 +665,14 @@ public class CommentAction extends Action {
 
 	Comment updatedComment = commentService.updateSticky(commentId, sticky);
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put(CommentConstants.ATTR_COMMENT_ID, commentId);
-	JSONObject.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	JSONObject.put(CommentConstants.ATTR_THREAD_ID, updatedComment.getThreadComment().getUid());
-	JSONObject.put(CommentConstants.ATTR_PARENT_COMMENT_ID, updatedComment.getParent().getUid());
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put(CommentConstants.ATTR_COMMENT_ID, commentId);
+	responseJSON.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	responseJSON.put(CommentConstants.ATTR_THREAD_ID, updatedComment.getThreadComment().getUid());
+	responseJSON.put(CommentConstants.ATTR_PARENT_COMMENT_ID, updatedComment.getParent().getUid());
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(responseJSON);
 	return null;
     }
 

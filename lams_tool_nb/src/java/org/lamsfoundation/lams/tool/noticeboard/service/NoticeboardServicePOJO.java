@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
 import java.util.ArrayList;
@@ -32,8 +31,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -65,6 +62,8 @@ import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.JsonUtil;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * An implementation of the NoticeboardService interface.
@@ -145,7 +144,6 @@ public class NoticeboardServicePOJO
 
     @Override
     public void saveNoticeboardSession(NoticeboardSession nbSession) {
-	NoticeboardContent content = nbSession.getNbContent();
 	nbSessionDAO.saveNbSession(nbSession);
     }
 
@@ -276,10 +274,10 @@ public class NoticeboardServicePOJO
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
@@ -456,7 +454,7 @@ public class NoticeboardServicePOJO
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
-	return new TreeMap<String, ToolOutputDefinition>();
+	return new TreeMap<>();
     }
 
     @Override
@@ -531,17 +529,17 @@ public class NoticeboardServicePOJO
 
     @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<String, ToolOutput>();
+	return new TreeMap<>();
     }
 
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -635,22 +633,23 @@ public class NoticeboardServicePOJO
 
 	return new ToolCompletionStatus(
 		NoticeboardUser.COMPLETED.equals(learner.getUserStatus()) ? ToolCompletionStatus.ACTIVITY_COMPLETED
-			: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
+			: ToolCompletionStatus.ACTIVITY_ATTEMPTED,
+		null, null);
     }
 
     // ****************** REST methods *************************
 
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 	Date updateDate = new Date();
 
 	NoticeboardContent noticeboard = new NoticeboardContent();
 	noticeboard.setNbContentId(toolContentID);
-	noticeboard.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	noticeboard.setContent(toolContentJSON.getString("content"));
-	noticeboard.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	noticeboard.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
+	noticeboard.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	noticeboard.setContent(JsonUtil.optString(toolContentJSON, "content"));
+	noticeboard.setReflectOnActivity(
+		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	noticeboard.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 
 	noticeboard.setCreatorUserId(userID.longValue());
 	noticeboard.setDateCreated(updateDate);

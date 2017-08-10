@@ -1202,7 +1202,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
 
             if(job == null) {
-                job = getDelegate().selectJobDetail(conn, newTrigger.getJobKey(), getClassLoadHelper());
+                job = retrieveJob(conn, newTrigger.getJobKey());
             }
             if (job == null) {
                 throw new JobPersistenceException("The job ("
@@ -2792,8 +2792,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         Set<JobKey> acquiredJobKeysForNoConcurrentExec = new HashSet<JobKey>();
         final int MAX_DO_LOOP_RETRY = 3;
         int currentLoopCount = 0;
-        long firstAcquiredTriggerFireTime = 0;
-        
         do {
             currentLoopCount ++;
             try {
@@ -2802,7 +2800,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 // No trigger is ready to fire yet.
                 if (keys == null || keys.size() == 0)
                     return acquiredTriggers;
-                
+
+                long batchEnd = noLaterThan;
+
                 for(TriggerKey triggerKey: keys) {
                     // If our trigger is no longer available, try a new one.
                     OperableTrigger nextTrigger = retrieveTrigger(conn, triggerKey);
@@ -2813,7 +2813,19 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     // If trigger's job is set as @DisallowConcurrentExecution, and it has already been added to result, then
                     // put it back into the timeTriggers set and continue to search for next trigger.
                     JobKey jobKey = nextTrigger.getJobKey();
-                    JobDetail job = getDelegate().selectJobDetail(conn, jobKey, getClassLoadHelper());
+                    JobDetail job;
+                    try {
+                        job = retrieveJob(conn, jobKey);
+                    } catch (JobPersistenceException jpe) {
+                        try {
+                            getLog().error("Error retrieving job, setting trigger state to ERROR.", jpe);
+                            getDelegate().updateTriggerState(conn, triggerKey, STATE_ERROR);
+                        } catch (SQLException sqle) {
+                            getLog().error("Unable to set trigger state to ERROR.", sqle);
+                        }
+                        continue;
+                    }
+                    
                     if (job.isConcurrentExectionDisallowed()) {
                         if (acquiredJobKeysForNoConcurrentExec.contains(jobKey)) {
                             continue; // next trigger
@@ -2822,6 +2834,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                         }
                     }
                     
+                    if (nextTrigger.getNextFireTime().getTime() > batchEnd) {
+                      break;
+                    }
                     // We now have a acquired trigger, let's add to return list.
                     // If our trigger was no longer in the expected state, try a new one.
                     int rowsUpdated = getDelegate().updateTriggerStateFromOtherState(conn, triggerKey, STATE_ACQUIRED, STATE_WAITING);
@@ -2831,9 +2846,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
                     getDelegate().insertFiredTrigger(conn, nextTrigger, STATE_ACQUIRED, null);
 
+                    if(acquiredTriggers.isEmpty()) {
+                        batchEnd = Math.max(nextTrigger.getNextFireTime().getTime(), System.currentTimeMillis()) + timeWindow;
+                    }
                     acquiredTriggers.add(nextTrigger);
-                    if(firstAcquiredTriggerFireTime == 0)
-                        firstAcquiredTriggerFireTime = nextTrigger.getNextFireTime().getTime();
                 }
 
                 // if we didn't end up with any trigger to fire from that first

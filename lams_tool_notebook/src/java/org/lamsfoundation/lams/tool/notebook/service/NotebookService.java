@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.notebook.service;
 
 import java.util.ArrayList;
@@ -33,8 +32,6 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -70,6 +67,8 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * An implementation of the INotebookService interface.
@@ -161,10 +160,10 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getNotebookOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -627,10 +626,10 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
@@ -642,7 +641,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getNotebookOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
-    
+
     @Override
     public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
 	// db doesn't have a start/finish date for learner, and session start/finish is null
@@ -661,20 +660,19 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
      * Rest call to create a new Notebook content. Required fields in toolContentJSON: "title", "instructions".
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 	Date updateDate = new Date();
 
 	Notebook nb = new Notebook();
 	nb.setToolContentId(toolContentID);
-	nb.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	nb.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	nb.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	nb.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 	nb.setCreateBy(userID.longValue());
 	nb.setCreateDate(updateDate);
 	nb.setUpdateDate(updateDate);
 
-	nb.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	nb.setAllowRichEditor(JsonUtil.opt(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
+	nb.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	nb.setAllowRichEditor(JsonUtil.optBoolean(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
 	// submissionDeadline is set in monitoring
 
 	nb.setContentInUse(false);

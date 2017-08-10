@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.rating.service;
 
 import java.math.BigInteger;
@@ -39,9 +37,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.rating.RatingException;
 import org.lamsfoundation.lams.rating.dao.IRatingCommentDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingCriteriaDAO;
@@ -51,15 +46,20 @@ import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledRatingDTO;
-import org.lamsfoundation.lams.rating.model.AuthoredItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingComment;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class RatingService implements IRatingService {
 
@@ -94,29 +94,29 @@ public class RatingService implements IRatingService {
     public int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId) {
 	return ratingDAO.getCountItemsRatedByUserByCriteria(criteriaId, userId);
     }
-    
+
     @Override
     public void removeUserCommitsByContent(final Long contentId, final Integer userId) {
 	List<Rating> ratings = ratingDAO.getRatingsByUser(contentId, userId);
 	for (Rating rating : ratings) {
 	    ratingDAO.delete(rating);
 	}
-	
+
 	List<RatingComment> comments = ratingCommentDAO.getCommentsByContentAndUser(contentId, userId);
 	for (RatingComment comment : comments) {
 	    ratingDAO.delete(comment);
 	}
     }
-    
+
     @Override
-    public Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Long toolSessionId, final Collection<Long> itemIds,
-	    Integer excludeUserId) {
+    public Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Long toolSessionId,
+	    final Collection<Long> itemIds, Integer excludeUserId) {
 	return ratingDAO.countUsersRatedEachItem(contentId, toolSessionId, itemIds, excludeUserId);
     }
 
     @Override
-    public Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Long toolSessionId, final Collection<Long> itemIds,
-	    Integer excludeUserId) {
+    public Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Long toolSessionId,
+	    final Collection<Long> itemIds, Integer excludeUserId) {
 	return ratingDAO.countUsersRatedEachItemByCriteria(criteriaId, toolSessionId, itemIds, excludeUserId);
     }
 
@@ -126,8 +126,8 @@ public class RatingService implements IRatingService {
     }
 
     @Override
-    public ItemRatingCriteriaDTO rateItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId,
-	    float ratingFloat) {
+    public ItemRatingCriteriaDTO rateItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId,
+	    Long itemId, float ratingFloat) {
 
 	Long ratingCriteriaId = ratingCriteria.getRatingCriteriaId();
 	Rating rating = ratingDAO.getRating(ratingCriteriaId, userId, itemId);
@@ -152,25 +152,26 @@ public class RatingService implements IRatingService {
     }
 
     @Override
-    public int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Map<Long, Float> newRatings) {
+    public int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId,
+	    Map<Long, Float> newRatings) {
 
 	User learner = (User) userManagementService.findById(User.class, userId);
 	int numRatings = 0;
-	
+
 	List<Rating> dbRatings = ratingDAO.getRatingsByUserCriteria(ratingCriteria.getRatingCriteriaId(), userId);
-	for ( Rating rating: dbRatings ) {
+	for (Rating rating : dbRatings) {
 	    Long itemId = rating.getItemId();
 	    Float newRating = newRatings.get(itemId);
-	    if ( newRating != null ) {
+	    if (newRating != null) {
 		rating.setRating(newRating);
 		newRatings.remove(itemId);
 		numRatings++;
 		ratingDAO.saveOrUpdate(rating);
 	    } else {
-		rating.setRating((Float)null);
+		rating.setRating((Float) null);
 	    }
 	}
-	for ( Map.Entry<Long, Float> entry : newRatings.entrySet() ) {
+	for (Map.Entry<Long, Float> entry : newRatings.entrySet()) {
 	    Rating rating = new Rating();
 	    rating.setItemId(entry.getKey());
 	    rating.setLearner(learner);
@@ -180,12 +181,13 @@ public class RatingService implements IRatingService {
 	    ratingDAO.saveOrUpdate(rating);
 	    numRatings++;
 	}
-	    
+
 	return numRatings;
     }
-    
+
     @Override
-    public void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId, String comment) {
+    public void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId,
+	    String comment) {
 	RatingComment ratingComment = ratingCommentDAO.getComment(ratingCriteria.getRatingCriteriaId(), userId, itemId);
 
 	// persist MessageRating changes in DB
@@ -209,8 +211,8 @@ public class RatingService implements IRatingService {
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
 
 	// fail safe - if there are no items, don't try to look anything up! LDEV-4094
-	if ( itemIds == null || itemIds.isEmpty() ) {
-	    return new LinkedList<ItemRatingDTO>();
+	if (itemIds == null || itemIds.isEmpty()) {
+	    return new LinkedList<>();
 	}
 
 	//initial preparations
@@ -221,8 +223,8 @@ public class RatingService implements IRatingService {
 	Long singleItemId = isSingleItem ? itemIds.iterator().next() : null;
 
 	//handle comments criteria
-	List<ItemRatingDTO> itemDtos = handleCommentsCriteria(criterias, toolSessionId, itemIds, isCommentsByOtherUsersRequired,
-		userId);
+	List<ItemRatingDTO> itemDtos = handleCommentsCriteria(criterias, toolSessionId, itemIds,
+		isCommentsByOtherUsersRequired, userId);
 
 	//get all data from DB
 	List<Rating> userRatings = ratingDAO.getRatingsByUser(contentId, userId.intValue());
@@ -238,7 +240,7 @@ public class RatingService implements IRatingService {
 	//handle all criterias except for comments' one
 	for (ItemRatingDTO itemDto : itemDtos) {
 	    Long itemId = itemDto.getItemId();
-	    List<ItemRatingCriteriaDTO> criteriaDtos = new LinkedList<ItemRatingCriteriaDTO>();
+	    List<ItemRatingCriteriaDTO> criteriaDtos = new LinkedList<>();
 	    itemDto.setCriteriaDtos(criteriaDtos);
 
 	    for (RatingCriteria criteria : criterias) {
@@ -274,7 +276,7 @@ public class RatingService implements IRatingService {
 		    }
 		}
 
-		if ( itemStatistics != null ) {
+		if (itemStatistics != null) {
 		    Number averageRating = (Number) itemStatistics[2];
 		    criteriaDto.setAverageRating(numberFormat.format(averageRating));
 		    criteriaDto.setAverageRatingAsNumber(averageRating);
@@ -297,8 +299,8 @@ public class RatingService implements IRatingService {
     /*
      * Fetches all required comments from the DB.
      */
-    private List<ItemRatingDTO> handleCommentsCriteria(List<RatingCriteria> criterias, Long toolSessionId, Collection<Long> itemIds,
-	    boolean isCommentsByOtherUsersRequired, Long userId) {
+    private List<ItemRatingDTO> handleCommentsCriteria(List<RatingCriteria> criterias, Long toolSessionId,
+	    Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) {
 
 	boolean isSingleItem = itemIds.size() == 1;
 	Long singleItemId = isSingleItem ? itemIds.iterator().next() : null;
@@ -312,11 +314,13 @@ public class RatingService implements IRatingService {
 
 		List<RatingCommentDTO> commentDtos;
 		if (isSingleItem) {
-		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItem(commentCriteriaId, toolSessionId, singleItemId);
+		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItem(commentCriteriaId, toolSessionId,
+			    singleItemId);
 
 		    //query DB using itemIds
 		} else if (isCommentsByOtherUsersRequired) {
-		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItems(commentCriteriaId, toolSessionId, itemIds);
+		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItems(commentCriteriaId, toolSessionId,
+			    itemIds);
 
 		    // get only comments done by the specified user
 		} else {
@@ -330,7 +334,7 @@ public class RatingService implements IRatingService {
 		    itemDto.setCommentsMinWordsLimit(criteria.getCommentsMinWordsLimit());
 
 		    //assign commentDtos by the appropriate items
-		    List<RatingCommentDTO> commentDtosPerItem = new LinkedList<RatingCommentDTO>();
+		    List<RatingCommentDTO> commentDtosPerItem = new LinkedList<>();
 		    for (RatingCommentDTO commentDto : commentDtos) {
 			if (commentDto.getItemId().equals(itemDto.getItemId())) {
 			    commentDtosPerItem.add(commentDto);
@@ -354,7 +358,7 @@ public class RatingService implements IRatingService {
 
     private List<ItemRatingDTO> initializeItemDtos(Collection<Long> itemIds) {
 	// initialize itemDtos
-	List<ItemRatingDTO> itemDtos = new LinkedList<ItemRatingDTO>();
+	List<ItemRatingDTO> itemDtos = new LinkedList<>();
 	for (Long itemId : itemIds) {
 	    ItemRatingDTO itemDto = new ItemRatingDTO();
 	    itemDto.setItemId(itemId);
@@ -380,9 +384,10 @@ public class RatingService implements IRatingService {
 	return ratingCriteriaDAO.getByRatingCriteriaId(ratingCriteriaId, clasz);
     }
 
-    
-    private LearnerItemRatingCriteria updateLearnerItemRatingCriteria(LearnerItemRatingCriteria oldCriteria, Long toolContentId, String title, Integer orderId, int ratingStyle, boolean withComments, int minWordsInComment){
-	
+    private LearnerItemRatingCriteria updateLearnerItemRatingCriteria(LearnerItemRatingCriteria oldCriteria,
+	    Long toolContentId, String title, Integer orderId, int ratingStyle, boolean withComments,
+	    int minWordsInComment) {
+
 	LearnerItemRatingCriteria criteria = oldCriteria != null ? oldCriteria : new LearnerItemRatingCriteria();
 	criteria.setRatingCriteriaTypeId(RatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
 	criteria.setToolContentId(toolContentId);
@@ -393,7 +398,7 @@ public class RatingService implements IRatingService {
 	criteria.setCommentsMinWordsLimit(minWordsInComment);
 	criteria.setMinimumRates(null);
 	criteria.setMaximumRates(null);
-	
+
 	Integer maxRating = null;
 	switch (ratingStyle) {
 	    case RatingCriteria.RATING_STYLE_STAR:
@@ -410,28 +415,30 @@ public class RatingService implements IRatingService {
 	criteria.setMaxRating(maxRating);
 	return criteria;
     }
-    
+
     @Override
-    public LearnerItemRatingCriteria saveLearnerItemRatingCriteria(Long toolContentId, String title, Integer orderId, int ratingStyle, boolean withComments, int minWordsInComment) throws RatingException {
+    public LearnerItemRatingCriteria saveLearnerItemRatingCriteria(Long toolContentId, String title, Integer orderId,
+	    int ratingStyle, boolean withComments, int minWordsInComment) throws RatingException {
 	List<RatingCriteria> criterias = ratingCriteriaDAO.getByToolContentId(toolContentId);
 	LearnerItemRatingCriteria criteria = null;
-	if ( criterias.size() > 0 ) {
-	    for ( RatingCriteria c : criterias ) {
-		if ( c.getOrderId().equals(orderId) )
-		    if ( ! c.isLearnerItemRatingCriteria() ) {
-			String msg = new StringBuilder("Wrong type of criteria found - needs to be a AuthoredItemRatingCriteria for toolContentId ")
-					.append(toolContentId)
-					.append("criteriaId ")
-					.append(c.getRatingCriteriaId())
+	if (criterias.size() > 0) {
+	    for (RatingCriteria c : criterias) {
+		if (c.getOrderId().equals(orderId)) {
+		    if (!c.isLearnerItemRatingCriteria()) {
+			String msg = new StringBuilder(
+				"Wrong type of criteria found - needs to be a AuthoredItemRatingCriteria for toolContentId ")
+					.append(toolContentId).append("criteriaId ").append(c.getRatingCriteriaId())
 					.toString();
 			log.error(msg);
 			throw new RatingException(msg);
 		    }
-		criteria = (LearnerItemRatingCriteria)c;
+		}
+		criteria = (LearnerItemRatingCriteria) c;
 		break;
 	    }
-	} 
-	criteria = updateLearnerItemRatingCriteria(criteria, toolContentId, title, orderId, ratingStyle, withComments, minWordsInComment);
+	}
+	criteria = updateLearnerItemRatingCriteria(criteria, toolContentId, title, orderId, ratingStyle, withComments,
+		minWordsInComment);
 	ratingCriteriaDAO.saveOrUpdate(criteria);
 	return criteria;
     }
@@ -440,7 +447,7 @@ public class RatingService implements IRatingService {
     public int deleteAllRatingCriterias(Long toolContentId) {
 	List<RatingCriteria> criterias = ratingCriteriaDAO.getByToolContentId(toolContentId);
 	int count = 0;
-	for ( RatingCriteria criteria : criterias ) {
+	for (RatingCriteria criteria : criterias) {
 	    ratingCriteriaDAO.deleteRatingCriteria(criteria.getRatingCriteriaId());
 	    count++;
 	}
@@ -450,31 +457,32 @@ public class RatingService implements IRatingService {
     @Override
     public void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias,
 	    Long toolContentId) {
-	
+
 	// different handling for comments - simple tag sets the isCommentsEnabled flag,
 	// the complex tag sends explicit comment type entry.
 	boolean explicitCommentTypeFound = false;
-	
+
 	// create orderId to RatingCriteria map
-	Map<Integer, RatingCriteria> mapOrderIdToRatingCriteria = new HashMap<Integer, RatingCriteria>();
+	Map<Integer, RatingCriteria> mapOrderIdToRatingCriteria = new HashMap<>();
 	for (RatingCriteria ratingCriteriaIter : oldCriterias) {
 	    mapOrderIdToRatingCriteria.put(ratingCriteriaIter.getOrderId(), ratingCriteriaIter);
 	}
-	
+
 //	for ( Map.Entry entry : request.getParameterMap().entrySet()) {
 //	    log.debug("entry: "+entry.getKey()+" "+entry.getValue());
 //	}
-	
+
 	int criteriaMaxOrderId = WebUtil.readIntParam(request, "criteriaMaxOrderId");
 	// i is equal to an old orderId
 	for (int i = 1; i <= criteriaMaxOrderId; i++) {
 
 	    String criteriaTitle = WebUtil.readStrParam(request, "criteriaTitle" + i, true);
 
-	    Integer ratingStyle = WebUtil.readIntParam(request,  "ratingStyle" + i, true);
-	    if ( ratingStyle == null )
+	    Integer ratingStyle = WebUtil.readIntParam(request, "ratingStyle" + i, true);
+	    if (ratingStyle == null) {
 		ratingStyle = RatingCriteria.RATING_STYLE_STAR;
-	    
+	    }
+
 	    Integer maxRating = WebUtil.readIntParam(request, "maxRating" + i, true);
 	    if (maxRating == null) {
 		switch (ratingStyle) {
@@ -493,19 +501,21 @@ public class RatingService implements IRatingService {
 
 	    Integer minRatings = 0;
 	    Integer maxRatings = 0;
-	    if ( ratingStyle == RatingCriteria.RATING_STYLE_STAR || ratingStyle == RatingCriteria.RATING_STYLE_COMMENT ) {
+	    if (ratingStyle == RatingCriteria.RATING_STYLE_STAR || ratingStyle == RatingCriteria.RATING_STYLE_COMMENT) {
 		minRatings = WebUtil.readIntParam(request, "minimumRates" + i, true);
 		maxRatings = WebUtil.readIntParam(request, "maximumRates" + i, true);
-	    } 
-	    
+	    }
 
-	    boolean commentsEnabled = ( ratingStyle != RatingCriteria.RATING_STYLE_COMMENT ? WebUtil.readBooleanParam(request,  "enableComments" + i, false) : true );
-	    
+	    boolean commentsEnabled = (ratingStyle != RatingCriteria.RATING_STYLE_COMMENT
+		    ? WebUtil.readBooleanParam(request, "enableComments" + i, false)
+		    : true);
+
 	    RatingCriteria ratingCriteria = mapOrderIdToRatingCriteria.get(i);
-	    if ( ratingStyle == RatingCriteria.RATING_STYLE_COMMENT || (ratingCriteria != null && ratingCriteria.isCommentRating()) ) {
+	    if (ratingStyle == RatingCriteria.RATING_STYLE_COMMENT
+		    || (ratingCriteria != null && ratingCriteria.isCommentRating())) {
 		explicitCommentTypeFound = true;
 	    }
-	    
+
 	    if (StringUtils.isNotBlank(criteriaTitle)) {
 		int newCriteriaOrderId = WebUtil.readIntParam(request, "criteriaOrderId" + i);
 
@@ -521,17 +531,17 @@ public class RatingService implements IRatingService {
 		ratingCriteria.setRatingStyle(ratingStyle);
 		ratingCriteria.setMaxRating(maxRating);
 		ratingCriteria.setCommentsEnabled(commentsEnabled);
-		if ( commentsEnabled ) {
+		if (commentsEnabled) {
 		    Integer commentsMinWordsLimit = WebUtil.readIntParam(request, "commentsMinWordsLimit" + i, true);
 		    ratingCriteria.setCommentsMinWordsLimit(commentsMinWordsLimit != null ? commentsMinWordsLimit : 0);
 		} else {
 		    ratingCriteria.setCommentsMinWordsLimit(0);
 		}
 
-		ratingCriteria.setMinimumRates( minRatings );
-		ratingCriteria.setMaximumRates( maxRatings );
-		
-    		ratingCriteriaDAO.saveOrUpdate(ratingCriteria);
+		ratingCriteria.setMinimumRates(minRatings);
+		ratingCriteria.setMaximumRates(maxRatings);
+
+		ratingCriteriaDAO.saveOrUpdate(ratingCriteria);
 		// !!updatedCriterias.add(ratingCriteria);
 
 		// delete
@@ -542,7 +552,7 @@ public class RatingService implements IRatingService {
 	}
 
 	// ==== handle comments criteria - simple tag support ====
-	if ( ! explicitCommentTypeFound ) {
+	if (!explicitCommentTypeFound) {
 	    boolean isCommentsEnabled = WebUtil.readBooleanParam(request, "isCommentsEnabled", false);
 
 	    // find comments' responsible RatingCriteria
@@ -582,75 +592,78 @@ public class RatingService implements IRatingService {
      * Convert the raw data from the database to StyledCriteriaRatingDTO and StyleRatingDTO. The rating service expects
      * the potential itemId followed by rating.* (its own fields) and the last item in the array to be an item
      * description (eg formatted user's name) Will go back to the database for the justification comment that would
-     * apply to hedging. 
-     * 
+     * apply to hedging.
+     *
      * If includeCurrentUser == true will include the current users' records (used for SelfReview and Monitoring)
      * otherwise skips the current user, so they do not rate themselves!
-     * 
-     * Entries in Object array for comment style: 
-     *   tool item id (usually user id), rating.item_id, rating_comment.comment, (tool fields)+
-     * Entries in Object array for other styles: 
-     *   tool item id (usually user id), rating.item_id, rating_comment.comment,
-     *   rating.rating, calculated.average_rating, calculated.count_vote, (tool fields)+
+     *
+     * Entries in Object array for comment style:
+     * tool item id (usually user id), rating.item_id, rating_comment.comment, (tool fields)+
+     * Entries in Object array for other styles:
+     * tool item id (usually user id), rating.item_id, rating_comment.comment,
+     * rating.rating, calculated.average_rating, calculated.count_vote, (tool fields)+
      */
     @Override
-    public StyledCriteriaRatingDTO convertToStyledDTO(RatingCriteria ratingCriteria, Long currentUserId, boolean includeCurrentUser, 
-	    List<Object[]> rawDataRows) {
+    public StyledCriteriaRatingDTO convertToStyledDTO(RatingCriteria ratingCriteria, Long currentUserId,
+	    boolean includeCurrentUser, List<Object[]> rawDataRows) {
 
 	StyledCriteriaRatingDTO criteriaDto = new StyledCriteriaRatingDTO();
 	criteriaDto.setRatingCriteria(ratingCriteria);
 
-	if (ratingCriteria.isHedgeStyleRating() && ratingCriteria.isCommentsEnabled() ) {
+	if (ratingCriteria.isHedgeStyleRating() && ratingCriteria.isCommentsEnabled()) {
 	    RatingComment justification = ratingCommentDAO.getComment(ratingCriteria.getRatingCriteriaId(),
 		    currentUserId.intValue(), ratingCriteria.getRatingCriteriaId());
-	    if (justification != null)
+	    if (justification != null) {
 		criteriaDto.setJustificationComment(justification.getComment());
-	} else if ( ratingCriteria.isStarStyleRating() ) {
-	    int ratedCount = getCountItemsRatedByUserByCriteria(ratingCriteria.getRatingCriteriaId(), currentUserId.intValue());
+	    }
+	} else if (ratingCriteria.isStarStyleRating()) {
+	    int ratedCount = getCountItemsRatedByUserByCriteria(ratingCriteria.getRatingCriteriaId(),
+		    currentUserId.intValue());
 	    criteriaDto.setCountRatedItems(ratedCount);
 	}
 
 	boolean isComment = ratingCriteria.isCommentRating();
-	if ( rawDataRows != null ) {
+	if (rawDataRows != null) {
 
-	    List<StyledRatingDTO> ratingDtos = new ArrayList<StyledRatingDTO>();
+	    List<StyledRatingDTO> ratingDtos = new ArrayList<>();
 	    criteriaDto.setRatingDtos(ratingDtos);
-
 
 	    NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
 	    numberFormat.setMaximumFractionDigits(1);
 
 	    for (Object[] row : rawDataRows) {
 		int numColumns = row.length;
-		if ( ( isComment && numColumns < 4 ) || ( !isComment && numColumns < 7) ) {
+		if ((isComment && numColumns < 4) || (!isComment && numColumns < 7)) {
 		    StringBuffer buf = new StringBuffer("convertToStyledDTO: ratingCriteria")
 			    .append(ratingCriteria.getRatingCriteriaId()).append(" UserId: ").append(currentUserId)
 			    .append("  Skipping data row as there are not enough columns. Only ").append(numColumns)
 			    .append(" columns. numColumns: ").append(numColumns);
-		    if (numColumns > 0)
+		    if (numColumns > 0) {
 			buf.append(" Data: 0:").append(row[0]);
-		    if (numColumns > 1)
+		    }
+		    if (numColumns > 1) {
 			buf.append(" 1:").append(row[1]);
+		    }
 		    log.error(buf.toString());
 		    break;
 		}
 
 		long itemId = ((BigInteger) row[0]).longValue();
-		if ( includeCurrentUser || itemId != currentUserId) {
+		if (includeCurrentUser || itemId != currentUserId) {
 
-		    if (row[1] != null && itemId != ((BigInteger) row[0]).longValue() ) {
-			log.error("convertToStyledDTO: ratingCriteria" + ratingCriteria.getRatingCriteriaId() + " UserId: "
-				+ currentUserId + "  Potential issue: expected item id " + row[0] + " does match real item id "
-				+ row[1] + ". Data: 0:" + row[0] + " 1:" + row[1]);
+		    if (row[1] != null && itemId != ((BigInteger) row[0]).longValue()) {
+			log.error("convertToStyledDTO: ratingCriteria" + ratingCriteria.getRatingCriteriaId()
+				+ " UserId: " + currentUserId + "  Potential issue: expected item id " + row[0]
+				+ " does match real item id " + row[1] + ". Data: 0:" + row[0] + " 1:" + row[1]);
 		    }
-		    
+
 		    StyledRatingDTO dto = new StyledRatingDTO(((BigInteger) row[0]).longValue());
 		    dto.setComment((String) row[2]);
 		    dto.setItemDescription((String) row[numColumns - 1]);
-		    if ( ! isComment ) {
-			dto.setUserRating(row[3] == null ? "" : numberFormat.format((Double) row[3]));
-			dto.setAverageRating(row[4] == null ? "" : numberFormat.format((Double) row[4]));
-			dto.setNumberOfVotes(row[5] == null ? "" : numberFormat.format((BigInteger) row[5]));
+		    if (!isComment) {
+			dto.setUserRating(row[3] == null ? "" : numberFormat.format(row[3]));
+			dto.setAverageRating(row[4] == null ? "" : numberFormat.format(row[4]));
+			dto.setNumberOfVotes(row[5] == null ? "" : numberFormat.format(row[5]));
 		    }
 		    ratingDtos.add(dto);
 		}
@@ -661,95 +674,99 @@ public class RatingService implements IRatingService {
     }
 
     /**
-     * Convert the raw data from the database to JSON, similar on StyledCriteriaRatingDTO and StyleRatingDTO. 
-     * The rating service expects the potential itemId followed by rating.* (its own fields) and the last item 
-     * in the array to be an item description (eg formatted user's name) Will go back to the database for the 
-     * justification comment that would apply to hedging. 
-     * 
+     * Convert the raw data from the database to JSON, similar on StyledCriteriaRatingDTO and StyleRatingDTO.
+     * The rating service expects the potential itemId followed by rating.* (its own fields) and the last item
+     * in the array to be an item description (eg formatted user's name) Will go back to the database for the
+     * justification comment that would apply to hedging.
+     *
      * If includeCurrentUser == true will include the current users' records (used for SelfReview and Monitoring)
      * otherwise skips the current user, so they do not rate themselves!
-     * 
+     *
      * toolSessionId is only used to calculate the number of users who have rated an item, so it may be null
      * if the tool doesn't need to seperate session (Peer Review doesn't need to separate by sessions).
-     * 
+     *
      * In JSON for use with tablesorter.
-     * Entries in Object array for comment style: 
-     *   tool item id (usually user id), rating.item_id, rating_comment.comment, (tool fields)+
-     * Entries in Object array for other styles: 
-     *   tool item id (usually user id), rating.item_id, rating_comment.comment,
-     *   rating.rating, calculated.average_rating, calculated.count_vote, (tool fields)+
-     * @throws JSONException 
+     * Entries in Object array for comment style:
+     * tool item id (usually user id), rating.item_id, rating_comment.comment, (tool fields)+
+     * Entries in Object array for other styles:
+     * tool item id (usually user id), rating.item_id, rating_comment.comment,
+     * rating.rating, calculated.average_rating, calculated.count_vote, (tool fields)+
+     *
+     * @throws JSONException
      */
     @Override
-    public JSONArray convertToStyledJSON(RatingCriteria ratingCriteria, Long toolSessionId, Long currentUserId, boolean includeCurrentUser, 
-	    List<Object[]> rawDataRows, boolean needRatesPerUser) throws JSONException {
+    public ArrayNode convertToStyledJSON(RatingCriteria ratingCriteria, Long toolSessionId, Long currentUserId,
+	    boolean includeCurrentUser, List<Object[]> rawDataRows, boolean needRatesPerUser) {
 
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	boolean isComment = ratingCriteria.isCommentRating();
 
-	if ( rawDataRows != null ) {
+	if (rawDataRows != null) {
 
-	    List<Long> itemIds = needRatesPerUser ? new ArrayList<Long>(rawDataRows.size()) : null;
+	    List<Long> itemIds = needRatesPerUser ? new ArrayList<>(rawDataRows.size()) : null;
 
 	    NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
 	    numberFormat.setMaximumFractionDigits(1);
 
 	    for (Object[] row : rawDataRows) {
 		int numColumns = row.length;
-		if ( ( isComment && numColumns < 4 ) || ( !isComment && numColumns < 7) ) {
+		if ((isComment && numColumns < 4) || (!isComment && numColumns < 7)) {
 		    StringBuffer buf = new StringBuffer("convertToStyledJSON: ratingCriteria")
 			    .append(ratingCriteria.getRatingCriteriaId()).append(" UserId: ").append(currentUserId)
 			    .append("  Skipping data row as there are not enough columns. Only ").append(numColumns)
 			    .append(" columns. numColumns: ").append(numColumns);
-		    if (numColumns > 0)
+		    if (numColumns > 0) {
 			buf.append(" Data: 0:").append(row[0]);
-		    if (numColumns > 1)
+		    }
+		    if (numColumns > 1) {
 			buf.append(" 1:").append(row[1]);
+		    }
 		    log.error(buf.toString());
 		    break;
 		}
-		
-		Long itemId = ((BigInteger) row[0]).longValue();
-		if ( includeCurrentUser || itemId != currentUserId) {
 
-		    if (row[1] != null &&  itemId.longValue() != ((BigInteger) row[0]).longValue() ) {
-			log.error("convertToStyledJSON: ratingCriteria" + ratingCriteria.getRatingCriteriaId() + " UserId: "
-				+ currentUserId + "  Potential issue: expected item id " + row[0] + " does match real item id "
-				+ row[1] + ". Data: 0:" + row[0] + " 1:" + row[1]);
+		Long itemId = ((BigInteger) row[0]).longValue();
+		if (includeCurrentUser || itemId != currentUserId) {
+
+		    if (row[1] != null && itemId.longValue() != ((BigInteger) row[0]).longValue()) {
+			log.error("convertToStyledJSON: ratingCriteria" + ratingCriteria.getRatingCriteriaId()
+				+ " UserId: " + currentUserId + "  Potential issue: expected item id " + row[0]
+				+ " does match real item id " + row[1] + ". Data: 0:" + row[0] + " 1:" + row[1]);
 		    }
-		    
-		    JSONObject userRow = new JSONObject();
+
+		    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 		    userRow.put("itemId", itemId);
 		    userRow.put("comment", row[2] == null ? "" : (String) row[2]);
-    		    userRow.put("itemDescription", row[numColumns - 1] == null ? "" : (String) row[numColumns - 1]);
-		    if ( ! isComment ) {
-        		    userRow.put("userRating", row[3] == null ? "" : numberFormat.format((Double) row[3]));
-        		    userRow.put("averageRating",  row[4] == null ? "" : numberFormat.format((Double) row[4]));
-        		    userRow.put("numberOfVotes", row[5] == null ? "" : numberFormat.format((BigInteger) row[5]));
+		    userRow.put("itemDescription", row[numColumns - 1] == null ? "" : (String) row[numColumns - 1]);
+		    if (!isComment) {
+			userRow.put("userRating", row[3] == null ? "" : numberFormat.format(row[3]));
+			userRow.put("averageRating", row[4] == null ? "" : numberFormat.format(row[4]));
+			userRow.put("numberOfVotes", row[5] == null ? "" : numberFormat.format(row[5]));
 		    } else {
 			// don't have missing entries in JSON or an exception can occur if you try to access them
-        		    userRow.put("userRating", "");
-        		    userRow.put("averageRating", "");
-        		    userRow.put("numberOfVotes", "");
+			userRow.put("userRating", "");
+			userRow.put("averageRating", "");
+			userRow.put("numberOfVotes", "");
 		    }
 
-		    rows.put(userRow);
-		    
-		    if ( needRatesPerUser )
+		    rows.add(userRow);
+
+		    if (needRatesPerUser) {
 			itemIds.add(itemId);
+		    }
 		}
 	    }
-	    
-	    if ( needRatesPerUser ) {
-		Map<Long, Long> countUsersRatedEachItemMap = ratingDAO.countUsersRatedEachItemByCriteria(ratingCriteria.getRatingCriteriaId(), toolSessionId, itemIds, -1);
-		for ( int i=0; i < rows.length(); i++ ) {
-		    JSONObject row = rows.getJSONObject(i);
-		    Long count = countUsersRatedEachItemMap.get(row.get("itemId"));
-		    row.put("ratesPerUser", count != null ? count : 0);
+
+	    if (needRatesPerUser) {
+		Map<Long, Long> countUsersRatedEachItemMap = ratingDAO.countUsersRatedEachItemByCriteria(
+			ratingCriteria.getRatingCriteriaId(), toolSessionId, itemIds, -1);
+		for (JsonNode row : rows) {
+		    Long count = countUsersRatedEachItemMap.get(JsonUtil.optLong(row, "itemId"));
+		    ((ObjectNode) row).put("ratesPerUser", count == null ? 0 : count);
 		}
 	    }
 	}
-	
+
 	return rows;
 
     }

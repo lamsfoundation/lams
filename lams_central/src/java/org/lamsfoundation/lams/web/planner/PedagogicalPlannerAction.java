@@ -33,9 +33,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,24 +49,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.IndexWriterConfig.OpenMode;
-import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.store.RAMDirectory;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -124,24 +104,13 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * Action managing Pedagogical Planner base page and non-tool activities.
  *
  * @author Marcin Cieslak
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static Logger log = Logger.getLogger(PedagogicalPlannerAction.class);
@@ -154,9 +123,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static MessageService messageService;
     private static PedagogicalPlannerDAO pedagogicalPlannerDAO;
     private static ActivityDAO activityDAO;
-
-    private static final RAMDirectory luceneDir = new RAMDirectory();
-    private static final Analyzer luceneAnalyzer = new StandardAnalyzer();
 
     private static final String FILE_EXTENSION_ZIP = ".zip";
     private static final String FILE_EXTENSION_LAS = ".las";
@@ -354,7 +320,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    throws ServletException {
 	ActionMessages errors = new ActionMessages();
 
-	List<PedagogicalPlannerActivityDTO> activities = new ArrayList<PedagogicalPlannerActivityDTO>();
+	List<PedagogicalPlannerActivityDTO> activities = new ArrayList<>();
 
 	// Create DTOs that hold all the necessary information of the activities
 	Activity activity = learningDesign.getFirstActivity();
@@ -752,46 +718,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Boolean edit = WebUtil.readBooleanParam(request, CentralConstants.PARAM_EDIT, false);
 	edit &= canEdit;
 
-	// Fill the DTO
-	PedagogicalPlannerSequenceNodeDTO dto = null;
-	if (filterText != null) {
-	    try {
-		// Filtering = display node and all the subnodes that were found in the search (not the immediate
-		// children of the node)
-		Set<Long> filteredNodeUids = filterSubnodes(node, filterText);
-		if (filteredNodeUids != null) {
-		    request.setAttribute(CentralConstants.PARAM_FILTER_TEXT, filterText);
-
-		    Set<PedagogicalPlannerSequenceNode> filteredNodes = new LinkedHashSet<PedagogicalPlannerSequenceNode>(
-			    filteredNodeUids.size());
-		    for (Long filteredUid : filteredNodeUids) {
-			PedagogicalPlannerSequenceNode subnode = getPedagogicalPlannerDAO().getByUid(filteredUid);
-			filteredNodes.add(subnode);
-		    }
-
-		    dto = new PedagogicalPlannerSequenceNodeDTO(node, filteredNodes, isSysAdmin,
-			    getPedagogicalPlannerDAO());
-		    for (PedagogicalPlannerSequenceNodeDTO subnodeDTO : dto.getSubnodes()) {
-			List<String[]> titlePath = getPedagogicalPlannerDAO().getTitlePath(subnodeDTO.getUid());
-			subnodeDTO.setTitlePath(titlePath);
-		    }
-		}
-	    } catch (Exception e) {
-		PedagogicalPlannerAction.log.error(e, e);
-		ActionMessages errors = new ActionMessages();
-		errors.add(ActionMessages.GLOBAL_MESSAGE,
-			new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILTER_PARSE));
-		saveErrors(request, errors);
-	    }
-	}
-
-	if (dto == null) {
-	    // No filtering or something went wrong in filtering
-	    dto = new PedagogicalPlannerSequenceNodeDTO(node, node.getSubnodes(), isSysAdmin,
-		    getPedagogicalPlannerDAO());
-	    if (nodeUid == null) {
-		dto.setRecentlyModifiedNodes(getRecentlyModifiedLearnindDesignsAsNodes());
-	    }
+	// No filtering or something went wrong in filtering
+	PedagogicalPlannerSequenceNodeDTO dto = new PedagogicalPlannerSequenceNodeDTO(node, node.getSubnodes(),
+		isSysAdmin, getPedagogicalPlannerDAO());
+	if (nodeUid == null) {
+	    dto.setRecentlyModifiedNodes(getRecentlyModifiedLearnindDesignsAsNodes());
 	}
 
 	// Additional DTO parameters
@@ -1181,7 +1112,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	    PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	    // exporting XML
-	    XStream designXml = new XStream(new SunUnsafeReflectionProvider());
+	    XStream designXml = new XStream(new StaxDriver());
 	    designXml.addPermission(AnyTypePermission.ANY);
 	    // do not serialize node's owner
 	    designXml.omitField(PedagogicalPlannerSequenceNode.class, "user");
@@ -1306,10 +1237,10 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     @SuppressWarnings("unchecked")
     private LearningDesign importLearningDesign(File sourceFile, ActionMessages errors) throws ServletException {
 	User user = getUser();
-	List<String> toolsErrorMsgs = new ArrayList<String>();
+	List<String> toolsErrorMsgs = new ArrayList<>();
 	Long learningDesignID = null;
 	LearningDesign learningDesign = null;
-	List<String> learningDesignErrorMsgs = new ArrayList<String>();
+	List<String> learningDesignErrorMsgs = new ArrayList<>();
 
 	Integer workspaceFolderId = null;
 
@@ -1366,7 +1297,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	WorkspaceFolder parentFolder = getUserManagementService().getRootOrganisation().getNormalFolder();
 	Integer workspaceFolderType = WorkspaceFolder.PUBLIC_SEQUENCES;
 
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("name", name);
 	properties.put("parentWorkspaceFolder.workspaceFolderId", parentFolder.getWorkspaceFolderId());
 	properties.put("workspaceFolderType", workspaceFolderType);
@@ -1419,7 +1350,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		}
 	    } else {
 
-		List<String> toolsErrorMsgs = new ArrayList<String>();
+		List<String> toolsErrorMsgs = new ArrayList<>();
 		String exportedLdFilePath = getExportService().exportLearningDesign(node.getLearningDesignId(),
 			toolsErrorMsgs);
 		if (!toolsErrorMsgs.isEmpty()) {
@@ -1475,100 +1406,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		node.setLearningDesignTitle(learningDesign.getTitle());
 	    }
 	}
-    }
-
-    /**
-     * Finds all node's descendants matching the query. Results can be not only the subnodes of the node, but also
-     * deeper descendants. This method uses Lucene project for query parsing and searchig.
-     *
-     * @param node
-     * @param filterText
-     * @return set of nodes' uids
-     * @throws ParseException
-     * @throws CorruptIndexException
-     * @throws IOException
-     */
-    private Set<Long> filterSubnodes(PedagogicalPlannerSequenceNode node, String filterText)
-	    throws ParseException, CorruptIndexException, IOException {
-	Set<Long> matchingSubnodeUids = new LinkedHashSet<Long>();
-	if (!StringUtils.isEmpty(filterText)) {
-
-	    Set<Document> docs = extractSubnodeDocuments(node);
-	    if (!docs.isEmpty()) {
-		// Searching is performed in title, brief description and full description of the node.
-		MultiFieldQueryParser queryParser = new MultiFieldQueryParser(
-			new String[] { PedagogicalPlannerAction.FIELD_NAME_TITLE,
-				PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION,
-				PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION },
-			PedagogicalPlannerAction.luceneAnalyzer);
-
-		Query query = queryParser.parse(filterText);
-
-		// build index based on nodes
-		IndexWriterConfig config = new IndexWriterConfig(PedagogicalPlannerAction.luceneAnalyzer.getVersion(),
-			PedagogicalPlannerAction.luceneAnalyzer);
-		config.setOpenMode(OpenMode.CREATE);
-		IndexWriter indexWriter = new IndexWriter(PedagogicalPlannerAction.luceneDir, config);
-		for (Document doc : docs) {
-		    indexWriter.addDocument(doc);
-		}
-		indexWriter.close();
-
-		// execute search
-		IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(PedagogicalPlannerAction.luceneDir));
-		TopDocs topDocs = searcher.search(query, null, docs.size());
-
-		for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-		    Document doc = searcher.doc(scoreDoc.doc);
-		    String ancestorUid = doc.get(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID);
-		    Long uid = new Long(ancestorUid);
-		    matchingSubnodeUids.add(uid);
-		}
-	    }
-	}
-	return matchingSubnodeUids;
-    }
-
-    /**
-     * Adds documents made of subnodes' title, descriptions and uid, then descents deeper into descendants.
-     *
-     * @param node
-     *            its subnodes will be parsed
-     * @return documents made of all of node's descendants
-     */
-    private Set<Document> extractSubnodeDocuments(PedagogicalPlannerSequenceNode node) {
-	Set<Document> docs = new HashSet<Document>();
-	if ((node != null) && (node.getSubnodes() != null)) {
-	    for (PedagogicalPlannerSequenceNode subnode : node.getSubnodes()) {
-		Document doc = new Document();
-		Field titleField = new TextField(PedagogicalPlannerAction.FIELD_NAME_TITLE, subnode.getTitle(),
-			Field.Store.NO);
-		titleField.setBoost(10);
-		doc.add(titleField);
-
-		String briefDesc = WebUtil.removeHTMLtags(subnode.getBriefDescription());
-		if (briefDesc != null) {
-		    Field briefDescField = new TextField(PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION,
-			    briefDesc, Field.Store.NO);
-		    doc.add(briefDescField);
-		}
-		String fullDesc = WebUtil.removeHTMLtags(subnode.getFullDescription());
-		if (fullDesc != null) {
-		    Field fullDescField = new TextField(PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION, fullDesc,
-			    Field.Store.NO);
-		    doc.add(fullDescField);
-		}
-
-		Field uidField = new StringField(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID,
-			subnode.getUid().toString(), Field.Store.YES);
-		doc.add(uidField);
-		docs.add(doc);
-
-		Set<Document> subnodeDocs = extractSubnodeDocuments(subnode);
-		docs.addAll(subnodeDocs);
-	    }
-	}
-	return docs;
     }
 
     /*----------------------- GROUPING METHODS -------------------------*/
@@ -1638,7 +1475,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	User user = getUser();
 	// the list is sorted most-recently-edited-on-top (so by the timestamp descending)
 	Set<Long> recentLDs = user.getRecentlyModifiedLearningDesigns();
-	List<PedagogicalPlannerSequenceNodeDTO> recentNodes = new LinkedList<PedagogicalPlannerSequenceNodeDTO>();
+	List<PedagogicalPlannerSequenceNodeDTO> recentNodes = new LinkedList<>();
 	// create "dummy", almost empty nodes
 	for (Long learningDesignId : recentLDs) {
 	    LearningDesign learningDesign = getAuthoringService().getLearningDesign(learningDesignId);
@@ -1718,7 +1555,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    if (!StringUtils.isEmpty(activityMetadataString)) {
 		String[] activityMetadataEntries = activityMetadataString.split("&");
 		// creata a map of metadata objects, because we are filling them multiple times during this iteration
-		Map<Long, PedagogicalPlannerActivityMetadata> activitiesMetadata = new TreeMap<Long, PedagogicalPlannerActivityMetadata>();
+		Map<Long, PedagogicalPlannerActivityMetadata> activitiesMetadata = new TreeMap<>();
 		for (String activityMetadataEntry : activityMetadataEntries) {
 		    String[] keyAndValue = activityMetadataEntry.split("=");
 		    String[] keyParts = keyAndValue[0].split("\\.");
@@ -1790,7 +1627,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws IOException, ServletException {
 	Long learningDesignId = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
 
-	List<String> toolsErrorMsgs = new ArrayList<String>();
+	List<String> toolsErrorMsgs = new ArrayList<>();
 	ActionMessages errors = new ActionMessages();
 	String zipFilePath = null;
 	boolean valid = false;
@@ -1854,7 +1691,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	    // list existing users (inherited role from parent nodes)
 	    Set<User> allInheritedUsers = getPedagogicalPlannerDAO().getInheritedNodeUsers(nodeUid, Role.ROLE_SYSADMIN);
-	    ArrayList<User> filteredInheritedUsers = new ArrayList<User>();
+	    ArrayList<User> filteredInheritedUsers = new ArrayList<>();
 	    for (Object o : allInheritedUsers) {
 		User u = (User) o;
 		// filter existing users of the actual node
@@ -1865,7 +1702,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    }
 
 	    // filter existing users from list of potential users
-	    ArrayList<User> potentialUsers = new ArrayList<User>();
+	    ArrayList<User> potentialUsers = new ArrayList<>();
 	    for (Object o : potentialUsersVector) {
 		User u = (User) o;
 		if (existingUsers.contains(u) || allInheritedUsers.contains(u)) {

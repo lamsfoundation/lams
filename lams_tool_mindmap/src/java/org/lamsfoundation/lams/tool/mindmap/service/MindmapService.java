@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mindmap.service;
 
 import java.util.ArrayList;
@@ -33,8 +32,6 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -78,8 +75,9 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
@@ -90,7 +88,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     private static Logger logger = Logger.getLogger(MindmapService.class.getName());
 
-    private final XStream xstream = new XStream(new SunUnsafeReflectionProvider());
+    private final XStream xstream = new XStream(new StaxDriver());
 
     private IMindmapDAO mindmapDAO = null;
     private IMindmapSessionDAO mindmapSessionDAO = null;
@@ -167,10 +165,10 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getMindmapOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -383,7 +381,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     @Override
     public String getLanguageXML() {
-	ArrayList<String> languageCollection = new ArrayList<String>();
+	ArrayList<String> languageCollection = new ArrayList<>();
 	languageCollection.add(new String("local.title"));
 	languageCollection.add(new String("local.delete_question"));
 	languageCollection.add(new String("local.yes"));
@@ -447,13 +445,13 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    return;
 	}
 
-	List<MindmapNode> nodesToDelete = new LinkedList<MindmapNode>();
+	List<MindmapNode> nodesToDelete = new LinkedList<>();
 	for (MindmapSession session : (Set<MindmapSession>) mindmap.getMindmapSessions()) {
 	    List<MindmapNode> nodes = mindmapNodeDAO.getMindmapNodesBySessionIdAndUserId(session.getSessionId(),
 		    userId.longValue());
 
 	    for (MindmapNode node : nodes) {
-		List<MindmapNode> descendants = new LinkedList<MindmapNode>();
+		List<MindmapNode> descendants = new LinkedList<>();
 		if ((node.getUser() != null) && node.getUser().getUserId().equals(userId.longValue())
 			&& !nodesToDelete.contains(node)
 			&& userOwnsChildrenNodes(node, userId.longValue(), descendants)) {
@@ -858,10 +856,10 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     public void setMindmapNodeDAO(IMindmapNodeDAO mindmapNodeDAO) {
@@ -1008,22 +1006,21 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      * (default false), reflectOnActivity (default false), reflectInstructions
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
 	Mindmap content = new Mindmap();
 	Date updateDate = new Date();
 	content.setToolContentId(toolContentID);
 	content.setCreateDate(updateDate);
 	content.setUpdateDate(updateDate);
-	content.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	content.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	content.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	content.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 	content.setContentInUse(false);
 	content.setDefineLater(false);
-	content.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
-	content.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	content.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	content.setMultiUserMode(JsonUtil.opt(toolContentJSON, "multiUserMode", Boolean.FALSE));
+	content.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	content.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	content.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	content.setMultiUserMode(JsonUtil.optBoolean(toolContentJSON, "multiUserMode", Boolean.FALSE));
 
 	// createdBy and submissionDeadline are null in the database using the standard authoring module
 	// submissionDeadline is set in monitoring

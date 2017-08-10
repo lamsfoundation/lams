@@ -33,14 +33,13 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -81,7 +80,7 @@ public class CleanupPreviewLessonsAction extends LamsDispatchAction {
     }
 
     public ActionForward deletePreviewLessons(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, JSONException {
+	    HttpServletResponse response) throws IOException {
 	Integer userID = getUserID();
 	Integer limit = WebUtil.readIntParam(request, "limit", true);
 	List<Long> lessonIDs = getLessonService().getPreviewLessons(limit);
@@ -92,7 +91,7 @@ public class CleanupPreviewLessonsAction extends LamsDispatchAction {
 	}
 
 	long[] lessonCount = getLessonService().getPreviewLessonCount();
-	JSONArray responseJSON = new JSONArray(lessonCount);
+	String responseJSON = JsonUtil.toString(lessonCount);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(responseJSON);
 	return null;

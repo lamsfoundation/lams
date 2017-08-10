@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONException;
+
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -268,7 +268,7 @@ public class LearningAction extends LamsDispatchAction {
     }
 
     public ActionForward forceCompleteActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	LearningForm lrnForm = (LearningForm) form;
 	ScribeUser scribeUser = scribeService.getUserByUID(lrnForm.getScribeUserUID());
 	ScribeSession session = scribeUser.getScribeSession();

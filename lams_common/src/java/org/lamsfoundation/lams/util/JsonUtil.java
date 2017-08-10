@@ -23,8 +23,13 @@
 
 package org.lamsfoundation.lams.util;
 
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Helper for JSON objects.
@@ -33,39 +38,88 @@ import org.apache.tomcat.util.json.JSONObject;
  *
  */
 public class JsonUtil {
+    public static final ObjectMapper objectMapper = new ObjectMapper();
 
-    /**
-     * Checks if given key exists in JSON object and returns defaultValue otherwise. Native JSONObject.opt() method does
-     * not check for JSONNull value, so it had to be rewritten.
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> T opt(JSONObject object, String field, T defaultValue) throws JSONException {
-	return object.isNull(field) ? defaultValue : (T) object.get(field);
+    public static JsonNode opt(JsonNode object, String field) {
+	return opt(object, field, null);
     }
 
-    /**
-     * Checks if given key exists in JSON object and returns defaultValue otherwise. Native JSONObject.opt() method does
-     * not check for JSONNull value, so it had to be rewritten.
-     */
-    public static Object opt(JSONObject object, String field) throws JSONException {
-	return object.isNull(field) ? null : object.get(field);
+    public static JsonNode opt(JsonNode object, String field, JsonNode defaultValue) {
+	return object.hasNonNull(field) ? object.get(field) : defaultValue;
     }
 
-    /**
-     * Checks if long value for given key exists in JSON object and returns null otherwise. This special method prevents
-     * exception when casting Integer (JSON default type for numbers) to Long. Native JSONObject.opt() method does not
-     * check for JSONNull value, so it had to be rewritten.
-     */
-    public static Long optLong(JSONObject object, String field) throws JSONException {
-	Object value = object.isNull(field) ? null : object.get(field);
+    public static ObjectNode optObject(JsonNode object, String field) {
+	return object.hasNonNull(field) ? (ObjectNode) object.get(field) : null;
+    }
+
+    public static ArrayNode optArray(JsonNode object, String field) {
+	return object.hasNonNull(field) ? (ArrayNode) object.get(field) : null;
+    }
+
+    public static Boolean optBoolean(JsonNode object, String field) {
+	return optBoolean(object, field, null);
+    }
+
+    public static Boolean optBoolean(JsonNode object, String field, Boolean defaultValue) {
+	return object.hasNonNull(field) ? (Boolean) object.get(field).asBoolean() : defaultValue;
+    }
+
+    public static Long optLong(JsonNode object, String field) {
+	return optLong(object, field, null);
+    }
+
+    public static Long optLong(JsonNode object, String field, Long defaultValue) {
+	return object.hasNonNull(field) ? (Long) object.get(field).asLong() : null;
+    }
+
+    public static Double optDouble(JsonNode object, String field, Double defaultValue) {
+	return object.hasNonNull(field) ? (Double) object.get(field).asDouble() : defaultValue;
+    }
+
+    public static Integer optDouble(JsonNode object, String field) {
+	return optInt(object, field, null);
+    }
+
+    public static Integer optInt(JsonNode object, String field) {
+	return optInt(object, field, null);
+    }
+
+    public static Integer optInt(JsonNode object, String field, Integer defaultValue) {
+	return object.hasNonNull(field) ? (Integer) object.get(field).asInt() : defaultValue;
+    }
+
+    public static String optString(JsonNode object, String field) {
+	return optString(object, field, null);
+    }
+
+    public static String optString(JsonNode object, String field, String defaultValue) {
+	return object.hasNonNull(field) ? object.get(field).asText() : defaultValue;
+    }
+
+    public static ArrayNode readArray(String content) throws JsonProcessingException, IOException {
+	return (ArrayNode) objectMapper.readTree(content);
+    }
+
+    public static ObjectNode readObject(String content) throws JsonProcessingException, IOException {
+	return (ObjectNode) objectMapper.readTree(content);
+    }
+
+    public static ArrayNode readArray(Object object) throws JsonProcessingException, IOException {
+	return (ArrayNode) objectMapper.valueToTree(object);
+    }
+
+    public static ObjectNode readObject(Object object) throws JsonProcessingException, IOException {
+	return (ObjectNode) objectMapper.valueToTree(object);
+    }
+
+    public static String toString(Object object) throws JsonProcessingException {
+	return objectMapper.writeValueAsString(object);
+    }
+
+    public static ObjectNode putOpt(ObjectNode object, String field, Object value) throws JsonProcessingException {
 	if (value != null) {
-	    if (value instanceof Number) {
-		value = ((Number) value).longValue();
-	    } else {
-		value = new Long((String) value);
-	    }
+	    object.set(field, objectMapper.valueToTree(value));
 	}
-
-	return (Long) value;
+	return object;
     }
 }

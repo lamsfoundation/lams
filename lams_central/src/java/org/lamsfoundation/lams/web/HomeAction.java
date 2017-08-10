@@ -27,9 +27,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
@@ -46,8 +43,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
@@ -74,6 +69,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * This is an action where all lams client environments launch. initial configuration of the individual environment
@@ -176,7 +174,6 @@ public class HomeAction extends DispatchAction {
 		return mapping.findForward("lessonIntro");
 	    }
 
-
 	    if (mode != null) {
 		req.setAttribute(AttributeNames.PARAM_MODE, mode);
 	    }
@@ -187,7 +184,7 @@ public class HomeAction extends DispatchAction {
 		    : "/" + serverURLContextPath;
 	    serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
 	    getServlet().getServletContext().getContext(serverURLContextPath + "learning")
-		    .getRequestDispatcher("/content.do?lessonID="+lessonId).forward(req, res);
+		    .getRequestDispatcher("/content.do?lessonID=" + lessonId).forward(req, res);
 	    return null;
 
 	} catch (Exception e) {
@@ -241,8 +238,7 @@ public class HomeAction extends DispatchAction {
 
     @SuppressWarnings("unchecked")
     public ActionForward addLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res)
-	    throws IOException, UserAccessDeniedException, JSONException, RepositoryCheckedException {
+	    HttpServletResponse res) throws IOException, UserAccessDeniedException, RepositoryCheckedException {
 	UserDTO userDTO = getUser();
 	Integer organisationID = new Integer(WebUtil.readIntParam(req, "organisationID"));
 
@@ -255,25 +251,25 @@ public class HomeAction extends DispatchAction {
 	String folderContentsJSON = getWorkspaceManagementService().getFolderContentsJSON(null, userDTO.getUserID(),
 		false);
 	req.setAttribute("folderContents", folderContentsJSON);
-	JSONObject users = new JSONObject();
+	ObjectNode users = JsonNodeFactory.instance.objectNode();
 
 	// get learners available for newly created lesson
 	Vector<User> learners = getUserManagementService().getUsersFromOrganisationByRole(organisationID, "LEARNER",
 		true);
 	for (User user : learners) {
-	    JSONObject userJSON = new JSONObject();
+	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
 	    userJSON.put("userID", user.getUserId());
 	    userJSON.put("firstName", user.getFirstName());
 	    userJSON.put("lastName", user.getLastName());
 	    userJSON.put("login", user.getLogin());
 
-	    users.append("selectedLearners", userJSON);
+	    users.withArray("selectedLearners").add(userJSON);
 	}
 
 	Vector<User> monitors = getUserManagementService().getUsersFromOrganisationByRole(organisationID, "MONITOR",
 		true);
 	for (User user : monitors) {
-	    JSONObject userJSON = new JSONObject();
+	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
 	    userJSON.put("userID", user.getUserId());
 	    userJSON.put("firstName", user.getFirstName());
 	    userJSON.put("lastName", user.getLastName());
@@ -281,9 +277,9 @@ public class HomeAction extends DispatchAction {
 
 	    if (userDTO.getUserID().equals(user.getUserId())) {
 		// creator is always selected
-		users.append("selectedMonitors", userJSON);
+		users.withArray("selectedMonitors").add(userJSON);
 	    } else {
-		users.append("unselectedMonitors", userJSON);
+		users.withArray("unselectedMonitors").add(userJSON);
 	    }
 	}
 
@@ -292,7 +288,7 @@ public class HomeAction extends DispatchAction {
 	// find lessons which can be set as preceding ones for newly created lesson
 	Organisation organisation = (Organisation) getUserManagementService().findById(Organisation.class,
 		organisationID);
-	Set<LessonDTO> availableLessons = new TreeSet<LessonDTO>(new LessonDTOComparator());
+	Set<LessonDTO> availableLessons = new TreeSet<>(new LessonDTOComparator());
 	for (Lesson availableLesson : (Set<Lesson>) organisation.getLessons()) {
 	    Integer availableLessonState = availableLesson.getLessonStateId();
 	    if (!Lesson.REMOVED_STATE.equals(availableLessonState)
@@ -309,8 +305,7 @@ public class HomeAction extends DispatchAction {
      * Gets subfolder contents in Add Lesson screen.
      */
     public ActionForward getFolderContents(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res)
-	    throws UserAccessDeniedException, JSONException, IOException, RepositoryCheckedException {
+	    HttpServletResponse res) throws UserAccessDeniedException, IOException, RepositoryCheckedException {
 	Integer folderID = WebUtil.readIntParam(req, "folderID", true);
 	boolean allowInvalidDesigns = WebUtil.readBooleanParam(req, "allowInvalidDesigns", false);
 	String folderContentsJSON = getWorkspaceManagementService().getFolderContentsJSON(folderID,

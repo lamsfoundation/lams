@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.workspace.service;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.apache.tomcat.util.json.JSONException;
+
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -128,7 +128,7 @@ public interface IWorkspaceManagementService {
      * learning designs and subfolders of the given folder. Sample output:
      */
     String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns)
-	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException;
+	    throws IOException, UserAccessDeniedException, RepositoryCheckedException;
 
     /**
      * Returns Folder Contents in JSON format, restricted by designType (used for Integrations) If folderID == null,
@@ -137,7 +137,7 @@ public interface IWorkspaceManagementService {
      * output:
      */
     String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns, String designType)
-	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException;
+	    throws IOException, UserAccessDeniedException, RepositoryCheckedException;
 
     /**
      * Returns a section of the learning designs in the root of the user's personal folder. Returns the data in in JSON
@@ -148,7 +148,7 @@ public interface IWorkspaceManagementService {
      * "name":"TBL_BBBBB","date":"2015-07-13 10:07:41.0"}]}
      */
     public String getPagedLearningDesignsJSON(Integer userID, boolean allowInvalidDesigns, String searchString,
-	    int page, int size, String sortName, String sortDate) throws JSONException, IOException;
+	    int page, int size, String sortName, String sortDate) throws IOException;
 
     /**
      * This method creates a new folder under the given parentFolder inside the user's default workspace.

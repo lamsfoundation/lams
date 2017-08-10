@@ -29,7 +29,7 @@ import java.util.List;
 
 import javax.servlet.http.Cookie;
 
-import org.apache.tomcat.util.json.JSONException;
+
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
@@ -112,9 +112,9 @@ public interface IDokumaranService {
      * @throws IOException 
      * @throws JSONException 
      */
-    void launchTimeLimit(Long toolContentId) throws JSONException, IOException;
+    void launchTimeLimit(Long toolContentId) throws IOException;
     
-    void addOneMinute(Long toolContentId) throws JSONException, IOException;
+    void addOneMinute(Long toolContentId) throws IOException;
 
     /**
      * Calculates how many seconds left till the time limit will expire. 

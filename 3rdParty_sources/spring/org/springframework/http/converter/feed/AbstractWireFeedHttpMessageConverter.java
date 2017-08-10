@@ -23,10 +23,10 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
-import com.sun.syndication.feed.WireFeed;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.WireFeedInput;
-import com.sun.syndication.io.WireFeedOutput;
+import com.rometools.rome.feed.WireFeed;
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.WireFeedInput;
+import com.rometools.rome.io.WireFeedOutput;
 
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -38,7 +38,10 @@ import org.springframework.util.StringUtils;
 
 /**
  * Abstract base class for Atom and RSS Feed message converters, using the
- * <a href="https://rome.dev.java.net">ROME tools</a> project.
+ * <a href="https://github.com/rometools/rome">ROME tools</a> project.
+ *
+ * <p>><b>NOTE: As of Spring 4.1, this is based on the {@code com.rometools}
+ * variant of ROME, version 1.5. Please upgrade your build dependency.</b>
  *
  * @author Arjen Poutsma
  * @since 3.0.2
@@ -62,12 +65,8 @@ public abstract class AbstractWireFeedHttpMessageConverter<T extends WireFeed> e
 
 		WireFeedInput feedInput = new WireFeedInput();
 		MediaType contentType = inputMessage.getHeaders().getContentType();
-		Charset charset;
-		if (contentType != null && contentType.getCharSet() != null) {
-			charset = contentType.getCharSet();
-		} else {
-			charset = DEFAULT_CHARSET;
-		}
+		Charset charset =
+				(contentType != null && contentType.getCharset() != null? contentType.getCharset() : DEFAULT_CHARSET);
 		try {
 			Reader reader = new InputStreamReader(inputMessage.getBody(), charset);
 			return (T) feedInput.build(reader);

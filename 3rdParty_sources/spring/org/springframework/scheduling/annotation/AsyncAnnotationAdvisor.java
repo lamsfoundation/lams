@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,13 @@ import java.util.concurrent.Executor;
 import org.aopalliance.aop.Advice;
 
 import org.springframework.aop.Pointcut;
+import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.aop.support.AbstractPointcutAdvisor;
 import org.springframework.aop.support.ComposablePointcut;
 import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -54,6 +55,8 @@ import org.springframework.util.ClassUtils;
 @SuppressWarnings("serial")
 public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements BeanFactoryAware {
 
+	private AsyncUncaughtExceptionHandler exceptionHandler;
+
 	private Advice advice;
 
 	private Pointcut pointcut;
@@ -63,15 +66,19 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 	 * Create a new {@code AsyncAnnotationAdvisor} for bean-style configuration.
 	 */
 	public AsyncAnnotationAdvisor() {
-		this(new SimpleAsyncTaskExecutor());
+		this(null, null);
 	}
 
 	/**
 	 * Create a new {@code AsyncAnnotationAdvisor} for the given task executor.
 	 * @param executor the task executor to use for asynchronous methods
+	 * (can be {@code null} to trigger default executor resolution)
+	 * @param exceptionHandler the {@link AsyncUncaughtExceptionHandler} to use to
+	 * handle unexpected exception thrown by asynchronous method executions
+	 * @see AnnotationAsyncExecutionInterceptor#getDefaultExecutor(BeanFactory)
 	 */
 	@SuppressWarnings("unchecked")
-	public AsyncAnnotationAdvisor(Executor executor) {
+	public AsyncAnnotationAdvisor(Executor executor, AsyncUncaughtExceptionHandler exceptionHandler) {
 		Set<Class<? extends Annotation>> asyncAnnotationTypes = new LinkedHashSet<Class<? extends Annotation>>(2);
 		asyncAnnotationTypes.add(Async.class);
 		try {
@@ -81,7 +88,13 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 		catch (ClassNotFoundException ex) {
 			// If EJB 3.1 API not present, simply ignore.
 		}
-		this.advice = buildAdvice(executor);
+		if (exceptionHandler != null) {
+			this.exceptionHandler = exceptionHandler;
+		}
+		else {
+			this.exceptionHandler = new SimpleAsyncUncaughtExceptionHandler();
+		}
+		this.advice = buildAdvice(executor, this.exceptionHandler);
 		this.pointcut = buildPointcut(asyncAnnotationTypes);
 	}
 
@@ -90,7 +103,7 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 	 * Specify the default task executor to use for asynchronous methods.
 	 */
 	public void setTaskExecutor(Executor executor) {
-		this.advice = buildAdvice(executor);
+		this.advice = buildAdvice(executor, this.exceptionHandler);
 	}
 
 	/**
@@ -131,8 +144,8 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 	}
 
 
-	protected Advice buildAdvice(Executor executor) {
-		return new AnnotationAsyncExecutionInterceptor(executor);
+	protected Advice buildAdvice(Executor executor, AsyncUncaughtExceptionHandler exceptionHandler) {
+		return new AnnotationAsyncExecutionInterceptor(executor, exceptionHandler);
 	}
 
 	/**
@@ -146,11 +159,12 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 			Pointcut cpc = new AnnotationMatchingPointcut(asyncAnnotationType, true);
 			Pointcut mpc = AnnotationMatchingPointcut.forMethodAnnotation(asyncAnnotationType);
 			if (result == null) {
-				result = new ComposablePointcut(cpc).union(mpc);
+				result = new ComposablePointcut(cpc);
 			}
 			else {
-				result.union(cpc).union(mpc);
+				result.union(cpc);
 			}
+			result = result.union(mpc);
 		}
 		return result;
 	}

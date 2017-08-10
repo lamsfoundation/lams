@@ -42,9 +42,6 @@ import java.util.TreeSet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -113,6 +110,9 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -1514,12 +1514,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     /**
      * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: title, instructions, topics.
-     * Topics must contain a JSONArray of JSONObject objects, which have the following mandatory fields: subject, body
+     * Topics must contain a ArrayNode of ObjectNode objects, which have the following mandatory fields: subject, body
      * There will usually be at least one topic object in the Topics array but the array may be of zero length.
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
 	Forum forum = new Forum();
 	Date updateDate = new Date();
@@ -1527,37 +1526,37 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	forum.setUpdated(updateDate);
 
 	forum.setContentId(toolContentID);
-	forum.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	forum.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	forum.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	forum.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 
-	forum.setAllowAnonym(JsonUtil.opt(toolContentJSON, "allowAnonym", Boolean.FALSE));
-	forum.setAllowEdit(JsonUtil.opt(toolContentJSON, "allowEdit", Boolean.TRUE)); // defaults to true in the default
-										      // entry in the db
-	forum.setAllowNewTopic(JsonUtil.opt(toolContentJSON, "allowNewTopic", Boolean.TRUE)); // defaults to true in the
-											      // default entry in the db
-	forum.setAllowRateMessages(JsonUtil.opt(toolContentJSON, "allowRateMessages", Boolean.FALSE));
-	forum.setAllowRichEditor(JsonUtil.opt(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
-	forum.setAllowUpload(JsonUtil.opt(toolContentJSON, "allowUpload", Boolean.FALSE));
+	forum.setAllowAnonym(JsonUtil.optBoolean(toolContentJSON, "allowAnonym", Boolean.FALSE));
+	forum.setAllowEdit(JsonUtil.optBoolean(toolContentJSON, "allowEdit", Boolean.TRUE)); // defaults to true in the default
+	// entry in the db
+	forum.setAllowNewTopic(JsonUtil.optBoolean(toolContentJSON, "allowNewTopic", Boolean.TRUE)); // defaults to true in the
+	// default entry in the db
+	forum.setAllowRateMessages(JsonUtil.optBoolean(toolContentJSON, "allowRateMessages", Boolean.FALSE));
+	forum.setAllowRichEditor(JsonUtil.optBoolean(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
+	forum.setAllowUpload(JsonUtil.optBoolean(toolContentJSON, "allowUpload", Boolean.FALSE));
 	forum.setContentInUse(false);
 	forum.setDefineLater(false);
-	forum.setLimitedMaxCharacters(JsonUtil.opt(toolContentJSON, "limitedMaxCharacters", Boolean.TRUE));
-	forum.setLimitedMinCharacters(JsonUtil.opt(toolContentJSON, "limitedMinCharacters", Boolean.FALSE));
-	forum.setLockWhenFinished(JsonUtil.opt(toolContentJSON, "lockWhenFinished", Boolean.FALSE));
-	forum.setMaxCharacters(JsonUtil.opt(toolContentJSON, "maxCharacters", 5000)); // defaults to 5000 chars in the
-										      // default entry in the db.
-	forum.setMaximumRate(JsonUtil.opt(toolContentJSON, "maximumRate", 0));
-	forum.setMaximumReply(JsonUtil.opt(toolContentJSON, "maximumReply", 0));
-	forum.setMinCharacters(JsonUtil.opt(toolContentJSON, "minCharacters", 0));
-	forum.setMinimumRate(JsonUtil.opt(toolContentJSON, "minimumRate", 0));
-	forum.setMinimumReply(JsonUtil.opt(toolContentJSON, "minimumReply", 0));
+	forum.setLimitedMaxCharacters(JsonUtil.optBoolean(toolContentJSON, "limitedMaxCharacters", Boolean.TRUE));
+	forum.setLimitedMinCharacters(JsonUtil.optBoolean(toolContentJSON, "limitedMinCharacters", Boolean.FALSE));
+	forum.setLockWhenFinished(JsonUtil.optBoolean(toolContentJSON, "lockWhenFinished", Boolean.FALSE));
+	forum.setMaxCharacters(JsonUtil.optInt(toolContentJSON, "maxCharacters", 5000)); // defaults to 5000 chars in the
+											 // default entry in the db.
+	forum.setMaximumRate(JsonUtil.optInt(toolContentJSON, "maximumRate", 0));
+	forum.setMaximumReply(JsonUtil.optInt(toolContentJSON, "maximumReply", 0));
+	forum.setMinCharacters(JsonUtil.optInt(toolContentJSON, "minCharacters", 0));
+	forum.setMinimumRate(JsonUtil.optInt(toolContentJSON, "minimumRate", 0));
+	forum.setMinimumReply(JsonUtil.optInt(toolContentJSON, "minimumReply", 0));
 	forum.setNotifyLearnersOnForumPosting(
-		JsonUtil.opt(toolContentJSON, "notifyLearnersOnForumPosting", Boolean.FALSE));
+		JsonUtil.optBoolean(toolContentJSON, "notifyLearnersOnForumPosting", Boolean.FALSE));
 	forum.setNotifyLearnersOnMarkRelease(
-		JsonUtil.opt(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
+		JsonUtil.optBoolean(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
 	forum.setNotifyTeachersOnForumPosting(
-		JsonUtil.opt(toolContentJSON, "notifyTeachersOnForumPosting", Boolean.FALSE));
-	forum.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
-	forum.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnForumPosting", Boolean.FALSE));
+	forum.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	forum.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	// submissionDeadline is set in monitoring
 
 	// *******************************Handle user*******************
@@ -1571,8 +1570,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	//		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	ForumUser forumUser = getUserByID(userID.longValue());
 	if (forumUser == null) {
-	    forumUser = new ForumUser(userID.longValue(), toolContentJSON.getString("firstName"),
-		    toolContentJSON.getString("lastName"), toolContentJSON.getString("loginName"));
+	    forumUser = new ForumUser(userID.longValue(), JsonUtil.optString(toolContentJSON, "firstName"),
+		    JsonUtil.optString(toolContentJSON, "lastName"), JsonUtil.optString(toolContentJSON, "loginName"));
 	    getForumUserDao().save(forumUser);
 	}
 	forum.setCreatedBy(forumUser);
@@ -1580,9 +1579,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	updateForum(forum);
 
 	// **************************** Handle topic *********************
-	JSONArray topics = toolContentJSON.getJSONArray("topics");
-	for (int i = 0; i < topics.length(); i++) {
-	    JSONObject msgData = (JSONObject) topics.get(i);
+	ArrayNode topics = JsonUtil.optArray(toolContentJSON, "topics");
+	for (int i = 0; i < topics.size(); i++) {
+	    ObjectNode msgData = (ObjectNode) topics.get(i);
 	    Message newMsg = new Message();
 	    //	    newMsg.setAttachments(attachments); TODO
 	    newMsg.setCreatedBy(forumUser);
@@ -1590,8 +1589,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    newMsg.setModifiedBy(null);
 	    newMsg.setUpdated(updateDate);
 
-	    newMsg.setSubject(msgData.getString("subject"));
-	    newMsg.setBody(msgData.getString("body"));
+	    newMsg.setSubject(JsonUtil.optString(msgData, "subject"));
+	    newMsg.setBody(JsonUtil.optString(msgData, "body"));
 	    newMsg.setForum(forum);
 	    newMsg.setHideFlag(false);
 	    // newMsg.setIsAnonymous(false); Does not appear on authoring interface

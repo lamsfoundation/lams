@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.rsrc.web.action;
 
 import java.io.IOException;
@@ -42,9 +41,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
@@ -64,12 +60,16 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 	String param = mapping.getParameter();
 
 	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
@@ -139,7 +139,7 @@ public class MonitoringAction extends Action {
     }
 
     private ActionForward getSubgridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	IResourceService service = getResourceService();
 
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.ATTR_RESOURCE_ITEM_UID);
@@ -162,7 +162,7 @@ public class MonitoringAction extends Action {
 	int totalPages = new Double(
 		Math.ceil(new Integer(countVisitLogs).doubleValue() / new Integer(rowLimit).doubleValue())).intValue();
 
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	DateFormat timeTakenFormatter = new SimpleDateFormat("H:mm:ss");
 	DateFormat dateFormatter = new SimpleDateFormat("d-MMM-yyyy h:mm a");
 	HttpSession ss = SessionManager.getSession();
@@ -171,34 +171,34 @@ public class MonitoringAction extends Action {
 	int i = 1;
 	for (VisitLogDTO visitLogDto : visitLogDtos) {
 
-	    JSONArray visitLogData = new JSONArray();
-	    visitLogData.put(visitLogDto.getUserId());
+	    ArrayNode visitLogData = JsonNodeFactory.instance.arrayNode();
+	    visitLogData.add(visitLogDto.getUserId());
 	    String fullName = StringEscapeUtils.escapeHtml(visitLogDto.getUserFullName());
-	    visitLogData.put(fullName);
+	    visitLogData.add(fullName);
 	    String accessDate = (visitLogDto.getAccessDate() == null) ? ""
 		    : dateFormatter.format(
 			    DateUtil.convertToTimeZoneFromDefault(monitorTimeZone, visitLogDto.getAccessDate()));
-	    visitLogData.put(accessDate);
+	    visitLogData.add(accessDate);
 	    String completeDate = (visitLogDto.getCompleteDate() == null) ? ""
 		    : dateFormatter.format(
 			    DateUtil.convertToTimeZoneFromDefault(monitorTimeZone, visitLogDto.getCompleteDate()));
-	    visitLogData.put(completeDate);
+	    visitLogData.add(completeDate);
 	    String timeTaken = (visitLogDto.getTimeTaken() == null) ? ""
 		    : timeTakenFormatter.format(visitLogDto.getTimeTaken());
-	    visitLogData.put(timeTaken);
+	    visitLogData.add(timeTaken);
 
-	    JSONObject userRow = new JSONObject();
+	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);
-	    userRow.put("cell", visitLogData);
+	    userRow.set("cell", visitLogData);
 
-	    rows.put(userRow);
+	    rows.add(userRow);
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("total", totalPages);
 	responseJSON.put("page", page);
 	responseJSON.put("records", countVisitLogs);
-	responseJSON.put("rows", rows);
+	responseJSON.set("rows", rows);
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.taskList.web.action;
 
 import java.io.IOException;
@@ -47,9 +46,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.SessionDTO;
@@ -72,6 +68,10 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
     private static String TOOL_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
@@ -79,7 +79,7 @@ public class MonitoringAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 	String param = mapping.getParameter();
 
 	if (param.equals("summary")) {
@@ -108,7 +108,7 @@ public class MonitoringAction extends Action {
 	    HttpServletResponse response) {
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
@@ -138,7 +138,8 @@ public class MonitoringAction extends Action {
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    sessionMap.put(TaskListConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
-	    sessionMap.put(TaskListConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	    sessionMap.put(TaskListConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
 	// Create reflectList if reflection is enabled.
@@ -165,7 +166,7 @@ public class MonitoringAction extends Action {
 	TaskListItem item = service.getTaskListItemByUid(itemUid);
 
 	// create sessionList depending on whether the item was created by author or by learner
-	List<SessionDTO> sessionDtos = new ArrayList<SessionDTO>();
+	List<SessionDTO> sessionDtos = new ArrayList<>();
 	if (item.isCreateByAuthor()) {
 	    List<TaskListSession> sessionList = service.getSessionsByContentId(contentId);
 	    for (TaskListSession session : sessionList) {
@@ -189,7 +190,7 @@ public class MonitoringAction extends Action {
      * Refreshes user list.
      */
     public ActionForward getPagedUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 	ITaskListService service = getTaskListService();
 
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
@@ -227,46 +228,44 @@ public class MonitoringAction extends Action {
 		Math.ceil(new Integer(countSessionUsers).doubleValue() / new Integer(rowLimit).doubleValue()))
 			.intValue();
 
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	int i = 1;
 	for (TaskListUserDTO userDto : userDtos) {
 
-	    JSONArray userData = new JSONArray();
-	    userData.put(userDto.getUserId());
+	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
+	    userData.add(userDto.getUserId());
 	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
-	    userData.put(fullName);
+	    userData.add(fullName);
 
 	    Set<Long> completedTaskUids = userDto.getCompletedTaskUids();
 	    for (TaskListItem item : items) {
-		String completionImage = completedTaskUids.contains(item.getUid())
-			? "<i class=\"fa fa-check\"></i>"
+		String completionImage = completedTaskUids.contains(item.getUid()) ? "<i class=\"fa fa-check\"></i>"
 			: "<i class=\"fa fa-minus\"></i>";
-		userData.put(completionImage);
+		userData.add(completionImage);
 	    }
 
 	    if (tasklist.isMonitorVerificationRequired()) {
 		String label = StringEscapeUtils.escapeHtml(service.getMessage("label.confirm"));
 
-		String verificationStatus = userDto.isVerifiedByMonitor()
-			? "<i class=\"fa fa-check\"></i>"
+		String verificationStatus = userDto.isVerifiedByMonitor() ? "<i class=\"fa fa-check\"></i>"
 			: "<a id='verif-" + userDto.getUserId()
 				+ "' href='javascript:;' onclick='return setVerifiedByMonitor(this, "
 				+ userDto.getUserId() + ");'>" + label + "</a>";
-		userData.put(verificationStatus);
+		userData.add(verificationStatus);
 	    }
 
-	    JSONObject userRow = new JSONObject();
+	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);
 	    userRow.put("cell", userData);
 
-	    rows.put(userRow);
+	    rows.add(userRow);
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("total", totalPages);
 	responseJSON.put("page", page);
 	responseJSON.put("records", countSessionUsers);
-	responseJSON.put("rows", rows);
+	responseJSON.set("rows", rows);
 
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responseJSON.toString()));
@@ -277,7 +276,7 @@ public class MonitoringAction extends Action {
      * Refreshes user list.
      */
     public ActionForward getPagedUsersByItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 	ITaskListService service = getTaskListService();
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -315,28 +314,27 @@ public class MonitoringAction extends Action {
 	String label = StringEscapeUtils.escapeHtml(service.getMessage("label.download"));
 
 	int i = 0;
-	JSONArray rows = new JSONArray();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	for (TaskListUserDTO userDto : userDtos) {
 
-	    JSONArray userData = new JSONArray();
+	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
-	    userData.put(fullName);
+	    userData.add(fullName);
 
-	    String completionImage = userDto.isCompleted()
-		    ? "<i class=\"fa fa-check\"></i>"
+	    String completionImage = userDto.isCompleted() ? "<i class=\"fa fa-check\"></i>"
 		    : "<i class=\"fa fa-minus\"></i>";
-	    userData.put(completionImage);
+	    userData.add(completionImage);
 
 	    String accessDate = (userDto.getAccessDate() == null) ? ""
 		    : dateFormatter
 			    .format(DateUtil.convertToTimeZoneFromDefault(monitorTimeZone, userDto.getAccessDate()));
-	    userData.put(accessDate);
+	    userData.add(accessDate);
 
 	    // fill up with comments and attachments made by this user
 	    if (item.isCommentsAllowed() || item.isFilesAllowed()) {
 		String commentsFiles = "<ul>";
 
-		ArrayList<String> userComments = new ArrayList<String>();
+		ArrayList<String> userComments = new ArrayList<>();
 		for (TaskListItemComment comment : itemComments) {
 		    if (userDto.getUserId().equals(comment.getCreateBy().getUserId())) {
 			userComments.add(comment.getComment());
@@ -350,7 +348,7 @@ public class MonitoringAction extends Action {
 		    commentsFiles += "</li>";
 		}
 
-		ArrayList<TaskListItemAttachment> userAttachments = new ArrayList<TaskListItemAttachment>();
+		ArrayList<TaskListItemAttachment> userAttachments = new ArrayList<>();
 		for (TaskListItemAttachment attachment : itemAttachments) {
 		    if (userDto.getUserId().equals(attachment.getCreateBy().getUserId())) {
 			userAttachments.add(attachment);
@@ -383,21 +381,21 @@ public class MonitoringAction extends Action {
 //
 //			</li>
 //		</c:forEach>
-		userData.put(commentsFiles);
+		userData.add(commentsFiles);
 	    }
 
-	    JSONObject userRow = new JSONObject();
+	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);
-	    userRow.put("cell", userData);
+	    userRow.set("cell", userData);
 
-	    rows.put(userRow);
+	    rows.add(userRow);
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("total", totalPages);
 	responseJSON.put("page", page);
 	responseJSON.put("records", countSessionUsers);
-	responseJSON.put("rows", rows);
+	responseJSON.set("rows", rows);
 
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responseJSON.toString()));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,7 @@ public class AnnotatedBeanDefinitionReader {
 		AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 	}
 
+
 	/**
 	 * Return the BeanDefinitionRegistry that this scanner operates on.
 	 */
@@ -117,25 +118,52 @@ public class AnnotatedBeanDefinitionReader {
 				(scopeMetadataResolver != null ? scopeMetadataResolver : new AnnotationScopeMetadataResolver());
 	}
 
+
+	/**
+	 * Register one or more annotated classes to be processed.
+	 * <p>Calls to {@code register} are idempotent; adding the same
+	 * annotated class more than once has no additional effect.
+	 * @param annotatedClasses one or more annotated classes,
+	 * e.g. {@link Configuration @Configuration} classes
+	 */
 	public void register(Class<?>... annotatedClasses) {
 		for (Class<?> annotatedClass : annotatedClasses) {
 			registerBean(annotatedClass);
 		}
 	}
 
+	/**
+	 * Register a bean from the given bean class, deriving its metadata from
+	 * class-declared annotations.
+	 * @param annotatedClass the class of the bean
+	 */
+	@SuppressWarnings("unchecked")
 	public void registerBean(Class<?> annotatedClass) {
 		registerBean(annotatedClass, null, (Class<? extends Annotation>[]) null);
 	}
 
-	public void registerBean(Class<?> annotatedClass,
-			@SuppressWarnings("unchecked") Class<? extends Annotation>... qualifiers) {
-
+	/**
+	 * Register a bean from the given bean class, deriving its metadata from
+	 * class-declared annotations.
+	 * @param annotatedClass the class of the bean
+	 * @param qualifiers specific qualifier annotations to consider,
+	 * in addition to qualifiers at the bean class level
+	 */
+	@SuppressWarnings("unchecked")
+	public void registerBean(Class<?> annotatedClass, Class<? extends Annotation>... qualifiers) {
 		registerBean(annotatedClass, null, qualifiers);
 	}
 
-	public void registerBean(Class<?> annotatedClass, String name,
-			@SuppressWarnings("unchecked") Class<? extends Annotation>... qualifiers) {
-
+	/**
+	 * Register a bean from the given bean class, deriving its metadata from
+	 * class-declared annotations.
+	 * @param annotatedClass the class of the bean
+	 * @param name an explicit name for the bean
+	 * @param qualifiers specific qualifier annotations to consider,
+	 * in addition to qualifiers at the bean class level
+	 */
+	@SuppressWarnings("unchecked")
+	public void registerBean(Class<?> annotatedClass, String name, Class<? extends Annotation>... qualifiers) {
 		AnnotatedGenericBeanDefinition abd = new AnnotatedGenericBeanDefinition(annotatedClass);
 		if (this.conditionEvaluator.shouldSkip(abd.getMetadata())) {
 			return;
@@ -147,10 +175,10 @@ public class AnnotatedBeanDefinitionReader {
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);
 		if (qualifiers != null) {
 			for (Class<? extends Annotation> qualifier : qualifiers) {
-				if (Primary.class.equals(qualifier)) {
+				if (Primary.class == qualifier) {
 					abd.setPrimary(true);
 				}
-				else if (Lazy.class.equals(qualifier)) {
+				else if (Lazy.class == qualifier) {
 					abd.setLazyInit(true);
 				}
 				else {

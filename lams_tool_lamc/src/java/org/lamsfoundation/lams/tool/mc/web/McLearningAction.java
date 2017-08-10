@@ -39,8 +39,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -65,6 +63,9 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Ozgur Demirtas
@@ -197,7 +198,7 @@ public class McLearningAction extends LamsDispatchAction {
      */
     protected List<AnswerDTO> buildAnswerDtos(List<String> answers, McContent content) {
 
-	List<AnswerDTO> answerDtos = new LinkedList<AnswerDTO>();
+	List<AnswerDTO> answerDtos = new LinkedList<>();
 
 	for (McQueContent question : (Set<McQueContent>) content.getMcQueContents()) {
 	    String questionUid = question.getUid().toString();
@@ -253,13 +254,14 @@ public class McLearningAction extends LamsDispatchAction {
 	String httpSessionID = mcLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
 	request.getSession().setAttribute(httpSessionID, sessionMap);
-	
+
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	McSession session = mcService.getMcSessionById(new Long(toolSessionID));
 	String toolContentId = session.getMcContent().getMcContentId().toString();
 	McContent mcContent = mcService.getMcContent(new Long(toolContentId));
 
-	List<String> answers = McLearningAction.parseLearnerAnswers(mcLearningForm, request, mcContent.isQuestionsSequenced());
+	List<String> answers = McLearningAction.parseLearnerAnswers(mcLearningForm, request,
+		mcContent.isQuestionsSequenced());
 	if (mcContent.isQuestionsSequenced()) {
 	    sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, answers);
 	}
@@ -276,7 +278,7 @@ public class McLearningAction extends LamsDispatchAction {
 	/* process the answers */
 	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, mcContent);
 	mcService.saveUserAttempt(user, answerDtos);
-	
+
 	//calculate total learner mark
 	int learnerMark = 0;
 	for (AnswerDTO answerDto : answerDtos) {
@@ -323,13 +325,14 @@ public class McLearningAction extends LamsDispatchAction {
 	}
 
 	//parse learner input
-	List<String> answers = McLearningAction.parseLearnerAnswers(mcLearningForm, request, mcContent.isQuestionsSequenced());
+	List<String> answers = McLearningAction.parseLearnerAnswers(mcLearningForm, request,
+		mcContent.isQuestionsSequenced());
 	sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, answers);
 
 	//save user attempt
 	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, mcContent);
 	mcService.saveUserAttempt(user, answerDtos);
-	
+
 	List<AnswerDTO> learnerAnswersDTOList = mcService.getAnswersFromDatabase(mcContent, user);
 	request.setAttribute(McAppConstants.LEARNER_ANSWERS_DTO_LIST, learnerAnswersDTOList);
 
@@ -382,7 +385,7 @@ public class McLearningAction extends LamsDispatchAction {
 
 	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
 	McContent mcContent = mcService.getMcContent(new Long(toolContentId));
-	
+
 	String sessionMapID = mcLearningForm.getHttpSessionID();
 	request.setAttribute("sessionMapID", sessionMapID);
 
@@ -485,15 +488,17 @@ public class McLearningAction extends LamsDispatchAction {
 	mcGeneralLearnerFlowDTO.setShowMarks(new Boolean(mcContent.isShowMarks()).toString());
 	mcGeneralLearnerFlowDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
 	mcGeneralLearnerFlowDTO.setLearnerMark(user.getLastAttemptTotalMark());
-	
+
 	Object[] markStatistics = null;
 	if (mcContent.isShowMarks()) {
 	    markStatistics = mcService.getMarkStatistics(mcSession);
 	}
 	if (markStatistics != null) {
-	    mcGeneralLearnerFlowDTO.setLowestMark(markStatistics[0] != null ? ((Float)markStatistics[0]).intValue() : 0);
-	    mcGeneralLearnerFlowDTO.setAverageMark(markStatistics[1] != null ? ((Float)markStatistics[1]).intValue() : 0);
-	    mcGeneralLearnerFlowDTO.setTopMark(markStatistics[2] != null ? ((Float)markStatistics[2]).intValue() : 0);
+	    mcGeneralLearnerFlowDTO
+		    .setLowestMark(markStatistics[0] != null ? ((Float) markStatistics[0]).intValue() : 0);
+	    mcGeneralLearnerFlowDTO
+		    .setAverageMark(markStatistics[1] != null ? ((Float) markStatistics[1]).intValue() : 0);
+	    mcGeneralLearnerFlowDTO.setTopMark(markStatistics[2] != null ? ((Float) markStatistics[2]).intValue() : 0);
 	} else {
 	    mcGeneralLearnerFlowDTO.setLowestMark(0);
 	    mcGeneralLearnerFlowDTO.setAverageMark(0);
@@ -529,7 +534,7 @@ public class McLearningAction extends LamsDispatchAction {
 	//clear sessionMap
 	String httpSessionID = mcLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	List<String> sequentialCheckedCa = new LinkedList<String>();
+	List<String> sequentialCheckedCa = new LinkedList<>();
 	sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, sequentialCheckedCa);
 
 	List<AnswerDTO> learnerAnswersDTOList = mcService.getAnswersFromDatabase(mcContent, mcQueUsr);
@@ -566,7 +571,7 @@ public class McLearningAction extends LamsDispatchAction {
      * checks Leader Progress
      */
     public ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 
 	if (mcService == null) {
 	    mcService = McServiceProxy.getMcService(getServlet().getServletContext());
@@ -578,10 +583,10 @@ public class McLearningAction extends LamsDispatchAction {
 
 	boolean isLeaderResponseFinalized = leader.isResponseFinalised();
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
+	ObjectNode.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
 	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 	return null;
     }
 
@@ -699,7 +704,8 @@ public class McLearningAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	List<String> answers = McLearningAction.parseLearnerAnswers(mcLearningForm, request, mcContent.isQuestionsSequenced());
+	List<String> answers = McLearningAction.parseLearnerAnswers(mcLearningForm, request,
+		mcContent.isQuestionsSequenced());
 
 	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, mcContent);
 	mcService.saveUserAttempt(user, answerDtos);
@@ -707,11 +713,12 @@ public class McLearningAction extends LamsDispatchAction {
 	return null;
     }
 
-    private static List<String> parseLearnerAnswers(McLearningForm mcLearningForm, HttpServletRequest request, boolean isQuestionsSequenced) {
+    private static List<String> parseLearnerAnswers(McLearningForm mcLearningForm, HttpServletRequest request,
+	    boolean isQuestionsSequenced) {
 	String httpSessionID = mcLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
 
-	List<String> answers = new LinkedList<String>();
+	List<String> answers = new LinkedList<>();
 	if (isQuestionsSequenced) {
 
 	    List<String> previousAnswers = (List<String>) sessionMap

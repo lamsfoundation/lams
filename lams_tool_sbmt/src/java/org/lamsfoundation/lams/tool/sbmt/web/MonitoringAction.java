@@ -49,9 +49,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.DynaActionForm;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
@@ -72,6 +69,10 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Manpreet Minhas
@@ -154,7 +155,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /** Ajax call to populate the tablesorter */
     public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -183,13 +184,13 @@ public class MonitoringAction extends LamsDispatchAction {
 	List<Object[]> users = service.getUsersForTablesorter(sessionID, page, size, sorting, searchString,
 		spreadsheet.isReflectOnActivity());
 
-	JSONArray rows = new JSONArray();
-	JSONObject responsedata = new JSONObject();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
+	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
 	responsedata.put("total_rows", service.getCountUsersBySession(sessionID, searchString));
 
 	for (Object[] userAndReflection : users) {
 
-	    JSONObject responseRow = new JSONObject();
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
 	    SubmitUser user = (SubmitUser) userAndReflection[0];
 	    responseRow.put(SbmtConstants.ATTR_USER_UID, user.getUid());
@@ -197,8 +198,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, StringEscapeUtils.escapeHtml(user.getFullName()));
 
 	    if (userAndReflection.length > 2) {
-		responseRow.put(SbmtConstants.ATTR_USER_NUM_FILE, 
-			(Integer)userAndReflection[1] - (Integer)userAndReflection[2]);
+		responseRow.put(SbmtConstants.ATTR_USER_NUM_FILE,
+			(Integer) userAndReflection[1] - (Integer) userAndReflection[2]);
 	    }
 
 	    if (userAndReflection.length > 3) {
@@ -206,13 +207,13 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 
 	    if (userAndReflection.length > 4) {
-		responseRow.put(SbmtConstants.ATTR_USER_REFLECTION, userAndReflection[4]);
+		responseRow.put(SbmtConstants.ATTR_USER_REFLECTION, (String) userAndReflection[4]);
 	    }
 
-	    rows.put(responseRow);
+	    rows.add(responseRow);
 	}
 
-	responsedata.put("rows", rows);
+	responsedata.set("rows", rows);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(new String(responsedata.toString()));
 	return null;
@@ -239,7 +240,7 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     private void statistic(HttpServletRequest request, Long contentID) {
-	SortedSet<StatisticDTO> statistics = new TreeSet<StatisticDTO>(new StatisticComparator());
+	SortedSet<StatisticDTO> statistics = new TreeSet<>(new StatisticComparator());
 	statistics.addAll(submitFilesService.getStatisticsBySession(contentID));
 	request.setAttribute("statisticList", statistics);
     }
@@ -509,7 +510,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		    .append("file as file does not exist. Requested by user ").append(currentUser.getUserID())
 		    .append(" for file ").append(detailID).append(" for user ").append(learnerUserID);
 	    log.error(builder.toString());
-	    throw new ServletException("Invalid call to "+(remove ? "remove" : "restore")+" file. See the server log for more details.");
+	    throw new ServletException("Invalid call to " + (remove ? "remove" : "restore")
+		    + " file. See the server log for more details.");
 	} else {
 
 	    if (!fileToProcess.getSubmitFileSession().getSessionID().equals(sessionID)
@@ -519,17 +521,19 @@ public class MonitoringAction extends LamsDispatchAction {
 			.append(currentUser.getUserID()).append(" for file ").append(detailID).append(" for user ")
 			.append(learnerUserID).append(" in session ").append(sessionID);
 		log.error(builder.toString());
-		throw new ServletException("Invalid call to "+(remove ? "remove" : "restore")+" file. See the server log for more details.");
+		throw new ServletException("Invalid call to " + (remove ? "remove" : "restore")
+			+ " file. See the server log for more details.");
 	    } else {
 
 		if (remove) {
 		    submitFilesService.removeLearnerFile(detailID, currentUser);
-		    notifyRemoveRestore(fileToProcess, "event.file.restore.subject", "event.file.restore.body", "restore file");
-
+		    notifyRemoveRestore(fileToProcess, "event.file.restore.subject", "event.file.restore.body",
+			    "restore file");
 
 		} else {
 		    submitFilesService.restoreLearnerFile(detailID, currentUser);
-		    notifyRemoveRestore(fileToProcess, "event.file.delete.subject", "event.file.delete.body", "delete file");
+		    notifyRemoveRestore(fileToProcess, "event.file.delete.subject", "event.file.delete.body",
+			    "delete file");
 		}
 
 	    }
@@ -542,21 +546,24 @@ public class MonitoringAction extends LamsDispatchAction {
 	return mapping.findForward("listMark");
     }
 
-    /** Notify the user by email of the file change. Need to do it here rather than in the service so that any issues are caught and logged
-     * without stuffing up the transaction. 
+    /**
+     * Notify the user by email of the file change. Need to do it here rather than in the service so that any issues are
+     * caught and logged
+     * without stuffing up the transaction.
      */
-    public void notifyRemoveRestore(SubmissionDetails detail, String i18nSubjectKey, String i18nBodyKey, String errorSubject) {
+    public void notifyRemoveRestore(SubmissionDetails detail, String i18nSubjectKey, String i18nBodyKey,
+	    String errorSubject) {
 	Long contentID = detail.getSubmitFileSession().getContent().getContentID();
 	Integer learnerID = detail.getLearner().getUserID();
 
-	// Can't just create a new subscription then call triggerForSingleUser() as 
-	// it needs a subscription id, which doesn't exist for a subscription created in the same 
+	// Can't just create a new subscription then call triggerForSingleUser() as
+	// it needs a subscription id, which doesn't exist for a subscription created in the same
 	// transaction. So reuse the existing RELEASE MARKS event and subscription (created when
 	// a file is uploaded) and override both the subject and the message.
 
 	try {
-	    boolean eventExists = submitFilesService.getEventNotificationService().eventExists(SbmtConstants.TOOL_SIGNATURE,
-		    SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, contentID);
+	    boolean eventExists = submitFilesService.getEventNotificationService().eventExists(
+		    SbmtConstants.TOOL_SIGNATURE, SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, contentID);
 
 	    if (eventExists) {
 		submitFilesService.getEventNotificationService().triggerForSingleUser(SbmtConstants.TOOL_SIGNATURE,
@@ -564,13 +571,15 @@ public class MonitoringAction extends LamsDispatchAction {
 			submitFilesService.getLocalisedMessage(i18nSubjectKey, null),
 			submitFilesService.getLocalisedMessage(i18nBodyKey, new Object[] { detail.getFilePath() }));
 	    } else {
-		log.error("Unable to notify user of "+errorSubject+". contentID="+contentID+" learner="+learnerID+" file "+detail.getFilePath()+" as "+SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE+" event is missing");
+		log.error("Unable to notify user of " + errorSubject + ". contentID=" + contentID + " learner="
+			+ learnerID + " file " + detail.getFilePath() + " as "
+			+ SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE + " event is missing");
 	    }
-	}  catch ( Exception e) {
-            log.error("Unable to notify user of "+errorSubject+". contentID="+contentID+" learner="+learnerID+" file "+detail.getFilePath()+" due to exception "+e.getMessage(),e);
-        }
+	} catch (Exception e) {
+	    log.error("Unable to notify user of " + errorSubject + ". contentID=" + contentID + " learner=" + learnerID
+		    + " file " + detail.getFilePath() + " due to exception " + e.getMessage(), e);
+	}
     }
-
 
     // **********************************************************
     // Private methods
@@ -610,7 +619,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * @param submitFilesSessionList
      */
     private void summary(HttpServletRequest request, List submitFilesSessionList) {
-	SortedSet<SessionDTO> sessions = new TreeSet<SessionDTO>(this.new SessionComparator());
+	SortedSet<SessionDTO> sessions = new TreeSet<>(this.new SessionComparator());
 
 	// build a map with all users in the submitFilesSessionList
 	Iterator it = submitFilesSessionList.iterator();
@@ -627,5 +636,5 @@ public class MonitoringAction extends LamsDispatchAction {
 	// request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 	request.setAttribute("sessions", sessions);
     }
-    
+
 }

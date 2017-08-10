@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scratchie.web.action;
 
 import java.io.IOException;
@@ -45,8 +44,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
@@ -62,12 +59,16 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
@@ -76,7 +77,7 @@ public class MonitoringAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 	String param = mapping.getParameter();
 
 	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
@@ -111,7 +112,7 @@ public class MonitoringAction extends Action {
 
 	initializeScratchieService();
 	// initialize Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
@@ -129,7 +130,8 @@ public class MonitoringAction extends Action {
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    request.setAttribute(ScratchieConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
-	    request.setAttribute(ScratchieConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	    request.setAttribute(ScratchieConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
 	// cache into sessionMap
@@ -215,7 +217,7 @@ public class MonitoringAction extends Action {
      * @param request
      * @param response
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     private ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -245,7 +247,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Exports tool results into excel.
-     * 
+     *
      * @throws IOException
      */
     private ActionForward exportExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -282,7 +284,7 @@ public class MonitoringAction extends Action {
      * Get the mark summary with data arranged in bands. Can be displayed graphically or in a table.
      */
     private ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	    HttpServletResponse res) throws IOException, ServletException {
 
 	initializeScratchieService();
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
@@ -292,16 +294,17 @@ public class MonitoringAction extends Action {
 
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
 	List<Number> results = null;
-	
-	if ( scratchie != null ) {
+
+	if (scratchie != null) {
 	    results = service.getMarksArray(scratchie.getContentId());
 	}
-	
-	JSONObject responseJSON = new JSONObject();
-	if ( results != null )
-	    responseJSON.put("data", results);
-	else 
-	    responseJSON.put("data", new Float[0]);
+
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	if (results != null) {
+	    responseJSON.set("data", JsonUtil.readArray(results));
+	} else {
+	    responseJSON.set("data", JsonUtil.readArray(new Float[0]));
+	}
 
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().write(responseJSON.toString());
@@ -319,7 +322,7 @@ public class MonitoringAction extends Action {
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
-	if ( scratchie != null ) {
+	if (scratchie != null) {
 	    LeaderResultsDTO leaderDto = service.getLeaderResultsDTOForLeaders(scratchie.getContentId());
 	    sessionMap.put("leaderDto", leaderDto);
 	}

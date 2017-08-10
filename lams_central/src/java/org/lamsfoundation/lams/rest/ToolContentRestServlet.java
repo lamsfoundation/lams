@@ -20,28 +20,29 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.rest;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.JsonUtil;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ToolContentRestServlet extends RestServlet {
     private static final Logger log = Logger.getLogger(ToolContentRestServlet.class);
 
     @Override
-    protected void doPostInternal(JSONObject requestJSON, UserDTO userDTO, HttpServletResponse response)
+    protected void doPostInternal(ObjectNode requestJSON, UserDTO userDTO, HttpServletResponse response)
 	    throws Exception {
 	// find out which Tool to create
-	String toolSignature = requestJSON.getString("toolSignature");
+	String toolSignature = JsonUtil.optString(requestJSON, "toolSignature");
 	Tool tool = getToolDAO().getToolBySignature(toolSignature);
 	Long toolContentID = getAuthoringService().insertToolContentID(tool.getToolId());
 
-	JSONObject toolContentJSON = requestJSON.getJSONObject("toolContent");
+	ObjectNode toolContentJSON = JsonUtil.optObject(requestJSON, "toolContent");
 	// Tools' services implement an interface for processing REST requests
 	ToolRestManager toolRestService = (ToolRestManager) getLamsCoreToolService().findToolService(tool);
 	toolRestService.createRestToolContent(userDTO.getUserID(), toolContentID, toolContentJSON);

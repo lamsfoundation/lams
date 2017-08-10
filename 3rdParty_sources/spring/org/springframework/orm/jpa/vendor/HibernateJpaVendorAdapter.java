@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,22 +28,23 @@ import org.hibernate.dialect.DerbyDialect;
 import org.hibernate.dialect.H2Dialect;
 import org.hibernate.dialect.HSQLDialect;
 import org.hibernate.dialect.InformixDialect;
-import org.hibernate.dialect.MySQLDialect;
+import org.hibernate.dialect.MySQL5Dialect;
 import org.hibernate.dialect.Oracle9iDialect;
 import org.hibernate.dialect.PostgreSQLDialect;
-import org.hibernate.dialect.SQLServerDialect;
-import org.hibernate.ejb.HibernateEntityManager;
-import org.hibernate.ejb.HibernateEntityManagerFactory;
-import org.hibernate.ejb.HibernatePersistence;
-
-import org.springframework.orm.jpa.JpaDialect;
+import org.hibernate.dialect.SQLServer2008Dialect;
 
 /**
- * {@link org.springframework.orm.jpa.JpaVendorAdapter} implementation for
- * Hibernate EntityManager. Developed and tested against Hibernate 3.6 and 4.2/4.3.
+ * {@link org.springframework.orm.jpa.JpaVendorAdapter} implementation for Hibernate
+ * EntityManager. Developed and tested against Hibernate 3.6, 4.2/4.3 as well as 5.x.
+ * <b>Hibernate 4.2+ is strongly recommended for use with Spring 4.0+.</b>
  *
  * <p>Exposes Hibernate's persistence provider and EntityManager extension interface,
- * and supports {@link AbstractJpaVendorAdapter}'s common configuration settings.
+ * and adapts {@link AbstractJpaVendorAdapter}'s common configuration settings.
+ * Also supports the detection of annotated packages (through
+ * {@link org.springframework.orm.jpa.persistenceunit.SmartPersistenceUnitInfo#getManagedPackages()}),
+ * e.g. containing Hibernate {@link org.hibernate.annotations.FilterDef} annotations,
+ * along with Spring-driven entity scanning which requires no {@code persistence.xml}
+ * ({@link org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean#setPackagesToScan}).
  *
  * <p>Note that the package location of Hibernate's JPA support changed from 4.2 to 4.3:
  * from {@code org.hibernate.ejb.HibernateEntityManager(Factory)} to
@@ -54,10 +55,13 @@ import org.springframework.orm.jpa.JpaDialect;
  * @author Juergen Hoeller
  * @author Rod Johnson
  * @since 2.0
+ * @see HibernateJpaDialect
+ * @see org.hibernate.ejb.HibernatePersistence
+ * @see org.hibernate.ejb.HibernateEntityManager
  */
 public class HibernateJpaVendorAdapter extends AbstractJpaVendorAdapter {
 
-	private final JpaDialect jpaDialect = new HibernateJpaDialect();
+	private final HibernateJpaDialect jpaDialect = new HibernateJpaDialect();
 
 	private final PersistenceProvider persistenceProvider;
 
@@ -66,31 +70,60 @@ public class HibernateJpaVendorAdapter extends AbstractJpaVendorAdapter {
 	private final Class<? extends EntityManager> entityManagerInterface;
 
 
-	@SuppressWarnings({"deprecation", "unchecked"})
+	@SuppressWarnings("unchecked")
 	public HibernateJpaVendorAdapter() {
-		PersistenceProvider providerToUse;
+		ClassLoader cl = HibernateJpaVendorAdapter.class.getClassLoader();
 		Class<? extends EntityManagerFactory> emfIfcToUse;
 		Class<? extends EntityManager> emIfcToUse;
+		Class<?> providerClass;
+		PersistenceProvider providerToUse;
 		try {
-			// Try Hibernate 4.3's org.hibernate.jpa package in order to avoid deprecation warnings
-			ClassLoader cl = HibernateJpaVendorAdapter.class.getClassLoader();
-			Class<?> hibernatePersistenceProviderClass = cl.loadClass("org.hibernate.jpa.HibernatePersistenceProvider");
-			providerToUse = (PersistenceProvider) hibernatePersistenceProviderClass.newInstance();
-			emfIfcToUse = (Class<? extends EntityManagerFactory>) cl.loadClass("org.hibernate.jpa.HibernateEntityManagerFactory");
-			emIfcToUse = (Class<? extends EntityManager>) cl.loadClass("org.hibernate.jpa.HibernateEntityManager");
-		}
-		catch (ClassNotFoundException ex) {
-			// Fall back to Hibernate 3.6-4.2 org.hibernate.ejb package
-			providerToUse = new HibernatePersistence();
-			emfIfcToUse = HibernateEntityManagerFactory.class;
-			emIfcToUse = HibernateEntityManager.class;
+			try {
+				// Try Hibernate 4.3/5.0's org.hibernate.jpa package in order to avoid deprecation warnings
+				emfIfcToUse = (Class<? extends EntityManagerFactory>) cl.loadClass("org.hibernate.jpa.HibernateEntityManagerFactory");
+				emIfcToUse = (Class<? extends EntityManager>) cl.loadClass("org.hibernate.jpa.HibernateEntityManager");
+				providerClass = cl.loadClass("org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider");
+			}
+			catch (ClassNotFoundException ex) {
+				// Fall back to Hibernate 3.6-4.2 org.hibernate.ejb package
+				emfIfcToUse = (Class<? extends EntityManagerFactory>) cl.loadClass("org.hibernate.ejb.HibernateEntityManagerFactory");
+				emIfcToUse = (Class<? extends EntityManager>) cl.loadClass("org.hibernate.ejb.HibernateEntityManager");
+				providerClass = cl.loadClass("org.springframework.orm.jpa.vendor.SpringHibernateEjbPersistenceProvider");
+			}
+			providerToUse = (PersistenceProvider) providerClass.newInstance();
 		}
 		catch (Exception ex) {
-			throw new IllegalStateException("Found HibernatePersistenceProvider but could not instantiate it", ex);
+			throw new IllegalStateException("Failed to determine Hibernate PersistenceProvider", ex);
 		}
 		this.persistenceProvider = providerToUse;
 		this.entityManagerFactoryInterface = emfIfcToUse;
 		this.entityManagerInterface = emIfcToUse;
+	}
+
+
+	/**
+	 * Set whether to prepare the underlying JDBC Connection of a transactional
+	 * Hibernate Session, that is, whether to apply a transaction-specific
+	 * isolation level and/or the transaction's read-only flag to the underlying
+	 * JDBC Connection.
+	 * <p>See {@link HibernateJpaDialect#setPrepareConnection(boolean)} for details.
+	 * This is just a convenience flag passed through to {@code HibernateJpaDialect}.
+	 * <p>On Hibernate 5.1/5.2, this flag remains {@code true} by default like against
+	 * previous Hibernate versions. The vendor adapter manually enforces Hibernate's
+	 * new connection handling mode {@code DELAYED_ACQUISITION_AND_HOLD} in that case
+	 * unless a user-specified connection handling mode property indicates otherwise;
+	 * switch this flag to {@code false} to avoid that interference.
+	 * <p><b>NOTE: Per the explanation above, you may have to turn this flag off
+	 * when using Hibernate in a JTA environment, e.g. on WebLogic.</b> Alternatively,
+	 * set Hibernate 5.2's "hibernate.connection.handling_mode" property to
+	 * "DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION" or even
+	 * "DELAYED_ACQUISITION_AND_RELEASE_AFTER_STATEMENT" in such a scenario.
+	 * @since 4.3.1
+	 * @see #getJpaPropertyMap()
+	 * @see HibernateJpaDialect#beginTransaction
+	 */
+	public void setPrepareConnection(boolean prepareConnection) {
+		this.jpaDialect.setPrepareConnection(prepareConnection);
 	}
 
 
@@ -125,6 +158,25 @@ public class HibernateJpaVendorAdapter extends AbstractJpaVendorAdapter {
 			jpaProperties.put(Environment.SHOW_SQL, "true");
 		}
 
+		if (this.jpaDialect.prepareConnection) {
+			// Hibernate 5.1/5.2: manually enforce connection release mode ON_CLOSE (the former default)
+			try {
+				// Try Hibernate 5.2
+				Environment.class.getField("CONNECTION_HANDLING");
+				jpaProperties.put("hibernate.connection.handling_mode", "DELAYED_ACQUISITION_AND_HOLD");
+			}
+			catch (NoSuchFieldException ex) {
+				// Try Hibernate 5.1
+				try {
+					Environment.class.getField("ACQUIRE_CONNECTIONS");
+					jpaProperties.put("hibernate.connection.release_mode", "ON_CLOSE");
+				}
+				catch (NoSuchFieldException ex2) {
+					// on Hibernate 5.0.x or lower - no need to change the default there
+				}
+			}
+		}
+
 		return jpaProperties;
 	}
 
@@ -141,17 +193,17 @@ public class HibernateJpaVendorAdapter extends AbstractJpaVendorAdapter {
 			case H2: return H2Dialect.class;
 			case HSQL: return HSQLDialect.class;
 			case INFORMIX: return InformixDialect.class;
-			case MYSQL: return MySQLDialect.class;
+			case MYSQL: return MySQL5Dialect.class;
 			case ORACLE: return Oracle9iDialect.class;
 			case POSTGRESQL: return PostgreSQLDialect.class;  // PostgreSQLDialect deprecated in 4.x
-			case SQL_SERVER: return SQLServerDialect.class;
+			case SQL_SERVER: return SQLServer2008Dialect.class;
 			case SYBASE: return org.hibernate.dialect.SybaseDialect.class;  // SybaseDialect deprecated in 3.6 but not 4.x
 			default: return null;
 		}
 	}
 
 	@Override
-	public JpaDialect getJpaDialect() {
+	public HibernateJpaDialect getJpaDialect() {
 		return this.jpaDialect;
 	}
 

@@ -34,7 +34,7 @@ import javax.naming.NamingException;
  * details.
  *
  * @author matt.accola
- * @version $Revision$ $Date$
+ * @version $Revision: 2243 $ $Date: 2013-04-30 11:39:48 -0700 (Tue, 30 Apr 2013) $
  */
 public class WorkManagerThreadExecutor implements ThreadExecutor {
     private final Logger log = LoggerFactory.getLogger(getClass());

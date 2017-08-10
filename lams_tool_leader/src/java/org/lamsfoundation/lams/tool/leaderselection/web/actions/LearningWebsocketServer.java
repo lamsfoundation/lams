@@ -15,13 +15,16 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
+
+
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
 import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionServiceProxy;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Sends leader has been selected event to the learners.
@@ -95,7 +98,7 @@ public class LearningWebsocketServer {
      * Registeres the Learner for processing.
      */
     @OnOpen
-    public void registerUser(Session websocket) throws JSONException, IOException {
+    public void registerUser(Session websocket) throws IOException {
 	Long toolSessionId = Long
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	Set<Session> sessionWebsockets = websockets.get(toolSessionId);
@@ -136,13 +139,13 @@ public class LearningWebsocketServer {
      * This method is called when leader has been selected and all non-leaders should refresh their pages in order
      * to see new leader name and a Finish button.
      */
-    public static void sendPageRefreshRequest(Long toolSessionId) throws JSONException, IOException {
+    public static void sendPageRefreshRequest(Long toolSessionId) throws IOException {
 	Set<Session> sessionWebsockets = websockets.get(toolSessionId);
 	if (sessionWebsockets == null) {
 	    return;
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("pageRefresh", true);
 	String response = responseJSON.toString();
 

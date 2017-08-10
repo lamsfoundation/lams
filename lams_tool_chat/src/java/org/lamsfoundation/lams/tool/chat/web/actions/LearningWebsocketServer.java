@@ -21,20 +21,23 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.service.IChatService;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Receives, processes and sends Chat messages to Learners.
@@ -124,34 +127,34 @@ public class LearningWebsocketServer {
 
 	    Set<Websocket> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	    Roster roster = null;
-	    JSONArray rosterJSON = null;
+	    ArrayNode rosterJSON = null;
 	    String rosterString = null;
 	    for (Websocket websocket : sessionWebsockets) {
 		// the connection is valid, carry on
-		JSONObject responseJSON = new JSONObject();
+		ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 		// fetch roster only once, but messages are personalised
-		if (rosterJSON == null) {
-		    roster = LearningWebsocketServer.rosters.get(toolSessionId);
-		    if (roster == null) {
-			// build a new roster object
-			roster = new Roster(toolSessionId);
-			LearningWebsocketServer.rosters.put(toolSessionId, roster);
+		try {
+		    if (rosterJSON == null) {
+			roster = LearningWebsocketServer.rosters.get(toolSessionId);
+			if (roster == null) {
+			    // build a new roster object
+			    roster = new Roster(toolSessionId);
+			    LearningWebsocketServer.rosters.put(toolSessionId, roster);
+			}
+
+			rosterJSON = roster.getRosterJSON();
+			rosterString = rosterJSON.toString();
 		    }
 
-		    rosterJSON = roster.getRosterJSON();
-		    rosterString = rosterJSON.toString();
-		}
-
-		try {
 		    String userName = websocket.userName;
-		    JSONArray messagesJSON = LearningWebsocketServer.getMessages(chatSession, messages, userName);
+		    ArrayNode messagesJSON = LearningWebsocketServer.getMessages(chatSession, messages, userName);
 		    // if hash of roster and messages is the same as before, do not send the message, save the bandwidth
 		    String hash = HashUtil.sha1(rosterString + messagesJSON.toString());
 		    if ((websocket.hash == null) || !websocket.hash.equals(hash)) {
 			websocket.hash = hash;
 
-			responseJSON.put("messages", messagesJSON);
-			responseJSON.put("roster", rosterJSON);
+			responseJSON.set("messages", messagesJSON);
+			responseJSON.set("roster", rosterJSON);
 
 			// send the payload to the Learner's browser
 			if (websocket.session.isOpen()) {
@@ -183,8 +186,11 @@ public class LearningWebsocketServer {
 
 	/**
 	 * Checks which Learners
+	 *
+	 * @throws IOException
+	 * @throws JsonProcessingException
 	 */
-	private JSONArray getRosterJSON() {
+	private ArrayNode getRosterJSON() throws JsonProcessingException, IOException {
 	    Set<String> localActiveUsers = new TreeSet<>();
 	    Set<Websocket> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	    // find out who is active locally
@@ -213,7 +219,7 @@ public class LearningWebsocketServer {
 		activeUsers.addAll(localActiveUsers);
 	    }
 
-	    return new JSONArray(activeUsers);
+	    return JsonUtil.readArray(activeUsers);
 	}
     }
 
@@ -297,9 +303,12 @@ public class LearningWebsocketServer {
 
     /**
      * Stores a message sent by a Learner.
+     * 
+     * @throws IOException
+     * @throws JsonProcessingException
      */
     @OnMessage
-    public void receiveMessage(String input, Session session) throws JSONException {
+    public void receiveMessage(String input, Session session) throws JsonProcessingException, IOException {
 	if (StringUtils.isBlank(input)) {
 	    return;
 	}
@@ -307,14 +316,14 @@ public class LearningWebsocketServer {
 	    // just a ping every few minutes
 	    return;
 	}
-	JSONObject messageJSON = new JSONObject(input);
-	String message = messageJSON.getString("message");
+	ObjectNode messageJSON = JsonUtil.readObject(input);
+	String message = JsonUtil.optString(messageJSON, "message");
 	if (StringUtils.isBlank(message)) {
 	    return;
 	}
 
-	Long toolSessionId = messageJSON.getLong("toolSessionID");
-	String toUser = messageJSON.getString("toUser");
+	Long toolSessionId = JsonUtil.optLong(messageJSON, "toolSessionID");
+	String toUser = JsonUtil.optString(messageJSON, "toUser");
 	new Thread(() -> {
 	    try {
 		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
@@ -356,9 +365,8 @@ public class LearningWebsocketServer {
     /**
      * Filteres messages meant for the given user (group or personal).
      */
-    private static JSONArray getMessages(ChatSession chatSession, List<ChatMessage> messages, String userName)
-	    throws JSONException {
-	JSONArray messagesJSON = new JSONArray();
+    private static ArrayNode getMessages(ChatSession chatSession, List<ChatMessage> messages, String userName) {
+	ArrayNode messagesJSON = JsonNodeFactory.instance.arrayNode();
 
 	for (ChatMessage message : messages) {
 	    // all messasges need to be written out, not only new ones,
@@ -368,11 +376,11 @@ public class LearningWebsocketServer {
 		    || message.getToUser().getLoginName().equals(userName))) {
 		String filteredMessage = LearningWebsocketServer.getChatService().filterMessage(message.getBody(),
 			chatSession.getChat());
-		JSONObject messageJSON = new JSONObject();
+		ObjectNode messageJSON = JsonNodeFactory.instance.objectNode();
 		messageJSON.put("body", filteredMessage);
 		messageJSON.put("from", message.getFromUser().getNickname());
 		messageJSON.put("type", message.getType());
-		messagesJSON.put(messageJSON);
+		messagesJSON.add(messageJSON);
 	    }
 	}
 

@@ -20,8 +20,6 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
@@ -30,6 +28,9 @@ import org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceProxy;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Sends Scratchies actions to non-leaders.
@@ -138,8 +139,8 @@ public class LearningWebsocketServer {
 	 * Feeds websockets with scratched answers.
 	 */
 	@SuppressWarnings("unchecked")
-	private static void send(Long toolSessionId) throws JSONException, IOException {
-	    JSONObject responseJSON = new JSONObject();
+	private static void send(Long toolSessionId) throws IOException {
+	    ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 
 	    Collection<ScratchieItem> items = LearningWebsocketServer.getScratchieService()
 		    .getItemsWithIndicatedScratches(toolSessionId);
@@ -148,7 +149,7 @@ public class LearningWebsocketServer {
 		Long itemUid = item.getUid();
 		// do not init variables below until it's really needed
 		Map<Long, Boolean> itemCache = null;
-		JSONObject itemJSON = null;
+		ObjectNode itemJSON = null;
 		for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
 		    if (answer.isScratched()) {
 			// answer is scratched, check if it is present in cache
@@ -168,19 +169,19 @@ public class LearningWebsocketServer {
 			    // send only updates, nothing Learners are already aware of
 			    itemCache.put(answerUid, answerStoredIsCorrect);
 			    if (itemJSON == null) {
-				itemJSON = new JSONObject();
+				itemJSON = JsonNodeFactory.instance.objectNode();
 			    }
 			    itemJSON.put(answerUid.toString(), answerStoredIsCorrect);
 			}
 		    }
 		}
 		if (itemJSON != null) {
-		    responseJSON.put(itemUid.toString(), itemJSON);
+		    responseJSON.set(itemUid.toString(), itemJSON);
 		}
 	    }
 
 	    // are there any updates to send?
-	    if (responseJSON.length() == 0) {
+	    if (responseJSON.size() == 0) {
 		return;
 	    }
 
@@ -210,7 +211,7 @@ public class LearningWebsocketServer {
      * Registeres the Learner for processing by SendWorker.
      */
     @OnOpen
-    public void registerUser(Session websocket) throws JSONException, IOException {
+    public void registerUser(Session websocket) throws IOException {
 	Long toolSessionId = Long
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
@@ -254,13 +255,13 @@ public class LearningWebsocketServer {
      * The leader finished scratching and also . Non-leaders will have
      * Finish button displayed.
      */
-    public static void sendCloseRequest(Long toolSessionId) throws JSONException, IOException {
+    public static void sendCloseRequest(Long toolSessionId) throws IOException {
 	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	if (sessionWebsockets == null) {
 	    return;
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("close", true);
 	String response = responseJSON.toString();
 
@@ -275,13 +276,13 @@ public class LearningWebsocketServer {
      * The time limit is expired but leader hasn't submitted required notebook/burning questions yet. Non-leaders
      * will need to refresh the page in order to stop showing them questions page.
      */
-    public static void sendPageRefreshRequest(Long toolSessionId) throws JSONException, IOException {
+    public static void sendPageRefreshRequest(Long toolSessionId) throws IOException {
 	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	if (sessionWebsockets == null) {
 	    return;
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("pageRefresh", true);
 	String response = responseJSON.toString();
 

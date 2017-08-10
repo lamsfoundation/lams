@@ -35,8 +35,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
@@ -47,6 +45,9 @@ import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Prepares data for charts.
@@ -59,7 +60,7 @@ public class VoteChartGeneratorAction extends LamsDispatchAction {
 
     @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	String currentSessionId = request.getParameter("currentSessionId");
 
 	Map<Long, String> nominationNames = new HashMap<>();
@@ -97,13 +98,13 @@ public class VoteChartGeneratorAction extends LamsDispatchAction {
 	    nominationVotes = voteGeneralLearnerFlowDTO.getMapStandardRatesContent();
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	for (Long index : nominationNames.keySet()) {
-	    JSONObject nomination = new JSONObject();
+	    ObjectNode nomination = JsonNodeFactory.instance.objectNode();
 	    // nominations' names and values go separately
 	    nomination.put("name", nominationNames.get(index));
 	    nomination.put("value", nominationVotes.get(index));
-	    responseJSON.append("data", nomination);
+	    responseJSON.withArray("data").add(nomination);
 	}
 
 	response.setContentType("application/json;charset=utf-8");

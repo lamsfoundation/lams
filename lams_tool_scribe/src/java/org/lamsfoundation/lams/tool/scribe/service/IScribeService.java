@@ -24,13 +24,15 @@
 
 package org.lamsfoundation.lams.tool.scribe.service;
 
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
+
+
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Defines the services available to the web layer from the Scribe Service
@@ -143,7 +145,7 @@ public interface IScribeService {
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);
 
-    void submitReport(Long toolSessionId, String userName, JSONObject requestJSON) throws JSONException;
+    void submitReport(Long toolSessionId, String userName, ObjectNode requestJSON);
 
     public void deleteHeading(Long headingUid);
 }

@@ -39,8 +39,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.presence.PresenceWebsocketServer;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
@@ -67,6 +65,9 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -211,8 +212,8 @@ public class LearnerAction extends LamsDispatchAction {
 
 	// make a copy of attempted and completed activities
 	LearnerProgress learnerProgress = learnerService.getProgress(userID, lessonID);
-	Map<Activity, Date> attemptedActivities = new HashMap<Activity, Date>(learnerProgress.getAttemptedActivities());
-	Map<Activity, CompletedActivityProgressArchive> completedActivities = new HashMap<Activity, CompletedActivityProgressArchive>();
+	Map<Activity, Date> attemptedActivities = new HashMap<>(learnerProgress.getAttemptedActivities());
+	Map<Activity, CompletedActivityProgressArchive> completedActivities = new HashMap<>();
 	for (Entry<Activity, CompletedActivityProgress> entry : learnerProgress.getCompletedActivities().entrySet()) {
 	    CompletedActivityProgressArchive activityArchive = new CompletedActivityProgressArchive(learnerProgress,
 		    entry.getKey(), entry.getValue().getStartDate(), entry.getValue().getFinishDate());
@@ -248,7 +249,7 @@ public class LearnerAction extends LamsDispatchAction {
      */
     @SuppressWarnings("unchecked")
     public ActionForward getLearnerProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 	Integer learnerId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, true);
 	Integer monitorId = null;
 	HttpSession ss = SessionManager.getSession();
@@ -262,7 +263,7 @@ public class LearnerAction extends LamsDispatchAction {
 	    monitorId = userId;
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	if (lessonId == null) {
 	    // depending on when this is called, there may only be a toolSessionId known, not the lessonId.
@@ -272,7 +273,7 @@ public class LearnerAction extends LamsDispatchAction {
 	    lessonId = toolSession.getLesson().getLessonId();
 	}
 
-	responseJSON.put("messages", getProgressBarMessages());
+	responseJSON.set("messages", getProgressBarMessages());
 
 	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
@@ -281,18 +282,18 @@ public class LearnerAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	responseJSON.put("currentActivityId", ret[1]);
-	responseJSON.put("isPreview", ret[2]);
+	responseJSON.put("currentActivityId", (Long) ret[1]);
+	responseJSON.put("isPreview", (boolean) ret[2]);
 	for (ActivityURL activity : (List<ActivityURL>) ret[0]) {
 	    if (activity.getFloating()) {
 		// these are support activities
 		for (ActivityURL childActivity : activity.getChildActivities()) {
-		    responseJSON.append("support",
-			    activityProgressToJSON(childActivity, null, lessonId, learnerId, monitorId));
+		    responseJSON.withArray("support")
+			    .add(activityProgressToJSON(childActivity, null, lessonId, learnerId, monitorId));
 		}
 	    } else {
-		responseJSON.append("activities",
-			activityProgressToJSON(activity, (Long) ret[1], lessonId, learnerId, monitorId));
+		responseJSON.withArray("support")
+			.add(activityProgressToJSON(activity, (Long) ret[1], lessonId, learnerId, monitorId));
 	    }
 	}
 
@@ -354,9 +355,9 @@ public class LearnerAction extends LamsDispatchAction {
     /**
      * Converts an activity in learner progress to a JSON object.
      */
-    private JSONObject activityProgressToJSON(ActivityURL activity, Long currentActivityId, Long lessonId,
-	    Integer learnerId, Integer monitorId) throws JSONException, IOException {
-	JSONObject activityJSON = new JSONObject();
+    private ObjectNode activityProgressToJSON(ActivityURL activity, Long currentActivityId, Long lessonId,
+	    Integer learnerId, Integer monitorId) throws IOException {
+	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	activityJSON.put("id", activity.getActivityId());
 	activityJSON.put("name", activity.getTitle());
 	activityJSON.put("status", activity.getActivityId().equals(currentActivityId) ? 0 : activity.getStatus());
@@ -395,16 +396,16 @@ public class LearnerAction extends LamsDispatchAction {
 
 	if (activity.getChildActivities() != null) {
 	    for (ActivityURL childActivity : activity.getChildActivities()) {
-		activityJSON.append("childActivities",
-			activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId, monitorId));
+		activityJSON.withArray("childActivities")
+			.add(activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId, monitorId));
 	    }
 	}
 
 	return activityJSON;
     }
 
-    private JSONObject getProgressBarMessages() throws JSONException {
-	JSONObject progressBarMessages = new JSONObject();
+    private ObjectNode getProgressBarMessages() {
+	ObjectNode progressBarMessages = JsonNodeFactory.instance.objectNode();
 	MessageService messageService = LearnerServiceProxy
 		.getMonitoringMessageService(getServlet().getServletContext());
 	for (String key : MONITOR_MESSAGE_KEYS) {
@@ -423,9 +424,9 @@ public class LearnerAction extends LamsDispatchAction {
      * Gets the lesson details based on lesson id or the current tool session
      */
     public ActionForward getLessonDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	Lesson lesson = null;
 
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);

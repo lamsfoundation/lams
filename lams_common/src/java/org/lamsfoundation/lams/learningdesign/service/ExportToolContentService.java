@@ -140,9 +140,10 @@ import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
-import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
+
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
@@ -476,7 +477,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    }
 
 	    // exporting XML
-	    XStream designXml = new XStream(new SunUnsafeReflectionProvider());
+	    XStream designXml = new XStream(new StaxDriver());
 	    designXml.addPermission(AnyTypePermission.ANY);
 	    designXml.toXML(ldDto, ldFile);
 	    ldFile.close();
@@ -547,7 +548,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    Writer toolFile = new OutputStreamWriter(new FileOutputStream(toolFileName), "UTF-8");
 
 	    // serialize tool xml into local file.
-	    XStream toolXml = new XStream(new SunUnsafeReflectionProvider());
+	    XStream toolXml = new XStream(new StaxDriver());
 	    toolXml.addPermission(AnyTypePermission.ANY);
 	    FileConverter fileConverter = null;
 	    if (!fileHandleClassList.isEmpty()) {
@@ -895,7 +896,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    String toVersion) throws ImportToolContentException {
 	Object toolPOJO = null;
 	// change xml to Tool POJO
-	XStream toolXml = new XStream(new SunUnsafeReflectionProvider());
+	XStream toolXml = new XStream(new StaxDriver());
 	toolXml.addPermission(AnyTypePermission.ANY);
 	FileConverter fileConverter = null;
 	if (!fileHandleClassList.isEmpty()) {

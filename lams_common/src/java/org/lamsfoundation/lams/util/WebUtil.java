@@ -1,12 +1,8 @@
 package org.lamsfoundation.lams.util;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.Principal;
@@ -17,12 +13,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * helper methods useful for servlets
@@ -368,7 +365,7 @@ public class WebUtil {
 	}
 	throw new IllegalArgumentException("[" + modeValue + "] is not a legal mode" + "in LAMS");
     }
-    
+
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
      *
@@ -377,7 +374,7 @@ public class WebUtil {
      */
     public static ToolAccessMode readToolAccessModeAuthorDefaulted(HttpServletRequest request) {
 	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	
+
 	ToolAccessMode mode;
 	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
 	    mode = ToolAccessMode.TEACHER;
@@ -553,8 +550,8 @@ public class WebUtil {
     /**
      * Produces JSON object with basic user details.
      */
-    public static JSONObject userToJSON(User user) throws JSONException {
-	JSONObject userJSON = new JSONObject();
+    public static ObjectNode userToJSON(User user) {
+	ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
 	userJSON.put("id", user.getUserId());
 	userJSON.put("firstName", user.getFirstName());
 	userJSON.put("lastName", user.getLastName());

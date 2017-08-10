@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.springframework.core.task.AsyncListenableTaskExecutor;
@@ -65,7 +63,7 @@ final class SimpleStreamingAsyncClientHttpRequest extends AbstractAsyncClientHtt
 
 	@Override
 	public HttpMethod getMethod() {
-		return HttpMethod.valueOf(this.connection.getRequestMethod());
+		return HttpMethod.resolve(this.connection.getRequestMethod());
 	}
 
 	@Override
@@ -91,20 +89,11 @@ final class SimpleStreamingAsyncClientHttpRequest extends AbstractAsyncClientHtt
 					this.connection.setChunkedStreamingMode(this.chunkSize);
 				}
 			}
-			writeHeaders(headers);
+			SimpleBufferingClientHttpRequest.addHeaders(this.connection, headers);
 			this.connection.connect();
 			this.body = this.connection.getOutputStream();
 		}
 		return StreamUtils.nonClosing(this.body);
-	}
-
-	private void writeHeaders(HttpHeaders headers) {
-		for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-			String headerName = entry.getKey();
-			for (String headerValue : entry.getValue()) {
-				this.connection.addRequestProperty(headerName, headerValue);
-			}
-		}
 	}
 
 	@Override
@@ -117,8 +106,10 @@ final class SimpleStreamingAsyncClientHttpRequest extends AbstractAsyncClientHtt
 						body.close();
 					}
 					else {
-						writeHeaders(headers);
+						SimpleBufferingClientHttpRequest.addHeaders(connection, headers);
 						connection.connect();
+						// Immediately trigger the request in a no-output scenario as well
+						connection.getResponseCode();
 					}
 				}
 				catch (IOException ex) {

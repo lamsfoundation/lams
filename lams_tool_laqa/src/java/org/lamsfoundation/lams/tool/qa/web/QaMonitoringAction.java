@@ -19,8 +19,6 @@ USA
 http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-
-
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
@@ -34,13 +32,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
@@ -54,12 +48,14 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Ozgur Demirtas
  */
 public class QaMonitoringAction extends LamsDispatchAction implements QaAppConstants {
-    private static Logger logger = Logger.getLogger(QaMonitoringAction.class.getName());
-
     @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, ToolException {
@@ -107,7 +103,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
      * @param request
      * @param response
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -176,7 +172,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
      * @return
      */
     public ActionForward getReflectionsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException, ToolException {
 
 	Long toolSessionId = WebUtil.readLongParam(request, QaAppConstants.TOOL_SESSION_ID);
 
@@ -196,20 +192,20 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	List<Object[]> users = qaService.getUserReflectionsForTablesorter(toolSessionId, page, size, sorting,
 		searchString);
 
-	JSONArray rows = new JSONArray();
-	JSONObject responsedata = new JSONObject();
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
+	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
 	responsedata.put("total_rows", qaService.getCountUsersBySessionWithSearch(toolSessionId, searchString));
 
 	for (Object[] userAndReflection : users) {
-	    JSONObject responseRow = new JSONObject();
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 	    responseRow.put("username", StringEscapeUtils.escapeHtml((String) userAndReflection[1]));
 	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
 		String reflection = StringEscapeUtils.escapeHtml((String) userAndReflection[2]);
 		responseRow.put(QaAppConstants.NOTEBOOK, reflection.replaceAll("\n", "<br>"));
 	    }
-	    rows.put(responseRow);
+	    rows.add(responseRow);
 	}
-	responsedata.put("rows", rows);
+	responsedata.set("rows", rows);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(new String(responsedata.toString()));
 	return null;

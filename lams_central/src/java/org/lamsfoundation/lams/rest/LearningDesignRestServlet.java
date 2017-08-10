@@ -20,29 +20,31 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.rest;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.JsonUtil;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class LearningDesignRestServlet extends RestServlet {
     private static final Logger log = Logger.getLogger(LearningDesignRestServlet.class);
 
     @Override
-    protected void doPostInternal(JSONObject requestJSON, UserDTO userDTO, HttpServletResponse response)
+    protected void doPostInternal(ObjectNode requestJSON, UserDTO userDTO, HttpServletResponse response)
 	    throws Exception {
-	JSONObject learningDesignJSON = requestJSON.getJSONObject("ld");
+	ObjectNode learningDesignJSON = JsonUtil.optObject(requestJSON, "ld");
 	LearningDesign learningDesign = getAuthoringService().saveLearningDesignDetails(learningDesignJSON);
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put("learningDesignID", learningDesign.getLearningDesignId());
-	JSONObject.put("title", learningDesign.getTitle());
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
+	ObjectNode.put("learningDesignID", learningDesign.getLearningDesignId());
+	ObjectNode.put("title", learningDesign.getTitle());
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
     }
 }

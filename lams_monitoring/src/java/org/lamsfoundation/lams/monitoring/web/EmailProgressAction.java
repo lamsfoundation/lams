@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
@@ -39,9 +38,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.monitoring.quartz.job.EmailProgressMessageJob;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
@@ -63,6 +59,10 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Responsible for "Email Progress" functionality.
@@ -86,11 +86,11 @@ public class EmailProgressAction extends LamsDispatchAction {
 
     /**
      * Gets learners or monitors of the lesson and organisation containing it.
-     * 
+     *
      * @throws SchedulerException
      */
     public ActionForward getEmailProgressDates(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, JSONException, SchedulerException {
+	    HttpServletResponse response) throws IOException, SchedulerException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(), "get class members", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -100,13 +100,13 @@ public class EmailProgressAction extends LamsDispatchAction {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
-	JSONObject responseJSON = new JSONObject();
-	JSONArray datesJSON = new JSONArray();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	ArrayNode datesJSON = JsonNodeFactory.instance.arrayNode();
 
 	// find all the current dates set up to send the emails
 	Scheduler scheduler = getScheduler();
 	String triggerPrefix = getTriggerPrefix(lessonId);
-	SortedSet<Date> currentDatesSet = new TreeSet<Date>();
+	SortedSet<Date> currentDatesSet = new TreeSet<>();
 	Set<TriggerKey> triggerKeys = scheduler
 		.getTriggerKeys(GroupMatcher.triggerGroupEquals(Scheduler.DEFAULT_GROUP));
 	for (TriggerKey triggerKey : triggerKeys) {
@@ -128,24 +128,24 @@ public class EmailProgressAction extends LamsDispatchAction {
 	}
 
 	for (Date date : currentDatesSet) {
-	    datesJSON.put(createDateJSON(request.getLocale(), user, date, null));
+	    datesJSON.add(createDateJSON(request.getLocale(), user, date, null));
 	}
-	responseJSON.put("dates", datesJSON);
+	responseJSON.set("dates", datesJSON);
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 	return null;
     }
 
-    private JSONObject createDateJSON(Locale locale, UserDTO user, Date date, String result) throws JSONException {
-	JSONObject dateJSON = new JSONObject();
+    private ObjectNode createDateJSON(Locale locale, UserDTO user, Date date, String result) {
+	ObjectNode dateJSON = JsonNodeFactory.instance.objectNode();
 	if (result != null) {
 	    dateJSON.put("result", result);
 	}
 	if (date != null) {
 	    dateJSON.put("id", date.getTime());
 	    dateJSON.put("ms", date.getTime());
-	    dateJSON.put("date", DateUtil.convertToStringForJSON(date, locale) );
+	    dateJSON.put("date", DateUtil.convertToStringForJSON(date, locale));
 	}
 	return dateJSON;
     }
@@ -168,7 +168,7 @@ public class EmailProgressAction extends LamsDispatchAction {
      * Add or remove a date for the email progress
      */
     public ActionForward updateEmailProgressDate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, JSONException {
+	    HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(), "get class members", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -178,20 +178,20 @@ public class EmailProgressAction extends LamsDispatchAction {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
-	// as we are using ms since UTC 0 calculated on the client, this will be correctly set up as server date 
+	// as we are using ms since UTC 0 calculated on the client, this will be correctly set up as server date
 	// and does not need changing (assuming the user's LAMS timezone matches the user's computer timezone).
 	long dateId = WebUtil.readLongParam(request, "id");
-	Date newDate = new Date(dateId); 
+	Date newDate = new Date(dateId);
 	boolean add = WebUtil.readBooleanParam(request, "add");
 
 	// calculate scheduleDate
 	String scheduledTriggerName = getTriggerName(lessonId, newDate);
-	JSONObject dateJSON = null;
+	ObjectNode dateJSON = null;
 
 	try {
 	    Scheduler scheduler = getScheduler();
-	    Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher
-		    .triggerGroupEquals(Scheduler.DEFAULT_GROUP));
+	    Set<TriggerKey> triggerKeys = scheduler
+		    .getTriggerKeys(GroupMatcher.triggerGroupEquals(Scheduler.DEFAULT_GROUP));
 	    Trigger trigger = null;
 
 	    for (TriggerKey triggerKey : triggerKeys) {
@@ -200,15 +200,14 @@ public class EmailProgressAction extends LamsDispatchAction {
 		    break;
 		}
 	    }
-		
+
 	    if (add) {
 		if (trigger == null) {
-		    String desc = new StringBuilder("Send progress email. Lesson ")
-		    	.append(lessonId).append(" on ").append(newDate).toString();
+		    String desc = new StringBuilder("Send progress email. Lesson ").append(lessonId).append(" on ")
+			    .append(newDate).toString();
 		    // build job detail based on the bean class
 		    JobDetail EmailProgressMessageJob = JobBuilder.newJob(EmailProgressMessageJob.class)
-			    .withIdentity(getJobName(lessonId, newDate))
-			    .withDescription(desc)
+			    .withIdentity(getJobName(lessonId, newDate)).withDescription(desc)
 			    .usingJobData(AttributeNames.PARAM_LESSON_ID, lessonId).build();
 
 		    // create customized triggers
@@ -244,7 +243,7 @@ public class EmailProgressAction extends LamsDispatchAction {
     }
 
     public ActionForward sendLessonProgressEmail(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Integer monitorUserId = getCurrentUser().getUserID();
@@ -261,7 +260,7 @@ public class EmailProgressAction extends LamsDispatchAction {
 	    if (getEventNotificationService().sendMessage(null, monitorUserId,
 		    IEventNotificationService.DELIVERY_METHOD_MAIL, parts[0], parts[1], true)) {
 		sent = 1;
-	    } 
+	    }
 
 	} catch (InvalidParameterException ipe) {
 	    error = ipe.getMessage();
@@ -269,7 +268,7 @@ public class EmailProgressAction extends LamsDispatchAction {
 	    error = e.getMessage();
 	}
 
-	JSONObject responseJSON = new JSONObject();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("sent", sent);
 	if (error != null) {
 	    responseJSON.put("error", error);

@@ -78,7 +78,7 @@ import java.util.TreeSet;
  * <tr>
  * <td align="left"><code>Month</code></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>1-12 or JAN-DEC</code></td>
+ * <td align="left"><code>0-11 or JAN-DEC</code></td>
  * <td align="left">&nbsp;</th>
  * <td align="left"><code>, - * /</code></td>
  * </tr>
@@ -119,7 +119,7 @@ import java.util.TreeSet;
  * the value to start with. Essentially, for each field in the expression, there
  * is a set of numbers that can be turned on or off. For seconds and minutes, 
  * the numbers range from 0 to 59. For hours 0 to 23, for days of the month 0 to
- * 31, and for months 1 to 12. The &quot;/&quot; character simply helps you turn
+ * 31, and for months 0 to 11 (JAN to DEC). The &quot;/&quot; character simply helps you turn
  * on every &quot;nth&quot; value in the given set. Thus &quot;7/6&quot; in the
  * month field only turns on month &quot;7&quot;, it does NOT mean every 6th 
  * month, please note that subtlety.  

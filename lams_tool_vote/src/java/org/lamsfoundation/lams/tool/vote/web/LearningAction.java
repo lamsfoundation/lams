@@ -45,8 +45,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -72,6 +70,9 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Ozgur Demirtas
@@ -206,11 +207,11 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	    List<VoteUsrAttempt> attempts = voteService.getAttemptsForUser(voteQueUsr.getUid());
 
-	    Map<String, String> mapQuestionsContent = new TreeMap<String, String>(new VoteComparator());
+	    Map<String, String> mapQuestionsContent = new TreeMap<>(new VoteComparator());
 	    Iterator<VoteUsrAttempt> listIterator = attempts.iterator();
 	    int order = 0;
 	    while (listIterator.hasNext()) {
-		VoteUsrAttempt attempt = (VoteUsrAttempt) listIterator.next();
+		VoteUsrAttempt attempt = listIterator.next();
 		VoteQueContent voteQueContent = attempt.getVoteQueContent();
 		order++;
 		if (voteQueContent != null) {
@@ -447,7 +448,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	}
 
 	if ((mapGeneralCheckedOptionsContent.size() == 0 && (userEntryAvailable == true))) {
-	    Map<String, String> mapLeanerCheckedOptionsContent = new TreeMap<String, String>(new VoteComparator());
+	    Map<String, String> mapLeanerCheckedOptionsContent = new TreeMap<>(new VoteComparator());
 
 	    if (userEntry.length() > 0) {
 		voteService.createAttempt(user, mapLeanerCheckedOptionsContent, userEntry, session, voteContentUid);
@@ -455,7 +456,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	}
 
 	if ((mapGeneralCheckedOptionsContent.size() > 0) && (userEntryAvailable == true)) {
-	    Map<String, String> mapLeanerCheckedOptionsContent = new TreeMap<String, String>(new VoteComparator());
+	    Map<String, String> mapLeanerCheckedOptionsContent = new TreeMap<>(new VoteComparator());
 
 	    if (userEntry.length() > 0) {
 		voteService.createAttempt(user, mapLeanerCheckedOptionsContent, userEntry, session, voteContentUid);
@@ -517,7 +518,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	Map<String, String> mapQuestionsContent = voteService.buildQuestionMap(voteContent, null);
 	request.setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
 
-	Map<String, String> mapGeneralCheckedOptionsContent = new TreeMap<String, String>(new VoteComparator());
+	Map<String, String> mapGeneralCheckedOptionsContent = new TreeMap<>(new VoteComparator());
 	request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
 
 	voteLearningForm.setUserEntry("");
@@ -534,7 +535,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
      * checks Leader Progress
      */
     public ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+	    HttpServletResponse response) throws IOException {
 
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -545,10 +546,10 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	boolean isLeaderResponseFinalized = leader.isResponseFinalised();
 
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
+	ObjectNode.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
 	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 	return null;
     }
 
@@ -825,7 +826,8 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	    // store group leader information
 	    voteLearningForm.setGroupLeaderName(groupLeader.getFullname());
-	    voteLearningForm.setGroupLeaderUserId(groupLeader.getQueUsrId() != null ? groupLeader.getQueUsrId().toString() : "");
+	    voteLearningForm.setGroupLeaderUserId(
+		    groupLeader.getQueUsrId() != null ? groupLeader.getQueUsrId().toString() : "");
 	    boolean isUserLeader = voteService.isUserGroupLeader(user, new Long(toolSessionID));
 	    voteLearningForm.setIsUserLeader(isUserLeader);
 	}
@@ -910,14 +912,14 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	if (user != null) {
 	    attempts = voteService.getAttemptsForUser(user.getUid());
 	}
-	Map<String, String> localMapQuestionsContent = new TreeMap<String, String>(new VoteComparator());
+	Map<String, String> localMapQuestionsContent = new TreeMap<>(new VoteComparator());
 
 	if (attempts != null) {
 
 	    Iterator<VoteUsrAttempt> listIterator = attempts.iterator();
 	    int order = 0;
 	    while (listIterator.hasNext()) {
-		VoteUsrAttempt attempt = (VoteUsrAttempt) listIterator.next();
+		VoteUsrAttempt attempt = listIterator.next();
 		VoteQueContent voteQueContent = attempt.getVoteQueContent();
 		order++;
 		if (voteQueContent != null) {
@@ -948,7 +950,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
     protected void setupAttributes(HttpServletRequest request, VoteContent voteContent,
 	    VoteLearningForm voteLearningForm, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO) {
 
-	Map<String, String> mapGeneralCheckedOptionsContent = new TreeMap<String, String>(new VoteComparator());
+	Map<String, String> mapGeneralCheckedOptionsContent = new TreeMap<>(new VoteComparator());
 	request.setAttribute(VoteAppConstants.MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
 
 	voteLearningForm.setActivityTitle(voteContent.getTitle());

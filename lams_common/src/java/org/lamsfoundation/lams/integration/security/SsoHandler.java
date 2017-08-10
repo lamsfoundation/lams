@@ -151,12 +151,6 @@ public class SsoHandler implements ServletExtension {
 
 		}
 
-		// prevent session fixation attack
-		// This will become obsolete on Undertow upgrade to version 1.1.10+
-		SessionManager.removeSessionByID(session.getId(), false);
-		request.changeSessionId();
-		session = request.getSession();
-
 		// store session so UniversalLoginModule can access it
 		SessionManager.startSession(request);
 

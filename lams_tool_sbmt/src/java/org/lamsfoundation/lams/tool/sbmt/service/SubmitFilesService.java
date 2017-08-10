@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.io.FileNotFoundException;
@@ -44,8 +42,6 @@ import java.util.TreeSet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -104,6 +100,8 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.dao.DataAccessException;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Manpreet Minhas
@@ -534,10 +532,10 @@ public class SubmitFilesService
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getSubmitFilesOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -620,7 +618,8 @@ public class SubmitFilesService
      *      java.lang.Long)
      */
     @Override
-    public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale, boolean includeRemovedFiles) {
+    public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale,
+	    boolean includeRemovedFiles) {
 	List<SubmissionDetails> list = submissionDetailsDAO.getBySessionAndLearner(sessionID, userID);
 	SortedSet details = new TreeSet(this.new FileDtoComparator());
 	if (list == null) {
@@ -629,7 +628,7 @@ public class SubmitFilesService
 
 	NumberFormat numberFormat = currentLocale != null ? NumberFormat.getInstance(currentLocale) : null;
 	for (SubmissionDetails submissionDetails : list) {
-	    if ( includeRemovedFiles || ! submissionDetails.isRemoved() ) {
+	    if (includeRemovedFiles || !submissionDetails.isRemoved()) {
 		FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails, numberFormat);
 		details.add(detailDto);
 	    }
@@ -743,16 +742,15 @@ public class SubmitFilesService
 	}
     }
 
- 
     @Override
     public void removeLearnerFile(Long detailID, UserDTO monitor) {
 
 	SubmissionDetails detail = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
 
 	if (detail != null) {
-	    if(monitor != null){
+	    if (monitor != null) {
 
-	    auditRemoveRestore(monitor, detail, "audit.file.delete");
+		auditRemoveRestore(monitor, detail, "audit.file.delete");
 	    }
 
 	    detail.setRemoved(true);
@@ -762,13 +760,13 @@ public class SubmitFilesService
 
     @Override
     public void restoreLearnerFile(Long detailID, UserDTO monitor) {
-	
+
 	SubmissionDetails detail = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
 
 	if (detail != null) {
-	    
-	    auditRemoveRestore(monitor, detail,"audit.file.restore");
-	    
+
+	    auditRemoveRestore(monitor, detail, "audit.file.restore");
+
 	    detail.setRemoved(false);
 	    submissionDetailsDAO.update(detail);
 	}
@@ -777,16 +775,15 @@ public class SubmitFilesService
 
     private void auditRemoveRestore(UserDTO monitor, SubmissionDetails detail, String i18nKey) {
 	SubmitUser learner = detail.getLearner();
-	StringBuilder instructorTxt = new StringBuilder(monitor.getLogin()).append(" (").append(monitor.getUserID()).append(") ")
-	    .append(monitor.getFirstName()).append(" ").append(monitor.getLastName());
-	StringBuilder learnerTxt = new StringBuilder(learner.getLogin()).append("  (").append(learner.getUserID()).append(") ")
-	    .append(learner.getFirstName()).append(" ").append(learner.getLastName());
+	StringBuilder instructorTxt = new StringBuilder(monitor.getLogin()).append(" (").append(monitor.getUserID())
+		.append(") ").append(monitor.getFirstName()).append(" ").append(monitor.getLastName());
+	StringBuilder learnerTxt = new StringBuilder(learner.getLogin()).append("  (").append(learner.getUserID())
+		.append(") ").append(learner.getFirstName()).append(" ").append(learner.getLastName());
 
-	String auditMsg = getLocalisedMessage(i18nKey, new Object[] { instructorTxt.toString(), detail.getFilePath(),
-	    learnerTxt.toString() });
+	String auditMsg = getLocalisedMessage(i18nKey,
+		new Object[] { instructorTxt.toString(), detail.getFilePath(), learnerTxt.toString() });
 	auditService.log(SbmtConstants.AUDIT_LOG_MODULE_NAME, auditMsg);
     }
-
 
     @Override
     public IVersionedNode downloadFile(Long uuid, Long versionID) throws SubmitFilesException {
@@ -824,14 +821,14 @@ public class SubmitFilesService
 	Map<Integer, StringBuilder> notificationMessages = null;
 	Object[] notificationMessageParameters = null;
 	if (notifyLearnersOnMarkRelease) {
-	    notificationMessages = new TreeMap<Integer, StringBuilder>();
+	    notificationMessages = new TreeMap<>();
 	    notificationMessageParameters = new Object[3];
 	}
 	while (iter.hasNext()) {
 	    details = (SubmissionDetails) iter.next();
 	    report = details.getReport();
 	    report.setDateMarksReleased(new Date());
-	    if (notifyLearnersOnMarkRelease && ! details.isRemoved()) {
+	    if (notifyLearnersOnMarkRelease && !details.isRemoved()) {
 		SubmitUser user = details.getLearner();
 		StringBuilder notificationMessage = notificationMessages.get(user.getUserID());
 		if (notificationMessage == null) {
@@ -891,7 +888,7 @@ public class SubmitFilesService
 	if (detailsList != null) {
 	    Float totalMark = null;
 	    for (SubmissionDetails details : detailsList) {
-		if ( ! details.isRemoved() ) {
+		if (!details.isRemoved()) {
 		    SubmitFilesReport report = details.getReport();
 		    if (report != null) {
 			if (totalMark == null) {
@@ -973,10 +970,10 @@ public class SubmitFilesService
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
@@ -1198,11 +1195,11 @@ public class SubmitFilesService
     }
 
     public IAuditService getAuditService() {
-        return auditService;
+	return auditService;
     }
 
     public void setAuditService(IAuditService auditService) {
-        this.auditService = auditService;
+	this.auditService = auditService;
     }
 
     public void setGradebookService(IGradebookService gradebookService) {
@@ -1222,7 +1219,7 @@ public class SubmitFilesService
     public void setSubmitFilesOutputFactory(SubmitFilesOutputFactory submitFilesOutputFactory) {
 	this.submitFilesOutputFactory = submitFilesOutputFactory;
     }
-    
+
     @Override
     public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
 	SubmitUser learner = getSessionUser(toolSessionId, learnerId.intValue());
@@ -1233,20 +1230,23 @@ public class SubmitFilesService
 	Date startDate = null;
 	Date endDate = null;
 	List<SubmissionDetails> list = submissionDetailsDAO.getBySessionAndLearner(toolSessionId, learnerId.intValue());
-	for ( SubmissionDetails detail : list ) {
+	for (SubmissionDetails detail : list) {
 	    Date newDate = detail.getDateOfSubmission();
-	    if ( newDate != null ) {
-		if ( startDate == null || newDate.before(startDate) )
+	    if (newDate != null) {
+		if (startDate == null || newDate.before(startDate)) {
 		    startDate = newDate;
-		if ( endDate == null || newDate.after(endDate) )
+		}
+		if (endDate == null || newDate.after(endDate)) {
 		    endDate = newDate;
+		}
 	    }
 	}
-	
-	if (learner.isFinished())
+
+	if (learner.isFinished()) {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, endDate);
-	else
+	} else {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
+	}
     }
 
     // ****************** REST methods *************************
@@ -1255,8 +1255,7 @@ public class SubmitFilesService
      * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: title, instructions
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
-	    throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
 	SubmitFilesContent content = new SubmitFilesContent();
 	Date updateDate = new Date();
@@ -1264,26 +1263,27 @@ public class SubmitFilesService
 	content.setUpdated(updateDate);
 
 	content.setContentID(toolContentID);
-	content.setTitle(toolContentJSON.getString(RestTags.TITLE));
-	content.setInstruction(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	content.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
+	content.setInstruction(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 
 	content.setContentInUse(false);
 	content.setDefineLater(false);
 	content.setNotifyTeachersOnFileSubmit(
-		JsonUtil.opt(toolContentJSON, "notifyTeachersOnFileSubmit", Boolean.FALSE));
+		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnFileSubmit", Boolean.FALSE));
 	content.setNotifyLearnersOnMarkRelease(
-		JsonUtil.opt(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
-	content.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
-	content.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	content.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	content.setLimitUpload(JsonUtil.opt(toolContentJSON, "limitUpload", Boolean.FALSE));
-	content.setLimitUploadNumber(JsonUtil.opt(toolContentJSON, "limitUploadNumber", 0));
+		JsonUtil.optBoolean(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
+	content.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	content.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	content.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	content.setLimitUpload(JsonUtil.optBoolean(toolContentJSON, "limitUpload", Boolean.FALSE));
+	content.setLimitUploadNumber(JsonUtil.optInt(toolContentJSON, "limitUploadNumber", 0));
 	// submissionDeadline is set in monitoring
 
 	SubmitUser user = getContentUser(toolContentID, userID);
 	if (user == null) {
-	    user = createContentUser(userID, toolContentJSON.getString("firstName"),
-		    toolContentJSON.getString("lastName"), toolContentJSON.getString("loginName"), toolContentID);
+	    user = createContentUser(userID, JsonUtil.optString(toolContentJSON, "firstName"),
+		    JsonUtil.optString(toolContentJSON, "lastName"), JsonUtil.optString(toolContentJSON, "loginName"),
+		    toolContentID);
 	}
 	content.setCreatedBy(user);
 	saveOrUpdateContent(content);

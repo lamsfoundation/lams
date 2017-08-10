@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.springframework.cache.ehcache;
 
-import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Set;
 
 import net.sf.ehcache.Cache;
@@ -38,6 +38,7 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * {@link FactoryBean} that creates a named EhCache {@link net.sf.ehcache.Cache} instance
@@ -52,9 +53,8 @@ import org.springframework.util.ClassUtils;
  * <p>Note: If the named Cache instance is found, the properties will be ignored and the
  * Cache instance will be retrieved from the CacheManager.
  *
- * <p>Note: As of Spring 4.0, Spring's EhCache support requires EhCache 2.1 or higher.
- * We recommend the use of EhCache 2.5 or higher.
-
+ * <p>Note: As of Spring 4.1, Spring's EhCache support requires EhCache 2.5 or higher.
+ *
  * @author Juergen Hoeller
  * @author Dmitriy Kopylenko
  * @since 1.1.1
@@ -65,8 +65,12 @@ import org.springframework.util.ClassUtils;
 public class EhCacheFactoryBean extends CacheConfiguration implements FactoryBean<Ehcache>, BeanNameAware, InitializingBean {
 
 	// EhCache's setStatisticsEnabled(boolean) available? Not anymore as of EhCache 2.7...
-	private static final boolean setStatisticsAvailable =
-			ClassUtils.hasMethod(Ehcache.class, "setStatisticsEnabled", boolean.class);
+	private static final Method setStatisticsEnabledMethod =
+			ClassUtils.getMethodIfAvailable(Ehcache.class, "setStatisticsEnabled", boolean.class);
+
+	// EhCache's setSampledStatisticsEnabled(boolean) available? Not anymore as of EhCache 2.7...
+	private static final Method setSampledStatisticsEnabledMethod =
+			ClassUtils.getMethodIfAvailable(Ehcache.class, "setSampledStatisticsEnabled", boolean.class);
 
 
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -94,8 +98,7 @@ public class EhCacheFactoryBean extends CacheConfiguration implements FactoryBea
 
 	@SuppressWarnings("deprecation")
 	public EhCacheFactoryBean() {
-		// Using deprecated setMaxElementsInMemory method for EhCache 2.1-2.4 compatibility
-		setMaxElementsInMemory(10000);
+		setMaxEntriesLocalHeap(10000);
 		setMaxElementsOnDisk(10000000);
 		setTimeToLiveSeconds(120);
 		setTimeToIdleSeconds(120);
@@ -227,7 +230,7 @@ public class EhCacheFactoryBean extends CacheConfiguration implements FactoryBea
 
 
 	@Override
-	public void afterPropertiesSet() throws CacheException, IOException {
+	public void afterPropertiesSet() throws CacheException {
 		// If no cache name given, use bean name as cache name.
 		String cacheName = getName();
 		if (cacheName == null) {
@@ -274,14 +277,13 @@ public class EhCacheFactoryBean extends CacheConfiguration implements FactoryBea
 			}
 
 			// Only necessary on EhCache <2.7: As of 2.7, statistics are on by default.
-			if (setStatisticsAvailable) {
-				if (this.statisticsEnabled) {
-					rawCache.setStatisticsEnabled(true);
-				}
-				if (this.sampledStatisticsEnabled) {
-					rawCache.setSampledStatisticsEnabled(true);
-				}
+			if (this.statisticsEnabled && setStatisticsEnabledMethod != null) {
+				ReflectionUtils.invokeMethod(setStatisticsEnabledMethod, rawCache, true);
 			}
+			if (this.sampledStatisticsEnabled && setSampledStatisticsEnabledMethod != null) {
+				ReflectionUtils.invokeMethod(setSampledStatisticsEnabledMethod, rawCache, true);
+			}
+
 			if (this.disabled) {
 				rawCache.setDisabled(true);
 			}

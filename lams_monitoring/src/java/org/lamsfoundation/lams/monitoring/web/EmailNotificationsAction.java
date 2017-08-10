@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
@@ -44,9 +43,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -81,6 +77,10 @@ import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * <p>
  * Responsible for "Email notification" functionality.
@@ -112,8 +112,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
     public ActionForward getLessonView(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(), "show lesson email notifications",
-		false)) {
+	if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
+		"show lesson email notifications", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -152,7 +152,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	Organisation org = (Organisation) learnerService.getUserManagementService().findById(Organisation.class, orgId);
 
 	// sort and filter lesson list
-	Set<Lesson> lessons = new TreeSet<Lesson>(new LessonComparator());
+	Set<Lesson> lessons = new TreeSet<>(new LessonComparator());
 	for (Lesson lesson : (Set<Lesson>) org.getLessons()) {
 	    if (!Lesson.REMOVED_STATE.equals(lesson.getLessonStateId())
 		    && !Lesson.FINISHED_STATE.equals(lesson.getLessonStateId())) {
@@ -180,7 +180,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws IOException, ServletException, SchedulerException {
 	getUserManagementService();
 	Scheduler scheduler = getScheduler();
-	TreeSet<EmailScheduleMessageJobDTO> scheduleList = new TreeSet<EmailScheduleMessageJobDTO>();
+	TreeSet<EmailScheduleMessageJobDTO> scheduleList = new TreeSet<>();
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	boolean isLessonNotifications = (lessonId != null);
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
@@ -241,30 +241,31 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
     /**
      * Delete a scheduled emails.
-     * @throws JSONException 
+     *
+     * @throws JSONException
      */
     public ActionForward deleteNotification(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, SchedulerException, JSONException {
-	
+	    HttpServletResponse response) throws IOException, ServletException, SchedulerException {
+
 	String inputTriggerName = WebUtil.readStrParam(request, "triggerName");
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	Integer userId = getCurrentUser().getUserID();
 	boolean isLessonNotifications = (lessonId != null);
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	getUserManagementService();
 	Scheduler scheduler = getScheduler();
 
-	JSONObject jsonObject = new JSONObject();
+	ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 	String error = null;
 
 	try {
 	    // if this method throws an Exception, there will be no deleteNotification=true in the JSON reply
 	    if (isLessonNotifications) {
-		if (!getSecurityService().isLessonMonitor(lessonId, userId,
-			"show scheduled lesson email notifications", false)) {
+		if (!getSecurityService().isLessonMonitor(lessonId, userId, "show scheduled lesson email notifications",
+			false)) {
 		    error = "Unable to delete notification: the user is not a monitor in the lesson";
 		}
 	    } else {
@@ -274,9 +275,9 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 		}
 	    }
 
-	    if ( error == null ) {
-		Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher
-			.triggerGroupEquals(Scheduler.DEFAULT_GROUP));
+	    if (error == null) {
+		Set<TriggerKey> triggerKeys = scheduler
+			.getTriggerKeys(GroupMatcher.triggerGroupEquals(Scheduler.DEFAULT_GROUP));
 		for (TriggerKey triggerKey : triggerKeys) {
 		    String triggerName = triggerKey.getName();
 		    if (triggerName.equals(inputTriggerName)) {
@@ -287,7 +288,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 			JobDetail jobDetail = scheduler.getJobDetail(trigger.getJobKey());
 			JobDataMap jobDataMap = jobDetail.getJobDataMap();
 			getAuditService().log(MonitoringConstants.MONITORING_MODULE_NAME,
-				"Deleting unsent scheduled notification " + jobKey + " " + jobDataMap.getString("emailBody"));
+				"Deleting unsent scheduled notification " + jobKey + " "
+					+ jobDataMap.getString("emailBody"));
 
 			scheduler.deleteJob(jobKey);
 
@@ -295,7 +297,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 		}
 
 	    }
-	    
+
 	} catch (Exception e) {
 	    String[] msg = new String[1];
 	    msg[0] = e.getMessage();
@@ -313,9 +315,9 @@ public class EmailNotificationsAction extends LamsDispatchAction {
      * Method called via Ajax. It either emails selected users or schedules these emails to be sent on specified date.
      */
     public ActionForward emailUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException {
 
-	JSONObject JSONObject = new JSONObject();
+	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
 	IMonitoringService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 
@@ -337,17 +339,17 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 			emailBody, isHtmlFormat);
 	    }
 
-	    JSONObject.put("isSuccessfullySent", isSuccessfullySent);
-	    
+	    ObjectNode.put("isSuccessfullySent", isSuccessfullySent);
+
 	    //prepare data for audit log
 	    scheduleDateStr = "now";
-	    emailClauseStr = "for users (userIds: " + StringUtils.join(userIdStrs,",") + ")";
-	    
+	    emailClauseStr = "for users (userIds: " + StringUtils.join(userIdStrs, ",") + ")";
+
 	} else {
 	    try {
 		Calendar now = Calendar.getInstance();
-		
-		Map<String, Object> searchParameters = new HashMap<String, Object>();
+
+		Map<String, Object> searchParameters = new HashMap<>();
 		copySearchParametersFromRequestToMap(request, searchParameters);
 
 		// calculate scheduleDate
@@ -369,8 +371,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 		// start the scheduling job
 		Scheduler scheduler = getScheduler();
 		scheduler.scheduleJob(emailScheduleMessageJob, startLessonTrigger);
-		JSONObject.put("isSuccessfullyScheduled", true);
-		
+		ObjectNode.put("isSuccessfullyScheduled", true);
+
 		//prepare data for audit log
 		scheduleDateStr = "on " + scheduleDate;
 		Object lessonIdObj = searchParameters.get(AttributeNames.PARAM_LESSON_ID);
@@ -379,11 +381,11 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 		if (lessonIdObj != null) {
 		    emailClauseStr = "for lesson (lessonId: " + lessonIdObj + ")";
 		} else if (lessonIDsObj != null) {
-		    emailClauseStr = "for lessons (lessonIDs: " + StringUtils.join((String[])lessonIDsObj,",") + ")";
+		    emailClauseStr = "for lessons (lessonIDs: " + StringUtils.join((String[]) lessonIDsObj, ",") + ")";
 		} else if (organisationIdObj != null) {
 		    emailClauseStr = "for organisation (organisationId: " + organisationIdObj + ")";
 		}
-		
+
 	    } catch (SchedulerException e) {
 		LamsDispatchAction.log.error("Error occurred at " + "[emailScheduleMessage]- fail to email scheduling",
 			e);
@@ -392,11 +394,11 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
 	//audit log
 	getAuditService().log(MonitoringConstants.MONITORING_MODULE_NAME,
-		"User " + getCurrentUser().getLogin() + " set a notification "+ emailClauseStr + " " + scheduleDateStr
+		"User " + getCurrentUser().getLogin() + " set a notification " + emailClauseStr + " " + scheduleDateStr
 			+ " with the following notice:  " + emailBody);
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	response.getWriter().print(ObjectNode);
 	return null;
     }
 
@@ -404,8 +406,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
      * Refreshes user list.
      */
     public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
-	Map<String, Object> map = new HashMap<String, Object>();
+	    HttpServletResponse response) throws IOException, ServletException {
+	Map<String, Object> map = new HashMap<>();
 	copySearchParametersFromRequestToMap(request, map);
 	Long lessonId = (Long) map.get(AttributeNames.PARAM_LESSON_ID);
 	Integer orgId = (Integer) map.get(AttributeNames.PARAM_ORGANISATION_ID);
@@ -434,27 +436,27 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	Collection<User> users = monitoringService.getUsersByEmailNotificationSearchType(searchType, lessonId,
 		lessonIds, activityId, xDaystoFinish, orgId);
 
-	JSONArray cellarray = new JSONArray();
+	ArrayNode cellarray = JsonNodeFactory.instance.arrayNode();
 
-	JSONObject responcedata = new JSONObject();
-	responcedata.put("total", "" + users.size());
-	responcedata.put("page", "" + 1);
-	responcedata.put("records", "" + users.size());
+	ObjectNode responseDate = JsonNodeFactory.instance.objectNode();
+	responseDate.put("total", "" + users.size());
+	responseDate.put("page", "" + 1);
+	responseDate.put("records", "" + users.size());
 
 	for (User user : users) {
-	    JSONArray cell = new JSONArray();
-	    cell.put(StringEscapeUtils.escapeHtml(user.getFirstName()) + " "
+	    ArrayNode cell = JsonNodeFactory.instance.arrayNode();
+	    cell.add(StringEscapeUtils.escapeHtml(user.getFirstName()) + " "
 		    + StringEscapeUtils.escapeHtml(user.getLastName()) + " ["
 		    + StringEscapeUtils.escapeHtml(user.getLogin()) + "]");
 
-	    JSONObject cellobj = new JSONObject();
+	    ObjectNode cellobj = JsonNodeFactory.instance.objectNode();
 	    cellobj.put("id", "" + user.getUserId());
-	    cellobj.put("cell", cell);
-	    cellarray.put(cellobj);
+	    cellobj.set("cell", cell);
+	    cellarray.add(cellobj);
 	}
-	responcedata.put("rows", cellarray);
+	responseDate.set("rows", cellarray);
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(new String(responcedata.toString()));
+	response.getWriter().print(new String(responseDate.toString()));
 	return null;
     }
 

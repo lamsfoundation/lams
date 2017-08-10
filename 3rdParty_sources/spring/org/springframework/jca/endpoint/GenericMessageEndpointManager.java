@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 the original author or authors.
+ * Copyright 2002-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -214,7 +214,7 @@ public class GenericMessageEndpointManager implements SmartLifecycle, Initializi
 	 * Set whether to auto-start the endpoint activation after this endpoint
 	 * manager has been initialized and the context has been refreshed.
 	 * <p>Default is "true". Turn this flag off to defer the endpoint
-	 * activation until an explicit {#start()} call.
+	 * activation until an explicit {@link #start()} call.
 	 */
 	public void setAutoStartup(boolean autoStartup) {
 		this.autoStartup = autoStartup;
@@ -308,7 +308,7 @@ public class GenericMessageEndpointManager implements SmartLifecycle, Initializi
 	@Override
 	public void stop(Runnable callback) {
 		synchronized (this.lifecycleMonitor) {
-			this.stop();
+			stop();
 			callback.run();
 		}
 	}
