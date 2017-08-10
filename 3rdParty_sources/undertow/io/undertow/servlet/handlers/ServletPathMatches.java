@@ -20,6 +20,7 @@ package io.undertow.servlet.handlers;
 
 import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.cache.LRUCache;
 import io.undertow.server.handlers.resource.Resource;
 import io.undertow.server.handlers.resource.ResourceManager;
 import io.undertow.servlet.UndertowServletMessages;
@@ -57,10 +58,12 @@ public class ServletPathMatches {
     public static final String DEFAULT_SERVLET_NAME = "default";
     private final Deployment deployment;
 
-    private final String[] welcomePages;
+    private volatile String[] welcomePages;
     private final ResourceManager resourceManager;
 
     private volatile ServletPathMatchesData data;
+
+    private final LRUCache<String, ServletPathMatch> pathMatchCache = new LRUCache<>(1000, -1, true); //TODO: configurable
 
     public ServletPathMatches(final Deployment deployment) {
         this.deployment = deployment;
@@ -73,8 +76,13 @@ public class ServletPathMatches {
     }
 
     public ServletPathMatch getServletHandlerByPath(final String path) {
+        ServletPathMatch existing = pathMatchCache.get(path);
+        if(existing != null) {
+            return existing;
+        }
         ServletPathMatch match = getData().getServletHandlerByPath(path);
         if (!match.isRequiredWelcomeFileMatch()) {
+            pathMatchCache.add(path, match);
             return match;
         }
         try {
@@ -82,6 +90,7 @@ public class ServletPathMatches {
             String remaining = match.getRemaining() == null ? match.getMatched() : match.getRemaining();
             Resource resource = resourceManager.getResource(remaining);
             if (resource == null || !resource.isDirectory()) {
+                pathMatchCache.add(path, match);
                 return match;
             }
 
@@ -91,15 +100,20 @@ public class ServletPathMatches {
             ServletPathMatch welcomePage = findWelcomeFile(pathWithTrailingSlash, !pathEndsWithSlash);
 
             if (welcomePage != null) {
+                pathMatchCache.add(path, welcomePage);
                 return welcomePage;
             } else {
                 welcomePage = findWelcomeServlet(pathWithTrailingSlash, !pathEndsWithSlash);
                 if (welcomePage != null) {
+                    pathMatchCache.add(path, welcomePage);
                     return welcomePage;
                 } else if(pathEndsWithSlash) {
+                    pathMatchCache.add(path, match);
                     return match;
                 } else {
-                    return new ServletPathMatch(match.getServletChain(), match.getMatched(), match.getRemaining(), REDIRECT, "/");
+                    ServletPathMatch redirect = new ServletPathMatch(match.getServletChain(), match.getMatched(), match.getRemaining(), REDIRECT, "/");
+                    pathMatchCache.add(path, redirect);
+                    return redirect;
                 }
             }
 
@@ -111,6 +125,7 @@ public class ServletPathMatches {
 
     public void invalidate() {
         this.data = null;
+        this.pathMatchCache.clear();
     }
 
     private ServletPathMatchesData getData() {
@@ -130,13 +145,17 @@ public class ServletPathMatches {
         if(File.separatorChar != '/' && path.contains(File.separator)) {
             return null;
         }
+        StringBuilder sb = new StringBuilder();
         for (String i : welcomePages) {
             try {
-                final String mergedPath = path + i;
+                sb.append(path);
+                sb.append(i);
+                final String mergedPath = sb.toString();
+                sb.setLength(0);
                 Resource resource = resourceManager.getResource(mergedPath);
                 if (resource != null) {
                     final ServletPathMatch handler = data.getServletHandlerByPath(mergedPath);
-                    return new ServletPathMatch(handler.getServletChain(), mergedPath, null, requiresRedirect ? REDIRECT : REWRITE, i);
+                    return new ServletPathMatch(handler.getServletChain(), mergedPath, null, requiresRedirect ? REDIRECT : REWRITE, mergedPath);
                 }
             } catch (IOException e) {
             }
@@ -145,14 +164,22 @@ public class ServletPathMatches {
     }
 
     private ServletPathMatch findWelcomeServlet(final String path, boolean requiresRedirect) {
+        StringBuilder sb = new StringBuilder();
         for (String i : welcomePages) {
-            String mergedPath = path + i;
+            sb.append(path);
+            sb.append(i);
+            final String mergedPath = sb.toString();
+            sb.setLength(0);
             final ServletPathMatch handler = data.getServletHandlerByPath(mergedPath);
             if (handler != null && !handler.isRequiredWelcomeFileMatch()) {
-                return new ServletPathMatch(handler.getServletChain(), handler.getMatched(), handler.getRemaining(), requiresRedirect ? REDIRECT : REWRITE, i);
+                return new ServletPathMatch(handler.getServletChain(), handler.getMatched(), handler.getRemaining(), requiresRedirect ? REDIRECT : REWRITE, mergedPath);
             }
         }
         return null;
+    }
+
+    public void setWelcomePages(List<String> welcomePages) {
+        this.welcomePages = welcomePages.toArray(new String[welcomePages.size()]);
     }
 
     /**
@@ -383,7 +410,7 @@ public class ServletPathMatches {
             if (key.endsWith("/*")) {
                 final String base = key.substring(0, key.length() - 1);
                 if (match == null || base.length() > match.length()) {
-                    if (path.startsWith(base)) {
+                    if (path.startsWith(base) || path.equals(base.substring(0, base.length() - 1))) {
                         match = base.substring(0, base.length() - 1);
                         servlet = entry.getValue();
                     }

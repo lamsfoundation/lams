@@ -1,34 +1,22 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cache.internal;
 
 import java.io.Serializable;
 import java.util.Set;
 
-import org.hibernate.cache.spi.CacheKey;
-import org.hibernate.cfg.Configuration;
+import org.hibernate.HibernateException;
+import org.hibernate.action.internal.CollectionAction;
+import org.hibernate.action.spi.AfterTransactionCompletionProcess;
+import org.hibernate.boot.Metadata;
+import org.hibernate.cache.spi.access.SoftLock;
+import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventSource;
 import org.hibernate.event.spi.EventType;
@@ -39,7 +27,6 @@ import org.hibernate.event.spi.PostInsertEventListener;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.integrator.spi.Integrator;
-import org.hibernate.metamodel.source.MetadataImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
@@ -55,18 +42,17 @@ import org.jboss.logging.Logger;
  * 
  * @author Andreas Berger
  */
-public class CollectionCacheInvalidator implements Integrator, PostInsertEventListener, PostDeleteEventListener,
-		PostUpdateEventListener {
+public class CollectionCacheInvalidator
+		implements Integrator, PostInsertEventListener, PostDeleteEventListener, PostUpdateEventListener {
 	private static final Logger LOG = Logger.getLogger( CollectionCacheInvalidator.class.getName() );
 
-	@Override
-	public void integrate(Configuration configuration, SessionFactoryImplementor sessionFactory,
-			SessionFactoryServiceRegistry serviceRegistry) {
-		integrate( serviceRegistry, sessionFactory );
-	}
+	/**
+	 * Exposed for use in testing
+	 */
+	public static boolean PROPAGATE_EXCEPTION = false;
 
 	@Override
-	public void integrate(MetadataImplementor metadata, SessionFactoryImplementor sessionFactory,
+	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
 			SessionFactoryServiceRegistry serviceRegistry) {
 		integrate( serviceRegistry, sessionFactory );
 	}
@@ -119,26 +105,25 @@ public class CollectionCacheInvalidator implements Integrator, PostInsertEventLi
 				return;
 			}
 			for ( String role : collectionRoles ) {
-				CollectionPersister collectionPersister = factory.getCollectionPersister( role );
+				final CollectionPersister collectionPersister = factory.getCollectionPersister( role );
 				if ( !collectionPersister.hasCache() ) {
 					// ignore collection if no caching is used
 					continue;
 				}
 				// this is the property this OneToMany relation is mapped by
 				String mappedBy = collectionPersister.getMappedByProperty();
-				if ( mappedBy != null ) {
+				if ( !collectionPersister.isManyToMany() &&
+						mappedBy != null && !mappedBy.isEmpty() ) {
 					int i = persister.getEntityMetamodel().getPropertyIndex( mappedBy );
 					Serializable oldId = null;
 					if ( oldState != null ) {
 						// in case of updating an entity we perhaps have to decache 2 entity collections, this is the
 						// old one
-						oldId = session.getIdentifier( oldState[i] );
+						oldId = getIdentifier( session, oldState[i] );
 					}
 					Object ref = persister.getPropertyValue( entity, i );
-					Serializable id = null;
-					if ( ref != null ) {
-						id = session.getIdentifier( ref );
-					}
+					Serializable id = getIdentifier( session, ref );
+
 					// only evict if the related entity has changed
 					if ( id != null && !id.equals( oldId ) ) {
 						evict( id, collectionPersister, session );
@@ -149,19 +134,67 @@ public class CollectionCacheInvalidator implements Integrator, PostInsertEventLi
 				}
 				else {
 					LOG.debug( "Evict CollectionRegion " + role );
-					collectionPersister.getCacheAccessStrategy().evictAll();
+					final SoftLock softLock = collectionPersister.getCacheAccessStrategy().lockRegion();
+					session.getActionQueue().registerProcess( new AfterTransactionCompletionProcess() {
+						@Override
+						public void doAfterTransactionCompletion(boolean success, SessionImplementor session) {
+							collectionPersister.getCacheAccessStrategy().unlockRegion( softLock );
+						}
+					} );
 				}
 			}
 		}
 		catch ( Exception e ) {
+			if ( PROPAGATE_EXCEPTION ) {
+				throw new IllegalStateException( e );
+			}
 			// don't let decaching influence other logic
 			LOG.error( "", e );
 		}
 	}
 
+	private Serializable getIdentifier(EventSource session, Object obj) {
+		Serializable id = null;
+		if ( obj != null ) {
+			id = session.getContextEntityIdentifier( obj );
+			if ( id == null ) {
+				id = session.getSessionFactory().getClassMetadata( obj.getClass() )
+						.getIdentifier( obj, session );
+			}
+		}
+		return id;
+	}
+
 	private void evict(Serializable id, CollectionPersister collectionPersister, EventSource session) {
-		LOG.debug( "Evict CollectionRegion " + collectionPersister.getRole() + " for id " + id );
-		CacheKey key = session.generateCacheKey( id, collectionPersister.getKeyType(), collectionPersister.getRole() );
-		collectionPersister.getCacheAccessStrategy().evict( key );
+		if ( LOG.isDebugEnabled() ) {
+			LOG.debug( "Evict CollectionRegion " + collectionPersister.getRole() + " for id " + id );
+		}
+		AfterTransactionCompletionProcess afterTransactionProcess = new CollectionEvictCacheAction(
+				collectionPersister,
+				null,
+				id,
+				session
+		).lockCache();
+		session.getActionQueue().registerProcess( afterTransactionProcess );
+	}
+
+	//execute the same process as invalidation with collection operations
+	private static final class CollectionEvictCacheAction extends CollectionAction {
+		protected CollectionEvictCacheAction(
+				CollectionPersister persister,
+				PersistentCollection collection,
+				Serializable key,
+				SessionImplementor session) {
+			super( persister, collection, key, session );
+		}
+
+		@Override
+		public void execute() throws HibernateException {
+		}
+
+		public AfterTransactionCompletionProcess lockCache() {
+			beforeExecutions();
+			return getAfterTransactionCompletionProcess();
+		}
 	}
 }

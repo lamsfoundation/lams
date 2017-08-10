@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.action.internal;
 
@@ -27,7 +10,7 @@ import java.io.Serializable;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
-import org.hibernate.cache.spi.CacheKey;
+import org.hibernate.cache.spi.access.EntityRegionAccessStrategy;
 import org.hibernate.cache.spi.access.SoftLock;
 import org.hibernate.engine.spi.EntityEntry;
 import org.hibernate.engine.spi.PersistenceContext;
@@ -101,10 +84,11 @@ public class EntityDeleteAction extends EntityAction {
 			version = persister.getVersion( instance );
 		}
 
-		final CacheKey ck;
+		final Object ck;
 		if ( persister.hasCache() ) {
-			ck = session.generateCacheKey( id, persister.getIdentifierType(), persister.getRootEntityName() );
-			lock = persister.getCacheAccessStrategy().lockItem( ck, version );
+			final EntityRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+			ck = cache.generateCacheKey( id, persister, session.getFactory(), session.getTenantIdentifier() );
+			lock = cache.lockItem( session, ck, version );
 		}
 		else {
 			ck = null;
@@ -129,7 +113,7 @@ public class EntityDeleteAction extends EntityAction {
 		persistenceContext.removeProxy( entry.getEntityKey() );
 		
 		if ( persister.hasCache() ) {
-			persister.getCacheAccessStrategy().remove( ck );
+			persister.getCacheAccessStrategy().remove( session, ck);
 		}
 
 		persistenceContext.getNaturalIdHelper().removeSharedNaturalIdCrossReference( persister, id, naturalIdValues );
@@ -201,13 +185,16 @@ public class EntityDeleteAction extends EntityAction {
 
 	@Override
 	public void doAfterTransactionCompletion(boolean success, SessionImplementor session) throws HibernateException {
-		if ( getPersister().hasCache() ) {
-			final CacheKey ck = getSession().generateCacheKey(
+		EntityPersister entityPersister = getPersister();
+		if ( entityPersister.hasCache() ) {
+			EntityRegionAccessStrategy cache = entityPersister.getCacheAccessStrategy();
+			final Object ck = cache.generateCacheKey(
 					getId(),
-					getPersister().getIdentifierType(),
-					getPersister().getRootEntityName()
+					entityPersister,
+					session.getFactory(),
+					session.getTenantIdentifier()
 			);
-			getPersister().getCacheAccessStrategy().unlockItem( ck, lock );
+			cache.unlockItem( session, ck, lock );
 		}
 		postCommitDelete( success );
 	}

@@ -20,12 +20,14 @@ package io.undertow.websockets.core;
 import io.undertow.conduits.IdleTimeoutConduit;
 import io.undertow.server.protocol.framed.AbstractFramedChannel;
 import io.undertow.server.protocol.framed.FrameHeaderData;
+import io.undertow.websockets.extensions.ExtensionFunction;
 import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
 import org.xnio.IoUtils;
-import org.xnio.Pool;
-import org.xnio.Pooled;
+import org.xnio.OptionMap;
+import io.undertow.connector.ByteBufferPool;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.StreamConnection;
 import org.xnio.channels.StreamSinkChannel;
 
@@ -60,7 +62,10 @@ public abstract class WebSocketChannel extends AbstractFramedChannel<WebSocketCh
     private volatile int closeCode = -1;
     private volatile String closeReason;
     private final String subProtocol;
-    private final boolean extensionsSupported;
+    protected final boolean extensionsSupported;
+    protected final ExtensionFunction extensionFunction;
+    protected final boolean hasReservedOpCode;
+
     /**
      * an incoming frame that has not been created yet
      */
@@ -87,17 +92,20 @@ public abstract class WebSocketChannel extends AbstractFramedChannel<WebSocketCh
      * @param client
      * @param peerConnections        The concurrent set that is used to track open connections associtated with an endpoint
      */
-    protected WebSocketChannel(final StreamConnection connectedStreamChannel, Pool<ByteBuffer> bufferPool, WebSocketVersion version, String wsUrl, String subProtocol, final boolean client, boolean extensionsSupported, Set<WebSocketChannel> peerConnections) {
-        super(connectedStreamChannel, bufferPool, new WebSocketFramePriority(), null);
+    protected WebSocketChannel(final StreamConnection connectedStreamChannel, ByteBufferPool bufferPool, WebSocketVersion version, String wsUrl, String subProtocol, final boolean client, boolean extensionsSupported, final ExtensionFunction extensionFunction, Set<WebSocketChannel> peerConnections, OptionMap options) {
+        super(connectedStreamChannel, bufferPool, new WebSocketFramePriority(), null, options);
         this.client = client;
         this.version = version;
         this.wsUrl = wsUrl;
         this.extensionsSupported = extensionsSupported;
+        this.extensionFunction = extensionFunction;
+        this.hasReservedOpCode = extensionFunction.hasExtensionOpCode();
         this.subProtocol = subProtocol;
         this.peerConnections = peerConnections;
         addCloseTask(new ChannelListener<WebSocketChannel>() {
             @Override
             public void handleEvent(WebSocketChannel channel) {
+                extensionFunction.dispose();
                 WebSocketChannel.this.peerConnections.remove(WebSocketChannel.this);
             }
         });
@@ -156,12 +164,12 @@ public abstract class WebSocketChannel extends AbstractFramedChannel<WebSocketCh
             partialFrame.handle(data);
         } catch (WebSocketException e) {
             //the data was corrupt
+            //send a close message
+            WebSockets.sendClose(new CloseMessage(CloseMessage.WRONG_CODE, e.getMessage()).toByteBuffer(), this, null);
             markReadsBroken(e);
             if (WebSocketLogger.REQUEST_LOGGER.isDebugEnabled()) {
                 WebSocketLogger.REQUEST_LOGGER.debugf(e, "receive failed due to Exception");
             }
-            //send a close message
-            WebSockets.sendClose(new CloseMessage(CloseMessage.WRONG_CODE, e.getMessage()).toByteBuffer(), this, null);
 
             throw new IOException(e);
         }
@@ -184,7 +192,7 @@ public abstract class WebSocketChannel extends AbstractFramedChannel<WebSocketCh
     protected abstract PartialFrame receiveFrame();
 
     @Override
-    protected StreamSourceFrameChannel createChannel(FrameHeaderData frameHeaderData, Pooled<ByteBuffer> frameData) {
+    protected StreamSourceFrameChannel createChannel(FrameHeaderData frameHeaderData, PooledByteBuffer frameData) {
         PartialFrame partialFrame = (PartialFrame) frameHeaderData;
         StreamSourceFrameChannel channel = partialFrame.getChannel(frameData);
         if (channel.getType() == WebSocketFrameType.CLOSE) {
@@ -319,41 +327,17 @@ public abstract class WebSocketChannel extends AbstractFramedChannel<WebSocketCh
      * were completely written.
      *
      * @param type        The {@link WebSocketFrameType} for which a {@link StreamSinkChannel} should be created
-     * @param payloadSize The size of the payload which will be included in the WebSocket Frame. This may be 0 if you want
-     *                    to transmit no payload at all.
      */
-    public final StreamSinkFrameChannel send(WebSocketFrameType type, long payloadSize) throws IOException {
+    public final StreamSinkFrameChannel send(WebSocketFrameType type) throws IOException {
         if(closeFrameSent || (closeFrameReceived && type != WebSocketFrameType.CLOSE)) {
             throw WebSocketMessages.MESSAGES.channelClosed();
         }
-        if (payloadSize < 0) {
-            throw WebSocketMessages.MESSAGES.negativePayloadLength();
-        }
         if (isWritesBroken()) {
             throw WebSocketMessages.MESSAGES.streamIsBroken();
         }
 
 
-        StreamSinkFrameChannel ch = createStreamSinkChannel(type, payloadSize);
-        getFramePriority().addToOrderQueue(ch);
-        if (type == WebSocketFrameType.CLOSE) {
-            closeFrameSent = true;
-        }
-        return ch;
-    }
-
-    /**
-     * Returns a new {@link StreamSinkFrameChannel} for sending the given {@link WebSocketFrameType} with the given payload.
-     * If this method is called multiple times, subsequent {@link StreamSinkFrameChannel}'s will not be writable until all previous frames
-     * were completely written.
-     *
-     * @param type The {@link WebSocketFrameType} for which a {@link StreamSinkChannel} should be created
-     */
-    public final StreamSinkFrameChannel send(WebSocketFrameType type) throws IOException {
-        if (isWritesBroken()) {
-            throw WebSocketMessages.MESSAGES.streamIsBroken();
-        }
-        StreamSinkFrameChannel ch = createStreamSinkChannel(type, -1);
+        StreamSinkFrameChannel ch = createStreamSinkChannel(type);
         getFramePriority().addToOrderQueue(ch);
         if (type == WebSocketFrameType.CLOSE) {
             closeFrameSent = true;
@@ -367,7 +351,7 @@ public abstract class WebSocketChannel extends AbstractFramedChannel<WebSocketCh
     public void sendClose() throws IOException {
         closeReason = "";
         closeCode = CloseMessage.NORMAL_CLOSURE;
-        StreamSinkFrameChannel closeChannel = send(WebSocketFrameType.CLOSE, 0);
+        StreamSinkFrameChannel closeChannel = send(WebSocketFrameType.CLOSE);
         closeChannel.shutdownWrites();
         if (!closeChannel.flush()) {
             closeChannel.getWriteSetter().set(ChannelListeners.flushingChannelListener(
@@ -387,9 +371,8 @@ public abstract class WebSocketChannel extends AbstractFramedChannel<WebSocketCh
      * Create a new StreamSinkFrameChannel which can be used to send a WebSocket Frame of the type {@link WebSocketFrameType}.
      *
      * @param type        The {@link WebSocketFrameType} of the WebSocketFrame which will be send over this {@link StreamSinkFrameChannel}
-     * @param payloadSize The size of the payload to transmit. May be 0 if non payload at all should be included, or -1 if unknown
      */
-    protected abstract StreamSinkFrameChannel createStreamSinkChannel(WebSocketFrameType type, long payloadSize);
+    protected abstract StreamSinkFrameChannel createStreamSinkChannel(WebSocketFrameType type);
 
 
     protected WebSocketFramePriority getFramePriority() {
@@ -422,7 +405,7 @@ public abstract class WebSocketChannel extends AbstractFramedChannel<WebSocketCh
         /**
          * @return The channel, or null if the channel is not available yet
          */
-        StreamSourceFrameChannel getChannel(final Pooled<ByteBuffer> data);
+        StreamSourceFrameChannel getChannel(final PooledByteBuffer data);
 
         /**
          * Handles the data, any remaining data will be pushed back
@@ -457,5 +440,9 @@ public abstract class WebSocketChannel extends AbstractFramedChannel<WebSocketCh
 
     public void setCloseCode(int closeCode) {
         this.closeCode = closeCode;
+    }
+
+    public ExtensionFunction getExtensionFunction() {
+        return extensionFunction;
     }
 }

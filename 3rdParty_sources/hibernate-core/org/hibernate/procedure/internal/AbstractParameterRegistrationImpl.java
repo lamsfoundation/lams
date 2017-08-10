@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.procedure.internal;
 
@@ -30,7 +13,10 @@ import java.util.Date;
 import javax.persistence.ParameterMode;
 import javax.persistence.TemporalType;
 
+import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.jdbc.cursor.spi.RefCursorSupport;
+import org.hibernate.engine.jdbc.env.spi.ExtractedDatabaseMetaData;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.procedure.ParameterBind;
 import org.hibernate.procedure.ParameterMisuseException;
@@ -40,9 +26,13 @@ import org.hibernate.type.CalendarDateType;
 import org.hibernate.type.CalendarTimeType;
 import org.hibernate.type.CalendarType;
 import org.hibernate.type.ProcedureParameterExtractionAware;
+import org.hibernate.type.ProcedureParameterNamedBinder;
 import org.hibernate.type.Type;
 
 import org.jboss.logging.Logger;
+
+import static org.hibernate.cfg.AvailableSettings.PROCEDURE_NULL_PARAM_PASSING;
+import static org.hibernate.engine.config.spi.StandardConverters.BOOLEAN;
 
 /**
  * Abstract implementation of ParameterRegistration/ParameterRegistrationImplementor
@@ -59,6 +49,7 @@ public abstract class AbstractParameterRegistrationImpl<T> implements ParameterR
 
 	private final ParameterMode mode;
 	private final Class<T> type;
+	private final boolean passNulls;
 
 	private ParameterBindImpl bind;
 
@@ -123,6 +114,11 @@ public abstract class AbstractParameterRegistrationImpl<T> implements ParameterR
 
 		this.mode = mode;
 		this.type = type;
+
+		this.passNulls = procedureCall.getSession().getFactory()
+				.getServiceRegistry()
+				.getService( ConfigurationService.class )
+				.getSetting( PROCEDURE_NULL_PARAM_PASSING, BOOLEAN, false );
 
 		if ( mode == ParameterMode.REF_CURSOR ) {
 			return;
@@ -268,27 +264,73 @@ public abstract class AbstractParameterRegistrationImpl<T> implements ParameterR
 						);
 					}
 				}
-				for ( int i = 0; i < sqlTypesToUse.length; i++ ) {
-					statement.registerOutParameter( startIndex + i, sqlTypesToUse[i] );
+				// TODO: sqlTypesToUse.length > 1 does not seem to have a working use case (HHH-10769).
+				// The idea is that an embeddable/custom type can have more than one column values
+				// that correspond with embeddable/custom attribute value. This does not seem to
+				// be working yet. For now, if sqlTypesToUse.length > 1, then register
+				// the out parameters by position (since we only have one name).
+				// This will cause a failure if there are other parameters bound by
+				// name and the dialect does not support "mixed" named/positional parameters;
+				// e.g., Oracle.
+				if ( sqlTypesToUse.length == 1 &&
+						procedureCall.getParameterStrategy() == ParameterStrategy.NAMED &&
+						canDoNameParameterBinding() ) {
+					statement.registerOutParameter( getName(), sqlTypesToUse[0] );
+				}
+				else {
+					for ( int i = 0; i < sqlTypesToUse.length; i++ ) {
+						statement.registerOutParameter( startIndex + i, sqlTypesToUse[i] );
+					}
 				}
 			}
 
 			if ( mode == ParameterMode.INOUT || mode == ParameterMode.IN ) {
 				if ( bind == null || bind.getValue() == null ) {
-					// the user did not bind a value to the parameter being processed.  That might be ok *if* the
-					// procedure as defined in the database defines a default value for that parameter.
+					// the user did not bind a value to the parameter being processed.  This is the condition
+					// defined by `passNulls` and that value controls what happens here.  If `passNulls` is
+					// {@code true} we will bind the NULL value into the statement; if `passNulls` is
+					// {@code false} we will not.
+					//
 					// Unfortunately there is not a way to reliably know through JDBC metadata whether a procedure
-					// parameter defines a default value.  So we simply allow the procedure execution to happen
-					// assuming that the database will complain appropriately if not setting the given parameter
-					// bind value is an error.
-					log.debugf(
-							"Stored procedure [%s] IN/INOUT parameter [%s] not bound; assuming procedure defines default value",
-							procedureCall.getProcedureName(),
-							this
-					);
+					// parameter defines a default value.  Deferring to that information would be the best option
+					if ( passNulls ) {
+						log.debugf(
+								"Stored procedure [%s] IN/INOUT parameter [%s] not bound and `passNulls` was set to true; binding NULL",
+								procedureCall.getProcedureName(),
+								this
+						);
+						if ( this.procedureCall.getParameterStrategy() == ParameterStrategy.NAMED && canDoNameParameterBinding() ) {
+							((ProcedureParameterNamedBinder) typeToUse ).nullSafeSet(
+									statement,
+									null,
+									this.getName(),
+									session()
+							);
+						}
+						else {
+							typeToUse.nullSafeSet( statement, null, startIndex, session() );
+						}
+					}
+					else {
+						log.debugf(
+								"Stored procedure [%s] IN/INOUT parameter [%s] not bound and `passNulls` was set to false; assuming procedure defines default value",
+								procedureCall.getProcedureName(),
+								this
+						);
+					}
 				}
 				else {
-					typeToUse.nullSafeSet( statement, bind.getValue(), startIndex, session() );
+					if ( this.procedureCall.getParameterStrategy() == ParameterStrategy.NAMED && canDoNameParameterBinding()) {
+						((ProcedureParameterNamedBinder) typeToUse).nullSafeSet(
+								statement,
+								bind.getValue(),
+								this.getName(),
+								session()
+						);
+					}
+					else {
+						typeToUse.nullSafeSet( statement, bind.getValue(), startIndex, session() );
+					}
 				}
 			}
 		}
@@ -305,6 +347,19 @@ public abstract class AbstractParameterRegistrationImpl<T> implements ParameterR
 						.registerRefCursorParameter( statement, startIndex );
 			}
 		}
+	}
+
+	private boolean canDoNameParameterBinding() {
+		final ExtractedDatabaseMetaData databaseMetaData = session()
+				.getJdbcCoordinator()
+				.getJdbcSessionOwner()
+				.getJdbcSessionContext()
+				.getServiceRegistry().getService( JdbcEnvironment.class )
+				.getExtractedDatabaseMetaData();
+		return
+				databaseMetaData.supportsNamedParameters() &&
+				ProcedureParameterNamedBinder.class.isInstance( hibernateType )
+						&& ((ProcedureParameterNamedBinder) hibernateType).canDoSetting();
 	}
 
 	public int[] getSqlTypes() {
@@ -325,12 +380,37 @@ public abstract class AbstractParameterRegistrationImpl<T> implements ParameterR
 			throw new ParameterMisuseException( "REF_CURSOR parameters should be accessed via results" );
 		}
 
+		// TODO: sqlTypesToUse.length > 1 does not seem to have a working use case (HHH-10769).
+		// For now, if sqlTypes.length > 1 with a named parameter, then extract
+		// parameter values by position (since we only have one name).
+		final boolean useNamed = sqlTypes.length == 1 &&
+				procedureCall.getParameterStrategy() == ParameterStrategy.NAMED &&
+				canDoNameParameterBinding();
+
 		try {
 			if ( ProcedureParameterExtractionAware.class.isInstance( hibernateType ) ) {
-				return (T) ( (ProcedureParameterExtractionAware) hibernateType ).extract( statement, startIndex, session() );
+				if ( useNamed ) {
+					return (T) ( (ProcedureParameterExtractionAware) hibernateType ).extract(
+							statement,
+							new String[] { getName() },
+							session()
+					);
+				}
+				else {
+					return (T) ( (ProcedureParameterExtractionAware) hibernateType ).extract(
+							statement,
+							startIndex,
+							session()
+					);
+				}
 			}
 			else {
-				return (T) statement.getObject( startIndex );
+				if ( useNamed ) {
+					return (T) statement.getObject( name );
+				}
+				else {
+					return (T) statement.getObject( startIndex );
+				}
 			}
 		}
 		catch (SQLException e) {

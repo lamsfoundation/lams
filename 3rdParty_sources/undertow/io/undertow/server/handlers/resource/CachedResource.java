@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 
@@ -39,7 +40,7 @@ import io.undertow.util.MimeMappings;
 /**
  * @author Stuart Douglas
  */
-public class CachedResource implements Resource {
+public class CachedResource implements Resource, RangeAwareResource {
 
     private final CacheKey cacheKey;
     private final CachingResourceManager cachingResourceManager;
@@ -166,6 +167,7 @@ public class CachedResource implements Resource {
             }
             underlyingResource.serve(newSender, exchange, completionCallback);
         } else {
+            UndertowLogger.REQUEST_LOGGER.tracef("Serving resource %s from the buffer cache to %s", name, exchange);
             //serve straight from the cache
             ByteBuffer[] buffers;
             boolean ok = false;
@@ -174,7 +176,7 @@ public class CachedResource implements Resource {
                 buffers = new ByteBuffer[pooled.length];
                 for (int i = 0; i < buffers.length; i++) {
                     // Keep position from mutating
-                    buffers[i] = pooled[i].getResource().duplicate();
+                    buffers[i] = pooled[i].getBuffer().duplicate();
                 }
                 ok = true;
             } finally {
@@ -213,8 +215,18 @@ public class CachedResource implements Resource {
     }
 
     @Override
+    public Path getFilePath() {
+        return underlyingResource.getFilePath();
+    }
+
+    @Override
     public File getResourceManagerRoot() {
         return underlyingResource.getResourceManagerRoot();
+    }
+
+    @Override
+    public Path getResourceManagerRootPath() {
+        return underlyingResource.getResourceManagerRootPath();
     }
 
     @Override
@@ -222,21 +234,90 @@ public class CachedResource implements Resource {
         return underlyingResource.getUrl();
     }
 
+    @Override
+    public void serveRange(Sender sender, HttpServerExchange exchange, long start, long end, IoCallback completionCallback) {
+        final DirectBufferCache dataCache = cachingResourceManager.getDataCache();
+        if(dataCache == null) {
+            ((RangeAwareResource)underlyingResource).serveRange(sender, exchange, start, end, completionCallback);
+            return;
+        }
+
+        final DirectBufferCache.CacheEntry existing = dataCache.get(cacheKey);
+        final Long length = getContentLength();
+        //if it is not eligible to be served from the cache
+        if (length == null || length > cachingResourceManager.getMaxFileSize()) {
+            underlyingResource.serve(sender, exchange, completionCallback);
+            return;
+        }
+        //it is not cached yet, just serve it directly
+        if (existing == null || !existing.enabled() || !existing.reference()) {
+            //it is not cached yet, install a wrapper to grab the data
+            ((RangeAwareResource)underlyingResource).serveRange(sender, exchange, start, end, completionCallback);
+        } else {
+            //serve straight from the cache
+            ByteBuffer[] buffers;
+            boolean ok = false;
+            try {
+                LimitedBufferSlicePool.PooledByteBuffer[] pooled = existing.buffers();
+                buffers = new ByteBuffer[pooled.length];
+                for (int i = 0; i < buffers.length; i++) {
+                    // Keep position from mutating
+                    buffers[i] = pooled[i].getBuffer().duplicate();
+                }
+                ok = true;
+            } finally {
+                if (!ok) {
+                    existing.dereference();
+                }
+            }
+            if(start > 0) {
+                long startDec = start;
+                long endCount = 0;
+                //handle the start of the range
+                for(ByteBuffer b : buffers) {
+                    if(endCount == end) {
+                        b.limit(b.position());
+                        continue;
+                    } else if(endCount + b.remaining() < end) {
+                        endCount += b.remaining();
+                    } else {
+                        b.limit((int) (b.position() + (end - endCount)));
+                        endCount = end;
+                    }
+                    if(b.remaining() >= startDec) {
+                        startDec = 0;
+                        b.position((int) (b.position() + startDec));
+                    } else {
+                        startDec -= b.remaining();
+                        b.position(b.limit());
+                    }
+                }
+            }
+            sender.send(buffers, new DereferenceCallback(existing, completionCallback));
+        }
+    }
+
+    @Override
+    public boolean isRangeSupported() {
+        //we can only handle range requests if the underlying resource supports it
+        //even if we have the resource in the cache it may disappear before we try and serve it
+        return underlyingResource instanceof RangeAwareResource && ((RangeAwareResource) underlyingResource).isRangeSupported();
+    }
 
     private static class DereferenceCallback implements IoCallback {
 
-        private final DirectBufferCache.CacheEntry cache;
+        private final DirectBufferCache.CacheEntry entry;
         private final IoCallback callback;
 
-        public DereferenceCallback(DirectBufferCache.CacheEntry cache, final IoCallback callback) {
-            this.cache = cache;
+        DereferenceCallback(DirectBufferCache.CacheEntry entry, final IoCallback callback) {
+            this.entry = entry;
             this.callback = callback;
         }
 
         @Override
         public void onComplete(final HttpServerExchange exchange, final Sender sender) {
             try {
-                cache.dereference();
+                entry.dereference();
             } finally {
                 callback.onComplete(exchange, sender);
             }
@@ -246,7 +327,7 @@ public class CachedResource implements Resource {
         public void onException(final HttpServerExchange exchange, final Sender sender, final IOException exception) {
             UndertowLogger.REQUEST_IO_LOGGER.ioException(exception);
             try {
-                cache.dereference();
+                entry.dereference();
             } finally {
                 callback.onException(exchange, sender, exception);
             }

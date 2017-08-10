@@ -53,6 +53,7 @@ public class FormAuthenticationMechanism implements AuthenticationMechanism {
     private final String errorPage;
     private final String postLocation;
     private final FormParserFactory formParserFactory;
+    private final IdentityManager identityManager;
 
     public FormAuthenticationMechanism(final String name, final String loginPage, final String errorPage) {
         this(FormParserFactory.builder().build(), name, loginPage, errorPage);
@@ -66,18 +67,32 @@ public class FormAuthenticationMechanism implements AuthenticationMechanism {
         this(formParserFactory, name, loginPage, errorPage, DEFAULT_POST_LOCATION);
     }
 
+    public FormAuthenticationMechanism(final FormParserFactory formParserFactory, final String name, final String loginPage, final String errorPage, final IdentityManager identityManager) {
+        this(formParserFactory, name, loginPage, errorPage, DEFAULT_POST_LOCATION, identityManager);
+    }
+
     public FormAuthenticationMechanism(final FormParserFactory formParserFactory, final String name, final String loginPage, final String errorPage, final String postLocation) {
+        this(formParserFactory, name, loginPage, errorPage, postLocation, null);
+    }
+
+    public FormAuthenticationMechanism(final FormParserFactory formParserFactory, final String name, final String loginPage, final String errorPage, final String postLocation, final IdentityManager identityManager) {
         this.name = name;
         this.loginPage = loginPage;
         this.errorPage = errorPage;
         this.postLocation = postLocation;
         this.formParserFactory = formParserFactory;
+        this.identityManager = identityManager;
+    }
+
+    @SuppressWarnings("deprecation")
+    private IdentityManager getIdentityManager(SecurityContext securityContext) {
+        return identityManager != null ? identityManager : securityContext.getIdentityManager();
     }
 
     @Override
     public AuthenticationMechanismOutcome authenticate(final HttpServerExchange exchange,
                                                        final SecurityContext securityContext) {
-        if (exchange.getRequestURI().endsWith(postLocation) && exchange.getRequestMethod().equals(Methods.POST)) {
+        if (exchange.getRequestPath().endsWith(postLocation) && exchange.getRequestMethod().equals(Methods.POST)) {
             return runFormAuth(exchange, securityContext);
         } else {
             return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
@@ -87,7 +102,7 @@ public class FormAuthenticationMechanism implements AuthenticationMechanism {
     public AuthenticationMechanismOutcome runFormAuth(final HttpServerExchange exchange, final SecurityContext securityContext) {
         final FormDataParser parser = formParserFactory.createParser(exchange);
         if (parser == null) {
-            UndertowLogger.REQUEST_LOGGER.debug("Could not authenticate as no form parser is present");
+            UndertowLogger.SECURITY_LOGGER.debug("Could not authenticate as no form parser is present");
             // TODO - May need a better error signaling mechanism here to prevent repeated attempts.
             return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
         }
@@ -97,7 +112,7 @@ public class FormAuthenticationMechanism implements AuthenticationMechanism {
             final FormData.FormValue jUsername = data.getFirst("j_username");
             final FormData.FormValue jPassword = data.getFirst("j_password");
             if (jUsername == null || jPassword == null) {
-                UndertowLogger.REQUEST_LOGGER.debug("Could not authenticate as username or password was not present in the posted result");
+                UndertowLogger.SECURITY_LOGGER.debugf("Could not authenticate as username or password was not present in the posted result for %s", exchange);
                 return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
             }
             final String userName = jUsername.getValue();
@@ -105,10 +120,11 @@ public class FormAuthenticationMechanism implements AuthenticationMechanism {
             AuthenticationMechanismOutcome outcome = null;
             PasswordCredential credential = new PasswordCredential(password.toCharArray());
             try {
-                IdentityManager identityManager = securityContext.getIdentityManager();
+                IdentityManager identityManager = getIdentityManager(securityContext);
                 Account account = identityManager.verify(userName, credential);
                 if (account != null) {
                     securityContext.authenticationComplete(account, name, true);
+                    UndertowLogger.SECURITY_LOGGER.debugf("Authenticated user %s using for auth for %s", account.getPrincipal().getName(), exchange);
                     outcome = AuthenticationMechanismOutcome.AUTHENTICATED;
                 } else {
                     securityContext.authenticationFailed(MESSAGES.authenticationFailed(userName), name);
@@ -134,7 +150,7 @@ public class FormAuthenticationMechanism implements AuthenticationMechanism {
                     @Override
                     public boolean handleDefaultResponse(final HttpServerExchange exchange) {
                         FormAuthenticationMechanism.sendRedirect(exchange, location);
-                        exchange.setResponseCode(StatusCodes.FOUND);
+                        exchange.setStatusCode(StatusCodes.FOUND);
                         exchange.endExchange();
                         return true;
                     }
@@ -145,11 +161,14 @@ public class FormAuthenticationMechanism implements AuthenticationMechanism {
     }
 
     public ChallengeResult sendChallenge(final HttpServerExchange exchange, final SecurityContext securityContext) {
-        if (exchange.getRequestURI().endsWith(postLocation) && exchange.getRequestMethod().equals(Methods.POST)) {
+        if (exchange.getRequestPath().endsWith(postLocation) && exchange.getRequestMethod().equals(Methods.POST)) {
+            UndertowLogger.SECURITY_LOGGER.debugf("Serving form auth error page %s for %s", loginPage, exchange);
             // This method would no longer be called if authentication had already occurred.
             Integer code = servePage(exchange, errorPage);
             return new ChallengeResult(true, code);
         } else {
+            UndertowLogger.SECURITY_LOGGER.debugf("Serving login form %s for %s", loginPage, exchange);
+
             // we need to store the URL
             storeInitialLocation(exchange);
             // TODO - Rather than redirecting, in order to make this mechanism compatible with the other mechanisms we need to

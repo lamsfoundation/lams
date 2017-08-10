@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cfg.beanvalidation;
 
@@ -27,70 +10,84 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import javax.validation.groups.Default;
 
 import org.hibernate.HibernateException;
-import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
+import org.hibernate.boot.spi.ClassLoaderAccess;
 
 /**
  * @author Emmanuel Bernard
  */
 public class GroupsPerOperation {
-
 	private static final String JPA_GROUP_PREFIX = "javax.persistence.validation.group.";
 	private static final String HIBERNATE_GROUP_PREFIX = "org.hibernate.validator.group.";
+
 	private static final Class<?>[] DEFAULT_GROUPS = new Class<?>[] { Default.class };
 	private static final Class<?>[] EMPTY_GROUPS = new Class<?>[] { };
 
 	private Map<Operation, Class<?>[]> groupsPerOperation = new HashMap<Operation, Class<?>[]>(4);
 
-	public GroupsPerOperation(Properties properties) {
-		setGroupsForOperation( Operation.INSERT, properties );
-		setGroupsForOperation( Operation.UPDATE, properties );
-		setGroupsForOperation( Operation.DELETE, properties );
-		setGroupsForOperation( Operation.DDL, properties );
+	private GroupsPerOperation() {
 	}
 
-	private void setGroupsForOperation(Operation operation, Properties properties) {
-		Object property = properties.get( operation.getGroupPropertyName() );
+	public static GroupsPerOperation from(Map settings, ClassLoaderAccess classLoaderAccess) {
+		GroupsPerOperation groupsPerOperation = new GroupsPerOperation();
 
-		Class<?>[] groups;
+		applyOperationGrouping( groupsPerOperation, Operation.INSERT, settings, classLoaderAccess );
+		applyOperationGrouping( groupsPerOperation, Operation.UPDATE, settings, classLoaderAccess );
+		applyOperationGrouping( groupsPerOperation, Operation.DELETE, settings, classLoaderAccess );
+		applyOperationGrouping( groupsPerOperation, Operation.DDL, settings, classLoaderAccess );
+
+		return groupsPerOperation;
+	}
+
+	private static void applyOperationGrouping(
+			GroupsPerOperation groupsPerOperation,
+			Operation operation,
+			Map settings,
+			ClassLoaderAccess classLoaderAccess) {
+		groupsPerOperation.groupsPerOperation.put(
+				operation,
+				buildGroupsForOperation( operation, settings, classLoaderAccess )
+		);
+	}
+
+	public static Class<?>[] buildGroupsForOperation(Operation operation, Map settings, ClassLoaderAccess classLoaderAccess) {
+		final Object property = settings.get( operation.getGroupPropertyName() );
+
 		if ( property == null ) {
-			groups = operation == Operation.DELETE ? EMPTY_GROUPS : DEFAULT_GROUPS;
+			return operation == Operation.DELETE ? EMPTY_GROUPS : DEFAULT_GROUPS;
 		}
-		else {
-			if ( property instanceof String ) {
-				String stringProperty = (String) property;
-				String[] groupNames = stringProperty.split( "," );
-				if ( groupNames.length == 1 && groupNames[0].equals( "" ) ) {
-					groups = EMPTY_GROUPS;
-				}
-				else {
-					List<Class<?>> groupsList = new ArrayList<Class<?>>(groupNames.length);
-					for (String groupName : groupNames) {
-						String cleanedGroupName = groupName.trim();
-						if ( cleanedGroupName.length() > 0) {
-							try {
-								groupsList.add( ReflectHelper.classForName( cleanedGroupName ) );
-							}
-							catch ( ClassNotFoundException e ) {
-								throw new HibernateException( "Unable to load class " + cleanedGroupName, e );
-							}
-						}
+
+		if ( property instanceof Class<?>[] ) {
+			return (Class<?>[]) property;
+		}
+
+		if ( property instanceof String ) {
+			String stringProperty = (String) property;
+			String[] groupNames = stringProperty.split( "," );
+			if ( groupNames.length == 1 && groupNames[0].equals( "" ) ) {
+				return EMPTY_GROUPS;
+			}
+
+			List<Class<?>> groupsList = new ArrayList<Class<?>>(groupNames.length);
+			for (String groupName : groupNames) {
+				String cleanedGroupName = groupName.trim();
+				if ( cleanedGroupName.length() > 0) {
+					try {
+						groupsList.add( classLoaderAccess.classForName( cleanedGroupName ) );
 					}
-					groups = groupsList.toArray( new Class<?>[groupsList.size()] );
+					catch ( ClassLoadingException e ) {
+						throw new HibernateException( "Unable to load class " + cleanedGroupName, e );
+					}
 				}
 			}
-			else if ( property instanceof Class<?>[] ) {
-				groups = (Class<?>[]) property;
-			}
-			else {
-				//null is bad and excluded by instanceof => exception is raised
-				throw new HibernateException( JPA_GROUP_PREFIX + operation.getGroupPropertyName() + " is of unknown type: String or Class<?>[] only");
-			}
+			return groupsList.toArray( new Class<?>[groupsList.size()] );
 		}
-		groupsPerOperation.put( operation, groups );
+
+		//null is bad and excluded by instanceof => exception is raised
+		throw new HibernateException( JPA_GROUP_PREFIX + operation.getGroupPropertyName() + " is of unknown type: String or Class<?>[] only");
 	}
 
 	public Class<?>[] get(Operation operation) {

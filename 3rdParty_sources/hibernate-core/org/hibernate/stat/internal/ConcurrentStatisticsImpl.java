@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.stat.internal;
 
@@ -28,6 +11,10 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.hibernate.cache.spi.Region;
+import org.hibernate.cache.spi.access.CollectionRegionAccessStrategy;
+import org.hibernate.cache.spi.access.EntityRegionAccessStrategy;
+import org.hibernate.cache.spi.access.NaturalIdRegionAccessStrategy;
+import org.hibernate.cache.spi.access.RegionAccessStrategy;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.collections.ArrayHelper;
@@ -39,7 +26,7 @@ import org.hibernate.stat.QueryStatistics;
 import org.hibernate.stat.SecondLevelCacheStatistics;
 import org.hibernate.stat.spi.StatisticsImplementor;
 
-import org.jboss.logging.Logger;
+import static org.hibernate.internal.CoreLogging.messageLogger;
 
 /**
  * Implementation of {@link org.hibernate.stat.Statistics} based on the {@link java.util.concurrent} package.
@@ -48,8 +35,7 @@ import org.jboss.logging.Logger;
  */
 @SuppressWarnings({ "unchecked" })
 public class ConcurrentStatisticsImpl implements StatisticsImplementor, Service {
-
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, ConcurrentStatisticsImpl.class.getName());
+	private static final CoreMessageLogger LOG = messageLogger( ConcurrentStatisticsImpl.class );
 
 	private SessionFactoryImplementor sessionFactory;
 
@@ -317,7 +303,10 @@ public class ConcurrentStatisticsImpl implements StatisticsImplementor, Service 
 			if ( region == null ) {
 				return null;
 			}
-			nics = new ConcurrentNaturalIdCacheStatisticsImpl( region );
+			NaturalIdRegionAccessStrategy accessStrategy
+					= (NaturalIdRegionAccessStrategy) sessionFactory.getNaturalIdCacheRegionAccessStrategy(regionName);
+
+			nics = new ConcurrentNaturalIdCacheStatisticsImpl( region, accessStrategy );
 			ConcurrentNaturalIdCacheStatisticsImpl previous;
 			if ( ( previous = (ConcurrentNaturalIdCacheStatisticsImpl) naturalIdCacheStatistics.putIfAbsent(
 					regionName, nics
@@ -346,7 +335,16 @@ public class ConcurrentStatisticsImpl implements StatisticsImplementor, Service 
 			if ( region == null ) {
 				return null;
 			}
-			slcs = new ConcurrentSecondLevelCacheStatisticsImpl( region );
+			RegionAccessStrategy accessStrategy = sessionFactory.getSecondLevelCacheRegionAccessStrategy(regionName);
+
+			EntityRegionAccessStrategy entityRegionAccessStrategy
+					= accessStrategy instanceof EntityRegionAccessStrategy ?
+					(EntityRegionAccessStrategy) accessStrategy : null;
+			CollectionRegionAccessStrategy collectionRegionAccessStrategy
+					= accessStrategy instanceof CollectionRegionAccessStrategy ?
+					(CollectionRegionAccessStrategy) accessStrategy : null;
+
+			slcs = new ConcurrentSecondLevelCacheStatisticsImpl( region, entityRegionAccessStrategy, collectionRegionAccessStrategy );
 			ConcurrentSecondLevelCacheStatisticsImpl previous;
 			if ( ( previous = (ConcurrentSecondLevelCacheStatisticsImpl) secondLevelCacheStatistics.putIfAbsent(
 					regionName, slcs
@@ -393,10 +391,11 @@ public class ConcurrentStatisticsImpl implements StatisticsImplementor, Service 
 	@Override
 	public void naturalIdQueryExecuted(String regionName, long time) {
 		naturalIdQueryExecutionCount.getAndIncrement();
-		boolean isLongestQuery = false;
+		boolean isLongestQuery;
+		//noinspection StatementWithEmptyBody
 		for ( long old = naturalIdQueryExecutionMaxTime.get();
-			  ( isLongestQuery = time > old ) && ( !naturalIdQueryExecutionMaxTime.compareAndSet( old, time ) );
-			  old = naturalIdQueryExecutionMaxTime.get() ) {
+				( isLongestQuery = time > old ) && ( !naturalIdQueryExecutionMaxTime.compareAndSet( old, time ) );
+				old = naturalIdQueryExecutionMaxTime.get() ) {
 			// nothing to do here given the odd loop structure...
 		}
 		if ( isLongestQuery && regionName != null ) {
@@ -409,12 +408,13 @@ public class ConcurrentStatisticsImpl implements StatisticsImplementor, Service 
 
 	@Override
 	public void queryExecuted(String hql, int rows, long time) {
-        LOG.hql(hql, time, (long) rows );
+		LOG.hql(hql, time, (long) rows );
 		queryExecutionCount.getAndIncrement();
-		boolean isLongestQuery = false;
+		boolean isLongestQuery;
+		//noinspection StatementWithEmptyBody
 		for ( long old = queryExecutionMaxTime.get();
-			  ( isLongestQuery = time > old ) && ( !queryExecutionMaxTime.compareAndSet( old, time ) );
-			  old = queryExecutionMaxTime.get() ) {
+				( isLongestQuery = time > old ) && ( !queryExecutionMaxTime.compareAndSet( old, time ) );
+				old = queryExecutionMaxTime.get() ) {
 			// nothing to do here given the odd loop structure...
 		}
 		if ( isLongestQuery ) {
@@ -859,7 +859,7 @@ public class ConcurrentStatisticsImpl implements StatisticsImplementor, Service 
 	}
 
 	@Override
-    public String toString() {
+	public String toString() {
 		return new StringBuilder()
 				.append( "Statistics[" )
 				.append( "start time=" ).append( startTime )

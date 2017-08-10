@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.dialect;
 
@@ -33,7 +16,6 @@ import org.hibernate.QueryTimeoutException;
 import org.hibernate.dialect.function.NoArgSQLFunction;
 import org.hibernate.dialect.pagination.LimitHandler;
 import org.hibernate.dialect.pagination.SQLServer2005LimitHandler;
-import org.hibernate.engine.spi.RowSelection;
 import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.exception.spi.SQLExceptionConversionDelegate;
 import org.hibernate.internal.util.JdbcExceptionHelper;
@@ -68,14 +50,16 @@ public class SQLServer2005Dialect extends SQLServerDialect {
 
 		registerColumnType( Types.BIGINT, "bigint" );
 		registerColumnType( Types.BIT, "bit" );
-
+		
+		// HHH-8435 fix
+		registerColumnType( Types.NCLOB, "nvarchar(MAX)" );
 
 		registerFunction( "row_number", new NoArgSQLFunction( "row_number", StandardBasicTypes.INTEGER, true ) );
 	}
 
 	@Override
-	public LimitHandler buildLimitHandler(String sql, RowSelection selection) {
-		return new SQLServer2005LimitHandler( sql, selection );
+	public LimitHandler getLimitHandler() {
+		return new SQLServer2005LimitHandler();
 	}
 
 	@Override
@@ -89,16 +73,18 @@ public class SQLServer2005Dialect extends SQLServerDialect {
 		final boolean isNoWait = lockOptions.getTimeOut() == LockOptions.NO_WAIT;
 		final String noWaitStr = isNoWait ? ", nowait" : "";
 		switch ( mode ) {
-			case UPGRADE_NOWAIT:
-				return tableName + " with (updlock, rowlock, nowait)";
 			case UPGRADE:
 			case PESSIMISTIC_WRITE:
-			case WRITE:
-				return tableName + " with (updlock, rowlock" + noWaitStr + " )";
-			case PESSIMISTIC_READ:
-				return tableName + " with (holdlock, rowlock" + noWaitStr + " )";
-			default:
+			case WRITE: {
+				return tableName + " with (updlock, rowlock" + noWaitStr + ")";
+			}
+			case PESSIMISTIC_READ: {
+				return tableName + " with (holdlock, rowlock" + noWaitStr + ")";
+			}case UPGRADE_SKIPLOCKED:
+				return tableName + " with (updlock, rowlock, readpast" + noWaitStr + ")";
+			default: {
 				return tableName;
+			}
 		}
 	}
 

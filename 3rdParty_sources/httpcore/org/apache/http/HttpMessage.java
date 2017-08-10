@@ -53,6 +53,7 @@ import org.apache.http.params.HttpParams;
  *
  * @since 4.0
  */
+@SuppressWarnings("deprecation")
 public interface HttpMessage {
 
     /**
@@ -75,7 +76,7 @@ public interface HttpMessage {
      * connection.
      *
      * @param name the name of the headers to return.
-     * @return the headers whose name property equals <code>name</code>.
+     * @return the headers whose name property equals {@code name}.
      */
     Header[] getHeaders(String name);
 
@@ -83,12 +84,12 @@ public interface HttpMessage {
      * Returns the first header with a specified name of this message. Header
      * values are ignored. If there is more than one matching header in the
      * message the first element of {@link #getHeaders(String)} is returned.
-     * If there is no matching header in the message <code>null</code> is
+     * If there is no matching header in the message {@code null} is
      * returned.
      *
      * @param name the name of the header to return.
-     * @return the first header whose name property equals <code>name</code>
-     *   or <code>null</code> if no such header could be found.
+     * @return the first header whose name property equals {@code name}
+     *   or {@code null} if no such header could be found.
      */
     Header getFirstHeader(String name);
 
@@ -96,11 +97,11 @@ public interface HttpMessage {
      * Returns the last header with a specified name of this message. Header values
      * are ignored. If there is more than one matching header in the message the
      * last element of {@link #getHeaders(String)} is returned. If there is no
-     * matching header in the message <code>null</code> is returned.
+     * matching header in the message {@code null} is returned.
      *
      * @param name the name of the header to return.
-     * @return the last header whose name property equals <code>name</code>.
-     *   or <code>null</code> if no such header could be found.
+     * @return the last header whose name property equals {@code name}.
+     *   or {@code null} if no such header could be found.
      */
     Header getLastHeader(String name);
 
@@ -179,7 +180,7 @@ public interface HttpMessage {
      * Returns an iterator of the headers with a given name.
      *
      * @param name      the name of the headers over which to iterate, or
-     *                  <code>null</code> for all headers
+     *                  {@code null} for all headers
      *
      * @return Iterator that returns Header objects with the argument name
      *         in the sequence they are sent over a connection.
@@ -189,13 +190,21 @@ public interface HttpMessage {
     /**
      * Returns the parameters effective for this message as set by
      * {@link #setParams(HttpParams)}.
+     *
+     * @deprecated (4.3) use configuration classes provided 'org.apache.http.config'
+     *  and 'org.apache.http.client.config'
      */
+    @Deprecated
     HttpParams getParams();
 
     /**
      * Provides parameters to be used for the processing of this message.
      * @param params the parameters
+     *
+     * @deprecated (4.3) use configuration classes provided 'org.apache.http.config'
+     *  and 'org.apache.http.client.config'
      */
+    @Deprecated
     void setParams(HttpParams params);
 
 }

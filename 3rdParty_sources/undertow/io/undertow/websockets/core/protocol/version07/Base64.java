@@ -19,6 +19,11 @@ package io.undertow.websockets.core.protocol.version07;
 
 import io.undertow.UndertowLogger;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * <p>
  * Encodes and decodes to and from Base64 notation.
@@ -196,9 +201,6 @@ class Base64 {
 
     /** The new line character (\n) as a byte. */
     private static final byte NEW_LINE = (byte) '\n';
-
-    /** Preferred encoding. */
-    private static final String PREFERRED_ENCODING = "US-ASCII";
 
     private static final byte WHITE_SPACE_ENC = -5; // Indicates white space in encoding
     private static final byte EQUALS_SIGN_ENC = -1; // Indicates equals sign in encoding
@@ -629,13 +631,7 @@ class Base64 {
         } // end finally
 
         // Return value according to relevant encoding.
-        try {
-            return new String(baos.toByteArray(), PREFERRED_ENCODING);
-        } // end try
-        catch (java.io.UnsupportedEncodingException uue) {
-            // Fall back to some Java default
-            return new String(baos.toByteArray());
-        } // end catch
+        return new String(baos.toByteArray(), StandardCharsets.US_ASCII);
 
     } // end encode
 
@@ -765,12 +761,7 @@ class Base64 {
         byte[] encoded = encodeBytesToBytes(source, off, len, options);
 
         // Return value according to relevant encoding.
-        try {
-            return new String(encoded, PREFERRED_ENCODING);
-        } // end try
-        catch (java.io.UnsupportedEncodingException uue) {
-            return new String(encoded);
-        } // end catch
+        return new String(encoded, StandardCharsets.US_ASCII);
 
     } // end encodeBytes
 
@@ -1137,13 +1128,8 @@ class Base64 {
             throw new NullPointerException("Input string was null.");
         } // end if
 
-        byte[] bytes;
-        try {
-            bytes = s.getBytes(PREFERRED_ENCODING);
-        } // end try
-        catch (java.io.UnsupportedEncodingException uee) {
-            bytes = s.getBytes();
-        } // end catch
+        byte[] bytes = s.getBytes(StandardCharsets.US_ASCII);
+
           // </change>
 
         // Decode
@@ -1339,7 +1325,7 @@ class Base64 {
         Base64.OutputStream bos = null;
         try {
             bos = new Base64.OutputStream(new java.io.FileOutputStream(filename), Base64.DECODE);
-            bos.write(dataToDecode.getBytes(PREFERRED_ENCODING));
+            bos.write(dataToDecode.getBytes(StandardCharsets.US_ASCII));
         } // end try
         catch (java.io.IOException e) {
             throw e; // Catch and throw to execute finally{} block
@@ -1372,19 +1358,19 @@ class Base64 {
         Base64.InputStream bis = null;
         try {
             // Set up some useful variables
-            java.io.File file = new java.io.File(filename);
-            byte[] buffer = null;
+            Path file = Paths.get(filename);
+            byte[] buffer;
             int length = 0;
-            int numBytes = 0;
+            int numBytes;
 
             // Check for size of file
-            if (file.length() > Integer.MAX_VALUE) {
-                throw new java.io.IOException("File is too big for this convenience method (" + file.length() + " bytes).");
+            if (Files.size(file) > Integer.MAX_VALUE) {
+                throw new java.io.IOException("File is too big for this convenience method (" + Files.size(file) + " bytes).");
             } // end if: file too big for int index
-            buffer = new byte[(int) file.length()];
+            buffer = new byte[(int) Files.size(file)];
 
             // Open a stream
-            bis = new Base64.InputStream(new java.io.BufferedInputStream(new java.io.FileInputStream(file)), Base64.DECODE);
+            bis = new Base64.InputStream(new java.io.BufferedInputStream(Files.newInputStream(file)), Base64.DECODE);
 
             // Read until done
             while ((numBytes = bis.read(buffer, length, 4096)) >= 0) {
@@ -1428,15 +1414,15 @@ class Base64 {
         Base64.InputStream bis = null;
         try {
             // Set up some useful variables
-            java.io.File file = new java.io.File(filename);
-            byte[] buffer = new byte[Math.max((int) (file.length() * 1.4 + 1), 40)]; // Need max() for math on small files
+            Path file = Paths.get(filename);
+            byte[] buffer = new byte[Math.max((int) (Files.size(file) * 1.4 + 1), 40)]; // Need max() for math on small files
                                                                                      // (v2.2.1); Need +1 for a few corner cases
                                                                                      // (v2.3.5)
             int length = 0;
-            int numBytes = 0;
+            int numBytes;
 
             // Open a stream
-            bis = new Base64.InputStream(new java.io.BufferedInputStream(new java.io.FileInputStream(file)), Base64.ENCODE);
+            bis = new Base64.InputStream(new java.io.BufferedInputStream(Files.newInputStream(file)), Base64.ENCODE);
 
             // Read until done
             while ((numBytes = bis.read(buffer, length, 4096)) >= 0) {
@@ -1444,7 +1430,7 @@ class Base64 {
             } // end while
 
             // Save in a variable to return
-            encodedData = new String(buffer, 0, length, Base64.PREFERRED_ENCODING);
+            encodedData = new String(buffer, 0, length, StandardCharsets.US_ASCII);
 
         } // end try
         catch (java.io.IOException e) {
@@ -1474,7 +1460,7 @@ class Base64 {
         java.io.OutputStream out = null;
         try {
             out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(outfile));
-            out.write(encoded.getBytes("US-ASCII")); // Strict, 7-bit output.
+            out.write(encoded.getBytes(StandardCharsets.US_ASCII)); // Strict, 7-bit output.
         } // end try
         catch (java.io.IOException e) {
             throw e; // Catch and release to execute finally{}
@@ -1541,7 +1527,7 @@ class Base64 {
          * @param in the <tt>java.io.InputStream</tt> from which to read data.
          * @since 1.3
          */
-        public InputStream(java.io.InputStream in) {
+        InputStream(java.io.InputStream in) {
             this(in, DECODE);
         } // end constructor
 
@@ -1566,7 +1552,7 @@ class Base64 {
          * @see Base64#DO_BREAK_LINES
          * @since 2.0
          */
-        public InputStream(java.io.InputStream in, int options) {
+        InputStream(java.io.InputStream in, int options) {
 
             super(in);
             this.options = options; // Record for later
@@ -1740,7 +1726,7 @@ class Base64 {
          * @param out the <tt>java.io.OutputStream</tt> to which data will be written.
          * @since 1.3
          */
-        public OutputStream(java.io.OutputStream out) {
+        OutputStream(java.io.OutputStream out) {
             this(out, ENCODE);
         } // end constructor
 
@@ -1764,7 +1750,7 @@ class Base64 {
          * @see Base64#DO_BREAK_LINES
          * @since 1.3
          */
-        public OutputStream(java.io.OutputStream out, int options) {
+        OutputStream(java.io.OutputStream out, int options) {
             super(out);
             this.breakLines = (options & DO_BREAK_LINES) != 0;
             this.encode = (options & ENCODE) != 0;

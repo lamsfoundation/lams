@@ -34,8 +34,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.http.annotation.Immutable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
@@ -43,32 +41,25 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.ProtocolException;
+import org.apache.http.annotation.Immutable;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.params.HttpClientParams;
-import org.apache.http.conn.HttpRoutedConnection;
-import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.config.Lookup;
+import org.apache.http.conn.routing.RouteInfo;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.cookie.CookieOrigin;
 import org.apache.http.cookie.CookieSpec;
-import org.apache.http.cookie.CookieSpecRegistry;
-import org.apache.http.cookie.SetCookie2;
+import org.apache.http.cookie.CookieSpecProvider;
 import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.ExecutionContext;
+import org.apache.http.util.Args;
+import org.apache.http.util.TextUtils;
 
 /**
  * Request interceptor that matches cookies available in the current
  * {@link CookieStore} to the request being executed and generates
- * corresponding <code>Cookie</code> request headers.
- * <p>
- * The following parameters can be used to customize the behavior of this
- * class:
- * <ul>
- *  <li>{@link org.apache.http.cookie.params.CookieSpecPNames#DATE_PATTERNS}</li>
- *  <li>{@link org.apache.http.cookie.params.CookieSpecPNames#SINGLE_COOKIE_HEADER}</li>
- *  <li>{@link org.apache.http.client.params.ClientPNames#COOKIE_POLICY}</li>
- * </ul>
+ * corresponding {@code Cookie} request headers.
  *
  * @since 4.0
  */
@@ -81,103 +72,95 @@ public class RequestAddCookies implements HttpRequestInterceptor {
         super();
     }
 
+    @Override
     public void process(final HttpRequest request, final HttpContext context)
             throws HttpException, IOException {
-        if (request == null) {
-            throw new IllegalArgumentException("HTTP request may not be null");
-        }
-        if (context == null) {
-            throw new IllegalArgumentException("HTTP context may not be null");
-        }
+        Args.notNull(request, "HTTP request");
+        Args.notNull(context, "HTTP context");
 
-        String method = request.getRequestLine().getMethod();
+        final String method = request.getRequestLine().getMethod();
         if (method.equalsIgnoreCase("CONNECT")) {
             return;
         }
 
+        final HttpClientContext clientContext = HttpClientContext.adapt(context);
+
         // Obtain cookie store
-        CookieStore cookieStore = (CookieStore) context.getAttribute(
-                ClientContext.COOKIE_STORE);
+        final CookieStore cookieStore = clientContext.getCookieStore();
         if (cookieStore == null) {
             this.log.debug("Cookie store not specified in HTTP context");
             return;
         }
 
         // Obtain the registry of cookie specs
-        CookieSpecRegistry registry = (CookieSpecRegistry) context.getAttribute(
-                ClientContext.COOKIESPEC_REGISTRY);
+        final Lookup<CookieSpecProvider> registry = clientContext.getCookieSpecRegistry();
         if (registry == null) {
             this.log.debug("CookieSpec registry not specified in HTTP context");
             return;
         }
 
-        // Obtain the target host (required)
-        HttpHost targetHost = (HttpHost) context.getAttribute(
-                ExecutionContext.HTTP_TARGET_HOST);
+        // Obtain the target host, possibly virtual (required)
+        final HttpHost targetHost = clientContext.getTargetHost();
         if (targetHost == null) {
             this.log.debug("Target host not set in the context");
             return;
         }
 
-        // Obtain the client connection (required)
-        HttpRoutedConnection conn = (HttpRoutedConnection) context.getAttribute(
-                ExecutionContext.HTTP_CONNECTION);
-        if (conn == null) {
-            this.log.debug("HTTP connection not set in the context");
+        // Obtain the route (required)
+        final RouteInfo route = clientContext.getHttpRoute();
+        if (route == null) {
+            this.log.debug("Connection route not set in the context");
             return;
         }
 
-        String policy = HttpClientParams.getCookiePolicy(request.getParams());
+        final RequestConfig config = clientContext.getRequestConfig();
+        String policy = config.getCookieSpec();
+        if (policy == null) {
+            policy = CookieSpecs.DEFAULT;
+        }
         if (this.log.isDebugEnabled()) {
             this.log.debug("CookieSpec selected: " + policy);
         }
 
-        URI requestURI;
+        URI requestURI = null;
         if (request instanceof HttpUriRequest) {
             requestURI = ((HttpUriRequest) request).getURI();
         } else {
             try {
                 requestURI = new URI(request.getRequestLine().getUri());
-            } catch (URISyntaxException ex) {
-                throw new ProtocolException("Invalid request URI: " +
-                        request.getRequestLine().getUri(), ex);
+            } catch (final URISyntaxException ignore) {
             }
         }
-
-        String hostName = targetHost.getHostName();
+        final String path = requestURI != null ? requestURI.getPath() : null;
+        final String hostName = targetHost.getHostName();
         int port = targetHost.getPort();
         if (port < 0) {
-            HttpRoute route = conn.getRoute();
-            if (route.getHopCount() == 1) {
-                port = conn.getRemotePort();
-            } else {
-                // Target port will be selected by the proxy.
-                // Use conventional ports for known schemes
-                String scheme = targetHost.getSchemeName();
-                if (scheme.equalsIgnoreCase("http")) {
-                    port = 80;
-                } else if (scheme.equalsIgnoreCase("https")) {
-                    port = 443;
-                } else {
-                    port = 0;
-                }
-            }
+            port = route.getTargetHost().getPort();
         }
 
-        CookieOrigin cookieOrigin = new CookieOrigin(
+        final CookieOrigin cookieOrigin = new CookieOrigin(
                 hostName,
-                port,
-                requestURI.getPath(),
-                conn.isSecure());
+                port >= 0 ? port : 0,
+                !TextUtils.isEmpty(path) ? path : "/",
+                route.isSecure());
 
         // Get an instance of the selected cookie policy
-        CookieSpec cookieSpec = registry.getCookieSpec(policy, request.getParams());
+        final CookieSpecProvider provider = registry.lookup(policy);
+        if (provider == null) {
+            if (this.log.isDebugEnabled()) {
+                this.log.debug("Unsupported cookie policy: " + policy);
+            }
+
+            return;
+        }
+        final CookieSpec cookieSpec = provider.create(clientContext);
         // Get all cookies available in the HTTP state
-        List<Cookie> cookies = new ArrayList<Cookie>(cookieStore.getCookies());
+        final List<Cookie> cookies = cookieStore.getCookies();
         // Find cookies matching the given origin
-        List<Cookie> matchedCookies = new ArrayList<Cookie>();
-        Date now = new Date();
-        for (Cookie cookie : cookies) {
+        final List<Cookie> matchedCookies = new ArrayList<Cookie>();
+        final Date now = new Date();
+        boolean expired = false;
+        for (final Cookie cookie : cookies) {
             if (!cookie.isExpired(now)) {
                 if (cookieSpec.match(cookie, cookieOrigin)) {
                     if (this.log.isDebugEnabled()) {
@@ -189,38 +172,36 @@ public class RequestAddCookies implements HttpRequestInterceptor {
                 if (this.log.isDebugEnabled()) {
                     this.log.debug("Cookie " + cookie + " expired");
                 }
+                expired = true;
             }
+        }
+        // Per RFC 6265, 5.3
+        // The user agent must evict all expired cookies if, at any time, an expired cookie
+        // exists in the cookie store
+        if (expired) {
+            cookieStore.clearExpired(now);
         }
         // Generate Cookie request headers
         if (!matchedCookies.isEmpty()) {
-            List<Header> headers = cookieSpec.formatCookies(matchedCookies);
-            for (Header header : headers) {
+            final List<Header> headers = cookieSpec.formatCookies(matchedCookies);
+            for (final Header header : headers) {
                 request.addHeader(header);
             }
         }
 
-        int ver = cookieSpec.getVersion();
+        final int ver = cookieSpec.getVersion();
         if (ver > 0) {
-            boolean needVersionHeader = false;
-            for (Cookie cookie : matchedCookies) {
-                if (ver != cookie.getVersion() || !(cookie instanceof SetCookie2)) {
-                    needVersionHeader = true;
-                }
-            }
-
-            if (needVersionHeader) {
-                Header header = cookieSpec.getVersionHeader();
-                if (header != null) {
-                    // Advertise cookie version support
-                    request.addHeader(header);
-                }
+            final Header header = cookieSpec.getVersionHeader();
+            if (header != null) {
+                // Advertise cookie version support
+                request.addHeader(header);
             }
         }
 
         // Stick the CookieSpec and CookieOrigin instances to the HTTP context
         // so they could be obtained by the response interceptor
-        context.setAttribute(ClientContext.COOKIE_SPEC, cookieSpec);
-        context.setAttribute(ClientContext.COOKIE_ORIGIN, cookieOrigin);
+        context.setAttribute(HttpClientContext.COOKIE_SPEC, cookieSpec);
+        context.setAttribute(HttpClientContext.COOKIE_ORIGIN, cookieOrigin);
     }
 
 }

@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.loader.plan.exec.internal;
 
@@ -36,9 +19,14 @@ import org.hibernate.persister.entity.Queryable;
  * A factory class for creating a {@link org.hibernate.loader.plan.exec.spi.LoadQueryDetails} object.
  */
 public class BatchingLoadQueryDetailsFactory {
-	public final BatchingLoadQueryDetailsFactory INSTANCE = new BatchingLoadQueryDetailsFactory();
+	/**
+	 * Singleton access
+	 */
+	public static final BatchingLoadQueryDetailsFactory INSTANCE = new BatchingLoadQueryDetailsFactory();
 
-	// protect against external instantiation.
+	/**
+	 * Private to disallow instantiation
+	 */
 	private BatchingLoadQueryDetailsFactory() {
 	}
 
@@ -53,7 +41,7 @@ public class BatchingLoadQueryDetailsFactory {
 	 *
 	 * @return The EntityLoadQueryDetails
 	 */
-	public static LoadQueryDetails makeEntityLoadQueryDetails(
+	public LoadQueryDetails makeEntityLoadQueryDetails(
 			LoadPlan loadPlan,
 			String[] keyColumnNames,
 			QueryBuildingParameters buildingParameters,
@@ -90,7 +78,7 @@ public class BatchingLoadQueryDetailsFactory {
 	 *
 	 * @return The EntityLoadQueryDetails
 	 */
-	public static LoadQueryDetails makeCollectionLoadQueryDetails(
+	public LoadQueryDetails makeCollectionLoadQueryDetails(
 			CollectionPersister collectionPersister,
 			LoadPlan loadPlan,
 			QueryBuildingParameters buildingParameters) {

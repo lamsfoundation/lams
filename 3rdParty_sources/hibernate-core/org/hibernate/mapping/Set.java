@@ -1,31 +1,15 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.mapping;
+
 import java.util.Iterator;
 
 import org.hibernate.MappingException;
-import org.hibernate.cfg.Mappings;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.spi.Mapping;
 import org.hibernate.type.CollectionType;
 
@@ -35,6 +19,9 @@ import org.hibernate.type.CollectionType;
  * @author Gavin King
  */
 public class Set extends Collection {
+	public Set(MetadataImplementor metadata, PersistentClass owner) {
+		super( metadata, owner );
+	}
 
 	public void validate(Mapping mapping) throws MappingException {
 		super.validate( mapping );
@@ -49,27 +36,23 @@ public class Set extends Collection {
 		throw new MappingException("set element mappings must have at least one non-nullable column: " + getRole() );*/
 	}
 
-	public Set(Mappings mappings, PersistentClass owner) {
-		super( mappings, owner );
-	}
-
 	public boolean isSet() {
 		return true;
 	}
 
 	public CollectionType getDefaultCollectionType() {
 		if ( isSorted() ) {
-			return getMappings().getTypeResolver()
+			return getMetadata().getTypeResolver()
 					.getTypeFactory()
 					.sortedSet( getRole(), getReferencedPropertyName(), getComparator() );
 		}
 		else if ( hasOrder() ) {
-			return getMappings().getTypeResolver()
+			return getMetadata().getTypeResolver()
 					.getTypeFactory()
 					.orderedSet( getRole(), getReferencedPropertyName() );
 		}
 		else {
-			return getMappings().getTypeResolver()
+			return getMetadata().getTypeResolver()
 					.getTypeFactory()
 					.set( getRole(), getReferencedPropertyName() );
 		}
@@ -77,7 +60,7 @@ public class Set extends Collection {
 
 	void createPrimaryKey() {
 		if ( !isOneToMany() ) {
-			PrimaryKey pk = new PrimaryKey();
+			PrimaryKey pk = new PrimaryKey( getCollectionTable() );
 			pk.addColumns( getKey().getColumnIterator() );
 			Iterator iter = getElement().getColumnIterator();
 			while ( iter.hasNext() ) {

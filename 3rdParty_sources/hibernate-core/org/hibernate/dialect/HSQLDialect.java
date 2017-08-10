@@ -1,36 +1,16 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.dialect;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.sql.Types;
 
 import org.hibernate.JDBCException;
 import org.hibernate.LockMode;
 import org.hibernate.MappingException;
 import org.hibernate.StaleObjectStateException;
+import org.hibernate.boot.TempTableDdlTransactionHandling;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.function.AvgWithArgumentCastFunction;
 import org.hibernate.dialect.function.NoArgSQLFunction;
@@ -44,16 +24,31 @@ import org.hibernate.dialect.lock.PessimisticForceIncrementLockingStrategy;
 import org.hibernate.dialect.lock.PessimisticReadSelectLockingStrategy;
 import org.hibernate.dialect.lock.PessimisticWriteSelectLockingStrategy;
 import org.hibernate.dialect.lock.SelectLockingStrategy;
+import org.hibernate.dialect.pagination.AbstractLimitHandler;
+import org.hibernate.dialect.pagination.LimitHandler;
+import org.hibernate.dialect.pagination.LimitHelper;
+import org.hibernate.engine.jdbc.env.spi.NameQualifierSupport;
+import org.hibernate.engine.spi.RowSelection;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.exception.spi.TemplatedViolatedConstraintNameExtracter;
 import org.hibernate.exception.spi.ViolatedConstraintNameExtracter;
+import org.hibernate.hql.spi.id.IdTableSupportStandardImpl;
+import org.hibernate.hql.spi.id.MultiTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.global.GlobalTemporaryTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.local.AfterUseAction;
+import org.hibernate.hql.spi.id.local.LocalTemporaryTableBulkIdStrategy;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.JdbcExceptionHelper;
 import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.persister.entity.Lockable;
 import org.hibernate.type.StandardBasicTypes;
-
 import org.jboss.logging.Logger;
+import java.sql.DatabaseMetaData;
+
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Locale;
 
 /**
  * An SQL dialect compatible with HSQLDB (HyperSQL).
@@ -74,10 +69,40 @@ public class HSQLDialect extends Dialect {
 			HSQLDialect.class.getName()
 	);
 
+	private final class HSQLLimitHandler extends AbstractLimitHandler {
+		@Override
+		public String processSql(String sql, RowSelection selection) {
+			final boolean hasOffset = LimitHelper.hasFirstRow( selection );
+			if ( hsqldbVersion < 200 ) {
+				return new StringBuilder( sql.length() + 10 )
+						.append( sql )
+						.insert(
+								sql.toLowerCase(Locale.ROOT).indexOf( "select" ) + 6,
+								hasOffset ? " limit ? ?" : " top ?"
+						)
+						.toString();
+			}
+			else {
+				return sql + (hasOffset ? " offset ? limit ?" : " limit ?");
+			}
+		}
+
+		@Override
+		public boolean supportsLimit() {
+			return true;
+		}
+
+		@Override
+		public boolean bindLimitParametersFirst() {
+			return hsqldbVersion < 200;
+		}
+	}
+
 	/**
-	 * version is 18 for 1.8 or 20 for 2.0
+	 * version is 180 for 1.8.0 or 200 for 2.0.0
 	 */
-	private int hsqldbVersion = 18;
+	private int hsqldbVersion = 180;
+	private final LimitHandler limitHandler;
 
 
 	/**
@@ -90,8 +115,9 @@ public class HSQLDialect extends Dialect {
 			final Class props = ReflectHelper.classForName( "org.hsqldb.persist.HsqlDatabaseProperties" );
 			final String versionString = (String) props.getDeclaredField( "THIS_VERSION" ).get( null );
 
-			hsqldbVersion = Integer.parseInt( versionString.substring( 0, 1 ) ) * 10;
-			hsqldbVersion += Integer.parseInt( versionString.substring( 2, 3 ) );
+			hsqldbVersion = Integer.parseInt( versionString.substring( 0, 1 ) ) * 100;
+			hsqldbVersion += Integer.parseInt( versionString.substring( 2, 3 ) ) * 10;
+			hsqldbVersion += Integer.parseInt( versionString.substring( 4, 5 ) );
 		}
 		catch ( Throwable e ) {
 			// must be a very old version
@@ -116,8 +142,9 @@ public class HSQLDialect extends Dialect {
 		registerColumnType( Types.TIMESTAMP, "timestamp" );
 		registerColumnType( Types.VARCHAR, "varchar($l)" );
 		registerColumnType( Types.VARBINARY, "varbinary($l)" );
+		registerColumnType( Types.NCLOB, "clob" );
 
-		if ( hsqldbVersion < 20 ) {
+		if ( hsqldbVersion < 200 ) {
 			registerColumnType( Types.NUMERIC, "numeric" );
 		}
 		else {
@@ -125,7 +152,7 @@ public class HSQLDialect extends Dialect {
 		}
 
 		//HSQL has no Blob/Clob support .... but just put these here for now!
-		if ( hsqldbVersion < 20 ) {
+		if ( hsqldbVersion < 200 ) {
 			registerColumnType( Types.BLOB, "longvarbinary" );
 			registerColumnType( Types.CLOB, "longvarchar" );
 		}
@@ -159,7 +186,7 @@ public class HSQLDialect extends Dialect {
 		registerFunction( "database", new NoArgSQLFunction( "database", StandardBasicTypes.STRING ) );
 
 		// datetime functions
-		if ( hsqldbVersion < 20 ) {
+		if ( hsqldbVersion < 200 ) {
 			registerFunction( "sysdate", new NoArgSQLFunction( "sysdate", StandardBasicTypes.DATE, false ) );
 		}
 		else {
@@ -216,7 +243,7 @@ public class HSQLDialect extends Dialect {
 
 		// special functions
 		// from v. 2.2.0 ROWNUM() is supported in all modes as the equivalent of Oracle ROWNUM
-		if ( hsqldbVersion > 21 ) {
+		if ( hsqldbVersion > 219 ) {
 			registerFunction( "rownum", new NoArgSQLFunction( "rownum", StandardBasicTypes.INTEGER ) );
 		}
 
@@ -224,6 +251,8 @@ public class HSQLDialect extends Dialect {
 		registerFunction( "concat", new VarArgsSQLFunction( StandardBasicTypes.STRING, "(", "||", ")" ) );
 
 		getDefaultProperties().setProperty( Environment.STATEMENT_BATCH_SIZE, DEFAULT_BATCH_SIZE );
+
+		limitHandler = new HSQLLimitHandler();
 	}
 
 	@Override
@@ -249,7 +278,7 @@ public class HSQLDialect extends Dialect {
 
 	@Override
 	public String getIdentityInsertString() {
-		return hsqldbVersion < 20 ? "null" : "default";
+		return hsqldbVersion < 200 ? "null" : "default";
 	}
 
 	@Override
@@ -259,12 +288,17 @@ public class HSQLDialect extends Dialect {
 
 	@Override
 	public String getForUpdateString() {
-		if ( hsqldbVersion >= 20 ) {
+		if ( hsqldbVersion >= 200 ) {
 			return " for update";
 		}
 		else {
 			return "";
 		}
+	}
+
+	@Override
+	public LimitHandler getLimitHandler() {
+		return limitHandler;
 	}
 
 	@Override
@@ -274,11 +308,11 @@ public class HSQLDialect extends Dialect {
 
 	@Override
 	public String getLimitString(String sql, boolean hasOffset) {
-		if ( hsqldbVersion < 20 ) {
+		if ( hsqldbVersion < 200 ) {
 			return new StringBuilder( sql.length() + 10 )
 					.append( sql )
 					.insert(
-							sql.toLowerCase().indexOf( "select" ) + 6,
+							sql.toLowerCase(Locale.ROOT).indexOf( "select" ) + 6,
 							hasOffset ? " limit ? ?" : " top ?"
 					)
 					.toString();
@@ -290,7 +324,7 @@ public class HSQLDialect extends Dialect {
 
 	@Override
 	public boolean bindLimitParametersFirst() {
-		return hsqldbVersion < 20;
+		return hsqldbVersion < 200;
 	}
 
 	@Override
@@ -300,7 +334,7 @@ public class HSQLDialect extends Dialect {
 
 	@Override
 	public boolean supportsColumnCheck() {
-		return hsqldbVersion >= 20;
+		return hsqldbVersion >= 200;
 	}
 
 	@Override
@@ -357,12 +391,12 @@ public class HSQLDialect extends Dialect {
 
 	@Override
 	public ViolatedConstraintNameExtracter getViolatedConstraintNameExtracter() {
-		return hsqldbVersion < 20 ? EXTRACTER_18 : EXTRACTER_20;
+		return hsqldbVersion < 200 ? EXTRACTER_18 : EXTRACTER_20;
 	}
 
 	private static final ViolatedConstraintNameExtracter EXTRACTER_18 = new TemplatedViolatedConstraintNameExtracter() {
 		@Override
-		public String extractConstraintName(SQLException sqle) {
+		protected String doExtractConstraintName(SQLException sqle) throws NumberFormatException {
 			String constraintName = null;
 
 			final int errorCode = JdbcExceptionHelper.extractErrorCode( sqle );
@@ -399,7 +433,7 @@ public class HSQLDialect extends Dialect {
 	 */
 	private static final ViolatedConstraintNameExtracter EXTRACTER_20 = new TemplatedViolatedConstraintNameExtracter() {
 		@Override
-		public String extractConstraintName(SQLException sqle) {
+		protected String doExtractConstraintName(SQLException sqle) throws NumberFormatException {
 			String constraintName = null;
 
 			final int errorCode = JdbcExceptionHelper.extractErrorCode( sqle );
@@ -474,73 +508,54 @@ public class HSQLDialect extends Dialect {
 		return true;
 	}
 
-	// temporary table support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-	// Hibernate uses this information for temporary tables that it uses for its own operations
-	// therefore the appropriate strategy is taken with different versions of HSQLDB
-
-	// All versions of HSQLDB support GLOBAL TEMPORARY tables where the table
-	// definition is shared by all users but data is private to the session
-	// HSQLDB 2.0 also supports session-based LOCAL TEMPORARY tables where
-	// the definition and data is private to the session and table declaration
-	// can happen in the middle of a transaction
-
 	@Override
-	public boolean supportsTemporaryTables() {
-		return true;
-	}
+	public MultiTableBulkIdStrategy getDefaultMultiTableBulkIdStrategy() {
+		// Hibernate uses this information for temporary tables that it uses for its own operations
+		// therefore the appropriate strategy is taken with different versions of HSQLDB
 
-	@Override
-	public String generateTemporaryTableName(String baseTableName) {
-		if ( hsqldbVersion < 20 ) {
-			return "HT_" + baseTableName;
+		// All versions of HSQLDB support GLOBAL TEMPORARY tables where the table
+		// definition is shared by all users but data is private to the session
+		// HSQLDB 2.0 also supports session-based LOCAL TEMPORARY tables where
+		// the definition and data is private to the session and table declaration
+		// can happen in the middle of a transaction
+
+		if ( hsqldbVersion < 200 ) {
+			return new GlobalTemporaryTableBulkIdStrategy(
+					new IdTableSupportStandardImpl() {
+						@Override
+						public String generateIdTableName(String baseName) {
+							return "HT_" + baseName;
+						}
+
+						@Override
+						public String getCreateIdTableCommand() {
+							return "create global temporary table";
+						}
+					},
+					// Version 1.8 GLOBAL TEMPORARY table definitions persist beyond the end
+					// of the session (by default, data is cleared at commit).
+					AfterUseAction.CLEAN
+			);
 		}
 		else {
-			// With HSQLDB 2.0, the table name is qualified with MODULE to assist the drop
-			// statement (in-case there is a global name beginning with HT_)
-			return "MODULE.HT_" + baseTableName;
-		}
-	}
+			return new LocalTemporaryTableBulkIdStrategy(
+					new IdTableSupportStandardImpl() {
+						@Override
+						public String generateIdTableName(String baseName) {
+							// With HSQLDB 2.0, the table name is qualified with MODULE to assist the drop
+							// statement (in-case there is a global name beginning with HT_)
+							return "MODULE.HT_" + baseName;
+						}
 
-	@Override
-	public String getCreateTemporaryTableString() {
-		if ( hsqldbVersion < 20 ) {
-			return "create global temporary table";
+						@Override
+						public String getCreateIdTableCommand() {
+							return "declare local temporary table";
+						}
+					},
+					AfterUseAction.DROP,
+					TempTableDdlTransactionHandling.NONE
+			);
 		}
-		else {
-			return "declare local temporary table";
-		}
-	}
-
-	@Override
-	public String getCreateTemporaryTablePostfix() {
-		return "";
-	}
-
-	@Override
-	public String getDropTemporaryTableString() {
-		return "drop table";
-	}
-
-	@Override
-	public Boolean performTemporaryTableDDLInIsolation() {
-		// Different behavior for GLOBAL TEMPORARY (1.8) and LOCAL TEMPORARY (2.0)
-		if ( hsqldbVersion < 20 ) {
-			return Boolean.TRUE;
-		}
-		else {
-			return Boolean.FALSE;
-		}
-	}
-
-	@Override
-	public boolean dropTemporaryTableAfterUse() {
-		// Version 1.8 GLOBAL TEMPORARY table definitions persist beyond the end
-		// of the session (by default, data is cleared at commit).<p>
-		//
-		// Version 2.x LOCAL TEMPORARY table definitions do not persist beyond
-		// the end of the session (by default, data is cleared at commit).
-		return true;
 	}
 
 	// current timestamp support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -598,7 +613,7 @@ public class HSQLDialect extends Dialect {
 			return new OptimisticForceIncrementLockingStrategy( lockable, lockMode );
 		}
 
-		if ( hsqldbVersion < 20 ) {
+		if ( hsqldbVersion < 200 ) {
 			return new ReadUncommittedLockingStrategy( lockable, lockMode );
 		}
 		else {
@@ -622,7 +637,7 @@ public class HSQLDialect extends Dialect {
 
 	@Override
 	public boolean supportsCommentOn() {
-		return hsqldbVersion >= 20;
+		return hsqldbVersion >= 200;
 	}
 
 	// Overridden informational metadata ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -639,12 +654,12 @@ public class HSQLDialect extends Dialect {
 
 	@Override
 	public boolean doesReadCommittedCauseWritersToBlockReaders() {
-		return hsqldbVersion >= 20;
+		return hsqldbVersion >= 200;
 	}
 
 	@Override
 	public boolean doesRepeatableReadCauseReadersToBlockWriters() {
-		return hsqldbVersion >= 20;
+		return hsqldbVersion >= 200;
 	}
 
 	@Override
@@ -659,6 +674,17 @@ public class HSQLDialect extends Dialect {
 
 	@Override
 	public boolean supportsTupleDistinctCounts() {
+		// from v. 2.2.9 is added support for COUNT(DISTINCT ...) with multiple arguments
+		return hsqldbVersion >= 229;
+	}
+
+	@Override
+	public NameQualifierSupport getNameQualifierSupport() {
+		return NameQualifierSupport.SCHEMA;
+	}
+
+	@Override
+	public boolean supportsNamedParameters(DatabaseMetaData databaseMetaData) throws SQLException {
 		return false;
 	}
 }

@@ -1,31 +1,14 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import org.hibernate.MappingException;
@@ -89,7 +72,9 @@ public final class QuerySplitter {
 		int start = getStartingPositionFor( tokens, templateQuery );
 		int count = 0;
 		String next;
-		String last = tokens[start - 1].toLowerCase();
+		String last = tokens[start - 1].toLowerCase(Locale.ROOT);
+
+		boolean inQuote = false;
 
 		for ( int i = start; i < tokens.length; i++ ) {
 
@@ -99,13 +84,33 @@ public final class QuerySplitter {
 				templateQuery.append( token );
 				continue;
 			}
+			else if ( isQuoteCharacter( token) ) {
+				inQuote = !inQuote;
+				templateQuery.append( token );
+				continue;
+			}
+			else if ( isTokenStartWithAQuoteCharacter( token ) ) {
+				if ( !isTokenEndWithAQuoteCharacter( token ) ) {
+					inQuote = true;
+				}
+				templateQuery.append( token );
+				continue;
+			}
+			else if ( isTokenEndWithAQuoteCharacter( token ) ) {
+				inQuote = false;
+				templateQuery.append( token );
+				continue;
+			}
+			else if ( inQuote ) {
+				templateQuery.append( token );
+				continue;
+			}
+			next = nextNonWhite( tokens, i ).toLowerCase(Locale.ROOT);
 
-			next = nextNonWhite( tokens, i ).toLowerCase();
+			boolean process = isJavaIdentifier( token )
+					&& isPossiblyClassName( last, next );
 
-			boolean process = isJavaIdentifier( token ) &&
-					isPossiblyClassName( last, next );
-
-			last = token.toLowerCase();
+			last = token.toLowerCase(Locale.ROOT);
 
 			if ( process ) {
 				String importedClassName = getImportedClass( token, factory );
@@ -133,6 +138,18 @@ public final class QuerySplitter {
 		return results;
 	}
 
+	private static boolean isQuoteCharacter(String token) {
+		return "'".equals( token ) || "\"".equals( token );
+	}
+
+	private static boolean isTokenStartWithAQuoteCharacter(String token) {
+		return token.startsWith( "'" ) || token.startsWith( "\"" );
+	}
+
+	private static boolean isTokenEndWithAQuoteCharacter(String token) {
+		return token.endsWith( "'" ) || token.endsWith( "\"" );
+	}
+
 	private static String nextNonWhite(String[] tokens, int start) {
 		for ( int i = start + 1; i < tokens.length; i++ ) {
 			if ( !ParserHelper.isWhitespace( tokens[i] ) ) {
@@ -144,13 +161,13 @@ public final class QuerySplitter {
 
 	private static int getStartingPositionFor(String[] tokens, StringBuilder templateQuery) {
 		templateQuery.append( tokens[0] );
-		if ( !"select".equals( tokens[0].toLowerCase() ) ) {
+		if ( !"select".equals( tokens[0].toLowerCase(Locale.ROOT) ) ) {
 			return 1;
 		}
 
 		// select-range is terminated by declaration of "from"
 		for ( int i = 1; i < tokens.length; i++ ) {
-			if ( "from".equals( tokens[i].toLowerCase() ) ) {
+			if ( "from".equals( tokens[i].toLowerCase(Locale.ROOT) ) ) {
 				return i;
 			}
 			templateQuery.append( tokens[i] );

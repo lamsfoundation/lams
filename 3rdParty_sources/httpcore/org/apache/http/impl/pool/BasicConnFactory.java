@@ -30,78 +30,155 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.http.HttpClientConnection;
+import org.apache.http.HttpConnectionFactory;
 import org.apache.http.HttpHost;
 import org.apache.http.annotation.Immutable;
-import org.apache.http.impl.DefaultHttpClientConnection;
-import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.config.ConnectionConfig;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.impl.DefaultBHttpClientConnection;
+import org.apache.http.impl.DefaultBHttpClientConnectionFactory;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.HttpParamConfig;
 import org.apache.http.params.HttpParams;
 import org.apache.http.pool.ConnFactory;
+import org.apache.http.util.Args;
 
 /**
  * A very basic {@link ConnFactory} implementation that creates
  * {@link HttpClientConnection} instances given a {@link HttpHost} instance.
- * <p/>
- * The following parameters can be used to customize the behavior of this
- * class:
- * <ul>
- *  <li>{@link org.apache.http.params.CoreProtocolPNames#HTTP_ELEMENT_CHARSET}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#TCP_NODELAY}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#SO_TIMEOUT}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#SO_LINGER}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#SOCKET_BUFFER_SIZE}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#MAX_LINE_LENGTH}</li>
- * </ul>
  *
  * @see HttpHost
  * @since 4.2
  */
+@SuppressWarnings("deprecation")
 @Immutable
 public class BasicConnFactory implements ConnFactory<HttpHost, HttpClientConnection> {
 
+    private final SocketFactory plainfactory;
     private final SSLSocketFactory sslfactory;
-    private final HttpParams params;
+    private final int connectTimeout;
+    private final SocketConfig sconfig;
+    private final HttpConnectionFactory<? extends HttpClientConnection> connFactory;
 
+    /**
+     * @deprecated (4.3) use
+     *   {@link BasicConnFactory#BasicConnFactory(SocketFactory, SSLSocketFactory, int,
+     *     SocketConfig, ConnectionConfig)}.
+     */
+    @Deprecated
     public BasicConnFactory(final SSLSocketFactory sslfactory, final HttpParams params) {
         super();
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP params may not be null");
-        }
+        Args.notNull(params, "HTTP params");
+        this.plainfactory = null;
         this.sslfactory = sslfactory;
-        this.params = params;
+        this.connectTimeout = params.getIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 0);
+        this.sconfig = HttpParamConfig.getSocketConfig(params);
+        this.connFactory = new DefaultBHttpClientConnectionFactory(
+                HttpParamConfig.getConnectionConfig(params));
     }
 
+    /**
+     * @deprecated (4.3) use
+     *   {@link BasicConnFactory#BasicConnFactory(int, SocketConfig, ConnectionConfig)}.
+     */
+    @Deprecated
     public BasicConnFactory(final HttpParams params) {
         this(null, params);
     }
 
+    /**
+     * @since 4.3
+     */
+    public BasicConnFactory(
+            final SocketFactory plainfactory,
+            final SSLSocketFactory sslfactory,
+            final int connectTimeout,
+            final SocketConfig sconfig,
+            final ConnectionConfig cconfig) {
+        super();
+        this.plainfactory = plainfactory;
+        this.sslfactory = sslfactory;
+        this.connectTimeout = connectTimeout;
+        this.sconfig = sconfig != null ? sconfig : SocketConfig.DEFAULT;
+        this.connFactory = new DefaultBHttpClientConnectionFactory(
+                cconfig != null ? cconfig : ConnectionConfig.DEFAULT);
+    }
+
+    /**
+     * @since 4.3
+     */
+    public BasicConnFactory(
+            final int connectTimeout, final SocketConfig sconfig, final ConnectionConfig cconfig) {
+        this(null, null, connectTimeout, sconfig, cconfig);
+    }
+
+    /**
+     * @since 4.3
+     */
+    public BasicConnFactory(final SocketConfig sconfig, final ConnectionConfig cconfig) {
+        this(null, null, 0, sconfig, cconfig);
+    }
+
+    /**
+     * @since 4.3
+     */
+    public BasicConnFactory() {
+        this(null, null, 0, SocketConfig.DEFAULT, ConnectionConfig.DEFAULT);
+    }
+
+    /**
+     * @deprecated (4.3) no longer used.
+     */
+    @Deprecated
     protected HttpClientConnection create(final Socket socket, final HttpParams params) throws IOException {
-        DefaultHttpClientConnection conn = new DefaultHttpClientConnection();
-        conn.bind(socket, params);
+        final int bufsize = params.getIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, 8 * 1024);
+        final DefaultBHttpClientConnection conn = new DefaultBHttpClientConnection(bufsize);
+        conn.bind(socket);
         return conn;
     }
 
+    @Override
     public HttpClientConnection create(final HttpHost host) throws IOException {
-        String scheme = host.getSchemeName();
+        final String scheme = host.getSchemeName();
         Socket socket = null;
         if ("http".equalsIgnoreCase(scheme)) {
-            socket = new Socket();
+            socket = this.plainfactory != null ? this.plainfactory.createSocket() :
+                    new Socket();
         } if ("https".equalsIgnoreCase(scheme)) {
-            if (this.sslfactory != null) {
-                socket = this.sslfactory.createSocket();
-            }
+            socket = (this.sslfactory != null ? this.sslfactory :
+                    SSLSocketFactory.getDefault()).createSocket();
         }
         if (socket == null) {
             throw new IOException(scheme + " scheme is not supported");
         }
-        int connectTimeout = HttpConnectionParams.getConnectionTimeout(this.params);
-        int soTimeout = HttpConnectionParams.getSoTimeout(this.params);
-
-        socket.setSoTimeout(soTimeout);
-        socket.connect(new InetSocketAddress(host.getHostName(), host.getPort()), connectTimeout);
-        return create(socket, this.params);
+        final String hostname = host.getHostName();
+        int port = host.getPort();
+        if (port == -1) {
+            if (host.getSchemeName().equalsIgnoreCase("http")) {
+                port = 80;
+            } else if (host.getSchemeName().equalsIgnoreCase("https")) {
+                port = 443;
+            }
+        }
+        socket.setSoTimeout(this.sconfig.getSoTimeout());
+        if (this.sconfig.getSndBufSize() > 0) {
+            socket.setSendBufferSize(this.sconfig.getSndBufSize());
+        }
+        if (this.sconfig.getRcvBufSize() > 0) {
+            socket.setReceiveBufferSize(this.sconfig.getRcvBufSize());
+        }
+        socket.setTcpNoDelay(this.sconfig.isTcpNoDelay());
+        final int linger = this.sconfig.getSoLinger();
+        if (linger >= 0) {
+            socket.setSoLinger(true, linger);
+        }
+        socket.setKeepAlive(this.sconfig.isSoKeepAlive());
+        socket.connect(new InetSocketAddress(hostname, port), this.connectTimeout);
+        return this.connFactory.createConnection(socket);
     }
 
 }

@@ -17,10 +17,10 @@
  */
 package io.undertow.security.api;
 
-import java.util.List;
-
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.IdentityManager;
+
+import java.util.List;
 
 /**
  * The security context.
@@ -32,10 +32,6 @@ import io.undertow.security.idm.IdentityManager;
  * @see io.undertow.security.impl.SecurityContextImpl
  */
 public interface SecurityContext {
-
-    // TODO - Some of this is used within the core of undertow, some by the servlet integration and some by the mechanisms -
-    // once released the use by mechanisms will require the greatest level of backwards compatibility maintenance so may be
-    // better to split the rest out.
 
     /*
      * Methods Used To Run Authentication Process
@@ -66,7 +62,7 @@ public interface SecurityContext {
      * Attempts to log the user in using the provided credentials. This result will be stored in the current
      * {@link AuthenticatedSessionManager} (if any), so subsequent requests will automatically be authenticated
      * as this user.
-     * <p/>
+     * <p>
      * This operation may block
      *
      * @param username The username
@@ -84,9 +80,6 @@ public interface SecurityContext {
     /*
      * Methods Used To Control/Configure The Authentication Process.
      */
-
-    // TODO - May be better to pass a parameter to the authenticate methods to indicate that authentication is required.
-
 
     /**
      * Marks this request as requiring authentication. Authentication challenge headers will only be sent if this
@@ -108,13 +101,17 @@ public interface SecurityContext {
      * called mechanisms will be iterated over in the order they are added, and given a chance to authenticate the user.
      *
      * @param mechanism The mechanism to add
+     * @deprecated This method is now only applicable to {@code SecurityContext} implementations that also implement the {@link AuthenticationMechanismContext} interface.
      */
+    @Deprecated
     void addAuthenticationMechanism(AuthenticationMechanism mechanism);
 
     /**
      *
      * @return A list of all authentication mechanisms in this context
+     * @deprecated Obtaining lists of mechanisms is discouraged, however there should not be a need to call this anyway.
      */
+    @Deprecated
     List<AuthenticationMechanism> getAuthenticationMechanisms();
 
     /*
@@ -150,7 +147,9 @@ public interface SecurityContext {
      * Obtain the associated {@link IdentityManager} to use to make account verification decisions.
      *
      * @return The associated {@link IdentityManager}
+     * @deprecated Authentication mechanisms that rely on the {@link IdentityManager} should instead hold their own reference to it.
      */
+    @Deprecated
     IdentityManager getIdentityManager();
 
     /**

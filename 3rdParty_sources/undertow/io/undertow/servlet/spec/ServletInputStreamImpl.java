@@ -18,26 +18,24 @@
 
 package io.undertow.servlet.spec;
 
-import io.undertow.servlet.UndertowServletMessages;
-import io.undertow.servlet.api.ThreadSetupAction;
-import io.undertow.servlet.core.CompositeThreadSetupAction;
-import org.xnio.Buffers;
-import org.xnio.ChannelListener;
-import org.xnio.IoUtils;
-import org.xnio.Pool;
-import org.xnio.Pooled;
-import org.xnio.channels.Channels;
-import org.xnio.channels.EmptyStreamSourceChannel;
-import org.xnio.channels.StreamSourceChannel;
-
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
 import static org.xnio.Bits.allAreClear;
 import static org.xnio.Bits.anyAreClear;
 import static org.xnio.Bits.anyAreSet;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import javax.servlet.ReadListener;
+import javax.servlet.ServletInputStream;
+
+import org.xnio.Buffers;
+import org.xnio.ChannelListener;
+import org.xnio.IoUtils;
+import org.xnio.channels.Channels;
+import org.xnio.channels.EmptyStreamSourceChannel;
+import org.xnio.channels.StreamSourceChannel;
+import io.undertow.connector.ByteBufferPool;
+import io.undertow.connector.PooledByteBuffer;
+import io.undertow.servlet.UndertowServletMessages;
 
 /**
  * Servlet input stream implementation. This stream is non-buffered, and is used for both
@@ -49,7 +47,7 @@ public class ServletInputStreamImpl extends ServletInputStream {
 
     private final HttpServletRequestImpl request;
     private final StreamSourceChannel channel;
-    private final Pool<ByteBuffer> bufferPool;
+    private final ByteBufferPool bufferPool;
 
     private volatile ReadListener listener;
     private volatile ServletInputStreamChannelListener internalListener;
@@ -64,7 +62,7 @@ public class ServletInputStreamImpl extends ServletInputStream {
 
     private int state;
     private AsyncContextImpl asyncContext;
-    private Pooled<ByteBuffer> pooled;
+    private PooledByteBuffer pooled;
 
     public ServletInputStreamImpl(final HttpServletRequestImpl request) {
         this.request = request;
@@ -73,7 +71,7 @@ public class ServletInputStreamImpl extends ServletInputStream {
         } else {
             this.channel = new EmptyStreamSourceChannel(request.getExchange().getIoThread());
         }
-        this.bufferPool = request.getExchange().getConnection().getBufferPool();
+        this.bufferPool = request.getExchange().getConnection().getByteBufferPool();
     }
 
 
@@ -151,10 +149,10 @@ public class ServletInputStreamImpl extends ServletInputStream {
         if (len == 0) {
             return 0;
         }
-        ByteBuffer buffer = pooled.getResource();
+        ByteBuffer buffer = pooled.getBuffer();
         int copied = Buffers.copy(ByteBuffer.wrap(b, off, len), buffer);
         if (!buffer.hasRemaining()) {
-            pooled.free();
+            pooled.close();
             pooled = null;
             if (listener != null) {
                 readIntoBufferNonBlocking();
@@ -167,11 +165,11 @@ public class ServletInputStreamImpl extends ServletInputStream {
         if (pooled == null && !anyAreSet(state, FLAG_FINISHED)) {
             pooled = bufferPool.allocate();
 
-            int res = Channels.readBlocking(channel, pooled.getResource());
-            pooled.getResource().flip();
+            int res = Channels.readBlocking(channel, pooled.getBuffer());
+            pooled.getBuffer().flip();
             if (res == -1) {
                 state |= FLAG_FINISHED;
-                pooled.free();
+                pooled.close();
                 pooled = null;
             }
         }
@@ -181,36 +179,36 @@ public class ServletInputStreamImpl extends ServletInputStream {
         if (pooled == null && !anyAreSet(state, FLAG_FINISHED)) {
             pooled = bufferPool.allocate();
             if (listener == null) {
-                int res = channel.read(pooled.getResource());
+                int res = channel.read(pooled.getBuffer());
                 if (res == 0) {
-                    pooled.free();
+                    pooled.close();
                     pooled = null;
                     return;
                 }
-                pooled.getResource().flip();
+                pooled.getBuffer().flip();
                 if (res == -1) {
                     state |= FLAG_FINISHED;
-                    pooled.free();
+                    pooled.close();
                     pooled = null;
                 }
             } else {
                 if (anyAreClear(state, FLAG_READY)) {
                     throw UndertowServletMessages.MESSAGES.streamNotReady();
                 }
-                int res = channel.read(pooled.getResource());
-                pooled.getResource().flip();
+                int res = channel.read(pooled.getBuffer());
+                pooled.getBuffer().flip();
                 if (res == -1) {
                     state |= FLAG_FINISHED;
-                    pooled.free();
+                    pooled.close();
                     pooled = null;
                 } else if (res == 0) {
                     state &= ~FLAG_READY;
-                    pooled.free();
+                    pooled.close();
                     pooled = null;
                     channel.getIoThread().execute(new Runnable() {
                         @Override
                         public void run() {
-                            if(!channel.isReadResumed()) {
+                            if (!channel.isReadResumed()) {
                                 channel.resumeReads();
                             }
                         }
@@ -232,7 +230,7 @@ public class ServletInputStreamImpl extends ServletInputStream {
         if (pooled == null) {
             return 0;
         }
-        return pooled.getResource().remaining();
+        return pooled.getBuffer().remaining();
     }
 
     @Override
@@ -245,14 +243,14 @@ public class ServletInputStreamImpl extends ServletInputStream {
             while (allAreClear(state, FLAG_FINISHED)) {
                 readIntoBuffer();
                 if (pooled != null) {
-                    pooled.free();
+                    pooled.close();
                     pooled = null;
                 }
             }
         } finally {
             state |= FLAG_FINISHED;
             if (pooled != null) {
-                pooled.free();
+                pooled.close();
                 pooled = null;
             }
             channel.shutdownReads();
@@ -279,27 +277,20 @@ public class ServletInputStreamImpl extends ServletInputStream {
                 if (pooled != null) {
                     state |= FLAG_READY;
                     if (!anyAreSet(state, FLAG_FINISHED)) {
-                        CompositeThreadSetupAction action = request.getServletContext().getDeployment().getThreadSetupAction();
-                        ThreadSetupAction.Handle handle = action.setup(request.getExchange());
-                        try {
-                            listener.onDataAvailable();
-                        } finally {
-                            handle.tearDown();
-                        }
-                        if(pooled != null) {
+                        request.getServletContext().invokeOnDataAvailable(request.getExchange(), listener);
+                        if (pooled != null) {
                             //they did not consume all the data
                             channel.suspendReads();
                         }
                     }
                 }
-            } catch (Exception e) {
-                CompositeThreadSetupAction action = request.getServletContext().getDeployment().getThreadSetupAction();
-                ThreadSetupAction.Handle handle = action.setup(request.getExchange());
-                try {
-                    listener.onError(e);
-                } finally {
-                    handle.tearDown();
-                }
+            } catch (final Exception e) {
+                request.getServletContext().invokeRunnable(request.getExchange(), new Runnable() {
+                    @Override
+                    public void run() {
+                        listener.onError(e);
+                    }
+                });
                 IoUtils.safeClose(channel);
             }
             if (anyAreSet(state, FLAG_FINISHED)) {
@@ -307,13 +298,7 @@ public class ServletInputStreamImpl extends ServletInputStream {
                     try {
                         state |= FLAG_ON_DATA_READ_CALLED;
                         channel.shutdownReads();
-                        CompositeThreadSetupAction action = request.getServletContext().getDeployment().getThreadSetupAction();
-                        ThreadSetupAction.Handle handle = action.setup(request.getExchange());
-                        try {
-                            listener.onAllDataRead();
-                        } finally {
-                            handle.tearDown();
-                        }
+                        request.getServletContext().invokeOnAllDataRead(request.getExchange(), listener);
                     } catch (IOException e) {
                         listener.onError(e);
                         IoUtils.safeClose(channel);

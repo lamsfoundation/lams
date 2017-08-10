@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cache.spi;
 
@@ -27,8 +10,8 @@ import java.io.Serializable;
 import java.util.Properties;
 import java.util.Set;
 
+import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.cache.CacheException;
-import org.hibernate.cfg.Settings;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.CoreMessageLogger;
@@ -64,13 +47,14 @@ public class UpdateTimestampsCache {
 	 * @param props Any properties
 	 * @param factory The SessionFactory
 	 */
-	public UpdateTimestampsCache(Settings settings, Properties props, final SessionFactoryImplementor factory) {
+	public UpdateTimestampsCache(SessionFactoryOptions settings, Properties props, final SessionFactoryImplementor factory) {
 		this.factory = factory;
 		final String prefix = settings.getCacheRegionPrefix();
 		final String regionName = prefix == null ? REGION_NAME : prefix + '.' + REGION_NAME;
 
 		LOG.startingUpdateTimestampsCache( regionName );
-		this.region = settings.getRegionFactory().buildTimestampsRegion( regionName, props );
+
+		this.region = settings.getServiceRegistry().getService( RegionFactory.class ).buildTimestampsRegion( regionName, props );
 	}
 
 	/**
@@ -80,7 +64,7 @@ public class UpdateTimestampsCache {
 	 * @param props Any properties
 	 */
 	@SuppressWarnings({"UnusedDeclaration"})
-	public UpdateTimestampsCache(Settings settings, Properties props) {
+	public UpdateTimestampsCache(SessionFactoryOptions settings, Properties props) {
 		this( settings, props, null );
 	}
 
@@ -108,7 +92,7 @@ public class UpdateTimestampsCache {
 
 				//put() has nowait semantics, is this really appropriate?
 				//note that it needs to be async replication, never local or sync
-				region.put( space, ts );
+				region.put( session, space, ts );
 			}
 			finally {
 				session.getEventListenerManager().cachePutEnd();
@@ -144,7 +128,7 @@ public class UpdateTimestampsCache {
 
 				//put() has nowait semantics, is this really appropriate?
 				//note that it needs to be async replication, never local or sync
-				region.put( space, ts );
+				region.put( session, space, ts );
 			}
 			finally {
 				session.getEventListenerManager().cachePutEnd();
@@ -205,7 +189,7 @@ public class UpdateTimestampsCache {
 		Long ts = null;
 		try {
 			session.getEventListenerManager().cacheGetStart();
-			ts = (Long) region.get( space );
+			ts = (Long) region.get( session, space );
 		}
 		finally {
 			session.getEventListenerManager().cacheGetEnd( ts != null );

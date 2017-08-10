@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.persister.collection;
 
@@ -32,7 +15,6 @@ import org.hibernate.type.Type;
  * @author Gavin King
  */
 public class CollectionPropertyMapping implements PropertyMapping {
-
 	private final QueryableCollection memberPersister;
 
 	public CollectionPropertyMapping(QueryableCollection memberPersister) {
@@ -44,7 +26,9 @@ public class CollectionPropertyMapping implements PropertyMapping {
 			return memberPersister.getElementType();
 		}
 		else if ( propertyName.equals(CollectionPropertyNames.COLLECTION_INDICES) ) {
-			if ( !memberPersister.hasIndex() ) throw new QueryException("unindexed collection before indices()");
+			if ( !memberPersister.hasIndex() ) {
+				throw new QueryException("unindexed collection before indices()");
+			}
 			return memberPersister.getIndexType();
 		}
 		else if ( propertyName.equals(CollectionPropertyNames.COLLECTION_SIZE) ) {
@@ -73,7 +57,9 @@ public class CollectionPropertyMapping implements PropertyMapping {
 			return memberPersister.getElementColumnNames(alias);
 		}
 		else if ( propertyName.equals(CollectionPropertyNames.COLLECTION_INDICES) ) {
-			if ( !memberPersister.hasIndex() ) throw new QueryException("unindexed collection in indices()");
+			if ( !memberPersister.hasIndex() ) {
+				throw new QueryException("unindexed collection in indices()");
+			}
 			return memberPersister.getIndexColumnNames(alias);
 		}
 		else if ( propertyName.equals(CollectionPropertyNames.COLLECTION_SIZE) ) {
@@ -81,25 +67,37 @@ public class CollectionPropertyMapping implements PropertyMapping {
 			return new String[] { "count(" + alias + '.' + cols[0] + ')' };
 		}
 		else if ( propertyName.equals(CollectionPropertyNames.COLLECTION_MAX_INDEX) ) {
-			if ( !memberPersister.hasIndex() ) throw new QueryException("unindexed collection in maxIndex()");
+			if ( !memberPersister.hasIndex() ) {
+				throw new QueryException("unindexed collection in maxIndex()");
+			}
 			String[] cols = memberPersister.getIndexColumnNames(alias);
-			if ( cols.length!=1 ) throw new QueryException("composite collection index in maxIndex()");
+			if ( cols.length!=1 ) {
+				throw new QueryException("composite collection index in maxIndex()");
+			}
 			return new String[] { "max(" + cols[0] + ')' };
 		}
 		else if ( propertyName.equals(CollectionPropertyNames.COLLECTION_MIN_INDEX) ) {
-			if ( !memberPersister.hasIndex() ) throw new QueryException("unindexed collection in minIndex()");
+			if ( !memberPersister.hasIndex() ) {
+				throw new QueryException("unindexed collection in minIndex()");
+			}
 			String[] cols = memberPersister.getIndexColumnNames(alias);
-			if ( cols.length!=1 ) throw new QueryException("composite collection index in minIndex()");
+			if ( cols.length!=1 ) {
+				throw new QueryException("composite collection index in minIndex()");
+			}
 			return new String[] { "min(" + cols[0] + ')' };
 		}
 		else if ( propertyName.equals(CollectionPropertyNames.COLLECTION_MAX_ELEMENT) ) {
 			String[] cols = memberPersister.getElementColumnNames(alias);
-			if ( cols.length!=1 ) throw new QueryException("composite collection element in maxElement()");
+			if ( cols.length!=1 ) {
+				throw new QueryException("composite collection element in maxElement()");
+			}
 			return new String[] { "max(" + cols[0] + ')' };
 		}
 		else if ( propertyName.equals(CollectionPropertyNames.COLLECTION_MIN_ELEMENT) ) {
 			String[] cols = memberPersister.getElementColumnNames(alias);
-			if ( cols.length!=1 ) throw new QueryException("composite collection element in minElement()");
+			if ( cols.length!=1 ) {
+				throw new QueryException("composite collection element in minElement()");
+			}
 			return new String[] { "min(" + cols[0] + ')' };
 		}
 		else {

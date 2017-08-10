@@ -1,30 +1,15 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.mapping;
+
 import org.hibernate.FetchMode;
 import org.hibernate.MappingException;
-import org.hibernate.cfg.Mappings;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.spi.Mapping;
 import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.type.Type;
@@ -34,7 +19,6 @@ import org.hibernate.type.Type;
  * @author Gavin King
  */
 public abstract class ToOne extends SimpleValue implements Fetchable {
-
 	private FetchMode fetchMode;
 	protected String referencedPropertyName;
 	private String referencedEntityName;
@@ -43,8 +27,8 @@ public abstract class ToOne extends SimpleValue implements Fetchable {
 	protected boolean unwrapProxy;
 	protected boolean referenceToPrimaryKey = true;
 
-	protected ToOne(Mappings mappings, Table table) {
-		super( mappings, table );
+	protected ToOne(MetadataImplementor metadata, Table table) {
+		super( metadata, table );
 	}
 
 	public FetchMode getFetchMode() {
@@ -75,10 +59,12 @@ public abstract class ToOne extends SimpleValue implements Fetchable {
 				null : referencedEntityName.intern();
 	}
 
-	public void setTypeUsingReflection(String className, String propertyName)
-	throws MappingException {
-		if (referencedEntityName==null) {
-			referencedEntityName = ReflectHelper.reflectedPropertyClass( className, propertyName ).getName();
+	public void setTypeUsingReflection(String className, String propertyName) throws MappingException {
+		if (referencedEntityName == null) {
+			final ClassLoaderService cls = getMetadata().getMetadataBuildingOptions()
+					.getServiceRegistry()
+					.getService( ClassLoaderService.class );
+			referencedEntityName = ReflectHelper.reflectedPropertyClass( className, propertyName, cls ).getName();
 		}
 	}
 
@@ -88,24 +74,6 @@ public abstract class ToOne extends SimpleValue implements Fetchable {
 	
 	public Object accept(ValueVisitor visitor) {
 		return visitor.accept(this);
-	}
-
-	/**
-	 * @deprecated To be removed in 5.  Removed as part of removing the notion of DOM entity-mode.
-	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
-	 */
-	@Deprecated
-	public boolean isEmbedded() {
-		return embedded;
-	}
-
-	/**
-	 * @deprecated To be removed in 5.  Removed as part of removing the notion of DOM entity-mode.
-	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
-	 */
-	@Deprecated
-	public void setEmbedded(boolean embedded) {
-		this.embedded = embedded;
 	}
 
 	public boolean isValid(Mapping mapping) throws MappingException {

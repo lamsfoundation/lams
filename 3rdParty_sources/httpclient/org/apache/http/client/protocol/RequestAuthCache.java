@@ -43,10 +43,9 @@ import org.apache.http.auth.AuthState;
 import org.apache.http.auth.Credentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.protocol.ExecutionContext;
+import org.apache.http.conn.routing.RouteInfo;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.Args;
 
 /**
  * Request interceptor that can preemptively authenticate against known hosts,
@@ -64,49 +63,57 @@ public class RequestAuthCache implements HttpRequestInterceptor {
         super();
     }
 
+    @Override
     public void process(final HttpRequest request, final HttpContext context)
             throws HttpException, IOException {
-        if (request == null) {
-            throw new IllegalArgumentException("HTTP request may not be null");
-        }
-        if (context == null) {
-            throw new IllegalArgumentException("HTTP context may not be null");
-        }
+        Args.notNull(request, "HTTP request");
+        Args.notNull(context, "HTTP context");
 
-        AuthCache authCache = (AuthCache) context.getAttribute(ClientContext.AUTH_CACHE);
+        final HttpClientContext clientContext = HttpClientContext.adapt(context);
+
+        final AuthCache authCache = clientContext.getAuthCache();
         if (authCache == null) {
             this.log.debug("Auth cache not set in the context");
             return;
         }
 
-        CredentialsProvider credsProvider = (CredentialsProvider) context.getAttribute(
-                ClientContext.CREDS_PROVIDER);
+        final CredentialsProvider credsProvider = clientContext.getCredentialsProvider();
         if (credsProvider == null) {
             this.log.debug("Credentials provider not set in the context");
             return;
         }
 
-        HttpHost target = (HttpHost) context.getAttribute(ExecutionContext.HTTP_TARGET_HOST);
-        if (target.getPort() < 0) {
-            SchemeRegistry schemeRegistry = (SchemeRegistry) context.getAttribute(
-                    ClientContext.SCHEME_REGISTRY);
-            Scheme scheme = schemeRegistry.getScheme(target);
-            target = new HttpHost(target.getHostName(),
-                    scheme.resolvePort(target.getPort()), target.getSchemeName());
+        final RouteInfo route = clientContext.getHttpRoute();
+        if (route == null) {
+            this.log.debug("Route info not set in the context");
+            return;
         }
 
-        AuthState targetState = (AuthState) context.getAttribute(ClientContext.TARGET_AUTH_STATE);
-        if (target != null && targetState != null && targetState.getState() == AuthProtocolState.UNCHALLENGED) {
-            AuthScheme authScheme = authCache.get(target);
+        HttpHost target = clientContext.getTargetHost();
+        if (target == null) {
+            this.log.debug("Target host not set in the context");
+            return;
+        }
+
+        if (target.getPort() < 0) {
+            target = new HttpHost(
+                    target.getHostName(),
+                    route.getTargetHost().getPort(),
+                    target.getSchemeName());
+        }
+
+        final AuthState targetState = clientContext.getTargetAuthState();
+        if (targetState != null && targetState.getState() == AuthProtocolState.UNCHALLENGED) {
+            final AuthScheme authScheme = authCache.get(target);
             if (authScheme != null) {
                 doPreemptiveAuth(target, authScheme, targetState, credsProvider);
             }
         }
 
-        HttpHost proxy = (HttpHost) context.getAttribute(ExecutionContext.HTTP_PROXY_HOST);
-        AuthState proxyState = (AuthState) context.getAttribute(ClientContext.PROXY_AUTH_STATE);
+        final HttpHost proxy = route.getProxyHost();
+        final AuthState proxyState = clientContext.getProxyAuthState();
         if (proxy != null && proxyState != null && proxyState.getState() == AuthProtocolState.UNCHALLENGED) {
-            AuthScheme authScheme = authCache.get(proxy);
+            final AuthScheme authScheme = authCache.get(proxy);
             if (authScheme != null) {
                 doPreemptiveAuth(proxy, authScheme, proxyState, credsProvider);
             }
@@ -118,16 +125,20 @@ public class RequestAuthCache implements HttpRequestInterceptor {
             final AuthScheme authScheme,
             final AuthState authState,
             final CredentialsProvider credsProvider) {
-        String schemeName = authScheme.getSchemeName();
+        final String schemeName = authScheme.getSchemeName();
         if (this.log.isDebugEnabled()) {
             this.log.debug("Re-using cached '" + schemeName + "' auth scheme for " + host);
         }
 
-        AuthScope authScope = new AuthScope(host, AuthScope.ANY_REALM, schemeName);
-        Credentials creds = credsProvider.getCredentials(authScope);
+        final AuthScope authScope = new AuthScope(host, AuthScope.ANY_REALM, schemeName);
+        final Credentials creds = credsProvider.getCredentials(authScope);
 
         if (creds != null) {
-            authState.setState(AuthProtocolState.SUCCESS);
+            if ("BASIC".equalsIgnoreCase(authScheme.getSchemeName())) {
+                authState.setState(AuthProtocolState.CHALLENGED);
+            } else {
+                authState.setState(AuthProtocolState.SUCCESS);
+            }
             authState.update(authScheme, creds);
         } else {
             this.log.debug("No credentials for preemptive authentication");

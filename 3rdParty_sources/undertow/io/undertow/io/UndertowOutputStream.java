@@ -27,8 +27,8 @@ import io.undertow.UndertowMessages;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import org.xnio.Buffers;
-import org.xnio.Pool;
-import org.xnio.Pooled;
+import io.undertow.connector.ByteBufferPool;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.channels.Channels;
 import org.xnio.channels.StreamSinkChannel;
 
@@ -37,7 +37,7 @@ import static org.xnio.Bits.anyAreSet;
 
 /**
  * Buffering output stream that wraps a channel.
- * <p/>
+ * <p>
  * This stream delays channel creation, so if a response will fit in the buffer it is not necessary to
  * set the content length header.
  *
@@ -47,7 +47,7 @@ public class UndertowOutputStream extends OutputStream implements BufferWritable
 
     private final HttpServerExchange exchange;
     private ByteBuffer buffer;
-    private Pooled<ByteBuffer> pooledBuffer;
+    private PooledByteBuffer pooledBuffer;
     private StreamSinkChannel channel;
     private int state;
     private int written;
@@ -67,6 +67,26 @@ public class UndertowOutputStream extends OutputStream implements BufferWritable
         this.exchange = exchange;
         this.contentLength = exchange.getResponseContentLength();
     }
+
+
+    /**
+     * If the response has not yet been written to the client this method will clear the streams buffer,
+     * invalidating any content that has already been written. If any content has already been sent to the client then
+     * this method will throw and IllegalStateException
+     *
+     * @throws java.lang.IllegalStateException If the response has been commited
+     */
+    public void resetBuffer() {
+        if(anyAreSet(state, FLAG_WRITE_STARTED)) {
+            throw UndertowMessages.MESSAGES.cannotResetBuffer();
+        }
+        if(pooledBuffer != null) {
+            pooledBuffer.close();
+            pooledBuffer = null;
+        }
+
+    }
+
 
     /**
      * {@inheritDoc}
@@ -89,6 +109,9 @@ public class UndertowOutputStream extends OutputStream implements BufferWritable
         if (len < 1) {
             return;
         }
+        if(Thread.currentThread() == exchange.getIoThread()) {
+            throw UndertowMessages.MESSAGES.blockingIoFromIOThread();
+        }
         if (anyAreSet(state, FLAG_CLOSED)) {
             throw UndertowMessages.MESSAGES.streamIsClosed();
         }
@@ -106,9 +129,9 @@ public class UndertowOutputStream extends OutputStream implements BufferWritable
                 if (channel == null) {
                     this.channel = channel = exchange.getResponseChannel();
                 }
-                final Pool<ByteBuffer> bufferPool = exchange.getConnection().getBufferPool();
+                final ByteBufferPool bufferPool = exchange.getConnection().getByteBufferPool();
                 ByteBuffer[] buffers = new ByteBuffer[MAX_BUFFERS_TO_ALLOCATE + 1];
-                Pooled[] pooledBuffers = new Pooled[MAX_BUFFERS_TO_ALLOCATE];
+                PooledByteBuffer[] pooledBuffers = new PooledByteBuffer[MAX_BUFFERS_TO_ALLOCATE];
                 try {
                     buffers[0] = buffer;
                     int bytesWritten = 0;
@@ -118,10 +141,10 @@ public class UndertowOutputStream extends OutputStream implements BufferWritable
                     bytesWritten += rem;
                     int bufferCount = 1;
                     for (int i = 0; i < MAX_BUFFERS_TO_ALLOCATE; ++i) {
-                        Pooled<ByteBuffer> pooled = bufferPool.allocate();
+                        PooledByteBuffer pooled = bufferPool.allocate();
                         pooledBuffers[bufferCount - 1] = pooled;
-                        buffers[bufferCount++] = pooled.getResource();
-                        ByteBuffer cb = pooled.getResource();
+                        buffers[bufferCount++] = pooled.getBuffer();
+                        ByteBuffer cb = pooled.getBuffer();
                         int toWrite = len - bytesWritten;
                         if (toWrite > cb.remaining()) {
                             rem = cb.remaining();
@@ -161,11 +184,11 @@ public class UndertowOutputStream extends OutputStream implements BufferWritable
                     buffer.clear();
                 } finally {
                     for (int i = 0; i < pooledBuffers.length; ++i) {
-                        Pooled p = pooledBuffers[i];
+                        PooledByteBuffer p = pooledBuffers[i];
                         if (p == null) {
                             break;
                         }
-                        p.free();
+                        p.close();
                     }
                 }
             } else {
@@ -321,7 +344,7 @@ public class UndertowOutputStream extends OutputStream implements BufferWritable
             Channels.flushBlocking(channel);
         } finally {
             if (pooledBuffer != null) {
-                pooledBuffer.free();
+                pooledBuffer.close();
                 buffer = null;
             } else {
                 buffer = null;
@@ -334,8 +357,8 @@ public class UndertowOutputStream extends OutputStream implements BufferWritable
         if (buffer != null) {
             return buffer;
         }
-        this.pooledBuffer = exchange.getConnection().getBufferPool().allocate();
-        this.buffer = pooledBuffer.getResource();
+        this.pooledBuffer = exchange.getConnection().getByteBufferPool().allocate();
+        this.buffer = pooledBuffer.getBuffer();
         return this.buffer;
     }
 

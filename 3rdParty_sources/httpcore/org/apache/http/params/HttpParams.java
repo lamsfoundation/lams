@@ -42,10 +42,12 @@ package org.apache.http.params;
  * In the simplest form one set of parameters can use content of another one
  * to obtain default values of parameters not present in the local set.
  *
- * @see DefaultedHttpParams
- *
  * @since 4.0
+ *
+ * @deprecated (4.3) use configuration classes provided 'org.apache.http.config'
+ *  and 'org.apache.http.client.config'
  */
+@Deprecated
 public interface HttpParams {
 
     /**
@@ -54,8 +56,8 @@ public interface HttpParams {
      * @param name the parent name.
      *
      * @return  an object that represents the value of the parameter,
-     *          <code>null</code> if the parameter is not set or if it
-     *          is explicitly set to <code>null</code>
+     *          {@code null} if the parameter is not set or if it
+     *          is explicitly set to {@code null}
      *
      * @see #setParameter(String, Object)
      */
@@ -73,10 +75,7 @@ public interface HttpParams {
      * Creates a copy of these parameters.
      *
      * @return  a new set of parameters holding the same values as this one
-     *
-     * @deprecated (4.1)
      */
-    @Deprecated
     HttpParams copy();
 
     /**
@@ -173,23 +172,23 @@ public interface HttpParams {
     HttpParams setBooleanParameter(String name, boolean value);
 
     /**
-     * Checks if a boolean parameter is set to <code>true</code>.
+     * Checks if a boolean parameter is set to {@code true}.
      *
      * @param name parameter name
      *
-     * @return <tt>true</tt> if the parameter is set to value <tt>true</tt>,
-     *         <tt>false</tt> if it is not set or set to <code>false</code>
+     * @return {@code true} if the parameter is set to value {@code true},
+     *         {@code false} if it is not set or set to {@code false}
      */
     boolean isParameterTrue(String name);
 
     /**
-     * Checks if a boolean parameter is not set or <code>false</code>.
+     * Checks if a boolean parameter is not set or {@code false}.
      *
      * @param name parameter name
      *
-     * @return <tt>true</tt> if the parameter is either not set or
-     *         set to value <tt>false</tt>,
-     *         <tt>false</tt> if it is set to <code>true</code>
+     * @return {@code true} if the parameter is either not set or
+     *         set to value {@code false},
+     *         {@code false} if it is set to {@code true}
      */
     boolean isParameterFalse(String name);
 

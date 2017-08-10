@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.spi;
 
@@ -71,6 +54,7 @@ public class ExecutableList<E extends Executable & Comparable & Serializable> im
 	private final ArrayList<E> executables;
 
 	private final Sorter<E> sorter;
+	private final boolean requiresSorting;
 	private boolean sorted;
 
 	/**
@@ -94,7 +78,20 @@ public class ExecutableList<E extends Executable & Comparable & Serializable> im
 	 * @param initialCapacity The initial capacity for instantiating the internal List
 	 */
 	public ExecutableList(int initialCapacity) {
-		this( initialCapacity, null );
+		// pass true for requiresSorting argument to maintain original behavior
+		this( initialCapacity, true );
+	}
+
+	public ExecutableList(boolean requiresSorting) {
+		this( INIT_QUEUE_LIST_SIZE, requiresSorting );
+	}
+
+	public ExecutableList(int initialCapacity, boolean requiresSorting) {
+		this.sorter = null;
+		this.executables = new ArrayList<E>( initialCapacity );
+		this.querySpaces = null;
+		this.requiresSorting = requiresSorting;
+		this.sorted = requiresSorting;
 	}
 
 	/**
@@ -115,7 +112,9 @@ public class ExecutableList<E extends Executable & Comparable & Serializable> im
 	public ExecutableList(int initialCapacity, ExecutableList.Sorter<E> sorter) {
 		this.sorter = sorter;
 		this.executables = new ArrayList<E>( initialCapacity );
-		this.querySpaces = new HashSet<Serializable>();
+		this.querySpaces = null;
+		// require sorting by default, even if sorter is null to maintain original behavior
+		this.requiresSorting = true;
 		this.sorted = true;
 	}
 
@@ -126,12 +125,17 @@ public class ExecutableList<E extends Executable & Comparable & Serializable> im
 	 */
 	public Set<Serializable> getQuerySpaces() {
 		if ( querySpaces == null ) {
-			querySpaces = new HashSet<Serializable>();
 			for ( E e : executables ) {
 				Serializable[] propertySpaces = e.getPropertySpaces();
-				if ( querySpaces != null && propertySpaces != null ) {
+				if ( propertySpaces != null && propertySpaces.length > 0 ) {
+					if( querySpaces == null ) {
+						querySpaces = new HashSet<Serializable>();
+					}
 					Collections.addAll( querySpaces, propertySpaces );
 				}
+			}
+			if( querySpaces == null ) {
+				return Collections.emptySet();
 			}
 		}
 		return querySpaces;
@@ -174,7 +178,7 @@ public class ExecutableList<E extends Executable & Comparable & Serializable> im
 	public void clear() {
 		executables.clear();
 		querySpaces = null;
-		sorted = true;
+		sorted = requiresSorting;
 	}
 
 	/**
@@ -211,16 +215,18 @@ public class ExecutableList<E extends Executable & Comparable & Serializable> im
 			return false;
 		}
 
-		// see if the addition invalidated the sorting
-		if ( sorter != null ) {
-			// we don't have intrinsic insight into the sorter's algorithm, so invalidate sorting
-			sorted = false;
-		}
-		else {
-			// otherwise, we added to the end of the list.  So check the comparison between the incoming
-			// executable and the one previously at the end of the list using the Comparable contract
-			if ( previousLast != null && previousLast.compareTo( executable ) > 0 ) {
+		// if it was sorted before the addition, then check if the addition invalidated the sorting
+		if ( sorted ) {
+			if ( sorter != null ) {
+				// we don't have intrinsic insight into the sorter's algorithm, so invalidate sorting
 				sorted = false;
+			}
+			else {
+				// otherwise, we added to the end of the list.  So check the comparison between the incoming
+				// executable and the one previously at the end of the list using the Comparable contract
+				if ( previousLast != null && previousLast.compareTo( executable ) > 0 ) {
+					sorted = false;
+				}
 			}
 		}
 
@@ -237,7 +243,8 @@ public class ExecutableList<E extends Executable & Comparable & Serializable> im
 	 */
 	@SuppressWarnings("unchecked")
 	public void sort() {
-		if ( sorted ) {
+		if ( sorted || !requiresSorting ) {
+			// nothing to do
 			return;
 		}
 
@@ -343,6 +350,10 @@ public class ExecutableList<E extends Executable & Comparable & Serializable> im
 		for ( E e : executables ) {
 			e.afterDeserialize( session );
 		}
+	}
+
+	public String toString() {
+		return "ExecutableList{size=" + executables.size() + "}";
 	}
 
 }

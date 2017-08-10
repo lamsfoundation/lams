@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cfg.beanvalidation;
 
@@ -28,12 +11,12 @@ import java.lang.reflect.Method;
 import java.util.Set;
 
 import org.hibernate.HibernateException;
+import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
-import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.metamodel.source.MetadataImplementor;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 
 import org.jboss.logging.Logger;
@@ -100,11 +83,12 @@ public class BeanValidationIntegrator implements Integrator {
 
 	@Override
 	public void integrate(
-			final Configuration configuration,
+			final Metadata metadata,
 			final SessionFactoryImplementor sessionFactory,
 			final SessionFactoryServiceRegistry serviceRegistry) {
+		final ConfigurationService cfgService = serviceRegistry.getService( ConfigurationService.class );
 		// IMPL NOTE : see the comments on ActivationContext.getValidationModes() as to why this is multi-valued...
-		final Set<ValidationMode> modes = ValidationMode.getModes( configuration.getProperties().get( MODE_PROPERTY ) );
+		final Set<ValidationMode> modes = ValidationMode.getModes( cfgService.getSettings().get( MODE_PROPERTY ) );
 		if ( modes.size() > 1 ) {
 			LOG.multipleValidationModes( ValidationMode.loggable( modes ) );
 		}
@@ -129,8 +113,8 @@ public class BeanValidationIntegrator implements Integrator {
 					}
 
 					@Override
-					public Configuration getConfiguration() {
-						return configuration;
+					public Metadata getMetadata() {
+						return metadata;
 					}
 
 					@Override
@@ -199,15 +183,6 @@ public class BeanValidationIntegrator implements Integrator {
 		catch (Exception e) {
 			throw new HibernateException( "Unable to load TypeSafeActivator class", e );
 		}
-	}
-
-
-
-	@Override
-	public void integrate(
-			MetadataImplementor metadata,
-			SessionFactoryImplementor sessionFactory,
-			SessionFactoryServiceRegistry serviceRegistry ) {
 	}
 
 	@Override

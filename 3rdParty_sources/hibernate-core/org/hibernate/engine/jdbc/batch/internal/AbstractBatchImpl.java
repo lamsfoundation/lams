@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.jdbc.batch.internal;
 
@@ -28,6 +11,8 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
+import org.jboss.logging.Logger;
+
 import org.hibernate.engine.jdbc.batch.spi.Batch;
 import org.hibernate.engine.jdbc.batch.spi.BatchKey;
 import org.hibernate.engine.jdbc.batch.spi.BatchObserver;
@@ -35,10 +20,7 @@ import org.hibernate.engine.jdbc.spi.JdbcCoordinator;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.hibernate.engine.jdbc.spi.SqlStatementLogger;
-import org.hibernate.engine.transaction.spi.TransactionContext;
 import org.hibernate.internal.CoreMessageLogger;
-
-import org.jboss.logging.Logger;
 
 /**
  * Convenience base class for implementers of the Batch interface.
@@ -55,7 +37,6 @@ public abstract class AbstractBatchImpl implements Batch {
 	private final BatchKey key;
 	private final JdbcCoordinator jdbcCoordinator;
 
-	private final TransactionContext transactionContext;
 	private final SqlStatementLogger sqlStatementLogger;
 	private final SqlExceptionHelper sqlExceptionHelper;
 
@@ -72,23 +53,26 @@ public abstract class AbstractBatchImpl implements Batch {
 		this.key = key;
 		this.jdbcCoordinator = jdbcCoordinator;
 
-		this.transactionContext = jdbcCoordinator.getTransactionCoordinator().getTransactionContext();
-		final JdbcServices jdbcServices = transactionContext.getTransactionEnvironment().getJdbcServices();
+		final JdbcServices jdbcServices = jdbcCoordinator.getJdbcSessionOwner()
+				.getJdbcSessionContext()
+				.getServiceRegistry()
+				.getService( JdbcServices.class );
+
 		this.sqlStatementLogger = jdbcServices.getSqlStatementLogger();
 		this.sqlExceptionHelper = jdbcServices.getSqlExceptionHelper();
 	}
 
+	protected JdbcCoordinator getJdbcCoordinator(){
+		return this.jdbcCoordinator;
+	}
+
 	/**
-	 * Perform batch execution.
+	 * Perform batch execution..
 	 * <p/>
 	 * This is called from the explicit {@link #execute() execution}, but may also be called from elsewhere
 	 * depending on the exact implementation.
 	 */
 	protected abstract void doExecuteBatch();
-
-	public TransactionContext transactionContext() {
-		return transactionContext;
-	}
 
 	/**
 	 * Convenience access to the SQLException helper.
@@ -170,7 +154,8 @@ public abstract class AbstractBatchImpl implements Batch {
 	protected void releaseStatements() {
 		for ( PreparedStatement statement : getStatements().values() ) {
 			clearBatch( statement );
-			jdbcCoordinator.release( statement );
+			jdbcCoordinator.getResourceRegistry().release( statement );
+			jdbcCoordinator.afterStatementExecution();
 		}
 		getStatements().clear();
 	}

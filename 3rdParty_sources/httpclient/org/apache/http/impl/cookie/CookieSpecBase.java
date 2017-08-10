@@ -28,26 +28,45 @@
 package org.apache.http.impl.cookie;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.http.annotation.NotThreadSafe;
-
 import org.apache.http.HeaderElement;
 import org.apache.http.NameValuePair;
+import org.apache.http.annotation.ThreadSafe;
+import org.apache.http.cookie.CommonCookieAttributeHandler;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.cookie.CookieAttributeHandler;
 import org.apache.http.cookie.CookieOrigin;
 import org.apache.http.cookie.MalformedCookieException;
+import org.apache.http.util.Args;
 
 /**
  * Cookie management functions shared by all specification.
  *
- *
  * @since 4.0
  */
-@NotThreadSafe // AbstractCookieSpec is not thread-safe
+@ThreadSafe
 public abstract class CookieSpecBase extends AbstractCookieSpec {
+
+    public CookieSpecBase() {
+        super();
+    }
+
+    /**
+     * @since 4.4
+     */
+    protected CookieSpecBase(final HashMap<String, CookieAttributeHandler> map) {
+        super(map);
+    }
+
+    /**
+     * @since 4.4
+     */
+    protected CookieSpecBase(final CommonCookieAttributeHandler... handlers) {
+        super(handlers);
+    }
 
     protected static String getDefaultPath(final CookieOrigin origin) {
         String defaultPath = origin.getPath();
@@ -68,27 +87,27 @@ public abstract class CookieSpecBase extends AbstractCookieSpec {
 
     protected List<Cookie> parse(final HeaderElement[] elems, final CookieOrigin origin)
                 throws MalformedCookieException {
-        List<Cookie> cookies = new ArrayList<Cookie>(elems.length);
-        for (HeaderElement headerelement : elems) {
-            String name = headerelement.getName();
-            String value = headerelement.getValue();
-            if (name == null || name.length() == 0) {
+        final List<Cookie> cookies = new ArrayList<Cookie>(elems.length);
+        for (final HeaderElement headerelement : elems) {
+            final String name = headerelement.getName();
+            final String value = headerelement.getValue();
+            if (name == null || name.isEmpty()) {
                 throw new MalformedCookieException("Cookie name may not be empty");
             }
 
-            BasicClientCookie cookie = new BasicClientCookie(name, value);
+            final BasicClientCookie cookie = new BasicClientCookie(name, value);
             cookie.setPath(getDefaultPath(origin));
             cookie.setDomain(getDefaultDomain(origin));
 
             // cycle through the parameters
-            NameValuePair[] attribs = headerelement.getParameters();
+            final NameValuePair[] attribs = headerelement.getParameters();
             for (int j = attribs.length - 1; j >= 0; j--) {
-                NameValuePair attrib = attribs[j];
-                String s = attrib.getName().toLowerCase(Locale.ENGLISH);
+                final NameValuePair attrib = attribs[j];
+                final String s = attrib.getName().toLowerCase(Locale.ROOT);
 
                 cookie.setAttribute(s, attrib.getValue());
 
-                CookieAttributeHandler handler = findAttribHandler(s);
+                final CookieAttributeHandler handler = findAttribHandler(s);
                 if (handler != null) {
                     handler.parse(cookie, attrib.getValue());
                 }
@@ -98,27 +117,21 @@ public abstract class CookieSpecBase extends AbstractCookieSpec {
         return cookies;
     }
 
+    @Override
     public void validate(final Cookie cookie, final CookieOrigin origin)
             throws MalformedCookieException {
-        if (cookie == null) {
-            throw new IllegalArgumentException("Cookie may not be null");
-        }
-        if (origin == null) {
-            throw new IllegalArgumentException("Cookie origin may not be null");
-        }
-        for (CookieAttributeHandler handler: getAttribHandlers()) {
+        Args.notNull(cookie, "Cookie");
+        Args.notNull(origin, "Cookie origin");
+        for (final CookieAttributeHandler handler: getAttribHandlers()) {
             handler.validate(cookie, origin);
         }
     }
 
+    @Override
     public boolean match(final Cookie cookie, final CookieOrigin origin) {
-        if (cookie == null) {
-            throw new IllegalArgumentException("Cookie may not be null");
-        }
-        if (origin == null) {
-            throw new IllegalArgumentException("Cookie origin may not be null");
-        }
-        for (CookieAttributeHandler handler: getAttribHandlers()) {
+        Args.notNull(cookie, "Cookie");
+        Args.notNull(origin, "Cookie origin");
+        for (final CookieAttributeHandler handler: getAttribHandlers()) {
             if (!handler.match(cookie, origin)) {
                 return false;
             }

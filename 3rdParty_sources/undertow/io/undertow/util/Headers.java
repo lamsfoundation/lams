@@ -18,6 +18,14 @@
 
 package io.undertow.util;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * NOTE: if you add a new header here you must also add it to {@link io.undertow.server.protocol.http.HttpRequestParser}
  *
@@ -236,9 +244,38 @@ public final class Headers {
     public static final HttpString USERNAME = new HttpString("username");
 
 
+    private static final Map<String, HttpString> HTTP_STRING_MAP;
+
+    static {
+        Map<String, HttpString> map = AccessController.doPrivileged(new PrivilegedAction<Map<String, HttpString>>() {
+            @Override
+            public Map<String, HttpString> run() {
+                Map<String, HttpString> map = new HashMap<>();
+                Field[] fields = Headers.class.getDeclaredFields();
+                for(Field field : fields) {
+                    if(Modifier.isStatic(field.getModifiers()) && field.getType() == HttpString.class) {
+                        field.setAccessible(true);
+                        try {
+                            HttpString result = (HttpString) field.get(null);
+                            map.put(result.toString(), result);
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+                return map;
+            }
+        });
+        HTTP_STRING_MAP = Collections.unmodifiableMap(map);
+    }
+
+    public static HttpString fromCache(String string) {
+        return HTTP_STRING_MAP.get(string);
+    }
+
     /**
      * Extracts a token from a header that has a given key. For instance if the header is
-     * <p/>
+     * <p>
      * content-type=multipart/form-data boundary=myboundary
      * and the key is boundary the myboundary will be returned.
      *
@@ -264,7 +301,7 @@ public final class Headers {
 
     /**
      * Extracts a quoted value from a header that has a given key. For instance if the header is
-     * <p/>
+     * <p>
      * content-disposition=form-data; name="my field"
      * and the key is name then "my field" will be returned without the quotes.
      *
@@ -324,7 +361,7 @@ public final class Headers {
             //no quotes
             for (end = start; end < header.length(); ++end) {
                 char c = header.charAt(end);
-                if (c == ' ' || c == '\t') {
+                if (c == ' ' || c == '\t' || c == ';') {
                     break;
                 }
             }

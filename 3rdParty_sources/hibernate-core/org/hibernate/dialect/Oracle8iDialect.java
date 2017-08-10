@@ -1,33 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.dialect;
-
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.List;
 
 import org.hibernate.JDBCException;
 import org.hibernate.QueryTimeoutException;
@@ -38,12 +15,20 @@ import org.hibernate.dialect.function.NvlFunction;
 import org.hibernate.dialect.function.SQLFunctionTemplate;
 import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.dialect.function.VarArgsSQLFunction;
+import org.hibernate.dialect.pagination.AbstractLimitHandler;
+import org.hibernate.dialect.pagination.LimitHandler;
+import org.hibernate.dialect.pagination.LimitHelper;
+import org.hibernate.engine.spi.RowSelection;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.exception.spi.SQLExceptionConversionDelegate;
 import org.hibernate.exception.spi.TemplatedViolatedConstraintNameExtracter;
 import org.hibernate.exception.spi.ViolatedConstraintNameExtracter;
+import org.hibernate.hql.spi.id.IdTableSupportStandardImpl;
+import org.hibernate.hql.spi.id.MultiTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.global.GlobalTemporaryTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.local.AfterUseAction;
 import org.hibernate.internal.util.JdbcExceptionHelper;
 import org.hibernate.procedure.internal.StandardCallableStatementSupport;
 import org.hibernate.procedure.spi.CallableStatementSupport;
@@ -55,6 +40,13 @@ import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.descriptor.sql.BitTypeDescriptor;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.List;
+import java.util.Locale;
+
 /**
  * A dialect for Oracle 8i.
  *
@@ -62,6 +54,56 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
  */
 @SuppressWarnings("deprecation")
 public class Oracle8iDialect extends Dialect {
+
+	private static final AbstractLimitHandler LIMIT_HANDLER = new AbstractLimitHandler() {
+		@Override
+		public String processSql(String sql, RowSelection selection) {
+			final boolean hasOffset = LimitHelper.hasFirstRow( selection );
+			sql = sql.trim();
+			boolean isForUpdate = false;
+			if (sql.toLowerCase(Locale.ROOT).endsWith( " for update" )) {
+				sql = sql.substring( 0, sql.length() - 11 );
+				isForUpdate = true;
+			}
+
+			final StringBuilder pagingSelect = new StringBuilder( sql.length() + 100 );
+			if (hasOffset) {
+				pagingSelect.append( "select * from ( select row_.*, rownum rownum_ from ( " );
+			}
+			else {
+				pagingSelect.append( "select * from ( " );
+			}
+			pagingSelect.append( sql );
+			if (hasOffset) {
+				pagingSelect.append( " ) row_ ) where rownum_ <= ? and rownum_ > ?" );
+			}
+			else {
+				pagingSelect.append( " ) where rownum <= ?" );
+			}
+
+			if (isForUpdate) {
+				pagingSelect.append( " for update" );
+			}
+
+			return pagingSelect.toString();
+		}
+
+		@Override
+		public boolean supportsLimit() {
+			return true;
+		}
+
+		@Override
+		public boolean bindLimitParametersInReverseOrder() {
+			return true;
+		}
+
+		@Override
+		public boolean useMaxForLimit() {
+			return true;
+		}
+	};
+
 	private static final int PARAM_LIST_SIZE_LIMIT = 1000;
 
 	/**
@@ -212,6 +254,7 @@ public class Oracle8iDialect extends Dialect {
 		// be returned (via its RETURNING clause).  No other driver seems to
 		// support this overloaded version.
 		getDefaultProperties().setProperty( Environment.USE_GET_GENERATED_KEYS, "false" );
+		getDefaultProperties().setProperty( Environment.BATCH_VERSIONED_DATA, "false" );
 	}
 
 	@Override
@@ -244,10 +287,15 @@ public class Oracle8iDialect extends Dialect {
 	}
 
 	@Override
+	public LimitHandler getLimitHandler() {
+		return LIMIT_HANDLER;
+	}
+
+	@Override
 	public String getLimitString(String sql, boolean hasOffset) {
 		sql = sql.trim();
 		boolean isForUpdate = false;
-		if ( sql.toLowerCase().endsWith( " for update" ) ) {
+		if ( sql.toLowerCase(Locale.ROOT).endsWith( " for update" ) ) {
 			sql = sql.substring( 0, sql.length()-11 );
 			isForUpdate = true;
 		}
@@ -422,7 +470,8 @@ public class Oracle8iDialect extends Dialect {
 		 * @param sqle The exception that was the result of the constraint violation.
 		 * @return The extracted constraint name.
 		 */
-		public String extractConstraintName(SQLException sqle) {
+		@Override
+		protected String doExtractConstraintName(SQLException sqle) throws NumberFormatException {
 			final int errorCode = JdbcExceptionHelper.extractErrorCode( sqle );
 			if ( errorCode == 1 || errorCode == 2291 || errorCode == 2292 ) {
 				return extractUsingTemplate( "(", ")", sqle.getMessage() );
@@ -522,29 +571,27 @@ public class Oracle8iDialect extends Dialect {
 	}
 
 	@Override
-	public boolean supportsTemporaryTables() {
-		return true;
-	}
+	public MultiTableBulkIdStrategy getDefaultMultiTableBulkIdStrategy() {
+		return new GlobalTemporaryTableBulkIdStrategy(
+				new IdTableSupportStandardImpl() {
+					@Override
+					public String generateIdTableName(String baseName) {
+						final String name = super.generateIdTableName( baseName );
+						return name.length() > 30 ? name.substring( 0, 30 ) : name;
+					}
 
-	@Override
-	public String generateTemporaryTableName(String baseTableName) {
-		final String name = super.generateTemporaryTableName( baseTableName );
-		return name.length() > 30 ? name.substring( 0, 30 ) : name;
-	}
+					@Override
+					public String getCreateIdTableCommand() {
+						return "create global temporary table";
+					}
 
-	@Override
-	public String getCreateTemporaryTableString() {
-		return "create global temporary table";
-	}
-
-	@Override
-	public String getCreateTemporaryTablePostfix() {
-		return "on commit delete rows";
-	}
-
-	@Override
-	public boolean dropTemporaryTableAfterUse() {
-		return false;
+					@Override
+					public String getCreateIdTableStatementOptions() {
+						return "on commit delete rows";
+					}
+				},
+				AfterUseAction.CLEAN
+		);
 	}
 
 	@Override
@@ -619,5 +666,10 @@ public class Oracle8iDialect extends Dialect {
 	public CallableStatementSupport getCallableStatementSupport() {
 		// Oracle supports returning cursors
 		return StandardCallableStatementSupport.REF_CURSOR_INSTANCE;
+	}
+
+	@Override
+	public boolean canCreateSchema() {
+		return false;
 	}
 }

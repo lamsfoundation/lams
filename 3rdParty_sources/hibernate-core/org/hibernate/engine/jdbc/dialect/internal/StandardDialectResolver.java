@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.jdbc.dialect.internal;
 
@@ -42,10 +25,13 @@ import org.hibernate.dialect.IngresDialect;
 import org.hibernate.dialect.MySQL5Dialect;
 import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.dialect.Oracle10gDialect;
+import org.hibernate.dialect.Oracle12cDialect;
 import org.hibernate.dialect.Oracle8iDialect;
 import org.hibernate.dialect.Oracle9iDialect;
 import org.hibernate.dialect.PostgreSQL81Dialect;
 import org.hibernate.dialect.PostgreSQL82Dialect;
+import org.hibernate.dialect.PostgreSQL92Dialect;
+import org.hibernate.dialect.PostgreSQL94Dialect;
 import org.hibernate.dialect.PostgreSQL9Dialect;
 import org.hibernate.dialect.PostgresPlusDialect;
 import org.hibernate.dialect.SQLServer2005Dialect;
@@ -103,9 +89,15 @@ public class StandardDialectResolver implements DialectResolver {
 			final int minorVersion = info.getDatabaseMinorVersion();
 
 			if ( majorVersion == 9 ) {
+				if ( minorVersion >= 4 ) {
+					return new PostgreSQL94Dialect();
+				}
+				else if ( minorVersion >= 2 ) {
+					return new PostgreSQL92Dialect();
+				}
 				return new PostgreSQL9Dialect();
 			}
-			
+
 			if ( majorVersion == 8 && minorVersion >= 2 ) {
 				return new PostgreSQL82Dialect();
 			}
@@ -196,7 +188,7 @@ public class StandardDialectResolver implements DialectResolver {
 
 			switch ( majorVersion ) {
 				case 12:
-					// fall through
+					return new Oracle12cDialect();
 				case 11:
 					// fall through
 				case 10:

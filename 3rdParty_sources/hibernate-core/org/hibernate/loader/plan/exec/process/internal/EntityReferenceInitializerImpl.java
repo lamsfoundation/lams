@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.loader.plan.exec.process.internal;
 
@@ -32,6 +15,7 @@ import org.hibernate.LockMode;
 import org.hibernate.StaleObjectStateException;
 import org.hibernate.WrongClassException;
 import org.hibernate.engine.internal.TwoPhaseLoad;
+import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.EntityUniqueKey;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -217,25 +201,23 @@ public class EntityReferenceInitializerImpl implements EntityReferenceInitialize
 		// Otherwise, we need to load it from the ResultSet...
 
 		// determine which entity instance to use.  Either the supplied one, or instantiate one
-		Object optionalEntityInstance = null;
-		if ( isReturn && context.shouldUseOptionalEntityInformation() ) {
+		Object entityInstance = null;
+		if ( isReturn &&
+				context.shouldUseOptionalEntityInformation() &&
+				context.getQueryParameters().getOptionalObject() != null ) {
 			final EntityKey optionalEntityKey = ResultSetProcessorHelper.getOptionalObjectKey(
 					context.getQueryParameters(),
 					context.getSession()
 			);
-			if ( optionalEntityKey != null ) {
-				if ( optionalEntityKey.equals( entityKey ) ) {
-					optionalEntityInstance = context.getQueryParameters().getOptionalObject();
-				}
+			if ( optionalEntityKey != null && optionalEntityKey.equals( entityKey ) ) {
+				entityInstance = context.getQueryParameters().getOptionalObject();
 			}
 		}
 
 		final String concreteEntityTypeName = getConcreteEntityTypeName( resultSet, context, entityKey );
-
-		final Object entityInstance = optionalEntityInstance != null
-				? optionalEntityInstance
-				: context.getSession().instantiate( concreteEntityTypeName, entityKey.getIdentifier() );
-
+		if ( entityInstance == null ) {
+			entityInstance = context.getSession().instantiate( concreteEntityTypeName, entityKey.getIdentifier() );
+		}
 		processingState.registerEntityInstance( entityInstance );
 
 		// need to hydrate it.
@@ -336,7 +318,7 @@ public class EntityReferenceInitializerImpl implements EntityReferenceInitialize
 			context.getProcessingState( entityReference ).registerHydratedState( values );
 		}
 		catch (SQLException e) {
-			throw context.getSession().getFactory().getJdbcServices().getSqlExceptionHelper().convert(
+			throw context.getSession().getFactory().getServiceRegistry().getService( JdbcServices.class ).getSqlExceptionHelper().convert(
 					e,
 					"Could not read entity state from ResultSet : " + entityKey
 			);
@@ -349,7 +331,7 @@ public class EntityReferenceInitializerImpl implements EntityReferenceInitialize
 					: null;
 		}
 		catch (SQLException e) {
-			throw context.getSession().getFactory().getJdbcServices().getSqlExceptionHelper().convert(
+			throw context.getSession().getFactory().getServiceRegistry().getService( JdbcServices.class ).getSqlExceptionHelper().convert(
 					e,
 					"Could not read entity row-id from ResultSet : " + entityKey
 			);
@@ -415,7 +397,7 @@ public class EntityReferenceInitializerImpl implements EntityReferenceInitialize
 			);
 		}
 		catch (SQLException e) {
-			throw context.getSession().getFactory().getJdbcServices().getSqlExceptionHelper().convert(
+			throw context.getSession().getFactory().getServiceRegistry().getService( JdbcServices.class ).getSqlExceptionHelper().convert(
 					e,
 					"Could not read discriminator value from ResultSet"
 			);
@@ -486,7 +468,7 @@ public class EntityReferenceInitializerImpl implements EntityReferenceInitialize
 				);
 			}
 			catch (SQLException e) {
-				throw session.getFactory().getJdbcServices().getSqlExceptionHelper().convert(
+				throw session.getFactory().getServiceRegistry().getService( JdbcServices.class ).getSqlExceptionHelper().convert(
 						e,
 						"Could not read version value from result set"
 				);

@@ -29,27 +29,22 @@ package org.apache.http.impl.io;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.http.io.EofSensor;
-import org.apache.http.io.SessionInputBuffer;
 import org.apache.http.params.HttpParams;
+import org.apache.http.util.Args;
 
 /**
- * {@link SessionInputBuffer} implementation bound to a {@link Socket}.
- * <p>
- * The following parameters can be used to customize the behavior of this
- * class:
- * <ul>
- *  <li>{@link org.apache.http.params.CoreProtocolPNames#HTTP_ELEMENT_CHARSET}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#MAX_LINE_LENGTH}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#MIN_CHUNK_LIMIT}</li>
- * </ul>
+ * {@link org.apache.http.io.SessionInputBuffer} implementation
+ * bound to a {@link Socket}.
  *
  * @since 4.0
+ *
+ * @deprecated (4.3) use {@link SessionInputBufferImpl}
  */
 @NotThreadSafe
+@Deprecated
 public class SocketInputBuffer extends AbstractSessionInputBuffer implements EofSensor {
 
     private final Socket socket;
@@ -61,47 +56,44 @@ public class SocketInputBuffer extends AbstractSessionInputBuffer implements Eof
      *
      * @param socket the socket to read data from.
      * @param buffersize the size of the internal buffer. If this number is less
-     *   than <code>0</code> it is set to the value of
+     *   than {@code 0} it is set to the value of
      *   {@link Socket#getReceiveBufferSize()}. If resultant number is less
-     *   than <code>1024</code> it is set to <code>1024</code>.
+     *   than {@code 1024} it is set to {@code 1024}.
      * @param params HTTP parameters.
      */
     public SocketInputBuffer(
             final Socket socket,
-            int buffersize,
+            final int buffersize,
             final HttpParams params) throws IOException {
         super();
-        if (socket == null) {
-            throw new IllegalArgumentException("Socket may not be null");
-        }
+        Args.notNull(socket, "Socket");
         this.socket = socket;
         this.eof = false;
-        if (buffersize < 0) {
-            buffersize = socket.getReceiveBufferSize();
+        int n = buffersize;
+        if (n < 0) {
+            n = socket.getReceiveBufferSize();
         }
-        if (buffersize < 1024) {
-            buffersize = 1024;
+        if (n < 1024) {
+            n = 1024;
         }
-        init(socket.getInputStream(), buffersize, params);
+        init(socket.getInputStream(), n, params);
     }
 
     @Override
     protected int fillBuffer() throws IOException {
-        int i = super.fillBuffer();
+        final int i = super.fillBuffer();
         this.eof = i == -1;
         return i;
     }
 
-    public boolean isDataAvailable(int timeout) throws IOException {
+    public boolean isDataAvailable(final int timeout) throws IOException {
         boolean result = hasBufferedData();
         if (!result) {
-            int oldtimeout = this.socket.getSoTimeout();
+            final int oldtimeout = this.socket.getSoTimeout();
             try {
                 this.socket.setSoTimeout(timeout);
                 fillBuffer();
                 result = hasBufferedData();
-            } catch (SocketTimeoutException ex) {
-                throw ex;
             } finally {
                 socket.setSoTimeout(oldtimeout);
             }

@@ -20,19 +20,18 @@ package io.undertow.client;
 
 import org.xnio.ChannelListener;
 import org.xnio.Option;
-import org.xnio.Pool;
+import io.undertow.connector.ByteBufferPool;
 import org.xnio.StreamConnection;
 import org.xnio.XnioIoThread;
 import org.xnio.XnioWorker;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.Channel;
 
 /**
  * A client connection. This can be used to send requests, or to upgrade the connection.
- * <p/>
+ * <p>
  * In general these objects are not thread safe, they should only be used by the IO thread
  * that is responsible for the connection. As a result this client does not provide a mechanism
  * to perform blocking IO, it is designed for async operation only.
@@ -43,15 +42,17 @@ public interface ClientConnection extends Channel {
 
     /**
      * Sends a client request. The request object should not be modified after it has been submitted to the connection.
-     * <p/>
+     * <p>
      * Request objects can be queued. Once the request is in a state that it is ready to be sent the {@code clientCallback}
      * is invoked to provide the caller with the {@link ClientExchange}
-     * <p/>
+     * <p>
+     * If {@link #isMultiplexingSupported()} returns true then multiple requests may be active at the same time, and a later
+     * request may complete before an earlier one.
+     * <p>
      * Note that the request header may not be written out until after the callback has been invoked. This allows the
      * client to write out a header with a gathering write if the request contains content.
      *
      * @param request The request to send.
-     * @return The resulting client exchange, that can be used to send the request body and read the response
      */
     void sendRequest(final ClientRequest request, final ClientCallback<ClientExchange> clientCallback);
 
@@ -63,7 +64,11 @@ public interface ClientConnection extends Channel {
      */
     StreamConnection performUpgrade() throws IOException;
 
-    Pool<ByteBuffer> getBufferPool();
+    /**
+     *
+     * @return The buffer pool used by the client
+     */
+    ByteBufferPool getBufferPool();
 
     SocketAddress getPeerAddress();
 
@@ -88,4 +93,31 @@ public interface ClientConnection extends Channel {
     <T> T setOption(Option<T> option, T value) throws IllegalArgumentException, IOException;
 
     boolean isUpgraded();
+
+    /**
+     *
+     * @return <code>true</code> if this connection support server push
+     */
+    boolean isPushSupported();
+
+    /**
+     *
+     * @return <code>true</code> if this client supports multiplexing
+     */
+    boolean isMultiplexingSupported();
+
+    /**
+     *
+     * @return the statistics information, or <code>null</code> if statistics are not supported or disabled
+     */
+    ClientStatistics getStatistics();
+
+    boolean isUpgradeSupported();
+
+    /**
+     * Adds a close listener, than will be invoked with the connection is closed
+     *
+     * @param listener The close listener
+     */
+    void addCloseListener(ChannelListener<ClientConnection> listener);
 }

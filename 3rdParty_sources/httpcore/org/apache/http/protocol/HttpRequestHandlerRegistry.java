@@ -30,15 +30,16 @@ package org.apache.http.protocol;
 import java.util.Map;
 
 import org.apache.http.annotation.ThreadSafe;
+import org.apache.http.util.Args;
 
 /**
  * Maintains a map of HTTP request handlers keyed by a request URI pattern.
  * <br>
  * Patterns may have three formats:
  * <ul>
- *   <li><code>*</code></li>
- *   <li><code>*&lt;uri&gt;</code></li>
- *   <li><code>&lt;uri&gt;*</code></li>
+ *   <li>{@code *}</li>
+ *   <li>{@code *&lt;uri&gt;}</li>
+ *   <li>{@code &lt;uri&gt;*}</li>
  * </ul>
  * <br>
  * This class can be used to resolve an instance of
@@ -47,8 +48,10 @@ import org.apache.http.annotation.ThreadSafe;
  * specified request URI.
  *
  * @since 4.0
+ * @deprecated (4.3) use {@link UriHttpRequestHandlerMapper}
  */
 @ThreadSafe // provided injected dependencies are thread-safe
+@Deprecated
 public class HttpRequestHandlerRegistry implements HttpRequestHandlerResolver {
 
     private final UriPatternMatcher<HttpRequestHandler> matcher;
@@ -65,12 +68,8 @@ public class HttpRequestHandlerRegistry implements HttpRequestHandlerResolver {
      * @param handler the handler.
      */
     public void register(final String pattern, final HttpRequestHandler handler) {
-        if (pattern == null) {
-            throw new IllegalArgumentException("URI request pattern may not be null");
-        }
-        if (handler == null) {
-            throw new IllegalArgumentException("Request handler may not be null");
-        }
+        Args.notNull(pattern, "URI request pattern");
+        Args.notNull(handler, "Request handler");
         matcher.register(pattern, handler);
     }
 

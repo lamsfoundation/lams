@@ -33,6 +33,8 @@ import java.util.NoSuchElementException;
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
 import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.util.Args;
+import org.apache.http.util.Asserts;
 
 /**
  * Implementation of a {@link HeaderIterator} based on a {@link List}.
@@ -66,7 +68,7 @@ public class BasicListHeaderIterator implements HeaderIterator {
 
     /**
      * The header name to filter by.
-     * <code>null</code> to iterate over all headers in the array.
+     * {@code null} to iterate over all headers in the array.
      */
     protected String headerName;
 
@@ -77,15 +79,11 @@ public class BasicListHeaderIterator implements HeaderIterator {
      *
      * @param headers   a list of headers over which to iterate
      * @param name      the name of the headers over which to iterate, or
-     *                  <code>null</code> for any
+     *                  {@code null} for any
      */
-    public BasicListHeaderIterator(List<Header> headers, String name) {
-        if (headers == null) {
-            throw new IllegalArgumentException
-                ("Header list must not be null.");
-        }
-
-        this.allHeaders = headers;
+    public BasicListHeaderIterator(final List<Header> headers, final String name) {
+        super();
+        this.allHeaders = Args.notNull(headers, "Header list");
         this.headerName = name;
         this.currentIndex = findNext(-1);
         this.lastIndex = -1;
@@ -95,15 +93,17 @@ public class BasicListHeaderIterator implements HeaderIterator {
     /**
      * Determines the index of the next header.
      *
-     * @param from      one less than the index to consider first,
+     * @param pos       one less than the index to consider first,
      *                  -1 to search for the first header
      *
      * @return  the index of the next header that matches the filter name,
      *          or negative if there are no more headers
      */
-    protected int findNext(int from) {
-        if (from < -1)
+    protected int findNext(final int pos) {
+        int from = pos;
+        if (from < -1) {
             return -1;
+        }
 
         final int to = this.allHeaders.size()-1;
         boolean found = false;
@@ -120,12 +120,13 @@ public class BasicListHeaderIterator implements HeaderIterator {
      *
      * @param index     the index of the header to check
      *
-     * @return  <code>true</code> if the header should be part of the
-     *          iteration, <code>false</code> to skip
+     * @return  {@code true} if the header should be part of the
+     *          iteration, {@code false} to skip
      */
-    protected boolean filterHeader(int index) {
-        if (this.headerName == null)
+    protected boolean filterHeader(final int index) {
+        if (this.headerName == null) {
             return true;
+        }
 
         // non-header elements, including null, will trigger exceptions
         final String name = (this.allHeaders.get(index)).getName();
@@ -135,6 +136,7 @@ public class BasicListHeaderIterator implements HeaderIterator {
 
 
     // non-javadoc, see interface HeaderIterator
+    @Override
     public boolean hasNext() {
         return (this.currentIndex >= 0);
     }
@@ -147,6 +149,7 @@ public class BasicListHeaderIterator implements HeaderIterator {
      *
      * @throws NoSuchElementException   if there are no more headers
      */
+    @Override
     public Header nextHeader()
         throws NoSuchElementException {
 
@@ -170,6 +173,7 @@ public class BasicListHeaderIterator implements HeaderIterator {
      *
      * @throws NoSuchElementException   if there are no more headers
      */
+    @Override
     public final Object next()
         throws NoSuchElementException {
         return nextHeader();
@@ -179,12 +183,10 @@ public class BasicListHeaderIterator implements HeaderIterator {
     /**
      * Removes the header that was returned last.
      */
+    @Override
     public void remove()
         throws UnsupportedOperationException {
-
-        if (this.lastIndex < 0) {
-            throw new IllegalStateException("No header to remove.");
-        }
+        Asserts.check(this.lastIndex >= 0, "No header to remove");
         this.allHeaders.remove(this.lastIndex);
         this.lastIndex = -1;
         this.currentIndex--; // adjust for the removed element

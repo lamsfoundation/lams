@@ -38,21 +38,21 @@ import static io.undertow.util.Methods.HEAD;
 
 /**
  * Facade for an underlying buffer cache that contains response information.
- * <p/>
+ * <p>
  * This facade is attached to the exchange and provides a mechanism for handlers to
  * serve cached content. By default a request to serve cached content is interpreted
  * to mean that the resulting response is cacheable, and so by default this will result
  * in the current response being cached (as long as it meets the criteria for caching).
- * <p/>
+ * <p>
  * Calling tryServeResponse can also result in the exchange being ended with a not modified
  * response code, if the response headers indicate that this is justified (e.g. if the
  * If-Modified-Since or If-None-Match headers indicate that the client has a cached copy
  * of the response)
- * <p/>
+ * <p>
  * This should be installed early in the handler chain, before any content encoding handlers.
  * This allows it to cache compressed copies of the response, which can significantly reduce
  * CPU load.
- * <p/>
+ * <p>
  * NOTE: This cache has no concept of authentication, it assumes that if the underlying handler
  * indicates that a response is cachable, then the current user has been properly authenticated
  * to access that resource, and that the resource will not change per user.
@@ -74,10 +74,10 @@ public class ResponseCache {
 
     /**
      * Attempts to serve the response from a cache.
-     * <p/>
+     * <p>
      * If this fails, then the response will be considered cachable, and may be cached
      * to be served by future handlers.
-     * <p/>
+     * <p>
      * If this returns true then the caller should not modify the exchange any more, as this
      * can result in a handoff to an IO thread
      *
@@ -89,10 +89,10 @@ public class ResponseCache {
 
     /**
      * Attempts to serve the response from a cache.
-     * <p/>
+     * <p>
      * If this fails, and the markCachable parameter is true then the response will be considered cachable,
      * and may be cached to be served by future handlers.
-     * <p/>
+     * <p>
      * If this returns true then the caller should not modify the exchange any more, as this
      * can result in a handoff to an IO thread
      *
@@ -130,7 +130,7 @@ public class ResponseCache {
         }
         //we do send a 304 if the if-none-match header matches
         if (!ETagUtils.handleIfNoneMatch(exchange, etag, true)) {
-            exchange.setResponseCode(StatusCodes.NOT_MODIFIED);
+            exchange.setStatusCode(StatusCodes.NOT_MODIFIED);
             exchange.endExchange();
             return true;
         }
@@ -139,7 +139,7 @@ public class ResponseCache {
             return false;
         }
         if (!DateUtils.handleIfModifiedSince(exchange, existingKey.getLastModified())) {
-            exchange.setResponseCode(StatusCodes.NOT_MODIFIED);
+            exchange.setStatusCode(StatusCodes.NOT_MODIFIED);
             exchange.endExchange();
             return true;
         }
@@ -180,7 +180,7 @@ public class ResponseCache {
             buffers = new ByteBuffer[pooled.length];
             for (int i = 0; i < buffers.length; i++) {
                 // Keep position from mutating
-                buffers[i] = pooled[i].getResource().duplicate();
+                buffers[i] = pooled[i].getBuffer().duplicate();
             }
             ok = true;
         } finally {
@@ -200,22 +200,22 @@ public class ResponseCache {
     }
 
     private static class DereferenceCallback implements IoCallback {
-        private final DirectBufferCache.CacheEntry cache;
+        private final DirectBufferCache.CacheEntry entry;
 
-        public DereferenceCallback(DirectBufferCache.CacheEntry cache) {
-            this.cache = cache;
+        DereferenceCallback(DirectBufferCache.CacheEntry entry) {
+            this.entry = entry;
         }
 
         @Override
         public void onComplete(final HttpServerExchange exchange, final Sender sender) {
-            cache.dereference();
+            entry.dereference();
             exchange.endExchange();
         }
 
         @Override
         public void onException(final HttpServerExchange exchange, final Sender sender, final IOException exception) {
             UndertowLogger.REQUEST_IO_LOGGER.ioException(exception);
-            cache.dereference();
+            entry.dereference();
             exchange.endExchange();
         }
     }

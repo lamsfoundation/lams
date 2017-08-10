@@ -24,6 +24,7 @@ import io.undertow.conduits.ConduitListener;
 import io.undertow.conduits.EmptyStreamSourceConduit;
 import io.undertow.conduits.ReadDataStreamSourceConduit;
 import io.undertow.server.AbstractServerConnection;
+import io.undertow.server.ConnectorStatisticsImpl;
 import io.undertow.server.Connectors;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.protocol.ParseTimeoutUpdater;
@@ -32,7 +33,7 @@ import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import org.xnio.ChannelListener;
-import org.xnio.Pooled;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.StreamConnection;
 import org.xnio.channels.StreamSinkChannel;
 import org.xnio.channels.StreamSourceChannel;
@@ -64,14 +65,16 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
     private final int maxRequestSize;
     private final long maxEntitySize;
     private final AjpRequestParser parser;
+    private final ConnectorStatisticsImpl connectorStatistics;
     private WriteReadyHandler.ChannelListenerHandler<ConduitStreamSinkChannel> writeReadyHandler;
 
     private ParseTimeoutUpdater parseTimeoutUpdater;
 
-    AjpReadListener(final AjpServerConnection connection, final String scheme, AjpRequestParser parser) {
+    AjpReadListener(final AjpServerConnection connection, final String scheme, AjpRequestParser parser, ConnectorStatisticsImpl connectorStatistics) {
         this.connection = connection;
         this.scheme = scheme;
         this.parser = parser;
+        this.connectorStatistics = connectorStatistics;
         this.maxRequestSize = connection.getUndertowOptions().get(UndertowOptions.MAX_HEADER_SIZE, UndertowOptions.DEFAULT_MAX_HEADER_SIZE);
         this.maxEntitySize = connection.getUndertowOptions().get(UndertowOptions.MAX_ENTITY_SIZE, UndertowOptions.DEFAULT_MAX_ENTITY_SIZE);
         this.writeReadyHandler = new WriteReadyHandler.ChannelListenerHandler<>(connection.getChannel().getSinkChannel());
@@ -89,7 +92,6 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
     public void startRequest() {
         connection.resetChannel();
         state = new AjpRequestParseState();
-        httpServerExchange = new HttpServerExchange(connection, maxEntitySize);
         read = 0;
         if(parseTimeoutUpdater != null) {
             parseTimeoutUpdater.connectionIdle();
@@ -103,10 +105,10 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
             channel.suspendReads();
             return;
         }
-        Pooled<ByteBuffer> existing = connection.getExtraBytes();
+        PooledByteBuffer existing = connection.getExtraBytes();
 
-        final Pooled<ByteBuffer> pooled = existing == null ? connection.getBufferPool().allocate() : existing;
-        final ByteBuffer buffer = pooled.getResource();
+        final PooledByteBuffer pooled = existing == null ? connection.getByteBufferPool().allocate() : existing;
+        final ByteBuffer buffer = pooled.getBuffer();
         boolean free = true;
         boolean bytesRead = false;
         try {
@@ -158,6 +160,9 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                     buffer.flip();
                 }
                 int begin = buffer.remaining();
+                if(httpServerExchange == null) {
+                    httpServerExchange = new HttpServerExchange(connection, maxEntitySize);
+                }
                 parser.parse(buffer, state, httpServerExchange);
 
                 read += begin - buffer.remaining();
@@ -197,7 +202,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
             channel.suspendReads();
 
             final HttpServerExchange httpServerExchange = this.httpServerExchange;
-            final AjpServerResponseConduit responseConduit = new AjpServerResponseConduit(connection.getChannel().getSinkChannel().getConduit(), connection.getBufferPool(), httpServerExchange, new ConduitListener<AjpServerResponseConduit>() {
+            final AjpServerResponseConduit responseConduit = new AjpServerResponseConduit(connection.getChannel().getSinkChannel().getConduit(), connection.getByteBufferPool(), httpServerExchange, new ConduitListener<AjpServerResponseConduit>() {
                 @Override
                 public void handleEvent(AjpServerResponseConduit channel) {
                     Connectors.terminateResponse(httpServerExchange);
@@ -215,6 +220,9 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                 if(scheme != null) {
                     httpServerExchange.setRequestScheme(scheme);
                 }
+                if(state.attributes != null) {
+                    httpServerExchange.putAttachment(HttpServerExchange.REQUEST_ATTRIBUTES, state.attributes);
+                }
                 state = null;
                 this.httpServerExchange = null;
                 httpServerExchange.setPersistent(true);
@@ -223,6 +231,9 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                     Connectors.setRequestStartTime(httpServerExchange);
                 }
                 connection.setCurrentExchange(httpServerExchange);
+                if(connectorStatistics != null) {
+                    connectorStatistics.setup(httpServerExchange);
+                }
                 Connectors.executeRootHandler(connection.getRootHandler(), httpServerExchange);
 
             } catch (Throwable t) {
@@ -234,7 +245,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
             UndertowLogger.REQUEST_LOGGER.exceptionProcessingRequest(e);
             safeClose(connection);
         } finally {
-            if (free) pooled.free();
+            if (free) pooled.close();
         }
     }
 

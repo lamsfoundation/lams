@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2012, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.bytecode.enhance.spi;
 
@@ -70,6 +53,26 @@ public interface EnhancementContext {
 	public boolean isCompositeClass(CtClass classDescriptor);
 
 	/**
+	 * Does the given class name represent an MappedSuperclass class?
+	 *
+	 * @param classDescriptor The descriptor of the class to check.
+	 *
+	 * @return {@code true} if the class is an mapped super class; {@code false} otherwise.
+	 */
+	public boolean isMappedSuperclassClass(CtClass classDescriptor);
+
+	/**
+	 * Should we manage association of bi-directional persistent attributes for this field?
+	 *
+	 * @param field The field to check.
+	 *
+	 * @return {@code true} indicates that the field is enhanced so that for bi-directional persistent fields
+	 * 			the association is managed, i.e. the associations are automatically set; {@code false} indicates that
+	 * 			the management is handled by the user.
+	 */
+	public boolean doBiDirectionalAssociationManagement(CtField field);
+
+	/**
 	 * Should we in-line dirty checking for persistent attributes for this class?
 	 *
 	 * @param classDescriptor The descriptor of the class to check.
@@ -78,6 +81,16 @@ public interface EnhancementContext {
 	 *         indicates it should not.  In-lined is more easily serializable and probably more performant.
 	 */
 	public boolean doDirtyCheckingInline(CtClass classDescriptor);
+
+	/**
+	 * Should we enhance field access to entities from this class?
+	 *
+	 * @param classDescriptor The descriptor of the class to check.
+	 *
+	 * @return {@code true} indicates that any direct access to fields of entities should be routed to the enhanced
+	 *         getter / setter  method.
+	 */
+	public boolean doExtendedEnhancement(CtClass classDescriptor);
 
 	/**
 	 * Does the given class define any lazy loadable attributes?

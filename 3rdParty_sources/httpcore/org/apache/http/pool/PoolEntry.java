@@ -30,14 +30,15 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.http.annotation.GuardedBy;
 import org.apache.http.annotation.ThreadSafe;
+import org.apache.http.util.Args;
 
 /**
  * Pool entry containing a pool connection object along with its route.
- * <p/>
+ * <p>
  * The connection contained by the pool entry may have an expiration time which
  * can be either set upon construction time or updated with
  * the {@link #updateExpiry(long, TimeUnit)}.
- * <p/>
+ * <p>
  * Pool entry may also have an object associated with it that represents
  * a connection state (usually a security principal or a unique token identifying
  * the user whose credentials have been used while establishing the connection).
@@ -54,7 +55,7 @@ public abstract class PoolEntry<T, C> {
     private final T route;
     private final C conn;
     private final long created;
-    private final long validUnit;
+    private final long validityDeadline;
 
     @GuardedBy("this")
     private long updated;
@@ -65,9 +66,9 @@ public abstract class PoolEntry<T, C> {
     private volatile Object state;
 
     /**
-     * Creates new <tt>PoolEntry</tt> instance.
+     * Creates new {@code PoolEntry} instance.
      *
-     * @param id unique identifier of the pool entry. May be <code>null</code>.
+     * @param id unique identifier of the pool entry. May be {@code null}.
      * @param route route to the opposite endpoint.
      * @param conn the connection.
      * @param timeToLive maximum time to live. May be zero if the connection
@@ -77,31 +78,25 @@ public abstract class PoolEntry<T, C> {
     public PoolEntry(final String id, final T route, final C conn,
             final long timeToLive, final TimeUnit tunit) {
         super();
-        if (route == null) {
-            throw new IllegalArgumentException("Route may not be null");
-        }
-        if (conn == null) {
-            throw new IllegalArgumentException("Connection may not be null");
-        }
-        if (tunit == null) {
-            throw new IllegalArgumentException("Time unit may not be null");
-        }
+        Args.notNull(route, "Route");
+        Args.notNull(conn, "Connection");
+        Args.notNull(tunit, "Time unit");
         this.id = id;
         this.route = route;
         this.conn = conn;
         this.created = System.currentTimeMillis();
         if (timeToLive > 0) {
-            this.validUnit = this.created + tunit.toMillis(timeToLive);
+            this.validityDeadline = this.created + tunit.toMillis(timeToLive);
         } else {
-            this.validUnit = Long.MAX_VALUE;
+            this.validityDeadline = Long.MAX_VALUE;
         }
-        this.expiry = this.validUnit;
+        this.expiry = this.validityDeadline;
     }
 
     /**
-     * Creates new <tt>PoolEntry</tt> instance without an expiry deadline.
+     * Creates new {@code PoolEntry} instance without an expiry deadline.
      *
-     * @param id unique identifier of the pool entry. May be <code>null</code>.
+     * @param id unique identifier of the pool entry. May be {@code null}.
      * @param route route to the opposite endpoint.
      * @param conn the connection.
      */
@@ -125,8 +120,19 @@ public abstract class PoolEntry<T, C> {
         return this.created;
     }
 
+    /**
+     * @since 4.4
+     */
+    public long getValidityDeadline() {
+        return this.validityDeadline;
+    }
+
+    /**
+     * @deprecated use {@link #getValidityDeadline()}
+     */
+    @Deprecated
     public long getValidUnit() {
-        return this.validUnit;
+        return this.validityDeadline;
     }
 
     public Object getState() {
@@ -146,17 +152,15 @@ public abstract class PoolEntry<T, C> {
     }
 
     public synchronized void updateExpiry(final long time, final TimeUnit tunit) {
-        if (tunit == null) {
-            throw new IllegalArgumentException("Time unit may not be null");
-        }
+        Args.notNull(tunit, "Time unit");
         this.updated = System.currentTimeMillis();
-        long newExpiry;
+        final long newExpiry;
         if (time > 0) {
             newExpiry = this.updated + tunit.toMillis(time);
         } else {
             newExpiry = Long.MAX_VALUE;
         }
-        this.expiry = Math.min(newExpiry, this.validUnit);
+        this.expiry = Math.min(newExpiry, this.validityDeadline);
     }
 
     public synchronized boolean isExpired(final long now) {
@@ -170,13 +174,13 @@ public abstract class PoolEntry<T, C> {
     public abstract void close();
 
     /**
-     * Returns <code>true</code> if the pool entry has been invalidated.
+     * Returns {@code true} if the pool entry has been invalidated.
      */
     public abstract boolean isClosed();
 
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
         buffer.append("[id:");
         buffer.append(this.id);
         buffer.append("][route:");

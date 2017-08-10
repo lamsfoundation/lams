@@ -29,41 +29,47 @@ package org.apache.http.impl.cookie;
 import java.util.Date;
 
 import org.apache.http.annotation.Immutable;
-
+import org.apache.http.cookie.ClientCookie;
+import org.apache.http.cookie.CommonCookieAttributeHandler;
 import org.apache.http.cookie.MalformedCookieException;
 import org.apache.http.cookie.SetCookie;
+import org.apache.http.util.Args;
 
 /**
  *
  * @since 4.0
  */
 @Immutable
-public class BasicMaxAgeHandler extends AbstractCookieAttributeHandler {
+public class BasicMaxAgeHandler extends AbstractCookieAttributeHandler implements CommonCookieAttributeHandler {
 
     public BasicMaxAgeHandler() {
         super();
     }
 
+    @Override
     public void parse(final SetCookie cookie, final String value)
             throws MalformedCookieException {
-        if (cookie == null) {
-            throw new IllegalArgumentException("Cookie may not be null");
-        }
+        Args.notNull(cookie, "Cookie");
         if (value == null) {
-            throw new MalformedCookieException("Missing value for max-age attribute");
+            throw new MalformedCookieException("Missing value for 'max-age' attribute");
         }
-        int age;
+        final int age;
         try {
             age = Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            throw new MalformedCookieException ("Invalid max-age attribute: "
+        } catch (final NumberFormatException e) {
+            throw new MalformedCookieException ("Invalid 'max-age' attribute: "
                     + value);
         }
         if (age < 0) {
-            throw new MalformedCookieException ("Negative max-age attribute: "
+            throw new MalformedCookieException ("Negative 'max-age' attribute: "
                     + value);
         }
         cookie.setExpiryDate(new Date(System.currentTimeMillis() + age * 1000L));
+    }
+
+    @Override
+    public String getAttributeName() {
+        return ClientCookie.MAX_AGE_ATTR;
     }
 
 }

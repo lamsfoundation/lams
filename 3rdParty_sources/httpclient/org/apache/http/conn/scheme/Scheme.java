@@ -29,7 +29,7 @@ package org.apache.http.conn.scheme;
 import java.util.Locale;
 
 import org.apache.http.annotation.Immutable;
-
+import org.apache.http.util.Args;
 import org.apache.http.util.LangUtils;
 
 /**
@@ -38,14 +38,20 @@ import org.apache.http.util.LangUtils;
  * SchemeRegistry}.
  * <p>
  * For example, to configure support for "https://" URLs, you could write code like the following:
+ * </p>
  * <pre>
  * Scheme https = new Scheme("https", 443, new MySecureSocketFactory());
- * SchemeRegistry.DEFAULT.register(https);
+ * SchemeRegistry registry = new SchemeRegistry();
+ * registry.register(https);
  * </pre>
  *
  * @since 4.0
+ *
+ * @deprecated (4.3) use {@link org.apache.http.conn.SchemePortResolver} for default port
+ * resolution and {@link org.apache.http.config.Registry} for socket factory lookups.
  */
 @Immutable
+@Deprecated
 public final class Scheme {
 
     /** The name of this scheme, in lowercase. (e.g. http, https) */
@@ -71,7 +77,7 @@ public final class Scheme {
     /**
      * Creates a new scheme.
      * Whether the created scheme allows for layered connections
-     * depends on the class of <code>factory</code>.
+     * depends on the class of {@code factory}.
      *
      * @param name      the scheme name, for example "http".
      *                  The name will be converted to lowercase.
@@ -81,17 +87,10 @@ public final class Scheme {
      *
      * @since 4.1
      */
-    @SuppressWarnings("deprecation")
     public Scheme(final String name, final int port, final SchemeSocketFactory factory) {
-        if (name == null) {
-            throw new IllegalArgumentException("Scheme name may not be null");
-        }
-        if ((port <= 0) || (port > 0xffff)) {
-            throw new IllegalArgumentException("Port is invalid: " + port);
-        }
-        if (factory == null) {
-            throw new IllegalArgumentException("Socket factory may not be null");
-        }
+        Args.notNull(name, "Scheme name");
+        Args.check(port > 0 && port <= 0xffff, "Port is invalid");
+        Args.notNull(factory, "Socket factory");
         this.name = name.toLowerCase(Locale.ENGLISH);
         this.defaultPort = port;
         if (factory instanceof SchemeLayeredSocketFactory) {
@@ -109,7 +108,7 @@ public final class Scheme {
     /**
      * Creates a new scheme.
      * Whether the created scheme allows for layered connections
-     * depends on the class of <code>factory</code>.
+     * depends on the class of {@code factory}.
      *
      * @param name      the scheme name, for example "http".
      *                  The name will be converted to lowercase.
@@ -119,23 +118,14 @@ public final class Scheme {
      *
      * @deprecated (4.1)  Use {@link #Scheme(String, int, SchemeSocketFactory)}
      */
-    @Deprecated 
+    @Deprecated
     public Scheme(final String name,
                   final SocketFactory factory,
                   final int port) {
 
-        if (name == null) {
-            throw new IllegalArgumentException
-                ("Scheme name may not be null");
-        }
-        if (factory == null) {
-            throw new IllegalArgumentException
-                ("Socket factory may not be null");
-        }
-        if ((port <= 0) || (port > 0xffff)) {
-            throw new IllegalArgumentException
-                ("Port is invalid: " + port);
-        }
+        Args.notNull(name, "Scheme name");
+        Args.notNull(factory, "Socket factory");
+        Args.check(port > 0 && port <= 0xffff, "Port is invalid");
 
         this.name = name.toLowerCase(Locale.ENGLISH);
         if (factory instanceof LayeredSocketFactory) {
@@ -207,8 +197,8 @@ public final class Scheme {
     /**
      * Indicates whether this scheme allows for layered connections.
      *
-     * @return <code>true</code> if layered connections are possible,
-     *         <code>false</code> otherwise
+     * @return {@code true} if layered connections are possible,
+     *         {@code false} otherwise
      */
     public final boolean isLayered() {
         return layered;
@@ -223,7 +213,7 @@ public final class Scheme {
      *
      * @return the given port or the defaultPort
      */
-    public final int resolvePort(int port) {
+    public final int resolvePort(final int port) {
         return port <= 0 ? defaultPort : port;
     }
 
@@ -235,7 +225,7 @@ public final class Scheme {
     @Override
     public final String toString() {
         if (stringRep == null) {
-            StringBuilder buffer = new StringBuilder();
+            final StringBuilder buffer = new StringBuilder();
             buffer.append(this.name);
             buffer.append(':');
             buffer.append(Integer.toString(this.defaultPort));
@@ -245,10 +235,12 @@ public final class Scheme {
     }
 
     @Override
-    public final boolean equals(Object obj) {
-        if (this == obj) return true;
+    public final boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (obj instanceof Scheme) {
-            Scheme that = (Scheme) obj;
+            final Scheme that = (Scheme) obj;
             return this.name.equals(that.name)
                 && this.defaultPort == that.defaultPort
                 && this.layered == that.layered;

@@ -1,30 +1,14 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.dialect;
 
 import java.io.FilterReader;
 import java.io.Reader;
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -41,14 +25,22 @@ import org.hibernate.dialect.function.NoArgSQLFunction;
 import org.hibernate.dialect.function.SQLFunctionTemplate;
 import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.dialect.function.VarArgsSQLFunction;
+import org.hibernate.dialect.pagination.AbstractLimitHandler;
+import org.hibernate.dialect.pagination.LimitHandler;
+import org.hibernate.dialect.pagination.LimitHelper;
 import org.hibernate.engine.jdbc.CharacterStream;
 import org.hibernate.engine.jdbc.ClobImplementer;
 import org.hibernate.engine.jdbc.NClobImplementer;
+import org.hibernate.engine.spi.RowSelection;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.exception.SQLGrammarException;
 import org.hibernate.exception.spi.SQLExceptionConversionDelegate;
+import org.hibernate.hql.spi.id.IdTableSupportStandardImpl;
+import org.hibernate.hql.spi.id.MultiTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.global.GlobalTemporaryTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.local.AfterUseAction;
 import org.hibernate.internal.util.JdbcExceptionHelper;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.descriptor.WrapperOptions;
@@ -70,6 +62,24 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
  * @author Andrew Clemons <andrew.clemons@sap.com>
  */
 public abstract class AbstractHANADialect extends Dialect {
+
+	private static final AbstractLimitHandler LIMIT_HANDLER = new AbstractLimitHandler() {
+		@Override
+		public String processSql(String sql, RowSelection selection) {
+			final boolean hasOffset = LimitHelper.hasFirstRow( selection );
+			return sql + ( hasOffset ? " limit ? offset ?" : " limit ?" );
+		}
+
+		@Override
+		public boolean supportsLimit() {
+			return true;
+		}
+
+		@Override
+		public boolean bindLimitParametersInReverseOrder() {
+			return true;
+		}
+	};
 
 	private static class CloseSuppressingReader extends FilterReader {
 		protected CloseSuppressingReader(final Reader in) {
@@ -112,6 +122,27 @@ public abstract class AbstractHANADialect extends Dialect {
 					}
 
 				}
+
+				@Override
+				protected void doBind(CallableStatement st, X value, String name, WrapperOptions options)
+						throws SQLException {
+					final CharacterStream characterStream = javaTypeDescriptor.unwrap(
+							value,
+							CharacterStream.class,
+							options
+					);
+
+					if ( value instanceof ClobImplementer ) {
+						st.setCharacterStream(
+								name,
+								new CloseSuppressingReader( characterStream.asReader() ),
+								characterStream.getLength()
+						);
+					}
+					else {
+						st.setCharacterStream( name, characterStream.asReader(), characterStream.getLength() );
+					}
+				}
 			};
 		}
 	};
@@ -130,13 +161,37 @@ public abstract class AbstractHANADialect extends Dialect {
 							options );
 
 					if ( value instanceof NClobImplementer ) {
-						st.setCharacterStream( index, new CloseSuppressingReader( characterStream.asReader() ),
-								characterStream.getLength() );
+						st.setCharacterStream(
+								index,
+								new CloseSuppressingReader( characterStream.asReader() ),
+								characterStream.getLength()
+						);
 					}
 					else {
 						st.setCharacterStream( index, characterStream.asReader(), characterStream.getLength() );
 					}
 
+				}
+
+				@Override
+				protected void doBind(CallableStatement st, X value, String name, WrapperOptions options)
+						throws SQLException {
+					final CharacterStream characterStream = javaTypeDescriptor.unwrap(
+							value,
+							CharacterStream.class,
+							options
+					);
+
+					if ( value instanceof NClobImplementer ) {
+						st.setCharacterStream(
+								name,
+								new CloseSuppressingReader( characterStream.asReader() ),
+								characterStream.getLength()
+						);
+					}
+					else {
+						st.setCharacterStream( name, characterStream.asReader(), characterStream.getLength() );
+					}
 				}
 			};
 		}
@@ -390,8 +445,16 @@ public abstract class AbstractHANADialect extends Dialect {
 	}
 
 	@Override
-	public String getCreateTemporaryTableString() {
-		return "create global temporary table";
+	public MultiTableBulkIdStrategy getDefaultMultiTableBulkIdStrategy() {
+		return new GlobalTemporaryTableBulkIdStrategy(
+				new IdTableSupportStandardImpl() {
+					@Override
+					public String getCreateIdTableCommand() {
+						return "create global temporary table";
+					}
+				},
+				AfterUseAction.CLEAN
+		);
 	}
 
 	@Override
@@ -625,11 +688,6 @@ public abstract class AbstractHANADialect extends Dialect {
 	}
 
 	@Override
-	public boolean supportsTemporaryTables() {
-		return true;
-	}
-
-	@Override
 	public boolean supportsTupleDistinctCounts() {
 		return false;
 	}
@@ -669,5 +727,10 @@ public abstract class AbstractHANADialect extends Dialect {
 	public String getAddForeignKeyConstraintString(final String constraintName, final String[] foreignKey,
 			final String referencedTable, final String[] primaryKey, final boolean referencesPrimaryKey) {
 		return super.getAddForeignKeyConstraintString(constraintName, foreignKey, referencedTable, primaryKey, referencesPrimaryKey) + " on update cascade";
+	}
+
+	@Override
+	public LimitHandler getLimitHandler() {
+		return LIMIT_HANDLER;
 	}
 }

@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.sql;
 
@@ -39,15 +21,15 @@ import org.hibernate.internal.util.StringHelper;
  */
 public class SelectFragment {
 	private String suffix;
-	private List columns = new ArrayList();
+	private List<String> columns = new ArrayList<String>();
 	//private List aliases = new ArrayList();
-	private List columnAliases = new ArrayList();
+	private List<String> columnAliases = new ArrayList<String>();
 	private String extraSelectList;
 	private String[] usedAliases;
 
 	public SelectFragment() {}
 
-	public List getColumns() {
+	public List<String> getColumns() {
 		return columns;
 	}
 
@@ -81,7 +63,9 @@ public class SelectFragment {
 	}
 
 	public SelectFragment addColumns(String[] columnNames) {
-		for (int i=0; i<columnNames.length; i++) addColumn( columnNames[i] );
+		for ( String columnName : columnNames ) {
+			addColumn( columnName );
+		}
 		return this;
 	}
 
@@ -98,20 +82,26 @@ public class SelectFragment {
 	}
 
 	public SelectFragment addColumns(String tableAlias, String[] columnNames) {
-		for (int i=0; i<columnNames.length; i++) addColumn( tableAlias, columnNames[i] );
+		for ( String columnName : columnNames ) {
+			addColumn( tableAlias, columnName );
+		}
 		return this;
 	}
 
 	public SelectFragment addColumns(String tableAlias, String[] columnNames, String[] columnAliases) {
 		for (int i=0; i<columnNames.length; i++) {
-			if ( columnNames[i]!=null ) addColumn( tableAlias, columnNames[i], columnAliases[i] );
+			if ( columnNames[i]!=null ) {
+				addColumn( tableAlias, columnNames[i], columnAliases[i] );
+			}
 		}
 		return this;
 	}
 
 	public SelectFragment addFormulas(String tableAlias, String[] formulas, String[] formulaAliases) {
 		for ( int i=0; i<formulas.length; i++ ) {
-			if ( formulas[i]!=null ) addFormula( tableAlias, formulas[i], formulaAliases[i] );
+			if ( formulas[i]!=null ) {
+				addFormula( tableAlias, formulas[i], formulaAliases[i] );
+			}
 		}
 		return this;
 	}
@@ -134,14 +124,16 @@ public class SelectFragment {
 
 	public String toFragmentString() {
 		StringBuilder buf = new StringBuilder( columns.size() * 10 );
-		Iterator iter = columns.iterator();
-		Iterator columnAliasIter = columnAliases.iterator();
+		Iterator<String> iter = columns.iterator();
+		Iterator<String> columnAliasIter = columnAliases.iterator();
 		//HashMap columnsUnique = new HashMap();
-		HashSet columnsUnique = new HashSet();
-		if (usedAliases!=null) columnsUnique.addAll( Arrays.asList(usedAliases) );
+		HashSet<String> columnsUnique = new HashSet<String>();
+		if (usedAliases!=null) {
+			columnsUnique.addAll( Arrays.asList(usedAliases) );
+		}
 		while ( iter.hasNext() ) {
-			String column = (String) iter.next();
-			String columnAlias = (String) columnAliasIter.next();
+			String column = iter.next();
+			String columnAlias = columnAliasIter.next();
 			//TODO: eventually put this back in, once we think all is fixed
 			//Object otherAlias = columnsUnique.put(qualifiedColumn, columnAlias);
 			/*if ( otherAlias!=null && !columnAlias.equals(otherAlias) ) {

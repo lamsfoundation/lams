@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.id;
 
@@ -31,15 +14,15 @@ import java.util.Properties;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.cfg.ObjectNameNormalizer;
-import org.hibernate.dialect.Dialect;
+import org.hibernate.boot.model.naming.ObjectNameNormalizer;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.StringHelper;
 import org.hibernate.mapping.Table;
+import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.Type;
-
-import org.jboss.logging.Logger;
 
 /**
  * <b>increment</b><br>
@@ -56,14 +39,14 @@ import org.jboss.logging.Logger;
  * @author Brett Meyer
  */
 public class IncrementGenerator implements IdentifierGenerator, Configurable {
-
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, IncrementGenerator.class.getName());
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( IncrementGenerator.class );
 
 	private Class returnClass;
 	private String sql;
 
 	private IntegralDataTypeHolder previousValueHolder;
 
+	@Override
 	public synchronized Serializable generate(SessionImplementor session, Object object) throws HibernateException {
 		if ( sql != null ) {
 			initializePreviousValueHolder( session );
@@ -71,17 +54,19 @@ public class IncrementGenerator implements IdentifierGenerator, Configurable {
 		return previousValueHolder.makeValueThenIncrement();
 	}
 
-	public void configure(Type type, Properties params, Dialect dialect) throws MappingException {
+	@Override
+	public void configure(Type type, Properties params, ServiceRegistry serviceRegistry) throws MappingException {
 		returnClass = type.getReturnedClass();
 
-		ObjectNameNormalizer normalizer =
-				( ObjectNameNormalizer ) params.get( PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER );
+		final JdbcEnvironment jdbcEnvironment = serviceRegistry.getService( JdbcEnvironment.class );
+		final ObjectNameNormalizer normalizer =
+				(ObjectNameNormalizer) params.get( PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER );
 
 		String column = params.getProperty( "column" );
 		if ( column == null ) {
 			column = params.getProperty( PersistentIdentifierGenerator.PK );
 		}
-		column = dialect.quote( normalizer.normalizeIdentifierQuoting( column ) );
+		column = normalizer.normalizeIdentifierQuoting( column ).render( jdbcEnvironment.getDialect() );
 
 		String tableList = params.getProperty( "tables" );
 		if ( tableList == null ) {
@@ -89,25 +74,21 @@ public class IncrementGenerator implements IdentifierGenerator, Configurable {
 		}
 		String[] tables = StringHelper.split( ", ", tableList );
 
-		final String schema = dialect.quote(
-				normalizer.normalizeIdentifierQuoting(
-						params.getProperty( PersistentIdentifierGenerator.SCHEMA )
-				)
+		final String schema = normalizer.toDatabaseIdentifierText(
+				params.getProperty( PersistentIdentifierGenerator.SCHEMA )
 		);
-		final String catalog = dialect.quote(
-				normalizer.normalizeIdentifierQuoting(
-						params.getProperty( PersistentIdentifierGenerator.CATALOG )
-				)
+		final String catalog = normalizer.toDatabaseIdentifierText(
+				params.getProperty( PersistentIdentifierGenerator.CATALOG )
 		);
 
 		StringBuilder buf = new StringBuilder();
-		for ( int i=0; i < tables.length; i++ ) {
-			final String tableName = dialect.quote( normalizer.normalizeIdentifierQuoting( tables[i] ) );
+		for ( int i = 0; i < tables.length; i++ ) {
+			final String tableName = normalizer.toDatabaseIdentifierText( tables[i] );
 			if ( tables.length > 1 ) {
 				buf.append( "select max(" ).append( column ).append( ") as mx from " );
 			}
 			buf.append( Table.qualify( catalog, schema, tableName ) );
-			if ( i < tables.length-1 ) {
+			if ( i < tables.length - 1 ) {
 				buf.append( " union " );
 			}
 		}
@@ -127,23 +108,28 @@ public class IncrementGenerator implements IdentifierGenerator, Configurable {
 			LOG.debugf( "Fetching initial value: %s", sql );
 		}
 		try {
-			PreparedStatement st = session.getTransactionCoordinator().getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
+			PreparedStatement st = session.getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
 			try {
-				ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().extract( st );
+				ResultSet rs = session.getJdbcCoordinator().getResultSetReturn().extract( st );
 				try {
-                    if (rs.next()) previousValueHolder.initialize(rs, 0L).increment();
-                    else previousValueHolder.initialize(1L);
+					if ( rs.next() ) {
+						previousValueHolder.initialize( rs, 0L ).increment();
+					}
+					else {
+						previousValueHolder.initialize( 1L );
+					}
 					sql = null;
 					if ( debugEnabled ) {
 						LOG.debugf( "First free id: %s", previousValueHolder.makeValue() );
 					}
 				}
 				finally {
-					session.getTransactionCoordinator().getJdbcCoordinator().release( rs, st );
+					session.getJdbcCoordinator().getResourceRegistry().release( rs, st );
 				}
 			}
 			finally {
-				session.getTransactionCoordinator().getJdbcCoordinator().release( st );
+				session.getJdbcCoordinator().getResourceRegistry().release( st );
+				session.getJdbcCoordinator().afterStatementExecution();
 			}
 		}
 		catch (SQLException sqle) {

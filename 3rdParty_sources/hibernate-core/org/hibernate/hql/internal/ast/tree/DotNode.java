@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal.ast.tree;
 
@@ -31,11 +14,12 @@ import org.hibernate.hql.internal.ast.util.ASTUtil;
 import org.hibernate.hql.internal.ast.util.ColumnHelper;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.log.DeprecationLogger;
 import org.hibernate.internal.util.StringHelper;
 import org.hibernate.persister.collection.QueryableCollection;
+import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.persister.entity.Queryable;
-import org.hibernate.sql.JoinFragment;
 import org.hibernate.sql.JoinType;
 import org.hibernate.type.CollectionType;
 import org.hibernate.type.EntityType;
@@ -61,8 +45,8 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 	public static boolean useThetaStyleImplicitJoins;
 	public static boolean regressionStyleJoinSuppression;
 
-	public static interface IllegalCollectionDereferenceExceptionBuilder {
-		public QueryException buildIllegalCollectionDereferenceException(
+	public interface IllegalCollectionDereferenceExceptionBuilder {
+		QueryException buildIllegalCollectionDereferenceException(
 				String collectionPropertyName,
 				FromReferenceNode lhs);
 	}
@@ -126,7 +110,7 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 	 *
 	 * @param joinType The type of join to use.
 	 *
-	 * @see JoinFragment
+	 * @see org.hibernate.sql.JoinFragment
 	 */
 	public void setJoinType(JoinType joinType) {
 		this.joinType = joinType;
@@ -216,7 +200,12 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 		if ( isResolved() ) {
 			return;
 		}
+
 		Type propertyType = prepareLhs(); // Prepare the left hand side and get the data type.
+
+		if ( parent == null && AbstractEntityPersister.ENTITY_CLASS.equals( propertyName ) ) {
+			DeprecationLogger.DEPRECATION_LOGGER.logDeprecationOfClassEntityTypeSelector( getLhs().getPath() );
+		}
 
 		// If there is no data type for this node, and we're at the end of the path (top most dot node), then
 		// this might be a Java constant.
@@ -298,6 +287,17 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 		String propName = getPath();
 		FromClause currentFromClause = getWalker().getCurrentFromClause();
 
+		// If the lhs of the join is a "component join", we need to go back to the
+		// first non-component-join as the origin to properly link aliases and
+		// join columns
+		FromElement lhsFromElement = getLhs().getFromElement();
+		while ( lhsFromElement != null && ComponentJoin.class.isInstance( lhsFromElement ) ) {
+			lhsFromElement = lhsFromElement.getOrigin();
+		}
+		if ( lhsFromElement == null ) {
+			throw new QueryException( "Unable to locate appropriate lhs" );
+		}
+
 		// determine whether we should use the table name or table alias to qualify the column names...
 		// we need to use the table-name when:
 		//		1) the top-level statement is not a SELECT
@@ -307,7 +307,6 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 		// the alias also, even if the FromElement is the root one...
 		//
 		// in all other cases, we should use the table alias
-		final FromElement lhsFromElement = getLhs().getFromElement();
 		if ( getWalker().getStatementType() != SqlTokenTypes.SELECT ) {
 			if ( isFromElementUpdateOrDeleteRoot( lhsFromElement ) ) {
 				// at this point we know we have the 2 conditions above,
@@ -330,7 +329,7 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 		// it makes sense to join twice on the same collection role
 		FromElementFactory factory = new FromElementFactory(
 				currentFromClause,
-				getLhs().getFromElement(),
+				lhsFromElement,
 				propName,
 				classAlias,
 				getColumns(),
@@ -476,7 +475,7 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 
 		boolean found = elem != null;
 		// even though we might find a pre-existing element by join path, we may not be able to reuse it...
-		boolean useFoundFromElement = found && canReuse( elem );
+		boolean useFoundFromElement = found && canReuse( classAlias, elem );
 
 		if ( !useFoundFromElement ) {
 			// If this is an implied join in a from element, then use the impled join type which is part of the
@@ -525,14 +524,20 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 		setFromElement( elem );    // This 'dot' expression now refers to the resulting from element.
 	}
 
-	private boolean canReuse(FromElement fromElement) {
+	private boolean canReuse(String classAlias, FromElement fromElement) {
 		// if the from-clauses are the same, we can be a little more aggressive in terms of what we reuse
-		if ( fromElement.getFromClause() == getWalker().getCurrentFromClause() ) {
+		if ( fromElement.getFromClause() == getWalker().getCurrentFromClause() &&
+				areSame( classAlias, fromElement.getClassAlias() )) {
 			return true;
 		}
 
 		// otherwise (subquery case) dont reuse the fromElement if we are processing the from-clause of the subquery
 		return getWalker().getCurrentClauseType() != SqlTokenTypes.FROM;
+	}
+
+	private boolean areSame(String alias1, String alias2) {
+		// again, null != null here
+		return !StringHelper.isEmpty( alias1 ) && !StringHelper.isEmpty( alias2 ) && alias1.equals( alias2 );
 	}
 
 	private void setImpliedJoin(FromElement elem) {

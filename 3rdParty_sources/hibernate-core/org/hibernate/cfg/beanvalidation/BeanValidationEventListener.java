@@ -1,30 +1,13 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cfg.beanvalidation;
 
 import java.util.HashSet;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.ConstraintViolation;
@@ -35,7 +18,8 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.hibernate.EntityMode;
-import org.hibernate.cfg.Configuration;
+import org.hibernate.boot.internal.ClassLoaderAccessImpl;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.spi.PreDeleteEvent;
 import org.hibernate.event.spi.PreDeleteEventListener;
@@ -68,27 +52,26 @@ public class BeanValidationEventListener
 	boolean initialized;
 
 	/**
-	 * No-arg constructor used when listener is configured via configuration file
-	 */
-	public BeanValidationEventListener() {
-	}
-
-	/**
 	 * Constructor used in an environment where validator factory is injected (JPA2).
 	 *
 	 * @param factory The {@code ValidatorFactory} to use to create {@code Validator} instance(s)
-	 * @param properties Configued properties
+	 * @param settings Configued properties
 	 */
-	public BeanValidationEventListener(ValidatorFactory factory, Properties properties) {
-		init( factory, properties );
+	public BeanValidationEventListener(ValidatorFactory factory, Map settings, ClassLoaderService classLoaderService) {
+		init( factory, settings, classLoaderService );
 	}
 
-	public void initialize(Configuration cfg) {
+	public void initialize(Map settings, ClassLoaderService classLoaderService) {
 		if ( !initialized ) {
 			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-			Properties props = cfg.getProperties();
-			init( factory, props );
+			init( factory, settings, classLoaderService );
 		}
+	}
+
+	private void init(ValidatorFactory factory, Map settings, ClassLoaderService classLoaderService) {
+		this.factory = factory;
+		groupsPerOperation = GroupsPerOperation.from( settings, new ClassLoaderAccessImpl( classLoaderService ) );
+		initialized = true;
 	}
 
 	public boolean onPreInsert(PreInsertEvent event) {
@@ -113,12 +96,6 @@ public class BeanValidationEventListener
 				event.getSession().getFactory(), GroupsPerOperation.Operation.DELETE
 		);
 		return false;
-	}
-
-	private void init(ValidatorFactory factory, Properties properties) {
-		this.factory = factory;
-		groupsPerOperation = new GroupsPerOperation( properties );
-		initialized = true;
 	}
 
 	private <T> void validate(T object, EntityMode mode, EntityPersister persister,

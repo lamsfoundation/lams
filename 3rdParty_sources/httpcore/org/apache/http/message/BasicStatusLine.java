@@ -32,6 +32,7 @@ import java.io.Serializable;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.annotation.Immutable;
+import org.apache.http.util.Args;
 
 /**
  * Basic implementation of {@link StatusLine}
@@ -61,34 +62,29 @@ public class BasicStatusLine implements StatusLine, Cloneable, Serializable {
      * @param version           the protocol version of the response
      * @param statusCode        the status code of the response
      * @param reasonPhrase      the reason phrase to the status code, or
-     *                          <code>null</code>
+     *                          {@code null}
      */
-    public BasicStatusLine(final ProtocolVersion version, int statusCode,
+    public BasicStatusLine(final ProtocolVersion version, final int statusCode,
                            final String reasonPhrase) {
         super();
-        if (version == null) {
-            throw new IllegalArgumentException
-                ("Protocol version may not be null.");
-        }
-        if (statusCode < 0) {
-            throw new IllegalArgumentException
-                ("Status code may not be negative.");
-        }
-        this.protoVersion = version;
-        this.statusCode   = statusCode;
+        this.protoVersion = Args.notNull(version, "Version");
+        this.statusCode = Args.notNegative(statusCode, "Status code");
         this.reasonPhrase = reasonPhrase;
     }
 
     // --------------------------------------------------------- Public Methods
 
+    @Override
     public int getStatusCode() {
         return this.statusCode;
     }
 
+    @Override
     public ProtocolVersion getProtocolVersion() {
         return this.protoVersion;
     }
 
+    @Override
     public String getReasonPhrase() {
         return this.reasonPhrase;
     }
@@ -96,8 +92,7 @@ public class BasicStatusLine implements StatusLine, Cloneable, Serializable {
     @Override
     public String toString() {
         // no need for non-default formatting in toString()
-        return BasicLineFormatter.DEFAULT
-            .formatStatusLine(null, this).toString();
+        return BasicLineFormatter.INSTANCE.formatStatusLine(null, this).toString();
     }
 
     @Override

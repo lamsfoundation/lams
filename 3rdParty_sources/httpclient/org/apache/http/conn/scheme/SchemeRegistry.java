@@ -31,17 +31,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.http.annotation.ThreadSafe;
-
 import org.apache.http.HttpHost;
+import org.apache.http.annotation.ThreadSafe;
+import org.apache.http.util.Args;
 
 /**
  * A set of supported protocol {@link Scheme}s.
  * Schemes are identified by lowercase names.
  *
  * @since 4.0
+ *
+ * @deprecated (4.3) use {@link org.apache.http.config.Registry}
  */
 @ThreadSafe
+@Deprecated
 public final class SchemeRegistry {
 
     /** The available schemes in this registry. */
@@ -60,13 +63,13 @@ public final class SchemeRegistry {
      *
      * @param name      the name of the scheme to look up (in lowercase)
      *
-     * @return  the scheme, never <code>null</code>
+     * @return  the scheme, never {@code null}
      *
      * @throws IllegalStateException
      *          if the scheme with the given name is not registered
      */
-    public final Scheme getScheme(String name) {
-        Scheme found = get(name);
+    public final Scheme getScheme(final String name) {
+        final Scheme found = get(name);
         if (found == null) {
             throw new IllegalStateException
                 ("Scheme '"+name+"' not registered.");
@@ -76,19 +79,17 @@ public final class SchemeRegistry {
 
     /**
      * Obtains the scheme for a host.
-     * Convenience method for <code>getScheme(host.getSchemeName())</pre>
+     * Convenience method for {@code getScheme(host.getSchemeName())}
      *
-     * @param host      the host for which to obtain the scheme
+     * @param host the host for which to obtain the scheme
      *
-     * @return  the scheme for the given host, never <code>null</code>
+     * @return the scheme for the given host, never {@code null}
      *
      * @throws IllegalStateException
      *          if a scheme with the respective name is not registered
      */
-    public final Scheme getScheme(HttpHost host) {
-        if (host == null) {
-            throw new IllegalArgumentException("Host must not be null.");
-        }
+    public final Scheme getScheme(final HttpHost host) {
+        Args.notNull(host, "Host");
         return getScheme(host.getSchemeName());
     }
 
@@ -98,15 +99,13 @@ public final class SchemeRegistry {
      * @param name      the name of the scheme to look up (in lowercase)
      *
      * @return  the scheme, or
-     *          <code>null</code> if there is none by this name
+     *          {@code null} if there is none by this name
      */
-    public final Scheme get(String name) {
-        if (name == null)
-            throw new IllegalArgumentException("Name must not be null.");
-
+    public final Scheme get(final String name) {
+        Args.notNull(name, "Scheme name");
         // leave it to the caller to use the correct name - all lowercase
-        //name = name.toLowerCase();
-        Scheme found = registeredSchemes.get(name);
+        //name = name.toLowerCase(Locale.ENGLISH);
+        final Scheme found = registeredSchemes.get(name);
         return found;
     }
 
@@ -118,13 +117,11 @@ public final class SchemeRegistry {
      * @param sch       the scheme to register
      *
      * @return  the scheme previously registered with that name, or
-     *          <code>null</code> if none was registered
+     *          {@code null} if none was registered
      */
-    public final Scheme register(Scheme sch) {
-        if (sch == null)
-            throw new IllegalArgumentException("Scheme must not be null.");
-
-        Scheme old = registeredSchemes.put(sch.getName(), sch);
+    public final Scheme register(final Scheme sch) {
+        Args.notNull(sch, "Scheme");
+        final Scheme old = registeredSchemes.put(sch.getName(), sch);
         return old;
     }
 
@@ -134,15 +131,13 @@ public final class SchemeRegistry {
      * @param name      the name of the scheme to unregister (in lowercase)
      *
      * @return  the unregistered scheme, or
-     *          <code>null</code> if there was none
+     *          {@code null} if there was none
      */
-    public final Scheme unregister(String name) {
-        if (name == null)
-            throw new IllegalArgumentException("Name must not be null.");
-
+    public final Scheme unregister(final String name) {
+        Args.notNull(name, "Scheme name");
         // leave it to the caller to use the correct name - all lowercase
-        //name = name.toLowerCase();
-        Scheme gone = registeredSchemes.remove(name);
+        //name = name.toLowerCase(Locale.ENGLISH);
+        final Scheme gone = registeredSchemes.remove(name);
         return gone;
     }
 

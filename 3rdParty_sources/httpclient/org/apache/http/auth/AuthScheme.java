@@ -1,20 +1,21 @@
 /*
  * ====================================================================
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  * ====================================================================
  *
  * This software consists of voluntary contributions made by many
@@ -23,7 +24,6 @@
  * <http://www.apache.org/>.
  *
  */
-
 package org.apache.http.auth;
 
 import org.apache.http.Header;
@@ -85,7 +85,7 @@ public interface AuthScheme {
     /**
      * Returns authentication realm. If the concept of an authentication
      * realm is not applicable to the given authentication scheme, returns
-     * <code>null</code>.
+     * {@code null}.
      *
      * @return the authentication realm
      */
@@ -95,7 +95,7 @@ public interface AuthScheme {
      * Tests if the authentication scheme is provides authorization on a per
      * connection basis instead of usual per request basis
      *
-     * @return <tt>true</tt> if the scheme is connection based, <tt>false</tt>
+     * @return {@code true} if the scheme is connection based, {@code false}
      * if the scheme is request based.
      */
     boolean isConnectionBased();
@@ -106,8 +106,8 @@ public interface AuthScheme {
      * successfully or unsuccessfully, that is, all the required authorization
      * challenges have been processed in their entirety.
      *
-     * @return <tt>true</tt> if the authentication process has been completed,
-     * <tt>false</tt> otherwise.
+     * @return {@code true} if the authentication process has been completed,
+     * {@code false} otherwise.
      */
     boolean isComplete();
 

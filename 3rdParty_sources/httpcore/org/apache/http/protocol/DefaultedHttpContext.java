@@ -27,7 +27,7 @@
 
 package org.apache.http.protocol;
 
-import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.util.Args;
 
 /**
  * {@link HttpContext} implementation that delegates resolution of an attribute
@@ -36,8 +36,10 @@ import org.apache.http.annotation.NotThreadSafe;
  * whereas the default context is treated as read-only.
  *
  * @since 4.0
+ *
+ * @deprecated (4.3) no longer used.
  */
-@NotThreadSafe
+@Deprecated
 public final class DefaultedHttpContext implements HttpContext {
 
     private final HttpContext local;
@@ -45,15 +47,12 @@ public final class DefaultedHttpContext implements HttpContext {
 
     public DefaultedHttpContext(final HttpContext local, final HttpContext defaults) {
         super();
-        if (local == null) {
-            throw new IllegalArgumentException("HTTP context may not be null");
-        }
-        this.local = local;
+        this.local = Args.notNull(local, "HTTP context");
         this.defaults = defaults;
     }
 
     public Object getAttribute(final String id) {
-        Object obj = this.local.getAttribute(id);
+        final Object obj = this.local.getAttribute(id);
         if (obj == null) {
             return this.defaults.getAttribute(id);
         } else {
@@ -75,7 +74,7 @@ public final class DefaultedHttpContext implements HttpContext {
 
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder();
+        final StringBuilder buf = new StringBuilder();
         buf.append("[local: ").append(this.local);
         buf.append("defaults: ").append(this.defaults);
         buf.append("]");

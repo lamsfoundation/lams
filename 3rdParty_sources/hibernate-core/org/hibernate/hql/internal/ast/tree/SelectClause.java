@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal.ast.tree;
 
@@ -48,6 +31,7 @@ public class SelectClause extends SelectExpressionList {
 	private boolean scalarSelect;
 
 	private List fromElementsForLoad = new ArrayList();
+	private List alreadyRenderedIdentifiers = new ArrayList();
 	//private Type[] sqlResultTypes;
 	private Type[] queryReturnTypes;
 	private String[][] columnNames;
@@ -241,6 +225,7 @@ public class SelectClause extends SelectExpressionList {
 							//sqlResultTypeList.add( type );
 							// Generate the select expression.
 							String text = fromElement.renderIdentifierSelect( size, k );
+							alreadyRenderedIdentifiers.add( text );
 							SelectExpressionImpl generatedExpr = (SelectExpressionImpl) appender.append(
 									SqlTokenTypes.SELECT_EXPR,
 									text,
@@ -372,6 +357,7 @@ public class SelectClause extends SelectExpressionList {
 		}
 	}
 
+	@Override
 	protected AST getFirstSelectExpression() {
 		AST n = getFirstChild();
 		// Skip 'DISTINCT' and 'ALL', so we return the first expression node.
@@ -407,8 +393,7 @@ public class SelectClause extends SelectExpressionList {
 		if ( aggregatedSelectExpression == null ) {
 			aliases = new String[selectExpressions.length];
 			for ( int i = 0; i < selectExpressions.length; i++ ) {
-				String alias = selectExpressions[i].getAlias();
-				aliases[i] = alias == null ? Integer.toString( i ) : alias;
+				aliases[i] = selectExpressions[i].getAlias();
 			}
 		}
 		else {
@@ -446,7 +431,7 @@ public class SelectClause extends SelectExpressionList {
 				if ( !selectExpressions[i].isScalar() ) {
 					FromElement fromElement = selectExpressions[i].getFromElement();
 					if ( fromElement != null ) {
-						renderNonScalarProperties( appender, fromElement, nonscalarSize, k );
+						renderNonScalarProperties( appender, selectExpressions[i], fromElement, nonscalarSize, k );
 						k++;
 					}
 				}
@@ -460,33 +445,69 @@ public class SelectClause extends SelectExpressionList {
 			int j,
 			SelectExpression expr,
 			ASTAppender appender) {
-		String text = fromElement.renderIdentifierSelect( nonscalarSize, j );
 		if ( !fromElement.getFromClause().isSubQuery() ) {
 			if ( !scalarSelect && !getWalker().isShallowQuery() ) {
-				//TODO: is this a bit ugly?
+//				// todo : ugh this is all fugly code
+//				if ( expr instanceof MapKeyNode ) {
+//					// don't over-write node text
+//				}
+//				else if ( expr instanceof MapEntryNode ) {
+//					// don't over-write node text
+//				}
+//				else {
+//					String text = fromElement.renderIdentifierSelect( nonscalarSize, j );
+//					expr.setText( text );
+//				}
+				String text = fromElement.renderIdentifierSelect( nonscalarSize, j );
 				expr.setText( text );
 			}
 			else {
-				appender.append( SqlTokenTypes.SQL_TOKEN, text, false );
+				String text = fromElement.renderIdentifierSelect( nonscalarSize, j );
+				if (! alreadyRenderedIdentifiers.contains(text)) {
+					appender.append( SqlTokenTypes.SQL_TOKEN, text, false );
+					alreadyRenderedIdentifiers.add(text);
+				}
 			}
 		}
 	}
 
-	private void renderNonScalarProperties(ASTAppender appender, FromElement fromElement, int nonscalarSize, int k) {
-		String text = fromElement.renderPropertySelect( nonscalarSize, k );
-		appender.append( SqlTokenTypes.SQL_TOKEN, text, false );
-		if ( fromElement.getQueryableCollection() != null && fromElement.isFetch() ) {
-			text = fromElement.renderCollectionSelectFragment( nonscalarSize, k );
-			appender.append( SqlTokenTypes.SQL_TOKEN, text, false );
+	private void renderNonScalarProperties(
+			ASTAppender appender,
+			SelectExpression selectExpression,
+			FromElement fromElement,
+			int nonscalarSize,
+			int k) {
+		final String text;
+		if ( selectExpression instanceof MapKeyNode ) {
+			final MapKeyNode mapKeyNode = (MapKeyNode) selectExpression;
+			if ( mapKeyNode.getMapKeyEntityFromElement() != null ) {
+				text = mapKeyNode.getMapKeyEntityFromElement().renderMapKeyPropertySelectFragment( nonscalarSize, k );
+			}
+			else {
+				text = fromElement.renderPropertySelect( nonscalarSize, k );
+			}
 		}
+		else if ( selectExpression instanceof MapEntryNode ) {
+			text = fromElement.renderMapEntryPropertySelectFragment( nonscalarSize, k );
+		}
+		else {
+			text = fromElement.renderPropertySelect( nonscalarSize, k );
+		}
+		appender.append( SqlTokenTypes.SQL_TOKEN, text, false );
+
+		if ( fromElement.getQueryableCollection() != null && fromElement.isFetch() ) {
+			String subText1 = fromElement.renderCollectionSelectFragment( nonscalarSize, k );
+			appender.append( SqlTokenTypes.SQL_TOKEN, subText1, false );
+		}
+
 		// Look through the FromElement's children to find any collections of values that should be fetched...
-		ASTIterator iter = new ASTIterator( fromElement );
-		while ( iter.hasNext() ) {
-			FromElement child = (FromElement) iter.next();
+		ASTIterator itr = new ASTIterator( fromElement );
+		while ( itr.hasNext() ) {
+			FromElement child = (FromElement) itr.next();
 			if ( child.isCollectionOfValuesOrComponents() && child.isFetch() ) {
 				// Need a better way to define the suffixes here...
-				text = child.renderValueCollectionSelectFragment( nonscalarSize, nonscalarSize + k );
-				appender.append( SqlTokenTypes.SQL_TOKEN, text, false );
+				final String subText2 = child.renderValueCollectionSelectFragment( nonscalarSize, nonscalarSize + k );
+				appender.append( SqlTokenTypes.SQL_TOKEN, subText2, false );
 			}
 		}
 	}

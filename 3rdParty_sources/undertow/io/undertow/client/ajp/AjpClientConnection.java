@@ -29,15 +29,18 @@ import static org.xnio.IoUtils.safeClose;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import io.undertow.client.ClientStatistics;
 import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
 import org.xnio.Option;
 import org.xnio.OptionMap;
-import org.xnio.Pool;
+import io.undertow.connector.ByteBufferPool;
 import org.xnio.StreamConnection;
 import org.xnio.XnioIoThread;
 import org.xnio.XnioWorker;
@@ -83,7 +86,7 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
     private final OptionMap options;
     private final AjpClientChannel connection;
 
-    private final Pool<ByteBuffer> bufferPool;
+    private final ByteBufferPool bufferPool;
 
     private static final int UPGRADED = 1 << 28;
     private static final int UPGRADE_REQUESTED = 1 << 29;
@@ -93,9 +96,11 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
     private int state;
 
     private final ChannelListener.SimpleSetter<AjpClientConnection> closeSetter = new ChannelListener.SimpleSetter<>();
-    private final ClientReceiveListener clientReceiveListener = new ClientReceiveListener();
+    private final ClientStatistics clientStatistics;
+    private final List<ChannelListener<ClientConnection>> closeListeners = new CopyOnWriteArrayList<>();
 
-    AjpClientConnection(final AjpClientChannel connection, final OptionMap options, final Pool<ByteBuffer> bufferPool) {
+    AjpClientConnection(final AjpClientChannel connection, final OptionMap options, final ByteBufferPool bufferPool, ClientStatistics clientStatistics) {
+        this.clientStatistics = clientStatistics;
         this.options = options;
         this.connection = connection;
         this.bufferPool = bufferPool;
@@ -104,6 +109,9 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
             @Override
             public void handleEvent(AjpClientChannel channel) {
                 ChannelListeners.invokeChannelListener(AjpClientConnection.this, closeSetter.get());
+                for(ChannelListener<ClientConnection> listener : closeListeners) {
+                    listener.handleEvent(AjpClientConnection.this);
+                }
             }
         });
         connection.getReceiveSetter().set(new ClientReceiveListener());
@@ -111,7 +119,7 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
     }
 
     @Override
-    public Pool<ByteBuffer> getBufferPool() {
+    public ByteBufferPool getBufferPool() {
         return bufferPool;
     }
 
@@ -175,6 +183,31 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
     @Override
     public boolean isUpgraded() {
         return anyAreSet(state, UPGRADE_REQUESTED | UPGRADED);
+    }
+
+    @Override
+    public boolean isPushSupported() {
+        return false;
+    }
+
+    @Override
+    public boolean isMultiplexingSupported() {
+        return false;
+    }
+
+    @Override
+    public ClientStatistics getStatistics() {
+        return clientStatistics;
+    }
+
+    @Override
+    public boolean isUpgradeSupported() {
+        return false;
+    }
+
+    @Override
+    public void addCloseListener(ChannelListener<ClientConnection> listener) {
+        closeListeners.add(listener);
     }
 
     @Override
@@ -314,7 +347,9 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
             } catch (Exception e) {
                 UndertowLogger.CLIENT_LOGGER.exceptionProcessingRequest(e);
                 safeClose(connection);
-                currentRequest.setFailed(e instanceof IOException ? (IOException) e : new IOException(e));
+                if(currentRequest != null) {
+                    currentRequest.setFailed(e instanceof IOException ? (IOException) e : new IOException(e));
+                }
             }
         }
     }

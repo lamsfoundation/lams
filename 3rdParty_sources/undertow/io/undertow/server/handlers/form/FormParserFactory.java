@@ -27,7 +27,7 @@ import io.undertow.util.AttachmentKey;
 
 /**
  * Factory class that can create a form data parser for a given request.
- * <p/>
+ * <p>
  * It does this by iterating the available parser definitions, and returning
  * the first parser that is created.
  *
@@ -65,8 +65,11 @@ public class FormParserFactory {
         return null;
     }
 
-    public interface ParserDefinition {
+    public interface ParserDefinition<T> {
+
         FormDataParser create(final HttpServerExchange exchange);
+
+        T setDefaultEncoding(String charset);
     }
 
     public static Builder builder() {
@@ -85,6 +88,8 @@ public class FormParserFactory {
 
         private List<ParserDefinition> parsers = new ArrayList<>();
 
+        private String defaultCharset = null;
+
         public Builder addParser(final ParserDefinition definition) {
             parsers.add(definition);
             return this;
@@ -100,7 +105,28 @@ public class FormParserFactory {
             return this;
         }
 
+        public List<ParserDefinition> getParsers() {
+            return parsers;
+        }
+
+        public void setParsers(List<ParserDefinition> parsers) {
+            this.parsers = parsers;
+        }
+
+        public String getDefaultCharset() {
+            return defaultCharset;
+        }
+
+        public void setDefaultCharset(String defaultCharset) {
+            this.defaultCharset = defaultCharset;
+        }
+
         public FormParserFactory build() {
+            if(defaultCharset != null) {
+                for (ParserDefinition parser : parsers) {
+                    parser.setDefaultEncoding(defaultCharset);
+                }
+            }
             return new FormParserFactory(parsers);
         }
 

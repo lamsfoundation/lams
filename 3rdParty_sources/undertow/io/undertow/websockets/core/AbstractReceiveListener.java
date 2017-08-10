@@ -142,7 +142,7 @@ public abstract class AbstractReceiveListener implements ChannelListener<WebSock
 
             @Override
             public void onError(WebSocketChannel channel, BufferedBinaryMessage context, Throwable throwable) {
-                context.getData().free();
+                context.getData().close();
                 AbstractReceiveListener.this.onError(channel, throwable);
             }
         });
@@ -167,11 +167,10 @@ public abstract class AbstractReceiveListener implements ChannelListener<WebSock
     }
 
     protected void onFullTextMessage(final WebSocketChannel channel, BufferedTextMessage message) throws IOException {
-
     }
 
     protected void onFullBinaryMessage(final WebSocketChannel channel, BufferedBinaryMessage message) throws IOException {
-
+        message.getData().free();
     }
 
     protected void onFullPingMessage(final WebSocketChannel channel, BufferedBinaryMessage message) throws IOException {
@@ -180,6 +179,7 @@ public abstract class AbstractReceiveListener implements ChannelListener<WebSock
     }
 
     protected void onFullPongMessage(final WebSocketChannel channel, BufferedBinaryMessage message) throws IOException {
+        message.getData().free();
     }
 
     protected void onFullCloseMessage(final WebSocketChannel channel, BufferedBinaryMessage message) throws IOException {
@@ -191,29 +191,28 @@ public abstract class AbstractReceiveListener implements ChannelListener<WebSock
                 WebSockets.sendClose(cm, channel, null);
             }
         } finally {
-            data.free();
+            data.close();
         }
     }
 
     protected void onCloseMessage(CloseMessage cm, WebSocketChannel channel) {
-
     }
 
     private static class FreeDataCallback implements WebSocketCallback<Void> {
         private final Pooled<ByteBuffer[]> data;
 
-        public FreeDataCallback(Pooled<ByteBuffer[]> data) {
+        FreeDataCallback(Pooled<ByteBuffer[]> data) {
             this.data = data;
         }
 
         @Override
         public void complete(WebSocketChannel channel, Void context) {
-            data.free();
+            data.close();
         }
 
         @Override
         public void onError(WebSocketChannel channel, Void context, Throwable throwable) {
-            data.free();
+            data.close();
         }
     }
 }

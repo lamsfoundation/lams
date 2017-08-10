@@ -35,7 +35,7 @@ import io.undertow.util.StatusCodes;
 
 /**
  * A redirect handler that redirects to the specified location via a 302 redirect.
- * <p/>
+ * <p>
  * The location is specified as an exchange attribute string.
  *
  * @author Stuart Douglas
@@ -61,7 +61,7 @@ public class RedirectHandler implements HttpHandler {
 
     @Override
     public void handleRequest(final HttpServerExchange exchange) throws Exception {
-        exchange.setResponseCode(StatusCodes.FOUND);
+        exchange.setStatusCode(StatusCodes.FOUND);
         exchange.getResponseHeaders().put(Headers.LOCATION, attribute.readAttribute(exchange));
         exchange.endExchange();
     }

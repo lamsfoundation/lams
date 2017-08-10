@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal.ast.tree;
 
@@ -32,12 +14,16 @@ import java.util.Set;
 import org.hibernate.MappingException;
 import org.hibernate.QueryException;
 import org.hibernate.engine.internal.JoinSequence;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.hql.internal.CollectionProperties;
 import org.hibernate.hql.internal.CollectionSubqueryFactory;
 import org.hibernate.hql.internal.NameGenerator;
 import org.hibernate.hql.internal.antlr.HqlSqlTokenTypes;
+import org.hibernate.hql.internal.ast.HqlSqlWalker;
+import org.hibernate.hql.internal.ast.util.SessionFactoryHelper;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.log.DeprecationLogger;
 import org.hibernate.internal.util.collections.ArrayHelper;
 import org.hibernate.param.ParameterSpecification;
 import org.hibernate.persister.collection.CollectionPropertyMapping;
@@ -232,6 +218,46 @@ class FromElementType {
 		}
 	}
 
+	public String renderMapKeyPropertySelectFragment(int size, int k) {
+		if ( persister == null ) {
+			throw new IllegalStateException( "Unexpected state in call to renderMapKeyPropertySelectFragment" );
+		}
+
+		final String fragment = ( (Queryable) persister ).propertySelectFragment(
+				getTableAlias(),
+				getSuffix( size, k ),
+				false
+		);
+		return trimLeadingCommaAndSpaces( fragment );
+
+//		if ( queryableCollection == null
+//				|| !Map.class.isAssignableFrom( queryableCollection.getCollectionType().getReturnedClass() ) ) {
+//			throw new IllegalStateException( "Illegal call to renderMapKeyPropertySelectFragment() when FromElement is not a Map" );
+//		}
+//
+//		if ( !queryableCollection.getIndexType().isEntityType() ) {
+//			return null;
+//		}
+//
+//		final HqlSqlWalker walker = fromElement.getWalker();
+//		final SessionFactoryHelper sfh = walker.getSessionFactoryHelper();
+//		final SessionFactoryImplementor sf = sfh.getFactory();
+//
+//		final EntityType indexEntityType = (EntityType) queryableCollection.getIndexType();
+//		final EntityPersister indexEntityPersister = (EntityPersister) indexEntityType.getAssociatedJoinable( sf );
+//
+//		final String fragment = ( (Queryable) indexEntityPersister ).propertySelectFragment(
+//				getTableAlias(),
+//				getSuffix( size, k ),
+//				false
+//		);
+//		return trimLeadingCommaAndSpaces( fragment );
+	}
+
+	public String renderMapEntryPropertySelectFragment(int size, int k) {
+		return null;
+	}
+
 	String renderCollectionSelectFragment(int size, int k) {
 		if ( queryableCollection == null ) {
 			return "";
@@ -396,14 +422,16 @@ class FromElementType {
 			// (most likely minElement, maxElement as well) cases.
 			//	todo : if ^^ is the case we should thrown an exception here rather than waiting for the sql error
 			//		if the dialect supports select-clause subqueries we could go ahead and generate the subquery also
-			Map enabledFilters = fromElement.getWalker().getEnabledFilters();
-			String subquery = CollectionSubqueryFactory.createCollectionSubquery(
-					joinSequence.copy().setUseThetaStyle( true ),
-					enabledFilters,
-					propertyMapping.toColumns( tableAlias, path )
-			);
-			LOG.debugf( "toColumns(%s,%s) : subquery = %s", tableAlias, path, subquery );
-			return new String[] {"(" + subquery + ")"};
+
+			// we also need to account for cases where the property name is a CollectionProperty, but
+			// is also a property on the element-entity.  This is handled inside `#getPropertyMapping`
+			// already; here just check for propertyMapping being the same as the entity persister.  Yes
+			// this is hacky, but really this is difficult to handle given the current codebase.
+			if ( persister != propertyMapping ) {
+				// we want the subquery...
+				DeprecationLogger.DEPRECATION_LOGGER.logDeprecationOfCollectionPropertiesInHql( path, fromElement.getClassAlias() );
+				return getCollectionPropertyReference( path ).toColumns( tableAlias );
+			}
 		}
 
 		if ( forceAlias ) {
@@ -503,6 +531,18 @@ class FromElementType {
 		// If the property is a special collection property name, return a CollectionPropertyMapping.
 		if ( CollectionProperties.isCollectionProperty( propertyName ) ) {
 			if ( collectionPropertyMapping == null ) {
+				// lets additionally make sure that the property name is not also the name
+				// of a property on the element, assuming that the element is an entity.
+				// todo : also consider composites?
+				if ( persister != null ) {
+					try {
+						if ( persister.getPropertyType( propertyName ) != null ) {
+							return (PropertyMapping) persister;
+						}
+					}
+					catch (QueryException ignore) {
+					}
+				}
 				collectionPropertyMapping = new CollectionPropertyMapping( queryableCollection );
 			}
 			return collectionPropertyMapping;
@@ -540,6 +580,52 @@ class FromElementType {
 
 	public void setIndexCollectionSelectorParamSpec(ParameterSpecification indexCollectionSelectorParamSpec) {
 		this.indexCollectionSelectorParamSpec = indexCollectionSelectorParamSpec;
+	}
+
+	public CollectionPropertyReference getCollectionPropertyReference(final String propertyName) {
+		if ( queryableCollection == null ) {
+			throw new QueryException( "Not a collection reference" );
+		}
+
+		final PropertyMapping collectionPropertyMapping;
+
+		if ( queryableCollection.isManyToMany()
+				&& queryableCollection.hasIndex()
+				&& SPECIAL_MANY2MANY_TREATMENT_FUNCTION_NAMES.contains( propertyName ) ) {
+			collectionPropertyMapping = new SpecialManyToManyCollectionPropertyMapping();
+		}
+		else if ( CollectionProperties.isCollectionProperty( propertyName ) ) {
+			if ( this.collectionPropertyMapping == null ) {
+				this.collectionPropertyMapping = new CollectionPropertyMapping( queryableCollection );
+			}
+			collectionPropertyMapping = this.collectionPropertyMapping;
+		}
+		else {
+			collectionPropertyMapping = queryableCollection;
+		}
+
+		return new CollectionPropertyReference() {
+			@Override
+			public Type getType() {
+				return collectionPropertyMapping.toType( propertyName );
+			}
+
+			@Override
+			public String[] toColumns(final String tableAlias) {
+				if ( propertyName.equalsIgnoreCase( "index" ) ) {
+					return collectionPropertyMapping.toColumns( tableAlias, propertyName );
+				}
+
+				Map enabledFilters = fromElement.getWalker().getEnabledFilters();
+				String subquery = CollectionSubqueryFactory.createCollectionSubquery(
+						joinSequence.copy().setUseThetaStyle( true ),
+						enabledFilters,
+						collectionPropertyMapping.toColumns( tableAlias, propertyName )
+				);
+				LOG.debugf( "toColumns(%s,%s) : subquery = %s", tableAlias, propertyName, subquery );
+				return new String[] {"(" + subquery + ")"};
+			}
+		};
 	}
 
 	private class SpecialManyToManyCollectionPropertyMapping implements PropertyMapping {

@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.internal.util;
 
@@ -35,11 +17,11 @@ import org.hibernate.HibernateException;
 
 /**
  * An object that is shallow-coneable
- * 
+ *
  * @author Steve Ebersole
  */
 public class Cloneable {
-	
+
 	private static final Object[] READER_METHOD_ARGS = new Object[0];
 
 	/**
@@ -51,12 +33,13 @@ public class Cloneable {
 	 */
 	public Object shallowCopy() {
 		return AccessController.doPrivileged(
-		        new PrivilegedAction() {
-			        public Object run() {
-				        return copyListeners();
-			        }
-		        }
-			);
+				new PrivilegedAction() {
+					@Override
+					public Object run() {
+						return copyListeners();
+					}
+				}
+		);
 	}
 
 	/**
@@ -68,13 +51,14 @@ public class Cloneable {
 	 */
 	public void validate() throws HibernateException {
 		AccessController.doPrivileged(
-		        new PrivilegedAction() {
-			        public Object run() {
-				        checkListeners();
-				        return null;
-			        }
-		        }
-			);
+				new PrivilegedAction() {
+					@Override
+					public Object run() {
+						checkListeners();
+						return null;
+					}
+				}
+		);
 
 	}
 
@@ -86,21 +70,19 @@ public class Cloneable {
 			internalCheckListeners( beanInfo );
 			copy = getClass().newInstance();
 			PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
-			for ( int i = 0, max = pds.length; i < max; i++ ) {
+			for ( PropertyDescriptor pd : pds ) {
 				try {
-					pds[i].getWriteMethod().invoke(
+					pd.getWriteMethod().invoke(
 							copy,
-							new Object[] {
-								pds[i].getReadMethod().invoke( this, READER_METHOD_ARGS )
-							}
-						);
+							pd.getReadMethod().invoke( this, READER_METHOD_ARGS )
+					);
 				}
-				catch( Throwable t ) {
-					throw new HibernateException( "Unable copy copy listener [" + pds[i].getName() + "]" );
+				catch (Throwable t) {
+					throw new HibernateException( "Unable copy copy listener [" + pd.getName() + "]" );
 				}
 			}
 		}
-		catch( Exception t ) {
+		catch (Exception t) {
 			throw new HibernateException( "Unable to copy listeners", t );
 		}
 		finally {
@@ -110,7 +92,7 @@ public class Cloneable {
 				Introspector.flushFromCaches( getClass() );
 			}
 		}
-		
+
 		return copy;
 	}
 
@@ -120,7 +102,7 @@ public class Cloneable {
 			beanInfo = Introspector.getBeanInfo( getClass(), Object.class );
 			internalCheckListeners( beanInfo );
 		}
-		catch( IntrospectionException t ) {
+		catch (IntrospectionException t) {
 			throw new HibernateException( "Unable to validate listener config", t );
 		}
 		finally {
@@ -135,28 +117,27 @@ public class Cloneable {
 	private void internalCheckListeners(BeanInfo beanInfo) {
 		PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
 		try {
-			for ( int i = 0, max = pds.length; i < max; i++ ) {
-				final Object listener = pds[i].getReadMethod().invoke( this, READER_METHOD_ARGS );
+			for ( PropertyDescriptor pd : pds ) {
+				final Object listener = pd.getReadMethod().invoke( this, READER_METHOD_ARGS );
 				if ( listener == null ) {
-					throw new HibernateException( "Listener [" + pds[i].getName() + "] was null" );
+					throw new HibernateException( "Listener [" + pd.getName() + "] was null" );
 				}
 				if ( listener.getClass().isArray() ) {
 					Object[] listenerArray = (Object[]) listener;
-					int length = listenerArray.length;
-					for ( int index = 0 ; index < length ; index++ ) {
-						if ( listenerArray[index] == null ) {
-							throw new HibernateException( "Listener in [" + pds[i].getName() + "] was null" );
+					for ( Object aListenerArray : listenerArray ) {
+						if ( aListenerArray == null ) {
+							throw new HibernateException( "Listener in [" + pd.getName() + "] was null" );
 						}
 					}
 				}
 			}
 		}
-		catch( HibernateException e ) {
+		catch (HibernateException e) {
 			throw e;
 		}
-		catch( Throwable t ) {
+		catch (Throwable t) {
 			throw new HibernateException( "Unable to validate listener config" );
 		}
 	}
-	
+
 }

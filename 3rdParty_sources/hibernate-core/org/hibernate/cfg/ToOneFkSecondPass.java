@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cfg;
 
@@ -28,6 +11,7 @@ import java.util.Iterator;
 import org.hibernate.AnnotationException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.MappingException;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.cfg.annotations.TableBinder;
 import org.hibernate.internal.util.StringHelper;
 import org.hibernate.mapping.Component;
@@ -46,8 +30,8 @@ import org.hibernate.mapping.ToOne;
  * @author Emmanuel Bernard
  */
 public class ToOneFkSecondPass extends FkSecondPass {
+	private MetadataBuildingContext buildingContext;
 	private boolean unique;
-	private Mappings mappings;
 	private String path;
 	private String entityClassName;
 
@@ -57,9 +41,9 @@ public class ToOneFkSecondPass extends FkSecondPass {
 			boolean unique,
 			String entityClassName,
 			String path,
-			Mappings mappings) {
+			MetadataBuildingContext buildingContext) {
 		super( value, columns );
-		this.mappings = mappings;
+		this.buildingContext = buildingContext;
 		this.unique = unique;
 		this.entityClassName = entityClassName;
 		this.path = entityClassName != null ? path.substring( entityClassName.length() + 1 ) : path;
@@ -73,7 +57,7 @@ public class ToOneFkSecondPass extends FkSecondPass {
 	@Override
     public boolean isInPrimaryKey() {
 		if ( entityClassName == null ) return false;
-		final PersistentClass persistentClass = mappings.getClass( entityClassName );
+		final PersistentClass persistentClass = buildingContext.getMetadataCollector().getEntityBinding( entityClassName );
 		Property property = persistentClass.getIdentifierProperty();
 		if ( path == null ) {
 			return false;
@@ -113,8 +97,8 @@ public class ToOneFkSecondPass extends FkSecondPass {
 								+ manyToOne.getReferencedEntityName()
 				);
 			}
-			BinderHelper.createSyntheticPropertyReference( columns, ref, null, manyToOne, false, mappings );
-			TableBinder.bindFk( ref, null, columns, manyToOne, unique, mappings );
+			BinderHelper.createSyntheticPropertyReference( columns, ref, null, manyToOne, false, buildingContext );
+			TableBinder.bindFk( ref, null, columns, manyToOne, unique, buildingContext );
 			/*
 			 * HbmMetadataSourceProcessorImpl does this only when property-ref != null, but IMO, it makes sense event if it is null
 			 */

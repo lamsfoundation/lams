@@ -20,6 +20,7 @@ package io.undertow.websockets.core;
 
 import io.undertow.websockets.WebSocketExtension;
 import org.jboss.logging.Messages;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.List;
+import java.util.zip.DataFormatException;
 
 /**
  * start at 20000
@@ -162,4 +164,13 @@ public interface WebSocketMessages {
 
     @Message(id = 2042, value = "Server responded with unsupported extension %s. Supported extensions: %s")
     IOException unsupportedExtension(String part, List<WebSocketExtension> supportedExtensions);
+
+    @Message(id = 2043, value = "WebSocket client is trying to use extensions but there is not extensions configured")
+    IllegalStateException badExtensionsConfiguredInClient();
+
+    @Message(id = 2044, value = "Compressed message payload is corrupted")
+    IOException badCompressedPayload(@Cause final DataFormatException cause);
+
+    @Message(id = 2045, value = "Unable to send on newly created channel!")
+    IllegalStateException unableToSendOnNewChannel();
 }

@@ -22,14 +22,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import io.undertow.util.MimeMappings;
 import org.jboss.logging.Logger;
-import org.xnio.FileAccess;
 import org.xnio.IoUtils;
 import org.xnio.channels.Channels;
 import org.xnio.channels.StreamSinkChannel;
@@ -47,7 +52,7 @@ import io.undertow.util.Headers;
 
 /**
  * Handler that serves up a file from disk to serve as an error page.
- * <p/>
+ * <p>
  * This handler does not server up and response codes by default, you must configure
  * the response codes it responds to.
  *
@@ -63,25 +68,44 @@ public class FileErrorPageHandler implements HttpHandler {
      */
     private volatile Set<Integer> responseCodes;
 
-    private volatile File file;
+    private volatile Path file;
 
+    private final MimeMappings mimeMappings;
+
+    @Deprecated
     public FileErrorPageHandler(final File file, final Integer... responseCodes) {
-        this.file = file;
-        this.responseCodes = new HashSet<>(Arrays.asList(responseCodes));
+        this(file.toPath(), responseCodes);
     }
 
+    public FileErrorPageHandler(final Path file, final Integer... responseCodes) {
+        this.file = file;
+        this.responseCodes = new HashSet<>(Arrays.asList(responseCodes));
+        this.mimeMappings = MimeMappings.DEFAULT;
+    }
+
+    @Deprecated
     public FileErrorPageHandler(HttpHandler next, final File file, final Integer... responseCodes) {
+        this(next, file.toPath(), responseCodes);
+    }
+
+    public FileErrorPageHandler(HttpHandler next, final Path file, final Integer... responseCodes) {
+        this(next, file, MimeMappings.DEFAULT, responseCodes);
+    }
+
+    public FileErrorPageHandler(HttpHandler next, final Path file, MimeMappings mimeMappings, final Integer... responseCodes) {
         this.next = next;
         this.file = file;
         this.responseCodes = new HashSet<>(Arrays.asList(responseCodes));
+        this.mimeMappings = mimeMappings;
     }
+
     @Override
     public void handleRequest(final HttpServerExchange exchange) throws Exception {
         exchange.addDefaultResponseListener(new DefaultResponseListener() {
             @Override
             public boolean handleDefaultResponse(final HttpServerExchange exchange) {
                 Set<Integer> codes = responseCodes;
-                if (!exchange.isResponseStarted() && codes.contains(exchange.getResponseCode())) {
+                if (!exchange.isResponseStarted() && codes.contains(exchange.getStatusCode())) {
                     serveFile(exchange);
                     return true;
                 }
@@ -93,13 +117,21 @@ public class FileErrorPageHandler implements HttpHandler {
     }
 
     private void serveFile(final HttpServerExchange exchange) {
+        String fileName = file.toString();
+        int index = fileName.lastIndexOf(".");
+        if(index > 0) {
+            String contentType = mimeMappings.getMimeType(fileName.substring(index + 1));
+            if(contentType != null) {
+                exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, contentType);
+            }
+        }
         exchange.dispatch(new Runnable() {
             @Override
             public void run() {
                 final FileChannel fileChannel;
                 try {
                     try {
-                        fileChannel = exchange.getConnection().getWorker().getXnio().openFile(file, FileAccess.READ_ONLY);
+                        fileChannel = FileChannel.open(file, StandardOpenOption.READ);
                     } catch (FileNotFoundException e) {
                         UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
                         exchange.endExchange();
@@ -110,7 +142,13 @@ public class FileErrorPageHandler implements HttpHandler {
                     exchange.endExchange();
                     return;
                 }
-                exchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, file.length());
+                long size;
+                try {
+                    size = Files.size(file);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                exchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, size);
                 final StreamSinkChannel response = exchange.getResponseChannel();
                 exchange.addExchangeCompleteListener(new ExchangeCompletionListener() {
                     @Override
@@ -122,7 +160,7 @@ public class FileErrorPageHandler implements HttpHandler {
 
                 try {
                     log.tracef("Serving file %s (blocking)", fileChannel);
-                    Channels.transferBlocking(response, fileChannel, 0, file.length());
+                    Channels.transferBlocking(response, fileChannel, 0, Files.size(file));
                     log.tracef("Finished serving %s, shutting down (blocking)", fileChannel);
                     response.shutdownWrites();
                     log.tracef("Finished serving %s, flushing (blocking)", fileChannel);
@@ -168,11 +206,11 @@ public class FileErrorPageHandler implements HttpHandler {
         return this;
     }
 
-    public File getFile() {
+    public Path getFile() {
         return file;
     }
 
-    public FileErrorPageHandler setFile(final File file) {
+    public FileErrorPageHandler setFile(final Path file) {
         this.file = file;
         return this;
     }
@@ -222,7 +260,7 @@ public class FileErrorPageHandler implements HttpHandler {
 
         @Override
         public HttpHandler wrap(HttpHandler handler) {
-            return new FileErrorPageHandler(handler, new File(file), responseCodes);
+            return new FileErrorPageHandler(handler, Paths.get(file), responseCodes);
         }
     }
 }

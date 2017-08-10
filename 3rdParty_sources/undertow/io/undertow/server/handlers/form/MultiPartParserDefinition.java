@@ -31,18 +31,22 @@ import io.undertow.util.MultipartParser;
 import io.undertow.util.SameThreadExecutor;
 import io.undertow.util.StatusCodes;
 import org.xnio.ChannelListener;
-import org.xnio.FileAccess;
 import org.xnio.IoUtils;
-import org.xnio.Pooled;
+import io.undertow.connector.PooledByteBuffer;
 import org.xnio.channels.StreamSourceChannel;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -50,23 +54,23 @@ import java.util.concurrent.Executor;
 /**
  * @author Stuart Douglas
  */
-public class MultiPartParserDefinition implements FormParserFactory.ParserDefinition {
+public class MultiPartParserDefinition implements FormParserFactory.ParserDefinition<MultiPartParserDefinition> {
 
     public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
     private Executor executor;
 
-    private File tempFileLocation;
+    private Path tempFileLocation;
 
-    private String defaultEncoding = "ISO-8859-1";
+    private String defaultEncoding = StandardCharsets.ISO_8859_1.displayName();
 
     private long maxIndividualFileSize = -1;
 
     public MultiPartParserDefinition() {
-        tempFileLocation = new File(System.getProperty("java.io.tmpdir"));
+        tempFileLocation = Paths.get(System.getProperty("java.io.tmpdir"));
     }
 
-    public MultiPartParserDefinition(final File tempDir) {
+    public MultiPartParserDefinition(final Path tempDir) {
         tempFileLocation = tempDir;
     }
 
@@ -74,7 +78,7 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
     public FormDataParser create(final HttpServerExchange exchange) {
         String mimeType = exchange.getRequestHeaders().getFirst(Headers.CONTENT_TYPE);
         if (mimeType != null && mimeType.startsWith(MULTIPART_FORM_DATA)) {
-            String boundary = Headers.extractTokenFromHeader(mimeType, "boundary");
+            String boundary = Headers.extractQuotedValueFromHeader(mimeType, "boundary");
             if (boundary == null) {
                 UndertowLogger.REQUEST_LOGGER.debugf("Could not find boundary in multipart request with ContentType: %s, multipart data will not be available", mimeType);
                 return null;
@@ -87,6 +91,12 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
                     nextListener.proceed();
                 }
             });
+            Long sizeLimit = exchange.getConnection().getUndertowOptions().get(UndertowOptions.MULTIPART_MAX_ENTITY_SIZE);
+            if(sizeLimit != null) {
+                exchange.setMaxEntitySize(sizeLimit);
+            }
+            UndertowLogger.REQUEST_LOGGER.tracef("Created multipart parser for %s", exchange);
+
             return parser;
 
         }
@@ -102,11 +112,11 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         return this;
     }
 
-    public File getTempFileLocation() {
+    public Path getTempFileLocation() {
         return tempFileLocation;
     }
 
-    public MultiPartParserDefinition setTempFileLocation(File tempFileLocation) {
+    public MultiPartParserDefinition setTempFileLocation(Path tempFileLocation) {
         this.tempFileLocation = tempFileLocation;
         return this;
     }
@@ -133,14 +143,14 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         private final HttpServerExchange exchange;
         private final FormData data;
         private final String boundary;
-        private final List<File> createdFiles = new ArrayList<>();
+        private final List<Path> createdFiles = new ArrayList<>();
         private final long maxIndividualFileSize;
         private String defaultEncoding;
 
         private final ByteArrayOutputStream contentBytes = new ByteArrayOutputStream();
         private String currentName;
         private String fileName;
-        private File file;
+        private Path file;
         private FileChannel fileChannel;
         private HeaderMap headers;
         private HttpHandler handler;
@@ -154,7 +164,16 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
             this.maxIndividualFileSize = maxIndividualFileSize;
             this.defaultEncoding = defaultEncoding;
             this.data = new FormData(exchange.getConnection().getUndertowOptions().get(UndertowOptions.MAX_PARAMETERS, 1000));
-            this.parser = MultipartParser.beginParse(exchange.getConnection().getBufferPool(), this, boundary.getBytes(), exchange.getRequestCharset());
+            String charset = defaultEncoding;
+            String contentType = exchange.getRequestHeaders().getFirst(Headers.CONTENT_TYPE);
+            if (contentType != null) {
+                String value = Headers.extractQuotedValueFromHeader(contentType, "charset");
+                if (value != null) {
+                    charset = value;
+                }
+            }
+           this.parser = MultipartParser.beginParse(exchange.getConnection().getByteBufferPool(), this, boundary.getBytes(), charset);
+
         }
 
 
@@ -185,16 +204,15 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
             if (existing != null) {
                 return existing;
             }
-
-            final MultipartParser.ParseState parser = MultipartParser.beginParse(exchange.getConnection().getBufferPool(), this, boundary.getBytes(), exchange.getRequestCharset());
             InputStream inputStream = exchange.getInputStream();
             if (inputStream == null) {
                 throw new IOException(UndertowMessages.MESSAGES.requestChannelAlreadyProvided());
             }
-            byte[] buf = new byte[1024];
-            try {
+            try (PooledByteBuffer pooled = exchange.getConnection().getByteBufferPool().getArrayBackedPool().allocate()){
+                ByteBuffer buf = pooled.getBuffer();
                 while (true) {
-                    int c = inputStream.read(buf);
+                    buf.clear();
+                    int c = inputStream.read(buf.array(), buf.arrayOffset(), buf.remaining());
                     if (c == -1) {
                         if (parser.isComplete()) {
                             break;
@@ -202,7 +220,8 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
                             throw UndertowMessages.MESSAGES.connectionTerminatedReadingMultiPartData();
                         }
                     } else if (c != 0) {
-                        parser.parse(ByteBuffer.wrap(buf, 0, c));
+                        buf.limit(c);
+                        parser.parse(buf);
                     }
                 }
                 exchange.putAttachment(FORM_DATA, data);
@@ -223,9 +242,13 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
                     fileName = Headers.extractQuotedValueFromHeader(disposition, "filename");
                     if (fileName != null) {
                         try {
-                            file = File.createTempFile("undertow", "upload", tempFileLocation);
+                            if (tempFileLocation != null) {
+                                file = Files.createTempFile(tempFileLocation, "undertow", "upload");
+                            } else {
+                                file = Files.createTempFile("undertow", "upload");
+                            }
                             createdFiles.add(file);
-                            fileChannel = exchange.getConnection().getWorker().getXnio().openFile(file, FileAccess.READ_WRITE);
+                            fileChannel = FileChannel.open(file, StandardOpenOption.READ, StandardOpenOption.WRITE);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
@@ -282,20 +305,23 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         }
 
 
-        public List<File> getCreatedFiles() {
+        public List<Path> getCreatedFiles() {
             return createdFiles;
         }
 
         @Override
         public void close() throws IOException {
             //we have to dispatch this, as it may result in file IO
-            final List<File> files = new ArrayList<>(getCreatedFiles());
+            final List<Path> files = new ArrayList<>(getCreatedFiles());
             exchange.getConnection().getWorker().execute(new Runnable() {
                 @Override
                 public void run() {
-                    for (final File file : files) {
-                        if (file.exists()) {
-                            if (!file.delete()) {
+                    for (final Path file : files) {
+                        if (Files.exists(file)) {
+                            try {
+                                Files.delete(file);
+                            } catch (NoSuchFileException e) { // ignore
+                            } catch (IOException e) {
                                 UndertowLogger.REQUEST_LOGGER.cannotRemoveUploadedFile(file);
                             }
                         }
@@ -308,6 +334,7 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         @Override
         public void setCharacterEncoding(final String encoding) {
             this.defaultEncoding = encoding;
+            parser.setCharacterEncoding(encoding);
         }
 
         private final class NonBlockingParseTask implements Runnable {
@@ -328,10 +355,10 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
                         exchange.dispatch(SameThreadExecutor.INSTANCE, handler);
                         return;
                     }
-                    Pooled<ByteBuffer> pooled = exchange.getConnection().getBufferPool().allocate();
+                    PooledByteBuffer pooled = exchange.getConnection().getByteBufferPool().allocate();
                     try {
                         while (true) {
-                            int c = requestChannel.read(pooled.getResource());
+                            int c = requestChannel.read(pooled.getBuffer());
                             if(c == 0) {
                                 requestChannel.getReadSetter().set(new ChannelListener<StreamSourceChannel>() {
                                     @Override
@@ -348,27 +375,27 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
                                     exchange.dispatch(SameThreadExecutor.INSTANCE, handler);
                                 } else {
                                     UndertowLogger.REQUEST_IO_LOGGER.ioException(UndertowMessages.MESSAGES.connectionTerminatedReadingMultiPartData());
-                                    exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
+                                    exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
                                     exchange.endExchange();
                                 }
                                 return;
                             } else {
-                                pooled.getResource().flip();
-                                parser.parse(pooled.getResource());
-                                pooled.getResource().compact();
+                                pooled.getBuffer().flip();
+                                parser.parse(pooled.getBuffer());
+                                pooled.getBuffer().compact();
                             }
                         }
                     } catch (MalformedMessageException e) {
                         UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
-                        exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
+                        exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
                         exchange.endExchange();
                     } finally {
-                        pooled.free();
+                        pooled.close();
                     }
 
                 } catch (Throwable e) {
                     UndertowLogger.REQUEST_IO_LOGGER.debug("Exception parsing data", e);
-                    exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
+                    exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
                     exchange.endExchange();
                 }
             }

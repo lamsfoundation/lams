@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.loader.plan.exec.internal;
 
@@ -32,11 +15,11 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.internal.CoreLogging;
+import org.hibernate.loader.plan.exec.process.internal.AbstractRowReader;
 import org.hibernate.loader.plan.exec.process.internal.EntityReferenceInitializerImpl;
 import org.hibernate.loader.plan.exec.process.internal.EntityReturnReader;
 import org.hibernate.loader.plan.exec.process.internal.ResultSetProcessingContextImpl;
 import org.hibernate.loader.plan.exec.process.internal.ResultSetProcessorHelper;
-import org.hibernate.loader.plan.exec.process.internal.AbstractRowReader;
 import org.hibernate.loader.plan.exec.process.spi.EntityReferenceInitializer;
 import org.hibernate.loader.plan.exec.process.spi.ReaderCollector;
 import org.hibernate.loader.plan.exec.process.spi.ResultSetProcessingContext;
@@ -51,7 +34,7 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.persister.entity.Joinable;
 import org.hibernate.persister.entity.OuterJoinLoadable;
 import org.hibernate.persister.entity.Queryable;
-import org.hibernate.type.ComponentType;
+import org.hibernate.type.CompositeType;
 import org.hibernate.type.Type;
 
 import org.jboss.logging.Logger;
@@ -168,6 +151,18 @@ public class EntityLoadQueryDetails extends AbstractLoadQueryDetails {
 	}
 
 	@Override
+	protected boolean isSubselectLoadingEnabled(FetchStats fetchStats) {
+		return getQueryBuildingParameters().getBatchSize() > 1 &&
+				fetchStats != null &&
+				fetchStats.hasSubselectFetches();
+	}
+
+	@Override
+	protected boolean shouldUseOptionalEntityInstance() {
+		return getQueryBuildingParameters().getBatchSize() < 2;
+	}
+
+	@Override
 	protected ReaderCollector getReaderCollector() {
 		return readerCollector;
 	}
@@ -234,38 +229,14 @@ public class EntityLoadQueryDetails extends AbstractLoadQueryDetails {
 			// if the entity reference we are hydrating is a Return, it is possible that its EntityKey is
 			// supplied by the QueryParameter optional entity information
 			if ( context.shouldUseOptionalEntityInformation() && context.getQueryParameters().getOptionalId() != null ) {
-				EntityKey entityKey = ResultSetProcessorHelper.getOptionalObjectKey(
-						context.getQueryParameters(),
-						context.getSession()
+				final EntityKey entityKey = context.getSession().generateEntityKey(
+						context.getQueryParameters().getOptionalId(),
+						processingState.getEntityReference().getEntityPersister()
 				);
 				processingState.registerIdentifierHydratedForm( entityKey.getIdentifier() );
 				processingState.registerEntityKey( entityKey );
-				final EntityPersister entityPersister = processingState.getEntityReference().getEntityPersister();
-				if ( entityPersister.getIdentifierType().isComponentType()  ) {
-					final ComponentType identifierType = (ComponentType) entityPersister.getIdentifierType();
-					if ( !identifierType.isEmbedded() ) {
-						addKeyManyToOnesToSession(
-								context,
-								identifierType,
-								entityKey.getIdentifier()
-						);
-					}
-				}
 			}
 			return super.readRow( resultSet, context );
-		}
-
-		private void addKeyManyToOnesToSession(ResultSetProcessingContextImpl context, ComponentType componentType, Object component ) {
-			for ( int i = 0 ; i < componentType.getSubtypes().length ; i++ ) {
-				final Type subType = componentType.getSubtypes()[ i ];
-				final Object subValue = componentType.getPropertyValue( component, i, context.getSession() );
-				if ( subType.isEntityType() ) {
-					( (Session) context.getSession() ).buildLockRequest( LockOptions.NONE ).lock( subValue );
-				}
-				else if ( subType.isComponentType() ) {
-					addKeyManyToOnesToSession( context, (ComponentType) subType, subValue  );
-				}
-			}
 		}
 
 		@Override

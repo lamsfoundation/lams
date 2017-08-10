@@ -1,33 +1,17 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.mapping;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.hibernate.MappingException;
-import org.hibernate.cfg.Mappings;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
 
@@ -39,12 +23,12 @@ public class ManyToOne extends ToOne {
 	private boolean ignoreNotFound;
 	private boolean isLogicalOneToOne;
 	
-	public ManyToOne(Mappings mappings, Table table) {
-		super( mappings, table );
+	public ManyToOne(MetadataImplementor metadata, Table table) {
+		super( metadata, table );
 	}
 
 	public Type getType() throws MappingException {
-		return getMappings().getTypeResolver().getTypeFactory().manyToOne(
+		return getMetadata().getTypeResolver().getTypeFactory().manyToOne(
 				getReferencedEntityName(),
 				referenceToPrimaryKey, 
 				getReferencedPropertyName(),
@@ -77,6 +61,7 @@ public class ManyToOne extends ToOne {
 					);
 			} 
 			else {
+				// todo : if "none" another option is to create the ForeignKey object still	but to set its #disableCreation flag
 				if ( !hasFormula() && !"none".equals( getForeignKeyName() ) ) {
 					java.util.List refColumns = new ArrayList();
 					Iterator iter = property.getColumnIterator();
@@ -89,8 +74,8 @@ public class ManyToOne extends ToOne {
 							getForeignKeyName(), 
 							getConstraintColumns(), 
 							( (EntityType) getType() ).getAssociatedEntityName(), 
-							refColumns 
-						);
+							refColumns
+					);
 					fk.setCascadeDeleteEnabled(isCascadeDeleteEnabled() );
 				}
 			}

@@ -32,6 +32,7 @@ import java.util.Locale;
 import org.apache.http.HttpStatus;
 import org.apache.http.ReasonPhraseCatalog;
 import org.apache.http.annotation.Immutable;
+import org.apache.http.util.Args;
 
 /**
  * English reason phrases for HTTP status codes.
@@ -69,20 +70,18 @@ public class EnglishReasonPhraseCatalog implements ReasonPhraseCatalog {
      * @param status    the status code, in the range 100-599
      * @param loc       ignored
      *
-     * @return  the reason phrase, or <code>null</code>
+     * @return  the reason phrase, or {@code null}
      */
-    public String getReason(int status, Locale loc) {
-        if ((status < 100) || (status >= 600)) {
-            throw new IllegalArgumentException
-                ("Unknown category for status code " + status + ".");
-        }
-
+    @Override
+    public String getReason(final int status, final Locale loc) {
+        Args.check(status >= 100 && status < 600, "Unknown category for status code " + status);
         final int category = status / 100;
         final int subcode  = status - 100*category;
 
         String reason = null;
-        if (REASON_PHRASES[category].length > subcode)
+        if (REASON_PHRASES[category].length > subcode) {
             reason = REASON_PHRASES[category][subcode];
+        }
 
         return reason;
     }
@@ -107,7 +106,7 @@ public class EnglishReasonPhraseCatalog implements ReasonPhraseCatalog {
      * @param status    the status code for which to define the phrase
      * @param reason    the reason phrase for this status code
      */
-    private static void setReason(int status, String reason) {
+    private static void setReason(final int status, final String reason) {
         final int category = status / 100;
         final int subcode  = status - 100*category;
         REASON_PHRASES[category][subcode] = reason;

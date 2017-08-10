@@ -34,9 +34,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.HttpStatus;
 import org.apache.http.annotation.ThreadSafe;
+import org.apache.http.util.Args;
 
 /**
- * ResponseDate is responsible for adding <code>Date<c/ode> header to the
+ * ResponseDate is responsible for adding {@code Date} header to the
  * outgoing responses. This interceptor is recommended for server side protocol
  * processors.
  *
@@ -51,16 +52,14 @@ public class ResponseDate implements HttpResponseInterceptor {
         super();
     }
 
+    @Override
     public void process(final HttpResponse response, final HttpContext context)
             throws HttpException, IOException {
-        if (response == null) {
-            throw new IllegalArgumentException
-                ("HTTP response may not be null.");
-        }
-        int status = response.getStatusLine().getStatusCode();
+        Args.notNull(response, "HTTP response");
+        final int status = response.getStatusLine().getStatusCode();
         if ((status >= HttpStatus.SC_OK) &&
             !response.containsHeader(HTTP.DATE_HEADER)) {
-            String httpdate = DATE_GENERATOR.getCurrentDate();
+            final String httpdate = DATE_GENERATOR.getCurrentDate();
             response.setHeader(HTTP.DATE_HEADER, httpdate);
         }
     }

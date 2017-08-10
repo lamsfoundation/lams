@@ -1,20 +1,21 @@
 /*
  * ====================================================================
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  * ====================================================================
  *
  * This software consists of voluntary contributions made by many
@@ -23,16 +24,14 @@
  * <http://www.apache.org/>.
  *
  */
-
 package org.apache.http.impl.auth;
 
 import java.util.Locale;
 
-import org.apache.http.annotation.NotThreadSafe;
-
 import org.apache.http.FormattedHeader;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
+import org.apache.http.annotation.NotThreadSafe;
 import org.apache.http.auth.AUTH;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.ChallengeState;
@@ -41,6 +40,7 @@ import org.apache.http.auth.Credentials;
 import org.apache.http.auth.MalformedChallengeException;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.Args;
 import org.apache.http.util.CharArrayBuffer;
 
 /**
@@ -56,21 +56,24 @@ import org.apache.http.util.CharArrayBuffer;
 @NotThreadSafe
 public abstract class AuthSchemeBase implements ContextAwareAuthScheme {
 
-    private ChallengeState challengeState;
+    protected ChallengeState challengeState;
 
     /**
-     * Creates an instance of <tt>AuthSchemeBase</tt> with the given challenge
+     * Creates an instance of {@code AuthSchemeBase} with the given challenge
      * state.
      *
      * @since 4.2
+     *
+     * @deprecated (4.3) do not use.
      */
+    @Deprecated
     public AuthSchemeBase(final ChallengeState challengeState) {
         super();
         this.challengeState = challengeState;
     }
 
     public AuthSchemeBase() {
-        this(null);
+        super();
     }
 
     /**
@@ -83,11 +86,10 @@ public abstract class AuthSchemeBase implements ContextAwareAuthScheme {
      * @throws MalformedChallengeException is thrown if the authentication challenge
      * is malformed
      */
+    @Override
     public void processChallenge(final Header header) throws MalformedChallengeException {
-        if (header == null) {
-            throw new IllegalArgumentException("Header may not be null");
-        }
-        String authheader = header.getName();
+        Args.notNull(header, "Header");
+        final String authheader = header.getName();
         if (authheader.equalsIgnoreCase(AUTH.WWW_AUTH)) {
             this.challengeState = ChallengeState.TARGET;
         } else if (authheader.equalsIgnoreCase(AUTH.PROXY_AUTH)) {
@@ -96,13 +98,13 @@ public abstract class AuthSchemeBase implements ContextAwareAuthScheme {
             throw new MalformedChallengeException("Unexpected header name: " + authheader);
         }
 
-        CharArrayBuffer buffer;
+        final CharArrayBuffer buffer;
         int pos;
         if (header instanceof FormattedHeader) {
             buffer = ((FormattedHeader) header).getBuffer();
             pos = ((FormattedHeader) header).getValuePos();
         } else {
-            String s = header.getValue();
+            final String s = header.getValue();
             if (s == null) {
                 throw new MalformedChallengeException("Header value is null");
             }
@@ -113,12 +115,12 @@ public abstract class AuthSchemeBase implements ContextAwareAuthScheme {
         while (pos < buffer.length() && HTTP.isWhitespace(buffer.charAt(pos))) {
             pos++;
         }
-        int beginIndex = pos;
+        final int beginIndex = pos;
         while (pos < buffer.length() && !HTTP.isWhitespace(buffer.charAt(pos))) {
             pos++;
         }
-        int endIndex = pos;
-        String s = buffer.substring(beginIndex, endIndex);
+        final int endIndex = pos;
+        final String s = buffer.substring(beginIndex, endIndex);
         if (!s.equalsIgnoreCase(getSchemeName())) {
             throw new MalformedChallengeException("Invalid scheme identifier: " + s);
         }
@@ -127,6 +129,7 @@ public abstract class AuthSchemeBase implements ContextAwareAuthScheme {
     }
 
 
+    @Override
     @SuppressWarnings("deprecation")
     public Header authenticate(
             final Credentials credentials,
@@ -139,7 +142,7 @@ public abstract class AuthSchemeBase implements ContextAwareAuthScheme {
             CharArrayBuffer buffer, int beginIndex, int endIndex) throws MalformedChallengeException;
 
     /**
-     * Returns <code>true</code> if authenticating against a proxy, <code>false</code>
+     * Returns {@code true} if authenticating against a proxy, {@code false}
      * otherwise.
      */
     public boolean isProxy() {
@@ -147,7 +150,7 @@ public abstract class AuthSchemeBase implements ContextAwareAuthScheme {
     }
 
     /**
-     * Returns {@link ChallengeState} value or <code>null</code> if unchallenged.
+     * Returns {@link ChallengeState} value or {@code null} if unchallenged.
      *
      * @since 4.2
      */
@@ -157,9 +160,9 @@ public abstract class AuthSchemeBase implements ContextAwareAuthScheme {
 
     @Override
     public String toString() {
-        String name = getSchemeName();
+        final String name = getSchemeName();
         if (name != null) {
-            return name.toUpperCase(Locale.US);
+            return name.toUpperCase(Locale.ROOT);
         } else {
             return super.toString();
         }

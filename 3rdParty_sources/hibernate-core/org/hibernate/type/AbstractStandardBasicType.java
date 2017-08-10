@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.type;
 
@@ -30,23 +13,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.cfg.Environment;
-import org.hibernate.engine.jdbc.LobCreator;
+import org.hibernate.engine.jdbc.Size;
 import org.hibernate.engine.spi.Mapping;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.util.StringHelper;
+import org.hibernate.internal.WrapperOptionsImpl;
 import org.hibernate.internal.util.collections.ArrayHelper;
-import org.hibernate.metamodel.relational.Size;
 import org.hibernate.type.descriptor.WrapperOptions;
+import org.hibernate.type.descriptor.WrapperOptionsContext;
 import org.hibernate.type.descriptor.java.JavaTypeDescriptor;
 import org.hibernate.type.descriptor.java.MutabilityPlan;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
-
-import org.dom4j.Node;
 
 /**
  * Convenience base class for {@link BasicType} implementations
@@ -55,7 +34,7 @@ import org.dom4j.Node;
  * @author Brett Meyer
  */
 public abstract class AbstractStandardBasicType<T>
-		implements BasicType, StringRepresentableType<T>, XmlRepresentableType<T>, ProcedureParameterExtractionAware<T> {
+		implements BasicType, StringRepresentableType<T>, ProcedureParameterExtractionAware<T>, ProcedureParameterNamedBinder {
 
 	private static final Size DEFAULT_SIZE = new Size( 19, 2, 255, Size.LobMultiplier.NONE ); // to match legacy behavior
 	private final Size dictatedSize = new Size();
@@ -83,14 +62,6 @@ public abstract class AbstractStandardBasicType<T>
 
 	public T fromStringValue(String xml) throws HibernateException {
 		return fromString( xml );
-	}
-
-	public String toXMLString(T value, SessionFactoryImplementor factory) throws HibernateException {
-		return toString( value );
-	}
-
-	public T fromXMLString(String xml, Mapping factory) throws HibernateException {
-		return StringHelper.isEmpty( xml ) ? null : fromStringValue( xml );
 	}
 
 	protected MutabilityPlan<T> getMutabilityPlan() {
@@ -299,15 +270,6 @@ public abstract class AbstractStandardBasicType<T>
 		return javaTypeDescriptor.extractLoggableRepresentation( (T) value );
 	}
 
-	@SuppressWarnings({ "unchecked" })
-	public final void setToXMLNode(Node node, Object value, SessionFactoryImplementor factory) {
-		node.setText( toString( (T) value ) );
-	}
-
-	public final Object fromXMLNode(Node xml, Mapping factory) {
-		return fromString( xml.getText() );
-	}
-
 	public final boolean isMutable() {
 		return getMutabilityPlan().isMutable();
 	}
@@ -363,7 +325,7 @@ public abstract class AbstractStandardBasicType<T>
 			Object owner,
 			Map copyCache,
 			ForeignKeyDirection foreignKeyDirection) {
-		return ForeignKeyDirection.FOREIGN_KEY_FROM_PARENT == foreignKeyDirection
+		return ForeignKeyDirection.FROM_PARENT == foreignKeyDirection
 				? getReplacement( (T) original, (T) target, session )
 				: target;
 	}
@@ -389,24 +351,26 @@ public abstract class AbstractStandardBasicType<T>
 		return remapSqlTypeDescriptor( options ).getExtractor( javaTypeDescriptor ).extract( statement, paramNames, options );
 	}
 	
-	// TODO : have SessionImplementor extend WrapperOptions
 	private WrapperOptions getOptions(final SessionImplementor session) {
-		return new WrapperOptions() {
-			public boolean useStreamForLobBinding() {
-				return Environment.useStreamsForBinary()
-						|| session.getFactory().getDialect().useInputStreamToInsertBlob();
-			}
+		if ( session instanceof WrapperOptionsContext ) {
+			return ( (WrapperOptionsContext) session ).getWrapperOptions();
+		}
 
-			public LobCreator getLobCreator() {
-				return Hibernate.getLobCreator( session );
-			}
+		return new WrapperOptionsImpl( session );
+	}
 
-			public SqlTypeDescriptor remapSqlTypeDescriptor(SqlTypeDescriptor sqlTypeDescriptor) {
-				final SqlTypeDescriptor remapped = sqlTypeDescriptor.canBeRemapped()
-						? session.getFactory().getDialect().remapSqlTypeDescriptor( sqlTypeDescriptor )
-						: sqlTypeDescriptor;
-				return remapped == null ? sqlTypeDescriptor : remapped;
-			}
-		};
+	@Override
+	public void nullSafeSet(
+			CallableStatement st, Object value, String name, SessionImplementor session) throws SQLException {
+		nullSafeSet( st, value, name, getOptions( session ) );
+	}
+
+	protected final void nullSafeSet(CallableStatement st, Object value, String name, WrapperOptions options) throws SQLException {
+		remapSqlTypeDescriptor( options ).getBinder( javaTypeDescriptor ).bind( st, ( T ) value, name, options );
+	}
+
+	@Override
+	public boolean canDoSetting() {
+		return true;
 	}
 }

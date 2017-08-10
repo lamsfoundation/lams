@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.type;
 
@@ -50,7 +33,10 @@ import org.jboss.logging.Logger;
 public class DbTimestampType extends TimestampType {
 	public static final DbTimestampType INSTANCE = new DbTimestampType();
 
-	private static final CoreMessageLogger LOG = Logger.getMessageLogger( CoreMessageLogger.class, DbTimestampType.class.getName() );
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
+			CoreMessageLogger.class,
+			DbTimestampType.class.getName()
+	);
 
 	@Override
 	public String getName() {
@@ -59,7 +45,7 @@ public class DbTimestampType extends TimestampType {
 
 	@Override
 	public String[] getRegistrationKeys() {
-		return new String[] { getName() };
+		return new String[] {getName()};
 	}
 
 	@Override
@@ -80,35 +66,43 @@ public class DbTimestampType extends TimestampType {
 	private Date getCurrentTimestamp(SessionImplementor session) {
 		Dialect dialect = session.getFactory().getDialect();
 		String timestampSelectString = dialect.getCurrentTimestampSelectString();
-        if (dialect.isCurrentTimestampSelectStringCallable()) return useCallableStatement(timestampSelectString, session);
-        return usePreparedStatement(timestampSelectString, session);
+		if ( dialect.isCurrentTimestampSelectStringCallable() ) {
+			return useCallableStatement( timestampSelectString, session );
+		}
+		return usePreparedStatement( timestampSelectString, session );
 	}
 
 	private Timestamp usePreparedStatement(String timestampSelectString, SessionImplementor session) {
 		PreparedStatement ps = null;
 		try {
-			ps = session.getTransactionCoordinator()
+			ps = session
 					.getJdbcCoordinator()
 					.getStatementPreparer()
 					.prepareStatement( timestampSelectString, false );
-			ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().extract( ps );
+			ResultSet rs = session.getJdbcCoordinator().getResultSetReturn().extract( ps );
 			rs.next();
 			Timestamp ts = rs.getTimestamp( 1 );
 			if ( LOG.isTraceEnabled() ) {
-				LOG.tracev( "Current timestamp retreived from db : {0} (nanos={1}, time={2})", ts, ts.getNanos(), ts.getTime() );
+				LOG.tracev(
+						"Current timestamp retreived from db : {0} (nanos={1}, time={2})",
+						ts,
+						ts.getNanos(),
+						ts.getTime()
+				);
 			}
 			return ts;
 		}
-		catch( SQLException e ) {
+		catch (SQLException e) {
 			throw session.getFactory().getSQLExceptionHelper().convert(
-			        e,
-			        "could not select current db timestamp",
-			        timestampSelectString
+					e,
+					"could not select current db timestamp",
+					timestampSelectString
 			);
 		}
 		finally {
 			if ( ps != null ) {
-				session.getTransactionCoordinator().getJdbcCoordinator().release( ps );
+				session.getJdbcCoordinator().getResourceRegistry().release( ps );
+				session.getJdbcCoordinator().afterStatementExecution();
 			}
 		}
 	}
@@ -116,28 +110,34 @@ public class DbTimestampType extends TimestampType {
 	private Timestamp useCallableStatement(String callString, SessionImplementor session) {
 		CallableStatement cs = null;
 		try {
-			cs = (CallableStatement) session.getTransactionCoordinator()
+			cs = (CallableStatement) session
 					.getJdbcCoordinator()
 					.getStatementPreparer()
 					.prepareStatement( callString, true );
 			cs.registerOutParameter( 1, java.sql.Types.TIMESTAMP );
-			session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().execute( cs );
+			session.getJdbcCoordinator().getResultSetReturn().execute( cs );
 			Timestamp ts = cs.getTimestamp( 1 );
 			if ( LOG.isTraceEnabled() ) {
-				LOG.tracev( "Current timestamp retreived from db : {0} (nanos={1}, time={2})", ts, ts.getNanos(), ts.getTime() );
+				LOG.tracev(
+						"Current timestamp retreived from db : {0} (nanos={1}, time={2})",
+						ts,
+						ts.getNanos(),
+						ts.getTime()
+				);
 			}
 			return ts;
 		}
-		catch( SQLException e ) {
+		catch (SQLException e) {
 			throw session.getFactory().getSQLExceptionHelper().convert(
-			        e,
-			        "could not call current db timestamp function",
-			        callString
+					e,
+					"could not call current db timestamp function",
+					callString
 			);
 		}
 		finally {
 			if ( cs != null ) {
-				session.getTransactionCoordinator().getJdbcCoordinator().release( cs );
+				session.getJdbcCoordinator().getResourceRegistry().release( cs );
+				session.getJdbcCoordinator().afterStatementExecution();
 			}
 		}
 	}

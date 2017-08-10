@@ -30,6 +30,7 @@ package org.apache.http;
 import java.io.Serializable;
 
 import org.apache.http.annotation.Immutable;
+import org.apache.http.util.Args;
 
 /**
  * Represents a protocol version. The "major.minor" numbering
@@ -66,22 +67,10 @@ public class ProtocolVersion implements Serializable, Cloneable {
      * @param major      the major version number of the protocol
      * @param minor      the minor version number of the protocol
      */
-    public ProtocolVersion(String protocol, int major, int minor) {
-        if (protocol == null) {
-            throw new IllegalArgumentException
-                ("Protocol name must not be null.");
-        }
-        if (major < 0) {
-            throw new IllegalArgumentException
-                ("Protocol major version number must not be negative.");
-        }
-        if (minor < 0) {
-            throw new IllegalArgumentException
-                ("Protocol minor version number may not be negative");
-        }
-        this.protocol = protocol;
-        this.major = major;
-        this.minor = minor;
+    public ProtocolVersion(final String protocol, final int major, final int minor) {
+        this.protocol = Args.notNull(protocol, "Protocol name");
+        this.major = Args.notNegative(major, "Protocol minor version");
+        this.minor = Args.notNegative(minor, "Protocol minor version");
     }
 
     /**
@@ -116,10 +105,11 @@ public class ProtocolVersion implements Serializable, Cloneable {
      * Obtains a specific version of this protocol.
      * This can be used by derived classes to instantiate themselves instead
      * of the base class, and to define constants for commonly used versions.
-     * <br/>
-     * The default implementation in this class returns <code>this</code>
+     * <p>
+     * The default implementation in this class returns {@code this}
      * if the version matches, and creates a new {@link ProtocolVersion}
      * otherwise.
+     * </p>
      *
      * @param major     the major version
      * @param minor     the minor version
@@ -127,7 +117,7 @@ public class ProtocolVersion implements Serializable, Cloneable {
      * @return  a protocol version with the same protocol name
      *          and the argument version
      */
-    public ProtocolVersion forVersion(int major, int minor) {
+    public ProtocolVersion forVersion(final int major, final int minor) {
 
         if ((major == this.major) && (minor == this.minor)) {
             return this;
@@ -159,18 +149,18 @@ public class ProtocolVersion implements Serializable, Cloneable {
      *
      * @param obj       the object to compare with
      *
-     * @return  <code>true</code> if the argument is the same protocol version,
-     *          <code>false</code> otherwise
+     * @return  {@code true} if the argument is the same protocol version,
+     *          {@code false} otherwise
      */
     @Override
-    public final boolean equals(Object obj) {
+    public final boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
         if (!(obj instanceof ProtocolVersion)) {
             return false;
         }
-        ProtocolVersion that = (ProtocolVersion) obj;
+        final ProtocolVersion that = (ProtocolVersion) obj;
 
         return ((this.protocol.equals(that.protocol)) &&
                 (this.major == that.major) &&
@@ -185,10 +175,10 @@ public class ProtocolVersion implements Serializable, Cloneable {
      *
      * @param that      the protocol version to consider
      *
-     * @return  <code>true</code> if {@link #compareToVersion compareToVersion}
-     *          can be called with the argument, <code>false</code> otherwise
+     * @return  {@code true} if {@link #compareToVersion compareToVersion}
+     *          can be called with the argument, {@code false} otherwise
      */
-    public boolean isComparable(ProtocolVersion that) {
+    public boolean isComparable(final ProtocolVersion that) {
         return (that != null) && this.protocol.equals(that.protocol);
     }
 
@@ -199,7 +189,7 @@ public class ProtocolVersion implements Serializable, Cloneable {
      * This method does <i>not</i> define a total ordering, as it would be
      * required for {@link java.lang.Comparable}.
      *
-     * @param that      the protocl version to compare with
+     * @param that      the protocol version to compare with
      *
      * @return   a negative integer, zero, or a positive integer
      *           as this version is less than, equal to, or greater than
@@ -207,19 +197,12 @@ public class ProtocolVersion implements Serializable, Cloneable {
      *
      * @throws IllegalArgumentException
      *         if the argument has a different protocol name than this object,
-     *         or if the argument is <code>null</code>
+     *         or if the argument is {@code null}
      */
-    public int compareToVersion(ProtocolVersion that) {
-        if (that == null) {
-            throw new IllegalArgumentException
-                ("Protocol version must not be null.");
-        }
-        if (!this.protocol.equals(that.protocol)) {
-            throw new IllegalArgumentException
-                ("Versions for different protocols cannot be compared. " +
-                 this + " " + that);
-        }
-
+    public int compareToVersion(final ProtocolVersion that) {
+        Args.notNull(that, "Protocol version");
+        Args.check(this.protocol.equals(that.protocol),
+                "Versions for different protocols cannot be compared: %s %s", this, that);
         int delta = getMajor() - that.getMajor();
         if (delta == 0) {
             delta = getMinor() - that.getMinor();
@@ -233,12 +216,12 @@ public class ProtocolVersion implements Serializable, Cloneable {
      *
      * @param version   the version against which to check this version
      *
-     * @return  <code>true</code> if this protocol version is
+     * @return  {@code true} if this protocol version is
      *          {@link #isComparable comparable} to the argument
      *          and {@link #compareToVersion compares} as greater or equal,
-     *          <code>false</code> otherwise
+     *          {@code false} otherwise
      */
-    public final boolean greaterEquals(ProtocolVersion version) {
+    public final boolean greaterEquals(final ProtocolVersion version) {
         return isComparable(version) && (compareToVersion(version) >= 0);
     }
 
@@ -248,12 +231,12 @@ public class ProtocolVersion implements Serializable, Cloneable {
      *
      * @param version   the version against which to check this version
      *
-     * @return  <code>true</code> if this protocol version is
+     * @return  {@code true} if this protocol version is
      *          {@link #isComparable comparable} to the argument
      *          and {@link #compareToVersion compares} as less or equal,
-     *          <code>false</code> otherwise
+     *          {@code false} otherwise
      */
-    public final boolean lessEquals(ProtocolVersion version) {
+    public final boolean lessEquals(final ProtocolVersion version) {
         return isComparable(version) && (compareToVersion(version) <= 0);
     }
 
@@ -265,7 +248,7 @@ public class ProtocolVersion implements Serializable, Cloneable {
      */
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
         buffer.append(this.protocol);
         buffer.append('/');
         buffer.append(Integer.toString(this.major));

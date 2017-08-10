@@ -1,31 +1,19 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2012, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.boot.registry.selector.internal;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
+import org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl;
+import org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl;
+import org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl;
+import org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.boot.registry.selector.SimpleStrategyRegistrationImpl;
 import org.hibernate.boot.registry.selector.StrategyRegistration;
@@ -53,6 +41,7 @@ import org.hibernate.dialect.InterbaseDialect;
 import org.hibernate.dialect.JDataStoreDialect;
 import org.hibernate.dialect.MckoiDialect;
 import org.hibernate.dialect.MimerSQLDialect;
+import org.hibernate.dialect.MySQL57InnoDBDialect;
 import org.hibernate.dialect.MySQL5Dialect;
 import org.hibernate.dialect.MySQL5InnoDBDialect;
 import org.hibernate.dialect.Oracle10gDialect;
@@ -74,9 +63,6 @@ import org.hibernate.dialect.SybaseASE15Dialect;
 import org.hibernate.dialect.SybaseAnywhereDialect;
 import org.hibernate.dialect.TeradataDialect;
 import org.hibernate.dialect.TimesTenDialect;
-import org.hibernate.engine.transaction.internal.jdbc.JdbcTransactionFactory;
-import org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory;
-import org.hibernate.engine.transaction.internal.jta.JtaTransactionFactory;
 import org.hibernate.engine.transaction.jta.platform.internal.BitronixJtaPlatform;
 import org.hibernate.engine.transaction.jta.platform.internal.BorlandEnterpriseServerJtaPlatform;
 import org.hibernate.engine.transaction.jta.platform.internal.JBossAppServerJtaPlatform;
@@ -92,14 +78,17 @@ import org.hibernate.engine.transaction.jta.platform.internal.WebSphereExtendedJ
 import org.hibernate.engine.transaction.jta.platform.internal.WebSphereJtaPlatform;
 import org.hibernate.engine.transaction.jta.platform.internal.WeblogicJtaPlatform;
 import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
-import org.hibernate.engine.transaction.spi.TransactionFactory;
 import org.hibernate.event.internal.EntityCopyAllowedLoggedObserver;
 import org.hibernate.event.internal.EntityCopyAllowedObserver;
 import org.hibernate.event.internal.EntityCopyNotAllowedObserver;
 import org.hibernate.event.spi.EntityCopyObserver;
-import org.hibernate.hql.spi.MultiTableBulkIdStrategy;
-import org.hibernate.hql.spi.PersistentTableBulkIdStrategy;
-import org.hibernate.hql.spi.TemporaryTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.MultiTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.global.GlobalTemporaryTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.local.LocalTemporaryTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.persistent.PersistentTableBulkIdStrategy;
+import org.hibernate.resource.transaction.TransactionCoordinatorBuilder;
+import org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorBuilderImpl;
+import org.hibernate.resource.transaction.backend.jta.internal.JtaTransactionCoordinatorBuilderImpl;
 
 import org.jboss.logging.Logger;
 
@@ -164,9 +153,10 @@ public class StrategySelectorBuilder {
 		// build the baseline...
 		addDialects( strategySelector );
 		addJtaPlatforms( strategySelector );
-		addTransactionFactories( strategySelector );
+		addTransactionCoordinatorBuilders( strategySelector );
 		addMultiTableBulkIdStrategies( strategySelector );
 		addEntityCopyObserverStrategies( strategySelector );
+		addImplicitNamingStrategies( strategySelector );
 
 		// apply auto-discovered registrations
 		for ( StrategyRegistrationProvider provider : classLoaderService.loadJavaServices( StrategyRegistrationProvider.class ) ) {
@@ -217,8 +207,7 @@ public class StrategySelectorBuilder {
 		addDialect( strategySelector, MimerSQLDialect.class );
 		addDialect( strategySelector, MySQL5Dialect.class );
 		addDialect( strategySelector, MySQL5InnoDBDialect.class );
-		addDialect( strategySelector, MySQL5Dialect.class );
-		addDialect( strategySelector, MySQL5InnoDBDialect.class );
+		addDialect( strategySelector, MySQL57InnoDBDialect.class );
 		addDialect( strategySelector, Oracle8iDialect.class );
 		addDialect( strategySelector, Oracle9iDialect.class );
 		addDialect( strategySelector, Oracle10gDialect.class );
@@ -354,15 +343,34 @@ public class StrategySelectorBuilder {
 		}
 	}
 
-	private void addTransactionFactories(StrategySelectorImpl strategySelector) {
-		strategySelector.registerStrategyImplementor( TransactionFactory.class, JdbcTransactionFactory.SHORT_NAME, JdbcTransactionFactory.class );
-		strategySelector.registerStrategyImplementor( TransactionFactory.class, "org.hibernate.transaction.JDBCTransactionFactory", JdbcTransactionFactory.class );
+	private void addTransactionCoordinatorBuilders(StrategySelectorImpl strategySelector) {
+		strategySelector.registerStrategyImplementor(
+				TransactionCoordinatorBuilder.class,
+				JdbcResourceLocalTransactionCoordinatorBuilderImpl.SHORT_NAME,
+				JdbcResourceLocalTransactionCoordinatorBuilderImpl.class
+		);
+		strategySelector.registerStrategyImplementor(
+				TransactionCoordinatorBuilder.class,
+				JtaTransactionCoordinatorBuilderImpl.SHORT_NAME,
+				JtaTransactionCoordinatorBuilderImpl.class
+		);
 
-		strategySelector.registerStrategyImplementor( TransactionFactory.class, JtaTransactionFactory.SHORT_NAME, JtaTransactionFactory.class );
-		strategySelector.registerStrategyImplementor( TransactionFactory.class, "org.hibernate.transaction.JTATransactionFactory", JtaTransactionFactory.class );
-
-		strategySelector.registerStrategyImplementor( TransactionFactory.class, CMTTransactionFactory.SHORT_NAME, CMTTransactionFactory.class );
-		strategySelector.registerStrategyImplementor( TransactionFactory.class, "org.hibernate.transaction.CMTTransactionFactory", CMTTransactionFactory.class );
+		// add the legacy TransactionFactory impl names...
+		strategySelector.registerStrategyImplementor(
+				TransactionCoordinatorBuilder.class,
+				"org.hibernate.transaction.JDBCTransactionFactory",
+				JdbcResourceLocalTransactionCoordinatorBuilderImpl.class
+		);
+		strategySelector.registerStrategyImplementor(
+				TransactionCoordinatorBuilder.class,
+				"org.hibernate.transaction.JTATransactionFactory",
+				JtaTransactionCoordinatorBuilderImpl.class
+		);
+		strategySelector.registerStrategyImplementor(
+				TransactionCoordinatorBuilder.class,
+				"org.hibernate.transaction.CMTTransactionFactory",
+				JtaTransactionCoordinatorBuilderImpl.class
+		);
 	}
 
 	private void addMultiTableBulkIdStrategies(StrategySelectorImpl strategySelector) {
@@ -373,8 +381,13 @@ public class StrategySelectorBuilder {
 		);
 		strategySelector.registerStrategyImplementor(
 				MultiTableBulkIdStrategy.class,
-				TemporaryTableBulkIdStrategy.SHORT_NAME,
-				TemporaryTableBulkIdStrategy.class
+				GlobalTemporaryTableBulkIdStrategy.SHORT_NAME,
+				GlobalTemporaryTableBulkIdStrategy.class
+		);
+		strategySelector.registerStrategyImplementor(
+				MultiTableBulkIdStrategy.class,
+				LocalTemporaryTableBulkIdStrategy.SHORT_NAME,
+				LocalTemporaryTableBulkIdStrategy.class
 		);
 	}
 
@@ -393,6 +406,34 @@ public class StrategySelectorBuilder {
 				EntityCopyObserver.class,
 				EntityCopyAllowedLoggedObserver.SHORT_NAME,
 				EntityCopyAllowedLoggedObserver.class
+		);
+	}
+
+	private void addImplicitNamingStrategies(StrategySelectorImpl strategySelector) {
+		strategySelector.registerStrategyImplementor(
+				ImplicitNamingStrategy.class,
+				"default",
+				ImplicitNamingStrategyJpaCompliantImpl.class
+		);
+		strategySelector.registerStrategyImplementor(
+				ImplicitNamingStrategy.class,
+				"jpa",
+				ImplicitNamingStrategyJpaCompliantImpl.class
+		);
+		strategySelector.registerStrategyImplementor(
+				ImplicitNamingStrategy.class,
+				"legacy-jpa",
+				ImplicitNamingStrategyLegacyJpaImpl.class
+		);
+		strategySelector.registerStrategyImplementor(
+				ImplicitNamingStrategy.class,
+				"legacy-hbm",
+				ImplicitNamingStrategyLegacyHbmImpl.class
+		);
+		strategySelector.registerStrategyImplementor(
+				ImplicitNamingStrategy.class,
+				"component-path",
+				ImplicitNamingStrategyComponentPathImpl.class
 		);
 	}
 }

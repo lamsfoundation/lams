@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.type;
 
@@ -41,7 +24,9 @@ import org.hibernate.EntityMode;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
+import org.hibernate.collection.internal.AbstractPersistentCollection;
 import org.hibernate.collection.spi.PersistentCollection;
+import org.hibernate.engine.jdbc.Size;
 import org.hibernate.engine.spi.CollectionEntry;
 import org.hibernate.engine.spi.CollectionKey;
 import org.hibernate.engine.spi.EntityEntry;
@@ -53,7 +38,6 @@ import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.MarkerObject;
 import org.hibernate.internal.util.collections.ArrayHelper;
 import org.hibernate.internal.util.collections.CollectionHelper;
-import org.hibernate.metamodel.relational.Size;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.collection.QueryableCollection;
 import org.hibernate.persister.entity.EntityPersister;
@@ -63,9 +47,6 @@ import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
 
 import org.jboss.logging.Logger;
-
-import org.dom4j.Element;
-import org.dom4j.Node;
 
 /**
  * A type that handles Hibernate <tt>PersistentCollection</tt>s (including arrays).
@@ -82,30 +63,11 @@ public abstract class CollectionType extends AbstractType implements Association
 	private final TypeFactory.TypeScope typeScope;
 	private final String role;
 	private final String foreignKeyPropertyName;
-	private final boolean isEmbeddedInXML;
-
-	/**
-	 * @deprecated Use {@link #CollectionType(TypeFactory.TypeScope, String, String)} instead
-	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
-	 */
-	@Deprecated
-	public CollectionType(TypeFactory.TypeScope typeScope, String role, String foreignKeyPropertyName, boolean isEmbeddedInXML) {
-		this.typeScope = typeScope;
-		this.role = role;
-		this.foreignKeyPropertyName = foreignKeyPropertyName;
-		this.isEmbeddedInXML = isEmbeddedInXML;
-	}
 
 	public CollectionType(TypeFactory.TypeScope typeScope, String role, String foreignKeyPropertyName) {
 		this.typeScope = typeScope;
 		this.role = role;
 		this.foreignKeyPropertyName = foreignKeyPropertyName;
-		this.isEmbeddedInXML = true;
-	}
-
-	@Override
-	public boolean isEmbeddedInXML() {
-		return isEmbeddedInXML;
 	}
 
 	public String getRole() {
@@ -125,9 +87,13 @@ public abstract class CollectionType extends AbstractType implements Association
 			// worrying about proxies is perhaps a little bit of overkill here...
 			if ( element instanceof HibernateProxy ) {
 				LazyInitializer li = ( (HibernateProxy) element ).getHibernateLazyInitializer();
-				if ( !li.isUninitialized() ) element = li.getImplementation();
+				if ( !li.isUninitialized() ) {
+					element = li.getImplementation();
+				}
 			}
-			if ( element == childObject ) return true;
+			if ( element == childObject ) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -140,8 +106,8 @@ public abstract class CollectionType extends AbstractType implements Association
 	@Override
 	public final boolean isEqual(Object x, Object y) {
 		return x == y
-			|| ( x instanceof PersistentCollection && ( (PersistentCollection) x ).isWrapper( y ) )
-			|| ( y instanceof PersistentCollection && ( (PersistentCollection) y ).isWrapper( x ) );
+			|| ( x instanceof PersistentCollection && ( (PersistentCollection) x ).wasInitialized() && ( (PersistentCollection) x ).isWrapper( y ) )
+			|| ( y instanceof PersistentCollection && ( (PersistentCollection) y ).wasInitialized() && ( (PersistentCollection) y ).isWrapper( x ) );
 	}
 
 	@Override
@@ -250,7 +216,7 @@ public abstract class CollectionType extends AbstractType implements Association
 	 * @return The iterator.
 	 */
 	public Iterator getElementsIterator(Object collection, SessionImplementor session) {
-		return getElementsIterator(collection);
+		return getElementsIterator( collection );
 	}
 
 	/**
@@ -334,7 +300,7 @@ public abstract class CollectionType extends AbstractType implements Association
 
 		// TODO: I don't really like this implementation; it would be better if
 		// this was handled by searchForDirtyCollections()
-		return isOwnerVersioned( session ) && super.isDirty( old, current, session );
+		return super.isDirty( old, current, session );
 		// return false;
 
 	}
@@ -366,7 +332,7 @@ public abstract class CollectionType extends AbstractType implements Association
 
 	@Override
 	public ForeignKeyDirection getForeignKeyDirection() {
-		return ForeignKeyDirection.FOREIGN_KEY_TO_PARENT;
+		return ForeignKeyDirection.TO_PARENT;
 	}
 
 	/**
@@ -380,8 +346,11 @@ public abstract class CollectionType extends AbstractType implements Association
 	public Serializable getKeyOfOwner(Object owner, SessionImplementor session) {
 		
 		EntityEntry entityEntry = session.getPersistenceContext().getEntry( owner );
-		if ( entityEntry == null ) return null; // This just handles a particular case of component
-									  // projection, perhaps get rid of it and throw an exception
+		if ( entityEntry == null ) {
+			// This just handles a particular case of component
+			// projection, perhaps get rid of it and throw an exception
+			return null;
+		}
 		
 		if ( foreignKeyPropertyName == null ) {
 			return entityEntry.getId();
@@ -408,7 +377,7 @@ public abstract class CollectionType extends AbstractType implements Association
 						entityEntry.getLoadedValue( foreignKeyPropertyName ),
 						session,
 						owner 
-					);
+				);
 			}
 
 			return (Serializable) id;
@@ -511,7 +480,7 @@ public abstract class CollectionType extends AbstractType implements Association
 				throw new MappingException( 
 						"collection was not an association: " + 
 						collectionPersister.getRole() 
-					);
+				);
 			}
 			
 			return collectionPersister.getElementPersister().getEntityName();
@@ -678,6 +647,10 @@ public abstract class CollectionType extends AbstractType implements Association
 			return null;
 		}
 		if ( !Hibernate.isInitialized( original ) ) {
+			if ( ( (PersistentCollection) original ).hasQueuedOperations() ) {
+				final AbstractPersistentCollection pc = (AbstractPersistentCollection) original;
+				pc.replaceQueuedOperationValues( getPersister( session ), copyCache );
+			}
 			return target;
 		}
 
@@ -758,25 +731,30 @@ public abstract class CollectionType extends AbstractType implements Association
 			collection = persistenceContext.useUnownedCollection( new CollectionKey(persister, key, entityMode) );
 			
 			if ( collection == null ) {
-				// create a new collection wrapper, to be initialized later
-				collection = instantiate( session, persister, key );
-				
-				collection.setOwner(owner);
-	
-				persistenceContext.addUninitializedCollection( persister, collection, key );
-	
-				// some collections are not lazy:
-				if ( initializeImmediately() ) {
-					session.initializeCollection( collection, false );
+
+				collection = persistenceContext.getCollection( new CollectionKey(persister, key, entityMode) );
+
+				if ( collection == null ) {
+					// create a new collection wrapper, to be initialized later
+					collection = instantiate( session, persister, key );
+
+					collection.setOwner( owner );
+
+					persistenceContext.addUninitializedCollection( persister, collection, key );
+
+					// some collections are not lazy:
+					if ( initializeImmediately() ) {
+						session.initializeCollection( collection, false );
+					}
+					else if ( !persister.isLazy() ) {
+						persistenceContext.addNonLazyCollection( collection );
+					}
+
+					if ( hasHolder() ) {
+						session.getPersistenceContext().addCollectionHolder( collection );
+					}
 				}
-				else if ( !persister.isLazy() ) {
-					persistenceContext.addNonLazyCollection( collection );
-				}
-	
-				if ( hasHolder() ) {
-					session.getPersistenceContext().addCollectionHolder( collection );
-				}
-				
+
 			}
 			
 			if ( LOG.isTraceEnabled() ) {
@@ -805,27 +783,6 @@ public abstract class CollectionType extends AbstractType implements Association
 		return foreignKeyPropertyName;
 	}
 
-	@Override
-	public boolean isXMLElement() {
-		return true;
-	}
-
-	@Override
-	public Object fromXMLNode(Node xml, Mapping factory) throws HibernateException {
-		return xml;
-	}
-
-	@Override
-	public void setToXMLNode(Node node, Object value, SessionFactoryImplementor factory)
-			throws HibernateException {
-		if ( !isEmbeddedInXML ) {
-			node.detach();
-		}
-		else {
-			replaceNode( node, (Element) value );
-		}
-	}
-	
 	/**
 	 * We always need to dirty check the collection because we sometimes 
 	 * need to incremement version number of owner and also because of 

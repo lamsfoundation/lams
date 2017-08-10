@@ -19,6 +19,7 @@
 package io.undertow.servlet.api;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,15 +34,19 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
 
 import javax.servlet.DispatcherType;
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.AuthenticationMechanismFactory;
+import io.undertow.security.api.AuthenticationMode;
 import io.undertow.security.api.NotificationReceiver;
 import io.undertow.security.api.SecurityContextFactory;
 import io.undertow.security.idm.IdentityManager;
 import io.undertow.server.HandlerWrapper;
 import io.undertow.server.handlers.resource.ResourceManager;
+import io.undertow.server.session.SecureRandomSessionIdGenerator;
+import io.undertow.server.session.SessionIdGenerator;
 import io.undertow.server.session.SessionListener;
 import io.undertow.servlet.ServletExtension;
 import io.undertow.servlet.UndertowServletMessages;
@@ -67,7 +72,7 @@ public class DeploymentInfo implements Cloneable {
     private int minorVersion;
     private Executor executor;
     private Executor asyncExecutor;
-    private File tempDir;
+    private Path tempDir;
     private JspConfigDescriptor jspConfigDescriptor;
     private DefaultServletConfig defaultServletConfig;
     private SessionManagerFactory sessionManagerFactory = new InMemorySessionManagerFactory();
@@ -96,6 +101,9 @@ public class DeploymentInfo implements Cloneable {
     private boolean eagerFilterInit = false;
     private boolean disableCachingForSecuredPages = true;
     private boolean escapeErrorMessage = true;
+    private boolean sendCustomReasonPhraseOnError = false;
+    private boolean useCachedAuthenticationMechanism = true;
+    private AuthenticationMode authenticationMode = AuthenticationMode.PRO_ACTIVE;
     private ExceptionHandler exceptionHandler;
     private final Map<String, ServletInfo> servlets = new HashMap<>();
     private final Map<String, FilterInfo> filters = new HashMap<>();
@@ -103,7 +111,7 @@ public class DeploymentInfo implements Cloneable {
     private final List<FilterMappingInfo> filterUrlMappings = new ArrayList<>();
     private final List<ListenerInfo> listeners = new ArrayList<>();
     private final List<ServletContainerInitializerInfo> servletContainerInitializers = new ArrayList<>();
-    private final List<ThreadSetupAction> threadSetupActions = new ArrayList<>();
+    private final List<ThreadSetupHandler> threadSetupActions = new ArrayList<>();
     private final Map<String, String> initParameters = new HashMap<>();
     private final Map<String, Object> servletContextAttributes = new HashMap<>();
     private final Map<String, String> localeCharsetMapping = new HashMap<>();
@@ -145,6 +153,39 @@ public class DeploymentInfo implements Cloneable {
      */
     private final List<HandlerWrapper> innerHandlerChainWrappers = new ArrayList<>();
 
+    /**
+     * A handler chain wrapper to wrap the initial stages of the security handlers, if this is set it is assumed it
+     * is taking over the responsibility of setting the {@link io.undertow.security.api.SecurityContext} that can handle authentication and the
+     * remaining Undertow handlers specific to authentication will be skipped.
+     */
+    private HandlerWrapper initialSecurityWrapper = null;
+
+    /**
+     * Handler chain wrappers that are applied just before the authentication mechanism is called. Theses handlers are
+     * always called, even if authentication is not required
+     */
+    private final List<HandlerWrapper> securityWrappers = new ArrayList<>();
+
+    /**
+     * Multipart config that will be applied to all servlets that do not have an explicit config
+     */
+    private MultipartConfigElement defaultMultipartConfig;
+
+    /**
+     * Cache of common content types, to prevent allocations when parsing the charset
+     */
+    private int contentTypeCacheSize = 100;
+
+    private boolean changeSessionIdOnLogin = true;
+
+    private SessionIdGenerator sessionIdGenerator = new SecureRandomSessionIdGenerator();
+
+    /**
+     * Config for the {@link io.undertow.servlet.handlers.CrawlerSessionManagerHandler}
+     */
+    private CrawlerSessionManagerConfig crawlerSessionManagerConfig;
+
+    private boolean securityDisabled;
 
     public void validate() {
         if (deploymentName == null) {
@@ -422,12 +463,18 @@ public class DeploymentInfo implements Cloneable {
         return servletContainerInitializers;
     }
 
+    @Deprecated
     public DeploymentInfo addThreadSetupAction(final ThreadSetupAction action) {
+        threadSetupActions.add(new LegacyThreadSetupActionWrapper(action));
+        return this;
+    }
+
+    public DeploymentInfo addThreadSetupAction(final ThreadSetupHandler action) {
         threadSetupActions.add(action);
         return this;
     }
 
-    public List<ThreadSetupAction> getThreadSetupActions() {
+    public List<ThreadSetupHandler> getThreadSetupActions() {
         return threadSetupActions;
     }
 
@@ -542,9 +589,9 @@ public class DeploymentInfo implements Cloneable {
     /**
      * Sets the executor that will be used to run servlet invocations. If this is null then the XNIO worker pool will be
      * used.
-     * <p/>
+     * <p>
      * Individual servlets may use a different executor
-     * <p/>
+     * <p>
      * If this is null then the current executor is used, which is generally the XNIO worker pool
      *
      * @param executor The executor
@@ -561,7 +608,7 @@ public class DeploymentInfo implements Cloneable {
 
     /**
      * Sets the executor that is used to run async tasks.
-     * <p/>
+     * <p>
      * If this is null then {@link #executor} is used, if this is also null then the default is used
      *
      * @param asyncExecutor The executor
@@ -572,10 +619,22 @@ public class DeploymentInfo implements Cloneable {
     }
 
     public File getTempDir() {
+        if(tempDir == null) {
+            return null;
+        }
+        return tempDir.toFile();
+    }
+
+    public Path getTempPath() {
         return tempDir;
     }
 
     public DeploymentInfo setTempDir(final File tempDir) {
+        this.tempDir = tempDir != null ? tempDir.toPath() : null;
+        return this;
+    }
+
+    public DeploymentInfo setTempDir(final Path tempDir) {
         this.tempDir = tempDir;
         return this;
     }
@@ -711,6 +770,43 @@ public class DeploymentInfo implements Cloneable {
         return Collections.unmodifiableList(initialHandlerChainWrappers);
     }
 
+
+    /**
+     * Sets the initial handler wrapper that will take over responsibility for establishing
+     * a security context that will handle authentication for the request.
+     *
+     * Undertow specific authentication mechanisms will not be installed but Undertow handlers will
+     * still make the decision as to if authentication is required and will subsequently
+     * call {@link io.undertow.security.api.SecurityContext#authenticate()} as required.
+     *
+     * @param wrapper the {@link HandlerWrapper} to handle the initial security context installation.
+     * @return {@code this} to allow chaining.
+     */
+    public DeploymentInfo setInitialSecurityWrapper(final HandlerWrapper wrapper) {
+        this.initialSecurityWrapper = wrapper;
+
+        return this;
+    }
+
+    public HandlerWrapper getInitialSecurityWrapper() {
+        return initialSecurityWrapper;
+    }
+
+    /**
+     * Adds a security handler. These are invoked before the authentication mechanism, and are always invoked
+     * even if authentication is not required.
+     * @param wrapper
+     * @return
+     */
+    public DeploymentInfo addSecurityWrapper(final HandlerWrapper wrapper) {
+        securityWrappers.add(wrapper);
+        return this;
+    }
+
+    public List<HandlerWrapper> getSecurityWrappers() {
+        return Collections.unmodifiableList(securityWrappers);
+    }
+
     public DeploymentInfo addNotificationReceiver(final NotificationReceiver notificationReceiver) {
         this.notificationReceivers.add(notificationReceiver);
         return this;
@@ -736,7 +832,7 @@ public class DeploymentInfo implements Cloneable {
 
     /**
      * Sets the map that will be used by the ServletContext implementation to store attributes.
-     * <p/>
+     * <p>
      * This should usuablly be null, in which case Undertow will create a new map. This is only
      * used in situations where you want multiple deployments to share the same servlet context
      * attributes.
@@ -966,16 +1062,18 @@ public class DeploymentInfo implements Cloneable {
         return jaspiAuthenticationMechanism;
     }
 
-    public void setJaspiAuthenticationMechanism(AuthenticationMechanism jaspiAuthenticationMechanism) {
+    public DeploymentInfo setJaspiAuthenticationMechanism(AuthenticationMechanism jaspiAuthenticationMechanism) {
         this.jaspiAuthenticationMechanism = jaspiAuthenticationMechanism;
+        return this;
     }
 
     public SecurityContextFactory getSecurityContextFactory() {
         return this.securityContextFactory;
     }
 
-    public void setSecurityContextFactory(final SecurityContextFactory securityContextFactory) {
+    public DeploymentInfo setSecurityContextFactory(final SecurityContextFactory securityContextFactory) {
         this.securityContextFactory = securityContextFactory;
+        return this;
     }
 
     public String getServerName() {
@@ -1009,8 +1107,9 @@ public class DeploymentInfo implements Cloneable {
         return disableCachingForSecuredPages;
     }
 
-    public void setDisableCachingForSecuredPages(boolean disableCachingForSecuredPages) {
+    public DeploymentInfo setDisableCachingForSecuredPages(boolean disableCachingForSecuredPages) {
         this.disableCachingForSecuredPages = disableCachingForSecuredPages;
+        return this;
     }
 
     public DeploymentInfo addLifecycleInterceptor(final LifecycleInterceptor interceptor) {
@@ -1051,8 +1150,9 @@ public class DeploymentInfo implements Cloneable {
      *
      * @param escapeErrorMessage If the error message should be escaped
      */
-    public void setEscapeErrorMessage(boolean escapeErrorMessage) {
+    public DeploymentInfo setEscapeErrorMessage(boolean escapeErrorMessage) {
         this.escapeErrorMessage = escapeErrorMessage;
+        return this;
     }
 
 
@@ -1063,6 +1163,114 @@ public class DeploymentInfo implements Cloneable {
 
     public List<SessionListener> getSessionListeners() {
         return Collections.unmodifiableList(sessionListeners);
+    }
+
+    public AuthenticationMode getAuthenticationMode() {
+        return authenticationMode;
+    }
+
+    /**
+     * Sets if this deployment should use pro-active authentication and always authenticate if the credentials are present
+     * or constraint driven auth which will only call the authentication mechanisms for protected resources.
+     *
+     * Pro active auth means that requests for unprotected resources will still be associated with a user, which may be
+     * useful for access logging.
+     *
+     *
+     * @param authenticationMode The authentication mode to use
+     * @return
+     */
+    public DeploymentInfo setAuthenticationMode(AuthenticationMode authenticationMode) {
+        this.authenticationMode = authenticationMode;
+        return this;
+    }
+
+    public MultipartConfigElement getDefaultMultipartConfig() {
+        return defaultMultipartConfig;
+    }
+
+    public DeploymentInfo setDefaultMultipartConfig(MultipartConfigElement defaultMultipartConfig) {
+        this.defaultMultipartConfig = defaultMultipartConfig;
+        return this;
+    }
+
+    public int getContentTypeCacheSize() {
+        return contentTypeCacheSize;
+    }
+
+    public DeploymentInfo setContentTypeCacheSize(int contentTypeCacheSize) {
+        this.contentTypeCacheSize = contentTypeCacheSize;
+        return this;
+    }
+
+    public SessionIdGenerator getSessionIdGenerator() {
+        return sessionIdGenerator;
+    }
+
+    public DeploymentInfo setSessionIdGenerator(SessionIdGenerator sessionIdGenerator) {
+        this.sessionIdGenerator = sessionIdGenerator;
+        return this;
+    }
+
+
+    public boolean isSendCustomReasonPhraseOnError() {
+        return sendCustomReasonPhraseOnError;
+    }
+
+    public CrawlerSessionManagerConfig getCrawlerSessionManagerConfig() {
+        return crawlerSessionManagerConfig;
+    }
+
+    public DeploymentInfo setCrawlerSessionManagerConfig(CrawlerSessionManagerConfig crawlerSessionManagerConfig) {
+        this.crawlerSessionManagerConfig = crawlerSessionManagerConfig;
+        return this;
+    }
+
+    /**
+     * If this is true then the message parameter of {@link javax.servlet.http.HttpServletResponse#sendError(int, String)} and
+     * {@link javax.servlet.http.HttpServletResponse#setStatus(int, String)} will be used as the HTTP reason phrase in
+     * the response.
+     *
+     * @param sendCustomReasonPhraseOnError If the parameter to sendError should be used as a HTTP reason phrase
+     * @return this
+     */
+    public DeploymentInfo setSendCustomReasonPhraseOnError(boolean sendCustomReasonPhraseOnError) {
+        this.sendCustomReasonPhraseOnError = sendCustomReasonPhraseOnError;
+        return this;
+    }
+
+    public boolean isChangeSessionIdOnLogin() {
+        return changeSessionIdOnLogin;
+    }
+
+    public DeploymentInfo setChangeSessionIdOnLogin(boolean changeSessionIdOnLogin) {
+        this.changeSessionIdOnLogin = changeSessionIdOnLogin;
+        return this;
+    }
+
+    public boolean isUseCachedAuthenticationMechanism() {
+        return useCachedAuthenticationMechanism;
+    }
+
+    /**
+     * If this is set to false the the cached authenticated session mechanism won't be installed. If you want FORM and
+     * other auth methods that require caching to work then you need to install another caching based auth method (such
+     * as SSO).
+     * @param useCachedAuthenticationMechanism If Undertow should use its internal authentication cache mechanism
+     * @return this
+     */
+    public DeploymentInfo setUseCachedAuthenticationMechanism(boolean useCachedAuthenticationMechanism) {
+        this.useCachedAuthenticationMechanism = useCachedAuthenticationMechanism;
+        return this;
+    }
+
+    public boolean isSecurityDisabled() {
+        return securityDisabled;
+    }
+
+    public DeploymentInfo setSecurityDisabled(boolean securityDisabled) {
+        this.securityDisabled = securityDisabled;
+        return this;
     }
 
     @Override
@@ -1111,6 +1319,8 @@ public class DeploymentInfo implements Cloneable {
         info.securityConstraints.addAll(securityConstraints);
         info.outerHandlerChainWrappers.addAll(outerHandlerChainWrappers);
         info.innerHandlerChainWrappers.addAll(innerHandlerChainWrappers);
+        info.initialSecurityWrapper = initialSecurityWrapper;
+        info.securityWrappers.addAll(securityWrappers);
         info.initialHandlerChainWrappers.addAll(initialHandlerChainWrappers);
         info.securityRoles.addAll(securityRoles);
         info.notificationReceivers.addAll(notificationReceivers);
@@ -1140,6 +1350,15 @@ public class DeploymentInfo implements Cloneable {
         info.escapeErrorMessage = escapeErrorMessage;
         info.sessionListeners.addAll(sessionListeners);
         info.lifecycleInterceptors.addAll(lifecycleInterceptors);
+        info.authenticationMode = authenticationMode;
+        info.defaultMultipartConfig = defaultMultipartConfig;
+        info.contentTypeCacheSize = contentTypeCacheSize;
+        info.sessionIdGenerator = sessionIdGenerator;
+        info.sendCustomReasonPhraseOnError = sendCustomReasonPhraseOnError;
+        info.changeSessionIdOnLogin = changeSessionIdOnLogin;
+        info.crawlerSessionManagerConfig = crawlerSessionManagerConfig;
+        info.securityDisabled = securityDisabled;
+        info.useCachedAuthenticationMechanism = useCachedAuthenticationMechanism;
         return info;
     }
 

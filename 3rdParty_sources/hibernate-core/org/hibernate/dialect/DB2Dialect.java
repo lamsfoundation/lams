@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.dialect;
 
@@ -27,18 +10,31 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Locale;
 
 import org.hibernate.JDBCException;
+import org.hibernate.MappingException;
+import org.hibernate.NullPrecedence;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.function.AvgWithArgumentCastFunction;
 import org.hibernate.dialect.function.NoArgSQLFunction;
 import org.hibernate.dialect.function.SQLFunctionTemplate;
 import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.dialect.function.VarArgsSQLFunction;
+import org.hibernate.dialect.pagination.AbstractLimitHandler;
+import org.hibernate.dialect.pagination.LimitHandler;
+import org.hibernate.dialect.pagination.LimitHelper;
 import org.hibernate.dialect.unique.DB2UniqueDelegate;
 import org.hibernate.dialect.unique.UniqueDelegate;
+import org.hibernate.engine.spi.RowSelection;
 import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.exception.spi.SQLExceptionConversionDelegate;
+import org.hibernate.hql.spi.id.IdTableSupportStandardImpl;
+import org.hibernate.hql.spi.id.MultiTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.global.GlobalTemporaryTableBulkIdStrategy;
+import org.hibernate.hql.spi.id.local.AfterUseAction;
+import org.hibernate.internal.CoreLogging;
+import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.JdbcExceptionHelper;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.descriptor.sql.SmallIntTypeDescriptor;
@@ -50,6 +46,37 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
  * @author Gavin King
  */
 public class DB2Dialect extends Dialect {
+	private static final CoreMessageLogger log = CoreLogging.messageLogger( DB2Dialect.class );
+
+	private static final AbstractLimitHandler LIMIT_HANDLER = new AbstractLimitHandler() {
+		@Override
+		public String processSql(String sql, RowSelection selection) {
+			if (LimitHelper.hasFirstRow( selection )) {
+				//nest the main query in an outer select
+				return "select * from ( select inner2_.*, rownumber() over(order by order of inner2_) as rownumber_ from ( "
+						+ sql + " fetch first " + getMaxOrLimit( selection ) + " rows only ) as inner2_ ) as inner1_ where rownumber_ > "
+						+ selection.getFirstRow() + " order by rownumber_";
+			}
+			return sql + " fetch first " + getMaxOrLimit( selection ) +  " rows only";
+		}
+
+		@Override
+		public boolean supportsLimit() {
+			return true;
+		}
+
+		@Override
+		public boolean useMaxForLimit() {
+			return true;
+		}
+
+		@Override
+		public boolean supportsVariableLimit() {
+			return false;
+		}
+	};
+
+
 	private final UniqueDelegate uniqueDelegate;
 
 	/**
@@ -225,6 +252,11 @@ public class DB2Dialect extends Dialect {
 	}
 
 	@Override
+	public String getSelectSequenceNextValString(String sequenceName) throws MappingException {
+		return "next value for " + sequenceName;
+	}
+
+	@Override
 	public String getCreateSequenceString(String sequenceName) {
 		return "create sequence " + sequenceName;
 	}
@@ -364,23 +396,26 @@ public class DB2Dialect extends Dialect {
 	}
 
 	@Override
-	public boolean supportsTemporaryTables() {
-		return true;
-	}
+	public MultiTableBulkIdStrategy getDefaultMultiTableBulkIdStrategy() {
+		return new GlobalTemporaryTableBulkIdStrategy(
+				new IdTableSupportStandardImpl() {
+					@Override
+					public String generateIdTableName(String baseName) {
+						return "session." + super.generateIdTableName( baseName );
+					}
 
-	@Override
-	public String getCreateTemporaryTableString() {
-		return "declare global temporary table";
-	}
+					@Override
+					public String getCreateIdTableCommand() {
+						return "declare global temporary table";
+					}
 
-	@Override
-	public String getCreateTemporaryTablePostfix() {
-		return "not logged";
-	}
-
-	@Override
-	public String generateTemporaryTableName(String baseTableName) {
-		return "session." + super.generateTemporaryTableName( baseTableName );
+					@Override
+					public String getCreateIdTableStatementOptions() {
+						return "not logged";
+					}
+				},
+				AfterUseAction.CLEAN
+		);
 	}
 
 	@Override
@@ -485,4 +520,56 @@ public class DB2Dialect extends Dialect {
 		return "not (" + expression + ")";
 	}
 
+	@Override
+	public LimitHandler getLimitHandler() {
+		return LIMIT_HANDLER;
+	}
+
+	/**
+	 * Handle DB2 "support" for null precedence...
+	 *
+	 * @param expression The SQL order expression. In case of {@code @OrderBy} annotation user receives property placeholder
+	 * (e.g. attribute name enclosed in '{' and '}' signs).
+	 * @param collation Collation string in format {@code collate IDENTIFIER}, or {@code null}
+	 * if expression has not been explicitly specified.
+	 * @param order Order direction. Possible values: {@code asc}, {@code desc}, or {@code null}
+	 * if expression has not been explicitly specified.
+	 * @param nullPrecedence Nulls precedence. Default value: {@link NullPrecedence#NONE}.
+	 *
+	 * @return
+	 */
+	@Override
+	public String renderOrderByElement(String expression, String collation, String order, NullPrecedence nullPrecedence) {
+		if ( nullPrecedence == null || nullPrecedence == NullPrecedence.NONE ) {
+			return super.renderOrderByElement( expression, collation, order, NullPrecedence.NONE );
+		}
+
+		// DB2 FTW!  A null precedence was explicitly requested, but DB2 "support" for null precedence
+		// is a joke.  Basically it supports combos that align with what it does anyway.  Here is the
+		// support matrix:
+		//		* ASC + NULLS FIRST -> case statement
+		//		* ASC + NULLS LAST -> just drop the NULLS LAST from sql fragment
+		//		* DESC + NULLS FIRST -> just drop the NULLS FIRST from sql fragment
+		//		* DESC + NULLS LAST -> case statement
+
+		if ( ( nullPrecedence == NullPrecedence.FIRST  && "desc".equalsIgnoreCase( order ) )
+				|| ( nullPrecedence == NullPrecedence.LAST && "asc".equalsIgnoreCase( order ) ) ) {
+			// we have one of:
+			//		* ASC + NULLS LAST
+			//		* DESC + NULLS FIRST
+			// so just drop the null precedence.  *NOTE: we could pass along the null precedence here,
+			// but only DB2 9.7 or greater understand it; dropping it is more portable across DB2 versions
+			return super.renderOrderByElement( expression, collation, order, NullPrecedence.NONE );
+		}
+
+		return String.format(
+				Locale.ENGLISH,
+				"case when %s is null then %s else %s end, %s %s",
+				expression,
+				nullPrecedence == NullPrecedence.FIRST ? "0" : "1",
+				nullPrecedence == NullPrecedence.FIRST ? "1" : "0",
+				expression,
+				order
+		);
+	}
 }

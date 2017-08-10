@@ -1,49 +1,26 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.persister.entity;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.QueryException;
+import org.hibernate.boot.model.relational.Database;
 import org.hibernate.cache.spi.access.EntityRegionAccessStrategy;
 import org.hibernate.cache.spi.access.NaturalIdRegionAccessStrategy;
 import org.hibernate.engine.OptimisticLockStyle;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.spi.ExecuteUpdateResultCheckStyle;
-import org.hibernate.engine.spi.Mapping;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.internal.DynamicFilterAliasGenerator;
 import org.hibernate.internal.FilterAliasGenerator;
 import org.hibernate.internal.util.MarkerObject;
+import org.hibernate.internal.util.StringHelper;
 import org.hibernate.internal.util.collections.ArrayHelper;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Formula;
@@ -56,15 +33,23 @@ import org.hibernate.mapping.Selectable;
 import org.hibernate.mapping.Subclass;
 import org.hibernate.mapping.Table;
 import org.hibernate.mapping.Value;
-import org.hibernate.metamodel.binding.EntityBinding;
+import org.hibernate.persister.spi.PersisterCreationContext;
 import org.hibernate.sql.CaseFragment;
 import org.hibernate.sql.InFragment;
 import org.hibernate.sql.Insert;
 import org.hibernate.sql.SelectFragment;
-import org.hibernate.type.*;
 import org.hibernate.type.DiscriminatorType;
-
+import org.hibernate.type.StandardBasicTypes;
+import org.hibernate.type.Type;
 import org.jboss.logging.Logger;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * An <tt>EntityPersister</tt> implementing the normalized "table-per-subclass"
@@ -145,10 +130,13 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 			final PersistentClass persistentClass,
 			final EntityRegionAccessStrategy cacheAccessStrategy,
 			final NaturalIdRegionAccessStrategy naturalIdRegionAccessStrategy,
-			final SessionFactoryImplementor factory,
-			final Mapping mapping) throws HibernateException {
+			final PersisterCreationContext creationContext) throws HibernateException {
 
-		super( persistentClass, cacheAccessStrategy, naturalIdRegionAccessStrategy, factory );
+		super( persistentClass, cacheAccessStrategy, naturalIdRegionAccessStrategy, creationContext );
+
+		final SessionFactoryImplementor factory = creationContext.getSessionFactory();
+		final Database database = creationContext.getMetadata().getDatabase();
+		final JdbcEnvironment jdbcEnvironment = database.getJdbcEnvironment();
 
 		// DISCRIMINATOR
 
@@ -217,28 +205,24 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 
 		final int idColumnSpan = getIdentifierColumnSpan();
 
-		ArrayList tables = new ArrayList();
-		ArrayList keyColumns = new ArrayList();
-		ArrayList keyColumnReaders = new ArrayList();
-		ArrayList keyColumnReaderTemplates = new ArrayList();
-		ArrayList cascadeDeletes = new ArrayList();
-		Iterator titer = persistentClass.getTableClosureIterator();
-		Iterator kiter = persistentClass.getKeyClosureIterator();
-		while ( titer.hasNext() ) {
-			Table tab = (Table) titer.next();
-			KeyValue key = (KeyValue) kiter.next();
-			String tabname = tab.getQualifiedName(
-					factory.getDialect(),
-					factory.getSettings().getDefaultCatalogName(),
-					factory.getSettings().getDefaultSchemaName()
-			);
-			tables.add( tabname );
+		ArrayList<String> tableNames = new ArrayList<String>();
+		ArrayList<String[]> keyColumns = new ArrayList<String[]>();
+		ArrayList<String[]> keyColumnReaders = new ArrayList<String[]>();
+		ArrayList<String[]> keyColumnReaderTemplates = new ArrayList<String[]>();
+		ArrayList<Boolean> cascadeDeletes = new ArrayList<Boolean>();
+		Iterator tItr = persistentClass.getTableClosureIterator();
+		Iterator kItr = persistentClass.getKeyClosureIterator();
+		while ( tItr.hasNext() ) {
+			final Table table = (Table) tItr.next();
+			final KeyValue key = (KeyValue) kItr.next();
+			final String tableName = determineTableName( table, jdbcEnvironment );
+			tableNames.add( tableName );
 			String[] keyCols = new String[idColumnSpan];
 			String[] keyColReaders = new String[idColumnSpan];
 			String[] keyColReaderTemplates = new String[idColumnSpan];
-			Iterator citer = key.getColumnIterator();
+			Iterator cItr = key.getColumnIterator();
 			for ( int k = 0; k < idColumnSpan; k++ ) {
-				Column column = (Column) citer.next();
+				Column column = (Column) cItr.next();
 				keyCols[k] = column.getQuotedName( factory.getDialect() );
 				keyColReaders[k] = column.getReadExpr( factory.getDialect() );
 				keyColReaderTemplates[k] = column.getTemplate( factory.getDialect(), factory.getSqlFunctionRegistry() );
@@ -249,26 +233,21 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 			cascadeDeletes.add( key.isCascadeDeleteEnabled() && factory.getDialect().supportsCascadeDelete() );
 		}
 
-		//Span of the tables directly mapped by this entity and super-classes, if any
-		coreTableSpan = tables.size();
+		//Span of the tableNames directly mapped by this entity and super-classes, if any
+		coreTableSpan = tableNames.size();
 
 		isNullableTable = new boolean[persistentClass.getJoinClosureSpan()];
 
 		int tableIndex = 0;
-		Iterator joinIter = persistentClass.getJoinClosureIterator();
-		while ( joinIter.hasNext() ) {
-			Join join = (Join) joinIter.next();
+		Iterator joinItr = persistentClass.getJoinClosureIterator();
+		while ( joinItr.hasNext() ) {
+			Join join = (Join) joinItr.next();
 
 			isNullableTable[tableIndex++] = join.isOptional();
 
 			Table table = join.getTable();
-
-			String tableName = table.getQualifiedName(
-					factory.getDialect(),
-					factory.getSettings().getDefaultCatalogName(),
-					factory.getSettings().getDefaultSchemaName()
-			);
-			tables.add( tableName );
+			final String tableName = determineTableName( table, jdbcEnvironment );
+			tableNames.add( tableName );
 
 			KeyValue key = join.getKey();
 			int joinIdColumnSpan = key.getColumnSpan();
@@ -277,10 +256,10 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 			String[] keyColReaders = new String[joinIdColumnSpan];
 			String[] keyColReaderTemplates = new String[joinIdColumnSpan];
 
-			Iterator citer = key.getColumnIterator();
+			Iterator cItr = key.getColumnIterator();
 
 			for ( int k = 0; k < joinIdColumnSpan; k++ ) {
-				Column column = (Column) citer.next();
+				Column column = (Column) cItr.next();
 				keyCols[k] = column.getQuotedName( factory.getDialect() );
 				keyColReaders[k] = column.getReadExpr( factory.getDialect() );
 				keyColReaderTemplates[k] = column.getTemplate( factory.getDialect(), factory.getSqlFunctionRegistry() );
@@ -291,64 +270,55 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 			cascadeDeletes.add( key.isCascadeDeleteEnabled() && factory.getDialect().supportsCascadeDelete() );
 		}
 
-		naturalOrderTableNames = ArrayHelper.toStringArray( tables );
+		naturalOrderTableNames = ArrayHelper.toStringArray( tableNames );
 		naturalOrderTableKeyColumns = ArrayHelper.to2DStringArray( keyColumns );
 		naturalOrderTableKeyColumnReaders = ArrayHelper.to2DStringArray( keyColumnReaders );
 		naturalOrderTableKeyColumnReaderTemplates = ArrayHelper.to2DStringArray( keyColumnReaderTemplates );
 		naturalOrderCascadeDeleteEnabled = ArrayHelper.toBooleanArray( cascadeDeletes );
 
-		ArrayList subtables = new ArrayList();
-		ArrayList isConcretes = new ArrayList();
-		ArrayList isDeferreds = new ArrayList();
-		ArrayList isLazies = new ArrayList();
+		ArrayList<String> subclassTableNames = new ArrayList<String>();
+		ArrayList<Boolean> isConcretes = new ArrayList<Boolean>();
+		ArrayList<Boolean> isDeferreds = new ArrayList<Boolean>();
+		ArrayList<Boolean> isLazies = new ArrayList<Boolean>();
 
-		keyColumns = new ArrayList();
-		titer = persistentClass.getSubclassTableClosureIterator();
-		while ( titer.hasNext() ) {
-			Table tab = (Table) titer.next();
+		keyColumns = new ArrayList<String[]>();
+		tItr = persistentClass.getSubclassTableClosureIterator();
+		while ( tItr.hasNext() ) {
+			Table tab = (Table) tItr.next();
 			isConcretes.add( persistentClass.isClassOrSuperclassTable( tab ) );
 			isDeferreds.add( Boolean.FALSE );
 			isLazies.add( Boolean.FALSE );
-			String tabname = tab.getQualifiedName(
-					factory.getDialect(),
-					factory.getSettings().getDefaultCatalogName(),
-					factory.getSettings().getDefaultSchemaName()
-			);
-			subtables.add( tabname );
+			final String tableName = determineTableName( tab, jdbcEnvironment );
+			subclassTableNames.add( tableName );
 			String[] key = new String[idColumnSpan];
-			Iterator citer = tab.getPrimaryKey().getColumnIterator();
+			Iterator cItr = tab.getPrimaryKey().getColumnIterator();
 			for ( int k = 0; k < idColumnSpan; k++ ) {
-				key[k] = ( (Column) citer.next() ).getQuotedName( factory.getDialect() );
+				key[k] = ( (Column) cItr.next() ).getQuotedName( factory.getDialect() );
 			}
 			keyColumns.add( key );
 		}
 
 		//Add joins
-		joinIter = persistentClass.getSubclassJoinClosureIterator();
-		while ( joinIter.hasNext() ) {
-			Join join = (Join) joinIter.next();
+		joinItr = persistentClass.getSubclassJoinClosureIterator();
+		while ( joinItr.hasNext() ) {
+			final Join join = (Join) joinItr.next();
+			final Table joinTable = join.getTable();
 
-			Table tab = join.getTable();
-
-			isConcretes.add( persistentClass.isClassOrSuperclassTable( tab ) );
+			isConcretes.add( persistentClass.isClassOrSuperclassTable( joinTable ) );
 			isDeferreds.add( join.isSequentialSelect() );
 			isLazies.add( join.isLazy() );
 
-			String tabname = tab.getQualifiedName(
-					factory.getDialect(),
-					factory.getSettings().getDefaultCatalogName(),
-					factory.getSettings().getDefaultSchemaName()
-			);
-			subtables.add( tabname );
+			String joinTableName = determineTableName( joinTable, jdbcEnvironment );
+			subclassTableNames.add( joinTableName );
 			String[] key = new String[idColumnSpan];
-			Iterator citer = tab.getPrimaryKey().getColumnIterator();
+			Iterator citer = joinTable.getPrimaryKey().getColumnIterator();
 			for ( int k = 0; k < idColumnSpan; k++ ) {
 				key[k] = ( (Column) citer.next() ).getQuotedName( factory.getDialect() );
 			}
 			keyColumns.add( key );
 		}
 
-		String[] naturalOrderSubclassTableNameClosure = ArrayHelper.toStringArray( subtables );
+		String[] naturalOrderSubclassTableNameClosure = ArrayHelper.toStringArray( subclassTableNames );
 		String[][] naturalOrderSubclassTableKeyColumnClosure = ArrayHelper.to2DStringArray( keyColumns );
 		isClassOrSuperclassTable = ArrayHelper.toBooleanArray( isConcretes );
 		subclassTableSequentialSelect = ArrayHelper.toBooleanArray( isDeferreds );
@@ -363,9 +333,9 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 		}
 
 		/**
-		 * Suppose an entity Client extends Person, mapped to the tables CLIENT and PERSON respectively.
+		 * Suppose an entity Client extends Person, mapped to the tableNames CLIENT and PERSON respectively.
 		 * For the Client entity:
-		 * naturalOrderTableNames -> PERSON, CLIENT; this reflects the sequence in which the tables are 
+		 * naturalOrderTableNames -> PERSON, CLIENT; this reflects the sequence in which the tableNames are
 		 * added to the meta-data when the annotated entities are processed.
 		 * However, in some instances, for example when generating joins, the CLIENT table needs to be 
 		 * the first table as it will the driving table.
@@ -373,7 +343,7 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 		 */
 
 		tableSpan = naturalOrderTableNames.length;
-		tableNames = reverse( naturalOrderTableNames, coreTableSpan );
+		this.tableNames = reverse( naturalOrderTableNames, coreTableSpan );
 		tableKeyColumns = reverse( naturalOrderTableKeyColumns, coreTableSpan );
 		tableKeyColumnReaders = reverse( naturalOrderTableKeyColumnReaders, coreTableSpan );
 		tableKeyColumnReaderTemplates = reverse( naturalOrderTableKeyColumnReaderTemplates, coreTableSpan );
@@ -381,7 +351,7 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 		subclassTableKeyColumnClosure = reverse( naturalOrderSubclassTableKeyColumnClosure, coreTableSpan );
 
 		spaces = ArrayHelper.join(
-				tableNames,
+				this.tableNames,
 				ArrayHelper.toStringArray( persistentClass.getSynchronizedTables() )
 		);
 
@@ -424,10 +394,10 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 			throw new AssertionFailure( "Tablespan does not match height of joined-subclass hiearchy." );
 		}
 
-		joinIter = persistentClass.getJoinClosureIterator();
+		joinItr = persistentClass.getJoinClosureIterator();
 		int j = coreTableSpan;
-		while ( joinIter.hasNext() ) {
-			Join join = (Join) joinIter.next();
+		while ( joinItr.hasNext() ) {
+			Join join = (Join) joinItr.next();
 
 			customSQLInsert[j] = join.getCustomSQLInsert();
 			insertCallable[j] = customSQLInsert[j] != null && join.isCustomInsertCallable();
@@ -460,7 +430,7 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 					factory.getSettings().getDefaultCatalogName(),
 					factory.getSettings().getDefaultSchemaName()
 			);
-			propertyTableNumbers[i] = getTableId( tabname, tableNames );
+			propertyTableNumbers[i] = getTableId( tabname, this.tableNames );
 			naturalOrderPropertyTableNumbers[i] = getTableId( tabname, naturalOrderTableNames );
 			i++;
 		}
@@ -590,7 +560,7 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 
 		initSubclassPropertyAliasesMap( persistentClass );
 
-		postConstruct( mapping );
+		postConstruct( creationContext.getMetadata() );
 
 	}
 
@@ -746,51 +716,6 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 					)
 			);
 		}
-	}
-
-	public JoinedSubclassEntityPersister(
-			final EntityBinding entityBinding,
-			final EntityRegionAccessStrategy cacheAccessStrategy,
-			final NaturalIdRegionAccessStrategy naturalIdRegionAccessStrategy,
-			final SessionFactoryImplementor factory,
-			final Mapping mapping) throws HibernateException {
-		super( entityBinding, cacheAccessStrategy, naturalIdRegionAccessStrategy, factory );
-		// TODO: implement!!! initializing final fields to null to make compiler happy
-		tableSpan = -1;
-		tableNames = null;
-		naturalOrderTableNames = null;
-		tableKeyColumns = null;
-		tableKeyColumnReaders = null;
-		tableKeyColumnReaderTemplates = null;
-		naturalOrderTableKeyColumns = null;
-		naturalOrderTableKeyColumnReaders = null;
-		naturalOrderTableKeyColumnReaderTemplates = null;
-		naturalOrderCascadeDeleteEnabled = null;
-		spaces = null;
-		subclassClosure = null;
-		subclassTableNameClosure = null;
-		subclassTableKeyColumnClosure = null;
-		isClassOrSuperclassTable = null;
-		naturalOrderPropertyTableNumbers = null;
-		propertyTableNumbers = null;
-		subclassPropertyTableNumberClosure = null;
-		subclassColumnTableNumberClosure = null;
-		subclassFormulaTableNumberClosure = null;
-		subclassTableSequentialSelect = null;
-		subclassTableIsLazyClosure = null;
-		discriminatorValues = null;
-		notNullColumnNames = null;
-		notNullColumnTableNumbers = null;
-		constraintOrderedTableNames = null;
-		constraintOrderedKeyColumnNames = null;
-		discriminatorValue = null;
-		discriminatorSQLString = null;
-		discriminatorType = StandardBasicTypes.INTEGER;
-		explicitDiscriminatorColumnName = null;
-		discriminatorAlias = IMPLICIT_DISCRIMINATOR_ALIAS;
-		coreTableSpan = -1;
-		isNullableTable = null;
-		subclassNamesBySubclassTable = null;
 	}
 
 	protected boolean isNullableTable(int j) {
@@ -962,7 +887,6 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 		return temp;
 	}
 
-
 	public String fromTableFragment(String alias) {
 		return getTableName() + ' ' + alias;
 	}
@@ -977,9 +901,22 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 				select.setExtraSelectList( discriminatorFragment( name ), getDiscriminatorAlias() );
 			}
 			else {
+				if ( getEntityMetamodel().getSuperclass() != null ) {
+					name = generateTableAlias( name, getRootHierarchyClassTableIndex() );
+				}
 				select.addColumn( name, explicitDiscriminatorColumnName, discriminatorAlias );
 			}
 		}
+	}
+
+	private int getRootHierarchyClassTableIndex() {
+		final String rootHierarchyClassTableName = naturalOrderTableNames[0];
+		for ( int i = 0; i < subclassTableNameClosure.length; i++ ) {
+			if ( subclassTableNameClosure[i].equals( rootHierarchyClassTableName ) ) {
+				return i;
+			}
+		}
+		return 0;
 	}
 
 	private CaseFragment discriminatorFragment(String alias) {
@@ -1026,13 +963,12 @@ public class JoinedSubclassEntityPersister extends AbstractEntityPersister {
 
 	public String[] toColumns(String alias, String propertyName) throws QueryException {
 		if ( ENTITY_CLASS.equals( propertyName ) ) {
-			// This doesn't actually seem to work but it *might*
-			// work on some dbs. Also it doesn't work if there
-			// are multiple columns of results because it
-			// is not accounting for the suffix:
-			// return new String[] { getDiscriminatorColumnName() };
-
-			return new String[] { discriminatorFragment( alias ).toFragmentString() };
+			if ( explicitDiscriminatorColumnName == null ) {
+				return new String[] { discriminatorFragment( alias ).toFragmentString() };
+			}
+			else {
+				return new String[] { StringHelper.qualify( alias, explicitDiscriminatorColumnName ) };
+			}
 		}
 		else {
 			return super.toColumns( alias, propertyName );

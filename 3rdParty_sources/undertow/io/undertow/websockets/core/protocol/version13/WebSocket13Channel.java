@@ -20,10 +20,11 @@ package io.undertow.websockets.core.protocol.version13;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSocketVersion;
 import io.undertow.websockets.core.protocol.version07.WebSocket07Channel;
-import org.xnio.Pool;
+import io.undertow.websockets.extensions.ExtensionFunction;
+import org.xnio.OptionMap;
+import io.undertow.connector.ByteBufferPool;
 import org.xnio.StreamConnection;
 
-import java.nio.ByteBuffer;
 import java.util.Set;
 
 /**
@@ -33,8 +34,8 @@ import java.util.Set;
  * @author <a href="mailto:nmaurer@redhat.com">Norman Maurer</a>
  */
 public class WebSocket13Channel extends WebSocket07Channel {
-    public WebSocket13Channel(StreamConnection channel, Pool<ByteBuffer> bufferPool, String wsUrl, String subProtocols, final boolean client, boolean allowExtensions, Set<WebSocketChannel> openConnections) {
-        super(channel, bufferPool, wsUrl, subProtocols, client, allowExtensions, openConnections);
+    public WebSocket13Channel(StreamConnection channel, ByteBufferPool bufferPool, String wsUrl, String subProtocols, final boolean client, boolean allowExtensions, final ExtensionFunction extensionFunction, Set<WebSocketChannel> openConnections, OptionMap options) {
+        super(channel, bufferPool, wsUrl, subProtocols, client, allowExtensions, extensionFunction, openConnections, options);
     }
 
     @Override

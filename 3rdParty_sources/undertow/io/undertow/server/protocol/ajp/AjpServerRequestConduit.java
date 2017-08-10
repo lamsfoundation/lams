@@ -20,6 +20,7 @@ package io.undertow.server.protocol.ajp;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.TimeUnit;
 
@@ -145,8 +146,7 @@ public class AjpServerRequestConduit extends AbstractStreamSourceConduit<StreamS
 
     @Override
     public void terminateReads() throws IOException {
-        if(exchange.isPersistent()) {
-            state |= STATE_FINISHED;
+        if(exchange.isPersistent() && anyAreSet(state, STATE_FINISHED)) {
             return;
         }
         super.terminateReads();
@@ -225,7 +225,7 @@ public class AjpServerRequestConduit extends AbstractStreamSourceConduit<StreamS
                 if (finishListener != null) {
                     finishListener.handleEvent(this);
                 }
-                return read;
+                throw new ClosedChannelException();
             } else if (headerBuffer.hasRemaining()) {
                 return 0;
             } else {
@@ -233,7 +233,7 @@ public class AjpServerRequestConduit extends AbstractStreamSourceConduit<StreamS
                 byte b1 = headerBuffer.get(); //0x12
                 byte b2 = headerBuffer.get(); //0x34
                 if (b1 != 0x12 || b2 != 0x34) {
-                    throw UndertowMessages.MESSAGES.wrongMagicNumber();
+                    throw UndertowMessages.MESSAGES.wrongMagicNumber(b1 << 8 | b2);
                 }
                 headerBuffer.get();//the length headers, two more than the string length header
                 headerBuffer.get();
@@ -254,7 +254,7 @@ public class AjpServerRequestConduit extends AbstractStreamSourceConduit<StreamS
             chunkRemaining = this.state & STATE_MASK;
         }
 
-        int limit = dst.remaining();
+        int limit = dst.limit();
         try {
             if (dst.remaining() > chunkRemaining) {
                 dst.limit((int) (dst.position() + chunkRemaining));

@@ -34,6 +34,7 @@ import org.apache.http.RequestLine;
 import org.apache.http.annotation.Immutable;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
+import org.apache.http.util.Args;
 
 /**
  * Default factory for creating {@link HttpRequest} objects.
@@ -42,6 +43,8 @@ import org.apache.http.message.BasicHttpRequest;
  */
 @Immutable
 public class DefaultHttpRequestFactory implements HttpRequestFactory {
+
+    public static final DefaultHttpRequestFactory INSTANCE = new DefaultHttpRequestFactory();
 
     private static final String[] RFC2616_COMMON_METHODS = {
         "GET"
@@ -66,20 +69,19 @@ public class DefaultHttpRequestFactory implements HttpRequestFactory {
     }
 
     private static boolean isOneOf(final String[] methods, final String method) {
-        for (int i = 0; i < methods.length; i++) {
-            if (methods[i].equalsIgnoreCase(method)) {
+        for (final String method2 : methods) {
+            if (method2.equalsIgnoreCase(method)) {
                 return true;
             }
         }
         return false;
     }
 
+    @Override
     public HttpRequest newHttpRequest(final RequestLine requestline)
             throws MethodNotSupportedException {
-        if (requestline == null) {
-            throw new IllegalArgumentException("Request line may not be null");
-        }
-        String method = requestline.getMethod();
+        Args.notNull(requestline, "Request line");
+        final String method = requestline.getMethod();
         if (isOneOf(RFC2616_COMMON_METHODS, method)) {
             return new BasicHttpRequest(requestline);
         } else if (isOneOf(RFC2616_ENTITY_ENC_METHODS, method)) {
@@ -91,6 +93,7 @@ public class DefaultHttpRequestFactory implements HttpRequestFactory {
         }
     }
 
+    @Override
     public HttpRequest newHttpRequest(final String method, final String uri)
             throws MethodNotSupportedException {
         if (isOneOf(RFC2616_COMMON_METHODS, method)) {

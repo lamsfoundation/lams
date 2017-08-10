@@ -69,7 +69,7 @@ public class IdleTimeoutConduit implements StreamSinkConduit, StreamSourceCondui
                 return;
             }
 
-            UndertowLogger.REQUEST_LOGGER.tracef("Timing out channel %s due to inactivity");
+            UndertowLogger.REQUEST_LOGGER.trace("Timing out channel due to inactivity");
             timedOut = true;
             doClose();
             if (sink.isWriteResumed()) {
@@ -111,10 +111,6 @@ public class IdleTimeoutConduit implements StreamSinkConduit, StreamSourceCondui
             throw new ClosedChannelException();
         }
         expireTime = currentTime + idleTimeout;
-        XnioExecutor.Key key = handle;
-        if (key == null) {
-            handle = sink.getWriteThread().executeAfter(timeoutCommand, idleTimeout, TimeUnit.MILLISECONDS);
-        }
     }
 
     @Override
@@ -212,21 +208,23 @@ public class IdleTimeoutConduit implements StreamSinkConduit, StreamSourceCondui
     @Override
     public long transferFrom(FileChannel src, long position, long count) throws IOException {
         handleIdleTimeout();
-        long r = sink.transferFrom(src, position, count);
-        return r;
+        return sink.transferFrom(src, position, count);
     }
 
     @Override
     public long transferFrom(StreamSourceChannel source, long count, ByteBuffer throughBuffer) throws IOException {
         handleIdleTimeout();
-        long r = sink.transferFrom(source, count, throughBuffer);
-
-        return r;
+        return sink.transferFrom(source, count, throughBuffer);
     }
 
     @Override
     public void suspendReads() {
         source.suspendReads();
+        XnioExecutor.Key handle = this.handle;
+        if(handle != null && !isWriteResumed()) {
+            handle.remove();
+            this.handle = null;
+        }
     }
 
     @Override
@@ -248,6 +246,7 @@ public class IdleTimeoutConduit implements StreamSinkConduit, StreamSourceCondui
     @Override
     public void resumeReads() {
         source.resumeReads();
+        handleResumeTimeout();
     }
 
     @Override
@@ -258,6 +257,7 @@ public class IdleTimeoutConduit implements StreamSinkConduit, StreamSourceCondui
     @Override
     public void wakeupReads() {
         source.wakeupReads();
+        handleResumeTimeout();
     }
     @Override
     public void awaitReadable() throws IOException {
@@ -313,16 +313,43 @@ public class IdleTimeoutConduit implements StreamSinkConduit, StreamSourceCondui
     @Override
     public void resumeWrites() {
         sink.resumeWrites();
+        handleResumeTimeout();
     }
 
     @Override
     public void suspendWrites() {
         sink.suspendWrites();
+        XnioExecutor.Key handle = this.handle;
+        if(handle != null && !isReadResumed()) {
+            handle.remove();
+            this.handle = null;
+        }
+
     }
 
     @Override
     public void wakeupWrites() {
         sink.wakeupWrites();
+        handleResumeTimeout();
+    }
+
+    private void handleResumeTimeout() {
+        long timeout = getIdleTimeout();
+        if (timeout <= 0) {
+            return;
+        }
+        long currentTime = System.currentTimeMillis();
+        long newExpireTime = currentTime + timeout;
+        boolean shorter = newExpireTime < expireTime;
+        if(shorter && handle != null) {
+            handle.remove();
+            handle = null;
+        }
+        expireTime = newExpireTime;
+        XnioExecutor.Key key = handle;
+        if (key == null) {
+            handle = getWriteThread().executeAfter(timeoutCommand, timeout, TimeUnit.MILLISECONDS);
+        }
     }
 
     @Override
@@ -381,11 +408,11 @@ public class IdleTimeoutConduit implements StreamSinkConduit, StreamSourceCondui
         this.idleTimeout = idleTimeout;
         if(idleTimeout > 0) {
             expireTime = System.currentTimeMillis() + idleTimeout;
+            if(isReadResumed() || isWriteResumed()) {
+                handleResumeTimeout();
+            }
         } else {
             expireTime = -1;
-        }
-        if (idleTimeout > 0 && handle == null) {
-            handle = sink.getWriteThread().executeAfter(timeoutCommand, idleTimeout + DELTA, TimeUnit.MILLISECONDS);
         }
     }
 }

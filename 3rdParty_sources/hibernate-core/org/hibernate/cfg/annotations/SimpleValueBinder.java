@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cfg.annotations;
 
@@ -38,6 +21,7 @@ import javax.persistence.TemporalType;
 import org.hibernate.AnnotationException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.MappingException;
+import org.hibernate.annotations.MapKeyType;
 import org.hibernate.annotations.Nationalized;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -45,12 +29,13 @@ import org.hibernate.annotations.common.reflection.ClassLoadingException;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.util.StandardClassLoaderDelegateImpl;
+import org.hibernate.boot.model.TypeDefinition;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.cfg.AccessType;
 import org.hibernate.cfg.AttributeConverterDefinition;
 import org.hibernate.cfg.BinderHelper;
 import org.hibernate.cfg.Ejb3Column;
 import org.hibernate.cfg.Ejb3JoinColumn;
-import org.hibernate.cfg.Mappings;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.hibernate.cfg.PkDrivenByDefaultMapsIdSecondPass;
 import org.hibernate.cfg.SetSimpleValueTypeSecondPass;
@@ -78,6 +63,8 @@ import org.jboss.logging.Logger;
 public class SimpleValueBinder {
     private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, SimpleValueBinder.class.getName());
 
+	private MetadataBuildingContext buildingContext;
+
 	private String propertyName;
 	private String returnedClassName;
 	private Ejb3Column[] columns;
@@ -85,7 +72,8 @@ public class SimpleValueBinder {
 	private String explicitType = "";
 	private String defaultType = "";
 	private Properties typeParameters = new Properties();
-	private Mappings mappings;
+	private boolean isNationalized;
+
 	private Table table;
 	private SimpleValue simpleValue;
 	private boolean isVersion;
@@ -108,6 +96,9 @@ public class SimpleValueBinder {
 
 	public void setVersion(boolean isVersion) {
 		this.isVersion = isVersion;
+		if ( isVersion && simpleValue != null ) {
+			simpleValue.makeVersion();
+		}
 	}
 
 	public void setTimestampVersionType(String versionType) {
@@ -157,10 +148,21 @@ public class SimpleValueBinder {
 		typeParameters.clear();
 		String type = BinderHelper.ANNOTATION_STRING_DEFAULT;
 
-		final boolean isNationalized = property.isAnnotationPresent( Nationalized.class )
-				|| mappings.useNationalizedCharacterData();
+		isNationalized = property.isAnnotationPresent( Nationalized.class )
+				|| buildingContext.getBuildingOptions().useNationalizedCharacterData();
 
-		Type annType = property.getAnnotation( Type.class );
+		Type annType = null;
+		if ( (!key && property.isAnnotationPresent( Type.class ))
+				|| (key && property.isAnnotationPresent( MapKeyType.class )) ) {
+			if ( key ) {
+				MapKeyType ann = property.getAnnotation( MapKeyType.class );
+				annType = ann.value();
+			}
+			else {
+				annType = property.getAnnotation( Type.class );
+			}
+		}
+
 		if ( annType != null ) {
 			setExplicitType( annType );
 			type = explicitType;
@@ -169,10 +171,10 @@ public class SimpleValueBinder {
 				|| ( key && property.isAnnotationPresent( MapKeyTemporal.class ) ) ) {
 
 			boolean isDate;
-			if ( mappings.getReflectionManager().equals( returnedClassOrElement, Date.class ) ) {
+			if ( buildingContext.getBuildingOptions().getReflectionManager().equals( returnedClassOrElement, Date.class ) ) {
 				isDate = true;
 			}
-			else if ( mappings.getReflectionManager().equals( returnedClassOrElement, Calendar.class ) ) {
+			else if ( buildingContext.getBuildingOptions().getReflectionManager().equals( returnedClassOrElement, Calendar.class ) ) {
 				isDate = false;
 			}
 			else {
@@ -204,39 +206,39 @@ public class SimpleValueBinder {
 			explicitType = type;
 		}
 		else if ( !key && property.isAnnotationPresent( Lob.class ) ) {
-			if ( mappings.getReflectionManager().equals( returnedClassOrElement, java.sql.Clob.class ) ) {
+			if ( buildingContext.getBuildingOptions().getReflectionManager().equals( returnedClassOrElement, java.sql.Clob.class ) ) {
 				type = isNationalized
 						? StandardBasicTypes.NCLOB.getName()
 						: StandardBasicTypes.CLOB.getName();
 			}
-			else if ( mappings.getReflectionManager().equals( returnedClassOrElement, java.sql.NClob.class ) ) {
+			else if ( buildingContext.getBuildingOptions().getReflectionManager().equals( returnedClassOrElement, java.sql.NClob.class ) ) {
 				type = StandardBasicTypes.NCLOB.getName();
 			}
-			else if ( mappings.getReflectionManager().equals( returnedClassOrElement, java.sql.Blob.class ) ) {
+			else if ( buildingContext.getBuildingOptions().getReflectionManager().equals( returnedClassOrElement, java.sql.Blob.class ) ) {
 				type = "blob";
 			}
-			else if ( mappings.getReflectionManager().equals( returnedClassOrElement, String.class ) ) {
+			else if ( buildingContext.getBuildingOptions().getReflectionManager().equals( returnedClassOrElement, String.class ) ) {
 				type = isNationalized
 						? StandardBasicTypes.MATERIALIZED_NCLOB.getName()
 						: StandardBasicTypes.MATERIALIZED_CLOB.getName();
 			}
-			else if ( mappings.getReflectionManager().equals( returnedClassOrElement, Character.class ) && isArray ) {
+			else if ( buildingContext.getBuildingOptions().getReflectionManager().equals( returnedClassOrElement, Character.class ) && isArray ) {
 				type = isNationalized
 						? CharacterArrayNClobType.class.getName()
 						: CharacterArrayClobType.class.getName();
 			}
-			else if ( mappings.getReflectionManager().equals( returnedClassOrElement, char.class ) && isArray ) {
+			else if ( buildingContext.getBuildingOptions().getReflectionManager().equals( returnedClassOrElement, char.class ) && isArray ) {
 				type = isNationalized
 						? PrimitiveCharacterArrayNClobType.class.getName()
 						: PrimitiveCharacterArrayClobType.class.getName();
 			}
-			else if ( mappings.getReflectionManager().equals( returnedClassOrElement, Byte.class ) && isArray ) {
+			else if ( buildingContext.getBuildingOptions().getReflectionManager().equals( returnedClassOrElement, Byte.class ) && isArray ) {
 				type = WrappedMaterializedBlobType.class.getName();
 			}
-			else if ( mappings.getReflectionManager().equals( returnedClassOrElement, byte.class ) && isArray ) {
+			else if ( buildingContext.getBuildingOptions().getReflectionManager().equals( returnedClassOrElement, byte.class ) && isArray ) {
 				type = StandardBasicTypes.MATERIALIZED_BLOB.getName();
 			}
-			else if ( mappings.getReflectionManager()
+			else if ( buildingContext.getBuildingOptions().getReflectionManager()
 					.toXClass( Serializable.class )
 					.isAssignableFrom( returnedClassOrElement ) ) {
 				type = SerializableToBlobType.class.getName();
@@ -252,7 +254,7 @@ public class SimpleValueBinder {
 		}
 		else if ( ( !key && property.isAnnotationPresent( Enumerated.class ) )
 				|| ( key && property.isAnnotationPresent( MapKeyEnumerated.class ) ) ) {
-			final Class attributeJavaType = mappings.getReflectionManager().toClass( returnedClassOrElement );
+			final Class attributeJavaType = buildingContext.getBuildingOptions().getReflectionManager().toClass( returnedClassOrElement );
 			if ( !Enum.class.isAssignableFrom( attributeJavaType ) ) {
 				throw new AnnotationException(
 						String.format(
@@ -267,12 +269,12 @@ public class SimpleValueBinder {
 			explicitType = type;
 		}
 		else if ( isNationalized ) {
-			if ( mappings.getReflectionManager().equals( returnedClassOrElement, String.class ) ) {
+			if ( buildingContext.getBuildingOptions().getReflectionManager().equals( returnedClassOrElement, String.class ) ) {
 				// nvarchar
 				type = StringNVarcharType.INSTANCE.getName();
 				explicitType = type;
 			}
-			else if ( mappings.getReflectionManager().equals( returnedClassOrElement, Character.class ) ) {
+			else if ( buildingContext.getBuildingOptions().getReflectionManager().equals( returnedClassOrElement, Character.class ) ) {
 				if ( isArray ) {
 					// nvarchar
 					type = StringNVarcharType.INSTANCE.getName();
@@ -319,13 +321,21 @@ public class SimpleValueBinder {
 			return;
 		}
 
-		if ( property.isAnnotationPresent( Temporal.class ) ) {
+		if ( !key && property.isAnnotationPresent( Temporal.class ) ) {
 			LOG.debugf( "Skipping AttributeConverter checks for Temporal attribute [%s]", property.getName() );
 			return;
 		}
+		if ( key && property.isAnnotationPresent( MapKeyTemporal.class ) ) {
+			LOG.debugf( "Skipping AttributeConverter checks for map-key annotated as MapKeyTemporal [%s]", property.getName() );
+			return;
+		}
 
-		if ( property.isAnnotationPresent( Enumerated.class ) ) {
+		if ( !key && property.isAnnotationPresent( Enumerated.class ) ) {
 			LOG.debugf( "Skipping AttributeConverter checks for Enumerated attribute [%s]", property.getName() );
+			return;
+		}
+		if ( key && property.isAnnotationPresent( MapKeyEnumerated.class ) ) {
+			LOG.debugf( "Skipping AttributeConverter checks for map-key annotated as MapKeyEnumerated [%s]", property.getName() );
 			return;
 		}
 
@@ -370,8 +380,8 @@ public class SimpleValueBinder {
 		}
 	}
 
-	public void setMappings(Mappings mappings) {
-		this.mappings = mappings;
+	public void setBuildingContext(MetadataBuildingContext buildingContext) {
+		this.buildingContext = buildingContext;
 	}
 
 	private void validate() {
@@ -386,15 +396,20 @@ public class SimpleValueBinder {
 		if ( table == null ) {
 			table = columns[0].getTable();
 		}
-		simpleValue = new SimpleValue( mappings, table );
+		simpleValue = new SimpleValue( buildingContext.getMetadataCollector(), table );
+		if ( isVersion ) {
+			simpleValue.makeVersion();
+		}
+		if ( isNationalized ) {
+			simpleValue.makeNationalized();
+		}
 
 		linkWithValue();
 
-		boolean isInSecondPass = mappings.isInSecondPass();
-		SetSimpleValueTypeSecondPass secondPass = new SetSimpleValueTypeSecondPass( this );
+		boolean isInSecondPass = buildingContext.getMetadataCollector().isInSecondPass();
 		if ( !isInSecondPass ) {
 			//Defer this to the second pass
-			mappings.addSecondPass( secondPass );
+			buildingContext.getMetadataCollector().addSecondPass( new SetSimpleValueTypeSecondPass( this ) );
 		}
 		else {
 			//We are already in second pass
@@ -404,10 +419,10 @@ public class SimpleValueBinder {
 	}
 
 	public void linkWithValue() {
-		if ( columns[0].isNameDeferred() && !mappings.isInSecondPass() && referencedEntityName != null ) {
-			mappings.addSecondPass(
+		if ( columns[0].isNameDeferred() && !buildingContext.getMetadataCollector().isInSecondPass() && referencedEntityName != null ) {
+			buildingContext.getMetadataCollector().addSecondPass(
 					new PkDrivenByDefaultMapsIdSecondPass(
-							referencedEntityName, ( Ejb3JoinColumn[] ) columns, simpleValue
+							referencedEntityName, (Ejb3JoinColumn[]) columns, simpleValue
 					)
 			);
 		}
@@ -442,28 +457,28 @@ public class SimpleValueBinder {
 		}
 		else {
 			String type;
-			org.hibernate.mapping.TypeDef typeDef;
+			TypeDefinition typeDef;
 
 			if ( !BinderHelper.isEmptyAnnotationValue( explicitType ) ) {
 				type = explicitType;
-				typeDef = mappings.getTypeDef( type );
+				typeDef = buildingContext.getMetadataCollector().getTypeDefinition( type );
 			}
 			else {
 				// try implicit type
-				org.hibernate.mapping.TypeDef implicitTypeDef = mappings.getTypeDef( returnedClassName );
+				TypeDefinition implicitTypeDef = buildingContext.getMetadataCollector().getTypeDefinition( returnedClassName );
 				if ( implicitTypeDef != null ) {
 					typeDef = implicitTypeDef;
 					type = returnedClassName;
 				}
 				else {
-					typeDef = mappings.getTypeDef( defaultType );
+					typeDef = buildingContext.getMetadataCollector().getTypeDefinition( defaultType );
 					type = defaultType;
 				}
 			}
 
 			if ( typeDef != null ) {
-				type = typeDef.getTypeClass();
-				simpleValue.setTypeParameters( typeDef.getParameters() );
+				type = typeDef.getTypeImplementorClass().getName();
+				simpleValue.setTypeParameters( typeDef.getParametersAsProperties() );
 			}
 			if ( typeParameters != null && typeParameters.size() != 0 ) {
 				//explicit type params takes precedence over type def params
@@ -486,9 +501,9 @@ public class SimpleValueBinder {
 		}
 		
 		if ( simpleValue.getTypeName() != null && simpleValue.getTypeName().length() > 0
-				&& simpleValue.getMappings().getTypeResolver().basic( simpleValue.getTypeName() ) == null ) {
+				&& simpleValue.getMetadata().getTypeResolver().basic( simpleValue.getTypeName() ) == null ) {
 			try {
-				Class typeClass = StandardClassLoaderDelegateImpl.INSTANCE.classForName( simpleValue.getTypeName() );
+				Class typeClass = buildingContext.getClassLoaderAccess().classForName( simpleValue.getTypeName() );
 
 				if ( typeClass != null && DynamicParameterizedType.class.isAssignableFrom( typeClass ) ) {
 					Properties parameters = simpleValue.getTypeParameters();

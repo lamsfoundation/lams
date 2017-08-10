@@ -31,26 +31,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.http.annotation.NotThreadSafe;
-import org.apache.http.entity.HttpEntityWrapper;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.ProtocolException;
+import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.entity.HttpEntityWrapper;
 import org.apache.http.protocol.HTTP;
 
 /**
  * A wrapper class for {@link HttpEntityEnclosingRequest}s that can
  * be used to change properties of the current request without
  * modifying the original object.
- * </p>
+ * <p>
  * This class is also capable of resetting the request headers to
  * the state of the original request.
- *
+ * </p>
  *
  * @since 4.0
+ *
+ * @deprecated (4.3) do not use.
  */
+@Deprecated
 @NotThreadSafe // e.g. [gs]etEntity()
 public class EntityEnclosingRequestWrapper extends RequestWrapper
     implements HttpEntityEnclosingRequest {
@@ -64,17 +66,20 @@ public class EntityEnclosingRequestWrapper extends RequestWrapper
         setEntity(request.getEntity());
     }
 
+    @Override
     public HttpEntity getEntity() {
         return this.entity;
     }
 
+    @Override
     public void setEntity(final HttpEntity entity) {
         this.entity = entity != null ? new EntityWrapper(entity) : null;
         this.consumed = false;
     }
 
+    @Override
     public boolean expectContinue() {
-        Header expect = getFirstHeader(HTTP.EXPECT_DIRECTIVE);
+        final Header expect = getFirstHeader(HTTP.EXPECT_DIRECTIVE);
         return expect != null && HTTP.EXPECT_CONTINUE.equalsIgnoreCase(expect.getValue());
     }
 
@@ -89,7 +94,6 @@ public class EntityEnclosingRequestWrapper extends RequestWrapper
             super(entity);
         }
 
-        @SuppressWarnings("deprecation")
         @Override
         public void consumeContent() throws IOException {
             consumed = true;

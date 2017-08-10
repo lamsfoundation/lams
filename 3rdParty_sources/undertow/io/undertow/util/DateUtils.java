@@ -75,7 +75,7 @@ public class DateUtils {
     private static final String OLD_COOKIE_PATTERN = "EEE, dd-MMM-yyyy HH:mm:ss z";
 
 
-    private static final String COMMON_LOG_PATTERN = "dd/MMM/yyyy:HH:mm:ss Z";
+    private static final String COMMON_LOG_PATTERN = "[dd/MMM/yyyy:HH:mm:ss Z]";
 
 
     private static final ThreadLocal<SimpleDateFormat> COMMON_LOG_PATTERN_FORMAT = new ThreadLocal<SimpleDateFormat>() {
@@ -232,23 +232,26 @@ public class DateUtils {
     public static void addDateHeaderIfRequired(HttpServerExchange exchange) {
         HeaderMap responseHeaders = exchange.getResponseHeaders();
         if (exchange.getConnection().getUndertowOptions().get(UndertowOptions.ALWAYS_SET_DATE, true) && !responseHeaders.contains(Headers.DATE)) {
-            String dateString = cachedDateString.get();
-            if (dateString != null) {
-                responseHeaders.put(Headers.DATE, dateString);
-            } else {
-                //set the time and register a timer to invalidate it
-                //note that this is racey, it does not matter if multiple threads do this
-                //the perf cost of synchronizing would be more than the perf cost of multiple threads running it
-                long realTime = System.currentTimeMillis();
-                long mod = realTime % 1000;
-                long toGo = 1000 - mod;
-                dateString = DateUtils.toDateString(new Date(realTime));
-                if (cachedDateString.compareAndSet(null, dateString)) {
-                    exchange.getConnection().getIoThread().executeAfter(INVALIDATE_TASK, toGo, TimeUnit.MILLISECONDS);
-                }
-                responseHeaders.put(Headers.DATE, dateString);
+            String dateString = getCurrentDateTime(exchange);
+            responseHeaders.put(Headers.DATE, dateString);
+        }
+    }
+
+    public static String getCurrentDateTime(HttpServerExchange exchange) {
+        String dateString = cachedDateString.get();
+        if (dateString == null) {
+            //set the time and register a timer to invalidate it
+            //note that this is racey, it does not matter if multiple threads do this
+            //the perf cost of synchronizing would be more than the perf cost of multiple threads running it
+            long realTime = System.currentTimeMillis();
+            long mod = realTime % 1000;
+            long toGo = 1000 - mod;
+            dateString = DateUtils.toDateString(new Date(realTime));
+            if (cachedDateString.compareAndSet(null, dateString)) {
+                exchange.getConnection().getIoThread().executeAfter(INVALIDATE_TASK, toGo, TimeUnit.MILLISECONDS);
             }
         }
+        return dateString;
     }
 
     private DateUtils() {

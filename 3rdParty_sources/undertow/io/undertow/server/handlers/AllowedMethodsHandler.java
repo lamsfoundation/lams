@@ -57,9 +57,13 @@ public class AllowedMethodsHandler implements HttpHandler {
         if (allowedMethods.contains(exchange.getRequestMethod())) {
             next.handleRequest(exchange);
         } else {
-            exchange.setResponseCode(StatusCodes.METHOD_NOT_ALLOWED);
+            exchange.setStatusCode(StatusCodes.METHOD_NOT_ALLOWED);
             exchange.endExchange();
         }
+    }
+
+    public Set<HttpString> getAllowedMethods() {
+        return Collections.unmodifiableSet(allowedMethods);
     }
 
     public static class Builder implements HandlerBuilder {

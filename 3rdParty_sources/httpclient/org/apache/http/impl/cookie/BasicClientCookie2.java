@@ -27,11 +27,9 @@
 
 package org.apache.http.impl.cookie;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.http.annotation.NotThreadSafe;
-
 import org.apache.http.cookie.SetCookie2;
 
 /**
@@ -40,7 +38,7 @@ import org.apache.http.cookie.SetCookie2;
  * @since 4.0
  */
 @NotThreadSafe
-public class BasicClientCookie2 extends BasicClientCookie implements SetCookie2, Serializable {
+public class BasicClientCookie2 extends BasicClientCookie implements SetCookie2 {
 
     private static final long serialVersionUID = -7744598295706617057L;
 
@@ -63,6 +61,7 @@ public class BasicClientCookie2 extends BasicClientCookie implements SetCookie2,
         return this.ports;
     }
 
+    @Override
     public void setPorts(final int[] ports) {
         this.ports = ports;
     }
@@ -72,11 +71,13 @@ public class BasicClientCookie2 extends BasicClientCookie implements SetCookie2,
         return this.commentURL;
     }
 
+    @Override
     public void setCommentURL(final String commentURL) {
         this.commentURL = commentURL;
     }
 
-    public void setDiscard(boolean discard) {
+    @Override
+    public void setDiscard(final boolean discard) {
         this.discard = discard;
     }
 
@@ -92,7 +93,7 @@ public class BasicClientCookie2 extends BasicClientCookie implements SetCookie2,
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        BasicClientCookie2 clone = (BasicClientCookie2) super.clone();
+        final BasicClientCookie2 clone = (BasicClientCookie2) super.clone();
         if (this.ports != null) {
             clone.ports = this.ports.clone();
         }

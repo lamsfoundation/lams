@@ -30,20 +30,24 @@ import java.util.concurrent.Executor;
 
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.server.HttpHandler;
+import io.undertow.server.HttpServerExchange;
 import io.undertow.server.session.SessionManager;
 import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ServletContainer;
 import io.undertow.servlet.api.ServletDispatcher;
+import io.undertow.servlet.api.ThreadSetupAction;
+import io.undertow.servlet.api.ThreadSetupHandler;
 import io.undertow.servlet.handlers.ServletInitialHandler;
 import io.undertow.servlet.handlers.ServletPathMatches;
+import io.undertow.servlet.handlers.ServletRequestContext;
 import io.undertow.servlet.spec.ServletContextImpl;
 
 /**
  * Class that represents the mutable state associated with a servlet deployment that is built up
  * during the bootstrap process.
- * <p/>
+ * <p>
  * Classes calling deployment methods during bootstrap must be aware of ordering concerns.
  *
  * @author Stuart Douglas
@@ -57,27 +61,23 @@ public class DeploymentImpl implements Deployment {
     private final ServletPathMatches servletPaths;
     private final ManagedServlets servlets;
     private final ManagedFilters filters;
-    private final Executor executor;
-    private final Executor asyncExecutor;
 
 
     private volatile ApplicationListeners applicationListeners;
     private volatile ServletContextImpl servletContext;
     private volatile ServletInitialHandler servletHandler;
     private volatile HttpHandler initialHandler;
-    private volatile CompositeThreadSetupAction threadSetupAction;
     private volatile ErrorPages errorPages;
     private volatile Map<String, String> mimeExtensionMappings;
     private volatile SessionManager sessionManager;
     private volatile Charset defaultCharset;
     private volatile List<AuthenticationMechanism> authenticationMechanisms;
+    private volatile List<ThreadSetupHandler> threadSetupActions;
 
     public DeploymentImpl(DeploymentManager deploymentManager, final DeploymentInfo deploymentInfo, ServletContainer servletContainer) {
         this.deploymentManager = deploymentManager;
         this.deploymentInfo = deploymentInfo;
         this.servletContainer = servletContainer;
-        this.executor = deploymentInfo.getExecutor();
-        this.asyncExecutor = deploymentInfo.getAsyncExecutor();
         servletPaths = new ServletPathMatches(this);
         servlets = new ManagedServlets(this, servletPaths);
         filters = new ManagedFilters(this, servletPaths);
@@ -153,12 +153,41 @@ public class DeploymentImpl implements Deployment {
         return servletPaths;
     }
 
-    public CompositeThreadSetupAction getThreadSetupAction() {
-        return threadSetupAction;
+    void setThreadSetupActions(List<ThreadSetupHandler> threadSetupActions) {
+        this.threadSetupActions = threadSetupActions;
     }
 
-    public void setThreadSetupAction(final CompositeThreadSetupAction threadSetupAction) {
-        this.threadSetupAction = threadSetupAction;
+    public <C, T> ThreadSetupHandler.Action<C, T> createThreadSetupAction(ThreadSetupHandler.Action<C, T> target) {
+        ThreadSetupHandler.Action<C, T> ret = target;
+        for(ThreadSetupHandler wrapper : threadSetupActions) {
+            ret = wrapper.create(ret);
+        }
+        return ret;
+    }
+
+    @Override
+    public ThreadSetupAction getThreadSetupAction() {
+        //TODO: remove all this, it is a hack to presever some backwards compat
+        return new ThreadSetupAction() {
+            @Override
+            public Handle setup(HttpServerExchange exchange) {
+
+                final ClassLoader old = SecurityActions.getContextClassLoader();
+                SecurityActions.setContextClassLoader(deploymentInfo.getClassLoader());
+                final ServletRequestContext oldSc = ServletRequestContext.current();
+                if(exchange != null) {
+                    ServletRequestContext sc = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+                    SecurityActions.setCurrentRequestContext(sc);
+                }
+                return new Handle() {
+                    @Override
+                    public void tearDown() {
+                        SecurityActions.setContextClassLoader(old);
+                        SecurityActions.setCurrentRequestContext(oldSc);
+                    }
+                };
+            }
+        };
     }
 
     public ErrorPages getErrorPages() {
@@ -190,12 +219,12 @@ public class DeploymentImpl implements Deployment {
 
     @Override
     public Executor getExecutor() {
-        return executor;
+        return deploymentInfo.getExecutor();
     }
 
     @Override
     public Executor getAsyncExecutor() {
-        return asyncExecutor;
+        return deploymentInfo.getAsyncExecutor();
     }
 
     public Charset getDefaultCharset() {

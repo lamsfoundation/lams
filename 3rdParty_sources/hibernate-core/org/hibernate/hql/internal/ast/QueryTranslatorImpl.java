@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal.ast;
 
@@ -36,6 +19,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.QueryException;
 import org.hibernate.ScrollableResults;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.engine.query.spi.EntityGraphQueryHint;
 import org.hibernate.engine.spi.QueryParameters;
 import org.hibernate.engine.spi.RowSelection;
@@ -296,7 +280,7 @@ public class QueryTranslatorImpl implements FilterTranslator {
 
 		final AST hqlAst = parser.getAST();
 
-		final NodeTraverser walker = new NodeTraverser( new JavaConstantConverter() );
+		final NodeTraverser walker = new NodeTraverser( new JavaConstantConverter( factory ) );
 		walker.traverseDepthFirst( hqlAst );
 
 		showHqlAst( hqlAst );
@@ -602,7 +586,14 @@ public class QueryTranslatorImpl implements FilterTranslator {
 	}
 
 	public static class JavaConstantConverter implements NodeTraverser.VisitationStrategy {
+		private final SessionFactoryImplementor factory;
 		private AST dotRoot;
+
+		public JavaConstantConverter(SessionFactoryImplementor factory) {
+
+			this.factory = factory;
+		}
+
 		@Override
 		public void visit(AST node) {
 			if ( dotRoot != null ) {
@@ -621,7 +612,7 @@ public class QueryTranslatorImpl implements FilterTranslator {
 		}
 		private void handleDotStructure(AST dotStructureRoot) {
 			final String expression = ASTUtil.getPathText( dotStructureRoot );
-			final Object constant = ReflectHelper.getConstantValue( expression );
+			final Object constant = ReflectHelper.getConstantValue( expression, factory.getServiceRegistry().getService( ClassLoaderService.class ) );
 			if ( constant != null ) {
 				dotStructureRoot.setFirstChild( null );
 				dotStructureRoot.setType( HqlTokenTypes.JAVA_CONSTANT );

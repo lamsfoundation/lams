@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.event.internal;
 
@@ -39,6 +22,7 @@ import org.hibernate.engine.internal.ForeignKeys;
 import org.hibernate.engine.internal.Versioning;
 import org.hibernate.engine.spi.CascadingAction;
 import org.hibernate.engine.spi.EntityEntry;
+import org.hibernate.engine.spi.EntityEntryExtraState;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.Status;
@@ -242,13 +226,13 @@ public abstract class AbstractSaveEventListener extends AbstractReassociateEvent
 
 		Serializable id = key == null ? null : key.getIdentifier();
 
-		boolean inTxn = source.getTransactionCoordinator().isTransactionInProgress();
+		boolean inTxn = source.isTransactionInProgress();
 		boolean shouldDelayIdentityInserts = !inTxn && !requiresImmediateIdAccess;
 
 		// Put a placeholder in entries, so we don't recurse back and try to save() the
 		// same object again. QUESTION: should this be done before onSave() is called?
 		// likewise, should it be done before onUpdate()?
-		source.getPersistenceContext().addEntry(
+		EntityEntry original = source.getPersistenceContext().addEntry(
 				entity,
 				Status.SAVING,
 				null,
@@ -305,6 +289,15 @@ public abstract class AbstractSaveEventListener extends AbstractReassociateEvent
 		}
 
 		markInterceptorDirty( entity, persister, source );
+
+		EntityEntry newEntry = source.getPersistenceContext().getEntry( entity );
+
+		if ( newEntry != original ) {
+			EntityEntryExtraState extraState = newEntry.getExtraState( EntityEntryExtraState.class );
+			if ( extraState == null ) {
+				newEntry.addExtraState( original.getExtraState( EntityEntryExtraState.class ) );
+			}
+		}
 
 		return id;
 	}
@@ -429,7 +422,10 @@ public abstract class AbstractSaveEventListener extends AbstractReassociateEvent
 		// cascade-save to many-to-one BEFORE the parent is saved
 		source.getPersistenceContext().incrementCascadeLevel();
 		try {
-			new Cascade( getCascadeAction(), CascadePoint.BEFORE_INSERT_AFTER_DELETE, source ).cascade(
+			Cascade.cascade(
+					getCascadeAction(),
+					CascadePoint.BEFORE_INSERT_AFTER_DELETE,
+					source,
 					persister,
 					entity,
 					anything
@@ -457,7 +453,10 @@ public abstract class AbstractSaveEventListener extends AbstractReassociateEvent
 		// cascade-save to collections AFTER the collection owner was saved
 		source.getPersistenceContext().incrementCascadeLevel();
 		try {
-			new Cascade( getCascadeAction(), CascadePoint.AFTER_INSERT_BEFORE_DELETE, source ).cascade(
+			Cascade.cascade(
+					getCascadeAction(),
+					CascadePoint.AFTER_INSERT_BEFORE_DELETE,
+					source,
 					persister,
 					entity,
 					anything

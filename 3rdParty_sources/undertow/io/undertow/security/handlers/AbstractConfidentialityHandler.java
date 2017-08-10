@@ -47,12 +47,12 @@ public abstract class AbstractConfidentialityHandler implements HttpHandler {
         } else {
             try {
                 URI redirectUri = getRedirectURI(exchange);
-
-                exchange.setResponseCode(StatusCodes.FOUND);
+                UndertowLogger.SECURITY_LOGGER.debugf("Redirecting request %s to %s to meet confidentiality requirements", exchange, redirectUri);
+                exchange.setStatusCode(StatusCodes.FOUND);
                 exchange.getResponseHeaders().put(Headers.LOCATION, redirectUri.toString());
             } catch (Exception e) {
                 UndertowLogger.REQUEST_LOGGER.exceptionProcessingRequest(e);
-                exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
+                exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
             }
             exchange.endExchange();
         }
@@ -63,7 +63,7 @@ public abstract class AbstractConfidentialityHandler implements HttpHandler {
      *
      * Here we say 'sufficiently' as sub-classes can override this and maybe even go so far as querying the actual SSLSession.
      *
-     * @param exchange - The {@see HttpServerExchange} for the request being processed.
+     * @param exchange - The {@link HttpServerExchange} for the request being processed.
      * @return true if the request is 'sufficiently' confidential, false otherwise.
      */
     protected boolean isConfidential(final HttpServerExchange exchange) {
@@ -77,7 +77,7 @@ public abstract class AbstractConfidentialityHandler implements HttpHandler {
      *
      * TODO: we should deprecate this and just use a predicate to decide to execute the handler instead
      *
-     * @param exchange - The {@see HttpServerExchange} for the request being processed.
+     * @param exchange - The {@link HttpServerExchange} for the request being processed.
      * @return true if the request requires confidentiality, false otherwise.
      */
     protected boolean confidentialityRequired(final HttpServerExchange exchange) {
@@ -88,8 +88,8 @@ public abstract class AbstractConfidentialityHandler implements HttpHandler {
      * All sub-classes are required to provide an implementation of this method, using the HttpServerExchange for the current
      * request return the address to use for a redirect should confidentiality be required and the request not be confidential.
      *
-     * @param exchange - The {@see HttpServerExchange} for the request being processed.
-     * @return The {@see URI} to redirect to.
+     * @param exchange - The {@link HttpServerExchange} for the request being processed.
+     * @return The {@link URI} to redirect to.
      */
     protected abstract URI getRedirectURI(final HttpServerExchange exchange) throws URISyntaxException;
 

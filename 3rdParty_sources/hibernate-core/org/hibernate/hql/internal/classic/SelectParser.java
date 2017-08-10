@@ -1,37 +1,22 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal.classic;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.hibernate.QueryException;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
+import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
 import org.hibernate.dialect.function.SQLFunction;
 import org.hibernate.hql.internal.QuerySplitter;
-import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
@@ -44,7 +29,7 @@ public class SelectParser implements Parser {
 
 	//TODO: arithmetic expressions, multiple new Foo(...)
 
-	private static final Set COUNT_MODIFIERS = new HashSet();
+	private static final Set<String> COUNT_MODIFIERS = new HashSet<String>();
 
 	static {
 		COUNT_MODIFIERS.add( "distinct" );
@@ -52,7 +37,7 @@ public class SelectParser implements Parser {
 		COUNT_MODIFIERS.add( "*" );
 	}
 
-	private LinkedList aggregateFuncTokenList = new LinkedList();
+	private LinkedList<String> aggregateFuncTokenList = new LinkedList<String>();
 
 	private boolean ready;
 	private boolean aggregate;
@@ -74,8 +59,7 @@ public class SelectParser implements Parser {
 	}
 
 	public void token(String token, QueryTranslatorImpl q) throws QueryException {
-
-		String lctoken = token.toLowerCase();
+		String lctoken = token.toLowerCase(Locale.ROOT);
 
 		if ( first ) {
 			first = false;
@@ -92,17 +76,23 @@ public class SelectParser implements Parser {
 		if ( afterNew ) {
 			afterNew = false;
 			try {
-				holderClass = ReflectHelper.classForName( QuerySplitter.getImportedClass( token, q.getFactory() ) );
+				holderClass = q.getFactory().getServiceRegistry()
+						.getService( ClassLoaderService.class )
+						.classForName( QuerySplitter.getImportedClass( token, q.getFactory() ) );
 			}
-			catch ( ClassNotFoundException cnfe ) {
-				throw new QueryException( cnfe );
+			catch ( ClassLoadingException e ) {
+				throw new QueryException( e );
 			}
-			if ( holderClass == null ) throw new QueryException( "class not found: " + token );
+			if ( holderClass == null ) {
+				throw new QueryException( "class not found: " + token );
+			}
 			q.setHolderClass( holderClass );
 			insideNew = true;
 		}
 		else if ( token.equals( "," ) ) {
-			if ( !aggregate && ready ) throw new QueryException( "alias or expression expected in SELECT" );
+			if ( !aggregate && ready ) {
+				throw new QueryException( "alias or expression expected in SELECT" );
+			}
 			q.appendScalarSelectToken( ", " );
 			ready = true;
 		}
@@ -152,7 +142,9 @@ public class SelectParser implements Parser {
 		}
 		else if ( getFunction( lctoken, q ) != null && token.equals( q.unalias( token ) ) ) {
 			// the name of an SQL function
-			if ( !ready ) throw new QueryException( ", expected before aggregate function in SELECT: " + token );
+			if ( !ready ) {
+				throw new QueryException( ", expected before aggregate function in SELECT: " + token );
+			}
 			aggregate = true;
 			aggregateAddSelectScalar = true;
 			aggregateFuncTokenList.add( lctoken );
@@ -174,7 +166,9 @@ public class SelectParser implements Parser {
 		}
 		else if ( aggregate ) {
 			boolean constantToken = false;
-			if ( !ready ) throw new QueryException( "( expected after aggregate function in SELECT" );
+			if ( !ready ) {
+				throw new QueryException( "( expected after aggregate function in SELECT" );
+			}
 			try {
 				ParserHelper.parse( aggregatePathExpressionParser, q.unalias( token ), ParserHelper.PATH_SEPARATORS, q );
 			}
@@ -199,7 +193,9 @@ public class SelectParser implements Parser {
 			}
 		}
 		else {
-			if ( !ready ) throw new QueryException( ", expected in SELECT" );
+			if ( !ready ) {
+				throw new QueryException( ", expected in SELECT" );
+			}
 			ParserHelper.parse( pathExpressionParser, q.unalias( token ), ParserHelper.PATH_SEPARATORS, q );
 			if ( pathExpressionParser.isCollectionValued() ) {
 				q.addCollection( pathExpressionParser.getCollectionName(),

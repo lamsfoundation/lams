@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.spi;
 
@@ -186,37 +169,43 @@ public final class CollectionEntry implements Serializable {
 			loadedKey = collection.getKey();
 		}
 
-		boolean nonMutableChange = collection.isDirty() &&
-				getLoadedPersister()!=null &&
-				!getLoadedPersister().isMutable();
-		if (nonMutableChange) {
+		boolean nonMutableChange = collection.isDirty()
+				&& getLoadedPersister() != null
+				&& !getLoadedPersister().isMutable();
+		if ( nonMutableChange ) {
 			throw new HibernateException(
 					"changed an immutable collection instance: " +
 					MessageHelper.collectionInfoString( getLoadedPersister().getRole(), getLoadedKey() )
-				);
+			);
 		}
 
-		dirty(collection);
+		dirty( collection );
 
 		if ( LOG.isDebugEnabled() && collection.isDirty() && getLoadedPersister() != null ) {
-			LOG.debugf( "Collection dirty: %s",
-					MessageHelper.collectionInfoString( getLoadedPersister().getRole(), getLoadedKey() ) );
+			LOG.debugf(
+					"Collection dirty: %s",
+					MessageHelper.collectionInfoString( getLoadedPersister().getRole(), getLoadedKey() )
+			);
 		}
 
-		setDoupdate(false);
-		setDoremove(false);
-		setDorecreate(false);
-		setReached(false);
-		setProcessed(false);
+		setReached( false );
+		setProcessed( false );
+
+		setDoupdate( false );
+		setDoremove( false );
+		setDorecreate( false );
 	}
 
 	public void postInitialize(PersistentCollection collection) throws HibernateException {
-		snapshot = getLoadedPersister().isMutable() ?
-				collection.getSnapshot( getLoadedPersister() ) :
-				null;
+		snapshot = getLoadedPersister().isMutable()
+				? collection.getSnapshot( getLoadedPersister() )
+				: null;
 		collection.setSnapshot(loadedKey, role, snapshot);
-		if (getLoadedPersister().getBatchSize() > 1) {
-			((AbstractPersistentCollection) collection).getSession().getPersistenceContext().getBatchFetchQueue().removeBatchLoadableCollection(this); 
+		if ( getLoadedPersister().getBatchSize() > 1 ) {
+			( (AbstractPersistentCollection) collection ).getSession()
+					.getPersistenceContext()
+					.getBatchFetchQueue()
+					.removeBatchLoadableCollection( this );
 		}
 	}
 
@@ -290,7 +279,7 @@ public final class CollectionEntry implements Serializable {
 	}
 
 	void afterDeserialize(SessionFactoryImplementor factory) {
-		loadedPersister = ( factory == null ? null : factory.getCollectionPersister(role) );
+		loadedPersister = ( factory == null ? null : factory.getCollectionPersister( role ) );
 	}
 
 	public boolean wasDereferenced() {

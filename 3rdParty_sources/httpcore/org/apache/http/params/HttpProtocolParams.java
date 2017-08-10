@@ -27,19 +27,22 @@
 
 package org.apache.http.params;
 
+import java.nio.charset.CodingErrorAction;
+
 import org.apache.http.HttpVersion;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.protocol.HTTP;
-
-import java.nio.charset.CodingErrorAction;
+import org.apache.http.util.Args;
 
 /**
  * Utility class for accessing protocol parameters in {@link HttpParams}.
  *
  * @since 4.0
  *
- * @see CoreProtocolPNames
+ * @deprecated (4.3) use configuration classes provided 'org.apache.http.config'
+ *  and 'org.apache.http.client.config'
  */
+@Deprecated
 public final class HttpProtocolParams implements CoreProtocolPNames {
 
     private HttpProtocolParams() {
@@ -48,15 +51,13 @@ public final class HttpProtocolParams implements CoreProtocolPNames {
 
     /**
      * Obtains value of the {@link CoreProtocolPNames#HTTP_ELEMENT_CHARSET} parameter.
-     * If not set, defaults to <code>US-ASCII</code>.
+     * If not set, defaults to {@code US-ASCII}.
      *
      * @param params HTTP parameters.
      * @return HTTP element charset.
      */
     public static String getHttpElementCharset(final HttpParams params) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
+        Args.notNull(params, "HTTP parameters");
         String charset = (String) params.getParameter
             (CoreProtocolPNames.HTTP_ELEMENT_CHARSET);
         if (charset == null) {
@@ -72,23 +73,19 @@ public final class HttpProtocolParams implements CoreProtocolPNames {
      * @param charset HTTP element charset.
      */
     public static void setHttpElementCharset(final HttpParams params, final String charset) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
+        Args.notNull(params, "HTTP parameters");
         params.setParameter(CoreProtocolPNames.HTTP_ELEMENT_CHARSET, charset);
     }
 
     /**
      * Obtains value of the {@link CoreProtocolPNames#HTTP_CONTENT_CHARSET} parameter.
-     * If not set, defaults to <code>ISO-8859-1</code>.
+     * If not set, defaults to {@code ISO-8859-1}.
      *
      * @param params HTTP parameters.
      * @return HTTP content charset.
      */
     public static String getContentCharset(final HttpParams params) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
+        Args.notNull(params, "HTTP parameters");
         String charset = (String) params.getParameter
             (CoreProtocolPNames.HTTP_CONTENT_CHARSET);
         if (charset == null) {
@@ -104,9 +101,7 @@ public final class HttpProtocolParams implements CoreProtocolPNames {
      * @param charset HTTP content charset.
      */
     public static void setContentCharset(final HttpParams params, final String charset) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
+        Args.notNull(params, "HTTP parameters");
         params.setParameter(CoreProtocolPNames.HTTP_CONTENT_CHARSET, charset);
     }
 
@@ -118,10 +113,8 @@ public final class HttpProtocolParams implements CoreProtocolPNames {
      * @return HTTP protocol version.
      */
     public static ProtocolVersion getVersion(final HttpParams params) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
-        Object param = params.getParameter
+        Args.notNull(params, "HTTP parameters");
+        final Object param = params.getParameter
             (CoreProtocolPNames.PROTOCOL_VERSION);
         if (param == null) {
             return HttpVersion.HTTP_1_1;
@@ -136,23 +129,19 @@ public final class HttpProtocolParams implements CoreProtocolPNames {
      * @param version HTTP protocol version.
      */
     public static void setVersion(final HttpParams params, final ProtocolVersion version) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
+        Args.notNull(params, "HTTP parameters");
         params.setParameter(CoreProtocolPNames.PROTOCOL_VERSION, version);
     }
 
     /**
      * Obtains value of the {@link CoreProtocolPNames#USER_AGENT} parameter.
-     * If not set, returns <code>null</code>.
+     * If not set, returns {@code null}.
      *
      * @param params HTTP parameters.
      * @return User agent string.
      */
     public static String getUserAgent(final HttpParams params) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
+        Args.notNull(params, "HTTP parameters");
         return (String) params.getParameter(CoreProtocolPNames.USER_AGENT);
     }
 
@@ -163,25 +152,20 @@ public final class HttpProtocolParams implements CoreProtocolPNames {
      * @param useragent User agent string.
      */
     public static void setUserAgent(final HttpParams params, final String useragent) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
+        Args.notNull(params, "HTTP parameters");
         params.setParameter(CoreProtocolPNames.USER_AGENT, useragent);
     }
 
     /**
      * Obtains value of the {@link CoreProtocolPNames#USE_EXPECT_CONTINUE} parameter.
-     * If not set, returns <code>false</code>.
+     * If not set, returns {@code false}.
      *
      * @param params HTTP parameters.
      * @return User agent string.
      */
     public static boolean useExpectContinue(final HttpParams params) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
-        return params.getBooleanParameter
-            (CoreProtocolPNames.USE_EXPECT_CONTINUE, false);
+        Args.notNull(params, "HTTP parameters");
+        return params.getBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, false);
     }
 
     /**
@@ -190,10 +174,8 @@ public final class HttpProtocolParams implements CoreProtocolPNames {
      * @param params HTTP parameters.
      * @param b expect-continue flag.
      */
-    public static void setUseExpectContinue(final HttpParams params, boolean b) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
+    public static void setUseExpectContinue(final HttpParams params, final boolean b) {
+        Args.notNull(params, "HTTP parameters");
         params.setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, b);
     }
 
@@ -205,10 +187,8 @@ public final class HttpProtocolParams implements CoreProtocolPNames {
      * @since 4.2
      */
     public static CodingErrorAction getMalformedInputAction(final HttpParams params) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
-        Object param = params.getParameter(CoreProtocolPNames.HTTP_MALFORMED_INPUT_ACTION);
+        Args.notNull(params, "HTTP parameters");
+        final Object param = params.getParameter(CoreProtocolPNames.HTTP_MALFORMED_INPUT_ACTION);
         if (param == null) {
             // the default CodingErrorAction
             return CodingErrorAction.REPORT;
@@ -223,10 +203,8 @@ public final class HttpProtocolParams implements CoreProtocolPNames {
      *
      * @since 4.2
      */
-    public static void setMalformedInputAction(final HttpParams params, CodingErrorAction action) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
+    public static void setMalformedInputAction(final HttpParams params, final CodingErrorAction action) {
+        Args.notNull(params, "HTTP parameters");
         params.setParameter(CoreProtocolPNames.HTTP_MALFORMED_INPUT_ACTION, action);
     }
 
@@ -238,10 +216,8 @@ public final class HttpProtocolParams implements CoreProtocolPNames {
      * @since 4.2
      */
     public static CodingErrorAction getUnmappableInputAction(final HttpParams params) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
-        Object param = params.getParameter(CoreProtocolPNames.HTTP_UNMAPPABLE_INPUT_ACTION);
+        Args.notNull(params, "HTTP parameters");
+        final Object param = params.getParameter(CoreProtocolPNames.HTTP_UNMAPPABLE_INPUT_ACTION);
         if (param == null) {
             // the default CodingErrorAction
             return CodingErrorAction.REPORT;
@@ -256,10 +232,9 @@ public final class HttpProtocolParams implements CoreProtocolPNames {
      *
      * @since 4.2
      */
-    public static void setUnmappableInputAction(final HttpParams params, CodingErrorAction action) {
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may no be null");
-        }
+    public static void setUnmappableInputAction(final HttpParams params, final CodingErrorAction action) {
+        Args.notNull(params, "HTTP parameters");
         params.setParameter(CoreProtocolPNames.HTTP_UNMAPPABLE_INPUT_ACTION, action);
     }
+
 }

@@ -27,69 +27,76 @@
 package org.apache.http.impl.cookie;
 
 import org.apache.http.annotation.Immutable;
-
+import org.apache.http.cookie.ClientCookie;
+import org.apache.http.cookie.CommonCookieAttributeHandler;
 import org.apache.http.cookie.Cookie;
-import org.apache.http.cookie.CookieAttributeHandler;
 import org.apache.http.cookie.CookieOrigin;
 import org.apache.http.cookie.CookieRestrictionViolationException;
 import org.apache.http.cookie.MalformedCookieException;
 import org.apache.http.cookie.SetCookie;
+import org.apache.http.util.Args;
+import org.apache.http.util.TextUtils;
 
 /**
  *
  * @since 4.0
  */
 @Immutable
-public class BasicPathHandler implements CookieAttributeHandler {
+public class BasicPathHandler implements CommonCookieAttributeHandler {
 
     public BasicPathHandler() {
         super();
     }
 
-    public void parse(final SetCookie cookie, String value)
-            throws MalformedCookieException {
-        if (cookie == null) {
-            throw new IllegalArgumentException("Cookie may not be null");
-        }
-        if (value == null || value.trim().length() == 0) {
-            value = "/";
-        }
-        cookie.setPath(value);
+    @Override
+    public void parse(
+            final SetCookie cookie, final String value) throws MalformedCookieException {
+        Args.notNull(cookie, "Cookie");
+        cookie.setPath(!TextUtils.isBlank(value) ? value : "/");
     }
 
+    @Override
     public void validate(final Cookie cookie, final CookieOrigin origin)
             throws MalformedCookieException {
         if (!match(cookie, origin)) {
             throw new CookieRestrictionViolationException(
-                "Illegal path attribute \"" + cookie.getPath()
+                "Illegal 'path' attribute \"" + cookie.getPath()
                 + "\". Path of origin: \"" + origin.getPath() + "\"");
         }
     }
 
-    public boolean match(final Cookie cookie, final CookieOrigin origin) {
-        if (cookie == null) {
-            throw new IllegalArgumentException("Cookie may not be null");
+    static boolean pathMatch(final String uriPath, final String cookiePath) {
+        String normalizedCookiePath = cookiePath;
+        if (normalizedCookiePath == null) {
+            normalizedCookiePath = "/";
         }
-        if (origin == null) {
-            throw new IllegalArgumentException("Cookie origin may not be null");
+        if (normalizedCookiePath.length() > 1 && normalizedCookiePath.endsWith("/")) {
+            normalizedCookiePath = normalizedCookiePath.substring(0, normalizedCookiePath.length() - 1);
         }
-        String targetpath = origin.getPath();
-        String topmostPath = cookie.getPath();
-        if (topmostPath == null) {
-            topmostPath = "/";
-        }
-        if (topmostPath.length() > 1 && topmostPath.endsWith("/")) {
-            topmostPath = topmostPath.substring(0, topmostPath.length() - 1);
-        }
-        boolean match = targetpath.startsWith (topmostPath);
-        // if there is a match and these values are not exactly the same we have
-        // to make sure we're not matcing "/foobar" and "/foo"
-        if (match && targetpath.length() != topmostPath.length()) {
-            if (!topmostPath.endsWith("/")) {
-                match = (targetpath.charAt(topmostPath.length()) == '/');
+        if (uriPath.startsWith(normalizedCookiePath)) {
+            if (normalizedCookiePath.equals("/")) {
+                return true;
+            }
+            if (uriPath.length() == normalizedCookiePath.length()) {
+                return true;
+            }
+            if (uriPath.charAt(normalizedCookiePath.length()) == '/') {
+                return true;
             }
         }
-        return match;
+        return false;
+    }
+
+    @Override
+    public boolean match(final Cookie cookie, final CookieOrigin origin) {
+        Args.notNull(cookie, "Cookie");
+        Args.notNull(origin, "Cookie origin");
+        return pathMatch(origin.getPath(), cookie.getPath());
+    }
+
+    @Override
+    public String getAttributeName() {
+        return ClientCookie.PATH_ATTR;
     }
 
 }

@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.internal;
 
@@ -37,16 +19,14 @@ import org.hibernate.hql.internal.HolderInstantiator;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
 
-import org.jboss.logging.Logger;
-
 /**
  * An implementation of <tt>java.util.Iterator</tt> that is
  * returned by <tt>iterate()</tt> query execution methods.
+ *
  * @author Gavin King
  */
 public final class IteratorImpl implements HibernateIterator {
-
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, IteratorImpl.class.getName());
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( IteratorImpl.class );
 
 	private ResultSet rs;
 	private final EventSource session;
@@ -60,52 +40,54 @@ public final class IteratorImpl implements HibernateIterator {
 	private HolderInstantiator holderInstantiator;
 
 	public IteratorImpl(
-	        ResultSet rs,
-	        PreparedStatement ps,
-	        EventSource sess,
-	        boolean readOnly,
-	        Type[] types,
-	        String[][] columnNames,
-	        HolderInstantiator holderInstantiator)
-	throws HibernateException, SQLException {
-
-		this.rs=rs;
-		this.ps=ps;
+			ResultSet rs,
+			PreparedStatement ps,
+			EventSource sess,
+			boolean readOnly,
+			Type[] types,
+			String[][] columnNames,
+			HolderInstantiator holderInstantiator) throws HibernateException, SQLException {
+		this.rs = rs;
+		this.ps = ps;
 		this.session = sess;
 		this.readOnly = readOnly;
 		this.types = types;
 		this.names = columnNames;
 		this.holderInstantiator = holderInstantiator;
 
-		single = types.length==1;
+		single = types.length == 1;
 
 		postNext();
 	}
 
 	public void close() throws JDBCException {
-		if (ps!=null) {
-			LOG.debug("Closing iterator");
-			session.getTransactionCoordinator().getJdbcCoordinator().release( ps );
-			ps = null;
-			rs = null;
-			hasNext = false;
+		if ( ps != null ) {
+			LOG.debug( "Closing iterator" );
+			session.getJdbcCoordinator().getResourceRegistry().release( ps );
 			try {
 				session.getPersistenceContext().getLoadContexts().cleanup( rs );
 			}
-			catch( Throwable ignore ) {
+			catch (Throwable ignore) {
 				// ignore this error for now
-                LOG.debugf("Exception trying to cleanup load context : %s", ignore.getMessage());
+				LOG.debugf( "Exception trying to cleanup load context : %s", ignore.getMessage() );
 			}
+			session.getJdbcCoordinator().afterStatementExecution();
+			ps = null;
+			rs = null;
+			hasNext = false;
 		}
 	}
 
 	private void postNext() throws SQLException {
-		LOG.debug("Attempting to retrieve next results");
+		LOG.debug( "Attempting to retrieve next results" );
 		this.hasNext = rs.next();
-		if (!hasNext) {
-			LOG.debug("Exhausted results");
+		if ( !hasNext ) {
+			LOG.debug( "Exhausted results" );
 			close();
-		} else LOG.debug("Retrieved next results");
+		}
+		else {
+			LOG.debug( "Retrieved next results" );
+		}
 	}
 
 	public boolean hasNext() {
@@ -113,7 +95,9 @@ public final class IteratorImpl implements HibernateIterator {
 	}
 
 	public Object next() throws HibernateException {
-		if ( !hasNext ) throw new NoSuchElementException("No more results");
+		if ( !hasNext ) {
+			throw new NoSuchElementException( "No more results" );
+		}
 		boolean sessionDefaultReadOnlyOrig = session.isDefaultReadOnly();
 		session.setDefaultReadOnly( readOnly );
 		try {
@@ -125,12 +109,12 @@ public final class IteratorImpl implements HibernateIterator {
 			}
 			else {
 				Object[] currentResults = new Object[types.length];
-				for (int i=0; i<types.length; i++) {
+				for ( int i = 0; i < types.length; i++ ) {
 					currentResults[i] = types[i].nullSafeGet( rs, names[i], session, null );
 				}
 
-				if (isHolder) {
-					currentResult = holderInstantiator.instantiate(currentResults);
+				if ( isHolder ) {
+					currentResult = holderInstantiator.instantiate( currentResults );
 				}
 				else {
 					currentResult = currentResults;
@@ -145,7 +129,7 @@ public final class IteratorImpl implements HibernateIterator {
 			throw session.getFactory().getSQLExceptionHelper().convert(
 					sqle,
 					"could not get next iterator result"
-				);
+			);
 		}
 		finally {
 			session.setDefaultReadOnly( sessionDefaultReadOnlyOrig );
@@ -153,21 +137,21 @@ public final class IteratorImpl implements HibernateIterator {
 	}
 
 	public void remove() {
-		if (!single) {
-			throw new UnsupportedOperationException("Not a single column hibernate query result set");
+		if ( !single ) {
+			throw new UnsupportedOperationException( "Not a single column hibernate query result set" );
 		}
-		if (currentResult==null) {
-			throw new IllegalStateException("Called Iterator.remove() before next()");
+		if ( currentResult == null ) {
+			throw new IllegalStateException( "Called Iterator.remove() before next()" );
 		}
 		if ( !( types[0] instanceof EntityType ) ) {
-			throw new UnsupportedOperationException("Not an entity");
+			throw new UnsupportedOperationException( "Not an entity" );
 		}
 
 		session.delete(
 				( (EntityType) types[0] ).getAssociatedEntityName(),
 				currentResult,
 				false,
-		        null
-			);
+				null
+		);
 	}
 }

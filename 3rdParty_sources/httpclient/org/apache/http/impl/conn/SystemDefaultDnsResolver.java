@@ -38,10 +38,10 @@ import org.apache.http.conn.DnsResolver;
  */
 public class SystemDefaultDnsResolver implements DnsResolver {
 
-    /**
-     * {@inheritDoc}
-     */
-    public InetAddress[] resolve(String host) throws UnknownHostException {
+    public static final SystemDefaultDnsResolver INSTANCE = new SystemDefaultDnsResolver();
+
+    @Override
+    public InetAddress[] resolve(final String host) throws UnknownHostException {
         return InetAddress.getAllByName(host);
     }
 

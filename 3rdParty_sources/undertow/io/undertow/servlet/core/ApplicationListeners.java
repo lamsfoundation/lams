@@ -25,6 +25,7 @@ import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestAttributeEvent;
 import javax.servlet.ServletRequestAttributeListener;
@@ -45,10 +46,10 @@ import static io.undertow.servlet.core.ApplicationListeners.ListenerState.PROGRA
 
 /**
  * Class that is responsible for invoking application listeners.
- * <p/>
+ * <p>
  * This class does not perform any context setup, the context must be setup
  * before invoking this class.
- * <p/>
+ * <p>
  * Note that arrays are used instead of lists for performance reasons.
  *
  * @author Stuart Douglas
@@ -143,10 +144,20 @@ public class ApplicationListeners implements Lifecycle {
             httpSessionIdListeners[old.length] = listener;
         }
         this.allListeners.add(listener);
+        if(started) {
+            try {
+                listener.start();
+            } catch (ServletException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
-    public void start() {
+    public void start() throws ServletException {
         started = true;
+        for (ManagedListener listener : allListeners) {
+            listener.start();
+        }
     }
 
     public void stop() {
@@ -164,6 +175,9 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void contextInitialized() {
+        if(!started) {
+            return;
+        }
         //new listeners can be added here, so we don't use an iterator
         final ServletContextEvent event = new ServletContextEvent(servletContext);
         for (int i = 0; i < servletContextListeners.length; ++i) {
@@ -178,6 +192,9 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void contextDestroyed() {
+        if(!started) {
+            return;
+        }
         final ServletContextEvent event = new ServletContextEvent(servletContext);
         for (int i = servletContextListeners.length - 1; i >= 0; --i) {
             ManagedListener listener = servletContextListeners[i];
@@ -190,6 +207,9 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void servletContextAttributeAdded(final String name, final Object value) {
+        if(!started) {
+            return;
+        }
         final ServletContextAttributeEvent sre = new ServletContextAttributeEvent(servletContext, name, value);
         for (int i = 0; i < servletContextAttributeListeners.length; ++i) {
             this.<ServletContextAttributeListener>get(servletContextAttributeListeners[i]).attributeAdded(sre);
@@ -197,6 +217,9 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void servletContextAttributeRemoved(final String name, final Object value) {
+        if(!started) {
+            return;
+        }
         final ServletContextAttributeEvent sre = new ServletContextAttributeEvent(servletContext, name, value);
         for (int i = 0; i < servletContextAttributeListeners.length; ++i) {
             this.<ServletContextAttributeListener>get(servletContextAttributeListeners[i]).attributeRemoved(sre);
@@ -204,6 +227,9 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void servletContextAttributeReplaced(final String name, final Object value) {
+        if(!started) {
+            return;
+        }
         final ServletContextAttributeEvent sre = new ServletContextAttributeEvent(servletContext, name, value);
         for (int i = 0; i < servletContextAttributeListeners.length; ++i) {
             this.<ServletContextAttributeListener>get(servletContextAttributeListeners[i]).attributeReplaced(sre);
@@ -211,25 +237,38 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void requestInitialized(final ServletRequest request) {
-        final ServletRequestEvent sre = new ServletRequestEvent(servletContext, request);
-        for (int i = 0; i < servletRequestListeners.length; ++i) {
-            this.<ServletRequestListener>get(servletRequestListeners[i]).requestInitialized(sre);
+        if(!started) {
+            return;
+        }
+        if(servletRequestListeners.length > 0) {
+            final ServletRequestEvent sre = new ServletRequestEvent(servletContext, request);
+            for (int i = 0; i < servletRequestListeners.length; ++i) {
+                this.<ServletRequestListener>get(servletRequestListeners[i]).requestInitialized(sre);
+            }
         }
     }
 
     public void requestDestroyed(final ServletRequest request) {
-        final ServletRequestEvent sre = new ServletRequestEvent(servletContext, request);
-        for (int i = servletRequestListeners.length - 1; i >= 0; --i) {
-            ManagedListener listener = servletRequestListeners[i];
-            try {
-                this.<ServletRequestListener>get(listener).requestDestroyed(sre);
-            } catch (Exception e) {
-                UndertowServletLogger.REQUEST_LOGGER.errorInvokingListener("requestDestroyed", listener.getListenerInfo().getListenerClass(), e);
+        if(!started) {
+            return;
+        }
+        if(servletRequestListeners.length > 0) {
+            final ServletRequestEvent sre = new ServletRequestEvent(servletContext, request);
+            for (int i = servletRequestListeners.length - 1; i >= 0; --i) {
+                ManagedListener listener = servletRequestListeners[i];
+                try {
+                    this.<ServletRequestListener>get(listener).requestDestroyed(sre);
+                } catch (Exception e) {
+                    UndertowServletLogger.REQUEST_LOGGER.errorInvokingListener("requestDestroyed", listener.getListenerInfo().getListenerClass(), e);
+                }
             }
         }
     }
 
     public void servletRequestAttributeAdded(final HttpServletRequest request, final String name, final Object value) {
+        if(!started) {
+            return;
+        }
         final ServletRequestAttributeEvent sre = new ServletRequestAttributeEvent(servletContext, request, name, value);
         for (int i = 0; i < servletRequestAttributeListeners.length; ++i) {
             this.<ServletRequestAttributeListener>get(servletRequestAttributeListeners[i]).attributeAdded(sre);
@@ -237,6 +276,9 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void servletRequestAttributeRemoved(final HttpServletRequest request, final String name, final Object value) {
+        if(!started) {
+            return;
+        }
         final ServletRequestAttributeEvent sre = new ServletRequestAttributeEvent(servletContext, request, name, value);
         for (int i = 0; i < servletRequestAttributeListeners.length; ++i) {
             this.<ServletRequestAttributeListener>get(servletRequestAttributeListeners[i]).attributeRemoved(sre);
@@ -244,6 +286,9 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void servletRequestAttributeReplaced(final HttpServletRequest request, final String name, final Object value) {
+        if(!started) {
+            return;
+        }
         final ServletRequestAttributeEvent sre = new ServletRequestAttributeEvent(servletContext, request, name, value);
         for (int i = 0; i < servletRequestAttributeListeners.length; ++i) {
             this.<ServletRequestAttributeListener>get(servletRequestAttributeListeners[i]).attributeReplaced(sre);
@@ -251,6 +296,9 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void sessionCreated(final HttpSession session) {
+        if(!started) {
+            return;
+        }
         final HttpSessionEvent sre = new HttpSessionEvent(session);
         for (int i = 0; i < httpSessionListeners.length; ++i) {
             this.<HttpSessionListener>get(httpSessionListeners[i]).sessionCreated(sre);
@@ -258,6 +306,9 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void sessionDestroyed(final HttpSession session) {
+        if(!started) {
+            return;
+        }
         final HttpSessionEvent sre = new HttpSessionEvent(session);
         for (int i = httpSessionListeners.length - 1; i >= 0; --i) {
             ManagedListener listener = httpSessionListeners[i];
@@ -266,6 +317,9 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void httpSessionAttributeAdded(final HttpSession session, final String name, final Object value) {
+        if(!started) {
+            return;
+        }
         final HttpSessionBindingEvent sre = new HttpSessionBindingEvent(session, name, value);
         for (int i = 0; i < httpSessionAttributeListeners.length; ++i) {
             this.<HttpSessionAttributeListener>get(httpSessionAttributeListeners[i]).attributeAdded(sre);
@@ -273,6 +327,9 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void httpSessionAttributeRemoved(final HttpSession session, final String name, final Object value) {
+        if(!started) {
+            return;
+        }
         final HttpSessionBindingEvent sre = new HttpSessionBindingEvent(session, name, value);
         for (int i = 0; i < httpSessionAttributeListeners.length; ++i) {
             this.<HttpSessionAttributeListener>get(httpSessionAttributeListeners[i]).attributeRemoved(sre);
@@ -280,6 +337,9 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void httpSessionAttributeReplaced(final HttpSession session, final String name, final Object value) {
+        if(!started) {
+            return;
+        }
         final HttpSessionBindingEvent sre = new HttpSessionBindingEvent(session, name, value);
         for (int i = 0; i < httpSessionAttributeListeners.length; ++i) {
             this.<HttpSessionAttributeListener>get(httpSessionAttributeListeners[i]).attributeReplaced(sre);
@@ -287,6 +347,9 @@ public class ApplicationListeners implements Lifecycle {
     }
 
     public void httpSessionIdChanged(final HttpSession session, final String oldSessionId) {
+        if(!started) {
+            return;
+        }
         final HttpSessionEvent sre = new HttpSessionEvent(session);
         for (int i = 0; i < httpSessionIdListeners.length; ++i) {
             this.<HttpSessionIdListener>get(httpSessionIdListeners[i]).sessionIdChanged(sre, oldSessionId);
@@ -317,7 +380,7 @@ public class ApplicationListeners implements Lifecycle {
         return false;
     }
 
-    public static enum ListenerState {
+    public enum ListenerState {
         NO_LISTENER,
         DECLARED_LISTENER,
         PROGRAMATIC_LISTENER,

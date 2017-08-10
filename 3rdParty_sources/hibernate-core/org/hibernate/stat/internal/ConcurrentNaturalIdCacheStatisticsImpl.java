@@ -1,38 +1,20 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.stat.internal;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.hibernate.cache.spi.NaturalIdCacheKey;
 import org.hibernate.cache.spi.Region;
+import org.hibernate.cache.spi.access.NaturalIdRegionAccessStrategy;
 import org.hibernate.stat.NaturalIdCacheStatistics;
 
 /**
@@ -43,6 +25,7 @@ import org.hibernate.stat.NaturalIdCacheStatistics;
 public class ConcurrentNaturalIdCacheStatisticsImpl extends CategorizedStatistics implements NaturalIdCacheStatistics {
 	private static final long serialVersionUID = 1L;
 	private final transient Region region;
+	private final transient NaturalIdRegionAccessStrategy accessStrategy;
 	private final AtomicLong hitCount = new AtomicLong();
 	private final AtomicLong missCount = new AtomicLong();
 	private final AtomicLong putCount = new AtomicLong();
@@ -53,15 +36,17 @@ public class ConcurrentNaturalIdCacheStatisticsImpl extends CategorizedStatistic
 
 	private final Lock readLock;
 	private final Lock writeLock;
+
 	{
 		final ReadWriteLock lock = new ReentrantReadWriteLock();
 		this.readLock = lock.readLock();
 		this.writeLock = lock.writeLock();
 	}
 
-	ConcurrentNaturalIdCacheStatisticsImpl(Region region) {
+	ConcurrentNaturalIdCacheStatisticsImpl(Region region, NaturalIdRegionAccessStrategy accessStrategy) {
 		super( region.getName() );
 		this.region = region;
+		this.accessStrategy = accessStrategy;
 	}
 
 	@Override
@@ -140,12 +125,12 @@ public class ConcurrentNaturalIdCacheStatisticsImpl extends CategorizedStatistic
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Map getEntries() {
 		final Map map = new HashMap();
-		final Iterator iter = this.region.toMap().entrySet().iterator();
-		while ( iter.hasNext() ) {
-			final Map.Entry me = (Map.Entry) iter.next();
-			map.put( ( (NaturalIdCacheKey) me.getKey() ).getNaturalIdValues(), me.getValue() );
+		for ( Object o : this.region.toMap().entrySet() ) {
+			Map.Entry me = (Map.Entry) o;
+			map.put( accessStrategy.getNaturalIdValues(me.getKey()), me.getValue() );
 		}
 		return map;
 	}
@@ -189,8 +174,12 @@ public class ConcurrentNaturalIdCacheStatisticsImpl extends CategorizedStatistic
 		this.readLock.lock();
 		try {
 			// Less chances for a context switch
-			for ( long old = this.executionMinTime.get(); time < old && !this.executionMinTime.compareAndSet( old, time ); old = this.executionMinTime.get() ) {;}
-			for ( long old = this.executionMaxTime.get(); time > old && !this.executionMaxTime.compareAndSet( old, time ); old = this.executionMaxTime.get() ) {;}
+			//noinspection StatementWithEmptyBody
+			for ( long old = this.executionMinTime.get(); time < old && !this.executionMinTime.compareAndSet( old, time ); old = this.executionMinTime.get() ) {
+			}
+			//noinspection StatementWithEmptyBody
+			for ( long old = this.executionMaxTime.get(); time > old && !this.executionMaxTime.compareAndSet( old, time ); old = this.executionMaxTime.get() ) {
+			}
 			this.executionCount.getAndIncrement();
 			this.totalExecutionTime.addAndGet( time );
 		}

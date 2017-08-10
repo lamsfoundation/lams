@@ -22,7 +22,7 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.3" name="oauth.signpost">
+<module xmlns="urn:jboss:module:1.5" name="oauth.signpost">
   <resources>
     <resource-root path="signpost-commonshttp4-1.2.1.2.jar"/>
     <resource-root path="signpost-core-1.2.1.2.jar"/>

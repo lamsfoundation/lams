@@ -21,15 +21,16 @@ package io.undertow.server.handlers;
 import io.undertow.Handlers;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.cache.LRUCache;
 import io.undertow.util.PathMatcher;
 
 /**
  * Handler that dispatches to a given handler based of a prefix match of the path.
- * <p/>
+ * <p>
  * This only matches a single level of a request, e.g if you have a request that takes the form:
- * <p/>
+ * <p>
  * /foo/bar
- * <p/>
+ * <p>
  *
  * @author Stuart Douglas
  */
@@ -37,38 +38,75 @@ public class PathHandler implements HttpHandler {
 
     private final PathMatcher<HttpHandler> pathMatcher = new PathMatcher<>();
 
+    private final LRUCache<String, PathMatcher.PathMatch<HttpHandler>> cache;
+
     public PathHandler(final HttpHandler defaultHandler) {
+        this(0);
+        pathMatcher.addPrefixPath("/", defaultHandler);
+    }
+
+    public PathHandler(final HttpHandler defaultHandler, int cacheSize) {
+        this(cacheSize);
         pathMatcher.addPrefixPath("/", defaultHandler);
     }
 
     public PathHandler() {
+        this(0);
+    }
+
+    public PathHandler(int cacheSize) {
+        if(cacheSize > 0) {
+            cache = new LRUCache<>(cacheSize, -1, true);
+        } else {
+            cache = null;
+        }
     }
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        final PathMatcher.PathMatch<HttpHandler> match = pathMatcher.match(exchange.getRelativePath());
+        PathMatcher.PathMatch<HttpHandler> match = null;
+        boolean hit = false;
+        if(cache != null) {
+            match = cache.get(exchange.getRelativePath());
+            hit = true;
+        }
+        if(match == null) {
+            match = pathMatcher.match(exchange.getRelativePath());
+        }
         if (match.getValue() == null) {
             ResponseCodeHandler.HANDLE_404.handleRequest(exchange);
             return;
         }
+        if(hit) {
+            cache.add(exchange.getRelativePath(), match);
+        }
         exchange.setRelativePath(match.getRemaining());
-        exchange.setResolvedPath(exchange.getRequestPath().substring(0, exchange.getRequestPath().length() - match.getRemaining().length()));
+        if(exchange.getResolvedPath().isEmpty()) {
+            //first path handler, we can just use the matched part
+            exchange.setResolvedPath(match.getMatched());
+        } else {
+            //already something in the resolved path
+            StringBuilder sb = new StringBuilder(exchange.getResolvedPath().length() + match.getMatched().length());
+            sb.append(exchange.getResolvedPath());
+            sb.append(match.getMatched());
+            exchange.setResolvedPath(sb.toString());
+        }
         match.getValue().handleRequest(exchange);
     }
 
     /**
      * Adds a path prefix and a handler for that path. If the path does not start
      * with a / then one will be prepended.
-     * <p/>
+     * <p>
      * The match is done on a prefix bases, so registering /foo will also match /bar. Exact
      * path matches are taken into account first.
-     * <p/>
+     * <p>
      * If / is specified as the path then it will replace the default handler.
      *
      * @param path    The path
      * @param handler The handler
      * @see #addPrefixPath(String, io.undertow.server.HttpHandler)
-     * @deprecated Superseded by {@link #addPrefixPath()}.
+     * @deprecated Superseded by {@link #addPrefixPath(String, io.undertow.server.HttpHandler)}.
      */
     @Deprecated
     public synchronized PathHandler addPath(final String path, final HttpHandler handler) {
@@ -78,11 +116,11 @@ public class PathHandler implements HttpHandler {
     /**
      * Adds a path prefix and a handler for that path. If the path does not start
      * with a / then one will be prepended.
-     * <p/>
+     * <p>
      * The match is done on a prefix bases, so registering /foo will also match /foo/bar.
      * Though exact path matches are taken into account before prefix path matches. So
      * if an exact path match exists it's  handler will be triggered.
-     * <p/>
+     * <p>
      * If / is specified as the path then it will replace the default handler.
      *
      * @param path    If the request contains this prefix, run handler.
@@ -97,7 +135,7 @@ public class PathHandler implements HttpHandler {
 
     /**
      * If the request path is exactly equal to the given path, run the handler.
-     * <p/>
+     * <p>
      * Exact paths are prioritized higher than prefix paths.
      *
      * @param path If the request path is exactly this, run handler.

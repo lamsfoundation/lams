@@ -35,10 +35,16 @@ import org.apache.http.annotation.Immutable;
  *
  *
  * @since 4.0
+ *
+ * @deprecated (4.4) Use {@link org.apache.http.conn.ssl.NoopHostnameVerifier}
  */
+@Deprecated
 @Immutable
 public class AllowAllHostnameVerifier extends AbstractVerifier {
 
+    public static final AllowAllHostnameVerifier INSTANCE = new AllowAllHostnameVerifier();
+
+    @Override
     public final void verify(
             final String host,
             final String[] cns,

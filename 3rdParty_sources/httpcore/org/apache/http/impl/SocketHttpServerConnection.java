@@ -35,32 +35,16 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 
 import org.apache.http.HttpInetConnection;
-import org.apache.http.annotation.NotThreadSafe;
 import org.apache.http.impl.io.SocketInputBuffer;
 import org.apache.http.impl.io.SocketOutputBuffer;
 import org.apache.http.io.SessionInputBuffer;
 import org.apache.http.io.SessionOutputBuffer;
-import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
+import org.apache.http.util.Args;
+import org.apache.http.util.Asserts;
 
-/**
- * Implementation of a server-side HTTP connection that can be bound to a
- * network Socket in order to receive and transmit data.
- * <p>
- * The following parameters can be used to customize the behavior of this
- * class:
- * <ul>
- *  <li>{@link org.apache.http.params.CoreProtocolPNames#STRICT_TRANSFER_ENCODING}</li>
- *  <li>{@link org.apache.http.params.CoreProtocolPNames#HTTP_ELEMENT_CHARSET}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#SOCKET_BUFFER_SIZE}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#MAX_LINE_LENGTH}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#MAX_HEADER_COUNT}</li>
- *  <li>{@link org.apache.http.params.CoreConnectionPNames#MIN_CHUNK_LIMIT}</li>
- * </ul>
- *
- * @since 4.0
- */
-@NotThreadSafe
+@Deprecated
 public class SocketHttpServerConnection extends
         AbstractHttpServerConnection implements HttpInetConnection {
 
@@ -72,16 +56,12 @@ public class SocketHttpServerConnection extends
     }
 
     protected void assertNotOpen() {
-        if (this.open) {
-            throw new IllegalStateException("Connection is already open");
-        }
+        Asserts.check(!this.open, "Connection is already open");
     }
 
     @Override
     protected void assertOpen() {
-        if (!this.open) {
-            throw new IllegalStateException("Connection is not open");
-        }
+        Asserts.check(this.open, "Connection is not open");
     }
 
     /**
@@ -101,7 +81,7 @@ public class SocketHttpServerConnection extends
      */
     protected SessionInputBuffer createSessionInputBuffer(
             final Socket socket,
-            int buffersize,
+            final int buffersize,
             final HttpParams params) throws IOException {
         return new SocketInputBuffer(socket, buffersize, params);
     }
@@ -123,7 +103,7 @@ public class SocketHttpServerConnection extends
      */
     protected SessionOutputBuffer createSessionOutputBuffer(
             final Socket socket,
-            int buffersize,
+            final int buffersize,
             final HttpParams params) throws IOException {
         return new SocketOutputBuffer(socket, buffersize, params);
     }
@@ -140,23 +120,18 @@ public class SocketHttpServerConnection extends
      * parser and formatter.
      * <p>
      * After this method's execution the connection status will be reported
-     * as open and the {@link #isOpen()} will return <code>true</code>.
+     * as open and the {@link #isOpen()} will return {@code true}.
      *
      * @param socket the socket.
      * @param params HTTP parameters.
      * @throws IOException in case of an I/O error.
      */
     protected void bind(final Socket socket, final HttpParams params) throws IOException {
-        if (socket == null) {
-            throw new IllegalArgumentException("Socket may not be null");
-        }
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
+        Args.notNull(socket, "Socket");
+        Args.notNull(params, "HTTP parameters");
         this.socket = socket;
 
-        int buffersize = HttpConnectionParams.getSocketBufferSize(params);
-
+        final int buffersize = params.getIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, -1);
         init(
                 createSessionInputBuffer(socket, buffersize, params),
                 createSessionOutputBuffer(socket, buffersize, params),
@@ -205,12 +180,12 @@ public class SocketHttpServerConnection extends
         }
     }
 
-    public void setSocketTimeout(int timeout) {
+    public void setSocketTimeout(final int timeout) {
         assertOpen();
         if (this.socket != null) {
             try {
                 this.socket.setSoTimeout(timeout);
-            } catch (SocketException ignore) {
+            } catch (final SocketException ignore) {
                 // It is not quite clear from the Sun's documentation if there are any
                 // other legitimate cases for a socket exception to be thrown when setting
                 // SO_TIMEOUT besides the socket being already closed
@@ -222,7 +197,7 @@ public class SocketHttpServerConnection extends
         if (this.socket != null) {
             try {
                 return this.socket.getSoTimeout();
-            } catch (SocketException ignore) {
+            } catch (final SocketException ignore) {
                 return -1;
             }
         } else {
@@ -232,7 +207,7 @@ public class SocketHttpServerConnection extends
 
     public void shutdown() throws IOException {
         this.open = false;
-        Socket tmpsocket = this.socket;
+        final Socket tmpsocket = this.socket;
         if (tmpsocket != null) {
             tmpsocket.close();
         }
@@ -244,19 +219,19 @@ public class SocketHttpServerConnection extends
         }
         this.open = false;
         this.open = false;
-        Socket sock = this.socket;
+        final Socket sock = this.socket;
         try {
             doFlush();
             try {
                 try {
                     sock.shutdownOutput();
-                } catch (IOException ignore) {
+                } catch (final IOException ignore) {
                 }
                 try {
                     sock.shutdownInput();
-                } catch (IOException ignore) {
+                } catch (final IOException ignore) {
                 }
-            } catch (UnsupportedOperationException ignore) {
+            } catch (final UnsupportedOperationException ignore) {
                 // if one isn't supported, the other one isn't either
             }
         } finally {
@@ -266,7 +241,7 @@ public class SocketHttpServerConnection extends
 
     private static void formatAddress(final StringBuilder buffer, final SocketAddress socketAddress) {
         if (socketAddress instanceof InetSocketAddress) {
-            InetSocketAddress addr = ((InetSocketAddress) socketAddress);
+            final InetSocketAddress addr = ((InetSocketAddress) socketAddress);
             buffer.append(addr.getAddress() != null ? addr.getAddress().getHostAddress() :
                 addr.getAddress())
             .append(':')
@@ -279,9 +254,9 @@ public class SocketHttpServerConnection extends
     @Override
     public String toString() {
         if (this.socket != null) {
-            StringBuilder buffer = new StringBuilder();
-            SocketAddress remoteAddress = this.socket.getRemoteSocketAddress();
-            SocketAddress localAddress = this.socket.getLocalSocketAddress();
+            final StringBuilder buffer = new StringBuilder();
+            final SocketAddress remoteAddress = this.socket.getRemoteSocketAddress();
+            final SocketAddress localAddress = this.socket.getLocalSocketAddress();
             if (remoteAddress != null && localAddress != null) {
                 formatAddress(buffer, localAddress);
                 buffer.append("<->");

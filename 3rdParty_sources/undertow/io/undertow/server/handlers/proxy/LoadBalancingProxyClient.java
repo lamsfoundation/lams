@@ -25,6 +25,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.ServerConnection;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.util.AttachmentKey;
+import io.undertow.util.AttachmentList;
 import io.undertow.util.CopyOnWriteMap;
 import org.xnio.OptionMap;
 import org.xnio.ssl.XnioSsl;
@@ -43,7 +44,7 @@ import static org.xnio.IoUtils.safeClose;
 /**
  * Initial implementation of a load balancing proxy client. This initial implementation is rather simplistic, and
  * will likely change.
- * <p/>
+ * <p>
  *
  * @author Stuart Douglas
  */
@@ -51,11 +52,12 @@ public class LoadBalancingProxyClient implements ProxyClient {
 
     /**
      * The attachment key that is used to attach the proxy connection to the exchange.
-     * <p/>
+     * <p>
      * This cannot be static as otherwise a connection from a different client could be re-used.
      */
     private final AttachmentKey<ExclusiveConnectionHolder> exclusiveConnectionKey = AttachmentKey.create(ExclusiveConnectionHolder.class);
 
+    private static final AttachmentKey<AttachmentList<Host>> ATTEMPTED_HOSTS = AttachmentKey.createList(Host.class);
 
     /**
      * Time in seconds between retries for problem servers
@@ -69,13 +71,15 @@ public class LoadBalancingProxyClient implements ProxyClient {
      */
     private volatile int connectionsPerThread = 10;
     private volatile int maxQueueSize = 0;
+    private volatile int softMaxConnectionsPerThread = 5;
+    private volatile int ttl = -1;
 
     /**
      * The hosts list.
      */
     private volatile Host[] hosts = {};
 
-    private final AtomicInteger currentHost = new AtomicInteger(0);
+    private final HostSelector hostSelector;
     private final UndertowClient client;
 
     private final Map<String, Host> routes = new CopyOnWriteMap<>();
@@ -90,17 +94,26 @@ public class LoadBalancingProxyClient implements ProxyClient {
     }
 
     public LoadBalancingProxyClient(UndertowClient client) {
-        this(client, null);
+        this(client, null, null);
     }
 
     public LoadBalancingProxyClient(ExclusivityChecker client) {
-        this(UndertowClient.getInstance(), client);
+        this(UndertowClient.getInstance(), client, null);
     }
 
     public LoadBalancingProxyClient(UndertowClient client, ExclusivityChecker exclusivityChecker) {
+        this(client, exclusivityChecker, null);
+    }
+
+    public LoadBalancingProxyClient(UndertowClient client, ExclusivityChecker exclusivityChecker, HostSelector hostSelector) {
         this.client = client;
         this.exclusivityChecker = exclusivityChecker;
         sessionCookieNames.add("JSESSIONID");
+        if(hostSelector == null) {
+            this.hostSelector = new RoundRobinHostSelector();
+        } else {
+            this.hostSelector = hostSelector;
+        }
     }
 
     public LoadBalancingProxyClient addSessionCookieName(final String sessionCookieName) {
@@ -137,6 +150,16 @@ public class LoadBalancingProxyClient implements ProxyClient {
 
     public LoadBalancingProxyClient setMaxQueueSize(int maxQueueSize) {
         this.maxQueueSize = maxQueueSize;
+        return this;
+    }
+
+    public LoadBalancingProxyClient setTtl(int ttl) {
+        this.ttl = ttl;
+        return this;
+    }
+
+    public LoadBalancingProxyClient setSoftMaxConnectionsPerThread(int softMaxConnectionsPerThread) {
+        this.softMaxConnectionsPerThread = softMaxConnectionsPerThread;
         return this;
     }
 
@@ -229,6 +252,7 @@ public class LoadBalancingProxyClient implements ProxyClient {
         if (host == null) {
             callback.couldNotResolveBackend(exchange);
         } else {
+            exchange.addToAttachmentList(ATTEMPTED_HOSTS, host);
             if (holder != null || (exclusivityChecker != null && exclusivityChecker.isExclusivityRequired(exchange))) {
                 // If we have a holder, even if the connection was closed we now exclusivity was already requested so our client
                 // may be assuming it still exists.
@@ -280,28 +304,33 @@ public class LoadBalancingProxyClient implements ProxyClient {
     }
 
     protected Host selectHost(HttpServerExchange exchange) {
+        AttachmentList<Host> attempted = exchange.getAttachment(ATTEMPTED_HOSTS);
         Host[] hosts = this.hosts;
         if (hosts.length == 0) {
             return null;
         }
         Host sticky = findStickyHost(exchange);
         if (sticky != null) {
-            return sticky;
+            if(attempted == null || !attempted.contains(sticky)) {
+                return sticky;
+            }
         }
-        int host = currentHost.incrementAndGet() % hosts.length;
+        int host = hostSelector.selectHost(hosts);
 
         final int startHost = host; //if the all hosts have problems we come back to this one
         Host full = null;
         Host problem = null;
         do {
             Host selected = hosts[host];
-            ProxyConnectionPool.AvailabilityType available = selected.connectionPool.available();
-            if (available == AVAILABLE) {
-                return selected;
-            } else if (available == FULL && full == null) {
-                full = selected;
-            } else if ((available == PROBLEM || available == FULL_QUEUE) && problem == null) {
-                problem = selected;
+            if(attempted == null || !attempted.contains(selected)) {
+                ProxyConnectionPool.AvailabilityType available = selected.connectionPool.available();
+                if (available == AVAILABLE) {
+                    return selected;
+                } else if (available == FULL && full == null) {
+                    full = selected;
+                } else if ((available == PROBLEM || available == FULL_QUEUE) && problem == null) {
+                    problem = selected;
+                }
             }
             host = (host + 1) % hosts.length;
         } while (host != startHost);
@@ -336,7 +365,7 @@ public class LoadBalancingProxyClient implements ProxyClient {
         return null;
     }
 
-    protected final class Host extends ConnectionPoolErrorHandler.SimpleConnectionPoolErrorHandler implements ConnectionPoolManager {
+    public final class Host extends ConnectionPoolErrorHandler.SimpleConnectionPoolErrorHandler implements ConnectionPoolManager {
         final ProxyConnectionPool connectionPool;
         final String jvmRoute;
         final URI uri;
@@ -366,17 +395,21 @@ public class LoadBalancingProxyClient implements ProxyClient {
 
         @Override
         public int getSMaxConnections() {
-            return connectionsPerThread;
+            return softMaxConnectionsPerThread;
         }
 
         @Override
         public long getTtl() {
-            return -1;
+            return ttl;
         }
 
         @Override
         public int getMaxQueueSize() {
             return maxQueueSize;
+        }
+
+        public URI getUri() {
+            return uri;
         }
     }
 
@@ -384,5 +417,20 @@ public class LoadBalancingProxyClient implements ProxyClient {
 
         private ProxyConnection connection;
 
+    }
+
+    public interface HostSelector {
+
+        int selectHost(Host[] availableHosts);
+    }
+
+    static class RoundRobinHostSelector implements HostSelector {
+
+        private final AtomicInteger currentHost = new AtomicInteger(0);
+
+        @Override
+        public int selectHost(Host[] availableHosts) {
+            return currentHost.incrementAndGet() % availableHosts.length;
+        }
     }
 }

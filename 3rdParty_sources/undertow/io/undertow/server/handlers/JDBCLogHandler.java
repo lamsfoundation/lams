@@ -15,16 +15,20 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.undertow.server.handlers;
 
 import io.undertow.UndertowLogger;
+import io.undertow.UndertowMessages;
 import io.undertow.security.api.SecurityContext;
 import io.undertow.server.ExchangeCompletionListener;
+import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.builder.HandlerBuilder;
 import io.undertow.util.Headers;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.net.InetSocketAddress;
 import java.sql.Connection;
@@ -32,8 +36,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
@@ -44,9 +52,6 @@ public class JDBCLogHandler implements HttpHandler, Runnable {
     private final String formatString;
     private final ExchangeCompletionListener exchangeCompletionListener = new JDBCLogCompletionListener();
 
-
-    private final Executor logWriteExecutor;
-
     private final Deque<JDBCLogAttribute> pendingMessages;
 
     //0 = not running
@@ -54,6 +59,8 @@ public class JDBCLogHandler implements HttpHandler, Runnable {
     //2 = running
     @SuppressWarnings("unused")
     private volatile int state = 0;
+    @SuppressWarnings("unused")
+    private volatile Executor executor;
 
     private static final AtomicIntegerFieldUpdater<JDBCLogHandler> stateUpdater = AtomicIntegerFieldUpdater.newUpdater(JDBCLogHandler.class, "state");
 
@@ -73,7 +80,12 @@ public class JDBCLogHandler implements HttpHandler, Runnable {
     private String refererField;
     private String userAgentField;
 
+    @Deprecated
     public JDBCLogHandler(final HttpHandler next, final Executor logWriteExecutor, final String formatString, DataSource dataSource) {
+        this(next, formatString, dataSource);
+    }
+
+    public JDBCLogHandler(final HttpHandler next, final String formatString, DataSource dataSource) {
         this.next = next;
         this.formatString = formatString;
         this.dataSource = dataSource;
@@ -89,7 +101,6 @@ public class JDBCLogHandler implements HttpHandler, Runnable {
         bytesField = "bytes";
         refererField = "referer";
         userAgentField = "userAgent";
-        this.logWriteExecutor = logWriteExecutor;
         this.pendingMessages = new ConcurrentLinkedDeque<>();
     }
 
@@ -100,6 +111,7 @@ public class JDBCLogHandler implements HttpHandler, Runnable {
     }
 
     private class JDBCLogCompletionListener implements ExchangeCompletionListener {
+
         @Override
         public void exchangeEvent(final HttpServerExchange exchange, final NextListener nextListener) {
             try {
@@ -126,10 +138,11 @@ public class JDBCLogHandler implements HttpHandler, Runnable {
         jdbcLogAttribute.query = exchange.getQueryString();
 
         jdbcLogAttribute.bytes = exchange.getResponseContentLength();
-        if (jdbcLogAttribute.bytes < 0)
+        if (jdbcLogAttribute.bytes < 0) {
             jdbcLogAttribute.bytes = 0;
+        }
 
-        jdbcLogAttribute.status = exchange.getResponseCode();
+        jdbcLogAttribute.status = exchange.getStatusCode();
 
         if (jdbcLogAttribute.pattern.equals("combined")) {
             jdbcLogAttribute.virtualHost = exchange.getRequestHeaders().getFirst(Headers.HOST);
@@ -142,7 +155,8 @@ public class JDBCLogHandler implements HttpHandler, Runnable {
         int state = stateUpdater.get(this);
         if (state == 0) {
             if (stateUpdater.compareAndSet(this, 0, 1)) {
-                logWriteExecutor.execute(this);
+                this.executor = exchange.getConnection().getWorker();
+                this.executor.execute(this);
             }
         }
     }
@@ -172,12 +186,13 @@ public class JDBCLogHandler implements HttpHandler, Runnable {
                 writeMessage(messages);
             }
         } finally {
+            Executor executor = this.executor;
             stateUpdater.set(this, 0);
             //check to see if there is still more messages
             //if so then run this again
             if (!pendingMessages.isEmpty()) {
                 if (stateUpdater.compareAndSet(this, 0, 1)) {
-                    logWriteExecutor.execute(this);
+                    executor.execute(this);
                 }
             }
         }
@@ -203,8 +218,9 @@ public class JDBCLogHandler implements HttpHandler, Runnable {
                         if (useLongContentLength) {
                             ps.setLong(6, jdbcLogAttribute.bytes);
                         } else {
-                            if (jdbcLogAttribute.bytes > Integer.MAX_VALUE)
+                            if (jdbcLogAttribute.bytes > Integer.MAX_VALUE) {
                                 jdbcLogAttribute.bytes = -1;
+                            }
                             ps.setInt(6, (int) jdbcLogAttribute.bytes);
                         }
                         ps.setString(7, jdbcLogAttribute.virtualHost);
@@ -215,7 +231,7 @@ public class JDBCLogHandler implements HttpHandler, Runnable {
                         ps.executeUpdate();
                         numberOfTries = 0;
                     } catch (SQLException e) {
-                        UndertowLogger.ROOT_LOGGER.error(e);
+                        UndertowLogger.ROOT_LOGGER.failedToWriteJdbcAccessLog(e);
                     }
                     numberOfTries--;
                 }
@@ -242,8 +258,7 @@ public class JDBCLogHandler implements HttpHandler, Runnable {
     }
 
     /**
-     * For tests only. Blocks the current thread until all messages are written
-     * Just does a busy wait.
+     * For tests only. Blocks the current thread until all messages are written Just does a busy wait.
      * <p/>
      * DO NOT USE THIS OUTSIDE OF A TEST
      */
@@ -257,17 +272,17 @@ public class JDBCLogHandler implements HttpHandler, Runnable {
     }
 
     private PreparedStatement prepareStatement(Connection conn) throws SQLException {
-        return conn.prepareStatement
-                ("INSERT INTO " + tableName + " ("
-                        + remoteHostField + ", " + userField + ", "
-                        + timestampField + ", " + queryField + ", "
-                        + statusField + ", " + bytesField + ", "
-                        + virtualHostField + ", " + methodField + ", "
-                        + refererField + ", " + userAgentField
-                        + ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        return conn.prepareStatement("INSERT INTO " + tableName + " ("
+                + remoteHostField + ", " + userField + ", "
+                + timestampField + ", " + queryField + ", "
+                + statusField + ", " + bytesField + ", "
+                + virtualHostField + ", " + methodField + ", "
+                + refererField + ", " + userAgentField
+                + ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     }
 
     private class JDBCLogAttribute {
+
         protected String remoteHost = "";
         protected String user = "";
         protected String query = "";
@@ -379,9 +394,132 @@ public class JDBCLogHandler implements HttpHandler, Runnable {
 
     @Override
     public String toString() {
-        return "JDBCLogHandler{" +
-                "formatString='" + formatString + '\'' +
-                '}';
+        return "JDBCLogHandler{"
+                + "formatString='" + formatString + '\''
+                + '}';
     }
 
+    public static class Builder implements HandlerBuilder {
+
+        @Override
+        public String name() {
+            return "jdbc-access-log";
+        }
+
+        @Override
+        public Map<String, Class<?>> parameters() {
+            Map<String, Class<?>> params = new HashMap<>();
+            params.put("format", String.class);
+            params.put("datasource", String.class);
+            params.put("tableName", String.class);
+            params.put("remoteHostField", String.class);
+            params.put("userField", String.class);
+            params.put("timestampField", String.class);
+            params.put("virtualHostField", String.class);
+            params.put("methodField", String.class);
+            params.put("queryField", String.class);
+            params.put("statusField", String.class);
+            params.put("bytesField", String.class);
+            params.put("refererField", String.class);
+            params.put("userAgentField", String.class);
+            return params;
+        }
+
+        @Override
+        public Set<String> requiredParameters() {
+            return Collections.singleton("datasource");
+        }
+
+        @Override
+        public String defaultParameter() {
+            return "datasource";
+        }
+
+        @Override
+        public HandlerWrapper build(Map<String, Object> config) {
+            String datasourceName = (String) config.get("datasource");
+            try {
+                DataSource ds = (DataSource) new InitialContext().lookup((String) config.get("datasource"));
+                String format = (String) config.get("format");
+                return new Wrapper(format, ds, (String)config.get("tableName"), (String)config.get("remoteHostField"), (String)config.get("userField"), (String)config.get("timestampField"), (String)config.get("virtualHostField"), (String)config.get("methodField"), (String)config.get("queryField"), (String)config.get("statusField"), (String)config.get("bytesField"), (String)config.get("refererField"), (String)config.get("userAgentField"));
+            } catch (NamingException ex) {
+                throw UndertowMessages.MESSAGES.datasourceNotFound(datasourceName);
+            }
+        }
+
+    }
+
+    private static class Wrapper implements HandlerWrapper {
+
+        private final DataSource datasource;
+        private final String format;
+
+        private final String tableName;
+        private final String remoteHostField;
+        private final String userField;
+        private final String timestampField;
+        private final String virtualHostField;
+        private final String methodField;
+        private final String queryField;
+        private final String statusField;
+        private final String bytesField;
+        private final String refererField;
+        private final String userAgentField;
+
+        private Wrapper(String format, DataSource datasource, String tableName, String remoteHostField, String userField, String timestampField, String virtualHostField, String methodField, String queryField, String statusField, String bytesField, String refererField, String userAgentField) {
+            this.datasource = datasource;
+            this.tableName = tableName;
+            this.remoteHostField = remoteHostField;
+            this.userField = userField;
+            this.timestampField = timestampField;
+            this.virtualHostField = virtualHostField;
+            this.methodField = methodField;
+            this.queryField = queryField;
+            this.statusField = statusField;
+            this.bytesField = bytesField;
+            this.refererField = refererField;
+            this.userAgentField = userAgentField;
+            this.format = "combined".equals(format) ? "combined" : "common";
+        }
+
+        @Override
+        public HttpHandler wrap(HttpHandler handler) {
+            JDBCLogHandler jdbc = new JDBCLogHandler(handler, format, datasource);
+            if(tableName != null) {
+                jdbc.setTableName(tableName);
+            }
+            if(remoteHostField != null) {
+                jdbc.setRemoteHostField(remoteHostField);
+            }
+            if(userField != null) {
+                jdbc.setUserField(userField);
+            }
+            if(timestampField != null) {
+                jdbc.setTimestampField(timestampField);
+            }
+            if(virtualHostField != null) {
+                jdbc.setVirtualHostField(virtualHostField);
+            }
+            if(methodField != null) {
+                jdbc.setMethodField(methodField);
+            }
+            if(queryField != null) {
+                jdbc.setQueryField(queryField);
+            }
+            if(statusField != null) {
+                jdbc.setStatusField(statusField);
+            }
+            if(bytesField != null) {
+                jdbc.setBytesField(bytesField);
+            }
+            if(refererField != null) {
+                jdbc.setRefererField(refererField);
+            }
+            if(userAgentField != null) {
+                jdbc.setUserAgentField(userAgentField);
+            }
+
+            return jdbc;
+        }
+    }
 }

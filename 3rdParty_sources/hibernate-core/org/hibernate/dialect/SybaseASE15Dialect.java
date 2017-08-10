@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.dialect;
 
@@ -68,8 +51,8 @@ public class SybaseASE15Dialect extends SybaseDialect {
 				)
 		);
 
-		registerFunction( "atan2", new SQLFunctionTemplate( StandardBasicTypes.DOUBLE, "atn2(?1, ?2" ) );
-		registerFunction( "atn2", new SQLFunctionTemplate( StandardBasicTypes.DOUBLE, "atn2(?1, ?2" ) );
+		registerFunction( "atan2", new SQLFunctionTemplate( StandardBasicTypes.DOUBLE, "atn2(?1, ?2)" ) );
+		registerFunction( "atn2", new SQLFunctionTemplate( StandardBasicTypes.DOUBLE, "atn2(?1, ?2)" ) );
 
 		registerFunction( "biginttohex", new SQLFunctionTemplate( StandardBasicTypes.STRING, "biginttohext(?1)" ) );
 		registerFunction( "char_length", new SQLFunctionTemplate( StandardBasicTypes.INTEGER, "char_length(?1)" ) );
@@ -90,9 +73,9 @@ public class SybaseASE15Dialect extends SybaseDialect {
 				"data_pages", new SQLFunctionTemplate( StandardBasicTypes.INTEGER, "data_pages(?1, ?2, ?3, ?4)" )
 		);
 		registerFunction( "datalength", new SQLFunctionTemplate( StandardBasicTypes.INTEGER, "datalength(?1)" ) );
-		registerFunction( "dateadd", new SQLFunctionTemplate( StandardBasicTypes.TIMESTAMP, "dateadd" ) );
-		registerFunction( "datediff", new SQLFunctionTemplate( StandardBasicTypes.INTEGER, "datediff" ) );
-		registerFunction( "datepart", new SQLFunctionTemplate( StandardBasicTypes.INTEGER, "datepart" ) );
+		registerFunction( "dateadd", new SQLFunctionTemplate( StandardBasicTypes.TIMESTAMP, "dateadd(?1, ?2, ?3)" ) );
+		registerFunction( "datediff", new SQLFunctionTemplate( StandardBasicTypes.INTEGER, "datediff(?1, ?2, ?3)" ) );
+		registerFunction( "datepart", new SQLFunctionTemplate( StandardBasicTypes.INTEGER, "datepart(?1, ?2)" ) );
 		registerFunction( "datetime", new SQLFunctionTemplate( StandardBasicTypes.TIMESTAMP, "datetime" ) );
 		registerFunction( "db_id", new SQLFunctionTemplate( StandardBasicTypes.INTEGER, "db_id(?1)" ) );
 		registerFunction( "difference", new SQLFunctionTemplate( StandardBasicTypes.INTEGER, "difference(?1,?2)" ) );

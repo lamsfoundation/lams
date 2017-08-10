@@ -1,32 +1,15 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.sql;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -118,7 +101,7 @@ public final class Template {
 	 * @deprecated Only intended for annotations usage; use {@link #renderWhereStringTemplate(String, String, Dialect, SQLFunctionRegistry)} instead
 	 */
 	@Deprecated
-    @SuppressWarnings({ "JavaDoc" })
+	@SuppressWarnings({ "JavaDoc" })
 	public static String renderWhereStringTemplate(String sqlWhereString, String placeholder, Dialect dialect) {
 		return renderWhereStringTemplate(
 				sqlWhereString,
@@ -165,7 +148,7 @@ public final class Template {
 		String nextToken = hasMore ? tokens.nextToken() : null;
 		while ( hasMore ) {
 			String token = nextToken;
-			String lcToken = token.toLowerCase();
+			String lcToken = token.toLowerCase(Locale.ROOT);
 			hasMore = tokens.hasMoreTokens();
 			nextToken = hasMore ? tokens.nextToken() : null;
 
@@ -322,6 +305,9 @@ public final class Template {
 				else if ( inFromClause && ",".equals(lcToken) ) {
 					beforeTable = true;
 				}
+				if ( isBoolean( token ) ) {
+					token = dialect.toBooleanValueString( Boolean.parseBoolean( token ) );
+				}
 				result.append(token);
 			}
 
@@ -378,7 +364,7 @@ public final class Template {
 //		String nextToken = hasMore ? tokens.nextToken() : null;
 //		while ( hasMore ) {
 //			String token = nextToken;
-//			String lcToken = token.toLowerCase();
+//			String lcToken = token.toLowerCase(Locale.ROOT);
 //			hasMore = tokens.hasMoreTokens();
 //			nextToken = hasMore ? tokens.nextToken() : null;
 //
@@ -653,7 +639,7 @@ public final class Template {
 	 * @deprecated Use {@link #translateOrderBy} instead
 	 */
 	@Deprecated
-    public static String renderOrderByStringTemplate(
+	public static String renderOrderByStringTemplate(
 			String orderByFragment,
 			Dialect dialect,
 			SQLFunctionRegistry functionRegistry) {
@@ -729,7 +715,7 @@ public final class Template {
 	}
 
 	private static boolean isNamedParameter(String token) {
-		return token.startsWith(":");
+		return token.startsWith( ":" );
 	}
 
 	private static boolean isFunctionOrKeyword(String lcToken, String nextToken, Dialect dialect, SQLFunctionRegistry functionRegistry) {
@@ -757,10 +743,16 @@ public final class Template {
 	}
 
 	private static boolean isIdentifier(String token) {
-		return token.charAt(0)=='`' || ( //allow any identifier quoted with backtick
-			Character.isLetter( token.charAt(0) ) && //only recognizes identifiers beginning with a letter
-			token.indexOf('.') < 0
+		if ( isBoolean( token ) ) {
+			return false;
+		}
+		return token.charAt( 0 ) == '`' || ( //allow any identifier quoted with backtick
+				Character.isLetter( token.charAt( 0 ) ) && //only recognizes identifiers beginning with a letter
+						token.indexOf( '.' ) < 0
 		);
 	}
 
+	private static boolean isBoolean(String token) {
+		return "true".equals( token ) || "false".equals( token );
+	}
 }

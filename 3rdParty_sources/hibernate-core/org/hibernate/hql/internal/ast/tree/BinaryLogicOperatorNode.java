@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.hql.internal.ast.tree;
 
@@ -29,6 +12,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.hql.internal.antlr.HqlSqlTokenTypes;
+import org.hibernate.hql.internal.ast.QuerySyntaxException;
 import org.hibernate.hql.internal.ast.util.ColumnHelper;
 import org.hibernate.internal.util.StringHelper;
 import org.hibernate.param.ParameterSpecification;
@@ -127,8 +111,22 @@ public class BinaryLogicOperatorNode extends AbstractSelectExpression implements
 		// mutation depends on the types of nodes involved...
 		int comparisonType = getType();
 		String comparisonText = getText();
-		setType( HqlSqlTokenTypes.AND );
-		setText( "AND" );
+
+		switch ( comparisonType ) {
+			case HqlSqlTokenTypes.EQ:
+				setType( HqlSqlTokenTypes.AND );
+				setText( "AND" );
+				break;
+
+			case HqlSqlTokenTypes.NE:
+				setType( HqlSqlTokenTypes.OR );
+				setText( "OR" );
+				break;
+
+			default:
+				throw new QuerySyntaxException( comparisonText + " operator not supported on composite types." );
+		}
+
 		String[] lhsElementTexts = extractMutationTexts( getLeftHandOperand(), valueElements );
 		String[] rhsElementTexts = extractMutationTexts( getRightHandOperand(), valueElements );
 
@@ -192,7 +190,7 @@ public class BinaryLogicOperatorNode extends AbstractSelectExpression implements
 				AST rhs = getASTFactory().create( HqlSqlTokenTypes.SQL_TOKEN, rhsElementTexts[i] );
 				op.setFirstChild( lhs );
 				lhs.setNextSibling( rhs );
-				AST newContainer = getASTFactory().create( HqlSqlTokenTypes.AND, "AND" );
+				AST newContainer = getASTFactory().create( container.getType(), container.getText() );
 				container.setFirstChild( newContainer );
 				newContainer.setNextSibling( op );
 				container = newContainer;

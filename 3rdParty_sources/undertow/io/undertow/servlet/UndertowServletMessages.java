@@ -18,9 +18,9 @@
 
 package io.undertow.servlet;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Path;
 
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
@@ -90,7 +90,7 @@ public interface UndertowServletMessages {
     RuntimeException cannotLoadClass(String className, @Cause Exception e);
 
     @Message(id = 10015, value = "Could not delete file %s")
-    IOException deleteFailed(File file);
+    IOException deleteFailed(Path file);
 
     @Message(id = 10016, value = "Not a multi part request")
     ServletException notAMultiPartRequest();
@@ -206,4 +206,9 @@ public interface UndertowServletMessages {
     @Message(id = 10053, value = "No confidential port is available to redirect the current request.")
     IllegalStateException noConfidentialPortAvailable();
 
+    @Message(id = 10054, value = "Unable to create an instance factory for %s")
+    RuntimeException couldNotCreateFactory(String className, @Cause Exception e);
+
+    @Message(id = 10055, value = "Listener is not started")
+    IllegalStateException listenerIsNotStarted();
 }

@@ -1,113 +1,57 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.internal.util.xml;
 
-import org.hibernate.internal.util.ClassLoaderHelper;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 
 import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
-import org.dom4j.io.DOMReader;
-import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
 import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
 
 /**
  * Small helper class that lazy loads DOM and SAX reader and keep them for fast use afterwards.
+ *
+ * @deprecated Currently only used for integration with HCANN.  The rest of Hibernate uses StAX now
+ * for XML processing.  See {@link org.hibernate.boot.jaxb.internal.stax}
  */
+@Deprecated
 public final class XMLHelper {
+	private final DocumentFactory documentFactory;
 
-	public static final EntityResolver DEFAULT_DTD_RESOLVER = new DTDEntityResolver();
+	public XMLHelper(ClassLoaderService classLoaderService) {
+		this.documentFactory = classLoaderService.workWithClassLoader(
+				new ClassLoaderService.Work<DocumentFactory>() {
+					@Override
+					public DocumentFactory doWork(ClassLoader classLoader) {
+						final ClassLoader originalTccl = Thread.currentThread().getContextClassLoader();
+						try {
+							Thread.currentThread().setContextClassLoader( classLoader );
+							return DocumentFactory.getInstance();
+						}
+						finally {
+							Thread.currentThread().setContextClassLoader( originalTccl );
+						}
+					}
+				}
+		);
 
-	private DOMReader domReader;
-	private SAXReader saxReader;
+	}
 
-	/**
-	 * @param errorHandler the sax error handler
-	 * @param entityResolver an xml entity resolver
-	 *
-	 * @return Create and return a dom4j {@code SAXReader} which will append all validation errors
-	 *         to the passed error list
-	 */
-	public SAXReader createSAXReader(ErrorHandler errorHandler, EntityResolver entityResolver) {
-		SAXReader saxReader = resolveSAXReader();
+	public DocumentFactory getDocumentFactory() {
+		return documentFactory;
+	}
+
+	public SAXReader createSAXReader(ErrorLogger errorLogger, EntityResolver entityResolver) {
+		SAXReader saxReader = new SAXReader();
+		saxReader.setMergeAdjacentText( true );
+		saxReader.setValidation( true );
+		saxReader.setErrorHandler( errorLogger );
 		saxReader.setEntityResolver( entityResolver );
-		saxReader.setErrorHandler( errorHandler );
+
 		return saxReader;
-	}
-
-	private SAXReader resolveSAXReader() {
-		if ( saxReader == null ) {
-			saxReader = new SAXReader();
-			saxReader.setMergeAdjacentText( true );
-			saxReader.setValidation( true );
-		}
-		return saxReader;
-	}
-
-	/**
-	 * @return create and return a dom4j DOMReader
-	 */
-	public DOMReader createDOMReader() {
-		if ( domReader == null ) {
-			domReader = new DOMReader();
-		}
-		return domReader;
-	}
-
-	public static Element generateDom4jElement(String elementName) {
-		return getDocumentFactory().createElement( elementName );
-	}
-
-	public static DocumentFactory getDocumentFactory() {
-
-		ClassLoader cl = ClassLoaderHelper.getContextClassLoader();
-		DocumentFactory factory;
-		try {
-			Thread.currentThread().setContextClassLoader( XMLHelper.class.getClassLoader() );
-			factory = DocumentFactory.getInstance();
-		}
-		finally {
-			Thread.currentThread().setContextClassLoader( cl );
-		}
-		return factory;
-	}
-
-	public static void dump(Element element) {
-		try {
-			// try to "pretty print" it
-			OutputFormat outFormat = OutputFormat.createPrettyPrint();
-			XMLWriter writer = new XMLWriter( System.out, outFormat );
-			writer.write( element );
-			writer.flush();
-			System.out.println( "" );
-		}
-		catch ( Throwable t ) {
-			// otherwise, just dump it
-			System.out.println( element.asXML() );
-		}
-
 	}
 }

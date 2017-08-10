@@ -26,6 +26,8 @@ import java.util.Set;
 import io.undertow.attribute.ExchangeAttribute;
 import io.undertow.attribute.ExchangeAttributes;
 import io.undertow.attribute.SubstituteEmptyWrapper;
+import io.undertow.predicate.Predicate;
+import io.undertow.predicate.Predicates;
 import io.undertow.server.ExchangeCompletionListener;
 import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
@@ -35,11 +37,11 @@ import io.undertow.server.handlers.builder.HandlerBuilder;
 /**
  * Access log handler. This handler will generate access log messages based on the provided format string,
  * and pass these messages into the provided {@link AccessLogReceiver}.
- * <p/>
+ * <p>
  * This handler can log any attribute that is provides via the {@link io.undertow.attribute.ExchangeAttribute}
  * mechanism. A general guide to the most common attribute is provided before, however this mechanism is extensible.
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  * <p>This factory produces token handlers for the following patterns</p>
  * <ul>
  * <li><b>%a</b> - Remote IP address
@@ -70,7 +72,7 @@ import io.undertow.server.handlers.builder.HandlerBuilder;
  * <li><b>combined</b> -
  * <code>%h %l %u %t "%r" %s %b "%{i,Referer}" "%{i,User-Agent}"</code>
  * </ul>
- * <p/>
+ * <p>
  * <p>
  * There is also support to write information from the cookie, incoming
  * header, or the session<br>
@@ -82,7 +84,6 @@ import io.undertow.server.handlers.builder.HandlerBuilder;
  * <li><code>%{r,xxx}</code> xxx is an attribute in the ServletRequest
  * <li><code>%{s,xxx}</code> xxx is an attribute in the HttpSession
  * </ul>
- * </p>
  *
  * @author Stuart Douglas
  */
@@ -93,13 +94,33 @@ public class AccessLogHandler implements HttpHandler {
     private final String formatString;
     private final ExchangeAttribute tokens;
     private final ExchangeCompletionListener exchangeCompletionListener = new AccessLogCompletionListener();
+    private final Predicate predicate;
 
     public AccessLogHandler(final HttpHandler next, final AccessLogReceiver accessLogReceiver, final String formatString, ClassLoader classLoader) {
+        this(next, accessLogReceiver, formatString, classLoader, Predicates.truePredicate());
+    }
+
+    public AccessLogHandler(final HttpHandler next, final AccessLogReceiver accessLogReceiver, final String formatString, ClassLoader classLoader, Predicate predicate) {
         this.next = next;
         this.accessLogReceiver = accessLogReceiver;
+        this.predicate = predicate;
         this.formatString = handleCommonNames(formatString);
         this.tokens = ExchangeAttributes.parser(classLoader, new SubstituteEmptyWrapper("-")).parse(this.formatString);
     }
+
+    public AccessLogHandler(final HttpHandler next, final AccessLogReceiver accessLogReceiver, String formatString, final ExchangeAttribute attribute) {
+        this(next, accessLogReceiver, formatString, attribute, Predicates.truePredicate());
+    }
+
+    public AccessLogHandler(final HttpHandler next, final AccessLogReceiver accessLogReceiver, String formatString, final ExchangeAttribute attribute, Predicate predicate) {
+        this.next = next;
+        this.accessLogReceiver = accessLogReceiver;
+        this.predicate = predicate;
+        this.formatString = handleCommonNames(formatString);
+        this.tokens = attribute;
+    }
+
+
 
     private static String handleCommonNames(String formatString) {
         if(formatString.equals("common")) {
@@ -121,7 +142,9 @@ public class AccessLogHandler implements HttpHandler {
         @Override
         public void exchangeEvent(final HttpServerExchange exchange, final NextListener nextListener) {
             try {
-                accessLogReceiver.logMessage(tokens.readAttribute(exchange));
+                if(predicate == null || predicate.resolve(exchange)) {
+                    accessLogReceiver.logMessage(tokens.readAttribute(exchange));
+                }
             } finally {
                 nextListener.proceed();
             }
@@ -134,8 +157,6 @@ public class AccessLogHandler implements HttpHandler {
                 "formatString='" + formatString + '\'' +
                 '}';
     }
-
-
 
     public static class Builder implements HandlerBuilder {
 

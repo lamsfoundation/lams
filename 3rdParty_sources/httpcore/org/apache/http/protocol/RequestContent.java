@@ -35,14 +35,15 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpVersion;
-import org.apache.http.ProtocolVersion;
 import org.apache.http.ProtocolException;
+import org.apache.http.ProtocolVersion;
 import org.apache.http.annotation.Immutable;
+import org.apache.http.util.Args;
 
 /**
  * RequestContent is the most important interceptor for outgoing requests.
  * It is responsible for delimiting content length by adding
- * <code>Content-Length</code> or <code>Transfer-Content</code> headers based
+ * {@code Content-Length} or {@code Transfer-Content} headers based
  * on the properties of the enclosed entity and the protocol version.
  * This interceptor is required for correct functioning of client side protocol
  * processors.
@@ -55,7 +56,7 @@ public class RequestContent implements HttpRequestInterceptor {
     private final boolean overwrite;
 
     /**
-     * Default constructor. The <code>Content-Length</code> or <code>Transfer-Encoding</code>
+     * Default constructor. The {@code Content-Length} or {@code Transfer-Encoding}
      * will cause the interceptor to throw {@link ProtocolException} if already present in the
      * response message.
      */
@@ -66,24 +67,23 @@ public class RequestContent implements HttpRequestInterceptor {
     /**
      * Constructor that can be used to fine-tune behavior of this interceptor.
      *
-     * @param overwrite If set to <code>true</code> the <code>Content-Length</code> and
-     * <code>Transfer-Encoding</code> headers will be created or updated if already present.
-     * If set to <code>false</code> the <code>Content-Length</code> and
-     * <code>Transfer-Encoding</code> headers will cause the interceptor to throw
+     * @param overwrite If set to {@code true} the {@code Content-Length} and
+     * {@code Transfer-Encoding} headers will be created or updated if already present.
+     * If set to {@code false} the {@code Content-Length} and
+     * {@code Transfer-Encoding} headers will cause the interceptor to throw
      * {@link ProtocolException} if already present in the response message.
-     * 
+     *
      * @since 4.2
      */
-     public RequestContent(boolean overwrite) {
+     public RequestContent(final boolean overwrite) {
          super();
          this.overwrite = overwrite;
     }
 
+    @Override
     public void process(final HttpRequest request, final HttpContext context)
             throws HttpException, IOException {
-        if (request == null) {
-            throw new IllegalArgumentException("HTTP request may not be null");
-        }
+        Args.notNull(request, "HTTP request");
         if (request instanceof HttpEntityEnclosingRequest) {
             if (this.overwrite) {
                 request.removeHeaders(HTTP.TRANSFER_ENCODING);
@@ -96,8 +96,8 @@ public class RequestContent implements HttpRequestInterceptor {
                     throw new ProtocolException("Content-Length header already present");
                 }
             }
-            ProtocolVersion ver = request.getRequestLine().getProtocolVersion();
-            HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();
+            final ProtocolVersion ver = request.getRequestLine().getProtocolVersion();
+            final HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();
             if (entity == null) {
                 request.addHeader(HTTP.CONTENT_LEN, "0");
                 return;

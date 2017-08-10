@@ -17,27 +17,24 @@
  */
 package io.undertow.security.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
+import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.AuthenticationMechanism.AuthenticationMechanismOutcome;
 import io.undertow.security.api.AuthenticationMechanism.ChallengeResult;
+import io.undertow.security.api.AuthenticationMechanismContext;
 import io.undertow.security.api.AuthenticationMode;
-import io.undertow.security.api.NotificationReceiver;
-import io.undertow.security.api.SecurityContext;
-import io.undertow.security.api.SecurityNotification;
-import io.undertow.security.api.SecurityNotification.EventType;
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.IdentityManager;
 import io.undertow.security.idm.PasswordCredential;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.StatusCodes;
 
-import static io.undertow.UndertowMessages.MESSAGES;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The internal SecurityContext used to hold the state of security for the current exchange.
@@ -45,39 +42,31 @@ import static io.undertow.UndertowMessages.MESSAGES;
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  * @author Stuart Douglas
  */
-public class SecurityContextImpl implements SecurityContext {
+public class SecurityContextImpl extends AbstractSecurityContext implements AuthenticationMechanismContext {
+
 
     private static final RuntimePermission PERMISSION = new RuntimePermission("MODIFY_UNDERTOW_SECURITY_CONTEXT");
 
-    private final AuthenticationMode authenticationMode;
-    private boolean authenticationRequired;
-    private String programaticMechName = "Programatic";
     private AuthenticationState authenticationState = AuthenticationState.NOT_ATTEMPTED;
-    private final HttpServerExchange exchange;
-    private final List<AuthenticationMechanism> authMechanisms = new ArrayList<>();
+    private final AuthenticationMode authenticationMode;
+
+    private String programaticMechName = "Programatic";
+
+    /**
+     * the authentication mechanisms. Note that in order to reduce the allocation of list and iterator structures
+     * we use a custom linked list structure.
+     */
+    private Node<AuthenticationMechanism> authMechanisms = null;
     private final IdentityManager identityManager;
-    private final List<NotificationReceiver> notificationReceivers = new ArrayList<>();
-
-
-    // Maybe this will need to be a custom mechanism that doesn't exchange tokens with the client but will then
-    // be configured to either associate with the connection, the session or some other arbitrary whatever.
-    //
-    // Do we want multiple to be supported or just one?  Maybe extend the AuthenticationMechanism to allow
-    // it to be identified and called.
-
-    private String mechanismName;
-    private Account account;
-
-    // TODO - Why two constructors?  Maybe the first can do.
 
     public SecurityContextImpl(final HttpServerExchange exchange, final IdentityManager identityManager) {
         this(exchange, AuthenticationMode.PRO_ACTIVE, identityManager);
     }
 
     public SecurityContextImpl(final HttpServerExchange exchange, final AuthenticationMode authenticationMode, final IdentityManager identityManager) {
+        super(exchange);
         this.authenticationMode = authenticationMode;
         this.identityManager = identityManager;
-        this.exchange = exchange;
         if (System.getSecurityManager() != null) {
             System.getSecurityManager().checkPermission(PERMISSION);
         }
@@ -92,8 +81,10 @@ public class SecurityContextImpl implements SecurityContext {
      * CHALLENGED_SENT
      */
 
+    @Override
     public boolean authenticate() {
-        if(authenticationState == AuthenticationState.ATTEMPTED) {
+        UndertowLogger.SECURITY_LOGGER.debugf("Attempting to authenticate %s, authentication required: %s", exchange, isAuthenticationRequired());
+        if(authenticationState == AuthenticationState.ATTEMPTED || (authenticationState == AuthenticationState.CHALLENGE_SENT && !exchange.isResponseStarted())) {
             //we are re-attempted, so we just reset the state
             //see UNDERTOW-263
             authenticationState = AuthenticationState.NOT_ATTEMPTED;
@@ -116,6 +107,7 @@ public class SecurityContextImpl implements SecurityContext {
             return authTransition();
 
         } else {
+            UndertowLogger.SECURITY_LOGGER.debugf("Authentication result was %s for %s", authenticationState, exchange);
             // Keep in mind this switch statement is only called after a call to authTransitionRequired.
             switch (authenticationState) {
                 case NOT_ATTEMPTED: // No constraint was set that mandated authentication so not reason to hold up the request.
@@ -130,11 +122,12 @@ public class SecurityContextImpl implements SecurityContext {
     }
 
     private AuthenticationState attemptAuthentication() {
-        return new AuthAttempter(authMechanisms.iterator(), exchange).transition();
+        return new AuthAttempter(authMechanisms,exchange).transition();
     }
 
     private AuthenticationState sendChallenges() {
-        return new ChallengeSender(authMechanisms.iterator(), exchange).transition();
+        UndertowLogger.SECURITY_LOGGER.debugf("Sending authentication challenge for %s", exchange);
+        return new ChallengeSender(authMechanisms, exchange).transition();
     }
 
     private boolean authTransitionRequired() {
@@ -142,31 +135,16 @@ public class SecurityContextImpl implements SecurityContext {
             case NOT_ATTEMPTED:
                 // There has been no attempt to authenticate the current request so do so either if required or if we are set to
                 // be pro-active.
-                return authenticationRequired || authenticationMode == AuthenticationMode.PRO_ACTIVE;
+                return isAuthenticationRequired() || authenticationMode == AuthenticationMode.PRO_ACTIVE;
             case ATTEMPTED:
                 // To be ATTEMPTED we know it was not AUTHENTICATED so if it is required we need to transition to send the
                 // challenges.
-                return authenticationRequired;
+                return isAuthenticationRequired();
             default:
                 // At this point the state would either be AUTHENTICATED or CHALLENGE_SENT - either of which mean no further
                 // transitions applicable for this request.
                 return false;
         }
-    }
-
-    @Override
-    public void setAuthenticationRequired() {
-        authenticationRequired = true;
-    }
-
-    @Override
-    public boolean isAuthenticationRequired() {
-        return authenticationRequired;
-    }
-
-    @Override
-    public boolean isAuthenticated() {
-        return authenticationState == AuthenticationState.AUTHENTICATED;
     }
 
     /**
@@ -178,38 +156,55 @@ public class SecurityContextImpl implements SecurityContext {
         this.programaticMechName = programaticMechName;
     }
 
-    /**
-     * @return The name of the mechanism used to authenticate the request.
-     */
-    @Override
-    public String getMechanismName() {
-        return mechanismName;
-    }
-
     @Override
     public void addAuthenticationMechanism(final AuthenticationMechanism handler) {
         // TODO - Do we want to change this so we can ensure the mechanisms are not modifiable mid request?
-        authMechanisms.add(handler);
+        if(authMechanisms == null) {
+            authMechanisms = new Node<>(handler);
+        } else {
+            Node<AuthenticationMechanism> cur = authMechanisms;
+            while (cur.next != null) {
+                cur = cur.next;
+            }
+            cur.next = new Node<>(handler);
+        }
     }
 
     @Override
+    @Deprecated
     public List<AuthenticationMechanism> getAuthenticationMechanisms() {
-        return Collections.unmodifiableList(authMechanisms);
+        List<AuthenticationMechanism> ret = new LinkedList<>();
+        Node<AuthenticationMechanism> cur = authMechanisms;
+        while (cur != null) {
+            ret.add(cur.item);
+            cur = cur.next;
+        }
+        return Collections.unmodifiableList(ret);
     }
 
     @Override
-    public Account getAuthenticatedAccount() {
-        return account;
-    }
-
-    @Override
+    @Deprecated
     public IdentityManager getIdentityManager() {
         return identityManager;
     }
 
     @Override
     public boolean login(final String username, final String password) {
-        final Account account = identityManager.verify(username, new PasswordCredential(password.toCharArray()));
+
+        UndertowLogger.SECURITY_LOGGER.debugf("Attempting programatic login for user %s for request %s", username, exchange);
+
+        final Account account;
+        if(System.getSecurityManager() == null) {
+            account = identityManager.verify(username, new PasswordCredential(password.toCharArray()));
+        } else {
+            account = AccessController.doPrivileged(new PrivilegedAction<Account>() {
+                @Override
+                public Account run() {
+                    return identityManager.verify(username, new PasswordCredential(password.toCharArray()));
+                }
+            });
+        }
+
         if (account == null) {
             return false;
         }
@@ -222,65 +217,33 @@ public class SecurityContextImpl implements SecurityContext {
 
     @Override
     public void logout() {
-        if (!isAuthenticated()) {
-            return;
+        Account authenticatedAccount = getAuthenticatedAccount();
+        if(authenticatedAccount != null) {
+            UndertowLogger.SECURITY_LOGGER.debugf("Logging out user %s for %s", authenticatedAccount.getPrincipal().getName(), exchange);
+        } else {
+            UndertowLogger.SECURITY_LOGGER.debugf("Logout called with no authenticated user in exchange %s", exchange);
         }
-        sendNoticiation(new SecurityNotification(exchange, SecurityNotification.EventType.LOGGED_OUT, account, mechanismName, true,
-                MESSAGES.userLoggedOut(account.getPrincipal().getName()), true));
-
-        this.account = null;
-        this.mechanismName = null;
+        super.logout();
         this.authenticationState = AuthenticationState.NOT_ATTEMPTED;
     }
 
-    @Override
-    public void authenticationComplete(Account account, String mechanism, final boolean cachingRequired) {
-        authenticationComplete(account, mechanism, false, cachingRequired);
-    }
-
-    protected void authenticationComplete(Account account, String mechanism, boolean programatic, final boolean cachingRequired) {
-        this.account = account;
-        this.mechanismName = mechanism;
-
-        sendNoticiation(new SecurityNotification(exchange, EventType.AUTHENTICATED, account, mechanism, programatic,
-                MESSAGES.userAuthenticated(account.getPrincipal().getName()), cachingRequired));
-    }
-
-    @Override
-    public void authenticationFailed(String message, String mechanism) {
-        sendNoticiation(new SecurityNotification(exchange, EventType.FAILED_AUTHENTICATION, null, mechanism, false, message, true));
-    }
-
-    private void sendNoticiation(final SecurityNotification notification) {
-        for (NotificationReceiver current : notificationReceivers) {
-            current.handleNotification(notification);
-        }
-    }
-
-    @Override
-    public void registerNotificationReceiver(NotificationReceiver receiver) {
-        notificationReceivers.add(receiver);
-    }
-
-    @Override
-    public void removeNotificationReceiver(NotificationReceiver receiver) {
-        notificationReceivers.remove(receiver);
-    }
 
     private class AuthAttempter {
 
-        private final Iterator<AuthenticationMechanism> mechanismIterator;
+        private Node<AuthenticationMechanism> currentMethod;
         private final HttpServerExchange exchange;
 
-        private AuthAttempter(final Iterator<AuthenticationMechanism> mechanismIterator, final HttpServerExchange exchange) {
-            this.mechanismIterator = mechanismIterator;
+        private AuthAttempter(Node<AuthenticationMechanism> currentMethod, final HttpServerExchange exchange) {
             this.exchange = exchange;
+            this.currentMethod = currentMethod;
         }
 
         private AuthenticationState transition() {
-            if (mechanismIterator.hasNext()) {
-                final AuthenticationMechanism mechanism = mechanismIterator.next();
+            if (currentMethod != null) {
+                final AuthenticationMechanism mechanism = currentMethod.item;
+                currentMethod = currentMethod.next;
                 AuthenticationMechanismOutcome outcome = mechanism.authenticate(exchange, SecurityContextImpl.this);
+                UndertowLogger.SECURITY_LOGGER.debugf("Authentication outcome was %s with method %s for %s", outcome, mechanism, exchange);
 
                 if (outcome == null) {
                     throw UndertowMessages.MESSAGES.authMechanismOutcomeNull();
@@ -315,55 +278,53 @@ public class SecurityContextImpl implements SecurityContext {
      */
     private class ChallengeSender {
 
-        private final Iterator<AuthenticationMechanism> mechanismIterator;
+        private Node<AuthenticationMechanism> currentMethod;
         private final HttpServerExchange exchange;
 
-        private boolean atLeastOneChallenge = false;
         private Integer chosenStatusCode = null;
+        private boolean challengeSent = false;
 
-        private ChallengeSender(final Iterator<AuthenticationMechanism> mechanismIterator, final HttpServerExchange exchange) {
-            this.mechanismIterator = mechanismIterator;
+        private ChallengeSender(Node<AuthenticationMechanism> currentMethod, final HttpServerExchange exchange) {
             this.exchange = exchange;
+            this.currentMethod = currentMethod;
         }
 
         private AuthenticationState transition() {
-            if (mechanismIterator.hasNext()) {
-                final AuthenticationMechanism mechanism = mechanismIterator.next();
+            if (currentMethod != null) {
+                final AuthenticationMechanism mechanism = currentMethod.item;
+                currentMethod = currentMethod.next;
                 ChallengeResult result = mechanism.sendChallenge(exchange, SecurityContextImpl.this);
 
                 if (result.isChallengeSent()) {
-                    atLeastOneChallenge = true;
+                    challengeSent = true;
                     Integer desiredCode = result.getDesiredResponseCode();
-                    if (chosenStatusCode == null) {
+                    if (desiredCode != null && (chosenStatusCode == null || chosenStatusCode.equals(StatusCodes.OK))) {
                         chosenStatusCode = desiredCode;
-                    } else if (desiredCode != null) {
-                        if (chosenStatusCode.equals(StatusCodes.OK)) {
-                            // Allows a more specific code to be chosen.
-                            // TODO - Still need a more complex code resolution strategy if many different codes are
-                            // returned (Although those mechanisms may just never work together.)
-                            chosenStatusCode = desiredCode;
+                        if (chosenStatusCode.equals(StatusCodes.OK) == false) {
+                            if(!exchange.isResponseStarted()) {
+                                exchange.setStatusCode(chosenStatusCode);
+                            }
                         }
                     }
                 }
-
 
                 // We always transition so we can reach the end of the list and hit the else.
                 return transition();
 
             } else {
                 if(!exchange.isResponseStarted()) {
-                    // Iterated all mechanisms, now need to select a suitable status code.
-                    if (atLeastOneChallenge) {
-                        if (chosenStatusCode != null) {
-                            exchange.setResponseCode(chosenStatusCode);
+                    // Iterated all mechanisms, if OK it will not be set yet.
+                    if (chosenStatusCode == null) {
+                        if (challengeSent == false) {
+                            // No mechanism generated a challenge so send a 403 as our challenge - i.e. just rejecting the request.
+                            exchange.setStatusCode(StatusCodes.FORBIDDEN);
                         }
-                    } else {
-                        // No mechanism generated a challenge so send a 403 as our challenge - i.e. just rejecting the request.
-                        exchange.setResponseCode(StatusCodes.FORBIDDEN);
+                    } else if (chosenStatusCode.equals(StatusCodes.OK)) {
+                        exchange.setStatusCode(chosenStatusCode);
                     }
                 }
-                return AuthenticationState.CHALLENGE_SENT;
 
+                return AuthenticationState.CHALLENGE_SENT;
             }
         }
 
@@ -380,6 +341,19 @@ public class SecurityContextImpl implements SecurityContext {
         AUTHENTICATED,
 
         CHALLENGE_SENT;
+    }
+
+    /**
+     * To reduce allocations we use a custom linked list data structure
+     * @param <T>
+     */
+    private static final class Node<T> {
+        final T item;
+        Node<T> next;
+
+        private Node(T item) {
+            this.item = item;
+        }
     }
 
 }

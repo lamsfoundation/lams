@@ -47,9 +47,10 @@ class SchemeLayeredSocketFactoryAdaptor extends SchemeSocketFactoryAdaptor
         this.factory = factory;
     }
 
+    @Override
     public Socket createLayeredSocket(
             final Socket socket,
-            final String target, int port,
+            final String target, final int port,
             final HttpParams params) throws IOException, UnknownHostException {
         return this.factory.createSocket(socket, target, port, true);
     }

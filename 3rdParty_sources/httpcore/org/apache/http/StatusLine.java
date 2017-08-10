@@ -37,7 +37,7 @@ package org.apache.http;
  * </pre>
  *
  * @see HttpStatus
- * @version $Id$
+ * @version $Id: StatusLine.java 937295 2010-04-23 13:44:00Z olegk $
  *
  * @since 4.0
  */

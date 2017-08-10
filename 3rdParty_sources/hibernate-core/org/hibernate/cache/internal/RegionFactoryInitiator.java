@@ -1,41 +1,23 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2011, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.cache.internal;
 
 import java.util.Map;
 import java.util.Properties;
 
-import org.hibernate.HibernateException;
 import org.hibernate.boot.registry.StandardServiceInitiator;
+import org.hibernate.boot.registry.selector.spi.StrategySelectionException;
 import org.hibernate.boot.registry.selector.spi.StrategySelector;
 import org.hibernate.cache.spi.RegionFactory;
 import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
-
-import org.jboss.logging.Logger;
 
 /**
  * Initiator for the {@link RegionFactory} service.
@@ -44,9 +26,7 @@ import org.jboss.logging.Logger;
  * @author Brett Meyer
  */
 public class RegionFactoryInitiator implements StandardServiceInitiator<RegionFactory> {
-
-	private static final CoreMessageLogger LOG = Logger.getMessageLogger( CoreMessageLogger.class,
-			RegionFactoryInitiator.class.getName() );
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( RegionFactoryInitiator.class );
 
 	/**
 	 * Singleton access
@@ -80,31 +60,57 @@ public class RegionFactoryInitiator implements StandardServiceInitiator<RegionFa
 
 		// The cache provider is needed when we either have second-level cache enabled
 		// or query cache enabled.  Note that useSecondLevelCache is enabled by default
-		final String setting = ConfigurationHelper.getString( AvailableSettings.CACHE_REGION_FACTORY,
-				configurationValues, null );
-		if ( ( useSecondLevelCache || useQueryCache ) && setting != null ) {
-			try {
-				final Class<? extends RegionFactory> regionFactoryClass = registry.getService( StrategySelector.class )
-						.selectStrategyImplementor( RegionFactory.class, setting );
-				try {
-					regionFactory = regionFactoryClass.getConstructor( Properties.class ).newInstance( p );
-				}
-				catch ( NoSuchMethodException e ) {
-					// no constructor accepting Properties found, try no arg constructor
-					LOG.debugf(
-							"%s did not provide constructor accepting java.util.Properties; attempting no-arg constructor.",
-							regionFactoryClass.getSimpleName() );
-					regionFactory = regionFactoryClass.getConstructor().newInstance();
-				}
-			}
-			catch ( Exception e ) {
-				throw new HibernateException( "could not instantiate RegionFactory [" + setting + "]", e );
-			}
+		if ( useSecondLevelCache || useQueryCache ) {
+			final Object strategyReference = configurationValues != null
+					? configurationValues.get( AvailableSettings.CACHE_REGION_FACTORY )
+					: null;
+			regionFactory = resolveRegionFactory(
+					registry.getService( StrategySelector.class ),
+					strategyReference,
+					p
+			);
 		}
 
 		LOG.debugf( "Cache region factory : %s", regionFactory.getClass().getName() );
 
 		return regionFactory;
+	}
+
+	@SuppressWarnings("unchecked")
+	private RegionFactory resolveRegionFactory(
+			StrategySelector strategySelector,
+			Object strategyReference,
+			Properties properties) {
+
+		if ( strategyReference == null || RegionFactory.class.isInstance( strategyReference ) ) {
+			// nothing to create; just let strategySelector resolve the RegionFactory
+			return strategySelector.resolveDefaultableStrategy(
+					RegionFactory.class,
+					strategyReference,
+					NoCachingRegionFactory.INSTANCE
+			);
+		}
+
+		final Class<? extends RegionFactory> implementationClass;
+		if ( Class.class.isInstance( strategyReference ) ) {
+			implementationClass = (Class<RegionFactory>) strategyReference;
+		}
+		else {
+			implementationClass = strategySelector.selectStrategyImplementor(
+					RegionFactory.class,
+					strategyReference.toString()
+			);
+		}
+
+		try {
+			return new StrategyCreatorRegionFactoryImpl( properties ).create( implementationClass );
+		}
+		catch (Exception e) {
+			throw new StrategySelectionException(
+					String.format( "Could not instantiate named strategy class [%s]", implementationClass.getName() ),
+					e
+			);
+		}
 	}
 
 	/**

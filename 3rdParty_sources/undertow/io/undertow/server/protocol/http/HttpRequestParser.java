@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,14 +88,15 @@ import static io.undertow.util.Methods.TRACE_STRING;
 import static io.undertow.util.Protocols.HTTP_0_9_STRING;
 import static io.undertow.util.Protocols.HTTP_1_0_STRING;
 import static io.undertow.util.Protocols.HTTP_1_1_STRING;
+import static io.undertow.util.Protocols.HTTP_2_0_STRING;
 
 /**
  * The basic HTTP parser. The actual parser is a sub class of this class that is generated as part of
  * the build process by the {@link io.undertow.annotationprocessor.AbstractParserGenerator} annotation processor.
- * <p/>
+ * <p>
  * The actual processor is a state machine, that means that for common header, method, protocol values
  * it will return an interned string, rather than creating a new string for each one.
- * <p/>
+ * <p>
  *
  * @author Stuart Douglas
  */
@@ -108,7 +110,7 @@ import static io.undertow.util.Protocols.HTTP_1_1_STRING;
         TRACE_STRING,
         CONNECT_STRING},
         protocols = {
-                HTTP_0_9_STRING, HTTP_1_0_STRING, HTTP_1_1_STRING
+                HTTP_0_9_STRING, HTTP_1_0_STRING, HTTP_1_1_STRING, HTTP_2_0_STRING
         },
         headers = {
                 ACCEPT_STRING,
@@ -177,7 +179,7 @@ public abstract class HttpRequestParser {
         maxHeaders = options.get(UndertowOptions.MAX_HEADERS, 200);
         allowEncodedSlash = options.get(UndertowOptions.ALLOW_ENCODED_SLASH, false);
         decode = options.get(UndertowOptions.DECODE_URL, true);
-        charset = options.get(UndertowOptions.URL_CHARSET, "UTF-8");
+        charset = options.get(UndertowOptions.URL_CHARSET, StandardCharsets.UTF_8.name());
     }
 
     public static final HttpRequestParser instance(final OptionMap options) {
@@ -346,7 +348,11 @@ public abstract class HttpRequestParser {
             if (next == ' ' || next == '\t') {
                 if (stringBuilder.length() != 0) {
                     final String path = stringBuilder.toString();
-                    if (parseState < HOST_DONE) {
+                    if(parseState == SECOND_SLASH) {
+                        exchange.setRequestPath("/");
+                        exchange.setRelativePath("/");
+                        exchange.setRequestURI(path);
+                    } else if (parseState < HOST_DONE) {
                         String decodedPath = decode(path, urlDecodeRequired, state, allowEncodedSlash);
                         exchange.setRequestPath(decodedPath);
                         exchange.setRelativePath(decodedPath);
@@ -373,7 +379,7 @@ public abstract class HttpRequestParser {
                 return;
             } else {
 
-                if (decode && (next == '+' || next == '%' || next > 127)) {
+                if (decode && (next == '%' || next > 127)) {
                     urlDecodeRequired = true;
                 } else if (next == ':' && parseState == START) {
                     parseState = FIRST_COLON;
@@ -400,7 +406,11 @@ public abstract class HttpRequestParser {
 
     private void beginPathParameters(ParseState state, HttpServerExchange exchange, StringBuilder stringBuilder, int parseState, int canonicalPathStart, boolean urlDecodeRequired) {
         final String path = stringBuilder.toString();
-        if (parseState < HOST_DONE) {
+        if(parseState == SECOND_SLASH) {
+            exchange.setRequestPath("/");
+            exchange.setRelativePath("/");
+            exchange.setRequestURI(path);
+        } else if (parseState < HOST_DONE) {
             String decodedPath = decode(path, urlDecodeRequired, state, allowEncodedSlash);
             exchange.setRequestPath(decodedPath);
             exchange.setRelativePath(decodedPath);
@@ -420,7 +430,11 @@ public abstract class HttpRequestParser {
 
     private void beginQueryParameters(ByteBuffer buffer, ParseState state, HttpServerExchange exchange, StringBuilder stringBuilder, int parseState, int canonicalPathStart, boolean urlDecodeRequired) {
         final String path = stringBuilder.toString();
-        if (parseState < HOST_DONE) {
+        if (parseState == SECOND_SLASH) {
+            exchange.setRequestPath("/");
+            exchange.setRelativePath("/");
+            exchange.setRequestURI(path);
+        } else if (parseState < HOST_DONE) {
             String decodedPath = decode(path, urlDecodeRequired, state, allowEncodedSlash);
             exchange.setRequestPath(decodedPath);
             exchange.setRelativePath(decodedPath);
@@ -489,7 +503,7 @@ public abstract class HttpRequestParser {
             } else if (next == '\r' || next == '\n') {
                 throw UndertowMessages.MESSAGES.failedToParsePath();
             } else {
-                if (decode && (next == '+' || next == '%' || next > 127)) {
+                if (decode && (next == '+' || next == '%' || next > 127)) { //+ is only a whitespace substitute in the query part of the URL
                     urlDecodeRequired = true;
                 } else if (next == '=' && nextQueryParam == null) {
                     nextQueryParam = decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true);
@@ -818,6 +832,7 @@ public abstract class HttpRequestParser {
      *
      * @return
      */
+    @SuppressWarnings("unused")
     protected static Map<String, HttpString> httpStrings() {
         final Map<String, HttpString> results = new HashMap<>();
         final Class[] classs = {Headers.class, Methods.class, Protocols.class};
@@ -825,7 +840,6 @@ public abstract class HttpRequestParser {
         for (Class<?> c : classs) {
             for (Field field : c.getDeclaredFields()) {
                 if (field.getType().equals(HttpString.class)) {
-                    field.setAccessible(true);
                     HttpString result = null;
                     try {
                         result = (HttpString) field.get(null);

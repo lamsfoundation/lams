@@ -1,25 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, 2013, Red Hat Inc. or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.engine.query.spi;
 
@@ -202,17 +185,18 @@ public class NativeSQLQueryPlan implements Serializable {
 			queryParameters.processFilters( this.customQuery.getSQL(), session );
 			final String sql = queryParameters.getFilteredSQL();
 
-			ps = session.getTransactionCoordinator().getJdbcCoordinator().getStatementPreparer().prepareStatement( sql, false );
+			ps = session.getJdbcCoordinator().getStatementPreparer().prepareStatement( sql, false );
 
 			try {
 				int col = 1;
 				col += bindPositionalParameters( ps, queryParameters, col, session );
 				col += bindNamedParameters( ps, queryParameters.getNamedParameters(), col, session );
-				result = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().executeUpdate( ps );
+				result = session.getJdbcCoordinator().getResultSetReturn().executeUpdate( ps );
 			}
 			finally {
 				if ( ps != null ) {
-					session.getTransactionCoordinator().getJdbcCoordinator().release( ps );
+					session.getJdbcCoordinator().getResourceRegistry().release( ps );
+					session.getJdbcCoordinator().afterStatementExecution();
 				}
 			}
 		}

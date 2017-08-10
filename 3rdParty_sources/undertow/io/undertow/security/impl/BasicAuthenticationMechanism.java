@@ -18,12 +18,21 @@
 package io.undertow.security.impl;
 
 import static io.undertow.UndertowMessages.MESSAGES;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import io.undertow.UndertowLogger;
+import io.undertow.UndertowMessages;
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.AuthenticationMechanismFactory;
 import io.undertow.security.api.SecurityContext;
@@ -33,6 +42,7 @@ import io.undertow.security.idm.PasswordCredential;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormParserFactory;
 import io.undertow.util.FlexBase64;
+import io.undertow.util.Headers;
 
 import static io.undertow.util.Headers.AUTHORIZATION;
 import static io.undertow.util.Headers.BASIC;
@@ -46,15 +56,28 @@ import static io.undertow.util.StatusCodes.UNAUTHORIZED;
  */
 public class BasicAuthenticationMechanism implements AuthenticationMechanism {
 
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
     public static final String SILENT = "silent";
+    public static final String CHARSET = "charset";
+    /**
+     * A comma separated list of patterns and charsets. The pattern is a regular expression.
+     *
+     * Because different browsers user different encodings this allows for the correct encoding to be selected based
+     * on the current browser. In general though it is recommended that BASIC auth not be used when passwords contain
+     * characters outside ASCII, as some browsers use the current locate to determine encoding.
+     *
+     * This list must have an even number of elements, as it is interpreted as pattern,charset,pattern,charset,...
+     */
+    public static final String USER_AGENT_CHARSETS = "user-agent-charsets";
 
     private final String name;
     private final String challenge;
 
     private static final String BASIC_PREFIX = BASIC + " ";
+    private static final String LOWERCASE_BASIC_PREFIX = BASIC_PREFIX.toLowerCase(Locale.ENGLISH);
     private static final int PREFIX_LENGTH = BASIC_PREFIX.length();
     private static final String COLON = ":";
+
+    private static final Map<Pattern, Charset> EMPTY_CHARSETS_MAP = Collections.emptyMap();
 
     /**
      * If silent is true then this mechanism will only take effect if there is an Authorization header.
@@ -64,9 +87,11 @@ public class BasicAuthenticationMechanism implements AuthenticationMechanism {
      */
     private final boolean silent;
 
-    public static final Factory FACTORY = new Factory();
+    private final IdentityManager identityManager;
 
-    // TODO - Can we get the realm name from the IDM?
+    private final Charset charset;
+    private final Map<Pattern, Charset> userAgentCharsets;
+
     public BasicAuthenticationMechanism(final String realmName) {
         this(realmName, "BASIC");
     }
@@ -76,9 +101,24 @@ public class BasicAuthenticationMechanism implements AuthenticationMechanism {
     }
 
     public BasicAuthenticationMechanism(final String realmName, final String mechanismName, final boolean silent) {
+        this(realmName, mechanismName, silent, null);
+    }
+    public BasicAuthenticationMechanism(final String realmName, final String mechanismName, final boolean silent, final IdentityManager identityManager) {
+        this(realmName, mechanismName, silent, identityManager, StandardCharsets.UTF_8, EMPTY_CHARSETS_MAP);
+    }
+
+    public BasicAuthenticationMechanism(final String realmName, final String mechanismName, final boolean silent, final IdentityManager identityManager, Charset charset, Map<Pattern, Charset> userAgentCharsets) {
         this.challenge = BASIC_PREFIX + "realm=\"" + realmName + "\"";
         this.name = mechanismName;
         this.silent = silent;
+        this.identityManager = identityManager;
+        this.charset = charset;
+        this.userAgentCharsets = Collections.unmodifiableMap(new LinkedHashMap<>(userAgentCharsets));
+    }
+
+    @SuppressWarnings("deprecation")
+    private IdentityManager getIdentityManager(SecurityContext securityContext) {
+        return identityManager != null ? identityManager : securityContext.getIdentityManager();
     }
 
     /**
@@ -90,20 +130,37 @@ public class BasicAuthenticationMechanism implements AuthenticationMechanism {
         List<String> authHeaders = exchange.getRequestHeaders().get(AUTHORIZATION);
         if (authHeaders != null) {
             for (String current : authHeaders) {
-                if (current.startsWith(BASIC_PREFIX)) {
+                if (current.toLowerCase(Locale.ENGLISH).startsWith(LOWERCASE_BASIC_PREFIX)) {
+
                     String base64Challenge = current.substring(PREFIX_LENGTH);
                     String plainChallenge = null;
                     try {
                         ByteBuffer decode = FlexBase64.decode(base64Challenge);
-                        plainChallenge = new String(decode.array(), decode.arrayOffset(), decode.limit(), UTF_8);
+
+                        Charset charset = this.charset;
+                        if(!userAgentCharsets.isEmpty()) {
+                            String ua = exchange.getRequestHeaders().getFirst(Headers.USER_AGENT);
+                            if(ua != null) {
+                                for (Map.Entry<Pattern, Charset> entry : userAgentCharsets.entrySet()) {
+                                    if(entry.getKey().matcher(ua).find()) {
+                                        charset = entry.getValue();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        plainChallenge = new String(decode.array(), decode.arrayOffset(), decode.limit(), charset);
+                        UndertowLogger.SECURITY_LOGGER.debugf("Found basic auth header %s (decoded using charset %s) in %s", plainChallenge, charset, exchange);
                     } catch (IOException e) {
+                        UndertowLogger.SECURITY_LOGGER.debugf(e, "Failed to decode basic auth header %s in %s", base64Challenge, exchange);
                     }
                     int colonPos;
                     if (plainChallenge != null && (colonPos = plainChallenge.indexOf(COLON)) > -1) {
                         String userName = plainChallenge.substring(0, colonPos);
                         char[] password = plainChallenge.substring(colonPos + 1).toCharArray();
 
-                        IdentityManager idm = securityContext.getIdentityManager();
+                        IdentityManager idm = getIdentityManager(securityContext);
                         PasswordCredential credential = new PasswordCredential(password);
                         try {
                             final AuthenticationMechanismOutcome result;
@@ -143,6 +200,7 @@ public class BasicAuthenticationMechanism implements AuthenticationMechanism {
             }
         }
         exchange.getResponseHeaders().add(WWW_AUTHENTICATE, challenge);
+        UndertowLogger.SECURITY_LOGGER.debugf("Sending basic auth challenge %s for %s", challenge, exchange);
         return new ChallengeResult(true, UNAUTHORIZED);
     }
 
@@ -154,11 +212,33 @@ public class BasicAuthenticationMechanism implements AuthenticationMechanism {
 
     public static class Factory implements AuthenticationMechanismFactory {
 
+        private final IdentityManager identityManager;
+
+        public Factory(IdentityManager identityManager) {
+            this.identityManager = identityManager;
+        }
+
         @Override
         public AuthenticationMechanism create(String mechanismName, FormParserFactory formParserFactory, Map<String, String> properties) {
             String realm = properties.get(REALM);
             String silent = properties.get(SILENT);
-            return new BasicAuthenticationMechanism(realm, mechanismName, silent != null && silent.equals("true"));
+            String charsetString = properties.get(CHARSET);
+            Charset charset = charsetString == null ? StandardCharsets.UTF_8 : Charset.forName(charsetString);
+            Map<Pattern, Charset> userAgentCharsets = new HashMap<>();
+            String userAgentString = properties.get(USER_AGENT_CHARSETS);
+            if(userAgentString != null) {
+                String[] parts = userAgentString.split(",");
+                if(parts.length % 2 != 0) {
+                    throw UndertowMessages.MESSAGES.userAgentCharsetMustHaveEvenNumberOfItems(userAgentString);
+                }
+                for(int i = 0; i < parts.length; i += 2) {
+                    Pattern pattern = Pattern.compile(parts[i]);
+                    Charset c = Charset.forName(parts[i + 1]);
+                    userAgentCharsets.put(pattern, c);
+                }
+            }
+
+            return new BasicAuthenticationMechanism(realm, mechanismName, silent != null && silent.equals("true"), identityManager, charset, userAgentCharsets);
         }
     }
 

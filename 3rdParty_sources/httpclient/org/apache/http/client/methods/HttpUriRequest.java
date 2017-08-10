@@ -36,23 +36,22 @@ import org.apache.http.HttpRequest;
  * convenience methods to access request properties such as request URI
  * and method type.
  *
- *
- * <!-- empty lines to avoid svn diff problems -->
  * @since 4.0
  */
 public interface HttpUriRequest extends HttpRequest {
 
     /**
-     * Returns the HTTP method this request uses, such as <code>GET</code>,
-     * <code>PUT</code>, <code>POST</code>, or other.
+     * Returns the HTTP method this request uses, such as {@code GET},
+     * {@code PUT}, {@code POST}, or other.
      */
     String getMethod();
 
     /**
      * Returns the URI this request uses, such as
-     * <code>http://example.org/path/to/file</code>.
-     * <br/>
+     * {@code http://example.org/path/to/file}.
+     * <p>
      * Note that the URI may be absolute URI (as above) or may be a relative URI.
+     * </p>
      * <p>
      * Implementations are encouraged to return
      * the URI that was initially requested.
@@ -78,8 +77,8 @@ public interface HttpUriRequest extends HttpRequest {
     /**
      * Tests if the request execution has been aborted.
      *
-     * @return <code>true</code> if the request execution has been aborted,
-     *   <code>false</code> otherwise.
+     * @return {@code true} if the request execution has been aborted,
+     *   {@code false} otherwise.
      */
     boolean isAborted();
 

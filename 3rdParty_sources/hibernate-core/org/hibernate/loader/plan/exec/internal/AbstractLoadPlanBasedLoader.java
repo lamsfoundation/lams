@@ -1,26 +1,8 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
- *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.loader.plan.exec.internal;
 
@@ -42,6 +24,8 @@ import org.hibernate.dialect.pagination.LimitHandler;
 import org.hibernate.dialect.pagination.LimitHelper;
 import org.hibernate.dialect.pagination.NoopLimitHandler;
 import org.hibernate.engine.jdbc.ColumnNameCache;
+import org.hibernate.engine.jdbc.spi.JdbcServices;
+import org.hibernate.engine.jdbc.spi.ResultSetWrapper;
 import org.hibernate.engine.spi.PersistenceContext;
 import org.hibernate.engine.spi.QueryParameters;
 import org.hibernate.engine.spi.RowSelection;
@@ -153,11 +137,12 @@ public abstract class AbstractLoadPlanBasedLoader {
 			}
 			finally {
 				if ( wrapper != null ) {
-					session.getTransactionCoordinator().getJdbcCoordinator().release(
+					session.getJdbcCoordinator().getResourceRegistry().release(
 							wrapper.getResultSet(),
 							wrapper.getStatement()
 					);
-					session.getTransactionCoordinator().getJdbcCoordinator().release( wrapper.getStatement() );
+					session.getJdbcCoordinator().getResourceRegistry().release( wrapper.getStatement() );
+					session.getJdbcCoordinator().afterStatementExecution();
 				}
 				persistenceContext.afterLoad();
 			}
@@ -190,10 +175,9 @@ public abstract class AbstractLoadPlanBasedLoader {
 
 		// Applying LIMIT clause.
 		final LimitHandler limitHandler = getLimitHandler(
-				queryParameters.getFilteredSQL(),
 				queryParameters.getRowSelection()
 		);
-		String sql = limitHandler.getProcessedSql();
+		String sql = limitHandler.processSql( queryParameters.getFilteredSQL(), queryParameters.getRowSelection() );
 
 		// Adding locks and comments.
 		sql = preprocessSQL( sql, queryParameters, getFactory().getDialect(), afterLoadActions );
@@ -206,13 +190,12 @@ public abstract class AbstractLoadPlanBasedLoader {
 	 * Build LIMIT clause handler applicable for given selection criteria. Returns {@link org.hibernate.dialect.pagination.NoopLimitHandler} delegate
 	 * if dialect does not support LIMIT expression or processed query does not use pagination.
 	 *
-	 * @param sql Query string.
 	 * @param selection Selection criteria.
 	 * @return LIMIT clause delegate.
 	 */
-	protected LimitHandler getLimitHandler(String sql, RowSelection selection) {
-		final LimitHandler limitHandler = getFactory().getDialect().buildLimitHandler( sql, selection );
-		return LimitHelper.useLimit( limitHandler, selection ) ? limitHandler : new NoopLimitHandler( sql, selection );
+	protected LimitHandler getLimitHandler(RowSelection selection) {
+		final LimitHandler limitHandler = getFactory().getDialect().getLimitHandler();
+		return LimitHelper.useLimit( limitHandler, selection ) ? limitHandler : NoopLimitHandler.INSTANCE;
 	}
 
 	private String preprocessSQL(
@@ -254,14 +237,14 @@ public abstract class AbstractLoadPlanBasedLoader {
 		final boolean callable = queryParameters.isCallable();
 		final ScrollMode scrollMode = getScrollMode( scroll, hasFirstRow, useLimitOffset, queryParameters );
 
-		final PreparedStatement st = session.getTransactionCoordinator().getJdbcCoordinator()
+		final PreparedStatement st = session.getJdbcCoordinator()
 				.getStatementPreparer().prepareQueryStatement( sql, callable, scrollMode );
 
 		try {
 
 			int col = 1;
 			//TODO: can we limit stored procedures ?!
-			col += limitHandler.bindLimitParametersAtStartOfQuery( st, col );
+			col += limitHandler.bindLimitParametersAtStartOfQuery( selection, st, col );
 
 			if (callable) {
 				col = dialect.registerResultSetOutParameter( (CallableStatement)st, col );
@@ -269,9 +252,9 @@ public abstract class AbstractLoadPlanBasedLoader {
 
 			col += bindParameterValues( st, queryParameters, col, session );
 
-			col += limitHandler.bindLimitParametersAtEndOfQuery( st, col );
+			col += limitHandler.bindLimitParametersAtEndOfQuery( selection, st, col );
 
-			limitHandler.setMaxRows( st );
+			limitHandler.setMaxRows( selection, st );
 
 			if ( selection != null ) {
 				if ( selection.getTimeout() != null ) {
@@ -305,11 +288,13 @@ public abstract class AbstractLoadPlanBasedLoader {
 			}
 		}
 		catch ( SQLException sqle ) {
-			session.getTransactionCoordinator().getJdbcCoordinator().release( st );
+			session.getJdbcCoordinator().getResourceRegistry().release( st );
+			session.getJdbcCoordinator().afterStatementExecution();
 			throw sqle;
 		}
 		catch ( HibernateException he ) {
-			session.getTransactionCoordinator().getJdbcCoordinator().release( st );
+			session.getJdbcCoordinator().getResourceRegistry().release( st );
+			session.getJdbcCoordinator().afterStatementExecution();
 			throw he;
 		}
 
@@ -446,7 +431,7 @@ public abstract class AbstractLoadPlanBasedLoader {
 			throws SQLException, HibernateException {
 
 		try {
-			ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().extract( st );
+			ResultSet rs = session.getJdbcCoordinator().getResultSetReturn().extract( st );
 			rs = wrapResultSetIfEnabled( rs , session );
 
 			if ( !limitHandler.supportsLimitOffset() || !LimitHelper.useLimit( limitHandler, selection ) ) {
@@ -459,7 +444,8 @@ public abstract class AbstractLoadPlanBasedLoader {
 			return rs;
 		}
 		catch ( SQLException sqle ) {
-			session.getTransactionCoordinator().getJdbcCoordinator().release( st );
+			session.getJdbcCoordinator().getResourceRegistry().release( st );
+			session.getJdbcCoordinator().afterStatementExecution();
 			throw sqle;
 		}
 	}
@@ -483,17 +469,22 @@ public abstract class AbstractLoadPlanBasedLoader {
 		}
 	}
 
-	private synchronized ResultSet wrapResultSetIfEnabled(final ResultSet rs, final SessionImplementor session) {
-		// synchronized to avoid multi-thread access issues; defined as method synch to avoid
-		// potential deadlock issues due to nature of code.
-		if ( session.getFactory().getSettings().isWrapResultSetsEnabled() ) {
+	private ResultSet wrapResultSetIfEnabled(final ResultSet rs, final SessionImplementor session) {
+		if ( session.getFactory().getSessionFactoryOptions().isWrapResultSetsEnabled() ) {
 			try {
 				if ( log.isDebugEnabled() ) {
 					log.debugf( "Wrapping result set [%s]", rs );
 				}
-				return session.getFactory()
-						.getJdbcServices()
-						.getResultSetWrapper().wrap( rs, retreiveColumnNameToIndexCache( rs ) );
+				ResultSetWrapper wrapper = session.getFactory()
+						.getServiceRegistry()
+						.getService( JdbcServices.class )
+						.getResultSetWrapper();
+				// synchronized to avoid multi-thread access issues
+				// Apparently the comment about this needing synchronization was introduced when AbstractLoadPlanBasedLoader first appeared
+				// in version control. Would need to investigate if it's still needed?
+				synchronized ( this ) {
+					return wrapper.wrap( rs, retreiveColumnNameToIndexCache( rs ) );
+				}
 			}
 			catch(SQLException e) {
 				log.unableToWrapResultSet( e );

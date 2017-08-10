@@ -26,6 +26,7 @@ import io.undertow.client.ClientExchange;
 import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
 import io.undertow.client.ContinueNotification;
+import io.undertow.client.PushCallback;
 import io.undertow.protocols.ajp.AjpClientChannel;
 import io.undertow.protocols.ajp.AjpClientRequestClientStreamSinkChannel;
 import io.undertow.protocols.ajp.AjpClientResponseStreamSourceChannel;
@@ -63,7 +64,7 @@ class AjpClientExchange extends AbstractAttachable implements ClientExchange {
     private static final int REQUEST_TERMINATED = 1;
     private static final int RESPONSE_TERMINATED = 1 << 1;
 
-    public AjpClientExchange(ClientCallback<ClientExchange> readyCallback, ClientRequest request, AjpClientConnection clientConnection) {
+    AjpClientExchange(ClientCallback<ClientExchange> readyCallback, ClientRequest request, AjpClientConnection clientConnection) {
         this.readyCallback = readyCallback;
         this.request = request;
         this.clientConnection = clientConnection;
@@ -126,6 +127,11 @@ class AjpClientExchange extends AbstractAttachable implements ClientExchange {
     @Override
     public void setContinueHandler(ContinueNotification continueHandler) {
         this.continueNotification = continueHandler;
+    }
+
+    @Override
+    public void setPushHandler(PushCallback pushCallback) {
+
     }
 
     void setFailed(IOException e) {

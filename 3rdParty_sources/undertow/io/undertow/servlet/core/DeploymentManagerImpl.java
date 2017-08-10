@@ -22,20 +22,22 @@ import io.undertow.Handlers;
 import io.undertow.predicate.Predicates;
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.AuthenticationMechanismFactory;
-import io.undertow.security.api.AuthenticationMode;
 import io.undertow.security.api.NotificationReceiver;
 import io.undertow.security.api.SecurityContextFactory;
 import io.undertow.security.handlers.AuthenticationMechanismsHandler;
 import io.undertow.security.handlers.NotificationReceiverHandler;
 import io.undertow.security.handlers.SecurityInitialHandler;
+import io.undertow.security.idm.IdentityManager;
 import io.undertow.security.impl.BasicAuthenticationMechanism;
 import io.undertow.security.impl.CachedAuthenticatedSessionMechanism;
 import io.undertow.security.impl.ClientCertAuthenticationMechanism;
 import io.undertow.security.impl.DigestAuthenticationMechanism;
 import io.undertow.security.impl.ExternalAuthenticationMechanism;
+import io.undertow.security.impl.GenericHeaderAuthenticationMechanism;
 import io.undertow.security.impl.SecurityContextFactoryImpl;
 import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
+import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.HttpContinueReadHandler;
 import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.form.FormEncodedDataDefinition;
@@ -66,8 +68,9 @@ import io.undertow.servlet.api.ServletSecurityInfo;
 import io.undertow.servlet.api.ServletSessionConfig;
 import io.undertow.servlet.api.ServletStackTraces;
 import io.undertow.servlet.api.SessionPersistenceManager;
-import io.undertow.servlet.api.ThreadSetupAction;
+import io.undertow.servlet.api.ThreadSetupHandler;
 import io.undertow.servlet.api.WebResourceCollection;
+import io.undertow.servlet.handlers.CrawlerSessionManagerHandler;
 import io.undertow.servlet.handlers.ServletDispatchingHandler;
 import io.undertow.servlet.handlers.ServletHandler;
 import io.undertow.servlet.handlers.ServletInitialHandler;
@@ -88,6 +91,7 @@ import io.undertow.util.MimeMappings;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -134,7 +138,7 @@ public class DeploymentManagerImpl implements DeploymentManager {
 
     @Override
     public void deploy() {
-        DeploymentInfo deploymentInfo = originalDeployment.clone();
+        final DeploymentInfo deploymentInfo = originalDeployment.clone();
 
         if (deploymentInfo.getServletStackTraces() == ServletStackTraces.ALL) {
             UndertowServletLogger.REQUEST_LOGGER.servletStackTracesAll(deploymentInfo.getDeploymentName());
@@ -144,9 +148,16 @@ public class DeploymentManagerImpl implements DeploymentManager {
         final DeploymentImpl deployment = new DeploymentImpl(this, deploymentInfo, servletContainer);
         this.deployment = deployment;
 
+        final List<ThreadSetupHandler> setup = new ArrayList<>();
+        setup.add(ServletRequestContextThreadSetupAction.INSTANCE);
+        setup.add(new ContextClassLoaderSetupAction(deploymentInfo.getClassLoader()));
+        setup.addAll(deploymentInfo.getThreadSetupActions());
+        deployment.setThreadSetupActions(setup);
+
         final ServletContextImpl servletContext = new ServletContextImpl(servletContainer, deployment);
         deployment.setServletContext(servletContext);
         handleExtensions(deploymentInfo, servletContext);
+        deployment.getServletPaths().setWelcomePages(deploymentInfo.getWelcomePages());
 
         deployment.setDefaultCharset(Charset.forName(deploymentInfo.getDefaultEncoding()));
 
@@ -154,75 +165,75 @@ public class DeploymentManagerImpl implements DeploymentManager {
 
         deployment.setSessionManager(deploymentInfo.getSessionManagerFactory().createSessionManager(deployment));
         deployment.getSessionManager().setDefaultSessionTimeout(deploymentInfo.getDefaultSessionTimeout());
-        for(SessionListener listener : deploymentInfo.getSessionListeners()) {
-            deployment.getSessionManager().registerSessionListener(listener);
-        }
 
-        final List<ThreadSetupAction> setup = new ArrayList<>();
-        setup.add(ServletRequestContextThreadSetupAction.INSTANCE);
-        setup.add(new ContextClassLoaderSetupAction(deploymentInfo.getClassLoader()));
-        setup.addAll(deploymentInfo.getThreadSetupActions());
-        final CompositeThreadSetupAction threadSetupAction = new CompositeThreadSetupAction(setup);
-        deployment.setThreadSetupAction(threadSetupAction);
 
-        ThreadSetupAction.Handle handle = threadSetupAction.setup(null);
         try {
+            deployment.createThreadSetupAction(new ThreadSetupHandler.Action<Void, Object>() {
+                @Override
+                public Void call(HttpServerExchange exchange, Object ignore) throws Exception {
+                    final ApplicationListeners listeners = createListeners();
+                    listeners.start();
 
-            final ApplicationListeners listeners = createListeners();
-            listeners.start();
+                    deployment.setApplicationListeners(listeners);
 
-            deployment.setApplicationListeners(listeners);
+                    //now create the servlets and filters that we know about. We can still get more later
+                    createServletsAndFilters(deployment, deploymentInfo);
 
-            //now create the servlets and filters that we know about. We can still get more later
-            createServletsAndFilters(deployment, deploymentInfo);
+                    //first run the SCI's
+                    for (final ServletContainerInitializerInfo sci : deploymentInfo.getServletContainerInitializers()) {
+                        final InstanceHandle<? extends ServletContainerInitializer> instance = sci.getInstanceFactory().createInstance();
+                        try {
+                            instance.getInstance().onStartup(sci.getHandlesTypes(), servletContext);
+                        } finally {
+                            instance.release();
+                        }
+                    }
 
-            //first run the SCI's
-            for (final ServletContainerInitializerInfo sci : deploymentInfo.getServletContainerInitializers()) {
-                final InstanceHandle<? extends ServletContainerInitializer> instance = sci.getInstanceFactory().createInstance();
-                try {
-                    instance.getInstance().onStartup(sci.getHandlesTypes(), servletContext);
-                } finally {
-                    instance.release();
+                    deployment.getSessionManager().registerSessionListener(new SessionListenerBridge(deployment, listeners, servletContext));
+                    for(SessionListener listener : deploymentInfo.getSessionListeners()) {
+                        deployment.getSessionManager().registerSessionListener(listener);
+                    }
+
+                    initializeErrorPages(deployment, deploymentInfo);
+                    initializeMimeMappings(deployment, deploymentInfo);
+                    initializeTempDir(servletContext, deploymentInfo);
+                    listeners.contextInitialized();
+                    //run
+
+                    HttpHandler wrappedHandlers = ServletDispatchingHandler.INSTANCE;
+                    wrappedHandlers = wrapHandlers(wrappedHandlers, deploymentInfo.getInnerHandlerChainWrappers());
+                    if(!deploymentInfo.isSecurityDisabled()) {
+                        HttpHandler securityHandler = setupSecurityHandlers(wrappedHandlers);
+                        wrappedHandlers = new PredicateHandler(DispatcherTypePredicate.REQUEST, securityHandler, wrappedHandlers);
+                    }
+                    HttpHandler outerHandlers = wrapHandlers(wrappedHandlers, deploymentInfo.getOuterHandlerChainWrappers());
+                    wrappedHandlers = new PredicateHandler(DispatcherTypePredicate.REQUEST, outerHandlers, wrappedHandlers);
+                    wrappedHandlers = handleDevelopmentModePersistentSessions(wrappedHandlers, deploymentInfo, deployment.getSessionManager(), servletContext);
+
+                    MetricsCollector metrics = deploymentInfo.getMetricsCollector();
+                    if(metrics != null) {
+                        wrappedHandlers = new MetricsChainHandler(wrappedHandlers, metrics, deployment);
+                    }
+                    if( deploymentInfo.getCrawlerSessionManagerConfig() != null ) {
+                        wrappedHandlers = new CrawlerSessionManagerHandler(deploymentInfo.getCrawlerSessionManagerConfig(), wrappedHandlers);
+                    }
+
+                    final ServletInitialHandler servletInitialHandler = SecurityActions.createServletInitialHandler(deployment.getServletPaths(), wrappedHandlers, deployment, servletContext);
+
+                    HttpHandler initialHandler = wrapHandlers(servletInitialHandler, deployment.getDeploymentInfo().getInitialHandlerChainWrappers());
+                    initialHandler = new HttpContinueReadHandler(initialHandler);
+                    if(deploymentInfo.getUrlEncoding() != null) {
+                        initialHandler = Handlers.urlDecodingHandler(deploymentInfo.getUrlEncoding(), initialHandler);
+                    }
+                    deployment.setInitialHandler(initialHandler);
+                    deployment.setServletHandler(servletInitialHandler);
+                    deployment.getServletPaths().invalidate(); //make sure we have a fresh set of servlet paths
+                    servletContext.initDone();
+                    return null;
                 }
-            }
-
-            deployment.getSessionManager().registerSessionListener(new SessionListenerBridge(threadSetupAction, listeners, servletContext));
-
-            initializeErrorPages(deployment, deploymentInfo);
-            initializeMimeMappings(deployment, deploymentInfo);
-            initializeTempDir(servletContext, deploymentInfo);
-            listeners.contextInitialized();
-            //run
-
-            HttpHandler wrappedHandlers = ServletDispatchingHandler.INSTANCE;
-            wrappedHandlers = wrapHandlers(wrappedHandlers, deploymentInfo.getInnerHandlerChainWrappers());
-            HttpHandler securityHandler = setupSecurityHandlers(wrappedHandlers);
-            wrappedHandlers = new PredicateHandler(DispatcherTypePredicate.REQUEST, securityHandler, wrappedHandlers);
-
-            HttpHandler outerHandlers = wrapHandlers(wrappedHandlers, deploymentInfo.getOuterHandlerChainWrappers());
-            wrappedHandlers = new PredicateHandler(DispatcherTypePredicate.REQUEST, outerHandlers, wrappedHandlers);
-            wrappedHandlers = handleDevelopmentModePersistentSessions(wrappedHandlers, deploymentInfo, deployment.getSessionManager(), servletContext);
-
-            MetricsCollector metrics = deploymentInfo.getMetricsCollector();
-            if(metrics != null) {
-                wrappedHandlers = new MetricsChainHandler(wrappedHandlers, metrics, deployment);
-            }
-
-            final ServletInitialHandler servletInitialHandler = SecurityActions.createServletInitialHandler(deployment.getServletPaths(), wrappedHandlers, deployment.getThreadSetupAction(), servletContext);
-
-            HttpHandler initialHandler = wrapHandlers(servletInitialHandler, deployment.getDeploymentInfo().getInitialHandlerChainWrappers());
-            initialHandler = new HttpContinueReadHandler(initialHandler);
-            if(deploymentInfo.getUrlEncoding() != null) {
-                initialHandler = Handlers.urlDecodingHandler(deploymentInfo.getUrlEncoding(), initialHandler);
-            }
-            deployment.setInitialHandler(initialHandler);
-            deployment.setServletHandler(servletInitialHandler);
-            deployment.getServletPaths().invalidate(); //make sure we have a fresh set of servlet paths
-            servletContext.initDone();
+            }).call(null, null);
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally {
-            handle.tearDown();
         }
         state = State.DEPLOYED;
     }
@@ -271,27 +282,16 @@ public class DeploymentManagerImpl implements DeploymentManager {
         final DeploymentInfo deploymentInfo = deployment.getDeploymentInfo();
         final LoginConfig loginConfig = deploymentInfo.getLoginConfig();
 
-        final Map<String, AuthenticationMechanismFactory> factoryMap = new HashMap<>(deploymentInfo.getAuthenticationMechanisms());
-        if(!factoryMap.containsKey(BASIC_AUTH)) {
-            factoryMap.put(BASIC_AUTH, BasicAuthenticationMechanism.FACTORY);
-        }
-        if(!factoryMap.containsKey(FORM_AUTH)) {
-            factoryMap.put(FORM_AUTH, ServletFormAuthenticationMechanism.FACTORY);
-        }
-        if(!factoryMap.containsKey(DIGEST_AUTH)) {
-            factoryMap.put(DIGEST_AUTH, DigestAuthenticationMechanism.FACTORY);
-        }
-        if(!factoryMap.containsKey(CLIENT_CERT_AUTH)) {
-            factoryMap.put(CLIENT_CERT_AUTH, ClientCertAuthenticationMechanism.FACTORY);
-        }
-        if(!factoryMap.containsKey(ExternalAuthenticationMechanism.NAME)) {
-            factoryMap.put(ExternalAuthenticationMechanism.NAME, ExternalAuthenticationMechanism.FACTORY);
-        }
         HttpHandler current = initialHandler;
         current = new SSLInformationAssociationHandler(current);
 
         final SecurityPathMatches securityPathMatches = buildSecurityConstraints();
         current = new ServletAuthenticationCallHandler(current);
+
+        for(HandlerWrapper wrapper : deploymentInfo.getSecurityWrappers()) {
+            current = wrapper.wrap(current);
+        }
+
         if(deploymentInfo.isDisableCachingForSecuredPages()) {
             current = Handlers.predicate(Predicates.authRequired(), Handlers.disableCache(current), current);
         }
@@ -302,72 +302,107 @@ public class DeploymentManagerImpl implements DeploymentManager {
         if (!securityPathMatches.isEmpty()) {
             current = new ServletSecurityConstraintHandler(securityPathMatches, current);
         }
-        List<AuthenticationMechanism> authenticationMechanisms = new LinkedList<>();
-        authenticationMechanisms.add(new CachedAuthenticatedSessionMechanism()); //TODO: does this really need to be hard coded?
+
+        HandlerWrapper initialSecurityWrapper = deploymentInfo.getInitialSecurityWrapper();
 
         String mechName = null;
-        if (loginConfig != null || deploymentInfo.getJaspiAuthenticationMechanism() != null) {
+        if (initialSecurityWrapper == null) {
+            final Map<String, AuthenticationMechanismFactory> factoryMap = new HashMap<>(deploymentInfo.getAuthenticationMechanisms());
+            final IdentityManager identityManager = deploymentInfo.getIdentityManager();
+            if(!factoryMap.containsKey(BASIC_AUTH)) {
+                factoryMap.put(BASIC_AUTH, new BasicAuthenticationMechanism.Factory(identityManager));
+            }
+            if(!factoryMap.containsKey(FORM_AUTH)) {
+                factoryMap.put(FORM_AUTH, new ServletFormAuthenticationMechanism.Factory(identityManager));
+            }
+            if(!factoryMap.containsKey(DIGEST_AUTH)) {
+                factoryMap.put(DIGEST_AUTH, new DigestAuthenticationMechanism.Factory(identityManager));
+            }
+            if(!factoryMap.containsKey(CLIENT_CERT_AUTH)) {
+                factoryMap.put(CLIENT_CERT_AUTH, new ClientCertAuthenticationMechanism.Factory(identityManager));
+            }
+            if(!factoryMap.containsKey(ExternalAuthenticationMechanism.NAME)) {
+                factoryMap.put(ExternalAuthenticationMechanism.NAME, new ExternalAuthenticationMechanism.Factory(identityManager));
+            }
+            if(!factoryMap.containsKey(GenericHeaderAuthenticationMechanism.NAME)) {
+                factoryMap.put(GenericHeaderAuthenticationMechanism.NAME, new GenericHeaderAuthenticationMechanism.Factory(identityManager));
+            }
+            List<AuthenticationMechanism> authenticationMechanisms = new LinkedList<>();
+            authenticationMechanisms.add(new CachedAuthenticatedSessionMechanism(identityManager)); //TODO: does this really need to be hard coded?
 
-            //we don't allow multipart requests, and always use the default encoding
-            FormParserFactory parser = FormParserFactory.builder(false)
-                    .addParser(new FormEncodedDataDefinition().setDefaultEncoding(deploymentInfo.getDefaultEncoding()))
-                    .build();
+            if (loginConfig != null || deploymentInfo.getJaspiAuthenticationMechanism() != null) {
 
-            List<AuthMethodConfig> authMethods = Collections.<AuthMethodConfig>emptyList();
-            if(loginConfig != null) {
-                authMethods = loginConfig.getAuthMethods();
+                //we don't allow multipart requests, and always use the default encoding
+                FormParserFactory parser = FormParserFactory.builder(false)
+                        .addParser(new FormEncodedDataDefinition().setDefaultEncoding(deploymentInfo.getDefaultEncoding()))
+                        .build();
+
+                List<AuthMethodConfig> authMethods = Collections.<AuthMethodConfig>emptyList();
+                if(loginConfig != null) {
+                    authMethods = loginConfig.getAuthMethods();
+                }
+
+                for(AuthMethodConfig method : authMethods) {
+                    AuthenticationMechanismFactory factory = factoryMap.get(method.getName());
+                    if(factory == null) {
+                        throw UndertowServletMessages.MESSAGES.unknownAuthenticationMechanism(method.getName());
+                    }
+                    if(mechName == null) {
+                        mechName = method.getName();
+                    }
+
+                    final Map<String, String> properties = new HashMap<>();
+                    properties.put(AuthenticationMechanismFactory.CONTEXT_PATH, deploymentInfo.getContextPath());
+                    properties.put(AuthenticationMechanismFactory.REALM, loginConfig.getRealmName());
+                    properties.put(AuthenticationMechanismFactory.ERROR_PAGE, loginConfig.getErrorPage());
+                    properties.put(AuthenticationMechanismFactory.LOGIN_PAGE, loginConfig.getLoginPage());
+                    properties.putAll(method.getProperties());
+
+                    String name = method.getName().toUpperCase(Locale.US);
+                    // The mechanism name is passed in from the HttpServletRequest interface as the name reported needs to be
+                    // comparable using '=='
+                    name = name.equals(FORM_AUTH) ? FORM_AUTH : name;
+                    name = name.equals(BASIC_AUTH) ? BASIC_AUTH : name;
+                    name = name.equals(DIGEST_AUTH) ? DIGEST_AUTH : name;
+                    name = name.equals(CLIENT_CERT_AUTH) ? CLIENT_CERT_AUTH : name;
+
+                    authenticationMechanisms.add(factory.create(name, parser, properties));
+                }
             }
 
-            for(AuthMethodConfig method : authMethods) {
-                AuthenticationMechanismFactory factory = factoryMap.get(method.getName());
-                if(factory == null) {
-                    throw UndertowServletMessages.MESSAGES.unknownAuthenticationMechanism(method.getName());
-                }
-                if(mechName == null) {
-                    mechName = method.getName();
-                }
-
-                final Map<String, String> properties = new HashMap<>();
-                properties.put(AuthenticationMechanismFactory.CONTEXT_PATH, deploymentInfo.getContextPath());
-                properties.put(AuthenticationMechanismFactory.REALM, loginConfig.getRealmName());
-                properties.put(AuthenticationMechanismFactory.ERROR_PAGE, loginConfig.getErrorPage());
-                properties.put(AuthenticationMechanismFactory.LOGIN_PAGE, loginConfig.getLoginPage());
-                properties.putAll(method.getProperties());
-
-                String name = method.getName().toUpperCase(Locale.US);
-                // The mechanism name is passed in from the HttpServletRequest interface as the name reported needs to be
-                // comparable using '=='
-                name = name.equals(FORM_AUTH) ? FORM_AUTH : name;
-                name = name.equals(BASIC_AUTH) ? BASIC_AUTH : name;
-                name = name.equals(DIGEST_AUTH) ? DIGEST_AUTH : name;
-                name = name.equals(CLIENT_CERT_AUTH) ? CLIENT_CERT_AUTH : name;
-
-                authenticationMechanisms.add(factory.create(name, parser, properties));
+            if(deploymentInfo.isUseCachedAuthenticationMechanism()) {
+                authenticationMechanisms.add(new CachedAuthenticatedSessionMechanism(identityManager));
             }
+
+            deployment.setAuthenticationMechanisms(authenticationMechanisms);
+            //if the JASPI auth mechanism is set then it takes over
+            if(deploymentInfo.getJaspiAuthenticationMechanism() == null) {
+                current = new AuthenticationMechanismsHandler(current, authenticationMechanisms);
+            } else {
+                current = new AuthenticationMechanismsHandler(current, Collections.<AuthenticationMechanism>singletonList(deploymentInfo.getJaspiAuthenticationMechanism()));
+            }
+
+            current = new CachedAuthenticatedSessionHandler(current, this.deployment.getServletContext());
         }
 
-        deployment.setAuthenticationMechanisms(authenticationMechanisms);
-        //if the JASPI auth mechanism is set then it takes over
-        if(deploymentInfo.getJaspiAuthenticationMechanism() == null) {
-            current = new AuthenticationMechanismsHandler(current, authenticationMechanisms);
-        } else {
-            current = new AuthenticationMechanismsHandler(current, Collections.<AuthenticationMechanism>singletonList(deploymentInfo.getJaspiAuthenticationMechanism()));
-        }
-
-        current = new CachedAuthenticatedSessionHandler(current, this.deployment.getServletContext());
         List<NotificationReceiver> notificationReceivers = deploymentInfo.getNotificationReceivers();
         if (!notificationReceivers.isEmpty()) {
             current = new NotificationReceiverHandler(current, notificationReceivers);
         }
 
-        // TODO - A switch to constraint driven could be configurable, however before we can support that with servlets we would
-        // need additional tracking within sessions if a servlet has specifically requested that authentication occurs.
-        SecurityContextFactory contextFactory = deploymentInfo.getSecurityContextFactory();
-        if (contextFactory == null) {
-            contextFactory = SecurityContextFactoryImpl.INSTANCE;
+        if (initialSecurityWrapper == null) {
+            // TODO - A switch to constraint driven could be configurable, however before we can support that with servlets we would
+            // need additional tracking within sessions if a servlet has specifically requested that authentication occurs.
+            SecurityContextFactory contextFactory = deploymentInfo.getSecurityContextFactory();
+            if (contextFactory == null) {
+                contextFactory = SecurityContextFactoryImpl.INSTANCE;
+            }
+            current = new SecurityInitialHandler(deploymentInfo.getAuthenticationMode(), deploymentInfo.getIdentityManager(), mechName,
+                    contextFactory, current);
+        } else {
+            current = initialSecurityWrapper.wrap(current);
         }
-        current = new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE, deploymentInfo.getIdentityManager(), mechName,
-                contextFactory, current);
+
         return current;
     }
 
@@ -433,7 +468,7 @@ public class DeploymentManagerImpl implements DeploymentManager {
     private void initializeMimeMappings(final DeploymentImpl deployment, final DeploymentInfo deploymentInfo) {
         final Map<String, String> mappings = new HashMap<>(MimeMappings.DEFAULT_MIME_MAPPINGS);
         for (MimeMapping mapping : deploymentInfo.getMimeMappings()) {
-            mappings.put(mapping.getExtension(), mapping.getMimeType());
+            mappings.put(mapping.getExtension().toLowerCase(Locale.ENGLISH), mapping.getMimeType());
         }
         deployment.setMimeExtensionMappings(mappings);
     }
@@ -478,63 +513,80 @@ public class DeploymentManagerImpl implements DeploymentManager {
 
     @Override
     public HttpHandler start() throws ServletException {
-        ThreadSetupAction.Handle handle = deployment.getThreadSetupAction().setup(null);
         try {
-            deployment.getSessionManager().start();
+            return deployment.createThreadSetupAction(new ThreadSetupHandler.Action<HttpHandler, Object>() {
+                @Override
+                public HttpHandler call(HttpServerExchange exchange, Object ignore) throws ServletException {
+                    deployment.getSessionManager().start();
 
-            //we need to copy before iterating
-            //because listeners can add other listeners
-            ArrayList<Lifecycle> lifecycles = new ArrayList<>(deployment.getLifecycleObjects());
-            for (Lifecycle object : lifecycles) {
-                object.start();
-            }
-            HttpHandler root = deployment.getHandler();
-            final TreeMap<Integer, List<ManagedServlet>> loadOnStartup = new TreeMap<>();
-            for(Map.Entry<String, ServletHandler> entry: deployment.getServlets().getServletHandlers().entrySet()) {
-                ManagedServlet servlet = entry.getValue().getManagedServlet();
-                Integer loadOnStartupNumber = servlet.getServletInfo().getLoadOnStartup();
-                if(loadOnStartupNumber != null) {
-                    if(loadOnStartupNumber < 0) {
-                        continue;
+                    //we need to copy before iterating
+                    //because listeners can add other listeners
+                    ArrayList<Lifecycle> lifecycles = new ArrayList<>(deployment.getLifecycleObjects());
+                    for (Lifecycle object : lifecycles) {
+                        object.start();
                     }
-                    List<ManagedServlet> list = loadOnStartup.get(loadOnStartupNumber);
-                    if(list == null) {
-                        loadOnStartup.put(loadOnStartupNumber, list = new ArrayList<>());
+                    HttpHandler root = deployment.getHandler();
+                    final TreeMap<Integer, List<ManagedServlet>> loadOnStartup = new TreeMap<>();
+                    for (Map.Entry<String, ServletHandler> entry : deployment.getServlets().getServletHandlers().entrySet()) {
+                        ManagedServlet servlet = entry.getValue().getManagedServlet();
+                        Integer loadOnStartupNumber = servlet.getServletInfo().getLoadOnStartup();
+                        if (loadOnStartupNumber != null) {
+                            if (loadOnStartupNumber < 0) {
+                                continue;
+                            }
+                            List<ManagedServlet> list = loadOnStartup.get(loadOnStartupNumber);
+                            if (list == null) {
+                                loadOnStartup.put(loadOnStartupNumber, list = new ArrayList<>());
+                            }
+                            list.add(servlet);
+                        }
                     }
-                    list.add(servlet);
-                }
-            }
-            for(Map.Entry<Integer, List<ManagedServlet>> load : loadOnStartup.entrySet()) {
-                for(ManagedServlet servlet : load.getValue()) {
-                    servlet.createServlet();
-                }
-            }
+                    for (Map.Entry<Integer, List<ManagedServlet>> load : loadOnStartup.entrySet()) {
+                        for (ManagedServlet servlet : load.getValue()) {
+                            servlet.createServlet();
+                        }
+                    }
 
-            if (deployment.getDeploymentInfo().isEagerFilterInit()){
-                for(ManagedFilter filter: deployment.getFilters().getFilters().values()) {
-                    filter.createFilter();
-                }
-            }
+                    if (deployment.getDeploymentInfo().isEagerFilterInit()) {
+                        for (ManagedFilter filter : deployment.getFilters().getFilters().values()) {
+                            filter.createFilter();
+                        }
+                    }
 
-            state = State.STARTED;
-            return root;
-        } finally {
-            handle.tearDown();
+                    state = State.STARTED;
+                    return root;
+                }
+            }).call(null, null);
+        } catch (ServletException|RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public void stop() throws ServletException {
-        ThreadSetupAction.Handle handle = deployment.getThreadSetupAction().setup(null);
         try {
-            for (Lifecycle object : deployment.getLifecycleObjects()) {
-                object.stop();
-            }
-            deployment.getSessionManager().stop();
-        } finally {
-            handle.tearDown();
+            deployment.createThreadSetupAction(new ThreadSetupHandler.Action<Void, Object>() {
+                @Override
+                public Void call(HttpServerExchange exchange, Object ignore) throws ServletException {
+                    for (Lifecycle object : deployment.getLifecycleObjects()) {
+                        try {
+                            object.stop();
+                        } catch (Exception e) {
+                            UndertowServletLogger.ROOT_LOGGER.failedToDestroy(object, e);
+                        }
+                    }
+                    deployment.getSessionManager().stop();
+                    state = State.DEPLOYED;
+                    return null;
+                }
+            }).call(null, null);
+        } catch (ServletException|RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        state = State.DEPLOYED;
     }
 
     private HttpHandler handleDevelopmentModePersistentSessions(HttpHandler next, final DeploymentInfo deploymentInfo, final SessionManager sessionManager, final ServletContextImpl servletContext) {
@@ -571,14 +623,20 @@ public class DeploymentManagerImpl implements DeploymentManager {
 
     @Override
     public void undeploy() {
-        ThreadSetupAction.Handle handle = deployment.getThreadSetupAction().setup(null);
         try {
-            deployment.destroy();
-            deployment = null;
-        } finally {
-            handle.tearDown();
+            deployment.createThreadSetupAction(new ThreadSetupHandler.Action<Void, Object>() {
+                @Override
+                public Void call(HttpServerExchange exchange, Object ignore) throws ServletException {
+                    deployment.destroy();
+                    deployment = null;
+                    state = State.UNDEPLOYED;
+                    return null;
+                }
+            }).call(null, null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        state = State.UNDEPLOYED;
+
     }
 
     @Override

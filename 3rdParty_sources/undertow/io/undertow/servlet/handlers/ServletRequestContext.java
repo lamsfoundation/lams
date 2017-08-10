@@ -20,7 +20,6 @@ package io.undertow.servlet.handlers;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.security.AccessController;
 import java.util.List;
 
 import io.undertow.UndertowMessages;
@@ -42,10 +41,10 @@ import javax.servlet.ServletResponse;
 
 /**
  * All the information that servlet needs to attach to the exchange.
- * <p/>
+ * <p>
  * This is all stored under this class, rather than using individual attachments, as
  * this approach has significant performance advantages.
- * <p/>
+ * <p>
  * The {@link ServletInitialHandler} also pushed this information to the {@link #CURRENT}
  * thread local, which allows it to be access even if the request or response have been
  * wrapped with non-compliant wrapper classes.
@@ -60,22 +59,25 @@ public class ServletRequestContext {
     private static final ThreadLocal<ServletRequestContext> CURRENT = new ThreadLocal<>();
 
     public static void setCurrentRequestContext(ServletRequestContext servletRequestContext) {
-        if(System.getSecurityManager() != null) {
-            AccessController.checkPermission(SET_CURRENT_REQUEST);
+        SecurityManager sm = System.getSecurityManager();
+        if(sm != null) {
+            sm.checkPermission(SET_CURRENT_REQUEST);
         }
         CURRENT.set(servletRequestContext);
     }
 
     public static void clearCurrentServletAttachments() {
-        if(System.getSecurityManager() != null) {
-            AccessController.checkPermission(SET_CURRENT_REQUEST);
+        SecurityManager sm = System.getSecurityManager();
+        if(sm != null) {
+            sm.checkPermission(SET_CURRENT_REQUEST);
         }
         CURRENT.remove();
     }
 
     public static ServletRequestContext requireCurrent() {
-        if(System.getSecurityManager() != null) {
-            AccessController.checkPermission(GET_CURRENT_REQUEST);
+        SecurityManager sm = System.getSecurityManager();
+        if(sm != null) {
+            sm.checkPermission(GET_CURRENT_REQUEST);
         }
         ServletRequestContext attachments = CURRENT.get();
         if (attachments == null) {
@@ -85,8 +87,9 @@ public class ServletRequestContext {
     }
 
     public static ServletRequestContext current() {
-        if(System.getSecurityManager() != null) {
-            AccessController.checkPermission(GET_CURRENT_REQUEST);
+        SecurityManager sm = System.getSecurityManager();
+        if(sm != null) {
+            sm.checkPermission(GET_CURRENT_REQUEST);
         }
         return CURRENT.get();
     }
@@ -109,6 +112,7 @@ public class ServletRequestContext {
     private HttpSessionImpl session;
 
     private ServletContextImpl currentServletContext;
+    private String overridenSessionId;
 
     /**
      * If this is true the request is running inside the context of ServletInitialHandler
@@ -116,6 +120,7 @@ public class ServletRequestContext {
     private boolean runningInsideHandler = false;
     private int errorCode = -1;
     private String errorMessage;
+    private boolean asyncSupported = true;
 
     public ServletRequestContext(final Deployment deployment, final HttpServletRequestImpl originalRequest, final HttpServletResponseImpl originalResponse, final ServletPathMatch originalServletPathMatch) {
         this.deployment = deployment;
@@ -261,5 +266,21 @@ public class ServletRequestContext {
 
     public void setRunningInsideHandler(boolean runningInsideHandler) {
         this.runningInsideHandler = runningInsideHandler;
+    }
+
+    public boolean isAsyncSupported() {
+        return asyncSupported;
+    }
+
+    public String getOverridenSessionId() {
+        return overridenSessionId;
+    }
+
+    public void setOverridenSessionId(String overridenSessionId) {
+        this.overridenSessionId = overridenSessionId;
+    }
+
+    public void setAsyncSupported(boolean asyncSupported) {
+        this.asyncSupported = asyncSupported;
     }
 }
