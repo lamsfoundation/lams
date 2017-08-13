@@ -115,6 +115,7 @@ public class UserManagementService implements IUserManagementService {
 	baseDAO.insertOrUpdate(object);
     }
 
+    @Override
     public User saveUser(User user) {
 	if (user != null) {
 	    // create user
@@ -459,11 +460,13 @@ public class UserManagementService implements IUserManagementService {
 	} else {
 	    // update workspace/folder names
 	    WorkspaceFolder folder = organisation.getNormalFolder();
-	    if (folder != null)
+	    if (folder != null) {
 		folder.setName(organisation.getName());
+	    }
 	    folder = organisation.getRunSequencesFolder();
-	    if (folder != null)
+	    if (folder != null) {
 		folder.setName(getRunSequencesFolderName(organisation.getName()));
+	    }
 	}
 
 	return organisation;
@@ -592,6 +595,12 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
+    public void setRolesForUserOrganisation(Integer userId, Integer organisationId, List<String> rolesList) {
+	User user = (User) findById(User.class, userId);
+	setRolesForUserOrganisation(user, organisationId, rolesList);
+    }
+
+    @Override
     public void setRolesForUserOrganisation(User user, Integer organisationId, List<String> rolesList) {
 
 	// Don't pass in the org from the web layer. The import for roles
@@ -653,6 +662,9 @@ public class UserManagementService implements IUserManagementService {
 	    uors = new HashSet<UserOrganisationRole>();
 	}
 	for (String roleId : rolesCopy) {
+	    if (roleId == null) {
+		continue;
+	    }
 	    Role role = (Role) findById(Role.class, Integer.parseInt(roleId));
 	    UserOrganisationRole uor = new UserOrganisationRole(uo, role);
 	    save(uor);
