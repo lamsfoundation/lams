@@ -104,8 +104,6 @@
 	<form-property name="serverdesc" type="java.lang.String" />
 	<form-property name="prefix" type="java.lang.String"/>
 	<form-property name="userinfoUrl" type="java.lang.String" />
-	<form-property name="serverUrl" type="java.lang.String" />
-	<form-property name="timeoutUrl" type="java.lang.String" initial="http://dummy.url/not.implemented"/>
 	<form-property name="lessonFinishUrl" type="java.lang.String"/>
 	<form-property name="extGroupsUrl" type="java.lang.String"/>
 	<form-property name="disabled" type="java.lang.Boolean" initial="false"/>

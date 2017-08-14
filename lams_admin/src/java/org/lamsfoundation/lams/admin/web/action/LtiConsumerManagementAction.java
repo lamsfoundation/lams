@@ -171,7 +171,6 @@ public class LtiConsumerManagementAction extends LamsDispatchAction {
 		ltiConsumer.setSid(null);
 		ltiConsumer.setServerTypeId(ExtServer.LTI_CONSUMER_SERVER_TYPE);
 		ltiConsumer.setUserinfoUrl("blank");
-		ltiConsumer.setTimeoutUrl("blank");
 	    } else {
 		ltiConsumer = integrationService.getExtServer(sid);
 		BeanUtils.copyProperties(ltiConsumer, extServerForm);
