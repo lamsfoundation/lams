@@ -64,3 +64,5 @@ xml-commons       xml-apis.jar 							1.3
 xstream           xmlpull-1.1.3.1.jar					1.1.3.1
 				  xpp3_min-1.1.4c.jar					1.1.4c
 				  xstream-1.5.0-SNAPSHOT.jar            1.5.0																				  XML serializer
+				  
+yuicompressor	  yuicompressor-2.4.9					2.4.9				   BSD License					YUI								  CSS and JS minifier 
