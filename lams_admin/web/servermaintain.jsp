@@ -56,14 +56,6 @@
 		<td><html:text property="userinfoUrl" size="70" styleClass="form-control"/></td>
 	</tr>
 	<tr>
-		<td><fmt:message key="sysadmin.serverUrl" /></td>
-		<td><html:text property="serverUrl" size="70" styleClass="form-control"/></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="sysadmin.timeoutUrl" />&nbsp;*</td>
-		<td><html:text property="timeoutUrl" size="70" styleClass="form-control"/></td>
-	</tr>
-	<tr>
 		<td><fmt:message key="sysadmin.lessonFinishUrl" /></td>
 		<td><html:text property="lessonFinishUrl" size="70" styleClass="form-control"/></td>
 	</tr>
@@ -98,7 +90,6 @@
 				servername: "required",
 				prefix: "required",
 				userinfoUrl: "required",
-				timeoutUrl: "required",
 				timeToLiveLoginRequest: {
 					required: true,
 					min: 1
@@ -110,7 +101,6 @@
 				servername: "<c:set var="namev"><fmt:message key='sysadmin.servername' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
 				prefix: "<c:set var="namev"><fmt:message key='sysadmin.prefix' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
 				userinfoUrl: "<c:set var="namev"><fmt:message key='sysadmin.userinfoUrl' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
-				timeoutUrl: "<c:set var="namev"><fmt:message key='sysadmin.timeoutUrl' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
 				timeToLiveLoginRequest: {
 					required: "<c:set var="namev"><fmt:message key='sysadmin.login.request.ttl' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
 					min: "<fmt:message key="error.login.request.ttl.negative" />"
