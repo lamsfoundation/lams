@@ -20,15 +20,6 @@
  */
 package org.lamsfoundation.lams.integration.security;
 
-import io.undertow.Handlers;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.server.session.Session;
-import io.undertow.servlet.ServletExtension;
-import io.undertow.servlet.api.DeploymentInfo;
-import io.undertow.servlet.handlers.ServletRequestContext;
-import io.undertow.servlet.spec.HttpSessionImpl;
-import io.undertow.util.Headers;
-
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.Date;
@@ -56,6 +47,15 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 
+import io.undertow.Handlers;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.server.session.Session;
+import io.undertow.servlet.ServletExtension;
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.handlers.ServletRequestContext;
+import io.undertow.servlet.spec.HttpSessionImpl;
+import io.undertow.util.Headers;
+
 /**
  * Allows access to LAMS WARs when an user logs in.
  *
@@ -66,13 +66,21 @@ public class SsoHandler implements ServletExtension {
     private static IAuditService auditService = null;
     private static IUserManagementService userManagementService = null;
 
-    protected static final String SESSION_KEY = "io.undertow.servlet.form.auth.redirect.location";
-
-    // if this attribute is set in session, credential cache will not be cleared on session destro in SessionListener
+    private static final String REDIRECT_KEY = "io.undertow.servlet.form.auth.redirect.location";
+    private static final String KEEP_SESSION_ID_KEY = "lams.keepSessionId";
+    // if this attribute is set in session, credential cache will not be cleared on session destroy in SessionListener
     public static final String NO_FLUSH_FLAG = "noFlush";
 
     @Override
     public void handleDeployment(final DeploymentInfo deploymentInfo, final ServletContext servletContext) {
+	// If WildFly was run with VM parameter -Dlams.keepSessionId=true
+	// session ID will not be changed after log in
+	// This is necessary for TestHarness to run as it does not process session ID change correctly 
+	boolean keepSessionId = Boolean.parseBoolean(System.getProperty(KEEP_SESSION_ID_KEY));
+	if (keepSessionId) {
+	    deploymentInfo.setChangeSessionIdOnLogin(false);
+	}
+	
 	// expose servlet context so other classes can use it
 	SessionManager.setServletContext(servletContext);
 
@@ -91,6 +99,7 @@ public class SsoHandler implements ServletExtension {
 
 		// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs
 		HttpSession session = request.getSession();
+		System.out.println("SESSION ID BEFORE LOGIN: " + session.getId());
 
 		/*
 		 * Fetch UserDTO before completing request so putting it later in session is done ASAP
@@ -157,6 +166,8 @@ public class SsoHandler implements ServletExtension {
 		// do the logging in UniversalLoginModule or cache
 		handler.handleRequest(exchange);
 
+		System.out.println("SESSION ID AFTER LOGIN: " + session.getId());
+
 		if (login.equals(request.getRemoteUser())) {
 		    session.setAttribute(AttributeNames.USER, userDTO);
 
@@ -206,6 +217,8 @@ public class SsoHandler implements ServletExtension {
 		}
 
 		SessionManager.endSession();
+
+		System.out.println("SESSION ID AFTER END: " + session.getId());
 	    });
 	});
     }
@@ -214,12 +227,12 @@ public class SsoHandler implements ServletExtension {
      * Forward to the login page with a specific error message. Avoids a redirect. Based on the
      * ServletFormAuthenticationMechanism method. The location should be relative to the current
      * context and start with "/" e.g. /login.jsp
-     * 
+     *
      * @throws IOException
      * @throws ServletException
      */
-    protected Integer serveLoginPage(final HttpServerExchange exchange, final String location) throws ServletException,
-	    IOException {
+    protected Integer serveLoginPage(final HttpServerExchange exchange, final String location)
+	    throws ServletException, IOException {
 
 	ServletRequestContext context = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
 	HttpServletRequest request = (HttpServletRequest) context.getServletRequest();
@@ -260,7 +273,7 @@ public class SsoHandler implements ServletExtension {
 		session = AccessController.doPrivileged(new HttpSessionImpl.UnwrapSessionAction(httpSession));
 	    }
 
-	    session.setAttribute(SsoHandler.SESSION_KEY, redirectURL);
+	    session.setAttribute(SsoHandler.REDIRECT_KEY, redirectURL);
 	}
     }
 
