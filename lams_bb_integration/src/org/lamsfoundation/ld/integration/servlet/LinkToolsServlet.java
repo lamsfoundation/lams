@@ -1,4 +1,4 @@
-package org.lamsfoundation.ld.integration.blackboard;
+package org.lamsfoundation.ld.integration.servlet;
 /**************************************************************** 
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
  * ============================================================= 

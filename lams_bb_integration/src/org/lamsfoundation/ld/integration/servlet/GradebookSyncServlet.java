@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.ld.integration.blackboard;
+package org.lamsfoundation.ld.integration.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +42,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.lamsfoundation.ld.integration.Constants;
 import org.lamsfoundation.ld.integration.util.LamsBuildingBlockException;
 import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
@@ -53,6 +55,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import blackboard.base.InitializationException;
+import blackboard.data.ValidationException;
 import blackboard.data.course.CourseMembership;
 import blackboard.data.gradebook.Lineitem;
 import blackboard.data.gradebook.Score;
@@ -60,22 +63,28 @@ import blackboard.persist.Id;
 import blackboard.persist.PersistenceException;
 import blackboard.persist.course.CourseMembershipDbLoader;
 import blackboard.persist.gradebook.ScoreDbLoader;
-import blackboard.persist.gradebook.ScoreDbPersister;
 import blackboard.platform.BbServiceException;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
+import blackboard.util.StringUtil;
 
 /**
- * Fixes issues created by GradebookSyncServlet, namely, removes marks of users that had not completed the lesson. 
+ * Monitor on BB side calls this servlet to syncronize lesson marks with LAMS Gradebook.
  */
-@SuppressWarnings("serial")
-public class GradebookSyncFixServlet extends HttpServlet {
+public class GradebookSyncServlet extends HttpServlet {
 
+    private static final long serialVersionUID = -3587062723412672084L;
+    private static Logger logger = LoggerFactory.getLogger(GradebookSyncServlet.class);
+
+    /**
+     * Monitor on BB side calls this servlet to syncronize lesson marks with LAMS Gradebook. After that get the latest
+     * marks for this user in this lesson and stores it in DB.
+     */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 	ContextManager ctxMgr = null;
-	int numberDeletedScores = 0;
+	int numberUpdatedScores = 0;
 	
 	try {
 	    // get Blackboard context
@@ -83,7 +92,6 @@ public class GradebookSyncFixServlet extends HttpServlet {
 	    Context ctx = ctxMgr.setContext(request);
 	    CourseMembershipDbLoader courseMemLoader = CourseMembershipDbLoader.Default.getInstance();
 	    ScoreDbLoader scoreLoader = ScoreDbLoader.Default.getInstance();
-	    ScoreDbPersister scorePersister = ScoreDbPersister.Default.getInstance();
 
 	    // get Parameter values
 	    String lamsLessonIdParam = request.getParameter(Constants.PARAM_LESSON_ID);
@@ -131,7 +139,7 @@ public class GradebookSyncFixServlet extends HttpServlet {
 	    List<Score> dbScores = scoreLoader.loadByLineitemId(lineitem.getId());
 	    List<CourseMembership> courseMemberships = courseMemLoader.loadByCourseId(lineitem.getCourseId(), null, true);
 	    
-	    //removes marks of users that had not completed the lesson
+	    //update all marks
 	    for (CourseMembership courseMembership: courseMemberships) {
 		Id courseMembershipId = courseMembership.getId();
 		String userName = courseMembership.getUser().getUserName();
@@ -145,25 +153,33 @@ public class GradebookSyncFixServlet extends HttpServlet {
 		    }
 		}
 		
-		// determine whether user had finished the lesson
-		boolean isUserHadFinishedLesson = false;
+		//find new score
 		for (int i = 0; i < learnerResults.getLength(); i++) {
 		    Node learnerResult = learnerResults.item(i);
 
 		    String extUsername = learnerResult.getAttributes().getNamedItem("extUsername").getNodeValue();
 
 		    if (userName.equals(extUsername)) {
-			isUserHadFinishedLesson = true;
+
+			//update old score
+			if (currentScore == null) {
+			    currentScore = new Score();
+			    currentScore.setLineitemId(lineitem.getId());
+			    currentScore.setCourseMembershipId(courseMembershipId);
+			}
+
+			//updates and persists currentScore in the DB
+			double gradebookMark = LineitemUtil.updateScoreBasedOnLamsResponse(lesson, learnerResult,
+				currentScore);
+
+			//calculate how many marks updated
+			if (StringUtil.isEmpty(currentScore.getGrade())
+				|| !new Double(currentScore.getGrade()).equals(new Double(gradebookMark))) {
+			    numberUpdatedScores++;
+			}
+
 			break;
 		    }
-		}
-		
-		//remove marks of the user that had not completed the lesson.
-		if ((currentScore != null) && !isUserHadFinishedLesson) {
-		    scorePersister.deleteById(currentScore.getId());
-		    
-		    //calculate how many marks are removed
-		    numberDeletedScores++;
 		}
 	    }
 
@@ -195,6 +211,8 @@ public class GradebookSyncFixServlet extends HttpServlet {
 	    throw new ServletException(e);
 	} catch (PersistenceException e) {
 	    throw new ServletException(e);
+	} catch (ValidationException e) {
+	    throw new ServletException(e);
 	} catch (InitializationException e) {
 	    throw new ServletException(e);
 	} catch (BbServiceException e) {
@@ -208,7 +226,7 @@ public class GradebookSyncFixServlet extends HttpServlet {
 	
 	response.setContentType("text/html");
 	PrintWriter out = response.getWriter();
-        out.write("Complete! " + numberDeletedScores + " marks have been removed from Blackboard Gradecenter.");
+        out.write("Complete! " + numberUpdatedScores + " marks have been updated/added to Blackboard Gradecenter.");
 	
     }
     

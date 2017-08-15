@@ -21,7 +21,7 @@
  */  
  
   
-package org.lamsfoundation.ld.integration.blackboard;
+package org.lamsfoundation.ld.integration.servlet;
 
 import java.io.IOException;
 
@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.lamsfoundation.ld.integration.Constants;
 import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 
@@ -39,9 +40,9 @@ import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
 
 /**
- * Makes a call to LAMS server to delete a learning design.
+ * Makes a call to LAMS server to get learning designs and returns it.
  */
-public class LamsLearningDesignDeleteServlet extends HttpServlet {
+public class LamsLearningDesignServlet extends HttpServlet {
 
     private static final long serialVersionUID = -351131323404991332L;
 
@@ -53,7 +54,7 @@ public class LamsLearningDesignDeleteServlet extends HttpServlet {
 	process(request, response);
     }
 
-    protected void process(HttpServletRequest request, HttpServletResponse response) {	
+    protected void process(HttpServletRequest request, HttpServletResponse response) {
 	String serverAddr = LamsPluginUtil.getServerUrl();
 	String serverId = LamsPluginUtil.getServerId();
 
@@ -63,24 +64,22 @@ public class LamsLearningDesignDeleteServlet extends HttpServlet {
 	}
 
 	// get request parameters
-	String courseId = request.getParameter("course_id");
+	String folderId = request.getParameter(Constants.PARAM_FOLDER_ID);
 
-	String strLearningDesignId = request.getParameter("sequence_id");
-	if ( strLearningDesignId != null ) {
-	    strLearningDesignId.trim();
+	//paging parameters of tablesorter - used in the LAMS Template Wizard
+	boolean usePaging = false;
+	String page = request.getParameter("page");
+	String size = request.getParameter("size");
+	if ( page != null && page.length()>0) {
+	    usePaging = true;
+	    if ( size == null || size.length()==0)
+		size="10";
 	}
-
-	// validate method parameter and associated parameters
-	if ( strLearningDesignId == null || strLearningDesignId.length() == 0 ) {
-	    throw new RuntimeException("Required parameters missing. Add sequence_id for the id of the learning design to be deleted");
-	}
-
-	long learningDesignId = 0;
-	try {
-	    learningDesignId = Long.parseLong(strLearningDesignId);
-	} catch ( Exception e ) {
-	    throw new RuntimeException("Required parameters missing. Add sequence_id for the id of the learning design to be deleted",e);
-	}
+	String sortName = request.getParameter("sortName");
+	String sortDate = request.getParameter("sortDate");
+	String search = request.getParameter("search");
+	String type = request.getParameter("type");
+	String username = request.getParameter("username"); // backup method to get user, when the Blackboard context does not have the user
 	
 	ContextManager ctxMgr = null;
 	Context ctx = null;
@@ -89,10 +88,12 @@ public class LamsLearningDesignDeleteServlet extends HttpServlet {
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	    ctx = ctxMgr.setContext(request);
 	    
-	    String serverResponse = LamsSecurityUtil.deleteLearningDesigns(ctx, courseId, learningDesignId);
+	    String courseId = ctx.getCourse().getCourseId();
+	    String method = usePaging ? "getPagedHomeLearningDesignsJSON" : "getLearningDesignsJSON";
+	    String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, username, courseId, folderId, method, type, search, page, size, sortName, sortDate);
 	    
 	    response.setContentType("application/json;charset=UTF-8");
-	    response.getWriter().print(serverResponse);
+	    response.getWriter().print(learningDesigns);
 	    
 	} catch (InitializationException e) {
 	    throw new RuntimeException(e);

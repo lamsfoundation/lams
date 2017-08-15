@@ -20,7 +20,7 @@
  */
 
 /* $$ */
-package org.lamsfoundation.ld.integration.blackboard;
+package org.lamsfoundation.ld.integration.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
