@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc.web;
+package org.lamsfoundation.lams.tool.mc.util;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -43,7 +43,6 @@ import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
-import org.lamsfoundation.lams.tool.mc.util.McComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;

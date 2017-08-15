@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc.web;
+package org.lamsfoundation.lams.tool.mc.web.action;
 
 import java.io.IOException;
 import java.util.ArrayList;

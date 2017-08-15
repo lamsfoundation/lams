@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc.web;
+package org.lamsfoundation.lams.tool.mc.util;
 
 import java.util.Iterator;
 import java.util.List;

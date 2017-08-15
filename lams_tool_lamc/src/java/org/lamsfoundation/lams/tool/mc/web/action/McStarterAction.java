@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.mc.web;
+package org.lamsfoundation.lams.tool.mc.web.action;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
+import org.lamsfoundation.lams.tool.mc.util.AuthoringUtil;
 import org.lamsfoundation.lams.tool.mc.web.form.McAuthoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;

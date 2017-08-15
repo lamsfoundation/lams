@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.mc.web;
+package org.lamsfoundation.lams.tool.mc.web.action;
 
 import javax.servlet.http.HttpSession;
 

@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc.web;
+package org.lamsfoundation.lams.tool.mc.web.action;
 
 import java.io.IOException;
 import java.util.Date;
@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
+import org.lamsfoundation.lams.tool.mc.util.LearningUtil;
 import org.lamsfoundation.lams.tool.mc.web.form.McLearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
