@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.qa.web;
+package org.lamsfoundation.lams.tool.qa.web.action;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.tool.qa.util.AuthoringUtil;
 import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;

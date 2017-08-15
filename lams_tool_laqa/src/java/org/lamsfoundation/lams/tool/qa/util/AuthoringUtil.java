@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.qa.web;
+package org.lamsfoundation.lams.tool.qa.util;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -38,7 +38,7 @@ import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
  */
 public class AuthoringUtil implements QaAppConstants {
 
-    protected static List<QaQuestionDTO> reorderUpdateQuestionDTOs(List<QaQuestionDTO> questionDTOs,
+    public static List<QaQuestionDTO> reorderUpdateQuestionDTOs(List<QaQuestionDTO> questionDTOs,
 	    QaQuestionDTO qaQuestionContentDTONew, String editableQuestionIndex) {
 
 	List<QaQuestionDTO> listFinalQuestionDTO = new LinkedList<QaQuestionDTO>();

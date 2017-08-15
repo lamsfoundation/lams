@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.qa.web;
+package org.lamsfoundation.lams.tool.qa.web.action;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -60,7 +60,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * rest of operations are located in <code>QaAction</code> action.
  *
  * @author Marcin Cieslak
- * @see org.lamsfoundation.lams.tool.qa.web.QaAction
+ * @see org.lamsfoundation.lams.tool.qa.web.action.QaAction
  */
 public class QaAuthoringConditionAction extends Action {
 

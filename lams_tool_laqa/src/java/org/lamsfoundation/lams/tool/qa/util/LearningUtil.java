@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.qa.web;
+package org.lamsfoundation.lams.tool.qa.util;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -36,7 +36,6 @@ import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.util.QaComparator;
 import org.lamsfoundation.lams.tool.qa.web.form.QaLearningForm;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 

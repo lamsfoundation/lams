@@ -21,7 +21,7 @@ http://www.gnu.org/licenses/gpl.txt
 
 
 
-package org.lamsfoundation.lams.tool.qa.web;
+package org.lamsfoundation.lams.tool.qa.web.action;
 
 import java.io.IOException;
 import java.util.Date;
