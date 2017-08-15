@@ -155,3 +155,7 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 ====================
 * LDEV-4381: Removed obsolete requestSrc and alternative LAMS server URL settings
 
+1.2.24 Release Fixes
+====================
+* LDEV-4407: Rename Java packages to reflect their purpose
+

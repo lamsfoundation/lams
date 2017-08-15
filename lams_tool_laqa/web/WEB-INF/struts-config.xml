@@ -45,7 +45,7 @@
    <!--Authoring Starter  -->
     <action
 		path="/authoringStarter"
-		type="org.lamsfoundation.lams.tool.qa.web.QaStarterAction"
+		type="org.lamsfoundation.lams.tool.qa.web.action.QaStarterAction"
 		name="QaAuthoringForm"
 		scope="request"
 		unknown="false"
@@ -62,7 +62,7 @@
 	
 	<action
       path="/authoring"
-      type="org.lamsfoundation.lams.tool.qa.web.QaAction"
+      type="org.lamsfoundation.lams.tool.qa.web.action.QaAction"
       name="QaAuthoringForm"
       input="/authoring/AuthoringTabsHolder.jsp"
       parameter="dispatch"
@@ -99,7 +99,7 @@
 	<!-- ==========  Authroing Definitions: Add QaCondition methods ========== -->
 		
 		<action path="/authoring/showConditions"
-			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			type="org.lamsfoundation.lams.tool.qa.web.action.QaAuthoringConditionAction"
 			name="QaAuthoringForm" 
 			scope="request" 
 			parameter="showConditions" 
@@ -107,7 +107,7 @@
 			<forward name="success" path="/authoring/conditions.jsp" />
 		</action>
 		<action path="/authoring/newConditionInit"
-			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			type="org.lamsfoundation.lams.tool.qa.web.action.QaAuthoringConditionAction"
 			name="QaConditionForm" 
 			scope="request" 
 			validate="false"			
@@ -115,7 +115,7 @@
 			<forward name="addcondition" path="/authoring/addCondition.jsp" />
 		</action>
 		<action path="/authoring/editCondition"
-			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			type="org.lamsfoundation.lams.tool.qa.web.action.QaAuthoringConditionAction"
 			name="QaConditionForm" 
 			scope="request" 
 			parameter="editCondition" 
@@ -123,7 +123,7 @@
 			<forward name="addcondition" path="/authoring/addCondition.jsp" />
 		</action>
 		<action path="/authoring/saveOrUpdateCondition"
-			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			type="org.lamsfoundation.lams.tool.qa.web.action.QaAuthoringConditionAction"
 			parameter="saveOrUpdateCondition"
 			name="QaConditionForm" 
 			scope="request" 
@@ -132,17 +132,17 @@
 			<forward name="success" path="/authoring/conditionList.jsp" />
 		</action>
 		<action path="/authoring/removeCondition"
-			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			type="org.lamsfoundation.lams.tool.qa.web.action.QaAuthoringConditionAction"
 			parameter="removeCondition">
 			<forward name="success" path="/authoring/conditionList.jsp" />
 		</action>
 		<action path="/authoring/upCondition"
-			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			type="org.lamsfoundation.lams.tool.qa.web.action.QaAuthoringConditionAction"
 			parameter="upCondition">
 			<forward name="success" path="/authoring/conditionList.jsp" />
 		</action>
 		<action path="/authoring/downCondition"
-			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			type="org.lamsfoundation.lams.tool.qa.web.action.QaAuthoringConditionAction"
 			parameter="downCondition">
 			<forward name="success" path="/authoring/conditionList.jsp" />
 		</action>
@@ -150,7 +150,7 @@
 		<!-- ==========  Authroing Definitions: Pedagogical Planner methods ========== -->
 		<action
 	      path="/pedagogicalPlanner"
-	      type="org.lamsfoundation.lams.tool.qa.web.QaPedagogicalPlannerAction"
+	      type="org.lamsfoundation.lams.tool.qa.web.action.QaPedagogicalPlannerAction"
 	      name="QaPedagogicalPlannerForm"
 	      scope="request"
 	      parameter="dispatch"
@@ -168,7 +168,7 @@
 	<!--Learning Starter  -->
    <action 
    		path="/learningStarter" 
-   		type="org.lamsfoundation.lams.tool.qa.web.QaLearningStarterAction" 
+   		type="org.lamsfoundation.lams.tool.qa.web.action.QaLearningStarterAction" 
    		name="QaLearningForm" 
    		scope="request"
 	    unknown="false"
@@ -224,7 +224,7 @@
 	
 	<action
       path="/learning"
-      type="org.lamsfoundation.lams.tool.qa.web.QaLearningAction"
+      type="org.lamsfoundation.lams.tool.qa.web.action.QaLearningAction"
       name="QaLearningForm"
       scope="request"
       input="/learning/AnswersContent.jsp"
@@ -273,7 +273,7 @@
 	
 	 <action
 		path="/monitoringStarter"
-		type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction"
+		type="org.lamsfoundation.lams.tool.qa.web.action.QaMonitoringStarterAction"
 		name="QaMonitoringForm"
 		scope="request"
 		parameter="dispatch"
@@ -290,7 +290,7 @@
 
 	 <action
 	      path="/monitoring"
-	      type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringAction"
+	      type="org.lamsfoundation.lams.tool.qa.web.action.QaMonitoringAction"
 	      name="QaMonitoringForm"
 	      scope="request"
 	      parameter="dispatch"
@@ -299,12 +299,12 @@
 
 	</action>
 	
-	<action path="/clearsession" type="org.lamsfoundation.lams.tool.qa.web.ClearSessionAction">
+	<action path="/clearsession" type="org.lamsfoundation.lams.tool.qa.web.action.ClearSessionAction">
 	</action>   
 	
 	<action
       path="/laqa11admin"
-      type="org.lamsfoundation.lams.tool.qa.web.QaAdminAction"
+      type="org.lamsfoundation.lams.tool.qa.web.action.QaAdminAction"
       name="laqa11AdminForm"
       scope="request"
       parameter="dispatch"
