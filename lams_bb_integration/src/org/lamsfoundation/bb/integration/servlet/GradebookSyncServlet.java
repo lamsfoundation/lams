@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.ld.integration.servlet;
+package org.lamsfoundation.bb.integration.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,13 +42,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.lamsfoundation.bb.integration.Constants;
+import org.lamsfoundation.bb.integration.util.LamsBuildingBlockException;
+import org.lamsfoundation.bb.integration.util.LamsPluginUtil;
+import org.lamsfoundation.bb.integration.util.LamsSecurityUtil;
+import org.lamsfoundation.bb.integration.util.LineitemUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.lamsfoundation.ld.integration.Constants;
-import org.lamsfoundation.ld.integration.util.LamsBuildingBlockException;
-import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
-import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
-import org.lamsfoundation.ld.integration.util.LineitemUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

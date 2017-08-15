@@ -21,7 +21,7 @@
  */  
  
   
-package org.lamsfoundation.ld.integration.servlet;
+package org.lamsfoundation.bb.integration.servlet;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,11 +31,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.lamsfoundation.bb.integration.Constants;
+import org.lamsfoundation.bb.integration.util.LamsPluginUtil;
+import org.lamsfoundation.bb.integration.util.LamsSecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.lamsfoundation.ld.integration.Constants;
-import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
-import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

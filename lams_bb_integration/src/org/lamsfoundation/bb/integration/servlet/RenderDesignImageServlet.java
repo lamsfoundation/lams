@@ -21,7 +21,7 @@
  */  
  
   
-package org.lamsfoundation.ld.integration.servlet;
+package org.lamsfoundation.bb.integration.servlet;
 
 import java.io.IOException;
 
@@ -29,8 +29,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
-import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
+import org.lamsfoundation.bb.integration.util.LamsSecurityUtil;
 
 import blackboard.base.InitializationException;
 import blackboard.platform.BbServiceException;
@@ -39,9 +38,10 @@ import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
 
 /**
- * Makes a call to LAMS server to delete a learning design.
+ * Makes a call to LAMS server to get a learning design visual image (svg data)
+ * Looks for either sequence_id for the learning design (sequence) id.
  */
-public class LamsLearningDesignDeleteServlet extends HttpServlet {
+public class RenderDesignImageServlet extends HttpServlet {
 
     private static final long serialVersionUID = -351131323404991332L;
 
@@ -53,18 +53,8 @@ public class LamsLearningDesignDeleteServlet extends HttpServlet {
 	process(request, response);
     }
 
-    protected void process(HttpServletRequest request, HttpServletResponse response) {	
-	String serverAddr = LamsPluginUtil.getServerUrl();
-	String serverId = LamsPluginUtil.getServerId();
-
-	// If lams.properties could not be read, throw exception
-	if (serverAddr == null || serverId == null) {
-	    throw new RuntimeException("lams.properties file could not be read. serverAddr:" + serverAddr + ", serverId:" + serverId);
-	}
-
-	// get request parameters
-	String courseId = request.getParameter("course_id");
-
+    public void process(HttpServletRequest request, HttpServletResponse response) {
+	
 	String strLearningDesignId = request.getParameter("sequence_id");
 	if ( strLearningDesignId != null ) {
 	    strLearningDesignId.trim();
@@ -72,14 +62,14 @@ public class LamsLearningDesignDeleteServlet extends HttpServlet {
 
 	// validate method parameter and associated parameters
 	if ( strLearningDesignId == null || strLearningDesignId.length() == 0 ) {
-	    throw new RuntimeException("Required parameters missing. Add sequence_id for the id of the learning design to be deleted");
+	    throw new RuntimeException("Requred parameters missing. Add sequence_id for the id of the learning design to be displayed");
 	}
 
 	long learningDesignId = 0;
 	try {
 	    learningDesignId = Long.parseLong(strLearningDesignId);
 	} catch ( Exception e ) {
-	    throw new RuntimeException("Required parameters missing. Add sequence_id for the id of the learning design to be deleted",e);
+	    throw new RuntimeException("Requred parameters missing. Add sequence_id for the id of the learning design to be displayed",e);
 	}
 	
 	ContextManager ctxMgr = null;
@@ -88,11 +78,10 @@ public class LamsLearningDesignDeleteServlet extends HttpServlet {
 	    // get Blackboard context
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	    ctx = ctxMgr.setContext(request);
-	    
-	    String serverResponse = LamsSecurityUtil.deleteLearningDesigns(ctx, courseId, learningDesignId);
-	    
-	    response.setContentType("application/json;charset=UTF-8");
-	    response.getWriter().print(serverResponse);
+
+	    String username = ctx.getUser().getUserName();
+	    String learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(username) + "&ldId=" + learningDesignId;
+	    response.sendRedirect(learningDesignImageUrl);
 	    
 	} catch (InitializationException e) {
 	    throw new RuntimeException(e);

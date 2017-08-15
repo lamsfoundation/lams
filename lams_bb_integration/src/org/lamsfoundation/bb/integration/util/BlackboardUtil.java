@@ -1,4 +1,4 @@
-package org.lamsfoundation.ld.integration.util;
+package org.lamsfoundation.bb.integration.util;
 
 import java.io.IOException;
 import java.text.ParseException;

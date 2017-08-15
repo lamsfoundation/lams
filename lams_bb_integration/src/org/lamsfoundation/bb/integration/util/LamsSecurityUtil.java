@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-package org.lamsfoundation.ld.integration.util;
+package org.lamsfoundation.bb.integration.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,9 +46,9 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.bb.integration.dto.LearnerProgressDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.lamsfoundation.ld.integration.dto.LearnerProgressDTO;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.SAXException;

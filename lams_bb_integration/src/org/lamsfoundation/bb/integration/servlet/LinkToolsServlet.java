@@ -1,4 +1,4 @@
-package org.lamsfoundation.ld.integration.servlet;
+package org.lamsfoundation.bb.integration.servlet;
 /**************************************************************** 
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
  * ============================================================= 
@@ -34,12 +34,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.lamsfoundation.bb.integration.util.BlackboardUtil;
+import org.lamsfoundation.bb.integration.util.LamsSecurityUtil;
+import org.lamsfoundation.bb.integration.util.LamsServerException;
+import org.lamsfoundation.bb.integration.util.LineitemUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.lamsfoundation.ld.integration.util.BlackboardUtil;
-import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
-import org.lamsfoundation.ld.integration.util.LamsServerException;
-import org.lamsfoundation.ld.integration.util.LineitemUtil;
 import org.xml.sax.SAXException;
 
 import blackboard.base.FormattedText;

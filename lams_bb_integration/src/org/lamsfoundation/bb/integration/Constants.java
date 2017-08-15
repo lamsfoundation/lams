@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-package org.lamsfoundation.ld.integration;
+package org.lamsfoundation.bb.integration;
 
 /**
  * Constants used for blackboard integration

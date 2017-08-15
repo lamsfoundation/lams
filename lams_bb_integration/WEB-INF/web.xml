@@ -2,63 +2,63 @@
 <web-app  xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
   <servlet>
     <servlet-name>ConfigServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.ConfigServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.ConfigServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>UserDataServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.UserDataServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.UserDataServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>GroupDataServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.GroupDataServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.GroupDataServlet</servlet-class>
   </servlet>  
   <servlet>
     <servlet-name>LamsLearningDesignServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.LamsLearningDesignServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.LamsLearningDesignServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>LamsLearningDesignDeleteServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.LamsLearningDesignDeleteServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.LamsLearningDesignDeleteServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>LinkToolsServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.LinkToolsServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.LinkToolsServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>GradebookServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.GradebookServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.GradebookServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>GradebookSyncServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.GradebookSyncServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.GradebookSyncServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>GradebookSyncFixServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.GradebookSyncFixServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.GradebookSyncFixServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>LessonManagerServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.LessonManagerServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.LessonManagerServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>LearnerMonitorServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.LearnerMonitorServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.LearnerMonitorServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>OpenLamsPageServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.OpenLamsPageServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.OpenLamsPageServlet</servlet-class>
   </servlet> 
   <servlet>
     <servlet-name>RenderDesignImageServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.RenderDesignImageServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.RenderDesignImageServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>StartLessonAjaxServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.StartLessonAjaxServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.StartLessonAjaxServlet</servlet-class>
   </servlet> 
   <servlet>
     <servlet-name>UpdateServerUrlServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.UpdateServerUrlServlet</servlet-class>
+    <servlet-class>org.lamsfoundation.bb.integration.servlet.UpdateServerUrlServlet</servlet-class>
   </servlet> 
 
   <servlet-mapping>

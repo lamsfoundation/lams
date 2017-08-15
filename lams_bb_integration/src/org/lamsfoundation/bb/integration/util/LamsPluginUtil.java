@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-package org.lamsfoundation.ld.integration.util;
+package org.lamsfoundation.bb.integration.util;
 
 import java.io.File;
 import java.io.FileInputStream;

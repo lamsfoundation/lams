@@ -1,4 +1,4 @@
-package org.lamsfoundation.ld.integration.servlet;
+package org.lamsfoundation.bb.integration.servlet;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
+import org.lamsfoundation.bb.integration.util.LamsPluginUtil;
 import org.xml.sax.SAXException;
 
 import blackboard.base.InitializationException;

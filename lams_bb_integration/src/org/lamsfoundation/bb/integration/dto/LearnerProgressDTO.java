@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.ld.integration.dto;
+package org.lamsfoundation.bb.integration.dto;
 
 public class LearnerProgressDTO {
 

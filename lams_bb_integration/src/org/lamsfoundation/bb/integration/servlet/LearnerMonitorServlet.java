@@ -1,4 +1,4 @@
-package org.lamsfoundation.ld.integration.servlet;
+package org.lamsfoundation.bb.integration.servlet;
 
 import java.io.IOException;
 
@@ -7,10 +7,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.lamsfoundation.bb.integration.dto.LearnerProgressDTO;
+import org.lamsfoundation.bb.integration.util.LamsSecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.lamsfoundation.ld.integration.dto.LearnerProgressDTO;
-import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 
 import blackboard.base.InitializationException;
 import blackboard.data.content.Content;
