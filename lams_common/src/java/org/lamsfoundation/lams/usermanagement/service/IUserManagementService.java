@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.themes.Theme;
@@ -216,6 +217,11 @@ public interface IUserManagementService {
     List getUserOrganisationRoles(Integer orgId, String login);
 
     /**
+     * Returns mapping org ID -> role IDs
+     */
+    Map<Integer, Set<Integer>> getRolesForUser(Integer userId);
+
+    /**
      * @param login
      * @param typeId
      * @param stateId
@@ -308,7 +314,7 @@ public interface IUserManagementService {
      */
     void setRolesForUserOrganisation(User user, Integer organisationId, List<String> rolesList);
 
-    void setRolesForUserOrganisation(Integer userId, Integer organisationId, List<String> rolesList);
+    void setRolesForUserOrganisation(Integer userId, Integer organisationId, Set<Integer> roleIDList);
 
     /**
      * Returns list of roles suitable for the given orgType.

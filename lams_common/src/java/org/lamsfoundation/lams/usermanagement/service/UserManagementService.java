@@ -35,6 +35,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -145,7 +146,7 @@ public class UserManagementService implements IUserManagementService {
 	}
 
 	if (newGroups != null) {
-	    Set<OrganisationGroup> obsoleteGroups = new HashSet<OrganisationGroup>(grouping.getGroups());
+	    Set<OrganisationGroup> obsoleteGroups = new HashSet<>(grouping.getGroups());
 	    for (OrganisationGroup newGroup : newGroups) {
 		OrganisationGroup existingGroup = null;
 		// check if group already exists
@@ -283,7 +284,7 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public boolean isUserInRole(Integer userId, Integer orgId, String roleName) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("userOrganisation.user.userId", userId);
 	properties.put("userOrganisation.organisation.organisationId", orgId);
 	properties.put("role.name", roleName);
@@ -295,7 +296,7 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public List getOrganisationsByTypeAndStatus(Integer typeId, Integer stateId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("organisationType.organisationTypeId", typeId);
 	properties.put("organisationState.organisationStateId", stateId);
 	return baseDAO.findByProperties(Organisation.class, properties);
@@ -316,15 +317,25 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public List getUserOrganisationRoles(Integer orgId, String login) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("userOrganisation.organisation.organisationId", orgId);
 	properties.put("userOrganisation.user.login", login);
 	return baseDAO.findByProperties(UserOrganisationRole.class, properties);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public Map<Integer, Set<Integer>> getRolesForUser(Integer userId) {
+	return ((List<UserOrganisation>) findByProperty(UserOrganisation.class, "user.userId", userId)).stream()
+		.collect(Collectors.toMap(userOrganisation -> userOrganisation.getOrganisation().getOrganisationId(),
+			userOrganisation -> userOrganisation.getUserOrganisationRoles().stream()
+				.map(userOrganisationRole -> userOrganisationRole.getRole().getRoleId())
+				.collect(Collectors.toSet())));
+    }
+
+    @Override
     public List getUserOrganisationsForUserByTypeAndStatus(String login, Integer typeId, Integer stateId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("user.login", login);
 	properties.put("organisation.organisationType.organisationTypeId", typeId);
 	properties.put("organisation.organisationState.organisationStateId", stateId);
@@ -334,7 +345,7 @@ public class UserManagementService implements IUserManagementService {
     @Override
     public List getUserOrganisationsForUserByTypeAndStatusAndParent(String login, Integer typeId, Integer stateId,
 	    Integer parentOrgId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("user.login", login);
 	properties.put("organisation.organisationType.organisationTypeId", typeId);
 	properties.put("organisation.organisationState.organisationStateId", stateId);
@@ -363,7 +374,7 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public UserOrganisation getUserOrganisation(Integer userId, Integer orgId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("user.userId", userId);
 	properties.put("organisation.organisationId", orgId);
 	List results = baseDAO.findByProperties(UserOrganisation.class, properties);
@@ -394,7 +405,7 @@ public class UserManagementService implements IUserManagementService {
 	workspaceFolder.addChild(workspaceFolder2);
 	save(workspaceFolder);
 
-	Set<WorkspaceFolder> folders = new HashSet<WorkspaceFolder>();
+	Set<WorkspaceFolder> folders = new HashSet<>();
 	folders.add(workspaceFolder);
 	folders.add(workspaceFolder2);
 	organisation.setWorkspaceFolders(folders);
@@ -504,7 +515,7 @@ public class UserManagementService implements IUserManagementService {
 	String query = "select u.userId,u.login,u.title,u.firstName,u.lastName, r "
 		+ "from User u left join u.userOrganisations as uo left join uo.userOrganisationRoles as uor left join uor.role as r where uo.organisation.organisationId=?";
 	List list = baseDAO.find(query, orgId);
-	Map<Integer, UserManageBean> beansMap = new HashMap<Integer, UserManageBean>();
+	Map<Integer, UserManageBean> beansMap = new HashMap<>();
 	for (int i = 0; i < list.size(); i++) {
 	    Object[] data = (Object[]) list.get(i);
 	    if (beansMap.containsKey(data[0])) {
@@ -520,7 +531,7 @@ public class UserManagementService implements IUserManagementService {
 		beansMap.put((Integer) data[0], bean);
 	    }
 	}
-	List<UserManageBean> userManageBeans = new ArrayList<UserManageBean>();
+	List<UserManageBean> userManageBeans = new ArrayList<>();
 	userManageBeans.addAll(beansMap.values());
 	return userManageBeans;
     }
@@ -595,9 +606,10 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public void setRolesForUserOrganisation(Integer userId, Integer organisationId, List<String> rolesList) {
+    public void setRolesForUserOrganisation(Integer userId, Integer organisationId, Set<Integer> roleIDList) {
 	User user = (User) findById(User.class, userId);
-	setRolesForUserOrganisation(user, organisationId, rolesList);
+	setRolesForUserOrganisation(user, organisationId,
+		roleIDList.stream().map(String::valueOf).collect(Collectors.toList()));
     }
 
     @Override
@@ -638,11 +650,11 @@ public class UserManagementService implements IUserManagementService {
 	    setRolesForUserOrganisation(user, org.getParentOrganisation(), rolesList);
 	}
 
-	List<String> rolesCopy = new ArrayList<String>();
+	List<String> rolesCopy = new ArrayList<>();
 	rolesCopy.addAll(rolesList);
 	log.debug("rolesList.size: " + rolesList.size());
 	Set<UserOrganisationRole> uors = uo.getUserOrganisationRoles();
-	Set<UserOrganisationRole> uorsCopy = new HashSet<UserOrganisationRole>();
+	Set<UserOrganisationRole> uorsCopy = new HashSet<>();
 	if (uors != null) {
 	    uorsCopy.addAll(uors);
 	    // remove the common part from the rolesList and uors
@@ -659,7 +671,7 @@ public class UserManagementService implements IUserManagementService {
 	    log.debug("removing roles: " + uorsCopy);
 	    uors.removeAll(uorsCopy);
 	} else {
-	    uors = new HashSet<UserOrganisationRole>();
+	    uors = new HashSet<>();
 	}
 	for (String roleId : rolesCopy) {
 	    if (roleId == null) {
@@ -751,7 +763,7 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType) {
-	List<Role> allRoles = new ArrayList<Role>();
+	List<Role> allRoles = new ArrayList<>();
 	allRoles.addAll(rolelist);
 	Role role = new Role();
 	if (!orgType.getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE) || !isSysadmin) {
