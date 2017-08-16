@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
-import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
+import org.lamsfoundation.lams.tool.sbmt.util.SubmitFilesException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**

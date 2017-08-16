@@ -15,23 +15,23 @@
 
     <form-bean
       name="SbmtPedagogicalPlannerForm"
-      type="org.lamsfoundation.lams.tool.sbmt.form.SubmitFilesPedagogicalPlannerForm"
+      type="org.lamsfoundation.lams.tool.sbmt.web.form.SubmitFilesPedagogicalPlannerForm"
     />
     <form-bean
       name="learnerForm"
-      type="org.lamsfoundation.lams.tool.sbmt.form.LearnerForm"
+      type="org.lamsfoundation.lams.tool.sbmt.web.form.LearnerForm"
     />
     <form-bean
       name="reflectionForm"
-      type="org.lamsfoundation.lams.tool.sbmt.form.ReflectionForm"
+      type="org.lamsfoundation.lams.tool.sbmt.web.form.ReflectionForm"
     />
     <form-bean
       name="sbmtMarkForm"
-      type="org.lamsfoundation.lams.tool.sbmt.form.MarkForm"
+      type="org.lamsfoundation.lams.tool.sbmt.web.form.MarkForm"
     />
     <form-bean
       name="SbmtAuthoringForm"
-      type="org.lamsfoundation.lams.tool.sbmt.form.AuthoringForm"
+      type="org.lamsfoundation.lams.tool.sbmt.web.form.AuthoringForm"
     />
 
 <form-bean name="SbmtMonitoringForm" type="org.apache.struts.action.DynaActionForm">
@@ -70,7 +70,7 @@
    <action-mappings>
     <action
       path="/authoring"
-      type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction"
+      type="org.lamsfoundation.lams.tool.sbmt.web.action.AuthoringAction"
       name="SbmtAuthoringForm"
       scope="request"
       input="/authoring/authoring.jsp"
@@ -91,7 +91,7 @@
     </action>
     <action
       path="/learner"
-      type="org.lamsfoundation.lams.tool.sbmt.web.LearnerAction"
+      type="org.lamsfoundation.lams.tool.sbmt.web.action.LearnerAction"
       name="learnerForm"
       scope="request"
       input="/learner/sbmtlearner.jsp"
@@ -117,7 +117,7 @@
     </action>
     <action
       path="/pedagogicalPlanner"
-      type="org.lamsfoundation.lams.tool.sbmt.web.SubmitFilesPedagogicalPlannerAction"
+      type="org.lamsfoundation.lams.tool.sbmt.web.action.SubmitFilesPedagogicalPlannerAction"
       name="SbmtPedagogicalPlannerForm"
       scope="request"
       parameter="dispatch"
@@ -132,7 +132,7 @@
     </action>
     <action
       path="/mark"
-      type="org.lamsfoundation.lams.tool.sbmt.web.MarkAction"
+      type="org.lamsfoundation.lams.tool.sbmt.web.action.MarkAction"
       name="sbmtMarkForm"
       scope="request"
       parameter="method"
@@ -157,7 +157,7 @@
     </action>
     <action
       path="/monitoring"
-      type="org.lamsfoundation.lams.tool.sbmt.web.MonitoringAction"
+      type="org.lamsfoundation.lams.tool.sbmt.web.action.MonitoringAction"
       name="SbmtMonitoringForm"
       scope="request"
       parameter="method"
@@ -188,7 +188,7 @@
 
 		<!--  ========= Reflection =============== -->
 		<action path="/learning/newReflection"
-			type="org.lamsfoundation.lams.tool.sbmt.web.ReflectAction"
+			type="org.lamsfoundation.lams.tool.sbmt.web.action.ReflectAction"
 			name="reflectionForm" 
 			validate="false" 
 			parameter="newReflection" 
@@ -197,7 +197,7 @@
 			<forward name="success" path="/learner/notebook.jsp" />
 		</action>
 		<action path="/learning/submitReflection"
-			type="org.lamsfoundation.lams.tool.sbmt.web.ReflectAction"
+			type="org.lamsfoundation.lams.tool.sbmt.web.action.ReflectAction"
 			name="reflectionForm" 
 			validate="false" 
 			input="/learner/notebook.jsp"
@@ -207,7 +207,7 @@
 		</action>
 
 <!-- ========== BEGIN: Common ============================== -->
-<action path="/clearsession" type="org.lamsfoundation.lams.tool.sbmt.web.ClearSessionAction"></action>
+<action path="/clearsession" type="org.lamsfoundation.lams.tool.sbmt.web.action.ClearSessionAction"></action>
 
   </action-mappings>
 

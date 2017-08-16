@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.tool.sbmt.form;
+package org.lamsfoundation.lams.tool.sbmt.web.form;
 
 import javax.servlet.http.HttpServletRequest;
 

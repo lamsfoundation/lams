@@ -23,7 +23,7 @@
 
 
 
-package org.lamsfoundation.lams.tool.sbmt.web;
+package org.lamsfoundation.lams.tool.sbmt.web.action;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
@@ -43,9 +43,9 @@ import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
-import org.lamsfoundation.lams.tool.sbmt.form.AuthoringForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
+import org.lamsfoundation.lams.tool.sbmt.web.form.AuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;

@@ -14,58 +14,47 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
- * USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 
 
+package org.lamsfoundation.lams.tool.sbmt.web.form;
 
-package org.lamsfoundation.lams.tool.sbmt.exception;
+import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
- * @author Manpreet Minhas
+ *
+ *
  */
-public class SubmitFilesException extends RuntimeException {
+public class SubmitFilesPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+    String instruction;
+    String contentFolderID;
 
-    private static final long serialVersionUID = 8623508856810983309L;
-
-    /**
-     * Default Constructor
-     */
-    public SubmitFilesException() {
-	super();
+    public String getContentFolderID() {
+	return contentFolderID;
     }
 
-    /**
-     * Constructor for customized error message
-     * 
-     * @param message
-     */
-    public SubmitFilesException(String message) {
-	super(message);
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
     }
 
-    /**
-     * Constructor for wrapping the throwable object
-     * 
-     * @param cause
-     */
-    public SubmitFilesException(Throwable cause) {
-	super(cause);
+    public String getInstruction() {
+	return instruction;
     }
 
-    /**
-     * Constructor for wrapping both the customized error message and
-     * throwable exception object.
-     * 
-     * @param message
-     * @param cause
-     */
-    public SubmitFilesException(String message, Throwable cause) {
-	super(message, cause);
+    public void setInstruction(String instructions) {
+	instruction = instructions;
     }
 
+    public void fillForm(SubmitFilesContent content) {
+	if (content != null) {
+	    String instruction = content.getInstruction();
+	    setInstruction(instruction);
+	    setToolContentID(content.getContentID());
+	}
+    }
 }

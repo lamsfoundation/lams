@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.sbmt.form;
+package org.lamsfoundation.lams.tool.sbmt.web.form;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.upload.FormFile;

@@ -23,7 +23,7 @@
 
 
 
-package org.lamsfoundation.lams.tool.sbmt.util;
+package org.lamsfoundation.lams.tool.sbmt;
 
 public class SbmtConstants {
 

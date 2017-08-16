@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.sbmt.web;
+package org.lamsfoundation.lams.tool.sbmt.web.action;
 
 import java.io.IOException;
 
@@ -34,11 +34,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.sbmt.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
-import org.lamsfoundation.lams.tool.sbmt.form.SubmitFilesPedagogicalPlannerForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
-import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
+import org.lamsfoundation.lams.tool.sbmt.web.form.SubmitFilesPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction;

@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.sbmt.web;
+package org.lamsfoundation.lams.tool.sbmt.web.action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +39,9 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
-import org.lamsfoundation.lams.tool.sbmt.form.MarkForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
+import org.lamsfoundation.lams.tool.sbmt.web.form.MarkForm;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;

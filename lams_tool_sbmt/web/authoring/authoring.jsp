@@ -8,7 +8,7 @@
 	<lams:WebAppURL />
 </c:set>
 
-<%@ page import="org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants"%>
+<%@ page import="org.lamsfoundation.lams.tool.sbmt.SbmtConstants"%>
 <lams:html>
 <lams:head>
 	
