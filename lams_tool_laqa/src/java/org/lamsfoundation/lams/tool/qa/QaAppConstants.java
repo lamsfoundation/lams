@@ -36,6 +36,7 @@ public interface QaAppConstants {
     public static final int SORT_BY_USERNAME_DESC = 2; // monitoring
     public static final int SORT_BY_RATING_ASC = 5; // learner & monitoring
     public static final int SORT_BY_RATING_DESC = 6; // learner & monitoring
+    public static final int SORT_BY_COMMENT_COUNT = 7; // learner 
 
     public static final String MY_SIGNATURE = "laqa11";
     public static final String TOOL_CONTENT_ID = "toolContentID";

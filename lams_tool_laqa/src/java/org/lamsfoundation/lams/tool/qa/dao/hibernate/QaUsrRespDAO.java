@@ -106,7 +106,7 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	return filteredSearchString;
     }
 
-    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING1 = "SELECT resp.*, AVG(rating.rating) avg_rating"
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING1 = "SELECT resp.*, AVG(rating.rating) avg_rating "
 	    + " FROM tl_laqa11_usr_resp resp" + " JOIN tl_laqa11_que_usr usr"
 	    + " ON resp.answer IS NOT NULL AND resp.qa_que_content_id = :questionId AND resp.que_usr_id = usr.uid "
 	    + " AND usr.que_usr_id!=:excludeUserId " + " JOIN tl_laqa11_session sess "
@@ -117,6 +117,20 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	    + " 	ON rat.rating_criteria_id = crit.rating_criteria_id AND crit.tool_content_id = :toolContentId"
 	    + " 	) rating" + " ON rating.item_id = resp.response_id" + " GROUP BY response_id" + " ORDER BY ";
 
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT = "SELECT resp.*, COUNT(rating_comment.item_id) count_comment "
+	    + " FROM tl_laqa11_usr_resp resp" 
+	    + " JOIN tl_laqa11_que_usr usr"
+	    + " ON resp.answer IS NOT NULL AND resp.qa_que_content_id = :questionId AND resp.que_usr_id = usr.uid "
+	    + " AND usr.que_usr_id!=:excludeUserId " 
+	    + " JOIN tl_laqa11_session sess "
+	    + " ON usr.qa_session_id = sess.uid AND sess.qa_session_id = :qaSessionId "
+	    + " LEFT JOIN ("
+	    + " 	SELECT ratcom.item_id FROM lams_rating_comment ratcom JOIN lams_rating_criteria crit"
+	    + " 	ON ratcom.rating_criteria_id = crit.rating_criteria_id AND crit.tool_content_id = :toolContentId"
+	    + " 	) rating_comment " 
+	    + " ON rating_comment.item_id = resp.response_id  GROUP BY response_id ORDER BY count_comment ASC, response_id ASC";
+
+    
     private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH1 = "from qaUsrResp in class QaUsrResp "
 	    + " WHERE qaUsrResp.answer IS NOT NULL AND qaUsrResp.qaQueUser.qaSession.qaSessionId=:qaSessionId AND qaUsrResp.qaQuestion.uid=:questionId AND qaUsrResp.qaQueUser.queUsrId!=:excludeUserId ";
     private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH2 = " AND qaUsrResp.qaQueUser.qaSession.groupLeader.queUsrId=qaUsrResp.qaQueUser.queUsrId ";
@@ -127,7 +141,7 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
     public List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId,
 	    final Long questionId, final Long excludeUserId, boolean isOnlyLeadersIncluded, int page, int size, int sorting, String searchString) {
 	String sortingOrder;
-	boolean useAverageRatingSort = false;
+
 	switch (sorting) {
 	    case QaAppConstants.SORT_BY_NO:
 		sortingOrder = "qaUsrResp.attemptTime";
@@ -146,11 +160,13 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 		break;
 	    case QaAppConstants.SORT_BY_RATING_ASC:
 		sortingOrder = " avg_rating ASC";
-		useAverageRatingSort = true;
 		break;
 	    case QaAppConstants.SORT_BY_RATING_DESC:
 		sortingOrder = " avg_rating DESC";
-		useAverageRatingSort = true;
+		break;
+	    case QaAppConstants.SORT_BY_COMMENT_COUNT:
+		// LDEV-4399: Only valid if there are no numeric ratings and no name search. Sort order is in SQL string
+		sortingOrder = "";
 		break;
 	    default:
 		sortingOrder = " resp.attempt_time"; // default if we get an unexpected sort order
@@ -160,7 +176,7 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 
 	// Build the query based on the type of sorting, pasting the username/fullname lookup in the middle of the SQL/HQL if searchString exists
 	// One query is SQL, so uses the user reference "usr", the other uses HQL so it uses "qaUsrResp.qaQueUser" to reference the username/fullname.
-	if (useAverageRatingSort) {
+	if (sorting == QaAppConstants.SORT_BY_RATING_ASC || sorting == QaAppConstants.SORT_BY_RATING_DESC) {
 
 	    String filteredSearchString = buildNameSearch(searchString, "usr");
 	    String queryText = SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING1
@@ -169,6 +185,14 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 
 	    query = getSessionFactory().getCurrentSession().createSQLQuery(queryText).addEntity(QaUsrResp.class)
 		    .setLong("toolContentId", toolContentId.longValue());
+	    
+	} else if (sorting == QaAppConstants.SORT_BY_COMMENT_COUNT ) {
+
+	    query = getSessionFactory().getCurrentSession()
+		    .createSQLQuery(SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT)
+		    .addEntity(QaUsrResp.class)
+		    .setLong("toolContentId", toolContentId.longValue());
+		    
 	} else {
 	    String filteredSearchString = buildNameSearch(searchString, "qaUsrResp.qaQueUser");
 	    String queryText = LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH1
