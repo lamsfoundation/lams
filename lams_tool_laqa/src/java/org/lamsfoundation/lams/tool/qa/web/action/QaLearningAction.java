@@ -1045,6 +1045,23 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	} else if (sortByCol2 != null) {
 	    sorting = sortByCol2.equals(0) ? QaAppConstants.SORT_BY_RATING_ASC : QaAppConstants.SORT_BY_RATING_DESC;
+
+	} else if ( ! isMonitoring) {
+	    // Is it learner and comment only? If so sort by number of comments.
+	    QaSession qaSession = QaLearningAction.qaService.getSessionById(qaSessionId);
+	    Set<LearnerItemRatingCriteria> criterias =  qaSession.getQaContent().getRatingCriterias();
+	    boolean hasComment = false;
+	    boolean hasRating = false;
+	    for ( LearnerItemRatingCriteria criteria : criterias ) {
+		if ( criteria.isCommentRating() ) {
+		    hasComment = true;
+		} else  {
+		    hasRating = true;
+		}
+	    }
+	    if ( hasComment && ! hasRating) {
+		sorting = QaAppConstants.SORT_BY_COMMENT_COUNT; 
+	    }
 	}
 
 	List<QaUsrResp> responses = QaLearningAction.qaService.getResponsesForTablesorter(qaContentId, qaSessionId,

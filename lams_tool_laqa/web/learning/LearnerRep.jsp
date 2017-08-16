@@ -178,6 +178,9 @@
 									}
 									
 									rows += '</td>';
+								} else {
+									// need a column or sorting is confused
+									rows += '<td style="display:none;"></td>';
 								}
 								
 								if (${isCommentsEnabled}) {
@@ -383,13 +386,15 @@
 					</lams:Alert>
 				</c:if>
 
-				<c:set var="numColumns" value="1" />
 				<c:choose>
-					<c:when test="${isCommentsEnabled and generalLearnerFlowDTO.allowRateAnswers}">
+					<c:when test="${isCommentsEnabled}">
 						<c:set var="numColumns" value="3" />
 					</c:when>
-					<c:otherwise>
+					<c:when test="${!isCommentsEnabled and generalLearnerFlowDTO.allowRateAnswers}">
 						<c:set var="numColumns" value="2" />
+					</c:when>
+					<c:otherwise>
+						<c:set var="numColumns" value="1" />
 					</c:otherwise>
 				</c:choose>
 
@@ -397,9 +402,14 @@
 					<thead>
 						<tr>
 							<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer" /></th>
-							<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
+							<c:choose>
+							<c:when test="${generalLearnerFlowDTO.allowRateAnswers}">
 								<th title="<fmt:message key='label.sort.by.rating'/>"><fmt:message key="label.learning.rating" /></th>
-							</c:if>
+							</c:when>
+							<c:otherwise>
+								<th style="display:none;"></th>
+							</c:otherwise>
+							</c:choose>
 							<c:if test="${isCommentsEnabled}">
 								<th><fmt:message key="label.comment" /></th>
 							</c:if>
