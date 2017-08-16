@@ -184,7 +184,10 @@ a:focus {
 }
 /* Comments/Forum classes */
 .msg .panel-heading {
-  padding: 3px;
+  padding: 3px 5px 3px 5px;
+}
+.msg .subject {
+      font-weight: 500;
 }
 .msg {
   margin-bottom: 5px;

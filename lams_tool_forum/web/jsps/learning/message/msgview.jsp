@@ -42,20 +42,9 @@
  	        </c:choose>
 
 			<div class="pull-right">
-			<span class="${textClass}"> 
-			  <c:if test='${(sessionMap.mode == "teacher") || (not hidden)}'>
-					<c:set var="author" value="${msgDto.author}" />
-					<c:if test="${empty author}">
-						<c:set var="author">
-							<fmt:message key="label.default.user.name" />
-						</c:set>
-					</c:if>
-					<span id="author"><c:out value="${author}" escapeXml="true" /></span>						
-				</c:if>
-			</span>
-			<lams:Portrait userId="${msgDto.authorUserId}"/>
+			    <lams:Portrait userId="${msgDto.authorUserId}"/>
 			</div>
-			<h5 class="${textClass}">
+			<span class="${textClass} subject">
 			<c:choose>
 				<c:when test='${(sessionMap.mode == "teacher") || (not hidden)}'>
 					<c:out value="${msgDto.message.subject}" />
@@ -64,8 +53,22 @@
 				&nbsp;<fmt:message key="topic.message.subject.hidden" />
 				</c:otherwise>
 			</c:choose>
-			</h5>
-			<lams:Date value="${msgDto.message.updated}" timeago="true"/>
+            </span><br/>
+
+            <div class="${textClass} small">
+              <fmt:message key="lable.topic.subject.by" />:
+			  <c:if test='${(sessionMap.mode == "teacher") || (not hidden)}'>
+					<c:set var="author" value="${msgDto.author}" />
+					<c:if test="${empty author}">
+						<c:set var="author">
+							<fmt:message key="label.default.user.name" />
+						</c:set>
+					</c:if>
+                    <span id="author"><b><c:out value="${author}" escapeXml="true" /></b></span>
+				</c:if>
+
+            - <lams:Date value="${msgDto.message.updated}" timeago="true"/>
+			</div>
 		</div>
 	</div> <!--  end of panel-heading -->
 
