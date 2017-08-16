@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.noticeboard.web;
+package org.lamsfoundation.lams.tool.noticeboard.web.action;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +40,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
@@ -48,7 +47,9 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
+import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
+import org.lamsfoundation.lams.tool.noticeboard.web.form.NbMonitoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;

@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.noticeboard.web;
+package org.lamsfoundation.lams.tool.noticeboard.web.action;
 
 import java.io.IOException;
 
@@ -37,6 +37,7 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
+import org.lamsfoundation.lams.tool.noticeboard.web.form.NbPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction;

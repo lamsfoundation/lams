@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.noticeboard.web;
+package org.lamsfoundation.lams.tool.noticeboard.web.action;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,13 +39,14 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
+import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
+import org.lamsfoundation.lams.tool.noticeboard.web.form.NbLearnerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;

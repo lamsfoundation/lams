@@ -22,30 +22,47 @@
  */
 
 
-package org.lamsfoundation.lams.tool.noticeboard.web;
-
-import javax.servlet.http.HttpSession;
-
-import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
+package org.lamsfoundation.lams.tool.noticeboard.util;
 
 /**
- * This class give a chance to clear HttpSession when user save/close authoring page.
- * 
- * @author Steve.Ni
- *
- *
- *
- * 
- * @version $Revision$
+ * Generic exception class for the noticeboard tool
  */
-public class ClearSessionAction extends LamsAuthoringFinishAction {
 
-    @Override
-    public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {
-	if (mode.isAuthor()) {
-	    session.removeAttribute(customiseSessionID);
-	}
+public class NbApplicationException extends RuntimeException {
+    /**
+     * Default Constructor
+     */
+    public NbApplicationException() {
+	super();
+    }
+
+    /**
+     * Constructor for customized error message
+     * 
+     * @param message
+     */
+    public NbApplicationException(String message) {
+	super(message);
+    }
+
+    /**
+     * Constructor for wrapping the throwable object
+     * 
+     * @param cause
+     */
+    public NbApplicationException(Throwable cause) {
+	super(cause);
+    }
+
+    /**
+     * Constructor for wrapping both the customized error message and
+     * throwable exception object.
+     * 
+     * @param message
+     * @param cause
+     */
+    public NbApplicationException(String message, Throwable cause) {
+	super(message, cause);
     }
 
 }

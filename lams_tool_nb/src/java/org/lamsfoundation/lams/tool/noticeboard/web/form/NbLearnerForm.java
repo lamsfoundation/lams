@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.noticeboard.web;
+package org.lamsfoundation.lams.tool.noticeboard.web.form;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
