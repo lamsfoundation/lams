@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.vote.web;
+package org.lamsfoundation.lams.tool.vote.web.action;
 
 import java.io.IOException;
 

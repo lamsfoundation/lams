@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.vote.web;
+package org.lamsfoundation.lams.tool.vote.web.action;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,8 +54,8 @@ import org.lamsfoundation.lams.tool.vote.dto.VoteQuestionDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
-import org.lamsfoundation.lams.tool.vote.service.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
+import org.lamsfoundation.lams.tool.vote.util.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.web.form.VoteAuthoringForm;

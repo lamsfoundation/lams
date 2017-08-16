@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.vote.service;
+package org.lamsfoundation.lams.tool.vote.util;
 
 /**
  * <p>
