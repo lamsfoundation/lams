@@ -599,11 +599,11 @@ function score(){
 			'rubricId' : container.attr('rubricId'),
 			'score'    : score
 		}));
+		
+		container.slideUp(function(){
+			container.remove();
+		});
 	}
-	
-	container.slideUp(function(){
-		container.remove();
-	});
 }
 
 

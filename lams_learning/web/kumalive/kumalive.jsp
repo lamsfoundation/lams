@@ -83,7 +83,6 @@
 						<i title="<fmt:message key="label.kumalive.mark.great"/>" class="scoreGood fa fa-smile-o"></i>
 						<i title="<fmt:message key="label.kumalive.mark.ok"/>" class="scoreNeutral fa fa-meh-o"></i>
 						<i title="<fmt:message key="label.kumalive.mark.bad"/>" class="scoreBad fa fa-frown-o"></i>
-						<i title="<fmt:message key="label.kumalive.mark.cancel"/>" class="scoreNone fa fa-times"></i>
 					</div>
 					<hr />
 				</div>
