@@ -23,11 +23,11 @@
     />
     <form-bean
       name="UserOrgRoleForm"
-      type="org.lamsfoundation.lams.admin.web.UserOrgRoleForm"
+      type="org.lamsfoundation.lams.admin.web.form.UserOrgRoleForm"
     />
     <form-bean
       name="ImportExcelForm"
-      type="org.lamsfoundation.lams.admin.web.ImportExcelForm"
+      type="org.lamsfoundation.lams.admin.web.form.ImportExcelForm"
     />
 
    <form-bean name="OrganisationForm" type="org.apache.struts.action.DynaActionForm">
@@ -141,7 +141,7 @@
 
 <form-bean
       name="ImportGroupsForm"
-      type="org.lamsfoundation.lams.admin.web.ImportExcelForm"
+      type="org.lamsfoundation.lams.admin.web.form.ImportExcelForm"
     />
 <form-bean name="SignupManagementForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="signupOrganisationId" type="java.lang.Integer" />
@@ -178,7 +178,7 @@
    <action-mappings>
     <action
       path="/userorgrole"
-      type="org.lamsfoundation.lams.admin.web.UserOrgRoleAction"
+      type="org.lamsfoundation.lams.admin.web.action.UserOrgRoleAction"
       name="UserOrgRoleForm"
       scope="session"
       unknown="false"
@@ -192,7 +192,7 @@
     </action>
     <action
       path="/orgmanage"
-      type="org.lamsfoundation.lams.admin.web.OrgManageAction"
+      type="org.lamsfoundation.lams.admin.web.action.OrgManageAction"
       name="OrgManageForm"
       scope="request"
       input=".orglist"
@@ -208,7 +208,7 @@
     </action>
     <action
       path="/servermaintain"
-      type="org.lamsfoundation.lams.admin.web.ServerMaintainAction"
+      type="org.lamsfoundation.lams.admin.web.action.ServerMaintainAction"
       name="ExtServerForm"
       scope="request"
       parameter="method"
@@ -249,7 +249,7 @@
     </action>    
     <action
       path="/toolcontentlist"
-      type="org.lamsfoundation.lams.admin.web.ToolContentListAction"
+      type="org.lamsfoundation.lams.admin.web.action.ToolContentListAction"
       unknown="false"
       validate="false"
     >
@@ -271,7 +271,7 @@
     </action>
     <action
       path="/usermanage"
-      type="org.lamsfoundation.lams.admin.web.UserManageAction"
+      type="org.lamsfoundation.lams.admin.web.action.UserManageAction"
       unknown="false"
       validate="false"
     >
@@ -283,7 +283,7 @@
     </action>
     <action
       path="/organisation"
-      type="org.lamsfoundation.lams.admin.web.OrganisationAction"
+      type="org.lamsfoundation.lams.admin.web.action.OrganisationAction"
       name="OrganisationForm"
       scope="request"
       parameter="method"
@@ -308,7 +308,7 @@
     </action>
     <action
       path="/usersave"
-      type="org.lamsfoundation.lams.admin.web.UserSaveAction"
+      type="org.lamsfoundation.lams.admin.web.action.UserSaveAction"
       name="UserForm"
       parameter="method"
       scope="request"
@@ -382,7 +382,7 @@
     </action>
     <action
       path="/serversave"
-      type="org.lamsfoundation.lams.admin.web.ServerSaveAction"
+      type="org.lamsfoundation.lams.admin.web.action.ServerSaveAction"
       name="ExtServerForm"
       scope="request"
       input=".servermaintain"
@@ -397,7 +397,7 @@
     </action>
     <action
       path="/userrolessave"
-      type="org.lamsfoundation.lams.admin.web.UserRolesSaveAction"
+      type="org.lamsfoundation.lams.admin.web.action.UserRolesSaveAction"
       name="UserRolesForm"
       scope="request"
       input=".userroles"
@@ -430,7 +430,7 @@
     </action>
     <action
       path="/importexcel"
-      type="org.lamsfoundation.lams.admin.web.ImportExcelAction"
+      type="org.lamsfoundation.lams.admin.web.action.ImportExcelAction"
       name="ImportExcelForm"
       scope="request"
       unknown="false"
@@ -444,7 +444,7 @@
     </action>
     <action
       path="/config"
-      type="org.lamsfoundation.lams.admin.web.ConfigAction"
+      type="org.lamsfoundation.lams.admin.web.action.ConfigAction"
       name="ConfigForm"
       scope="request"
       input=".editconfig"
@@ -470,7 +470,7 @@
     </action>
     <action
       path="/user"
-      type="org.lamsfoundation.lams.admin.web.UserAction"
+      type="org.lamsfoundation.lams.admin.web.action.UserAction"
       name="UserForm"
       scope="request"
       parameter="method"
@@ -505,7 +505,7 @@
     </action>
     <action
       path="/userroles"
-      type="org.lamsfoundation.lams.admin.web.UserRolesAction"
+      type="org.lamsfoundation.lams.admin.web.action.UserRolesAction"
       name="UserRolesForm"
       scope="request"
       parameter="method"
@@ -525,7 +525,7 @@
     </action>
     <action
       path="/joblist"
-      type="org.lamsfoundation.lams.admin.web.ScheduledJobListAction"
+      type="org.lamsfoundation.lams.admin.web.action.ScheduledJobListAction"
       unknown="false"
       validate="false"
     >
@@ -588,7 +588,7 @@
     </action>
     <action
       path="/userorg"
-      type="org.lamsfoundation.lams.admin.web.UserOrgAction"
+      type="org.lamsfoundation.lams.admin.web.action.UserOrgAction"
       name="UserOrgForm"
       scope="request"
       unknown="false"
@@ -614,7 +614,7 @@
     </action>
     <action
       path="/usersearch"
-      type="org.lamsfoundation.lams.admin.web.UserSearchAction"
+      type="org.lamsfoundation.lams.admin.web.action.UserSearchAction"
       parameter="dispatch"
       unknown="false"
       validate="false"
@@ -627,7 +627,7 @@
     </action>
     <action
       path="/importexcelsave"
-      type="org.lamsfoundation.lams.admin.web.ImportExcelSaveAction"
+      type="org.lamsfoundation.lams.admin.web.action.ImportExcelSaveAction"
       name="ImportExcelForm"
       scope="request"
       input=".importexcel"
@@ -721,7 +721,7 @@
     </action>
     <action
       path="/userorgrolesave"
-      type="org.lamsfoundation.lams.admin.web.UserOrgRoleSaveAction"
+      type="org.lamsfoundation.lams.admin.web.action.UserOrgRoleSaveAction"
       name="UserOrgRoleForm"
       scope="session"
       input=".userorgrole"
@@ -777,7 +777,7 @@
     </action>
     <action
       path="/userorgsave"
-      type="org.lamsfoundation.lams.admin.web.UserOrgSaveAction"
+      type="org.lamsfoundation.lams.admin.web.action.UserOrgSaveAction"
       name="UserOrgForm"
       scope="request"
       input=".userorg"
@@ -797,7 +797,7 @@
     </action>
     <action
       path="/loginsave"
-      type="org.lamsfoundation.lams.admin.web.LoginSaveAction"
+      type="org.lamsfoundation.lams.admin.web.action.LoginSaveAction"
       name="LoginMaintainForm"
       scope="request"
       input=".loginmaintian"
@@ -869,7 +869,7 @@
     </action>
     <action
       path="/disabledmanage"
-      type="org.lamsfoundation.lams.admin.web.DisabledUserManageAction"
+      type="org.lamsfoundation.lams.admin.web.action.DisabledUserManageAction"
       unknown="false"
       validate="false"
     >
@@ -881,7 +881,7 @@
     </action>
     <action
       path="/serverlist"
-      type="org.lamsfoundation.lams.admin.web.ServerListAction"
+      type="org.lamsfoundation.lams.admin.web.action.ServerListAction"
       unknown="false"
       validate="false"
     >
@@ -893,7 +893,7 @@
     </action>
     <action
       path="/loginmaintain"
-      type="org.lamsfoundation.lams.admin.web.LoginMaintainAction"
+      type="org.lamsfoundation.lams.admin.web.action.LoginMaintainAction"
       name="LoginMaintainForm"
       scope="request"
       unknown="false"
@@ -907,7 +907,7 @@
     </action>
     <action
       path="/orgsave"
-      type="org.lamsfoundation.lams.admin.web.OrgSaveAction"
+      type="org.lamsfoundation.lams.admin.web.action.OrgSaveAction"
       name="OrganisationForm"
       scope="request"
       input=".organisation"

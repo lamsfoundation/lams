@@ -21,7 +21,7 @@
 			</list>
 		</property>
 		<property name ="target">
-			<bean class="org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServicePOJO">
+			<bean class="org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardService">
 				<property name="nbContentDAO"><ref bean="nbContentDAO"/></property>
 				<property name="nbSessionDAO"><ref bean="nbSessionDAO"/></property>
 				<property name="nbUserDAO"><ref bean="nbUserDAO"/></property>

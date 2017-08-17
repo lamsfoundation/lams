@@ -23,8 +23,6 @@
 
 package org.lamsfoundation.lams.admin.web.action;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,10 +30,8 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.admin.service.IImportService;
 import org.lamsfoundation.lams.admin.web.form.ImportExcelForm;
+import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * @author jliew
@@ -46,33 +42,20 @@ import org.lamsfoundation.lams.admin.web.form.ImportExcelForm;
  *
  *
  *
- *
- *
  */
-public class ImportGroupsAction extends Action {
+public class ImportExcelAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	if (isCancelled(request)) {
-	    return mapping.findForward("sysadmin");
-	}
+	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
+	//if (orgId==null) orgId = (Integer)request.getAttribute("orgId");
 
-	IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
-	ImportExcelForm importForm = (ImportExcelForm) form;
-	importForm.setOrgId(0);
-	FormFile file = importForm.getFile();
+	ImportExcelForm importExcelForm = (ImportExcelForm) form;
+	importExcelForm.setOrgId(orgId);
 
-	// validation
-	if (file == null || file.getFileSize() <= 0) {
-	    return mapping.findForward("importGroups");
-	}
-
-	List results = importService.parseGroupSpreadsheet(file);
-	request.setAttribute("results", results);
-
-	return mapping.findForward("importGroups");
+	return mapping.findForward("importexcel");
     }
 
 }

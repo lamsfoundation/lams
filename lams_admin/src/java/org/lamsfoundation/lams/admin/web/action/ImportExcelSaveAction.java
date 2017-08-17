@@ -36,6 +36,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.service.IImportService;
 import org.lamsfoundation.lams.admin.web.form.ImportExcelForm;
+import org.lamsfoundation.lams.web.session.SessionManager;
 
 /**
  * @author jliew
@@ -48,8 +49,11 @@ import org.lamsfoundation.lams.admin.web.form.ImportExcelForm;
  *
  *
  *
+ *
+ *
+ *
  */
-public class ImportGroupsAction extends Action {
+public class ImportExcelSaveAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -60,19 +64,46 @@ public class ImportGroupsAction extends Action {
 	}
 
 	IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
-	ImportExcelForm importForm = (ImportExcelForm) form;
-	importForm.setOrgId(0);
-	FormFile file = importForm.getFile();
+	ImportExcelForm importExcelForm = (ImportExcelForm) form;
+	FormFile file = importExcelForm.getFile();
 
 	// validation
 	if (file == null || file.getFileSize() <= 0) {
-	    return mapping.findForward("importGroups");
+	    return mapping.findForward("import");
 	}
 
-	List results = importService.parseGroupSpreadsheet(file);
-	request.setAttribute("results", results);
+	String sessionId = SessionManager.getSession().getId();
+	SessionManager.getSession().setAttribute(IImportService.IMPORT_FILE, file);
+	// use a new thread only if number of users is > threshold
+	if (importService.getNumRows(file) < IImportService.THRESHOLD) {
+	    List results = importService.parseSpreadsheet(file, sessionId);
+	    SessionManager.getSession(sessionId).setAttribute(IImportService.IMPORT_RESULTS, results);
+	    return mapping.findForward("results");
+	} else {
+	    Thread t = new Thread(new ImportExcelThread(sessionId));
+	    t.start();
+	    return mapping.findForward("status");
+	}
+    }
 
-	return mapping.findForward("importGroups");
+    private class ImportExcelThread implements Runnable {
+	private String sessionId;
+
+	public ImportExcelThread(String sessionId) {
+	    this.sessionId = sessionId;
+	}
+
+	@Override
+	public void run() {
+	    IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
+	    try {
+		FormFile file = (FormFile) SessionManager.getSession(sessionId)
+			.getAttribute(IImportService.IMPORT_FILE);
+		List results = importService.parseSpreadsheet(file, sessionId);
+		SessionManager.getSession(sessionId).setAttribute(IImportService.IMPORT_RESULTS, results);
+	    } catch (Exception e) {
+	    }
+	}
     }
 
 }

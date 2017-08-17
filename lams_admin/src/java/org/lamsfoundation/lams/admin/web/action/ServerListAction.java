@@ -1,5 +1,5 @@
 /****************************************************************
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * Copyright (C) 2006 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  *
@@ -14,15 +14,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
-
 package org.lamsfoundation.lams.admin.web.action;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,47 +32,24 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.admin.service.IImportService;
-import org.lamsfoundation.lams.admin.web.form.ImportExcelForm;
+import org.lamsfoundation.lams.integration.ExtServer;
 
 /**
- * @author jliew
  *
- *
- *
- *
- *
- *
- *
- *
- *
+ * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public class ImportGroupsAction extends Action {
+public class ServerListAction extends Action {
 
     @Override
+    @SuppressWarnings("unchecked")
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
-	if (isCancelled(request)) {
-	    return mapping.findForward("sysadmin");
-	}
-
-	IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
-	ImportExcelForm importForm = (ImportExcelForm) form;
-	importForm.setOrgId(0);
-	FormFile file = importForm.getFile();
-
-	// validation
-	if (file == null || file.getFileSize() <= 0) {
-	    return mapping.findForward("importGroups");
-	}
-
-	List results = importService.parseGroupSpreadsheet(file);
-	request.setAttribute("results", results);
-
-	return mapping.findForward("importGroups");
+	List<ExtServer> extServers = AdminServiceProxy.getIntegrationService(getServlet().getServletContext())
+		.getAllExtServers();
+	Collections.sort(extServers);
+	request.setAttribute("servers", extServers);
+	return mapping.findForward("serverlist");
     }
 
 }

@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.admin.web.form;
 import java.util.List;
 
 import org.apache.struts.action.ActionForm;
-import org.lamsfoundation.lams.admin.web.OrgManageBean;
+import org.lamsfoundation.lams.admin.web.dto.OrgManageBean;
 
 /**
  * @version
