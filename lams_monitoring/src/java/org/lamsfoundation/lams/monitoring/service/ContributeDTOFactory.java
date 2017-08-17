@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.monitoring;
+package org.lamsfoundation.lams.monitoring.service;
 
 import java.util.Collections;
 import java.util.HashSet;
