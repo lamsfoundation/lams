@@ -22,30 +22,14 @@
  */
 package org.lamsfoundation.lams.admin.web.form;
 
-import java.util.List;
-
 import org.apache.struts.action.ActionForm;
-import org.lamsfoundation.lams.admin.web.dto.OrgManageBean;
 
 /**
- * @version
- *
- *          <p>
- *          <a href="OrgManageActionForm.java.html"><i>View Source</i></a>
- *          </p>
- *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- *
- *         Created at 20:56:24 on 2006-6-5
- *
- *
  */
-
 public class OrgManageForm extends ActionForm {
 
     private static final long serialVersionUID = -3960695533993640297L;
-
-    private List<OrgManageBean> orgManageBeans;
 
     private Integer type;
 
@@ -69,14 +53,6 @@ public class OrgManageForm extends ActionForm {
 
     public void setType(Integer type) {
 	this.type = type;
-    }
-
-    public List<OrgManageBean> getOrgManageBeans() {
-	return orgManageBeans;
-    }
-
-    public void setOrgManageBeans(List<OrgManageBean> orgManageBeans) {
-	this.orgManageBeans = orgManageBeans;
     }
 
     public Integer getParentId() {

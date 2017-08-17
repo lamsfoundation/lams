@@ -25,10 +25,9 @@
 package org.lamsfoundation.lams.admin.web.dto;
 
 /**
+ * Bean used as member of UserOrgRoleForm, representing a user's roles.
+ *         
  * @author jliew
- *
- *         Bean used as member of UserOrgRoleForm, representing a user's roles.
- *
  */
 public class UserBean {
 
