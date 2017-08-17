@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <%@include file="/common/taglibs.jsp"%>
-<%@ page import="org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants"%>
+<%@ page import="org.lamsfoundation.lams.tool.sbmt.SbmtConstants"%>
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>

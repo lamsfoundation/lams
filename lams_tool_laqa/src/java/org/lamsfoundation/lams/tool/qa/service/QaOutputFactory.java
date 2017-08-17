@@ -93,7 +93,7 @@ public class QaOutputFactory extends OutputFactory {
     }
 
     /**
-     * Follows {@link QaServicePOJO#getToolOutput(List, Long, Long)}.
+     * Follows {@link QaService#getToolOutput(List, Long, Long)}.
      *
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IQaService qaService, Long toolSessionId,

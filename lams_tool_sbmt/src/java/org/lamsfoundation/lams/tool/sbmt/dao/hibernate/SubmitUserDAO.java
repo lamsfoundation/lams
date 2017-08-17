@@ -36,10 +36,10 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.tool.sbmt.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitUserDAO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
-import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.springframework.stereotype.Repository;
 
 @Repository

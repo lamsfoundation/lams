@@ -60,7 +60,7 @@
 			</list>
 		</property>
 			<property name="target">
-				<bean class="org.lamsfoundation.lams.tool.vote.service.VoteServicePOJO">
+				<bean class="org.lamsfoundation.lams.tool.vote.service.VoteService">
 					<property name="voteContentDAO"><ref bean="voteContentDAO"/></property>
 					<property name="voteSessionDAO"><ref bean="voteSessionDAO"/></property>
 					<property name="voteUserDAO"><ref bean="voteUserDAO"/></property>

@@ -29,6 +29,9 @@ import java.util.Date;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.lamsfoundation.lams.contentrepository.exception.FileException;
+import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
+
 /**
  * The IVersionedNode interface represents a particular version of a node
  * in the hierarchy that makes up the repository. This interface represents
