@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.learning.web;
+package org.lamsfoundation.lams.learning.web.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;

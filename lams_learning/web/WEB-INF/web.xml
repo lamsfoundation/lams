@@ -100,14 +100,14 @@
 	<servlet>
 		<servlet-name>RepopulateProgressMarksServlet</servlet-name>
 		<servlet-class>
-			org.lamsfoundation.lams.learning.web.RepopulateProgressMarksServlet
+			org.lamsfoundation.lams.learning.web.servlet.RepopulateProgressMarksServlet
 		</servlet-class>
 	</servlet>
 	
 	<servlet>
 		<servlet-name>LogLessonMarkPushedToIntegrationsServlet</servlet-name>
 		<servlet-class>
-			org.lamsfoundation.lams.learning.web.LogLessonMarkPushedToIntegrationsServlet
+			org.lamsfoundation.lams.learning.web.servlet.LogLessonMarkPushedToIntegrationsServlet
 		</servlet-class>
 	</servlet>	
 	
