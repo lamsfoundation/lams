@@ -95,7 +95,7 @@
 								var isItemAuthoredByUser = userData["isItemAuthoredByUser"];
 								
 								rows += '<tr>';
-								rows += '<td>';
+								rows += '<td style="vertical-align:top;">';
 								
 								if (${generalLearnerFlowDTO.userNameVisible == 'true'}) {
 									rows += '<div class="sbox-heading bg-warning">';
@@ -123,7 +123,7 @@
 								var hasStartedRating = false;
 
 								if (${generalLearnerFlowDTO.allowRateAnswers}) {
-									rows += '<td style="width:150px;">';
+									rows += '<td style="width:150px;vertical-align:top;">';
 									
 									if (userData["visible"] == 'true') {
 										rows += '<div class="rating-stars-holder">';
@@ -184,7 +184,7 @@
 								}
 								
 								if (${isCommentsEnabled}) {
-									rows += '<td style="width:30%; min-width: 250px;" id="comments-area-' + itemId + '">';
+									rows += '<td style="width:30%; min-width: 250px; vertical-align:top;" id="comments-area-' + itemId + '">';
 									
 									if (userData["visible"] == 'true') {
 										var commentsCriteriaId = userData["commentsCriteriaId"];

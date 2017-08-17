@@ -88,7 +88,7 @@
 								var isItemAuthoredByUser = userData["isItemAuthoredByUser"];
 								
 								rows += '<tr>';
-								rows += '<td>';
+								rows += '<td style="vertical-align:top;">';
 								
 								if (${generalLearnerFlowDTO.userNameVisible == 'true'}) {
 									rows += '<div class="sbox-heading bg-warning">';
@@ -117,7 +117,7 @@
 
 	
 								if (${generalLearnerFlowDTO.allowRateAnswers}) {
-									rows += '<td style="width:150px;">';
+									rows += '<td style="width:150px; vertical-align:top;">';
 									
 									if (userData["visible"] == 'true') {
 										rows += '<div class="rating-stars-holder">';
@@ -172,10 +172,13 @@
 									}
 									
 									rows += '</td>';
+								} else {
+									// need a column or sorting is confused
+									rows += '<td style="display:none;"></td>';
 								}
 								
 								if (${isCommentsEnabled}) {
-									rows += '<td style="width:30%; min-width: 250px;" id="comments-area-' + itemId + '">';
+									rows += '<td style="width:30%; min-width: 250px; vertical-align:top;" id="comments-area-' + itemId + '">';
 									
 									if (userData["visible"] == 'true') {
 										var commentsCriteriaId = userData["commentsCriteriaId"];
@@ -385,13 +388,15 @@
 					</div>
 				</c:if>
 
-				<c:set var="numColumns" value="1" />
 				<c:choose>
-					<c:when test="${isCommentsEnabled and generalLearnerFlowDTO.allowRateAnswers}">
+					<c:when test="${isCommentsEnabled}">
 						<c:set var="numColumns" value="3" />
 					</c:when>
-					<c:otherwise>
+					<c:when test="${!isCommentsEnabled and generalLearnerFlowDTO.allowRateAnswers}">
 						<c:set var="numColumns" value="2" />
+					</c:when>
+					<c:otherwise>
+						<c:set var="numColumns" value="1" />
 					</c:otherwise>
 				</c:choose>
 	
@@ -399,9 +404,14 @@
 					<thead>
 						<tr>
 							<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer" /></th>
-							<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
+							<c:choose>
+							<c:when test="${generalLearnerFlowDTO.allowRateAnswers}">
 								<th title="<fmt:message key='label.sort.by.rating'/>"><fmt:message key="label.learning.rating" /></th>
-							</c:if>
+							</c:when>
+							<c:otherwise>
+								<th style="display:none;"></th>
+							</c:otherwise>
+							</c:choose>
 							<c:if test="${isCommentsEnabled}">
 								<th><fmt:message key="label.comment" /></th>
 							</c:if>
