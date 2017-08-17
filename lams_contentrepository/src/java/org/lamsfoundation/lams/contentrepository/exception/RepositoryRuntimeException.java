@@ -22,18 +22,22 @@
  */
 
 
-package org.lamsfoundation.lams.contentrepository;
+package org.lamsfoundation.lams.contentrepository.exception;
 
 /**
- * The node is invalid for some reason. The reason should be given in
- * the exception message.
+ * Main runtime exception thrown by content repository classes. This is only
+ * used for unexpected internal errors, such that the calling code could
+ * never recover.
+ *
+ * @see RepositoryCheckedException
  */
-public class ValidationException extends RepositoryCheckedException {
+public class RepositoryRuntimeException extends RuntimeException {
+
     /**
      * Constructs a new instance of this class.
      */
-    public ValidationException() {
-	this("The node is invalid.");
+    public RepositoryRuntimeException() {
+	this("Content Repository Runtime Error.");
     }
 
     /**
@@ -43,7 +47,7 @@ public class ValidationException extends RepositoryCheckedException {
      * @param s
      *            description
      */
-    public ValidationException(String s) {
+    public RepositoryRuntimeException(String s) {
 	super(s);
     }
 
@@ -56,7 +60,7 @@ public class ValidationException extends RepositoryCheckedException {
      * @param cause
      *            root throwable cause
      */
-    public ValidationException(String s, Throwable cause) {
+    public RepositoryRuntimeException(String s, Throwable cause) {
 	super(s, cause);
 
     }
@@ -67,8 +71,22 @@ public class ValidationException extends RepositoryCheckedException {
      * @param cause
      *            root failure cause
      */
-    public ValidationException(Throwable cause) {
-	this("The node is invalid.", cause);
+    public RepositoryRuntimeException(Throwable cause) {
+	this("Content Repository Runtime Error.", cause);
+    }
+
+    @Override
+    public String getMessage() {
+
+	String s1 = super.getMessage();
+	if (s1 == null) {
+	    s1 = "";
+	}
+
+	Throwable cause = getCause();
+	String s2 = cause != null ? cause.getMessage() : null;
+	return s2 != null ? s1 + ":" + s2 : s1;
+
     }
 
 }

@@ -22,17 +22,18 @@
  */
 
 
-package org.lamsfoundation.lams.contentrepository;
+package org.lamsfoundation.lams.contentrepository.exception;
 
 /**
- * The current ticket doesn't have sufficient rights for the requested action.
+ * Requested workspace not found.
  */
-public class AccessDeniedException extends RepositoryCheckedException {
+public class WorkspaceNotFoundException extends RepositoryCheckedException {
+
     /**
      * Constructs a new instance of this class.
      */
-    public AccessDeniedException() {
-	this("The current ticket doesn't have sufficient rights for the requested action.");
+    public WorkspaceNotFoundException() {
+	this("Requested workspace not found.");
     }
 
     /**
@@ -42,7 +43,7 @@ public class AccessDeniedException extends RepositoryCheckedException {
      * @param s
      *            description
      */
-    public AccessDeniedException(String s) {
+    public WorkspaceNotFoundException(String s) {
 	super(s);
     }
 
@@ -55,7 +56,7 @@ public class AccessDeniedException extends RepositoryCheckedException {
      * @param cause
      *            root throwable cause
      */
-    public AccessDeniedException(String s, Throwable cause) {
+    public WorkspaceNotFoundException(String s, Throwable cause) {
 	super(s, cause);
 
     }
@@ -66,8 +67,8 @@ public class AccessDeniedException extends RepositoryCheckedException {
      * @param cause
      *            root failure cause
      */
-    public AccessDeniedException(Throwable cause) {
-	this("The current ticket doesn't have sufficient rights for the requested action.", cause);
+    public WorkspaceNotFoundException(Throwable cause) {
+	this("Requested workspace not found.", cause);
     }
 
 }

@@ -22,18 +22,17 @@
  */
 
 
-package org.lamsfoundation.lams.contentrepository;
+package org.lamsfoundation.lams.contentrepository.exception;
 
 /**
- * Thrown when value is assigned to a propery of the wrong type, or some
- * other formatting type problem.
+ * An item already exists with the given id or path.
  */
-public class ValueFormatException extends RepositoryCheckedException {
+public class ItemExistsException extends RepositoryCheckedException {
     /**
      * Constructs a new instance of this class.
      */
-    public ValueFormatException() {
-	this("Value assigned to wrong type or other formatting error.");
+    public ItemExistsException() {
+	this("An item already exists with the given id or path.");
     }
 
     /**
@@ -43,7 +42,7 @@ public class ValueFormatException extends RepositoryCheckedException {
      * @param s
      *            description
      */
-    public ValueFormatException(String s) {
+    public ItemExistsException(String s) {
 	super(s);
     }
 
@@ -56,7 +55,7 @@ public class ValueFormatException extends RepositoryCheckedException {
      * @param cause
      *            root throwable cause
      */
-    public ValueFormatException(String s, Throwable cause) {
+    public ItemExistsException(String s, Throwable cause) {
 	super(s, cause);
 
     }
@@ -67,8 +66,8 @@ public class ValueFormatException extends RepositoryCheckedException {
      * @param cause
      *            root failure cause
      */
-    public ValueFormatException(Throwable cause) {
-	this("Value assigned to wrong type or other formatting error.", cause);
+    public ItemExistsException(Throwable cause) {
+	this("An item already exists with the given id or path.", cause);
     }
 
 }

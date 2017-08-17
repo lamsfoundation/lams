@@ -27,8 +27,8 @@ package org.lamsfoundation.lams.contentrepository.service;
 
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.exception.WorkspaceNotFoundException;
 
 /**
  * Administrative interface to the Repository. "Protects"

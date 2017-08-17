@@ -22,17 +22,17 @@
  */
 
 
-package org.lamsfoundation.lams.contentrepository;
+package org.lamsfoundation.lams.contentrepository.exception;
 
 /**
- * Login failed.
+ * The current ticket doesn't have sufficient rights for the requested action.
  */
-public class LoginException extends RepositoryCheckedException {
+public class AccessDeniedException extends RepositoryCheckedException {
     /**
      * Constructs a new instance of this class.
      */
-    public LoginException() {
-	this("Content Repository Login Failed.");
+    public AccessDeniedException() {
+	this("The current ticket doesn't have sufficient rights for the requested action.");
     }
 
     /**
@@ -42,7 +42,7 @@ public class LoginException extends RepositoryCheckedException {
      * @param s
      *            description
      */
-    public LoginException(String s) {
+    public AccessDeniedException(String s) {
 	super(s);
     }
 
@@ -55,7 +55,7 @@ public class LoginException extends RepositoryCheckedException {
      * @param cause
      *            root throwable cause
      */
-    public LoginException(String s, Throwable cause) {
+    public AccessDeniedException(String s, Throwable cause) {
 	super(s, cause);
 
     }
@@ -66,8 +66,8 @@ public class LoginException extends RepositoryCheckedException {
      * @param cause
      *            root failure cause
      */
-    public LoginException(Throwable cause) {
-	this("Content Repository Login Failed.", cause);
+    public AccessDeniedException(Throwable cause) {
+	this("The current ticket doesn't have sufficient rights for the requested action.", cause);
     }
 
 }

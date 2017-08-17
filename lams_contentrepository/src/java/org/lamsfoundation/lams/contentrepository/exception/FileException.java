@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.contentrepository;
+package org.lamsfoundation.lams.contentrepository.exception;
 
 /**
  * Some error was generated reading or writing the files

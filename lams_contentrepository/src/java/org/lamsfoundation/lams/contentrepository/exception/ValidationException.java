@@ -22,17 +22,18 @@
  */
 
 
-package org.lamsfoundation.lams.contentrepository;
+package org.lamsfoundation.lams.contentrepository.exception;
 
 /**
- * Generic exception thrown whenever a parameter is missing.
+ * The node is invalid for some reason. The reason should be given in
+ * the exception message.
  */
-public class InvalidParameterException extends RepositoryCheckedException {
+public class ValidationException extends RepositoryCheckedException {
     /**
      * Constructs a new instance of this class.
      */
-    public InvalidParameterException() {
-	this("A required parameter is null.");
+    public ValidationException() {
+	this("The node is invalid.");
     }
 
     /**
@@ -42,7 +43,7 @@ public class InvalidParameterException extends RepositoryCheckedException {
      * @param s
      *            description
      */
-    public InvalidParameterException(String s) {
+    public ValidationException(String s) {
 	super(s);
     }
 
@@ -55,7 +56,7 @@ public class InvalidParameterException extends RepositoryCheckedException {
      * @param cause
      *            root throwable cause
      */
-    public InvalidParameterException(String s, Throwable cause) {
+    public ValidationException(String s, Throwable cause) {
 	super(s, cause);
 
     }
@@ -66,8 +67,8 @@ public class InvalidParameterException extends RepositoryCheckedException {
      * @param cause
      *            root failure cause
      */
-    public InvalidParameterException(Throwable cause) {
-	this("A required parameter is null.", cause);
+    public ValidationException(Throwable cause) {
+	this("The node is invalid.", cause);
     }
 
 }

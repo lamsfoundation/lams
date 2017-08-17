@@ -22,18 +22,18 @@
  */
 
 
-package org.lamsfoundation.lams.contentrepository;
+package org.lamsfoundation.lams.contentrepository.exception;
 
 /**
- * Item requested does not exist.
+ * Thrown when value is assigned to a propery of the wrong type, or some
+ * other formatting type problem.
  */
-public class ItemNotFoundException extends RepositoryCheckedException {
-
+public class ValueFormatException extends RepositoryCheckedException {
     /**
      * Constructs a new instance of this class.
      */
-    public ItemNotFoundException() {
-	this("Item requested does not exist.");
+    public ValueFormatException() {
+	this("Value assigned to wrong type or other formatting error.");
     }
 
     /**
@@ -43,7 +43,7 @@ public class ItemNotFoundException extends RepositoryCheckedException {
      * @param s
      *            description
      */
-    public ItemNotFoundException(String s) {
+    public ValueFormatException(String s) {
 	super(s);
     }
 
@@ -56,7 +56,7 @@ public class ItemNotFoundException extends RepositoryCheckedException {
      * @param cause
      *            root throwable cause
      */
-    public ItemNotFoundException(String s, Throwable cause) {
+    public ValueFormatException(String s, Throwable cause) {
 	super(s, cause);
 
     }
@@ -67,8 +67,8 @@ public class ItemNotFoundException extends RepositoryCheckedException {
      * @param cause
      *            root failure cause
      */
-    public ItemNotFoundException(Throwable cause) {
-	this("Item requested does not exist.", cause);
+    public ValueFormatException(Throwable cause) {
+	this("Value assigned to wrong type or other formatting error.", cause);
     }
 
 }

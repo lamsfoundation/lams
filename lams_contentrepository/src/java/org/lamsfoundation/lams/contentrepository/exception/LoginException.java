@@ -22,17 +22,17 @@
  */
 
 
-package org.lamsfoundation.lams.contentrepository;
+package org.lamsfoundation.lams.contentrepository.exception;
 
 /**
- * An item already exists with the given id or path.
+ * Login failed.
  */
-public class ItemExistsException extends RepositoryCheckedException {
+public class LoginException extends RepositoryCheckedException {
     /**
      * Constructs a new instance of this class.
      */
-    public ItemExistsException() {
-	this("An item already exists with the given id or path.");
+    public LoginException() {
+	this("Content Repository Login Failed.");
     }
 
     /**
@@ -42,7 +42,7 @@ public class ItemExistsException extends RepositoryCheckedException {
      * @param s
      *            description
      */
-    public ItemExistsException(String s) {
+    public LoginException(String s) {
 	super(s);
     }
 
@@ -55,7 +55,7 @@ public class ItemExistsException extends RepositoryCheckedException {
      * @param cause
      *            root throwable cause
      */
-    public ItemExistsException(String s, Throwable cause) {
+    public LoginException(String s, Throwable cause) {
 	super(s, cause);
 
     }
@@ -66,8 +66,8 @@ public class ItemExistsException extends RepositoryCheckedException {
      * @param cause
      *            root failure cause
      */
-    public ItemExistsException(Throwable cause) {
-	this("An item already exists with the given id or path.", cause);
+    public LoginException(Throwable cause) {
+	this("Content Repository Login Failed.", cause);
     }
 
 }

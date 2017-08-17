@@ -22,18 +22,23 @@
  */
 
 
-package org.lamsfoundation.lams.contentrepository;
+package org.lamsfoundation.lams.contentrepository.exception;
 
 /**
- * Requested workspace not found.
+ * Main exception thrown by content repository classes. All exceptions thrown by the content
+ * repository (except RepositoryRuntimeException) are based on this class, so calling code
+ * can catch this exception and catch all of the repository exceptions, if it doesn't want to
+ * catch particular exceptions.
+ *
+ * @see RepositoryRuntimeException
  */
-public class WorkspaceNotFoundException extends RepositoryCheckedException {
+public class RepositoryCheckedException extends Exception {
 
     /**
      * Constructs a new instance of this class.
      */
-    public WorkspaceNotFoundException() {
-	this("Requested workspace not found.");
+    public RepositoryCheckedException() {
+	this("Content Repository Error.");
     }
 
     /**
@@ -43,7 +48,7 @@ public class WorkspaceNotFoundException extends RepositoryCheckedException {
      * @param s
      *            description
      */
-    public WorkspaceNotFoundException(String s) {
+    public RepositoryCheckedException(String s) {
 	super(s);
     }
 
@@ -56,7 +61,7 @@ public class WorkspaceNotFoundException extends RepositoryCheckedException {
      * @param cause
      *            root throwable cause
      */
-    public WorkspaceNotFoundException(String s, Throwable cause) {
+    public RepositoryCheckedException(String s, Throwable cause) {
 	super(s, cause);
 
     }
@@ -67,8 +72,22 @@ public class WorkspaceNotFoundException extends RepositoryCheckedException {
      * @param cause
      *            root failure cause
      */
-    public WorkspaceNotFoundException(Throwable cause) {
-	this("Requested workspace not found.", cause);
+    public RepositoryCheckedException(Throwable cause) {
+	this("Content Repository Error.", cause);
+    }
+
+    @Override
+    public String getMessage() {
+
+	String s1 = super.getMessage();
+	if (s1 == null) {
+	    s1 = "";
+	}
+
+	Throwable cause = getCause();
+	String s2 = cause != null ? cause.getMessage() : null;
+	return s2 != null ? s1 + ":" + s2 : s1;
+
     }
 
 }
