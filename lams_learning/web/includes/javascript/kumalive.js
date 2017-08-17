@@ -107,11 +107,14 @@ kumaliveWebsocket.onmessage = function(e){
 							label = $('<label />').appendTo(checkbox);
 						$('<span />').text(this).appendTo(label);
 						$('<input />').attr('type', 'checkbox')
+									  .prop('checked', true)
 									  .prependTo(label);
 					}
 				});
 			}
-			if (rubricsDiv.is(':empty')){
+			// do not show the box at all if there are no rubrics
+			// (exactly: there is the single default blank one)
+			if ($('.checkbox', rubricsDiv).length == 0){
 				rubricsDiv.remove();
 			}
 			
