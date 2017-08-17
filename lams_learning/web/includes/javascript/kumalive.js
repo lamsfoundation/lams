@@ -244,6 +244,9 @@ function toggleRaiseHandPrompt(message) {
 			$('#raiseHandPromptButton').show();
 		}
 		
+		$('.score[userId]').slideUp(function() {
+			$(this).remove();
+		});
 		// no question is asked at the moment
 		raiseHandPrompt.slideUp(function(){
 			$('#teacher').slideDown();
@@ -601,7 +604,7 @@ function score(){
 		}));
 		
 		container.slideUp(function(){
-			container.remove();
+			$(this).remove();
 		});
 	}
 }
