@@ -14,13 +14,11 @@ var kumaliveWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
 	speakerId = null,
 	// rubrics to evaluate speaker
 	rubrics = null,
-	// learners with no profile picture will get an icon with one of these colours
-	learnerColors = ['#001f3f', '#FF851B', '#85144b', '#111111', '#3D9970', '#0074D9', '#FF4136'],
 	// index of user icon colour currently used
 	learnerColorIndex = 1,
 	// template of a HTML structure of a learner
 	learnerDivTemplate = $('<div />').addClass('learner changing')
-		.append($('<div />').addClass('profilePictureWrapper').append($('<div />').addClass('profilePicture profilePictureHidden')))
+		.append($('<div />').addClass('profilePicture profilePictureHidden'))
 		.append($('<div />').addClass('name')),
 	REFRESH_DELAY = 1000,
 	ANIMATION_DURATION = 1000,
@@ -181,12 +179,8 @@ function init(message) {
 	// set dialog name
 	$('head title').text(LABELS.KUMALIVE_TITLE + ' ' + message.name);
 	// set teacher portrait and name
-	if (message.teacherPortraitUuid) {
-		$('#actionCell #teacher .profilePicture').css('background-image',
-				'url(' + LAMS_URL + 'download?preferDownload=false&uuid=' + message.teacherPortraitUuid + ')');
-	} else {
-		$('#actionCell #teacher .profilePicture').addClass('fa fa-user-circle-o');
-	}
+	addPortrait($('#actionCell #teacher .profilePicture'), message.teacherPortraitUuid, 
+			message.teacherId, "large", true, LAMS_URL);
 	$('#teacher .name').text(message.teacherName);
 	
 	rubrics = message.rubrics;
@@ -284,14 +278,8 @@ function processParticipants(message) {
 									   .attr('userId', learner.id)
 									   .appendTo(learnersContainer);
 		var profilePicture = $('.profilePicture', learnerDiv);
-		// use profiel picture or a coloured icon
-		if (learner.portraitUuid) {
-			profilePicture.css('background-image',
-					'url(' + LAMS_URL + 'download?preferDownload=false&uuid=' + learner.portraitUuid + ')');
-		} else {
-			profilePicture.addClass('fa fa-user-circle-o').css('color', learnerColors[learnerColorIndex]);
-			learnerColorIndex = (learnerColorIndex + 1) % learnerColors.length;
-		}
+		// use profile picture or a coloured icon
+		addPortrait(profilePicture, learner.portraitUuid, learner.id, "medium", true, LAMS_URL);
 		$('.name', learnerDiv).text(learner.firstName + ' ' + learner.lastName);
 		
 		if (roleTeacher) {

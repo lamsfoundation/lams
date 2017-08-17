@@ -66,39 +66,26 @@
 	display: none;
 }
 
-.learner .profilePictureWrapper {
-	width: 40px;
-	height: 40px;
-	margin-left: 20px;
+.learner .profilePicture {
+	width: 35px;
+	height: 35px;
 }
 
-.profilePicture {
-	position: relative;
-	border-radius: 100%;
-	background-repeat: no-repeat;
-	background-position: center;
-	background-size: cover;
+.learner .profilePicture:before {
+	font-size: 35px;
+	line-height: 26px;	
 }
 
 .profilePictureHidden {
-	top: 20px;
-	left: 20px;
-	width: 0;
-	height: 0;
-	font-size: 0;
+	opacity: 0;
 }
 
 .profilePictureShown {
-	top: 0;
-	left: 0;
-	width: 40px;
-	height: 40px;
-	font-size: 40px;
+	opacity: 1;
 }
 
 .name {
 	height: 40px;
-	padding-top: 5px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
@@ -110,8 +97,12 @@
 .speaker .profilePicture {
 	width: 80px;
 	height: 80px;
-	font-size: 80px;
 	margin: auto;
+}
+
+.speaker .profilePicture:before {
+	font-size: 76px;
+	line-height: 80px;
 }
 
 #teacher {
@@ -159,10 +150,6 @@
 	color: red;
 }
 
-.scoreNone {
-	color: gray;
-}
-
 .score:last-child hr {
 	display: none;
 }
@@ -183,31 +170,24 @@
 		margin-right: 20px;
 	}
 	
-	.learner .name {
-		font-size: 12px;
-	}
-	
-	.learner .profilePictureWrapper {
+	.learner .profilePicture {
 		width: 80px;
 		height: 80px;
-		margin-left: 0;
 	}
 	
-	.profilePictureHidden {
-		top: 40px;
-		left: 40px;
-	}
-
-	.profilePictureShown {
-		width: 80px;
-		height: 80px;
+	.learner .profilePicture:before {
+		line-height: 70px;	
 		font-size: 80px;
 	}
 	
 	.speaker .profilePicture {
 		width: 200px;
 		height: 200px;
-		font-size: 200px;
+	}
+	
+	.speaker .profilePicture:before {
+		font-size: 196px;
+		line-height: 200px;
 	}
 	
 	.speaker .name {
