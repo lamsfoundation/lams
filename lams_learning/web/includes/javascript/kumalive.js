@@ -279,7 +279,7 @@ function processParticipants(message) {
 									   .appendTo(learnersContainer);
 		var profilePicture = $('.profilePicture', learnerDiv);
 		// use profile picture or a coloured icon
-		addPortrait(profilePicture, learner.portraitUuid, learner.id, "medium", true, LAMS_URL);
+		addPortrait(profilePicture, learner.portraitUuid, learner.id, "large", true, LAMS_URL);
 		$('.name', learnerDiv).text(learner.firstName + ' ' + learner.lastName);
 		
 		if (roleTeacher) {
@@ -462,28 +462,28 @@ function toggleSpeak(message) {
 		// create speaker HTML element
 		$('.name', learnerDiv).clone().appendTo(speaker);
 		if (roleTeacher) {
-			$('<div />').addClass('btn btn-default').click(stopSpeak).text(LABELS.SPEAK_FINISH).appendTo(speaker);
+			$('<button />').addClass('btn btn-default').click(stopSpeak).text(LABELS.SPEAK_FINISH).appendTo(speaker);
 		}
 		
-		var targetProfilePicture = $('.profilePicture', learnerDiv).clone()
-			   .removeClass('profilePictureShown')
-			   .prependTo(speaker),
+		var targetProfilePicture = $('.profilePicture', learnerDiv)
+				.clone()
+				.prependTo(speaker),
 			targetOffset = targetProfilePicture.offset(),
+			targetWidth = targetProfilePicture.width(),
+			targetHeight = targetProfilePicture.height(),
 			profilePicture = $('.profilePicture', learnerDiv),
 			transitionCopy = profilePicture.clone().appendTo('body')
 				.css({
 					'position' : 'fixed'
-				}).offset(profilePicture.offset())
+				})
+				.offset(profilePicture.offset())
 				// animate moving speaker from learners to speaker panel
 		        .animate({
-			    	'left'      : targetOffset.left,
-			    	'top'       : targetOffset.top,
-			    	'width'     : targetProfilePicture.css('width'),
-			    	'height'    : targetProfilePicture.css('height'),
-			    	'font-size' : targetProfilePicture.css('font-size')
+			    	'left'      : targetOffset.left + targetWidth / 4,
+			    	'top'       : targetOffset.top + targetHeight / 4
 			    }, ANIMATION_DURATION, function(){
-					speaker.css('visibility', 'visible');
-			    	transitionCopy.remove();
+			    		speaker.css('visibility', 'visible');
+			    		transitionCopy.remove();
 			    });
 	});
 }
@@ -492,10 +492,11 @@ function toggleSpeak(message) {
  * Animate learner arrival
  */
 function learnerFadeIn(learnerDiv) {
-	var nameDiv = $('.name', learnerDiv).css('color', 'green');
+	var nameDiv = $('.name', learnerDiv);
 	learnerDiv.css('display', 'inline-block');
 
 	$('.profilePicture', learnerDiv).switchClass('profilePictureHidden', 'profilePictureShown', ANIMATION_DURATION, function(){
+		$(this).removeClass('profilePictureShown');
 		nameDiv.css('color', 'initial');
 		learnerDiv.removeClass('changing');
 	});

@@ -15,6 +15,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 	<script type="text/javascript">
 		var	orgId = ${param.organisationID},
 			userId = <lams:user property="userID"/>,

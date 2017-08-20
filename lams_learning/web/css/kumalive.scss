@@ -66,12 +66,12 @@
 	display: none;
 }
 
-.learner .profilePicture {
+.profilePicture {
 	width: 35px;
 	height: 35px;
 }
 
-.learner .profilePicture:before {
+.profilePicture:before {
 	font-size: 35px;
 	line-height: 26px;	
 }
@@ -85,7 +85,6 @@
 }
 
 .name {
-	height: 40px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
@@ -101,7 +100,7 @@
 }
 
 .speaker .profilePicture:before {
-	font-size: 76px;
+	font-size: 70px;
 	line-height: 80px;
 }
 
@@ -170,12 +169,12 @@
 		margin-right: 20px;
 	}
 	
-	.learner .profilePicture {
+	.profilePicture {
 		width: 80px;
 		height: 80px;
 	}
 	
-	.learner .profilePicture:before {
+	.profilePicture:before {
 		line-height: 70px;	
 		font-size: 80px;
 	}
@@ -186,12 +185,13 @@
 	}
 	
 	.speaker .profilePicture:before {
-		font-size: 196px;
+		font-size: 200px;
 		line-height: 200px;
 	}
 	
 	.speaker .name {
 		font-size: 18px;
+		margin-top: 10px;
 	}
 	
 	#raiseHandPrompt i {
