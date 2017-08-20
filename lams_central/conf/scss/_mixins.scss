@@ -126,10 +126,12 @@
 	width: $size;
 	height: $size;
 	display: inline-block;
+	background-repeat:no-repeat;
+    background-size:cover;
 }
 
 // Generic avatars used in place of profile pictures
-@mixin portrait-generic($height) {
+@mixin portrait-generic($height, $line-height) {
   display: inline-block;
   height: $height;
   vertical-align: middle;
@@ -137,6 +139,7 @@
   content: "\f2be";
   font-family: FontAwesome;
   font-style: normal;
-  font-size: $height - 4;
+  font-size: $height;
   font-weight: normal;
+  line-height: $line-height;
 } }

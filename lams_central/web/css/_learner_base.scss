@@ -1015,19 +1015,19 @@ $portrait-size-image-xl: 400px;
 }
 
 .portrait-generic-sm {
-	@include portrait-generic($portrait-size-image-sm);
+	@include portrait-generic($portrait-size-image-sm, 26px);
 }
 
 .portrait-generic-md {
-	@include portrait-generic($portrait-size-image-md);
+	@include portrait-generic($portrait-size-image-md, 65px);
 }
 
 .portrait-generic-lg {
-	@include portrait-generic($portrait-size-image-lg);
+	@include portrait-generic($portrait-size-image-lg, 200px);
 }
 
 .portrait-generic-xl {
-	@include portrait-generic($portrait-size-image-xl);
+	@include portrait-generic($portrait-size-image-xl, 400px);
 }
 
 .leader-display {
