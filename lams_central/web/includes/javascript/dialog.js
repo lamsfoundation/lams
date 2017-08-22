@@ -105,15 +105,15 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	
 	dialog.on('show.bs.modal', initParams.modal ? initParams.open : function(event){
 		
-		// skip all further actions if dialog is already shown (it's required due to bootstrap doesn't fire 'shown.bs.modal' event second time if dialog is currently open)
-		if (dialog.data('shown')) {
-			return;
+		// skip hiding dialog if it's already shown, as bootstrap doesn't fire 'shown.bs.modal' event second time if dialog is already open
+		if (!dialog.data('shown')) {
+			dialog.css('visibility', 'hidden');
 		}
 		
-		dialog.css('visibility', 'hidden');
 		if (initParams.open) {
 			initParams.open.call(dialog, event);
 		}
+		
 	});
 	dialog.on('hide.bs.modal', initParams.beforeClose);
 	dialog.on('hidden.bs.modal', initParams.close);
