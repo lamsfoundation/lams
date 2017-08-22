@@ -58,7 +58,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="uid" value="${entry.uid}" />
 		<html:hidden property="signature" />
 		<html:hidden property="lessonID" value="${entry.externalID}" />
-
+		<html:hidden property="currentLessonID" value="${empty currentLessonID ? param.currentLessonID : currentLessonID}" />
+		
 		<!-- set title -->
 		<c:set var="title">
 			<c:choose>
@@ -139,7 +140,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:when>
 						<c:otherwise>
 							<c:set var="editnote">
-								<html:rewrite page="/notebook.do?method=viewEntry&mode=edit&uid=" />
+								<html:rewrite page="/notebook.do?method=viewEntry&mode=edit&currentLessonID=${param.currentLessonID}&uid=" />
 								<c:out value="${entry.uid}" />
 							</c:set>
 							<c:if test="${entry.externalSignature != scratchJournalSig}">
@@ -147,7 +148,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<fmt:message key="label.edit.button" />
 								</a>
 							</c:if>
-							<a href="javascript: history.back();" class="btn btn-default" id="viewAllBtn">
+							<c:set var="viewAll">
+								<html:rewrite page="/notebook.do?method=viewAll&currentLessonID=${param.currentLessonID}" />
+							</c:set>
+							<a href="${viewAll}" class="btn btn-default" id="viewAllBtn">
 								<fmt:message key="mynotes.view.all.button" />
 							</a>
 						</c:otherwise>
