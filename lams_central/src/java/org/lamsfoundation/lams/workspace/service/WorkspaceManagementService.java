@@ -38,7 +38,7 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;

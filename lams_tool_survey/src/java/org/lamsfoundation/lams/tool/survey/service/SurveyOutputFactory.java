@@ -79,7 +79,7 @@ public class SurveyOutputFactory extends OutputFactory {
     }
 
     /**
-     * Follows {@link QaServicePOJO#getToolOutput(List, Long, Long)}.
+     * Follows {@link SurveyService#getToolOutput(List, Long, Long)}.
      *
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, ISurveyService surveyService,

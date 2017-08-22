@@ -1015,7 +1015,7 @@ $portrait-size-image-xl: 400px;
 }
 
 .portrait-generic-sm {
-	@include portrait-generic($portrait-size-image-sm, 26px);
+	@include portrait-generic($portrait-size-image-sm, 35px);
 }
 
 .portrait-generic-md {

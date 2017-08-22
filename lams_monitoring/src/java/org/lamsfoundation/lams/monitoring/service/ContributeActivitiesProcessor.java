@@ -33,7 +33,6 @@ import org.lamsfoundation.lams.learningdesign.LearningDesignProcessor;
 import org.lamsfoundation.lams.learningdesign.SimpleActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
-import org.lamsfoundation.lams.monitoring.ContributeDTOFactory;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;

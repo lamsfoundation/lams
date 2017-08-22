@@ -25,7 +25,7 @@
 package org.lamsfoundation.lams.contentrepository.service;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryRuntimeException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

@@ -28,6 +28,13 @@ import java.io.InputStream;
 import java.util.Calendar;
 import java.util.List;
 
+import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryRuntimeException;
+import org.lamsfoundation.lams.contentrepository.exception.ValueFormatException;
+
 /**
  * IVersionedNodeAdmin represents the full functionality for a versioned node.
  *

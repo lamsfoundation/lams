@@ -55,6 +55,7 @@
 	<form-property name="title" type="java.lang.String" />
 	<form-property name="entry" type="java.lang.String" />
 	<form-property name="lessonID" type="java.lang.Long" />
+	<form-property name="currentLessonID" type="java.lang.Long" />
 	<form-property name="signature" type="java.lang.String" />
 </form-bean>
 
@@ -115,11 +116,6 @@
         name="viewAll"
         path=".notebookViewAll"
         redirect="false"
-      />
-      <forward
-        name="viewAllRedirect"
-        path="/notebook.do?method=viewAll"
-        redirect="true"
       />
       <forward
         name="viewSingle"

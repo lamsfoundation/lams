@@ -26,6 +26,8 @@ package org.lamsfoundation.lams.contentrepository;
 
 import java.util.Calendar;
 
+import org.lamsfoundation.lams.contentrepository.exception.ValueFormatException;
+
 /**
  * A value is an object which is explicitly marked with a type. This type can
  * be used for hints to the persistence layer as to how to store/retrieve

@@ -32,8 +32,8 @@ import org.hibernate.Session;
 import org.lamsfoundation.lams.contentrepository.CrCredential;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.IWorkspace;
-import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
 import org.lamsfoundation.lams.contentrepository.dao.ICredentialDAO;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryRuntimeException;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.springframework.stereotype.Repository;
 

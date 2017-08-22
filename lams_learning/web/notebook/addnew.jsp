@@ -48,6 +48,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:form action="/notebook.do?method=processNewEntry" styleId="notebookForm" method="post">
 
 		<html:hidden property="signature" />
+		<html:hidden property="currentLessonID" value="${param.currentLessonID}" />
 		<html:hidden property="lessonID" value="${param.lessonID}" />
 
 		<div class="lead">

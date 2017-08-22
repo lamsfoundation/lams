@@ -35,16 +35,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </c:set>
 
 <lams:Page type="learner" title="${title}" hideProgressBar="true">
-	<c:if test="${empty entries}">
-		<c:set var="addnote">
-			<html:rewrite page="/notebook/add.do?lessonID=" />
-			<c:out value="${lessonID}" />
-		</c:set>
-		<div class="pull-right">
-			<a href="${addnote}" class="btn btn-default pull-right" id="addNewBtn"><fmt:message
-					key="mynotes.add.new.current.lesson.button" /></a>
-		</div>
-	</c:if>
+	<c:set var="addnote">
+		<html:rewrite page="/notebook/add.do?lessonID=" />
+		<c:out value="${lessonID}" />
+	</c:set>
+	<div class="pull-right">
+		<a href="${addnote}" class="btn btn-default pull-right" id="addNewBtn"><fmt:message
+				key="mynotes.add.new.current.lesson.button" /></a>
+	</div>
 	
 	<div class="lead">
 		<fmt:message key="mynotes.view.all.button" />
@@ -63,7 +61,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:set>
 
 				<c:set var="addnote">
-					<html:rewrite page="/notebook/add.do?lessonID=" />
+					<html:rewrite page="/notebook/add.do?currentLessonID=${lessonID}&lessonID=" />
 					<c:out value="${entry.externalID}" />
 				</c:set>
 
@@ -120,7 +118,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 							<tr>
 								<td class="align-left" width="28%"><c:set var="viewnote">
-										<html:rewrite page="/notebook.do?method=viewEntry&uid=" />
+										<html:rewrite page="/notebook.do?method=viewEntry&currentLessonID=${lessonID}&uid=" />
 										<c:out value="${entry.uid}" />
 									</c:set> <html:link href="${viewnote}">
 										<c:choose>

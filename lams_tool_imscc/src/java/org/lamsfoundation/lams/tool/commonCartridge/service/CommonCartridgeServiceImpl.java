@@ -41,12 +41,12 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.exception.LoginException;
+import org.lamsfoundation.lams.contentrepository.exception.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;

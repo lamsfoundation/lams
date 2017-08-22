@@ -34,14 +34,14 @@ import org.lamsfoundation.lams.contentrepository.CrNode;
 import org.lamsfoundation.lams.contentrepository.CrNodeVersion;
 import org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty;
 import org.lamsfoundation.lams.contentrepository.CrWorkspace;
-import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.IValue;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeType;
 import org.lamsfoundation.lams.contentrepository.PropertyName;
-import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.dao.INodeDAO;
+import org.lamsfoundation.lams.contentrepository.exception.FileException;
+import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.exception.ValueFormatException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -76,7 +76,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
     @Override
     public SimpleVersionedNode createFileNode(CrWorkspace workspace, SimpleVersionedNode parentNode, String relPath,
 	    InputStream istream, String filename, String mimeType, String versionDescription, Integer userId)
-	    throws org.lamsfoundation.lams.contentrepository.InvalidParameterException {
+	    throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException {
 
 	SimpleVersionedNode initialNodeVersion = createBasicNode(NodeType.FILENODE, workspace, parentNode, relPath,
 		versionDescription, userId);
@@ -93,7 +93,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
      */
     @Override
     public SimpleVersionedNode createPackageNode(CrWorkspace workspace, String initialPath, String versionDescription,
-	    Integer userId) throws org.lamsfoundation.lams.contentrepository.InvalidParameterException {
+	    Integer userId) throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException {
 
 	SimpleVersionedNode initialNodeVersion = createBasicNode(NodeType.PACKAGENODE, workspace, null, null,
 		versionDescription, userId);
@@ -112,7 +112,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
     @Override
     public SimpleVersionedNode createDataNode(CrWorkspace workspace, SimpleVersionedNode parentNode,
 	    String versionDescription, Integer userId)
-	    throws org.lamsfoundation.lams.contentrepository.InvalidParameterException {
+	    throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException {
 
 	SimpleVersionedNode initialNodeVersion = createBasicNode(NodeType.DATANODE, workspace, parentNode, null,
 		versionDescription, userId);

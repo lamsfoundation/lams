@@ -35,7 +35,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.service.IImportService;
-import org.lamsfoundation.lams.admin.web.ImportExcelForm;
+import org.lamsfoundation.lams.admin.web.form.ImportExcelForm;
 
 /**
  * @author jliew

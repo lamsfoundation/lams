@@ -25,7 +25,7 @@
 package org.lamsfoundation.lams.contentrepository.client;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;

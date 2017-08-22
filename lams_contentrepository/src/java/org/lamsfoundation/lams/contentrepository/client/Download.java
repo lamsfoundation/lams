@@ -36,14 +36,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IValue;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.NodeType;
 import org.lamsfoundation.lams.contentrepository.PropertyName;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.ValueFormatException;
+import org.lamsfoundation.lams.contentrepository.exception.FileException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.exception.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;

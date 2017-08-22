@@ -15,19 +15,19 @@
 
     <form-bean
       name="NbAuthoringForm"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringForm"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.form.NbAuthoringForm"
     />
     <form-bean
       name="NbPedagogicalPlannerForm"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.NbPedagogicalPlannerForm"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.form.NbPedagogicalPlannerForm"
     />
     <form-bean
       name="NbMonitoringForm"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringForm"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.form.NbMonitoringForm"
     />
     <form-bean
       name="NbLearnerForm"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerForm"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.form.NbLearnerForm"
     />
 
     <!--
@@ -50,14 +50,14 @@
    <action-mappings>
     <action
       path="/clearsession"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.ClearSessionAction"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.action.ClearSessionAction"
       unknown="false"
       validate="false"
     >
     </action>
     <action
       path="/authoring"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.action.NbAuthoringAction"
       name="NbAuthoringForm"
       scope="request"
       input="/author_page.jsp"
@@ -73,7 +73,7 @@
     </action>
     <action
       path="/monitoring"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.action.NbMonitoringAction"
       name="NbMonitoringForm"
       scope="request"
       input=".monitoringContent"
@@ -99,7 +99,7 @@
     </action>
     <action
       path="/pedagogicalPlanner"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.NbPedagogicalPlannerAction"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.action.NbPedagogicalPlannerAction"
       name="NbPedagogicalPlannerForm"
       scope="request"
       parameter="dispatch"
@@ -114,7 +114,7 @@
     </action>
     <action
       path="/starter/learner"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.action.NbLearnerStarterAction"
       name="NbLearnerForm"
       scope="request"
       parameter="mode"
@@ -139,7 +139,7 @@
     </action>
     <action
       path="/learner"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerAction"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.action.NbLearnerAction"
       name="NbLearnerForm"
       scope="request"
       input=".learnerContent"

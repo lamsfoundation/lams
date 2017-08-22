@@ -47,7 +47,7 @@ import org.apache.struts.actions.DispatchAction;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.integration.dto.ExtGroupDTO;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
