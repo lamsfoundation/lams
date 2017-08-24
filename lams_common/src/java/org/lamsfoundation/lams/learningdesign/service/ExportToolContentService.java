@@ -83,6 +83,7 @@ import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
@@ -1813,10 +1814,20 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		act.setLearningLibrary(learningLibraryDAO.getLearningLibraryById(actDto.getLearningLibraryID()));
 		break;
 	    case Activity.OPTIONS_ACTIVITY_TYPE:
+		OptionsActivity optionsActivity = (OptionsActivity) act;
+		optionsActivity.setMaxNumberOfOptions(actDto.getMaxOptions());
+		optionsActivity.setMinNumberOfOptions(actDto.getMinOptions());
+		optionsActivity.setOptionsInstructions(actDto.getOptionsInstructions());
+		break;
 	    case Activity.OPTIONS_WITH_SEQUENCES_TYPE:
-		((OptionsActivity) act).setMaxNumberOfOptions(actDto.getMaxOptions());
-		((OptionsActivity) act).setMinNumberOfOptions(actDto.getMinOptions());
-		((OptionsActivity) act).setOptionsInstructions(actDto.getOptionsInstructions());
+		OptionsWithSequencesActivity optionsWithSequencesActivity = (OptionsWithSequencesActivity) act;
+		optionsWithSequencesActivity.setMaxNumberOfOptions(actDto.getMaxOptions());
+		optionsWithSequencesActivity.setMinNumberOfOptions(actDto.getMinOptions());
+		optionsWithSequencesActivity.setOptionsInstructions(actDto.getOptionsInstructions());
+		optionsWithSequencesActivity.setStartXcoord(actDto.getStartXCoord());
+		optionsWithSequencesActivity.setEndXcoord(actDto.getEndXCoord());
+		optionsWithSequencesActivity.setStartYcoord(actDto.getStartYCoord());
+		optionsWithSequencesActivity.setEndYcoord(actDto.getEndYCoord());
 		break;
 	    case Activity.SEQUENCE_ACTIVITY_TYPE:
 		break;
