@@ -2,7 +2,6 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
 <%@ page import="java.util.HashMap"%>
-<%@ page import="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"%>
 <%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
 <c:set var="lams">
 	<lams:LAMSURL />

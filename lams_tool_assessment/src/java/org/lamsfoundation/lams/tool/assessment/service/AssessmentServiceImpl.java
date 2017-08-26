@@ -670,6 +670,9 @@ public class AssessmentServiceImpl
 	    }
 
 	} else if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
+	    //clear previous answer
+	    questionResult.setSubmittedOptionUid(null);
+	    
 	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 
 		//prepare regex which takes into account only * special character

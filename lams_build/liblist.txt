@@ -54,3 +54,5 @@ struts            jakarta-oro.jar                       2.0.7                  A
 urlrewritefilter urlrewritefilter-4.0.3.jar             4.0.3                  BSD License              	 tuckey.org         			  Java Web Filter which allows rewriting URLs
 
 xstream           xstream-1.5.0-SNAPSHOT.jar            1.5.0																				  XML serializer
+
+yuicompressor	  yuicompressor-2.4.9					2.4.9				   BSD License					YUI								  CSS and JS minifier 

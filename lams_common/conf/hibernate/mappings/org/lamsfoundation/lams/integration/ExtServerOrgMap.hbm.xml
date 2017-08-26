@@ -95,26 +95,6 @@
         />
 
         <property
-            name="serverUrl"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="server_url"
-            length="255"
-            not-null="false"
-        />
-
-        <property
-            name="timeoutUrl"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="timeout_url"
-            length="65535"
-            not-null="true"
-        />
-
-        <property
             name="lessonFinishUrl"
             type="java.lang.String"
             update="true"

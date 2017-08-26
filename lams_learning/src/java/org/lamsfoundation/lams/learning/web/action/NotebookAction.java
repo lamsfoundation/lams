@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
@@ -32,7 +31,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -47,7 +45,6 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -60,13 +57,9 @@ public class NotebookAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
     // Instance variables
     // ---------------------------------------------------------------------
-    private static Logger log = Logger.getLogger(NotebookAction.class);
-
     private static final String VIEW_ALL = "viewAll";
     private static final String VIEW_SINGLE = "viewSingle";
     private static final String VIEW_JOURNALS = "viewJournals";
-    private static final String ADD_NEW = "addNew";
-    private static final String SAVE_SUCCESS = "saveSuccess";
 
     public ICoreNotebookService getNotebookService() {
 	WebApplicationContext webContext = WebApplicationContextUtils
@@ -89,7 +82,10 @@ public class NotebookAction extends LamsDispatchAction {
 	Integer learnerID = LearningWebUtil.getUserId();
 
 	// lessonID
-	Long lessonID = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
+	Long lessonID = (Long) notebookForm.get("currentLessonID");
+	if (lessonID == null || lessonID == 0) {
+	    lessonID = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
+	}
 
 	// get all notebook entries for the learner
 
@@ -140,7 +136,7 @@ public class NotebookAction extends LamsDispatchAction {
 	}
 
 	request.getSession().setAttribute("journals", journals);
-	request.setAttribute("lessonID", lessonID);
+	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonID);
 
 	return mapping.findForward(NotebookAction.VIEW_JOURNALS);
     }
@@ -174,6 +170,7 @@ public class NotebookAction extends LamsDispatchAction {
 
 	DynaActionForm notebookForm = (DynaActionForm) actionForm;
 	Long uid = (Long) notebookForm.get("uid");
+	Long currentLessonID = (Long) notebookForm.get("currentLessonID");
 	String mode = WebUtil.readStrParam(request, "mode", true);
 
 	NotebookEntry entry = notebookService.getEntry(uid);
@@ -184,6 +181,10 @@ public class NotebookAction extends LamsDispatchAction {
 
 	if (entry != null) {
 	    request.setAttribute("entry", entry);
+	}
+
+	if (currentLessonID != null) {
+	    request.setAttribute("currentLessonID", currentLessonID);
 	}
 
 	return mapping.findForward(NotebookAction.VIEW_SINGLE);
@@ -208,7 +209,7 @@ public class NotebookAction extends LamsDispatchAction {
 	notebookService.createNotebookEntry(id, CoreNotebookConstants.SCRATCH_PAD, signature, userID, title, entry);
 
 	boolean skipViewAll = WebUtil.readBooleanParam(request, "skipViewAll", false);
-	return skipViewAll ? null : mapping.findForward("viewAllRedirect");
+	return skipViewAll ? null : viewAll(mapping, actionForm, request, response);
     }
 
     /**
@@ -223,7 +224,6 @@ public class NotebookAction extends LamsDispatchAction {
 	// get form data
 	DynaActionForm notebookForm = (DynaActionForm) actionForm;
 	Long uid = (Long) notebookForm.get("uid");
-	Long id = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
 	String title = (String) notebookForm.get("title");
 	String entry = (String) notebookForm.get("entry");
 	String signature = (String) notebookForm.get("signature");
@@ -244,7 +244,7 @@ public class NotebookAction extends LamsDispatchAction {
 
 	notebookService.updateEntry(entryObj);
 
-	return mapping.findForward("viewAllRedirect");
+	return viewAll(mapping, actionForm, request, response);
 
     }
 

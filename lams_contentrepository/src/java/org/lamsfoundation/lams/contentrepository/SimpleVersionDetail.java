@@ -29,6 +29,7 @@ import java.util.Date;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryRuntimeException;
 
 /**
  * Describes the version details - for displaying a version

@@ -28,12 +28,12 @@ import java.io.InputStream;
 
 import org.lamsfoundation.lams.contentrepository.CrNode;
 import org.lamsfoundation.lams.contentrepository.CrWorkspace;
-import org.lamsfoundation.lams.contentrepository.FileException;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
-import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.dao.INodeDAO;
+import org.lamsfoundation.lams.contentrepository.exception.FileException;
+import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryRuntimeException;
+import org.lamsfoundation.lams.contentrepository.exception.ValueFormatException;
 
 public interface INodeFactory {
 
@@ -47,14 +47,14 @@ public interface INodeFactory {
      * @param relPath
      *            The path of the new Node that is to be created,
      *            the last item of this path will be the name of the new Node.
-     * @throws org.lamsfoundation.lams.contentrepository.InvalidParameterException
+     * @throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException
      *             if the file parameters are invalid
      * @throws RepositoryRuntimeException
      *             if an internal error occurs.
      */
     public abstract SimpleVersionedNode createFileNode(CrWorkspace workspace, SimpleVersionedNode parentNode,
 	    String relPath, InputStream istream, String filename, String mimeType, String versionDescription,
-	    Integer userId) throws org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+	    Integer userId) throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 
     /**
      * Create a new package node (which is assumed to be a newly created Spring
@@ -62,27 +62,27 @@ public interface INodeFactory {
      * 
      * @param initialPath
      *            The path of the default content.
-     * @throws org.lamsfoundation.lams.contentrepository.InvalidParameterException
+     * @throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException
      *             if the file parameters are invalid
      * @throws RepositoryRuntimeException
      *             if an internal error occurs.
      */
     public abstract SimpleVersionedNode createPackageNode(CrWorkspace workspace, String initialPath,
 	    String versionDescription, Integer userId)
-	    throws org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+	    throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 
     /**
      * Create a new data node (which is assumed to be a newly created Spring
      * bean). This node may have a parent node.
      * 
-     * @throws org.lamsfoundation.lams.contentrepository.InvalidParameterException
+     * @throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException
      *             if the file parameters are invalid
      * @throws RepositoryRuntimeException
      *             if an internal error occurs.
      */
     public abstract SimpleVersionedNode createDataNode(CrWorkspace workspace, SimpleVersionedNode parentNode,
 	    String versionDescription, Integer userId)
-	    throws org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+	    throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 
     /**
      * Build a SimpleVersionedNode, given a CrNode from the database. If versionId == null

@@ -30,7 +30,7 @@
    <!--Authoring Starter  -->
     <action
 		path="/authoringStarter"
-		type="org.lamsfoundation.lams.tool.mc.web.McStarterAction"
+		type="org.lamsfoundation.lams.tool.mc.web.action.McStarterAction"
 		name="McAuthoringForm"
 		scope="request"
 		unknown="false"
@@ -45,7 +45,7 @@
 	
 	<action
       path="/authoring"
-      type="org.lamsfoundation.lams.tool.mc.web.McAction"
+      type="org.lamsfoundation.lams.tool.mc.web.action.McAction"
       name="McAuthoringForm"
       input="/authoring/AuthoringTabsHolder.jsp"
       parameter="dispatch"
@@ -80,7 +80,7 @@
 
    <!--Learning Starter Action: initializes the Learning module -->
    <action 	path="/learningStarter" 
-   			type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
+   			type="org.lamsfoundation.lams.tool.mc.web.action.McLearningStarterAction" 
    			name="McLearningForm" 
 	      	scope="request"
 	      	validate="false"
@@ -158,7 +158,7 @@
 	<!-- ==========  Authroing Definitions: Pedagogical Planner methods ========== -->
 		<action
 	      path="/pedagogicalPlanner"
-	      type="org.lamsfoundation.lams.tool.mc.web.McPedagogicalPlannerAction"
+	      type="org.lamsfoundation.lams.tool.mc.web.action.McPedagogicalPlannerAction"
 	      name="McPedagogicalPlannerForm"
 	      scope="request"
 	      parameter="dispatch"
@@ -175,7 +175,7 @@
 	
    <!--Learning Main Action: interacts with the Learning module user -->
 	<action	path="/learning"
-		    type="org.lamsfoundation.lams.tool.mc.web.McLearningAction"
+		    type="org.lamsfoundation.lams.tool.mc.web.action.McLearningAction"
 			name="McLearningForm"
       		scope="request"
       		input="/learning/AnswersContent.jsp"
@@ -230,7 +230,7 @@
     
     <!--Monitoring Starter Action: initializes the Monitoring module -->
    <action 	path="/monitoringStarter" 
-   			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringStarterAction" 
+   			type="org.lamsfoundation.lams.tool.mc.web.action.McMonitoringStarterAction" 
 	      	scope="request"
       		unknown="false"
       		validate="false"
@@ -252,7 +252,7 @@
    
    <!--Monitoring Main Action: interacts with the Monitoring module user -->
    <action 	path="/monitoring" 
-   			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringAction"
+   			type="org.lamsfoundation.lams.tool.mc.web.action.McMonitoringAction"
 	      	scope="request"
    			input="/monitoring/MonitoringMaincontent.jsp"
       		parameter="dispatch"
@@ -304,7 +304,7 @@
 	</action>  
 	
    <action 	path="/clearsession" 
-   			type="org.lamsfoundation.lams.tool.mc.web.ClearSessionAction"> 
+   			type="org.lamsfoundation.lams.tool.mc.web.action.ClearSessionAction"> 
 	</action>    
  </action-mappings>
 	

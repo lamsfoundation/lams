@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.contentrepository.dao;
 
 import java.io.InputStream;
 
-import org.lamsfoundation.lams.contentrepository.FileException;
+import org.lamsfoundation.lams.contentrepository.exception.FileException;
 
 /**
  * Manages the reading and writing of files to the repository directories.

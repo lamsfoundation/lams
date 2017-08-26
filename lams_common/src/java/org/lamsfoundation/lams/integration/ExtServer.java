@@ -42,12 +42,6 @@ public class ExtServer implements Serializable, Comparable {
     private String userinfoUrl;
 
     /** persistent field */
-    private String serverUrl;
-
-    /** persistent field */
-    private String timeoutUrl;
-
-    /** persistent field */
     private String lessonFinishUrl;
 
     private String extGroupsUrl;
@@ -138,22 +132,6 @@ public class ExtServer implements Serializable, Comparable {
 
     public void setUserinfoUrl(String userinfoUrl) {
 	this.userinfoUrl = userinfoUrl;
-    }
-
-    public String getServerUrl() {
-	return this.serverUrl;
-    }
-
-    public void setServerUrl(String serverUrl) {
-	this.serverUrl = serverUrl;
-    }
-
-    public String getTimeoutUrl() {
-	return this.timeoutUrl;
-    }
-
-    public void setTimeoutUrl(String timeoutUrl) {
-	this.timeoutUrl = timeoutUrl;
     }
 
     public String getLessonFinishUrl() {

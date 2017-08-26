@@ -134,6 +134,10 @@ public class IndexAction extends LamsDispatchAction {
 		.getFavoriteOrganisationsByUser(userDTO.getUserID());
 	request.setAttribute("favoriteOrganisations", favoriteOrganisations);
 	request.setAttribute("activeOrgId", user.getLastVisitedOrganisationId());
+	
+	boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
+	int userCoursesCount = userManagementService.getCountActiveCoursesByUser(userDTO.getUserID(), isSysadmin, null);
+	request.setAttribute("isCourseSearchOn", userCoursesCount > 10);
 
 	return mapping.findForward("main");
     }

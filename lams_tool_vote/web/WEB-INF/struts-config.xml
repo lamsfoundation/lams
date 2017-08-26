@@ -31,7 +31,7 @@
   <action-mappings>
 	<!--Authoring Main Action : interacts with the authoring module user-->
 	<action path="/authoring"
-	      	type="org.lamsfoundation.lams.tool.vote.web.AuthoringAction"
+	      	type="org.lamsfoundation.lams.tool.vote.web.action.AuthoringAction"
     	  	name="VoteAuthoringForm"
 	      	scope="request"
     	  	input="/authoring/AuthoringMaincontent.jsp"
@@ -103,7 +103,7 @@
 	<!-- ==========  Authroing Definitions: Pedagogical Planner methods ========== -->
 	<action
       path="/pedagogicalPlanner"
-      type="org.lamsfoundation.lams.tool.vote.web.VotePedagogicalPlannerAction"
+      type="org.lamsfoundation.lams.tool.vote.web.action.VotePedagogicalPlannerAction"
       name="VotePedagogicalPlannerForm"
       scope="request"
       parameter="dispatch"
@@ -119,7 +119,7 @@
 	
    <!--Learning Main Action: interacts with the Learning module user -->
 	<action	path="/learning"
-		    type="org.lamsfoundation.lams.tool.vote.web.LearningAction"
+		    type="org.lamsfoundation.lams.tool.vote.web.action.LearningAction"
 			name="VoteLearningForm"
       		scope="request"
       		input="/learning/AnswersContent.jsp"
@@ -222,7 +222,7 @@
    
    <!--Monitoring Main Action: interacts with the Monitoring module user -->
    <action 	path="/monitoring" 
-   			type="org.lamsfoundation.lams.tool.vote.web.MonitoringAction" 
+   			type="org.lamsfoundation.lams.tool.vote.web.action.MonitoringAction" 
    			name="VoteMonitoringForm" 
 	      	scope="request"
    			input="/monitoring/MonitoringMaincontent.jsp"
@@ -286,13 +286,13 @@
 	</action>  
 
    <action 	path="/chartGenerator" 
-   			type="org.lamsfoundation.lams.tool.vote.web.VoteChartGeneratorAction"
+   			type="org.lamsfoundation.lams.tool.vote.web.action.VoteChartGeneratorAction"
    			parameter="dispatch"
       		validate="false">
 	</action>
 	
    <action 	path="/clearsession" 
-   			type="org.lamsfoundation.lams.tool.vote.web.ClearSessionAction"> 
+   			type="org.lamsfoundation.lams.tool.vote.web.action.ClearSessionAction"> 
 	</action>     			
  </action-mappings>
 	

@@ -43,10 +43,10 @@ public class UserOrganisation implements Serializable {
     private Organisation organisation;
 
     /** persistent field */
-    private Set userOrganisationRoles;
+    private Set<UserOrganisationRole> userOrganisationRoles;
 
     /** full constructor */
-    public UserOrganisation(User user, Organisation organisation, Set userOrganisationRoles) {
+    public UserOrganisation(User user, Organisation organisation, Set<UserOrganisationRole> userOrganisationRoles) {
 	this.user = user;
 	this.organisation = organisation;
 	this.userOrganisationRoles = userOrganisationRoles;
@@ -86,17 +86,17 @@ public class UserOrganisation implements Serializable {
 	this.organisation = organisation;
     }
 
-    public Set getUserOrganisationRoles() {
+    public Set<UserOrganisationRole> getUserOrganisationRoles() {
 	return this.userOrganisationRoles;
     }
 
-    public void setUserOrganisationRoles(Set userOrganisationRoles) {
+    public void setUserOrganisationRoles(Set<UserOrganisationRole> userOrganisationRoles) {
 	this.userOrganisationRoles = userOrganisationRoles;
     }
 
     public void addUserOrganisationRole(UserOrganisationRole userOrganisationRole) {
 	if (userOrganisationRoles == null) {
-	    userOrganisationRoles = new HashSet();
+	    userOrganisationRoles = new HashSet<>();
 	}
 	userOrganisationRoles.add(userOrganisationRole);
     }

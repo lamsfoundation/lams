@@ -29,22 +29,22 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.CrWorkspace;
-import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.ItemExistsException;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
-import org.lamsfoundation.lams.contentrepository.ValidationException;
-import org.lamsfoundation.lams.contentrepository.ValueFormatException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.exception.FileException;
+import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.exception.ItemExistsException;
+import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.exception.LoginException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryRuntimeException;
+import org.lamsfoundation.lams.contentrepository.exception.ValidationException;
+import org.lamsfoundation.lams.contentrepository.exception.ValueFormatException;
+import org.lamsfoundation.lams.contentrepository.exception.WorkspaceNotFoundException;
 
 /**
  * Tool access to the repository.

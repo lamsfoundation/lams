@@ -70,7 +70,7 @@
 			</list>
 		</property>
 			<property name="target">
-				<bean class="org.lamsfoundation.lams.tool.mc.service.McServicePOJO">
+				<bean class="org.lamsfoundation.lams.tool.mc.service.McService">
 					<property name="mcContentDAO"><ref bean="mcContentDAO"/></property>
 					<property name="mcSessionDAO"><ref bean="mcSessionDAO"/></property>
 					<property name="mcUserDAO"><ref bean="mcUserDAO"/></property>

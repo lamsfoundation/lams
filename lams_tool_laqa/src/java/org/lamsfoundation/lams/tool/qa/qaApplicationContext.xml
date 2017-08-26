@@ -70,7 +70,7 @@
 			</list>
 		</property>
 			<property name="target">
-				<bean class="org.lamsfoundation.lams.tool.qa.service.QaServicePOJO">
+				<bean class="org.lamsfoundation.lams.tool.qa.service.QaService">
 					<property name="qaDAO"><ref bean="qaContentDAO"/></property>
 					<property name="qaSessionDAO"><ref bean="qaSessionDAO"/></property>
 					<property name="qaQueUsrDAO"><ref bean="qaQueUsrDAO"/></property>

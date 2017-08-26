@@ -13,5 +13,5 @@
     <label for="dokumaran.instructions">
     	<fmt:message key="label.authoring.basic.instruction" />
     </label>
-    <lams:CKEditor id="dokumaran.instructions" value="${formBean.dokumaran.instructions}" contentFolderID="${formBean.contentFolderID}" height="400"/>
+    <lams:CKEditor id="dokumaran.instructions" value="${formBean.dokumaran.instructions}" contentFolderID="${formBean.contentFolderID}" height="400" toolbarSet="DefaultDoku" method="inline"/>
 </div>

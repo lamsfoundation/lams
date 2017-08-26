@@ -173,15 +173,9 @@ public class IntegrationService implements IIntegrationService {
 	ExtCourseClassMap extCourseClassMap = getExtCourseClassMap(extServer.getSid(), extCourseId);
 	if (extCourseClassMap == null) {
 	    //create new ExtCourseClassMap
-
-	    org = createOrganisation(extServer, user, extCourseId, extCourseName, countryIsoCode, langIsoCode,
-		    parentOrgId, prefix);
-	    extCourseClassMap = new ExtCourseClassMap();
-	    extCourseClassMap.setCourseid(extCourseId);
-	    extCourseClassMap.setExtServer(extServer);
-	    extCourseClassMap.setOrganisation(org);
-	    service.save(extCourseClassMap);
-
+	    extCourseClassMap = createExtCourseClassMap(extServer, user.getUserId(), extCourseId, extCourseName,
+		    countryIsoCode, langIsoCode, parentOrgId, prefix);
+	    org = extCourseClassMap.getOrganisation();
 	} else {
 	    org = extCourseClassMap.getOrganisation();
 
@@ -203,6 +197,21 @@ public class IntegrationService implements IIntegrationService {
 
 	updateUserRoles(user, org, isTeacher);
 
+	return extCourseClassMap;
+    }
+
+    @Override
+    public ExtCourseClassMap createExtCourseClassMap(ExtServer extServer, Integer userId, String extCourseId,
+	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean prefix)
+	    throws UserInfoValidationException {
+	User user = (User) service.findById(User.class, userId);
+	Organisation org = createOrganisation(extServer, user, extCourseId, extCourseName, countryIsoCode, langIsoCode,
+		parentOrgId, prefix);
+	ExtCourseClassMap extCourseClassMap = new ExtCourseClassMap();
+	extCourseClassMap.setCourseid(extCourseId);
+	extCourseClassMap.setExtServer(extServer);
+	extCourseClassMap.setOrganisation(org);
+	service.save(extCourseClassMap);
 	return extCourseClassMap;
     }
 

@@ -29,8 +29,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 
 /**
  * <p>

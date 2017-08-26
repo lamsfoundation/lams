@@ -24,6 +24,8 @@
 
 package org.lamsfoundation.lams.contentrepository;
 
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
+
 /**
  * LAMS property types.
  */

@@ -130,7 +130,7 @@
 </tag>
 <tag>
 <name>resource</name>
-<tagclass>org.apache.strutsel.taglib.bean.ELDokumaranTag</tagclass>
+<tagclass>org.apache.strutsel.taglib.bean.ELResourceTag</tagclass>
 <teiclass>org.apache.struts.taglib.bean.ResourceTei</teiclass>
 <bodycontent>empty</bodycontent>
 <attribute>

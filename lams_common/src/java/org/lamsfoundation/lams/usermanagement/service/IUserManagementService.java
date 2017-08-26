@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.themes.Theme;
@@ -58,7 +59,7 @@ public interface IUserManagementService {
      *            The object to be inserted
      */
     void save(Object object);
-    
+
     User saveUser(User user);
 
     /**
@@ -133,29 +134,30 @@ public interface IUserManagementService {
      * @return UserBasicDTO objectsin a Vector
      */
     Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean getUser);
-    
+
     /**
      * Return all organisations that were marked as favorite by the specified user
-     * 
+     *
      * @param userId
      * @return
      */
     List<Organisation> getFavoriteOrganisationsByUser(Integer userId);
-    
+
     /**
      * Checks whether user marked this organisation as favorite.
-     * 
+     *
      * @param organisationId
      * @param userId
      * @return
      */
     boolean isOrganisationFavorite(Integer organisationId, Integer userId);
-    
+
     /**
      * Toggles whether organisation is marked as favorite
-     * 
+     *
      * @param organisation
-     * @param user user performing toggling
+     * @param user
+     *            user performing toggling
      */
     void toggleOrganisationFavorite(Integer orgId, Integer userId);
 
@@ -213,6 +215,11 @@ public interface IUserManagementService {
      * @return a list of UserOrganisationRoles
      */
     List getUserOrganisationRoles(Integer orgId, String login);
+
+    /**
+     * Returns mapping org ID -> role IDs
+     */
+    Map<Integer, Set<Integer>> getRolesForUser(Integer userId);
 
     /**
      * @param login
@@ -306,6 +313,8 @@ public interface IUserManagementService {
      * @param rolesList
      */
     void setRolesForUserOrganisation(User user, Integer organisationId, List<String> rolesList);
+
+    void setRolesForUserOrganisation(Integer userId, Integer organisationId, Set<Integer> roleIDList);
 
     /**
      * Returns list of roles suitable for the given orgType.
