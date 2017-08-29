@@ -6,52 +6,39 @@
 
 <hibernate-mapping
 >
-
     <class
         name="org.lamsfoundation.lams.learningdesign.ActivityEvaluation"
         table="lams_activity_evaluation"
     >
-
         <id
-            name="uid"
-            column="activity_evaluation_id"
+            name="activityId"
+            column="activity_id"
             type="java.lang.Long"
         >
-            <generator class="native">
-              <!--  
-                  To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-ActivityEvaluation.xml 
-                  containing the additional parameters and place it in your merge dir. 
-              --> 
-            </generator>
+            <generator class="foreign">
+				<param name="property">activity</param>
+			</generator>
         </id>
-
-        <many-to-one
-            name="activity"
-            class="org.lamsfoundation.lams.learningdesign.ToolActivity"
-            cascade="save-update"
-            
-            update="true"
-            insert="true"
-            column="activity_id"
+        
+        <one-to-one
+        	name="activity"
+        	class="org.lamsfoundation.lams.learningdesign.ToolActivity"
+        	constrained="true"
+			foreign-key="FK_lams_activity_evaluation_1"
+		/>
+		
+        <property
+            name="toolOutputDefinition"
+            type="java.lang.String"
+            column="tool_output_definition"
+            length="255"
             not-null="true"
         />
 
         <property
-            name="toolOutputDefinition"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="tool_output_definition"
-            length="255"
+            name="weight"
+            type="java.lang.Float"
+            column="weight"
         />
-
-        <!--
-            To add non XDoclet property mappings, create a file named
-                hibernate-properties-ActivityEvaluation.xml
-            containing the additional properties and place it in your merge dir.
-        -->
-
     </class>
-
 </hibernate-mapping>

@@ -178,7 +178,14 @@ public class ToolContentVersionFilter {
 		    node = node.getNextSibling();
 		    if (oldNode.getNodeName().equals(renamed.oldFieldname)) {
 			Element newElement = root.getOwnerDocument().createElement(renamed.newFieldname);
-			newElement.setTextContent(oldNode.getTextContent());
+			if (oldNode.hasChildNodes()) {
+			    NodeList children = oldNode.getChildNodes();
+			    for (int childIndex = 0; childIndex < children.getLength(); childIndex++) {
+				newElement.appendChild(children.item(childIndex).cloneNode(true));
+			    }
+			} else {
+			    newElement.setTextContent(oldNode.getTextContent());
+			}
 			root.replaceChild(newElement, oldNode);
 			ToolContentVersionFilter.log.debug("Field " + renamed.oldFieldname + " in class "
 				+ renamed.ownerClass.getName() + " was renamed to " + renamed.newFieldname);

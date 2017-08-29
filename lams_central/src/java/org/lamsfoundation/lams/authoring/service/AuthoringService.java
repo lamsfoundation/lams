@@ -403,8 +403,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	SortedMap<String, ToolOutputDefinition> defns = lamsCoreToolService.getOutputDefinitionsFromTool(toolContentID,
 		definitionType);
 
-	ArrayList<ToolOutputDefinitionDTO> defnDTOList = new ArrayList<ToolOutputDefinitionDTO>(
-		defns != null ? defns.size() : 0);
+	ArrayList<ToolOutputDefinitionDTO> defnDTOList = new ArrayList<>(defns != null ? defns.size() : 0);
 	if (defns != null) {
 	    for (ToolOutputDefinition defn : defns.values()) {
 		defnDTOList.add(new ToolOutputDefinitionDTO(defn));
@@ -857,8 +856,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	updateCompetenceMappings(newLearningDesign.getCompetences(), newActivities);
 
-	updateEvaluations(newActivities);
-
 	try {
 	    AuthoringService.copyLearningDesignImages(originalLearningDesign.getLearningDesignId(),
 		    newLearningDesign.getLearningDesignId());
@@ -944,19 +941,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	insertCompetenceMappings(mainDesign.getCompetences(), designToImport.getCompetences(), newActivities);
 
-	// For some reason, the evaluations will not save on insert when the
-	// learning design is saved, so doing it manually here
-
-	this.updateEvaluations(newActivities);
-
-	// for (Integer activityKey : newActivities.keySet()) {
-	// Activity activity = newActivities.get(activityKey);
-	// if (activity.isToolActivity()) {
-	// ToolActivity toolAct = (ToolActivity) activity;
-	// baseDAO.insertOrUpdateAll(toolAct.getActivityEvaluations());
-	// }
-	// }
-
 	return mainDesign;
     }
 
@@ -1027,16 +1011,16 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      */
     private HashMap<Integer, Activity> updateDesignActivities(LearningDesign originalLearningDesign,
 	    LearningDesign newLearningDesign, int uiidOffset, String customCSV) {
-	HashMap<Integer, Activity> newActivities = new HashMap<Integer, Activity>(); // key
+	HashMap<Integer, Activity> newActivities = new HashMap<>(); // key
 	// is
 	// UIID
-	HashMap<Integer, Grouping> newGroupings = new HashMap<Integer, Grouping>(); // key
+	HashMap<Integer, Grouping> newGroupings = new HashMap<>(); // key
 	// is
 	// UIID
 
 	// as we create the activities, we need to record any "first child"
 	// UIID's for the sequence activity to process later
-	Map<Integer, SequenceActivity> firstChildUIIDToSequence = new HashMap<Integer, SequenceActivity>();
+	Map<Integer, SequenceActivity> firstChildUIIDToSequence = new HashMap<>();
 
 	Set oldParentActivities = originalLearningDesign.getParentActivities();
 	if (oldParentActivities != null) {
@@ -1115,7 +1099,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    }
 
 	    if ((activity.getInputActivities() != null) && (activity.getInputActivities().size() > 0)) {
-		Set<Activity> newInputActivities = new HashSet<Activity>();
+		Set<Activity> newInputActivities = new HashSet<>();
 		Iterator inputIter = activity.getInputActivities().iterator();
 		while (inputIter.hasNext()) {
 		    Activity elem = (Activity) inputIter.next();
@@ -1293,7 +1277,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      */
     public void updateDesignCompetences(LearningDesign originalLearningDesign, LearningDesign newLearningDesign,
 	    boolean insert) {
-	HashSet<Competence> newCompeteces = new HashSet<Competence>();
+	HashSet<Competence> newCompeteces = new HashSet<>();
 
 	Set<Competence> oldCompetences = originalLearningDesign.getCompetences();
 	if (oldCompetences != null) {
@@ -1340,7 +1324,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	for (Integer activityKey : newActivities.keySet()) {
 	    Activity activity = newActivities.get(activityKey);
 	    if (activity.isToolActivity()) {
-		Set<CompetenceMapping> newCompetenceMappings = new HashSet<CompetenceMapping>();
+		Set<CompetenceMapping> newCompetenceMappings = new HashSet<>();
 		ToolActivity newToolActivity = (ToolActivity) activity;
 		if (newToolActivity.getCompetenceMappings() != null) {
 		    for (CompetenceMapping competenceMapping : newToolActivity.getCompetenceMappings()) {
@@ -1398,7 +1382,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	for (Integer activityKey : newActivities.keySet()) {
 	    Activity activity = newActivities.get(activityKey);
 	    if (activity.isToolActivity()) {
-		Set<CompetenceMapping> newCompetenceMappings = new HashSet<CompetenceMapping>();
+		Set<CompetenceMapping> newCompetenceMappings = new HashSet<>();
 		ToolActivity newToolActivity = (ToolActivity) activity;
 		if (newToolActivity.getCompetenceMappings() != null) {
 		    for (CompetenceMapping competenceMapping : newToolActivity.getCompetenceMappings()) {
@@ -1417,20 +1401,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		}
 		newToolActivity.getCompetenceMappings().addAll(newCompetenceMappings);
 		// activityDAO.update(newToolActivity);
-	    }
-	}
-    }
-
-    private void updateEvaluations(HashMap<Integer, Activity> newActivities) {
-
-	for (Integer key : newActivities.keySet()) {
-	    Activity activity = newActivities.get(key);
-	    if (activity.isToolActivity()) {
-		Set<ActivityEvaluation> newActivityEvaluations = ((ToolActivity) activity).getActivityEvaluations();
-
-		if (newActivityEvaluations != null) {
-		    baseDAO.insertOrUpdateAll(newActivityEvaluations);
-		}
 	    }
 	}
     }
@@ -1551,7 +1521,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     @Override
     public Vector<AuthoringActivityDTO> getToolActivities(Long learningDesignId, String languageCode) {
 	LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignId);
-	Vector<AuthoringActivityDTO> listOfAuthoringActivityDTOs = new Vector<AuthoringActivityDTO>();
+	Vector<AuthoringActivityDTO> listOfAuthoringActivityDTOs = new Vector<>();
 
 	for (Iterator i = learningDesign.getActivities().iterator(); i.hasNext();) {
 	    Activity currentActivity = (Activity) i.next();
@@ -1744,9 +1714,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	}
 	if (gradebookToolOutputDefinitionName != null) {
 	    ActivityEvaluation evaluation = new ActivityEvaluation();
-	    evaluation.setActivity(activity);
 	    evaluation.setToolOutputDefinition(gradebookToolOutputDefinitionName);
-	    baseDAO.insert(evaluation);
+	    evaluation.setActivity(activity);
+	    activity.setEvaluation(evaluation);
+	    activityDAO.update(activity);
 	}
 
 	learningDesign.getActivities().add(activity);
@@ -1802,7 +1773,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     @Override
     public List<LearningDesignAccess> updateLearningDesignAccessByUser(Integer userId) {
 	List<LearningDesignAccess> accessList = learningDesignDAO.getAccessByUser(userId);
-	List<LearningDesignAccess> result = new LinkedList<LearningDesignAccess>();
+	List<LearningDesignAccess> result = new LinkedList<>();
 	for (LearningDesignAccess access : accessList) {
 	    LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(access.getLearningDesignId());
 	    if (learningDesign == null) {

@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learningdesign.dto;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -244,7 +245,7 @@ public class AuthoringActivityDTO extends BaseDTO {
     /** List of the UIIDs of the activities that are input activities for this activity */
     private Integer toolActivityUIID;
 
-    private ArrayList<String> activityEvaluations;
+    private List<String> evaluation;
 
     /**
      * Used by a sequence activity to determine the start of the transition based sequence and used by tool based
@@ -412,7 +413,7 @@ public class AuthoringActivityDTO extends BaseDTO {
 	extLmsId = toolActivity.getTool().getExtLmsId();
 	helpURL = HelpUtil.constructToolURL(toolActivity.getTool().getHelpUrl(), toolSignature, "", languageCode);
 
-	competenceMappingTitles = new ArrayList<String>();
+	competenceMappingTitles = new ArrayList<>();
 	if (toolActivity.getCompetenceMappings() != null) {
 
 	    Set<CompetenceMapping> competenceMappings = toolActivity.getCompetenceMappings();
@@ -424,15 +425,18 @@ public class AuthoringActivityDTO extends BaseDTO {
 	    }
 	}
 
-	activityEvaluations = new ArrayList<String>();
-	if (toolActivity.getActivityEvaluations() != null) {
-	    for (ActivityEvaluation eval : toolActivity.getActivityEvaluations()) {
-		activityEvaluations.add(eval.getToolOutputDefinition());
+	if (toolActivity.getEvaluation() != null) {
+	    evaluation = new ArrayList<String>();
+	    ActivityEvaluation eval = toolActivity.getEvaluation();
+	    evaluation.add(eval.getToolOutputDefinition());
+	    if (eval.getWeight() != null) {
+		String.valueOf(eval.getWeight());
 	    }
 	}
 
 	plannerMetadataDTO = toolActivity.getPlannerMetadata() == null ? null
 		: new PlannerActivityMetadataDTO(toolActivity.getPlannerMetadata());
+
     }
 
     private void addGateActivityAttributes(Object activity, ArrayList<BranchActivityEntryDTO> branchMappings) {
@@ -1248,12 +1252,12 @@ public class AuthoringActivityDTO extends BaseDTO {
 	this.competenceMappingTitles = competenceMappingTitles;
     }
 
-    public ArrayList<String> getActivityEvaluations() {
-	return activityEvaluations;
+    public List<String> getEvaluation() {
+	return evaluation;
     }
 
-    public void setActivityEvaluations(ArrayList<String> activityEvaluations) {
-	this.activityEvaluations = activityEvaluations;
+    public void setEvaluation(List<String> evaluation) {
+	this.evaluation = evaluation;
     }
 
     public PlannerActivityMetadataDTO getPlannerMetadataDTO() {

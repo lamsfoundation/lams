@@ -248,7 +248,7 @@ ActivityDefs = {
 	 * Constructor for a Tool Activity.
 	 */
 	ToolActivity : function(id, uiid, toolContentID, toolID, learningLibraryID, authorURL, x, y, title,
-							readOnly, gradebookToolOutputDefinitionName) {
+							readOnly, evaluation) {
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.toolContentID = toolContentID;
@@ -257,7 +257,8 @@ ActivityDefs = {
 		this.authorURL = authorURL;
 		this.title = title;
 		this.readOnly = readOnly;
-		this.gradebookToolOutputDefinitionName = gradebookToolOutputDefinitionName;
+		this.gradebookToolOutputDefinitionName = evaluation ? evaluation[0] :  "<NONE>";
+		this.gradebookToolOutputWeight = evaluation && evaluation.length > 1 ? evaluation[1] : null;
 		this.transitions = {
 			'from' : [],
 			'to'   : []

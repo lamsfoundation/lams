@@ -1514,8 +1514,7 @@ GeneralLib = {
 											activityData.yCoord ? activityData.yCoord : 1,
 											activityData.activityTitle,
 											activityData.readOnly,
-											activityData.activityEvaluations.length > 0
-												? activityData.activityEvaluations[0] : "<NONE>");
+											activityData.evaluation);
 							// for later reference
 							activityData.activity = activity;
 							break;
@@ -2329,7 +2328,8 @@ GeneralLib = {
 				'maxOptions'			 : activity.maxOptions || null,
 				'stopAfterActivity'		 : activity.stopAfterActivity ? true : false,
 				'toolActivityUIID'		 : activity.input ? activity.input.uiid : null,
-				'gradebookToolOutputDefinitionName' : activity.gradebookToolOutputDefinitionName
+				'gradebookToolOutputDefinitionName' : activity.gradebookToolOutputDefinitionName == '<NONE>' ?
+														null : activity.gradebookToolOutputDefinitionName 
 			});
 	
 			var activityTransitions = activity instanceof ActivityDefs.BranchingActivity ?

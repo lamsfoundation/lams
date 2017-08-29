@@ -203,4 +203,5 @@ public interface AuthoringJsonTags {
 
     /** Evaluation tool output tag */
     public static final String TOOL_OUTPUT_DEFINITION = "gradebookToolOutputDefinitionName";
+    public static final String TOOL_OUTPUT_WEIGHT = "gradebookToolOutputWeight";
 }

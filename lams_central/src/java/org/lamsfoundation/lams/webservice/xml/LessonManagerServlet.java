@@ -173,8 +173,8 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    if (method.equals(CentralConstants.METHOD_START)) {
 		ldId = new Long(ldIdStr);
-		Long lessonId = startLesson(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
-			country, lang, customCSV, presenceEnable, imEnable, enableNotifications);
+		Long lessonId = LessonManagerServlet.startLesson(serverId, datetime, hashValue, username, ldId,
+			courseId, title, desc, country, lang, customCSV, presenceEnable, imEnable, enableNotifications);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
@@ -388,7 +388,7 @@ public class LessonManagerServlet extends HttpServlet {
 		    user.getUserId(), customCSV, false, false, presenceEnable, imEnable, true, enableNotifications,
 		    false, false, null, null);
 	    // 2. create lessonClass for lesson
-	    createLessonClass(lesson, organisation, user);
+	    LessonManagerServlet.createLessonClass(lesson, organisation, user);
 	    // 3. start lesson
 	    monitoringService.startLesson(lesson.getLessonId(), user.getUserId());
 	    // store information which extServer has started the lesson
@@ -415,7 +415,7 @@ public class LessonManagerServlet extends HttpServlet {
 		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false,
 		    false, presenceEnable, imEnable, true, enableNotifications, false, false, null, null);
 	    // 2. create lessonClass for lesson
-	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
+	    LessonManagerServlet.createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. schedule lesson
 	    Date date = DateUtil.convertFromString(startDate, DateUtil.SCHEDULE_LESSON_FORMAT);
 	    monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap.getUser().getUserId());
@@ -739,8 +739,8 @@ public class LessonManagerServlet extends HttpServlet {
     private Long importLearningDesign(HttpServletRequest request, HttpServletResponse response, String filePath,
 	    String username, String serverId, String customCSV) throws RemoteException {
 
-	List<String> ldErrorMsgs = new ArrayList<String>();
-	List<String> toolsErrorMsgs = new ArrayList<String>();
+	List<String> ldErrorMsgs = new ArrayList<>();
+	List<String> toolsErrorMsgs = new ArrayList<>();
 	Long ldId = null;
 	Integer workspaceFolderUid = null;
 	ExtUserUseridMap userMap;
@@ -783,9 +783,9 @@ public class LessonManagerServlet extends HttpServlet {
 
     @SuppressWarnings("unchecked")
     private static void createLessonClass(Lesson lesson, Organisation organisation, User creator) {
-	List<User> staffList = new LinkedList<User>();
+	List<User> staffList = new LinkedList<>();
 	staffList.add(creator);
-	List<User> learnerList = new LinkedList<User>();
+	List<User> learnerList = new LinkedList<>();
 	Vector<User> learnerVector = userManagementService
 		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, true);
 	learnerList.addAll(learnerVector);
@@ -896,7 +896,8 @@ public class LessonManagerServlet extends HttpServlet {
 		String[] learnerIdArray = (learnerIds != null) ? learnerIds.split(",") : new String[0];
 		String[] monitorIdArray = (monitorIds != null) ? monitorIds.split(",") : new String[0];
 		String[] firstNameArray = (firstNames != null)
-			? firstNames.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1) : new String[0];
+			? firstNames.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)
+			: new String[0];
 		String[] lastNameArray = (lastNames != null) ? lastNames.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)
 			: new String[0];
 		String[] emailArray = (emails != null) ? emails.split(",") : new String[0];
@@ -1032,7 +1033,7 @@ public class LessonManagerServlet extends HttpServlet {
 	ExtServer extServer = integrationService.getExtServer(serverId);
 	Authenticator.authenticate(extServer, datetime, username, hashValue);
 
-	List<Lesson> lessons = new LinkedList<Lesson>();
+	List<Lesson> lessons = new LinkedList<>();
 	if (courseId != null) {
 
 	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer.getSid(), courseId);
@@ -1073,7 +1074,7 @@ public class LessonManagerServlet extends HttpServlet {
 		}
 	    }
 	    lessonElement.setAttribute("lessonMaxPossibleMark", lessonMaxPossibleMark.toString());
-	    
+
 	    List<ExtUserUseridMap> allUsers = integrationService.getExtUserUseridMapByExtServer(extServer);
 
 	    // if outputsUser is null we build results for the whole lesson, otherwise - for the specified learner
@@ -1098,14 +1099,14 @@ public class LessonManagerServlet extends HttpServlet {
 	    } else {
 		log.debug("Getting tool ouputs report for: " + lessonId + ". With learning design: "
 			+ lesson.getLearningDesign().getLearningDesignId());
-		
+
 		List<User> usersCompletedLesson = monitoringService.getUsersCompletedLesson(lessonId, null, null, true);
 		List<GradebookUserLesson> gradebookUserLessons = gradebookService.getGradebookUserLesson(lessonId);
-		
+
 		// add all users who had finished the lesson
 		for (User user : usersCompletedLesson) {
 		    Integer userId = user.getUserId();
-		    
+
 		    // find user's gradebookLessonMark (it will be null in cases when lesson contains zero activities that
 		    // set to produce toolOutputs)
 		    Double gradebookUserLessonMark = null;
@@ -1130,19 +1131,19 @@ public class LessonManagerServlet extends HttpServlet {
 
     /*
      * Creates learner element and appends it to the specified lessonElement.
-     * 
+     *
      * @param extServer
-     * 
+     *
      * @param lessonElement
-     * 
+     *
      * @param allUsers all available users associated with extServer
-     * 
+     *
      * @param userId userId of the learner to whom this learnerElement corresponds
-     * 
+     *
      * @param gradebookUserLessonMark mark of the gradebookUserLesson
-     * 
+     *
      * @return
-     * 
+     *
      * @throws Exception
      */
     private void createLearnerElement(ExtServer extServer, Element lessonElement, List<ExtUserUseridMap> allUsers,
@@ -1203,7 +1204,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 	Set<ToolActivity> activities = getLessonActivities(lesson);
 
-	Set<User> learners = new TreeSet<User>();
+	Set<User> learners = new TreeSet<>();
 	// if outputsUser is null we build results for the whole lesson, otherwise - for the specified learner
 	if (outputsUser != null) {
 
@@ -1231,7 +1232,7 @@ public class LessonManagerServlet extends HttpServlet {
 	List<ToolSession> toolSessions = toolService.getToolSessionsByLesson(lesson);
 
 	// map contains pairs toolContentId -> toolOutputDefinitions
-	Map<Long, Map<String, ToolOutputDefinition>> toolOutputDefinitionsMap = new TreeMap<Long, Map<String, ToolOutputDefinition>>();
+	Map<Long, Map<String, ToolOutputDefinition>> toolOutputDefinitionsMap = new TreeMap<>();
 	for (ToolActivity activity : activities) {
 	    Long toolContentId = activity.getToolContentId();
 	    if (toolOutputDefinitionsMap.get(toolContentId) == null) {
@@ -1325,8 +1326,8 @@ public class LessonManagerServlet extends HttpServlet {
      */
     @SuppressWarnings("unchecked")
     private Set<ToolActivity> getLessonActivities(Lesson lesson) {
-	Set<Activity> activities = new TreeSet<Activity>();
-	Set<ToolActivity> toolActivities = new TreeSet<ToolActivity>();
+	Set<Activity> activities = new TreeSet<>();
+	Set<ToolActivity> toolActivities = new TreeSet<>();
 
 	/*
 	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
@@ -1412,14 +1413,12 @@ public class LessonManagerServlet extends HttpServlet {
 		    ToolOutputDefinition definition = toolOutputDefinitions.get(outputName);
 
 		    if (isAuthoredToolOutputs) {
-			Set<ActivityEvaluation> activityEvaluations = activity.getActivityEvaluations();
-			if (activityEvaluations != null) {
-			    for (ActivityEvaluation evaluation : activityEvaluations) {
-				if (outputName.equals(evaluation.getToolOutputDefinition())) {
-				    ToolOutput toolOutput = toolService.getOutputFromTool(outputName, toolSession,
-					    learner.getUserId());
-				    activityElement.appendChild(getOutputElement(document, toolOutput, definition));
-				}
+			ActivityEvaluation evaluation = activity.getEvaluation();
+			if (evaluation != null) {
+			    if (outputName.equals(evaluation.getToolOutputDefinition())) {
+				ToolOutput toolOutput = toolService.getOutputFromTool(outputName, toolSession,
+					learner.getUserId());
+				activityElement.appendChild(getOutputElement(document, toolOutput, definition));
 			    }
 			}
 		    } else {

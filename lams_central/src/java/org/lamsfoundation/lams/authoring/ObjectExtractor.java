@@ -469,7 +469,8 @@ public class ObjectExtractor implements IObjectExtractor {
 
 			int nextOrderId = 2;
 			Activity nextActivity = defaultActivity.getTransitionFrom() != null
-				? defaultActivity.getTransitionFrom().getToActivity() : null;
+				? defaultActivity.getTransitionFrom().getToActivity()
+				: null;
 			while (nextActivity != null) {
 			    boolean removed = unprocessedChildren.remove(nextActivity);
 			    if (!removed) {
@@ -480,7 +481,8 @@ public class ObjectExtractor implements IObjectExtractor {
 			    }
 			    nextActivity.setOrderId(nextOrderId++);
 			    nextActivity = nextActivity.getTransitionFrom() != null
-				    ? nextActivity.getTransitionFrom().getToActivity() : null;
+				    ? nextActivity.getTransitionFrom().getToActivity()
+				    : null;
 			}
 
 			if (unprocessedChildren.size() > 0) {
@@ -768,36 +770,25 @@ public class ObjectExtractor implements IObjectExtractor {
 
     private void extractEvaluationObject(JSONObject activityDetails, ToolActivity toolActivity)
 	    throws ObjectExtractorException, JSONException {
-
-	Set<ActivityEvaluation> activityEvaluations = toolActivity.getActivityEvaluations();
-	ActivityEvaluation activityEvaluation;
-
-	// Get the first (only) ActivityEvaluation if it exists
-	if ((activityEvaluations != null) && (activityEvaluations.size() >= 1)) {
-	    activityEvaluation = activityEvaluations.iterator().next();
-	} else {
-	    activityEvaluation = new ActivityEvaluation();
-	}
-
 	String toolOutputDefinition = (String) JsonUtil.opt(activityDetails, AuthoringJsonTags.TOOL_OUTPUT_DEFINITION);
-	if (!StringUtils.isBlank(toolOutputDefinition)) {
-	    activityEvaluations = new HashSet<>();
-	    activityEvaluation.setActivity(toolActivity);
-	    activityEvaluation.setToolOutputDefinition(toolOutputDefinition);
-	    activityEvaluations.add(activityEvaluation);
-	    toolActivity.setActivityEvaluations(activityEvaluations);
-	    baseDAO.insertOrUpdate(activityEvaluation);
+	if (StringUtils.isNotBlank(toolOutputDefinition)) {
+	    ActivityEvaluation evaluation = toolActivity.getEvaluation();
+	    if (evaluation == null) {
+		evaluation = new ActivityEvaluation();
+		evaluation.setActivity(toolActivity);
+	    }
+	    evaluation.setToolOutputDefinition(toolOutputDefinition);
 
+	    String weight = (String) JsonUtil.opt(activityDetails, AuthoringJsonTags.TOOL_OUTPUT_WEIGHT);
+	    if (StringUtils.isNotBlank(weight)) {
+		evaluation.setWeight(Float.valueOf(weight));
+	    }
+	    toolActivity.setEvaluation(evaluation);
+	} else {
 	    // update the parent toolActivity
-	    toolActivity.setActivityEvaluations(activityEvaluations);
-	    activityDAO.insertOrUpdate(toolActivity);
-
-	} else if (activityEvaluation.getUid() != null) {
-	    // update the parent toolActivity
-	    toolActivity.setActivityEvaluations(new HashSet<ActivityEvaluation>());
-	    activityDAO.insertOrUpdate(toolActivity);
-	    baseDAO.delete(activityEvaluation);
+	    toolActivity.setEvaluation(null);
 	}
+	activityDAO.update(toolActivity);
     }
 
     private void parseCompetences(JSONArray competenceList) throws ObjectExtractorException, JSONException {
