@@ -839,12 +839,6 @@ public class AuthoringAction extends Action {
 		}
 	    }
 	    if (form.getForum().isAllowRateMessages()) {
-		if (form.getForum().getMaximumRate() <= 0) {
-		    ActionMessage error = new ActionMessage("error.limit.char.less.zero");
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-		}
-	    }
-	    if (form.getForum().isAllowRateMessages()) {
 		if (form.getForum().getMaximumRate() != 0
 			&& form.getForum().getMaximumRate() < form.getForum().getMinimumRate()) {
 		    ActionMessage error = new ActionMessage("error.min.rate.less.max");
@@ -856,12 +850,6 @@ public class AuthoringAction extends Action {
 		if (form.getForum().getMaximumReply() != 0
 			&& form.getForum().getMaximumReply() < form.getForum().getMinimumReply()) {
 		    ActionMessage error = new ActionMessage("error.min.less.max");
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-		}
-	    }
-	    if (!form.getForum().isAllowNewTopic()) {
-		if (form.getForum().getMaximumReply() <= 0) {
-		    ActionMessage error = new ActionMessage("error.limit.char.less.zero");
 		    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 		}
 	    }
