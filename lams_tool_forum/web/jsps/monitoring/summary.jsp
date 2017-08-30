@@ -29,6 +29,8 @@
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 <script src="${lams}includes/javascript/jquery.timeago.js" type="text/javascript"></script>
 <script src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js" type="text/javascript"></script>
+<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
+
 <script type="text/javascript">
 
 	function releaseMarks(sessionId){
@@ -86,7 +88,7 @@
 							rows += '<tr>';
 							
 							rows += '<td>';
-							rows += 	userData["userName"];
+							rows += 	definePortraitPopover(userData["portraitId"], userData["userId"], userData["userName"], userData["userName"]);
 							rows += '</td>';
 							
 							rows += '<td align="right">';
@@ -135,6 +137,7 @@
 			    	}
 				}})
 			  .bind('pagerInitialized pagerComplete', function(event, options){
+					initializePortraitPopover('${lams}');
 					$("time.timeago").timeago();
 				})
 			 

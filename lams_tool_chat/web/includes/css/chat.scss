@@ -56,9 +56,16 @@
 	height: 200px;
 	overflow: auto;
 	border: $border-thin-default;
-	font-size: 12px;
-	font-weight: bold;
 	padding: 2px;
+}
+
+#roster span {
+    display: inline-block;
+	margin-left: 5px;
+	font-weight: bold;
+	font-size: 14px;
+    padding-top: 7px;
+    vertical-align: top;
 }
 	
 #sendMessageArea {
@@ -73,7 +80,7 @@
 #sendMessageButton {
 	width: 100%;
 }
-
+    
 .selected {
 	background-color: $gray-lightest;
 	padding: 2px;

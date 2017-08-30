@@ -22,6 +22,7 @@
 	};
 </script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
 
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -56,13 +57,13 @@
 			            json = {};
 			    		
 						for (i = 0; i < data.rows.length; i++){
-							var userData = data.rows[i];
-
+							var userData = data.rows[i],
+								userId = userData["userID"],
+								fullName = userData["fullName"];
+							
 							rows += '<tr>';
-							rows += '<td>'
-							rows += userData["fullName"];
-							rows += '</td>';
-							rows += '<td align="center">'
+ 							rows += '<td>'+ definePortraitPopover(userData["portraitId"], userId, fullName, fullName) +'</td>';
+ 							rows += '<td align="center">'
 							rows += userData["numFiles"];
 							rows += '</td>';
 							
@@ -72,7 +73,7 @@
 							} else {
 								rows += '<fmt:message key="label.no"/>';
 							}
-							rows += ' [<a href=\"javascript:viewMark('+userData["userID"]+','+$(table).attr("data-session-id")+');\"><fmt:message key="label.view.files" /></a>]';
+							rows += ' [<a href=\"javascript:viewMark('+userId+','+$(table).attr("data-session-id")+');\"><fmt:message key="label.view.files" /></a>]';
 							rows += '</td>';
 
 							<c:if test="${reflectOn}">
@@ -93,10 +94,12 @@
 						return json;
 			            
 			    	}
-				}
-			})
+			}
+			}).bind('pagerInitialized pagerComplete', function(event, options){
+				initializePortraitPopover('${lams}');
+            })
 		});
-  	})
+  	});
 
   	
   	function launchPopup(url, title) {
@@ -136,6 +139,7 @@
 			}
 		);
 	}
+
 </script>
 
 <div class="panel">

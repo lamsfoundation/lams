@@ -26,16 +26,25 @@
 	height: 260px;
 	overflow: auto;
 	border: $border-thin-default;
+	font-size: 14px;
 	padding: 2px;
 	padding-right:5px;
 }
 
 #roster {
-	height: 260px;
+	height: 200px;
 	overflow: auto;
 	border: $border-thin-default;
-	font-weight: bold;
 	padding: 2px;
+}
+
+#roster span {
+    display: inline-block;
+	margin-left: 5px;
+	font-weight: bold;
+	font-size: 14px;
+    padding-top: 7px;
+    vertical-align: top;
 }
 
 #sendMessageArea {

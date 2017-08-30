@@ -1013,7 +1013,7 @@ public class SubmitFilesService
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString, boolean getNotebookEntries) {
 	return submitUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries,
-		coreNotebookService);
+		coreNotebookService, userManagementService);
     }
 
     @Override

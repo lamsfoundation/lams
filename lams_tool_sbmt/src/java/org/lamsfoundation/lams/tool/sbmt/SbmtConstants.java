@@ -53,6 +53,8 @@ public class SbmtConstants {
 
     public static final String ATTR_USER_FILE_MARKED = "marked";
 
+    public static final String ATTR_PORTRAIT_ID = "portraitId";
+
     public static final String SUCCESS = "success";
 
     public static final String ATTR_FINISH_LOCK = "finishLock";

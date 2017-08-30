@@ -307,6 +307,7 @@ public class MonitoringAction extends Action {
 	    ForumUser user = (ForumUser) userAndReflection[0];
 
 	    responseRow.put(ForumConstants.ATTR_USER_UID, user.getUid());
+	    responseRow.put(ForumConstants.ATTR_USER_ID, user.getUserId());
 	    responseRow.put("userName", StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
 
 	    int numberOfPosts = 0;
@@ -338,6 +339,11 @@ public class MonitoringAction extends Action {
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
 		responseRow.put("notebookEntry", StringEscapeUtils.escapeHtml((String) userAndReflection[1]));
 	    }
+	    
+	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
+		responseRow.put(ForumConstants.ATTR_PORTRAIT_ID, userAndReflection[2]);
+	    }
+
 	    rows.put(responseRow);
 	}
 	responcedata.put("rows", rows);

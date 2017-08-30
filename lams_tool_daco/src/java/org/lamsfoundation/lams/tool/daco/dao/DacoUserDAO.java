@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 public interface DacoUserDAO extends DAO {
 
@@ -39,7 +40,8 @@ public interface DacoUserDAO extends DAO {
     List<DacoUser> getBySessionId(Long sessionId, int sorting);
 
     List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
-	    boolean getNotebookEntries, ICoreNotebookService coreNotebookService);
+	    boolean getNotebookEntries, ICoreNotebookService coreNotebookService, 
+	    IUserManagementService userManagementService);
 
     int getCountUsersBySession(final Long sessionId, String searchString);
 }

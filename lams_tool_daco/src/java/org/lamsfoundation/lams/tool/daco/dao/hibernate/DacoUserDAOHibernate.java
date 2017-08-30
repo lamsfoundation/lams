@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
 import org.lamsfoundation.lams.tool.daco.dao.DacoUserDAO;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -100,7 +101,8 @@ public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
      * where the String is the notebook entry. No notebook entries needed? Will return "null" in their place.
      */
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService) {
+	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService,
+	    IUserManagementService userManagementService) {
 
 	String sortingOrder;
 	switch (sorting) {
@@ -128,15 +130,18 @@ public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
 		    DacoConstants.TOOL_SIGNATURE, "user.user_id");
 	}
 
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+	
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 
-	queryText.append("SELECT user.* ");
-	queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
-	queryText.append(", COUNT(DISTINCT(record_id)) record_count");
-	queryText.append(" FROM tl_ladaco10_users user ");
-	queryText.append(
-		" JOIN tl_ladaco10_sessions sess on user.session_uid = sess.uid and sess.session_id = :sessionId");
+	queryText.append("SELECT user.* ")
+		.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry")
+		.append(", COUNT(DISTINCT(record_id)) record_count ")
+		.append(portraitStrings[0])
+		.append(" FROM tl_ladaco10_users user ")
+		.append(portraitStrings[1])
+		.append(	" JOIN tl_ladaco10_sessions sess on user.session_uid = sess.uid and sess.session_id = :sessionId");
 
 	// If filtering by name add a name based where clause
 	buildNameSearch(queryText, searchString);
@@ -155,7 +160,9 @@ public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
 	query.addEntity("user", DacoUser.class).addScalar("record_count", IntegerType.INSTANCE)
-		.addScalar("notebookEntry", StringType.INSTANCE).setLong("sessionId", sessionId.longValue())
+		.addScalar("notebookEntry", StringType.INSTANCE)
+		.addScalar("portraitId", IntegerType.INSTANCE)
+		.setLong("sessionId", sessionId.longValue())
 		.setFirstResult(page * size).setMaxResults(size);
 	return query.list();
 

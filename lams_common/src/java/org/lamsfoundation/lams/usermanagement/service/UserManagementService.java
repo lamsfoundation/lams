@@ -39,8 +39,10 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.FavoriteOrganisation;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
@@ -1006,6 +1008,30 @@ public class UserManagementService implements IUserManagementService {
 	List<User> results = baseDAO.findByProperty(User.class, "openidURL", openidURL);
 	return results.isEmpty() ? null : (User) results.get(0);
     }
+    
+    /**
+     * Returns the SQL needed to look up portrait details for a given user. This is an efficient way to get the entries 
+     * at the same time as retrieving the tool data, rather than making a separate lookup. 
+     *
+     * The return values are the entry for the select clause (will always have a leading space but no trailing comma and an
+     * alias of luser) and the sql join clause, which should go with any other join clauses.
+     *
+     * To convert the portrait id set up the sql -> java object translation using 
+     * addScalar("portraitId", IntegerType.INSTANCE)
+     *
+     * @param userIdString
+     *            User identifier field string e.g. user.user_id
+     * @return String[] { partial select string, join clause }
+     *
+     */
+    @Override
+    public String[] getPortraitSQL(String userIdString) {
+	String[] retValue = new String[2];
+	retValue[0] = ", luser.portrait_uuid portraitId ";
+	retValue[1] = " JOIN lams_user luser ON luser.user_id = " + userIdString;
+	return retValue;
+    }
+
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection

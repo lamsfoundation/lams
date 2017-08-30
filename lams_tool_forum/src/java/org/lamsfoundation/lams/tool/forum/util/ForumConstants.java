@@ -142,6 +142,10 @@ public interface ForumConstants {
 
     public static final String ATTR_USER_UID = "userUid";
 
+    public static final String ATTR_USER_ID = "userId";
+
+    public static final String ATTR_PORTRAIT_ID = "portraitId";
+
     public static final String ATTR_MESSAGES = "messages";
 
     public static final String PARAM_UPDATE_MODE = "updateMode";

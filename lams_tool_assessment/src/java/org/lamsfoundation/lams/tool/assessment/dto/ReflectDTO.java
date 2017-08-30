@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 
 public class ReflectDTO {
     private Long userUid;
+    private Long userId;
     private String fullName;
     private String loginName;
     private String reflect;
@@ -38,6 +39,7 @@ public class ReflectDTO {
 	this.setLoginName(user.getLoginName());
 	this.setFullName(user.getFirstName() + " " + user.getLastName());
 	this.setUserUid(user.getUid());
+	this.setUserId(user.getUserId());
     }
 
     public String getFullName() {
@@ -78,5 +80,13 @@ public class ReflectDTO {
 
     public void setDate(Date date) {
 	this.date = date;
+    }
+
+    public Long getUserId() {
+	return userId;
+    }
+
+    public void setUserId(Long userId) {
+	this.userId = userId;
     }
 }
