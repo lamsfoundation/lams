@@ -111,11 +111,11 @@
     
     <%-- Form to Collect ID of Selected LAMS Sequence --%>
     <form name="lesson_form" id="lesson_form" action="../LessonManager?method=start" method="post" onSubmit="return confirmSubmit();">
-    	<input type="hidden" name="content_id" value="${param.content_id}">
+    		<input type="hidden" name="content_id" value="${param.content_id}">
         <input type="hidden" name="course_id" value="${param.course_id}">
-    	<input type="hidden" name="sequence_id" id="sequence_id" value="0">
+    		<input type="hidden" name="sequence_id" id="sequence_id" value="0">
     	
-    	<bbNG:dataCollection>
+    		<bbNG:dataCollection>
 		
             <bbNG:step title="Name and describe the lesson">
                 <bbNG:dataElement label="Name" isRequired="true" labelFor="title">
@@ -184,16 +184,16 @@
                 </bbNG:dataElement>
             </bbNG:step>
             
-            <bbNG:stepSubmit title="Start Lesson" cancelOnClick="back();" />
+            <bbNG:stepSubmit title="Start Lesson" 
+            			cancelUrl="/webapps/blackboard/content/listContentEditable.jsp?content_id=${param.content_id}&course_id=${param.course_id}" />
         
-    	</bbNG:dataCollection>
+    		</bbNG:dataCollection>
     </form>
 
     <bbNG:jsBlock>
         <script type="text/javascript">
-        	
             var authorWin = null;
-        	var previewWin = null;
+        		var previewWin = null;
             var isSelected = false;
             
             // Open the LAMS Seuence Preview Window
@@ -247,8 +247,7 @@
                 }
             }
             
-            // Do form vaildation
-            // Check that a title has been supplied
+            // Do form vaildation. Check that a title has been supplied
             function confirmSubmit() {
                 var title = rettrim(document.lesson_form.title.value);
 				if ((title == "")||(title == null)) {
@@ -265,11 +264,6 @@
             // Utility function to trim
             function rettrim(stringToTrim) {
                 return stringToTrim.replace(/^\s+|\s+$/g,"");
-            }
-            
-            // Go back one page if the user clicks the Cancel Button
-            function back() {
-                history.go(-1);
             }
         </script>
     </bbNG:jsBlock>
