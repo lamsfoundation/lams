@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -89,8 +90,9 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	return (List<AssessmentUser>) this.doFind(FIND_BY_SESSION_ID, sessionId);
     }
 
-    private static String LOAD_USERS_ORDERED_BY_SESSION = "SELECT DISTINCT user.user_id, user.last_name, user.first_name, user.login_name, result.grade"
-		+ " FROM tl_laasse10_user user  INNER JOIN tl_laasse10_session session"
+    private static String LOAD_USERS_ORDERED_BY_SESSION_SELECT = "SELECT DISTINCT user.user_id, user.last_name, user.first_name, user.login_name, result.grade ";
+    private static String LOAD_USERS_ORDERED_BY_SESSION_FROM = " FROM tl_laasse10_user user  ";
+    private static String LOAD_USERS_ORDERED_BY_SESSION_JOIN = " INNER JOIN tl_laasse10_session session"
 		+ " ON user.session_uid=session.uid  LEFT OUTER JOIN tl_laasse10_assessment_result result "
 		+ " ON result.user_uid = user.uid  	AND result.finish_date IS NOT NULL"
 		+ " 	AND result.latest = 1  WHERE session.session_id = :sessionId "
@@ -101,9 +103,15 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     @SuppressWarnings("unchecked")
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
-	    String sortOrder, String searchString) {
+	    String sortOrder, String searchString, IUserManagementService userManagementService) {
 
-	StringBuilder bldr = new StringBuilder(LOAD_USERS_ORDERED_BY_SESSION);
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+	
+	StringBuilder bldr = new StringBuilder(LOAD_USERS_ORDERED_BY_SESSION_SELECT)
+		.append(portraitStrings[0])
+		.append(LOAD_USERS_ORDERED_BY_SESSION_FROM)
+		.append(portraitStrings[1])
+		.append(LOAD_USERS_ORDERED_BY_SESSION_JOIN);
 	if ( "total".equalsIgnoreCase(sortBy) )
 	    bldr.append(LOAD_USERS_ORDERED_ORDER_BY_TOTAL);
 	else
@@ -128,6 +136,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		String lastName = (String) element[2];
 		String login = (String) element[3];
 		float grade = element[4] == null ? 0 : ((Number) element[4]).floatValue();
+		Long portraitId = element[5] == null ? null : ((Number) element[5]).longValue();
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setUserId(userId);
@@ -135,6 +144,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		userDto.setLastName(lastName);
 		userDto.setLogin(login);
 		userDto.setGrade(grade);
+		userDto.setPortraitId(portraitId);
 		userDtos.add(userDto);
 	    }
 

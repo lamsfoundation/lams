@@ -30,12 +30,14 @@ import java.util.List;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.SQLQuery;
+import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.IForumUserDAO;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -94,7 +96,8 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
      * where the String is the notebook entry. No notebook entries needed? Will return "null" in their place.
      */
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService) {
+	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService,
+	    IUserManagementService userManagementService) {
 	String sortingOrder;
 	boolean sortOnMessage;
 	switch (sorting) {
@@ -143,12 +146,16 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 		    ForumConstants.TOOL_SIGNATURE, "user.user_id");
 	}
 
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 
 	queryText.append("SELECT user.* ");
 	queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
+	queryText.append(portraitStrings[0]);
 	queryText.append(" FROM tl_lafrum11_forum_user user ");
+	queryText.append(portraitStrings[1]);
 	queryText.append(
 		" JOIN tl_lafrum11_tool_session session ON user.session_id = session.uid and session.session_id = :sessionId");
 
@@ -176,6 +183,7 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
 	query.addEntity("user", ForumUser.class).addScalar("notebookEntry", StringType.INSTANCE)
+		.addScalar("portraitId", IntegerType.INSTANCE)
 		.setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
 	return query.list();
 

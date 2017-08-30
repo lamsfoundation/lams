@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
 
 /**
@@ -496,4 +497,6 @@ public interface IAssessmentService {
 	    List<QuestionReference> deletedReferences);
 
     void releaseFromCache(Object object);
+    
+    Long getPortraitId(Long userId);
 }

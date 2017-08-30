@@ -71,7 +71,6 @@ a {
     color: $a-link-default;
 }
 
-
 a:hover {
     color: $a-link-default-hover;
 }
@@ -79,6 +78,20 @@ a:hover {
 a:focus {
     color: $a-link-default-focus;
 }
+
+// popover links forced to be the usual link color or jqgrid interferes
+.popover-link {
+    color: $a-link-default !important;
+}
+
+.popover-link:hover {
+    color: $a-link-default-hover !important;
+}
+
+.popover-link:focus {
+    color: $a-link-default-focus !important;
+}
+
 
 @if variable-exists(panel-default-heading-background) {
     .panel-default>.panel-heading {

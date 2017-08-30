@@ -7,6 +7,8 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		
+		initializePortraitPopover("<lams:LAMSURL />");
+		
 		<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 		
 			jQuery("#list${sessionDto.sessionId}").jqGrid({
@@ -23,13 +25,15 @@
 			   	colNames:['userId',
 						'sessionId',
 						"<fmt:message key="label.monitoring.summary.user.name" />",
-					    "<fmt:message key="label.monitoring.summary.total" />"],
-					    
+					    "<fmt:message key="label.monitoring.summary.total" />",
+					    'portraitId'
+				],
 			   	colModel:[
 			   		{name:'userId', index:'userId', width:0, hidden: true},
 			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
-			   		{name:'userName', index:'userName', width:570, searchoptions: { clearSearch: false }},
-			   		{name:'total', index:'total', width:174, align:"right", formatter:'number', search:false}		
+			   		{name:'userName', index:'userName', width:570, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
+			   		{name:'total', index:'total', width:174, align:"right", formatter:'number', search:false},
+			   		{name:'portraitId', index:'portraitId', width:0, hidden: true},
 			   	],
 			   	ondblClickRow: function(rowid) {
 			   		var userId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'userId');
@@ -56,9 +60,12 @@
 		  	       	);    
 	  	  		},
 			    loadError: function(xhr,st,err) {
-			    	jQuery("#list${sessionDto.sessionId}").clearGridData();
-			    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
-			    }
+			    		jQuery("#list${sessionDto.sessionId}").clearGridData();
+			    		$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.loaderror"/>", "<fmt:message key="label.ok"/>");
+			    },
+			    loadComplete: function () {
+			   	 	initializePortraitPopover('<lams:LAMSURL/>');
+			    	},
 
 			})
 			<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput}">
@@ -162,7 +169,12 @@
 	    	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
 	    });
 	};
+
+	function userNameFormatter (cellvalue, options, rowObject) {
+		return definePortraitPopover(rowObject[4], rowObject[0],  rowObject[2]);
+	}
 	
+
 	function exportSummary() {
 		var url = "<c:url value='/monitoring/exportSummary.do'/>";
 	    var reqIDVar = new Date();
