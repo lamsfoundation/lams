@@ -1,5 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/portrait.js" ></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		initializePortraitPopover('<lams:LAMSURL />');
+	});
+</script>
+
 <c:if test="${kaltura.reflectOnActivity && not empty reflectList}">
 
 	<div class="panel-group" id="reflections" role="tablist" aria-multiselectable="true"> 
@@ -17,7 +24,7 @@
 					<c:forEach var="reflectDTO" items="${reflectList}">
 						<tr>
 							<td>
-								<strong><c:out value="${reflectDTO.fullName}" escapeXml="true"/></strong> - <lams:Date value="${reflectDTO.lastModified}"/>
+								<lams:Portrait userId="${reflectDTO.userId}" hover="true"><strong><c:out value="${reflectDTO.fullName}" escapeXml="true"/></strong></lams:Portrait> - <lams:Date value="${reflectDTO.lastModified}"/>
 								<br>
 								<lams:out value="${reflectDTO.entry}" escapeHtml="true" />
 							</td>

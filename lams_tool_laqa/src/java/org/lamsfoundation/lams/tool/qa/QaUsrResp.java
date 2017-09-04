@@ -68,6 +68,7 @@ public class QaUsrResp implements Serializable, Comparable {
 
     //DTO fields
     private ItemRatingDTO itemRatingDto;
+    private Long portraitId;
 
     /** full constructor */
     public QaUsrResp(Long responseId, String answer, String answerAutosaved, Date attemptTime, String timezone,
@@ -269,6 +270,14 @@ public class QaUsrResp implements Serializable, Comparable {
 
     public void setItemRatingDto(ItemRatingDTO itemRatingDto) {
 	this.itemRatingDto = itemRatingDto;
+    }
+
+    public Long getPortraitId() {
+	return portraitId;
+    }
+
+    public void setPortraitId(Long portraitId) {
+	this.portraitId = portraitId;
     }
 
 }

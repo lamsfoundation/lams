@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -100,19 +101,30 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
     public void removeMcUser(McQueUsr mcUser) {
 	this.getSession().delete(mcUser);
     }
+    
+    final String LOAD_USERS_SELECT = "SELECT user.uid, user.que_usr_id, user.fullname, user.last_attempt_total_mark ";
+    final String LOAD_USERS_FROM = " FROM tl_lamc11_que_usr user ";
+    final String LOAD_USERS_JOINWHERE = " JOIN tl_lamc11_session session on user.mc_session_id = session.uid "
+    	+ " WHERE session.mc_session_id = :sessionId "
+	+ " AND (user.fullname LIKE CONCAT('%', :searchString, '%')) "
+	+ " ORDER BY CASE WHEN :sortBy='userName' THEN user.fullname "
+	+ " WHEN :sortBy='total' THEN user.last_attempt_total_mark END ";
 
     @SuppressWarnings("unchecked")
     @Override
     public List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
-	    String sortOrder, String searchString) {
+	    String sortOrder, String searchString, IUserManagementService userManagementService) {
 
-	final String LOAD_USERS = "SELECT DISTINCT user.uid, user.fullname, user.lastAttemptTotalMark " + "FROM "
-		+ McQueUsr.class.getName() + " user " + "WHERE user.mcSession.mcSessionId = :sessionId "
-		+ " AND (user.fullname LIKE CONCAT('%', :searchString, '%')) " + " ORDER BY " + " CASE "
-		+ " 	WHEN :sortBy='userName' THEN user.fullname "
-		+ " 	WHEN :sortBy='total' THEN user.lastAttemptTotalMark " + " END " + sortOrder;
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.que_usr_id");
 
-	Query query = getSession().createQuery(LOAD_USERS);
+	StringBuilder bldr = new StringBuilder(LOAD_USERS_SELECT)
+		.append(portraitStrings[0])
+		.append(LOAD_USERS_FROM)
+		.append(portraitStrings[1])
+		.append(LOAD_USERS_JOINWHERE)
+		.append(sortOrder);
+
+	SQLQuery query = getSession().createSQLQuery(bldr.toString());
 	query.setLong("sessionId", sessionId);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
@@ -126,14 +138,18 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 	if (list != null && list.size() > 0) {
 	    for (Object[] element : list) {
 
-		Long userId = ((Number) element[0]).longValue();
-		String fullName = (String) element[1];
-		Integer totalMark = element[2] == null ? 0 : ((Number) element[2]).intValue();
+		Long userUid = ((Number) element[0]).longValue();
+		Long userId = ((Number) element[1]).longValue();
+		String fullName = (String) element[2];
+		Integer totalMark = element[3] == null ? 0 : ((Number) element[3]).intValue();
+		Long portraitId = element[4] == null ? null : ((Number) element[4]).longValue();
 
 		McUserMarkDTO userDto = new McUserMarkDTO();
-		userDto.setQueUsrId(userId.toString());
+		userDto.setQueUsrId(userUid.toString());
+		userDto.setUserId(userId.toString());
 		userDto.setFullName(fullName);
 		userDto.setTotalMark(new Long(totalMark));
+		userDto.setPortraitId(portraitId==null ? null : portraitId.toString());
 		userDtos.add(userDto);
 	    }
 

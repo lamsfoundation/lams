@@ -144,7 +144,7 @@ public class MonitoringAction extends Action {
 	ImageGallery imageGallery = (ImageGallery) sessionMap.get(ImageGalleryConstants.ATTR_IMAGE_GALLERY);
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
 	ImageGalleryItem image = getImageGalleryService().getImageGalleryItemByUid(imageUid);
-	Long toolSessionId = WebUtil.readLongParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	Long toolSessionId = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_TOOL_SESSION_ID);
 	
 	if (imageGallery.isAllowVote()) {
 	    List<List<UserImageContributionDTO>> imageSummary = getImageGalleryService().getImageSummary(contentId,

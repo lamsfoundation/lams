@@ -29,8 +29,9 @@
 			
 						<html:link href="javascript:launchPopup('${fn:escapeXml(openNotebook)}');" styleClass="btn btn-default btn-sm">
 							<fmt:message key="label.view" />
-						</html:link>
-						&nbsp;<c:out value="${userName}" escapeXml="true"/> 
+						</html:link>&nbsp;
+						<lams:Portrait userId="${userId}" hover="true"><c:out value="${userName}" escapeXml="true"/> </lams:Portrait>
+						
 					</td>
 				</tr>	
 			</c:forEach>		

@@ -8,7 +8,7 @@
 	<title><fmt:message key="label.monitoring"/></title>
 	
 	<%@ include file="/common/monitoringheader.jsp"%>
-	<link href="${lams}css/chart.css" rel="stylesheet" type="text/css"/>
+	<lams:css suffix="chart"/>
 
 	<script type="text/javascript">
 	
