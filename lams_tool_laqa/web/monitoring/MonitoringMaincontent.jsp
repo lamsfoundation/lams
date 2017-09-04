@@ -86,6 +86,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 	<script type="text/javascript">
 	
 		var POSTED_BY_LABEL = '<fmt:message key="label.posted.by"><fmt:param>{0}</fmt:param><fmt:param>{1}</fmt:param></fmt:message>';
@@ -125,14 +126,14 @@
 				    		
 							for (i = 0; i < data.rows.length; i++){
 								var userData = data.rows[i];
-								var itemId = userData["responseUid"];
+								var itemId = userData["responseUid"],
+									fullName = userData["userName"];
 								
 								rows += '<tr>';
 								rows += '<td>';
 								
 									rows += '<div>';
-									rows += 	'<span class="field-name">';
-									rows += 		userData["userName"];
+									rows += 	definePortraitPopover(userData["portraitId"], userData["userID"], fullName, fullName) 
 									rows += 	'</span> ';
 									rows += 	'(<time class="timeago" title="';
 									rows += 	userData["attemptTime"]
@@ -223,6 +224,7 @@
 				.bind('pagerInitialized pagerComplete', function(event, options){
 					$("time.timeago").timeago();
 					initializeJRating();
+					initializePortraitPopover('${lams}');
 				})
 			});
 			

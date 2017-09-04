@@ -4,8 +4,14 @@
 <lams:html>
 <lams:head>
 	<%@ include file="/common/header.jsp" %>
+	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/portrait.js" ></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			initializePortraitPopover('<lams:LAMSURL />');
+		});
+	</script>
 </lams:head>
-
+	
 <body class="stripes">
 
 	<c:set var="title"><fmt:message key="label.monitoring.heading.access" /></c:set>
@@ -27,7 +33,8 @@
 						<lams:Date value="${user.accessDate}"/>
 					</td>
 					<td>
-						<c:out value="${user.firstName},${user.lastName}" escapeXml="true"/>
+						<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
+						
 					</td>
 				</tr>
 			</c:forEach>

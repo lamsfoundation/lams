@@ -2,6 +2,13 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/portrait.js" ></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	initializePortraitPopover('<lams:LAMSURL />');
+});
+</script>
+
 <div class="panel">
 	<h4>
 	  <c:out value="${sessionMap.commonCartridge.title}" escapeXml="true"/>
@@ -143,7 +150,7 @@
 						</c:if>
 						<tr>
 							<td colspan="2">
-								<c:out value="${user.fullName}" escapeXml="true"/>
+								<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.fullName}" escapeXml="true"/></lams:Portrait>
 							</td>
 							<td colspan="2" class="align-right">
 								<c:set var="viewReflection">
