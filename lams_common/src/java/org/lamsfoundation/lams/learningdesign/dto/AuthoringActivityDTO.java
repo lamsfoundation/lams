@@ -430,7 +430,7 @@ public class AuthoringActivityDTO extends BaseDTO {
 	    ActivityEvaluation eval = toolActivity.getEvaluation();
 	    evaluation.add(eval.getToolOutputDefinition());
 	    if (eval.getWeight() != null) {
-		String.valueOf(eval.getWeight());
+		evaluation.add(String.valueOf(eval.getWeight()));
 	    }
 	}
 

@@ -37,7 +37,7 @@
 
         <property
             name="weight"
-            type="java.lang.Float"
+            type="java.lang.Integer"
             column="weight"
         />
     </class>

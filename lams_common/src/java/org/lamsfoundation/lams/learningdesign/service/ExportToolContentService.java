@@ -1226,7 +1226,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		ActivityEvaluation activityEvaluation = new ActivityEvaluation();
 		activityEvaluation.setToolOutputDefinition(eval.get(0));
 		if (eval.size() > 1) {
-		    activityEvaluation.setWeight(Float.valueOf(eval.get(1)));
+		    activityEvaluation.setWeight(Integer.valueOf(eval.get(1)));
 		}
 		activityEvaluation.setActivity((ToolActivity) act);
 		((ToolActivity) act).setEvaluation(activityEvaluation);

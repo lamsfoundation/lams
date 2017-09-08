@@ -5,7 +5,7 @@ SET FOREIGN_KEY_CHECKS=0;
 
 -- Add column for weighted outputs
 
-ALTER TABLE lams_activity_evaluation ADD COLUMN weight FLOAT(4,1) DEFAULT NULL,
+ALTER TABLE lams_activity_evaluation ADD COLUMN weight TINYINT DEFAULT NULL,
 									 DROP PRIMARY KEY,
 									 ADD PRIMARY KEY (activity_id),
 									 DROP COLUMN activity_evaluation_id;

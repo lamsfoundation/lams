@@ -33,7 +33,7 @@ public class ActivityEvaluation {
     private Long activityId;
     private ToolActivity activity;
     private String toolOutputDefinition;
-    private Float weight;
+    private Integer weight;
 
     public Long getActivityId() {
 	return activityId;
@@ -59,11 +59,11 @@ public class ActivityEvaluation {
 	this.toolOutputDefinition = toolOutputDefinition;
     }
 
-    public Float getWeight() {
+    public Integer getWeight() {
 	return weight;
     }
 
-    public void setWeight(Float weight) {
+    public void setWeight(Integer weight) {
 	this.weight = weight;
     }
 }

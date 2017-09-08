@@ -996,6 +996,98 @@ GeneralInitLib = {
 
 		layout.dialogs.push(layout.infoDialog);
 		
+		
+		var weightsDialogContents = $('#weightsDialogContents');
+		layout.weightsDialog = showDialog('weightsDialog',{
+			'autoOpen'      : false,
+			'modal'			: true,
+			'resizable'     : false,
+			'draggable'     : true,
+			'width'			: 500,
+			'close' 		: null,
+			'data' 			: {
+				'prepareForOpen' : function(){
+					var tbody = $('tbody', weightsDialogContents).empty();
+					if (layout.activities.length == 0) {
+						tbody.append($('<tr />').append($('<td colspan="3" />').text('No activities with selected gradebook output')));
+						$('#sumWeightCell', layout.weightsDialog).empty();
+						return;
+					}
+					$.each(layout.activities, function(){
+						if (this.gradebookToolOutputDefinitionName) {
+							var activity = this,
+								row = $('<tr />').appendTo(tbody).data('activity', activity).hover(
+									function(){
+										var row = $(this);
+										row.siblings().each(function(){
+											$(this).removeClass('selected');
+										});
+										row.addClass('selected');
+										ActivityLib.removeSelectEffect();
+										ActivityLib.addSelectEffect(row.data('activity'), false);
+									},
+									function(){
+										$(this).removeClass('selected');
+										ActivityLib.removeSelectEffect($(this).data('activity'));
+									}),
+								weight = $('<input maxlength="3" />');
+							$('<td />').text(activity.title).appendTo(row);
+							$('<td />').text(activity.gradebookToolOutputDefinitionDescription).appendTo(row);
+							$('<td />').append(weight).appendTo(row);
+							weight.spinner({
+								'min'    : 0,
+								'max'    : 100,
+								'change' : function(){
+									activity.gradebookToolOutputWeight = $(this).val();
+									layout.weightsDialog.data('sumWeights')();
+								},
+								'spin'  : function(event, ui) {
+									activity.gradebookToolOutputWeight = ui.value;
+									layout.weightsDialog.data('sumWeights')();
+								}
+							}).val(activity.gradebookToolOutputWeight);
+						}
+					});
+					
+					layout.weightsDialog.data('sumWeights')(true);
+				},
+				
+				'sumWeights' : function(firstRun){
+					var sum = null;
+					$('tbody tr', layout.weightsDialog).each(function(){
+						var weight = $('input', this);
+						if (!firstRun && !weight.spinner('isValid')) {
+							weight.val(null);
+							return true;
+						}
+						var value = $(this).data('activity').gradebookToolOutputWeight;
+						if (value) {
+							if (sum == null) {
+								sum = 0;
+							}
+							sum += +value;
+						}
+					});
+					
+					var sumCell = $('#sumWeightCell', layout.weightsDialog);
+					if (sum == null) {
+						sumCell.empty();
+					} else {
+						sumCell.text(sum + '%');
+						if (sum == 100) {
+							sumCell.removeClass('incorrect');
+						} else {
+							sumCell.addClass('incorrect');
+						}
+					}
+				}
+			}
+		});
+		
+		$('.modal-body', layout.weightsDialog).empty().append(weightsDialogContents.show());
+		
+		layout.dialogs.push(layout.weightsDialog);
+		
 		// license widgets init
 		$('#ldDescriptionLicenseSelect').change(function(){
 			var option = $('option:selected', this);
@@ -2014,8 +2106,9 @@ GeneralLib = {
 			annotations = [],
 			layoutActivityDefs = [],
 			systemGate = null,
-			error = null;
-	
+			error = null,
+			weightsSum = null;
+		
 		$.each(layout.activities, function(){
 			if (this.parentActivity	&& (this.parentActivity instanceof ActivityDefs.BranchingActivity
 							|| this.parentActivity instanceof ActivityDefs.BranchActivity)){
@@ -2023,7 +2116,21 @@ GeneralLib = {
 				this.parentActivity = null;
 				this.orderID = null;
 			}
+			
+			if (this.gradebookToolOutputWeight || this.gradebookToolOutputWeight == 0) {
+				if (weightsSum == null) {
+					weightsSum = 0;
+				}
+				weightsSum += +this.gradebookToolOutputWeight;
+			}
 		});
+		
+		if (weightsSum != null && weightsSum != 100) {
+			if (displayErrors) {
+				alert(LABELS.WEIGHTS_SUM_ERROR);
+			}
+			return false;
+		}
 		
 		$.each(layout.activities, function(){
 			// add all branch activities for iteration and saving
@@ -2091,7 +2198,9 @@ GeneralLib = {
 									}
 									// the branch is shared between two branchings
 									// it should have been detected when adding a transition
-									alert(LABELS.CROSS_BRANCHING_ERROR);
+									if (displayErrors) {
+										alert(LABELS.CROSS_BRANCHING_ERROR);
+									}
 									return false;
 								}
 								// a nested branching encountered when crawling, just jump over it
@@ -2107,7 +2216,9 @@ GeneralLib = {
 						} while (activity);
 						
 						if (error) {
-							alert(branchingActivity.title + LABELS.END_MATCH_ERROR);
+							if (displayErrors) {
+								alert(branchingActivity.title + LABELS.END_MATCH_ERROR);
+							}
 							return false;
 						}
 					});
@@ -2329,7 +2440,8 @@ GeneralLib = {
 				'stopAfterActivity'		 : activity.stopAfterActivity ? true : false,
 				'toolActivityUIID'		 : activity.input ? activity.input.uiid : null,
 				'gradebookToolOutputDefinitionName' : activity.gradebookToolOutputDefinitionName == '<NONE>' ?
-														null : activity.gradebookToolOutputDefinitionName 
+														null : activity.gradebookToolOutputDefinitionName,
+				'gradebookToolOutputWeight' : activity.gradebookToolOutputWeight
 			});
 	
 			var activityTransitions = activity instanceof ActivityDefs.BranchingActivity ?
@@ -2473,8 +2585,11 @@ GeneralLib = {
 	 * Stores the sequece in database.
 	 */
 	saveLearningDesign : function(folderID, learningDesignID, title) {
-		var ld = GeneralLib.prepareLearningDesignData(true),
-			systemGate = ld.systemGate,
+		var ld = GeneralLib.prepareLearningDesignData(true);
+		if (!ld) {
+			return false;
+		}
+		var systemGate = ld.systemGate,
 			// final success/failure of the save
 			result = false;
 		

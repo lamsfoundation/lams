@@ -781,7 +781,7 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	    String weight = (String) JsonUtil.opt(activityDetails, AuthoringJsonTags.TOOL_OUTPUT_WEIGHT);
 	    if (StringUtils.isNotBlank(weight)) {
-		evaluation.setWeight(Float.valueOf(weight));
+		evaluation.setWeight(Integer.valueOf(weight));
 	    }
 	    toolActivity.setEvaluation(evaluation);
 	} else {

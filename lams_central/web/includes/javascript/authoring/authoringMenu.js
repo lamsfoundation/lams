@@ -534,6 +534,11 @@ var MenuLib = {
 		});
 	},
 	
+	openWeights : function(){
+		layout.weightsDialog.data('prepareForOpen')();
+		layout.weightsDialog.modal('show');
+	},
+	
 	
 	/**
 	 * Make a copy of an existing activity.
