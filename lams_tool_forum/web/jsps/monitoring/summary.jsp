@@ -26,6 +26,7 @@
 	};
 </script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 <script src="${lams}includes/javascript/jquery.timeago.js" type="text/javascript"></script>
 <script src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js" type="text/javascript"></script>
 <script type="text/javascript">
@@ -135,7 +136,6 @@
 				}})
 			  .bind('pagerInitialized pagerComplete', function(event, options){
 					$("time.timeago").timeago();
-					initializeJRating();
 				})
 			 
 			});

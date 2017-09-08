@@ -159,3 +159,6 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 ====================
 * LDEV-4407: Rename Java packages to reflect their purpose
 
+1.2.25 Release Fixes
+====================
+* LDEV-4418: Change back button javascript
