@@ -273,13 +273,17 @@ public class UniversalLoginModule implements LoginModule {
 	    UniversalLoginModule.themeService = (IThemeService) ctx.getBean("themeService");
 	}
 
-	// allow sysadmin to login as another user; in this case, the LAMS shared session will be present,
-	// allowing the following check to work
-	if (UniversalLoginModule.userManagementService.isUserSysAdmin()) {
-	    if (UniversalLoginModule.log.isDebugEnabled()) {
-		UniversalLoginModule.log.debug("Authenticated sysadmin");
+	// there is no session if the request did not go through SsoHandler
+	// it happens on session failover
+	if (SessionManager.getSession() != null) {
+	    // allow sysadmin to login as another user; in this case, the LAMS shared session will be present,
+	    // allowing the following check to work
+	    if (UniversalLoginModule.userManagementService.isUserSysAdmin()) {
+		if (UniversalLoginModule.log.isDebugEnabled()) {
+		    UniversalLoginModule.log.debug("Authenticated sysadmin");
+		}
+		return true;
 	    }
-	    return true;
 	}
 
 	String userName = getUserName();
