@@ -80,7 +80,7 @@ public class SsoHandler implements ServletExtension {
 	if (keepSessionId) {
 	    deploymentInfo.setChangeSessionIdOnLogin(false);
 	}
-	
+
 	// expose servlet context so other classes can use it
 	SessionManager.setServletContext(servletContext);
 
@@ -99,7 +99,6 @@ public class SsoHandler implements ServletExtension {
 
 		// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs
 		HttpSession session = request.getSession();
-		System.out.println("SESSION ID BEFORE LOGIN: " + session.getId());
 
 		/*
 		 * Fetch UserDTO before completing request so putting it later in session is done ASAP
@@ -162,11 +161,15 @@ public class SsoHandler implements ServletExtension {
 
 		// store session so UniversalLoginModule can access it
 		SessionManager.startSession(request);
+		
+		String oldSessionID = session.getId();
 
 		// do the logging in UniversalLoginModule or cache
 		handler.handleRequest(exchange);
 
-		System.out.println("SESSION ID AFTER LOGIN: " + session.getId());
+		// session ID was changed after log in
+		SessionManager.updateSessionID(oldSessionID);
+		
 
 		if (login.equals(request.getRemoteUser())) {
 		    session.setAttribute(AttributeNames.USER, userDTO);
@@ -175,13 +178,13 @@ public class SsoHandler implements ServletExtension {
 		    if (existingSession != null) {
 			try {
 			    // tell SessionListener not to flush credential cache on session destroy,
-			    // otherwise this authentication processs fails
+			    // otherwise this authentication process fails
 			    existingSession.setAttribute(NO_FLUSH_FLAG, true);
 			} catch (IllegalStateException e) {
 			    // if it was already invalidated, do nothing
 			}
 			// remove an existing session for the given user
-			SessionManager.removeSessionByLogin(login, true);
+			SessionManager.removeSessionByLogin(login, request.isRequestedSessionIdValid());
 		    }
 		    // register current session as the only one for the given user
 		    SessionManager.addSession(login, session);
@@ -217,8 +220,6 @@ public class SsoHandler implements ServletExtension {
 		}
 
 		SessionManager.endSession();
-
-		System.out.println("SESSION ID AFTER END: " + session.getId());
 	    });
 	});
     }

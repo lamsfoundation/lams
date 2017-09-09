@@ -90,17 +90,18 @@ public class SessionManager {
      */
     public static void removeSessionByLogin(String login, boolean invalidate) {
 	HttpSession session = SessionManager.loginMapping.get(login);
-	if (session != null) {
-	    SessionManager.loginMapping.remove(login);
-	    SessionManager.sessionIdMapping.remove(session.getId());
+	if (session == null) {
+	    return;
+	}
+	SessionManager.loginMapping.remove(login);
+	SessionManager.sessionIdMapping.remove(session.getId());
 
-	    if (invalidate) {
-		try {
-		    session.invalidate();
-		} catch (IllegalStateException e) {
-		    System.out.println("SessionMananger invalidation exception");
-		    // if it was already invalidated, do nothing
-		}
+	if (invalidate) {
+	    try {
+		session.invalidate();
+	    } catch (IllegalStateException e) {
+		System.out.println("SessionMananger invalidation exception");
+		// if it was already invalidated, do nothing
 	    }
 	}
     }
@@ -109,18 +110,36 @@ public class SessionManager {
      * Unregisteres the session by the given ID.
      */
     public static void removeSessionByID(String sessionID, boolean invalidate) {
-	HttpSession session = getSession(sessionID);
-	if (session != null) {
-	    SessionManager.sessionIdMapping.remove(sessionID);
+	HttpSession session = SessionManager.getSession(sessionID);
+	if (session == null) {
+	    return;
+	}
+	SessionManager.sessionIdMapping.remove(sessionID);
 
-	    if (invalidate) {
-		try {
-		    session.invalidate();
-		} catch (IllegalStateException e) {
-		    System.out.println("SessionMananger invalidation exception");
-		    // if it was already invalidated, do nothing
-		}
+	if (invalidate) {
+	    try {
+		session.invalidate();
+	    } catch (IllegalStateException e) {
+		System.out.println("SessionMananger invalidation exception");
+		// if it was already invalidated, do nothing
 	    }
+	}
+    }
+
+    /**
+     * Makes sure that given session ID points to correct session.
+     * It may not be the case after session ID change after login.
+     */
+    public static void updateSessionID(String sessionID) {
+	HttpSession session = SessionManager.getSession(sessionID);
+	if (session == null) {
+	    return;
+	}
+	String newSessionID = session.getId();
+	if (!sessionID.equals(newSessionID)) {
+	    SessionManager.sessionIdMapping.remove(sessionID);
+	    SessionManager.sessionIdMapping.put(newSessionID, session);
+	    SessionManager.sessionManager.currentSessionIdContainer.set(newSessionID);
 	}
     }
 
