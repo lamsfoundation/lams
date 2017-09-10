@@ -184,6 +184,11 @@
 		<put name="title" value="sysadmin.maintain.external.servers"/>
 		<put name="content" value="serverlist.jsp" />	
 	</definition>
+	
+	<definition name=".sessionlist" path="/template.jsp">
+		<put name="title" value="sysadmin.maintain.session"/>
+		<put name="content" value="sessionlist.jsp" />	
+	</definition>
 
 	<definition name=".servermaintain" path="/template.jsp">
 		<put name="title" value="sysadmin.maintain.server.edit"/>
