@@ -24,6 +24,8 @@
 package org.lamsfoundation.lams.web.session;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletContext;
@@ -109,7 +111,7 @@ public class SessionManager {
      * Unregisteres the session by the given ID.
      */
     public static void removeSessionByID(String sessionID, boolean invalidate) {
-	HttpSession session = getSession(sessionID);
+	HttpSession session = SessionManager.getSession(sessionID);
 	if (session != null) {
 	    SessionManager.sessionIdMapping.remove(sessionID);
 
@@ -151,6 +153,17 @@ public class SessionManager {
      */
     public static int getSessionCount() {
 	return SessionManager.sessionIdMapping.size();
+    }
+
+    /**
+     * Lists all logins with their assigned sessions
+     */
+    public static Map<String, String> getLoginToSessionIDMappings() {
+	Map<String, String> result = new TreeMap<String, String>();
+	for (Entry<String, HttpSession> entry : loginMapping.entrySet()) {
+	    result.put(entry.getKey(), entry.getValue().getId());
+	}
+	return result;
     }
 
     public static void setServletContext(ServletContext servletContext) {

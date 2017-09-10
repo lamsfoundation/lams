@@ -892,6 +892,18 @@
       />
     </action>
     <action
+      path="/sessionlist"
+      type="org.lamsfoundation.lams.admin.web.action.SessionListAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="sessionlist"
+        path=".sessionlist"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/loginmaintain"
       type="org.lamsfoundation.lams.admin.web.action.LoginMaintainAction"
       name="LoginMaintainForm"
