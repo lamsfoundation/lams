@@ -6,7 +6,7 @@
   // width to the value defined here, but the height will be
   // calculated based on the aspect ratio of the input stream.
 
-  var width = 460;    // We will scale the photo width to this
+  var width = 0;    // We will scale the photo width to this
   var height = 0;     // This will be computed based on the input stream
 
   // |streaming| indicates whether or not we're currently streaming
@@ -21,7 +21,7 @@
   var canvas = null;
   var photo = null;
   var startbutton = null;
-  //*LAMS* var added by LAMS. It will hold a URL representing the webcamera picture. It get created by URL.createObjectURL() method.
+  //*LAMS* var added by LAMS. It will hold a URL representing the webcamera picture. It gets created by URL.createObjectURL() method.
   var objectURL;
 
   function startup() {
@@ -64,7 +64,16 @@
 
     video.addEventListener('canplay', function(ev){
       if (!streaming) {
-        height = video.videoHeight / (video.videoWidth/width);
+    	  	//*LAMS* modified by LAMS
+    	  	var videoHeight = video.videoHeight;
+    	  	var videoWidth = video.videoWidth;
+    	  	if (videoWidth > videoHeight) {
+    	  		height = PORTRAIT_SIZE;
+    	  		width =  (videoWidth*height)/videoHeight;
+    	  	} else {
+    	  		width = PORTRAIT_SIZE;
+    	  		height = (videoHeight*width)/videoWidth;   	  		
+    	  	}  
       
         // Firefox currently has a bug where the height can't be read from
         // the video, so we will make assumptions if this happens.
@@ -112,13 +121,27 @@
       
       //*LAMS* added by LAMS. Creates a Blob object representing the image contained in the canvas. Which we then display in photo img.
       canvas.toBlob(function(blob) {
-    	$("#still-portrait").show();
-    	$('html, body').animate({
+    	  	$("#still-portrait").show();
+    	  	$('html, body').animate({
             scrollTop: $("#still-portrait").offset().top
         }, 2000);
-    	
+
+    	  	//create object URL
         objectURL = URL.createObjectURL(blob);
-        photo.src = objectURL;
+        
+        //display croppie
+        if (!croppieWidget) {
+	  	  	croppieWidget = $('#photo').croppie({
+	  	  	    viewport: {
+	  	  	        width: PORTRAIT_SIZE,
+	  	  	        height: PORTRAIT_SIZE
+	  	  	    },
+	  	  	    boundary: { width: width, height: height },
+	  	  	});
+        }
+  	  	croppieWidget.croppie('bind', {
+  	  	    url: objectURL
+  	  	});
       });
       
       //*LAMS* commented out by LAMS
