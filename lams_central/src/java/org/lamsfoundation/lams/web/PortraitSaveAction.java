@@ -105,22 +105,16 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	    
 	    //Create nice file name. If file name equals to "blob" - it means it was uploaded using webcam
 	    String fileNameWithoutExt;
-	    boolean isUploadedFromWebcam = false;
 	    if (fileName.equals("blob")) {
 		HttpSession ss = SessionManager.getSession();
 		UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		fileNameWithoutExt = userDTO.getLogin() + "_portrait";
-		isUploadedFromWebcam = true;
 
 	    } else {
 		fileNameWithoutExt = fileName.substring(0, fileName.indexOf('.'));
 	    }
 
 	    // upload to the content repository
-	    if (!isUploadedFromWebcam) {
-		//resize
-		is = ResizePictureUtil.resize(file.getInputStream(), LARGEST_DIMENSION_ORIGINAL);
-	    }
 	    originalFileNode = getCentralToolContentHandler().uploadFile(is, fileNameWithoutExt + "_original.png",
 		    "image/png");
 	    is.close();
