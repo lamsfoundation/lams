@@ -25,21 +25,30 @@ package org.lamsfoundation.lams.admin.web.action;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 
 /**
  * @author Marcin Cieslak
  */
-public class SessionListAction extends Action {
+public class SessionMaintainAction extends LamsDispatchAction {
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public ActionForward list(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 	request.setAttribute("sessions", SessionManager.getLoginToSessionIDMappings());
-	return mapping.findForward("sessionlist");
+	return mapping.findForward("sessionmaintain");
+    }
+
+    public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	String login = request.getParameter("login");
+	if (StringUtils.isNotBlank(login)) {
+	    SessionManager.removeSessionByLogin(login, true);
+	}
+	return list(mapping, form, request, response);
     }
 }
