@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -105,27 +106,39 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 	return (List<ResourceItemVisitLog>) doFind(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
     }
 
+    private static String LOAD_USERS_ORDERED_BY_NAME_SELECT = " SELECT user.user_id, CONCAT(user.last_name, ' ', user.first_name), visit.complete_date, visit.access_date ";
+    private static String LOAD_USERS_ORDERED_BY_NAME_FROM = " FROM tl_larsrc11_item_log visit " 
+    	+ " JOIN tl_larsrc11_user user ON visit.user_uid = user.uid " 
+    	+ "	AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%'))";
+    private static String LOAD_USERS_ORDERED_BY_NAME_WHERE = " WHERE visit.session_id = :sessionId AND visit.resource_item_uid = :itemUid " 
+    	+ " ORDER BY CASE WHEN :sortBy='userName' THEN CONCAT(user.last_name, ' ', user.first_name) "
+    	+ "	WHEN :sortBy='startTime' THEN visit.access_date "
+    	+ "	WHEN :sortBy='completeTime' THEN visit.complete_date "
+    	+ "	WHEN :sortBy='timeTaken' THEN TIMEDIFF(visit.complete_date,visit.access_date) END ";
+
     @Override
     public List<VisitLogDTO> getPagedVisitLogsBySessionAndItem(Long sessionId, Long itemUid, int page, int size,
-	    String sortBy, String sortOrder, String searchString) {
-	String LOAD_USERS_ORDERED_BY_NAME = "SELECT visit.user.userId, CONCAT(visit.user.lastName, ' ', visit.user.firstName), visit.completeDate, visit.accessDate"
-		+ " FROM " + ResourceItemVisitLog.class.getName() + " visit" + " WHERE visit.sessionId = :sessionId "
-		+ " AND visit.resourceItem.uid = :itemUid "
-		+ " AND (CONCAT(visit.user.lastName, ' ', visit.user.firstName) LIKE CONCAT('%', :searchString, '%')) "
-		+ " ORDER BY " + " CASE " + " WHEN :sortBy='userName' THEN CONCAT(user.lastName, ' ', user.firstName) "
-		+ " WHEN :sortBy='startTime' THEN visit.accessDate "
-		+ " WHEN :sortBy='completeTime' THEN visit.completeDate "
-		+ " WHEN :sortBy='timeTaken' THEN TIMEDIFF(visit.completeDate,visit.accessDate) " + " END " + sortOrder;
+	    String sortBy, String sortOrder, String searchString, IUserManagementService userManagementService) {
 
-	Query query = getSession().createQuery(LOAD_USERS_ORDERED_BY_NAME);
-	query.setLong("sessionId", sessionId);
-	query.setLong("itemUid", itemUid);
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+
+	StringBuilder bldr = new StringBuilder(LOAD_USERS_ORDERED_BY_NAME_SELECT)
+		.append(portraitStrings[0])
+		.append(LOAD_USERS_ORDERED_BY_NAME_FROM)
+		.append(portraitStrings[1])
+		.append(LOAD_USERS_ORDERED_BY_NAME_WHERE)
+		.append(sortOrder);
+	
+	Query query = getSession().createSQLQuery(bldr.toString())
+		.setLong("sessionId", sessionId)
+		.setLong("itemUid", itemUid);
+
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
-	query.setString("searchString", searchString);
-	query.setString("sortBy", sortBy);
-	query.setFirstResult(page * size);
-	query.setMaxResults(size);
+	query.setString("searchString", searchString)
+		.setString("sortBy", sortBy)
+		.setFirstResult(page * size)
+		.setMaxResults(size);
 	List<Object[]> list = query.list();
 
 	ArrayList<VisitLogDTO> visitLogDto = new ArrayList<VisitLogDTO>();
@@ -138,6 +151,7 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 		Date accessDate = element[3] == null ? null : new Date(((Timestamp) element[3]).getTime());
 		Date timeTaken = (element[2] == null || element[3] == null) ? null
 			: new Date(completeDate.getTime() - accessDate.getTime());
+		Long portraitId =  element[4] == null ? null : ((Number) element[4]).longValue();
 
 		VisitLogDTO userDto = new VisitLogDTO();
 		userDto.setUserId(userId);
@@ -145,7 +159,7 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 		userDto.setCompleteDate(completeDate);
 		userDto.setAccessDate(accessDate);
 		userDto.setTimeTaken(timeTaken);
-		;
+		userDto.setPortraitId(portraitId);;
 		visitLogDto.add(userDto);
 	    }
 	}

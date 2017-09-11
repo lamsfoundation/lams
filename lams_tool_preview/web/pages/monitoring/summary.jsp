@@ -8,7 +8,7 @@
 <link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 <lams:css suffix="jquery.jRating"/>
-<link rel="stylesheet" href="${webapp}includes/css/learning.css'/>">
+<link type="text/css" href="${webapp}includes/css/learning.css" rel="stylesheet" >
 <style type="text/css">
 	#common-buttons-area {
 		overflow: auto;
@@ -60,6 +60,7 @@
 <script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 <script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script>
 <script src="${lams}includes/javascript/download.js" type="text/javascript" ></script>
+<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
 
 <script type="text/javascript">
 	function exportResults() {

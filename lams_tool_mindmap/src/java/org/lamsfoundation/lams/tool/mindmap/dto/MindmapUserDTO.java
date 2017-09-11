@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
 
 public class MindmapUserDTO implements Comparable {
     public Long uid;
+    public Long userId;
     public String loginName;
     public String firstName;
     public String lastName;
@@ -39,6 +40,7 @@ public class MindmapUserDTO implements Comparable {
 
     public MindmapUserDTO(MindmapUser user, NotebookEntry entry) {
 	this.uid = user.getUid();
+	this.userId = user.getUserId();
 	this.loginName = user.getLoginName();
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
@@ -49,6 +51,7 @@ public class MindmapUserDTO implements Comparable {
 
     public MindmapUserDTO(MindmapUser user) {
 	this.uid = user.getUid();
+	this.userId = user.getUserId();
 	this.loginName = user.getLoginName();
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
@@ -112,5 +115,13 @@ public class MindmapUserDTO implements Comparable {
 
     public NotebookEntryDTO getEntryDTO() {
 	return entryDTO;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

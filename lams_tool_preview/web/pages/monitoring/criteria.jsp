@@ -36,8 +36,9 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
-<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 
 </lams:head>
 <body class="stripes">

@@ -356,13 +356,11 @@ public class PeerreviewServiceImpl
 	}
 
 	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria,
-		currentUserId, null, null, sorting, searchString, getByUser, ratingService);
+		currentUserId, null, null, sorting, searchString, getByUser, ratingService,
+		userManagementService);
 
 	for (Object[] raw : rawData) {
-	    int len = raw.length;
-	    StringBuilder description = new StringBuilder((String) raw[len - 2]).append(" ")
-		    .append((String) raw[len - 1]);
-	    raw[len - 1] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	    raw[raw.length - 2] = (Object) StringEscapeUtils.escapeCsv((String)raw[raw.length - 2]);
 	}
 	// if !getByUser -> is get current user's ratings from other users ->
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
@@ -375,13 +373,10 @@ public class PeerreviewServiceImpl
 	    boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) throws JSONException {
 
 	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria,
-		currentUserId, page, size, sorting, searchString, getByUser, ratingService);
+		currentUserId, page, size, sorting, searchString, getByUser, ratingService, userManagementService);
 
 	for (Object[] raw : rawData) {
-	    int len = raw.length;
-	    StringBuilder description = new StringBuilder((String) raw[len - 2]).append(" ")
-		    .append((String) raw[len - 1]);
-	    raw[len - 1] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	    raw[raw.length - 2] = (Object) StringEscapeUtils.escapeCsv((String)raw[raw.length - 2]);
 	}
 	// if !getByUser -> is get current user's ratings from other users ->
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
@@ -413,12 +408,11 @@ public class PeerreviewServiceImpl
 	    Integer page, Integer size, int sorting, String searchString) {
 
 	List<Object[]> rawData = peerreviewUserDao.getCommentsCounts(toolContentId, toolSessionId, criteria, page, size,
-		sorting, searchString);
+		sorting, searchString, userManagementService);
 
-	// raw data: user_id, comment_count, first_name, last_name
+	// raw data: user_id, comment_count, first_name  last_name, portrait id
 	for (Object[] raw : rawData) {
-	    StringBuilder description = new StringBuilder((String) raw[2]).append(" ").append((String) raw[3]);
-	    raw[3] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	    raw[2] = (Object) StringEscapeUtils.escapeCsv((String)raw[2]);
 	}
 
 	return rawData;

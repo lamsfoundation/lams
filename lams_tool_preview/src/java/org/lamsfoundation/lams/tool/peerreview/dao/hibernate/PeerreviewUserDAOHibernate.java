@@ -29,7 +29,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.type.DateType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
@@ -41,6 +40,7 @@ import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dao.PeerreviewUserDAO;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements PeerreviewUserDAO {
 
@@ -125,14 +125,14 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     }
     
     // column order is very important. The potential itemId must be first, followed by rating.*,
-    // and the user's first name and last name must be the last two columns or the DTO conversion will fail.
+    // and the user's name and portrait id must be the last two columns or the DTO conversion will fail.
     // See PeerreviewServiceImpl.getUsersRatingsCommentsByCriteriaId
-    private static final String FIND_USER_RATINGS_COMMENTS1 = "SELECT user.user_id, rating.*, user.first_name, user.last_name "
-	    + " FROM tl_laprev11_peerreview p "
+    private static final String FIND_USER_RATINGS_COMMENTS_SELECT = "SELECT user.user_id, rating.*, CONCAT(user.first_name, \" \", user.last_name) ";
+    private static final String FIND_USER_RATINGS_COMMENTS1 =  " FROM tl_laprev11_peerreview p "
 	    + " JOIN tl_laprev11_session sess ON p.content_id = :toolContentId AND p.uid = sess.peerreview_uid AND sess.session_id = :toolSessionId  "
-	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid AND user.hidden = 0 "
-	    + " LEFT JOIN ( ";
-    private static final String FIND_USER_RATINGS_COMMENTS2 = " ) rating ON user.user_id = rating.item_id ";
+	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid AND user.hidden = 0 ";
+    private static final String FIND_USER_RATINGS_COMMENTS2 =  " LEFT JOIN ( ";
+    private static final String FIND_USER_RATINGS_COMMENTS3 = " ) rating ON user.user_id = rating.item_id ";
     
     private void buildNameSearch(String searchString, StringBuilder sqlBuilder, boolean whereDone) {
 	if (!StringUtils.isBlank(searchString)) {
@@ -150,7 +150,9 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> getRatingsComments(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long userId, Integer page,
-    Integer size, int sorting, String searchString, boolean getByUser, IRatingService coreRatingService) {
+	    Integer size, int sorting, String searchString, boolean getByUser, IRatingService coreRatingService,
+	    IUserManagementService userManagementService) {
+	
 	String sortingOrder = "";
 	switch (sorting) {
 	    case PeerreviewConstants.SORT_BY_NO:
@@ -178,9 +180,15 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 		break;
 	}
 
-    	StringBuilder bldr =  new StringBuilder(FIND_USER_RATINGS_COMMENTS1);
-    	bldr.append(coreRatingService.getRatingSelectJoinSQL(criteria.getRatingStyle(), getByUser));
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+	
+    	StringBuilder bldr =  new StringBuilder(FIND_USER_RATINGS_COMMENTS_SELECT);
+    	bldr.append(portraitStrings[0]);
+    	bldr.append(FIND_USER_RATINGS_COMMENTS1);
+    	bldr.append(portraitStrings[1]);
     	bldr.append(FIND_USER_RATINGS_COMMENTS2);
+    	bldr.append(coreRatingService.getRatingSelectJoinSQL(criteria.getRatingStyle(), getByUser));
+    	bldr.append(FIND_USER_RATINGS_COMMENTS3);
     	if ( ! getByUser) 
     	    bldr.append("WHERE user.user_id = :userId ");
     	
@@ -225,18 +233,19 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	return (List<Object[]>) query.list();
     }
 
-    private static final String COUNT_COMMENTS_FOR_SESSION = "SELECT user.user_id, rating.comment_count, user.first_name, user.last_name  "
-    	    + " FROM tl_laprev11_peerreview p "
+    private static final String COUNT_COMMENTS_FOR_SESSION_SELECT = "SELECT user.user_id, rating.comment_count, CONCAT(user.first_name, \" \", user.last_name) ";
+    private static final String COUNT_COMMENTS_FOR_SESSION_FROM = " FROM tl_laprev11_peerreview p "
 	    + " JOIN tl_laprev11_session sess ON p.content_id = :toolContentId AND p.uid = sess.peerreview_uid AND sess.session_id = :toolSessionId  "
-	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid AND user.hidden = 0 "
-	    + " LEFT JOIN ( "
+	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid AND user.hidden = 0 ";
+    private static final String COUNT_COMMENTS_FOR_SESSION_RATING_JOIN =  " LEFT JOIN ( "
 	    + " 	SELECT r.item_id, count(r.comment)  comment_count "
 	    + " 	FROM lams_rating_comment r "
 	    + "		WHERE r.rating_criteria_id = :ratingCriteriaId "
 	    + " 	GROUP BY r.item_id ) rating ON user.user_id = rating.item_id ";
     @Override
     public List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
-	    Integer page, Integer size, int sorting, String searchString) {
+	    Integer page, Integer size, int sorting, String searchString,
+	    IUserManagementService userManagementService) {
 	String sortingOrder = "";
 	switch (sorting) {
 	    case PeerreviewConstants.SORT_BY_NO:
@@ -255,7 +264,13 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 		sortingOrder = " ORDER BY rating.comment_count DESC";
 	}
 
-    	StringBuilder bldr =  new StringBuilder(COUNT_COMMENTS_FOR_SESSION);
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+
+    	StringBuilder bldr =  new StringBuilder(COUNT_COMMENTS_FOR_SESSION_SELECT)
+    		.append(portraitStrings[0])
+    		.append(COUNT_COMMENTS_FOR_SESSION_FROM)
+    		.append(portraitStrings[1])
+    		.append(COUNT_COMMENTS_FOR_SESSION_RATING_JOIN);
     	buildNameSearch(searchString, bldr, false);
     	bldr.append(sortingOrder);
     	

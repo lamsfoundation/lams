@@ -37,6 +37,8 @@ public class LeaderselectionUserDTO implements Comparable {
     private String firstName;
 
     private String lastName;
+    
+    private Long userId;
 
     private boolean finishedActivity;
 
@@ -46,6 +48,7 @@ public class LeaderselectionUserDTO implements Comparable {
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.finishedActivity = user.isFinishedActivity();
+	this.userId = user.getUserId();
     }
 
     public LeaderselectionUserDTO(LeaderselectionUser user) {
@@ -54,6 +57,7 @@ public class LeaderselectionUserDTO implements Comparable {
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.finishedActivity = user.isFinishedActivity();
+	this.userId = user.getUserId();
     }
 
     @Override
@@ -105,5 +109,13 @@ public class LeaderselectionUserDTO implements Comparable {
 
     public void setFinishedActivity(boolean finishedActivity) {
 	this.finishedActivity = finishedActivity;
+    }
+
+    public Long getUserId() {
+	return userId;
+    }
+
+    public void setUserId(Long userId) {
+	this.userId = userId;
     }
 }

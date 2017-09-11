@@ -31,6 +31,8 @@ public class VisitLogDTO {
 
     private String userFullName;
 
+    private Long portraitId;
+
     // the user access some reousrce item date time. Use in monitoring summary page
     private Date accessDate;
     // resource item complete date. Use in monitoring summary page
@@ -38,6 +40,7 @@ public class VisitLogDTO {
     // difference between completeDate and accessDate
     private Date timeTaken;
 
+    
     public Long getUserId() {
 	return userId;
     }
@@ -76,6 +79,14 @@ public class VisitLogDTO {
 
     public void setTimeTaken(Date timeTaken) {
 	this.timeTaken = timeTaken;
+    }
+
+    public Long getPortraitId() {
+	return portraitId;
+    }
+
+    public void setPortraitId(Long portraitId) {
+	this.portraitId = portraitId;
     }
 
 }

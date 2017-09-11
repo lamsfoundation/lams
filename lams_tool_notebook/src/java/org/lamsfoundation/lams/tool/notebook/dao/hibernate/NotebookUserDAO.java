@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.notebook.dao.INotebookUserDAO;
 import org.lamsfoundation.lams.tool.notebook.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -103,7 +104,7 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
      * Will return List<[NotebookUser, String, Date]> where the String is the notebook entry and the modified date.
      */
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService) {
+	    String searchString, ICoreNotebookService coreNotebookService, IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
 	    case NotebookConstants.SORT_BY_USERNAME_ASC:
@@ -131,14 +132,18 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 	String[] notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings(sessionId.toString(),
 		NotebookConstants.TOOL_SIGNATURE, "user.user_id", true);
 
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 	queryText.append("SELECT user.* ");
 	queryText.append(notebookEntryStrings[0]);
+	queryText.append(portraitStrings[0]);
 	queryText.append(" FROM tl_lantbk11_user user ");
 	queryText.append(
 		" JOIN tl_lantbk11_session session ON user.notebook_session_uid = session.uid and session.session_id = :sessionId");
 	queryText.append(notebookEntryStrings[1]);
+	queryText.append(portraitStrings[1]);
 
 	// If filtering by name add a name based where clause
 	buildNameSearch(searchString, queryText);
@@ -148,7 +153,8 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
 	query.addEntity("user", NotebookUser.class).addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("notebookModifiedDate", TimestampType.INSTANCE).setLong("sessionId", sessionId.longValue())
+		.addScalar("notebookModifiedDate", TimestampType.INSTANCE).addScalar("portraitId", IntegerType.INSTANCE)
+		.setLong("sessionId", sessionId.longValue())
 		.setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }

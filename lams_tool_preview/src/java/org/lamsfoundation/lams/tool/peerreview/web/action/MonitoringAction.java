@@ -227,7 +227,8 @@ public class MonitoringAction extends Action {
 		Object[] rawRow = rawRows.get(i);
 		JSONObject cell = new JSONObject();
 		cell.put("itemId", rawRow[0]);
-		cell.put("itemDescription", (String)rawRow[3]);
+		cell.put("itemDescription", rawRow[2]);
+		cell.put("itemDescription2", rawRow[3]);
 
 		Number numCommentsNumber = (Number) rawRow[1];
 		int numComments = numCommentsNumber != null ? numCommentsNumber.intValue() : 0;
