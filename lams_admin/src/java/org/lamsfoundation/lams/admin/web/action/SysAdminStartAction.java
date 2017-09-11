@@ -63,7 +63,7 @@ public class SysAdminStartAction extends Action {
 	    links.add(new LinkBean("ltiConsumerManagement.do", "label.manage.tool.consumers"));
 	    links.add(new LinkBean("toolcontentlist.do", "sysadmin.tool.management"));
 	    links.add(new LinkBean("themeManagement.do", "admin.themes.title"));
-	    links.add(new LinkBean("sessionlist.do", "sysadmin.maintain.session"));
+	    links.add(new LinkBean("sessionmaintain.do?method=list", "sysadmin.maintain.session"));
 	    groupedLinks.add(new Object[]{AdminConstants.START_CONFIG_LINKS,links});
 
 	    links = new ArrayList<LinkBean>();

@@ -892,14 +892,15 @@
       />
     </action>
     <action
-      path="/sessionlist"
-      type="org.lamsfoundation.lams.admin.web.action.SessionListAction"
+      path="/sessionmaintain"
+      type="org.lamsfoundation.lams.admin.web.action.SessionMaintainAction"
+      parameter="method"
       unknown="false"
       validate="false"
     >
       <forward
-        name="sessionlist"
-        path=".sessionlist"
+        name="sessionmaintain"
+        path=".sessionmaintain"
         redirect="false"
       />
     </action>
