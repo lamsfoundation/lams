@@ -1,5 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<script type="text/javascript">
+$(document).ready(function(){
+		initializePortraitPopover("<lams:LAMSURL />");
+});
+</script>
+
 <div class="panel">
 	<h4>
 	    <c:out value="${leaderselectionDTO.title}" escapeXml="true"/>
@@ -42,8 +48,8 @@
 		
 		<c:forEach var="user" items="${session.userDTOs}">
 			<tr>
-				<td width="30%" style="padding: 5px 0;">
-					<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
+				<td width="30%">
+					<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
 				</td>
 				<td width="70%" align="center">
 					<c:choose>

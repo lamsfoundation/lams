@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 public interface PeerreviewUserDAO extends DAO {
 
@@ -52,10 +53,12 @@ public interface PeerreviewUserDAO extends DAO {
     int getCountUsersBySession(final Long toolSessionId, final Long excludeUserId);
 
     List<Object[]> getRatingsComments(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long userId, Integer page,
-	    Integer size, int sorting, String searchString, boolean getByUser, IRatingService coreRatingService);
+	    Integer size, int sorting, String searchString, boolean getByUser, IRatingService coreRatingService,
+	    IUserManagementService userManagementService);
 	
     List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
-	    Integer page, Integer size, int sorting, String searchString);
+	    Integer page, Integer size, int sorting, String searchString,
+	    IUserManagementService userManagementService);
 	
     List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId );
     

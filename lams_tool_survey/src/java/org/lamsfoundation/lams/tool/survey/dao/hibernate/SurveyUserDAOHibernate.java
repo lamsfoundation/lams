@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyUserDAO;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -84,8 +85,8 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 	return ((Number) list.get(0)).intValue();
     }
 
-    private static final String FIND_USER_ANSWERS_BY_SESSION_ID = "SELECT user.*, answer.answer_choices answerChoices , answer.answer_text answerText"
-	    + " FROM tl_lasurv11_user user "
+    private static final String FIND_USER_ANSWERS_BY_SESSION_ID_SELECT = "SELECT user.*, answer.answer_choices answerChoices , answer.answer_text answerText";
+    private static final String FIND_USER_ANSWERS_BY_SESSION_ID_FROM = " FROM tl_lasurv11_user user "
 	    + " JOIN tl_lasurv11_session session ON user.session_uid = session.uid and session.session_id = :sessionId "
 	    + " LEFT JOIN tl_lasurv11_answer answer ON user.uid = answer.user_uid and answer.question_uid = :questionId ";
 
@@ -97,7 +98,7 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
      * free entry choice.
      */
     public List<Object[]> getUsersForTablesorter(final Long sessionId, final Long questionId, int page, int size,
-	    int sorting, String searchString) {
+	    int sorting, String searchString, IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
 	    case SurveyConstants.SORT_BY_NAME_ASC:
@@ -110,9 +111,14 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 		sortingOrder = "user.uid";
 	}
 
-	// Basic select for the user records
-	StringBuilder queryText = new StringBuilder(FIND_USER_ANSWERS_BY_SESSION_ID);
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 
+	// Basic select for the user records
+	StringBuilder queryText = new StringBuilder(FIND_USER_ANSWERS_BY_SESSION_ID_SELECT)
+		.append(portraitStrings[0])
+		.append(FIND_USER_ANSWERS_BY_SESSION_ID_FROM)
+		.append(portraitStrings[1]);
+	
 	// If filtering by name add a name based where clause
 	buildNameSearch(searchString, queryText);
 
@@ -121,7 +127,8 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
 	query.addEntity("user", SurveyUser.class).addScalar("answerChoices", StringType.INSTANCE)
-		.addScalar("answerText", StringType.INSTANCE).setLong("sessionId", sessionId.longValue())
+		.addScalar("answerText", StringType.INSTANCE).addScalar("portraitId", IntegerType.INSTANCE)
+		.setLong("sessionId", sessionId.longValue())
 		.setLong("questionId", questionId.longValue()).setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }
@@ -162,7 +169,7 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
      * String (notebook entry)]>
      */
     public List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService) {
+	    String searchString, ICoreNotebookService coreNotebookService, IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
 	    case SurveyConstants.SORT_BY_NAME_ASC:
@@ -179,16 +186,20 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 	String[] notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings(sessionId.toString(),
 		SurveyConstants.TOOL_SIGNATURE, "user.user_id");
 
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 	queryText.append("SELECT user.* ");
 	queryText.append(notebookEntryStrings[0]);
+	queryText.append(portraitStrings[0]);
 	queryText.append(" FROM tl_lasurv11_user user ");
 	queryText.append(
 		" JOIN tl_lasurv11_session session ON user.session_uid = session.uid and session.session_id = :sessionId ");
 
-	// Add the notebook join
+	// Add the notebook & portrait join
 	queryText.append(notebookEntryStrings[1]);
+	queryText.append(portraitStrings[1]);
 
 	// If filtering by name add a name based where clause
 	buildNameSearch(searchString, queryText);
@@ -198,6 +209,7 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
 	query.addEntity("user", SurveyUser.class).addScalar("notebookEntry", StringType.INSTANCE)
+		.addScalar("portraitId", IntegerType.INSTANCE)
 		.setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }

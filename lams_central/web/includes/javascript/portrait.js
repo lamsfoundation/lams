@@ -20,7 +20,7 @@ var NUM_COLORS = 7,
    STYLE_LARGE = 'large',
    STYLE_XLARGE = 'xlarge';
 
-// Add a portrait to an existing div as specified by selector
+// Add a portrait to an existing div as specified by selector.
 function addPortrait( selector, portraitId, userId, size, round, LAMS_URL ) {
     var isRound = round == null ? true : round;
     if ( portraitId  && portraitId > 0) {
@@ -55,6 +55,7 @@ function initializePortraitPopover(LAMS_URL, size) {
 				html: true,
 		        trigger: 'hover focus',
 		        title: element.dataset.fullname,
+		        delay: { "show": 700, "hide": 100 },
 		        container: 'body' // ensures popovers are not clipped within jqgrid tables
 		});
 			element.classList.remove('new-popover');
@@ -64,7 +65,7 @@ function initializePortraitPopover(LAMS_URL, size) {
 
 // Define the element to have a popover/tooltip to display the learner's portrait. Call in the ajaxProcessing (tablesorter) or 
 // in a formatter function (jqgrid). Use with initializePortraitPopover. Displays the fullName and portrait in the popover when the 
-// user hovers on linkText. Usually linkText === fullName
+// user hovers on linkText. Usually linkText === fullName.  
 function definePortraitPopover(portraitId, userId, fullName, linkText) {
 	if ( ! linkText )
 		linkText = fullName;

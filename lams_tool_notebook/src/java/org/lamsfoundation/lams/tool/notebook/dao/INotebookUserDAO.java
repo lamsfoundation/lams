@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.notebook.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**
  * DAO for accessing the NotebookUser objects - interface defining
@@ -65,7 +66,7 @@ public interface INotebookUserDAO extends IBaseDAO {
      * Will return List<[NotebookUser, String, Date]> where the String is the notebook entry and the modified date.
      */
     List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
-	    ICoreNotebookService coreNotebookService);
+	    ICoreNotebookService coreNotebookService, IUserManagementService userManagementService);
 
     int getCountUsersBySession(final Long sessionId, String searchString);
 

@@ -33,7 +33,8 @@ package org.lamsfoundation.lams.rating.dto;
 public class StyledRatingDTO {
 
     private Long itemId; 
-    private String itemDescription; // user readable version of the item, usually the name of the learner that has been rated\
+    private String itemDescription; // user readable version of the item, usually the name of the learner that has been rated
+    private String itemDescription2; // system detail for addition description content, usually the portrait id of the learner that has been rated.
     
     private String userRating; // rating left by the current user
     private String averageRating; // average of ratings by all users
@@ -91,6 +92,14 @@ public class StyledRatingDTO {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getItemDescription2() {
+	return itemDescription2;
+    }
+
+    public void setItemDescription2(String itemDescription2) {
+	this.itemDescription2 = itemDescription2;
     }
     
 

@@ -52,6 +52,8 @@ public interface NotebookConstants {
 
     public static final String PARAM_ORDER_ID = "orderId";
     public static final String PARAM_USER_UID = "userUid";
+    public static final String ATTR_USER_ID = "userId";
+    public static final String ATTR_PORTRAIT_ID = "portraitId";
     public static final String ATTR_DELETED_CONDITION_LIST = "deletedConditionList";
     public static final String USER_ENTRY_DEFINITION_NAME = "user.entry.output.definition.notebook";
     public static final String ALL_USERS_ENTRIES_DEFINITION_NAME = "all.users.entries.definition.notebook";
