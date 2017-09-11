@@ -161,7 +161,7 @@ public class SsoHandler implements ServletExtension {
 
 		// store session so UniversalLoginModule can access it
 		SessionManager.startSession(request);
-		
+
 		String oldSessionID = session.getId();
 
 		// do the logging in UniversalLoginModule or cache
@@ -169,7 +169,6 @@ public class SsoHandler implements ServletExtension {
 
 		// session ID was changed after log in
 		SessionManager.updateSessionID(oldSessionID);
-		
 
 		if (login.equals(request.getRemoteUser())) {
 		    session.setAttribute(AttributeNames.USER, userDTO);
@@ -186,8 +185,6 @@ public class SsoHandler implements ServletExtension {
 			// remove an existing session for the given user
 			SessionManager.removeSessionByLogin(login, request.isRequestedSessionIdValid());
 		    }
-		    // register current session as the only one for the given user
-		    SessionManager.addSession(login, session);
 		    Integer failedAttempts = user.getFailedAttempts();
 		    if (failedAttempts != null && failedAttempts > 0 && password != null
 			    && !password.startsWith("#LAMS")) {

@@ -70,6 +70,9 @@ public class SessionManager {
 	String sessionId = session.getId();
 	SessionManager.sessionIdMapping.put(sessionId, session);
 	SessionManager.sessionManager.currentSessionIdContainer.set(sessionId);
+	if (request.getRemoteUser() != null) {
+	    SessionManager.loginMapping.put(request.getRemoteUser(), session);
+	}
     }
 
     /**
@@ -78,13 +81,6 @@ public class SessionManager {
      */
     public static void endSession() {
 	SessionManager.sessionManager.currentSessionIdContainer.set(null);
-    }
-
-    /**
-     * Registeres the session for the given user.
-     */
-    public static void addSession(String login, HttpSession session) {
-	SessionManager.loginMapping.put(login, session);
     }
 
     /**
