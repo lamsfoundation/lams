@@ -55,7 +55,7 @@ function initializePortraitPopover(LAMS_URL, size) {
 				html: true,
 		        trigger: 'hover focus',
 		        title: element.dataset.fullname,
-		        delay: { "show": 700, "hide": 100 },
+		        delay: { "show": 400, "hide": 100 },
 		        container: 'body' // ensures popovers are not clipped within jqgrid tables
 		});
 			element.classList.remove('new-popover');
