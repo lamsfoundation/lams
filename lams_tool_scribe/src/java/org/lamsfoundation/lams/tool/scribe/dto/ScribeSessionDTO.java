@@ -48,6 +48,7 @@ public class ScribeSessionDTO implements Comparable {
     int VotePercentage;
 
     String appointedScribe;
+    Long appointedScribeUserId;
 
     Set<ScribeReportEntryDTO> reportDTOs;
 
@@ -64,8 +65,10 @@ public class ScribeSessionDTO implements Comparable {
 	ScribeUser appointedScribe = session.getAppointedScribe();
 	if (appointedScribe == null) {
 	    this.appointedScribe = null;
+	    this.appointedScribeUserId = null;
 	} else {
 	    this.appointedScribe = appointedScribe.getFirstName() + " " + appointedScribe.getLastName();
+	    this.appointedScribeUserId = appointedScribe.getUserId();
 	}
 
 	userDTOs = new TreeSet<ScribeUserDTO>();
@@ -172,4 +175,13 @@ public class ScribeSessionDTO implements Comparable {
     public void setReportSubmitted(boolean reportSubmitted) {
 	this.reportSubmitted = reportSubmitted;
     }
+
+    public Long getAppointedScribeUserId() {
+        return appointedScribeUserId;
+    }
+
+    public void setAppointedScribeUserId(Long appointedScribeUserId) {
+        this.appointedScribeUserId = appointedScribeUserId;
+    }
+
 }

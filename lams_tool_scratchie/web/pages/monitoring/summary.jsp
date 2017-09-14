@@ -51,15 +51,17 @@
 						'sessionId',
 						"<fmt:message key="label.monitoring.summary.user.name" />",
 						"<fmt:message key="label.monitoring.summary.attempts" />",
-					    "<fmt:message key="label.monitoring.summary.mark" />"
+					    "<fmt:message key="label.monitoring.summary.mark" />",
+					    'portraitId'
 				],
 			   	colModel:[
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 			   		{name:'userId', index:'userId', width:0, hidden: true},
 			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
-			   		{name:'userName', index:'userName', width:570},
+			   		{name:'userName', index:'userName', width:570, formatter:userNameFormatter},
 			   		{name:'totalAttempts', index:'totalAttempts', width:100, align:"right", sorttype:"int"},
-			   		{name:'mark', index:'mark', width:100, align:"right", sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}}		
+			   		{name:'mark', index:'mark', width:100, align:"right", sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}},
+			   		{name:'portraitId', index:'portraitId', width:0, hidden: true},
 			   	],
 			   	// caption: "${summary.sessionName}",
 				cellurl: '<c:url value="/monitoring/saveUserMark.do"/>',
@@ -83,7 +85,6 @@
   						return {userId:userId, sessionId:sessionId};		  				  		
   				  	}
   				}
-
 			});
 			
    	        <c:forEach var="user" items="${summary.users}" varStatus="i">
@@ -93,12 +94,15 @@
    	   	     		sessionId:"${user.session.sessionId}",
    	   	     		userName:"${user.lastName}, ${user.firstName}",
    	   				totalAttempts:"${summary.totalAttempts}",
-   	   				mark:"<c:choose><c:when test='${summary.totalAttempts == 0}'>-</c:when><c:otherwise>${summary.mark}</c:otherwise></c:choose>"
+   	   				mark:"<c:choose><c:when test='${summary.totalAttempts == 0}'>-</c:when><c:otherwise>${summary.mark}</c:otherwise></c:choose>",
+   	   				portraitId:"${user.portraitId}"
    	   	   	    });
 	        </c:forEach>
 			
 		</c:forEach>
-		
+
+		initializePortraitPopover('<lams:LAMSURL/>');
+
 		<!-- Display burningQuestionItemDtos -->
 		<c:forEach var="burningQuestionItemDto" items="${sessionMap.burningQuestionItemDtos}" varStatus="i">
 			<c:set var="scratchieItem" value="${burningQuestionItemDto.scratchieItem}"/>
@@ -180,6 +184,10 @@
         };
         setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
+        function userNameFormatter (cellvalue, options, rowObject) {
+    			return definePortraitPopover(rowObject.portraitId, rowObject.userId,  rowObject.userName);
+    		}
+    	
 		$("#item-uid").change(function() {
 			var itemUid = $(this).val();
 			if (itemUid != -1) {
