@@ -6,6 +6,7 @@ import java.util.Set;
 
 public class TaskListUserDTO {
     private Long userId;
+    private Long portraitId;
     private String fullName;
     private boolean verifiedByMonitor;
 
@@ -60,6 +61,14 @@ public class TaskListUserDTO {
 
     public void setAccessDate(Date accessDate) {
 	this.accessDate = accessDate;
+    }
+
+    public Long getPortraitId() {
+        return portraitId;
+    }
+
+    public void setPortraitId(Long portraitId) {
+        this.portraitId = portraitId;
     }
 
 }

@@ -26,8 +26,8 @@ import java.util.HashMap;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.Tag;
-import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -40,7 +40,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Output a URL to display a user's portrait. If you modify the logic here, change portrait.js too!
  */
-public class PortraitTag extends TagSupport {
+public class PortraitTag extends BodyTagSupport {
     private static final long serialVersionUID = -3143529984657965761L;
     private static final Logger log = Logger.getLogger(PortraitTag.class);
     private static final int NUM_COLORS = 7;
@@ -66,6 +66,7 @@ public class PortraitTag extends TagSupport {
     private String userId = null;
     private String size = null;
     private String round = null;
+    private String hover = null;
 
     public PortraitTag() {
 	super();
@@ -74,46 +75,36 @@ public class PortraitTag extends TagSupport {
     @Override
     public int doStartTag() throws JspException {
 
+	return super.doStartTag();
+    }
+
+    @Override
+    public int doEndTag() throws JspException {
+
 	String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
 	serverURL = serverURL == null ? null : serverURL.trim();
 
 	try {
-	    String code = null;
-	    boolean isRound = (getRound() != null ? Boolean.getBoolean(getRound()) : true);
 	    if (userId != null && userId.length() > 0) {
+		String code = null;
 		HashMap<String, String> cache = getPortraitCache();
 		code = cache.get(userId);
+
 		if (code == null) {
-		    Integer userIdLong = Integer.decode(userId);
-		    User user = (User) getUserManagementService().findById(User.class, userIdLong);
-		    Long portraitId = user != null ? user.getPortraitUuid() : null;
-		    if (portraitId != null) {
-			String[] sizes = getSizeClass();
-			StringBuilder bldr = new StringBuilder("<img class=\"").append(sizes[0]);
-			if ( isRound ) {
-			    bldr.append(CSS_ROUND);
-			}
-			bldr.append("\" src='").append(serverURL);
-			if (!serverURL.endsWith("/")) {
-			    bldr.append("/");
-			}
-			bldr.append("download?preferDownload=false&uuid=").append(portraitId)
-				.append(sizes[1])
-				.append("'></img>");
-			code = bldr.toString();
+		    Integer userIdInt = Integer.decode(userId);
+		    User user = (User) getUserManagementService().findById(User.class, userIdInt);
+		    boolean isHover = (hover != null ? Boolean.valueOf(hover) : false);
+		    if ( isHover ) {
+			code = buildHoverUrl(user);
 		    } else {
-			code = new StringBuilder("<div class=\"").append(getGenericSizeClass())
-				.append(PORTRAIT_VERSION_SUFFIX).append(userIdLong % NUM_COLORS).append("\"></div>")
-				.toString();
+			code = buildDivUrl(user);
 		    }
 		    cache.put(userId, code);
 		}
-	    } else {
-		code = "<div class=\"portrait-generic-small\"></div>";
-	    }
 
-	    JspWriter writer = pageContext.getOut();
-	    writer.println(code);
+		JspWriter writer = pageContext.getOut();
+		writer.println(code);
+	    }
 
 	} catch (NumberFormatException nfe) {
 	    PortraitTag.log.error("PortraitId unable to write out portrait details as userId is invalid. " + userId,
@@ -128,6 +119,45 @@ public class PortraitTag extends TagSupport {
 	return Tag.SKIP_BODY;
     }
 
+    private String buildDivUrl(User user) {
+	Long portraitId = user != null ? user.getPortraitUuid() : null;
+	if (portraitId != null) {
+	    boolean isRound = (round != null ? Boolean.valueOf(round) : true);
+	    String[] sizes = getSizeClass();
+	    StringBuilder bldr = new StringBuilder("<img class=\"").append(sizes[0]);
+	    if (isRound) {
+		bldr.append(CSS_ROUND);
+	    }
+	    String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
+	    bldr.append("\" src='").append(serverURL);
+	    if (!serverURL.endsWith("/")) {
+		bldr.append("/");
+	    }
+	    bldr.append("download?preferDownload=false&uuid=").append(portraitId).append(sizes[1]).append("'></img>");
+	    return bldr.toString();
+	} else {
+	    return new StringBuilder("<div class=\"").append(getGenericSizeClass()).append(PORTRAIT_VERSION_SUFFIX)
+		    .append(user.getUserId() % NUM_COLORS).append("\"></div>").toString();
+	}
+    }
+
+    private String buildHoverUrl(User user) {
+	Long portraitId = user != null ? user.getPortraitUuid() : null;
+	String linkText = getBodyContent() != null ? getBodyContent().getString() : null;
+	if (portraitId != null) {
+	    String fullName = user.getFullName();
+	    if ( linkText == null || linkText.length() == 0)
+		linkText = fullName;
+	    return new StringBuilder(
+		    "<a tabindex=\"0\" class=\"popover-link new-popover\" role=\"button\" data-toggle=\"popover\" data-id=\"popover-")
+			    .append(userId).append("\" data-portrait=\"").append(portraitId)
+			    .append("\" data-fullname=\"").append(fullName).append("\">")
+			    .append(linkText).append("</a>").toString();
+	} else {
+	    return linkText != null ? linkText : "";
+	}
+    }
+    
     private IUserManagementService getUserManagementService() {
 	if (userManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
@@ -137,7 +167,6 @@ public class PortraitTag extends TagSupport {
 	return userManagementService;
     }
 
-    @SuppressWarnings("unchecked")
     private HashMap<String, String> getPortraitCache() {
 	HashMap<String, String> cache = (HashMap<String, String>) pageContext.getAttribute("portraitCache");
 	if (cache == null) {
@@ -194,5 +223,13 @@ public class PortraitTag extends TagSupport {
 
     public void setRound(String round) {
 	this.round = round;
+    }
+
+    public String getHover() {
+	return hover;
+    }
+
+    public void setHover(String hover) {
+	this.hover = hover;
     }
 }

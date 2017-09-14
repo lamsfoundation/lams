@@ -34,6 +34,7 @@ public class ChatMessageDTO implements Comparable {
     public Long uid;
 
     public String from;
+    public Long fromUserId;
 
     public String body;
 
@@ -45,6 +46,7 @@ public class ChatMessageDTO implements Comparable {
 
     public ChatMessageDTO(ChatMessage chatMessage) {
 	this.from = chatMessage.getFromUser().getNickname();
+	this.fromUserId = chatMessage.getFromUser().getUserId();
 	this.body = chatMessage.getBody();
 	this.type = chatMessage.getType();
 	this.sendDate = chatMessage.getSendDate();
@@ -109,5 +111,13 @@ public class ChatMessageDTO implements Comparable {
 
     public void setHidden(Boolean hidden) {
 	this.hidden = hidden;
+    }
+
+    public Long getFromUserId() {
+        return fromUserId;
+    }
+
+    public void setFromUserId(Long fromUserId) {
+        this.fromUserId = fromUserId;
     }
 }

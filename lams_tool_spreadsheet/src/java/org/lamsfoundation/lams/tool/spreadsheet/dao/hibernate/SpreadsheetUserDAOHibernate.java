@@ -28,12 +28,14 @@ import java.util.List;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.SQLQuery;
+import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetUserDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -77,7 +79,8 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
      * where the String is the notebook entry. No notebook entries needed? Will return in their place.
      */
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService) {
+	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService,
+	    IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
 	    case SpreadsheetConstants.SORT_BY_USERNAME_ASC:
@@ -96,6 +99,8 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 		sortingOrder = "user.last_name, user.first_name";
 	}
 
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+
 	// If the session uses notebook, then get the sql to join across to get the entries
 	String[] notebookEntryStrings = null;
 	if (getNotebookEntries) {
@@ -107,10 +112,12 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 	StringBuilder queryText = new StringBuilder();
 	queryText.append("SELECT user.* ");
 	queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
+	queryText.append(portraitStrings[0]);
 	queryText.append(" FROM tl_lasprd10_user user ");
 	queryText.append(
 		" JOIN tl_lasprd10_session session ON user.session_uid = session.uid and session.session_id = :sessionId");
-
+	queryText.append(portraitStrings[1]);
+	
 	// If sorting by mark then join to mark
 	if (sorting == SpreadsheetConstants.SORT_BY_MARKED_ASC || sorting == SpreadsheetConstants.SORT_BY_MARKED_DESC) {
 	    queryText.append(
@@ -131,6 +138,7 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
 	query.addEntity("user", SpreadsheetUser.class).addScalar("notebookEntry", StringType.INSTANCE)
+		.addScalar("portraitId", IntegerType.INSTANCE)
 		.setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }

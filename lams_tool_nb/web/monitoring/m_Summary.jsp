@@ -1,6 +1,13 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/portrait.js" ></script>
 	
+<script type="text/javascript">
+	$(document).ready(function(){
+		initializePortraitPopover("<lams:LAMSURL />");
+	});
+</script>
+
 <div class="panel">
 	<h4><c:out value="${formBean.title}" escapeXml="true" /></h4>
 	<div class="voffset5"><c:out value="${formBean.basicContent}" escapeXml="false" /></div>
@@ -21,8 +28,8 @@
 				</tr>
 			</logic:empty>
 			<tr>
-				${allowComments ? '<td>' : '<td width="40%">'}
-					<c:out value="${reflection.username}" />
+				<td width="40%">
+					<lams:Portrait userId="${reflection.userId}" hover="true"><c:out value="${reflection.username}" /></lams:Portrait>
 				</td>
 				<c:url value="monitoring.do" var="viewReflection">
 					<c:param name="method" value="viewReflection" />

@@ -27,13 +27,15 @@
 		   	colNames:[
 				'itemId',
 				'<fmt:message key="label.user.name" />',
-				'${heading}'
+				'${heading}',
+				'portraitId'
 				<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">, ''</c:if>
 			],
 		   	colModel:[
 		   		{name:'itemId', index:'itemId', width:0, hidden: true},
-		   		{name:'itemDescription', index:'itemDescription', width:200, searchoptions: { clearSearch: false }},
-		   		{name:'rating', index:'rating', width:100, align:"center", search:false}
+		   		{name:'itemDescription', index:'itemDescription', width:200, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
+		   		{name:'rating', index:'rating', width:100, align:"center", search:false},
+		   		{name:'itemDescription2', index:'itemId', width:0, hidden: true}
 				<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">, {name:'email', index:'email', width:100, align:"center", search:false}</c:if>		   		
 		   	],
 		   	rowNum:10,
@@ -42,6 +44,7 @@
 		   	viewrecords:true,
 			loadComplete: function(){
 				initializeJRating();
+				initializePortraitPopover('<lams:LAMSURL/>');
 			},
 		   	// caption: "${groupSummary.sessionName}" use Bootstrap panels as the title bar
 			subGrid: true,
@@ -105,6 +108,10 @@
         $('div[id^="collapse"]').on('shown.bs.collapse', function () {
             resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
         })
+
+        function userNameFormatter (cellvalue, options, rowObject) {
+			return definePortraitPopover(rowObject.itemDescription2, rowObject.itemId,  rowObject.itemDescription);
+		}
 
         function resizeJqgrid(jqgrids) {
             jqgrids.each(function(index) {

@@ -646,7 +646,8 @@ public class RatingService implements IRatingService {
 		    
 		    StyledRatingDTO dto = new StyledRatingDTO(((BigInteger) row[0]).longValue());
 		    dto.setComment((String) row[2]);
-		    dto.setItemDescription((String) row[numColumns - 1]);
+		    dto.setItemDescription( row[numColumns - 2] != null ? row[numColumns - 2].toString() : null);
+		    dto.setItemDescription2( row[numColumns - 1] != null ? row[numColumns - 1].toString() : null);
 		    if ( ! isComment ) {
 			dto.setUserRating(row[3] == null ? "" : numberFormat.format((Double) row[3]));
 			dto.setAverageRating(row[4] == null ? "" : numberFormat.format((Double) row[4]));
@@ -662,9 +663,9 @@ public class RatingService implements IRatingService {
 
     /**
      * Convert the raw data from the database to JSON, similar on StyledCriteriaRatingDTO and StyleRatingDTO. 
-     * The rating service expects the potential itemId followed by rating.* (its own fields) and the last item 
-     * in the array to be an item description (eg formatted user's name) Will go back to the database for the 
-     * justification comment that would apply to hedging. 
+     * The rating service expects the potential itemId followed by rating.* (its own fields) and the last two items 
+     * in the array will be two item descriptions fields (eg formatted user's name, portrait id). Will go back to 
+     * the database for the justification comment that would apply to hedging. 
      * 
      * If includeCurrentUser == true will include the current users' records (used for SelfReview and Monitoring)
      * otherwise skips the current user, so they do not rate themselves!
@@ -721,7 +722,8 @@ public class RatingService implements IRatingService {
 		    JSONObject userRow = new JSONObject();
 		    userRow.put("itemId", itemId);
 		    userRow.put("comment", row[2] == null ? "" : (String) row[2]);
-    		    userRow.put("itemDescription", row[numColumns - 1] == null ? "" : (String) row[numColumns - 1]);
+    		    userRow.put("itemDescription", row[numColumns - 2] == null ? "" : row[numColumns - 2].toString());
+    		    userRow.put("itemDescription2", row[numColumns - 1] == null ? "" : row[numColumns - 1].toString());
 		    if ( ! isComment ) {
         		    userRow.put("userRating", row[3] == null ? "" : numberFormat.format((Double) row[3]));
         		    userRow.put("averageRating",  row[4] == null ? "" : numberFormat.format((Double) row[4]));

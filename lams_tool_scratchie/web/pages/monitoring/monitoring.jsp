@@ -14,7 +14,7 @@
 	<link type="text/css" href="${lams}css/thickbox.css" rel="stylesheet"  media="screen">
 	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 	<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css" >
-	<lams:css suffix="main"/>
+	<lams:css suffix="chart"/>
 		
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
@@ -34,6 +34,8 @@
  	<!--  Marks Chart -->
  	<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
+
+ 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
  
 	 <script>
 			var initialTabId = "${initialTabId}";

@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteStatsDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**
  * @author Ozgur Demirtas
@@ -83,7 +84,7 @@ public interface IVoteUsrAttemptDAO {
      * Will return List<[login (String), fullname(String), attemptTime(Timestamp]>
      */
     List<Object[]> getUserAttemptsForTablesorter(Long sessionUid, Long questionUid, int page, int size, int sorting,
-	    String searchString);
+	    String searchString, IUserManagementService userManagementService);
 
     /**
      * Get the count of all possible users for getUserAttemptsForTablesorter(). Either sessionUid or questionUid may
@@ -92,13 +93,13 @@ public interface IVoteUsrAttemptDAO {
     int getCountUsersBySession(Long sessionUid, Long questionUid, String searchString);
 
     List<Object[]> getUserReflectionsForTablesorter(Long sessionUid, int page, int size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService);
+	    String searchString, ICoreNotebookService coreNotebookService, IUserManagementService userManagementService);
 
     List<VoteStatsDTO> getStatisticsBySession(Long toolContentId);
 
     /** Gets the details for the open text nominations */
     List<OpenTextAnswerDTO> getUserOpenTextAttemptsForTablesorter(Long sessionUid, Long contentUid, int page, int size,
-	    int sorting, String searchStringVote, String searchStringUsername);
+	    int sorting, String searchStringVote, String searchStringUsername, IUserManagementService userManagementService);
 
     int getCountUsersForOpenTextEntries(Long sessionUid, Long contentUid, String searchStringVote,
 	    String searchStringUsername);

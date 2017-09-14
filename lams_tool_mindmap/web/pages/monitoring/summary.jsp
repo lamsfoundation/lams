@@ -2,6 +2,8 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="dto" value="${mindmapDTO}" />
 
+<script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
+
 <link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 
@@ -22,12 +24,19 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+
 <script type="text/javascript">
+	$(document).ready(function(){
+		initializePortraitPopover("<lams:LAMSURL />");
+	});
+	
 	var evalcomixWindow = null;
 	function openEvalcomixWindow(url) {
     	evalcomixWindow=window.open(url, 'evalcomixWindow', 'width=1152,height=648,scrollbars=yes,resizable=yes');
 		if (window.focus) {evalcomixWindow.focus()}
 	}
+	
 </script>
 
 <div class="panel">
@@ -95,7 +104,7 @@
 						<c:forEach var="user" items="${session.userDTOs}">
 							<tr>
 								<td>
-									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
+									<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
 								</td>
 						
 								<td >
@@ -139,7 +148,7 @@
 				<c:forEach var="user" items="${session.userDTOs}">
 					<tr>
 						<td>
-							<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
+							<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
 						</td>
 						
 						<td>

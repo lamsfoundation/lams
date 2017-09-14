@@ -1114,6 +1114,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    responseRow.put("answer", response.getAnswer());
 	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFullname()));
 	    responseRow.put("visible", new Boolean(response.isVisible()).toString());
+	    responseRow.put("userID", user.getQueUsrId());
+	    responseRow.put("portraitId", response.getPortraitId());
 
 	    // format attemptTime - got straight from server time to other timezones in formatter
 	    // as trying to convert dates runs into tz issues - any Date object created is still

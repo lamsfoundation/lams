@@ -11,6 +11,7 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
  */
 public class ReflectDTO {
     private Long userUid;
+    private Long userId;
     private String fullName;
     private String loginName;
     private boolean hasRefection;
@@ -23,6 +24,7 @@ public class ReflectDTO {
 	this.setLoginName(user.getLoginName());
 	this.setFullName(user.getFirstName() + " " + user.getLastName());
 	this.setUserUid(user.getUid());
+	this.setUserId(user.getUserId());
     }
 
     public boolean isFinishReflection() {
@@ -87,5 +89,13 @@ public class ReflectDTO {
 
     public void setDate(Date date) {
 	this.date = date;
+    }
+
+    public Long getUserId() {
+	return userId;
+    }
+
+    public void setUserId(Long userId) {
+	this.userId = userId;
     }
 }

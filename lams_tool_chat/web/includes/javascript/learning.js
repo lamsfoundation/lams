@@ -1,7 +1,4 @@
-// for chat users to be indetified by different colours
-var PALETTE = ["#008CD2", "#DF7C08", "#83B532", "#E0BE40", "#AE8124", "#5F0704", "#004272", "#CD322B", "#254806"],
-	// to be accessible from learning.jsp
-	sendChatToolMessage;
+var sendChatToolMessage; // to be accessible from learning.jsp
 
 $(document).ready(function() {
 	messageDiv = $("#messages");
@@ -70,27 +67,38 @@ $(document).ready(function() {
 				'class' : 'message ' + (this.type == 'chat' ? 'private_message' : '')
 			});
 			$('<div />',{
-				'class' : 'messageFrom',
+				'class' : 'messageFrom '+getPortraitColourClass(this.lamsUserId),
 				'text'  : this.from
-			}).css('color' , getColour(this.from)).appendTo(container);
+			}).appendTo(container);
 			$('<span />',{
 				'text'  : this.body
 			}).appendTo(container);
 				
 			container.appendTo(messageDiv);
 		});
-	  
+	  		
 		// move to the bottom
 		messageDiv.scrollTop(messageDiv.prop('scrollHeight'));
 		rosterDiv.html('');
 		jQuery.each(input.roster, function(index, value){
 			var userDiv = $('<div />', {
-				'class' : (value == selectedUser ? 'selected' : 'unselected'),
-				'text'  : value
-			}).css('color', getColour(value))
+				'class' : (value.nickName == selectedUser ? 'selected' : 'unselected'),
+			})
 			  .appendTo(rosterDiv);
+
+			var pictureDivId = 'roster-'+value.lamsUserId;
+			$('<div />', {
+				'id'    : pictureDivId
+			}).appendTo(userDiv);
+			addPortrait(jQuery('#'+pictureDivId), value.portraitId, value.lamsUserId, 'small', true, LAMS_URL);
+
+			$('<span />', {
+				'class' : getPortraitColourClass(value.lamsUserId),
+				'text'  : value.nickName
+			}).appendTo(userDiv);			
+
 				
-				// only Monitor can send a personal message
+			// only Monitor can send a personal message
 			if (MODE == 'teacher') {
 				userDiv.click(function(){
 					userSelected($(this));
@@ -101,13 +109,12 @@ $(document).ready(function() {
 	}
 	
 	function userSelected(userDiv) {
-		var userDivContent = userDiv.html();
+		var userDivContent = userDiv.children().last().html().trim();
 		// is Monitor clicked the already selectedd user, desect him and make message go to everyone
 		selectedUser = userDivContent == selectedUser ? null : userDivContent;
 
 		if (selectedUser) {
-			sendToUserSpan.html(selectedUser)
-			              .css('color', getColour(selectedUser));
+			sendToUserSpan.html(selectedUser);
 		}
 		sendToEveryoneSpan.css('display', selectedUser ? 'none' : 'inline');
 		sendToUserSpan.css('display', selectedUser ? 'inline' : 'none');
@@ -138,12 +145,3 @@ $(document).ready(function() {
 		chatWebsocketPingFunc(true);
 	}
 });
-
-function getColour(nick) {
-	// same nick should give same colour
-	var charSum = 0;
-	for ( var i = 0; i < nick.length; i++) {
-		charSum += nick.charCodeAt(i);
-	}
-	return PALETTE[charSum % (PALETTE.length)];
-}

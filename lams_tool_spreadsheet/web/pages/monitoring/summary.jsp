@@ -5,6 +5,7 @@
 <c:set var="tool"><lams:WebAppURL /></c:set>
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/monitorToolSummaryAdvanced.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 <script type="text/javascript">
 /* 	function editMark(userUid){
 		var url = "<c:url value="/monitoring/editMark.do?userUid="/>" + userUid +"&toolContentID=" + ${param.toolContentID} + "&sessionMapID=" + "${sessionMapID}";

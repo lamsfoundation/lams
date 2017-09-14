@@ -5,7 +5,7 @@
 </c:set>
 
 <script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
-
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/portrait.js"></script>
 <!-- Include the gmap API header -->
 <c:choose>
 	<c:when test="${gmapKey != null}">
@@ -49,6 +49,7 @@ var markerLimit = ${gmapDTO.maxMarkers};
 
 function initMonotorGmap()
 {
+	initializePortraitPopover('<lams:LAMSURL />');
 	if (GBrowserIsCompatible()) 
 	{
 		//map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(640,320) } );

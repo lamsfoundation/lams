@@ -299,7 +299,8 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     @Override
     public Collection<TaskListUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
-	return taskListUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString);
+	return taskListUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString,
+		userManagementService);
     }
 
     @Override

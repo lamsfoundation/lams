@@ -125,6 +125,8 @@ public class DacoConstants {
 
     public static final String RECORD_COUNT = "recordCount";
 
+    public static final String PORTRAIT_ID = "portraitId";
+
     // for parameters' name
 
     public static final String PARAM_FILE_VERSION_ID = "fileVersionId";
