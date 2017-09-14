@@ -169,6 +169,7 @@ public class MonitoringAction extends Action {
 
 	    SpreadsheetUser user = (SpreadsheetUser) userAndReflection[0];
 	    responseRow.put(SpreadsheetConstants.ATTR_USER_UID, user.getUid());
+	    responseRow.put(SpreadsheetConstants.ATTR_USER_ID, user.getUserId());
 	    responseRow.put(SpreadsheetConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml(user.getFullUsername()));
 	    if (user.getUserModifiedSpreadsheet() != null) {
 		responseRow.put("userModifiedSpreadsheet", "true");
@@ -181,6 +182,10 @@ public class MonitoringAction extends Action {
 
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
 		responseRow.put("reflection", userAndReflection[1]);
+	    }
+
+	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
+		responseRow.put("portraitId", userAndReflection[2]);
 	    }
 
 	    rows.put(responseRow);

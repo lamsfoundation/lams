@@ -504,7 +504,8 @@ public class User implements Serializable, Comparable {
 		(tutorialsDisabled == null ? false : true), // assume tutorials enabled if not set
 		tutorialPages, 
 		(firstLogin == null ? true : false), // assume no firstLogin value means they haven't logged in
-		lastVisitedOrganisationId
+		lastVisitedOrganisationId,
+		portraitUuid
 	);
     }
 

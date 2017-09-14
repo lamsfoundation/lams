@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListUserDAO;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskListUserDTO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -79,12 +80,9 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 	return (List<TaskListUser>) this.doFind(FIND_BY_SESSION_ID, sessionId);
     }
 
-    @Override
-    public Collection<TaskListUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
-	    String sortOrder, String searchString) {
-
-	String LOAD_USERS = "SELECT user.uid, CONCAT(user.last_name, ' ', user.first_name), user.is_verified_by_monitor, visitLog.taskList_item_uid"
-		+ " FROM tl_latask10_user user" + " INNER JOIN tl_latask10_session session"
+    public static final String LOAD_USERS_SELECT = "SELECT user.uid, CONCAT(user.last_name, ' ', user.first_name), user.is_verified_by_monitor, visitLog.taskList_item_uid";
+    public static final String LOAD_USERS_FROM =  " FROM tl_latask10_user user";
+    public static final String LOAD_USERS_JOINS = " INNER JOIN tl_latask10_session session"
 		+ " ON user.session_uid=session.uid" +
 
 		" LEFT OUTER JOIN tl_latask10_item_log visitLog " + " ON visitLog.user_uid = user.uid"
@@ -92,9 +90,24 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 
 		" WHERE session.session_id = :sessionId "
 		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
-		+ " ORDER BY CONCAT(user.last_name, ' ', user.first_name) " + sortOrder;
+		+ " ORDER BY CONCAT(user.last_name, ' ', user.first_name) ";
 
-	SQLQuery query = getSession().createSQLQuery(LOAD_USERS);
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<TaskListUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
+	    String sortOrder, String searchString, IUserManagementService userManagementService) {
+
+
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+
+	StringBuilder bldr = new StringBuilder(LOAD_USERS_SELECT)
+		.append(portraitStrings[0])
+		.append(LOAD_USERS_FROM)
+		.append(portraitStrings[1])
+		.append(LOAD_USERS_JOINS)
+		.append(sortOrder);
+	
+	SQLQuery query = getSession().createSQLQuery(bldr.toString());
 	query.setLong("sessionId", sessionId);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
@@ -112,6 +125,7 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 		String fullName = (String) element[1];
 		boolean isVerifiedByMonitor =  element[2] == null ? false : (Boolean) element[2];
 		Long completedTaskUid = element[3] == null ? 0 : ((Number) element[3]).longValue();
+		Long portraitId = element[4] == null ? null : ((Number) element[4]).longValue();
 
 		TaskListUserDTO userDto = (userIdToUserDto.get(userId) == null) ? new TaskListUserDTO()
 			: userIdToUserDto.get(userId);
@@ -119,6 +133,7 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 		userDto.setFullName(fullName);
 		userDto.setVerifiedByMonitor(isVerifiedByMonitor);
 		userDto.getCompletedTaskUids().add(completedTaskUid);
+		userDto.setPortraitId(portraitId);
 
 		userIdToUserDto.put(userId, userDto);
 	    }

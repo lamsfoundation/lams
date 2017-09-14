@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.taskList.dto.TaskListUserDTO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**
  * DAO interface for <code>TaskListUser</code>.
@@ -80,7 +81,7 @@ public interface TaskListUserDAO extends DAO {
      * @return
      */
     Collection<TaskListUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
-	    String sortOrder, String searchString);
+	    String sortOrder, String searchString, IUserManagementService userManagementService);
 
     /**
      * Returns paged users for jqGrid based on sessionId and taskListItemUid.

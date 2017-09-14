@@ -53,11 +53,19 @@
 
 							rows += '<tr>';
 							rows += '<td>';
+							var portraitURL = definePortraitPopover(userData["portraitId"], userData["userId"], userData["userName"]);
 							if ( ${spreadsheet.learnerAllowedToSave} ) {
-								var reviewURL = '<c:url value="/reviewItem.do"/>?userUid='+userData["userUid"];
-								rows += '<a href="javascript:launchPopup(\'' + reviewURL + '\')">' + userData["userName"] + '</a>';
+								var reviewURL = 'href="javascript:launchPopup(\''
+										+'<c:url value="/reviewItem.do"/>?userUid='+userData["userUid"]
+										+'\')"';
+								if ( portraitURL.indexOf("<a") >= 0 ) {
+									reviewURL = portraitURL.replace("class",reviewURL+" class");
+								} else {
+									reviewURL = '<a ' + reviewURL + '>' + portraitURL + '</a>';
+								}
+								rows += reviewURL;
 							} else {
-								rows += userData["userName"];
+								rows += portraitURL;
 							}
 							rows += '</td>';
 
@@ -95,7 +103,9 @@
 			            
 			    	}
 				},					
-			})
+			}).bind('pagerInitialized pagerComplete', function(event, options){
+				initializePortraitPopover('${lams}');
+            })
 		});
   	})
 </script>

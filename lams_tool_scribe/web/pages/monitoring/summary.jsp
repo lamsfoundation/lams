@@ -2,6 +2,7 @@
 <c:set var="dto" value="${requestScope.monitoringDTO}" />
 
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/portrait.js" ></script>
 <script type="text/javascript">
 	function confirmForceComplete() {
 		var message = "<fmt:message key='message.confirmForceComplete'/>";
@@ -11,6 +12,9 @@
 			return false;
 		}
 	}
+	$(document).ready(function(){
+	 	initializePortraitPopover('<lams:LAMSURL/>');
+	});
 </script>
 
 <html:form action="/monitoring">
@@ -92,7 +96,7 @@
 	
 		<c:if test="${session.appointedScribe != null}">
 			<strong>
-				<fmt:message key="heading.appointedScribe" />: <c:out value="${session.appointedScribe}" escapeXml="true"/>
+				<fmt:message key="heading.appointedScribe" />: <lams:Portrait userId="${session.appointedScribeUserId}" hover="true"><c:out value="${session.appointedScribe}" escapeXml="true"/></lams:Portrait>
 			</strong>
 		</c:if>
 	</div>
@@ -138,7 +142,7 @@
 					<fmt:message>heading.learner</fmt:message>
 				</th>
 
-				<th>
+				<th style="text-align: right">
 					<c:choose>
 						<c:when test="${dto.reflectOnActivity}">
 							<fmt:message key="heading.reflection" />
@@ -153,19 +157,19 @@
 			<c:forEach var="user" items="${session.userDTOs}">
 				<tr>
 					<td>
-						<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
+						<lams:Portrait userId="${user.userID}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
 					</td>
 					<c:if test="${dto.reflectOnActivity}">
-						<td align="right">
+						<td style="text-align: right">
 							<c:if test="${user.finishedReflection}">
 								<c:url value="monitoring.do" var="openNotebook">
 									<c:param name="dispatch" value="openNotebook" />
 									<c:param name="uid" value="${user.uid}" />
 								</c:url>
 
-								<html:link href="${fn:escapeXml(openNotebook)}">
+								<a href="javascript:launchPopup('${openNotebook}','<fmt:message key="heading.reflection" />');" class="btn btn-default btn-sm" >
 									<fmt:message key="link.view" />
-								</html:link>
+								</a>
 							</c:if>
 						</td>
 					</c:if>

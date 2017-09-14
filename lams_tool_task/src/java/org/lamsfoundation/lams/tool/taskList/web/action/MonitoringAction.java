@@ -255,6 +255,8 @@ public class MonitoringAction extends Action {
 		userData.put(verificationStatus);
 	    }
 
+	    userData.put(userDto.getPortraitId());
+	    
 	    JSONObject userRow = new JSONObject();
 	    userRow.put("id", i++);
 	    userRow.put("cell", userData);
