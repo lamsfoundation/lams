@@ -145,6 +145,8 @@ public class MonitoringService implements IMonitoringService {
     private static Logger log = Logger.getLogger(MonitoringService.class);
 
     private static final String AUDIT_LESSON_CREATED_KEY = "audit.lesson.created";
+    private static final String AUDIT_LESSON_REMOVED_KEY = "audit.lesson.removed";
+    private static final String AUDIT_LESSON_REMOVED_PERMANENTLY_KEY = "audit.lesson.removed.permanently";
 
     private ILessonDAO lessonDAO;
 
@@ -867,6 +869,9 @@ public class MonitoringService implements IMonitoringService {
 	securityService.isLessonMonitor(lessonId, userId, "remove lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	setLessonState(requestedLesson, Lesson.REMOVED_STATE);
+	
+	writeAuditLog(MonitoringService.AUDIT_LESSON_REMOVED_KEY,
+		new Object[] { requestedLesson.getLessonName(),  requestedLesson.getLessonId() });
     }
 
     @SuppressWarnings("unchecked")
@@ -937,6 +942,9 @@ public class MonitoringService implements IMonitoringService {
 
 	// finally remove the learning design
 	lessonDAO.delete(learningDesign);
+	
+	writeAuditLog(MonitoringService.AUDIT_LESSON_REMOVED_PERMANENTLY_KEY,
+		new Object[] { lesson.getLessonName(),  lesson.getLessonId() });
     }
 
     @Override
