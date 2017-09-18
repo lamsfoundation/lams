@@ -35,6 +35,45 @@ function addPortrait( selector, portraitId, userId, size, round, LAMS_URL ) {
     }
 }
 
+// Define a DIV element that is the learner's portrait. Call in the ajaxProcessing (tablesorter) or 
+// in a formatter function (jqgrid). Is the direct eqivalent of the Portrait tag. Use this method if you need to return
+// the HTML which defines a portrait. Use addPortrait if you need to add a portrait to an existing DIV.
+function definePortrait( portraitId, userId, size, round, LAMS_URL, portraitLocationClasses ) {
+    var isRound = round == null ? true : round;
+    if ( portraitId  && portraitId > 0) {
+    		var retValue = '<div style="background-image:url(' + LAMS_URL + 'download?preferDownload=false&uuid='
+    			+ portraitId + _getSizeVersion(size) + ')" class="' + _getSizeCSS(size);
+    		if ( isRound ) {
+    			retValue += ' ' + CSS_ROUND;
+    		}
+    		if ( portraitLocationClasses ) {
+    			retValue += ' ' + portraitLocationClasses;
+    		}
+    		retValue += '"></div>';
+    		return retValue;
+    } else {
+		var retValue = '<div class="' + _getGenericSizeClass(size) + ' ' + getPortraitColourClass(userId);
+		if ( portraitLocationClasses ) {
+			retValue += ' ' + portraitLocationClasses;
+		}
+		retValue += '"></div>';
+		return retValue;
+    }
+}
+
+// define a small header with the portrait and two lines of text next to portrait
+function definePortraitMiniHeader(portraitId, userId, LAMS_URL, line1, line2, portraitOnRight, otherClasses) {
+	var html = '<div';
+	if ( otherClasses )
+		html += ' class="' + otherClasses + '"';
+	html += '>';
+	html += definePortrait(portraitId, userId, "small", true, LAMS_URL, portraitOnRight ? "pull-right" : "pull-left roffset5");
+	html += '<span>' + line1 + '</span>';
+	html += '<br/><span style="font-size: smaller">' + line2 + '</span>';
+	html += '</div>';
+	return html;
+}
+
 // Get the colour that would be used for the generic portrait. Useful when you need a consistent colour for a user. 
 function getPortraitColourClass(userId) {
 	return PORTRAIT_VERSION_SUFFIX + userId % NUM_COLORS;

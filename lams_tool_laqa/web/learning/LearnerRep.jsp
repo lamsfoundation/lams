@@ -50,6 +50,7 @@
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	<script src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js" type="text/javascript"></script>
+	<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
 
 	<script type="text/javascript">
 		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
@@ -98,15 +99,9 @@
 								rows += '<td style="vertical-align:top;">';
 								
 								if (${generalLearnerFlowDTO.userNameVisible == 'true'}) {
-									rows += '<div class="sbox-heading bg-warning">';
-									rows += 	'<div class="user">';
-									rows += 		userData["userName"];
-									rows += 	'</div> - ';
-									rows += '<time class="timeago" title="';
-									rows += userData["attemptTime"];
-									rows += '" datetime="';
-									rows += 	userData["timeAgo"];
-									rows += '"></time></div>';
+									rows += definePortraitMiniHeader(userData["portraitId"], userData["userID"], '${lams}', userData["userName"], 
+											'<time class="timeago" title="' + userData["attemptTime"] + '" datetime="' + userData["timeAgo"] + '"></time>', 
+											false, "sbox-heading bg-warning")
 								}
 								
 								rows += 	'<div class="user-answer">';
@@ -334,11 +329,9 @@
 								<div class="${splitRow}">
 									<div class="sbox">
 										<div class="sbox-heading bg-warning">
-											<div class="user">
-												<c:out value="${userResponse.qaQueUser.fullname}" />
-											</div>
-											-
-											<lams:Date value="${userResponse.attemptTime}" timeago="true"/>
+											<div class="pull-left roffset5"><lams:Portrait userId="${userResponse.qaQueUser.queUsrId}"/></div>
+												<span><c:out value="${userResponse.qaQueUser.fullname}" /></span>
+												<br><span style="font-size: smaller"><lams:Date value="${userResponse.attemptTime}" timeago="true"/></span>
 										</div>
 										<div class="sbox-body">
 											<c:out value="${userResponse.answer}" escapeXml="false" />
