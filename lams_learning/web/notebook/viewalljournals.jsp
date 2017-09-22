@@ -41,9 +41,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<!-- set user check flag -->
 			<c:if test="${status.first}">
 				<c:set var="userToCheck" value="${entry.user.userId}" />
-				<h2>
-					<c:out value="${entry.user.fullName}" escapeXml="false" />
-				</h2>
+				<h4><lams:Portrait userId="${entry.user.userId}"/><c:out value="${entry.user.fullName}" escapeXml="false" /></h4>
 				<tr>
 					<th scope="col" width="30%" colspan="2"><fmt:message key="mynotes.entry.title.label" /></th>
 					<th scope="col" width="25%" align="center"><fmt:message key="mynotes.entry.create.date.label" /></th>
@@ -56,9 +54,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</table>
 
 	<c:set var="userToCheck" value="${entry.user.userId}" />
-	<h2>
-		<c:out value="${entry.user.fullName}" escapeXml="false" />
-	</h2>
+	<h4><lams:Portrait userId="${entry.user.userId}"/><c:out value="${entry.user.fullName}" escapeXml="false" /></h4>
 	<table class="alternative-color" cellspacing="0">
 		<tr>
 			<th scope="col" width="30%" colspan="2"><fmt:message key="mynotes.entry.title.label" /></th>
@@ -68,9 +64,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if>
 
 		<tr>
-			<td class="align-left" width="28%"><c:set var="viewnote">
-					<html:rewrite page="/notebook.do?method=viewEntry&mode=teacher&uid=" />
-					<c:out value="${entry.uid}" />
+			<td class="align-left" width="28%">
+				<c:set var="viewnote">
+					<html:rewrite page="/notebook.do?method=viewEntry&mode=teacher&uid=${entry.uid}&currentLessonID=${lessonID}" />
 				</c:set> <html:link href="${viewnote}">
 					<c:choose>
 						<c:when test="${empty entry.title}">

@@ -107,10 +107,17 @@ function fillGroup(users, container) {
 		// create user DIVs
 		$.each(users, function(index, userJSON) {
 			var userDiv = $('<div />').attr('userId', userJSON.id)
-				.addClass('draggableItem')
-	    		.text(userJSON.firstName + ' ' + userJSON.lastName 
-	    				  + ' (' + userJSON.login + ')'
-	    			   );
+				.addClass('draggableItem');
+			var portraitDiv = $('<div />').attr({
+				'id': 'portrait-'+userJSON.id,
+				})
+				.addClass('roffset5')
+				.appendTo(userDiv);
+			addPortrait(portraitDiv, userJSON.portraitId, userJSON.id, 'small', true, LAMS_URL );
+			$('<span/>').text(userJSON.firstName + ' ' + userJSON.lastName + ' (' + userJSON.login + ')')
+				.addClass('portrait-sm-lineheight')
+				.appendTo(userDiv);
+
 			// for later use
 			userDivs.push(userDiv);
 			userIds.push(userJSON.id);

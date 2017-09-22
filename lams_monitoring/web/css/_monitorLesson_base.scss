@@ -372,21 +372,8 @@ div#tabLearnersContainer {
 }
 
 td.progressBarLabel {
-	padding: 0;
-	background-color: $brand-primary-light;
+	line-height: 1 !important;
 }
-
-td.progressBarLabel div {
-	float: left;
-	padding: 10px 0 4px 20px;
-	font-weight: bold;
-}
-
-td.progressBarLabel a {
-	float: right;
-	margin: 6px 5px 4px 0;
-}
-
 
 /********** BOOTSTRAP ADDITIONS **********/
 
