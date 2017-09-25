@@ -175,6 +175,7 @@ public class UserAction extends LamsDispatchAction {
 		userSelectedTheme = UserAction.themeService.getDefaultTheme().getThemeId();
 	    }
 	    userForm.set("userTheme", userSelectedTheme);
+	    userForm.set("initialPortraitId", user.getPortraitUuid());
 	    
 	    //property available for modification only to sysadmins
 	    userForm.set("twoFactorAuthenticationEnabled", user.isTwoFactorAuthenticationEnabled());

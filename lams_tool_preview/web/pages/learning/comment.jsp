@@ -37,6 +37,7 @@
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 	
+	<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
 	
 	<script type="text/javascript">
 
@@ -101,10 +102,11 @@
 							
 							rows += '<tr>';
 
-							rows += '<td class="username" width="20%"><span>';
+							rows += '<td class="username" width="20%"><div class="pull-left roffset5">';
+							rows += definePortrait( userData["itemDescription2"], itemId, 'small', true, '${lams}' );
+							rows += '</div><span class="portrait-sm-lineheight">';
 							rows += userData["itemDescription"];
 							rows += '</span>'
-
 							rows += '</td>';
 							
 							rows += '<td class="comment" id="comments-area-' + itemId + '" width="80%">';
@@ -336,7 +338,7 @@
 		<input type="hidden" name="next" id="next" value=""/>		
 
 		<lams:TSTable numColumns="2" test="1">
-			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" > 
+			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" style="width:25%" > 
 				<fmt:message key="label.user.name" />
 			</th>
 			<th class="comment"> 

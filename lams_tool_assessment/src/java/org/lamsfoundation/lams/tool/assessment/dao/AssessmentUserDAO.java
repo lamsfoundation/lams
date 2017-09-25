@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 public interface AssessmentUserDAO extends DAO {
 
@@ -37,7 +38,7 @@ public interface AssessmentUserDAO extends DAO {
     List<AssessmentUser> getBySessionID(Long sessionId);
 
     List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
-	    String searchString);
+	    String searchString, IUserManagementService userManagementService);
 
     int getCountUsersBySession(Long sessionId, String searchString);
 

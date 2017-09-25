@@ -173,6 +173,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	    } else {
 		responseRow.put(NotebookConstants.PARAM_MODIFIED_DATE, noEntry);
 	    }
+	    
+	    responseRow.put(NotebookConstants.ATTR_USER_ID, user.getUserId());
+	    if (userAndReflection.length > 3 && userAndReflection[3] != null) {
+		responseRow.put(NotebookConstants.ATTR_PORTRAIT_ID, userAndReflection[3]);
+	    }
 	    rows.put(responseRow);
 	}
 	responsedata.put("rows", rows);

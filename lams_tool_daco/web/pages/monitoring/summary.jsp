@@ -3,8 +3,11 @@
 <c:set var="monitoringSummary" value="${sessionMap.monitoringSummary}" />
 <c:set var="anyRecordsAvailable" value="false" />	
 <c:set var="daco" value="${sessionMap.daco}"/>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 				
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js"></script>
+<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js"></script>
+<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
+
 <script type="text/javascript">
 	function exportSummary(){
 		location.href = "<c:url value='/monitoring/exportToSpreadsheet.do'/>?sessionMapID=${sessionMapID}&reqID=" + (new Date()).getTime();
@@ -43,13 +46,13 @@
 			            json = {};
 			    		
 						for (i = 0; i < data.rows.length; i++){
-							var userData = data.rows[i];
+							var userData = data.rows[i],
+								userId = userData["userId"],
+								fullName = userData["userFullName"];;
 							
 							rows += '<tr>';
 							
-							rows += '<td>';
-							rows += 	userData["userFullName"];
-							rows += '</td>';
+							rows += '<td>'+ definePortraitPopover(userData["portraitId"], userId, fullName, fullName) +'</td>';
 							
 							rows += '<td align="center">';
 							rows += userData["recordCount"];
@@ -83,7 +86,9 @@
 						return json;
 			            
 			    	}				
-				}})
+				}}).bind('pagerInitialized pagerComplete', function(event, options){
+					initializePortraitPopover('${lams}');
+	            })
 			});
 	  	})
 </script>

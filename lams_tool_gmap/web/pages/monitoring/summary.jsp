@@ -57,7 +57,7 @@
 		<c:forEach var="user" items="${session.userDTOs}">
 			<tr>
 				<td>
-					<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
+					<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
 				</td>
 				<td>
 					<c:if test="${user.finishedReflection}">
@@ -112,7 +112,7 @@
 				</td>
 				<td>
 					<a href="javascript:clearMap();addUsersForSession${session.sessionID}();addMarkersForSession${session.sessionID}();"
-					class="btn btn-default btn-xs pull-right">Show On Map</a>
+					class="btn btn-default btn-xs pull-right"><fmt:message key="label.show.on.map"/></a>
 				</td>
 			</tr>
 		</c:forEach>
@@ -215,7 +215,6 @@
 		clearMap();
 		addUsersForSession${session.sessionID}();
 		addMarkersForSession${session.sessionID}();
-		makeReflectionDivVisible('reflectionDiv${session.sessionID}');
 	</c:if>
 	</c:forEach>
 	

@@ -197,16 +197,20 @@ public class MonitoringAction extends LamsDispatchAction {
 	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, StringEscapeUtils.escapeHtml(user.getFullName()));
 
 	    if (userAndReflection.length > 2) {
-		responseRow.put(SbmtConstants.ATTR_USER_NUM_FILE, 
-			(Integer)userAndReflection[1] - (Integer)userAndReflection[2]);
+		responseRow.put(SbmtConstants.ATTR_PORTRAIT_ID, (Integer)userAndReflection[1]);
 	    }
 
 	    if (userAndReflection.length > 3) {
-		responseRow.put(SbmtConstants.ATTR_USER_FILE_MARKED, (Integer) userAndReflection[3] > 0);
+		responseRow.put(SbmtConstants.ATTR_USER_NUM_FILE, 
+			(Integer)userAndReflection[2] - (Integer)userAndReflection[3]);
 	    }
 
 	    if (userAndReflection.length > 4) {
-		responseRow.put(SbmtConstants.ATTR_USER_REFLECTION, userAndReflection[4]);
+		responseRow.put(SbmtConstants.ATTR_USER_FILE_MARKED, (Integer) userAndReflection[4] > 0);
+	    }
+
+	    if (userAndReflection.length > 5) {
+		responseRow.put(SbmtConstants.ATTR_USER_REFLECTION, userAndReflection[5]);
 	    }
 
 	    rows.put(responseRow);

@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.sbmt.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitUserDAO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -96,7 +97,8 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
      * and String is the notebook entry. No notebook entries needed? Will return null in their place.
      */
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService) {
+	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService,
+	    IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
 	    case SbmtConstants.SORT_BY_USERNAME_ASC:
@@ -129,13 +131,18 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 		    SbmtConstants.TOOL_SIGNATURE, "user.user_id");
 	}
 
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+	
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
-	queryText.append("SELECT user.*, COUNT(details.submission_id) numFiles, COALESCE(SUM(details.removed),0) numFilesRemoved, count(report.marks) numFilesMarked ");
-	queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
-	queryText.append(" FROM tl_lasbmt11_user user ");
-	queryText.append(" LEFT JOIN tl_lasbmt11_submission_details details ON user.uid = details.learner_id ");
-	queryText.append(" LEFT JOIN tl_lasbmt11_report report ON details.submission_id = report.report_id ");
+	queryText.append("SELECT user.* ")
+		.append(portraitStrings[0])
+		.append(", COUNT(details.submission_id) numFiles, COALESCE(SUM(details.removed),0) numFilesRemoved, count(report.marks) numFilesMarked ")
+		.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry")
+		.append(" FROM tl_lasbmt11_user user ")
+		.append(portraitStrings[1])
+		.append(" LEFT JOIN tl_lasbmt11_submission_details details ON user.uid = details.learner_id ")
+		.append(" LEFT JOIN tl_lasbmt11_report report ON details.submission_id = report.report_id ");
 
 	// If using notebook, add the notebook join
 	if (notebookEntryStrings != null) {
@@ -155,6 +162,7 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
 	query.addEntity("user", SubmitUser.class)
+		.addScalar("portraitId", IntegerType.INSTANCE)
 		.addScalar("numFiles", IntegerType.INSTANCE).addScalar("numFilesRemoved", IntegerType.INSTANCE)
 		.addScalar("numFilesMarked", IntegerType.INSTANCE).addScalar("notebookEntry", StringType.INSTANCE)
 		.setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);

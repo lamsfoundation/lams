@@ -331,7 +331,8 @@ public class AssessmentServiceImpl
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
-	return assessmentUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString);
+	return assessmentUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, 
+		searchString, userManagementService);
     }
 
     @Override
@@ -346,6 +347,15 @@ public class AssessmentServiceImpl
 		sortOrder, searchString);
     }
 
+    @Override
+    public Long getPortraitId(Long userId) {
+	if ( userId != null ) {
+	    User user = (User) userManagementService.findById(User.class, userId.intValue());
+	    return user != null ? user.getPortraitUuid() : null;
+	}
+	return null;
+    }
+    
     @Override
     public Assessment getAssessmentByContentId(Long contentId) {
 	Assessment rs = assessmentDao.getByContentId(contentId);

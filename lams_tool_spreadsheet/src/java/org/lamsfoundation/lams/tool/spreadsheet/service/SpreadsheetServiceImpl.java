@@ -214,7 +214,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString, boolean getNotebookEntries) {
 	return spreadsheetUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
-		getNotebookEntries, coreNotebookService);
+		getNotebookEntries, coreNotebookService, userManagementService);
     }
 
     @Override

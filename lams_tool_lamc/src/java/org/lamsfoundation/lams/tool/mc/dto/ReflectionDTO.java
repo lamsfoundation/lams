@@ -23,6 +23,8 @@
 package org.lamsfoundation.lams.tool.mc.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 
 /**
  * <p>
@@ -42,6 +44,15 @@ public class ReflectionDTO implements Comparable {
 
     protected String entry;
 
+    public ReflectionDTO(McQueUsr user, String sessionId, NotebookEntry notebookEntry) {
+	this.setUserId(user.getQueUsrId().toString());
+	this.setSessionId(sessionId);
+	this.setUserName(user.getFullname());
+	this.setReflectionUid(notebookEntry.getUid().toString());
+	// String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+	this.setEntry(notebookEntry.getEntry());
+    }
+    
     @Override
     public int compareTo(Object o) {
 	ReflectionDTO reflectionDTO = (ReflectionDTO) o;

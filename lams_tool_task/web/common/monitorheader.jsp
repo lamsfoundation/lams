@@ -21,6 +21,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 	
 
 	

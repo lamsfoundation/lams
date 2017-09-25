@@ -19,11 +19,17 @@
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
 		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 	};
+	
+	$(document).ready(function(){
+		initializePortraitPopover("${lams}");
+	});
+
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
 
 <div class="panel">
 	<h4>
@@ -93,7 +99,7 @@
 					<c:forEach var="message" items="${session.messageDTOs}">
 						<div class="message">
 							<div class="messageFrom">
-								${message.from}
+								<lams:Portrait userId="${message.fromUserId}" hover="true">${message.from}</lams:Portrait>
 							</div>
 							<lams:out escapeHtml="true" value="${message.body}"></lams:out>
 						</div>
@@ -121,7 +127,7 @@
 				<c:forEach var="user" items="${session.userDTOs}">
 					<tr>
 						<td>
-							<c:out value="${user.nickname}" escapeXml="true"/>
+							<lams:Portrait userId="${user.userID}" hover="true"><c:out value="${user.nickname}" escapeXml="true"/></lams:Portrait>
 						</td>
 						<td class="text-center">
 							${user.postCount}

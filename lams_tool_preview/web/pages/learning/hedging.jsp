@@ -100,7 +100,8 @@
 				<c:forEach var="ratingDto" items="${criteriaRatings.ratingDtos}">
 				<tr>
 					<td>
-						${ratingDto.itemDescription}
+						<lams:Portrait userId="${ratingDto.itemId}"/><span class="portrait-sm-lineheight">${ratingDto.itemDescription}</span>
+						
 					</td>
 					<td style="width: 100px;">
 						<c:choose>

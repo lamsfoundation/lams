@@ -31,6 +31,7 @@ public class AssessmentUserDTO {
     private float grade;
 
     private Long questionResultUid;
+    private Long portraitId;
 
     public String getFirstName() {
 	return firstName;
@@ -78,6 +79,14 @@ public class AssessmentUserDTO {
 
     public void setQuestionResultUid(Long questionResultUid) {
 	this.questionResultUid = questionResultUid;
+    }
+
+    public Long getPortraitId() {
+	return portraitId;
+    }
+
+    public void setPortraitId(Long portraitId) {
+	this.portraitId = portraitId;
     }
 
 }

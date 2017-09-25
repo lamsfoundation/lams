@@ -29,6 +29,8 @@ import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.service.IChatService;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -52,12 +54,16 @@ public class LearningWebsocketServer {
 	private Session session;
 	private String userName;
 	private String nickName;
+	private Long lamsUserId;
+	private Long portraitId;
 	private String hash;
 
-	private Websocket(Session session, String nickName) {
+	private Websocket(Session session, String nickName, Long lamsUserId, Long portraitId) {
 	    this.session = session;
 	    this.userName = session.getUserPrincipal().getName();
 	    this.nickName = nickName;
+	    this.lamsUserId = lamsUserId;
+	    this.portraitId = portraitId;
 	}
     }
 
@@ -175,7 +181,7 @@ public class LearningWebsocketServer {
 	private long lastDBCheckTime = 0;
 
 	// Learners who are currently active
-	private final Set<String> activeUsers = new TreeSet<>();
+	private final  TreeMap<String, Long[]> activeUsers = new TreeMap<String, Long[]>();
 
 	private Roster(Long toolSessionId) {
 	    this.toolSessionId = toolSessionId;
@@ -185,18 +191,18 @@ public class LearningWebsocketServer {
 	 * Checks which Learners
 	 */
 	private JSONArray getRosterJSON() {
-	    Set<String> localActiveUsers = new TreeSet<>();
+	    TreeMap<String, Long[]> localActiveUsers = new TreeMap<String, Long[]>();
 	    Set<Websocket> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	    // find out who is active locally
 	    for (Websocket websocket : sessionWebsockets) {
-		localActiveUsers.add(websocket.nickName);
+		localActiveUsers.put(websocket.nickName, new Long[] {websocket.lamsUserId, websocket.portraitId} );
 	    }
 
 	    // is it time to sync with the DB yet?
 	    long currentTime = System.currentTimeMillis();
 	    if ((currentTime - lastDBCheckTime) > ChatConstants.PRESENCE_IDLE_TIMEOUT) {
 		// store Learners active on this node
-		LearningWebsocketServer.getChatService().updateUserPresence(toolSessionId, localActiveUsers);
+		LearningWebsocketServer.getChatService().updateUserPresence(toolSessionId, localActiveUsers.keySet());
 
 		// read active Learners from all nodes
 		List<ChatUser> storedActiveUsers = LearningWebsocketServer.getChatService()
@@ -204,22 +210,34 @@ public class LearningWebsocketServer {
 		// refresh current collection
 		activeUsers.clear();
 		for (ChatUser activeUser : storedActiveUsers) {
-		    activeUsers.add(activeUser.getNickname());
+		    activeUsers.put(activeUser.getNickname(), new Long[] {activeUser.getUserId(), getPortraitId(activeUser.getUserId())});
 		}
 
 		lastDBCheckTime = currentTime;
 	    } else {
 		// add users active on this node; no duplicates - it is a set, not a list
-		activeUsers.addAll(localActiveUsers);
+		activeUsers.putAll(localActiveUsers);
 	    }
 
-	    return new JSONArray(activeUsers);
+	    JSONArray rosterJSON = new JSONArray();
+	    for ( Map.Entry<String, Long[]> entry : activeUsers.entrySet() ) {
+		Long[] ids = entry.getValue();
+		try {
+		    JSONObject userJSON = new JSONObject().put("nickName", entry.getKey()).put("lamsUserId", ids[0]).put("portraitId", ids[1]);
+		    rosterJSON.put(userJSON);
+		} catch (JSONException e) {
+		    log.error("Unable to add user to Chat roster. User details "+entry.getKey()+": "+ids);
+		    e.printStackTrace();
+		}
+	    }
+	    return rosterJSON;
 	}
     }
 
     private static Logger log = Logger.getLogger(LearningWebsocketServer.class);
 
     private static IChatService chatService;
+    private static IUserManagementService userManagmentService;
 
     private static final SendWorker sendWorker = new SendWorker();
     private static final Map<Long, Roster> rosters = new ConcurrentHashMap<>();
@@ -251,7 +269,7 @@ public class LearningWebsocketServer {
 		HibernateSessionManager.openSession();
 		ChatUser chatUser = LearningWebsocketServer.getChatService().getUserByLoginNameAndSessionId(userName,
 			toolSessionId);
-		Websocket websocket = new Websocket(session, chatUser.getNickname());
+		Websocket websocket = new Websocket(session, chatUser.getNickname(), chatUser.getUserId(), getPortraitId(chatUser.getUserId()));
 		finalSessionWebsockets.add(websocket);
 
 		// update the chat window immediatelly
@@ -371,6 +389,7 @@ public class LearningWebsocketServer {
 		JSONObject messageJSON = new JSONObject();
 		messageJSON.put("body", filteredMessage);
 		messageJSON.put("from", message.getFromUser().getNickname());
+		messageJSON.put("lamsUserId", message.getFromUser().getUserId());
 		messageJSON.put("type", message.getType());
 		messagesJSON.put(messageJSON);
 	    }
@@ -379,6 +398,15 @@ public class LearningWebsocketServer {
 	return messagesJSON;
     }
 
+    private static Long getPortraitId(Long userId) {
+	if ( userId != null ) {
+	    User user = (User) getUserManagementService().findById(User.class, userId.intValue());
+	    if ( user != null )
+		return user.getPortraitUuid();
+	} 
+	return null;
+    }
+    
     private static IChatService getChatService() {
 	if (LearningWebsocketServer.chatService == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
@@ -387,4 +415,14 @@ public class LearningWebsocketServer {
 	}
 	return LearningWebsocketServer.chatService;
     }
+
+    private static IUserManagementService getUserManagementService() {
+	if (LearningWebsocketServer.userManagmentService == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+	    LearningWebsocketServer.userManagmentService = (IUserManagementService) wac.getBean("userManagementService");
+	}
+	return LearningWebsocketServer.userManagmentService;
+    }
+
 }

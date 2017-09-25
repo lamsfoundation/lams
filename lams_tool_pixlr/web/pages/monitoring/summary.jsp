@@ -2,7 +2,12 @@
 <c:set var="dto" value="${pixlrDTO}" />
 
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/portrait.js" ></script>
 <script type="text/javascript">
+	$(document).ready(function(){
+		initializePortraitPopover("<lams:LAMSURL />");
+	});
+	
 	function submitForm(method, uid) {
 		document.getElementById("dispatch").value = method;
 		document.getElementById("hideUserImageUid").value = uid;
@@ -74,16 +79,7 @@
 			<c:forEach var="user" items="${session.userDTOs}">
 				<tr>
 					<td>
-						<c:choose>
-							<c:when test="${user.imageFileName != null && user.imageFileName != pixlrDTO.imageFileName}">
-								<a href="javascript:openPopup('${pixlrImageFolderURL}/${user.imageFileName}', ${user.imageHeight}, ${user.imageWidth})">
-									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
-								</a>
-							</c:when>
-							<c:otherwise>
-								<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
-							</c:otherwise>
-						</c:choose>
+						<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
 					</td>
 					
 					<td>

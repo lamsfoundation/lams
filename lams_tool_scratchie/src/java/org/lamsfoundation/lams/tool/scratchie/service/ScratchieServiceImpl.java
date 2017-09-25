@@ -570,6 +570,9 @@ public class ScratchieServiceImpl
     }
 
     @Override
+    /* If isIncludeOnlyLeaders then include the portrait ids needed for monitoring. If false then it
+     * is probably the export and that doesn't need portraits.
+     */
     public List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders) {
 	List<GroupSummary> groupSummaryList = new ArrayList<>();
 	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(contentId);
@@ -589,7 +592,11 @@ public class ScratchieServiceImpl
 
 		boolean isUserGroupLeader = session.isUserGroupLeader(user.getUid());
 		// include only leaders in case isUserGroupLeader is ON, include all otherwise
-		if ((isIncludeOnlyLeaders && isUserGroupLeader) || !isIncludeOnlyLeaders) {
+		if (isIncludeOnlyLeaders && isUserGroupLeader) {
+		    User systemUser = (User) userManagementService.findById(User.class, user.getUserId().intValue());
+		    user.setPortraitId(systemUser.getPortraitUuid());
+		    usersToShow.add(user);
+		} else if (!isIncludeOnlyLeaders) {
 		    usersToShow.add(user);
 		}
 	    }

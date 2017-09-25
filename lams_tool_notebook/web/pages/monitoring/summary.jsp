@@ -5,6 +5,7 @@
 <link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet"/>
+
 <style media="screen,projection" type="text/css">
 	 .ui-jqgrid {
 		border-left-style: none !important;
@@ -35,6 +36,7 @@
 	};
 
 	$(document).ready(function(){
+
 		<c:forEach var="sessionEntry" items="${notebookDTO.sessions}">
 			<c:set var="sessionId" value ="${sessionEntry.key}"/>
 			<c:set var="sessionName" value ="${sessionEntry.value}"/>
@@ -62,6 +64,7 @@
 			    },
 
  				gridComplete: function() {	
+ 					initializePortraitPopover('${lams}');
 					var dop = $("#group${sessionId}");
  			    	//expand subgrids that have available notebook entry, reformatting 
  			    	// the comment data for the "comment summary / comment sort" field.
@@ -141,18 +144,22 @@
 					    "<fmt:message key="label.lastModified" />",
 					    'entry',
 					    "<fmt:message key="label.comment" />",  // comment summary for sorting
-					    'actualComment'],
+					    'actualComment',
+						'userId',
+						'portraitId'],
 					    
 			   	colModel:[
 			   		{name:'id',index:'id', width:10, hidden: true, search: false},
 			   		{name:'userUid',index:'userUid', width:0, hidden: true, search: false},
-			   		{name:'userName',index:'userName', width:200},
+			   		{name:'userName',index:'userName', width:200, formatter:userNameFormatter},
 			   		{name:'lastEdited',index:'lastEdited', hidden: true, width:0, search: false},		
 			   		{name:'lastEditedTimeago',index:'lastEditedTimeago', hidden: true, width:0,  search: false},		
 			   		{name:'lastEditedTimeagoOutput',index:'lastEditedTimeagoOutput', width:120, search: false},		
 			   		{name:'entry',index:'entry', hidden: true, width:0, search: false},	
 			   		{name:'commentsort',index:'commentsort', width:40, search: false },
-			   		{name:'comment',index:'comment', hidden: true, width:0, search: false}		
+			   		{name:'comment',index:'comment', hidden: true, width:0, search: false},
+			   		{name:'userId',index:'userId', width:0, hidden: true, search: false},
+			   		{name:'portraitId',index:'portraitId', width:0, hidden: true, search: false}
 			   	],
 			   	
 			   	multiselect: false,
@@ -179,6 +186,9 @@
         };
         setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
+        function userNameFormatter (cellvalue, options, rowObject) {
+    			return definePortraitPopover(rowObject.portraitId, rowObject.userId,  rowObject.userName);
+	    	}
 	});
 
 </script>

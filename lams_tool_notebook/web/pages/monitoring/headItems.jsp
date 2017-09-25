@@ -21,4 +21,6 @@
 <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 
+<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+
 <script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>

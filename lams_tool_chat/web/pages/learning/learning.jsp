@@ -2,8 +2,9 @@
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script type="text/javascript">
-	var MODE = "${MODE}", TOOL_SESSION_ID = '${param.toolSessionID}', APP_URL = '<lams:WebAppURL />', LEARNING_ACTION = "<c:url value='/learning.do'/>";
+	var MODE = "${MODE}", TOOL_SESSION_ID = '${param.toolSessionID}', APP_URL = '<lams:WebAppURL />', LEARNING_ACTION = "<c:url value='/learning.do'/>", LAMS_URL = '<lams:LAMSURL/>';
 </script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 <script type="text/javascript" src="includes/javascript/learning.js"></script>
 
 
@@ -43,10 +44,10 @@
 
 	<!-- chat UI -->
 	<div class="row">
-		<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10">
+		<div class="col-xs-12 col-sm-9 col-md-9 col-lg-8">
 			<div id="messages"></div>
 		</div>
-		<div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+		<div class="col-xs-12 col-sm-3 col-md-3 col-lg-4">
 			<div id="roster" class="hidden-xs"></div>
 		</div>
 	</div>
@@ -64,12 +65,12 @@
 
 	<c:if test="${MODE != 'learner' || !chatDTO.lockOnFinish || !chatUserDTO.finishedActivity}">
 		<div class="row">
-			<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10">
+			<div class="col-xs-12 col-sm-9 col-md-9 col-lg-8">
 				<div id="textArea" class="voffset5">
 					<textarea id="sendMessageArea" rows="2" class="form-control" autofocus></textarea>
 				</div>
 			</div>
-			<div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 ">
+			<div class="col-xs-12 col-sm-3 col-md-3 col-lg-4">
 				<div id="sendMessageButtonCell" class="voffset5">
 					<input id="sendMessageButton" class="btn btn-autoresize btn-default" type="button" onclick="javascript:sendChatToolMessage()"
 						value='<fmt:message key="button.send"/>' />

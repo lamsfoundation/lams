@@ -84,6 +84,7 @@
 	<form-property name="timeZone" type="java.lang.String" />
 	<form-property name="userTheme" type="java.lang.Long" />
 	<form-property name="twoFactorAuthenticationEnabled" type="java.lang.Boolean" initial="false" />
+	<form-property name="initialPortraitId" type="java.lang.Long" initial="false" /> <!-- Name different to real field to avoid overwriting in bean copies -->
 </form-bean>
 
 <form-bean name="UserOrgForm" type="org.apache.struts.action.DynaActionForm">
@@ -888,6 +889,19 @@
       <forward
         name="serverlist"
         path=".serverlist"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/sessionmaintain"
+      type="org.lamsfoundation.lams.admin.web.action.SessionMaintainAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="sessionmaintain"
+        path=".sessionmaintain"
         redirect="false"
       />
     </action>
