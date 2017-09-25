@@ -86,6 +86,8 @@
 				FOLDER : '<c:out value="${FOLDER_VAR}" />',
 				<fmt:message key="authoring.fla.sequence" var="SEQUENCE_VAR"/>
 				SEQUENCE : '<c:out value="${SEQUENCE_VAR}" />',
+				<fmt:message key="authoring.fla.weights.title" var="WEIGHTS_TITLE_VAR"/>
+				WEIGHTS_TITLE : '<c:out value="${WEIGHTS_TITLE_VAR}" />',
 				<fmt:message key="authoring.fla.sequence.not.valid" var="SEQUENCE_NOT_VALID_VAR"/>
 				SEQUENCE_NOT_VALID : decoderDiv.html('<c:out value="${SEQUENCE_NOT_VALID_VAR}" />').text(),
 				<fmt:message key="authoring.fla.sequence.validation.issues" var="SEQUENCE_VALIDATION_ISSUES_VAR"/>

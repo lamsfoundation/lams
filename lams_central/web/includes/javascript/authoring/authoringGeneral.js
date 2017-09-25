@@ -1005,6 +1005,7 @@ GeneralInitLib = {
 			'draggable'     : true,
 			'width'			: 500,
 			'close' 		: null,
+			'title'			: LABELS.WEIGHTS_TITLE,
 			'data' 			: {
 				'prepareForOpen' : function(){
 					var tbody = $('tbody', weightsDialogContents).empty();
