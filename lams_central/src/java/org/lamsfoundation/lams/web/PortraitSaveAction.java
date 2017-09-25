@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.web;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,10 +39,15 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.CentralToolContentHandler;
+import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -57,11 +63,14 @@ public class PortraitSaveAction extends LamsDispatchAction {
 
     private static Logger log = Logger.getLogger(PortraitSaveAction.class);
     private static IUserManagementService service;
+    private static IAuditService auditService;
+    private static MessageService messageService;
     private static CentralToolContentHandler centralToolContentHandler;
     private static int LARGEST_DIMENSION_ORIGINAL = 400;
     private static int LARGEST_DIMENSION_LARGE = 200;
     private static int LARGEST_DIMENSION_MEDIUM = 80;
     private static int LARGEST_DIMENSION_SMALL = 35;
+    private static final String PORTRAIT_DELETE_AUDIT_KEY = "audit.delete.portrait";
 
     /**
      * Upload portrait image.
@@ -153,7 +162,45 @@ public class PortraitSaveAction extends LamsDispatchAction {
 
 	return mapping.findForward("profile");
     }
+    
+    /** Called from sysadmin to delete an inappropriate portrait */
+    public ActionForward deletePortrait(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
+	Integer userId = WebUtil.readIntParam(request, "userId", true);
+	
+	// check user is sysadmin
+	if (!(request.isUserInRole(Role.SYSADMIN))) {
+	    log.error("Attempt to delete a portrait by user that is not sysadmin. User is "+request.getRemoteUser()+" portrait to be deleted is for user "+userId+".");
+	    return deleteResponse(response, "error");
+	}
+
+	String responseValue = "deleted";
+	User userToModify = (User) getService().findById(User.class, userId);
+	if (userToModify != null && userToModify.getPortraitUuid() != null) {
+	    
+	    Object[] args = new Object[] { userToModify.getFullName(), userToModify.getLogin(), userToModify.getUserId(), userToModify.getPortraitUuid() };
+	    String auditMessage = getMessageService().getMessage(PORTRAIT_DELETE_AUDIT_KEY, args);
+	    getAuditService().log(CentralConstants.MODULE_NAME, auditMessage);
+
+	    try {
+		getCentralToolContentHandler().deleteFile(userToModify.getPortraitUuid());
+            	userToModify.setPortraitUuid(null);
+            	getService().saveUser(userToModify);
+	    } catch (Exception e) {
+		log.error("Unable to delete a portrait for user "+userId+".", e);
+		return deleteResponse(response, "error");
+	    }
+	}
+	return deleteResponse(response, responseValue);
+    }
+
+    private ActionForward deleteResponse(HttpServletResponse response, String data) throws IOException {
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().write(data);
+	return null;
+    }
+    
     private CentralToolContentHandler getCentralToolContentHandler() {
 	if (centralToolContentHandler == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
@@ -171,4 +218,23 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	}
 	return service;
     }
+    
+    private IAuditService getAuditService() {
+	if (PortraitSaveAction.auditService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    PortraitSaveAction.auditService = (IAuditService) ctx.getBean("auditService");
+	}
+	return PortraitSaveAction.auditService;
+    }
+
+    private MessageService getMessageService() {
+	if (PortraitSaveAction.messageService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    PortraitSaveAction.messageService = (MessageService) ctx.getBean("centralMessageService");
+	}
+	return PortraitSaveAction.messageService;
+    }
+
 }

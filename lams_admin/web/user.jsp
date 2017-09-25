@@ -13,8 +13,8 @@
 
 <script src="/lams/includes/javascript/jquery.js"></script>
 <script src="/lams/includes/javascript/jquery-ui.js"></script>
-<script src="/lams/includes/javascript/groupDisplay.js"></script>
 <script src="/lams/includes/javascript/jquery.validate.js"></script>
+<script src="/lams/includes/javascript/portrait.js"></script>
 <script type="text/javascript">
 var mustHaveUppercase = ${mustHaveUppercase},
 mustHaveNumerics  = ${mustHaveNumerics},
@@ -99,6 +99,43 @@ $.validator.addMethod("pwcheck", function(value) {
 		});
 
 	});
+	
+	<logic:notEmpty name="UserForm" property="userId">
+	$(document).ready(function(){
+		var portraitId = '<bean:write name="UserForm" property="initialPortraitId" />';
+		loadPortrait(portraitId);
+	});
+
+	function loadPortrait(portraitId) {
+		$("#portraitPicture").removeClass();
+		$("#portraitPicture").css('background-image','');
+		addPortrait( $("#portraitPicture"), portraitId, 
+				'<bean:write name="UserForm" property="userId" />', 'large', true, '/lams/' );
+		<c:if test="${isSysadmin}">
+		if ( portraitId.length > 0 )  {
+			$("#portraitButton").css('display','block');
+		} else {
+			$("#portraitButton").css('display','none');
+		}
+		</c:if>
+	}
+	
+	<c:if test="${isSysadmin}">
+	function deletePortrait() {
+		$("#portraitButton").css('display','none');
+		$.ajax({
+			url : '/lams/saveportrait.do?method=deletePortrait',
+			data : { 	'userId'  : '<bean:write name="UserForm" property="userId" />' },		
+		success : function(response) {
+			if ( response == 'deleted') {
+				loadPortrait('');
+			} else {
+				alert("<fmt:message key='error.portrait.removal.failed'/>");
+			}
+		}});
+	}
+	</c:if>
+	</logic:notEmpty>
 </script>
 
 <html-el:form styleId="UserForm" action="usersave.do?method=saveUserDetails" method="post">
@@ -144,38 +181,60 @@ $.validator.addMethod("pwcheck", function(value) {
 		</div>
 
 		<div class="panel-body">
-			<logic:empty name="UserForm" property="userId">
-			<lams:Alert type="info" id="passwordConditions" close="false">
-			<fmt:message key='label.password.must.contain' />:
-				<ul class="list-unstyled" style="line-height: 1.2">
-					<li><span class="fa fa-check"></span> <fmt:message
-							key='label.password.min.length'>
-							<fmt:param value='${minNumChars}' />
-						</fmt:message></li>
-
-					<c:if test="${mustHaveUppercase}">
+		    <div class="row">
+			<div class="col-md-12">
+			
+				<logic:empty name="UserForm" property="userId">
+				<lams:Alert type="info" id="passwordConditions" close="false">
+				<fmt:message key='label.password.must.contain' />:
+					<ul class="list-unstyled" style="line-height: 1.2">
 						<li><span class="fa fa-check"></span> <fmt:message
-								key='label.password.must.ucase' /></li>
-					</c:if>
-					<c:if test="${mustHaveLowercase}">
-								<li><span class="fa fa-check"></span> <fmt:message
-										key='label.password.must.lcase' /></li>
-							</c:if>
-
-					<c:if test="${mustHaveNumerics}">
-						<li><span class="fa fa-check"></span> <fmt:message
-								key='label.password.must.number' /></li>
-					</c:if>
-
-
-					<c:if test="${mustHaveSymbols}">
-						<li><span class="fa fa-check"></span> <fmt:message
-								key='label.password.must.symbol' /></li>
-					</c:if>
-				</ul>
-			</lams:Alert>
+								key='label.password.min.length'>
+								<fmt:param value='${minNumChars}' />
+							</fmt:message></li>
+	
+						<c:if test="${mustHaveUppercase}">
+							<li><span class="fa fa-check"></span> <fmt:message
+									key='label.password.must.ucase' /></li>
+						</c:if>
+						<c:if test="${mustHaveLowercase}">
+									<li><span class="fa fa-check"></span> <fmt:message
+											key='label.password.must.lcase' /></li>
+								</c:if>
+	
+						<c:if test="${mustHaveNumerics}">
+							<li><span class="fa fa-check"></span> <fmt:message
+									key='label.password.must.number' /></li>
+						</c:if>
+	
+	
+						<c:if test="${mustHaveSymbols}">
+							<li><span class="fa fa-check"></span> <fmt:message
+									key='label.password.must.symbol' /></li>
+						</c:if>
+					</ul>
+				</lams:Alert>
+			</logic:empty>
+		</div>
+		</div>
+		
+		<!--  Main panel. Do not show portrait area for new user. -->
+		<logic:notEmpty name="UserForm" property="userId">
+	    <div class="row">
+		<div class="col-md-3">
+    			<div class="text-center"><div id="portraitPicture" ></div></div>
+			<c:if test="${isSysadmin}">
+    			<div id="portraitButton" class="text-center voffset10" style="display:none; margin-bottom: 5px;">
+    			<a href="#" onclick="javascript:deletePortrait();" class="btn btn-primary btn-sm"><fmt:message key="label.delete.portrait" /></a></div>
+    			</c:if>
+    		</div>
+		<div class="col-md-9">
+		</logic:notEmpty>
+		<logic:empty name="UserForm" property="userId">
+	    <div class="row">
+		<div class="col-md-12">
 		</logic:empty>
-
+		
 			<table class="table table-condensed table-no-border">
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.login" />
@@ -375,10 +434,15 @@ $.validator.addMethod("pwcheck", function(value) {
 				</c:if>
 				
 			</table>
+		</div>
+		</div>
+		
+		<div class="row">
+		<div class="col-md-12">
 			<logic:notEmpty name="UserForm" property="userId">
-			<div class="pull-left">
-			<a href="userChangePass.jsp?userId=<bean:write name='UserForm' property='userId' />&login=<bean:write name='UserForm' property='login' />" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
-			</div>
+				<div class="pull-left">
+				<a href="userChangePass.jsp?userId=<bean:write name='UserForm' property='userId' />&login=<bean:write name='UserForm' property='login' />" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
+				</div>
 			</logic:notEmpty>
 			<div class="pull-right">
 				<input type="submit" name="org.apache.struts.taglib.html.CANCEL" value="<fmt:message key="admin.cancel" />" 
@@ -387,9 +451,11 @@ $.validator.addMethod("pwcheck", function(value) {
 					<fmt:message key="admin.save" />
 				</html-el:submit>
 			</div>
-
 		</div>
-	</div>
+		</div>
+		
+		</div>
+	</div> <!-- End of panel -->
 
 
 	<c:if test="${not empty globalRoles || not empty userOrgRoles}">
