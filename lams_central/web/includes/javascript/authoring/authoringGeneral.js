@@ -1039,7 +1039,11 @@ GeneralInitLib = {
 								'min'    : 0,
 								'max'    : 100,
 								'change' : function(){
-									activity.gradebookToolOutputWeight = $(this).val();
+									var value = $(this).val();
+									if (value == "" || isNaN(value)) {
+										value = null;
+									}
+									activity.gradebookToolOutputWeight = value;
 									layout.weightsDialog.data('sumWeights')();
 								},
 								'spin'  : function(event, ui) {
