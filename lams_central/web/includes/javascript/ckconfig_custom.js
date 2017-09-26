@@ -134,6 +134,7 @@ CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV;
 CKEDITOR.config.removePlugins = 'elementspath';
 CKEDITOR.config.allowedContent = true;
 CKEDITOR.config.toolbarCanCollapse = true;
+CKEDITOR.config.embed_provider = '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}';//default URL for 'embed' plugin
 
 // ---- Additional scripts -----
 // Hides editor instaces until they are fully initialized
