@@ -3,16 +3,16 @@
 
 CKEDITOR.config.toolbar_Default = [
 	['Source','-','Maximize', 'Preview','PasteFromWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
-	['Paint_Button','oembed','Image','Link','Iframe','Table','HorizontalRule','Smiley','SpecialChar','Templates','Format','Font','FontSize','About']
+	['Embed','Image','Link','Iframe','Table','HorizontalRule','Smiley','SpecialChar','Templates','Format','Font','FontSize','About']
 ];
 
 CKEDITOR.config.toolbar_DefaultInline = [
 	['Sourcedialog','-','PasteFromWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
-    ['Paint_Button','oembed','Image','Link','Iframe','Table','HorizontalRule','Smiley','SpecialChar','Templates','Format','Font','FontSize','About']
+    ['Embed','Image','Link','Iframe','Table','HorizontalRule','Smiley','SpecialChar','Templates','Format','Font','FontSize','About']
 ];
 
 CKEDITOR.config.toolbar_DefaultDokuInline = [
-                                  	['Bold','Italic','Underline','StrikeThrough','NumberedList','BulletedList','Indent','Outdent','Undo','Redo']
+	['Bold','Italic','Underline','StrikeThrough','NumberedList','BulletedList','Indent','Outdent','Undo','Redo']
 ];
 
 // removing Video Recorder from default tool bar LDEV-2961
@@ -131,7 +131,7 @@ CKEDITOR.config.templates_files = [CKEDITOR.basePath + '../www/public/ckeditor-t
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.config.enterMode = 'div';
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
-CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,paint,iframe,lineutils,widget,oembed,sourcedialog,dialog,templates';
+CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,iframe,lineutils,widget,embed,sourcedialog,dialog,templates';
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath';
 CKEDITOR.config.allowedContent = true;
