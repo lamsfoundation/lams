@@ -1146,6 +1146,8 @@ public class GradebookService implements IGradebookService {
 
 	Set<Lesson> lessons = new TreeSet<Lesson>(new LessonComparator());
 	lessons.addAll(lessonService.getLessonsByGroupAndUser(userId, organisationId));
+	
+	Map<Long, Boolean> isWeightedLessonMap = new HashMap<Long, Boolean>();
 
 	if ((lessons != null) && (lessons.size() > 0)) {
 
@@ -1184,13 +1186,14 @@ public class GradebookService implements IGradebookService {
 	    }
 	    rowList.add(headerRow);
 
-	    // collect users from all lessons
+	    // collect users from all lessons & check if lesson uses weightings
 	    LinkedHashSet<User> allLearners = new LinkedHashSet<User>();
 	    List<Long> lessonIds = new LinkedList<Long>();
 	    for (Lesson lesson : lessons) {
 		Set dbLessonUsers = lesson.getAllLearners();
 		allLearners.addAll(dbLessonUsers);
 		lessonIds.add(lesson.getLessonId());
+		isWeightedLessonMap.put(lesson.getLessonId(), isWeightedMarks(lesson.getLearningDesign()));
 	    }
 
 	    // Fetching the user data
@@ -1217,7 +1220,7 @@ public class GradebookService implements IGradebookService {
 		    String startDate = "";
 		    String finishDate = "";
 		    Long timeTakenSeconds = null;
-		    Double mark = null;
+		    Object mark = null;
 		    String feedback = "";
 
 		    // check if learner is participating in this lesson
@@ -1268,7 +1271,12 @@ public class GradebookService implements IGradebookService {
 			}
 
 			if (gradebookUserLesson != null) {
-			    mark = gradebookUserLesson.getMark();
+			    Double rawMark = gradebookUserLesson.getMark();
+			    if ( rawMark != null && isWeightedLessonMap.get(lesson.getLessonId()) ) {
+				mark = GradebookUtil.niceFormatting(rawMark, true);
+			    } else {
+				mark = rawMark;
+			    }
 			    feedback = gradebookUserLesson.getFeedback();
 			}
 		    } else {

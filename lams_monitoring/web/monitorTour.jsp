@@ -194,6 +194,12 @@
 			        placement: "top",
 			        onNext: hideMarkChart
 			      },{
+			        element: "#tour-weight-button",
+			        title: "<fmt:message key="tour.gradebook.show.weight"/>",
+			        content: "<fmt:message key="tour.gradebook.show.weight.content"/>",
+			        placement: "bottom",
+			        onPrev: showMarkChart
+			      },{
 			        element: "#tour-dates",
 			        title: "<fmt:message key="tour.gradebook.show.dates"/>",
 			        content: "<fmt:message key="tour.gradebook.show.dates.content"/>",
