@@ -6,6 +6,8 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 
+<c:set var="usesWeights">${not empty weights}</c:set>
+
 <lams:html>
 <lams:head>
 	<title><fmt:message key="gradebook.title.window.lessonMonitor"/></title>
@@ -56,7 +58,22 @@
 			$("#markChartShown").css("display", "none");
 			$("#markChartHidden").css("display", "inline");
 		}
-		
+
+		<c:if test="${usesWeights}">
+		function toggleWeight() {
+			if ( $("#weights").css("display") == "none" ) {
+				$("#weights").css("display","block");
+				$("#weightShown").css("display","inline");
+				$("#weightHidden").css("display","none");
+			} else {
+				$("#weights").css("display","none");
+				$("#weightShown").css("display","none");
+				$("#weightHidden").css("display","inline");
+			}
+		}
+		</c:if>
+
+
 		function toggleRelease() {
 			
 			var conf;
@@ -501,6 +518,7 @@
 		        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
 		});
+		
 	</script>
 	
 </lams:head>
@@ -574,6 +592,27 @@
 		</div>
 	</c:set>
 	
+	<c:if test="${usesWeights}">
+		<c:set var="weightButtonCode">
+			<div id="tour-weight-button">
+				<div id="weightShown" style="display:none">
+				<a href="javascript:toggleWeight()" class="${btnclass}" title="<fmt:message key='label.button.hide.weights'/>" >
+					<i class="fa fa-balance-scale"></i> <span class="hidden-xs">
+					<fmt:message key="label.button.hide.weights"/>
+					</span>
+				</a> 
+				</div>
+				<div id="weightHidden">
+					<a href="javascript:toggleWeight()" class="${btnclass}" title="<fmt:message key='label.button.show.weights'/>" >
+						<i class="fa fa-balance-scale"></i> <span class="hidden-xs">
+						<fmt:message key="label.button.show.weights"/>
+						</span>
+					</a> 
+				</div>
+			</div>
+		</c:set>
+	</c:if>
+	
 	<c:choose>
 	<c:when test="${!isInTabs}">
 		<%-- replacement for Page type admin --%>
@@ -592,6 +631,7 @@
 
 		<div class="gbTopButtonsContainer pull-right">
 			${chartButtonCode}
+			${weightButtonCode}
 			${tourDatesCode}
 			<a target="_blank" class="${btnclass}" title="<fmt:message key='button.help.tooltip'/>"
 				   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
@@ -642,6 +682,7 @@
 
 		<c:if test="${isInTabs}">
 	 		${chartButtonCode}
+	 		${weightButtonCode}
 			${tourDatesCode}
 		</c:if>
 		
@@ -653,7 +694,28 @@
  				 <div id="markChartDiv" class="markChartDiv" style="display:none"></div>
 				</div>
 			</div>
-		
+
+			<c:if test="${usesWeights}">
+			<div id="weights" class="grid-holder voffset20" style="display:none" >
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<fmt:message key="label.weights.title"/>
+				</div>
+				<div class="panel-body">
+				<%-- Display weights in four columns --%>
+				<c:forEach var="weightArray" items="${weights}" varStatus="weightCounter">
+					<c:if test="${(weightCounter.index mod 3) == 0}">
+						<c:if test="${weightCounter.index gt 0}"></div></c:if>
+						<div class="row">
+					</c:if>
+					<div class="col-sm-4">${weightArray[0]}: ${weightArray[2]}</div>
+				</c:forEach>
+				</div> <%-- close off row started in the loop --%>
+				</div>
+			</div>	
+			</div>	
+			</c:if>
+			
 			<div class="grid-holder voffset20">
 				<table id="userView" class="scroll" ></table>
 				<div id="userViewPager" class="scroll" ></div>

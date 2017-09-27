@@ -49,6 +49,7 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
@@ -164,6 +165,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     protected IWorkspaceManagementService workspaceManagementService;
 
     protected ILogEventService logEventService;
+    
+    protected IGradebookService gradebookService;
 
     protected ToolContentIDGenerator contentIDGenerator;
 
@@ -339,6 +342,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	this.monitoringService = monitoringService;
     }
 
+    public void setGradebookService(IGradebookService gradebookService) {
+        this.gradebookService = gradebookService;
+    }
+
     public void setWorkspaceManagementService(IWorkspaceManagementService workspaceManagementService) {
 	this.workspaceManagementService = workspaceManagementService;
     }
@@ -487,7 +494,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws IOException {
+    public void finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws Exception {
 	User user = (User) baseDAO.find(User.class, userID);
 	if (user == null) {
 	    throw new IOException("User not found, ID: " + userID);
@@ -501,6 +508,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	}
 	// only the user who is editing the design may unlock it
 	if (design.getEditOverrideUser().equals(user)) {
+	    
 	    design.setEditOverrideLock(false);
 	    design.setEditOverrideUser(null);
 
@@ -535,6 +543,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		initialiseToolActivityForRuntime(design, lesson);
 
 		learningDesignDAO.update(design);
+		
+		// if the weightings have been changed need to recalculate the marks
+		if ( gradebookService.isWeightedMarks(design) )
+		    gradebookService.recalculateTotalMarksForLesson(lesson.getLessonId());
 	    }
 	}
     }

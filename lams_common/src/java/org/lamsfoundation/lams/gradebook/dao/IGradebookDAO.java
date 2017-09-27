@@ -39,7 +39,9 @@ public interface IGradebookDAO extends IBaseDAO {
 
     GradebookUserActivity getGradebookUserDataForActivity(Long activityID, Integer userID);
 
-    Double getGradebookUserActivityMarkSum(Long lessonID, Integer userID);
+    List<GradebookUserActivity> getGradebookUserActivitiesForLesson(Long lessonID, Integer userID);
+    
+//    Double getGradebookUserActivityMarkSum(Long lessonID, Integer userID);
 
     List<GradebookUserActivity> getAllGradebookUserActivitiesForActivity(Long activityID);
 

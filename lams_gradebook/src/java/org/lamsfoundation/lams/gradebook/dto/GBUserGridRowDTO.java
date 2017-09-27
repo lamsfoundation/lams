@@ -68,7 +68,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
 	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
-	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
+	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark, displayMarkAsPercent) : CELL_EMPTY);
 
 	} else if (view == GBGridView.MON_ACTIVITY) {
 
@@ -93,7 +93,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
 	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
-	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
+	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark, displayMarkAsPercent) : CELL_EMPTY);
 
 	} else if (view == GBGridView.LIST) {
 	    ret.add(rowName);

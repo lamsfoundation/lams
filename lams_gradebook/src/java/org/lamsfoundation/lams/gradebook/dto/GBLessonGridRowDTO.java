@@ -66,7 +66,7 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
 	    ret.add((medianTimeTaken != null && medianTimeTaken != 0) ? convertTimeToString(medianTimeTaken)
 		    : CELL_EMPTY);
-	    ret.add((averageMark != null) ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY);
+	    ret.add((averageMark != null) ? GradebookUtil.niceFormatting(averageMark, displayMarkAsPercent) : CELL_EMPTY);
 
 	} else if ((view == GBGridView.LRN_COURSE) || (view == GBGridView.MON_USER)) {
 	    if (gradebookLearnerURL != null && gradebookLearnerURL.length() != 0) {
@@ -83,8 +83,8 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 	    ret.add((medianTimeTaken != null && medianTimeTaken != 0)
 		    ? toItalic(convertTimeToString(medianTimeTaken)) : CELL_EMPTY);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add((averageMark != null) ? toItalic(GradebookUtil.niceFormatting(averageMark)) : CELL_EMPTY);
-	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
+	    ret.add((averageMark != null) ? toItalic(GradebookUtil.niceFormatting(averageMark, displayMarkAsPercent)) : CELL_EMPTY);
+	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark, displayMarkAsPercent) : CELL_EMPTY);
 
 	    //plain lesson list case
 	} else if (view == GBGridView.LIST) {

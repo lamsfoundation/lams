@@ -172,6 +172,15 @@ public class GradebookUtil {
 
     }
 
+    public static String niceFormatting(Double mark, boolean displayAsPercentage) {
+
+	String markStr = new DecimalFormat("##0.00").format(mark);
+	if ( displayAsPercentage )
+	    markStr += "%";
+	return markStr;
+
+    }
+
     private static Document getDocument() throws ParserConfigurationException {
 	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	DocumentBuilder builder = factory.newDocumentBuilder();
