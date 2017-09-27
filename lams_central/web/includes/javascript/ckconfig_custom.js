@@ -129,7 +129,7 @@ CKEDITOR.config.browserContextMenuOnCtrl = true;
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.config.enterMode = 'div';
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
-CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,iframe,lineutils,widget,sourcedialog,dialog';
+CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath';
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath';
 CKEDITOR.config.allowedContent = true;
