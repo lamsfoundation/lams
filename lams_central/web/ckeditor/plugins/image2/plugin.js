@@ -900,7 +900,7 @@
 				image;
 
 			// http://dev.ckeditor.com/ticket/11110 Don't initialize on pasted fake objects.
-			if ( el.attributes[ 'data-cke-realelement' ] )
+			if ( el.attributes[ 'data-cke-realelement' ] || el.attributes[ 'data-jlatexmath' ] )
 				return;
 
 			// If a center wrapper is found, there are 3 possible cases:
