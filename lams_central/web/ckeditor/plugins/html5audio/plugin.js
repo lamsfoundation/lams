@@ -95,6 +95,12 @@ CKEDITOR.plugins.add( 'html5audio', {
                         this.element.getChild( 0 ).setAttribute( 'controlslist', 'nodownload' );
                     }
                 }
+                
+                //*LAMS* add padding around widget to increase area where user can double click and right click when trying to open html5audio dialog
+                var elementCssPadding = this.element.getStyle( 'padding').replace('px', '');
+                if ( elementCssPadding < 10) {
+                	this.element.setStyle( 'padding', '10px' );
+                }
             }
         } );
 
@@ -118,5 +124,18 @@ CKEDITOR.plugins.add( 'html5audio', {
         }
 
         CKEDITOR.dialog.add( 'html5audio', this.path + 'dialogs/html5audio.js' );
+        
+		editor.on( 'doubleclick', function( evt ) {
+			var element = evt.data.element;
+			
+			//check if it has parent with class .lams-bootpanel
+			if ( element && editor.elementPath( element ).contains( function( element ) {        
+			    	if ( element.is( 'div' ) && element.hasClass( 'ckeditor-html5-audio' )) {
+			    		return true;
+			    	}
+				} )) {
+				evt.data.dialog = 'html5audio';
+			}
+		} );
     }
 } );
