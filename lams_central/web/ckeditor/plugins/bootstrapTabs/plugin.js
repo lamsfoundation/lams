@@ -49,8 +49,7 @@ CKEDITOR.plugins.add('bootstrapTabs', {
           // NOTE: The first part of this condition determinds if we've reached the '#document' for the page.
           // If we've reached the document ascendant, then calling hasClass() will cause an error, breaking the contextMenu.
           // http://docs.ckeditor.com/#!/api/CKEDITOR.dom.document
-          return !( element instanceof CKEDITOR.dom.document ) &&
-                  ( element.hasClass('nav-tabs') || element.hasClass('tab-content') );
+		    	return !( element instanceof CKEDITOR.dom.document ) && element.hasClass('bootstrap-tabs') ;
 				});
         if ( ascendant ) {
           return { bootstrapTabsItem: CKEDITOR.TRISTATE_OFF };
@@ -63,29 +62,24 @@ CKEDITOR.plugins.add('bootstrapTabs', {
 		// When an element is double-clicked, the bootstrapTabsDialog
 		// will be displayed for elements that are descendents part of a tab set.
 		editor.on('doubleclick', function (event) {
-      var element = event.data.element;
+			var element = event.data.element;
 
-	    // If an ascendant of the element has the nav-tabs or tab-content class,
-	    // enable the context menu (a button with off state for the tab)
-	    ascendant = element.getAscendant( function(element) {
-	    	// QUESTION: How to prevent linkDialog from displaying on doubleclick in a nav-tab?
-	    	// In the case of of a[role="tab"], the link dialog is not displayed, but the bootstrapTabsDialog
-	    	// is not displayed as preferred.
-        // NOTE: The first part of this condition determinds if we've reached the '#document' for the page.
-        // If we've reached the document ascendant, then calling hasClass() will cause an error, breaking the contextMenu.
-        // http://docs.ckeditor.com/#!/api/CKEDITOR.dom.document
-        return !( element instanceof CKEDITOR.dom.document ) &&
-                (
-                  ( element.name == 'a' && element.attributes.role == 'tab') ||
-                  element.hasClass('nav-tabs') ||
-                  element.hasClass('tab-content')
-                );
+			// If an ascendant of the element has the nav-tabs or tab-content class,
+			// enable the context menu (a button with off state for the tab)
+			ascendant = element.getAscendant( function(element) {
+				// QUESTION: How to prevent linkDialog from displaying on doubleclick in a nav-tab?
+				// In the case of of a[role="tab"], the link dialog is not displayed, but the bootstrapTabsDialog
+				// is not displayed as preferred.
+				// NOTE: The first part of this condition determinds if we've reached the '#document' for the page.
+				// If we've reached the document ascendant, then calling hasClass() will cause an error, breaking the contextMenu.
+				// http://docs.ckeditor.com/#!/api/CKEDITOR.dom.document
+				return !( element instanceof CKEDITOR.dom.document ) && element.hasClass('bootstrap-tabs') ;
 			});
 
 			if ( ascendant ) {
-        event.data.dialog = 'bootstrapTabsDialog';
-      }
+				event.data.dialog = 'bootstrapTabsDialog';
+			}
 
-    });
+		});
 	}
 });
