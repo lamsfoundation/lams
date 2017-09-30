@@ -483,7 +483,7 @@ public class KumaliveWebsocketServer {
 	Long rubricId = requestJSON.getLong("rubricId");
 	Integer learnerId = requestJSON.getInt(AttributeNames.PARAM_USER_ID);
 	KumaliveWebsocketServer.getKumaliveService().scoreKumalive(rubricId, learnerId,
-		Short.valueOf(requestJSON.getString("score")));
+		Long.valueOf(requestJSON.getString("batch")), Short.valueOf(requestJSON.getString("score")));
 
 	KumaliveDTO kumalive = kumalives.get(organisationId);
 	if (logger.isDebugEnabled()) {

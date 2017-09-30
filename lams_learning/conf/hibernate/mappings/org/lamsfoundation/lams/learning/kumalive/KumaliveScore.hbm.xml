@@ -10,6 +10,7 @@
 			<generator class="native" />
 		</id>
 
+		<property name="batch" type="java.lang.Long" length="10" column="batch" />
 		<property name="score" type="java.lang.Short" column="score" not-null="true" />
 
 		<many-to-one name="rubric"

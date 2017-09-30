@@ -35,6 +35,7 @@ CREATE TABLE lams_kumalive_score (
 	   score_id BIGINT(20) NOT NULL AUTO_INCREMENT
 	 , rubric_id BIGINT(20) NOT NULL
      , user_id BIGINT(20)
+     , batch BIGINT(10)
      , score TINYINT
      , PRIMARY KEY (score_id)
      , CONSTRAINT FK_lams_kumalive_score_1 FOREIGN KEY (rubric_id)

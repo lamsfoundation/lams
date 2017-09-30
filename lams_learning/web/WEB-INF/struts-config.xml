@@ -371,6 +371,11 @@
         path="/kumalive/kumaliveRubrics.jsp"
         redirect="false"
       />
+     <forward
+        name="displayReport"
+        path="/kumalive/kumaliveReport.jsp"
+        redirect="false"
+      />
     </action>
     
 <action path="/index"

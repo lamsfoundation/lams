@@ -27,18 +27,28 @@ import java.util.List;
 
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
 
 public interface IKumaliveService {
+    Kumalive getKumalive(Long id);
+
     Kumalive startKumalive(Integer organisationId, Integer userId, String name, JSONArray rubrics, boolean isTeacher)
 	    throws JSONException;
 
     void finishKumalive(Long id);
 
-    void scoreKumalive(Long rubricId, Integer userId, Short score);
+    void scoreKumalive(Long rubricId, Integer userId, Long batch, Short score);
 
     List<KumaliveRubric> getRubrics(Integer organisationId);
 
     void saveRubrics(Integer organisationId, JSONArray rubricsJSON) throws JSONException;
+
+    JSONObject getReportOrganisationData(Integer organisationId, String sortColumn, boolean isAscending, int rowLimit,
+	    int page) throws JSONException;
+
+    JSONObject getReportKumaliveData(Long kumaliveId, boolean isAscending) throws JSONException;
+
+    JSONObject getReportUserData(Long kumaliveId, Integer userId) throws JSONException;
 }

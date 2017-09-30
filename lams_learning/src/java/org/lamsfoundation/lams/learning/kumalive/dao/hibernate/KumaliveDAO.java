@@ -29,25 +29,68 @@ import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learning.kumalive.dao.IKumaliveDAO;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
+import org.lamsfoundation.lams.learning.kumalive.model.KumaliveScore;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
     private static final String FIND_KUMALIVE_BY_ORGANISATION = "FROM " + Kumalive.class.getName()
 	    + " AS k WHERE k.organisation.organisationId = ? AND k.finished = 0";
+    private static final String FIND_KUMALIVES_BY_ORGANISATION = "FROM " + Kumalive.class.getName()
+	    + " AS k WHERE k.organisation.organisationId = ? ORDER BY ";
     private static final String FIND_RUBRICS_BY_ORGANISATION = "FROM " + KumaliveRubric.class.getName()
 	    + " AS r WHERE r.organisation.organisationId = ? AND r.kumalive IS NULL ORDER BY r.orderId ASC";
+    private static final String FIND_SCORE_BY_KUMALIVE = "FROM " + KumaliveScore.class.getName()
+	    + " AS s WHERE s.rubric.kumalive.kumaliveId = ? ORDER BY s.user.firstName ";
+    private static final String FIND_SCORE_BY_KUMALIVE_AND_USER = "FROM " + KumaliveScore.class.getName()
+	    + " AS s WHERE s.rubric.kumalive.kumaliveId = ? AND s.user.userId = ?";
 
     @Override
     @SuppressWarnings("unchecked")
-    public Kumalive findKumaliveByOrganisationId(Integer organisationId) {
+    public Kumalive findKumalive(Integer organisationId) {
 	List<Kumalive> result = (List<Kumalive>) doFind(FIND_KUMALIVE_BY_ORGANISATION, organisationId);
 	return result.isEmpty() ? null : result.get(0);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<KumaliveRubric> findRubricsByOrganisationId(Integer organisationId) {
+    public List<KumaliveRubric> findRubrics(Integer organisationId) {
 	return (List<KumaliveRubric>) doFind(FIND_RUBRICS_BY_ORGANISATION, organisationId);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Kumalive> findKumalives(Integer organisationId, String sortColumn, boolean isAscending) {
+	StringBuilder query = new StringBuilder(FIND_KUMALIVES_BY_ORGANISATION);
+	switch (sortColumn) {
+	    case "name":
+		query.append("name");
+		break;
+	    default:
+		query.append("kumaliveId");
+		break;
+	}
+	if (!isAscending) {
+	    query.append(" DESC");
+	}
+
+	return (List<Kumalive>) doFind(query.toString(), organisationId);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<KumaliveScore> findKumaliveScore(Long kumaliveId, boolean isAscending) {
+	StringBuilder query = new StringBuilder(FIND_SCORE_BY_KUMALIVE);
+	if (!isAscending) {
+	    query.append(" DESC");
+	}
+
+	return (List<KumaliveScore>) doFind(query.toString(), kumaliveId);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<KumaliveScore> findKumaliveScore(Long kumaliveId, Integer userId) {
+	return (List<KumaliveScore>) doFind(FIND_SCORE_BY_KUMALIVE_AND_USER, kumaliveId, userId);
     }
 }

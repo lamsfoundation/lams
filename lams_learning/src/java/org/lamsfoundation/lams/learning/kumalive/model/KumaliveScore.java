@@ -27,20 +27,21 @@ import java.io.Serializable;
 import org.lamsfoundation.lams.usermanagement.User;
 
 public class KumaliveScore implements Serializable {
-
     private static final long serialVersionUID = -5191089091527630037L;
 
     private Long scoreId;
     private KumaliveRubric rubric;
     private User user;
+    private Long batch;
     private Short score;
 
     public KumaliveScore() {
     }
 
-    public KumaliveScore(KumaliveRubric rubric, User user, Short score) {
+    public KumaliveScore(KumaliveRubric rubric, User user, Long batch, Short score) {
 	this.rubric = rubric;
 	this.user = user;
+	this.batch = batch;
 	this.score = score;
     }
 
@@ -66,6 +67,14 @@ public class KumaliveScore implements Serializable {
 
     public void setUser(User user) {
 	this.user = user;
+    }
+
+    public Long getBatch() {
+	return batch;
+    }
+
+    public void setBatch(Long batch) {
+	this.batch = batch;
     }
 
     public Short getScore() {

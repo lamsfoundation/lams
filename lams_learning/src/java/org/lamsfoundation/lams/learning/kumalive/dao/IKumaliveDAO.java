@@ -28,9 +28,16 @@ import java.util.List;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
+import org.lamsfoundation.lams.learning.kumalive.model.KumaliveScore;
 
 public interface IKumaliveDAO extends IBaseDAO {
-    Kumalive findKumaliveByOrganisationId(Integer organisationId);
+    Kumalive findKumalive(Integer organisationId);
 
-    List<KumaliveRubric> findRubricsByOrganisationId(Integer organisationId);
+    List<KumaliveRubric> findRubrics(Integer organisationId);
+
+    List<Kumalive> findKumalives(Integer organisationId, String sortColumn, boolean isAscending);
+
+    List<KumaliveScore> findKumaliveScore(Long kumaliveId, boolean isAscending);
+    
+    List<KumaliveScore> findKumaliveScore(Long kumaliveId, Integer userId);
 }
