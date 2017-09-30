@@ -10,10 +10,10 @@
 	    <link type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
 
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 
 <script type="text/javascript">
 
@@ -76,7 +76,7 @@
 
 							rows += '<tr>';
 							rows += '<td>';
-							rows += userData["userName"];
+							rows += definePortraitPopover(userData["portraitId"], userData["userId"],  userData["userName"],  userData["userName"]);
 							rows += '</td>';
 
 						    <c:forEach var="option" items="${question.options}">
@@ -105,9 +105,10 @@
 						json.rows = $(rows);
 						return json;
 			            
-			    	}
-				}
-			})
+					}
+				}}).bind('pagerInitialized pagerComplete', function(event, options){
+					initializePortraitPopover('${lams}');
+	            })
 		});
   	})
 </script>

@@ -518,4 +518,10 @@ public interface IUserManagementService {
      * Stores organisation (course) groups and removes the unnecessary ones.
      */
     void saveOrganisationGrouping(OrganisationGrouping grouping, Collection<OrganisationGroup> newGroups);
+    
+    /**
+     * Returns the SQL needed to look up portrait details for a given user. This is an efficient way to get the entries 
+     * at the same time as retrieving the tool data, rather than making a separate lookup. 
+     */
+    String[] getPortraitSQL(String userIdString);
 }

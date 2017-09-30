@@ -27,7 +27,7 @@
 	border-spacing: 10px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
 	#messages {
 		height: 100px;
 		resize: vertical;
@@ -39,7 +39,7 @@
 	
 }
 
-@media (min-width: 769px) {
+@media (min-width: 768px) {
 	#messages {
 		height: 200px;
 		resize: vertical;
@@ -54,11 +54,21 @@
 
 #roster {
 	height: 200px;
+	resize: vertical;
 	overflow: auto;
 	border: $border-thin-default;
-	font-size: 12px;
-	font-weight: bold;
 	padding: 2px;
+}
+
+#roster div {
+	margin-right: 5px; 
+}	
+
+#roster span {
+    display: inline;
+	font-size: 14px;
+    padding-top: 7px;
+    vertical-align: top;
 }
 	
 #sendMessageArea {
@@ -73,7 +83,7 @@
 #sendMessageButton {
 	width: 100%;
 }
-
+    
 .selected {
 	background-color: $gray-lightest;
 	padding: 2px;

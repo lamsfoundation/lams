@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.tool.vote.dao.IVoteUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteStatsDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -266,8 +267,8 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 
     // Used by Monitoring
 
-    private static final String FIND_USER_ANSWERS_BY_QUESTION_UID = "SELECT user.username username, user.fullname fullname, attempt.attempt_time attemptTime"
-	    + " FROM tl_lavote11_usr user "
+    private static final String FIND_USER_ANSWERS_BY_QUESTION_UID_SELECT = "SELECT user.user_id, user.username username, user.fullname fullname, attempt.attempt_time attemptTime ";
+    private static final String FIND_USER_ANSWERS_BY_QUESTION_UID_FROM = " FROM tl_lavote11_usr user "
 	    + " JOIN tl_lavote11_usr_attempt attempt on user.uid = attempt.que_usr_id AND attempt.vote_nomination_content_id = :questionUid ";
     private static final String FIND_USER_ANSWERS_BY_QUESTION_UID_SESSION_ADDITION = " AND user.vote_session_id = :sessionUid ";
 
@@ -282,7 +283,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
      * Will return List<[login (String), fullname(String), attemptTime(Timestamp]>
      */
     public List<Object[]> getUserAttemptsForTablesorter(Long sessionUid, Long questionUid, int page, int size,
-	    int sorting, String searchString) {
+	    int sorting, String searchString, IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
 	    case VoteAppConstants.SORT_BY_NAME_ASC:
@@ -301,8 +302,13 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 		sortingOrder = "user.uid";
 	}
 
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+
 	// Basic select for the user records
-	StringBuilder queryText = new StringBuilder(FIND_USER_ANSWERS_BY_QUESTION_UID);
+	StringBuilder queryText = new StringBuilder(FIND_USER_ANSWERS_BY_QUESTION_UID_SELECT)
+		.append(portraitStrings[0])
+		.append(FIND_USER_ANSWERS_BY_QUESTION_UID_FROM)
+		.append(portraitStrings[1]);
 
 	if (sessionUid != null) {
 	    queryText.append(FIND_USER_ANSWERS_BY_QUESTION_UID_SESSION_ADDITION);
@@ -315,8 +321,11 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	queryText.append(" ORDER BY " + sortingOrder);
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
-	query.addScalar("username", StringType.INSTANCE).addScalar("fullname", StringType.INSTANCE)
-		.addScalar("attemptTime", TimestampType.INSTANCE).setLong("questionUid", questionUid.longValue())
+	query.addScalar("user_id", IntegerType.INSTANCE).addScalar("username", StringType.INSTANCE)
+		.addScalar("fullname", StringType.INSTANCE)
+		.addScalar("attemptTime", TimestampType.INSTANCE)
+		.addScalar("portraitId", IntegerType.INSTANCE)
+		.setLong("questionUid", questionUid.longValue())
 		.setFirstResult(page * size).setMaxResults(size);
 	if (sessionUid != null) {
 	    query.setLong("sessionUid", sessionUid.longValue());
@@ -386,7 +395,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
      * Will return List<[login (String), fullname(String), String (notebook entry)]>
      */
     public List<Object[]> getUserReflectionsForTablesorter(final Long sessionUid, int page, int size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService) {
+	    String searchString, ICoreNotebookService coreNotebookService, IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
 	    case VoteAppConstants.SORT_BY_NAME_ASC:
@@ -403,17 +412,21 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	String[] notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings("session.vote_session_id",
 		VoteAppConstants.MY_SIGNATURE, "user.user_id");
 
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
-	queryText.append("SELECT user.username username, user.fullname fullname ");
+	queryText.append("SELECT user.user_id user_id, user.username username, user.fullname fullname ");
 	queryText.append(notebookEntryStrings[0]);
+	queryText.append(portraitStrings[0]);
 	queryText.append(" FROM tl_lavote11_usr user ");
 	queryText.append(
 		" JOIN tl_lavote11_session session ON user.vote_session_id = :sessionUid AND user.vote_session_id = session.uid ");
 
 	// Add the notebook join
 	queryText.append(notebookEntryStrings[1]);
-
+	queryText.append(portraitStrings[1]);
+	
 	// If filtering by name add a name based where clause
 	buildNameSearch(searchString, queryText, true);
 
@@ -421,16 +434,19 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	queryText.append(" ORDER BY " + sortingOrder);
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
-	query.addScalar("username", StringType.INSTANCE).addScalar("fullname", StringType.INSTANCE)
-		.addScalar("notebookEntry", StringType.INSTANCE).setLong("sessionUid", sessionUid.longValue())
+	query.addScalar("user_id", IntegerType.INSTANCE)
+		.addScalar("username", StringType.INSTANCE).addScalar("fullname", StringType.INSTANCE)
+		.addScalar("notebookEntry", StringType.INSTANCE).addScalar("portraitId", IntegerType.INSTANCE)
+		.setLong("sessionUid", sessionUid.longValue())
 		.setFirstResult(page * size).setMaxResults(size);
 
 	return query.list();
     }
 
-    private static final String FIND_USER_OPEN_TEXT = "SELECT user.uid userUid, user.username login, user.fullname fullName, "
-	    + " attempt.uid userEntryUid, attempt.userEntry userEntry, attempt.attempt_time attemptTime, attempt.visible visible "
-	    + " FROM tl_lavote11_usr user "
+    private static final String FIND_USER_OPEN_TEXT_SELECT = "SELECT user.uid userUid, user.username login, user.fullname fullName, "
+	    + " attempt.uid userEntryUid, attempt.userEntry userEntry, attempt.attempt_time attemptTime, attempt.visible visible ";
+    
+    private static final String FIND_USER_OPEN_TEXT_FROM =  " FROM tl_lavote11_usr user "
 	    + " JOIN tl_lavote11_usr_attempt attempt ON user.uid = attempt.que_usr_id AND attempt.vote_nomination_content_id = 1 ";
 
     private static final String FIND_USER_OPEN_TEXT_SESSION_UID_ADD = "AND user.vote_session_id=:sessionUid";
@@ -447,7 +463,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
      * Will return List<OpenTextAnswerDTO>
      */
     public List<OpenTextAnswerDTO> getUserOpenTextAttemptsForTablesorter(Long sessionUid, Long toolContentId, int page,
-	    int size, int sorting, String searchStringVote, String searchStringUsername) {
+	    int size, int sorting, String searchStringVote, String searchStringUsername, IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
 	    case VoteAppConstants.SORT_BY_NAME_ASC:
@@ -478,14 +494,19 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 		sortingOrder = "user.uid";
 	}
 
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+
 	// Basic select for the user records
-	StringBuilder queryText = new StringBuilder(FIND_USER_OPEN_TEXT);
+	StringBuilder queryText = new StringBuilder(FIND_USER_OPEN_TEXT_SELECT)
+		.append(portraitStrings[0])
+		.append(FIND_USER_OPEN_TEXT_FROM);
 
 	if (sessionUid != null) {
 	    queryText.append(FIND_USER_OPEN_TEXT_SESSION_UID_ADD);
 	} else {
 	    queryText.append(FIND_USER_OPEN_TEXT_CONTENT_UID_ADD);
 	}
+	queryText.append(portraitStrings[1]);
 
 	// If filtering by name/entry add a where clause
 	buildCombinedSearch(searchStringVote, searchStringUsername, queryText);
@@ -497,7 +518,8 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	query.addScalar("userUid", LongType.INSTANCE).addScalar("login", StringType.INSTANCE)
 		.addScalar("fullName", StringType.INSTANCE).addScalar("userEntryUid", LongType.INSTANCE)
 		.addScalar("userEntry", StringType.INSTANCE).addScalar("attemptTime", TimestampType.INSTANCE)
-		.addScalar("visible", BooleanType.INSTANCE).setFirstResult(page * size).setMaxResults(size)
+		.addScalar("visible", BooleanType.INSTANCE).addScalar("portraitId", LongType.INSTANCE)
+		.setFirstResult(page * size).setMaxResults(size)
 		.setResultTransformer(Transformers.aliasToBean(OpenTextAnswerDTO.class));
 
 	if (sessionUid != null) {

@@ -39,6 +39,7 @@
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		   		<property name="eventNotificationService"><ref bean="eventNotificationService" /></property>
 		   		<property name="messageService"><ref bean="notebookMessageService" /></property>
+		   		<property name="userManagementService"><ref bean="userManagementService" /></property>
 		   		<property name="notebookOutputFactory"><ref bean="notebookOutputFactory"/></property>
 			</bean>
 		</property>

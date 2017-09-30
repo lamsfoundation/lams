@@ -10,8 +10,10 @@
 		<link href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet" type="text/css" >
 		<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css" >
 		<link href="${lams}css/thickbox.css" rel="stylesheet" rel="stylesheet" type="text/css">
-		<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
-		<lams:css suffix="main"/>
+		<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>		
+ 		<lams:css suffix="chart"/>
+ 		
+		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 		
 		<style type="text/css">
 			.ui-jqgrid tr.jqgrow td {
@@ -47,6 +49,7 @@
  		
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
+ 		<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
  		
 		<script>        
 		    function doSelectTab(tabId) {

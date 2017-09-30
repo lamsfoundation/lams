@@ -70,20 +70,21 @@
     <%-- Action Control Bar --%>
     <bbNG:actionControlBar>
         <bbNG:actionButton id="open_learner" url="javascript:openLearner();" title="Open Lesson" primary="true"/>       <%-- Access the Lesson as a Learner --%>
-        <c:if test="${isInstructor}">
-            <bbNG:actionButton id="open_monitor" url="javascript:openMonitor('${param.course_id}', '${param.lsid}');" title="Open Monitor" primary="true"/>  <%-- Access the Monitor --%>
+        <c:if test="${isInstructor}">																				 <%-- Access the Monitor --%>
+            <bbNG:actionButton id="open_monitor" url="javascript:openMonitor('${param.course_id}', '${param.lsid}');" title="Open Monitor" primary="true"/>  
         </c:if>
-        <bbNG:actionButton id="cancel" url="javascript:back();" title="Cancel" primary="false"/>                        <%-- Cancel (Go Back) --%>
+        <bbNG:actionButton id="cancel" title="Cancel" primary="false"                       							 
+        		url="javascript:document.location='/webapps/blackboard/content/listContentEditable.jsp?content_id=${param.content_id}&course_id=${param.course_id}';"/><%-- Cancel (Go Back) --%> 
     </bbNG:actionControlBar>
 
 	<c:if test='${description != null && description != ""}'>
 	    <div class="vtbegenerated"> 
-	    	${description} 
+	    		${description} 
 	    </div>
     </c:if>
     
     <c:if test="${isDisplayDesignImage}">
-    	<div style="text-align: center; margin-top: 10px;">
+    		<div style="text-align: center; margin-top: 10px;">
    			<img src="${learningDesignImageUrl}">
    		</div>
     </c:if>
@@ -109,12 +110,12 @@
 		    		<span class="super">*</span>
 		    		Total activities depend on your learning path.
 		    	</div>
-		    </c:when>
-		    <c:otherwise>
+		</c:when>
+		<c:otherwise>
 	    	 	<p>
 		    		You have completed this lesson.
 		    	</p>
-		    </c:otherwise>
+		</c:otherwise>
 	    	</c:choose>
 	    </div>
     </c:if>
@@ -123,11 +124,6 @@
         <script type="text/javascript">
             var learnerWin = null;
             var monitorWin = null;
-                
-            // Go back one page if the user clicks the Cancel Button
-            function back() {
-                history.go(-1);
-            }
                 
             // Open the Lesson as a Learner
             function openLearner() {

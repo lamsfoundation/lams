@@ -525,7 +525,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString, boolean getNotebookEntries) {
 	return forumUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries,
-		coreNotebookService);
+		coreNotebookService, userManagementService);
     }
 
     @Override

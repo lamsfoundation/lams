@@ -145,6 +145,9 @@ public class MonitoringService implements IMonitoringService {
     private static Logger log = Logger.getLogger(MonitoringService.class);
 
     private static final String AUDIT_LESSON_CREATED_KEY = "audit.lesson.created";
+    private static final String AUDIT_LESSON_REMOVED_KEY = "audit.lesson.removed";
+    private static final String AUDIT_LESSON_REMOVED_PERMANENTLY_KEY = "audit.lesson.removed.permanently";
+    private static final String AUDIT_LESSON_STATUS_CHANGED = "audit.lesson.status.changed";
 
     private ILessonDAO lessonDAO;
 
@@ -384,6 +387,7 @@ public class MonitoringService implements IMonitoringService {
 		forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish, precedingLesson);
 
 	Long initializedLearningDesignId = initializedLesson.getLearningDesign().getLearningDesignId();
+	auditLogLessonStateChange(initializedLesson,null, initializedLesson.getLessonStateId()); 
 	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CREATE, userID, initializedLearningDesignId,
 		initializedLesson.getLessonId(), null);
 
@@ -665,6 +669,7 @@ public class MonitoringService implements IMonitoringService {
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("=============Lesson " + lessonId + " started===============");
 	}
+	auditLogLessonStateChange(requestedLesson,null, requestedLesson.getLessonStateId()); 
 	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_START, userId, null, lessonId, null);
     }
 
@@ -812,6 +817,7 @@ public class MonitoringService implements IMonitoringService {
      * @param status
      */
     private void setLessonState(Lesson requestedLesson, Integer status) {
+	auditLogLessonStateChange(requestedLesson, requestedLesson.getLessonStateId(), status); 
 	requestedLesson.setPreviousLessonStateId(requestedLesson.getLessonStateId());
 	requestedLesson.setLessonStateId(status);
 	lessonDAO.updateLesson(requestedLesson);
@@ -819,6 +825,33 @@ public class MonitoringService implements IMonitoringService {
 		requestedLesson.getLessonId(), null);
     }
 
+    private void auditLogLessonStateChange(Lesson lesson, Integer previousStatus, Integer newStatus) {
+	String fromState = getStateDescription(previousStatus);
+	String toState = getStateDescription(newStatus);
+	writeAuditLog(MonitoringService.AUDIT_LESSON_STATUS_CHANGED,
+		new Object[] { lesson.getLessonName(),  lesson.getLessonId(), fromState, toState });
+    }
+
+    private String getStateDescription(Integer status) {
+	if (status != null) {
+	    if (status.equals(Lesson.CREATED))
+		return messageService.getMessage("lesson.state.created");
+	    if (status.equals(Lesson.NOT_STARTED_STATE))
+		return messageService.getMessage("lesson.state.scheduled");
+	    if (status.equals(Lesson.STARTED_STATE))
+		return messageService.getMessage("lesson.state.started");
+	    if (status.equals(Lesson.SUSPENDED_STATE))
+		return messageService.getMessage("lesson.state.suspended");
+	    if (status.equals(Lesson.FINISHED_STATE))
+		return messageService.getMessage("lesson.state.finished");
+	    if (status.equals(Lesson.ARCHIVED_STATE))
+		return messageService.getMessage("lesson.state.archived");
+	    if (status.equals(Lesson.REMOVED_STATE))
+		return messageService.getMessage("lesson.state.removed");
+	}
+	return "-";
+    }
+    
     /**
      * Sets a lesson back to its previous state. Used when we "unsuspend" or "unarchive"
      *
@@ -827,37 +860,46 @@ public class MonitoringService implements IMonitoringService {
      */
     private void revertLessonState(Lesson requestedLesson) {
 	Integer currentStatus = requestedLesson.getLessonStateId();
+	Integer newStatus;
 
 	if (requestedLesson.getPreviousLessonStateId() != null) {
 	    if (requestedLesson.getPreviousLessonStateId().equals(Lesson.NOT_STARTED_STATE)
 		    && requestedLesson.getScheduleStartDate().before(new Date())) {
 		requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
+		newStatus = Lesson.STARTED_STATE;
 
 	    } else {
 		requestedLesson.setLessonStateId(requestedLesson.getPreviousLessonStateId());
+		newStatus = requestedLesson.getPreviousLessonStateId();
 	    }
 	    requestedLesson.setPreviousLessonStateId(null);
 
 	} else {
 	    if ((requestedLesson.getStartDateTime() != null) && (requestedLesson.getScheduleStartDate() != null)) {
 		requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
+		newStatus = Lesson.STARTED_STATE;
 
 	    } else if (requestedLesson.getScheduleStartDate() != null) {
 		if (requestedLesson.getScheduleStartDate().after(new Date())) {
 		    requestedLesson.setLessonStateId(Lesson.NOT_STARTED_STATE);
+		    newStatus = Lesson.NOT_STARTED_STATE;
 		} else {
 		    requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
+		    newStatus = Lesson.STARTED_STATE;
 		}
 	    } else if (requestedLesson.getStartDateTime() != null) {
 		requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
+		newStatus = Lesson.STARTED_STATE;
 	    } else {
 		requestedLesson.setLessonStateId(Lesson.CREATED);
+		newStatus = Lesson.CREATED;
 	    }
 
 	    requestedLesson.setPreviousLessonStateId(currentStatus);
 	}
 	lessonDAO.updateLesson(requestedLesson);
 
+	auditLogLessonStateChange(requestedLesson,currentStatus, newStatus); 
 	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson.getUser().getUserId(), null,
 		requestedLesson.getLessonId(), null);
     }
@@ -937,6 +979,9 @@ public class MonitoringService implements IMonitoringService {
 
 	// finally remove the learning design
 	lessonDAO.delete(learningDesign);
+	
+	writeAuditLog(MonitoringService.AUDIT_LESSON_REMOVED_PERMANENTLY_KEY,
+		new Object[] { lesson.getLessonName(),  lesson.getLessonId() });
     }
 
     @Override

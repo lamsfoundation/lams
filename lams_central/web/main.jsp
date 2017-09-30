@@ -160,14 +160,16 @@
         
 			<%@ include file="favoriteOrganisations.jsp"%>
             
-			<div class="form-group offcanvas-search">
-				<input type="text" id="offcanvas-search-input" class="form-control input-sm" placeholder="<fmt:message key="label.search.for.courses" />..."
-						data-column="1" type="search">
-			</div>
+            <c:if test="${isCourseSearchOn}">
+				<div class="form-group offcanvas-search">
+					<input type="text" id="offcanvas-search-input" class="form-control input-sm" placeholder="<fmt:message key="label.search.for.courses" />..."
+							data-column="1" type="search">
+				</div>
+			</c:if>
             
             <div class="tour-organisations">
-			<lams:TSTable numColumns="2">
-			</lams:TSTable>
+				<lams:TSTable numColumns="2">
+				</lams:TSTable>
 			</div>
 			
         </div>

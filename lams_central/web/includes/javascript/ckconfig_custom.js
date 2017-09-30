@@ -2,17 +2,17 @@
 // Main difference Source became Sourcedialog and Maximize and Preview were dropped.
 
 CKEDITOR.config.toolbar_Default = [
-	['Source','-','Maximize', 'Preview','PasteFromWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
-	['Paint_Button','oembed','Image','Link','Iframe','Table','HorizontalRule','Smiley','SpecialChar','Templates','Format','Font','FontSize','About']
+	['Source','-','Maximize','Preview','PasteFromWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
+	['Embed','Image','Link','Iframe','Table','HorizontalRule','Emojione','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_DefaultInline = [
-	['Sourcedialog','-','PasteFromWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
-    ['Paint_Button','oembed','Image','Link','Iframe','Table','HorizontalRule','Smiley','SpecialChar','Templates','Format','Font','FontSize','About']
+	['Sourcedialog','Preview','-','PasteFromWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
+    ['Embed','Image','Link','Iframe','Table','HorizontalRule','Emojione','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_DefaultDokuInline = [
-                                  	['Bold','Italic','Underline','StrikeThrough','NumberedList','BulletedList','Indent','Outdent','Undo','Redo']
+	['Bold','Italic','Underline','StrikeThrough','NumberedList','BulletedList','Indent','Outdent','Undo','Redo']
 ];
 
 // removing Video Recorder from default tool bar LDEV-2961
@@ -24,9 +24,9 @@ CKEDITOR.config.toolbar_DefaultLearner = [
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-	['Jlatexmath','About'],
+	['Jlatexmath'],
 	['TextColor','BGColor'],
-	['Image','Table','HorizontalRule','Smiley','SpecialChar'],
+	['Image','Table','HorizontalRule','Emojione'],
 	['Format','Font','FontSize']
 ];
 
@@ -36,9 +36,9 @@ CKEDITOR.config.toolbar_DefaultLearnerInline = [
   	['Bold','Italic','Underline', '-','Subscript','Superscript'],
   	['NumberedList','BulletedList','-','Outdent','Indent'],
   	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-  	['Jlatexmath','About'],
+  	['Jlatexmath'],
   	['TextColor','BGColor'],
-  	['Image','Table','HorizontalRule','Smiley','SpecialChar'],
+  	['Image','Table','HorizontalRule','Emojione'],
   	['Format','Font','FontSize']
   ];
 
@@ -48,9 +48,9 @@ CKEDITOR.config.toolbar_DefaultMonitor = [
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-	['Jlatexmath','About'],
+	['Jlatexmath'],
 	['TextColor','BGColor'],
-	['Table','HorizontalRule','Smiley','SpecialChar'],
+	['Table','HorizontalRule','Emojione'],
 	['Format','Font','FontSize']
 ];
 
@@ -60,9 +60,9 @@ CKEDITOR.config.toolbar_DefaultMonitorInline = [
   	['Bold','Italic','Underline', '-','Subscript','Superscript'],
   	['NumberedList','BulletedList','-','Outdent','Indent'],
   	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-  	['Jlatexmath','About'],
+  	['Jlatexmath'],
   	['TextColor','BGColor'],
-  	['Table','HorizontalRule','Smiley','SpecialChar'],
+  	['Table','HorizontalRule','Emojione'],
   	['Format','Font','FontSize']
 ];
 
@@ -73,9 +73,9 @@ CKEDITOR.config.toolbar_CustomWiki = [
 	['NumberedList','BulletedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 	['wikilink','Link','Image'],
-	['Jlatexmath','About'],
+	['Jlatexmath'],
 	['TextColor','BGColor'],
-	['Table','HorizontalRule','Smiley','SpecialChar'],
+	['Table','HorizontalRule','Emojione'],
 	['Format','Font','FontSize']
 ];
 
@@ -86,21 +86,21 @@ CKEDITOR.config.toolbar_CustomWikiInline = [
   	['NumberedList','BulletedList','-','Outdent','Indent'],
   	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
   	['wikilink','Link','Image'],
-  	['Jlatexmath','About'],
+  	['Jlatexmath'],
   	['TextColor','BGColor'],
-  	['Table','HorizontalRule','Smiley','SpecialChar'],
+  	['Table','HorizontalRule','Emojione'],
   	['Format','Font','FontSize']
 ];
 
 
 CKEDITOR.config.toolbar_CustomPedplanner = [
 	['Source','-','Maximize','Preview','PasteFromWord','Bold','Italic','Underline', '-','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath'], 
-	['Image','Link','Iframe','Table','Smiley','Font','FontSize']
+	['Image','Link','Iframe','Table','Emojione','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_CustomPedplannerInline = [
 	['Sourcedialog','-','PasteFromWord','Bold','Italic','Underline', '-','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath'], 
-	['Image','Link','Iframe','Table','Smiley','Font','FontSize']
+	['Image','Link','Iframe','Table','Emojione','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_LessonDescription = [
@@ -108,7 +108,7 @@ CKEDITOR.config.toolbar_LessonDescription = [
 	['NumberedList','BulletedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 	['TextColor','BGColor'],
-	['Table','HorizontalRule','Smiley','SpecialChar'],
+	['Table','HorizontalRule','Emojione'],
 	['Format','Font','FontSize']
 ];
 
@@ -117,7 +117,7 @@ CKEDITOR.config.toolbar_LessonDescriptionInline = [
  	['NumberedList','BulletedList','-','Outdent','Indent'],
  	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
  	['TextColor','BGColor'],
- 	['Table','HorizontalRule','Smiley','SpecialChar'],
+ 	['Table','HorizontalRule','Emojione'],
  	['Format','Font','FontSize']
  ];
 
@@ -126,16 +126,15 @@ CKEDITOR.config.contentsCss = CKEDITOR.basePath + '../css/defaultHTML_learner.cs
 //CKEDITOR.config.skin = 'office2013' ;
 CKEDITOR.config.disableNativeSpellChecker = false;
 CKEDITOR.config.browserContextMenuOnCtrl = true;
-CKEDITOR.config.templates = 'lams_templates';
-CKEDITOR.config.templates_files = [CKEDITOR.basePath + '../www/public/ckeditor-templates/htmltemplates.js'];
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.config.enterMode = 'div';
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
-CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,paint,iframe,lineutils,widget,oembed,sourcedialog,dialog,templates';
+CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,html5audio,bootstrapTabs';
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
-CKEDITOR.config.removePlugins = 'elementspath';
+CKEDITOR.config.removePlugins = 'elementspath,about,specialchar';
 CKEDITOR.config.allowedContent = true;
 CKEDITOR.config.toolbarCanCollapse = true;
+CKEDITOR.config.embed_provider = '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}';//default URL for 'embed' plugin
 
 // ---- Additional scripts -----
 // Hides editor instaces until they are fully initialized

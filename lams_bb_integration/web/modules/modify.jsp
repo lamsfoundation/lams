@@ -89,21 +89,15 @@
                 
             </bbNG:step> 
             
-            <bbNG:stepSubmit title="Start Lesson" cancelOnClick="back();" />
+            <bbNG:stepSubmit title="Start Lesson" 
+            			cancelUrl="/webapps/blackboard/content/listContentEditable.jsp?content_id=${param.content_id}&course_id=${param.course_id}"/>
 
         </bbNG:dataCollection>
     </form>
 
     <bbNG:jsBlock>
-        <script type="text/javascript">
-        
-            // Go back one page if the user clicks the Cancel Button
-            function back() {
-                history.go(-1);
-            }
-            
-            // Do form vaildation
-            // Check that a title has been supplied 
+        <script type="text/javascript">            
+            // Do form vaildation. Check that a title has been supplied 
             function validateModify() {
                 var title = rettrim(document.lams_form.title.value);
                 if ((title == "")||(title == null)) {

@@ -44,7 +44,7 @@ When true, hides the names and groups the comments.  -->
 		<tr>
 			<c:if test="${not currentUserDisplay}">
 			<td>
-				<c:out value="${rating.itemDescription}" escapeXml="true"/>
+				<lams:Portrait userId="${rating.itemId}"/><span class="portrait-sm-lineheight"><c:out value="${rating.itemDescription}" escapeXml="true"/></span>
 			</td>
 			</c:if>
 			<td>
@@ -64,7 +64,7 @@ When true, hides the names and groups the comments.  -->
 		<table class="tablesorter">
 		<thead>
 			<tr>
-				<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" width="${criteriaRatings.ratingCriteria.commentsEnabled ? '20%' : '33%'}" > 
+				<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" width="${criteriaRatings.ratingCriteria.commentsEnabled ? '25%' : '40%'}" > 
 					<fmt:message key="label.user.name" />
 				</th>
 				<th class="rating text-center ">
@@ -82,7 +82,7 @@ When true, hides the names and groups the comments.  -->
 			<c:if test="${not empty rating.averageRating}">
 			<tr>
 				<td>
-					<c:out value="${rating.itemDescription}" escapeXml="true"/>
+					<lams:Portrait userId="${rating.itemId}"/><span class="portrait-sm-lineheight"><c:out value="${rating.itemDescription}" escapeXml="true"/></span>
 				</td>
 				<td class="rating">
 					<div class="rating-stars-holder text-center center-block">
@@ -162,7 +162,8 @@ When true, hides the names and groups the comments.  -->
 					<c:otherwise><fmt:formatNumber value="${rating.averageRating}" type="number" maxFractionDigits="0" /></c:otherwise>
 				</c:choose>
 			:</strong>
-			&nbsp;<c:out value="${rating.itemDescription}" escapeXml="true"/>&nbsp;
+			&nbsp;<c:if test="${not currentUserDisplay}"><lams:Portrait userId="${rating.itemId}"/></c:if>
+			<span class="portrait-sm-lineheight"><c:out value="${rating.itemDescription}" escapeXml="true"/>&nbsp;</span>
 				<c:if test="${not currentUserDisplay && not empty rating.userRating}">
 					(${rating.userRating})
 				</c:if>
@@ -183,7 +184,8 @@ When true, hides the names and groups the comments.  -->
 					<c:otherwise>${rating.averageRating}</c:otherwise>
 				</c:choose>
 			:</strong>
-			&nbsp;<c:out value="${rating.itemDescription}" escapeXml="true"/>&nbsp;
+			&nbsp;<c:if test="${not currentUserDisplay}"><lams:Portrait userId="${rating.itemId}"/></c:if>
+			<span class="portrait-sm-lineheight"><c:out value="${rating.itemDescription}" escapeXml="true"/>&nbsp;</span>
 				<c:if test="${not currentUserDisplay && not empty rating.userRating}">
 					(${rating.userRating})
 				</c:if>

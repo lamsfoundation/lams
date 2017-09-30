@@ -76,7 +76,7 @@ public class UserDTO implements Serializable {
 	this.pagesWithDisabledTutorials = pagesWithDisabledTutorials;
 	this.firstLogin = firstLogin;
 	this.lastVisitedOrganisationId = lastVisitedOrganisationId;
-	this.portraitUuid = portraitUuid;
+	this.setPortraitUuid(portraitUuid);
     }
 
     /**
@@ -171,8 +171,7 @@ public class UserDTO implements Serializable {
 		.append("direction", getDirection()).append("email", getEmail()).append("htmlTheme", getTheme())
 		.append("timeZone", getTimeZone()).append("authenticationMethodId", getAuthenticationMethodId())
 		.append("fckLanguageMapping", getFckLanguageMapping())
-		.append("tutorialsDisabled", "" + getTutorialsDisabled()).append("portraitUuid", getPortraitUuid())
-		.toString();
+		.append("tutorialsDisabled", "" + getTutorialsDisabled()).toString();
     }
 
     public String getFckLanguageMapping() {

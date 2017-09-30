@@ -84,6 +84,7 @@ public class SpreadsheetConstants {
 
     public static final String ATTR_REFLECT_LIST = "reflectList";
     public static final String ATTR_USER_UID = "userUid";
+    public static final String ATTR_USER_ID = "userId";
     public static final String ATTR_USER_NAME = "userName";
     public static final String ATTR_USER_MARK = "mark";
     public static final String ATTR_USER_IS_MARKED = "userIsMarked";

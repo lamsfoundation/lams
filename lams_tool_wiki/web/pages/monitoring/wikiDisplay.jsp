@@ -1,6 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>
 
+<script type="text/javascript">
+$(document).ready(function(){
+		initializePortraitPopover('<lams:LAMSURL />');
+});
+</script>
+
 <html:form action="/monitoring" styleId="monitoringForm" method="post" enctype="multipart/form-data">
 
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
@@ -261,7 +267,7 @@
 				<c:if test="${not empty user.notebookEntry}">
 					<tr>
 						<td>
-							${user.firstName} ${user.lastName}
+							<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
 						</td>
 						<td>
 							<lams:out escapeHtml="true" value="${user.notebookEntry}" />

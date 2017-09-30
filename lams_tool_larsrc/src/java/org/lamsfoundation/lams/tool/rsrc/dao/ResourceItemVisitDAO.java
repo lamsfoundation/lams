@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 public interface ResourceItemVisitDAO extends DAO {
 
@@ -47,7 +48,7 @@ public interface ResourceItemVisitDAO extends DAO {
     List<ResourceItemVisitLog> getResourceItemLogBySession(Long sessionId, Long itemUid);
 
     List<VisitLogDTO> getPagedVisitLogsBySessionAndItem(Long sessionId, Long itemUid, int page, int size, String sortBy,
-	    String sortOrder, String searchString);
+	    String sortOrder, String searchString, IUserManagementService userManagementService);
 
     int getCountVisitLogsBySessionAndItem(Long sessionId, Long itemUid, String searchString);
 

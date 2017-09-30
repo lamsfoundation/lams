@@ -26,6 +26,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 <link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">

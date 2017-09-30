@@ -117,7 +117,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<i>
 								<fmt:message key="mynotes.entry.submitted.by">
 									<fmt:param>
-										<c:out value="${entry.user.fullName}" escapeXml="false" />
+										<lams:Portrait userId="${entry.user.userId}"/><c:out value="${entry.user.fullName}" escapeXml="false" />
 									</fmt:param>
 								</fmt:message>
 							</i>
@@ -148,9 +148,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<fmt:message key="label.edit.button" />
 								</a>
 							</c:if>
-							<c:set var="viewAll">
-								<html:rewrite page="/notebook.do?method=viewAll&currentLessonID=${param.currentLessonID}" />
-							</c:set>
+							<c:choose>
+								<c:when test="${mode == 'teacher'}">
+									<c:set var="viewAll">
+										<html:rewrite page="/notebook.do?method=viewAllJournals&lessonID=${param.currentLessonID}" />
+									</c:set>
+								</c:when>
+								<c:otherwise>
+									<c:set var="viewAll">
+										<html:rewrite page="/notebook.do?method=viewAll&currentLessonID=${param.currentLessonID}" />
+									</c:set>
+								</c:otherwise>
+							</c:choose>
 							<a href="${viewAll}" class="btn btn-default" id="viewAllBtn">
 								<fmt:message key="mynotes.view.all.button" />
 							</a>

@@ -44,9 +44,6 @@ CKEDITOR.plugins.add('jlatexmath', {
 	 						var sName = element.getAttribute('src').match( /jlatexmath\?formula(.*)/ );
 	 						if (sName!=null) {
 	 							evt.data.dialog = 'Jlatexmath';
-	 							
-	 							evt.cancelBubble = true; 
-	 							evt.returnValue = false; 
 	 						}
 	 					}
 	 				}, 

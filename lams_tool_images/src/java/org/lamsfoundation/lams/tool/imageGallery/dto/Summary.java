@@ -54,6 +54,7 @@ public class Summary {
     private boolean itemHide;
     private String itemTitle;
     private String username;
+    private Long userId; // LAMS user id
     private int numberOfVotes;
     private ItemRatingDTO itemRatingDto;
 
@@ -83,6 +84,7 @@ public class Summary {
 	    this.itemTitle = item.getTitle();
 	    this.username = item.getCreateBy() == null ? ""
 		    : item.getCreateBy().getFirstName() + " " + item.getCreateBy().getLastName();
+	    this.userId = item.getCreateBy() == null ? null : item.getCreateBy().getUserId();
 	} else {
 	    this.itemUid = new Long(-1);
 	}
@@ -180,5 +182,13 @@ public class Summary {
 
     public void setInitGroup(boolean isInitGroup) {
 	this.isInitGroup = isInitGroup;
+    }
+
+    public Long getUserId() {
+	return userId;
+    }
+
+    public void setUserId(Long userId) {
+	this.userId = userId;
     }
 }

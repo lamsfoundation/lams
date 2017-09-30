@@ -62,6 +62,7 @@ public class SurveyConstants {
     public static final String PARAM_TITLE = "title";
 
     public static final String ATTR_USER_UID = "userUid";
+    public static final String ATTR_USER_ID = "userId";
 
     public static final String ATTR_USER = "user";
 
@@ -172,6 +173,8 @@ public class SurveyConstants {
 
     public static final String ATTR_REFLECTION = "notebookEntry";
 
+    public static final String ATTR_PORTRAIT_ID = "portraitId";
+    
     public static final int SORT_BY_DEAFAULT = 0;
     public static final int SORT_BY_ANSWER_ASC = 1;
     public static final int SORT_BY_ANSWER_DESC = 2;

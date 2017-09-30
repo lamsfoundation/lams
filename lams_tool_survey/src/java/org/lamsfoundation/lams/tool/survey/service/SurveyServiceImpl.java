@@ -258,7 +258,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString) {
 	return surveyUserDao.getUserReflectionsForTablesorter(sessionId, page, size, sorting, searchString,
-		coreNotebookService);
+		coreNotebookService, userManagementService);
     }
 
     @Override
@@ -329,7 +329,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public List<Object[]> getQuestionAnswersForTablesorter(Long sessionId, Long questionId, int page, int size,
 	    int sorting, String searchString) {
 
-	return surveyUserDao.getUsersForTablesorter(sessionId, questionId, page, size, sorting, searchString);
+	return surveyUserDao.getUsersForTablesorter(sessionId, questionId, page, size, sorting, searchString,
+		userManagementService);
     }
 
     @Override

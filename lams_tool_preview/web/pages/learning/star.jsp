@@ -31,6 +31,8 @@
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 	
+	<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
+	
 	<script type="text/javascript">
 	
 	var YOUR_RATING_LABEL = '<fmt:message key="label.you.gave.rating"><fmt:param>@1@</fmt:param></fmt:message>',
@@ -99,10 +101,12 @@
 							
 							rows += '<tr>';
 
-							rows += '<td class="username"><span>';
+							rows += '<td class="username"><div class="pull-left roffset5">';
+							rows += definePortrait( userData["itemDescription2"], itemId, 'small', true, '${lams}' );
+							rows += '</div><span class="portrait-sm-lineheight">';
 							rows += userData["itemDescription"];
 							rows += '</span>'
-
+								
 							if (isMaximumRatesPerUserReached) {
 								rows += '<br/><div class="alert alert-warning"><i class="fa fa-exclamation-circle text-muted"></i> <fmt:message key="label.cant.rate" /></div>';
 							}
@@ -304,7 +308,7 @@
 		</c:if>
 	
 		<lams:TSTable numColumns="${numColumns}">
-			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>"  width="20%"> 
+			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>"> 
 				<fmt:message key="label.user.name" />
 			</th>
 			<th class="rating">  

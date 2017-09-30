@@ -36,7 +36,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class McUserMarkDTO implements Comparable {
     private String sessionId;
     private String sessionName;
-    private String queUsrId;
+    private String queUsrId; // mc user uid
+    private String userId; // LAMS userId
+    private String portraitId;
     private String userName;
     private String fullName;
     private boolean isUserLeader;
@@ -204,5 +206,21 @@ public class McUserMarkDTO implements Comparable {
      */
     public void setAttemptTime(Date attemptTime) {
 	this.attemptTime = attemptTime;
+    }
+
+    public String getUserId() {
+	return userId;
+    }
+
+    public void setUserId(String userId) {
+	this.userId = userId;
+    }
+
+    public String getPortraitId() {
+	return portraitId;
+    }
+
+    public void setPortraitId(String portraitId) {
+	this.portraitId = portraitId;
     }
 }

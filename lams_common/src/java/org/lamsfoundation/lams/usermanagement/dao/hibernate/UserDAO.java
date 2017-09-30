@@ -39,7 +39,7 @@ public class UserDAO extends LAMSBaseDAO implements IUserDAO {
 	}
 
 	StringBuilder queryBuilder = new StringBuilder(
-		"SELECT user.userId, user.login, user.firstName, user.lastName, user.email FROM User user WHERE user.disabledFlag=0 ");
+		"SELECT user.userId, user.login, user.firstName, user.lastName, user.email, user.portraitUuid FROM User user WHERE user.disabledFlag=0 ");
 	// support for custom search from a toolbar
 	UserDAO.addNameSearch(queryBuilder, "user", searchPhrase);
 	//order by
@@ -58,9 +58,10 @@ public class UserDAO extends LAMSBaseDAO implements IUserDAO {
 	    String firstName = (String) element[2];
 	    String lastName = (String) element[3];
 	    String email = (String) element[4];
+	    Long portraitUuid = element[5] != null ? ((Number) element[5]).longValue() : null;
 
 	    UserDTO userDto = new UserDTO(userId, firstName, lastName, login, null, null, null, email, null, null, null,
-		    null, true, null, false, null, null);
+		    null, true, null, false, null, portraitUuid);
 
 	    userDtos.add(userDto);
 	}

@@ -190,11 +190,13 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	for (Object[] userAndAnswers : users) {
 
 	    JSONObject responseRow = new JSONObject();
-	    responseRow.put(VoteAppConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml((String) userAndAnswers[1]));
+	    responseRow.put(VoteAppConstants.ATTR_USER_ID, userAndAnswers[0]);
+	    responseRow.put(VoteAppConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml((String) userAndAnswers[2]));
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME,
-		    DateUtil.convertToStringForJSON((Date) userAndAnswers[2], request.getLocale()));
+		    DateUtil.convertToStringForJSON((Date) userAndAnswers[3], request.getLocale()));
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME_TIMEAGO,
-		    DateUtil.convertToStringForTimeagoJSON((Date) userAndAnswers[2]));
+		    DateUtil.convertToStringForTimeagoJSON((Date) userAndAnswers[3]));
+	    responseRow.put(VoteAppConstants.ATTR_PORTRAIT_ID, userAndAnswers[4]);
 	    rows.put(responseRow);
 	}
 	responsedata.put("rows", rows);
@@ -230,11 +232,15 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 
 	for (Object[] userAndReflection : users) {
 	    JSONObject responseRow = new JSONObject();
+	    responseRow.put(VoteAppConstants.ATTR_USER_ID, userAndReflection[0]);
 	    responseRow.put(VoteAppConstants.ATTR_USER_NAME,
-		    StringEscapeUtils.escapeHtml((String) userAndReflection[1]));
-	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
-		String reflection = StringEscapeUtils.escapeHtml((String) userAndReflection[2]);
+		    StringEscapeUtils.escapeHtml((String) userAndReflection[2]));
+	    if (userAndReflection.length > 3 && userAndReflection[3] != null) {
+		String reflection = StringEscapeUtils.escapeHtml((String) userAndReflection[3]);
 		responseRow.put(VoteAppConstants.NOTEBOOK, reflection.replaceAll("\n", "<br>"));
+	    }
+	    if (userAndReflection.length > 4) {
+		responseRow.put(VoteAppConstants.ATTR_PORTRAIT_ID, userAndReflection[4]);
 	    }
 	    rows.put(responseRow);
 	}
@@ -313,6 +319,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME_TIMEAGO,
 		    DateUtil.convertToStringForTimeagoJSON(userAndAttempt.getAttemptTime()));
 	    responseRow.put("visible", userAndAttempt.isVisible());
+	    responseRow.put("portraitId", userAndAttempt.getPortraitId());
 
 	    rows.put(responseRow);
 	}
