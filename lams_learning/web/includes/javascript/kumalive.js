@@ -418,7 +418,7 @@ function toggleSpeak(message) {
 				if (roleTeacher) {
 					if ($('#actionCell .score[userId="' + speakerId + '"]').length == 0) {
 						// create a score panel for each rubric
-						var batch = new Date().getTime() / 1000;
+						var batch = Math.floor(new Date().getTime() / 1000);
 						$.each(rubrics, function(){
 							$('#score').clone(true).attr({
 								'id'       : null,
