@@ -1,6 +1,8 @@
 package org.lamsfoundation.lams.learning.kumalive;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +24,9 @@ import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.ExcelUtil;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -84,7 +89,7 @@ public class KumaliveAction extends LamsDispatchAction {
 	Integer currentUserId = userDTO.getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, false);
 	if (!KumaliveAction.getSecurityService().hasOrgRole(organisationId, currentUserId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report data", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report organisation data", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
 	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
@@ -111,7 +116,7 @@ public class KumaliveAction extends LamsDispatchAction {
 	Kumalive kumalive = KumaliveAction.getKumaliveService().getKumalive(kumaliveId);
 	Organisation organisation = kumalive.getOrganisation();
 	if (!KumaliveAction.getSecurityService().hasOrgRole(organisation.getOrganisationId(), currentUserId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report kumalive columns", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report kumalive rubrics", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation "
 		    + organisation.getOrganisationId();
 	    log.warn(warning);
@@ -123,7 +128,7 @@ public class KumaliveAction extends LamsDispatchAction {
 	for (KumaliveRubric rubric : kumalive.getRubrics()) {
 	    JSONArray rubricJSON = new JSONArray();
 	    rubricJSON.put(rubric.getRubricId());
-	    rubricJSON.put(rubric.getName());
+	    rubricJSON.put(rubric.getName() == null ? "" : rubric.getName());
 	    responseJSON.put(rubricJSON);
 	}
 
@@ -139,7 +144,7 @@ public class KumaliveAction extends LamsDispatchAction {
 	Kumalive kumalive = KumaliveAction.getKumaliveService().getKumalive(kumaliveId);
 	Organisation organisation = kumalive.getOrganisation();
 	if (!KumaliveAction.getSecurityService().hasOrgRole(organisation.getOrganisationId(), currentUserId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report lesson data", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report kumalive data", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation "
 		    + organisation.getOrganisationId();
 	    log.warn(warning);
@@ -165,7 +170,7 @@ public class KumaliveAction extends LamsDispatchAction {
 	Kumalive kumalive = KumaliveAction.getKumaliveService().getKumalive(kumaliveId);
 	Organisation organisation = kumalive.getOrganisation();
 	if (!KumaliveAction.getSecurityService().hasOrgRole(organisation.getOrganisationId(), currentUserId,
-		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report lesson data", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report user data", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation "
 		    + organisation.getOrganisationId();
 	    log.warn(warning);
@@ -176,6 +181,48 @@ public class KumaliveAction extends LamsDispatchAction {
 	JSONObject responseJSON = KumaliveAction.getKumaliveService().getReportUserData(kumaliveId, userId);
 
 	writeResponse(response, "text/json", LamsDispatchAction.ENCODING_UTF8, responseJSON.toString());
+	return null;
+    }
+
+    public ActionForward exportKumalives(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, JSONException {
+	UserDTO userDTO = getUserDTO();
+	Integer currentUserId = userDTO.getUserID();
+	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
+	List<Long> kumaliveIds = null;
+	if (organisationId == null) {
+	    String kumaliveIdsParam = WebUtil.readStrParam(request, "kumaliveIds", false);
+	    JSONArray kumaliveIdsJSON = new JSONArray(kumaliveIdsParam);
+	    kumaliveIds = new LinkedList<Long>();
+	    for (int index = 0; index < kumaliveIdsJSON.length(); index++) {
+		kumaliveIds.add(kumaliveIdsJSON.getLong(index));
+	    }
+	    Kumalive kumalive = KumaliveAction.getKumaliveService().getKumalive(kumaliveIds.get(0));
+	    organisationId = kumalive.getOrganisation().getOrganisationId();
+	}
+
+	if (!KumaliveAction.getSecurityService().hasOrgRole(organisationId, currentUserId,
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive export", false)) {
+	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
+	    log.warn(warning);
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
+	    return null;
+	}
+
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = null;
+	if (kumaliveIds == null) {
+	    dataToExport = KumaliveAction.getKumaliveService().exportKumalives(organisationId);
+	} else {
+	    dataToExport = KumaliveAction.getKumaliveService().exportKumalives(kumaliveIds);
+	}
+	String fileName = "kumalive_report.xlsx";
+	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
+
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+	ExcelUtil.createExcel(response.getOutputStream(), dataToExport, "Date", true);
+
 	return null;
     }
 

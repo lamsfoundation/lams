@@ -8,13 +8,16 @@
 <lams:html>
 <lams:head>
 	<lams:css/>
-	<link type="text/css" href="css/ui.jqgrid.css" rel="stylesheet" />
+	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet" />
 	<style type="text/css">
+		#downloadFrame {
+			display: none;
+		}
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.jqgrid.src.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 
 	<script type="text/javascript">
 		$(document).ready(function(){
@@ -35,10 +38,10 @@
 			    sortorder		   : "asc", 
 			    sortname		   : "id", 
 			    pager			   : true,
-			    rowNum			   :10,
+			    rowNum			   : 10,
 				colNames : [
 					'#',
-					'Name'
+					'<fmt:message key="label.kumalive.report.full.name"/>'
 				],
 			    colModel : [
 					{
@@ -52,10 +55,22 @@
 					   'title' : false
 					}
 			    ],
+			    onSelectRow : function(){
+				    // disable "Export selected" button when no Kumalives are selected
+			    	var noRowsSelected = $(this).jqGrid('getGridParam','selarrrow').length == 0;
+			    	$('#exportSelected').prop('disabled', noRowsSelected);
+				},
+				gridComplete : function(){
+					var noRecords = $("#organisationGrid").jqGrid('getGridParam','reccount') == 0;
+					$('#exportAll').prop('disabled', noRecords);
+				},
 			    loadError : function(xhr,st,err) {
 			    	$("#organisationGrid").clearGridData();
-			    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+			    	$.jgrid.info_dialog('<fmt:message key="error.title"/>', 
+	    					'<fmt:message key="message.kumalive.report.load.error"/>',
+	    					'<fmt:message key="button.kumalive.ok"/>');
 			    },
+			    // subgrid for learners who replied to questions during Kumalive
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
 					var kumaliveId = row_id,
@@ -63,6 +78,7 @@
 				   $("#" + subgrid_id).html("<table id='" + user_subgrid_table_id + "' class='scroll'></table><div id='"
 						 + user_subgrid_table_id + "_pager' class='scroll' ></div>");
 
+				   // fetch rubrics first so we can build column model
 				   $.ajax({
 						url: "<lams:LAMSURL />learning/kumalive.do",
 					    data: {
@@ -85,8 +101,9 @@
 
 				            $("#" + user_subgrid_table_id).jqGrid({
 				                datatype 	: 'json',
-				                url 		: "<lams:LAMSURL />learning/kumalive.do?method=getReportKumaliveData&kumaliveId=" + kumaliveId,
-				                colNames 	: ['Name'].concat(columnNames),
+				                url 		: "<lams:LAMSURL />learning/kumalive.do?method=getReportKumaliveData&kumaliveId="
+					                			+ kumaliveId,
+				                colNames 	: ['<fmt:message key="label.kumalive.report.full.name"/>'].concat(columnNames),
 				                colModel 	: [
 								      		   {
 												'name'  : 'name', 
@@ -103,8 +120,11 @@
 								sortname 	: "name", 
 								loadError 	: function(xhr,st,err) {
 						    		$("#" + user_subgrid_table_id).clearGridData();
-						    		$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+						    		$.jgrid.info_dialog('<fmt:message key="error.title"/>', 
+								    					'<fmt:message key="message.kumalive.report.load.error"/>',
+								    					'<fmt:message key="button.kumalive.ok"/>');
 						    	},
+						    	// subgrid of scores (marks) for the given learner
 						    	subGrid: true,
 								subGridRowExpanded: function(subgrid_id, row_id) {
 									var userId = row_id,
@@ -114,7 +134,8 @@
 									  
 						            $("#" + score_subgrid_table_id).jqGrid({
 						                datatype 	: 'json',
-						                url 		: "<lams:LAMSURL />learning/kumalive.do?method=getReportUserData&kumaliveId=" + kumaliveId + "&userId=" + userId,
+						                url 		: "<lams:LAMSURL />learning/kumalive.do?method=getReportUserData&kumaliveId="
+							                			+ kumaliveId + "&userId=" + userId,
 						                colNames 	: ['#'].concat(columnNames),
 						                colModel 	: [
 										      		   {
@@ -131,30 +152,52 @@
 									    shrinkToFit : true,
 										loadError 	: function(xhr,st,err) {
 								    		$("#" + score_subgrid_table_id).clearGridData();
-								    		$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+								    		$.jgrid.info_dialog('<fmt:message key="error.title"/>', 
+							    					'<fmt:message key="message.kumalive.report.load.error"/>',
+							    					'<fmt:message key="button.kumalive.ok"/>');
 								    	}
 						            });
 								}
 				            });
-				        },
-				        error: function(x, e) {
-				            alert(x.readyState + " "+ x.status +" "+ e.msg);   
 				        }
 				    });
 				}
 			});
 		});
+
+		function exportAll(){
+			$('#downloadFrame').attr('src',
+				'<lams:LAMSURL />learning/kumalive.do?method=exportKumalives&organisationID=${param.organisationID}');
+		}
+
+		function exportSelected(){
+			$('#downloadFrame').attr('src',
+				'<lams:LAMSURL />learning/kumalive.do?method=exportKumalives&kumaliveIds='
+				// return an array of IDs of rows (Kumalives) selected on all pages
+				+ JSON.stringify($("#organisationGrid").jqGrid('getGridParam','selarrrow')));
+		}
 	</script>
 	
 </lams:head>
 <body class="stripes">
 
 <lams:Page type="admin">
-	<div class="grid-holder voffset20">
+	<div id="toolbar" class="buttons btn-group-sm" style="text-align: right">
+		<button id="exportAll" class="btn btn-default" onClick="javascript:exportAll()">
+			<i class="fa fa-download"></i> 
+			<span><fmt:message key="button.kumalive.report.export.all"/></span>
+		</button>
+		<button id="exportSelected" class="btn btn-default" disabled="disabled" onClick="javascript:exportSelected()">
+			<i class="fa fa-download"></i> 
+			<span><fmt:message key="button.kumalive.report.export.selected"/></span>
+		</button>
+	</div>
+	<div class="grid-holder voffset10">
 		<table id="organisationGrid"></table>
 		<div class="tooltip-lg" id="tooltip"></div>
 	</div>
 </lams:Page>
 
+<iframe id="downloadFrame"></iframe>
 </body>
 </lams:html>

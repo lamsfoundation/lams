@@ -46,28 +46,21 @@ import org.lamsfoundation.lams.learning.kumalive.model.KumaliveScore;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.MessageService;
 
 public class KumaliveService implements IKumaliveService {
-    // ---------------------------------------------------------------------
-    // Instance variables
-    // ---------------------------------------------------------------------
     private static Logger logger = Logger.getLogger(KumaliveService.class);
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
+    private static final ExcelCell[] EMPTY_ROW = new ExcelCell[1];
 
     private IKumaliveDAO kumaliveDAO;
     private ISecurityService securityService;
+    private MessageService messageService;
 
     static {
 	DECIMAL_FORMAT.setRoundingMode(RoundingMode.HALF_UP);
-    }
-
-    public void setSecurityService(ISecurityService securityService) {
-	this.securityService = securityService;
-    }
-
-    public void setKumaliveDAO(IKumaliveDAO kumaliveDAO) {
-	this.kumaliveDAO = kumaliveDAO;
     }
 
     @Override
@@ -160,7 +153,6 @@ public class KumaliveService implements IKumaliveService {
 	}
     }
 
-    
     /**
      * Gets Kumalives for the given organisation packed into jqGrid JSON format
      */
@@ -219,29 +211,28 @@ public class KumaliveService implements IKumaliveService {
 	return resultJSON;
     }
 
-    
     /**
      * Gets learners who answered to question in the given Kumalive, packed into jqGrid JSON format
      */
     @Override
     public JSONObject getReportKumaliveData(Long kumaliveId, boolean isAscending) throws JSONException {
 	Kumalive kumalive = getKumalive(kumaliveId);
-	List<String> rubrics = new LinkedList<String>();
+	List<Long> rubrics = new LinkedList<Long>();
 	for (KumaliveRubric rubric : kumalive.getRubrics()) {
-	    rubrics.add(rubric.getName());
+	    rubrics.add(rubric.getRubricId());
 	}
 
-	// mapping learner -> rubric -> scores
-	Map<User, Map<String, List<Short>>> scores = kumaliveDAO.findKumaliveScore(kumaliveId, isAscending).stream()
+	// mapping learner -> rubric ID -> scores
+	Map<User, Map<Long, List<Short>>> scores = kumaliveDAO.findKumaliveScore(kumaliveId, isAscending).stream()
 		.collect(Collectors.groupingBy(KumaliveScore::getUser, LinkedHashMap::new,
-			Collectors.groupingBy(score -> score.getRubric().getName(),
+			Collectors.groupingBy(score -> score.getRubric().getRubricId(),
 				Collectors.mapping(KumaliveScore::getScore, Collectors.toList()))));
 
 	JSONObject resultJSON = new JSONObject();
 	resultJSON.put(GradebookConstants.ELEMENT_RECORDS, scores.size());
 
 	JSONArray rowsJSON = new JSONArray();
-	for (Entry<User, Map<String, List<Short>>> userEntry : scores.entrySet()) {
+	for (Entry<User, Map<Long, List<Short>>> userEntry : scores.entrySet()) {
 	    JSONObject rowJSON = new JSONObject();
 	    User user = userEntry.getKey();
 	    rowJSON.put(GradebookConstants.ELEMENT_ID, user.getUserId());
@@ -249,7 +240,7 @@ public class KumaliveService implements IKumaliveService {
 	    JSONArray cellJSON = new JSONArray();
 	    cellJSON.put(user.getFirstName() + " " + user.getLastName());
 	    // calculate average of scores for the given rubric
-	    for (String rubric : rubrics) {
+	    for (Long rubric : rubrics) {
 		Double score = null;
 		List<Short> attempts = userEntry.getValue().get(rubric);
 		if (attempts != null) {
@@ -280,15 +271,15 @@ public class KumaliveService implements IKumaliveService {
     @Override
     public JSONObject getReportUserData(Long kumaliveId, Integer userId) throws JSONException {
 	Kumalive kumalive = getKumalive(kumaliveId);
-	List<String> rubrics = new LinkedList<String>();
+	List<Long> rubrics = new LinkedList<Long>();
 	for (KumaliveRubric rubric : kumalive.getRubrics()) {
-	    rubrics.add(rubric.getName());
+	    rubrics.add(rubric.getRubricId());
 	}
 
-	// mapping batch (question ID) -> rubric -> score
-	Map<Long, Map<String, Short>> scores = kumaliveDAO.findKumaliveScore(kumaliveId, userId).stream()
+	// mapping batch (question ID) -> rubric ID -> score
+	Map<Long, Map<Long, Short>> scores = kumaliveDAO.findKumaliveScore(kumaliveId, userId).stream()
 		.collect(Collectors.groupingBy(KumaliveScore::getBatch, LinkedHashMap::new,
-			Collectors.toMap(score -> score.getRubric().getName(), KumaliveScore::getScore)));
+			Collectors.toMap(score -> score.getRubric().getRubricId(), KumaliveScore::getScore)));
 
 	JSONObject resultJSON = new JSONObject();
 	resultJSON.put(GradebookConstants.ELEMENT_RECORDS, scores.size());
@@ -296,14 +287,14 @@ public class KumaliveService implements IKumaliveService {
 	JSONArray rowsJSON = new JSONArray();
 	// just normal ordering of questions
 	short order = 1;
-	for (Entry<Long, Map<String, Short>> batchEntry : scores.entrySet()) {
+	for (Entry<Long, Map<Long, Short>> batchEntry : scores.entrySet()) {
 	    JSONObject rowJSON = new JSONObject();
 	    rowJSON.put(GradebookConstants.ELEMENT_ID, order);
 
 	    JSONArray cellJSON = new JSONArray();
 	    cellJSON.put(order);
 	    order++;
-	    for (String rubric : rubrics) {
+	    for (Long rubric : rubrics) {
 		Short score = batchEntry.getValue().get(rubric);
 		cellJSON.put(score == null ? "" : score);
 	    }
@@ -315,5 +306,137 @@ public class KumaliveService implements IKumaliveService {
 	resultJSON.put(GradebookConstants.ELEMENT_ROWS, rowsJSON);
 
 	return resultJSON;
+    }
+
+    /**
+     * Exports to Excel all Kumalives in the given organisation.
+     */
+    @Override
+    public LinkedHashMap<String, ExcelCell[][]> exportKumalives(Integer organisationId) {
+	List<Kumalive> kumalives = kumaliveDAO.findKumalives(organisationId, "", true);
+	return export(kumalives);
+    }
+
+    /**
+     * Exports to Excel Kumalives with given IDs.
+     */
+    @Override
+    public LinkedHashMap<String, ExcelCell[][]> exportKumalives(List<Long> kumaliveIds) {
+	List<Kumalive> kumalives = kumaliveDAO.findKumalives(kumaliveIds);
+	return export(kumalives);
+    }
+
+    /**
+     * Exports to Excel given Kumalives.
+     */
+    private LinkedHashMap<String, ExcelCell[][]> export(List<Kumalive> kumalives) {
+	List<ExcelCell[]> rows = new LinkedList<ExcelCell[]>();
+
+	// iterate over Kumalives and add them to the report
+	for (Kumalive kumalive : kumalives) {
+	    ExcelCell[] kumaliveHeaderRow = new ExcelCell[1];
+	    kumaliveHeaderRow[0] = new ExcelCell(messageService.getMessage("label.kumalive.report.name"), true);
+	    rows.add(kumaliveHeaderRow);
+
+	    ExcelCell[] kumaliveNameRow = new ExcelCell[1];
+	    kumaliveNameRow[0] = new ExcelCell(kumalive.getName(), false);
+	    rows.add(kumaliveNameRow);
+
+	    // mapping user -> batch -> rubric -> score
+	    Map<User, Map<Long, Map<Long, Short>>> scores = kumaliveDAO
+		    .findKumaliveScore(kumalive.getKumaliveId(), true).stream()
+		    .collect(Collectors.groupingBy(KumaliveScore::getUser, LinkedHashMap::new, Collectors.groupingBy(
+			    KumaliveScore::getBatch, LinkedHashMap::new,
+			    Collectors.toMap(score -> score.getRubric().getRubricId(), KumaliveScore::getScore))));
+
+	    if (scores.size() == 0) {
+		// no learners answered to question, carry on
+		ExcelCell[] noMarksRow = new ExcelCell[1];
+		noMarksRow[0] = new ExcelCell(messageService.getMessage("label.kumalive.report.mark.none"), true);
+		rows.add(noMarksRow);
+		rows.add(EMPTY_ROW);
+		continue;
+	    }
+
+	    // headers for learners
+	    ExcelCell[] marksRow = new ExcelCell[1];
+	    marksRow[0] = new ExcelCell(messageService.getMessage("label.kumalive.report.mark"), true);
+	    rows.add(marksRow);
+
+	    ExcelCell[] userHeaderRow = new ExcelCell[4 + kumalive.getRubrics().size()];
+	    userHeaderRow[0] = new ExcelCell(messageService.getMessage("label.kumalive.report.first.name"), true);
+	    userHeaderRow[1] = new ExcelCell(messageService.getMessage("label.kumalive.report.last.name"), true);
+	    userHeaderRow[2] = new ExcelCell(messageService.getMessage("label.kumalive.report.login"), true);
+	    userHeaderRow[3] = new ExcelCell(messageService.getMessage("label.kumalive.report.attempt"), true);
+	    // iterate over rubrics and make them columns
+	    int userRowLength = 4;
+	    for (KumaliveRubric rubric : kumalive.getRubrics()) {
+		userHeaderRow[userRowLength++] = new ExcelCell(rubric.getName(), true);
+	    }
+	    rows.add(userHeaderRow);
+
+	    for (Entry<User, Map<Long, Map<Long, Short>>> learnerEntry : scores.entrySet()) {
+		// learner details and average mark
+		User learner = learnerEntry.getKey();
+		ExcelCell[] userRow = new ExcelCell[userRowLength];
+		userRow[0] = new ExcelCell(learner.getFirstName(), false);
+		userRow[1] = new ExcelCell(learner.getLastName(), false);
+		userRow[2] = new ExcelCell(learner.getLogin(), false);
+		userRow[3] = new ExcelCell(messageService.getMessage("label.kumalive.report.average"), false);
+		rows.add(userRow);
+
+		// build rows for each attempt (answer to a question, batch)
+		Short[][] resultsByRubric = new Short[learnerEntry.getValue().size()][userRowLength - 4];
+		int attempt = 0;
+		for (Map<Long, Short> results : scores.get(learner).values()) {
+		    ExcelCell[] attemptRow = new ExcelCell[userRowLength];
+		    attemptRow[3] = new ExcelCell(
+			    messageService.getMessage("label.kumalive.report.attempt") + " " + (attempt + 1), false);
+		    int rubricIndex = 0;
+		    for (KumaliveRubric rubric : kumalive.getRubrics()) {
+			Short result = results.get(rubric.getRubricId());
+			attemptRow[rubricIndex + 4] = new ExcelCell(result, false);
+			// store mark to calculate average later
+			resultsByRubric[attempt][rubricIndex] = result;
+			rubricIndex++;
+		    }
+		    attempt++;
+		    rows.add(attemptRow);
+		}
+		// calculate average per each rubric and update the first learner row
+		for (int rubricIndex = 0; rubricIndex < userRowLength - 4; rubricIndex++) {
+		    int count = 0;
+		    double score = 0;
+		    for (int attemptIndex = 0; attemptIndex < resultsByRubric.length; attemptIndex++) {
+			Short result = resultsByRubric[attemptIndex][rubricIndex];
+			if (result == null) {
+			    continue;
+			}
+			score += result;
+			count++;
+		    }
+		    if (count > 0) {
+			userRow[rubricIndex + 4] = new ExcelCell(DECIMAL_FORMAT.format(score / count), false);
+		    }
+		}
+	    }
+	    rows.add(EMPTY_ROW);
+	}
+
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	dataToExport.put(messageService.getMessage("label.kumalive.report.header"), rows.toArray(new ExcelCell[][] {}));
+	return dataToExport;
+    }
+
+    public void setSecurityService(ISecurityService securityService) {
+	this.securityService = securityService;
+    }
+
+    public void setKumaliveDAO(IKumaliveDAO kumaliveDAO) {
+	this.kumaliveDAO = kumaliveDAO;
+    }
+
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
     }
 }

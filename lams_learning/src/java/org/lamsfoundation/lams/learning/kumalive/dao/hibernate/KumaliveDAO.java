@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.learning.kumalive.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learning.kumalive.dao.IKumaliveDAO;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
@@ -34,10 +35,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
-    private static final String FIND_KUMALIVE_BY_ORGANISATION = "FROM " + Kumalive.class.getName()
+    private static final String FIND_CURRENT_KUMALIVE_BY_ORGANISATION = "FROM " + Kumalive.class.getName()
 	    + " AS k WHERE k.organisation.organisationId = ? AND k.finished = 0";
     private static final String FIND_KUMALIVES_BY_ORGANISATION = "FROM " + Kumalive.class.getName()
 	    + " AS k WHERE k.organisation.organisationId = ? ORDER BY ";
+    private static final String FIND_KUMALIVES_BY_IDS = "FROM " + Kumalive.class.getName()
+	    + " AS k WHERE k.kumaliveId IN (:ids)";
     private static final String FIND_RUBRICS_BY_ORGANISATION = "FROM " + KumaliveRubric.class.getName()
 	    + " AS r WHERE r.organisation.organisationId = ? AND r.kumalive IS NULL ORDER BY r.orderId ASC";
     private static final String FIND_SCORE_BY_KUMALIVE = "FROM " + KumaliveScore.class.getName()
@@ -48,7 +51,7 @@ public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
     @Override
     @SuppressWarnings("unchecked")
     public Kumalive findKumalive(Integer organisationId) {
-	List<Kumalive> result = (List<Kumalive>) doFind(FIND_KUMALIVE_BY_ORGANISATION, organisationId);
+	List<Kumalive> result = (List<Kumalive>) doFind(FIND_CURRENT_KUMALIVE_BY_ORGANISATION, organisationId);
 	return result.isEmpty() ? null : result.get(0);
     }
 
@@ -75,6 +78,14 @@ public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
 	}
 
 	return (List<Kumalive>) doFind(query.toString(), organisationId);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Kumalive> findKumalives(List<Long> kumaliveIds) {
+	Query query = getSession().createQuery(FIND_KUMALIVES_BY_IDS);
+	query.setParameterList("ids", kumaliveIds);
+	return query.list();
     }
 
     @SuppressWarnings("unchecked")

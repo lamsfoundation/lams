@@ -89,6 +89,7 @@
 			<bean class="org.lamsfoundation.lams.learning.kumalive.service.KumaliveService">
 				<property name="securityService"><ref bean="securityService"/></property>
 				<property name="kumaliveDAO"><ref bean="kumaliveDAO"/></property>
+				<property name="messageService"><ref bean="learningMessageService"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">
@@ -98,6 +99,7 @@
 				<prop key="score*">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="export*">PROPAGATION_REQUIRED</prop>
    			</props>
 		</property>
 	</bean> 

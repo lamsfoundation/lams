@@ -33,11 +33,13 @@ import org.lamsfoundation.lams.learning.kumalive.model.KumaliveScore;
 public interface IKumaliveDAO extends IBaseDAO {
     Kumalive findKumalive(Integer organisationId);
 
-    List<KumaliveRubric> findRubrics(Integer organisationId);
-
     List<Kumalive> findKumalives(Integer organisationId, String sortColumn, boolean isAscending);
 
+    List<Kumalive> findKumalives(List<Long> kumaliveIds);
+
+    List<KumaliveRubric> findRubrics(Integer organisationId);
+
     List<KumaliveScore> findKumaliveScore(Long kumaliveId, boolean isAscending);
-    
+
     List<KumaliveScore> findKumaliveScore(Long kumaliveId, Integer userId);
 }
