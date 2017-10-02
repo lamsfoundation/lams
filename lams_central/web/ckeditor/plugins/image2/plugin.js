@@ -7,7 +7,8 @@
 
 ( function() {
 
-	var template = '<img class="img-round" alt="" src="" />',
+	//**LAMS** replaced default class "img-round" with "img-responsive"
+	var template = '<img class="img-responsive" alt="" src="" />',
 		templateBlock = new CKEDITOR.template(
 			'<figure class="{captionedClass}">' +
 				template +
