@@ -55,15 +55,8 @@
 					   'title' : false
 					}
 			    ],
-			    onSelectRow : function(){
-				    // disable "Export selected" button when no Kumalives are selected
-			    	var noRowsSelected = $(this).jqGrid('getGridParam','selarrrow').length == 0;
-			    	$('#exportSelected').prop('disabled', noRowsSelected);
-				},
-				gridComplete : function(){
-					var noRecords = $("#organisationGrid").jqGrid('getGridParam','reccount') == 0;
-					$('#exportAll').prop('disabled', noRecords);
-				},
+			    onSelectRow  : toggleExportButtons,
+				gridComplete : toggleExportButtons,
 			    loadError : function(xhr,st,err) {
 			    	$("#organisationGrid").clearGridData();
 			    	$.jgrid.info_dialog('<fmt:message key="error.title"/>', 
@@ -166,15 +159,32 @@
 		});
 
 		function exportAll(){
+			$('.exportButton').prop('disabled', true);
+			// re-enalbe after few seconds
+			setTimeout(toggleExportButtons, 3000);
+			
 			$('#downloadFrame').attr('src',
 				'<lams:LAMSURL />learning/kumalive.do?method=exportKumalives&organisationID=${param.organisationID}');
 		}
 
 		function exportSelected(){
+			$('.exportButton').prop('disabled', true);
+			// re-enalbe after few seconds
+			setTimeout(toggleExportButtons, 3000);
+			
 			$('#downloadFrame').attr('src',
 				'<lams:LAMSURL />learning/kumalive.do?method=exportKumalives&kumaliveIds='
 				// return an array of IDs of rows (Kumalives) selected on all pages
 				+ JSON.stringify($("#organisationGrid").jqGrid('getGridParam','selarrrow')));
+		}
+
+		function toggleExportButtons() {
+			var noRecords = $("#organisationGrid").jqGrid('getGridParam','reccount') == 0;
+			$('#exportAll').prop('disabled', noRecords);
+
+			// disable "Export selected" button when no Kumalives are selected
+	    	var noRowsSelected = $(this).jqGrid('getGridParam','selarrrow') == null;
+	    	$('#exportSelected').prop('disabled', noRowsSelected);
 		}
 	</script>
 	
@@ -183,11 +193,11 @@
 
 <lams:Page type="admin">
 	<div id="toolbar" class="buttons btn-group-sm" style="text-align: right">
-		<button id="exportAll" class="btn btn-default" onClick="javascript:exportAll()">
+		<button id="exportAll" class="btn btn-default exportButton" onClick="javascript:exportAll()">
 			<i class="fa fa-download"></i> 
 			<span><fmt:message key="button.kumalive.report.export.all"/></span>
 		</button>
-		<button id="exportSelected" class="btn btn-default" disabled="disabled" onClick="javascript:exportSelected()">
+		<button id="exportSelected" class="btn btn-default exportButton" disabled="disabled" onClick="javascript:exportSelected()">
 			<i class="fa fa-download"></i> 
 			<span><fmt:message key="button.kumalive.report.export.selected"/></span>
 		</button>
