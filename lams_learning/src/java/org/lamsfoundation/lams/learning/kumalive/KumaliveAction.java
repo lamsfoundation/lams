@@ -221,7 +221,7 @@ public class KumaliveAction extends LamsDispatchAction {
 	response.setContentType("application/x-download");
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 
-	ExcelUtil.createExcel(response.getOutputStream(), dataToExport, "Date", true);
+	ExcelUtil.createExcel(response.getOutputStream(), dataToExport, "Exported on:", true);
 
 	return null;
     }

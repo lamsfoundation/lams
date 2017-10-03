@@ -25,13 +25,19 @@ package org.lamsfoundation.lams.learning.kumalive.service;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -39,6 +45,7 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
+import org.lamsfoundation.lams.gradebook.util.UserComparator;
 import org.lamsfoundation.lams.learning.kumalive.dao.IKumaliveDAO;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
@@ -47,13 +54,16 @@ import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
 public class KumaliveService implements IKumaliveService {
     private static Logger logger = Logger.getLogger(KumaliveService.class);
 
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##",
+	    new DecimalFormatSymbols(Locale.ENGLISH));
     private static final ExcelCell[] EMPTY_ROW = new ExcelCell[1];
+    private static final Comparator<User> USER_COMPARATOR = new UserComparator();
 
     private IKumaliveDAO kumaliveDAO;
     private ISecurityService securityService;
@@ -330,6 +340,25 @@ public class KumaliveService implements IKumaliveService {
      * Exports to Excel given Kumalives.
      */
     private LinkedHashMap<String, ExcelCell[][]> export(List<Kumalive> kumalives) {
+	Map<User, Map<String, Map<Long, Double>>> learnerSummaries = new TreeMap<>(USER_COMPARATOR);
+
+	Organisation organisation = kumalives.get(0).getOrganisation();
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+
+	ExcelCell[][] kumalivesSheet = buildReportKumalivesSheet(kumalives, learnerSummaries);
+	dataToExport.put(messageService.getMessage("label.kumalive.report.sheet.header",
+		new Object[] { organisation.getName() }), kumalivesSheet);
+
+	ExcelCell[][] learnersSheet = buildReportLearnersSheet(kumalives, learnerSummaries);
+	dataToExport.put(messageService.getMessage("label.kumalive.report.sheet.header.learners"), learnersSheet);
+	return dataToExport;
+    }
+
+    /**
+     * Builds Kumalives summary sheet for the report
+     */
+    private ExcelCell[][] buildReportKumalivesSheet(List<Kumalive> kumalives,
+	    Map<User, Map<String, Map<Long, Double>>> learnerSummaries) {
 	List<ExcelCell[]> rows = new LinkedList<ExcelCell[]>();
 
 	// iterate over Kumalives and add them to the report
@@ -342,12 +371,13 @@ public class KumaliveService implements IKumaliveService {
 	    kumaliveNameRow[0] = new ExcelCell(kumalive.getName(), false);
 	    rows.add(kumaliveNameRow);
 
-	    // mapping user -> batch -> rubric -> score
-	    Map<User, Map<Long, Map<Long, Short>>> scores = kumaliveDAO
+	    // mapping user (sorted by name) -> batch (i.e. question ID) -> rubric -> score
+	    TreeMap<User, Map<Long, Map<Long, Short>>> scores = kumaliveDAO
 		    .findKumaliveScore(kumalive.getKumaliveId(), true).stream()
-		    .collect(Collectors.groupingBy(KumaliveScore::getUser, LinkedHashMap::new, Collectors.groupingBy(
-			    KumaliveScore::getBatch, LinkedHashMap::new,
-			    Collectors.toMap(score -> score.getRubric().getRubricId(), KumaliveScore::getScore))));
+		    .collect(Collectors.groupingBy(KumaliveScore::getUser,
+			    () -> new TreeMap<User, Map<Long, Map<Long, Short>>>(USER_COMPARATOR),
+			    Collectors.groupingBy(KumaliveScore::getBatch, TreeMap::new, Collectors
+				    .toMap(score -> score.getRubric().getRubricId(), KumaliveScore::getScore))));
 
 	    if (scores.size() == 0) {
 		// no learners answered to question, carry on
@@ -363,9 +393,9 @@ public class KumaliveService implements IKumaliveService {
 	    marksRow[0] = new ExcelCell(messageService.getMessage("label.kumalive.report.mark"), true);
 	    rows.add(marksRow);
 
-	    ExcelCell[] userHeaderRow = new ExcelCell[4 + kumalive.getRubrics().size()];
-	    userHeaderRow[0] = new ExcelCell(messageService.getMessage("label.kumalive.report.first.name"), true);
-	    userHeaderRow[1] = new ExcelCell(messageService.getMessage("label.kumalive.report.last.name"), true);
+	    ExcelCell[] userHeaderRow = new ExcelCell[5 + kumalive.getRubrics().size()];
+	    userHeaderRow[0] = new ExcelCell(messageService.getMessage("label.kumalive.report.last.name"), true);
+	    userHeaderRow[1] = new ExcelCell(messageService.getMessage("label.kumalive.report.first.name"), true);
 	    userHeaderRow[2] = new ExcelCell(messageService.getMessage("label.kumalive.report.login"), true);
 	    userHeaderRow[3] = new ExcelCell(messageService.getMessage("label.kumalive.report.attempt"), true);
 	    // iterate over rubrics and make them columns
@@ -373,12 +403,13 @@ public class KumaliveService implements IKumaliveService {
 	    for (KumaliveRubric rubric : kumalive.getRubrics()) {
 		userHeaderRow[userRowLength++] = new ExcelCell(rubric.getName(), true);
 	    }
+	    userHeaderRow[userRowLength] = new ExcelCell(messageService.getMessage("label.kumalive.report.time"), true);
 	    rows.add(userHeaderRow);
 
 	    for (Entry<User, Map<Long, Map<Long, Short>>> learnerEntry : scores.entrySet()) {
 		// learner details and average mark
 		User learner = learnerEntry.getKey();
-		ExcelCell[] userRow = new ExcelCell[userRowLength];
+		ExcelCell[] userRow = new ExcelCell[userRowLength + 1];
 		userRow[0] = new ExcelCell(learner.getFirstName(), false);
 		userRow[1] = new ExcelCell(learner.getLastName(), false);
 		userRow[2] = new ExcelCell(learner.getLogin(), false);
@@ -388,19 +419,25 @@ public class KumaliveService implements IKumaliveService {
 		// build rows for each attempt (answer to a question, batch)
 		Short[][] resultsByRubric = new Short[learnerEntry.getValue().size()][userRowLength - 4];
 		int attempt = 0;
-		for (Map<Long, Short> results : scores.get(learner).values()) {
-		    ExcelCell[] attemptRow = new ExcelCell[userRowLength];
+		Long[] rubricIds = new Long[kumalive.getRubrics().size()];
+		for (Entry<Long, Map<Long, Short>> batchEntry : scores.get(learner).entrySet()) {
+		    ExcelCell[] attemptRow = new ExcelCell[userRowLength + 1];
 		    attemptRow[3] = new ExcelCell(
 			    messageService.getMessage("label.kumalive.report.attempt") + " " + (attempt + 1), false);
 		    int rubricIndex = 0;
+		    Map<Long, Short> results = batchEntry.getValue();
 		    for (KumaliveRubric rubric : kumalive.getRubrics()) {
+			rubricIds[rubricIndex] = rubric.getRubricId();
 			Short result = results.get(rubric.getRubricId());
-			attemptRow[rubricIndex + 4] = new ExcelCell(result, false);
+			attemptRow[rubricIndex + 4] = new ExcelCell(result == null ? null : result.intValue(), false);
 			// store mark to calculate average later
 			resultsByRubric[attempt][rubricIndex] = result;
 			rubricIndex++;
 		    }
 		    attempt++;
+		    Date attemptDate = new Date(batchEntry.getKey() * 1000);
+		    attemptRow[userRowLength] = new ExcelCell(
+			    FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(attemptDate), false);
 		    rows.add(attemptRow);
 		}
 		// calculate average per each rubric and update the first learner row
@@ -416,16 +453,87 @@ public class KumaliveService implements IKumaliveService {
 			count++;
 		    }
 		    if (count > 0) {
-			userRow[rubricIndex + 4] = new ExcelCell(DECIMAL_FORMAT.format(score / count), false);
+			double average = Double.valueOf(DECIMAL_FORMAT.format(score / count));
+			userRow[rubricIndex + 4] = new ExcelCell(average, false);
+			// populate data for learners sheet
+			Map<String, Map<Long, Double>> learnerSummary = learnerSummaries.get(learner);
+			if (learnerSummary == null) {
+			    learnerSummary = new HashMap<String, Map<Long, Double>>();
+			    learnerSummaries.put(learner, learnerSummary);
+			}
+			Map<Long, Double> learnerKumaliveSummary = learnerSummary.get(kumalive.getName());
+			if (learnerKumaliveSummary == null) {
+			    learnerKumaliveSummary = new HashMap<Long, Double>();
+			    learnerSummary.put(kumalive.getName(), learnerKumaliveSummary);
+			}
+			learnerKumaliveSummary.put(rubricIds[rubricIndex], average);
 		    }
 		}
 	    }
 	    rows.add(EMPTY_ROW);
 	}
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
-	dataToExport.put(messageService.getMessage("label.kumalive.report.header"), rows.toArray(new ExcelCell[][] {}));
-	return dataToExport;
+	return rows.toArray(new ExcelCell[][] {});
+    }
+
+    /**
+     * Builds Kumalives summary sheet for the report
+     */
+    private ExcelCell[][] buildReportLearnersSheet(List<Kumalive> kumalives,
+	    Map<User, Map<String, Map<Long, Double>>> learnerSummaries) {
+	List<ExcelCell[]> rows = new LinkedList<ExcelCell[]>();
+	Map<String, Integer> kumaliveNamePosition = new HashMap<String, Integer>();
+	List<ExcelCell> userHeaderRow = new LinkedList<ExcelCell>();
+	userHeaderRow.add(new ExcelCell(messageService.getMessage("label.kumalive.report.last.name"), true));
+	userHeaderRow.add(new ExcelCell(messageService.getMessage("label.kumalive.report.first.name"), true));
+	userHeaderRow.add(new ExcelCell(messageService.getMessage("label.kumalive.report.login"), true));
+	// count cells for kumalives and their rubrics
+	int userRowLength = 3;
+	for (Kumalive kumalive : kumalives) {
+	    kumaliveNamePosition.put(kumalive.getName(), userRowLength);
+	    // use border only on first cell in kumalive
+	    boolean border = true;
+	    for (KumaliveRubric rubric : kumalive.getRubrics()) {
+		userHeaderRow.add(new ExcelCell(rubric.getName(), true, border ? 1 : 0));
+		border = false;
+		userRowLength++;
+	    }
+	}
+
+	// now that we know how long is the whole user row, we can build kumalive names row and add it first
+	ExcelCell[] kumaliveNameRow = new ExcelCell[userRowLength];
+	for (Entry<String, Integer> kumaliveNameEntry : kumaliveNamePosition.entrySet()) {
+	    kumaliveNameRow[kumaliveNameEntry.getValue()] = new ExcelCell(kumaliveNameEntry.getKey(), true, 1);
+	}
+	rows.add(kumaliveNameRow);
+	rows.add(userHeaderRow.toArray(EMPTY_ROW));
+
+	for (Entry<User, Map<String, Map<Long, Double>>> learnerSummary : learnerSummaries.entrySet()) {
+	    ExcelCell[] userRow = new ExcelCell[userRowLength];
+	    User learner = learnerSummary.getKey();
+	    userRow[0] = new ExcelCell(learner.getFirstName(), false);
+	    userRow[1] = new ExcelCell(learner.getLastName(), false);
+	    userRow[2] = new ExcelCell(learner.getLogin(), false);
+	    for (Kumalive kumalive : kumalives) {
+		Map<Long, Double> learnerKumaliveSummary = learnerSummary.getValue().get(kumalive.getName());
+		if (learnerKumaliveSummary == null) {
+		    continue;
+		}
+		int position = kumaliveNamePosition.get(kumalive.getName());
+		boolean border = true;
+		for (KumaliveRubric rubric : kumalive.getRubrics()) {
+		    Double average = learnerKumaliveSummary.get(rubric.getRubricId());
+		    if (average != null) {
+			userRow[position] = new ExcelCell(average, false, border ? 1 : 0);
+		    }
+		    border = false;
+		    position++;
+		}
+	    }
+	    rows.add(userRow);
+	}
+
+	return rows.toArray(new ExcelCell[][] {});
     }
 
     public void setSecurityService(ISecurityService securityService) {
