@@ -77,8 +77,12 @@
 					thumbheight: 80,//${thumbnailImageDimensions},
 				    data: [
 						<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
+							<c:set var="description"><div><span class="caption-description">${image.descriptionEscaped}</span></c:set>
 							<c:if test="${!image.createByAuthor && (image.createBy != null)}">
-								<c:set var="imageAddedBy" ><div class="caption-description"><fmt:message key="label.learning.added.by" /> <c:out value="${image.createBy.firstName} ${commentsImage.createBy.lastName}" escapeXml="true"/></div></c:set>
+								<c:set var="portrait"><div class="roffset5"><lams:Portrait userId="${image.createBy.userId}"/></div></c:set>
+								<c:set var="portrait">${fn:replace(portrait, "'", "\\'")}</c:set> <%-- escape the url --%>
+								<c:set var="imageAddedBy"><div class="caption-description"><fmt:message key="label.learning.added.by" />&nbsp;<c:out value="${image.createBy.firstName} ${image.createBy.lastName}" escapeXml="true"/></div></c:set>
+								<c:set var="description"><table><tr><td>${portrait}</td><td>${description}${imageAddedBy}</td></tr></table></c:set>
 							</c:if>					
 						
 							{
@@ -87,8 +91,8 @@
 								full: '<html:rewrite page="/download/?uuid="/>${image.originalFileUuid}&preferDownload=false',
 								id: '${image.uid}', // Custom anchor is used with the hash:true option.
 								caption: '<div class="caption-heading">${image.titleEscaped}</div>'
-									+ '<span class="caption-description">${image.descriptionEscaped}</span>'
-									+'${imageAddedBy}',
+									+ '${description}'
+									+'</div>',
 								//html: $('selector'), // ...or '<div>123</div>'. Custom HTML inside the frame.
 								//fit: 'cover' // Override the global fit option.
 								//any: 'Any data relative to the frame you want to store'
