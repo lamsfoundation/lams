@@ -544,9 +544,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 		learningDesignDAO.update(design);
 		
-		// if the weightings have been changed need to recalculate the marks
-		if ( gradebookService.isWeightedMarks(design) )
-		    gradebookService.recalculateTotalMarksForLesson(lesson.getLessonId());
+		// Always recalculate marks as we can't tell if weightings have been changed/added/removed.
+		// This will override any Gradebook entered *lesson* marks, but will calculate based on
+		// Gradebook entered *activity* marks.
+		gradebookService.recalculateTotalMarksForLesson(lesson.getLessonId());
 	    }
 	}
     }

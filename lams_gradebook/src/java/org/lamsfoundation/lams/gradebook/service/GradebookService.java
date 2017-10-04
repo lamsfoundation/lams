@@ -1765,12 +1765,16 @@ public class GradebookService implements IGradebookService {
 		    gradebookUserLesson.getLearner().getUserId());
 
 	Double totalMark;
-	if (oldActivityMark == null || gradebookUserLesson.getMark() == null || useWeightings) {
+	if (oldActivityMark == null || gradebookUserLesson.getMark() == null) {
 	    totalMark = calculateLessonMark(useWeightings, userActivities, markedActivity);
-	} else {
+	} else if ( ! useWeightings ) {
 	    totalMark = gradebookUserLesson.getMark() - oldActivityMark;
 	    if ( markedActivity.getMark() != null )
 		totalMark += markedActivity.getMark();
+	} else {
+	    Double oldWeightedMark = getWeightedMark(true, markedActivity, oldActivityMark);
+	    Double newWeighterMark = getWeightedMark(true, markedActivity, markedActivity.getMark());
+	    totalMark = gradebookUserLesson.getMark() - oldWeightedMark + newWeighterMark;
 	}
 
 	gradebookUserLesson.setMark(totalMark);
@@ -1780,12 +1784,13 @@ public class GradebookService implements IGradebookService {
     private Double calculateLessonMark(boolean useWeightings, List<GradebookUserActivity> userActivities, 
 	    GradebookUserActivity markedActivity) {
 	
-	Double totalMark = markedActivity != null ? getWeightedMark(useWeightings, markedActivity) : 0.0;
+	Double totalMark = markedActivity != null ?
+		getWeightedMark(useWeightings, markedActivity, markedActivity.getMark()) : 0.0;
 	
 	for ( GradebookUserActivity guact : userActivities ) {
 	    if ( markedActivity == null || guact.getUid() != markedActivity.getUid() ) {
 		if ( useWeightings ) {
-	    	    totalMark = totalMark + getWeightedMark(useWeightings, guact);
+	    	    totalMark = totalMark + getWeightedMark(useWeightings, guact, guact.getMark());
     	    	} else {
 		    totalMark = totalMark + guact.getMark();
     	    	}
@@ -1794,8 +1799,8 @@ public class GradebookService implements IGradebookService {
 	return totalMark;
     }
     
-    private Double getWeightedMark( boolean useWeightings, GradebookUserActivity guact) {
-	Double rawMark = ( guact.getMark() != null ? guact.getMark() : 0.0);
+    private Double getWeightedMark( boolean useWeightings, GradebookUserActivity guact, Double inputRawMark) {
+	Double rawMark = inputRawMark != null ? inputRawMark : 0.0;
 	if ( useWeightings ) {
 	    ToolActivity activity = guact.getActivity();
 	    ActivityEvaluation eval = activity.getEvaluation();
