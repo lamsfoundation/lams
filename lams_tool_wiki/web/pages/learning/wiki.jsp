@@ -204,20 +204,21 @@
 
                     <div class="panel panel-default" id="view">
                       <div class="panel-heading">
-                        <h4 class="panel-title">${fn:escapeXml(currentWikiPage.title)}</h4>
-                        <!-- Last edited -->
+                        <!-- Title and Last edited -->
+                        <c:choose>
+                            <c:when test="${currentWikiPage.currentWikiContentDTO.editorDTO == null}">
+                                <c:set var="lastEditName"><fmt:message key="label.wiki.history.editor.author"/></c:set>
+                            </c:when>
+                            <c:otherwise>
+                                <c:set var="lastEditPortrait"><div class="pull-right"><lams:Portrait userId="${currentWikiPage.currentWikiContentDTO.editorDTO.userId}"/></div></c:set>
+                                <c:set var="lastEditName"><c:out value="${currentWikiPage.currentWikiContentDTO.editorDTO.firstName} ${currentWikiPage.currentWikiContentDTO.editorDTO.lastName}" escapeXml="true"/></c:set>
+                            </c:otherwise>
+                        </c:choose>
+                        ${lastEditPortrait}
+                        <h4 class="panel-title">${fn:escapeXml(currentWikiPage.title)}</h4> 
                         <div class="voffset5" style="font-size: 12px">
                           <fmt:message key="label.wiki.last.edit">
-                            <fmt:param>
-                              <c:choose>
-                                <c:when test="${currentWikiPage.currentWikiContentDTO.editorDTO == null}">
-                                  <fmt:message key="label.wiki.history.editor.author"/>
-                                </c:when>
-                                <c:otherwise>
-                                  <c:out value="${currentWikiPage.currentWikiContentDTO.editorDTO.firstName} ${currentWikiPage.currentWikiContentDTO.editorDTO.lastName}" escapeXml="true"/>
-                                </c:otherwise>
-                              </c:choose>
-                            </fmt:param>
+                            <fmt:param>${lastEditName}</fmt:param>
                             <fmt:param>
                               <lams:Date value="${currentWikiPage.currentWikiContentDTO.editDate}" timeago="true"/>
                             </fmt:param>
@@ -278,7 +279,7 @@
                             <th>
                               <fmt:message key="label.wiki.history.date"></fmt:message>
                             </th>
-                            <th>
+                            <th>	
                               <fmt:message key="label.wiki.history.editor"></fmt:message>
                             </th>
                             <th>
@@ -297,6 +298,7 @@
                                 <td>
                                   <c:choose>
                                     <c:when test="${wikiContentPageVersion.editorDTO != null}">
+                                     	<lams:Portrait userId="${wikiContentPageVersion.editorDTO.userId}"/>
                                       <c:out value="${wikiContentPageVersion.editorDTO.firstName} ${wikiContentPageVersion.editorDTO.lastName}" escapeXml="true"/>
                                     </c:when>
                                     <c:otherwise>

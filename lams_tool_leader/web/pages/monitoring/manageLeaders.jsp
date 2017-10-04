@@ -44,8 +44,9 @@
 						</c:if>
 						
 						<c:forEach var="user" items="${session.userDTOs}">
-							<div>
+							<div class="voffset5">
 								<input type="radio" name="sessionId${session.sessionID}" value="${user.uid}" <c:if test="${session.groupLeader.uid == user.uid}">checked="checked"</c:if>/>
+								&nbsp;<lams:Portrait userId="${user.userId}"/>&nbsp;
 								<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 							</div>
 						</c:forEach>

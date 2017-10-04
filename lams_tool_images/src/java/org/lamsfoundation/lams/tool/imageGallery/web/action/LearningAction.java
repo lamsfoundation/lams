@@ -227,7 +227,7 @@ public class LearningAction extends Action {
 	    Set<ImageGalleryItem> groupImages = service.getImagesForGroup(imageGallery, sessionId);
 	    for (ImageGalleryItem image : groupImages) {
 
-		// initialize login name to avoid session close error in proxy object
+		// initialize login name abd userid to avoid session close error in proxy object
 		if (image.getCreateBy() != null) {
 		    image.getCreateBy().getLoginName();
 		}

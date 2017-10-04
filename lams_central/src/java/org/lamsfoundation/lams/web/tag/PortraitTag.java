@@ -103,7 +103,7 @@ public class PortraitTag extends BodyTagSupport {
 		}
 
 		JspWriter writer = pageContext.getOut();
-		writer.println(code);
+		writer.print(code);
 	    }
 
 	} catch (NumberFormatException nfe) {
