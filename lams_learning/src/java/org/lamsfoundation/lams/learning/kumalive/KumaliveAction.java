@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -220,6 +221,12 @@ public class KumaliveAction extends LamsDispatchAction {
 
 	response.setContentType("application/x-download");
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+	// set cookie that will tell JS script that export has been finished
+	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
+	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
+	fileDownloadTokenCookie.setPath("/");
+	response.addCookie(fileDownloadTokenCookie);
 
 	ExcelUtil.createExcel(response.getOutputStream(), dataToExport, "Exported on:", true);
 

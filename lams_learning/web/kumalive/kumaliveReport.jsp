@@ -18,6 +18,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
 
 	<script type="text/javascript">
 		$(document).ready(function(){
@@ -55,8 +56,8 @@
 					   'title' : false
 					}
 			    ],
-			    onSelectRow  : toggleExportButtons,
-				gridComplete : toggleExportButtons,
+			    onSelectRow  : unblockExportButtons,
+				gridComplete : unblockExportButtons,
 			    loadError : function(xhr,st,err) {
 			    	$("#organisationGrid").clearGridData();
 			    	$.jgrid.info_dialog('<fmt:message key="error.title"/>', 
@@ -159,32 +160,42 @@
 		});
 
 		function exportAll(){
-			$('.exportButton').prop('disabled', true);
-			// re-enalbe after few seconds
-			setTimeout(toggleExportButtons, 3000);
-			
-			$('#downloadFrame').attr('src',
-				'<lams:LAMSURL />learning/kumalive.do?method=exportKumalives&organisationID=${param.organisationID}');
+			 blockExportButtons('<lams:LAMSURL />learning/kumalive.do?method=exportKumalives&organisationID=${param.organisationID}');
 		}
 
 		function exportSelected(){
-			$('.exportButton').prop('disabled', true);
-			// re-enalbe after few seconds
-			setTimeout(toggleExportButtons, 3000);
-			
-			$('#downloadFrame').attr('src',
-				'<lams:LAMSURL />learning/kumalive.do?method=exportKumalives&kumaliveIds='
+			 blockExportButtons('<lams:LAMSURL />learning/kumalive.do?method=exportKumalives&kumaliveIds='
 				// return an array of IDs of rows (Kumalives) selected on all pages
 				+ JSON.stringify($("#organisationGrid").jqGrid('getGridParam','selarrrow')));
 		}
 
-		function toggleExportButtons() {
+		// based on Andrey's blockexportbutton.js in Gradebook
+		function blockExportButtons( exportExcelUrl) {
+			$('.exportButton').prop('disabled', true);
+			
+			var token = new Date().getTime(); //use the current timestamp as the token value
+			
+			fileDownloadCheckTimer = window.setInterval(function () {
+				var cookieValue = $.cookie('fileDownloadToken');
+				if (cookieValue == token) {
+					// confirmation token received, unblock the buttons
+					window.clearInterval(fileDownloadCheckTimer);
+					$.cookie('fileDownloadToken', null); //clears this cookie value
+					unblockExportButtons();
+				}
+			}, 1000);
+
+
+			$('#downloadFrame').attr('src', exportExcelUrl + "&downloadTokenValue=" + token);
+		}
+
+		function unblockExportButtons() {
 			var noRecords = $("#organisationGrid").jqGrid('getGridParam','reccount') == 0;
 			$('#exportAll').prop('disabled', noRecords);
 
 			// disable "Export selected" button when no Kumalives are selected
-	    	var noRowsSelected = $(this).jqGrid('getGridParam','selarrrow') == null;
-	    	$('#exportSelected').prop('disabled', noRowsSelected);
+			var selectedRows = $(this).jqGrid('getGridParam','selarrrow');
+	    	$('#exportSelected').prop('disabled', !selectedRows || selectedRows.length == 0);
 		}
 	</script>
 	
