@@ -1006,6 +1006,58 @@ public class GradebookService implements IGradebookService {
 
 	ExcelCell[][] activityData = rowList1.toArray(new ExcelCell[][] {});
 	dataToExport.put(getMessage("gradebook.gridtitle.activitygrid"), activityData);
+	
+
+	// -------------------- process activity excel page (simplified) --------------------------------
+
+	rowList = new LinkedList<ExcelCell[]>();
+	
+	//add header
+	ExcelCell[] simplifiedTitleRow = new ExcelCell[3 + activityToUserDTOMap.keySet().size()];
+	int count = 3;
+	for (Activity activity : activityToUserDTOMap.keySet()) {
+	    simplifiedTitleRow[count++] = new ExcelCell(activity.getTitle(), true);
+	}
+	rowList.add(simplifiedTitleRow);
+	simplifiedTitleRow = new ExcelCell[4 + activityToUserDTOMap.keySet().size()];
+	count = 0;
+	simplifiedTitleRow[count++] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
+	simplifiedTitleRow[count++] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
+	simplifiedTitleRow[count++] = new ExcelCell(getMessage("gradebook.export.login"), true);
+	for (Activity activity : activityToUserDTOMap.keySet()) {
+	    simplifiedTitleRow[count++] = new ExcelCell(getMessage("gradebook.columntitle.mark"), true);
+	}
+	simplifiedTitleRow[count] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
+	rowList.add(simplifiedTitleRow);
+	
+	//iterating through all users in a lesson
+	for (GBUserGridRowDTO userRow : userRows) {
+	    ExcelCell[] userDataRow = new ExcelCell[4 + activityToUserDTOMap.keySet().size()];
+	    count = 0;
+	    userDataRow[count++] = new ExcelCell(userRow.getLastName(), false);
+	    userDataRow[count++] = new ExcelCell(userRow.getFirstName(), false);
+	    userDataRow[count++] = new ExcelCell(userRow.getLogin(), false);
+
+	    for (Activity activity : activityToUserDTOMap.keySet()) {
+		
+		//find according userActivityMark
+		Double userActivityMark = null;
+		List<GBUserGridRowDTO> userDtos = activityToUserDTOMap.get(activity);
+		for (GBUserGridRowDTO userDto : userDtos) {
+		    if (userDto.getLogin().equals(userRow.getLogin())) {
+			userActivityMark = userDto.getMark();
+			break;
+		    }
+		}
+		userDataRow[count++] = new ExcelCell(userActivityMark, false);
+	    }
+	    
+	    userDataRow[count] = new ExcelCell(userRow.getMark(), false);
+	    rowList.add(userDataRow);
+	}
+
+	ExcelCell[][] activitySimplifiedData = rowList.toArray(new ExcelCell[][] {});
+	dataToExport.put(getMessage("gradebook.gridtitle.activitygrid") + " (simplified)", activitySimplifiedData);
 
 	// -------------------- process Learner View page --------------------------------
 
