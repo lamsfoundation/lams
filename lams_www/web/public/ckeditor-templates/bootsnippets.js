@@ -115,11 +115,11 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		css: '',
 		html: 
 		'<div class="row">' +
-		'	<div class="col-md-6 col-md-offset-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>' +
+		'	<div class="col-md-8 col-md-offset-2 lead"><em>"It is the same with people as it is with riding a bike. Only when moving can one comfortably maintain one\'s balance."</em></div>' +
 		'</div>' +
 		'<div class="row">' +
-		'	<div class="text-center voffset20">' +
-		'		<img src="https://www.w3schools.com/bootstrap/img_avatar1.png" style="width:60px">' +
+		'	<div class="text-center">' +
+		'		<img class="img-circle" src="/lams/www/public/ckeditor-templates/images/albert.jpg" style="width:80px">' +
 		'	</div>' +
 		'</div>'
 	},
@@ -221,7 +221,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		css: '',
 		html: 
 		'<div class="col-md-12">' +
-			'<img alt="..." class="img-responsive center-block" src="/lams/www/public/ckeditor-templates/images/orangutan_house.jpg">' +
+			'<img class="img-responsive center-block" src="/lams/www/public/ckeditor-templates/images/centered_image.jpg">' +
 		'</div>'
 	},
 	{
@@ -232,7 +232,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		html: 
 		'<div class="row">' +
 	    ' 	<div class="col-md-12" style="padding-left:0; padding-right:0;">' +
-	    '  		<img src="/lams/www/public/ckeditor-templates/images/orangutan_house.jpg" class="img-responsive" style="width: 100%;"/>' +
+	    '  		<img src="/lams/www/public/ckeditor-templates/images/image_full_width.jpg" class="img-responsive" style="width: 100%;"/>' +
 	    '	</div>' +
 	    '</div>'
 	},
@@ -244,7 +244,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		html: 
 		'<div class="row">' +
 		'	<div class="col-md-4 col-sm-6">' +
-		'		<img class="img-responsive" src="/lams/www/public/ckeditor-templates/images/orangutan_house.jpg">' +
+		'		<img class="img-responsive" src="/lams/www/public/ckeditor-templates/images/sanfran.jpg">' +
 		'	</div>' +
 	
 		'	<div class="col-md-8 col-sm-6">' +
@@ -260,8 +260,8 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		css: '',
 		html: 
 		'<div class="container">' +
-		'	<div class="col-md-6">' +
-		'		<img alt="test" class="img-responsive" src="/lams/www/public/ckeditor-templates/images/soaring_umbrellas.jpg">' +
+		'	<div class="col-xs-12 col-sm-9 col-sm-offset-1">' +
+		'		<img class="img-responsive" src="/lams/www/public/ckeditor-templates/images/desk.jpg">' +
 		'		<div class="carousel-caption">' +
 		'			<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eleifend, turpis non luctus tempor</h2>' +
 		'		</div>' +
@@ -276,11 +276,11 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		html: 
 		'<div class="col-md-6">' +
 		'	<div class="panel panel-default">' +
-		'		<div class="panel-heading">Image Title</div>' +
+		'		<div class="panel-heading">Image header</div>' +
 			
 		'		<div class="panel-body">' +
-		'			<img alt="" class="img-responsive center-block" src="/lams/www/public/ckeditor-templates/images/soaring_umbrellas.jpg">' +
-		'			<h4>Show the Description by default!</h4>' +
+		'			<img class="img-responsive center-block" src="/lams/www/public/ckeditor-templates/images/learn.jpg">' +
+		'			<h4>Title</h4>' +
 		'			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed in lobortis nisl, vitae iaculis sapien. Phasellus ultrices gravida massa luctus ornare. Suspendisse blandit quam elit, eu imperdiet neque semper et.</p>' +
 		'		</div>' +
 		
@@ -304,26 +304,26 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'    <div class="carousel-inner">' +
 		
 		'      <div class="item active">' +
-		'        <img src="/lams/www/public/ckeditor-templates/images/sealine.jpg" alt="Los Angeles" style="width:100%;">' +
+		'        <img src="/lams/www/public/ckeditor-templates/images/sealine.jpg" style="width:100%;">' +
 		'        <div class="carousel-caption">' +
-		'          <h3>Cape Phiolent</h3>' +
-		'          <p>Is always so much fun!</p>' +
+		'          <h3>Ireland</h3>' +
+		'          <p>Sealine</p>' +
 		'        </div>' +
 		'      </div>' +
 		
 		'      <div class="item">' +
-		'        <img src="/lams/www/public/ckeditor-templates/images/desert.jpg" alt="Chicago" style="width:100%;">' +
+		'        <img src="/lams/www/public/ckeditor-templates/images/meduana.jpg" style="width:100%;">' +
 		'        <div class="carousel-caption">' +
-		'          <h3>Iran</h3>' +
-		'          <p>Thank you, Iranian desert!</p>' +
+		'          <h3>Germany</h3>' +
+		'          <p>Speicherstadt, Hamburg</p>' +
 		'        </div>' +
 		'      </div>' +
 		    
 		'      <div class="item">' +
-		'        <img src="/lams/www/public/ckeditor-templates/images/mountain_ridge.jpg" alt="New York" style="width:100%;">' +
+		'        <img src="/lams/www/public/ckeditor-templates/images/fuji.jpg" style="width:100%;">' +
 		'        <div class="carousel-caption">' +
-		'          <h3>Tehran</h3>' +
-		'          <p>We love Tehran!</p>' +
+		'          <h3>Japan</h3>' +
+		'          <p>Mount Fuji</p>' +
 		'        </div>' +
 		'      </div>' +
 		  
@@ -348,7 +348,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'<div class="row">' +
 		'    <div class="col-md-6">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/sealine.jpg" alt="Lights" style="width:100%">' +
+		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/stairs.jpg" style="width:100%">' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -356,7 +356,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	  </div>' +
 		'	  <div class="col-md-6">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/desert.jpg" alt="Nature" style="width:100%">' +
+		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/study.jpg" style="width:100%">' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -373,7 +373,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'<div class="row">' +
 		'    <div class="col-md-4">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/sealine.jpg" alt="Lights" style="width:100%">' +
+		'	        <img src="/lams/www/public/ckeditor-templates/images/math.jpg" alt="" style="width:100%">' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -381,7 +381,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	  </div>' +
 		'	  <div class="col-md-4">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/desert.jpg" alt="Nature" style="width:100%">' +
+		'	        <img src="/lams/www/public/ckeditor-templates/images/ideas.jpg" alt="" style="width:100%">' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -389,7 +389,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	  </div>' +
 		'	  <div class="col-md-4">' +
 		'	    <div class="thumbnail">' +
-		'	        <img src="/lams/www/public/ckeditor-templates/images/mountain_ridge.jpg" alt="Fjords" style="width:100%">' +
+		'	        <img src="/lams/www/public/ckeditor-templates/images/cogs.jpg" alt="" style="width:100%">' +
 		'	        <div class="caption">' +
 		'	          <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>' +
 		'	        </div>' +
@@ -416,7 +416,7 @@ CKEDITOR.addSnippets( 'bootsnippets-multimedia', {
 		'<h2>Responsive Embed</h2>' +
 		'<p>Create a responsive video and scale it nicely to the parent element with an 16:9 aspect ratio</p>' +
 
-		'<div class="col-lg-10">' +
+		'<div class="col-lg-12">' +
 		'	<div class="embed-responsive embed-responsive-16by9" data-oembed-url="https://www.youtube.com/embed/">' +
 		'		<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/2uTMTyqQxl4"></iframe>' +
 		'	</div>' +
