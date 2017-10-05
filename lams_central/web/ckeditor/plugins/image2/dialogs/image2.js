@@ -455,7 +455,7 @@ CKEDITOR.dialog.add( 'image2', function( editor ) {
                         	var oldClasses = widget.getClasses();
                         	
                         	//add new classes
-                        	var userEnteredClasses = this.getValue().split(',');
+                        	var userEnteredClasses = this.getValue().split(',').filter(x => x);
                         	for (var i = 0; i < userEnteredClasses.length; i++) {
                         		var userEnteredClass = userEnteredClasses[i];
                         	    if (!widget.hasClass(userEnteredClass)) {
