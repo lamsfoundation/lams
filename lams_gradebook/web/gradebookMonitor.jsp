@@ -175,18 +175,20 @@
 			    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
 			    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 			    	"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
-			    	"<fmt:message key="gradebook.columntitle.mark"/>"
+			    	"<fmt:message key="gradebook.columntitle.mark"/>",
+			    	'portraitId'
 			    ],
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true},
+			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true, formatter:userNameFormatter},
 			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
 			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
 			      {name:'startDate',index:'startDate', sortable:true, editable:false, hidden:false, search:false, width:85, align:"left"},
 			      {name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:false, search:false, width:85, align:"left"},
 			      {name:'feedback',index:'feedback', sortable:true, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, search:false },
-			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
-			    ],
+			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"},
+			      {name:'portraitId', index:'portraitId', width:0, hidden: true}
+			      ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#userView").clearGridData();
 			    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
@@ -309,6 +311,7 @@
 					},
 					gridComplete: function(){
 						toolTip($(".jqgrow"), "jqgridTooltip");  // Allow tooltips for this grid	
+				   	 	initializePortraitPopover('<lams:LAMSURL/>');
 						// Load dates shown but hide straight away as all columns needed initially so that subgrid is displayed properly LDEV-4289
 						processLessonDateFields( lessonDatesHidden );
 					}
@@ -391,18 +394,22 @@
 						    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
 						    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
-						     	"<fmt:message key="gradebook.columntitle.mark"/>"
+						     	"<fmt:message key="gradebook.columntitle.mark"/>",
+							    	'portraitId',
+						     	'activityURL'
 						     ],
 						     colModel:[
 						     	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 						     	{name:'marksAvailable',index:'marksAvailable', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-						     	{name:'rowName',index:'rowName', sortable:true, editable:false},
+						     	{name:'rowName',index:'rowName', sortable:true, editable:false, formatter:userNameFormatterActivity},
 						      	{name:'status', index:'status', sortable:false, editable:false, search:false, width:30, align:"center"},
 						      	{name:'timeTaken', index:'timeTaken', sortable:true, editable: false, width:80, align:"center"},
 							    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
 							    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false, width:200, hidden:true},
-						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
+						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"},
+						     	{name:'portraitId', index:'portraitId', width:0, hidden: true},
+						     	{name:'activityURL', index:'activityURL', width:0, hidden: true}
 						     ],
 						     loadError: function(xhr,st,err) {
 					    		jQuery("#"+subgrid_table_id).clearGridData();
@@ -473,6 +480,7 @@
 						     },
 							 gridComplete: function(){
 							 	toolTip($(".jqgrow"), "jqgridTooltip");	// applying tooltips for this grid
+						   	 	initializePortraitPopover('<lams:LAMSURL/>');
 							 }
 						 }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}) // applying refresh button
 						 
@@ -514,6 +522,24 @@
 		        $('div[id^="collapse"]').on('shown.bs.collapse', function () {
 		            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
 		        })
+
+		        	function userNameFormatter (cellvalue, options, rowObject) {
+					return definePortraitPopover(rowObject.children[8].innerHTML, rowObject.id, cellvalue);
+				}
+
+		        // Combine portraits with activityURL. Both are optional so it is mix and match.
+	       	 	function userNameFormatterActivity (cellvalue, options, rowObject) {
+	       	 		var portProcessed = definePortraitPopover(rowObject.children[9].innerHTML, rowObject.id, cellvalue);
+	       	 		if ( rowObject.children.length > 10 &&  rowObject.children[10] && rowObject.children[10].innerHTML.length > 0 ) {
+	       	 			var activityURL = rowObject.children[10].innerHTML;
+	       	 			if ( portProcessed.indexOf('<a') != -1 ) {
+	       	 				return portProcessed.replace("<a ", "<a href='"+activityURL+"' ");
+	       	 			} else {
+	       	 				return "<a href='"+activityURL+"'>"+cellvalue+"</a>";
+	       	 			}
+	       	 		} 
+	       	 		return portProcessed;
+				}
 
 		        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
