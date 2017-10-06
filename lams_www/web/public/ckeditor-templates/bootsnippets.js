@@ -418,7 +418,7 @@ CKEDITOR.addSnippets( 'bootsnippets-multimedia', {
 
 		'<div class="col-lg-12">' +
 		'	<div class="embed-responsive embed-responsive-16by9" data-oembed-url="https://www.youtube.com/embed/">' +
-		'		<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/2uTMTyqQxl4"></iframe>' +
+		'		<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/nTFEUsudhfs"></iframe>' +
 		'	</div>' +
 		'</div>'
 	},
