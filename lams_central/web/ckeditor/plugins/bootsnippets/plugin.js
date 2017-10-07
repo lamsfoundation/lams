@@ -174,11 +174,18 @@
 
 			contents: [ {
 				id: 'selectTpl',
+				style: 'margin-top: -15px;',
 				//label: lang.title,
 				elements: [ 
 					{
 					type: 'vbox',
 					children: [
+					{
+						className : 'fake-object-to-focus',
+						type: 'html',
+						focus: true,
+						html: '<div></div>'
+					},
 					{
 						id: 'snippetsList',
 						type: 'html',
