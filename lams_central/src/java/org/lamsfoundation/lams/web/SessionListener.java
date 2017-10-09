@@ -95,12 +95,16 @@ public class SessionListener implements HttpSessionListener {
 	HttpSession session = sessionEvent.getSession();
 	if (session != null) {
 	    SessionManager.removeSessionByID(session.getId(), false);
-	    
+
 	    UserDTO userDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
 	    if (userDTO != null) {
 		String login = userDTO.getLogin();
 		Principal principal = new SimplePrincipal(login);
 		SessionListener.authenticationManager.flushCache(principal);
+
+		// remove obsolete mappings to session
+		// the session is either already invalidated or will be very soon by another module
+		SessionManager.removeSessionByLogin(login, false);
 	    }
 	}
     }

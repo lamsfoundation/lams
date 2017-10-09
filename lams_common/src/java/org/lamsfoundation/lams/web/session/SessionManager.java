@@ -70,14 +70,31 @@ public class SessionManager {
     public static void startSession(HttpServletRequest request) {
 	HttpSession session = request.getSession();
 	if (session.getAttribute(LOG_OUT_FLAG) != null) {
+	    // session was flagged for invalidation
 	    session.invalidate();
 	    throw new SecurityException("You were logged out");
 	}
+
 	String sessionId = session.getId();
-	SessionManager.sessionIdMapping.put(sessionId, session);
-	SessionManager.sessionManager.currentSessionIdContainer.set(sessionId);
-	if (request.getRemoteUser() != null) {
-	    SessionManager.loginMapping.put(request.getRemoteUser(), session);
+	sessionIdMapping.put(sessionId, session);
+	sessionManager.currentSessionIdContainer.set(sessionId);
+
+	// check if another session for this user already exists
+	String login = request.getRemoteUser();
+	if (login != null) {
+	    HttpSession existingSession = loginMapping.get(login);
+	    // check if it's a different session and if so, which one is newer
+	    if (existingSession != null && !existingSession.getId().equals(sessionId)) {
+		if (session.getCreationTime() > existingSession.getCreationTime()) {
+		    // mark the other session for invalidation
+		    existingSession.setAttribute(LOG_OUT_FLAG, true);
+		} else {
+		    // invalidate this session
+		    session.invalidate();
+		    throw new SecurityException("You were logged out");
+		}
+	    }
+	    loginMapping.put(login, session);
 	}
     }
 
@@ -98,7 +115,6 @@ public class SessionManager {
 	    return;
 	}
 	SessionManager.loginMapping.remove(login);
-	SessionManager.sessionIdMapping.remove(session.getId());
 
 	if (invalidate) {
 	    // only mark for invalidation, not invalidate
