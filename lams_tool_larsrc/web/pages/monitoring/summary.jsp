@@ -36,8 +36,11 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="${lams}includes/javascript/portrait.js" ></script>
 <script type="text/javascript">
 	$(document).ready(function(){
+		
+		initializePortraitPopover("<lams:LAMSURL />");
 
 		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
 		
@@ -93,27 +96,31 @@
 						   "<fmt:message key="monitoring.label.user.name"/>",
 						   "<fmt:message key="monitoring.label.access.time"/>", 
 						   "<fmt:message key="monitoring.label.complete.time"/>", 
-						   "<fmt:message key="monitoring.label.time.taken"/>"
+						   "<fmt:message key="monitoring.label.time.taken"/>",
+						   'portraitId'
 						],
 						colModel:[
 						   {name:'id', index:'id', hidden:true},
-						   {name:'userName',index:'userName', searchoptions: { clearSearch: false }},
+						   {name:'userName',index:'userName', searchoptions: { clearSearch: false }, formatter:userNameFormatter},
 						   {name:'startTime', index:'startTime', width:140, align:"center", search:false},
 						   {name:'completeTime', index:'completeTime', width:140, align:"center", search:false},
-						   {name:'timeTaken',index:'timeTaken', width:70, align:"center", search:false}
+						   {name:'timeTaken',index:'timeTaken', width:70, align:"center", search:false},
+						   {name:'portraidId',index:'portraidId', hidden:true}
 						],
 						loadError: function(xhr,st,err) {
-					    	jQuery("#"+subgridTableId).clearGridData();
-					    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
-					    }
+						    	jQuery("#"+subgridTableId).clearGridData();
+						    	jQuery.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.loaderror"/>", "<fmt:message key="label.ok"/>");
+					    },
+						loadComplete: function () {
+					   	 	initializePortraitPopover('<lams:LAMSURL/>');
+					    	}
 					})
 					.jqGrid('filterToolbar', { 
 						searchOnEnter: false
 					})
 					.navGrid("#pager-" + subgridTableId, {edit:false,add:false,del:false,search:false});
 				}
-			});
-			
+			})
    	        <c:forEach var="item" items="${groupSummary.items}" varStatus="i">
 				<c:choose>
 					<c:when test="${item.itemHide}">
@@ -183,6 +190,9 @@
 		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 	});
 	
+	function userNameFormatter (cellvalue, options, rowObject) {
+		return definePortraitPopover(rowObject[5], rowObject[0],  rowObject[1]);
+	}
 	
 	function changeItemVisibility(linkObject, itemUid, isHideItem) {
 		<c:set var="hideShowLink"><a href='<c:url value='/monitoring/changeItemVisibility.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}' class='button'> <fmt:message key='monitoring.label.show' /> </a></c:set>

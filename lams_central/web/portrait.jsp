@@ -11,6 +11,7 @@
 <lams:html>
 <lams:head>
 	<lams:css/>
+	<link rel="stylesheet" href="css/croppie.css" />
 	<style type="text/css">
 		#accordion h3 a {
 			border-bottom: 0;
@@ -26,8 +27,8 @@
 			margin-bottom: 0xp;
 		}
 		
-		#canvas, #still-portrait {
-		  display:none;
+		#canvas, #still-portrait, #upload-croppie, #save-upload-button {
+			display:none;
 		}
 	</style>
 
@@ -38,7 +39,14 @@
 	<script type="text/javascript" src="includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="includes/javascript/webrtc-capturestill.js"></script>
 	<script type="text/javascript">
-	
+		//constant for croppie.js
+		var PORTRAIT_SIZE = 400;
+	</script>
+	<script type="text/javascript" src="includes/javascript/croppie.js"></script>
+	<script type="text/javascript">
+		//variable defined in croppie.js
+		var croppieWidget;
+		
 		jQuery(document).ready(function() {
 			//handler for upload-webcam button
 			$('#upload-webcam').click(function() {
@@ -47,15 +55,50 @@
 				});
 				
 				//Creates a Blob object representing the image contained in the canvas. Which we then upload to the server.
-			    canvas.toBlob(function(blob) {
-			    	var formData = new FormData();
+				croppieWidget.croppie('result', 'blob').then(function(blob) {
+					var formData = new FormData();
 					formData.append("file", blob);
 					uploadProtraitToServerSide(formData);
-			    }, 'image/png');		
+				});	
 			});
 
 			//update dialog's height and title
 			updateMyProfileDialogSettings('<fmt:message key="title.portrait.change.screen" />', '740');
+
+			//init croppie widget on Upload tab
+			var $uploadCroppie = $('#upload-croppie').croppie({
+	  	  	    viewport: {
+	  	  	        width: PORTRAIT_SIZE,
+	  	  	        height: PORTRAIT_SIZE
+	  	  	    },
+	  	  		enforceBoundary: false,
+	  	  	    boundary: { width: 500, height: 500 }
+			});
+
+			$('#upload-input').on('change', function () { 
+				//readFile
+	 			if (this.files && this.files[0]) {
+		            var reader = new FileReader();
+		            
+		            reader.onload = function (e) {
+						$('#save-upload-button, #upload-croppie').show();
+		            		$uploadCroppie.croppie('bind', {
+		            			url: e.target.result
+		            		});
+		            }
+		            
+		            reader.readAsDataURL(this.files[0]);
+		        } else {
+			        alert("Sorry - you're browser doesn't support the FileReader API");
+			    }
+			});
+			$('#save-upload-button').on('click', function (ev) {
+				$uploadCroppie.croppie('result', 'blob').then(function(blob) {
+					var formData = new FormData();
+					formData.append("file", blob);
+					uploadProtraitToServerSide(formData);
+				});
+			});
 		});
 
 		function uploadPortraitFile() {
@@ -76,6 +119,7 @@
 				}
 			});
 		}
+
 	</script>
 </lams:head>
 
@@ -109,8 +153,8 @@
 			    	<div class="panel-title">
 			        	<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" 
 			        			aria-expanded="true" aria-controls="collapseOne">
-			          		<i class="fa fa-fw fa-camera text-primary"></i> 
-			          		<fmt:message key="label.portrait.take.snapshot.from.webcamera" />
+			          	<i class="fa fa-fw fa-camera text-primary"></i> 
+			          	<fmt:message key="label.portrait.take.snapshot.from.webcamera" />
 			        	</a>
 			    	</div>
 			    </div>
@@ -120,20 +164,18 @@
 			      			
 						<div>
 						    <video id="video">
-						    	<fmt:message key="label.video.stream.not.available" />
+						    		<fmt:message key="label.video.stream.not.available" />
 						    </video>
 						</div>
 						    
-						<a id="startbutton" class="btn btn-sm btn-file btn-default voffset5" role="button"
-								href="#nogo">
+						<a id="startbutton" class="btn btn-sm btn-file btn-default voffset5" role="button" href="#nogo">
 							<fmt:message key='label.portrait.take.snapshot' />
 						</a>
 						
 						<canvas id="canvas"></canvas>
-						
 						<div id="still-portrait">
 							<div class="output voffset10">
-								<img id="photo" alt="<fmt:message key='label.screen.capture.will.appear.in.this.box' />"> 
+								<div id="photo" ></div> 
 							</div>
 							
 							<a class="btn btn-sm btn-default voffset10" id="upload-webcam">
@@ -146,28 +188,33 @@
 			
 			<!-- Upload -->
 			<div class="panel panel-default">
-			    <div class="panel-heading" role="tab" id="headingTwo">
-			      <div class="panel-title">
-			        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-			         <i class="fa fa-fw fa-upload text-primary"></i> <fmt:message key="label.portrait.upload" />
-			        </a>
-			      </div>
-			    </div>
+				<div class="panel-heading" role="tab" id="headingTwo">
+					<div class="panel-title">
+			        		<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" 
+			        				aria-expanded="false" aria-controls="collapseTwo">
+			        			<i class="fa fa-fw fa-upload text-primary"></i> 
+			        			<fmt:message key="label.portrait.upload" />
+			        		</a>
+					</div>
+				</div>
 			    
 			    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-			    	<div class="panel-body">
+			    		<div class="panel-body">
 						<div class="form-group">
 							<label class="btn btn-default">
-								<html:file property="file" />
+								<input type="file" name="file" value="" id="upload-input" accept="image/*">
 							</label>
-							<a class="btn btn-sm btn-default offset5" onclick="uploadPortraitFile()" role="button">
-								<fmt:message key="button.save" />
-							</a>
+							
 							<p class="help-block">
 								<fmt:message key="msg.portrait.resized" />
-							</p>								
+							</p>	
+							<div id="upload-croppie"></div>
+							
+							<a class="btn btn-sm btn-default offset5" id="save-upload-button" role="button">
+								<fmt:message key='label.portrait.yes.set.it.as.portrait' />
+							</a>
 						</div>
-			    	</div>
+			    		</div>
 			    </div>
 			</div>
 		</div>

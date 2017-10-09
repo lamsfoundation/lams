@@ -542,7 +542,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public List<VisitLogDTO> getPagedVisitLogsBySessionAndItem(Long sessionId, Long itemUid, int page, int size,
 	    String sortBy, String sortOrder, String searchString) {
 	return resourceItemVisitDao.getPagedVisitLogsBySessionAndItem(sessionId, itemUid, page, size, sortBy, sortOrder,
-		searchString);
+		searchString, userManagementService);
     }
 
     @Override

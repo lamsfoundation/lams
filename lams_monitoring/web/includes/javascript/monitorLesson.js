@@ -760,8 +760,8 @@ function initSequenceTab(){
     // initialise lesson dialog
 	var learnerGroupDialog = showDialog('learnerGroupDialog',{
 			'autoOpen'  : false,
-			'width'     : 400,
-			'height'	: 430,
+			'width'     : 450,
+			'height'	: 450,
 			'resizable' : true,
 			'open'      : function(){
 				autoRefreshBlocked = true;
@@ -1868,6 +1868,7 @@ function updateLearnerProgressHeader(pageNumber) {
  * Load the give page of learners' progress.
  */
 function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
+
 	// prevent double refresh at the same time
 	if (learnersRefreshInProgress) {
 		return;
@@ -1877,7 +1878,7 @@ function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
 	if (!learnerProgressCellsTemplate) {
 		// fill the placeholder, after all required variables were initialised
 		learnerProgressCellsTemplate =
-		  '<tr><td class="active" id="progressBarLabel;00;"><strong>;11;</strong>';
+		  '<tr><td class="active progressBarLabel" id="progressBarLabel;00;"><div id="portrait-;00;" class="roffset5"/><span class="portrait-sm-lineheight" style="font-weight: bold">;11;</span>';
 
 		learnerProgressCellsTemplate +=
 			'<a class="btn btn-xs btn-default pull-right tour-email-button" href="#" onClick="javascript:showEmailDialog(;00;)"><i class="fa fa-envelope-o"></i> '
@@ -1927,6 +1928,7 @@ function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
 						.replace(/;00;/g, this.id)
 						.replace(/;11;/g, getLearnerDisplayName(this));
 					$(learnerProgressCellsInstance).appendTo('#tabLearnersTable');
+					addPortrait($("#portrait-"+this.id), this.portraitId, this.id, 'small', true, LAMS_URL );
 					
 					// request data to build progress bar SVG
 					fillProgressBar(barId);
@@ -2125,7 +2127,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 	
 	// hide unnecessary controls
 	togglePagingCells(learnerGroupDialog, pageNumber, maxPageNumber);
-	
+
 	$.each(learners, function(learnerIndex, learner) {
 		var viewUrl = allowView ? LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
         				       	  + learner.id + '&activityID=' + ajaxProperties.data.activityID + '&lessonID=' + lessonId
@@ -2135,9 +2137,17 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 									'viewUrl'    : viewUrl
 									})
 			                      .addClass('dialogListItem')
-							      .html(getLearnerDisplayName(learner))
-							      .appendTo(learnerGroupList);
-			
+							      .appendTo(learnerGroupList),
+				portraitDiv = $('<div />').attr({
+						'id': 'user-'+learner.id,
+						})
+						.addClass('roffset5')
+						.appendTo(learnerDiv);
+				addPortrait( portraitDiv, learner.portraitId, learner.id, 'small', true, LAMS_URL );
+				$('<span/>').html(getLearnerDisplayName(learner))
+					.addClass('portrait-sm-lineheight')
+					.appendTo(learnerDiv);
+
 		if (allowForceComplete || allowView || allowEmail) {
 			learnerDiv.click(function(event){
 				// select the learner

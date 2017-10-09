@@ -29,21 +29,26 @@
 						<c:if test="${sessionMap.monitorVerificationRequired}">
 							,'<fmt:message key="label.monitoring.summary.confirm.completion" />'
 						</c:if>
+						,'portraitId'
 						],
 			   	colModel:[
 			   		{name:'userUid',index:'userUid', width:0, hidden: true}
-			   		,{name:'userName',index:'userName', width:200, searchoptions: { clearSearch: false }}
+			   		,{name:'userName',index:'userName', width:200, searchoptions: { clearSearch: false }, formatter:userNameFormatter}
 			   		<c:forEach var="item" items="${sessionDto.taskListItems}" varStatus="status">
 			   			,{name:'item${status.index}',index:'item${status.index}', width:100, sortable:false, search:false, align:"center"}
 			   		</c:forEach>
 			   		<c:if test="${sessionMap.monitorVerificationRequired}">
 			   			,{name:'monitorVerificationRequired',index:'monitorVerificationRequired', width:130, sortable:false, search:false, align:"center"}
 			   		</c:if>
+			   		,{name:'portraitId', index:'portraitId', width:0, hidden: true},
 			   	],
 			   	loadError: function(xhr,st,err) {
 			   		jQuery("#group${sessionDto.sessionId}").clearGridData();
 			   		info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
-			   	}
+			   	},
+			    loadComplete: function () {
+			   	 	initializePortraitPopover('<lams:LAMSURL/>');
+			    	}
 			})
 			.jqGrid('filterToolbar', { 
  	 			searchOnEnter: false
@@ -71,6 +76,10 @@
 		};
 		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 	});
+
+	function userNameFormatter (cellvalue, options, rowObject) {
+		return definePortraitPopover(rowObject[rowObject.length-1], rowObject[0],  rowObject[1]);
+	}
 
 	function summaryTask(itemUid){
 		var myUrl = "<c:url value="/monitoring/itemSummary.do"/>?sessionMapID=${sessionMapID}&toolContentID=${toolContentID}&itemUid=" + itemUid;

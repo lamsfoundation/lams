@@ -230,7 +230,8 @@ public class MonitoringAction extends Action {
 		Object[] rawRow = rawRows.get(i);
 		ObjectNode cell = JsonNodeFactory.instance.objectNode();
 		cell.put("itemId", (Long) rawRow[0]);
-		cell.put("itemDescription", (String) rawRow[3]);
+		cell.put("itemDescription", (String) rawRow[2]);
+		cell.put("itemDescription2", (String) rawRow[3]);
 
 		Number numCommentsNumber = (Number) rawRow[1];
 		int numComments = numCommentsNumber != null ? numCommentsNumber.intValue() : 0;

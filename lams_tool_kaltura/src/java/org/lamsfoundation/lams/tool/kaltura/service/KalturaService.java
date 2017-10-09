@@ -400,6 +400,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 		if (entry != null) {
 		    NotebookEntryDTO notebookEntryDTO = new NotebookEntryDTO(entry);
 		    notebookEntryDTO.setFullName(user.getFirstName() + " " + user.getLastName());
+		    notebookEntryDTO.setUserId(user.getUserId());
 		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified()
 			    : entry.getCreateDate();
 		    notebookEntryDTO.setLastModified(postedDate);

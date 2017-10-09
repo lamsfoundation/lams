@@ -404,7 +404,7 @@
       <icon></icon>
       <name>Portrait</name>
       <tag-class>org.lamsfoundation.lams.web.tag.PortraitTag</tag-class>
-      <body-content>empty</body-content>
+      <body-content>JSP</body-content>
       <attribute>
          <name>userId</name>
          <required>true</required>
@@ -420,6 +420,12 @@
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
          <description>If true shows the portrait as a round dot. Defaults to true.</description>
+      </attribute>
+      <attribute>
+         <name>hover</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+         <description>If true then display as a hover box. Uses the body of the tag as the link text.</description>
       </attribute>
    </tag>
 	

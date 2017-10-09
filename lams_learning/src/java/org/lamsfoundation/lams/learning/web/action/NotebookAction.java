@@ -105,42 +105,52 @@ public class NotebookAction extends LamsDispatchAction {
     public ActionForward viewAllJournals(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	// List of Journal entries
-	List<NotebookEntry> journals = null;
 
 	DynaActionForm notebookForm = (DynaActionForm) actionForm;
 
-	// lesson service
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-
 	// getting requested object according to coming parameters
 	Integer userID = LearningWebUtil.getUserId();
-
-	// lessonID
-	Long lessonID = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
-	Lesson lesson = learnerService.getLesson(lessonID);
-
-	// check user has permission
 	User user = (User) LearnerServiceProxy.getUserManagementService(getServlet().getServletContext())
 		.findById(User.class, userID);
-
-	if ((lesson.getUser() != null) && lesson.getUser().getUserId().equals(userID)) {
-	    journals = getJournals(lesson.getLessonId());
-	}
-
-	if ((lesson == null) || (lesson.getLessonClass() == null) || !lesson.getLessonClass().isStaffMember(user)) {
+	
+	// lesson service
+	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	Long lessonID = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
+	Lesson lesson = learnerService.getLesson(lessonID);
+	
+	if ( ! hasStaffAccessToJournals(user, lesson) ) {
 	    throw new UserAccessDeniedException(
-		    "User " + userID + " may not retrieve journal entries for lesson " + lesson.getLessonId());
-	} else if (journals == null) {
-	    journals = getJournals(lesson.getLessonId());
+		    "User " + userID + " may not retrieve journal entries for lesson " + lessonID);
 	}
 
+	// List of Journal entries
+	List<NotebookEntry> journals = getJournals(lesson.getLessonId());
 	request.getSession().setAttribute("journals", journals);
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonID);
 
 	return mapping.findForward(NotebookAction.VIEW_JOURNALS);
     }
 
+    // check user has permission to access all the journals for a lesson
+    private boolean hasStaffAccessToJournals(User user, Lesson lesson) {
+	
+	if (lesson == null) {
+	    return false;
+	}
+
+	// lesson owner okay
+	if ((lesson.getUser() != null) && lesson.getUser().getUserId().equals(user.getUserId())) {
+	    return true;
+	}
+
+	// staff member okay
+	if ((lesson.getLessonClass() != null) && lesson.getLessonClass().isStaffMember(user)) {
+	    return true;
+	} 
+	
+	return false;
+    }
+    
     /**
      *
      * @param lessonID
@@ -174,6 +184,21 @@ public class NotebookAction extends LamsDispatchAction {
 	String mode = WebUtil.readStrParam(request, "mode", true);
 
 	NotebookEntry entry = notebookService.getEntry(uid);
+
+	// getting requested object according to coming parameters
+	Integer userID = LearningWebUtil.getUserId();
+	User user = (User) LearnerServiceProxy.getUserManagementService(getServlet().getServletContext())
+		.findById(User.class, userID);
+
+	if ( entry.getUser() != null && ! entry.getUser().getUserId().equals(user.getUserId()) ) {
+	    // wants to look at someone else's entry - check they are a teacher
+	    ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	    Lesson lesson = learnerService.getLesson(currentLessonID);
+	    if ( ! hasStaffAccessToJournals(user, lesson) ) {
+		throw new UserAccessDeniedException(
+		    "User " + userID + " may not retrieve journal entries for lesson " + currentLessonID);
+	    }
+	}
 
 	if (mode != null) {
 	    request.setAttribute("mode", mode);

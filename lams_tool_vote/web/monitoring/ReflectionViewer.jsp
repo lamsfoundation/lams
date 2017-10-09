@@ -47,7 +47,7 @@
 
 							rows += '<tr>';
 							rows += '<td>';
-							rows += userData["userName"];
+							rows += definePortraitPopover(userData["portraitId"], userData["userId"], userData["userName"], userData["userName"]);
 							rows += '</td>';
 
 							rows += '<td>';
@@ -67,6 +67,10 @@
 			            
 			    	}
 				}				
+			})
+			// bind to pager events
+			.bind('pagerInitialized pagerComplete', function(event, options){
+				initializePortraitPopover('<lams:LAMSURL />');
 			})
 		});
   	})

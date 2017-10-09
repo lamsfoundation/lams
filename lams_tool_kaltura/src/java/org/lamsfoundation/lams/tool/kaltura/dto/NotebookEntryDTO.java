@@ -7,6 +7,8 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 public class NotebookEntryDTO {
 
     private Long uid;
+    
+    private Long userId;
 
     private String entry;
 
@@ -61,6 +63,14 @@ public class NotebookEntryDTO {
 
     public void setFullName(String fullName) {
 	this.fullName = fullName;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
 }

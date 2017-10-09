@@ -108,6 +108,10 @@ public class GradebookService implements IGradebookService {
     private static Logger logger = Logger.getLogger(GradebookService.class);
 
     private static final ExcelCell[] EMPTY_ROW = new ExcelCell[4];
+    
+    private static final String TOOL_SIGNATURE_ASSESSMENT = "laasse10";
+    public static final String TOOL_SIGNATURE_SCRATCHIE = "lascrt11";
+    public static final String TOOL_SIGNATURE_MCQ = "lamc11";
 
     // Services
     private ILamsCoreToolService toolService;
@@ -954,13 +958,73 @@ public class GradebookService implements IGradebookService {
 	    userDataRow[5] = new ExcelCell(userRow.getMark(), false);
 	    rowList.add(userDataRow);
 	}
+	rowList.add(GradebookService.EMPTY_ROW);
+
+	// -- Summary for activity marks (simplified) ---
+
+	Map<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = getDataForLessonGradebookExport(lesson);
+	//filter out all activities that doesn't have numeric outputs
+	Map<ToolActivity, List<GBUserGridRowDTO>> filteredActivityToUserDTOMap = new LinkedHashMap<ToolActivity, List<GBUserGridRowDTO>>();
+	for (ToolActivity activity : activityToUserDTOMap.keySet()) {
+	    String toolSignature = activity.getTool().getToolSignature();
+	    //check whether toolActivity has a NumericToolOutput
+	    if (!activity.getActivityEvaluations().isEmpty() && (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
+		    || TOOL_SIGNATURE_MCQ.equals(toolSignature) || TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature))) {
+		filteredActivityToUserDTOMap.put(activity, activityToUserDTOMap.get(activity));
+	    }
+	}
+	
+	//add header
+	ExcelCell[] headerRow = new ExcelCell[1];
+	headerRow[0] = new ExcelCell(getMessage("gradebook.summary.activity.marks"), true);
+	rowList.add(headerRow);
+	headerRow = new ExcelCell[3 + filteredActivityToUserDTOMap.keySet().size()];
+	int count = 3;
+	for (Activity activity : filteredActivityToUserDTOMap.keySet()) {
+	    headerRow[count++] = new ExcelCell(activity.getTitle(), true);
+	}
+	rowList.add(headerRow);
+	headerRow = new ExcelCell[4 + filteredActivityToUserDTOMap.keySet().size()];
+	count = 0;
+	headerRow[count++] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
+	headerRow[count++] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
+	headerRow[count++] = new ExcelCell(getMessage("gradebook.export.login"), true);
+	for (Activity activity : filteredActivityToUserDTOMap.keySet()) {
+	    headerRow[count++] = new ExcelCell(getMessage("gradebook.columntitle.mark"), true);
+	}
+	headerRow[count] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
+	rowList.add(headerRow);
+	
+	//iterating through all users in a lesson
+	for (GBUserGridRowDTO userRow : userRows) {
+	    ExcelCell[] userDataRow = new ExcelCell[4 + filteredActivityToUserDTOMap.keySet().size()];
+	    count = 0;
+	    userDataRow[count++] = new ExcelCell(userRow.getLastName(), false);
+	    userDataRow[count++] = new ExcelCell(userRow.getFirstName(), false);
+	    userDataRow[count++] = new ExcelCell(userRow.getLogin(), false);
+
+	    for (Activity activity : filteredActivityToUserDTOMap.keySet()) {
+		
+		//find according userActivityMark
+		Double userActivityMark = null;
+		List<GBUserGridRowDTO> userDtos = filteredActivityToUserDTOMap.get(activity);
+		for (GBUserGridRowDTO userDto : userDtos) {
+		    if (userDto.getLogin().equals(userRow.getLogin())) {
+			userActivityMark = userDto.getMark();
+			break;
+		    }
+		}
+		userDataRow[count++] = new ExcelCell(userActivityMark, false);
+	    }
+	    
+	    userDataRow[count] = new ExcelCell(userRow.getMark(), false);
+	    rowList.add(userDataRow);
+	}
 
 	ExcelCell[][] summaryData = rowList.toArray(new ExcelCell[][] {});
 	dataToExport.put(getMessage("gradebook.export.lesson.summary"), summaryData);
 
 	// -------------------- process activity excel page --------------------------------
-
-	Map<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = getDataForLessonGradebookExport(lesson);
 	List<ExcelCell[]> rowList1 = new LinkedList<ExcelCell[]>();
 
 	for (Activity activity : activityToUserDTOMap.keySet()) {
@@ -969,7 +1033,7 @@ public class GradebookService implements IGradebookService {
 	    activityTitleRow[0] = new ExcelCell(activity.getTitle(), true);
 	    rowList1.add(activityTitleRow);
 
-	    int count = 0;
+	    count = 0;
 	    ExcelCell[] titleRow = new ExcelCell[7];
 	    titleRow[count++] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
 	    titleRow[count++] = new ExcelCell(getMessage("gradebook.export.first.name"), true);

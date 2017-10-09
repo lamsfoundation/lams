@@ -47,7 +47,7 @@
 
 							rows += '<tr>';
 							rows += '<td>';
-							rows += userData["userName"];
+							rows += definePortraitPopover(userData["portraitId"], userData["userId"], userData["userName"], userData["userName"]);
 							rows += '</td>';
 
 							rows += '<td>';
@@ -72,11 +72,13 @@
 			// bind to pager events
 			.bind('pagerInitialized pagerComplete', function(event, options){
 				$("time.timeago").timeago();
+				initializePortraitPopover('<lams:LAMSURL />');
 			})
 		});
   	})
+
 </script>	
-	</lams:head>
+</lams:head>
 <body class="stripes">
 	<c:set var="title"><fmt:message key="label.learnersVoted"/></c:set>
 	<lams:Page type="learner" title="${title}">

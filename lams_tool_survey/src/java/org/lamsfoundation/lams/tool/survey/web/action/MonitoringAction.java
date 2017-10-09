@@ -233,6 +233,7 @@ public class MonitoringAction extends Action {
 	    SurveyUser user = (SurveyUser) userAndAnswers[0];
 	    responseRow.put(SurveyConstants.ATTR_USER_NAME,
 		    StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+	    responseRow.put(SurveyConstants.ATTR_USER_ID, user.getUserId());
 
 	    if (userAndAnswers.length > 1 && userAndAnswers[1] != null) {
 		responseRow.put("choices",
@@ -255,6 +256,9 @@ public class MonitoringAction extends Action {
 		    answer = answer.replaceAll("\n", "<br>");
 		}
 		responseRow.put("answerText", answer);
+	    }
+	    if (userAndAnswers.length > 3 && userAndAnswers[3] != null) {
+		responseRow.put(SurveyConstants.ATTR_PORTRAIT_ID, ((Number)userAndAnswers[3]).longValue());
 	    }
 	    rows.add(responseRow);
 	}
@@ -307,10 +311,15 @@ public class MonitoringAction extends Action {
 	    SurveyUser user = (SurveyUser) userAndReflection[0];
 	    responseRow.put(SurveyConstants.ATTR_USER_NAME,
 		    StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+	    responseRow.put(SurveyConstants.ATTR_USER_ID, user.getUserId());
 
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
 		String reflection = StringEscapeUtils.escapeHtml((String) userAndReflection[1]);
 		responseRow.put(SurveyConstants.ATTR_REFLECTION, reflection.replaceAll("\n", "<br>"));
+	    }
+
+	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
+		responseRow.put(SurveyConstants.ATTR_PORTRAIT_ID, ((Number)userAndReflection[2]).longValue());
 	    }
 
 	    rows.add(responseRow);

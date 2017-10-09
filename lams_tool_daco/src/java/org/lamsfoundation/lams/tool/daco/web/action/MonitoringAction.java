@@ -262,6 +262,9 @@ public class MonitoringAction extends Action {
 		responseRow.put(DacoConstants.NOTEBOOK_ENTRY,
 			StringEscapeUtils.escapeHtml((String) userAndReflection[2]));
 	    }
+	    if (userAndReflection.length > 3 && userAndReflection[3] != null) {
+		responseRow.put(DacoConstants.PORTRAIT_ID, (String) userAndReflection[3]);
+	    }
 	    rows.add(responseRow);
 	}
 	responsedata.set("rows", rows);

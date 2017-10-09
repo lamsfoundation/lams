@@ -1,6 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>
 
+<script type="text/javascript">
+$(document).ready(function(){
+		initializePortraitPopover('<lams:LAMSURL />');
+});
+</script>
+
 <html:form action="/monitoring" styleId="monitoringForm" method="post" enctype="multipart/form-data">
 
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
@@ -60,20 +66,21 @@
 		<!-- Wiki main -->
 	     <div class="panel panel-default" id="view">
 	       <div class="panel-heading">
+	         <!-- Title & Last edited -->
+             <c:choose>
+               <c:when test="${currentWikiPage.currentWikiContentDTO.editorDTO == null}">
+                  <c:set var="lastEditName"><fmt:message key="label.wiki.history.editor.author"/></c:set>
+               </c:when>
+               <c:otherwise>
+                <c:set var="lastEditPortrait"><div class="pull-right"><lams:Portrait userId="${currentWikiPage.currentWikiContentDTO.editorDTO.userId}"/></div></c:set>
+                  <c:set var="lastEditName"><c:out value="${currentWikiPage.currentWikiContentDTO.editorDTO.firstName} ${currentWikiPage.currentWikiContentDTO.editorDTO.lastName}" escapeXml="true"/></c:set>
+               </c:otherwise>
+             </c:choose>
+             ${lastEditPortrait}
 	         <h4 class="panel-title">${fn:escapeXml(currentWikiPage.title)}</h4>
-	         <!-- Last edited -->
 	         <div class="voffset5" style="font-size: 12px">
 	           <fmt:message key="label.wiki.last.edit">
-	             <fmt:param>
-	               <c:choose>
-	                 <c:when test="${currentWikiPage.currentWikiContentDTO.editorDTO == null}">
-	                   <fmt:message key="label.wiki.history.editor.author"/>
-	                 </c:when>
-	                 <c:otherwise>
-	                   <c:out value="${currentWikiPage.currentWikiContentDTO.editorDTO.firstName} ${currentWikiPage.currentWikiContentDTO.editorDTO.lastName}" escapeXml="true"/>
-	                 </c:otherwise>
-	               </c:choose>
-	             </fmt:param>
+	             <fmt:param>${lastEditName}</fmt:param>
 	             <fmt:param>
 	               <lams:Date value="${currentWikiPage.currentWikiContentDTO.editDate}" timeago="true"/>
 	             </fmt:param>
@@ -123,6 +130,7 @@
 								<td>
 									<c:choose>
 										<c:when test="${wikiContentPageVersion.editorDTO != null}">
+	                                     	<lams:Portrait userId="${wikiContentPageVersion.editorDTO.userId}"/>
 											${wikiContentPageVersion.editorDTO.firstName} ${wikiContentPageVersion.editorDTO.lastName}
 										</c:when>
 										<c:otherwise>
@@ -261,7 +269,7 @@
 				<c:if test="${not empty user.notebookEntry}">
 					<tr>
 						<td>
-							${user.firstName} ${user.lastName}
+							<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
 						</td>
 						<td>
 							<lams:out escapeHtml="true" value="${user.notebookEntry}" />

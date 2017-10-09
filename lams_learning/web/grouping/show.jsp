@@ -56,7 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<td width="15%"><strong><c:out value="${group.groupName}" /></strong></td>
 								<td><c:forEach items="${group.users}" var="user">
 										<div name="u-${user.userId}" class="user-container">
-											<i name="ui-${user.userId}" class="fa fa-xs fa-user"></i>&nbsp;<c:out value="${user.firstName}" />&nbsp<c:out value="${user.lastName}" />
+											<lams:Portrait userId="${user.userId}"/>&nbsp;<c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />
 										</div>
 									</c:forEach></td>
 							</tr>

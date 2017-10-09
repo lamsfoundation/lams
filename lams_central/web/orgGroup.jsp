@@ -17,6 +17,7 @@
 	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
 	<script type="text/javascript" src="includes/javascript/orgGroup.js"></script>
+	<script type="text/javascript" src="includes/javascript/portrait.js"></script>
 	<script type="text/javascript">;
 		var grouping = ${grouping},
 			organisationId = grouping.organisationId,

@@ -49,14 +49,13 @@
 				</c:if>
 			</c:if>
 
-			<div class="media">
-  				<div class="media-left">
-					<i class="ui-icon ui-icon-info"></i>
-				</div>
-				<div class="media-body">
-					<small><fmt:message key="register.if.you.want.to.signup" />x</small>
-				</div>
-			</div>
+            <div class="alert alert-info">
+                <ul class="fa-ul">
+                    <li><i class="fa fa-info-circle fa-li fa-lg"></i>
+                        <fmt:message key="register.if.you.want.to.signup" />
+                    </li>
+                </ul>
+            </div>    
 
 			<c:if test="${not empty error}">
 				<lams:Alert type="danger" id="errors" close="false">

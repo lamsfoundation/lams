@@ -367,12 +367,14 @@ public class MonitoringAction extends Action {
 	    if (groupLeader != null) {
 
 		float assessmentResult = service.getLastTotalScoreByUser(assessment.getUid(), groupLeader.getUserId());
+		Long portraitId = service.getPortraitId(groupLeader.getUserId());
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setUserId(groupLeader.getUserId());
 		userDto.setFirstName(groupLeader.getFirstName());
 		userDto.setLastName(groupLeader.getLastName());
 		userDto.setGrade(assessmentResult);
+		userDto.setPortraitId(portraitId);
 		userDtos.add(userDto);
 		countSessionUsers = 1;
 	    }
@@ -397,6 +399,8 @@ public class MonitoringAction extends Action {
 	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " " + userDto.getLastName());
 	    userData.add(fullName);
 	    userData.add(userDto.getGrade());
+	    if (userDto.getPortraitId() != null ) 
+		userData.add(userDto.getPortraitId());
 
 	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);

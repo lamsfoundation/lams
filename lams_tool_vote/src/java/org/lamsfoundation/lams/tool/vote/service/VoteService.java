@@ -1680,7 +1680,7 @@ public class VoteService
     public List<Object[]> getUserAttemptsForTablesorter(Long sessionUid, Long questionUid, int page, int size,
 	    int sorting, String searchString) {
 	return voteUsrAttemptDAO.getUserAttemptsForTablesorter(sessionUid, questionUid, page, size, sorting,
-		searchString);
+		searchString, userManagementService);
     }
 
     @Override
@@ -1692,7 +1692,7 @@ public class VoteService
     public List<Object[]> getUserReflectionsForTablesorter(Long sessionUid, int page, int size, int sorting,
 	    String searchString) {
 	return voteUsrAttemptDAO.getUserReflectionsForTablesorter(sessionUid, page, size, sorting, searchString,
-		getCoreNotebookService());
+		getCoreNotebookService(), userManagementService);
     }
 
     @Override
@@ -1710,7 +1710,7 @@ public class VoteService
     public List<OpenTextAnswerDTO> getUserOpenTextAttemptsForTablesorter(Long sessionUid, Long contentUid, int page,
 	    int size, int sorting, String searchStringVote, String searchStringUsername) {
 	return voteUsrAttemptDAO.getUserOpenTextAttemptsForTablesorter(sessionUid, contentUid, page, size, sorting,
-		searchStringVote, searchStringUsername);
+		searchStringVote, searchStringUsername, userManagementService);
     }
 
     @Override

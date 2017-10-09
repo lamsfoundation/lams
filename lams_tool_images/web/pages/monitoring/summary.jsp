@@ -1,6 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	initializePortraitPopover('${lams}');
+});
+</script>
 
 <div class="panel">
 	<h4>
@@ -94,7 +102,7 @@
 						   	<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false
 						</c:set>
 						<c:set var="url" >
-							<c:url value='/monitoring/imageSummary.do'/>?sessionMapID=${sessionMapID}&imageUid=${image.uid}&KeepThis=true&TB_iframe=true&modal=true&toolSessionID=${sessionId}
+							<c:url value='/monitoring/imageSummary.do'/>?sessionMapID=${sessionMapID}&imageUid=${image.uid}&toolSessionID=${sessionId}&KeepThis=true&TB_iframe=true&modal=true
 						</c:set>				
 						<a href="${url}" class="thickbox" title="<fmt:message key='label.monitoring.imagesummary.image.summary' />" style="border-style: none;"> 
 							<c:set var="title">
@@ -107,15 +115,24 @@
 					<td style="vertical-align:middle;">
 						<c:set var="title">
 							<c:out value="${image.title}" escapeXml="true"/>
-							<c:if test="${!summary.itemCreateByAuthor}">
-								[ <fmt:message key="label.monitoring.by"/> <c:out value="${summary.username}" escapeXml="true"/> ]
-							</c:if>						
 						</c:set>
-						<a href="${url}" class="thickbox">
-							<c:out value="${title}" escapeXml="false"/>
-						</a>
+						<a href="${url}" class="thickbox"><c:out value="${title}" escapeXml="false"/></a>
+
+						<c:if test="${! summary.itemCreateByAuthor}">
+							<c:set var="portraitURL"><lams:Portrait userId="${summary.userId}" hover="true"><c:out value="${summary.username}" escapeXml="true"/></lams:Portrait></c:set>
+							<c:choose>
+							<c:when test="${fn:containsIgnoreCase(portraitURL,'<a ')}">
+								<c:set var="authorref">${fn:replace(portraitURL, "class=\"", "href=\"REPLACEMEURL\" class=\"thickbox ")}</c:set>
+								<c:set var="authorref">${fn:replace(authorref, "REPLACEMEURL", url)}</c:set>
+							</c:when>
+							<c:otherwise>
+								<c:set var="authorref"><c:out value="${summary.username}" escapeXml="true"/></c:set>
+							</c:otherwise>
+							</c:choose>
+							[ <fmt:message key="label.monitoring.by"/>&nbsp;${authorref} ]
+						</c:if>							
 					</td>
-					
+
 					<c:choose>
 						<c:when test="${sessionMap.imageGallery.allowRank}">
 							<td style="vertical-align:middle; padding-left:0px; text-align:center;">
@@ -195,7 +212,7 @@
 			<c:forEach var="user" items="${userList}" varStatus="refStatus">
 				<tr>
 					<td>
-						<c:out value="${user.fullName}" escapeXml="true"/>
+						<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.fullName}" escapeXml="true"/></lams:Portrait>
 					</td>
 					<td>
 						<c:set var="viewReflection">

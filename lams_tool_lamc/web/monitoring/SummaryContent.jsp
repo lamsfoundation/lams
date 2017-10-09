@@ -5,6 +5,8 @@
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
 
+<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
+
 <style media="screen,projection" type="text/css">
 	.ui-jqgrid {
 		border-left-style: none !important;
@@ -36,6 +38,8 @@
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
 	$(document).ready(function(){
+		initializePortraitPopover('${lams}');
+
 		<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 		
 			jQuery("#group${sessionDto.sessionId}").jqGrid({
@@ -45,23 +49,30 @@
 				autowidth: true,
 				shrinkToFit: true,
 				pager: 'pager-${sessionDto.sessionId}',
-				rowList:[10,20,30,40,50,100],
+				rowList:[2,10,20,30,40,50,100],
 				rowNum:10,
 				viewrecords:true,
 			   	/* caption: "${sessionDto.sessionName}", */
 			   	colNames:[
 						'userUid',
+						'userId',
 						"<fmt:message key="label.monitoring.summary.user.name" />",
-					    "<fmt:message key="label.monitoring.summary.total" />"],
+					    "<fmt:message key="label.monitoring.summary.total" />",
+					    'portraitId'],
 			   	colModel:[
 			   		{name:'userUid',index:'userUid', width:0, hidden: true},
-			   		{name:'userName',index:'userName', width:200, searchoptions: { clearSearch: false }},
-			   		{name:'total',index:'total', width:50,align:"right",sorttype:"int", search:false}		
+			   		{name:'userId',index:'userId', width:0, hidden: true},
+			   		{name:'userName',index:'userName', width:200, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
+			   		{name:'total',index:'total', width:50,align:"right",sorttype:"int", search:false}	,
+			   		{name:'portraitId', index:'portraitId', width:0, hidden: true}
 			   	],
 			   	loadError: function(xhr,st,err) {
 			   		jQuery("#group${sessionDto.sessionId}").clearGridData();
-			   		info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+			   		info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.loaderror"/>", "<fmt:message key="label.ok"/>");
 			   	},
+			   	loadComplete: function () {
+			   	 	initializePortraitPopover('<lams:LAMSURL/>');
+			    	},
 			  	onSelectRow: function(rowid) { 
 			  	    if(rowid == null) { 
 			  	    	rowid=0; 
@@ -167,6 +178,10 @@
             });
         };
         setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+        
+    		function userNameFormatter (cellvalue, options, rowObject) {
+	    		return definePortraitPopover(rowObject[4], rowObject[0],  rowObject[2]);
+    		}
 	});
 
 </script>
@@ -251,8 +266,6 @@
 	</div>
 	</c:if>
 
-	<jsp:include page="/monitoring/Reflections.jsp" />
-				
 </c:if>
 
 <c:if test="${not empty reflectionsContainerDTO}"> 							

@@ -298,7 +298,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    final Long questionId, final Long excludeUserId, boolean isOnlyLeadersIncluded, int page, int size,
 	    int sorting, String searchString) {
 	return qaUsrRespDAO.getResponsesForTablesorter(toolContentId, qaSessionId, questionId, excludeUserId,
-		isOnlyLeadersIncluded, page, size, sorting, searchString);
+		isOnlyLeadersIncluded, page, size, sorting, searchString, userManagementService);
     }
 
     @Override

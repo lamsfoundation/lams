@@ -43,6 +43,7 @@ public class ScratchieUser implements Cloneable, Comparable {
     private String lastName;
     private String loginName;
     private boolean sessionFinished;
+    private Long portraitId;
 
     private ScratchieSession session;
     private Scratchie scratchie;
@@ -55,6 +56,7 @@ public class ScratchieUser implements Cloneable, Comparable {
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
+	this.portraitId = user.getPortraitUuid();
 	this.session = session;
 	this.scratchie = null;
 	this.sessionFinished = false;
@@ -211,6 +213,14 @@ public class ScratchieUser implements Cloneable, Comparable {
     @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(firstName).append(lastName).append(loginName).toHashCode();
+    }
+
+    public Long getPortraitId() {
+	return portraitId;
+    }
+
+    public void setPortraitId(Long portraitId) {
+	this.portraitId = portraitId;
     }
 
 }

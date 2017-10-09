@@ -1023,7 +1023,7 @@ function lamslesson_http_call_post($url,$request) {
 	# pass charset as part of headers so it is interpreted correctly
 	# on the LAMS side. See LDEV-2875
 	$headers = array(
-		"Content-Type" =>  "application/x-www-form-urlencoded;charset=UTF-8"
+		"Content-Type" =>  "application/x-www-form-urlencoded;charset=utf-8"
 	);
 	$results = download_file_content($url, $headers, $request);
 

@@ -419,7 +419,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     @Override
     public List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
-	return mcUserDAO.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString);
+	return mcUserDAO.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString,
+		userManagementService);
     }
 
     @Override
@@ -573,6 +574,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		mcUserMarkDTO.setUserGroupLeader(session.isUserGroupLeader(user));
 		mcUserMarkDTO.setUserName(user.getUsername());
 		mcUserMarkDTO.setQueUsrId(user.getUid().toString());
+		mcUserMarkDTO.setUserId(user.getQueUsrId().toString());
 
 		if (isFullAttemptDetailsRequired) {
 
@@ -1691,54 +1693,22 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     @Override
     public List<ReflectionDTO> getReflectionList(McContent mcContent, Long userID) {
 	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<ReflectionDTO>();
-	if (userID == null) {
-	    // all users mode
-	    for (McSession mcSession : (Set<McSession>) mcContent.getMcSessions()) {
-
-		for (McQueUsr user : (Set<McQueUsr>) mcSession.getMcQueUsers()) {
-
+	for (McSession mcSession : (Set<McSession>) mcContent.getMcSessions()) {
+	    for (McQueUsr user : (Set<McQueUsr>) mcSession.getMcQueUsers()) {
+		// if all users mode or single user mode and found right user
+		if (userID == null || user.getQueUsrId().equals(userID)) {
 		    NotebookEntry notebookEntry = this.getEntry(mcSession.getMcSessionId(),
 			    CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.TOOL_SIGNATURE,
 			    new Integer(user.getQueUsrId().toString()));
 
 		    if (notebookEntry != null) {
-			ReflectionDTO reflectionDTO = new ReflectionDTO();
-			reflectionDTO.setUserId(user.getQueUsrId().toString());
-			reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-			reflectionDTO.setUserName(user.getFullname());
-			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			// String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-			reflectionDTO.setEntry(notebookEntry.getEntry());
+			ReflectionDTO reflectionDTO = new ReflectionDTO(user, 
+				mcSession.getMcSessionId().toString(), notebookEntry);
 			reflectionsContainerDTO.add(reflectionDTO);
 		    }
 		}
 	    }
-	} else {
-	    // single user mode
-	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
-		McSession mcSession = (McSession) sessionIter.next();
-		for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
-		    McQueUsr user = (McQueUsr) userIter.next();
-		    if (user.getQueUsrId().equals(userID)) {
-			NotebookEntry notebookEntry = this.getEntry(mcSession.getMcSessionId(),
-				CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.TOOL_SIGNATURE,
-				new Integer(user.getQueUsrId().toString()));
-
-			if (notebookEntry != null) {
-			    ReflectionDTO reflectionDTO = new ReflectionDTO();
-			    reflectionDTO.setUserId(user.getQueUsrId().toString());
-			    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-			    reflectionDTO.setUserName(user.getFullname());
-			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			    // String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-			    reflectionDTO.setEntry(notebookEntry.getEntry());
-			    reflectionsContainerDTO.add(reflectionDTO);
-			}
-		    }
-		}
-	    }
 	}
-
 	return reflectionsContainerDTO;
     }
 

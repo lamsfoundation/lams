@@ -302,6 +302,8 @@ public class McMonitoringAction extends LamsDispatchAction {
 	    ArrayNode visitLogData = JsonNodeFactory.instance.arrayNode();
 	    Long userUid = Long.parseLong(userDto.getQueUsrId());
 	    visitLogData.add(userUid);
+	    visitLogData.add(userDto.getUserId());
+
 	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
 	    if (groupLeader != null && groupLeader.getUid().equals(userUid)) {
 		fullName += " (" + mcService.getLocalizedMessage("label.monitoring.group.leader") + ")";
@@ -310,6 +312,8 @@ public class McMonitoringAction extends LamsDispatchAction {
 	    visitLogData.add(fullName);
 	    Long totalMark = (userDto.getTotalMark() == null) ? 0 : userDto.getTotalMark();
 	    visitLogData.add(totalMark);
+	    
+	    visitLogData.add(userDto.getPortraitId());
 
 	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);

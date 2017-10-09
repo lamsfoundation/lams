@@ -108,6 +108,7 @@ input[type="checkbox"] {
 					<input type="hidden" name="ccEmail" id="cc-email-hidden-input"
 						value="" /> <span><label><fmt:message
 								key="email.to" />:</label> <c:if test="${not empty user}">
+							<lams:Portrait userId="${user.userId}"/> 
 							<c:out value="${user.firstName} ${user.lastName}" /> &lt;<c:out
 								value="${user.email}" />&gt;
 							 </c:if> </span>

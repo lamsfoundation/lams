@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -99,6 +100,8 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
+    
+    private IUserManagementService userManagementService;
 
     private MessageService messageService;
 
@@ -484,7 +487,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString) {
 	return notebookUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
-		coreNotebookService);
+		coreNotebookService, userManagementService);
     }
 
     @Override
@@ -562,6 +565,14 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
     public void setAuditService(IAuditService auditService) {
 	this.auditService = auditService;
+    }
+
+    public IUserManagementService getUserManagementService() {
+        return userManagementService;
+    }
+
+    public void setUserManagementService(IUserManagementService userManagementService) {
+        this.userManagementService = userManagementService;
     }
 
     public ICoreNotebookService getCoreNotebookService() {

@@ -186,6 +186,7 @@ public class MonitoringAction extends Action {
 	    String timeTaken = (visitLogDto.getTimeTaken() == null) ? ""
 		    : timeTakenFormatter.format(visitLogDto.getTimeTaken());
 	    visitLogData.add(timeTaken);
+	    visitLogData.add(visitLogDto.getPortraitId());
 
 	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);

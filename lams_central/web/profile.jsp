@@ -29,7 +29,7 @@
 
 <div class="container">
 	<div class="row vertical-center-row">
-		<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+		<div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-6 col-md-offset-3">
 			<div class="panel voffset20">
 				<div class="panel-body">
 					<div class="text-center">
@@ -47,7 +47,7 @@
 							<c:otherwise>
 								<img style="margin: 0 auto;" class="img-circle img-responsive"
 									title="<bean:write name="fullName" />"
-									src="/lams/download/?uuid=<bean:write name="portraitUuid" />&preferDownload=false" />
+									src="/lams/download/?uuid=<bean:write name="portraitUuid" />&version=2&preferDownload=false" />
 							</c:otherwise>
 						</c:choose>
 

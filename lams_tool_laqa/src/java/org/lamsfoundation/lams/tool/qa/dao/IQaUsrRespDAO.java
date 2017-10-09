@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.qa.dao;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**
  * @author Ozgur Demirtas
@@ -49,7 +50,8 @@ public interface IQaUsrRespDAO {
     List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId);
 
     List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId, final Long questionId,
-	    final Long excludeUserId, boolean isOnlyLeadersIncluded, int page, int size, int sorting, String searchString);
+	    final Long excludeUserId, boolean isOnlyLeadersIncluded, int page, int size, 
+	    int sorting, String searchString, IUserManagementService userManagementService);
 
     int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId,
 	    boolean isOnlyLeadersIncluded, String searchString);

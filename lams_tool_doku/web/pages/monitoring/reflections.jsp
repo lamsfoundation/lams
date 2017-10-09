@@ -1,5 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<script type="text/javascript">
+	$(document).ready(function(){
+		initializePortraitPopover("<lams:LAMSURL />");
+	});
+</script>
+		
 <div class="panel-group" id="accordionReflection" role="tablist" aria-multiselectable="true"> 
     <div class="panel panel-default" >
         <div class="panel-heading collapsable-icon-left" id="headingReflection">
@@ -16,7 +22,8 @@
 				<c:forEach var="reflectDTO" items="${sessionMap.reflectList}">
 					<tr>
 						<td>
-							<strong><c:out value="${reflectDTO.fullName}" escapeXml="true"/></strong> - <lams:Date value="${reflectDTO.date}"/>
+							<lams:Portrait userId="${reflectDTO.userId}" hover="true"><strong><c:out value="${reflectDTO.fullName}" escapeXml="true"/></strong></lams:Portrait>
+							 - <lams:Date value="${reflectDTO.date}"/>
 							<br>
 							<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
 						</td>

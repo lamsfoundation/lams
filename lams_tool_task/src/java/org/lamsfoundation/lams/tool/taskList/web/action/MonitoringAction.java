@@ -254,6 +254,8 @@ public class MonitoringAction extends Action {
 		userData.add(verificationStatus);
 	    }
 
+	    userData.add(userDto.getPortraitId());
+	    
 	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);
 	    userRow.put("cell", userData);

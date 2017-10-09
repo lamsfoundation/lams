@@ -462,7 +462,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString, boolean getNotebookEntries) {
 	return dacoUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries,
-		coreNotebookService);
+		coreNotebookService, userManagementService);
     }
 
     @Override
