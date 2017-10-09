@@ -34,6 +34,8 @@ import javax.servlet.http.HttpSession;
 
 public class SessionManager {
     public static final String SYS_SESSION_COOKIE = "JSESSIONID";
+    // if this attribute is set in session, next call will force the user to log out
+    public static final String LOG_OUT_FLAG = "lamsLogOutFlag";
 
     // singleton
     private static SessionManager sessionManager;
@@ -67,6 +69,10 @@ public class SessionManager {
      */
     public static void startSession(HttpServletRequest request) {
 	HttpSession session = request.getSession();
+	if (session.getAttribute(LOG_OUT_FLAG) != null) {
+	    session.invalidate();
+	    throw new SecurityException("You were logged out");
+	}
 	String sessionId = session.getId();
 	SessionManager.sessionIdMapping.put(sessionId, session);
 	SessionManager.sessionManager.currentSessionIdContainer.set(sessionId);
@@ -95,12 +101,10 @@ public class SessionManager {
 	SessionManager.sessionIdMapping.remove(session.getId());
 
 	if (invalidate) {
-	    try {
-		session.invalidate();
-	    } catch (IllegalStateException e) {
-		System.out.println("SessionMananger invalidation exception");
-		// if it was already invalidated, do nothing
-	    }
+	    // only mark for invalidation, not invalidate
+	    // otherwise on clustered environment we get problems with server-side invalidation of Infinispan distributed sessions
+	    // see WFLY-7281 and WFLY-7229; maybe it will work on WildFly 11
+	    session.setAttribute(LOG_OUT_FLAG, true);
 	}
     }
 
@@ -115,12 +119,10 @@ public class SessionManager {
 	SessionManager.sessionIdMapping.remove(sessionID);
 
 	if (invalidate) {
-	    try {
-		session.invalidate();
-	    } catch (IllegalStateException e) {
-		System.out.println("SessionMananger invalidation exception");
-		// if it was already invalidated, do nothing
-	    }
+	    // only mark for invalidation, not invalidate
+	    // otherwise on clustered environment we get problems with server-side invalidation of Infinispan distributed sessions
+	    // see WFLY-7281 and WFLY-7229; maybe it will work on WildFly 11
+	    session.setAttribute(LOG_OUT_FLAG, true);
 	}
     }
 

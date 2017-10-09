@@ -35,7 +35,6 @@ import javax.servlet.jsp.jstl.core.Config;
 
 import org.apache.log4j.Logger;
 import org.jboss.security.CacheableManager;
-import org.lamsfoundation.lams.integration.security.SsoHandler;
 import org.lamsfoundation.lams.security.SimplePrincipal;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
@@ -95,23 +94,13 @@ public class SessionListener implements HttpSessionListener {
 	// clear the authentication cache when the session is invalidated
 	HttpSession session = sessionEvent.getSession();
 	if (session != null) {
+	    SessionManager.removeSessionByID(session.getId(), false);
+	    
 	    UserDTO userDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
-	    if (userDTO == null) {
-		SessionManager.removeSessionByID(session.getId(), false);
-	    } else {
-		// this is set in SsoHandler
-		// if user logs in from another browser, cache must not be flushed,
-		// otherwise current authentication process fails
-		Boolean noFlush = (Boolean) session.getAttribute(SsoHandler.NO_FLUSH_FLAG);
-		if (!Boolean.TRUE.equals(noFlush)) {
-		    String login = userDTO.getLogin();
-		    Principal principal = new SimplePrincipal(login);
-		    SessionListener.authenticationManager.flushCache(principal);
-
-		    // remove obsolete mappings to session
-		    // the session is either already invalidated or will be very soon by another module
-		    SessionManager.removeSessionByLogin(login, false);
-		}
+	    if (userDTO != null) {
+		String login = userDTO.getLogin();
+		Principal principal = new SimplePrincipal(login);
+		SessionListener.authenticationManager.flushCache(principal);
 	    }
 	}
     }
