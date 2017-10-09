@@ -68,14 +68,12 @@ public class SsoHandler implements ServletExtension {
 
     private static final String REDIRECT_KEY = "io.undertow.servlet.form.auth.redirect.location";
     private static final String KEEP_SESSION_ID_KEY = "lams.keepSessionId";
-    // if this attribute is set in session, credential cache will not be cleared on session destroy in SessionListener
-    public static final String NO_FLUSH_FLAG = "noFlush";
 
     @Override
     public void handleDeployment(final DeploymentInfo deploymentInfo, final ServletContext servletContext) {
 	// If WildFly was run with VM parameter -Dlams.keepSessionId=true
 	// session ID will not be changed after log in
-	// This is necessary for TestHarness to run as it does not process session ID change correctly 
+	// This is necessary for TestHarness to run as it does not process session ID change correctly
 	boolean keepSessionId = Boolean.parseBoolean(System.getProperty(KEEP_SESSION_ID_KEY));
 	if (keepSessionId) {
 	    deploymentInfo.setChangeSessionIdOnLogin(false);
@@ -88,6 +86,7 @@ public class SsoHandler implements ServletExtension {
 	deploymentInfo.addOuterHandlerChainWrapper(handler -> {
 	    // just forward all requests except one for logging in
 	    return Handlers.path().addPrefixPath("/", handler).addExactPath("/j_security_check", exchange -> {
+		// intercept login page
 		ServletRequestContext context = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
 		HttpServletResponse response = (HttpServletResponse) context.getServletResponse();
 		HttpServletRequest request = (HttpServletRequest) context.getServletRequest();
@@ -110,19 +109,19 @@ public class SsoHandler implements ServletExtension {
 		String login = request.getParameter("j_username");
 		User user = null;
 		if (StringUtils.isBlank(login)) {
-		    serveLoginPage(exchange, "/login.jsp?failed=true");
+		    SsoHandler.serveLoginPage(exchange, request, response, "/login.jsp?failed=true");
 		    return;
 		}
 		user = getUserManagementService(session.getServletContext()).getUserByLogin(login);
 		if (user == null) {
-		    serveLoginPage(exchange, "/login.jsp?failed=true");
+		    SsoHandler.serveLoginPage(exchange, request, response, "/login.jsp?failed=true");
 		    return;
 		}
 		UserDTO userDTO = user.getUserDTO();
 		String password = request.getParameter("j_password");
 		if (user.getLockOutTime() != null && user.getLockOutTime().getTime() > System.currentTimeMillis()
 			&& password != null && !password.startsWith("#LAMS")) {
-		    serveLoginPage(exchange, "/login.jsp?lockedOut=true");
+		    SsoHandler.serveLoginPage(exchange, request, response, "/login.jsp?lockedOut=true");
 		    return;
 		}
 
@@ -159,6 +158,9 @@ public class SsoHandler implements ServletExtension {
 
 		}
 
+		// check if user is already logged in
+		HttpSession existingSession = SessionManager.getSessionForLogin(login);
+
 		// store session so UniversalLoginModule can access it
 		SessionManager.startSession(request);
 
@@ -173,18 +175,11 @@ public class SsoHandler implements ServletExtension {
 		if (login.equals(request.getRemoteUser())) {
 		    session.setAttribute(AttributeNames.USER, userDTO);
 
-		    HttpSession existingSession = SessionManager.getSessionForLogin(login);
+		    // if user is already logged in on another browser, log him out
 		    if (existingSession != null) {
-			try {
-			    // tell SessionListener not to flush credential cache on session destroy,
-			    // otherwise this authentication process fails
-			    existingSession.setAttribute(NO_FLUSH_FLAG, true);
-			} catch (IllegalStateException e) {
-			    // if it was already invalidated, do nothing
-			}
-			// remove an existing session for the given user
-			SessionManager.removeSessionByLogin(login, request.isRequestedSessionIdValid());
+			SessionManager.removeSessionByID(existingSession.getId(), true);
 		    }
+
 		    Integer failedAttempts = user.getFailedAttempts();
 		    if (failedAttempts != null && failedAttempts > 0 && password != null
 			    && !password.startsWith("#LAMS")) {
@@ -225,17 +220,9 @@ public class SsoHandler implements ServletExtension {
      * Forward to the login page with a specific error message. Avoids a redirect. Based on the
      * ServletFormAuthenticationMechanism method. The location should be relative to the current
      * context and start with "/" e.g. /login.jsp
-     *
-     * @throws IOException
-     * @throws ServletException
      */
-    protected Integer serveLoginPage(final HttpServerExchange exchange, final String location)
-	    throws ServletException, IOException {
-
-	ServletRequestContext context = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
-	HttpServletRequest request = (HttpServletRequest) context.getServletRequest();
-	HttpServletResponse response = (HttpServletResponse) context.getServletResponse();
-
+    private static Integer serveLoginPage(final HttpServerExchange exchange, final HttpServletRequest request,
+	    final HttpServletResponse response, final String location) throws ServletException, IOException {
 	exchange.getResponseHeaders().add(Headers.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
 	exchange.getResponseHeaders().add(Headers.PRAGMA, "no-cache");
 	exchange.getResponseHeaders().add(Headers.EXPIRES, "0");
@@ -248,7 +235,7 @@ public class SsoHandler implements ServletExtension {
      * Notifies authentication mechanism where it should redirect after log in. Based on
      * ServletFormAuthenticationMechanism method.
      */
-    protected static void handleRedirectBack(ServletRequestContext context, String redirectURL) {
+    private static void handleRedirectBack(ServletRequestContext context, String redirectURL) {
 	/*
 	 * Prevent HTTP Response Splitting attack by sanitizing redirectURL.
 	 * The attack was possible by changing action of login form to, for example,
@@ -278,7 +265,7 @@ public class SsoHandler implements ServletExtension {
     /**
      * Memorises jvmRoute if it is already set.
      */
-    protected static void setJvmRoute(HttpServletRequest request) {
+    private static void setJvmRoute(HttpServletRequest request) {
 	// if previous requests has not created a session, cookies will be null
 	Cookie[] cookies = request.getCookies();
 	if (cookies == null) {
@@ -297,7 +284,7 @@ public class SsoHandler implements ServletExtension {
 	}
     }
 
-    protected IUserManagementService getUserManagementService(ServletContext context) {
+    private IUserManagementService getUserManagementService(ServletContext context) {
 	if (SsoHandler.userManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(context);
 	    SsoHandler.userManagementService = (UserManagementService) ctx.getBean("userManagementService");
@@ -305,7 +292,7 @@ public class SsoHandler implements ServletExtension {
 	return SsoHandler.userManagementService;
     }
 
-    protected IAuditService getAuditService(ServletContext context) {
+    private IAuditService getAuditService(ServletContext context) {
 	if (SsoHandler.auditService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(context);
 	    SsoHandler.auditService = (IAuditService) ctx.getBean("auditService");

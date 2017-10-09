@@ -176,12 +176,11 @@
 				// invalidate session so a new user can be logged in
 				HttpSession hs = SessionManager.getSession();
 				if (hs != null) {
+				    // maybe this attribute removal is not necessary
+				    // since we invalidate the session right after it
 				    hs.removeAttribute("login");
 				    hs.removeAttribute("password");
-					UserDTO userDTO = (UserDTO) hs.getAttribute("user");
-					if (userDTO != null) {
-					    SessionManager.removeSessionByLogin(userDTO.getLogin(), true);
-					}
+				    hs.invalidate();
 				}
 			%>
 			<script type="text/javascript">
