@@ -8,7 +8,7 @@ CKEDITOR.config.toolbar_Default = [
 
 CKEDITOR.config.toolbar_DefaultInline = [
 	['Sourcedialog','Preview','-','PasteFromWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
-    ['Embed','Image','Link','Iframe','Table','HorizontalRule','Emojione','Format','Font','FontSize']
+    ['Embed','Image','Link','Iframe','Table','HorizontalRule','Emojione','-','bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','bootsnippets-advanced-layout','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_DefaultDokuInline = [
@@ -126,19 +126,26 @@ CKEDITOR.config.contentsCss = CKEDITOR.basePath + '../css/defaultHTML_learner.cs
 //CKEDITOR.config.skin = 'office2013' ;
 CKEDITOR.config.disableNativeSpellChecker = false;
 CKEDITOR.config.browserContextMenuOnCtrl = true;
+CKEDITOR.config.bootsnippets = 'bootsnippets-text, bootsnippets-image, bootsnippets-multimedia, bootsnippets-advanced-layout';
+CKEDITOR.config.bootsnippets_icons = CKEDITOR.basePath + '/plugins/bootsnippets/icons/ico_text.ico, ' + CKEDITOR.basePath + '/plugins/bootsnippets/icons/ico_image.ico, ' + CKEDITOR.basePath + '/plugins/bootsnippets/icons/ico_video.png, form';
+CKEDITOR.config.bootsnippets_labels = 'Text Snippets, Image Snippets, Multimedia Snippets, Advanced Layout Snippets';
+CKEDITOR.config.bootsnippets_files = [CKEDITOR.basePath + '../www/public/ckeditor-templates/bootsnippets.js'];
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.config.enterMode = 'div';
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
-CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,html5audio,bootstrapTabs';
+CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,html5audio,bootstrapTabs,bootpanel,bootsnippets';
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath,about,specialchar';
 CKEDITOR.config.allowedContent = true;
 CKEDITOR.config.toolbarCanCollapse = true;
 CKEDITOR.config.embed_provider = '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}';//default URL for 'embed' plugin
+//allow empty i and span tags (for font awesome)
+CKEDITOR.dtd.$removeEmpty['i'] = false;
+CKEDITOR.dtd.$removeEmpty['span'] = false;
 
 // ---- Additional scripts -----
-// Hides editor instaces until they are fully initialized
 
+// Hides editor instaces until they are fully initialized
 CKEDITOR.on('instanceCreated', function(e){
 	e.editor.element.$.style.display = 'none';
 });

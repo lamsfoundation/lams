@@ -435,6 +435,42 @@ CKEDITOR.dialog.add( 'image2', function( editor ) {
                         },
                         validate: editor.config.image2_altRequired === true ? CKEDITOR.dialog.validate.notEmpty( lang.altMissing ) : null
                     },
+                    //**LAMS** the following classes chunk added by LAMS 
+                    {
+                        id: 'classes',
+                        type: 'text',
+                        label: 'Classes',
+                        setup: function( widget ) {
+                        	var classesObj = widget.getClasses();
+                        	var classesNames = [];
+                        	for (var classesName in classesObj) {
+                                if (classesObj.hasOwnProperty(classesName)) {
+                                	classesNames.push(classesName);
+                                }
+                            }
+                            this.setValue( classesNames.join(',') );
+                            
+                        },
+                        commit: function( widget ) {
+                        	var oldClasses = widget.getClasses();
+                        	
+                        	//add new classes
+                        	var userEnteredClasses = this.getValue().split(',').filter(x => x);
+                        	for (var i = 0; i < userEnteredClasses.length; i++) {
+                        		var userEnteredClass = userEnteredClasses[i];
+                        	    if (!widget.hasClass(userEnteredClass)) {
+                        	    	widget.addClass(userEnteredClass);
+                        	    }
+                        	}
+                            
+                        	//remove obsolete classes
+                            for (var oldClass in oldClasses) {
+                                if (oldClasses.hasOwnProperty(oldClass) && !userEnteredClasses.includes(oldClass)) {
+                                	widget.removeClass(oldClass);
+                                }
+                            }
+                        }
+                    },
 					{
 						type: 'hbox',
 						widths: [ '25%', '25%', '50%' ],
