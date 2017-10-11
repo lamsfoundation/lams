@@ -469,8 +469,9 @@ public class AssessmentServiceImpl
 
 	    // mark previous attempt as being not the latest any longer
 	    } else {
-		lastResult.setLatest(false);
+		lastResult.setLatest(null);
 		assessmentResultDao.saveObject(lastResult);
+		assessmentResultDao.flush();
 	    }
 	}
 

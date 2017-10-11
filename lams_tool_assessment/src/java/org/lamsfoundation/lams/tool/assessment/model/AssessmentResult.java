@@ -42,7 +42,7 @@ public class AssessmentResult {
     //date when user has started activity (pressed start button) that has time limitation
     private Date timeLimitLaunchedDate;
     //indicates the latest retry
-    private boolean isLatest;
+    private Boolean isLatest;
     private Date finishDate;
     private AssessmentUser user;
     private Long sessionId;
@@ -122,11 +122,11 @@ public class AssessmentResult {
      *
      * @return
      */
-    public boolean isLatest() {
+    public Boolean isLatest() {
 	return isLatest;
     }
 
-    public void setLatest(boolean isLatest) {
+    public void setLatest(Boolean isLatest) {
 	this.isLatest = isLatest;
     }
 
