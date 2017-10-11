@@ -11,7 +11,7 @@ FROM tl_laasse10_assessment_result as a, tl_laasse10_assessment_result as b
 WHERE
           (a.assessment_uid   = b.assessment_uid OR a.assessment_uid IS NULL AND b.assessment_uid IS NULL)
       AND (a.user_uid = b.user_uid OR a.user_uid IS NULL AND b.user_uid IS NULL)
-      AND (a.latest = b.latest AND latest = 1)
+      AND (a.latest = 1 AND b.latest = 1)
       AND a.uid < b.uid;
       
 --set up tl_laasse10_assessment_result table to properly handle constraint
