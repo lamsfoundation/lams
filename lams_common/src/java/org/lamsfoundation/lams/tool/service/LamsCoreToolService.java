@@ -606,24 +606,20 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     @Override
     public Long getActivityMaxPossibleMark(ToolActivity activity) {
-
 	// if ActivityEvaluation is not set it means activity will produce no toolOutputs and thus max possible mark is null
-	if ((activity == null) || (activity.getActivityEvaluations() == null)
-		|| activity.getActivityEvaluations().isEmpty()) {
+	if ((activity == null) || (activity.getEvaluation() == null)) {
 	    return null;
 	}
 
 	// the first available activity evaluation will be the only one that activity has
-	ActivityEvaluation activityEvaluation = activity.getActivityEvaluations().iterator().next();
+	ActivityEvaluation evaluation = activity.getEvaluation();
 
 	// searching for the according toolOutputDefinition
 	SortedMap<String, ToolOutputDefinition> toolOutputDefinitions = getOutputDefinitionsFromTool(
 		activity.getToolContentId(), ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION);
 	for (String key : toolOutputDefinitions.keySet()) {
 	    ToolOutputDefinition toolOutputDefinition = toolOutputDefinitions.get(key);
-
-	    if (activityEvaluation.getToolOutputDefinition().equals(key)) {
-
+	    if (evaluation.getToolOutputDefinition().equals(key)) {
 		Object upperLimit = toolOutputDefinition.getEndValue();
 		if ((upperLimit != null) && (upperLimit instanceof Long)) {
 		    return (Long) upperLimit;
@@ -875,10 +871,10 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     }
 
     @Override
-    public ToolCompletionStatus getCompletionStatusFromTool(User learner, Activity activity)  {
+    public ToolCompletionStatus getCompletionStatusFromTool(User learner, Activity activity) {
 	if (activity.isToolActivity()) {
 	    ToolSession session = getToolSessionByLearner(learner, activity);
-	    ToolSessionManager toolService = (ToolSessionManager) findToolService(((ToolActivity)activity).getTool());
+	    ToolSessionManager toolService = (ToolSessionManager) findToolService(((ToolActivity) activity).getTool());
 	    return toolService.getCompletionStatus(learner.getUserId().longValue(), session.getToolSessionId());
 	}
 	return null;

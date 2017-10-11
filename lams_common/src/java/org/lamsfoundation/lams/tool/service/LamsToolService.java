@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.service;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +51,6 @@ import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
-import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
@@ -138,60 +136,40 @@ public class LamsToolService implements ILamsToolService {
     public Boolean isGroupedActivity(long toolContentID) {
 	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentID);
 	boolean isGroupedActivity = toolActivity == null ? null : toolActivity.getApplyGrouping();
-	
+
 	return isGroupedActivity;
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	auditService.logStartEditingActivityInMonitor(toolContentID);
-    }    
+    }
 
     @Override
     public String getActivityEvaluation(Long toolContentId) {
-
 	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
-	Set<ActivityEvaluation> activityEvaluations = toolActivity.getActivityEvaluations();
-	if (activityEvaluations.isEmpty()) {
-	    return null;
-	} else {
-	    ActivityEvaluation activityEvaluation = activityEvaluations.iterator().next();
-	    return activityEvaluation.getToolOutputDefinition();
-	}
+	ActivityEvaluation evaluation = toolActivity.getEvaluation();
+	return evaluation == null ? null : evaluation.getToolOutputDefinition();
     }
 
     @Override
     public void setActivityEvaluation(Long toolContentId, String toolOutputDefinition) {
-
 	if (StringUtils.isEmpty(toolOutputDefinition)) {
 	    return;
 	}
 
 	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
-	Set<ActivityEvaluation> activityEvaluations = toolActivity.getActivityEvaluations();
-
-	// Get the first (only) ActivityEvaluation if it exists
-	ActivityEvaluation activityEvaluation;
+	ActivityEvaluation evaluation = toolActivity.getEvaluation();
 	boolean isToolOutputDefinitionChanged = true;
-	if (activityEvaluations.isEmpty()) {
-	    activityEvaluation = new ActivityEvaluation();
-	    activityEvaluation.setActivity(toolActivity);
-
-	    activityEvaluations = new HashSet<ActivityEvaluation>();
-	    activityEvaluations.add(activityEvaluation);
-	    toolActivity.setActivityEvaluations(activityEvaluations);
-
+	if (evaluation == null) {
+	    evaluation = new ActivityEvaluation();
+	    evaluation.setActivity(toolActivity);
+	    toolActivity.setEvaluation(evaluation);
 	} else {
-	    activityEvaluation = activityEvaluations.iterator().next();
-	    isToolOutputDefinitionChanged = !toolOutputDefinition.equals(activityEvaluation.getToolOutputDefinition());
+	    isToolOutputDefinitionChanged = !toolOutputDefinition.equals(evaluation.getToolOutputDefinition());
 	}
-
-	activityEvaluation.setToolOutputDefinition(toolOutputDefinition);
-	activityDAO.insertOrUpdate(activityEvaluation);
-
-	// update the parent toolActivity
-	toolActivity.setActivityEvaluations(activityEvaluations);
-	activityDAO.insertOrUpdate(toolActivity);
+	evaluation.setToolOutputDefinition(toolOutputDefinition);
+	activityDAO.update(toolActivity);
 
 	//update gradebook marks if required
 	if (isToolOutputDefinitionChanged) {
@@ -227,7 +205,7 @@ public class LamsToolService implements ILamsToolService {
 
 	return leaderUserId;
     }
-    
+
     @Override
     public Set<Long> getAllLeaderUserIds(Long toolSessionId, Integer learnerId) {
 	Set<Long> leaderUserIds = null;
@@ -236,12 +214,12 @@ public class LamsToolService implements ILamsToolService {
 	ToolActivity specifiedActivity = toolSession.getToolActivity();
 	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId,
 		toolSession.getLesson().getLessonId());
-	
+
 	// check if there is leaderSelectionTool available
 	if (leaderSelectionActivity != null) {
 	    leaderUserIds = getLeaderUserId(leaderSelectionActivity.getActivityId());
 	}
-	
+
 	return leaderUserIds;
     }
 
@@ -285,7 +263,7 @@ public class LamsToolService implements ILamsToolService {
 		toolActivity = (ToolActivity) activity;
 	    }
 
-	    if (LamsToolService.LEADER_SELECTION_TOOL_SIGNATURE.equals(toolActivity.getTool().getToolSignature())) {
+	    if (ILamsToolService.LEADER_SELECTION_TOOL_SIGNATURE.equals(toolActivity.getTool().getToolSignature())) {
 		return activity;
 	    }
 
@@ -301,7 +279,7 @@ public class LamsToolService implements ILamsToolService {
 
 		if (completedActivity instanceof ToolActivity) {
 		    ToolActivity completedToolActivity = (ToolActivity) completedActivity;
-		    if (LamsToolService.LEADER_SELECTION_TOOL_SIGNATURE
+		    if (ILamsToolService.LEADER_SELECTION_TOOL_SIGNATURE
 			    .equals(completedToolActivity.getTool().getToolSignature())) {
 			Date finishDate = completedActivities.get(completedActivity).getFinishDate();
 
@@ -352,7 +330,7 @@ public class LamsToolService implements ILamsToolService {
     public void setActivityDAO(IActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
     }
-    
+
     public void setAuditService(IAuditService auditService) {
 	this.auditService = auditService;
     }

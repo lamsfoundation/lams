@@ -711,6 +711,14 @@ var PropertyDefs = {
 				var selectedGradebookToolOutputDefinition = $('.propertiesContentFieldGradebook option:selected', content);
 				if (selectedGradebookToolOutputDefinition.length > 0){
 					activity.gradebookToolOutputDefinitionName = selectedGradebookToolOutputDefinition.val();
+					if (activity.gradebookToolOutputDefinitionName) {
+						$.each(activity.outputDefinitions, function(){
+							if (this.name == activity.gradebookToolOutputDefinitionName) {
+								activity.gradebookToolOutputDefinitionDescription = this.description;
+								return false;
+							}
+						});
+					}
 				}
 				
 				if (redrawNeeded) {
@@ -1546,7 +1554,7 @@ PropertyLib = {
 	
 	
 	/**
-	 * Fill outpu definitions of given activity for Gradebook.
+	 * Fill output definitions of given activity for Gradebook.
 	 */
 	fillOutputDefinitionsDropdown : function(activity) {
 		// find all tools that support input and fill dropdown menu with their titles

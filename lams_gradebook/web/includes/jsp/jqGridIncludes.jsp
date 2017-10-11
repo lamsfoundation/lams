@@ -15,6 +15,8 @@ Include this jsp in your jqGrid page head to get some jqGrid functionaility
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.locale-en.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 </c:if>
 
 <script type="text/javascript">
@@ -97,8 +99,9 @@ Include this jsp in your jqGrid page head to get some jqGrid functionaility
 	// Check a cell before opening tooltip to make sure empty or invalid cells do not display
 	function checkCell(kmouse) {
 		var cell = $(kmouse.target).html();
-		if (cell != null && cell !="" && cell !="&nbsp;" && cell != "-" && cell.charAt(0) != '<') {
-			return true;
+		if (cell != null && cell !="" && cell !="&nbsp;" && cell != "-" && cell.charAt(0) != '<' && cell.indexOf('popover')==-1 ) {
+			var parent = $(kmouse.target).parent().html();
+			return ( ! ( parent.indexOf("<a") == 0 && parent.indexOf('popover')>-1 ) );
 		}
 		return false;
 	}

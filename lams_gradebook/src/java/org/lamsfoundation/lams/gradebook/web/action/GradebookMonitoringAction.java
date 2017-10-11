@@ -105,6 +105,11 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	    request.setAttribute("lessonDetails", lessonDetatilsDTO);
 	    request.setAttribute("marksReleased", marksReleased);
 	    
+	    List<String[]> weights = getGradebookService().getWeights(lesson.getLearningDesign());
+	    if ( weights.size() > 0 ) {
+		request.setAttribute("weights", weights);
+	    }
+	    
 	    request.setAttribute("isInTabs", WebUtil.readBooleanParam(request, "isInTabs", false));
 
 	    return mapping.findForward("monitorgradebook");
@@ -213,18 +218,11 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	// Fetch the id based on which grid it came from
 	if (view == GBGridView.MON_ACTIVITY) {
 	    String rowID = WebUtil.readStrParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-
-	    // Splitting the rowID param to get the activity/group id pair
-	    String[] split = rowID.split("_");
-	    if (split.length == 2) {
-		activityID = Long.parseLong(split[0]);
-	    } else {
-		activityID = Long.parseLong(rowID);
-	    }
-
+	    activityID = getActivityFromParameter(rowID);
 	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_ID);
 	} else if (view == GBGridView.MON_USER) {
-	    activityID = WebUtil.readLongParam(request, GradebookConstants.PARAM_ID);
+	    String rowID = WebUtil.readStrParam(request, GradebookConstants.PARAM_ID);
+	    activityID = getActivityFromParameter(rowID);
 	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
 	}
 
@@ -257,6 +255,18 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	}
 
 	return null;
+    }
+
+    private Long getActivityFromParameter(String rowID) {
+	Long activityID;
+	// Splitting the rowID param to get the activity/group id pair
+	String[] split = rowID.split("_");
+	if (split.length == 2) {
+	activityID = Long.parseLong(split[0]);
+	} else {
+	activityID = Long.parseLong(rowID);
+	}
+	return activityID;
     }
 
     /**

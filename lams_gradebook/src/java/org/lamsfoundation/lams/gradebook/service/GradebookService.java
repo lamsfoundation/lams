@@ -22,7 +22,6 @@
 
 package org.lamsfoundation.lams.gradebook.service;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,6 +51,7 @@ import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
+import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.gradebook.util.LessonComparator;
 import org.lamsfoundation.lams.gradebook.util.UserComparator;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
@@ -62,6 +62,8 @@ import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.FloatingActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
@@ -332,6 +334,8 @@ public class GradebookService implements IGradebookService {
 		userToGradebookUserLessonMap = getUserToGradebookUserLessonMap(lesson, learners);
 	    }
 
+	    boolean isWeighted = isWeightedMarks(lesson.getLearningDesign());
+
 	    for (User learner : learners) {
 		LearnerProgress learnerProgress = userToLearnerProgressMap.get(learner.getUserId());
 		GBUserGridRowDTO gradebookUserDTO = new GBUserGridRowDTO(learner);
@@ -355,14 +359,16 @@ public class GradebookService implements IGradebookService {
 		    }
 
 		    if (startDate != null) {
-			if (userTimeZone != null)
+			if (userTimeZone != null) {
 			    startDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, startDate);
+			}
 			gradebookUserDTO.setStartDate(startDate);
 		    }
 
 		    if (learnerProgress.getFinishDate() != null) {
-			if (userTimeZone != null)
+			if (userTimeZone != null) {
 			    finishDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, finishDate);
+			}
 			gradebookUserDTO.setFinishDate(finishDate);
 		    }
 
@@ -372,6 +378,7 @@ public class GradebookService implements IGradebookService {
 		if (gradebookUserLesson != null) {
 		    gradebookUserDTO.setMark(gradebookUserLesson.getMark());
 		    gradebookUserDTO.setFeedback(gradebookUserLesson.getFeedback());
+		    gradebookUserDTO.setDisplayMarkAsPercent(isWeighted);
 		}
 
 	    }
@@ -484,7 +491,9 @@ public class GradebookService implements IGradebookService {
 	    Integer userId = user.getUserId();
 	    GradebookUserLesson gradebookUserLesson = userToGradebookUserLessonMap.get(userId);
 
-	    Double totalMark = gradebookDAO.getGradebookUserActivityMarkSum(lessonId, userId);
+	    List<GradebookUserActivity> userActivities = gradebookDAO.getGradebookUserActivitiesForLesson(lessonId, userId);
+	    Double totalMark = calculateLessonMark(isWeightedMarks(lesson.getLearningDesign()), userActivities, null);
+
 	    if (totalMark != null) {
 
 		if (totalMark > 0 && gradebookUserLesson == null) {
@@ -506,14 +515,13 @@ public class GradebookService implements IGradebookService {
 	Lesson lesson = lessonDAO.getLessonForActivity(activityId);
 
 	if ((lesson == null) || (activity == null) || !(activity instanceof ToolActivity)
-		|| (((ToolActivity) activity).getActivityEvaluations() == null)
-		|| ((ToolActivity) activity).getActivityEvaluations().isEmpty()) {
+		|| (((ToolActivity) activity).getEvaluation() == null)) {
 	    return;
 	}
 	ToolActivity toolActivity = (ToolActivity) activity;
 
 	// Getting the first activity evaluation
-	ActivityEvaluation eval = toolActivity.getActivityEvaluations().iterator().next();
+	ActivityEvaluation eval = toolActivity.getEvaluation();
 	String toolOutputDefinition = eval.getToolOutputDefinition();
 
 	Map<Integer, GradebookUserActivity> userToGradebookUserActivityMap = getUserToGradebookUserActivityMap(activity,
@@ -553,14 +561,13 @@ public class GradebookService implements IGradebookService {
 
 	if ((toolSession == null) || (toolSession == null) || (learner == null) || (lesson == null)
 		|| (activity == null) || !(activity instanceof ToolActivity)
-		|| (((ToolActivity) activity).getActivityEvaluations() == null)
-		|| ((ToolActivity) activity).getActivityEvaluations().isEmpty()) {
+		|| (((ToolActivity) activity).getEvaluation() == null)) {
 	    return;
 	}
 	ToolActivity toolActivity = (ToolActivity) activity;
 
 	// Getting the first activity evaluation
-	ActivityEvaluation eval = toolActivity.getActivityEvaluations().iterator().next();
+	ActivityEvaluation eval = toolActivity.getEvaluation();
 
 	try {
 	    ToolOutput toolOutput = toolService.getOutputFromTool(eval.getToolOutputDefinition(), toolSession,
@@ -601,6 +608,40 @@ public class GradebookService implements IGradebookService {
 		gradebookUserActivity, gradebookUserLesson);
     }
 
+    public boolean isWeightedMarks(LearningDesign design) {
+	Set<Activity> activities = (Set<Activity>) design.getActivities();
+	for ( Activity activity : activities) {
+	    if ( activity.isToolActivity() ) {
+		// fetch real object, otherwise there is a cast error
+		ToolActivity act = (ToolActivity)  activityDAO.getActivityByActivityId(activity.getActivityId());
+		ActivityEvaluation eval = act.getEvaluation();
+		if ( eval != null && eval.getWeight() != null &&  eval.getWeight() > 0) 
+		    return true;
+	    }
+	}
+	return false;
+    }
+
+    public List<String[]> getWeights(LearningDesign design) {
+	List<String[]> evaluations = new ArrayList<String[]>();
+	Set<Activity> activities = (Set<Activity>) design.getActivities();
+	for ( Activity activity : activities) {
+	    if ( activity.isToolActivity() ) {
+		// fetch real object, otherwise there is a cast error
+		ToolActivity act = (ToolActivity)  activityDAO.getActivityByActivityId(activity.getActivityId());
+		ActivityEvaluation eval = act.getEvaluation();
+		if ( eval != null && eval.getWeight() != null &&  eval.getWeight() > 0) {
+		    String[] evaluation = new String[3];
+		    evaluation[0] = act.getTitle();
+		    evaluation[1] = eval.getToolOutputDefinition();
+		    evaluation[2] = eval.getWeight().toString() + '%';
+		    evaluations.add(evaluation);
+		}
+	    }
+	}
+	return evaluations;
+    }
+
     /**
      * It's the same method as above, it only also accepts gradebookUserActivity and gradebookUserLesson as parameters.
      */
@@ -623,7 +664,7 @@ public class GradebookService implements IGradebookService {
 	    gradebookDAO.insertOrUpdate(gradebookUserActivity);
 	    //flush the session in order to make updated mark be available at calculating lesson total mark
 	    gradebookDAO.flush();
-	    
+
 	    // Now update the lesson mark
 	    if (gradebookUserLesson == null) {
 		gradebookUserLesson = new GradebookUserLesson();
@@ -631,7 +672,8 @@ public class GradebookService implements IGradebookService {
 		gradebookUserLesson.setLesson(lesson);
 	    }
 
-	    aggregateTotalMarkForLesson(gradebookUserLesson, mark, oldActivityMark);
+	    aggregateTotalMarkForLesson(isWeightedMarks(lesson.getLearningDesign()),
+		    gradebookUserLesson, gradebookUserActivity, oldActivityMark);
 
 	    // audit log changed gradebook mark
 	    if (isAuditLogRequired) {
@@ -721,6 +763,7 @@ public class GradebookService implements IGradebookService {
 		    lessonRows.add(lessonRow);
 		    lessonRow.setLessonName(lesson.getLessonName());
 		    lessonRow.setId(lesson.getLessonId().toString());
+		    lessonRow.setDisplayMarkAsPercent(isWeightedMarks(lesson.getLearningDesign()));
 
 		    if (view == GBGridView.LIST) {
 			continue;
@@ -738,8 +781,9 @@ public class GradebookService implements IGradebookService {
 
 			Date startDate = lesson.getStartDateTime();
 			if (startDate != null) {
-			    if (userTimeZone != null)
+			    if (userTimeZone != null) {
 				startDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, startDate);
+			    }
 			    lessonRow.setStartDate(startDate);
 			}
 
@@ -768,14 +812,16 @@ public class GradebookService implements IGradebookService {
 			    }
 
 			    if (startDate != null) {
-				if (userTimeZone != null)
+				if (userTimeZone != null) {
 				    startDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, startDate);
+				}
 				lessonRow.setStartDate(startDate);
 			    }
 
 			    if (learnerProgress.getFinishDate() != null) {
-				if (userTimeZone != null)
+				if (userTimeZone != null) {
 				    finishDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, finishDate);
+				}
 				lessonRow.setFinishDate(finishDate);
 			    }
 			}
@@ -842,7 +888,7 @@ public class GradebookService implements IGradebookService {
 	    }
 
 	    ComplexActivity sequence = (ComplexActivity) activity;
-	    Set<Activity> childActivities = (Set<Activity>) sequence.getActivities();
+	    Set<Activity> childActivities = sequence.getActivities();
 	    for (Activity childActivity : childActivities) {
 		getActivityDataForLessonGradebookExport(activityToUserDTOMap, complexLearners, userToLearnerProgressMap,
 			activityDAO.getActivityByActivityId(childActivity.getActivityId()));
@@ -882,6 +928,8 @@ public class GradebookService implements IGradebookService {
     @SuppressWarnings("unchecked")
     public LinkedHashMap<String, ExcelCell[][]> exportLessonGradebook(Lesson lesson) {
 
+	boolean isWeighted = isWeightedMarks(lesson.getLearningDesign());
+
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
 	// -------------------- process summary excel page --------------------------------
@@ -890,9 +938,13 @@ public class GradebookService implements IGradebookService {
 	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
 
 	// Adding the lesson average data to the summary
+	Object lessonAverageMarkValue = getAverageMarkForLesson(lesson.getLessonId());
+	if ( isWeighted )
+	    lessonAverageMarkValue = GradebookUtil.niceFormatting((Double)lessonAverageMarkValue, true);
+	
 	ExcelCell[] lessonAverageMark = new ExcelCell[2];
 	lessonAverageMark[0] = new ExcelCell(getMessage("gradebook.export.average.lesson.mark"), true);
-	lessonAverageMark[1] = new ExcelCell(getAverageMarkForLesson(lesson.getLessonId()), false);
+	lessonAverageMark[1] = new ExcelCell(lessonAverageMarkValue, false);
 	rowList.add(lessonAverageMark);
 
 	ExcelCell[] lessonMedianTimeTaken = new ExcelCell[2];
@@ -949,13 +1001,17 @@ public class GradebookService implements IGradebookService {
 
 	for (GBUserGridRowDTO userRow : userRows) {
 	    // Adding the user data for the lesson
+	    Object userMarkValue = userRow.getMark();
+	    if ( userMarkValue != null && isWeighted )
+		userMarkValue = GradebookUtil.niceFormatting((Double)userMarkValue, true);
+
 	    ExcelCell[] userDataRow = new ExcelCell[6];
 	    userDataRow[0] = new ExcelCell(userRow.getLastName(), false);
 	    userDataRow[1] = new ExcelCell(userRow.getFirstName(), false);
 	    userDataRow[2] = new ExcelCell(userRow.getLogin(), false);
 	    userDataRow[3] = new ExcelCell(getProgressMessage(userRow), false);
 	    userDataRow[4] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
-	    userDataRow[5] = new ExcelCell(userRow.getMark(), false);
+	    userDataRow[5] = new ExcelCell(userMarkValue, false);
 	    rowList.add(userDataRow);
 	}
 	rowList.add(GradebookService.EMPTY_ROW);
@@ -968,7 +1024,7 @@ public class GradebookService implements IGradebookService {
 	for (ToolActivity activity : activityToUserDTOMap.keySet()) {
 	    String toolSignature = activity.getTool().getToolSignature();
 	    //check whether toolActivity has a NumericToolOutput
-	    if (!activity.getActivityEvaluations().isEmpty() && (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
+	    if ( activity.getEvaluation() != null && (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
 		    || TOOL_SIGNATURE_MCQ.equals(toolSignature) || TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature))) {
 		filteredActivityToUserDTOMap.put(activity, activityToUserDTOMap.get(activity));
 	    }
@@ -1017,7 +1073,11 @@ public class GradebookService implements IGradebookService {
 		userDataRow[count++] = new ExcelCell(userActivityMark, false);
 	    }
 	    
-	    userDataRow[count] = new ExcelCell(userRow.getMark(), false);
+	    Object userMarkValue = userRow.getMark();
+	    if ( userMarkValue != null && isWeighted )
+		userMarkValue = GradebookUtil.niceFormatting((Double)userMarkValue, true);
+
+	    userDataRow[count] = new ExcelCell(userMarkValue, false);
 	    rowList.add(userDataRow);
 	}
 
@@ -1154,6 +1214,8 @@ public class GradebookService implements IGradebookService {
 
 	Set<Lesson> lessons = new TreeSet<Lesson>(new LessonComparator());
 	lessons.addAll(lessonService.getLessonsByGroupAndUser(userId, organisationId));
+	
+	Map<Long, Boolean> isWeightedLessonMap = new HashMap<Long, Boolean>();
 
 	if ((lessons != null) && (lessons.size() > 0)) {
 
@@ -1192,13 +1254,14 @@ public class GradebookService implements IGradebookService {
 	    }
 	    rowList.add(headerRow);
 
-	    // collect users from all lessons
+	    // collect users from all lessons & check if lesson uses weightings
 	    LinkedHashSet<User> allLearners = new LinkedHashSet<User>();
 	    List<Long> lessonIds = new LinkedList<Long>();
 	    for (Lesson lesson : lessons) {
 		Set dbLessonUsers = lesson.getAllLearners();
 		allLearners.addAll(dbLessonUsers);
 		lessonIds.add(lesson.getLessonId());
+		isWeightedLessonMap.put(lesson.getLessonId(), isWeightedMarks(lesson.getLearningDesign()));
 	    }
 
 	    // Fetching the user data
@@ -1225,7 +1288,7 @@ public class GradebookService implements IGradebookService {
 		    String startDate = "";
 		    String finishDate = "";
 		    Long timeTakenSeconds = null;
-		    Double mark = null;
+		    Object mark = null;
 		    String feedback = "";
 
 		    // check if learner is participating in this lesson
@@ -1248,12 +1311,14 @@ public class GradebookService implements IGradebookService {
 
 			// start date
 			if ((learnerProgress != null) && (learnerProgress.getStartDate() != null)) {
-			    startDate = FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(learnerProgress.getStartDate());
+			    startDate = FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT
+				    .format(learnerProgress.getStartDate());
 			}
 
 			// finish date
 			if ((learnerProgress != null) && (learnerProgress.getFinishDate() != null)) {
-			    finishDate = FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(learnerProgress.getFinishDate());
+			    finishDate = FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT
+				    .format(learnerProgress.getFinishDate());
 			}
 
 			// calculate time taken
@@ -1274,7 +1339,12 @@ public class GradebookService implements IGradebookService {
 			}
 
 			if (gradebookUserLesson != null) {
-			    mark = gradebookUserLesson.getMark();
+			    Double rawMark = gradebookUserLesson.getMark();
+			    if ( rawMark != null && isWeightedLessonMap.get(lesson.getLessonId()) ) {
+				mark = GradebookUtil.niceFormatting(rawMark, true);
+			    } else {
+				mark = rawMark;
+			    }
 			    feedback = gradebookUserLesson.getFeedback();
 			}
 		    } else {
@@ -1392,10 +1462,11 @@ public class GradebookService implements IGradebookService {
 	    rowList.add(lessonsNames);
 
 	    // Headers row----------------------
-	    if (simplified)
+	    if (simplified) {
 		rowList.add(createSelectedLessonsHeaderSimplified(selectedLessons, numberCellsPerRow));
-	    else
+	    } else {
 		rowList.add(createSelectedLessonsHeaderFull(selectedLessons, lessonActivitiesMap, numberCellsPerRow));
+	    }
 
 	    // Actual data rows----------------------
 	    for (User learner : allLearners) {
@@ -1429,7 +1500,7 @@ public class GradebookService implements IGradebookService {
 
 			// group name
 			String groupName = "";
-			for (Group group : (Set<Group>) lesson.getLessonClass().getGroups()) {
+			for (Group group : lesson.getLessonClass().getGroups()) {
 			    if (group.hasLearner(learner)) {
 				groupName = group.getGroupName();
 				break;
@@ -1446,10 +1517,12 @@ public class GradebookService implements IGradebookService {
 			    }
 			}
 			String startDate = (learnerProgress == null || learnerProgress.getStartDate() == null) ? ""
-				: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(learnerProgress.getStartDate());
+				: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT
+					.format(learnerProgress.getStartDate());
 			userRow[i++] = new ExcelCell(startDate, false);
 			String finishDate = (learnerProgress == null || learnerProgress.getFinishDate() == null) ? ""
-				: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(learnerProgress.getFinishDate());
+				: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT
+					.format(learnerProgress.getFinishDate());
 			userRow[i++] = new ExcelCell(finishDate, false);
 		    }
 
@@ -1461,17 +1534,21 @@ public class GradebookService implements IGradebookService {
 			Double mark = 0d;
 			if (gradebookUserActivity != null) {
 			    mark = gradebookUserActivity.getMark();
-			    if (!simplified)
+			    if (!simplified) {
 				userRow[i++] = new ExcelCell(mark, false);
+			    }
 			} else {
-			    if (!simplified)
+			    if (!simplified) {
 				userRow[i++] = new ExcelCell("", false);
+			    }
 			}
 
 			Long activityTotalMarks = (activityToTotalMarkMap.get(activity.getActivityId()) != null)
-				? activityToTotalMarkMap.get(activity.getActivityId()) : 0l;
-			if (!simplified)
+				? activityToTotalMarkMap.get(activity.getActivityId())
+				: 0l;
+			if (!simplified) {
 			    userRow[i++] = new ExcelCell(activityTotalMarks, false);
+			}
 
 			lessonTotal += mark;
 			overallTotal += mark;
@@ -1749,20 +1826,68 @@ public class GradebookService implements IGradebookService {
      *
      * @param gradebookUserLesson
      */
-    private void aggregateTotalMarkForLesson(GradebookUserLesson gradebookUserLesson, Double newActivityMark,
+    private void aggregateTotalMarkForLesson(boolean useWeightings, GradebookUserLesson gradebookUserLesson, GradebookUserActivity markedActivity,
 	    Double oldActivityMark) {
-	newActivityMark = newActivityMark == null ? 0 : newActivityMark;
+	
+	List<GradebookUserActivity> userActivities = gradebookDAO.getGradebookUserActivitiesForLesson(gradebookUserLesson.getLesson().getLessonId(),
+		    gradebookUserLesson.getLearner().getUserId());
 
 	Double totalMark;
 	if (oldActivityMark == null || gradebookUserLesson.getMark() == null) {
-	    totalMark = gradebookDAO.getGradebookUserActivityMarkSum(gradebookUserLesson.getLesson().getLessonId(),
-		    gradebookUserLesson.getLearner().getUserId());
+	    totalMark = calculateLessonMark(useWeightings, userActivities, markedActivity);
+	} else if ( ! useWeightings ) {
+	    totalMark = gradebookUserLesson.getMark() - oldActivityMark;
+	    if ( markedActivity.getMark() != null )
+		totalMark += markedActivity.getMark();
 	} else {
-	    totalMark = gradebookUserLesson.getMark() - oldActivityMark + newActivityMark;
+	    Double oldWeightedMark = getWeightedMark(true, markedActivity, oldActivityMark);
+	    Double newWeighterMark = getWeightedMark(true, markedActivity, markedActivity.getMark());
+	    totalMark = gradebookUserLesson.getMark() - oldWeightedMark + newWeighterMark;
 	}
 
 	gradebookUserLesson.setMark(totalMark);
 	gradebookDAO.insertOrUpdate(gradebookUserLesson);
+    }
+    
+    private Double calculateLessonMark(boolean useWeightings, List<GradebookUserActivity> userActivities, 
+	    GradebookUserActivity markedActivity) {
+	
+	Double totalMark = markedActivity != null ?
+		getWeightedMark(useWeightings, markedActivity, markedActivity.getMark()) : 0.0;
+	
+	for ( GradebookUserActivity guact : userActivities ) {
+	    if ( markedActivity == null || guact.getUid() != markedActivity.getUid() ) {
+		if ( useWeightings ) {
+	    	    totalMark = totalMark + getWeightedMark(useWeightings, guact, guact.getMark());
+    	    	} else {
+		    totalMark = totalMark + guact.getMark();
+    	    	}
+	    }
+	}
+	return totalMark;
+    }
+    
+    private Double getWeightedMark( boolean useWeightings, GradebookUserActivity guact, Double inputRawMark) {
+	Double rawMark = inputRawMark != null ? inputRawMark : 0.0;
+	if ( useWeightings ) {
+	    ToolActivity activity = guact.getActivity();
+	    ActivityEvaluation eval = activity.getEvaluation();
+	    Long maxMark = toolService.getActivityMaxPossibleMark(activity);
+	    if ( maxMark == null ) {
+		logger.error(new StringBuilder("Unable to correctly calculate weighted mark as no maximum mark is known for activity \"")
+			.append(activity.getTitle())
+			.append("\" (")
+			.append(activity.getActivityId())
+			.append("). This activity will be skipped.")
+			.toString());
+		return 0.0;
+	    }
+	    if ( maxMark == 0 ) {
+		return 0.0;
+	    }
+	    return rawMark / maxMark * eval.getWeight();
+	}
+	return rawMark;
     }
 
     /**
@@ -2050,7 +2175,7 @@ public class GradebookService implements IGradebookService {
 
 	return map;
     }
-    
+
     @Override
     public List<Number> getMarksArray(Long lessonId) {
 	return gradebookDAO.getAllMarksForLesson(lessonId);

@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign;
 
 /**
@@ -29,48 +28,29 @@ package org.lamsfoundation.lams.learningdesign;
  * copied and exported in author.
  *
  * @author lfoxton
- *
- *
- *
  */
 public class ActivityEvaluation {
-
-    private Long uid;
-    private Activity activity;
+    private Long activityId;
+    private ToolActivity activity;
     private String toolOutputDefinition;
+    private Integer weight;
 
-    public ActivityEvaluation() {
-	super();
-	// TODO Auto-generated constructor stub
+    public Long getActivityId() {
+	return activityId;
     }
 
-    /**
-     *
-     */
-    public Long getUid() {
-	return uid;
+    public void setActivityId(Long activityId) {
+	this.activityId = activityId;
     }
 
-    public void setUid(Long uid) {
-	this.uid = uid;
-    }
-
-    /**
-     *
-     *
-     *
-     */
-    public Activity getActivity() {
+    public ToolActivity getActivity() {
 	return activity;
     }
 
-    public void setActivity(Activity activity) {
+    public void setActivity(ToolActivity activity) {
 	this.activity = activity;
     }
 
-    /**
-     *
-     */
     public String getToolOutputDefinition() {
 	return toolOutputDefinition;
     }
@@ -79,4 +59,11 @@ public class ActivityEvaluation {
 	this.toolOutputDefinition = toolOutputDefinition;
     }
 
+    public Integer getWeight() {
+	return weight;
+    }
+
+    public void setWeight(Integer weight) {
+	this.weight = weight;
+    }
 }

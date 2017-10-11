@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -318,5 +319,10 @@ public interface IGradebookService {
      */
     List<Number> getMarksArray(Long lessonId);
 
+    /** Will the marks caculation take into account weighting? */
+    boolean isWeightedMarks(LearningDesign design);
+    
+    /** Get a summary of the weightings */
+    List<String[]> getWeights(LearningDesign design);
 
 }

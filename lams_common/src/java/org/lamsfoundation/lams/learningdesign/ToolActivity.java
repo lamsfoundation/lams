@@ -50,6 +50,8 @@ import org.lamsfoundation.lams.util.MessageService;
  */
 public class ToolActivity extends SimpleActivity implements Serializable {
 
+    private static final long serialVersionUID = -7500867438126908849L;
+
     private static Logger log = Logger.getLogger(ToolActivity.class);
 
     /** Holds value of property toolContentId. */
@@ -63,7 +65,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
     private Set<CompetenceMapping> competenceMappings;
 
-    private Set<ActivityEvaluation> activityEvaluations;
+    private ActivityEvaluation evaluation;
 
     private Set<GradebookUserActivity> gradebookUserActivities;
 
@@ -74,8 +76,8 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	    Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary, Activity parentActivity,
 	    Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign, Grouping grouping,
 	    Integer activityTypeId, Transition transitionTo, Transition transitionFrom, String languageFile,
-	    Boolean stopAfterActivity, Set inputActivities, Tool tool, Long toolContentId, Set branchActivityEntries,
-	    Set<CompetenceMapping> competenceMappings, Set<ActivityEvaluation> activityEvaluations,
+	    Boolean stopAfterActivity, Set<Activity> inputActivities, Tool tool, Long toolContentId,
+	    Set branchActivityEntries, Set<CompetenceMapping> competenceMappings, ActivityEvaluation evaluation,
 	    Set<GradebookUserActivity> gradebookUserActivities) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
 		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
@@ -83,7 +85,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	this.tool = tool;
 	this.toolContentId = toolContentId;
 	this.competenceMappings = competenceMappings;
-	this.activityEvaluations = activityEvaluations;
+	this.evaluation = evaluation;
 	super.simpleActivityStrategy = new ToolActivityStrategy(this);
 	this.gradebookUserActivities = gradebookUserActivities;
     }
@@ -120,7 +122,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	newToolActivity.setTool(this.getTool());
 	newToolActivity.setToolContentId(this.getToolContentId());
 
-	Set<CompetenceMapping> newCompetenceMappings = new HashSet<CompetenceMapping>();
+	Set<CompetenceMapping> newCompetenceMappings = new HashSet<>();
 	if (this.competenceMappings != null) {
 	    for (CompetenceMapping compMap : this.competenceMappings) {
 		CompetenceMapping newComp = new CompetenceMapping();
@@ -132,18 +134,15 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
 	newToolActivity.setCompetenceMappings(newCompetenceMappings);
 
-	Set<ActivityEvaluation> newEvaluations = new HashSet<ActivityEvaluation>();
-	if (this.activityEvaluations != null) {
-	    for (ActivityEvaluation evaluation : this.activityEvaluations) {
-		ActivityEvaluation newEvaluation = new ActivityEvaluation();
-		newEvaluation.setActivity(newToolActivity);
-		newEvaluation.setToolOutputDefinition(evaluation.getToolOutputDefinition());
-		newEvaluations.add(newEvaluation);
-	    }
+	if (this.evaluation != null) {
+	    ActivityEvaluation newEvaluation = new ActivityEvaluation();
+	    newEvaluation.setToolOutputDefinition(evaluation.getToolOutputDefinition());
+	    newEvaluation.setWeight(evaluation.getWeight());
+	    newEvaluation.setActivity(newToolActivity);
+	    newToolActivity.setEvaluation(newEvaluation);
 	}
-	newToolActivity.setActivityEvaluations(newEvaluations);
 
-	Set<GradebookUserActivity> newGradebookUserActivities = new HashSet<GradebookUserActivity>();
+	Set<GradebookUserActivity> newGradebookUserActivities = new HashSet<>();
 	if (this.gradebookUserActivities != null) {
 	    for (GradebookUserActivity gradebookAct : this.gradebookUserActivities) {
 		GradebookUserActivity newGradebookAct = new GradebookUserActivity();
@@ -336,12 +335,12 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	toolActivities.add(this);
     }
 
-    public Set<ActivityEvaluation> getActivityEvaluations() {
-	return activityEvaluations;
+    public ActivityEvaluation getEvaluation() {
+	return evaluation;
     }
 
-    public void setActivityEvaluations(Set<ActivityEvaluation> activityEvaluations) {
-	this.activityEvaluations = activityEvaluations;
+    public void setEvaluation(ActivityEvaluation evaluation) {
+	this.evaluation = evaluation;
     }
 
     public Set<GradebookUserActivity> getGradebookUserActivities() {

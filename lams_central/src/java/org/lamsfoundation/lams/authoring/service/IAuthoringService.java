@@ -237,8 +237,9 @@ public interface IAuthoringService {
      * @param cancelled
      *            flag specifying whether user cancelled or saved the edit
      * @throws IOException
+     * @throws Exception 
      */
-    void finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws IOException;
+    void finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws Exception;
 
     /** Get the message service, which gives access to the I18N text */
     MessageService getMessageService();

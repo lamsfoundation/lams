@@ -159,14 +159,11 @@
 			        <one-to-many class="org.lamsfoundation.lams.learningdesign.CompetenceMapping"/>
 			    </set>
 			    
-			    <set name="activityEvaluations" lazy="true" inverse="true" cascade="none" >
-			        <meta attribute="field-description">@hibernate.set lazy="false" inverse="true" cascade="none"
-        												@hibernate.collection-key column="activity_evaluation_id"
-        										        @hibernate.collection-one-to-many class="org.lamsfoundation.lams.evaluation.model.ActivityEvaluation"
-			        </meta>
-			        <key><column name="activity_id" /></key>
-			        <one-to-many class="org.lamsfoundation.lams.learningdesign.ActivityEvaluation"/>
-			    </set>
+			    <one-to-one
+			    	name="evaluation"
+			    	class="org.lamsfoundation.lams.learningdesign.ActivityEvaluation"
+			    	cascade="save-update"
+			    />
 			    
 			    <set name="gradebookUserActivities" lazy="true" inverse="true" cascade="none" >
 			        <meta attribute="field-description">@hibernate.set lazy="false" inverse="true" cascade="none"

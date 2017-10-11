@@ -86,6 +86,8 @@
 				FOLDER : '<c:out value="${FOLDER_VAR}" />',
 				<fmt:message key="authoring.fla.sequence" var="SEQUENCE_VAR"/>
 				SEQUENCE : '<c:out value="${SEQUENCE_VAR}" />',
+				<fmt:message key="authoring.fla.weights.title" var="WEIGHTS_TITLE_VAR"/>
+				WEIGHTS_TITLE : '<c:out value="${WEIGHTS_TITLE_VAR}" />',
 				<fmt:message key="authoring.fla.sequence.not.valid" var="SEQUENCE_NOT_VALID_VAR"/>
 				SEQUENCE_NOT_VALID : decoderDiv.html('<c:out value="${SEQUENCE_NOT_VALID_VAR}" />').text(),
 				<fmt:message key="authoring.fla.sequence.validation.issues" var="SEQUENCE_VALIDATION_ISSUES_VAR"/>
@@ -130,6 +132,8 @@
 				RESOURCE_MODIFY_ERROR : decoderDiv.html('<c:out value="${RESOURCE_MODIFY_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.folder.move.to.child.error" var="FOLDER_MOVE_TO_CHILD_ERROR_VAR"/>
 				FOLDER_MOVE_TO_CHILD_ERROR : decoderDiv.html('<c:out value="${FOLDER_MOVE_TO_CHILD_ERROR_VAR}" />').text(),
+				<fmt:message key="authoring.fla.weights.sum.error" var="WEIGHTS_SUM_ERROR_VAR"/>
+				WEIGHTS_SUM_ERROR : decoderDiv.html('<c:out value="${WEIGHTS_SUM_ERROR_VAR}" />').text(),
 				
 				// HandlerLib
 				<fmt:message key="authoring.fla.transition.from.exists.error" var="TRANSITION_FROM_EXISTS_ERROR_VAR"/>
@@ -376,7 +380,12 @@
 		    <li id="annotateRegionButton" onClick="javascript:MenuLib.addAnnotationRegion()"><a href="#"><fmt:message key="authoring.fla.page.menu.annotate.region" /></a></li>
 		  </ul>
 		</div>
-				
+		
+		<button id="weightButton" class="btn btn-default desktopButton" onClick="javascript:MenuLib.openWeights()">
+			<i class="fa fa-balance-scale"></i> 
+			<span><fmt:message key="authoring.fla.weights.menu" /></span>
+		</button>	
+		
 		<button id="arrangeButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.arrangeActivities()">
 			<i class="fa fa-th"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.arrange" /></span>
@@ -436,7 +445,7 @@
 						 onClick="javascript:MenuLib.toggleDescriptionDiv()">
 						<span id="ldDescriptionFieldTitle"><fmt:message key="authoring.fla.page.ld.title" /></span>
 						<span id="ldDescriptionFieldModified"></span>
-						<span id="ldDescriptionHideTip">▼</span>
+						<span id="ldDescriptionHideTip">?</span>
 					</div>
 					<div id="ldDescriptionDetails">
 						<div class="ldDescriptionLabel"><fmt:message key="authoring.fla.page.ld.description" /></div>
@@ -1056,7 +1065,7 @@
 			</div>
 		 </div>
 	</div>
-	
+
 	
 	<!-- EXPORT CANVAS AS IMAGE DIALOG -->
 	<div id="exportImageDialogContents" class="dialogContents exportDialog">
@@ -1068,6 +1077,28 @@
 	<div id="exportLDDialogContents" class="dialogContents exportDialog">
 		<span><fmt:message key="authoring.fla.page.download.wait" /><br /><fmt:message key="authoring.fla.page.download.close" /></span>
 		<iframe></iframe>
+	</div>
+	
+		
+	<!-- OUTPUT WEIGHTS DIALOG -->
+	<div id="weightsDialogContents" class="dialogContents">
+		<table>
+			<thead>
+				<tr>
+					<td><fmt:message key="authoring.fla.weights.activity" /></td>
+					<td><fmt:message key="authoring.fla.weights.output" /></td>
+					<td><fmt:message key="authoring.fla.weights.weight" /></td>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="2"><fmt:message key="authoring.fla.weights.sum" /></td>
+					<td id="sumWeightCell"></td>
+				</tr>
+			</tfoot>
+		</table>
 	</div>
 </body>
 </lams:html>

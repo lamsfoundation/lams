@@ -69,6 +69,9 @@ public abstract class GradebookGridRowDTO {
 
     protected String status;
     protected String feedback;
+    
+    protected boolean displayMarkAsPercent = false;
+   
 
     /**
      * A shared function to convert milliseconds into a readable string
@@ -264,5 +267,13 @@ public abstract class GradebookGridRowDTO {
 	this.finishDate = finishDate;
     }
 
+    public boolean getDisplayMarkAsPercent() {
+ 	return displayMarkAsPercent;
+     }
 
+     public void setDisplayMarkAsPercent(boolean displayMarkAsPercent) {
+ 	this.displayMarkAsPercent = displayMarkAsPercent;
+     }
+
+    
 }
