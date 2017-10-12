@@ -21,6 +21,9 @@ ALTER TABLE tl_laasse10_assessment_result CHANGE COLUMN latest latest TINYINT(1)
 --add unique constraint
 ALTER TABLE tl_laasse10_assessment_result ADD UNIQUE KEY UQ_tl_laasse10_assessment_result_5 (assessment_uid, user_uid, latest);
 
+--remove unique constraint previously added in patch20170822.sql (LDEV-4410 Add unique index to prevent duplicate result copied from leader)
+ALTER TABLE tl_laasse10_assessment_result DROP INDEX UQ_tl_laasse10_assessment_result_4;
+
 UPDATE lams_tool SET tool_version='20171011' WHERE tool_signature='laasse10';
 
 ----------------------Put all sql statements above here-------------------------
