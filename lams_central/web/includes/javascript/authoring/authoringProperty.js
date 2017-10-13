@@ -488,8 +488,8 @@ var PropertyDefs = {
 			$('.propertiesContentFieldTitle', content).val(activity.title);
 			
 			$('input', content).change(function(){
-				// extract changed properties and redraw the Activity, if needed
-				var content = $(this).closest('.dialogContainer'),
+				// extract changed properties and redraw the activity, if needed
+				var content = $(this).closest('.dialogContents'),
 					activity = content.data('parentObject'),
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				if (newTitle == '') {
