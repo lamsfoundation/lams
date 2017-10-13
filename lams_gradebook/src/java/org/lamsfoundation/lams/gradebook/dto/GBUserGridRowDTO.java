@@ -42,6 +42,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     private String lastName;
     private String login;
     private String currentActivity;
+    private Long portraitId;
 
     public GBUserGridRowDTO() {
     }
@@ -52,6 +53,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.login = user.getLogin();
+	this.setPortraitId(user.getPortraitUuid());
     }
 
     @Override
@@ -68,23 +70,23 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
 	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
-	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
+	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark, displayMarkAsPercent) : CELL_EMPTY);
+	    ret.add(portraitId != null ? portraitId.toString() : "");
 
 	} else if (view == GBGridView.MON_ACTIVITY) {
 
 	    ret.add(marksAvailable != null ? marksAvailable.toString() : "");
-	    if (activityUrl != null && activityUrl.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>"
-			+ rowName + "</a>");
-	    } else {
-		ret.add(rowName);
-	    }
+	    ret.add(rowName);
 	    ret.add(status);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
 	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
+	    ret.add(portraitId != null ? portraitId.toString() : "");
+	    if (activityUrl != null && activityUrl.length() != 0) {
+		ret.add("javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>");
+	    } 
 
 	} else if (view == GBGridView.MON_COURSE) {
 	    ret.add(rowName);
@@ -93,10 +95,13 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
 	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
-	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
+	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark, displayMarkAsPercent) : CELL_EMPTY);
+	    ret.add(portraitId != null ? portraitId.toString() : "");
 
 	} else if (view == GBGridView.LIST) {
 	    ret.add(rowName);
+	    ret.add(portraitId != null ? portraitId.toString() : "");
+
 	}
 
 	return ret;
@@ -140,6 +145,14 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 
     public void setCurrentActivity(String currentActivity) {
 	this.currentActivity = currentActivity;
+    }
+
+    public Long getPortraitId() {
+	return portraitId;
+    }
+
+    public void setPortraitId(Long portraitId) {
+	this.portraitId = portraitId;
     }
 
 }

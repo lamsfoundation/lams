@@ -248,7 +248,7 @@ ActivityDefs = {
 	 * Constructor for a Tool Activity.
 	 */
 	ToolActivity : function(id, uiid, toolContentID, toolID, learningLibraryID, authorURL, x, y, title,
-							readOnly, gradebookToolOutputDefinitionName) {
+							readOnly, evaluation) {
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.toolContentID = toolContentID;
@@ -257,7 +257,11 @@ ActivityDefs = {
 		this.authorURL = authorURL;
 		this.title = title;
 		this.readOnly = readOnly;
-		this.gradebookToolOutputDefinitionName = gradebookToolOutputDefinitionName;
+		if (evaluation) {
+			this.gradebookToolOutputDefinitionName = evaluation[0];
+			this.gradebookToolOutputWeight = evaluation.length > 1 ? evaluation[1] : null;
+		}
+		
 		this.transitions = {
 			'from' : [],
 			'to'   : []
@@ -925,6 +929,20 @@ ActivityLib = {
 				if (object.loadPropertiesDialogContent) {
 					PropertyLib.openPropertiesDialog(object);
 				}
+				
+				/* This will become useful if weights dialog get non-modal
+				if (object instanceof ActivityDefs.ToolActivity
+						&& object.gradebookToolOutputDefinitionName
+						&& layout.weightsDialog.hasClass('in')) {
+					$('tbody tr', layout.weightsDialog).each(function(){
+						if ($(this).data('activity') == object) {
+							$(this).addClass('selected');
+						} else {
+							$(this).removeClass('selected');
+						}
+					});
+				}
+				*/
 			}
 		}
 	},
@@ -1288,7 +1306,6 @@ ActivityLib = {
 		if (!activity.toolID) {
 			return;
 		}
-			
 		$.ajax({
 			url : LAMS_URL + 'authoring/author.do',
 			data : {
@@ -1301,14 +1318,20 @@ ActivityLib = {
 			dataType : 'json',
 			success : function(response) {
 				activity.outputDefinitions = response;
-				if (!activity.gradebookToolOutputDefinitionName) {
-					$.each(activity.outputDefinitions, function() {
-						if (this.isDefaultGradebookMark){
-							activity.gradebookToolOutputDefinitionName = this.name;
+				$.each(activity.outputDefinitions, function() {
+					if (activity.gradebookToolOutputDefinitionName) {
+						if (this.name == activity.gradebookToolOutputDefinitionName) {
+							activity.gradebookToolOutputDefinitionDescription = this.description;
 							return false;
 						}
-					});
-				}
+					} else {
+						if (this.isDefaultGradebookMark){
+							activity.gradebookToolOutputDefinitionName = this.name;
+							activity.gradebookToolOutputDefinitionDescription = this.description;
+							return false;
+						}
+					}
+				});
 			}
 		});
 	},

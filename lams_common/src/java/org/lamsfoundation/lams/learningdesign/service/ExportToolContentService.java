@@ -58,10 +58,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
@@ -822,7 +822,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	String currentVersionString = Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER);
 	try {
-	    boolean isLaterVersion = !VersionUtil.isSameOrLaterVersionAsServer(versionString, true);
+	    boolean isLaterVersion = !VersionUtil.isSameOrLaterVersionAsServer(versionString);
 	    if (isLaterVersion) {
 		log.warn(
 			"Importing a design from a later version of LAMS. There may be parts of the design that will fail to import. Design name \'"
@@ -854,11 +854,18 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	// all exported files from server version prior to 2.4.2 will require deletion of defineLater and runOffline
 	// flags
-	boolean isEarlierVersionThan242 = !VersionUtil.isSameOrLaterVersion("2.4.2", versionString, true);
+	boolean isEarlierVersionThan242 = !VersionUtil.isSameOrLaterVersion("2.4.2", versionString);
 	if (isEarlierVersionThan242) {
 	    Class problemClass = Class.forName(AuthoringActivityDTO.class.getName());
 	    contentFilter.removeField(problemClass, "defineLater");
 	    contentFilter.removeField(problemClass, "runOffline");
+	    contentFilter.transformXML(fullFilePath);
+	}
+
+	boolean isEarlierVersionThan301 = !VersionUtil.isSameOrLaterVersion("3.0.1", versionString);
+	if (isEarlierVersionThan301) {
+	    Class problemClass = Class.forName(AuthoringActivityDTO.class.getName());
+	    contentFilter.renameField(problemClass, "activityEvaluations", "evaluation");
 	    contentFilter.transformXML(fullFilePath);
 	}
     }
@@ -1214,14 +1221,17 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    act.setActivityId(null);
 	    activityDAO.insert(act);
 
+	    List<String> eval = actDto.getEvaluation();
 	    // Once the activity is saved, we can import the ActivityEvaluations
-	    if (actDto.getActivityEvaluations() != null) {
-		for (String toolOutputDefinition : actDto.getActivityEvaluations()) {
-		    ActivityEvaluation activityEvaluation = new ActivityEvaluation();
-		    activityEvaluation.setToolOutputDefinition(toolOutputDefinition);
-		    activityEvaluation.setActivity(act);
-		    baseDAO.insertOrUpdate(activityEvaluation);
+	    if (eval != null && eval.size() > 0) {
+		ActivityEvaluation activityEvaluation = new ActivityEvaluation();
+		activityEvaluation.setToolOutputDefinition(eval.get(0));
+		if (eval.size() > 1) {
+		    activityEvaluation.setWeight(Integer.valueOf(eval.get(1)));
 		}
+		activityEvaluation.setActivity((ToolActivity) act);
+		((ToolActivity) act).setEvaluation(activityEvaluation);
+		activityDAO.update(act);
 	    }
 	}
 

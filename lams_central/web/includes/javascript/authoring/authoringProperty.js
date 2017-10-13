@@ -488,8 +488,8 @@ var PropertyDefs = {
 			$('.propertiesContentFieldTitle', content).val(activity.title);
 			
 			$('input', content).change(function(){
-				// extract changed properties and redraw the Activity, if needed
-				var content = $(this).closest('.dialogContainer'),
+				// extract changed properties and redraw the activity, if needed
+				var content = $(this).closest('.dialogContents'),
 					activity = content.data('parentObject'),
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				if (newTitle == '') {
@@ -711,6 +711,14 @@ var PropertyDefs = {
 				var selectedGradebookToolOutputDefinition = $('.propertiesContentFieldGradebook option:selected', content);
 				if (selectedGradebookToolOutputDefinition.length > 0){
 					activity.gradebookToolOutputDefinitionName = selectedGradebookToolOutputDefinition.val();
+					if (activity.gradebookToolOutputDefinitionName) {
+						$.each(activity.outputDefinitions, function(){
+							if (this.name == activity.gradebookToolOutputDefinitionName) {
+								activity.gradebookToolOutputDefinitionDescription = this.description;
+								return false;
+							}
+						});
+					}
 				}
 				
 				if (redrawNeeded) {
@@ -1546,7 +1554,7 @@ PropertyLib = {
 	
 	
 	/**
-	 * Fill outpu definitions of given activity for Gradebook.
+	 * Fill output definitions of given activity for Gradebook.
 	 */
 	fillOutputDefinitionsDropdown : function(activity) {
 		// find all tools that support input and fill dropdown menu with their titles

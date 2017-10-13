@@ -48,8 +48,11 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     private static final String GET_GRADEBOOK_USER_LESSONS = "from GradebookUserLesson gles where "
 	    + "gles.lesson.lessonId=:lessonID";
 
-    private static final String GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM = "select sum(gact.mark) from GradebookUserActivity gact where "
+    private static final String GET_GRADEBOOK_ACTIVITIES_FROM_LESSON = "from GradebookUserActivity gact where "
 	    + "gact.learner=:userID and gact.activity in (select distinct tses.toolActivity from ToolSession tses where tses.lesson=:lessonID)";
+
+//    private static final String GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM = "select sum(gact.mark) from GradebookUserActivity gact where "
+//	    + "gact.learner=:userID and gact.activity in (select distinct tses.toolActivity from ToolSession tses where tses.lesson=:lessonID)";
 
     private static final String GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY = "FROM GradebookUserActivity gact where "
 	    + "gact.activity.activityId=:activityID";
@@ -107,18 +110,26 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Double getGradebookUserActivityMarkSum(Long lessonID, Integer userID) {
-	List result = getSessionFactory().getCurrentSession().createQuery(GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM)
+    public List<GradebookUserActivity> getGradebookUserActivitiesForLesson(Long lessonID, Integer userID) {
+	List<GradebookUserActivity> result = getSessionFactory().getCurrentSession().createQuery(GET_GRADEBOOK_ACTIVITIES_FROM_LESSON)
 		.setInteger("userID", userID.intValue()).setLong("lessonID", lessonID.longValue()).list();
-
-	if (result != null) {
-	    if (result.size() > 0) {
-		return (Double) result.get(0);
-	    }
-	}
-
-	return 0.0;
+	return result;
     }
+
+//    @Override
+//    @SuppressWarnings("unchecked")
+//    public Double getGradebookUserActivityMarkSum(Long lessonID, Integer userID) {
+//	List result = getSessionFactory().getCurrentSession().createQuery(GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM)
+//		.setInteger("userID", userID.intValue()).setLong("lessonID", lessonID.longValue()).list();
+//
+//	if (result != null) {
+//	    if (result.size() > 0) {
+//		return (Double) result.get(0);
+//	    }
+//	}
+//
+//	return 0.0;
+//    }
 
     @Override
     @SuppressWarnings("unchecked")

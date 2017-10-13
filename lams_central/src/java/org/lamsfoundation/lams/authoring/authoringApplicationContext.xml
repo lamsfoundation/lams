@@ -63,6 +63,7 @@
 		<property name="monitoringService"><ref bean="monitoringService"/></property>
 		<property name="workspaceManagementService"><ref bean="workspaceManagementService"/></property>
 		<property name="logEventService"><ref bean="logEventService"/></property>		
+		<property name="gradebookService"><ref bean="gradebookService" /></property>
 	</bean>
 	
 	<bean id="authoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

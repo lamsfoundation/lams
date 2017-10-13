@@ -26,6 +26,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<style type="text/css">
+.user-container {
+	padding: 2px;
+}
+</style>
 
 <script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
 
@@ -65,12 +70,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<logic:iterate id="group" name="groups">
 				<tr>
 					<td width="25%" class="first"><strong><c:out value="${group.groupName}" /></strong></td>
-					<td width="60%"><c:if test="${viewStudentsBeforeSelection}">
+					<td width="60%">
+					<c:if test="${viewStudentsBeforeSelection}">
 							<c:forEach items="${group.users}" var="user">
-								<i class="fa fa-sm fa-user"></i>&nbsp;<c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />
-								<br/>
+								<div name="u-${user.userId}" class="user-container">
+								<lams:Portrait userId="${user.userId}"/>&nbsp;<c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />
+								</div>
 							</c:forEach>
-						&nbsp;
 					</c:if></td>
 					<td><c:choose>
 							<c:when test="${not empty maxLearnersPerGroup and fn:length(group.users)>=maxLearnersPerGroup}">

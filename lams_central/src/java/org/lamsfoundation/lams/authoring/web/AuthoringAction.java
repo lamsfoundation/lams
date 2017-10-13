@@ -203,7 +203,14 @@ public class AuthoringAction extends LamsDispatchAction {
 	Long learningDesignID = WebUtil.readLongParam(request, "learningDesignID", false);
 	boolean cancelled = WebUtil.readBooleanParam(request, "cancelled", false);
 
-	authoringService.finishEditOnFly(learningDesignID, getUserId(), cancelled);
+	try {
+	    authoringService.finishEditOnFly(learningDesignID, getUserId(), cancelled);
+	} catch (Exception e) {
+	    String errorMsg = "Error occured ending EditOnFly" + e.getMessage()+" learning design id "+learningDesignID;
+	    log.error(errorMsg, e);
+	    throw new IOException(e);
+	}
+
 	return null;
     }
 

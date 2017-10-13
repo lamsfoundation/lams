@@ -766,36 +766,27 @@ public class ObjectExtractor implements IObjectExtractor {
 
     private void extractEvaluationObject(ObjectNode activityDetails, ToolActivity toolActivity)
 	    throws ObjectExtractorException {
-
-	Set<ActivityEvaluation> activityEvaluations = toolActivity.getActivityEvaluations();
-	ActivityEvaluation activityEvaluation;
-
-	// Get the first (only) ActivityEvaluation if it exists
-	if ((activityEvaluations != null) && (activityEvaluations.size() >= 1)) {
-	    activityEvaluation = activityEvaluations.iterator().next();
-	} else {
-	    activityEvaluation = new ActivityEvaluation();
-	}
-
 	String toolOutputDefinition = JsonUtil.optString(activityDetails, AuthoringJsonTags.TOOL_OUTPUT_DEFINITION);
-	if (!StringUtils.isBlank(toolOutputDefinition)) {
-	    activityEvaluations = new HashSet<>();
-	    activityEvaluation.setActivity(toolActivity);
-	    activityEvaluation.setToolOutputDefinition(toolOutputDefinition);
-	    activityEvaluations.add(activityEvaluation);
-	    toolActivity.setActivityEvaluations(activityEvaluations);
-	    baseDAO.insertOrUpdate(activityEvaluation);
+	if (StringUtils.isNotBlank(toolOutputDefinition)) {
+	    ActivityEvaluation evaluation = toolActivity.getEvaluation();
+	    if (evaluation == null) {
+		evaluation = new ActivityEvaluation();
+		evaluation.setActivity(toolActivity);
+	    }
+	    evaluation.setToolOutputDefinition(toolOutputDefinition);
 
+	    String weight = JsonUtil.optString(activityDetails, AuthoringJsonTags.TOOL_OUTPUT_WEIGHT);
+	    if (StringUtils.isBlank(weight)) {
+		evaluation.setWeight(null);
+	    } else {
+		evaluation.setWeight(Integer.valueOf(weight));
+	    }
+	    toolActivity.setEvaluation(evaluation);
+	} else {
 	    // update the parent toolActivity
-	    toolActivity.setActivityEvaluations(activityEvaluations);
-	    activityDAO.insertOrUpdate(toolActivity);
-
-	} else if (activityEvaluation.getUid() != null) {
-	    // update the parent toolActivity
-	    toolActivity.setActivityEvaluations(new HashSet<ActivityEvaluation>());
-	    activityDAO.insertOrUpdate(toolActivity);
-	    baseDAO.delete(activityEvaluation);
+	    toolActivity.setEvaluation(null);
 	}
+	activityDAO.update(toolActivity);
     }
 
     private void parseCompetences(ArrayNode competenceList) throws ObjectExtractorException {

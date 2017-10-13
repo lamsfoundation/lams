@@ -370,6 +370,34 @@ div#outputConditionsDialogContents tr.selected {
 	background-color: $brand-primary-light;
 }
 
+div#weightsDialogContents table {
+	width: 100%;
+}
+
+div#weightsDialogContents thead, div#weightsDialogContents tfoot {
+	font-weight: bold;
+}
+
+div#weightsDialogContents {
+	padding: 5px;
+}
+
+div#weightsDialogContents tr {
+	margin-bottom: 5px;
+}
+
+div#weightsDialogContents tr.selected {
+	background-color: $brand-primary-light;
+}
+
+div#weightsDialogContents td.incorrect {
+	color: $brand-danger;
+}
+
+div#weightsDialogContents input {
+	width: 30px;
+}
+
 /**** Main authoring styles ****/
 
 div#toolbar {

@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.util;
 
 /**
@@ -31,7 +30,7 @@ public class VersionUtil {
 
     /**
      * Extract the three possible parts of the ServerVersionNumber.
-     * 
+     *
      * @return Long[4]
      */
     public static Long[] extractSystemVersionParts() throws NumberFormatException {
@@ -42,7 +41,7 @@ public class VersionUtil {
      * Extract the three possible parts of a version number. Should only be applied to data in the format
      * nn.nn.nn.nnnnnn,
      * such as the ServerVersionNumber value.
-     * 
+     *
      * @return Long[4]
      */
     public static Long[] extractVersionParts(String versionString) throws NumberFormatException {
@@ -55,9 +54,6 @@ public class VersionUtil {
 		    versionParts[1] = Long.parseLong(split[1]);
 		    if (split.length > 2) {
 			versionParts[2] = Long.parseLong(split[2]);
-			if (split.length > 3) {
-			    versionParts[3] = Long.parseLong(split[3]);
-			}
 		    }
 		}
 	    }
@@ -65,8 +61,8 @@ public class VersionUtil {
 	return versionParts;
     }
 
-    public static boolean isSameOrLaterVersion(String versionOneString, String versionTwoString,
-	    boolean compareOnlyFirstPart) throws NumberFormatException {
+    public static boolean isSameOrLaterVersion(String versionOneString, String versionTwoString)
+	    throws NumberFormatException {
 	Long[] versionTwo = VersionUtil.extractVersionParts(versionTwoString);
 	Long[] versionOne = VersionUtil.extractVersionParts(versionOneString);
 	int compareRes = VersionUtil.checkVersionPart(versionTwo[0], versionOne[0]);
@@ -89,28 +85,20 @@ public class VersionUtil {
 	if (compareRes < 0) {
 	    return false;
 	}
-	if (compareRes > 0) {
-	    return true;
-	}
-
-	return (compareOnlyFirstPart || VersionUtil.checkVersionPart(versionTwo[3], versionOne[3]) >= 0);
+	return true;
     }
 
     /**
      * Is the supplied version string the same as the current version? The comparison is done to the internal
      * server version, not the version displayed on the login screen. Splits the version into its three component part
      * for comparison.
-     * 
+     *
      * @param versionString
      *            String to be compared to the current Server version.
-     * @param compareOnlyFirstPart
-     *            Set to true to only compare the Major and Minor version numbers (e.g. 2.0.4), set to false to compare
-     *            the date part.
      */
-    public static boolean isSameOrLaterVersionAsServer(String versionString, boolean compareOnlyFirstPart)
-	    throws NumberFormatException {
+    public static boolean isSameOrLaterVersionAsServer(String versionString) throws NumberFormatException {
 	String serverVersion = Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER);
-	return VersionUtil.isSameOrLaterVersion(versionString, serverVersion, compareOnlyFirstPart);
+	return VersionUtil.isSameOrLaterVersion(versionString, serverVersion);
     }
 
     private static int checkVersionPart(Long version1, Long version2) {
@@ -122,5 +110,4 @@ public class VersionUtil {
 	}
 	return version1.compareTo(version2);
     }
-
 }

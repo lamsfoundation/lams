@@ -47,6 +47,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
@@ -165,6 +166,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     protected IWorkspaceManagementService workspaceManagementService;
 
     protected ILogEventService logEventService;
+
+    protected IGradebookService gradebookService;
 
     protected ToolContentIDGenerator contentIDGenerator;
 
@@ -340,6 +343,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	this.monitoringService = monitoringService;
     }
 
+    public void setGradebookService(IGradebookService gradebookService) {
+	this.gradebookService = gradebookService;
+    }
+
     public void setWorkspaceManagementService(IWorkspaceManagementService workspaceManagementService) {
 	this.workspaceManagementService = workspaceManagementService;
     }
@@ -404,8 +411,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	SortedMap<String, ToolOutputDefinition> defns = lamsCoreToolService.getOutputDefinitionsFromTool(toolContentID,
 		definitionType);
 
-	ArrayList<ToolOutputDefinitionDTO> defnDTOList = new ArrayList<>(
-		defns != null ? defns.size() : 0);
+	ArrayList<ToolOutputDefinitionDTO> defnDTOList = new ArrayList<>(defns != null ? defns.size() : 0);
 	if (defns != null) {
 	    for (ToolOutputDefinition defn : defns.values()) {
 		defnDTOList.add(new ToolOutputDefinitionDTO(defn));
@@ -489,7 +495,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws IOException {
+    public void finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws Exception {
 	User user = (User) baseDAO.find(User.class, userID);
 	if (user == null) {
 	    throw new IOException("User not found, ID: " + userID);
@@ -537,6 +543,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		initialiseToolActivityForRuntime(design, lesson);
 
 		learningDesignDAO.update(design);
+
+		// Always recalculate marks as we can't tell if weightings have been changed/added/removed.
+		// This will override any Gradebook entered *lesson* marks, but will calculate based on
+		// Gradebook entered *activity* marks.
+		gradebookService.recalculateTotalMarksForLesson(lesson.getLessonId());
 	    }
 	}
     }
@@ -858,8 +869,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	updateCompetenceMappings(newLearningDesign.getCompetences(), newActivities);
 
-	updateEvaluations(newActivities);
-
 	try {
 	    AuthoringService.copyLearningDesignImages(originalLearningDesign.getLearningDesignId(),
 		    newLearningDesign.getLearningDesignId());
@@ -944,19 +953,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	learningDesignDAO.update(mainDesign);
 
 	insertCompetenceMappings(mainDesign.getCompetences(), designToImport.getCompetences(), newActivities);
-
-	// For some reason, the evaluations will not save on insert when the
-	// learning design is saved, so doing it manually here
-
-	this.updateEvaluations(newActivities);
-
-	// for (Integer activityKey : newActivities.keySet()) {
-	// Activity activity = newActivities.get(activityKey);
-	// if (activity.isToolActivity()) {
-	// ToolActivity toolAct = (ToolActivity) activity;
-	// baseDAO.insertOrUpdateAll(toolAct.getActivityEvaluations());
-	// }
-	// }
 
 	return mainDesign;
     }
@@ -1422,20 +1418,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	}
     }
 
-    private void updateEvaluations(HashMap<Integer, Activity> newActivities) {
-
-	for (Integer key : newActivities.keySet()) {
-	    Activity activity = newActivities.get(key);
-	    if (activity.isToolActivity()) {
-		Set<ActivityEvaluation> newActivityEvaluations = ((ToolActivity) activity).getActivityEvaluations();
-
-		if (newActivityEvaluations != null) {
-		    baseDAO.insertOrUpdateAll(newActivityEvaluations);
-		}
-	    }
-	}
-    }
-
     /**
      * Determines the type of activity and returns a deep-copy of the same
      *
@@ -1744,9 +1726,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	}
 	if (gradebookToolOutputDefinitionName != null) {
 	    ActivityEvaluation evaluation = new ActivityEvaluation();
-	    evaluation.setActivity(activity);
 	    evaluation.setToolOutputDefinition(gradebookToolOutputDefinitionName);
-	    baseDAO.insert(evaluation);
+	    evaluation.setActivity(activity);
+	    activity.setEvaluation(evaluation);
+	    activityDAO.update(activity);
 	}
 
 	learningDesign.getActivities().add(activity);

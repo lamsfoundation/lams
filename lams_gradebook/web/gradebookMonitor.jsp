@@ -6,6 +6,8 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 
+<c:set var="usesWeights">${not empty weights}</c:set>
+
 <lams:html>
 <lams:head>
 	<title><fmt:message key="gradebook.title.window.lessonMonitor"/></title>
@@ -56,7 +58,22 @@
 			$("#markChartShown").css("display", "none");
 			$("#markChartHidden").css("display", "inline");
 		}
-		
+
+		<c:if test="${usesWeights}">
+		function toggleWeight() {
+			if ( $("#weights").css("display") == "none" ) {
+				$("#weights").css("display","block");
+				$("#weightShown").css("display","inline");
+				$("#weightHidden").css("display","none");
+			} else {
+				$("#weights").css("display","none");
+				$("#weightShown").css("display","none");
+				$("#weightHidden").css("display","inline");
+			}
+		}
+		</c:if>
+
+
 		function toggleRelease() {
 			
 			var conf;
@@ -158,18 +175,20 @@
 			    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
 			    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 			    	"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
-			    	"<fmt:message key="gradebook.columntitle.mark"/>"
+			    	"<fmt:message key="gradebook.columntitle.mark"/>",
+			    	'portraitId'
 			    ],
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true},
+			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true, formatter:userNameFormatter},
 			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
 			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
 			      {name:'startDate',index:'startDate', sortable:true, editable:false, hidden:false, search:false, width:85, align:"left"},
 			      {name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:false, search:false, width:85, align:"left"},
 			      {name:'feedback',index:'feedback', sortable:true, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, search:false },
-			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
-			    ],
+			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"},
+			      {name:'portraitId', index:'portraitId', width:0, hidden: true}
+			      ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#userView").clearGridData();
 			    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
@@ -292,6 +311,7 @@
 					},
 					gridComplete: function(){
 						toolTip($(".jqgrow"), "jqgridTooltip");  // Allow tooltips for this grid	
+				   	 	initializePortraitPopover('<lams:LAMSURL/>');
 						// Load dates shown but hide straight away as all columns needed initially so that subgrid is displayed properly LDEV-4289
 						processLessonDateFields( lessonDatesHidden );
 					}
@@ -374,18 +394,22 @@
 						    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
 						    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
-						     	"<fmt:message key="gradebook.columntitle.mark"/>"
+						     	"<fmt:message key="gradebook.columntitle.mark"/>",
+							    	'portraitId',
+						     	'activityURL'
 						     ],
 						     colModel:[
 						     	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 						     	{name:'marksAvailable',index:'marksAvailable', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-						     	{name:'rowName',index:'rowName', sortable:true, editable:false},
+						     	{name:'rowName',index:'rowName', sortable:true, editable:false, formatter:userNameFormatterActivity},
 						      	{name:'status', index:'status', sortable:false, editable:false, search:false, width:30, align:"center"},
 						      	{name:'timeTaken', index:'timeTaken', sortable:true, editable: false, width:80, align:"center"},
 							    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
 							    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false, width:200, hidden:true},
-						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
+						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"},
+						     	{name:'portraitId', index:'portraitId', width:0, hidden: true},
+						     	{name:'activityURL', index:'activityURL', width:0, hidden: true}
 						     ],
 						     loadError: function(xhr,st,err) {
 					    		jQuery("#"+subgrid_table_id).clearGridData();
@@ -456,6 +480,7 @@
 						     },
 							 gridComplete: function(){
 							 	toolTip($(".jqgrow"), "jqgridTooltip");	// applying tooltips for this grid
+						   	 	initializePortraitPopover('<lams:LAMSURL/>');
 							 }
 						 }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}) // applying refresh button
 						 
@@ -498,9 +523,28 @@
 		            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
 		        })
 
+		        	function userNameFormatter (cellvalue, options, rowObject) {
+					return definePortraitPopover(rowObject.children[8].innerHTML, rowObject.id, cellvalue);
+				}
+
+		        // Combine portraits with activityURL. Both are optional so it is mix and match.
+	       	 	function userNameFormatterActivity (cellvalue, options, rowObject) {
+	       	 		var portProcessed = definePortraitPopover(rowObject.children[9].innerHTML, rowObject.id, cellvalue);
+	       	 		if ( rowObject.children.length > 10 &&  rowObject.children[10] && rowObject.children[10].innerHTML.length > 0 ) {
+	       	 			var activityURL = rowObject.children[10].innerHTML;
+	       	 			if ( portProcessed.indexOf('<a') != -1 ) {
+	       	 				return portProcessed.replace("<a ", "<a href='"+activityURL+"' ");
+	       	 			} else {
+	       	 				return "<a href='"+activityURL+"'>"+cellvalue+"</a>";
+	       	 			}
+	       	 		} 
+	       	 		return portProcessed;
+				}
+
 		        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
 		});
+		
 	</script>
 	
 </lams:head>
@@ -574,6 +618,27 @@
 		</div>
 	</c:set>
 	
+	<c:if test="${usesWeights}">
+		<c:set var="weightButtonCode">
+			<div id="tour-weight-button">
+				<div id="weightShown" style="display:none">
+				<a href="javascript:toggleWeight()" class="${btnclass}" title="<fmt:message key='label.button.hide.weights'/>" >
+					<i class="fa fa-balance-scale"></i> <span class="hidden-xs">
+					<fmt:message key="label.button.hide.weights"/>
+					</span>
+				</a> 
+				</div>
+				<div id="weightHidden">
+					<a href="javascript:toggleWeight()" class="${btnclass}" title="<fmt:message key='label.button.show.weights'/>" >
+						<i class="fa fa-balance-scale"></i> <span class="hidden-xs">
+						<fmt:message key="label.button.show.weights"/>
+						</span>
+					</a> 
+				</div>
+			</div>
+		</c:set>
+	</c:if>
+	
 	<c:choose>
 	<c:when test="${!isInTabs}">
 		<%-- replacement for Page type admin --%>
@@ -592,6 +657,7 @@
 
 		<div class="gbTopButtonsContainer pull-right">
 			${chartButtonCode}
+			${weightButtonCode}
 			${tourDatesCode}
 			<a target="_blank" class="${btnclass}" title="<fmt:message key='button.help.tooltip'/>"
 				   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
@@ -642,6 +708,7 @@
 
 		<c:if test="${isInTabs}">
 	 		${chartButtonCode}
+	 		${weightButtonCode}
 			${tourDatesCode}
 		</c:if>
 		
@@ -653,7 +720,28 @@
  				 <div id="markChartDiv" class="markChartDiv" style="display:none"></div>
 				</div>
 			</div>
-		
+
+			<c:if test="${usesWeights}">
+			<div id="weights" class="grid-holder voffset20" style="display:none" >
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<fmt:message key="label.weights.title"/>
+				</div>
+				<div class="panel-body">
+				<%-- Display weights in four columns --%>
+				<c:forEach var="weightArray" items="${weights}" varStatus="weightCounter">
+					<c:if test="${(weightCounter.index mod 3) == 0}">
+						<c:if test="${weightCounter.index gt 0}"></div></c:if>
+						<div class="row">
+					</c:if>
+					<div class="col-sm-4">${weightArray[0]}: ${weightArray[2]}</div>
+				</c:forEach>
+				</div> <%-- close off row started in the loop --%>
+				</div>
+			</div>	
+			</div>	
+			</c:if>
+			
 			<div class="grid-holder voffset20">
 				<table id="userView" class="scroll" ></table>
 				<div id="userViewPager" class="scroll" ></div>
