@@ -57,7 +57,7 @@ import io.undertow.servlet.spec.HttpSessionImpl;
 import io.undertow.util.Headers;
 
 /**
- * Allows access to LAMS WARs when an user logs in.
+ * Allows access to other LAMS modules when an user logs in Central.
  *
  * @author Marcin Cieslak
  *
@@ -67,7 +67,7 @@ public class SsoHandler implements ServletExtension {
     private static IUserManagementService userManagementService = null;
 
     private static final String REDIRECT_KEY = "io.undertow.servlet.form.auth.redirect.location";
-    private static final String KEEP_SESSION_ID_KEY = "lams.keepSessionId";
+    static final String KEEP_SESSION_ID_KEY = "lams.keepSessionId";
 
     @Override
     public void handleDeployment(final DeploymentInfo deploymentInfo, final ServletContext servletContext) {
