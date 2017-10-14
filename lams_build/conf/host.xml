@@ -87,21 +87,32 @@
 
     <servers>
         <server name="server-one" group="lams-server-group" auto-start="true">
-              
-                          <jvm name="default">
-                            <jvm-options>
+             <!--
+              ~ 
+              ~             <jvm name="default">
+              ~               <jvm-options>
+              					Remote JPDA debugging for a specific server
+              ~                 <option value="-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n"/>
+              					LAMS: disable session ID change on auth so TestHarness can run
               					<option value="-Dlams.keepSessionId=true"/>
-                           </jvm-options>
-                         </jvm>
-                         
+              ~               </jvm-options>
+              ~            </jvm>
+              ~            
+              -->
         </server>
         <server name="server-two" group="lams-server-group" auto-start="true">
-                          <jvm name="default">
-                             <jvm-options>
+             <!--
+              ~ 
+              ~             <jvm name="default">
+              ~               <jvm-options>
+              					Remote JPDA debugging for a specific server
+              ~                 <option value="-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n"/>
+              					LAMS: disable session ID change on auth so TestHarness can run
               					<option value="-Dlams.keepSessionId=true"/>
-                            </jvm-options>
-                         </jvm>
-                        
+              ~               </jvm-options>
+              ~            </jvm>
+              ~            
+              -->
               
              <!--
               ~  server-two avoids port conflicts by incrementing the ports in
