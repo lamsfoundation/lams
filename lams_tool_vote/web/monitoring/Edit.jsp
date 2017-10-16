@@ -1,6 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 
+<lams:Alert id="editWarning" type="warning" close="false">
+    <fmt:message key="message.monitoring.edit.activity.warning" />
+</lams:Alert>
+
 <table class="table table-condensed">
 	<tr>
 		<td width="15%"><fmt:message key="label.authoring.title.col"></fmt:message></td>

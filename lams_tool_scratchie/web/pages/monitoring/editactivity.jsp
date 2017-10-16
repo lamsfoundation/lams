@@ -2,6 +2,10 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="scratchie" value="${sessionMap.scratchie}"/>
 
+<lams:Alert id="editWarning" type="warning" close="false">
+    <fmt:message key="message.monitoring.edit.activity.warning" />
+</lams:Alert>
+
 <table class="table table-condensed">
 	<tr>
 		<td width="10%" nowrap>
