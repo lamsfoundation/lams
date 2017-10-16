@@ -86,6 +86,11 @@ public interface IMcUsrAttemptDAO {
     McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId);
 
     /**
+     * Get the highest attempt order for a all users in a session for a particular question
+     */
+    List<McUsrAttempt> getUserAttemptsByQuestionSession(final Long sessionUid, final Long mcQueContentId);
+    
+    /**
      * Count how many attempts done to this option
      *
      * @param optionUid

@@ -87,6 +87,8 @@ public interface IMcService {
 
     McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) throws McApplicationException;
 
+    Long getPortraitId(Long userId);
+
     void saveUserAttempt(McQueUsr user, List<AnswerDTO> answerDtos);
 
     void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;

@@ -288,9 +288,28 @@ public class McMonitoringAction extends LamsDispatchAction {
 	}
 	String searchString = WebUtil.readStrParam(request, "userName", true);
 
-	List<McUserMarkDTO> userDtos = mcService.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy,
-		sortOrder, searchString);
-	int countVisitLogs = mcService.getCountPagedUsersBySession(sessionId, searchString);
+	List<McUserMarkDTO> userDtos = new ArrayList<McUserMarkDTO>();
+	int countVisitLogs = 0;
+	//in case of UseSelectLeaderToolOuput - display only one user
+	if (groupLeader != null) {
+	    
+		Integer totalMark = groupLeader.getLastAttemptTotalMark();
+		Long portraitId = mcService.getPortraitId(groupLeader.getQueUsrId());
+		
+		McUserMarkDTO userDto = new McUserMarkDTO();
+		userDto.setQueUsrId(groupLeader.getUid().toString());
+		userDto.setUserId(groupLeader.getQueUsrId().toString());
+		userDto.setFullName(groupLeader.getFullname());
+		userDto.setTotalMark(totalMark != null ? totalMark.longValue() : null);
+		userDto.setPortraitId(portraitId==null ? null : portraitId.toString());
+		userDtos.add(userDto);
+		countVisitLogs = 1;
+
+	} else {
+	    userDtos = mcService.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy,
+	    		sortOrder, searchString);
+	    countVisitLogs = mcService.getCountPagedUsersBySession(sessionId, searchString);
+	}
 
 	int totalPages = new Double(
 		Math.ceil(new Integer(countVisitLogs).doubleValue() / new Integer(rowLimit).doubleValue())).intValue();
