@@ -16,10 +16,7 @@
 <lams:head>
 
 	<lams:css/>
-	<!-- Need both ui stylesheets or we lose the grey headers on the grids. -->
-	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery.jqGrid.css" type="text/css" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-tour.min.css"> 
 	<lams:css suffix="progressBar"/>
@@ -35,8 +32,6 @@
 		});
 	</script>
 	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>

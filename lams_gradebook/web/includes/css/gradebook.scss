@@ -4,20 +4,11 @@
 	display: none;
 }
 
-#export-selected-lessons-button {
-	margin-bottom: 10px;
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-th-column .cbox,
+.ui-jqgrid.ui-jqgrid-bootstrap .jqgrow>td>.cbox {
+    height: 14px !important;
+    width: 14px !important;
 }
-
-#gbox_lessons-jqgrid {
-	margin-left: auto;
-	margin-right: auto;
-}
-
-// Grids should have no border but date widgets need the border
-.ui-jqgrid.ui-widget-content {
-    border: 0px solid #aaaaaa !important;
-}
-
 
 /* Formatting buttons on the Gradebook Lesson screen */
 .gbTopButtonsContainer {

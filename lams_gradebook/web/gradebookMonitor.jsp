@@ -139,14 +139,6 @@
             resizeJqgrid(jQuery("#userView"));
  		}
 
-        function resizeJqgrid(jqgrids) {
-            jqgrids.each(function(index) {
-                var gridId = $(this).attr('id');
-                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-            });
-        };
-
 		jQuery(document).ready(function(){
   
 			var jqgridWidth = $(window).width() - 100;
@@ -154,6 +146,9 @@
 			
 			// Create the user view grid with sub grid for activities	
 			jQuery("#userView").jqGrid({
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
+				autoencode:false,
 				caption: "<fmt:message key="gradebook.gridtitle.usergrid"/>",
 			    datatype: "xml",
 			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monUserView&lessonID=${lessonDetails.lessonID}",
@@ -165,7 +160,7 @@
 			    sortorder: "asc", 
 			    sortname: "rowName", 
 			    pager: 'userViewPager',
-			    rowList:[5,10,20,30],
+			    rowList:[10,20,30,40,50,100],
 			    rowNum:10,
 				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradebookData&lessonID=${lessonDetails.lessonID}",
 			    colNames:["", 
@@ -200,13 +195,16 @@
 				   subgrid_table_id = subgrid_id+"_t";
 					 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 					   	jQuery("#"+subgrid_table_id).jqGrid({
+							 guiStyle: "bootstrap",
+							 iconSet: 'fontAwesome',
+							 autoencode:false,
 						     datatype: "xml",
 						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
 						     height: "100%",
 						     autowidth:true,
 						     cellEdit:true,
 						     pager: subgrid_table_id + "_pager",
-							 rowList:[5,10,20,30],
+						     rowList:[10,20,30,40,50,100],
 							 rowNum:10,
 						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradebookData&lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
 						     colNames: [
@@ -305,6 +303,7 @@
 						     },
 							 gridComplete: function(){
 							 	toolTip($(".jqgrow"), "jqgridTooltip");
+							 	fixPagerInCenter(subgrid_table_id+"_pager", 1);
 							 }
 					  	}).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}); // applying refresh button
 					  
@@ -316,23 +315,13 @@
 						processLessonDateFields( lessonDatesHidden );
 					}
 				}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false}); // applying refresh button
-				
-				// Allowing search for this grid
-				jQuery("#userView").navButtonAdd('#userViewPager',{
-					caption: "",
-					title: "Search Names",
-					buttonimg:"<lams:LAMSURL />images/find.png", 
-					onClickButton: function(){
-						jQuery("#userView").searchGrid({
-								top:10, 
-								left:10,
-								sopt:['cn','bw','eq','ne','ew']
-							});
-						}
-				});
-								
+				jQuery("#userView").jqGrid('filterToolbar');
+
 				// Creating activity view with sub learner view
 				jQuery("#activityView").jqGrid({
+					guiStyle: "bootstrap",
+					iconSet: 'fontAwesome',
+					autoencode:false,
 					caption: "<fmt:message key="gradebook.gridtitle.activitygrid"/>",
 				    datatype: "xml",
 				    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&view=monActivityView&lessonID=${lessonDetails.lessonID}",
@@ -341,8 +330,8 @@
 				    shrinkToFit: false,
 				    cellEdit: true,
 				    pager: "activityViewPager",
-				    rowList:[5,10,20,30],
-			    	rowNum:10,
+				    rowList:[10,20,30,40,50,100],
+				    	rowNum:10,
 				    sortorder: "asc", 
 				    sortname: "activityId", 
 				    colNames:[
@@ -374,6 +363,9 @@
 					   
 					   jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 					   jQuery("#"+subgrid_table_id).jqGrid({
+ 							 guiStyle: "bootstrap",
+							 iconSet: 'fontAwesome',
+							 autoencode:false,
 						     datatype: "xml",
 						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monActivityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID + "&groupId=" + groupID,
 						     height: "100%",
@@ -383,7 +375,7 @@
 						     sortorder: "asc", 
 							 sortname: "fullName", 
 							 pager: subgrid_table_id + "_pager",
-							 rowList:[5,10,20,30],
+						     rowList:[10,20,30,40,50,100],
 							 rowNum:10,
 						     colNames: [
 						     	'',
@@ -403,7 +395,7 @@
 						     	{name:'marksAvailable',index:'marksAvailable', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 						     	{name:'rowName',index:'rowName', sortable:true, editable:false, formatter:userNameFormatterActivity},
 						      	{name:'status', index:'status', sortable:false, editable:false, search:false, width:30, align:"center"},
-						      	{name:'timeTaken', index:'timeTaken', sortable:true, editable: false, width:80, align:"center"},
+						      	{name:'timeTaken', index:'timeTaken', sortable:true, editable: false, search:false, width:80, align:"center"},
 							    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
 							    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false, width:200, hidden:true},
@@ -481,25 +473,15 @@
 							 gridComplete: function(){
 							 	toolTip($(".jqgrow"), "jqgridTooltip");	// applying tooltips for this grid
 						   	 	initializePortraitPopover('<lams:LAMSURL/>');
+						   	 	fixPagerInCenter(subgrid_table_id+"_pager", 1);
 							 }
 						 }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}) // applying refresh button
-						 
-						 // allowing search for this grid
-						 jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
-								caption: "",
-								buttonimg:"<lams:LAMSURL />images/find.png", 
-								onClickButton: function(){
-									jQuery("#"+subgrid_table_id).searchGrid({
-																		top:10, 
-																		left:10,
-																		sopt:['cn','bw','eq','ne','ew']
-																	});
-								}
-						  });
-						  
-					 },
+						 jQuery("#"+subgrid_table_id).jqGrid('filterToolbar');
+
+					},
 					 gridComplete: function(){
 					 	toolTip($(".jqgrow"), "jqgridTooltip");	// enable tooltips for grid
+					 	fixPagerInCenter('activityViewPager', 0);
 					 }	 
 				}).navGrid("#activityViewPager", {edit:false,add:false,del:false,search:false}); // enable refresh button
 				
@@ -524,14 +506,14 @@
 		        })
 
 		        	function userNameFormatter (cellvalue, options, rowObject) {
-					return definePortraitPopover(rowObject.children[8].innerHTML, rowObject.id, cellvalue);
+					return definePortraitPopover(rowObject[8].innerHTML, rowObject.id, cellvalue);
 				}
 
 		        // Combine portraits with activityURL. Both are optional so it is mix and match.
 	       	 	function userNameFormatterActivity (cellvalue, options, rowObject) {
-	       	 		var portProcessed = definePortraitPopover(rowObject.children[9].innerHTML, rowObject.id, cellvalue);
-	       	 		if ( rowObject.children.length > 10 &&  rowObject.children[10] && rowObject.children[10].innerHTML.length > 0 ) {
-	       	 			var activityURL = rowObject.children[10].innerHTML;
+	       	 		var portProcessed = definePortraitPopover(rowObject[9].innerHTML, rowObject.id, cellvalue);
+	       	 		if ( rowObject.children.length > 10 && rowObject[10].innerHTML.length > 0 ) {
+	       	 			var activityURL = rowObject[10].innerHTML;
 	       	 			if ( portProcessed.indexOf('<a') != -1 ) {
 	       	 				return portProcessed.replace("<a ", "<a href='"+activityURL+"' ");
 	       	 			} else {
