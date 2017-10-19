@@ -292,7 +292,7 @@ public class LearnerAction extends LamsDispatchAction {
 			    .add(activityProgressToJSON(childActivity, null, lessonId, learnerId, monitorId));
 		}
 	    } else {
-		responseJSON.withArray("support")
+		responseJSON.withArray("activities")
 			.add(activityProgressToJSON(activity, (Long) ret[1], lessonId, learnerId, monitorId));
 	    }
 	}
