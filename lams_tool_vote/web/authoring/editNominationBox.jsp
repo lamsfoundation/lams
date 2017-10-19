@@ -14,15 +14,13 @@
 		
 		<div class="panel-body">
 
-		<html:form action="/authoring?validate=false" styleId="newNominationForm" enctype="multipart/form-data" method="POST">
-
-			<html:hidden property="dispatch" value="saveSingleNomination" />
-			<html:hidden property="toolContentID" />
-			<html:hidden property="currentTab" styleId="currentTab" />
-			<html:hidden property="httpSessionID" />
-			<html:hidden property="contentFolderID" />
-			<html:hidden property="editableNominationIndex" />
-			<html:hidden property="editNominationBoxRequest" value="true" />
+		<form:form action="saveSingleNomination.do" modelAttribute="voteAuthoringForm" id="newNominationForm" method="POST">
+			<form:hidden path="toolContentID" />
+			<form:hidden path="currentTab" />
+			<form:hidden path="httpSessionID" />
+			<form:hidden path="contentFolderID" />
+			<form:hidden path="editableNominationIndex" />
+			<input type="hidden" name="editNominationBoxRequest" value="true" />
 
 			<div class="form-group">
 				<lams:CKEditor id="newNomination"
@@ -38,7 +36,7 @@
 					<i class="fa fa-plus"></i>&nbsp; <fmt:message key="label.save.nomination" /> </a>
 			</div>
 					
-		</html:form>
+		</form:form>
 		</div>
 		</div>
 

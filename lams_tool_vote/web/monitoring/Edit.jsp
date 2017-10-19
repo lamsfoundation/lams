@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 
 <table class="table table-condensed">
 	<tr>
@@ -25,11 +24,11 @@
 
 </table>
 
-<c:url  var="authoringUrl" value="/authoring.do?dispatch=start">
-	<c:param name="toolContentID" value="${formBean.toolContentID}" />
-	<c:param name="contentFolderID" value="${formBean.contentFolderID}" />
+<c:url var="authoringUrl" value="/authoring/start.do">
+	<c:param name="toolContentID" value="${voteMonitoringForm.toolContentID}" />
+	<c:param name="contentFolderID" value="${voteMonitoringForm.contentFolderID}" />
 	<c:param name="mode" value="teacher" />
 </c:url>
-<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
+<a href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
 	<fmt:message key="label.edit"/>
-</html:link> 
+</a> 

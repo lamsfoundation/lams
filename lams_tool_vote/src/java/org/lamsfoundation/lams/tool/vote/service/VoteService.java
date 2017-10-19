@@ -90,7 +90,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.util.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
-import org.lamsfoundation.lams.tool.vote.web.action.MonitoringAction;
+import org.lamsfoundation.lams.tool.vote.web.action.MonitoringController;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -656,7 +656,7 @@ public class VoteService
 	    }
 
 	    if (monitoredUserContainerDTOs.size() > 0) {
-		Map<String, VoteMonitoredUserDTO> mapMonitoredUserContainerDTO = MonitoringAction
+		Map<String, VoteMonitoredUserDTO> mapMonitoredUserContainerDTO = MonitoringController
 			.convertToVoteMonitoredUserDTOMap(monitoredUserContainerDTOs);
 
 		voteMonitoredAnswersDTO.setQuestionAttempts(mapMonitoredUserContainerDTO);

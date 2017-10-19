@@ -16,11 +16,11 @@
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
 		var noSelected = 0;
-		var maxVotes = <c:out value="${VoteLearningForm.maxNominationCount}"/>;
-		var minVotes = <c:out value="${VoteLearningForm.minNominationCount}"/>;
+		var maxVotes = <c:out value="${voteLearningForm.maxNominationCount}"/>;
+		var minVotes = <c:out value="${voteLearningForm.minNominationCount}"/>;
 		function updateCount(clickedObj) {
 			var userEntry = 0;
-			<c:if test="${VoteLearningForm.allowTextEntry == true}">
+			<c:if test="${voteLearningForm.allowTextEntry == true}">
 			if (document.forms[0].userEntry.value != "") {
 				userEntry = 1;
 			}
@@ -42,7 +42,7 @@
 		function validate() {
 			var error = "";
 			var userEntry = 0;
-			<c:if test="${VoteLearningForm.allowTextEntry == true}">
+			<c:if test="${voteLearningForm.allowTextEntry == true}">
 			if (document.forms[0].userEntry.value != "") {
 				userEntry = 1;
 			}
@@ -76,9 +76,8 @@
 
 			$.ajax({
 				async : false,
-				url : '<c:url value="/learning.do"/>',
-				data : 'dispatch=checkLeaderProgress&toolSessionID='
-						+ $('[name="toolSessionID"]').val(),
+				url : '<c:url value="/learning/checkLeaderProgress.do"/>',
+				data : 'toolSessionID=' + $('[name="toolSessionID"]').val(),
 				dataType : 'json',
 				type : 'post',
 				success : function(json) {
@@ -116,24 +115,21 @@
 
 <body class="stripes">
 
-	<html:form onsubmit="return validate();" action="/learning?validate=false&dispatch=continueOptionsCombined"
-		method="POST" target="_self">
-		<c:set var="formBean" value="<%=request
-							.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-		<html:hidden property="toolSessionID" />
-		<html:hidden property="userID" />
-		<html:hidden property="revisitingUser" />
-		<html:hidden property="previewOnly" />
-		<html:hidden property="maxNominationCount" />
-		<html:hidden property="minNominationCount" />
-		<html:hidden property="allowTextEntry" />
-		<html:hidden property="lockOnFinish" />
-		<html:hidden property="reportViewOnly" />
-		<html:hidden property="showResults" />
-		<html:hidden property="userLeader" />
-		<html:hidden property="groupLeaderName" />
-		<html:hidden property="groupLeaderUserId" />
-		<html:hidden property="useSelectLeaderToolOuput" />
+	<form:form modelAttribute="voteLearningForm" onsubmit="return validate();" action="continueOptionsCombined.do" method="POST">
+		<form:hidden path="toolSessionID" />
+		<form:hidden path="userID" />
+		<form:hidden path="revisitingUser" />
+		<form:hidden path="previewOnly" />
+		<form:hidden path="maxNominationCount" />
+		<form:hidden path="minNominationCount" />
+		<form:hidden path="allowTextEntry" />
+		<form:hidden path="lockOnFinish" />
+		<form:hidden path="reportViewOnly" />
+		<form:hidden path="showResults" />
+		<form:hidden path="userLeader" />
+		<form:hidden path="groupLeaderName" />
+		<form:hidden path="groupLeaderUserId" />
+		<form:hidden path="useSelectLeaderToolOuput" />
 
 
 		<lams:Page type="learner" title="${voteGeneralLearnerFlowDTO.activityTitle}">
@@ -141,8 +137,8 @@
 
 
 			<!-- Announcements and advanced settings -->
-			<c:if test="${formBean.useSelectLeaderToolOuput}">
-				<lams:LeaderDisplay idName="groupLeader" username="${formBean.groupLeaderName}" userId="${formBean.groupLeaderUserId}"/>
+			<c:if test="${voteLearningForm.useSelectLeaderToolOuput}">
+				<lams:LeaderDisplay idName="groupLeader" username="${voteLearningForm.groupLeaderName}" userId="${voteLearningForm.groupLeaderUserId}"/>
 			</c:if>
 
 			<c:if test="${not empty voteGeneralLearnerFlowDTO.submissionDeadline}">
@@ -196,23 +192,21 @@
 			</div>
 			<!-- End options -->
 
-			<c:if test="${VoteLearningForm.allowTextEntry == 'true'}">
+			<c:if test="${voteLearningForm.allowTextEntry == 'true'}">
 				<fmt:message key="label.other" />:
-				<html:text styleClass="form-control" property="userEntry" size="30" maxlength="100" />
+				<form:input cssClass="form-control" path="userEntry" size="30" maxlength="100" />
 			</c:if>
 
-			<html:hidden property="donePreview" />
+			<form:hidden path="donePreview" />
 
-
-			<html:submit property="continueOptionsCombined" styleClass="btn btn-primary pull-right voffset10">
-				<fmt:message key="label.submit.vote" />
-			</html:submit>
+			<input type="submit" name="continueOptionsCombined" class="btn btn-primary pull-right voffset10"
+				   value='<fmt:message key="label.submit.vote" />' />
 
 			<div id="footer"></div>
 
 		</lams:Page>
 
-	</html:form>
+	</form:form>
 
 </body>
 </lams:html>

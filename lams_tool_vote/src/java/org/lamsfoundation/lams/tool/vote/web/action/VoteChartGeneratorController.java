@@ -22,29 +22,27 @@
 
 package org.lamsfoundation.lams.tool.vote.web.action;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
-import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -54,13 +52,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @author Marcin Cieslak
  */
-public class VoteChartGeneratorAction extends LamsDispatchAction {
-    private static Logger logger = Logger.getLogger(VoteChartGeneratorAction.class.getName());
-    private static IVoteService voteService;
+@Controller
+public class VoteChartGeneratorController {
+    @Autowired
+    @Qualifier("voteService")
+    private IVoteService voteService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping(path = "/chartGenerator", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String start(HttpServletRequest request) {
 	String currentSessionId = request.getParameter("currentSessionId");
 
 	Map<Long, String> nominationNames = new HashMap<>();
@@ -69,7 +69,7 @@ public class VoteChartGeneratorAction extends LamsDispatchAction {
 	//request for the all session summary
 	if ("0".equals(currentSessionId)) {
 	    long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	    LinkedList<SessionDTO> sessionDTOs = getVoteService().getSessionDTOs(toolContentID);
+	    LinkedList<SessionDTO> sessionDTOs = voteService.getSessionDTOs(toolContentID);
 
 	    // check allSessionsSummary exists
 	    SessionDTO allSessionsSummary = sessionDTOs.getFirst();
@@ -87,11 +87,10 @@ public class VoteChartGeneratorAction extends LamsDispatchAction {
 
 	    //sessionId should not be blank
 	} else if (!StringUtils.isBlank(currentSessionId)) {
-	    logger.warn("Session Id should not be blank");
-	    VoteSession voteSession = getVoteService().getSessionBySessionId(new Long(currentSessionId));
+	    VoteSession voteSession = voteService.getSessionBySessionId(new Long(currentSessionId));
 	    VoteContent voteContent = voteSession.getVoteContent();
 
-	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = getVoteService().prepareChartData(request,
+	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = voteService.prepareChartData(request,
 		    voteContent.getVoteContentId(), voteSession.getUid(), new VoteGeneralLearnerFlowDTO());
 
 	    nominationNames = voteGeneralLearnerFlowDTO.getMapStandardNominationsContent();
@@ -107,15 +106,6 @@ public class VoteChartGeneratorAction extends LamsDispatchAction {
 	    responseJSON.withArray("data").add(nomination);
 	}
 
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().write(responseJSON.toString());
-	return null;
-    }
-
-    private IVoteService getVoteService() {
-	if (voteService == null) {
-	    voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-	}
-	return voteService;
+	return responseJSON.toString();
     }
 }

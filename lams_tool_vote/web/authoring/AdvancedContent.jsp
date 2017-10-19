@@ -11,9 +11,8 @@
 	
 	<div class="checkbox">
 		<label for="useSelectLeaderToolOuput">
-		<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput">
-		</html:checkbox>
-		<fmt:message key="label.use.select.leader.tool.output" />
+			<form:checkbox path="useSelectLeaderToolOuput" id="useSelectLeaderToolOuput" value="1" />
+			<fmt:message key="label.use.select.leader.tool.output" />
 		</label>
 	</div>
 	
@@ -23,42 +22,41 @@
 
 	<div class="checkbox">
 		<label for="allowText">
-		<html:checkbox property="allowText" value="1" styleId="allowText" onchange="changeMinMaxVotes(-1, -1);">
-		</html:checkbox>
-		<fmt:message key="label.allowText" />
+			<form:checkbox path="allowText" id="allowText" value="1" onchange="changeMinMaxVotes(-1, -1);" />
+			<fmt:message key="label.allowText" />
 		</label>
 	</div>
 	
 	<div class="form-group">
-		<html:select property="minNominationCount" styleId="minNominationCount" styleClass="form-control form-control-inline input-sm" onchange="validateNominationCount(true);">
-		</html:select>&nbsp;<fmt:message key="label.minNomCount" />
+		<form:select path="minNominationCount" cssClass="form-control form-control-inline input-sm" onchange="validateNominationCount(true);" />
+		&nbsp;<fmt:message key="label.minNomCount" />
 	</div>
 	
 	<div class="form-group">
-		<html:select property="maxNominationCount" styleId="maxNominationCount" styleClass="form-control form-control-inline input-sm" onchange="validateNominationCount(false);">
-		</html:select>&nbsp;<fmt:message key="label.maxNomCount" />
+		<form:select path="maxNominationCount" cssClass="form-control form-control-inline input-sm" onchange="validateNominationCount(false);" />
+		&nbsp;<fmt:message key="label.maxNomCount" />
 	</div>
 	
 	<c:if test="${not empty voteGeneralAuthoringDTO.dataFlowObjectNames}">
 		<div class="form-group">
-			<html:select property="maxInputs" styleId="maxInputs"  styleClass="form-control input-sm">
-				<html:option value="0" styleId="dataFlowLimitNoneOption">
+			<form:select path="maxInputs" cssClass="form-control input-sm">
+				<form:option value="0" id="dataFlowLimitNoneOption">
 					<fmt:message key="label.advanced.data.flow.limit.none" />
-				</html:option>
+				</form:option>
 				<c:forEach begin="1" end="50" var="index">
-					<html:option value="${index}">${index}</html:option>
+					<form:option value="${index}">${index}</form:option>
 				</c:forEach>
-			</html:select>
+			</form:select>
 			<label for="maxInputs">
-			<fmt:message key="label.advanced.data.flow.limit" /></label>
+				<fmt:message key="label.advanced.data.flow.limit" />
+			</label>
 		</div>
 	</c:if>
 	
 	<div class="checkbox">
 		<label for="showResults">
-		<html:checkbox property="showResults" value="1" styleId="showResults">
-		</html:checkbox>
-		<fmt:message key="label.show.results" />
+			<form:checkbox path="showResults" id="showResults" value="1" />
+			<fmt:message key="label.show.results" />
 		</label>
 	</div>
 
@@ -68,29 +66,26 @@
 
 	<div class="checkbox">
 		<label for="lockOnFinish">
-		<html:checkbox property="lockOnFinish" value="1" styleId="lockOnFinish">
-		</html:checkbox>
-		<fmt:message key="label.vote.lockedOnFinish" />
+			<form:checkbox path="lockOnFinish" id="lockOnFinish" value="1" />
+			<fmt:message key="label.vote.lockedOnFinish" />
 		</label>
 	</div>
 
 	<div class="checkbox">
 		<label for="reflect">
-		<html:checkbox property="reflect" value="1" styleId="reflect">
-		</html:checkbox>
-		<fmt:message key="label.reflect" />
+			<form:checkbox path="reflect" id="reflect" value="1" />
+			<fmt:message key="label.reflect" />
 		</label>
 	</div>
 	<div class="form-group">
-		<html:textarea rows="3" property="reflectionSubject" styleId="reflectInstructions" styleClass="form-control"></html:textarea> 
+		<form:textarea rows="3" path="reflectionSubject" cssClass="form-control"></form:textarea> 
 	</div>
 
 </lams:SimplePanel>
 
 <script type="text/javascript">
-<!--
 //automatically turn on refect option if there are text input in refect instruction area
-	var ra = document.getElementById("reflectInstructions");
+	var ra = document.getElementById("reflectionSubject");
 	var rao = document.getElementById("reflect");
 	function turnOnRefect(){
 		if(isEmpty(ra.value)){
@@ -123,6 +118,4 @@
 		}
 	}
 
-
-//-->
 </script>

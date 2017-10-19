@@ -27,17 +27,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
+import org.springframework.validation.Errors;
 
-public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4035785085162811572L;
+public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     private List<String> nomination;
     private String contentFolderID;
     private String instructions;
@@ -58,9 +53,7 @@ public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	this.contentFolderID = contentFolderID;
     }
 
-    @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
+    public void validate(Errors errors) {
 	boolean valid = true;
 	boolean allEmpty = true;
 	if (nomination != null && !nomination.isEmpty()) {
@@ -72,14 +65,12 @@ public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	    }
 	}
 	if (allEmpty) {
-	    ActionMessage error = new ActionMessage("nominations.none.submitted");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    errors.reject("nominations.none.submitted");
 	    valid = false;
 	    nomination = null;
 	}
 
 	setValid(valid);
-	return errors;
     }
 
     public void fillForm(VoteContent voteContent) {

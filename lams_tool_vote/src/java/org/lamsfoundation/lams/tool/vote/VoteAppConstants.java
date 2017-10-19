@@ -143,39 +143,6 @@ public interface VoteAppConstants {
     public static final String ATTR_ATTEMPT_TIME = "attemptTime";
     public static final String ATTR_ATTEMPT_TIME_TIMEAGO = "attemptTimeTimeago";
 
-    /*
-     * exception constants
-     */
-    public static final String USER_EXCEPTION_WRONG_FORMAT = "userExceptionWrongFormat";
-    public static final String USER_EXCEPTION_INCOMPATIBLE_IDS = "userExceptionIncompatibleIds";
-    public static final String USER_EXCEPTION_NUMBERFORMAT = "userExceptionNumberFormat";
-    public static final String USER_EXCEPTION_CONTENT_DOESNOTEXIST = "userExceptionContentDoesNotExist";
-    public static final String USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST = "userExceptionToolSessionDoesNotExist";
-    public static final String USER_EXCEPTION_TOOLCONTENT_DOESNOTEXIST = "userExceptionToolContentDoesNotExist";
-    public static final String USER_EXCEPTION_LEARNER_REQUIRED = "userExceptionLearnerRequired";
-    public static final String USER_EXCEPTION_CONTENTID_REQUIRED = "userExceptionContentIdRequired";
-    public static final String USER_EXCEPTION_TOOLSESSIONID_REQUIRED = "userExceptionToolSessionIdRequired";
-    public static final String USER_EXCEPTION_TOOLSESSIONID_INCONSISTENT = "userExceptionToolSessionIdInconsistent";
-    public static final String USER_EXCEPTION_USERID_NOTAVAILABLE = "userExceptionUserIdNotAvailable";
-    public static final String USER_EXCEPTION_USERID_NOTNUMERIC = "userExceptionUserIdNotNumeric";
-    public static final String USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS = "userExceptionOnlyContentAndNoSessions";
-    public static final String USER_EXCEPTION_USERID_EXISTING = "userExceptionUserIdExisting";
-    public static final String USER_EXCEPTION_USER_DOESNOTEXIST = "userExceptionUserDoesNotExist";
-    public static final String USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED = "userExceptionMonitoringTabContentIdRequired";
-    public static final String USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP = "userExceptionDefaultContentNotSetup";
-    public static final String USER_EXCEPTION_NO_TOOL_SESSIONS = "userExceptionNoToolSessions";
-    public static final String USER_EXCEPTION_MODE_REQUIRED = "userExceptionModeRequired";
-    public static final String USER_EXCEPTION_CONTENT_IN_USE = "userExceptionContentInUse";
-    public static final String USER_EXCEPTION_CONTENT_BEING_MODIFIED = "userExceptionContentBeingModified";
-    public static final String USER_EXCEPTION_MODE_INVALID = "userExceptionModeInvalid";
-    public static final String USER_EXCEPTION_QUESTION_EMPTY = "userExceptionQuestionEmpty";
-    public static final String USER_EXCEPTION_ANSWER_EMPTY = "userExceptionAnswerEmpty";
-    public static final String USER_EXCEPTION_ANSWERS_DUPLICATE = "userExceptionAnswersDuplicate";
-    public static final String USER_EXCEPTION_OPTIONS_COUNT_ZERO = "userExceptionOptionsCountZero";
-    public static final String USER_EXCEPTION_CHKBOXES_EMPTY = "userExceptionChkboxesEmpty";
-    public static final String USER_EXCEPTION_SUBMIT_NONE = "userExceptionSubmitNone";
-    public static final String USER_EXCEPTION_WEIGHT_MUST_EQUAL100 = "userExceptionWeightMustEqual100";
-    public static final String USER_EXCEPTION_SINGLE_OPTION = "userExceptionSingleOption";
     public static final String SUCCESS = "success";
 
     public static final Integer DATA_FLOW_OBJECT_ASSIGMENT_ID = 0;

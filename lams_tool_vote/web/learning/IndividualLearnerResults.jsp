@@ -18,47 +18,45 @@
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.VoteLearningForm.action += "&dispatch=" + actionMethod;
-			document.VoteLearningForm.submit();
+			document.forms.voteLearningForm.action = actionMethod + '.do';
+			document.forms.voteLearningForm.submit();
 		}
 	</script>
 </lams:head>
 
 <body class="stripes">
 
-	<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
-		<c:set var="formBean" value="<%=request
-							.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-		<c:set var="isUserLeader" value="${formBean.userLeader}" />
-		<c:set var="isLeadershipEnabled" value="${formBean.useSelectLeaderToolOuput}" />
+	<form:form modelAttribute="voteLearningForm" method="POST">
+		<c:set var="isUserLeader" value="${voteLearningForm.userLeader}" />
+		<c:set var="isLeadershipEnabled" value="${voteLearningForm.useSelectLeaderToolOuput}" />
 		<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
 
-		<html:hidden property="toolSessionID" />
-		<html:hidden property="userID" />
-		<html:hidden property="revisitingUser" />
-		<html:hidden property="previewOnly" />
-		<html:hidden property="maxNominationCount" />
-		<html:hidden property="minNominationCount" />
-		<html:hidden property="allowTextEntry" />
-		<html:hidden property="lockOnFinish" />
-		<html:hidden property="reportViewOnly" />
-		<html:hidden property="userEntry" />
-		<html:hidden property="showResults" />
-		<html:hidden property="userLeader" />
-		<html:hidden property="groupLeaderName" />
-		<html:hidden property="groupLeaderUserId" />
-		<html:hidden property="useSelectLeaderToolOuput" />
+		<form:hidden path="toolSessionID" />
+		<form:hidden path="userID" />
+		<form:hidden path="revisitingUser" />
+		<form:hidden path="previewOnly" />
+		<form:hidden path="maxNominationCount" />
+		<form:hidden path="minNominationCount" />
+		<form:hidden path="allowTextEntry" />
+		<form:hidden path="lockOnFinish" />
+		<form:hidden path="reportViewOnly" />
+		<form:hidden path="userEntry" />
+		<form:hidden path="showResults" />
+		<form:hidden path="userLeader" />
+		<form:hidden path="groupLeaderName" />
+		<form:hidden path="groupLeaderUserId" />
+		<form:hidden path="useSelectLeaderToolOuput" />
 
 		<lams:Page type="learner" title="${voteGeneralLearnerFlowDTO.activityTitle}">
 
-			<c:if test="${VoteLearningForm.lockOnFinish and voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
+			<c:if test="${voteLearningForm.lockOnFinish and voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
 				<lams:Alert id="lockWhenFinished" type="info" close="false">
 					<fmt:message key="message.warnLockOnFinish" />
 				</lams:Alert>
 			</c:if>
 
 			<c:if test="${isLeadershipEnabled}">
-				<lams:LeaderDisplay idName="leaderEnabled" username="${formBean.groupLeaderName}" userId="${formBean.groupLeaderUserId}"/>
+				<lams:LeaderDisplay idName="leaderEnabled" username="${voteLearningForm.groupLeaderName}" userId="${voteLearningForm.groupLeaderUserId}"/>
 			</c:if>
 
 			<div class="row">
@@ -80,22 +78,21 @@
 								</div>
 							</c:forEach>
 
-							<c:if test="${not empty VoteLearningForm.userEntry}">
+							<c:if test="${not empty voteLearningForm.userEntry}">
 								<div class="media">
 									<div class="media-left">
 										<i class="fa fa-xs fa-check text-success"></i>
 									</div>
 									<div class="media-body">
-										<c:out value="${VoteLearningForm.userEntry}" escapeXml="true" />
+										<c:out value="${voteLearningForm.userEntry}" escapeXml="true" />
 									</div>
 								</div>
 							</c:if>
 
 							<c:if test="${hasEditRight}">
-								<html:submit property="redoQuestions" styleClass="btn btn-sm btn-default pull-left voffset10"
-									onclick="submitMethod('redoQuestions');">
-									<fmt:message key="label.retake" />?
-							</html:submit>
+								<input type="submit" name="redoQuestions" class="btn btn-sm btn-default pull-left voffset10"
+									onclick="submitMethod('redoQuestions');"
+									value='<fmt:message key="label.retake" />?' />
 							</c:if>
 
 						</div>
@@ -106,37 +103,39 @@
 
 
 			<c:choose>
-				<c:when test="${VoteLearningForm.showResults=='true'}">
-					<html:submit property="viewAllResults" styleClass="btn btn-primary pull-right"
-						onclick="submitMethod('viewAllResults');">
-						<fmt:message key="label.overAllResults" />
-					</html:submit>
+				<c:when test="${voteLearningForm.showResults=='true'}">
+					<input type="submit" name="viewAllResults" class="btn btn-primary pull-right"
+						onclick="submitMethod('viewAllResults');"
+						value='<fmt:message key="label.overAllResults" />' />
 				</c:when>
 
 				<c:when test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
-					<html:submit property="learnerFinished" styleId="finishButton" onclick="javascript:submitMethod('learnerFinished')"
-						styleClass="btn btn-primary voffset10 pull-right n	a">
-						<c:choose>
-							<c:when test="${activityPosition.last}">
-								<fmt:message key="button.submitActivity" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="button.endLearning" />
-							</c:otherwise>
-						</c:choose>
-					</html:submit>
+					<input type="submit" name="learnerFinished" id="finishButton" onclick="javascript:submitMethod('learnerFinished')"
+						class="btn btn-primary voffset10 pull-right"
+						value='
+							<c:choose>
+								<c:when test="${activityPosition.last}">
+									<fmt:message key="button.submitActivity" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="button.endLearning" />
+								</c:otherwise>
+							</c:choose>
+						     '
+						/>
+
+					</input>
 				</c:when>
 
 				<c:otherwise>
-					<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
-						styleClass="btn btn-primary pull-right">
-						<fmt:message key="label.continue" />
-					</html:submit>
+					<input type="submit" name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
+						class="btn btn-primary pull-right"
+						value='<fmt:message key="label.continue" />' />
 				</c:otherwise>
 			</c:choose>
 
 		</lams:Page>
-	</html:form>
+	</form:form>
 
 	</div>
 	<div id="footer"></div>

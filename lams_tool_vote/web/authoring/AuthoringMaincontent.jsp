@@ -74,32 +74,32 @@
         }		
         
         function doSubmit(method) {
-        	document.VoteAuthoringForm.dispatch.value=method;
-        	document.VoteAuthoringForm.submit();
+        	document.forms.voteAuthoringForm.action=method + ".do";
+        	document.forms.voteAuthoringForm.submit();
         }
         
 		function submitModifyNomination(optionIndexValue, actionMethod) {
-			document.VoteAuthoringForm.optIndex.value=optionIndexValue; 
+			document.forms.voteAuthoringForm.optIndex.value=optionIndexValue; 
 			submitMethod(actionMethod);
 		}
 
 		function submitModifyAuthoringNomination(questionIndexValue, actionMethod) {
-			document.VoteAuthoringForm.questionIndex.value=questionIndexValue; 
+			document.forms.voteAuthoringForm.questionIndex.value=questionIndexValue; 
 			submitMethod(actionMethod);
 		}
 		
 		function submitMethod(actionMethod) {
-			document.VoteAuthoringForm.dispatch.value=actionMethod; 
-			document.VoteAuthoringForm.submit();
+			document.forms.voteAuthoringForm.action=actionMethod + ".do";
+			document.forms.voteAuthoringForm.submit();
 		}
 		
 		function deleteOption(deletableOptionIndex, actionMethod) {
-			document.VoteAuthoringForm.deletableOptionIndex.value=deletableOptionIndex; 
+			document.forms.voteAuthoringForm.deletableOptionIndex.value=deletableOptionIndex; 
 			submitMethod(actionMethod);
 		}
 		
 		function submitDeleteFile(uuid, actionMethod) {
-			document.VoteAuthoringForm.uuid.value=uuid; 
+			document.forms.voteAuthoringForm.uuid.value=uuid; 
 			submitMethod(actionMethod);
 		}
  
@@ -108,15 +108,12 @@
 </lams:head>
 <body class="stripes" ><!-- onLoad="init();" -->
 
-	<html:form  styleId="authoringForm" action="/authoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<html:hidden property="dispatch" value="submitAllContent"/>
-		<html:hidden property="toolContentID"/>
-		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="httpSessionID"/>									
-		<html:hidden property="contentFolderID"/>
+	<form:form modelAttribute="voteAuthoringForm" action="submitAllContent.do" method="POST">
+		<form:hidden path="toolContentID"/>
+		<form:hidden path="currentTab" styleId="currentTab" />
+		<form:hidden path="httpSessionID"/>									
+		<form:hidden path="contentFolderID"/>
 		<input type="hidden" name="mode" value="${mode}">
-
 
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>
 		<lams:Page title="${title}" type="navbar">
@@ -135,20 +132,20 @@
 					<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
                 </lams:TabBodys>
   	
-  				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 
-				cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 
-				contentFolderID="${formBean.contentFolderID}" accessMode="${mode}" defineLater="${mode=='teacher'}"/>
+  				<lams:AuthoringButton formID="voteAuthoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 
+				cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${voteAuthoringForm.toolContentID}" 
+				contentFolderID="${voteAuthoringForm.contentFolderID}" accessMode="${mode}" defineLater="${mode=='teacher'}"/>
 			</lams:TabBodyArea>
 			
 			<div id="footer"></div>
 
 		</lams:Page>
 
-	</html:form>
+	</form:form>
 
 	<script type="text/javascript">
-		<c:if test="${ not empty formBean.maxNominationCount }"> 			
-			changeMinMaxVotes(${formBean.maxNominationCount}, ${formBean.minNominationCount});
+		<c:if test="${ not empty voteAuthoringForm.maxNominationCount }"> 			
+			changeMinMaxVotes(${voteAuthoringForm.maxNominationCount}, ${voteAuthoringForm.minNominationCount});
 		</c:if> 
 	</script>
 

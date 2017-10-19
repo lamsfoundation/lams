@@ -33,18 +33,10 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -59,17 +51,22 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
-import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.tool.vote.util.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
-import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.web.form.VoteLearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -77,36 +74,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Ozgur Demirtas
  */
-public class LearningAction extends LamsDispatchAction implements VoteAppConstants {
-    private static Logger logger = Logger.getLogger(LearningAction.class.getName());
+@Controller
+@RequestMapping("/learning")
+public class LearningController implements VoteAppConstants {
+    private static Logger logger = Logger.getLogger(LearningController.class.getName());
 
-    private static IVoteService voteService;
+    @Autowired
+    private WebApplicationContext applicationContext;
 
-    /**
-     *
-     * main content/question content management and workflow logic
-     *
-     * if the passed toolContentID exists in the db, we need to get the relevant
-     * data into the Map if not, create the default Map
-     */
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
-	voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
+    @Autowired
+    @Qualifier("voteService")
+    private IVoteService voteService;
 
-	repopulateRequestParameters(request, voteLearningForm);
-
-	VoteUtils.cleanUpUserExceptions(request);
-	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
-	voteLearningForm.setMinNominationCountReached(new Boolean(false).toString());
-	return null;
-    }
-
-    public ActionForward viewAllResults(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	VoteUtils.cleanUpUserExceptions(request);
-	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+    @RequestMapping("/viewAllResults")
+    public String viewAllResults(VoteLearningForm voteLearningForm, HttpServletRequest request) {
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
 
 	voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
@@ -117,8 +98,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
 	voteGeneralLearnerFlowDTO.setMinNominationCountReached(new Boolean(false).toString());
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-	repopulateRequestParameters(request, voteLearningForm);
+	LearningController.repopulateRequestParameters(request, voteLearningForm);
 
 	String toolSessionID = request.getParameter(TOOL_SESSION_ID);
 	logger.info("Tool session ID" + toolSessionID);
@@ -157,16 +137,13 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
-	return (mapping.findForward(ALL_NOMINATIONS));
+	return "/learning/AllNominations";
     }
 
-    public ActionForward viewAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	VoteUtils.cleanUpUserExceptions(request);
-
-	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+    @RequestMapping("/viewAnswers")
+    public String viewAnswers(VoteLearningForm voteLearningForm, HttpServletRequest request) {
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
 
 	voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
@@ -177,9 +154,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
 	voteGeneralLearnerFlowDTO.setMinNominationCountReached(new Boolean(false).toString());
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
-	repopulateRequestParameters(request, voteLearningForm);
+	LearningController.repopulateRequestParameters(request, voteLearningForm);
 
 	String toolSessionID = request.getParameter(TOOL_SESSION_ID);
 	logger.info("Tool session id :" + toolSessionID);
@@ -228,20 +203,16 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
-		getServlet().getServletContext());
-	return (mapping.findForward(VIEW_ANSWERS));
+		applicationContext.getServletContext());
+	return "/learning/ViewAnswers";
     }
 
-    public ActionForward redoQuestionsOk(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	VoteUtils.cleanUpUserExceptions(request);
+    @RequestMapping("/redoQuestionsOk")
+    public String redoQuestionsOk(VoteLearningForm voteLearningForm, HttpServletRequest request) {
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
-	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
 
-	repopulateRequestParameters(request, voteLearningForm);
+	LearningController.repopulateRequestParameters(request, voteLearningForm);
 
 	String toolSessionID = request.getParameter(TOOL_SESSION_ID);
 	logger.info("Tool session id:" + toolSessionID);
@@ -274,13 +245,12 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	voteLearningForm.resetCommands();
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
-	return redoQuestions(mapping, form, request, response);
+	return redoQuestions(voteLearningForm, request);
     }
 
-    public ActionForward learnerFinished(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/learnerFinished")
+    public String learnerFinished(VoteLearningForm voteLearningForm, HttpServletRequest request) {
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
-	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 
 	voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
@@ -290,9 +260,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
 	voteGeneralLearnerFlowDTO.setMinNominationCountReached(new Boolean(false).toString());
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
-	repopulateRequestParameters(request, voteLearningForm);
+	LearningController.repopulateRequestParameters(request, voteLearningForm);
 
 	String toolSessionID = request.getParameter(TOOL_SESSION_ID);
 	logger.info("Tool Session id :" + toolSessionID);
@@ -326,8 +294,6 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
-	VoteUtils.cleanUpUserExceptions(request);
-
 	String nextUrl = null;
 	try {
 	    nextUrl = voteService.leaveToolSession(new Long(toolSessionID), new Long(userID));
@@ -335,36 +301,32 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	    logger.error("failure getting nextUrl: " + e);
 	    voteLearningForm.resetCommands();
 	    //throw new ServletException(e);
-	    return (mapping.findForward(LEARNING_STARTER));
+	    return "/learningIndex";
 	} catch (ToolException e) {
 	    logger.error("failure getting nextUrl: " + e);
 	    voteLearningForm.resetCommands();
 	    //throw new ServletException(e);
-	    return (mapping.findForward(LEARNING_STARTER));
+	    return "/learningIndex";
 	} catch (Exception e) {
 	    logger.error("unknown exception getting nextUrl: " + e);
 	    voteLearningForm.resetCommands();
 	    //throw new ServletException(e);
-	    return (mapping.findForward(LEARNING_STARTER));
+	    return "/learningIndex";
 	}
 
 	voteLearningForm.resetCommands();
 
 	/* pay attention here */
-	response.sendRedirect(nextUrl);
-
-	return null;
-
+	return "redirect:" + nextUrl;
     }
 
-    public ActionForward continueOptionsCombined(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	VoteUtils.cleanUpUserExceptions(request);
-	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
-	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+    @RequestMapping("/continueOptionsCombined")
+    public String continueOptionsCombined(VoteLearningForm voteLearningForm, Errors errors,
+	    HttpServletRequest request) {
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-	repopulateRequestParameters(request, voteLearningForm);
+	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
+
+	LearningController.repopulateRequestParameters(request, voteLearningForm);
 
 	String toolSessionID = request.getParameter(TOOL_SESSION_ID);
 	logger.info("Tool session id:" + toolSessionID);
@@ -408,9 +370,9 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	if (castVoteCount > intMaxNominationCount) {
 	    voteLearningForm.setMaxNominationCountReached(new Boolean(true).toString());
 	    voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(true).toString());
-	    persistInRequestError(request, "error.maxNominationCount.reached");
+	    errors.reject("error.maxNominationCount.reached");
 	    logger.error("You have selected too many nominations.");
-	    return (mapping.findForward(LOAD_LEARNER));
+	    return "/learning/AnswersContent";
 	}
 
 	VoteContent voteContent = session.getVoteContent();
@@ -479,19 +441,15 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	voteLearningForm.resetCommands();
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
-	return (mapping.findForward(INDIVIDUAL_REPORT));
+	return "/learning/IndividualLearnerResults";
     }
 
-    public ActionForward redoQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	VoteUtils.cleanUpUserExceptions(request);
+    @RequestMapping("/redoQuestions")
+    public String redoQuestions(VoteLearningForm voteLearningForm, HttpServletRequest request) {
 
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
-	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
-	repopulateRequestParameters(request, voteLearningForm);
+	LearningController.repopulateRequestParameters(request, voteLearningForm);
 
 	String toolSessionID = request.getParameter(TOOL_SESSION_ID);
 	voteLearningForm.setToolSessionID(toolSessionID);
@@ -528,16 +486,13 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	voteLearningForm.resetCommands();
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
-	return (mapping.findForward(LOAD_LEARNER));
+	return "/learning/AnswersContent";
     }
 
-    /**
-     * checks Leader Progress
-     */
-    public ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping(path = "/checkLeaderProgress", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String checkLeaderProgress(HttpServletRequest request) throws IOException {
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	VoteSession session = voteService.getSessionBySessionId(toolSessionId);
@@ -546,20 +501,16 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	boolean isLeaderResponseFinalized = leader.isResponseFinalised();
 
-	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
-	ObjectNode.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
-	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(ObjectNode);
-	return null;
+	ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
+	objectNode.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
+	return objectNode.toString();
     }
 
-    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
-	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+    @RequestMapping("/submitReflection")
+    public String submitReflection(VoteLearningForm voteLearningForm, HttpServletRequest request) {
 
-	repopulateRequestParameters(request, voteLearningForm);
+	LearningController.repopulateRequestParameters(request, voteLearningForm);
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	logger.info("Tool Session Id" + toolSessionID);
 	voteLearningForm.setToolSessionID(toolSessionID);
@@ -575,14 +526,11 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 		new Integer(userID), reflectionEntry);
 
 	voteLearningForm.resetUserActions(); /* resets all except submitAnswersContent */
-	return learnerFinished(mapping, form, request, response);
+	return learnerFinished(voteLearningForm, request);
     }
 
-    public ActionForward forwardtoReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
-	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
+    @RequestMapping("/forwardtoReflection")
+    public String forwardtoReflection(VoteLearningForm voteLearningForm, HttpServletRequest request) {
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	logger.info("toolSessionID:" + toolSessionID);
 	VoteSession voteSession = voteService.getSessionBySessionId(new Long(toolSessionID));
@@ -590,9 +538,6 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	VoteContent voteContent = voteSession.getVoteContent();
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
 	voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
-
-	//String reflectionSubject = voteContent.getReflectionSubject();
-	//reflectionSubject = VoteUtils.replaceNewLines(reflectionSubject);
 
 	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
 
@@ -614,12 +559,12 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	voteLearningForm.resetCommands();
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
-	return (mapping.findForward(NOTEBOOK));
+	return "/learning/Notebook";
     }
 
-    protected void repopulateRequestParameters(HttpServletRequest request, VoteLearningForm voteLearningForm) {
+    private static void repopulateRequestParameters(HttpServletRequest request, VoteLearningForm voteLearningForm) {
 	String toolSessionID = request.getParameter(TOOL_SESSION_ID);
 	voteLearningForm.setToolSessionID(toolSessionID);
 
@@ -673,17 +618,10 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
      *
      * make sure this session exists in tool's session table by now.
      */
-    public ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, VoteApplicationException {
-
-	VoteUtils.cleanUpUserExceptions(request);
-
-	if (voteService == null) {
-	    voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-	}
+    @RequestMapping("/start")
+    public String start(VoteLearningForm voteLearningForm, Errors errors, HttpServletRequest request) {
 
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
-	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 
 	voteLearningForm.setRevisitingUser(new Boolean(false).toString());
 	voteLearningForm.setUserEntry("");
@@ -695,9 +633,9 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	voteGeneralLearnerFlowDTO.setCastVoteCount("0");
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
 
-	ActionForward validateParameters = validateParameters(request, mapping, voteLearningForm);
-	if (validateParameters != null) {
-	    return validateParameters;
+	boolean validateParameters = LearningController.validateParameters(request, voteLearningForm);
+	if (!validateParameters) {
+	    return "/VoteErrorBox";
 	}
 
 	String toolSessionID = voteLearningForm.getToolSessionID();
@@ -710,9 +648,9 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	VoteSession voteSession = voteService.getSessionBySessionId(new Long(toolSessionID));
 
 	if (voteSession == null) {
-	    VoteUtils.cleanUpUserExceptions(request);
+
 	    logger.error("error: The tool expects voteSession.");
-	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
+	    return "/VoteErrorBox";
 	}
 
 	/*
@@ -721,17 +659,17 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	 */
 	VoteContent voteContent = voteSession.getVoteContent();
 	if (voteContent == null) {
-	    VoteUtils.cleanUpUserExceptions(request);
+
 	    logger.error("error: The tool expects voteContent.");
-	    persistInRequestError(request, "error.content.doesNotExist");
-	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
+	    errors.reject("error.content.doesNotExist");
+	    return "/VoteErrorBox";
 	}
 
 	/*
 	 * The content we retrieved above must have been created before in Authoring time. And the passed tool session
 	 * id already refers to it.
 	 */
-	setupAttributes(request, voteContent, voteLearningForm, voteGeneralLearnerFlowDTO);
+	LearningController.setupAttributes(request, voteContent, voteLearningForm, voteGeneralLearnerFlowDTO);
 
 	voteLearningForm.setToolContentID(voteContent.getVoteContentId().toString());
 	voteGeneralLearnerFlowDTO.setToolContentID(voteContent.getVoteContentId().toString());
@@ -783,17 +721,17 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	    // calculate whether deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("submissionDeadline");
+		return "/learning/submissionDeadline";
 	    }
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
 	/* find out if the content is being modified at the moment. */
 	if (voteContent.isDefineLater()) {
-	    VoteUtils.cleanUpUserExceptions(request);
-	    return mapping.findForward(VoteAppConstants.DEFINE_LATER);
+
+	    return "/learning/defineLater";
 	}
 
 	//process group leader
@@ -809,7 +747,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 		request.setAttribute(TOOL_SESSION_ID, toolSessionID);
 		request.setAttribute(ATTR_CONTENT, voteContent);
 
-		return mapping.findForward(WAIT_FOR_LEADER);
+		return "/learning/WaitForLeader";
 	    }
 
 	    // check if leader has submitted all answers
@@ -849,7 +787,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	    boolean isGroupedActivity = voteService.isGroupedActivity(new Long(voteLearningForm.getToolContentID()));
 	    request.setAttribute("isGroupedActivity", isGroupedActivity);
 
-	    return mapping.findForward(VoteAppConstants.EXIT_PAGE);
+	    return "/learning/ExitLearning";
 	}
 
 	/*
@@ -883,7 +821,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 		String isContentLockOnFinish = voteLearningForm.getLockOnFinish();
 		if (isContentLockOnFinish.equals(new Boolean(true).toString()) && isResponseFinalised == true) {
 		    // user with session id: userSessionId should not redo votes. session is locked
-		    return mapping.findForward(VoteAppConstants.EXIT_PAGE);
+		    return "/learning/ExitLearning";
 		}
 
 		voteLearningForm.setRevisitingUser(new Boolean(true).toString());
@@ -892,14 +830,14 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 		if (isContentLockOnFinish.equals(new Boolean(false).toString()) && isResponseFinalised == true) {
 		    // isContentLockOnFinish is false, enable redo of votes
-		    return mapping.findForward(VoteAppConstants.REVISITED_ALL_NOMINATIONS);
+		    return "/learning/RevisitedAllNominations";
 		}
 
-		return mapping.findForward(VoteAppConstants.ALL_NOMINATIONS);
+		return "/learning/AllNominations";
 	    }
 	}
 	// presenting standard learner screen..
-	return mapping.findForward(VoteAppConstants.LOAD_LEARNER);
+	return "/learning/AnswersContent";
     }
 
     /**
@@ -947,7 +885,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
      * @param request
      * @param voteContent
      */
-    protected void setupAttributes(HttpServletRequest request, VoteContent voteContent,
+    private static void setupAttributes(HttpServletRequest request, VoteContent voteContent,
 	    VoteLearningForm voteLearningForm, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO) {
 
 	Map<String, String> mapGeneralCheckedOptionsContent = new TreeMap<String, String>(new VoteComparator());
@@ -974,8 +912,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
     }
 
-    protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping,
-	    VoteLearningForm voteLearningForm) {
+    private static boolean validateParameters(HttpServletRequest request, VoteLearningForm voteLearningForm) {
 	/*
 	 * obtain and setup the current user's data
 	 */
@@ -998,19 +935,19 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	String strToolSessionId = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	long toolSessionID = 0;
 	if (strToolSessionId == null || strToolSessionId.length() == 0) {
-	    VoteUtils.cleanUpUserExceptions(request);
+
 	    // persistInRequestError(request, "error.toolSessionId.required");
 	    logger.error("error.toolSessionId.required");
-	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
+	    return false;
 	} else {
 	    try {
 		toolSessionID = new Long(strToolSessionId).longValue();
 		voteLearningForm.setToolSessionID(new Long(toolSessionID).toString());
 	    } catch (NumberFormatException e) {
-		VoteUtils.cleanUpUserExceptions(request);
+
 		// persistInRequestError(request, "error.sessionId.numberFormatException");
 		logger.error("add error.sessionId.numberFormatException to ActionMessages.");
-		return mapping.findForward(VoteAppConstants.ERROR_LIST);
+		return false;
 	    }
 	}
 
@@ -1018,40 +955,19 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	String mode = request.getParameter(VoteAppConstants.MODE);
 
 	if (mode == null || mode.length() == 0) {
-	    VoteUtils.cleanUpUserExceptions(request);
+
 	    logger.error("mode missing: ");
-	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
+	    return false;
 	}
 
 	if (!mode.equals("learner") && !mode.equals("teacher") && !mode.equals("author")) {
-	    VoteUtils.cleanUpUserExceptions(request);
+
 	    logger.error("mode invalid: ");
-	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
+	    return false;
 	}
 	voteLearningForm.setLearningMode(mode);
 
-	return null;
-    }
-
-    boolean isSessionCompleted(String userSessionId, IVoteService voteService) {
-	VoteSession voteSession = voteService.getSessionBySessionId(new Long(userSessionId));
-	if (voteSession.getSessionStatus() != null
-		&& voteSession.getSessionStatus().equals(VoteAppConstants.COMPLETED)) {
-	    return true;
-	}
-	return false;
-    }
-
-    /**
-     * persists error messages to request scope
-     *
-     * @param request
-     * @param message
-     */
-    public void persistInRequestError(HttpServletRequest request, String message) {
-	ActionMessages errors = new ActionMessages();
-	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-	saveErrors(request, errors);
+	return true;
     }
 
     private VoteQueUsr getCurrentUser(String toolSessionId) {

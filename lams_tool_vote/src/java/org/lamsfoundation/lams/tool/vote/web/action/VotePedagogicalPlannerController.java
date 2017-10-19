@@ -21,56 +21,45 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.vote.web.action;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
-import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.tool.vote.web.form.VotePedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-public class VotePedagogicalPlannerAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/pedagogicalPlanner")
+public class VotePedagogicalPlannerController {
+    @Autowired
+    @Qualifier("voteService")
+    private IVoteService voteService;
 
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return initPedagogicalPlannerForm(mapping, form, request, response);
-    }
-
-    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	VotePedagogicalPlannerForm plannerForm = (VotePedagogicalPlannerForm) form;
+    @RequestMapping("/initPedagogicalPlannerForm")
+    public String initPedagogicalPlannerForm(VotePedagogicalPlannerForm plannerForm, HttpServletRequest request) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	VoteContent voteContent = getVoteService().getVoteContent(toolContentID);
+	VoteContent voteContent = voteService.getVoteContent(toolContentID);
 	plannerForm.fillForm(voteContent);
 	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	plannerForm.setContentFolderID(contentFolderId);
-	return mapping.findForward(VoteAppConstants.SUCCESS);
+	return "/authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException {
-	VotePedagogicalPlannerForm plannerForm = (VotePedagogicalPlannerForm) form;
-	ActionMessages errors = plannerForm.validate();
-	if (errors.isEmpty()) {
-	    VoteContent voteContent = getVoteService().getVoteContent(plannerForm.getToolContentID());
+    @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
+    public String saveOrUpdatePedagogicalPlannerForm(VotePedagogicalPlannerForm plannerForm, Errors errors) {
+	plannerForm.validate(errors);
+	if (!errors.hasErrors()) {
+	    VoteContent voteContent = voteService.getVoteContent(plannerForm.getToolContentID());
 	    voteContent.setInstructions(plannerForm.getInstructions());
 
 	    int nominationIndex = 1;
@@ -82,10 +71,10 @@ public class VotePedagogicalPlannerAction extends LamsDispatchAction {
 		    plannerForm.removeNomination(nominationIndex - 1);
 		} else {
 		    if (nominationIndex <= voteContent.getVoteQueContents().size()) {
-			VoteQueContent voteQueContent = getVoteService()
-				.getQuestionByDisplayOrder((long) nominationIndex, voteContent.getUid());
+			VoteQueContent voteQueContent = voteService.getQuestionByDisplayOrder((long) nominationIndex,
+				voteContent.getUid());
 			voteQueContent.setQuestion(nomination);
-			getVoteService().saveOrUpdateVoteQueContent(voteQueContent);
+			voteService.saveOrUpdateVoteQueContent(voteQueContent);
 
 		    } else {
 			VoteQueContent voteQueContent = new VoteQueContent();
@@ -93,36 +82,29 @@ public class VotePedagogicalPlannerAction extends LamsDispatchAction {
 			voteQueContent.setVoteContent(voteContent);
 			voteQueContent.setVoteContentId(voteContent.getVoteContentId());
 			voteQueContent.setQuestion(nomination);
-			getVoteService().saveOrUpdateVoteQueContent(voteQueContent);
+			voteService.saveOrUpdateVoteQueContent(voteQueContent);
 		    }
 		    nominationIndex++;
 		}
 	    } while (nominationIndex <= plannerForm.getNominationCount());
 	    if (nominationIndex <= voteContent.getVoteQueContents().size()) {
-		getVoteService().removeQuestionsFromCache(voteContent);
-		getVoteService().removeVoteContentFromCache(voteContent);
+		voteService.removeQuestionsFromCache(voteContent);
+		voteService.removeVoteContentFromCache(voteContent);
 		for (; nominationIndex <= voteContent.getVoteQueContents().size(); nominationIndex++) {
-		    VoteQueContent voteQueContent = getVoteService().getQuestionByDisplayOrder((long) nominationIndex,
+		    VoteQueContent voteQueContent = voteService.getQuestionByDisplayOrder((long) nominationIndex,
 			    voteContent.getUid());
-		    getVoteService().removeVoteQueContent(voteQueContent);
+		    voteService.removeVoteQueContent(voteQueContent);
 		}
 	    }
 	} else {
-	    saveErrors(request, errors);
+	    //  saveErrors(request, errors);
 	}
-	return mapping.findForward(VoteAppConstants.SUCCESS);
+	return "/authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward createPedagogicalPlannerQuestion(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) {
-	VotePedagogicalPlannerForm plannerForm = (VotePedagogicalPlannerForm) form;
+    @RequestMapping("/createPedagogicalPlannerQuestion")
+    public String createPedagogicalPlannerQuestion(VotePedagogicalPlannerForm plannerForm) {
 	plannerForm.setNomination(plannerForm.getNominationCount().intValue(), "");
-	return mapping.findForward(VoteAppConstants.SUCCESS);
-    }
-
-    private IVoteService getVoteService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	return "/authoring/pedagogicalPlannerForm";
     }
 }

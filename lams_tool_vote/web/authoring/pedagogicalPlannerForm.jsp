@@ -36,7 +36,7 @@
   		function createQuestion(){
   			prepareFormData();
   			$('#pedagogicalPlannerForm').ajaxSubmit({
-  				url: "<c:url value='/pedagogicalPlanner.do?dispatch=createPedagogicalPlannerQuestion' />",
+  				url: "<c:url value='/pedagogicalPlanner/createPedagogicalPlannerQuestion.do' />",
   				success: function(responseText){
  	  				var bodyTag = '<body';
  	  				var selectedBody = responseText.substring(responseText.search(bodyTag) + 1);
@@ -69,29 +69,28 @@
 </lams:head>
 <body id="body">
 	<%@ include file="/common/messages.jsp"%>
-	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
-		<html:hidden property="toolContentID" styleId="toolContentID" />
-		<html:hidden property="valid" styleId="valid" />
-		<html:hidden property="callID" styleId="callID" />
-		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
+	<form:form action="<lams:WebAppURL />pedagogicalPlanner/saveOrUpdatePedagogicalPlannerForm.do" modelAttribute="pedagogicalPlannerForm" method="post">
+		<form:hidden path="toolContentID" />
+		<form:hidden path="valid" />
+		<form:hidden path="callID" />
+		<form:hidden path="activityOrderNumber" />
 		
-		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		<h4 class="space-left"><fmt:message key="label.authoring.instructions"/></h4>
-		<lams:CKEditor id="instructions" value="${formBean.instructions}"
-			contentFolderID="${formBean.contentFolderID}"
+		<lams:CKEditor id="instructions" value="${pedagogicalPlannerForm.instructions}"
+			contentFolderID="${pedagogicalPlannerForm.contentFolderID}"
 			toolbarSet="CustomPedplanner" height="150px"
 			width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 		</lams:CKEditor>
 
-		<c:if test="${formBean.nominationCount ne 0}">
+		<c:if test="${pedagogicalPlannerForm.nominationCount ne 0}">
 			<h4 class="space-left space-top"><fmt:message key="label.vote.nominations"/></h4>
 			<table id="nominationTable" cellpadding="0" cellspacing="0">
-				<c:forEach var="nominationIndex"  begin="1" end="${formBean.nominationCount}" >
+				<c:forEach var="nominationIndex"  begin="1" end="${pedagogicalPlannerForm.nominationCount}" >
 					<tr>
 						<td class="CKcell">
 							<lams:CKEditor id="nomination[${nominationIndex-1}]"
-								value="${formBean.nominationList[nominationIndex-1]}"
-								contentFolderID="${formBean.contentFolderID}"
+								value="${pedagogicalPlannerForm.nominationList[nominationIndex-1]}"
+								contentFolderID="${pedagogicalPlannerForm.contentFolderID}"
 				                toolbarSet="CustomPedplanner" height="150px"
 				                width="${param.plannerCKEditorShortWidth}" displayExpanded="false">
 							</lams:CKEditor>
@@ -105,7 +104,7 @@
 				</c:forEach>
 			</table>
 		</c:if>
-	</html:form>
+	</form:form>
 	<a class="button" href="javascript:createQuestion();"><fmt:message key="label.add.new.nomination" /></a>
 </body>
 </lams:html>

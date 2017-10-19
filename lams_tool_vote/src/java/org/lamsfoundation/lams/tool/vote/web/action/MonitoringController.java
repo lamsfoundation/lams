@@ -22,7 +22,6 @@
 
 package org.lamsfoundation.lams.tool.vote.web.action;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -32,24 +31,15 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
 import org.lamsfoundation.lams.tool.vote.dto.SummarySessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralAuthoringDTO;
-import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteQuestionDTO;
@@ -57,18 +47,20 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
-import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
-import org.lamsfoundation.lams.tool.vote.util.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
-import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.web.form.VoteMonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -77,34 +69,28 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Ozgur Demirtas
  */
-public class MonitoringAction extends LamsDispatchAction implements VoteAppConstants {
-    private static Logger logger = Logger.getLogger(MonitoringAction.class.getName());
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController implements VoteAppConstants {
+    private static Logger logger = Logger.getLogger(MonitoringController.class.getName());
 
-    /**
-     * main content/question content management and workflow logic
-     */
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	VoteUtils.cleanUpUserExceptions(request);
-	return null;
+    @Autowired
+    @Qualifier("voteService")
+    private IVoteService voteService;
+
+    @RequestMapping(path = "/hideOpenVote", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String hideOpenVote(HttpServletRequest request) {
+	return toggleHideShow(request, false);
     }
 
-    public ActionForward hideOpenVote(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
-	return toggleHideShow(request, response, false);
+    @RequestMapping(path = "/showOpenVote", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String showOpenVote(HttpServletRequest request) {
+	return toggleHideShow(request, true);
     }
 
-    public ActionForward showOpenVote(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
-	return toggleHideShow(request, response, true);
-    }
-
-    private ActionForward toggleHideShow(HttpServletRequest request, HttpServletResponse response, boolean show)
-	    throws IOException, ServletException, ToolException {
-
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
+    private String toggleHideShow(HttpServletRequest request, boolean show) {
 	Long currentUid = WebUtil.readLongParam(request, "currentUid");
 	logger.info("Current Uid" + currentUid);
 
@@ -121,24 +107,19 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	    voteService.hideOpenVote(voteUsrAttempt);
 	}
 
-	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
-	responsedata.put("currentUid", currentUid);
-	responsedata.put("nextActionMethod", nextActionMethod);
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(new String(responsedata.toString()));
-	return null;
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("currentUid", currentUid);
+	responseJSON.put("nextActionMethod", nextActionMethod);
+	return responseJSON.toString();
     }
 
-    public ActionForward getVoteNomination(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
+    @RequestMapping("/getVoteNomination")
+    public String getVoteNomination(VoteMonitoringForm voteMonitoringForm, HttpServletRequest request) {
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
-	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
 	voteMonitoringForm.setVoteService(voteService);
 
 	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
-	MonitoringAction.repopulateRequestParameters(request, voteMonitoringForm, voteGeneralMonitoringDTO);
+	MonitoringController.repopulateRequestParameters(request, voteMonitoringForm, voteGeneralMonitoringDTO);
 
 	Long questionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_QUESTION_UID, false);
 	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
@@ -151,11 +132,12 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	if (sessionUid != null) {
 	    request.setAttribute(VoteAppConstants.ATTR_SESSION_UID, sessionUid);
 	}
-	return mapping.findForward(VoteAppConstants.VOTE_NOMINATION_VIEWER);
+	return "/monitoring/VoteNominationViewer";
     }
 
-    public ActionForward getVoteNominationsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
+    @RequestMapping(path = "/getVoteNominationsJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getVoteNominationsJSON(HttpServletRequest request) {
 
 	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
 	if (sessionUid == 0L) {
@@ -180,13 +162,12 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	}
 
 	//return user list according to the given sessionID
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	List<Object[]> users = voteService.getUserAttemptsForTablesorter(sessionUid, questionUid, page, size, sorting,
 		searchString);
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
-	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
-	responsedata.put("total_rows", voteService.getCountUsersBySession(sessionUid, questionUid, searchString));
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("total_rows", voteService.getCountUsersBySession(sessionUid, questionUid, searchString));
 
 	for (Object[] userAndAnswers : users) {
 
@@ -200,14 +181,13 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	    responseRow.put(VoteAppConstants.ATTR_PORTRAIT_ID, (Integer) userAndAnswers[4]);
 	    rows.add(responseRow);
 	}
-	responsedata.set("rows", rows);
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(new String(responsedata.toString()));
-	return null;
+	responseJSON.set("rows", rows);
+	return responseJSON.toString();
     }
 
-    public ActionForward getReflectionsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
+    @RequestMapping(path = "/getReflectionsJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getReflectionsJSON(HttpServletRequest request) {
 
 	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
 
@@ -223,13 +203,12 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	}
 
 	//return user list according to the given sessionID
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	List<Object[]> users = voteService.getUserReflectionsForTablesorter(sessionUid, page, size, sorting,
 		searchString);
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
-	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
-	responsedata.put("total_rows", voteService.getCountUsersBySession(sessionUid, null, searchString));
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("total_rows", voteService.getCountUsersBySession(sessionUid, null, searchString));
 
 	for (Object[] userAndReflection : users) {
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
@@ -245,25 +224,22 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	    }
 	    rows.add(responseRow);
 	}
-	responsedata.set("rows", rows);
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(new String(responsedata.toString()));
-	return null;
+	responseJSON.set("rows", rows);
+	return responseJSON.toString();
     }
 
-    public ActionForward statistics(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
-
+    @RequestMapping("/statistics")
+    public String statistics(HttpServletRequest request) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 
 	request.setAttribute("isGroupedActivity", voteService.isGroupedActivity(toolContentID));
 	request.setAttribute(VoteAppConstants.VOTE_STATS_DTO, voteService.getStatisticsBySession(toolContentID));
-	return mapping.findForward(VoteAppConstants.STATISTICS);
+	return "/monitoring/Stats";
     }
 
-    public ActionForward getOpenTextNominationsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
+    @RequestMapping(path = "/getOpenTextNominationsJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getOpenTextNominationsJSON(HttpServletRequest request) {
 
 	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
 	if (sessionUid == 0L) {
@@ -297,13 +273,12 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	}
 
 	//return user list according to the given sessionID
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	List<OpenTextAnswerDTO> users = voteService.getUserOpenTextAttemptsForTablesorter(sessionUid, contentUid, page,
 		size, sorting, searchStringVote, searchStringUsername);
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
-	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
-	responsedata.put("total_rows", voteService.getCountUsersForOpenTextEntries(sessionUid, contentUid,
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("total_rows", voteService.getCountUsersForOpenTextEntries(sessionUid, contentUid,
 		searchStringVote, searchStringUsername));
 
 	for (OpenTextAnswerDTO userAndAttempt : users) {
@@ -324,53 +299,39 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 
 	    rows.add(responseRow);
 	}
-	responsedata.set("rows", rows);
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(new String(responsedata.toString()));
-	return null;
+	responseJSON.set("rows", rows);
+	return responseJSON.toString();
     }
 
-    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
-	IVoteService VoteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
-	//String uid = request.getParameter("uid");
-
-	String userId = request.getParameter("userId");
-
-	String userName = request.getParameter("userName");
-
-	String sessionId = request.getParameter("sessionId");
-
-	NotebookEntry notebookEntry = VoteService.getEntry(new Long(sessionId), CoreNotebookConstants.NOTEBOOK_TOOL,
-		VoteAppConstants.MY_SIGNATURE, new Integer(userId));
-
-	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
-	if (notebookEntry != null) {
-	    //String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
-	    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
-	    voteGeneralLearnerFlowDTO.setUserName(userName);
-	}
-	request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
-
-	return mapping.findForward(VoteAppConstants.LEARNER_NOTEBOOK);
-    }
-
-    /**
-     * Set Submission Deadline
+    /*
+     * Possible error: forward "learnerNotebook" is not listed in Struts
      *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
+     * @RequestMapping("/openNotebook")
+     * public ActionForward openNotebook(HttpServletRequest request) throws IOException, ServletException, ToolException
+     * {
+     * String userId = request.getParameter("userId");
+     *
+     * String userName = request.getParameter("userName");
+     *
+     * String sessionId = request.getParameter("sessionId");
+     *
+     * NotebookEntry notebookEntry = voteService.getEntry(new Long(sessionId), CoreNotebookConstants.NOTEBOOK_TOOL,
+     * VoteAppConstants.MY_SIGNATURE, new Integer(userId));
+     *
+     * VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
+     * if (notebookEntry != null) {
+     * //String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
+     * voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
+     * voteGeneralLearnerFlowDTO.setUserName(userName);
+     * }
+     * request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
+     *
+     * return mapping.findForward(VoteAppConstants.LEARNER_NOTEBOOK);
+     * }
      */
-    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
+    @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseBody
+    public String setSubmissionDeadline(HttpServletRequest request) {
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	VoteContent voteContent = voteService.getVoteContent(contentID);
 
@@ -388,27 +349,20 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	}
 	voteContent.setSubmissionDeadline(tzSubmissionDeadline);
 	voteService.updateVote(voteContent);
-	response.setContentType("text/plain;charset=utf-8");
-	response.getWriter().print(formattedDate);
-	return null;
+	return formattedDate;
     }
 
-    public ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, VoteApplicationException {
-	VoteUtils.cleanUpUserExceptions(request);
-
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
-	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
+    @RequestMapping("/start")
+    public String start(VoteMonitoringForm voteMonitoringForm, HttpServletRequest request) {
 
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
-	ActionForward validateParameters = validateParameters(request, mapping, voteMonitoringForm);
-	if (validateParameters != null) {
-	    return validateParameters;
+	boolean validateParameters = validateParameters(request, voteMonitoringForm);
+	if (!validateParameters) {
+	    return "/VoteErrorBox";
 	}
 
 	// initialiseMonitoringData
@@ -420,10 +374,10 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	VoteContent voteContent = voteService.getVoteContent(new Long(toolContentID));
 
 	if (voteContent == null) {
-	    VoteUtils.cleanUpUserExceptions(request);
+
 	    logger.error("Vote Content does not exist");
 	    voteGeneralMonitoringDTO.setUserExceptionContentDoesNotExist(Boolean.TRUE.toString());
-	    return (mapping.findForward(VoteAppConstants.ERROR_LIST));
+	    return "/VoteErrorBox";
 	}
 
 	voteGeneralMonitoringDTO.setActivityTitle(voteContent.getTitle());
@@ -464,7 +418,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	voteGeneralMonitoringDTO.setCurrentTab("1");
 
 	if (sessionDTOs.size() > 0) {
-	    VoteUtils.cleanUpUserExceptions(request);
+
 	    voteGeneralMonitoringDTO.setUserExceptionContentInUse(Boolean.TRUE.toString());
 	}
 
@@ -500,33 +454,31 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	voteGeneralAuthoringDTO.setActivityTitle(voteGeneralMonitoringDTO.getActivityTitle());
 	voteGeneralAuthoringDTO.setActivityInstructions(voteGeneralMonitoringDTO.getActivityInstructions());
 
-	MonitoringAction.repopulateRequestParameters(request, voteMonitoringForm, voteGeneralMonitoringDTO);
+	MonitoringController.repopulateRequestParameters(request, voteMonitoringForm, voteGeneralMonitoringDTO);
 
 	boolean isGroupedActivity = voteService.isGroupedActivity(new Long(toolContentID));
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
 	request.setAttribute("isAllowText", voteContent.isAllowText());
 
-	return mapping.findForward(VoteAppConstants.LOAD_MONITORING);
+	return "/monitoring/MonitoringMaincontent";
     }
 
-    private ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping,
-	    VoteMonitoringForm voteMonitoringForm) {
-
+    private boolean validateParameters(HttpServletRequest request, VoteMonitoringForm voteMonitoringForm) {
 	String strToolContentId = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	if ((strToolContentId == null) || (strToolContentId.length() == 0)) {
-	    VoteUtils.cleanUpUserExceptions(request);
-	    return (mapping.findForward(VoteAppConstants.ERROR_LIST));
+
+	    return false;
 	} else {
 	    try {
 		voteMonitoringForm.setToolContentID(strToolContentId);
 	    } catch (NumberFormatException e) {
 		logger.error("Number Format Exception");
-		VoteUtils.cleanUpUserExceptions(request);
-		return (mapping.findForward(VoteAppConstants.ERROR_LIST));
+
+		return false;
 	    }
 	}
-	return null;
+	return true;
     }
 
     public static Map<String, VoteMonitoredUserDTO> convertToVoteMonitoredUserDTOMap(List<VoteMonitoredUserDTO> list) {

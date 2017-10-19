@@ -36,7 +36,7 @@
 	            cssPageDisplay: '.pagedisplay',
 	            cssPageSize: '.pagesize',
 	            cssDisabled: 'disabled',
-	            ajaxUrl : "<lams:WebAppURL/>monitoring.do?dispatch=getReflectionsJSON&page={page}&size={size}&{sortList:column}&{filterList:fcol}&sessionUid=" + $(this).attr('data-session-id'),
+	            ajaxUrl : "<lams:WebAppURL/>monitoring/getReflectionsJSON.do?page={page}&size={size}&{sortList:column}&{filterList:fcol}&sessionUid=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 					if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],
