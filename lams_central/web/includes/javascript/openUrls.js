@@ -8,6 +8,7 @@
 		
 		var authorWin = null;
 		var learnWin = null;
+		var kumaliveWin = null;
 		var monitorLessonWin = null;
 		var addLessonWin = null;
 		var epWin = null;
@@ -111,6 +112,21 @@
 					learnWin.focus();
 				} else {
 					learnWin = window.open(learnerUrl,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes');
+				}
+			}
+		}
+		
+		function openKumalive(orgID, role) {
+			var kumaliveUrl = LAMS_URL + '/learning/kumalive/kumalive.jsp?organisationID=' + orgID + '&role=' + role
+			
+			if (isMac) {
+				kumaliveWin = window.open(kumaliveUrl,'kumaliveWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes');
+			} else {
+				if (kumaliveWin && !kumaliveWin.closed) {
+					kumaliveWin.location = kumaliveUrl;		
+					kumaliveWin.focus();
+				} else {
+					kumaliveWin = window.open(kumaliveUrl,'kumaliveWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes');
 				}
 			}
 		}
