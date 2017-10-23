@@ -7,6 +7,8 @@ SET FOREIGN_KEY_CHECKS=0;
 UPDATE lams_tool SET 
 	author_url = 'tool/lavote11/authoring/start.do',
 	learner_url = 'tool/lavote11/learning/start.do?mode=learner',
+	learner_preview_url = 'tool/lavote11/learning/start.do?mode=author',
+	learner_progress_url = 'tool/lavote11/learning/start.do?mode=teacher',
 	monitor_url = 'tool/lavote11/monitoring/start.do',
 	pedagogical_planner_url = 'tool/lavote11/pedagogicalPlanner/initPedagogicalPlannerForm.do'
 WHERE tool_signature = 'lavote11';
