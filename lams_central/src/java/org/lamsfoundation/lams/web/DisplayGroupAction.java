@@ -213,8 +213,9 @@ public class DisplayGroupAction extends Action {
 	    }
 	}
 
-	if (Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE) && (roles.contains(Role.ROLE_GROUP_MANAGER)
-		|| roles.contains(Role.ROLE_MONITOR) || roles.contains(Role.ROLE_LEARNER))) {
+	if (Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE) && org.getEnableKumalive()
+		&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)
+			|| roles.contains(Role.ROLE_LEARNER))) {
 	    links.add(new IndexLinkBean(
 		    roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)
 			    ? "index.kumalive.teacher"

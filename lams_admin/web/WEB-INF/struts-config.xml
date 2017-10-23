@@ -47,6 +47,7 @@
 	<form-property name="enableGradebookForLearners" type="java.lang.Boolean" initial="false"/>
 	<form-property name="enableSingleActivityLessons" type="java.lang.Boolean" initial="false"/>
 	<form-property name="enableLiveEdit" type="java.lang.Boolean" initial="true"/>
+	<form-property name="enableKumalive" type="java.lang.Boolean" initial="false"/>
 </form-bean>
 
 <form-bean name="UserRolesForm" type="org.apache.struts.action.DynaActionForm">
