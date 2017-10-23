@@ -54,6 +54,8 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
@@ -196,7 +198,8 @@ public class DisplayGroupAction extends Action {
 	    } else {// CLASS_TYPE
 		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
 		    String name = org.getParentOrganisation().getEnableSingleActivityLessons()
-			    ? "index.addlesson.single" : "index.addlesson";
+			    ? "index.addlesson.single"
+			    : "index.addlesson";
 		    links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + org.getOrganisationId() + ")",
 			    "fa fa-fw fa-plus", null));
 		}
@@ -210,10 +213,15 @@ public class DisplayGroupAction extends Action {
 	    }
 	}
 
-	links.add(new IndexLinkBean(
-		roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR) ? "index.kumalive.teacher"
-			: "index.kumalive",
-		"javascript:openKumalive(" + org.getOrganisationId() + ")", "fa fa-fw fa-bolt", "index.kumalive.tooltip"));
+	if (Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE) && (roles.contains(Role.ROLE_GROUP_MANAGER)
+		|| roles.contains(Role.ROLE_MONITOR) || roles.contains(Role.ROLE_LEARNER))) {
+	    links.add(new IndexLinkBean(
+		    roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)
+			    ? "index.kumalive.teacher"
+			    : "index.kumalive",
+		    "javascript:openKumalive(" + org.getOrganisationId() + ")", "fa fa-fw fa-bolt",
+		    "index.kumalive.tooltip"));
+	}
 
 	orgBean.setLinks(links);
 	orgBean.setMoreLinks(moreLinks);
