@@ -25,6 +25,8 @@ import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -50,6 +52,12 @@ public class KumaliveAction extends LamsDispatchAction {
 	UserDTO userDTO = getUserDTO();
 	Integer currentUserId = userDTO.getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, false);
+	if (!Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE)) {
+	    String warning = "Kumalives are disabled";
+	    log.warn(warning);
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
+	    return null;
+	}
 	if (!KumaliveAction.getSecurityService().hasOrgRole(organisationId, currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get rubrics", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
@@ -73,6 +81,12 @@ public class KumaliveAction extends LamsDispatchAction {
 	UserDTO userDTO = getUserDTO();
 	Integer currentUserId = userDTO.getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, false);
+	if (!Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE)) {
+	    String warning = "Kumalives are disabled";
+	    log.warn(warning);
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
+	    return null;
+	}
 	if (!KumaliveAction.getSecurityService().hasOrgRole(organisationId, currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
@@ -89,6 +103,12 @@ public class KumaliveAction extends LamsDispatchAction {
 	UserDTO userDTO = getUserDTO();
 	Integer currentUserId = userDTO.getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, false);
+	if (!Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE)) {
+	    String warning = "Kumalives are disabled";
+	    log.warn(warning);
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
+	    return null;
+	}
 	if (!KumaliveAction.getSecurityService().hasOrgRole(organisationId, currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report organisation data", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
@@ -116,6 +136,12 @@ public class KumaliveAction extends LamsDispatchAction {
 	Long kumaliveId = WebUtil.readLongParam(request, "kumaliveId", false);
 	Kumalive kumalive = KumaliveAction.getKumaliveService().getKumalive(kumaliveId);
 	Organisation organisation = kumalive.getOrganisation();
+	if (!Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE)) {
+	    String warning = "Kumalives are disabled";
+	    log.warn(warning);
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
+	    return null;
+	}
 	if (!KumaliveAction.getSecurityService().hasOrgRole(organisation.getOrganisationId(), currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report kumalive rubrics", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation "
@@ -144,6 +170,12 @@ public class KumaliveAction extends LamsDispatchAction {
 	Long kumaliveId = WebUtil.readLongParam(request, "kumaliveId", false);
 	Kumalive kumalive = KumaliveAction.getKumaliveService().getKumalive(kumaliveId);
 	Organisation organisation = kumalive.getOrganisation();
+	if (!Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE)) {
+	    String warning = "Kumalives are disabled";
+	    log.warn(warning);
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
+	    return null;
+	}
 	if (!KumaliveAction.getSecurityService().hasOrgRole(organisation.getOrganisationId(), currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report kumalive data", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation "
@@ -170,6 +202,12 @@ public class KumaliveAction extends LamsDispatchAction {
 	Integer userId = WebUtil.readIntParam(request, "userId", false);
 	Kumalive kumalive = KumaliveAction.getKumaliveService().getKumalive(kumaliveId);
 	Organisation organisation = kumalive.getOrganisation();
+	if (!Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE)) {
+	    String warning = "Kumalives are disabled";
+	    log.warn(warning);
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
+	    return null;
+	}
 	if (!KumaliveAction.getSecurityService().hasOrgRole(organisation.getOrganisationId(), currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report user data", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation "
@@ -202,6 +240,12 @@ public class KumaliveAction extends LamsDispatchAction {
 	    organisationId = kumalive.getOrganisation().getOrganisationId();
 	}
 
+	if (!Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE)) {
+	    String warning = "Kumalives are disabled";
+	    log.warn(warning);
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
+	    return null;
+	}
 	if (!KumaliveAction.getSecurityService().hasOrgRole(organisationId, currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive export", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
@@ -238,6 +282,12 @@ public class KumaliveAction extends LamsDispatchAction {
 	UserDTO userDTO = getUserDTO();
 	Integer userId = userDTO.getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, false);
+	if (!Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE)) {
+	    String warning = "Kumalives are disabled";
+	    log.warn(warning);
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
+	    return null;
+	}
 	if (!KumaliveAction.getSecurityService().hasOrgRole(organisationId, userId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get rubrics", false)) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;

@@ -29,6 +29,8 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -130,6 +132,10 @@ public class KumaliveWebsocketServer {
 
     @OnMessage
     public void receiveRequest(String input, Session session) throws JSONException, IOException {
+	if (!Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE)) {
+	    logger.warn("Kumalives are disabled");
+	    return;
+	}
 	if (StringUtils.isBlank(input)) {
 	    return;
 	}
