@@ -38,7 +38,7 @@
         } 
         
 		function doStatistic(){
-			var url = '/monitoring/statistics.do?toolContentID=${toolContentID}';
+			var url = 'statistics.do?toolContentID=${toolContentID}';
 			$.ajaxSetup({ cache: true });
 			$("#statisticArea").load(url);
 		}
