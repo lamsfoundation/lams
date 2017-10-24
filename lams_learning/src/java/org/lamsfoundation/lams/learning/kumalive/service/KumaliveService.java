@@ -78,6 +78,11 @@ public class KumaliveService implements IKumaliveService {
 	return (Kumalive) kumaliveDAO.find(Kumalive.class, id);
     }
 
+    @Override
+    public Kumalive getKumaliveByOrganisation(Integer organisationId) {
+	return kumaliveDAO.findKumalive(organisationId);
+    }
+
     /**
      * Fetches or creates a Kumalive
      *
@@ -89,7 +94,7 @@ public class KumaliveService implements IKumaliveService {
 	if (isTeacher) {
 	    securityService.isGroupMonitor(organisationId, userId, "start kumalive", true);
 	}
-	Kumalive kumalive = kumaliveDAO.findKumalive(organisationId);
+	Kumalive kumalive = getKumaliveByOrganisation(organisationId);
 	if (kumalive == null) {
 	    if (!isTeacher) {
 		return null;

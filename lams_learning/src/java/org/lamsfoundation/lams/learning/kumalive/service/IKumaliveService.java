@@ -36,6 +36,8 @@ import org.lamsfoundation.lams.util.ExcelCell;
 public interface IKumaliveService {
     Kumalive getKumalive(Long id);
 
+    Kumalive getKumaliveByOrganisation(Integer organisationId);
+
     Kumalive startKumalive(Integer organisationId, Integer userId, String name, JSONArray rubrics, boolean isTeacher)
 	    throws JSONException;
 

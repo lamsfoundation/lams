@@ -2,6 +2,7 @@
 
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-function" prefix="fn"%>
 
 <!-- Add More options menu drop down first (if it contains links) -->
 <c:if test="${not empty org.moreLinks}">
@@ -76,12 +77,33 @@
 				</div>
 			</div>
 		</c:when>
+		<c:when test="${link.name eq 'index.kumalive'}">
+			<div class="course-right-buttons pull-right">
+				<a class="btn btn-success btn-sm"
+                     <c:if test="${not empty link.tooltip}">
+                     	title="<fmt:message key='${link.tooltip}'/>"
+                 	</c:if>
+                 	<c:choose>
+	                 	<c:when test="${fn:contains(link.style, 'disabled')}">
+	                     	disabled="disabled"
+	                 	</c:when>
+	                 	<c:otherwise>
+	                 		onClick="<c:out value='${link.url}'/>"
+	                 	</c:otherwise>
+                 	</c:choose>                 	
+                >
+					<i class="${link.style}" title="<fmt:message key="${link.name}" />"></i>
+					<span class="hidden-xs"><fmt:message key="${link.name}" /></span>
+				</a>
+			</div>
+		</c:when>
 		<c:otherwise>
 			<div class="course-right-buttons pull-right">
 				<a class="btn btn-primary btn-sm tour-${link.id}" onClick="<c:out value='${link.url}'/>"
-                                        <c:if test="${not empty link.tooltip}">
-                                        title="<fmt:message key='${link.tooltip}'/>"
-                                    </c:if>>
+                     <c:if test="${not empty link.tooltip}">
+                     	title="<fmt:message key='${link.tooltip}'/>"
+                 	</c:if>
+                >
 					<i class="${link.style}" title="<fmt:message key="${link.name}" />"></i>
 					<span class="hidden-xs"><fmt:message key="${link.name}" /></span>
 				</a>
