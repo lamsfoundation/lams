@@ -57,6 +57,10 @@
 			</c:if>
 								
 			<%@ include file="historyresponses.jsp"%>
+			
+			<c:if test="${assessment.enableConfidenceLevels}">
+				<%@ include file="confidencelevel.jsp"%>
+			</c:if>
 		</div>
 					
 	</div>

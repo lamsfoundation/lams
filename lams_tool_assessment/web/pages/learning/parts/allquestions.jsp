@@ -64,6 +64,10 @@
 						</c:choose>
 					</c:when>						
 				</c:choose>
+				
+				<c:if test="${assessment.enableConfidenceLevels}">
+					<%@ include file="confidencelevel.jsp"%>
+				</c:if>
 			</div>
 					
 		</div>

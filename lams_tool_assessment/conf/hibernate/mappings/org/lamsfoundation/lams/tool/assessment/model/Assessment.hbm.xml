@@ -207,6 +207,14 @@
             insert="true"
             column="allow_grades_after_attempt"
         />
+        
+        <property
+            name="enableConfidenceLevels"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="enable_confidence_levels"
+        />
 
         <property
             name="allowHistoryResponses"

@@ -11,17 +11,11 @@
 		
 		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
-		<style media="screen,projection" type="text/css">
-			.ui-jqgrid tr.jqgrow td {
-			    white-space: normal !important;
-			    height:auto;
-			    vertical-align:text-top;
-			    padding-top:2px;
-			}
-		</style>
+		<link href="<html:rewrite page='/includes/css/monitoring.css'/>" rel="stylesheet" type="text/css">	
 		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+	 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/monitoring.js'/>"></script>
   	    <script>
   	    	var isEdited = false;
   	    	var previousCellValue = "";
@@ -38,18 +32,30 @@
 	  				  	rowList:[10,20,30,40,50,100],
 	  				    rowNum:10,
 	  				    viewrecords:true,
-	  				   	colNames:['questionResultUid',
-	  				   	     	'maxMark',
-	  		  				   	"<fmt:message key="label.monitoring.summary.user.name" />",
-	  							"<fmt:message key="label.monitoring.user.summary.response" />",
-	  						    "<fmt:message key="label.monitoring.user.summary.grade" />"],
+	  				   	colNames:[
+		  				   	'questionResultUid',
+	  				   	    	'maxMark',
+	  		  				"<fmt:message key="label.monitoring.summary.user.name" />",
+	  						"<fmt:message key="label.monitoring.user.summary.response" />",
+		  			   		<c:if test="${assessment.enableConfidenceLevels}">
+		  			   			"<fmt:message key="label.confidence" />",
+		  			  		</c:if>
+	  						"<fmt:message key="label.monitoring.user.summary.grade" />"
+	  					],
 	  						    
 	  				   	colModel:[
 							{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 							{name:'maxMark', index:'maxMark', width:0, hidden: true},
 							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }},
 	  				   		{name:'response', index:'response', width:427, sortable:false, search:false},
-	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }		
+	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align',
+			                        formatter: function (cellvalue) {
+			                            return gradientNumberFormat(cellvalue);
+			                        }
+				  			   	},
+			  			  	</c:if>
+	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' }		
 	  				   	],
 	  				   	multiselect: false,
 	  				   	caption: "${sessionDto.sessionName}",

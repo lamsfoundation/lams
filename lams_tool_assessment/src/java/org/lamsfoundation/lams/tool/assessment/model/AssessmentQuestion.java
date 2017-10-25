@@ -49,6 +49,11 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     private String title;
 
     private String question;
+    
+    /**
+     * It stores sha1(title + description) value that allows us to search for the AssessmentQuestions with the same title and question
+     */
+    private String questionHash;
 
     private int sequenceId;
 
@@ -221,6 +226,16 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
     public void setQuestion(String question) {
 	this.question = question;
+    }
+    
+    /**
+     * Returns sha1(title + description) value that allows us to search for the AssessmentQuestions with the same title and question
+     */
+    public String getQuestionHash() {
+	return questionHash;
+    }
+    public void setQuestionHash(String questionHash) {
+	this.questionHash = questionHash;
     }
 
     /**

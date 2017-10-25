@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevel;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
@@ -434,6 +435,24 @@ public interface IAssessmentService {
     void changeQuestionResultMark(Long questionResultUid, float newMark);
 
     void notifyTeachersOnAttemptCompletion(Long sessionId, String userName);
+    
+    /**
+     * Returns all confidence levels user left in this activity.
+     *
+     * @param userId
+     * @param toolSessionId
+     * @return
+     */
+    List<ConfidenceLevel> getConfidenceLevelsByUser(Integer userId, Long toolSessionId);
+    
+    /**
+     * Returns all confidence levels user left in this activity.
+     *
+     * @param userId
+     * @param toolSessionId
+     * @return
+     */
+    List<ConfidenceLevel> getConfidenceLevelsByQuestionAndSession(Long questionUid, Long toolSessionId);
 
     /**
      * Get a message from the language files with the given key

@@ -50,6 +50,15 @@
             insert="true"
             column="question"
         />
+        
+       	<property 
+       		name="questionHash" 
+       		type="java.lang.String" 
+            update="true"
+            insert="true"
+       		column="question_hash"
+			length="64"
+		/>
 
         <property
             name="sequenceId"

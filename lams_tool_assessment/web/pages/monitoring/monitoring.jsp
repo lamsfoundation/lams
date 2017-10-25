@@ -12,18 +12,9 @@
 		<link href="${lams}css/thickbox.css" rel="stylesheet" rel="stylesheet" type="text/css">
 		<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>		
  		<lams:css suffix="chart"/>
+ 		<link href="<html:rewrite page='/includes/css/monitoring.css'/>" rel="stylesheet" type="text/css">	
  		
 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
-		
-		<style type="text/css">
-			.ui-jqgrid tr.jqgrow td {
-			    white-space: normal !important;
-			    height:auto;
-			    vertical-align:text-top;
-			    padding-top:2px;
-			}	
-		</style>
-
 		<script>
 			// pass settings to monitorToolSummaryAdvanced.js
 			var submissionDeadlineSettings = {
@@ -46,10 +37,10 @@
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
    		<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
- 		
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
  		<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
+ 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/monitoring.js'/>"></script>
  		
 		<script>        
 		    function doSelectTab(tabId) {
