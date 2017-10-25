@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 
 <script type="text/javascript">
 	function masterDetailLoadUp(){
@@ -14,17 +15,20 @@
  	       		
  	       	var table = jQuery("#userSummary${assessmentResult.sessionId}");
  	     	table.addRowData(${i.index + 1}, {
- 	   	    	id:"${i.index + 1}",
+ 	   	    		id:"${i.index + 1}",
  	   	   		questionResultUid:"${questionResult.uid}",
  	   	   		title:"${fn:escapeXml(title)}",
  	   	   		response:responseStr,
+ 	   	   		<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+ 	   	   			confidence:"${questionResult.confidenceLevel}",
+ 	   	   		</c:if>
  	   	   		grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
  	   	   	});
 
  	 	    // set maxGrade attribute to cell DOM element
  	 	    table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  "${questionResult.maxMark}"});
 		</c:forEach>
-	};	  	   	  
+	};
 	masterDetailLoadUp();
 </script>
    	  

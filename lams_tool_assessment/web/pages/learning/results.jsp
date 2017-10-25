@@ -6,10 +6,21 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
+	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
+	<style media="screen,projection" type="text/css">
+		.slider-tick {
+			width: 0;
+			height 0;
+		}
+		.slider.slider-horizontal {
+		    margin-left: 5px;
+		}
+	</style>
 	
 	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script> 
 	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
 
 	<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 	<%-- param has higher level for request attribute --%>

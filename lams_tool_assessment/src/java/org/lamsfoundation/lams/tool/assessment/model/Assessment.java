@@ -76,6 +76,8 @@ public class Assessment implements Cloneable {
     private boolean allowWrongAnswersAfterQuestion;
 
     private boolean allowGradesAfterAttempt;
+    
+    private boolean enableConfidenceLevels;
 
     private boolean allowHistoryResponses;
 
@@ -525,6 +527,18 @@ public class Assessment implements Cloneable {
     public void setAllowGradesAfterAttempt(boolean allowGradesAfterAttempt) {
 	this.allowGradesAfterAttempt = allowGradesAfterAttempt;
     }
+    
+    /**
+    *
+    * @return
+    */
+   public boolean isEnableConfidenceLevels() {
+	return enableConfidenceLevels;
+   }
+
+   public void setEnableConfidenceLevels(boolean enableConfidenceLevels) {
+	this.enableConfidenceLevels = enableConfidenceLevels;
+   }
 
     /**
      *

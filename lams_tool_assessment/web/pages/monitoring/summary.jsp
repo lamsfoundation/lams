@@ -22,11 +22,12 @@
 			    rowList:[10,20,30,40,50,100],
 			    rowNum:10,
 			    viewrecords:true,
-			   	colNames:['userId',
-						'sessionId',
-						"<fmt:message key="label.monitoring.summary.user.name" />",
-					    "<fmt:message key="label.monitoring.summary.total" />",
-					    'portraitId'
+			   	colNames:[
+				   	'userId',
+					'sessionId',
+					"<fmt:message key="label.monitoring.summary.user.name" />",
+					"<fmt:message key="label.monitoring.summary.total" />",
+					'portraitId'
 				],
 			   	colModel:[
 			   		{name:'userId', index:'userId', width:0, hidden: true},
@@ -45,17 +46,18 @@
 			  	},
 			  	onSelectRow: function(rowid) { 
 			  	    if(rowid == null) { 
-			  	    	rowid=0; 
+			  	    		rowid=0; 
 			  	    } 
 			   		var userId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'userId');
 			   		var sessionId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'sessionId');
 					var userMasterDetailUrl = '<c:url value="/monitoring/userMasterDetail.do"/>';
 		  	        jQuery("#userSummary${sessionDto.sessionId}").clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
 		  	        $("#masterDetailArea").load(
-		  	        	userMasterDetailUrl,
-		  	        	{
-		  	        		userID: userId,
-		  	        		sessionId: sessionId
+		  	        		userMasterDetailUrl,
+		  	        		{
+		  	        			userID: userId,
+		  	        			sessionId: sessionId,
+		  	        			sessionMapID: '${sessionMapID}'
 		  	       		}
 		  	       	);    
 	  	  		},
@@ -85,18 +87,29 @@
 				autowidth: true,
 				shrinkToFit: false,
 				caption: "<fmt:message key="label.monitoring.summary.learner.summary" />",
-			   	colNames:['#',
-						'questionResultUid',
-  						'Question',
-  						"<fmt:message key="label.monitoring.user.summary.response" />",
-  						"<fmt:message key="label.authoring.basic.list.header.mark" />"],
-					    
+			   	colNames:[
+				   	'#',
+					'questionResultUid',
+  					'Question',
+  					"<fmt:message key="label.monitoring.user.summary.response" />",
+  					<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+  						"<fmt:message key="label.confidence" />",
+  					</c:if>
+  					"<fmt:message key="label.authoring.basic.list.header.mark" />"
+  				], 
 			   	colModel:[
-	  			   		{name:'id', index:'id', width:20, sorttype:"int"},
-	  			   		{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
-	  			   		{name:'title', index:'title', width: 200},
-	  			   		{name:'response', index:'response', width:443, sortable:false},
-	  			   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }
+	  			   	{name:'id', index:'id', width:20, sorttype:"int"},
+	  			   	{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
+	  			   	{name:'title', index:'title', width: 200},
+	  			   	{name:'response', index:'response', width:443, sortable:false},
+	  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+	  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align',
+	                        formatter: function (cellvalue) {
+	                            return gradientNumberFormat(cellvalue);
+	                        }
+		  			   	},
+	  			  	</c:if>
+	  			   	{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' }
 			   	],
 			   	multiselect: false,
 
@@ -137,6 +150,8 @@
 			});
 			
 		</c:forEach>
+
+
 		
 		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
 		$(window).bind('resize', function() {
@@ -173,7 +188,6 @@
 	function userNameFormatter (cellvalue, options, rowObject) {
 		return definePortraitPopover(rowObject[4], rowObject[0],  rowObject[2]);
 	}
-	
 
 	function exportSummary() {
 		var url = "<c:url value='/monitoring/exportSummary.do'/>";
@@ -182,7 +196,6 @@
 		url = url + param;
 		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	};
-	
 </script>
 
 <div class="panel">
