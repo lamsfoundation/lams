@@ -79,18 +79,21 @@
 		</c:when>
 		<c:when test="${link.name eq 'index.kumalive'}">
 			<div class="course-right-buttons pull-right">
-				<a class="btn btn-success btn-sm"
+                 <c:choose>
+	                <c:when test="${fn:contains(link.style, 'disabled')}">
+                        <c:set var="kumaliveState" value="disabled"/>
+	                 </c:when>
+	                 <c:otherwise>
+                        <c:set var="kumaliveState" value="enabled"/>
+	                 </c:otherwise>
+                 </c:choose>                 	
+                 <a class="btn btn-success btn-sm ${kumaliveState}"
                      <c:if test="${not empty link.tooltip}">
                      	title="<fmt:message key='${link.tooltip}'/>"
                  	</c:if>
-                 	<c:choose>
-	                 	<c:when test="${fn:contains(link.style, 'disabled')}">
-	                     	disabled="disabled"
-	                 	</c:when>
-	                 	<c:otherwise>
-	                 		onClick="<c:out value='${link.url}'/>"
-	                 	</c:otherwise>
-                 	</c:choose>                 	
+                    <c:if test="${kumaliveState eq 'enabled'}">
+	                 	onClick="<c:out value='${link.url}'/>"
+                    </c:if>    
                 >
 					<i class="${link.style}" title="<fmt:message key="${link.name}" />"></i>
 					<span class="hidden-xs"><fmt:message key="${link.name}" /></span>
