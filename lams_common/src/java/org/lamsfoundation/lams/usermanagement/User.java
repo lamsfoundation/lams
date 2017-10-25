@@ -500,7 +500,7 @@ public class User implements Serializable, Comparable {
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
 		theme != null ? new ThemeDTO(theme) : null,
 		// TimeZone.getTimeZone("Australia/Sydney"),
-		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, 
+		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping,
 		(tutorialsDisabled == null ? false : true), // assume tutorials enabled if not set
 		tutorialPages, 
 		(firstLogin == null ? true : false), // assume no firstLogin value means they haven't logged in
@@ -642,11 +642,11 @@ public class User implements Serializable, Comparable {
     }
 
     public Integer getFailedAttempts() {
-        return failedAttempts;
+	return failedAttempts;
     }
 
     public void setFailedAttempts(Integer failedAttempts) {
-        this.failedAttempts = failedAttempts;
+	this.failedAttempts = failedAttempts;
     }
 
     public Date getLockOutTime() {

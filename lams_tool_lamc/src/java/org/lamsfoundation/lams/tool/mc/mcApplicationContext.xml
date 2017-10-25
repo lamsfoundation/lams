@@ -106,6 +106,7 @@
 					<prop key="setReflectiveData">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="setDefineLater">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="changeUserAttemptMark">PROPAGATION_REQUIRED,-McApplicationException</prop>
 				</props>
 			</property>
 	</bean>  

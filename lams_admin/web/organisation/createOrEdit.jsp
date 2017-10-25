@@ -115,6 +115,13 @@
 				<fmt:message key="config.live.edit"/>
 			</label>
 		</div>
+		
+		<div class="checkbox">
+			<label for="enable-kumalive">
+			<html-el:checkbox property="enableKumalive" styleId="enable-kumalive"/>
+				<fmt:message key="config.kumalive.enable"/>
+			</label>
+		</div>
 	
 	<logic:notEmpty name="OrganisationForm" property="orgId">
 		<div class="voffset10">

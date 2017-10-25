@@ -359,7 +359,25 @@
         redirect="false"
       />
     </action>
-
+    <action
+      path="/kumalive"
+      type="org.lamsfoundation.lams.learning.kumalive.KumaliveAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayRubrics"
+        path="/kumalive/kumaliveRubrics.jsp"
+        redirect="false"
+      />
+     <forward
+        name="displayReport"
+        path="/kumalive/kumaliveReport.jsp"
+        redirect="false"
+      />
+    </action>
+    
 <action path="/index"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter="/main.jsp" />

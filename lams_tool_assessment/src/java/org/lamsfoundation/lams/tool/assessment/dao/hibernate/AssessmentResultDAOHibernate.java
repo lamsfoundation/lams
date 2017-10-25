@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
@@ -171,12 +172,16 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     @Override
     public List<AssessmentUserDTO> getFirstTotalScoresByContentId(Long toolContentId) {
-	final String FIRST_SCORES_BY_CONTENT_ID = "SELECT res.user.userId, res.grade FROM " + AssessmentResult.class.getName()
-		+ " AS res WHERE res.startDate = ( SELECT MIN(resMax.startDate) FROM "
-		+ AssessmentResult.class.getName()
-		+ " AS resMax WHERE resMax.user.userId = res.user.userId AND resMax.assessment.contentId=? AND (resMax.finishDate != null) )";
+	final String FIRST_SCORES_BY_CONTENT_ID = "SELECT user.user_id, res.grade "
+		+ "FROM tl_laasse10_assessment_result AS res "
+		+ "JOIN tl_laasse10_user AS user ON res.user_uid = user.uid "
+		+ "JOIN tl_laasse10_assessment AS assess ON res.assessment_uid = assess.uid AND assess.content_id = :contentId "
+		+ "INNER JOIN (SELECT user_uid, MIN(start_date) AS startDate FROM tl_laasse10_assessment_result WHERE finish_date IS NOT NULL GROUP BY user_uid) firstRes "
+		+ "ON (res.user_uid = firstRes.user_uid AND res.start_date = firstRes.startDate) GROUP BY res.user_uid";
 
-	List<Object[]> list = (List<Object[]>) doFind(FIRST_SCORES_BY_CONTENT_ID, new Object[] { toolContentId });
+	SQLQuery query = getSession().createSQLQuery(FIRST_SCORES_BY_CONTENT_ID);
+	query.setLong("contentId", toolContentId);
+	List<Object[]> list = query.list();
 	return convertResultsToAssessmentUserDTOList(list);
     }
 

@@ -125,6 +125,10 @@
 				length="1" not-null="true"
 			</meta>
 		</property>
+		
+		<property name="enableKumalive" type="java.lang.Boolean"
+				  column="enable_kumalive" not-null="true" length="1">
+		</property>
 
 		<!-- Associations -->
 

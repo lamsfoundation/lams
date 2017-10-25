@@ -470,9 +470,10 @@ function showGradebookCourseDialog(orgID){
 	showDialog(id, {
 		'orgID' : orgID,
 		'height': Math.max(380, Math.min(900, $(window).height() - 30)),
-		'width' : Math.max(380, Math.min(1024, $(window).width() - 60)),
+		'width' : Math.max(380, Math.min(955, $(window).width() - 60)),
 		'title' : LABELS.GRADEBOOK_COURSE_TITLE,
 		'open' : function() {
+			console.log("width "+$(window).width()+":"+Math.max(380, Math.min(955, $(window).width() - 60)));
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=' + orgID);
@@ -532,6 +533,40 @@ function showSearchLessonDialog(orgID){
 				+ 'findUserLessons.do?dispatch=getResults&courseID=' + orgID);
 		}
 	}, true);
+}
+
+function showKumaliveRubricsDialog(orgID){
+	var id = "dialogKumaliveRubrics" + orgID;
+	showDialog(id, {
+		'data' : {
+			'orgID' : orgID
+		},
+		'height': Math.max(380, Math.min(650, $(window).height() - 30)),
+		'width' : Math.max(380, Math.min(610, $(window).width() - 60)),
+		'title' : LABELS.KUMALIVE_RUBRICS_TITLE,
+		'open' : function() {
+			var orgID = $(this).data('orgID');
+			// load contents after opening the dialog
+			$('iframe', this).attr('src', LAMS_URL	+ '/learning/kumalive.do?method=getRubrics&organisationID=' + orgID);
+		}
+	}, false);
+}
+
+function showKumaliveReportDialog(orgID){
+	var id = "dialogKumaliveReports" + orgID;
+	showDialog(id, {
+		'data' : {
+			'orgID' : orgID
+		},
+		'height': Math.max(380, Math.min(800, $(window).height() - 30)),
+		'width' : Math.max(380, Math.min(1024, $(window).width() - 60)),
+		'title' : LABELS.KUMALIVE_REPORT_TITLE,
+		'open' : function() {
+			var orgID = $(this).data('orgID');
+			// load contents after opening the dialog
+			$('iframe', this).attr('src', LAMS_URL	+ '/learning/kumalive.do?method=getReport&organisationID=' + orgID);
+		}
+	}, false);
 }
 
 

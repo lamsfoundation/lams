@@ -43,6 +43,8 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
+import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
+import org.lamsfoundation.lams.learning.kumalive.service.IKumaliveService;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonService;
@@ -54,6 +56,8 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
@@ -67,6 +71,7 @@ public class DisplayGroupAction extends Action {
     private static LessonService lessonService;
     private static ILearningDesignService learningDesignService;
     private static ISecurityService securityService;
+    private static IKumaliveService kumaliveService;
 
     @Override
     @SuppressWarnings({ "unchecked" })
@@ -77,7 +82,7 @@ public class DisplayGroupAction extends Action {
 
 	Organisation org = null;
 	if (orgId != null) {
-	    org = (Organisation) getService().findById(Organisation.class, orgId);
+	    org = (Organisation) getUserManagementService().findById(Organisation.class, orgId);
 	}
 
 	if (org != null) {
@@ -90,8 +95,8 @@ public class DisplayGroupAction extends Action {
 	    }
 
 	    List<Integer> roles = new ArrayList<Integer>();
-	    List<UserOrganisationRole> userOrganisationRoles = getService().getUserOrganisationRoles(orgId,
-		    request.getRemoteUser());
+	    List<UserOrganisationRole> userOrganisationRoles = getUserManagementService()
+		    .getUserOrganisationRoles(orgId, request.getRemoteUser());
 	    for (UserOrganisationRole userOrganisationRole : userOrganisationRoles) {
 		Integer roleId = userOrganisationRole.getRole().getRoleId();
 		roles.add(roleId);
@@ -106,7 +111,7 @@ public class DisplayGroupAction extends Action {
 		request.setAttribute("tools",
 			getLearningDesignService().getToolDTOs(false, false, request.getRemoteUser()));
 	    }
-	    
+
 	    //set whether organisation is favorite
 	    boolean isFavorite = service.isOrganisationFavorite(orgId, user.getUserId());
 	    iob.setFavorite(isFavorite);
@@ -117,7 +122,8 @@ public class DisplayGroupAction extends Action {
 
     private IndexOrgBean createOrgBean(Organisation org, List<Integer> roles, String username, boolean isSysAdmin)
 	    throws SQLException, NamingException {
-	IndexOrgBean orgBean = new IndexOrgBean(org.getOrganisationId(), org.getName(),
+	Integer organisationId = org.getOrganisationId();
+	IndexOrgBean orgBean = new IndexOrgBean(organisationId, org.getName(),
 		org.getOrganisationType().getOrganisationTypeId());
 
 	// populate group contents
@@ -129,12 +135,12 @@ public class DisplayGroupAction extends Action {
 	if (isSysAdmin) {
 	    if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
 		moreLinks.add(new IndexLinkBean("index.classman",
-			"javascript:openOrgManagement(" + org.getOrganisationId() + ")", "fa fa-fw fa-users", null));
+			"javascript:openOrgManagement(" + organisationId + ")", "fa fa-fw fa-users", null));
 	    }
 	}
 
 	if (org.getEnableGradebookForLearners() && roles.contains(Role.ROLE_LEARNER)) {
-	    String link = "javascript:showGradebookLearnerDialog(" + org.getOrganisationId() + ")";
+	    String link = "javascript:showGradebookLearnerDialog(" + organisationId + ")";
 	    links.add(new IndexLinkBean("index.coursegradebook.learner", link, "fa fa-fw fa-list-ol", null));
 	}
 
@@ -144,33 +150,31 @@ public class DisplayGroupAction extends Action {
 		if ((!isSysAdmin)
 			&& (roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER))) {
 		    moreLinks.add(new IndexLinkBean("index.classman",
-			    "javascript:openOrgManagement(" + org.getOrganisationId() + ")", "fa fa-fw fa-ellipsis-v",
-			    null));
+			    "javascript:openOrgManagement(" + organisationId + ")", "fa fa-fw fa-ellipsis-v", null));
 		}
 		if ((roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER)
 			|| roles.contains(Role.ROLE_AUTHOR) || roles.contains(Role.ROLE_MONITOR))) {
 		    moreLinks.add(new IndexLinkBean("index.orggroup",
-			    "javascript:showOrgGroupingDialog(" + org.getOrganisationId() + ")", "fa fa-fw fa-users",
-			    null));
+			    "javascript:showOrgGroupingDialog(" + organisationId + ")", "fa fa-fw fa-users", null));
 		}
 
 		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
 		    String name = org.getEnableSingleActivityLessons() ? "index.addlesson.single" : "index.addlesson";
-		    links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + org.getOrganisationId() + ")",
+		    links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + organisationId + ")",
 			    "fa fa-fw fa-plus", null));
 		}
 		moreLinks.add(new IndexLinkBean("index.searchlesson",
-			"javascript:showSearchLessonDialog(" + org.getOrganisationId() + ")", "fa fa-fw fa-search",
+			"javascript:showSearchLessonDialog(" + organisationId + ")", "fa fa-fw fa-search",
 			"index.searchlesson.tooltip"));
 
 		// Adding course notifications links if enabled
 		if (org.getEnableCourseNotifications()
 			&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR))) {
 		    moreLinks.add(new IndexLinkBean("index.emailnotifications",
-			    "javascript:showNotificationsDialog(" + org.getOrganisationId() + ",null)",
-			    "fa fa-fw fa-bullhorn", "index.emailnotifications.tooltip"));
+			    "javascript:showNotificationsDialog(" + organisationId + ",null)", "fa fa-fw fa-bullhorn",
+			    "index.emailnotifications.tooltip"));
 		}
-		
+
 		// Adding lesson sorting link
 		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
 
@@ -188,7 +192,7 @@ public class DisplayGroupAction extends Action {
 
 		// Adding gradebook course monitor links if enabled
 		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_GROUP_ADMIN)) {
-		    String link = "javascript:showGradebookCourseDialog(" + org.getOrganisationId() + ")";
+		    String link = "javascript:showGradebookCourseDialog(" + organisationId + ")";
 		    moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "fa fa-fw fa-list-ol",
 			    "index.coursegradebook.tooltip"));
 		}
@@ -196,18 +200,32 @@ public class DisplayGroupAction extends Action {
 	    } else {// CLASS_TYPE
 		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
 		    String name = org.getParentOrganisation().getEnableSingleActivityLessons()
-			    ? "index.addlesson.single" : "index.addlesson";
-		    links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + org.getOrganisationId() + ")",
+			    ? "index.addlesson.single"
+			    : "index.addlesson";
+		    links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + organisationId + ")",
 			    "fa fa-fw fa-plus", null));
 		}
 
 		// Adding gradebook course monitor links if enabled
 		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_GROUP_ADMIN)) {
-		    String link = "javascript:showGradebookCourseDialog(" + org.getOrganisationId() + ")";
-		    moreLinks.add(new IndexLinkBean("index.coursegradebook.subgroup", link, "fa fa-fw fa-list-ol", null));
+		    String link = "javascript:showGradebookCourseDialog(" + organisationId + ")";
+		    moreLinks.add(
+			    new IndexLinkBean("index.coursegradebook.subgroup", link, "fa fa-fw fa-list-ol", null));
 		}
 	    }
 	}
+
+	if (Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE) && org.getEnableKumalive()
+		&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)
+			|| roles.contains(Role.ROLE_LEARNER))) {
+	    Kumalive kumalive = getKumaliveService().getKumaliveByOrganisation(organisationId);
+	    boolean isMonitor = roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR);
+	    boolean disabled = !isMonitor && (kumalive == null || kumalive.getFinished());
+	    links.add(new IndexLinkBean(isMonitor ? "index.kumalive.teacher" : "index.kumalive",
+		    "javascript:openKumalive(" + organisationId + ")",
+		    "fa fa-fw fa-bolt" + (disabled ? " disabled" : ""), "index.kumalive.tooltip"));
+	}
+
 	orgBean.setLinks(links);
 	orgBean.setMoreLinks(moreLinks);
 
@@ -231,7 +249,7 @@ public class DisplayGroupAction extends Action {
 	    for (Organisation organisation : children) {
 		if (OrganisationState.ACTIVE.equals(organisation.getOrganisationState().getOrganisationStateId())) {
 		    List<Integer> classRoles = new ArrayList<Integer>();
-		    List<UserOrganisationRole> userOrganisationRoles = getService()
+		    List<UserOrganisationRole> userOrganisationRoles = getUserManagementService()
 			    .getUserOrganisationRoles(organisation.getOrganisationId(), username);
 		    // don't list the subgroup if user is not a member, and not a group admin/manager
 		    if (((userOrganisationRoles == null) || userOrganisationRoles.isEmpty()) && !isSysAdmin
@@ -287,12 +305,6 @@ public class DisplayGroupAction extends Action {
 	    }
 	}
 
-	// getting the organisation
-	Organisation org = (Organisation) DisplayGroupAction.service.findById(Organisation.class, orgId);
-
-	// Getting the parent organisation if applicable
-	Organisation parent = org.getParentOrganisation();
-
 	// iterate through user's lessons where they are staff (or simply through all lessons in case of Group_Manager),
 	// and add staff links to the beans in the map.
 	Integer userRole = (roles.contains(Role.ROLE_GROUP_MANAGER)) ? Role.ROLE_GROUP_MANAGER : Role.ROLE_MONITOR;
@@ -330,8 +342,8 @@ public class DisplayGroupAction extends Action {
 	    // Add delete lesson option
 	    if (isGroupManagerOrMonitor) {
 		String removeLessonLink = "javascript:removeLesson(" + bean.getId() + ")";
-		lessonLinks.addFirst(new IndexLinkBean("index.remove.lesson", removeLessonLink,
-			"fa fa-fw fa-trash-o", "index.remove.lesson.tooltip"));
+		lessonLinks.addFirst(new IndexLinkBean("index.remove.lesson", removeLessonLink, "fa fa-fw fa-trash-o",
+			"index.remove.lesson.tooltip"));
 	    }
 
 	    if (lessonLinks.size() > 0) {
@@ -344,10 +356,10 @@ public class DisplayGroupAction extends Action {
     }
 
     private User getUser(String login) {
-	return (User) getService().findByProperty(User.class, "login", login).get(0);
+	return (User) getUserManagementService().findByProperty(User.class, "login", login).get(0);
     }
 
-    private IUserManagementService getService() {
+    private IUserManagementService getUserManagementService() {
 	if (DisplayGroupAction.service == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
@@ -381,5 +393,14 @@ public class DisplayGroupAction extends Action {
 	    DisplayGroupAction.securityService = (ISecurityService) ctx.getBean("securityService");
 	}
 	return DisplayGroupAction.securityService;
+    }
+
+    private IKumaliveService getKumaliveService() {
+	if (DisplayGroupAction.kumaliveService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    DisplayGroupAction.kumaliveService = (IKumaliveService) ctx.getBean("kumaliveService");
+	}
+	return DisplayGroupAction.kumaliveService;
     }
 }

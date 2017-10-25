@@ -417,6 +417,14 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
+    public Long getPortraitId(Long userId) {
+	if ( userId != null ) {
+	    User user = (User) userManagementService.findById(User.class, userId.intValue());
+	    return user != null ? user.getPortraitUuid() : null;
+	}
+	return null;
+    }
+    @Override
     public List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
 	return mcUserDAO.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString,
@@ -776,31 +784,54 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    return;
 	}
 
-	McUsrAttempt userAttempt = mcUsrAttemptDAO.getUserAttemptByUid(userAttemptUid);
-	Integer userId = userAttempt.getMcQueUsr().getQueUsrId().intValue();
-	Long userUid = userAttempt.getMcQueUsr().getUid();
-	Long toolSessionId = userAttempt.getMcQueUsr().getMcSession().getMcSessionId();
-	Integer oldMark = userAttempt.getMark();
-	int oldTotalMark = mcUsrAttemptDAO.getUserTotalMark(userUid);
+	McUsrAttempt userAttemptToUpdate = mcUsrAttemptDAO.getUserAttemptByUid(userAttemptUid);
+	McQueUsr selectedUser = userAttemptToUpdate.getMcQueUsr();
+	Long userUid = selectedUser.getUid();
+	McSession mcSession = selectedUser.getMcSession();
 
+	Integer oldMark = userAttemptToUpdate.getMark();
+	int oldTotalMark = mcUsrAttemptDAO.getUserTotalMark(userUid);
 	int totalMark = (oldMark == null) ? oldTotalMark + newMark : (oldTotalMark - oldMark) + newMark;
 
-	//update mark for one particular question
-	userAttempt.setMark(newMark);
-	mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
+	List<McUsrAttempt> userAttempts = new ArrayList<McUsrAttempt>();
+	McQueUsr groupLeader = mcSession.getGroupLeader();
+	if (groupLeader != null) {
+	    if (groupLeader.equals(selectedUser)) {
+		// This is the group leader so update everyone in the group's mark
+		userAttempts = mcUsrAttemptDAO.getUserAttemptsByQuestionSession(mcSession.getUid(),
+			userAttemptToUpdate.getMcQueContent().getUid());
+	    } else {
+		String error = new StringBuilder(
+			"Attempting to update the mark for a non-leader. Cannot update. Session ")
+			.append(mcSession.getSession_name()).append(":").append(mcSession.getMcSessionId())
+			.append(" user ").append(selectedUser.getUsername()).append(":")
+			.append(selectedUser.getQueUsrId()).toString();
+		logger.warn(error);
+	    }
+	} else {
+	    userAttempts = new ArrayList<McUsrAttempt>();
+	    userAttempts.add(userAttemptToUpdate);
+	}
 
-	//update user's total mark
-	McQueUsr user = userAttempt.getMcQueUsr();
-	user.setLastAttemptTotalMark(totalMark);
-	updateMcQueUsr(user);
+	for (McUsrAttempt attempt : userAttempts) {
+	    
+	    attempt.setMark(newMark);
+	    mcUsrAttemptDAO.saveMcUsrAttempt(attempt);
 
-	// propagade changes to Gradebook
-	gradebookService.updateActivityMark(new Double(totalMark), null, userId, toolSessionId, false);
+	    // update user's total mark
+	    McQueUsr user = attempt.getMcQueUsr();
+	    user.setLastAttemptTotalMark(totalMark);
+	    updateMcQueUsr(user);
 
-	// record mark change with audit service
-	auditService.logMarkChange(McAppConstants.TOOL_SIGNATURE, userAttempt.getMcQueUsr().getQueUsrId(),
-		userAttempt.getMcQueUsr().getUsername(), "" + oldMark, "" + totalMark);
+	    // propagate changes to Gradebook
+	    gradebookService.updateActivityMark(new Double(totalMark), null, user.getQueUsrId().intValue(), 
+		    mcSession.getMcSessionId(), false);
 
+	    // record mark change with audit service
+	    auditService.logMarkChange(McAppConstants.TOOL_SIGNATURE, user.getQueUsrId(),
+		    user.getUsername(), "" + oldMark, "" + totalMark);
+
+	}
     }
 
     @Override

@@ -187,6 +187,14 @@ public class GradebookAction extends LamsDispatchAction {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	UserDTO user = getUser();
 
+	// in case of toolbar searching (which uses different parameters than a single field searching) get those
+	// parameters
+	if (isSearch && (searchField == null)) {
+	    searchField = GradebookConstants.PARAM_ROW_NAME;
+	    searchOper = GradebookConstants.SEARCH_CONTAINS;
+	    searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_ROW_NAME, true);
+	}
+
 	// Get the user gradebook list from the db
 	List<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<GBUserGridRowDTO>();
 

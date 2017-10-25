@@ -51,6 +51,10 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
     private static final String LOAD_PARTICULAR_QUESTION_ATTEMPT = "from attempt in class McUsrAttempt where attempt.mcQueUsr.uid=:queUsrUid"
 	    + " and attempt.mcQueContentId=:mcQueContentId" + " order by attempt.mcOptionsContent.uid";
 
+    private static final String LOAD_FINAL_USER_QUESTION_ATTEMPTS_FOR_QUESTION_SESSION = "from attempt in class McUsrAttempt where "
+	    + " attempt.mcQueUsr.mcSessionId=:sessionUid AND attempt.mcQueContentId=:mcQueContentId "
+	    + " AND attempt.mcQueUsr.responseFinalised = true order by attempt.mcQueUsr.uid";
+
     private static final String LOAD_ALL_QUESTION_ATTEMPTS = "from attempt in class McUsrAttempt where attempt.mcQueUsr.uid=:queUsrUid"
 	    + " AND attempt.mcQueUsr.responseFinalised = true order by attempt.mcQueContentId, attempt.mcOptionsContent.uid";
 
@@ -101,6 +105,15 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 
 	McUsrAttempt userAttempt = (userAttemptList.size() == 0) ? null : userAttemptList.get(0);
 	return userAttempt;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<McUsrAttempt> getUserAttemptsByQuestionSession(final Long sessionUid, final Long mcQueContentId) {
+	List<McUsrAttempt> userAttemptList = getSessionFactory().getCurrentSession()
+		.createQuery(LOAD_FINAL_USER_QUESTION_ATTEMPTS_FOR_QUESTION_SESSION).setLong("sessionUid", sessionUid.longValue())
+		.setLong("mcQueContentId", mcQueContentId.longValue()).list();
+	return userAttemptList;
     }
 
     @Override

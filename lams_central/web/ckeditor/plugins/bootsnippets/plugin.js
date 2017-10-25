@@ -8,7 +8,7 @@
 	//add all commands, dialogs and buttons specified in ckconfig_custom.js
 	CKEDITOR.plugins.add( 'bootsnippets', {
 		requires: 'dialog',
-		lang: 'en', 
+		lang: 'en,es,gr,ru', 
 		hidpi: false, 
 		init: function( editor ) {
 			var snippetNames = (CKEDITOR.config.bootsnippets).split( ',' );
@@ -83,7 +83,7 @@
 
 				for ( var j = 0; j < count; j++ ) {
 					var snippet = snippets[ j ],
-						item = createSnippetItem( snippet, imagesPath );
+						item = createSnippetItem( snippet, editor, imagesPath );
 					item.setAttribute( 'aria-posinset', j + 1 );
 					item.setAttribute( 'aria-setsize', count );
 					container.append( item );
@@ -91,15 +91,17 @@
 			}
 		}
 
-		function createSnippetItem( snippet, imagesPath ) {
+		function createSnippetItem( snippet, editor, imagesPath ) {
 			var item = CKEDITOR.dom.element.createFromHtml( '<a href="javascript:void(0)" tabIndex="-1" role="option" >' +
 				'<div class="cke_tpl_item"></div>' +
 				'</a>' );
+			
+			var lang = editor.lang.bootsnippets,
+				title = lang[snippet.title] ? lang[snippet.title] : snippet.title;
 
 			// Build the inner HTML of our new item DIV.
 			var html = '<table style="width:350px;" class="cke_tpl_preview" role="presentation">';
-			
-			html += '<tr><td style="white-space:normal;"><span class="cke_tpl_title">' + snippet.title + '</span><br/>';
+			html += '<tr><td style="white-space:normal;"><span class="cke_tpl_title">' + title + '</span><br/>';
 			if ( snippet.description ) {
 				html += '<span>' + snippet.description + '</span>';
 			}
@@ -160,12 +162,10 @@
 		var plugin = CKEDITOR.plugins.get( 'bootsnippets' );
 		CKEDITOR.document.appendStyleSheet( CKEDITOR.getUrl( plugin.path + 'dialogs/snippets.css' ) );
 
-
-		var listContainer;
-
 		var snippetListLabelId = 'cke_tpl_list_label_' + CKEDITOR.tools.getNextNumber(),
 			lang = editor.lang.bootsnippets,
-			config = editor.config;
+			config = editor.config,
+			listContainer;
 		return {
 			title: lang.title,
 

@@ -79,20 +79,6 @@ a:focus {
     color: $a-link-default-focus;
 }
 
-// popover links forced to be the usual link color or jqgrid interferes
-.popover-link {
-    color: $a-link-default !important;
-}
-
-.popover-link:hover {
-    color: $a-link-default-hover !important;
-}
-
-.popover-link:focus {
-    color: $a-link-default-focus !important;
-}
-
-
 @if variable-exists(panel-default-heading-background) {
     .panel-default>.panel-heading {
 	    background-color: $panel-default-heading-background;
@@ -230,11 +216,11 @@ a:focus {
   padding: 3px 5px;
 }
 .panel-learner-page {
-  border-radius: 6px;
+  border-radius: $border-radius-large;
   box-shadow: $panel-box-shadow;
 }
 .panel-monitor-page {
-  border-radius: 6px;
+  border-radius: $border-radius-large;
   box-shadow: $panel-box-shadow;
 }
 // .panel-learner-page-title,
@@ -252,7 +238,7 @@ a:focus {
 //   min-height: 48px;
 // }
 .panel-admin-page {
-  border-radius: 6px;
+  border-radius: $border-radius-large;
   box-shadow: $panel-box-shadow;
   margin-top: 20px;
 }
@@ -289,8 +275,8 @@ body.stripes {
 .sbox-heading {
   padding: 3px 5px;
   border-bottom: 1px solid $gray-lighter;
-  border-top-right-radius: 3px;
-  border-top-left-radius: 3px;
+  border-top-right-radius: $border-radius-small;
+  border-top-left-radius: $border-radius-small;
 }
 .user {
   display: inline-block;
@@ -530,7 +516,7 @@ a.button-add-item:before {
 }
 
 .modal .ui-resizable-handle.ui-resizable-s {
-	border-radius: 6px;
+	border-radius: $border-radius-large;
     border-bottom: 1px solid white;
 }
 
@@ -601,7 +587,7 @@ a.button-add-item:before {
 	
 	/* darker outline than usual */
 	nav.sidebar{
-		  border-radius: 6px;
+		  border-radius: $border-radius-large;
 		  box-shadow: $panel-box-shadow;
 		  min-height:300px;
 	}
@@ -787,6 +773,8 @@ div.growlUI h1,div.growlUI h2 {
 	width: 150px;
 	font-size: 0.9em;
 	word-wrap: break-word;
+    border-radius: $border-radius-large;
+    @include box-shadow(0 5px 10px rgba(0,0,0,.2));
 }
 
 .tooltip-lg{
@@ -797,7 +785,28 @@ div.growlUI h1,div.growlUI h2 {
     padding:5px;
     width:250px;
     font-size: 1.1em;
+	font-weight: bold;
 	word-wrap: break-word;
+    border-radius: $border-radius-large;
+    @include box-shadow(0 5px 10px rgba(0,0,0,.2));
+}
+
+// Popovers used in Gradebook to display portraits
+// popover links forced to be the usual link color or jqgrid can interfere
+.popover-link {
+    color: $a-link-default !important;
+}
+
+.popover-link:hover {
+    color: $a-link-default-hover !important;
+}
+
+.popover-link:focus {
+    color: $a-link-default-focus !important;
+}
+
+.popover-title {
+	background-color: $gray-light-mid;
 }
 
 // clickable panel created in CKEditor
@@ -1018,7 +1027,7 @@ $portrait-size-image-xl: 400px;
 
 .portrait-container-sm {
 	height: $portrait-size-image-sm + 3;
-	margin-top: 3px;
+	margin-top: $border-radius-small;
 }
 
 // Used in PortraitTag.java when user does not have a portrait

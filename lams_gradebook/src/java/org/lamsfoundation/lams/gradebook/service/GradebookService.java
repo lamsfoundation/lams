@@ -742,7 +742,7 @@ public class GradebookService implements IGradebookService {
 
 	if (organisation != null) {
 
-	    List<Lesson> lessons = view == GBGridView.MON_COURSE
+	    List<Lesson> lessons = ( view == GBGridView.MON_COURSE || view == GBGridView.LIST )
 		    ? gradebookDAO.getLessonsByGroupAndUser(userId, orgId, page, size, sortBy, sortOrder, searchString)
 		    : lessonService.getLessonsByGroupAndUser(userId, orgId);
 
