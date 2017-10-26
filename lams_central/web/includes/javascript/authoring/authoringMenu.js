@@ -405,6 +405,9 @@ var MenuLib = {
 	 * Opens a pop up for importing LD. Loads the imported LD to canvas.
 	 */
 	importLearningDesign : function(){
+		if (layout.modified && !confirm(LABELS.CLEAR_CANVAS_CONFIRM)) {
+			return;
+		}
 		var dialog = showDialog("dialogImportLearningDesign", {
 						'modal' : true,
 						'height' : 350,
@@ -482,6 +485,9 @@ var MenuLib = {
 	 * Opens "Open sequence" dialog where an user can choose a Learning Design to load.
 	 */
 	openLearningDesign : function(){
+		if (layout.modified && !confirm(LABELS.CLEAR_CANVAS_CONFIRM)) {
+			return;
+		}
 		layout.ldStoreDialog.data('prepareForOpen')(LABELS.OPEN_DIALOG_TITLE, null,
 				'#ldStoreDialogOpenButton, #ldStoreDialogCancelButton', false);
 		layout.ldStoreDialog.modal('show');
