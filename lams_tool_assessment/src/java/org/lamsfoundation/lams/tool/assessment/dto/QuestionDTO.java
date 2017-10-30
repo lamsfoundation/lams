@@ -84,6 +84,8 @@ public class QuestionDTO {
     private Set<OptionDTO> matchingPairOptions;
 
     private List<Object[]> questionResults;
+    
+    private int confidenceLevel;
 
     public QuestionDTO(AssessmentQuestion question) {
 	this.uid = question.getUid();
@@ -340,6 +342,13 @@ public class QuestionDTO {
     }
     public void setQuestionResults(List<Object[]> questionResults2) {
 	this.questionResults = questionResults2;
+    }
+    
+    public int getConfidenceLevel() {
+	return confidenceLevel;
+    }
+    public void setConfidenceLevel(int confidenceLevel) {
+	this.confidenceLevel = confidenceLevel;
     }
 
     public boolean isResponseSubmitted() {

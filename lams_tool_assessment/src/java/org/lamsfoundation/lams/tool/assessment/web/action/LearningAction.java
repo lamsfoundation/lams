@@ -53,6 +53,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevel;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -366,6 +367,22 @@ public class LearningAction extends Action {
 		    }
 		});
 		questionDto.setMatchingPairOptions(new LinkedHashSet<>(optionsSortedByOptionString));
+	    }
+	}
+
+	// populate user entered confidence levels
+	if (assessment.isEnableConfidenceLevels()) {
+	    List<ConfidenceLevel> confidenceLevels = service.getConfidenceLevelsByUser(user.getUserId().intValue(),
+		    toolSessionId);
+	    
+	    for (QuestionDTO questionDto : questionDtos) {
+		//find according confidenceLevel
+		for (ConfidenceLevel confidenceLevel : confidenceLevels) {
+		    if (questionDto.getUid().equals(confidenceLevel.getQuestionUid())) {
+			questionDto.setConfidenceLevel(confidenceLevel.getConfidenceLevel());
+			break;
+		    }
+		}
 	    }
 	}
 
@@ -895,6 +912,7 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
+	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Set<QuestionDTO> questionsForOnePage = pagedQuestionDtos.get(pageNumber - 1);
@@ -979,6 +997,12 @@ public class LearningAction extends Action {
 		    answerString = answerString.replaceAll("[\n\r\f]", "");
 		    questionDto.setAnswerString(answerString);
 		}
+	    }
+
+	    // store confidence level entered by the learner
+	    if (assessment.isEnableConfidenceLevels()) {
+		int confidenceLevel = WebUtil.readIntParam(request, AssessmentConstants.ATTR_CONFIDENCE_LEVEL_PREFIX + i);
+		questionDto.setConfidenceLevel(confidenceLevel);
 	    }
 	}
     }

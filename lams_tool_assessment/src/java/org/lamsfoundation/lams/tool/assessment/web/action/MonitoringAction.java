@@ -46,6 +46,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevel;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -206,9 +207,11 @@ public class MonitoringAction extends Action {
 	initAssessmentService();
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_SESSION_ID);
+	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);	
 	AssessmentResultDTO result = service.getUserMasterDetail(sessionId, userId);
 
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return (result == null) ? null : mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
@@ -485,6 +488,10 @@ public class MonitoringAction extends Action {
 		Math.ceil(new Integer(countSessionUsers).doubleValue() / new Integer(rowLimit).doubleValue()))
 			.intValue();
 
+	List<ConfidenceLevel> confidenceLevels = assessment.isEnableConfidenceLevels()
+		? service.getConfidenceLevelsByQuestionAndSession(questionUid, sessionId)
+		: null;
+
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	int i = 1;
 	for (AssessmentUserDTO userDto : userDtos) {
@@ -500,13 +507,30 @@ public class MonitoringAction extends Action {
 		userData.add(questionResult.getMaxMark());
 		userData.add(fullName);
 		userData.add(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
+		
+		// prepare for displaying purposes confidence levels 
+		if (assessment.isEnableConfidenceLevels()) {
+		    //find according confidenceLevel
+		    int confidence = -1;
+		    for (ConfidenceLevel confidenceLevel : confidenceLevels) {
+			if (questionResult.getAssessmentQuestion().getUid().equals(confidenceLevel.getQuestionUid())) {
+			    confidence = confidenceLevel.getConfidenceLevel();
+			    break;
+			}
+		    }
+		    userData.add(confidence);
+		}
+		
 		userData.add(questionResult.getMark());
-
+		
 	    } else {
 		userData.add("");
 		userData.add("");
 		userData.add(fullName);
 		userData.add("-");
+		if (assessment.isEnableConfidenceLevels()) {
+		    userData.add(-1);
+		}
 		userData.add("-");
 	    }
 

@@ -49,6 +49,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevel;
+import org.lamsfoundation.lams.confidencelevel.service.IConfidenceLevelService;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -105,9 +107,11 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -141,6 +145,8 @@ public class AssessmentServiceImpl
     private AssessmentOutputFactory assessmentOutputFactory;
 
     // system services
+
+    private IConfidenceLevelService confidenceLevelService;
 
     private ILamsToolService toolService;
 
@@ -189,7 +195,7 @@ public class AssessmentServiceImpl
 		// create new user in a DB
 		if (leader == null) {
 		    AssessmentServiceImpl.log.debug("creating new user with userId: " + leaderUserId);
-		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
+		    User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
 		    String userName = leaderDto.getLogin();
 		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
 		    leader = new AssessmentUser(leaderDto.getUserDTO(), assessmentSession);
@@ -217,13 +223,14 @@ public class AssessmentServiceImpl
 		leader.getUserId());
 	AssessmentResult userResult = assessmentResultDao.getLastAssessmentResult(assessmentUid, user.getUserId());
 	Set<AssessmentQuestionResult> leaderQuestionResults = leaderResult.getQuestionResults();
+	Long toolSessionId = leaderResult.getSessionId();
 
 	// if response doesn't exist create new empty objects which we populate on the next step
 	if (userResult == null) {
 	    userResult = new AssessmentResult();
 	    userResult.setAssessment(leaderResult.getAssessment());
 	    userResult.setUser(user);
-	    userResult.setSessionId(leaderResult.getSessionId());
+	    userResult.setSessionId(toolSessionId);
 
 	    Set<AssessmentQuestionResult> userQuestionResults = userResult.getQuestionResults();
 	    for (AssessmentQuestionResult leaderQuestionResult : leaderQuestionResults) {
@@ -283,6 +290,18 @@ public class AssessmentServiceImpl
 	}
 
 	assessmentResultDao.saveObject(userResult);
+	
+	// copy leader's confidence levels to the current user
+	Assessment assessment = leaderResult.getAssessment();
+	if (assessment.isEnableConfidenceLevels()) {
+	    List<ConfidenceLevel> confidences = confidenceLevelService.getConfidenceLevelsByUser(leader.getUserId().intValue(), toolSessionId);
+	    Map<Long, Integer> questionUidToConfidenceLevelMap = new HashMap<Long, Integer>();
+	    for (ConfidenceLevel confidence : confidences) {
+		questionUidToConfidenceLevelMap.put(confidence.getQuestionUid(), confidence.getConfidenceLevel());
+    }
+
+	    confidenceLevelService.saveConfidenceLevels(toolSessionId, user.getUserId().intValue(), questionUidToConfidenceLevelMap);
+	}
     }
 
     @Override
@@ -405,6 +424,24 @@ public class AssessmentServiceImpl
 
     @Override
     public void saveOrUpdateAssessment(Assessment assessment) {
+	//update questions' hashes in case questions' titles or descriptions got changed
+	for (AssessmentQuestion question : (Set<AssessmentQuestion>) assessment.getQuestions()) {
+	    String plainText = "";
+	    if (question.getTitle() != null) {
+		plainText += question.getTitle();
+	    }
+	    if (question.getQuestion() != null) {
+		plainText += question.getQuestion();
+	    }
+	    String newHash = HashUtil.sha1(plainText);
+	    String oldHash = question.getQuestionHash();
+	    
+	    if (oldHash == null || !oldHash.equals(newHash)) {
+		question.setQuestionHash(newHash);
+	    }
+	}
+	
+	//store object in DB
 	assessmentDao.saveObject(assessment);
     }
 
@@ -537,6 +574,7 @@ public class AssessmentServiceImpl
 	}
 
 	// store all answers (in all pages)
+	Map<Long, Integer> questionUidToConfidenceLevelMap = new HashMap<Long, Integer>();
 	for (Set<QuestionDTO> questionsForOnePage : pagedQuestions) {
 	    for (QuestionDTO questionDto : questionsForOnePage) {
 
@@ -573,11 +611,20 @@ public class AssessmentServiceImpl
 		    }
 		}
 
+		// store confidence levels entered by the learner
+		int level = questionDto.getConfidenceLevel();
+		questionUidToConfidenceLevelMap.put(questionDto.getUid(), level);
+
 		float userQeustionGrade = storeUserAnswer(result, questionDto, isAutosave);
 		grade += userQeustionGrade;
 
 		maximumGrade += questionDto.getGrade();
 	    }
+	}
+
+	// store confidence levels entered by the learner
+	if (assessment.isEnableConfidenceLevels()) {
+	    confidenceLevelService.saveConfidenceLevels(result.getSessionId(), userId.intValue(), questionUidToConfidenceLevelMap);
 	}
 
 	// store grades and finished date only on user hitting submit all answers button (and not submit mark hedging
@@ -1071,6 +1118,23 @@ public class AssessmentServiceImpl
 		    }
 		}
 	    }
+	    
+	    // populate user entered confidence levels
+	    if (assessment.isEnableConfidenceLevels()) {
+		List<ConfidenceLevel> confidenceLevels = getConfidenceLevelsByUser(userId.intValue(),
+			sessionId);
+
+		for (AssessmentQuestionResult questionResult : questionResultsToDisplay) {
+		    //find according confidenceLevel
+		    for (ConfidenceLevel confidenceLevel : confidenceLevels) {
+			if (questionResult.getAssessmentQuestion().getUid().equals(confidenceLevel.getQuestionUid())) {
+			    questionResult.setConfidenceLevel(confidenceLevel.getConfidenceLevel());
+			    break;
+			}
+		    }
+		}
+	    }
+	    
 	    resultDto.setQuestionResults(questionResultsToDisplay);
 
 	    //escaping
@@ -1114,6 +1178,10 @@ public class AssessmentServiceImpl
 		}
 	    }
 
+	    List<ConfidenceLevel> confidenceLevels = assessment.isEnableConfidenceLevels()
+		    ? getConfidenceLevelsByUser(userId.intValue(), sessionId)
+		    : null;
+
 	    //prepare list of UserSummaryItems
 	    ArrayList<UserSummaryItem> userSummaryItems = new ArrayList<>();
 	    for (AssessmentQuestion question : questions) {
@@ -1127,6 +1195,18 @@ public class AssessmentServiceImpl
 
 			    // for displaying purposes only (no saving occurrs)
 			    questionResult.setFinishDate(result.getFinishDate());
+
+			    // prepare for displaying purposes confidence levels 
+			    if (assessment.isEnableConfidenceLevels()) {
+				//find according confidenceLevel
+				for (ConfidenceLevel confidenceLevel : confidenceLevels) {
+				    if (questionResult.getAssessmentQuestion().getUid()
+					    .equals(confidenceLevel.getQuestionUid())) {
+					questionResult.setConfidenceLevel(confidenceLevel.getConfidenceLevel());
+					break;
+				    }
+				}
+			    }
 
 			    questionResults.add(questionResult);
 			    break;
@@ -2302,6 +2382,15 @@ public class AssessmentServiceImpl
     }
 
     @Override
+    public List<ConfidenceLevel> getConfidenceLevelsByUser(Integer userId, Long toolSessionId) {
+	return confidenceLevelService.getConfidenceLevelsByUser(userId, toolSessionId);
+    }
+    
+    @Override
+    public List<ConfidenceLevel> getConfidenceLevelsByQuestionAndSession(Long questionUid, Long toolSessionId) {
+	return confidenceLevelService.getConfidenceLevelsByQuestionAndSession(questionUid, toolSessionId);
+    }
+    @Override
     public List<Number> getMarksArray(Long sessionId) {
 	return assessmentUserDao.getRawUserMarksBySession(sessionId);
     }
@@ -2410,6 +2499,10 @@ public class AssessmentServiceImpl
 	this.auditService = auditService;
     }
 
+    public void setConfidenceLevelService(IConfidenceLevelService confidenceLevelService) {
+	this.confidenceLevelService = confidenceLevelService;
+    }
+
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
     }
@@ -2508,7 +2601,7 @@ public class AssessmentServiceImpl
 	    }
 	    toolContentObj.setCreatedBy(user);
 
-	    assessmentDao.saveObject(toolContentObj);
+	    saveOrUpdateAssessment(toolContentObj);
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
 	}
@@ -2543,7 +2636,7 @@ public class AssessmentServiceImpl
 	}
 
 	Assessment toContent = Assessment.newInstance(assessment, toContentId);
-	assessmentDao.saveObject(toContent);
+	saveOrUpdateAssessment(toContent);
     }
 
     @Override
@@ -2742,10 +2835,6 @@ public class AssessmentServiceImpl
 	    }
 	}
 	return false;
-    }
-
-    public IExportToolContentService getExportContentService() {
-	return exportContentService;
     }
 
     public void setExportContentService(IExportToolContentService exportContentService) {

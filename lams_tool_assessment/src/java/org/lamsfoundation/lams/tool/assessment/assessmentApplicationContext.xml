@@ -89,6 +89,9 @@
    		<property name="auditService">
    			<ref bean="auditService"/>
    		</property>
+   		<property name="confidenceLevelService">
+   			<ref bean="confidenceLevelService"/>
+   		</property>
    		<property name="userManagementService">
    			<ref bean="userManagementService"/>
    		</property>

@@ -1492,11 +1492,7 @@ GeneralLib = {
 	 */
 	newLearningDesign : function(force){
 		// force means that user should not be asked for confirmation.
-		if (!force && (layout.activities.length > 0
-					  || layout.regions.length > 0
-					  || layout.labels.length > 0
-					  || layout.floatingActivity)
-				&& !confirm(LABELS.CLEAR_CANVAS_CONFIRM)){
+		if (!force && layout.modified && !confirm(LABELS.CLEAR_CANVAS_CONFIRM)){
 			return;
 		}
 		

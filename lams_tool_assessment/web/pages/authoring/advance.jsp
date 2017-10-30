@@ -189,6 +189,13 @@
 		<fmt:message key="label.authoring.advance.allow.students.grades" />
 	</label>
 </div>
+
+<div class="checkbox">
+	<label for="enable-confidence-levels">
+		<html:checkbox property="assessment.enableConfidenceLevels" styleId="enable-confidence-levels"/>
+		<fmt:message key="label.enable.confidence.levels" />
+	</label>
+</div>
 </lams:SimplePanel>
 
 </lams:SimplePanel>
