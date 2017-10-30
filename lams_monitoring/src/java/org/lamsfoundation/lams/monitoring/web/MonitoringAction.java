@@ -185,6 +185,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
 	Boolean forceRestart = WebUtil.readBooleanParam(request, "forceRestart", false);
 	Boolean allowRestart = WebUtil.readBooleanParam(request, "allowRestart", false);
+	boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
 
 	Lesson newLesson = null;
 	if ((copyType != null) && copyType.equals(LearningDesign.COPY_TYPE_PREVIEW)) {
@@ -194,7 +195,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    try {
 		newLesson = getMonitoringService().initializeLesson(title, desc, ldId, organisationId, getUserId(),
 			customCSV, false, false, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, false,
-			forceRestart, allowRestart, null, null);
+			forceRestart, allowRestart, gradebookOnComplete, null, null);
 	    } catch (SecurityException e) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
@@ -290,6 +291,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean timeLimitIndividualField = WebUtil.readBooleanParam(request, "timeLimitIndividual", false);
 	Integer timeLimitIndividual = timeLimitEnable && timeLimitIndividualField ? timeLimitDays : null;
 	Integer timeLimitLesson = timeLimitEnable && !timeLimitIndividualField ? timeLimitDays : null;
+	boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
 
 	IUserManagementService userManagementService = MonitoringServiceProxy
 		.getUserManagementService(getServlet().getServletContext());
@@ -330,18 +332,17 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 
 	    if (LamsDispatchAction.log.isDebugEnabled()) {
-		LamsDispatchAction.log
-			.debug("Creating lesson "
-				+ (splitNumberLessons == null ? ""
-					: "(" + lessonIndex + "/" + splitNumberLessons + ") ")
-				+ "\"" + lessonInstanceName + "\"");
+		LamsDispatchAction.log.debug("Creating lesson "
+			+ (splitNumberLessons == null ? "" : "(" + lessonIndex + "/" + splitNumberLessons + ") ") + "\""
+			+ lessonInstanceName + "\"");
 	    }
 
 	    Lesson lesson = null;
 	    try {
 		lesson = getMonitoringService().initializeLesson(lessonInstanceName, introDescription, ldId,
 			organisationId, userId, null, introEnable, introImage, presenceEnable, imEnable, enableLiveEdit,
-			notificationsEnable, forceRestart, allowRestart, timeLimitIndividual, precedingLessonId);
+			notificationsEnable, forceRestart, allowRestart, gradebookOnComplete, timeLimitIndividual,
+			precedingLessonId);
 
 		getMonitoringService().createLessonClassForLesson(lesson.getLessonId(), organisation,
 			learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
@@ -1025,8 +1026,9 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	Integer possibleLearnersCount = getLessonService().getCountLessonLearners(lessonId, null);
 	Integer completedLearnersCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
-	Integer startedLearnersCount = getLessonService().getCountActiveLessonLearners(lessonId)- completedLearnersCount;
-	Integer notCompletedLearnersCount = possibleLearnersCount - completedLearnersCount - startedLearnersCount ;
+	Integer startedLearnersCount = getLessonService().getCountActiveLessonLearners(lessonId)
+		- completedLearnersCount;
+	Integer notCompletedLearnersCount = possibleLearnersCount - completedLearnersCount - startedLearnersCount;
 
 	JSONObject responseJSON = new JSONObject();
 	JSONObject notStartedJSON = new JSONObject();
@@ -1036,8 +1038,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	JSONObject startedJSON = new JSONObject();
 	startedJSON.put("name", getMessageService().getMessage("lesson.chart.started"));
-	startedJSON.put("value", Math
-		.round((startedLearnersCount.doubleValue()) / possibleLearnersCount * 100));
+	startedJSON.put("value", Math.round((startedLearnersCount.doubleValue()) / possibleLearnersCount * 100));
 	responseJSON.append("data", startedJSON);
 
 	JSONObject completedJSON = new JSONObject();

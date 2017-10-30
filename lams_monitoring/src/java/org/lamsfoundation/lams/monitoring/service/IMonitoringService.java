@@ -61,8 +61,8 @@ public interface IMonitoringService {
     Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID, User user,
 	    String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerPresenceAvailable,
 	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
-	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Integer scheduledNumberDaysToLessonFinish,
-	    Lesson precedingLesson);
+	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Boolean gradebookOnComplete,
+	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson);
 
     /**
      * <p>
@@ -109,7 +109,7 @@ public interface IMonitoringService {
 	    Integer userID, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
 	    Boolean enableNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
-	    Integer numberDaysToLessonFinish, Long precedingLessonId);
+	    Boolean gradebookOnComplete, Integer numberDaysToLessonFinish, Long precedingLessonId);
 
     /**
      * Create new lesson according to the learning design specified by the user, but for a preview session rather than a
@@ -649,13 +649,15 @@ public interface IMonitoringService {
     Long cloneLesson(Long lessonId, Integer creatorId, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException;
 
-
     void removeLearnerContent(Long lessonId, Integer learnerId);
 
-    /** Generate an email containing the progress details for individual activities in a lesson. 
-     * @return String[] {subject, email body} */
+    /**
+     * Generate an email containing the progress details for individual activities in a lesson.
+     *
+     * @return String[] {subject, email body}
+     */
     String[] generateLessonProgressEmail(Long lessonId, Integer userId);
-    
+
     /**
      * Get list of users who completed the given lesson.
      */

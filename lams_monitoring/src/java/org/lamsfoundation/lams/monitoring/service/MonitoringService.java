@@ -354,7 +354,8 @@ public class MonitoringService implements IMonitoringService {
 	    Integer organisationId, Integer userID, String customCSV, Boolean enableLessonIntro,
 	    Boolean displayDesignImage, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
 	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean forceLearnerRestart,
-	    Boolean allowLearnerRestart, Integer scheduledNumberDaysToLessonFinish, Long precedingLessonId) {
+	    Boolean allowLearnerRestart, Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish,
+	    Long precedingLessonId) {
 
 	securityService.isGroupMonitor(organisationId, userID, "intializeLesson", true);
 
@@ -384,10 +385,11 @@ public class MonitoringService implements IMonitoringService {
 	Lesson initializedLesson = initializeLesson(lessonName, lessonDescription, originalLearningDesign, user,
 		runSeqFolder, LearningDesign.COPY_TYPE_LESSON, customCSV, enableLessonIntro, displayDesignImage,
 		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
-		forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish, precedingLesson);
+		forceLearnerRestart, allowLearnerRestart, gradebookOnComplete, scheduledNumberDaysToLessonFinish,
+		precedingLesson);
 
 	Long initializedLearningDesignId = initializedLesson.getLearningDesign().getLearningDesignId();
-	auditLogLessonStateChange(initializedLesson,null, initializedLesson.getLessonStateId()); 
+	auditLogLessonStateChange(initializedLesson, null, initializedLesson.getLessonStateId());
 	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CREATE, userID, initializedLearningDesignId,
 		initializedLesson.getLessonId(), null);
 
@@ -407,7 +409,7 @@ public class MonitoringService implements IMonitoringService {
 
 	return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, null,
 		LearningDesign.COPY_TYPE_PREVIEW, customCSV, false, false, learnerPresenceAvailable, learnerImAvailable,
-		liveEditEnabled, true, false, false, null, null);
+		liveEditEnabled, true, false, false, false, null, null);
     }
 
     @Override
@@ -415,7 +417,7 @@ public class MonitoringService implements IMonitoringService {
 	    User user, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
 	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
-	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
+	    Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
 	LearningDesign learningDesign = authoringService.getLearningDesign(learningDesignID);
 	if (learningDesign == null) {
 	    throw new MonitoringServiceException(
@@ -423,8 +425,8 @@ public class MonitoringService implements IMonitoringService {
 	}
 	Lesson lesson = createNewLesson(lessonName, lessonDescription, user, learningDesign, enableLessonIntro,
 		displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish,
-		precedingLesson);
+		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, gradebookOnComplete,
+		scheduledNumberDaysToLessonFinish, precedingLesson);
 	writeAuditLog(MonitoringService.AUDIT_LESSON_CREATED_KEY,
 		new Object[] { lessonName, learningDesign.getTitle() });
 	return lesson;
@@ -434,7 +436,8 @@ public class MonitoringService implements IMonitoringService {
 	    User user, WorkspaceFolder workspaceFolder, int copyType, String customCSV, Boolean enableLessonIntro,
 	    Boolean displayDesignImage, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
 	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean forceLearnerRestart,
-	    Boolean allowLearnerRestart, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
+	    Boolean allowLearnerRestart, Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish,
+	    Lesson precedingLesson) {
 	// copy the current learning design
 	LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
 		new Integer(copyType), user, workspaceFolder, true, null, customCSV);
@@ -450,8 +453,8 @@ public class MonitoringService implements IMonitoringService {
 
 	Lesson lesson = createNewLesson(title, lessonDescription, user, copiedLearningDesign, enableLessonIntro,
 		displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish,
-		precedingLesson);
+		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, gradebookOnComplete,
+		scheduledNumberDaysToLessonFinish, precedingLesson);
 	writeAuditLog(MonitoringService.AUDIT_LESSON_CREATED_KEY,
 		new Object[] { lessonName, copiedLearningDesign.getTitle() });
 	return lesson;
@@ -669,7 +672,7 @@ public class MonitoringService implements IMonitoringService {
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("=============Lesson " + lessonId + " started===============");
 	}
-	auditLogLessonStateChange(requestedLesson,null, requestedLesson.getLessonStateId()); 
+	auditLogLessonStateChange(requestedLesson, null, requestedLesson.getLessonStateId());
 	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_START, userId, null, lessonId, null);
     }
 
@@ -817,7 +820,7 @@ public class MonitoringService implements IMonitoringService {
      * @param status
      */
     private void setLessonState(Lesson requestedLesson, Integer status) {
-	auditLogLessonStateChange(requestedLesson, requestedLesson.getLessonStateId(), status); 
+	auditLogLessonStateChange(requestedLesson, requestedLesson.getLessonStateId(), status);
 	requestedLesson.setPreviousLessonStateId(requestedLesson.getLessonStateId());
 	requestedLesson.setLessonStateId(status);
 	lessonDAO.updateLesson(requestedLesson);
@@ -829,29 +832,36 @@ public class MonitoringService implements IMonitoringService {
 	String fromState = getStateDescription(previousStatus);
 	String toState = getStateDescription(newStatus);
 	writeAuditLog(MonitoringService.AUDIT_LESSON_STATUS_CHANGED,
-		new Object[] { lesson.getLessonName(),  lesson.getLessonId(), fromState, toState });
+		new Object[] { lesson.getLessonName(), lesson.getLessonId(), fromState, toState });
     }
 
     private String getStateDescription(Integer status) {
 	if (status != null) {
-	    if (status.equals(Lesson.CREATED))
+	    if (status.equals(Lesson.CREATED)) {
 		return messageService.getMessage("lesson.state.created");
-	    if (status.equals(Lesson.NOT_STARTED_STATE))
+	    }
+	    if (status.equals(Lesson.NOT_STARTED_STATE)) {
 		return messageService.getMessage("lesson.state.scheduled");
-	    if (status.equals(Lesson.STARTED_STATE))
+	    }
+	    if (status.equals(Lesson.STARTED_STATE)) {
 		return messageService.getMessage("lesson.state.started");
-	    if (status.equals(Lesson.SUSPENDED_STATE))
+	    }
+	    if (status.equals(Lesson.SUSPENDED_STATE)) {
 		return messageService.getMessage("lesson.state.suspended");
-	    if (status.equals(Lesson.FINISHED_STATE))
+	    }
+	    if (status.equals(Lesson.FINISHED_STATE)) {
 		return messageService.getMessage("lesson.state.finished");
-	    if (status.equals(Lesson.ARCHIVED_STATE))
+	    }
+	    if (status.equals(Lesson.ARCHIVED_STATE)) {
 		return messageService.getMessage("lesson.state.archived");
-	    if (status.equals(Lesson.REMOVED_STATE))
+	    }
+	    if (status.equals(Lesson.REMOVED_STATE)) {
 		return messageService.getMessage("lesson.state.removed");
+	    }
 	}
 	return "-";
     }
-    
+
     /**
      * Sets a lesson back to its previous state. Used when we "unsuspend" or "unarchive"
      *
@@ -899,7 +909,7 @@ public class MonitoringService implements IMonitoringService {
 	}
 	lessonDAO.updateLesson(requestedLesson);
 
-	auditLogLessonStateChange(requestedLesson,currentStatus, newStatus); 
+	auditLogLessonStateChange(requestedLesson, currentStatus, newStatus);
 	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson.getUser().getUserId(), null,
 		requestedLesson.getLessonId(), null);
     }
@@ -979,9 +989,9 @@ public class MonitoringService implements IMonitoringService {
 
 	// finally remove the learning design
 	lessonDAO.delete(learningDesign);
-	
+
 	writeAuditLog(MonitoringService.AUDIT_LESSON_REMOVED_PERMANENTLY_KEY,
-		new Object[] { lesson.getLessonName(),  lesson.getLessonId() });
+		new Object[] { lesson.getLessonName(), lesson.getLessonId() });
     }
 
     @Override
@@ -1808,10 +1818,11 @@ public class MonitoringService implements IMonitoringService {
 	    LearningDesign copiedLearningDesign, Boolean enableLessonIntro, Boolean displayDesignImage,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
 	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
-	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
+	    Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
 	Lesson newLesson = Lesson.createNewLessonWithoutClass(lessonName, lessonDescription, user, copiedLearningDesign,
 		enableLessonIntro, displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish);
+		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, gradebookOnComplete,
+		scheduledNumberDaysToLessonFinish);
 	if (precedingLesson != null) {
 	    HashSet precedingLessons = new HashSet();
 	    precedingLessons.add(precedingLesson);
@@ -1962,8 +1973,8 @@ public class MonitoringService implements IMonitoringService {
 		    // be lost via Live
 		    // Edit.
 		} else {
-		    MonitoringService.log
-			    .error("Request made to add a group which would be more than the max number of groups for the grouping "
+		    MonitoringService.log.error(
+			    "Request made to add a group which would be more than the max number of groups for the grouping "
 				    + grouping
 				    + ". This grouping is used for branching so we can't increase the max group number.");
 		    throw new MonitoringServiceException("Cannot increase the number of groups for the grouping "
@@ -2155,8 +2166,8 @@ public class MonitoringService implements IMonitoringService {
 	    // can't remove the group if someone has already started working on
 	    // the branch.
 	    if (isActivityAttempted(branch)) {
-		MonitoringService.log
-			.warn("removeGroupFromBranch: A group member has already started the branch. Unable to remove the group from the branch. Group ID was "
+		MonitoringService.log.warn(
+			"removeGroupFromBranch: A group member has already started the branch. Unable to remove the group from the branch. Group ID was "
 				+ groupIDString);
 	    } else {
 		branch.removeGroupFromBranch(group);
@@ -2305,21 +2316,22 @@ public class MonitoringService implements IMonitoringService {
 
     @SuppressWarnings("unchecked")
     private EmailProgressActivitiesProcessor getEmailProgressActivitiesProcessor(Long lessonId) {
-	
-	// TODO custom SQL to get the ids, number of users & marks in one go 
+
+	// TODO custom SQL to get the ids, number of users & marks in one go
 	Lesson lesson = lessonService.getLesson(lessonId);
 	LearningDesign ld = lesson.getLearningDesign();
 	Long[] activityIds = new Long[ld.getActivities().size()];
-	int i=0;
-	Iterator<Activity> activityIterator = (Iterator<Activity>) ld.getActivities().iterator();
-	while ( activityIterator.hasNext() ) {
+	int i = 0;
+	Iterator<Activity> activityIterator = ld.getActivities().iterator();
+	while (activityIterator.hasNext()) {
 	    Activity activity = activityIterator.next();
 	    activityIds[i] = activity.getActivityId();
 	    i++;
 	}
 	Map<Long, Integer> numberOfUsersInActivity = getCountLearnersCurrentActivities(activityIds);
 
-	EmailProgressActivitiesProcessor processor = new EmailProgressActivitiesProcessor(ld, activityDAO, numberOfUsersInActivity);
+	EmailProgressActivitiesProcessor processor = new EmailProgressActivitiesProcessor(ld, activityDAO,
+		numberOfUsersInActivity);
 	processor.parseLearningDesign();
 	return processor;
     }
@@ -2336,28 +2348,27 @@ public class MonitoringService implements IMonitoringService {
 
 	StringBuilder progress = new StringBuilder();
 	progress.append("<H3>Lesson ").append(lesson.getLessonName()).append("</H3><p>")
-		.append(getMessageService().getMessage("label.started")).append(" ")
-		.append(lesson.getStartDateTime()).append("</p><H3>")
-		.append(getMessageService().getMessage("label.grouping.learners")).append("</H3>")
-		.append("<table><tr><th width=\"50%\" align=\"left\">").append(getMessageService().getMessage("label.status")).append("</th><th>")
+		.append(getMessageService().getMessage("label.started")).append(" ").append(lesson.getStartDateTime())
+		.append("</p><H3>").append(getMessageService().getMessage("label.grouping.learners")).append("</H3>")
+		.append("<table><tr><th width=\"50%\" align=\"left\">")
+		.append(getMessageService().getMessage("label.status")).append("</th><th>")
 		.append(getMessageService().getMessage("progress.email.heading.number.learners"))
-		.append("</th><th>%</th></tr>")
-		.append("<tr><td width=\"50%\">").append(getMessageService().getMessage("label.not.started")).append("</td><td>")
-		.append(notStarted).append("</td><td>")
-		.append(asPercentage(notStarted, possibleLearnersCount)).append("%</td></tr>")
-		.append("<tr><td width=\"50%\">").append(getMessageService().getMessage("lesson.chart.started")).append("</td><td>")
-		.append(startedLearnersCount).append("</td><td>")
+		.append("</th><th>%</th></tr>").append("<tr><td width=\"50%\">")
+		.append(getMessageService().getMessage("label.not.started")).append("</td><td>").append(notStarted)
+		.append("</td><td>").append(asPercentage(notStarted, possibleLearnersCount)).append("%</td></tr>")
+		.append("<tr><td width=\"50%\">").append(getMessageService().getMessage("lesson.chart.started"))
+		.append("</td><td>").append(startedLearnersCount).append("</td><td>")
 		.append(asPercentage(startedLearnersCount, possibleLearnersCount)).append("%</td></tr>")
-		.append("<tr><td width=\"50%\">").append(getMessageService().getMessage("lesson.chart.completed")).append("</td><td>")
-		.append(completedLearnersCount).append("</td><td>")
+		.append("<tr><td width=\"50%\">").append(getMessageService().getMessage("lesson.chart.completed"))
+		.append("</td><td>").append(completedLearnersCount).append("</td><td>")
 		.append(asPercentage(completedLearnersCount, possibleLearnersCount)).append("%</td></tr>")
-		.append("<td width=\"50%\"></td><td><strong>").append(possibleLearnersCount).append("</strong></td><td><strong>")
-		.append("100%</strong></td></tr></table>")
-		.append("<H3>").append(getMessageService().getMessage("progress.email.heading.overall.progress")).append("</H3>")
-		.append("<table><tr><th width=\"50%\" align=\"left\">").append(getMessageService().getMessage("label.activity")).append("</th><th>")
+		.append("<td width=\"50%\"></td><td><strong>").append(possibleLearnersCount)
+		.append("</strong></td><td><strong>").append("100%</strong></td></tr></table>").append("<H3>")
+		.append(getMessageService().getMessage("progress.email.heading.overall.progress")).append("</H3>")
+		.append("<table><tr><th width=\"50%\" align=\"left\">")
+		.append(getMessageService().getMessage("label.activity")).append("</th><th>")
 		.append(getMessageService().getMessage("progress.email.heading.number.learners"))
-		.append("</th><th>%</th></tr>")
-		.append("<tr><td width=\"50%\"><i>")
+		.append("</th><th>%</th></tr>").append("<tr><td width=\"50%\"><i>")
 		.append(getMessageService().getMessage("label.not.started")).append("</i></td><td>").append(notStarted)
 		.append("</td>").append("<td>").append(asPercentage(notStarted, possibleLearnersCount))
 		.append("%</td></tr>");
@@ -2374,8 +2385,8 @@ public class MonitoringService implements IMonitoringService {
 		}
 		String title = activity.getTitle(); // null for gates
 		if (title == null) {
-		    title = activity.isGateActivity() ? getMessageService().getMessage("label.gate.title") : 
-			getMessageService().getMessage("label.unknown");
+		    title = activity.isGateActivity() ? getMessageService().getMessage("label.gate.title")
+			    : getMessageService().getMessage("label.unknown");
 		}
 
 		if (activity.isBranchingActivity() || activity.isOptionsActivity()) {
@@ -2401,8 +2412,7 @@ public class MonitoringService implements IMonitoringService {
 		.append("%</td></tr>").append("<tr><td width=\"60%\"><td><strong>").append(numLearnersProcessed)
 		.append("</strong></td><td><strong>").append(asPercentage(numLearnersProcessed, possibleLearnersCount))
 		.append("%</strong></td>").append("</table>").append("<p>&nbsp;</p>").append("<p>&nbsp;</p>")
-		.append("<p><i>")
-		.append(getMessageService().getMessage("progress.email.sent.automatically"))
+		.append("<p><i>").append(getMessageService().getMessage("progress.email.sent.automatically"))
 		.append("</i></p>");
 
 	String subject = getMessageService().getMessage("progress.email.subject",
@@ -2411,10 +2421,10 @@ public class MonitoringService implements IMonitoringService {
 	return new String[] { subject, progress.toString() };
 
     }
-    
-    private String asPercentage(Integer numerator, Integer denominator ) {
+
+    private String asPercentage(Integer numerator, Integer denominator) {
 	double raw = numerator.doubleValue() / denominator * 100;
-	return NumberUtil.formatLocalisedNumber(raw, (Locale)null, 2);  
+	return NumberUtil.formatLocalisedNumber(raw, (Locale) null, 2);
     }
 
     @Override
@@ -2443,7 +2453,8 @@ public class MonitoringService implements IMonitoringService {
 			    null, lesson.isEnableLessonIntro(), lesson.isDisplayDesignImage(),
 			    lesson.getLearnerPresenceAvailable(), lesson.getLearnerImAvailable(),
 			    lesson.getLiveEditEnabled(), lesson.getEnableLessonNotifications(),
-			    lesson.getForceLearnerRestart(), lesson.getAllowLearnerRestart(), null, null);
+			    lesson.getForceLearnerRestart(), lesson.getAllowLearnerRestart(),
+			    lesson.getGradebookOnComplete(), null, null);
 
 		    // save LessonClasses
 		    this.createLessonClassForLesson(newLesson.getLessonId(), group, learnerGroupName, learnerUsers,
@@ -2540,5 +2551,5 @@ public class MonitoringService implements IMonitoringService {
 
 	return resetReadOnly;
     }
-    
+
 }
