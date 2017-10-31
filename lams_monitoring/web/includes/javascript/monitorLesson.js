@@ -36,6 +36,7 @@ var originalSequenceCanvas = null,
 	popupHeight = 720;
 
 
+
 //********** LESSON TAB FUNCTIONS **********
 
 /**
@@ -1028,6 +1029,7 @@ function updateSequenceTab() {
 					});
 				}
 			});	
+			initializePortraitPopover(LAMS_URL, 'large', 'top');
 			
 			sequenceRefreshInProgress = false;
 		}
@@ -1273,20 +1275,29 @@ function addActivityIcons(activity) {
 			if ([3,4,5,7,13,14].indexOf(activity.type) == -1) {
 				$.each(activity.learners, function(learnerIndex, learner){
 					var learnerDisplayName = getLearnerDisplayName(learner);
-						element = appendXMLElement('image', {
-							'id'         : 'act' + activity.id + 'learner' + learner.id,
-							'x'          : coord.x + learnerIndex*15 + 1,
-							// a bit lower for Optional Activity
-							'y'          : coord.y,
-							'height'     : 16,
-							'width'      : 16,
-							'xlink:href' : LAMS_URL + 'images/icons/' 
-											   + (learner.id == sequenceSearchedLearner ? 'user_red.png'
-											      : (learner.leader ? 'user_online.png' : 'user.png')),
-							'style'		 : 'cursor : pointer'
-						}, null, appendTarget);
-						appendXMLElement('title', null, learnerDisplayName, element);
-					});
+						activityLearnerId = 'act' + activity.id + 'learner' + learner.id,
+						elementAttributes = {
+									'id'			 : activityLearnerId,
+									'x'          : coord.x + learnerIndex*15 + 1,
+									// a bit lower for Optional Activity
+									'y'          : coord.y,
+									'height'     : 16,
+									'width'      : 16,
+									'xlink:href' : LAMS_URL + 'images/icons/' 
+													   + (learner.id == sequenceSearchedLearner ? 'user_red.png'
+													      : (learner.leader ? 'user_online.png' : 'user.png')),
+									'style'		 : 'cursor : pointer',
+									'class'		 : 'popover-link new-popover',
+									'data-toggle': 'popover',
+									'data-id'	 : 'popover-'+activityLearnerId,
+									'data-fullname': learnerDisplayName},
+						element;
+
+					if ( learner.portraitId ) {
+						elementAttributes['data-portrait'] = learner.portraitId;
+					} 
+					element = appendXMLElement('image', elementAttributes, null, appendTarget);
+				});
 			}
 		}
 	}
@@ -1403,13 +1414,18 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 	if (learners) {
 		// create learner icons, along with handlers
 		$.each(learners, function(learnerIndex, learner){
-				// make an icon for each learner
+			// make an icon for each learner			
+			var activityLearnerId = 'completedlearner'+learner.id;
 			var icon = $('<img />').attr({
+				'id'	   : activityLearnerId,
 				'src' : LAMS_URL + 'images/icons/' 
 				   		+ (learner.id == sequenceSearchedLearner ? 'user_red.png' : 'user.png'),
 				'style'		 : 'cursor : pointer',
-				'title'      : getLearnerDisplayName(learner)
-			})
+				'class'		 : 'popover-link new-popover',
+				'data-toggle': 'popover',
+				'data-id'	 : 'popover-'+activityLearnerId,
+				'data-fullname': getLearnerDisplayName(learner)
+				})
 				// drag learners to force complete activities
 				  .draggable({
 					'appendTo'    : '#t2',
@@ -1434,6 +1450,9 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 					}
 				})
 				.appendTo(iconsContainer);
+			if ( learner.portraitId ) {
+				icon.attr('data-portrait', learner.portraitId);
+			} 
 			
 			if (learner.id == sequenceSearchedLearner){
 				highlightSearchedLearner(icon);

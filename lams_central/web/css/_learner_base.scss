@@ -791,23 +791,6 @@ div.growlUI h1,div.growlUI h2 {
     @include box-shadow(0 5px 10px rgba(0,0,0,.2));
 }
 
-// Popovers used in Gradebook to display portraits
-// popover links forced to be the usual link color or jqgrid can interfere
-.popover-link {
-    color: $a-link-default !important;
-}
-
-.popover-link:hover {
-    color: $a-link-default-hover !important;
-}
-
-.popover-link:focus {
-    color: $a-link-default-focus !important;
-}
-
-.popover-title {
-	background-color: $gray-light-mid;
-}
 
 // clickable panel created in CKEditor
 .lams-bootpanel .clickable {
@@ -1080,4 +1063,27 @@ $portrait-size-image-xl: 400px;
 	h4 {
 	    margin-bottom: 0px;
 	}
+}
+
+// Popovers used in Gradebook to display portraits
+// popover links forced to be the usual link color or jqgrid can interfere
+.popover-link {
+    color: $a-link-default !important;
+}
+
+.popover-link:hover {
+    color: $a-link-default-hover !important;
+}
+
+.popover-link:focus {
+    color: $a-link-default-focus !important;
+}
+
+.popover-title {
+	background-color: $gray-light-mid;
+}
+
+.popover-content-with-portrait {
+	min-height: $portrait-size-image-lg + 20;
+	min-width:  $portrait-size-image-lg + 20;
 }

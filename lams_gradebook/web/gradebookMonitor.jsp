@@ -506,12 +506,12 @@
 		        })
 
 		        	function userNameFormatter (cellvalue, options, rowObject) {
-					return definePortraitPopover(rowObject[8].innerHTML, rowObject.id, cellvalue);
+					return definePortraitPopover(rowObject[8].innerHTML, rowObject.id, cellvalue, cellvalue, true);
 				}
 
 		        // Combine portraits with activityURL. Both are optional so it is mix and match.
 	       	 	function userNameFormatterActivity (cellvalue, options, rowObject) {
-	       	 		var portProcessed = definePortraitPopover(rowObject[9].innerHTML, rowObject.id, cellvalue);
+	       	 		var portProcessed = definePortraitPopover(rowObject[9].innerHTML, rowObject.id, cellvalue, cellvalue, true);
 	       	 		if ( rowObject.children.length > 10 && rowObject[10].innerHTML.length > 0 ) {
 	       	 			var activityURL = rowObject[10].innerHTML;
 	       	 			if ( portProcessed.indexOf('<a') != -1 ) {

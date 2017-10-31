@@ -424,7 +424,7 @@
 
 	  	function userNameFormatter (cellvalue, options, rowObject) {
 	  		var index = rowObject.length - 1;
-			return definePortraitPopover(rowObject[index].innerHTML, rowObject[0].innerHTML, cellvalue);
+			return definePortraitPopover(rowObject[index].innerHTML, rowObject[0].innerHTML, cellvalue, cellvalue, true);
 		}
 		
 	</script>
