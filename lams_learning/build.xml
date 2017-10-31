@@ -26,7 +26,7 @@
 			  verbose="true"
 		/>
 		<copy todir="${basedir}/build/war/WEB-INF/classes"
-			  file="${basedir}/build/classes/java/org/lamsfoundation/lams/learning/kumalive/kumaliveWebsocketServer.class"
+			  file="${basedir}/build/classes/java/org/lamsfoundation/lams/learning/kumalive/KumaliveWebsocketServer.class"
 			  verbose="true"
 		/>
 	</target>
