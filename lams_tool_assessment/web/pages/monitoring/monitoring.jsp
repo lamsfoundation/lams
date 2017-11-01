@@ -40,7 +40,7 @@
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
  		<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
- 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/monitoring.js'/>"></script>
+ 		<script type="text/javascript" src="${lams}/includes/javascript/jqGrid.confidenceLevelFormattter.js"></script>
  		
 		<script>        
 		    function doSelectTab(tabId) {

@@ -28,9 +28,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
-import org.lamsfoundation.lams.confidencelevel.ConfidenceLevel;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
@@ -47,7 +46,6 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
 
 /**
@@ -84,6 +82,8 @@ public interface IAssessmentService {
      */
     void copyAnswersFromLeader(AssessmentUser user, AssessmentUser leader)
 	    throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException;
+    
+    List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId);
 
     /**
      * Stores date when user has started activity with time limit.
@@ -435,24 +435,6 @@ public interface IAssessmentService {
     void changeQuestionResultMark(Long questionResultUid, float newMark);
 
     void notifyTeachersOnAttemptCompletion(Long sessionId, String userName);
-    
-    /**
-     * Returns all confidence levels user left in this activity.
-     *
-     * @param userId
-     * @param toolSessionId
-     * @return
-     */
-    List<ConfidenceLevel> getConfidenceLevelsByUser(Integer userId, Long toolSessionId);
-    
-    /**
-     * Returns all confidence levels user left in this activity.
-     *
-     * @param userId
-     * @param toolSessionId
-     * @return
-     */
-    List<ConfidenceLevel> getConfidenceLevelsByQuestionAndSession(Long questionUid, Long toolSessionId);
 
     /**
      * Get a message from the language files with the given key

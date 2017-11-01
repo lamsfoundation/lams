@@ -11,9 +11,9 @@
 		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 		<link href="<html:rewrite page='/includes/css/monitoring.css'/>" rel="stylesheet" type="text/css">	
 
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
-	 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/monitoring.js'/>"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/jqGrid.confidenceLevelFormattter.js"></script>
   	    <script>
 	    	var isEdited = false;
   	    	var previousCellValue = "";  	    	
@@ -45,11 +45,7 @@
 	  				   		{name:'time', index:'time', width:150, sorttype:'date', datefmt:'Y-m-d'},
 	  				   		{name:'response', index:'response', width:341, sortable:false},
 	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
-			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align',
-			                        formatter: function (cellvalue) {
-			                            return gradientNumberFormat(cellvalue);
-			                        }
-				  			   	},
+			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
 	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' }		
 	  				   	],
