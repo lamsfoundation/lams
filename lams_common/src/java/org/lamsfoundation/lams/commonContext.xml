@@ -321,36 +321,6 @@
 
 	</bean>
 	
-	<!--  ConfidenceLevel Service -->
-
-	<bean id="confidenceLevelService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-
-		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
-		<property name ="target">
-			<bean class="org.lamsfoundation.lams.confidencelevel.service.ConfidenceLevelService">
-				<property name="messageService"><ref bean="commonMessageService"/></property>
-				<property name="confidenceLevelDAO"><ref bean="confidenceLevelDAO" /></property>
-				<property name="userManagementService"><ref bean="userManagementService"/></property>
-			</bean>
-		</property>
-		<property name="proxyTargetClass"><value>true</value></property> 
-		<property name="preInterceptors">
-			<list>
-				<ref bean="transactionRetryInterceptor" />			
-			</list>
-		</property>
-		<property name="transactionAttributes">
-			<props>
-				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
-				<prop key="create*">PROPAGATION_REQUIRED</prop>
-				<prop key="rateItem">PROPAGATION_REQUIRED</prop>
-			</props>
-		</property>
-
-	</bean>
-	
 	<!-- Event notification Service -->
 
 	 <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -611,12 +581,7 @@
 	</bean>	
 	<bean id="ratingCriteriaDAO" class="org.lamsfoundation.lams.rating.dao.hibernate.RatingCriteriaDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>	
-	
-	<!-- ConfidenceLevel related beans -->
-	<bean id="confidenceLevelDAO" class="org.lamsfoundation.lams.confidencelevel.dao.hibernate.ConfidenceLevelDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>	
+	</bean>
 	
 	<!--  Configuration related beans -->
 	<bean id="configurationDAO" class="org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO">
