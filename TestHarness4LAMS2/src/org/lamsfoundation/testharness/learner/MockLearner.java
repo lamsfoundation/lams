@@ -219,7 +219,7 @@ public class MockLearner extends MockUser implements Runnable {
 	// an example of matched string:
 	// location.href ='http://localhost/lams/mylinksubstring/learner.do'
 	Pattern linkPattern = Pattern
-		.compile("location\\.href\\s*=\\s*['\"](.*" + Pattern.quote(linkSubstring) + ".*)['\"]");
+		.compile("location\\.href\\s*=\\s*['\"](.*" + Pattern.quote(linkSubstring) + ".*?)['\"]");
 	Matcher m = linkPattern.matcher(resp.getText());
 	if (m.find()) {
 	    String url = m.group(1);
