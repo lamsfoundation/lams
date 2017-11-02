@@ -115,7 +115,6 @@
 			<ref bean="eventNotificationService"/>
 		</property>
 		<property name="scratchieOutputFactory"><ref bean="scratchieOutputFactory"/></property>
-		<property name="scheduler"><ref bean="scheduler"/></property>
     </bean>
 
     <bean id="scratchieService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

@@ -30,6 +30,7 @@ import java.util.SortedMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -529,6 +530,38 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
 	}
+    }
+    
+    @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevelsByToolSession(ToolSession toolSession) {
+	
+	if (toolSession == null) {
+	    String error = "The toolSession is null. Unable to get confidence levels";
+	    LamsCoreToolService.log.error(error);
+	    throw new DataMissingException(error);
+	}
+
+	Tool tool = toolSession.getToolActivity().getTool();
+	if (tool == null) {
+	    String error = "The tool for toolSession " + toolSession.getToolSessionId() + " is missing.";
+	    LamsCoreToolService.log.error(error);
+	    throw new DataMissingException(error);
+	}
+	
+	try {
+	    ToolSessionManager sessionManager = (ToolSessionManager) findToolService(tool);
+	    return sessionManager.getConfidenceLevels(toolSession.getToolSessionId());
+	} catch (NoSuchBeanDefinitionException e) {
+	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output. toolActivity "
+		    + toolSession.getToolActivity().getActivityId();
+	    LamsCoreToolService.log.error(message, e);
+	    throw new ToolException(message, e);
+	} catch (java.lang.AbstractMethodError e) {
+	    String message = "Tool " + tool.getToolDisplayName()
+		    + " doesn't support the getToolOutput(name, toolSessionId, learnerId) method so no output definitions can be accessed.";
+	    LamsCoreToolService.log.error(message, e);
+	    throw new ToolException(message, e);
+	}	
     }
 
     @Override

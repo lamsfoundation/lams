@@ -49,9 +49,11 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -98,12 +100,11 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 
 /**
  * @author Andrey Balan
@@ -154,8 +155,6 @@ public class ScratchieServiceImpl
     private IEventNotificationService eventNotificationService;
 
     private ScratchieOutputFactory scratchieOutputFactory;
-
-    private Scheduler scheduler;
 
     // *******************************************************************************
     // Service method
@@ -233,6 +232,53 @@ public class ScratchieServiceImpl
     public void deleteScratchieItem(Long uid) {
 	scratchieItemDao.removeObject(ScratchieItem.class, uid);
     }
+    
+    @Override
+    public void populateItemsWithConfidenceLevels(Long userId, Long toolSessionId, Integer confidenceLevelsActivityUiid,
+	    Collection<ScratchieItem> items) {
+	List<ConfidenceLevelDTO> confidenceLevelDtos = toolService
+		.getConfidenceLevelsByActivity(confidenceLevelsActivityUiid, userId.intValue(), toolSessionId);
+	
+	//populate Scratchie items with confidence levels
+	for (ScratchieItem item : items) {
+	    
+	    String plainText = "";
+	    if (item.getTitle() != null) {
+		plainText += item.getTitle();
+	    }
+	    if (item.getDescription() != null) {
+		plainText += item.getDescription();
+	    }
+	    String questionHash = HashUtil.sha1(plainText);
+	    
+	    //init answers' confidenceLevelDtos list
+	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+		LinkedList<ConfidenceLevelDTO> confidenceLevelDtosTemp = new LinkedList<ConfidenceLevelDTO>();
+		answer.setConfidenceLevelDtos(confidenceLevelDtosTemp);
+	    }
+
+	    //find according confidenceLevelDto
+	    for (ConfidenceLevelDTO confidenceLevelDto : confidenceLevelDtos) {
+		if (questionHash.equals(confidenceLevelDto.getQuestionHash())) {
+		    
+		    //find according answer
+		    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+			String answerHash = HashUtil.sha1(answer.getDescription());
+			if (answerHash.equals(confidenceLevelDto.getAnswerHash())) {
+			    answer.getConfidenceLevelDtos().add(confidenceLevelDto);
+			}
+		    }
+		    
+		}
+	    }
+	    
+	}
+    }
+    
+    @Override
+    public Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId) {
+	return toolService.getPrecedingConfidenceLevelsActivities(toolContentId);
+    }
 
     @Override
     public ScratchieUser checkLeaderSelectToolForSessionLeader(ScratchieUser user, Long toolSessionId) {
@@ -265,7 +311,7 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public void launchTimeLimit(Long sessionId) throws SchedulerException {
+    public void launchTimeLimit(Long sessionId) {
 	ScratchieSession session = getScratchieSessionBySessionId(sessionId);
 	int timeLimit = session.getScratchie().getTimeLimit();
 	if (timeLimit == 0) {
@@ -2032,6 +2078,11 @@ public class ScratchieServiceImpl
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<>();
     }
+    
+    @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
+	return null;
+    }
 
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
@@ -2122,14 +2173,6 @@ public class ScratchieServiceImpl
 
     public void setScratchieOutputFactory(ScratchieOutputFactory scratchieOutputFactory) {
 	this.scratchieOutputFactory = scratchieOutputFactory;
-    }
-
-    /**
-     * @param scheduler
-     *            The scheduler to set.
-     */
-    public void setScheduler(Scheduler scheduler) {
-	this.scheduler = scheduler;
     }
 
     @Override

@@ -2,8 +2,17 @@
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="confidenceLevelsActivities" value="${sessionMap.confidenceLevelsActivities}" />
 
-<!-- Advance Tab Content -->
+<script lang="javascript">
+	$(document).ready(function(){
+		$("#display-confidence-levels-activities").click(function() {
+			$("#confidence-levels-activity").prop("disabled", !$(this).is(':checked'));
+		});
+
+		<c:if test="${formBean.scratchie.confidenceLevelsActivityUiid == null}">$("#confidence-levels-activity").prop('disabled','disabled'); </c:if>
+	});
+</script>
 
 <lams:SimplePanel titleKey="label.scratchie.options">
 	<c:if test="${sessionMap.isEnabledExtraPointOption}">
@@ -33,6 +42,37 @@
 		<label for="time-limit">
 			<fmt:message key="label.time.limit" />&nbsp;
 			<html:text property="scratchie.timeLimit" size="3" styleId="time-limit" styleClass="form-control input-sm"/>
+		</label>
+	</div>
+	
+	<div class="checkbox">
+		<c:if test="${confidenceLevelsActivities == null}">
+			<div class="alert-warning" style="margin-bottom: 5px;">
+				<fmt:message key="label.save.learning.design" />
+			</div>		
+		</c:if>
+	
+		<label for="display-confidence-levels-activities">
+			<input type="checkbox" id="display-confidence-levels-activities"
+					<c:if test="${formBean.scratchie.confidenceLevelsActivityUiid != null}">checked="true"</c:if>
+					<c:if test="${fn:length(confidenceLevelsActivities) == 0}">disabled="disabled"</c:if>
+			/>
+			
+			<c:choose>
+				<c:when test="${fn:length(confidenceLevelsActivities) == 0}">
+					<fmt:message key="label.no.confidence.levels.activities" />
+				</c:when>
+				
+				<c:otherwise>
+					<fmt:message key="label.show.confidence.level" />&nbsp;
+					<html:select property="scratchie.confidenceLevelsActivityUiid" styleClass="form-control input-sm" styleId="confidence-levels-activity">
+						<c:forEach var="confidenceProvidingActivity" items="${confidenceLevelsActivities}">
+							<html:option value="${confidenceProvidingActivity.activityUIID}">${confidenceProvidingActivity.title}</html:option>
+						</c:forEach>
+					</html:select>
+				</c:otherwise>
+			</c:choose>
+
 		</label>
 	</div>
 </lams:SimplePanel>

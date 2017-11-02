@@ -23,8 +23,11 @@
 package org.lamsfoundation.lams.tool.service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -123,6 +126,25 @@ public interface ILamsToolService {
      * Returns leaders' userIds for all tool sessions from the given Leader Selection Tool.
      */
     Set<Long> getLeaderUserId(Long leaderSelectionActivityId);
+    
+    /**
+     * Returns all activities that precede specified activity and produce confidence levels.
+     * 
+     * @param toolContentId toolContentId of the specified activity 
+     * @return
+     */
+    Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId);
+    
+    /**
+     * Returns confidence levels from the specified activity. 
+     * 
+     * @param activityUiid activityUiid of the activity with confidence levels
+     * @param requestorUserId userId of the requesting user. we need it in order to get confidence level providing tool's sessionId
+     * @param requestorToolSessionId toolSessionId of the activity that calls this method
+     * @return
+     */
+    List<ConfidenceLevelDTO> getConfidenceLevelsByActivity(Integer confidenceLevelActivityUiid, Integer requestorUserId,
+	    Long requestorToolSessionId);
 
     /**
      * Get a count of all the users that would be returned by getUsersForActivity(Long toolSessionId);

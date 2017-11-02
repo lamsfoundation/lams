@@ -180,6 +180,8 @@ public class ScratchieConstants {
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
     public static final String ATTR_ANSWER_UIDS = "answerUids";
+    
+    public static final String ATTR_CONFIDENCE_LEVELS_ACTIVITIES = "confidenceLevelsActivities";
 
     public static final String LEARNER_MARK = "learner.mark";
 

@@ -16,24 +16,24 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 	<style type="text/css">
-#scratches {
-	border-spacing: 0;
-}
+	#scratches {
+		border-spacing: 0;
+	}
+	
+	#scratches tr td {
+		padding: 12px 15px;
+	}
+	
+	#scratches a, #scratches a:hover {
+		border-bottom: none;
+	}
+	
+	.scartchie-image {
+		border: 0;
+	}
+	</style>
 
-#scratches tr td {
-	padding: 12px 15px;
-}
-
-#scratches a, #scratches a:hover {
-	border-bottom: none;
-}
-
-.scartchie-image {
-	border: 0;
-}
-</style>
-
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript">
 		function disableFinishButton() {
 			document.getElementById("finish-button").disabled = true;
