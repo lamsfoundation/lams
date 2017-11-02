@@ -79,6 +79,22 @@ public interface IMcUsrAttemptDAO {
      * @return
      */
     List<McUsrAttempt> getFinalizedUserAttempts(Long queUserUid);
+    
+    /**
+     * Returns attempts and portraitUiids left by all users in the specified session. It's used only by ToolSessionManager.getConfidenceLevels().
+     * 
+     * @param sessionId
+     * @return
+     */
+    List<Object[]> getFinalizedAttemptsBySessionId(final Long sessionId);
+    
+    /**
+     * Returns attempts and portraitUiids left by all leaders in the specified activity. It's used only by ToolSessionManager.getConfidenceLevels().
+     * 
+     * @param contentId
+     * @return
+     */
+    List<Object[]> getLeadersFinalizedAttemptsByContentId(final Long contentId);
 
     /**
      * Get the highest attempt order for a user for a particular question

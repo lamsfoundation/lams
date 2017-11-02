@@ -104,6 +104,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelUtil;
+import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
@@ -198,12 +199,13 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    if (userAttempt == null) {
 		userAttempt = new McUsrAttempt(leaderAttempt.getAttemptTime(), question, user,
 			leaderAttempt.getMcOptionsContent(), leaderAttempt.getMark(), leaderAttempt.isPassed(),
-			leaderAttempt.isAttemptCorrect());
+			leaderAttempt.isAttemptCorrect(), leaderAttempt.getConfidenceLevel());
 		mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
 
-		// if it's been changed by the leader
+	    // if it's been changed by the leader
 	    } else if (leaderAttempt.getAttemptTime().compareTo(userAttempt.getAttemptTime()) != 0) {
 		userAttempt.setMcOptionsContent(leaderAttempt.getMcOptionsContent());
+		userAttempt.setConfidenceLevel(leaderAttempt.getConfidenceLevel());
 		userAttempt.setAttemptTime(leaderAttempt.getAttemptTime());
 		this.updateMcUsrAttempt(userAttempt);
 	    }
@@ -216,21 +218,12 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     @Override
     public void createMc(McContent mcContent) throws McApplicationException {
-	try {
-	    mcContentDAO.saveMcContent(mcContent);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is creating mc content: " + e.getMessage(),
-		    e);
-	}
+	mcContentDAO.saveMcContent(mcContent);
     }
 
     @Override
     public McContent getMcContent(Long toolContentId) throws McApplicationException {
-	try {
-	    return mcContentDAO.findMcContentById(toolContentId);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is loading mc content: " + e.getMessage(), e);
-	}
+	return mcContentDAO.findMcContentById(toolContentId);
     }
 
     @Override
@@ -244,45 +237,22 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public void updateQuestion(McQueContent mcQueContent) throws McApplicationException {
-	try {
-	    mcQueContentDAO.updateMcQueContent(mcQueContent);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is updating mc que content: " + e.getMessage(), e);
-	}
-
+    public McQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long mcContentUid) {
+	return mcQueContentDAO.getQuestionContentByDisplayOrder(displayOrder, mcContentUid);
     }
 
     @Override
-    public McQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long mcContentUid)
-	    throws McApplicationException {
-	try {
-	    return mcQueContentDAO.getQuestionContentByDisplayOrder(displayOrder, mcContentUid);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is getting mc que content by display order: " + e.getMessage(), e);
-	}
+    public List getAllQuestionsSorted(final long mcContentId) {
+	return mcQueContentDAO.getAllQuestionEntriesSorted(mcContentId);
     }
 
     @Override
-    public List getAllQuestionsSorted(final long mcContentId) throws McApplicationException {
-	try {
-	    return mcQueContentDAO.getAllQuestionEntriesSorted(mcContentId);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is getting all question entries: " + e.getMessage(), e);
-	}
-    }
-
-    @Override
-    public void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException {
-	try {
-	    mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is updating mc que content: " + e.getMessage(), e);
-	}
+    public void saveOrUpdateMcQueContent(McQueContent mcQueContent) {
+	//update questions' hash
+	String newHash = mcQueContent.getQuestion() == null ? null : HashUtil.sha1(mcQueContent.getQuestion());
+	mcQueContent.setQuestionHash(newHash);
+	
+	mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent);
     }
 
     @Override
@@ -309,8 +279,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	    // in case question doesn't exist
 	    if (question == null) {
-		question = new McQueContent(currentQuestionText, new Integer(displayOrder), new Integer(currentMark),
-			currentFeedback, content, null, null);
+		question = new McQueContent(currentQuestionText, null, new Integer(displayOrder),
+			new Integer(currentMark), currentFeedback, content, null, null);
 
 		// adding a new question to content
 		content.getMcQueContents().add(question);
@@ -356,7 +326,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    question.setMcOptionsContents(newOptions);
 
 	    // updating the existing question content
-	    updateQuestion(question);
+	    saveOrUpdateMcQueContent(question);
 
 	}
 	return content;
@@ -453,6 +423,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		Integer mark = answerDto.getMark();
 		boolean passed = user.isMarkPassed(mark);
 		boolean isAttemptCorrect = answerDto.isAttemptCorrect();
+		int confidenceLevel = answerDto.getConfidenceLevel();
 
 		McUsrAttempt userAttempt = this.getUserAttemptByQuestion(user.getUid(), questionUid);
 		if (userAttempt != null) {
@@ -470,12 +441,13 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 			userAttempt.setMark(mark);
 			userAttempt.setPassed(passed);
 			userAttempt.setAttemptCorrect(isAttemptCorrect);
+			userAttempt.setConfidenceLevel(confidenceLevel);
 		    }
 
 		} else {
 		    // create new userAttempt
 		    userAttempt = new McUsrAttempt(attemptTime, question, user, answerOption, mark, passed,
-			    isAttemptCorrect);
+			    isAttemptCorrect, confidenceLevel);
 		}
 
 		mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
@@ -529,9 +501,10 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		McUsrAttempt dbAttempt = this.getUserAttemptByQuestion(user.getUid(), questionUid);
 		if (dbAttempt != null) {
-		    Long selectedOptionUid = dbAttempt.getMcOptionsContent().getUid();
+		    answerDto.setConfidenceLevel(dbAttempt.getConfidenceLevel());
 
 		    // mark selected option as selected
+		    Long selectedOptionUid = dbAttempt.getMcOptionsContent().getUid();
 		    for (McOptsContent option : answerDto.getOptions()) {
 			if (selectedOptionUid.equals(option.getUid())) {
 			    option.setSelected(true);
@@ -647,26 +620,12 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     @Override
     public List<McUsrAttempt> getFinalizedUserAttempts(final McQueUsr user) throws McApplicationException {
-	try {
-	    return mcUsrAttemptDAO.getFinalizedUserAttempts(user.getUid());
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is getting the learner's attempts by user id and que content id and attempt order: "
-			    + e.getMessage(),
-		    e);
-	}
+	return mcUsrAttemptDAO.getFinalizedUserAttempts(user.getUid());
     }
 
     @Override
     public McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId) throws McApplicationException {
-	try {
-	    return mcUsrAttemptDAO.getUserAttemptByQuestion(queUsrUid, mcQueContentId);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is getting the learner's attempts by user id and que content id and attempt order: "
-			    + e.getMessage(),
-		    e);
-	}
+	return mcUsrAttemptDAO.getUserAttemptByQuestion(queUsrUid, mcQueContentId);
     }
     
     @Override
@@ -676,12 +635,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     @Override
     public List<McQueContent> getQuestionsByContentUid(final Long contentUid) throws McApplicationException {
-	try {
-	    return mcQueContentDAO.getQuestionsByContentUid(contentUid.longValue());
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is getting by uid  mc question content: " + e.getMessage(), e);
-	}
+	return mcQueContentDAO.getQuestionsByContentUid(contentUid.longValue());
     }
 
     @Override
@@ -1535,10 +1489,42 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return mcOutputFactory.getToolOutputs(name, this, toolContentId);
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
-	return null;
+	List<ConfidenceLevelDTO> confidenceLevelDtos = new ArrayList<ConfidenceLevelDTO>();
+	if (toolSessionId == null) {
+	    return confidenceLevelDtos;
+	}
+	
+	McContent content = getMcSessionById(toolSessionId).getMcContent();
+	
+	//in case McContent is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor  
+	List<Object[]> userAttemptsAndPortraits = content.isUseSelectLeaderToolOuput()
+		? mcUsrAttemptDAO.getLeadersFinalizedAttemptsByContentId(content.getMcContentId())
+		: mcUsrAttemptDAO.getFinalizedAttemptsBySessionId(toolSessionId);
+
+	for (Object[] userAttemptAndPortraitIter : userAttemptsAndPortraits) {
+	    McUsrAttempt userAttempt = (McUsrAttempt) userAttemptAndPortraitIter[0];
+	    Long portraitUuid = userAttemptAndPortraitIter[1] == null ? null
+		    : ((Number) userAttemptAndPortraitIter[1]).longValue();
+	    Long userId = userAttempt.getQueUsrId();
+
+	    //fill in question's and user answer's hashes 
+	    McQueContent question = userAttempt.getMcQueContent();
+	    String answer = userAttempt.getMcOptionsContent().getMcQueOptionText();
+
+	    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
+	    confidenceLevelDto.setUserId(userId.intValue());
+	    confidenceLevelDto.setPortraitUuid(portraitUuid);
+	    confidenceLevelDto.setLevel(userAttempt.getConfidenceLevel());
+	    confidenceLevelDto.setQuestion(question.getQuestion());
+	    confidenceLevelDto.setAnswer(answer);
+
+	    confidenceLevelDtos.add(confidenceLevelDto);
+	}
+
+	return confidenceLevelDtos;
     }
 
     @Override
@@ -1912,6 +1898,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	mcq.setShowMarks(JsonUtil.opt(toolContentJSON, "showMarks", Boolean.FALSE));
 	mcq.setPrefixAnswersWithLetters(JsonUtil.opt(toolContentJSON, "prefixAnswersWithLetters", Boolean.TRUE));
 	mcq.setPassMark(JsonUtil.opt(toolContentJSON, "passMark", 0));
+	mcq.setEnableConfidenceLevels(JsonUtil.opt(toolContentJSON, "enableConfidenceLevels", Boolean.FALSE));
 	// submissionDeadline is set in monitoring
 
 	createMc(mcq);
@@ -1920,8 +1907,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	JSONArray questions = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
 	for (int i = 0; i < questions.length(); i++) {
 	    JSONObject questionData = (JSONObject) questions.get(i);
-	    McQueContent question = new McQueContent(questionData.getString(RestTags.QUESTION_TEXT),
-		    questionData.getInt(RestTags.DISPLAY_ORDER), 1, "", mcq, null, new HashSet<McOptsContent>());
+	    String questionText = questionData.getString(RestTags.QUESTION_TEXT);
+	    McQueContent question = new McQueContent(questionText, null, questionData.getInt(RestTags.DISPLAY_ORDER), 1,
+		    "", mcq, null, new HashSet<McOptsContent>());
 
 	    JSONArray optionsData = questionData.getJSONArray(RestTags.ANSWERS);
 	    for (int j = 0; j < optionsData.length(); j++) {

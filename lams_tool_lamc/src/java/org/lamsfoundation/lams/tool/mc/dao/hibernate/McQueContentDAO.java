@@ -96,11 +96,6 @@ public class McQueContentDAO extends LAMSBaseDAO implements IMcQueContentDAO {
     }
 
     @Override
-    public void updateMcQueContent(McQueContent mcQueContent) {
-	this.getSession().saveOrUpdate(mcQueContent);
-    }
-
-    @Override
     public List getAllQuestionEntriesSorted(final long mcContentId) {
 	List list = getSessionFactory().getCurrentSession().createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER)
 		.setLong("mcContentId", mcContentId).list();

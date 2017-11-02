@@ -49,6 +49,8 @@ public interface IMcUserDAO {
     McQueUsr getMcUserByUID(Long uid);
 
     McQueUsr getMcUserBySession(Long userId, Long sessionUid);
+    
+    List<Object[]> getUsersWithPortraitsBySessionID(Long sessionId);
 
     void saveMcUser(McQueUsr mcUser);
 

@@ -54,6 +54,8 @@ public class AnswerDTO implements Comparable {
     protected String feedbackCorrect;
 
     protected String feedback;
+    
+    private int confidenceLevel;
 
     /**
      * @return Returns the answerOption.
@@ -220,5 +222,13 @@ public class AnswerDTO implements Comparable {
      */
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
+    }
+    
+    public int getConfidenceLevel() {
+	return confidenceLevel;
+    }
+
+    public void setConfidenceLevel(int confidenceLevel) {
+	this.confidenceLevel = confidenceLevel;
     }
 }

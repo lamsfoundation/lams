@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -75,6 +76,27 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
     public List<McUsrAttempt> getFinalizedUserAttempts(final Long userUid) {
 	return getSessionFactory().getCurrentSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
 		.setLong("queUsrUid", userUid.longValue()).list();
+    }
+    
+    @Override
+    public List<Object[]> getFinalizedAttemptsBySessionId(final Long sessionId) {
+	final String LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID = "SELECT attempt, u.portraitUuid FROM " + McUsrAttempt.class.getName() 
+		+ " AS attempt, " + User.class.getName() + " as u WHERE attempt.mcQueUsr.mcSession.mcSessionId=:sessionId"
+		+ " AND attempt.mcQueUsr.responseFinalised = true AND u.userId=attempt.mcQueUsr.queUsrId";
+
+	return getSessionFactory().getCurrentSession().createQuery(LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID)
+		.setLong("sessionId", sessionId).list();
+    }
+    
+    @Override
+    public List<Object[]> getLeadersFinalizedAttemptsByContentId(final Long contentId) {
+	final String LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID = "SELECT attempt, u.portraitUuid FROM " + McUsrAttempt.class.getName() 
+		+ " AS attempt, " + User.class.getName() + " as u WHERE attempt.mcQueUsr=attempt.mcQueUsr.mcSession.groupLeader "
+		+ " AND attempt.mcQueContent.mcContent.mcContentId=:contentId "
+		+ " AND attempt.mcQueUsr.responseFinalised = true AND u.userId=attempt.mcQueUsr.queUsrId";
+
+	return getSessionFactory().getCurrentSession().createQuery(LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID)
+		.setLong("contentId", contentId).list();
     }
 
     @Override

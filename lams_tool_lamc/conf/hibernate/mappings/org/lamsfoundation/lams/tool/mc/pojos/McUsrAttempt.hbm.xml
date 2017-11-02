@@ -112,6 +112,14 @@
     >
         <column name="mc_que_option_id" />
     </many-to-one>
+    
+    <property
+        name="confidenceLevel"
+        type="int"
+        update="true"
+        insert="true"
+        column="confidence_level"
+    />
 
 </class>
 </hibernate-mapping>

@@ -140,7 +140,7 @@ public class McAction extends LamsDispatchAction {
 	    for (McQueContent question : sortedQuestions) {
 		McQueContent existingQuestion = mcService.getQuestionByUid(question.getUid());
 		existingQuestion.setDisplayOrder(new Integer(displayOrder));
-		mcService.updateQuestion(existingQuestion);
+		mcService.saveOrUpdateMcQueContent(existingQuestion);
 		displayOrder++;
 	    }
 	}

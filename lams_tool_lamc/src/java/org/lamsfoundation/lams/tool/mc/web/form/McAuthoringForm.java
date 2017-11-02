@@ -55,6 +55,8 @@ public class McAuthoringForm extends McLearningForm  {
     protected String sln;
 
     protected String passmark;
+    
+    protected boolean enableConfidenceLevels;
 
     protected String questionsSequenced;
 
@@ -198,6 +200,14 @@ public class McAuthoringForm extends McLearningForm  {
      */
     public void setPassmark(String passmark) {
 	this.passmark = passmark;
+    }
+    
+    public boolean isEnableConfidenceLevels() {
+ 	return enableConfidenceLevels;
+    }
+
+    public void setEnableConfidenceLevels(boolean enableConfidenceLevels) {
+ 	this.enableConfidenceLevels = enableConfidenceLevels;
     }
 
     /**

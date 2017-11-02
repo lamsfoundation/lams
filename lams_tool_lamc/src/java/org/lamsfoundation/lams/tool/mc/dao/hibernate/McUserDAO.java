@@ -86,6 +86,36 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 	}
 	return null;
     }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Object[]> getUsersWithPortraitsBySessionID(Long sessionId) {
+	final String LOAD_USERS_WITH_PORTRAITS_BY_SESSION_ID = "SELECT user.user_id, luser.portrait_uuid portraitId FROM tl_lamc11_que_usr user  " +
+		" INNER JOIN tl_lamc11_session session ON user.mc_session_id=session.uid" +
+		" INNER JOIN lams_user luser ON luser.user_id = user.que_usr_id" +
+		" WHERE session.mc_session_id = :sessionId";
+	
+	SQLQuery query = getSession().createSQLQuery(LOAD_USERS_WITH_PORTRAITS_BY_SESSION_ID);
+	query.setLong("sessionId", sessionId);
+	List<Object[]> list = query.list();
+
+	ArrayList<Object[]> userDtos = new ArrayList<Object[]>();
+	if (list != null && list.size() > 0) {
+	    for (Object[] element : list) {
+
+		Long userId = ((Number) element[0]).longValue();
+		Long portraitId = element[1] == null ? null : ((Number) element[1]).longValue();
+
+		Object[] userDto = new Object[2];
+		userDto[0] = userId;
+		userDto[0] = portraitId;
+		userDtos.add(userDto);
+	    }
+
+	}
+
+	return userDtos;
+    }
 
     @Override
     public void saveMcUser(McQueUsr mcUser) {

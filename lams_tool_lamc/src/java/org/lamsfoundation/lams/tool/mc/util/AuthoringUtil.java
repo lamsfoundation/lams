@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -101,6 +102,7 @@ public class AuthoringUtil {
 	boolean prefixAnswersWithLettersBoolean = false;
 	boolean retriesBoolean = false;
 	boolean reflectBoolean = false;
+	boolean enableConfidenceLevels = WebUtil.readBooleanParam(request, "enableConfidenceLevels", false);
 
 	if ((questionsSequenced != null) && (questionsSequenced.equalsIgnoreCase("1"))) {
 	    questionsSequencedBoolean = true;
@@ -174,6 +176,7 @@ public class AuthoringUtil {
 	mcContent.setShowReport(slnBoolean);
 	mcContent.setUseSelectLeaderToolOuput(useSelectLeaderToolOuputBoolean);
 	mcContent.setPrefixAnswersWithLetters(prefixAnswersWithLettersBoolean);
+	mcContent.setEnableConfidenceLevels(enableConfidenceLevels);
 
 	mcContent.setReflect(reflectBoolean);
 	mcContent.setReflectionSubject(reflectionSubject);
