@@ -8,7 +8,7 @@ ALTER TABLE tl_laasse10_assessment ADD COLUMN enable_confidence_levels TINYINT(1
 
 --add questions' hashes in order to be able to search for the similar questions with the same title and question
 ALTER TABLE tl_laasse10_assessment_question ADD COLUMN question_hash CHAR(40);
-UPDATE tl_laasse10_assessment_question SET question_hash = SHA1(CONCAT(title, question));
+UPDATE tl_laasse10_assessment_question SET question_hash = SHA1(question);
 
 --add confidence level property to tl_laasse10_question_result
 ALTER TABLE tl_laasse10_question_result ADD COLUMN confidence_level int;

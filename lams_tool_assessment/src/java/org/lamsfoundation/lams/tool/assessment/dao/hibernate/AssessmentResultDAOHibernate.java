@@ -222,7 +222,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     
     @Override
     public List<Object[]> getLastFinishedAssessmentResultsBySession(Long sessionId) {
-	final String FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID = "SELECT r, u FROM " + AssessmentResult.class.getName()
+	final String FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID = "SELECT r, u.portraitUuid FROM " + AssessmentResult.class.getName()
 		+ " AS r, " + User.class.getName() + " as u WHERE r.sessionId=? AND (r.finishDate != null) AND r.latest=1 AND u.userId=r.user.userId";
 	
 	return (List<Object[]>) doFind(FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID, new Object[] { sessionId });
@@ -230,7 +230,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     
     @Override
     public List<Object[]> getLeadersLastFinishedAssessmentResults(Long contentId) {
-	final String FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID = "SELECT r, u FROM " + AssessmentResult.class.getName()
+	final String FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID = "SELECT r, u.portraitUuid FROM " + AssessmentResult.class.getName()
 		+ " AS r, " + User.class.getName() + " as u WHERE r.user=r.user.session.groupLeader AND r.assessment.contentId=? AND (r.finishDate != null) AND r.latest=1 AND u.userId=r.user.userId";
 	
 	return (List<Object[]>) doFind(FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID, new Object[] { contentId });

@@ -242,29 +242,23 @@ public class ScratchieServiceImpl
 	//populate Scratchie items with confidence levels
 	for (ScratchieItem item : items) {
 	    
-	    String plainText = "";
-	    if (item.getTitle() != null) {
-		plainText += item.getTitle();
-	    }
-	    if (item.getDescription() != null) {
-		plainText += item.getDescription();
-	    }
-	    String questionHash = HashUtil.sha1(plainText);
-	    
 	    //init answers' confidenceLevelDtos list
 	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
 		LinkedList<ConfidenceLevelDTO> confidenceLevelDtosTemp = new LinkedList<ConfidenceLevelDTO>();
 		answer.setConfidenceLevelDtos(confidenceLevelDtosTemp);
 	    }
 
+	    //Assessment (similar with Scratchie) adds '\n' at the end of question, MCQ - '\r\n'
+	    String question = item.getDescription() == null ? "" : item.getDescription().replaceAll("(\\r|\\n)", "");
+	    
 	    //find according confidenceLevelDto
 	    for (ConfidenceLevelDTO confidenceLevelDto : confidenceLevelDtos) {
-		if (questionHash.equals(confidenceLevelDto.getQuestionHash())) {
-		    
+		if (question.equals(confidenceLevelDto.getQuestion().replaceAll("(\\r|\\n)", ""))) {
+
 		    //find according answer
 		    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
-			String answerHash = HashUtil.sha1(answer.getDescription());
-			if (answerHash.equals(confidenceLevelDto.getAnswerHash())) {
+			String answerText = answer.getDescription().replaceAll("(\\r|\\n)", "");
+			if (answerText.equals(confidenceLevelDto.getAnswer().replaceAll("(\\r|\\n)", ""))) {
 			    answer.getConfidenceLevelDtos().add(confidenceLevelDto);
 			}
 		    }

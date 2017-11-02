@@ -8,9 +8,9 @@ public class ConfidenceLevelDTO {
 
     private int level;
     
-    private String questionHash;
+    private String question;
     
-    private String answerHash;
+    private String answer;
     
     /**
      */
@@ -44,21 +44,21 @@ public class ConfidenceLevelDTO {
     
     /**
      */
-    public void setQuestionHash(String questionHash) {
-	this.questionHash = questionHash;
+    public void setQuestion(String question) {
+	this.question = question;
     }
 
-    public String getQuestionHash() {
-	return this.questionHash;
+    public String getQuestion() {
+	return this.question;
     }
     
     /**
      */
-    public void setAnswerHash(String answerHash) {
-	this.answerHash = answerHash;
+    public void setAnswer(String answer) {
+	this.answer = answer;
     }
 
-    public String getAnswerHash() {
-	return this.answerHash;
+    public String getAnswer() {
+	return this.answer;
     }
 }
