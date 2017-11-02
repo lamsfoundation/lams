@@ -69,15 +69,6 @@ public interface IMcQueContentDAO {
 
     /**
      * <p>
-     * updates McQueContent with the given identifier <code>mcQueContent</code>
-     * </p>
-     *
-     * @param mcQueContent
-     */
-    void updateMcQueContent(McQueContent mcQueContent);
-
-    /**
-     * <p>
      * saves McQueContent with the given identifier <code>mcQueContent</code>
      * </p>
      *

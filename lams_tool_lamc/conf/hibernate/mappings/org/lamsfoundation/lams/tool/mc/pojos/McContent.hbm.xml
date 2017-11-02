@@ -175,7 +175,14 @@
         column="pass_mark"
         length="1"
     />
-
+    
+    <property
+        name="enableConfidenceLevels"
+        type="boolean"
+        update="true"
+        insert="true"
+        column="enable_confidence_levels"
+    />
     
    	 <set
             name="mcQueContents"

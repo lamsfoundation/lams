@@ -106,6 +106,7 @@ public class McMonitoringStarterAction extends Action {
 
 	request.setAttribute(McAppConstants.ATTR_CONTENT, mcContent);
 	request.setAttribute("questionsSequenced", mcContent.isQuestionsSequenced());
+	request.setAttribute("enableConfidenceLevels", mcContent.isEnableConfidenceLevels());
 	request.setAttribute("showMarks", mcContent.isShowMarks());
 	request.setAttribute("useSelectLeaderToolOuput", mcContent.isUseSelectLeaderToolOuput());
 	request.setAttribute("prefixAnswersWithLetters", mcContent.isPrefixAnswersWithLetters());

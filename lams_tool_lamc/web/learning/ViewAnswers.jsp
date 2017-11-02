@@ -1,16 +1,32 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" />
 <c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
+
 <lams:html>
 <lams:head>
-	<lams:css />
-
 	<title><fmt:message key="activity.title" /></title>
+	
+	<lams:css />
+	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
+	<style media="screen,projection" type="text/css">
+		div.growlUI h1, div.growlUI h2 {
+			color: white;
+			margin: 5px 5px 5px 0px;
+			text-align: center;
+			font-size: 18px;
+		}
+		table .bg-success, table .bg-danger {
+			width: 32px;
+		}
+	</style>	
+
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
 	<script type="text/javascript">
 		function disableFinishButton() {
 			var elem = document.getElementById("finishButton");
@@ -115,26 +131,53 @@
 																<c:when test="${attemptEntry.value.mcOptionsContent.correctOption}">
 																	<td class="bg-success" style="vertical-align: top;"><i class="fa fa-check"
 																		style="color: green; font-size: 22px"></i>
+																	</td>
 																</c:when>
 																<c:otherwise>
 																	<td class="bg-danger" style="vertical-align: top;"><i class="fa fa-times"
-																		style="color: red; font-size: 22px"></i></td>
+																		style="color: red; font-size: 22px"></i>
+																	</td>
 																</c:otherwise>
 															</c:choose>
-
 														</c:if>
 													</c:forEach>
 													<!-- end show right/wrong -->
 												</c:if>
-												<td width="100%">
-													<!-- display student selection --> <c:forEach var="attemptEntry"
-														items="${mcGeneralLearnerFlowDTO.attemptMap}">
+												
+												<td>
+													<!-- display student selection --> 
+													<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
 														<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
 															<c:out value="${attemptEntry.value.mcOptionsContent.mcQueOptionText}" escapeXml="false" />
 														</c:if>
-													</c:forEach> <!-- end student selection -->
+													</c:forEach> 
+													<!-- end student selection -->
 												</td>
 											</tr>
+											
+											<c:if test="${sessionMap.content.enableConfidenceLevels}">
+												<tr>
+													<td
+														<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">colspan="2"</c:if>
+													>
+														<div class="question-type">
+															<fmt:message key="label.confidence" />
+														</div>
+														
+														<div>
+															<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
+																<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
+																	<input data-provide="slider" type="text" 
+																		data-slider-ticks="[0, 5, 10]" data-slider-ticks-labels='["0", "50", "100%"]' 
+																		data-slider-enabled="false" data-slider-tooltip="hide"
+																		<c:if test="${attemptEntry.value.confidenceLevel != -1}">data-slider-value="${attemptEntry.value.confidenceLevel}"</c:if>
+																	/>
+																</c:if>
+															</c:forEach>
+														</div>
+													</td>
+												</tr>
+											</c:if>
 										</table>
 									</div>
 								</c:if>
@@ -143,8 +186,7 @@
 							<!-- answer feedback -->
 							<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
 								<c:forEach var="feedbackEntry" items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">
-									<c:if
-										test="${(requestScope.mainQueIndex == feedbackEntry.key)
+									<c:if test="${(requestScope.mainQueIndex == feedbackEntry.key)
                                           && (feedbackEntry.value != null) && (feedbackEntry.value != '')}">
 
 										<div class="panel panel-default">

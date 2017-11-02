@@ -409,19 +409,8 @@ public class AssessmentServiceImpl
     public void saveOrUpdateAssessment(Assessment assessment) {
 	//update questions' hashes in case questions' titles or descriptions got changed
 	for (AssessmentQuestion question : (Set<AssessmentQuestion>) assessment.getQuestions()) {
-	    String plainText = "";
-	    if (question.getTitle() != null) {
-		plainText += question.getTitle();
-	    }
-	    if (question.getQuestion() != null) {
-		plainText += question.getQuestion();
-	    }
-	    String newHash = HashUtil.sha1(plainText);
-	    String oldHash = question.getQuestionHash();
-	    
-	    if (oldHash == null || !oldHash.equals(newHash)) {
-		question.setQuestionHash(newHash);
-	    }
+	    String newHash = question.getQuestion() == null ? null : HashUtil.sha1(question.getQuestion());
+	    question.setQuestionHash(newHash);
 	}
 	
 	//store object in DB
@@ -2684,15 +2673,15 @@ public class AssessmentServiceImpl
 	
 	Assessment assessment = getAssessmentBySessionId(toolSessionId);
 	//in case Assessment is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor  
-	List<Object[]> assessmentResultsAndUsers = assessment.isUseSelectLeaderToolOuput()
+	List<Object[]> assessmentResultsAndPortraits = assessment.isUseSelectLeaderToolOuput()
 		? assessmentResultDao.getLeadersLastFinishedAssessmentResults(assessment.getContentId())
 		: assessmentResultDao.getLastFinishedAssessmentResultsBySession(toolSessionId);
 
-	for (Object[] assessmentResultsAndUsersIter : assessmentResultsAndUsers) {
-	    AssessmentResult assessmentResult = (AssessmentResult) assessmentResultsAndUsersIter[0];
-	    User user = (User) assessmentResultsAndUsersIter[1];
-	    Integer userId = user.getUserId();
-	    Long portraitUuid = user.getPortraitUuid();
+	for (Object[] assessmentResultsAndPortraitIter : assessmentResultsAndPortraits) {
+	    AssessmentResult assessmentResult = (AssessmentResult) assessmentResultsAndPortraitIter[0];
+	    Long portraitUuid = assessmentResultsAndPortraitIter[1] == null ? null
+		    : ((Number) assessmentResultsAndPortraitIter[1]).longValue();
+	    Long userId = assessmentResult.getUser().getUserId();
 	    
 	    //fill in question's and user answer's hashes 
 	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
@@ -2734,11 +2723,11 @@ public class AssessmentServiceImpl
 		
 		for (String answer : answers) {
 		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
-		    confidenceLevelDto.setUserId(userId);
+		    confidenceLevelDto.setUserId(userId.intValue());
 		    confidenceLevelDto.setPortraitUuid(portraitUuid);
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
-		    confidenceLevelDto.setQuestionHash(question.getQuestionHash());
-		    confidenceLevelDto.setAnswerHash(HashUtil.sha1(answer));
+		    confidenceLevelDto.setQuestion(question.getQuestion());
+		    confidenceLevelDto.setAnswer(answer);
 		    
 		    confidenceLevelDtos.add(confidenceLevelDto);
 		}

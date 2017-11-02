@@ -66,6 +66,13 @@
 			<fmt:message key="radiobox.passmark" />
 		</div>
 	</div>
+
+	<div class="checkbox">
+		<label for="enable-confidence-levels">
+			<html:checkbox property="enableConfidenceLevels" value="true" styleId="enable-confidence-levels"/>
+			<fmt:message key="label.enable.confidence.levels" />
+		</label>
+	</div>
 </lams:SimplePanel>
 
 <lams:SimplePanel titleKey="label.activity.completion">

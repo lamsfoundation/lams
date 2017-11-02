@@ -63,9 +63,11 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
 
     /** persistent field */
     private McOptsContent mcOptionsContent;
+    
+    private int confidenceLevel;
 
     public McUsrAttempt(Date attemptTime, McQueContent mcQueContent, McQueUsr mcQueUsr, McOptsContent mcOptionsContent,
-	    Integer mark, boolean passed, boolean attemptCorrect) {
+	    Integer mark, boolean passed, boolean attemptCorrect, int confidenceLevel) {
 	this.attemptTime = attemptTime;
 	this.mcQueContent = mcQueContent;
 	this.mcQueUsr = mcQueUsr;
@@ -73,6 +75,7 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
 	this.mark = mark;
 	this.passed = passed;
 	this.attemptCorrect = attemptCorrect;
+	this.confidenceLevel = confidenceLevel;
     }
 
     /** default constructor */
@@ -227,6 +230,14 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
      */
     public void setAttemptCorrect(boolean attemptCorrect) {
 	this.attemptCorrect = attemptCorrect;
+    }
+    
+    public int getConfidenceLevel() {
+	return confidenceLevel;
+    }
+
+    public void setConfidenceLevel(int confidenceLevel) {
+	this.confidenceLevel = confidenceLevel;
     }
 
     /**

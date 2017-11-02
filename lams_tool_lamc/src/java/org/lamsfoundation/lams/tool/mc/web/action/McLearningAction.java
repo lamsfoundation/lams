@@ -196,7 +196,7 @@ public class McLearningAction extends LamsDispatchAction {
     /**
      *
      */
-    protected List<AnswerDTO> buildAnswerDtos(List<String> answers, McContent content) {
+    protected List<AnswerDTO> buildAnswerDtos(List<String> answers, McContent content, HttpServletRequest request) {
 
 	List<AnswerDTO> answerDtos = new LinkedList<AnswerDTO>();
 
@@ -233,9 +233,14 @@ public class McLearningAction extends LamsDispatchAction {
 		answerDto.setFeedbackIncorrect(question.getFeedback());
 		answerDto.setMark(0);
 	    }
+	    
+	    //handle confidence levels
+	    if (content.isEnableConfidenceLevels()) {
+		int confidenceLevel = WebUtil.readIntParam(request, "confidenceLevel" + question.getUid());
+		answerDto.setConfidenceLevel(confidenceLevel);
+	    }
 
 	    answerDtos.add(answerDto);
-
 	}
 
 	return answerDtos;
@@ -275,7 +280,7 @@ public class McLearningAction extends LamsDispatchAction {
 	}
 
 	/* process the answers */
-	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, mcContent);
+	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, mcContent, request);
 	mcService.saveUserAttempt(user, answerDtos);
 	
 	//calculate total learner mark
@@ -328,7 +333,7 @@ public class McLearningAction extends LamsDispatchAction {
 	sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, answers);
 
 	//save user attempt
-	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, mcContent);
+	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, mcContent, request);
 	mcService.saveUserAttempt(user, answerDtos);
 	
 	List<AnswerDTO> learnerAnswersDTOList = mcService.getAnswersFromDatabase(mcContent, user);
@@ -702,7 +707,7 @@ public class McLearningAction extends LamsDispatchAction {
 
 	List<String> answers = McLearningAction.parseLearnerAnswers(mcLearningForm, request, mcContent.isQuestionsSequenced());
 
-	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, mcContent);
+	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, mcContent, request);
 	mcService.saveUserAttempt(user, answerDtos);
 
 	return null;
