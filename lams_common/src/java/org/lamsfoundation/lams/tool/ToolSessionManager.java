@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool;
 import java.util.List;
 import java.util.SortedMap;
 
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -156,6 +157,14 @@ public interface ToolSessionManager {
      * @return
      */
     List<ToolOutput> getToolOutputs(String name, Long toolContentId);
+    
+    /**
+     * Returns confidence levels indicated by learners when answering questions. By now this feature is supported only by Assessment and MCQ tools.
+     * 
+     * @param toolSessionId
+     * @return
+     */
+    List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId);
 
     /**
      * Notifies tool that the user is force completed. Currently it's been utilized only by leader aware tools, which

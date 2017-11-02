@@ -50,7 +50,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.confidencelevel.ConfidenceLevel;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -485,10 +484,6 @@ public class MonitoringAction extends Action {
 	int totalPages = new Double(
 		Math.ceil(new Integer(countSessionUsers).doubleValue() / new Integer(rowLimit).doubleValue()))
 			.intValue();
-	
-	List<ConfidenceLevel> confidenceLevels = assessment.isEnableConfidenceLevels()
-		? service.getConfidenceLevelsByQuestionAndSession(questionUid, sessionId)
-		: null;
 
 	JSONArray rows = new JSONArray();
 	int i = 1;
@@ -506,17 +501,9 @@ public class MonitoringAction extends Action {
 		userData.put(fullName);
 		userData.put(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
 		
-		// prepare for displaying purposes confidence levels 
+		// show confidence levels if this feature is turned ON 
 		if (assessment.isEnableConfidenceLevels()) {
-		    //find according confidenceLevel
-		    int confidence = -1;
-		    for (ConfidenceLevel confidenceLevel : confidenceLevels) {
-			if (questionResult.getAssessmentQuestion().getUid().equals(confidenceLevel.getQuestionUid())) {
-			    confidence = confidenceLevel.getConfidenceLevel();
-			    break;
-			}
-		    }
-		    userData.put(confidence);
+		    userData.put(questionResult.getConfidenceLevel());
 		}
 		
 		userData.put(questionResult.getMark());

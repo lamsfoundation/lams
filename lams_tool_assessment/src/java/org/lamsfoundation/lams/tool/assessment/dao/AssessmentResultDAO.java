@@ -67,6 +67,16 @@ public interface AssessmentResultDAO extends DAO {
      * @return
      */
     List<AssessmentResult> getLastFinishedAssessmentResults(Long contentId);
+    
+    List<Object[]> getLastFinishedAssessmentResultsBySession(Long sessionId);
+    
+    /**
+     * Get results for all leaders in current activity.
+     * 
+     * @param contentId
+     * @return
+     */
+    List<Object[]> getLeadersLastFinishedAssessmentResults(Long contentId);
 
     int getAssessmentResultCount(Long assessmentUid, Long userId);
 

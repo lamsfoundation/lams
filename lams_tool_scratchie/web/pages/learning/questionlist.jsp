@@ -1,11 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
-
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
 <%-- param has higher level for request attribute --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 </c:if>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 <c:set var="scratchie" value="${sessionMap.scratchie}" />
@@ -103,7 +104,8 @@
 	<table id="scratches" class="table table-hover">
 		<c:forEach var="answer" items="${item.answers}" varStatus="status">
 			<tr id="tr${answer.uid}">
-				<td style="width: 40px;"><c:choose>
+				<td style="width: 40px;">
+					<c:choose>
 						<c:when test="${answer.scratched && answer.correct}">
 							<img src="<html:rewrite page='/includes/images/scratchie-correct.png'/>" class="scartchie-image"
 								 id="image-${item.uid}-${answer.uid}">
@@ -123,15 +125,50 @@
 								id="image-${item.uid}-${answer.uid}" />
 							</a>
 						</c:otherwise>
-					</c:choose> <c:if test="${(mode == 'teacher') && (answer.attemptOrder != -1)}">
+					</c:choose> 
+					
+					<c:if test="${(mode == 'teacher') && (answer.attemptOrder != -1)}">
 						<div style="text-align: center; margin-top: 2px;">
 							<fmt:message key="label.choice.number">
 								<fmt:param>${answer.attemptOrder}</fmt:param>
 							</fmt:message>
 						</div>
-					</c:if></td>
+					</c:if>
+				</td>
 
-				<td style="vertical-align: middle;"><c:out value="${answer.description}" escapeXml="false" /></td>
+				<td 
+					<c:if test="${fn:length(answer.confidenceLevelDtos) > 0}">class="answer-with-confidence-level-portrait"</c:if>
+				>
+					<c:out value="${answer.description}" escapeXml="false" />
+					
+					<c:if test="${scratchie.confidenceLevelsActivityUiid != null}">
+						<div id="user-confidence-levels">
+							<c:forEach var="confidenceLevelDto" items="${answer.confidenceLevelDtos}" varStatus="status">
+							
+								<div class="c100 p${confidenceLevelDto.level}0 small">
+									<span>
+										<c:choose>
+										<c:when test="${confidenceLevelDto.portraitUuid == null}">
+											<div class="portrait-generic-sm portrait-color-${confidenceLevelDto.userId % 7}"></div>
+										</c:when>
+										<c:otherwise>
+			    								<img class="portrait-sm portrait-round" src="${lams}download/?uuid=${confidenceLevelDto.portraitUuid}&preferDownload=false&version=4" alt="">
+										</c:otherwise>
+										</c:choose>
+									</span>
+									<div class="slice">
+										<div class="bar"></div>
+										<div class="fill"></div>
+									</div>
+									<div class="confidence-level-percentage">
+										${confidenceLevelDto.level}0%
+									</div>
+								</div>
+	    
+							</c:forEach>
+						</div>
+					</c:if>
+				</td>
 			</tr>
 		</c:forEach>
 	</table>

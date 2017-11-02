@@ -51,8 +51,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.confidencelevel.ConfidenceLevel;
-import org.lamsfoundation.lams.confidencelevel.service.IConfidenceLevelService;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -113,7 +112,6 @@ import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
@@ -143,8 +141,6 @@ public class AssessmentServiceImpl
     private AssessmentOutputFactory assessmentOutputFactory;
 
     // system services
-    
-    private IConfidenceLevelService confidenceLevelService;
 
     private ILamsToolService toolService;
 
@@ -268,6 +264,7 @@ public class AssessmentServiceImpl
 		    userQuestionResult.setMark(leaderQuestionResult.getMark());
 		    userQuestionResult.setMaxMark(leaderQuestionResult.getMaxMark());
 		    userQuestionResult.setPenalty(leaderQuestionResult.getPenalty());
+		    userQuestionResult.setConfidenceLevel(leaderQuestionResult.getConfidenceLevel());
 
 		    Set<AssessmentOptionAnswer> leaderOptionAnswers = leaderQuestionResult.getOptionAnswers();
 		    Set<AssessmentOptionAnswer> userOptionAnswers = userQuestionResult.getOptionAnswers();
@@ -288,18 +285,6 @@ public class AssessmentServiceImpl
 	}
 
 	assessmentResultDao.saveObject(userResult);
-	
-	// copy leader's confidence levels to the current user
-	Assessment assessment = leaderResult.getAssessment();
-	if (assessment.isEnableConfidenceLevels()) {
-	    List<ConfidenceLevel> confidences = confidenceLevelService.getConfidenceLevelsByUser(leader.getUserId().intValue(), toolSessionId);
-	    Map<Long, Integer> questionUidToConfidenceLevelMap = new HashMap<Long, Integer>();
-	    for (ConfidenceLevel confidence : confidences) {
-		questionUidToConfidenceLevelMap.put(confidence.getQuestionUid(), confidence.getConfidenceLevel());
-	    }
-	    
-	    confidenceLevelService.saveConfidenceLevels(toolSessionId, user.getUserId().intValue(), questionUidToConfidenceLevelMap);
-	}
     }
 
     @Override
@@ -572,7 +557,6 @@ public class AssessmentServiceImpl
 	}
 
 	// store all answers (in all pages)
-	Map<Long, Integer> questionUidToConfidenceLevelMap = new HashMap<Long, Integer>();
 	for (Set<QuestionDTO> questionsForOnePage : pagedQuestions) {
 	    for (QuestionDTO questionDto : questionsForOnePage) {
 
@@ -607,21 +591,12 @@ public class AssessmentServiceImpl
 			continue;
 		    }
 		}
-		
-		// store confidence levels entered by the learner
-		int level = questionDto.getConfidenceLevel();
-		questionUidToConfidenceLevelMap.put(questionDto.getUid(), level);
 
 		float userQeustionGrade = storeUserAnswer(result, questionDto, isAutosave);
 		grade += userQeustionGrade;
 
 		maximumGrade += questionDto.getGrade();
 	    }
-	}
-	
-	// store confidence levels entered by the learner
-	if (assessment.isEnableConfidenceLevels()) {
-	    confidenceLevelService.saveConfidenceLevels(result.getSessionId(), userId.intValue(), questionUidToConfidenceLevelMap);
 	}
 
 	// store grades and finished date only on user hitting submit all answers button (and not submit mark hedging
@@ -691,7 +666,13 @@ public class AssessmentServiceImpl
 		optionAnswer.setAnswerInt(j++);
 	    }
 	}
+	
+	// store confidence levels entered by the learner
+	if (assessment.isEnableConfidenceLevels()) {
+	    questionResult.setConfidenceLevel(questionDto.getConfidenceLevel());
+	}
 
+	//calculate both mark and maxMark
 	float mark = 0;
 	float maxMark = questionDto.getGrade();
 	if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
@@ -1100,22 +1081,6 @@ public class AssessmentServiceImpl
 		}
 	    }
 	    
-	    // populate user entered confidence levels
-	    if (assessment.isEnableConfidenceLevels()) {
-		List<ConfidenceLevel> confidenceLevels = getConfidenceLevelsByUser(userId.intValue(),
-			sessionId);
-
-		for (AssessmentQuestionResult questionResult : questionResultsToDisplay) {
-		    //find according confidenceLevel
-		    for (ConfidenceLevel confidenceLevel : confidenceLevels) {
-			if (questionResult.getAssessmentQuestion().getUid().equals(confidenceLevel.getQuestionUid())) {
-			    questionResult.setConfidenceLevel(confidenceLevel.getConfidenceLevel());
-			    break;
-			}
-		    }
-		}
-	    }
-	    
 	    resultDto.setQuestionResults(questionResultsToDisplay);
 
 	    //escaping
@@ -1159,10 +1124,6 @@ public class AssessmentServiceImpl
 		}
 	    }
 
-	    List<ConfidenceLevel> confidenceLevels = assessment.isEnableConfidenceLevels()
-		    ? getConfidenceLevelsByUser(userId.intValue(), sessionId)
-		    : null;
-
 	    //prepare list of UserSummaryItems
 	    ArrayList<UserSummaryItem> userSummaryItems = new ArrayList<UserSummaryItem>();
 	    for (AssessmentQuestion question : questions) {
@@ -1174,20 +1135,8 @@ public class AssessmentServiceImpl
 		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
 			if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
 
-			    // for displaying purposes only (no saving occurrs)
+			    // for displaying purposes only (no saving occurs)
 			    questionResult.setFinishDate(result.getFinishDate());
-			    
-			    // prepare for displaying purposes confidence levels 
-			    if (assessment.isEnableConfidenceLevels()) {
-				//find according confidenceLevel
-				for (ConfidenceLevel confidenceLevel : confidenceLevels) {
-				    if (questionResult.getAssessmentQuestion().getUid()
-					    .equals(confidenceLevel.getQuestionUid())) {
-					questionResult.setConfidenceLevel(confidenceLevel.getConfidenceLevel());
-					break;
-				    }
-				}
-			    }
 
 			    questionResults.add(questionResult);
 			    break;
@@ -2351,16 +2300,6 @@ public class AssessmentServiceImpl
 	String message = messageService.getMessage("event.learner.completes.attempt.body", new Object[] { userName });
 	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }
-
-    @Override
-    public List<ConfidenceLevel> getConfidenceLevelsByUser(Integer userId, Long toolSessionId) {
-	return confidenceLevelService.getConfidenceLevelsByUser(userId, toolSessionId);
-    }
-    
-    @Override
-    public List<ConfidenceLevel> getConfidenceLevelsByQuestionAndSession(Long questionUid, Long toolSessionId) {
-	return confidenceLevelService.getConfidenceLevelsByQuestionAndSession(questionUid, toolSessionId);
-    }
     
     @Override
     public List<Number> getMarksArray(Long sessionId) {
@@ -2465,10 +2404,6 @@ public class AssessmentServiceImpl
 
     public void setAuditService(IAuditService auditService) {
 	this.auditService = auditService;
-    }
-    
-    public void setConfidenceLevelService(IConfidenceLevelService confidenceLevelService) {
-	this.confidenceLevelService = confidenceLevelService;
     }
 
     public void setLearnerService(ILearnerService learnerService) {
@@ -2725,36 +2660,93 @@ public class AssessmentServiceImpl
 	assessmentSessionDao.deleteBySessionId(toolSessionId);
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     *
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
     @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return assessmentOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     *
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return assessmentOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     *
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long)
-     */
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return assessmentOutputFactory.getToolOutputs(name, this, toolContentId);
+    }
+    
+    @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
+	List<ConfidenceLevelDTO> confidenceLevelDtos = new ArrayList<ConfidenceLevelDTO>();
+	if (toolSessionId == null) {
+	    return confidenceLevelDtos;
+	}
+	
+	Assessment assessment = getAssessmentBySessionId(toolSessionId);
+	//in case Assessment is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor  
+	List<Object[]> assessmentResultsAndUsers = assessment.isUseSelectLeaderToolOuput()
+		? assessmentResultDao.getLeadersLastFinishedAssessmentResults(assessment.getContentId())
+		: assessmentResultDao.getLastFinishedAssessmentResultsBySession(toolSessionId);
+
+	for (Object[] assessmentResultsAndUsersIter : assessmentResultsAndUsers) {
+	    AssessmentResult assessmentResult = (AssessmentResult) assessmentResultsAndUsersIter[0];
+	    User user = (User) assessmentResultsAndUsersIter[1];
+	    Integer userId = user.getUserId();
+	    Long portraitUuid = user.getPortraitUuid();
+	    
+	    //fill in question's and user answer's hashes 
+	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
+		AssessmentQuestion question = questionResult.getAssessmentQuestion();
+		
+		List<String> answers = new LinkedList<String>();
+		
+		if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+		    
+		    for (AssessmentQuestionOption option : question.getOptions()) {
+			for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
+			    if (optionAnswer.getAnswerBoolean() && (optionAnswer.getOptionUid().equals(option.getUid()))) {
+				answers.add(option.getOptionString());
+			    }
+			}
+		    }
+
+		} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
+
+		} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
+		    answers.add(questionResult.getAnswerString());
+
+		} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+		    answers.add(questionResult.getAnswerString());
+
+		} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
+		    if (questionResult.getAnswerString() != null) {
+			answers.add("" + questionResult.getAnswerBoolean());
+		    }
+		    
+		} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ESSAY) {
+		    answers.add(questionResult.getAnswerString());
+
+		} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+
+		} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
+		    
+		}
+		
+		for (String answer : answers) {
+		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
+		    confidenceLevelDto.setUserId(userId);
+		    confidenceLevelDto.setPortraitUuid(portraitUuid);
+		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
+		    confidenceLevelDto.setQuestionHash(question.getQuestionHash());
+		    confidenceLevelDto.setAnswerHash(HashUtil.sha1(answer));
+		    
+		    confidenceLevelDtos.add(confidenceLevelDto);
+		}
+	    }
+	    
+	}
+
+	return confidenceLevelDtos;
     }
 
     @Override

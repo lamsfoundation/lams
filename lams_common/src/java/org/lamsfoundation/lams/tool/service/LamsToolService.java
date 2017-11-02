@@ -24,7 +24,10 @@
 package org.lamsfoundation.lams.tool.service;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +37,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
@@ -43,14 +47,17 @@ import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
@@ -67,6 +74,9 @@ public class LamsToolService implements ILamsToolService {
 
     // Leader selection tool Constants
     private static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
+    
+    private static final String TOOL_SIGNATURE_ASSESSMENT = "laasse10";
+    private static final String TOOL_SIGNATURE_MCQ = "lamc11";
 
     private IActivityDAO activityDAO;
     private IAuditService auditService;
@@ -267,7 +277,7 @@ public class LamsToolService implements ILamsToolService {
 		return activity;
 	    }
 
-	    //in case of floating activity
+	//in case of a floating activity
 	} else if (activityClass.equals(FloatingActivity.class)) {
 	    LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(userId, lessonId);
 	    Map<Activity, CompletedActivityProgress> completedActivities = learnerProgress.getCompletedActivities();
@@ -311,6 +321,106 @@ public class LamsToolService implements ILamsToolService {
 	}
 
 	return null;
+    }
+    
+    @Override
+    public Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId) {
+	ToolActivity specifiedActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
+	
+	//if specifiedActivity is null - most likely author hasn't saved the sequence yet
+	if (specifiedActivity == null) {
+	    return null;
+	}
+	
+	Set<Long> confidenceProvidingActivityIds = new LinkedHashSet<Long>();
+	findPrecedingConfidenceProvidingActivities(specifiedActivity, confidenceProvidingActivityIds);
+	
+	Set<ToolActivity> confidenceProvidingActivities = new LinkedHashSet<ToolActivity>();
+	for (Long confidenceProvidingActivityId : confidenceProvidingActivityIds) {
+	    ToolActivity confidenceProvidingActivity = (ToolActivity) activityDAO.getActivityByActivityId(confidenceProvidingActivityId, ToolActivity.class);
+	    confidenceProvidingActivities.add(confidenceProvidingActivity);
+	}
+
+	return confidenceProvidingActivities;
+    }
+    
+    /**
+     * Finds all preceding activities that can provide confidence levels (currently only Assessment and MCQ provide
+     * them). Please note, it does not check whether enableConfidenceLevels advanced option is ON in those activities.
+     */
+    @SuppressWarnings("rawtypes")
+    private void findPrecedingConfidenceProvidingActivities(Activity activity, Set<Long> confidenceProvidingActivityIds) {
+	// check if current activity is Leader Select one. if so - stop searching and return it.
+	Class activityClass = Hibernate.getClass(activity);
+	if (activityClass.equals(ToolActivity.class)) {
+	    ToolActivity toolActivity;
+
+	    // activity is loaded as proxy due to lazy loading and in order to prevent quering DB we just re-initialize
+	    // it here again
+	    Hibernate.initialize(activity);
+	    if (activity instanceof HibernateProxy) {
+		toolActivity = (ToolActivity) ((HibernateProxy) activity).getHibernateLazyInitializer()
+			.getImplementation();
+	    } else {
+		toolActivity = (ToolActivity) activity;
+	    }
+
+	    String toolSignature = toolActivity.getTool().getToolSignature();
+	    if (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature) || TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
+		confidenceProvidingActivityIds.add(toolActivity.getActivityId());
+	    }
+
+	//in case of a floating activity - return all available confidence providing activities
+	} else if (activityClass.equals(FloatingActivity.class)) {
+	    Set<Activity> activities = activity.getLearningDesign().getActivities();
+	    for (Activity activityIter : activities) {
+		if (activityIter instanceof ToolActivity) {
+		    String toolSignatureIter = ((ToolActivity) activityIter).getTool().getToolSignature();
+		    if (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignatureIter)
+			    || TOOL_SIGNATURE_MCQ.equals(toolSignatureIter)) {
+			confidenceProvidingActivityIds.add(activityIter.getActivityId());
+		    }
+		}
+	    }
+	    return;
+	}
+
+	// check previous activity
+	Transition transitionTo = activity.getTransitionTo();
+	if (transitionTo != null) {
+	    Activity fromActivity = transitionTo.getFromActivity();
+	    findPrecedingConfidenceProvidingActivities(fromActivity, confidenceProvidingActivityIds);
+	    return;
+	}
+
+	// check parent activity
+	Activity parent = activity.getParentActivity();
+	if (parent != null) {
+	    findPrecedingConfidenceProvidingActivities(parent, confidenceProvidingActivityIds);
+	    return;
+	}
+    }
+    
+    @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevelsByActivity(Integer confidenceLevelActivityUiid, Integer requestorUserId,
+	    Long requestorToolSessionId) {
+	User user = (User) activityDAO.find(User.class, requestorUserId);
+	if (user == null) {
+	    throw new ToolException("No user found for userId=" + requestorUserId);
+	}
+
+	ToolSession requestorSession = toolSessionDAO.getToolSession(requestorToolSessionId);
+	if (requestorSession == null) {
+	    throw new ToolException("No session found for toolSessionId=" + requestorToolSessionId);
+	}
+
+	Activity confidenceLevelActivity = activityDAO.getActivityByUIID(confidenceLevelActivityUiid,
+		requestorSession.getToolActivity().getLearningDesign());
+	ToolSession confidenceLevelSession = toolSessionDAO.getToolSessionByLearner(user, confidenceLevelActivity);
+
+	List<ConfidenceLevelDTO> confidenceLevelDtos = lamsCoreToolService.getConfidenceLevelsByToolSession(confidenceLevelSession);
+
+	return confidenceLevelDtos;
     }
 
     @Override

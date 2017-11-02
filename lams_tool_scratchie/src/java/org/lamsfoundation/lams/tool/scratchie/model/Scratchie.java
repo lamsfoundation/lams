@@ -72,6 +72,8 @@ public class Scratchie implements Cloneable {
     private boolean shuffleItems;
     
     private int timeLimit;
+    
+    private Integer confidenceLevelsActivityUiid;
 
     private boolean reflectOnActivity;
 
@@ -371,5 +373,27 @@ public class Scratchie implements Cloneable {
      */
     public void setTimeLimit(int timeLimit) {
 	this.timeLimit = timeLimit;
+    }
+    
+    /**
+     * @return which preceding activity should be queried for confidence levels
+     */
+    public boolean isConfidenceLevelsEnabled() {
+	return confidenceLevelsActivityUiid != null;
+    }
+    
+    /**
+     * @return which preceding activity should be queried for confidence levels
+     */
+    public Integer getConfidenceLevelsActivityUiid() {
+	return confidenceLevelsActivityUiid;
+    }
+
+    /**
+     * @param confidenceLevelsActivityUiid
+     *            preceding activity that should be queried for confidence levels
+     */
+    public void setConfidenceLevelsActivityUiid(Integer confidenceLevelsActivityUiid) {
+	this.confidenceLevelsActivityUiid = confidenceLevelsActivityUiid;
     }
 }

@@ -150,6 +150,15 @@
             insert="true"
             column="time_limit"
         />
+        
+        <property
+            name="confidenceLevelsActivityUiid"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            column="confidence_levels_activity_uiid"
+            unique="true"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

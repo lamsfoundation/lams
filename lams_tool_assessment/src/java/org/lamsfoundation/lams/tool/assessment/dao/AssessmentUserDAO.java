@@ -46,9 +46,10 @@ public interface AssessmentUserDAO extends DAO {
 	    String sortBy, String sortOrder, String searchString);
     
     List<Number> getRawUserMarksBySession(Long sessionId);
+    
     Object[] getStatsMarksBySession(Long sessionId);
+    
     List<Number> getRawLeaderMarksByToolContentId(Long toolContentId);
+    
     Object[] getStatsMarksForLeaders(Long toolContentId);
-
-
 }

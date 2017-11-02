@@ -15,7 +15,7 @@
 		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
-	 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/monitoring.js'/>"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/jqGrid.confidenceLevelFormattter.js"></script>
   	    <script>
   	    	var isEdited = false;
   	    	var previousCellValue = "";
@@ -49,11 +49,7 @@
 							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }},
 	  				   		{name:'response', index:'response', width:427, sortable:false, search:false},
 	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
-			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align',
-			                        formatter: function (cellvalue) {
-			                            return gradientNumberFormat(cellvalue);
-			                        }
-				  			   	},
+			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
 	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' }		
 	  				   	],

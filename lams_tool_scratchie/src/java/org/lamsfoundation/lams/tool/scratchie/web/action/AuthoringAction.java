@@ -54,6 +54,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionExporter;
@@ -247,6 +248,10 @@ public class AuthoringAction extends Action {
 	    }
 	    i++;
 	}
+	
+	//display confidence providing activities
+	Set<ToolActivity> confidenceLevelsActivities = service.getPrecedingConfidenceLevelsActivities(contentId);
+	sessionMap.put(ScratchieConstants.ATTR_CONFIDENCE_LEVELS_ACTIVITIES, confidenceLevelsActivities);
 
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_FORM, scratchieForm);
 	return mapping.findForward(ScratchieConstants.SUCCESS);

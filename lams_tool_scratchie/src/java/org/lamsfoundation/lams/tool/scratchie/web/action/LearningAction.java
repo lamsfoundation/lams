@@ -266,6 +266,11 @@ public class LearningAction extends Action {
 	if (mode.isTeacher()) {
 	    service.getScratchesOrder(items, toolSessionId);
 	}
+	
+	//display confidence levels 
+	if (scratchie.isConfidenceLevelsEnabled()) {
+	    service.populateItemsWithConfidenceLevels(user.getUserId(), toolSessionId, scratchie.getConfidenceLevelsActivityUiid(), items);
+	}
 
 	// populate items with the existing burning questions for displaying purposes
 	List<ScratchieBurningQuestion> burningQuestions = null;

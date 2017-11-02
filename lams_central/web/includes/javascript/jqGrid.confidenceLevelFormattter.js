@@ -1,4 +1,5 @@
-        var gradientNumberFormat = function (cellvalue) {
+//confidence level column formatter function for jqGrid
+function gradientNumberFormatter (cellvalue) {
         		var MIN_DATA_VALUE = 0,
         			MAX_DATA_VALUE = 10;
         		
@@ -30,4 +31,4 @@
                     procents + '%;"></div><div class="filled-bar-text">' +
                     $.fmatter.util.NumberFormat(cellvalue, $.jgrid.formatter["integer"]) +
                     '</div></div>';
-        };
+};

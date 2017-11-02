@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
@@ -60,6 +61,25 @@ public interface IScratchieService {
      * @return
      */
     Scratchie getScratchieByContentId(Long contentId);
+    
+    /**
+     * Populate scratchie items with the confidence levels from the activity specified in author
+     * 
+     * @param userId
+     * @param toolSessionId
+     * @param confidenceLevelsActivityUiid
+     * @param items
+     */
+    void populateItemsWithConfidenceLevels(Long userId, Long toolSessionId, Integer confidenceLevelsActivityUiid,
+	    Collection<ScratchieItem> items);
+    
+    /**
+     * Returns all activities that precede specified activity and produce confidence levels.
+     * 
+     * @param toolContentId toolContentId of the specified activity 
+     * @return
+     */
+    Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId);
 
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.

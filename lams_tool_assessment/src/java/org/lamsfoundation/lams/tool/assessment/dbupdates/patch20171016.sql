@@ -10,6 +10,9 @@ ALTER TABLE tl_laasse10_assessment ADD COLUMN enable_confidence_levels TINYINT(1
 ALTER TABLE tl_laasse10_assessment_question ADD COLUMN question_hash CHAR(40);
 UPDATE tl_laasse10_assessment_question SET question_hash = SHA1(CONCAT(title, question));
 
+--add confidence level property to tl_laasse10_question_result
+ALTER TABLE tl_laasse10_question_result ADD COLUMN confidence_level int;
+
 UPDATE lams_tool SET tool_version='20171016' WHERE tool_signature='laasse10';
 
 ----------------------Put all sql statements above here-------------------------

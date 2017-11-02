@@ -21,7 +21,26 @@
 	<%@ include file="/common/header.jsp"%>
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
+	<link rel="stylesheet" type="text/css" href="${lams}css/circle.css" />
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/scratchie-learning.css'/>" />
+	<style type="text/css">
+		#user-confidence-levels {
+			margin-left: 20px;
+		}
+		.answer-with-confidence-level-portrait {
+			display: flex;
+   			align-items: center;
+		}
+		.c100.small {
+			font-size: 41px;
+			margin-right: 5px;
+		}
+		.confidence-level-percentage {
+			font-size: 13px;
+		    margin-top: 43px;
+		    text-align: center;
+		}
+	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>

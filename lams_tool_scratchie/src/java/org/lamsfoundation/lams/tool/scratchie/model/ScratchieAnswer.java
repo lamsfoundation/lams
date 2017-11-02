@@ -23,7 +23,12 @@
 
 package org.lamsfoundation.lams.tool.scratchie.model;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 
 /**
  * Tool may contain several questions. Which in turn contain answers.
@@ -48,6 +53,7 @@ public class ScratchieAnswer implements Cloneable {
     private boolean scratched;
     private int attemptOrder;
     private int[] attempts;
+    private List<ConfidenceLevelDTO> confidenceLevelDtos;
 
     // **********************************************************
     // Get/Set methods
@@ -145,6 +151,14 @@ public class ScratchieAnswer implements Cloneable {
 
     public void setAttempts(int[] attempts) {
 	this.attempts = attempts;
+    }
+    
+    public List<ConfidenceLevelDTO> getConfidenceLevelDtos() {
+	return confidenceLevelDtos;
+    }
+
+    public void setConfidenceLevelDtos(List<ConfidenceLevelDTO> confidenceLevelDtos) {
+	this.confidenceLevelDtos = confidenceLevelDtos;
     }
 
     @Override

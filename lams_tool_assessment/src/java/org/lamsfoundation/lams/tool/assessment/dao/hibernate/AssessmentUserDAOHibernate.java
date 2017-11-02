@@ -62,8 +62,6 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	    + " JOIN tl_laasse10_assessment a ON s.assessment_uid = a.uid "
 	    + " WHERE r.finish_date IS NOT NULL AND r.latest = 1 AND a.content_id = :toolContentId";
 
-    
-
     @SuppressWarnings("rawtypes")
     @Override
     public AssessmentUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {

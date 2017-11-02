@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -222,6 +223,22 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     @Override
     public List<AssessmentResult> getLastFinishedAssessmentResults(Long contentId) {
 	return (List<AssessmentResult>) doFind(FIND_LAST_FINISHED_RESULTS_BY_CONTENT_ID, new Object[] { contentId });
+    }
+    
+    @Override
+    public List<Object[]> getLastFinishedAssessmentResultsBySession(Long sessionId) {
+	final String FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID = "SELECT r, u FROM " + AssessmentResult.class.getName()
+		+ " AS r, " + User.class.getName() + " as u WHERE r.sessionId=? AND (r.finishDate != null) AND r.latest=1 AND u.userId=r.user.userId";
+	
+	return (List<Object[]>) doFind(FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID, new Object[] { sessionId });
+    }
+    
+    @Override
+    public List<Object[]> getLeadersLastFinishedAssessmentResults(Long contentId) {
+	final String FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID = "SELECT r, u FROM " + AssessmentResult.class.getName()
+		+ " AS r, " + User.class.getName() + " as u WHERE r.user=r.user.session.groupLeader AND r.assessment.contentId=? AND (r.finishDate != null) AND r.latest=1 AND u.userId=r.user.userId";
+	
+	return (List<Object[]>) doFind(FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID, new Object[] { contentId });
     }
 
     @Override
