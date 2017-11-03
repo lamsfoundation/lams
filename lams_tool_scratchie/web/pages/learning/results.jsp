@@ -205,7 +205,7 @@
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		function editBurningQuestions() {
-			document.location.href='<c:url value="/learning/showBurningQuestions.do?sessionMapID=${sessionMapID}"/>';
+			document.location.href='<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}';
 		}
 		function refresh() {
 			location.reload();
@@ -240,13 +240,12 @@
 		</lams:Alert>
 	
 		<div class="row voffset5" >
-				<html:button property="refreshButton" onclick="return refresh();" styleClass="btn btn-default voffset5 roffset5 pull-right">
-					<fmt:message key="label.refresh" />
-				</html:button>
+			<html:button property="refreshButton" onclick="return refresh();" styleClass="btn btn-default voffset5 roffset5 pull-right">
+				<fmt:message key="label.refresh" />
+			</html:button>
 		</div>
 
 		<!-- Display burningQuestionItemDtos -->
-
 		<c:if test="${sessionMap.isBurningQuestionsEnabled}">
 			<div class="voffset5">
 				<div class="lead">
@@ -267,6 +266,7 @@
 			</div>
 		</c:if>
 
+		<!-- Display reflections -->
 		<c:if test="${sessionMap.reflectOn}">
 			<div class="voffset10">
 				<div class="panel panel-default">
@@ -308,6 +308,7 @@
 			</div>
 		</c:if>
 
+		<!-- Display finish buttons -->
 		<c:if test="${mode != 'teacher'}">
 			<div class="voffset10 pull-right">
 				<html:link href="#nogo" property="finishButton" styleId="finishButton" onclick="return finishSession()"
@@ -325,7 +326,6 @@
 		</c:if>
 
 		<div id="footer"></div>
-		<!--closes footer-->
 	</lams:Page>
 </body>
 </lams:html>

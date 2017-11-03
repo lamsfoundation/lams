@@ -24,6 +24,9 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/circle.css" />
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/scratchie-learning.css'/>" />
 	<style type="text/css">
+		.burning-question-container {
+			padding: 0 15px;
+		}
 		#user-confidence-levels {
 			margin-left: 20px;
 		}
@@ -40,24 +43,31 @@
 		    margin-top: 43px;
 		    text-align: center;
 		}
+		.lead {
+			margin-top: 30px;
+		}
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>	
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript">
 		function scratchImage(itemUid, answerUid, isCorrect) {
 			// first show animation, then put static image
 			var imageSuffix = isCorrect ? 'correct' : 'wrong';
-    		$('#image-' + itemUid + '-' + answerUid).load(function(){
-    			var image = $(this).off("load");
-    			// show static image after animation
-    			setTimeout(function(){
-    				image.attr("src", "<html:rewrite page='/includes/images/scratchie-" + imageSuffix + ".png'/>");
-    			}, 1300);
-    		}).attr("src", "<html:rewrite page='/includes/images/scratchie-" + imageSuffix + "-animation.gif'/>");
+	    		$('#image-' + itemUid + '-' + answerUid).load(function(){
+	    			var image = $(this).off("load");
+	    			// show static image after animation
+	    			setTimeout(
+	    	    			function(){
+	    					image.attr("src", "<html:rewrite page='/includes/images/scratchie-" + imageSuffix + ".png'/>");
+	    				}, 
+	    				1300
+	    			);
+	    		}).attr("src", "<html:rewrite page='/includes/images/scratchie-" + imageSuffix + "-animation.gif'/>");
 		}
 
 		function scratchItem(itemUid, answerUid){
@@ -67,25 +77,29 @@
 	            dataType: 'json',
 	            type: 'post',
 	            success: function (json) {
-	            	if (json == null) {
-	            		return false;
-	            	}
-	            	
-	            	scratchImage(itemUid, answerUid, json.answerCorrect);
-	            	
-	            	if (json.answerCorrect) {
-	            		//disable scratching
-	            		$("[id^=imageLink-" + itemUid + "]").removeAttr('onclick'); 
-	            		$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
-	            		$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
-	            	} else {
-	            		var id = '-' + itemUid + '-' + answerUid;
-	            		$('#imageLink' + id).removeAttr('onclick');
-	            		$('#imageLink' + id).css('cursor','default');
-	            	}
+		            	if (json == null) {
+		            		return false;
+		            	}
+		            	
+		            	scratchImage(itemUid, answerUid, json.answerCorrect);
+		            	
+		            	if (json.answerCorrect) {
+		            		//disable scratching
+		            		$("[id^=imageLink-" + itemUid + "]").removeAttr('onclick'); 
+		            		$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
+		            		$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
+
+		            	} else {
+		            		var id = '-' + itemUid + '-' + answerUid;
+		            		$('#imageLink' + id).removeAttr('onclick');
+		            		$('#imageLink' + id).css('cursor','default');
+		            	}
 	            }
 	       	});
 		}
+
+		//boolean to indicate whether ok dialog is still ON so that autosave can't be run
+		var isWaitingForConfirmation = ${isTimeLimitEnabled && isTimeLimitNotLaunched};
 
 		//time limit feature
 		<c:if test="${isTimeLimitEnabled}">
@@ -104,9 +118,9 @@
 					//once OK button pressed start countdown
 				    $('#timelimit-start-ok').click(function() {
 				    	
-			        	//store date when user has started activity with time limit
+			        		//store date when user has started activity with time limit
 				        $.ajax({
-				        	async: true,
+				        		async: true,
 				            url: '<c:url value="/learning/launchTimeLimit.do"/>',
 				            data: 'sessionMapID=${sessionMapID}',
 				            type: 'post'
@@ -114,6 +128,7 @@
 			        	
 				       	$.unblockUI();
 				       	displayCountdown();
+				       	isWaitingForConfirmation = false;
 				    });
 					
 				} else {
@@ -152,13 +167,39 @@
 					onExpiry: function(periods) {
 				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-fw"></i> <fmt:message key="label.time.is.over" /></h1>' }); 
 				        
-				        setTimeout(function() { 
-				        	finish(true);
-				        }, 4000); 
+				        setTimeout(
+							function() {
+				        			finish(true);
+				        		}, 
+				        		4000
+				        ); 
 					},
 					description: "<div id='countdown-label'><fmt:message key='label.countdown.time.left' /></div>"
 				});
 			}
+		</c:if>
+
+		//autosave feature
+		<c:if test="${isUserLeader && (mode != 'teacher')}">
+			
+			var autosaveInterval = "30000"; // 30 seconds interval
+			window.setInterval(
+				function(){
+					if (isWaitingForConfirmation) return;
+					
+					//ajax form submit
+					$('#burning-questions').ajaxSubmit({
+						url: "<c:url value='/learning/autosaveBurningQuestions.do'/>?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
+		                success: function() {
+			                	$.jGrowl(
+			                		"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.burning.questions.autosaved" />",
+			                		{ life: 2000, closeTemplate: '' }
+			                	);
+		                }
+					});
+	        		}, 
+	        		autosaveInterval
+	        );
 		</c:if>
 
 		function finish(isTimelimitExpired) {
@@ -173,7 +214,10 @@
 			
 			if (proceed) {
 				document.getElementById("finishButton").disabled = true;
-				document.location.href ='<c:url value="/learning/' + method + '.do?sessionMapID=${sessionMapID}"/>';	
+
+		        	var myForm = $('#burning-questions');
+		        	myForm.attr("action", '<c:url value="/learning/' + method + '.do?sessionMapID=${sessionMapID}"/>&date=' + new Date().getTime());
+		        	myForm.submit();
 			}
 			
 			return false;
@@ -218,7 +262,6 @@
 		</div>
 
 		<div id="footer"></div>
-		<!--closes footer-->
 	</lams:Page>
 </body>
 </lams:html>
