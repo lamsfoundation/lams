@@ -207,7 +207,6 @@
 			<forward name="waitforleader" path="/pages/learning/waitforleader.jsp" />
 			<forward name="waitForLeaderTimeLimit" path="/pages/learning/waitForLeaderTimeLimit.jsp" />
 			<forward name="newReflection" path="/learning/newReflection.do" />
-			<forward name="showBurningQuestions" path="/learning/showBurningQuestions.do" />
 			<forward name="showResults" path="/learning/showResults.do" />
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
 			<forward name="submissionDeadline" path="/pages/learning/submissionDeadline.jsp" />			
@@ -232,19 +231,11 @@
 			<forward name="success" path="/pages/learning/finish.jsp" />
 		</action>
 		<!--  ========= Burning questions =============== -->
-		<action path="/learning/showBurningQuestions"
+		<action path="/learning/autosaveBurningQuestions"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
-			parameter="showBurningQuestions">
-			<forward name="success" path="/pages/learning/burningQuestions.jsp" />
-		</action>
-		<action path="/learning/saveBurningQuestions"
-			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
-			name="reflectionForm"
 			validate="false" 
-			parameter="saveBurningQuestions" 
+			parameter="autosaveBurningQuestions" 
 			scope="request">
-			<forward name="newReflection" path="/learning/newReflection.do"/>
-			<forward name="showResults" path="/learning/showResults.do" />
 		</action>
 		<action path="/learning/like"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"

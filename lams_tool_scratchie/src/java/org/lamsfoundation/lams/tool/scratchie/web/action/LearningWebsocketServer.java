@@ -100,7 +100,7 @@ public class LearningWebsocketServer {
 			}
 
 			boolean isWaitingForLeaderToSubmit = LearningWebsocketServer.getScratchieService()
-				.isWaitingForLeaderToSubmit(toolSession);
+				.isWaitingForLeaderToSubmitNotebook(toolSession);
 			if (timeLimitUp) {
 			    // time limit is up
 			    if (isWaitingForLeaderToSubmit) {

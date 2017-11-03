@@ -319,7 +319,7 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public boolean isWaitingForLeaderToSubmit(ScratchieSession toolSession) {
+    public boolean isWaitingForLeaderToSubmitNotebook(ScratchieSession toolSession) {
 	Long toolSessionId = toolSession.getSessionId();
 	Scratchie scratchie = toolSession.getScratchie();
 	ScratchieUser groupLeader = toolSession.getGroupLeader();
@@ -331,15 +331,9 @@ public class ScratchieServiceImpl
 	    notebookEntry = getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		    ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId().intValue());
 	}
-	List<ScratchieBurningQuestion> burningQuestions = null;
-	if (scratchie.isBurningQuestionsEnabled()) {
-	    burningQuestions = getBurningQuestionsBySession(toolSessionId);
-	}
-	boolean isWaitingForLeaderToSubmitNotebook = isReflectOnActivity && (notebookEntry == null);
-	boolean isWaitingForLeaderToSubmitBurningQuestions = scratchie.isBurningQuestionsEnabled()
-		&& ((burningQuestions == null) || burningQuestions.isEmpty()) && !toolSession.isSessionFinished();
-
-	return isWaitingForLeaderToSubmitNotebook || isWaitingForLeaderToSubmitBurningQuestions;
+	
+	// return whether it's waiting for the leader to submit notebook
+	return isReflectOnActivity && (notebookEntry == null);
     }
 
     @Override

@@ -59,14 +59,13 @@
 	
 	// set up timer for the first time
 	scratchieWebsocketPingFunc(true);
-
 	
 	// run when the server pushes new reports and vote statistics
 	scratchieWebsocket.onmessage = function(e) {
 		// create JSON object
 		var input = JSON.parse(e.data);
 
-		//time limit is expired but leader hasn't submitted required notebook/burning questions yet. Non-leaders
+		//time limit is expired but leader hasn't submitted required notebook yet. Non-leaders
         //will need to refresh the page in order to stop showing them questions page.
 		if (input.pageRefresh) {
 			location.reload();
@@ -92,6 +91,8 @@
 	};
 	</script>
 </c:if>
+
+<form id="burning-questions" name="burning-questions" method="post" action="">
 
 <c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 	<div class="lead">
@@ -172,8 +173,38 @@
 			</tr>
 		</c:forEach>
 	</table>
+	
+	<%-- show burning questions --%>
+	<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled}">
+		<div class="form-group burning-question-container">
+			<a data-toggle="collapse" data-target="#burning-question-item${item.uid}">
+				<i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i>
+				<fmt:message key="label.burning.question" />
+			</a>
+			
+			<div id="burning-question-item${item.uid}" class="collapse <c:if test="${not empty item.burningQuestion}">in</c:if>">
+				<textarea rows="5" name="burningQuestion${item.uid}" class="form-control">${item.burningQuestion}</textarea>
+			</div>
+		</div>
+	</c:if>
 
 </c:forEach>
+
+<%-- show general burning question --%>
+<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled}">
+	<div class="form-group burning-question-container">
+		<a data-toggle="collapse" data-target="#burning-question-general">
+			<i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i>
+			<fmt:message key="label.general.burning.question" />
+		</a>
+
+		<div id="burning-question-general" class="collapse <c:if test="${not empty sessionMap.generalBurningQuestion}">in</c:if>">
+			<textarea rows="5" name="generalBurningQuestion" class="form-control">${sessionMap.generalBurningQuestion}</textarea>
+		</div>
+	</div>
+</c:if>
+
+</form>
 
 <%-- show reflection (only for teacher) --%>
 <c:if test="${sessionMap.userFinished and sessionMap.reflectOn and (mode == 'teacher')}">
@@ -204,13 +235,6 @@
 <c:if test="${mode != 'teacher'}">
 	<div class="voffset10 pull-right">
 		<c:choose>
-			<c:when test="${isUserLeader && sessionMap.isBurningQuestionsEnabled}">
-				<input type="hidden" name="method" id="method" value="showBurningQuestions">
-				<html:button property="finishButton" styleId="finishButton" onclick="return finish(false);"
-					styleClass="btn btn-sm btn-default">
-					<fmt:message key="label.continue.burning.questions" />
-				</html:button>
-			</c:when>
 			<c:when test="${isUserLeader && sessionMap.reflectOn}">
 				<input type="hidden" name="method" id="method" value="newReflection">
 				<html:button property="finishButton" styleId="finishButton" onclick="return finish(false);"
