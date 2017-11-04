@@ -112,7 +112,7 @@
 									<fmt:message key="label.tab.class.monitors.unselected" />
 									
 								</div>
-								<div id="unselected-monitors" class="userContainer"><span id="sort-unselected-monitors" class="sortUsersButton">▲</span></div>
+								<div id="unselected-monitors" class="userContainer"><span id="sort-unselected-monitors" class="sortUsersButton">?</span></div>
 							</td>
 							<td class="userConainterTransferCell userConainterTransferTopCell">
 								<i id="monitorMoveToRight" class="fa fa-2x fa-arrow-right text-left text-primary" 
@@ -122,7 +122,7 @@
 								<div class="userContainerTitle">
 									<fmt:message key="label.tab.class.monitors.selected" />
 								</div>
-								<div id="selected-monitors" class="userContainer"><span id="sort-selected-monitors" class="sortUsersButton">▲</span></div>
+								<div id="selected-monitors" class="userContainer"><span id="sort-selected-monitors" class="sortUsersButton">?</span></div>
 							</td>
 						</tr>
 						<tr>
@@ -136,7 +136,7 @@
 								<div class="userContainerTitle">
 									<fmt:message key="label.tab.class.learners.unselected" />
 								</div>
-								<div id="unselected-learners" class="userContainer"><span id="sort-unselected-learners" class="sortUsersButton">▲</span></div>
+								<div id="unselected-learners" class="userContainer"><span id="sort-unselected-learners" class="sortUsersButton">?</span></div>
 							</td>
 							<td class="userConainterTransferCell userConainterTransferTopCell" >
 								<i id="learnerMoveToRight" class="fa fa-2x fa-arrow-right text-left text-primary"
@@ -146,7 +146,7 @@
 								<div class="userContainerTitle">
 									<fmt:message key="label.tab.class.learners.selected" />
 								</div>
-								<div id="selected-learners" class="userContainer"><span id="sort-selected-learners" class="sortUsersButton">▲</span></div>
+								<div id="selected-learners" class="userContainer"><span id="sort-selected-learners" class="sortUsersButton">?</span></div>
 							</td>
 						</tr>
 						<tr>
@@ -180,18 +180,23 @@
 							 <fmt:message key="label.tab.advanced.intro.description" />
 							</div>
 							<lams:CKEditor id="introDescription" toolbarSet="LessonDescription" value="">
-							</lams:CKEditor>
+							</lams:CKEditor>+
 
 							<div class="checkbox">
 								<label>
 									<input id="introImageField" name="introImage" value="true" type="checkbox"/><fmt:message key="label.tab.advanced.intro.image" />
 								</label>
-							</div>	  
+							</div>
 						</div>
-					
+
 					
 					<div class="lead"><fmt:message key="label.tab.advanced.section.advanced" /></div>
 					<div class="options">
+						<div class="checkbox">
+							<label>
+								<input id="gradebookOnCompleteField" name="gradebookOnComplete" value="true" checked="checked" type="checkbox"/><fmt:message key="label.tab.advanced.field.gradebook.complete" />
+							</label>
+						</div>	
 						<div class="checkbox">
 							<label>
 								<input id="startMonitorField" name="startMonitor" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.monitor" /></input><br />
