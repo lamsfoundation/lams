@@ -42,12 +42,13 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBAverageMarkComparator;
-import org.lamsfoundation.lams.gradebook.dto.comparators.GBMedianTimeTakenComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBIDComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBMarkComparator;
+import org.lamsfoundation.lams.gradebook.dto.comparators.GBMedianTimeTakenComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBRowNameComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBStartDateComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBTimeTakenComparator;
+import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -181,6 +182,25 @@ public class GradebookUtil {
 
     }
 
+    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded) {
+	return createPercentageCell(mark, markConversionNeeded, false, 0);
+    }
+
+//    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded, Boolean isBold) {
+//	return createPercentageCell(mark, markConversionNeeded, isBold, 0);
+//    }
+    
+    // if markConversionNeeded is true then mark is divided by 100. Otherwise assumes already a percentage.
+    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded, Boolean isBold, int borderStyle) {
+	Double convertedMark = null;
+	if ( mark != null )
+	    convertedMark = markConversionNeeded ? mark / 100.0 : mark;
+	
+	ExcelCell userMarkCell = new ExcelCell(convertedMark, isBold, borderStyle);
+	userMarkCell.setIsPercentage(true);
+	return userMarkCell;
+    }
+    
     private static Document getDocument() throws ParserConfigurationException {
 	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	DocumentBuilder builder = factory.newDocumentBuilder();
