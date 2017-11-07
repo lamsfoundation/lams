@@ -74,6 +74,9 @@ public class Scratchie implements Cloneable {
     private int timeLimit;
     
     private Integer confidenceLevelsActivityUiid;
+    
+    //overwrites default preset marks stored as admin config setting
+    private String presetMarks;
 
     private boolean reflectOnActivity;
 
@@ -396,4 +399,18 @@ public class Scratchie implements Cloneable {
     public void setConfidenceLevelsActivityUiid(Integer confidenceLevelsActivityUiid) {
 	this.confidenceLevelsActivityUiid = confidenceLevelsActivityUiid;
     }
+    
+    /**
+     * This property holds value that can overwrite default preset marks stored in admin config setting. It can be null
+     * and therefore ScratchieService.getPresetMarks() method should be used instead when calculating actual marks.
+     *
+     * @return
+     */
+   public String getPresetMarks() {
+	return presetMarks;
+   }
+
+   public void setPresetMarks(String presetMarks) {
+	this.presetMarks = presetMarks;
+   }
 }

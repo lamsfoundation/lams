@@ -159,6 +159,14 @@
             column="confidence_levels_activity_uiid"
             unique="true"
         />
+        
+        <property
+            name="presetMarks"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="preset_marks"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

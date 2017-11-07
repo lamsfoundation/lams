@@ -193,10 +193,6 @@ public class AuthoringAction extends Action {
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	scratchieForm.setSessionMapID(sessionMap.getSessionID());
 
-	ScratchieConfigItem isEnabledExtraPointOption = service
-		.getConfigItem(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION);
-	sessionMap.put(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION,
-		new Boolean(isEnabledExtraPointOption.getConfigValue()));
 
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
@@ -222,6 +218,18 @@ public class AuthoringAction extends Action {
 	    AuthoringAction.log.error(e);
 	    throw new ServletException(e);
 	}
+
+	ScratchieConfigItem isEnabledExtraPointOption = service
+		.getConfigItem(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION);
+	sessionMap.put(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION,
+		new Boolean(isEnabledExtraPointOption.getConfigValue()));
+	
+	//prepare advanced option allowing to overwrite default preset marks
+	ScratchieConfigItem defaultPresetMarksConfigItem = service.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS);
+	String defaultPresetMarks = defaultPresetMarksConfigItem == null ? "" : defaultPresetMarksConfigItem.getConfigValue();
+	boolean presetMarksOverwritten = scratchie.getPresetMarks() != null && !scratchie.getPresetMarks().equals(defaultPresetMarks);
+	sessionMap.put(ScratchieConstants.ATTR_IS_PRESET_MARKS_OVERWRITTEN, presetMarksOverwritten);
+	sessionMap.put(ScratchieConstants.ATTR_DEFAULT_PRESET_MARKS, defaultPresetMarks);
 
 	// init it to avoid null exception in following handling
 	if (items == null) {
