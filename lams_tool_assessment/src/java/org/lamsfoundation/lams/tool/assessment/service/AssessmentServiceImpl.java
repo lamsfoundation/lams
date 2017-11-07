@@ -348,7 +348,7 @@ public class AssessmentServiceImpl
     public List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page,
 	    int size, String sortBy, String sortOrder, String searchString) {
 	return assessmentUserDao.getPagedUsersBySessionAndQuestion(sessionId, questionUid, page, size, sortBy,
-		sortOrder, searchString);
+		sortOrder, searchString, userManagementService);
     }
 
     @Override

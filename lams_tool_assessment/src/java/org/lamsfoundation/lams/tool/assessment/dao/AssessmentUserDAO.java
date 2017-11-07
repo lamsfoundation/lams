@@ -43,7 +43,7 @@ public interface AssessmentUserDAO extends DAO {
     int getCountUsersBySession(Long sessionId, String searchString);
 
     List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page, int size,
-	    String sortBy, String sortOrder, String searchString);
+	    String sortBy, String sortOrder, String searchString, IUserManagementService userManagementService);
     
     List<Number> getRawUserMarksBySession(Long sessionId);
     

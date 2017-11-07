@@ -500,14 +500,15 @@ public class MonitoringAction extends Action {
 		userData.put(questionResult.getMaxMark());
 		userData.put(fullName);
 		userData.put(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
-		
 		// show confidence levels if this feature is turned ON 
 		if (assessment.isEnableConfidenceLevels()) {
 		    userData.put(questionResult.getConfidenceLevel());
 		}
 		
 		userData.put(questionResult.getMark());
-
+		if (userDto.getPortraitId() != null ) 
+		    userData.put(userDto.getPortraitId());
+		
 	    } else {
 		userData.put("");
 		userData.put("");

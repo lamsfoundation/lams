@@ -16,6 +16,7 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jqGrid.confidenceLevelFormattter.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
   	    <script>
   	    	var isEdited = false;
   	    	var previousCellValue = "";
@@ -40,18 +41,20 @@
 		  			   		<c:if test="${assessment.enableConfidenceLevels}">
 		  			   			"<fmt:message key="label.confidence" />",
 		  			  		</c:if>
-	  						"<fmt:message key="label.monitoring.user.summary.grade" />"
+	  						"<fmt:message key="label.monitoring.user.summary.grade" />",
+	  						'portraitId'
 	  					],
 	  						    
 	  				   	colModel:[
 							{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 							{name:'maxMark', index:'maxMark', width:0, hidden: true},
-							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }},
+							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
 	  				   		{name:'response', index:'response', width:427, sortable:false, search:false},
 	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
 			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
-	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' }		
+	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
+		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}
 	  				   	],
 	  				   	multiselect: false,
 	  				   	caption: "${sessionDto.sessionName}",
@@ -86,7 +89,10 @@
 	  							var questionResultUid = jQuery("#session${sessionDto.sessionId}").getCell(rowid, 'questionResultUid');
 	  							return {questionResultUid:questionResultUid};		  				  		
 	  				  		}
-	  					}
+	  					},
+  						loadComplete: function () {
+  					   	 	initializePortraitPopover('<lams:LAMSURL/>');
+  					    	}
   						/*  resetSelection() doesn't work in this version
 						    hope it'll be fixed in the next one
 						    
@@ -128,6 +134,17 @@
         			self.parent.tb_remove();
         		}
     		}
+    		
+    		function userNameFormatter (cellvalue, options, rowObject) {
+    			debugger;
+    			<c:choose><c:when test="${assessment.enableConfidenceLevels}">
+    			var portraitId = rowObject[6];
+    			</c:when><c:otherwise>
+    			var portraitId = rowObject[5];
+    			</c:otherwise></c:choose>
+    			return definePortraitPopover(portraitId, rowObject[0], rowObject[2]);
+    		}
+
   		</script>
 	</lams:head>
 	
