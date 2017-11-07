@@ -183,7 +183,7 @@ public class LtiAction extends LamsDispatchAction {
 	// 1. init lesson
 	Lesson lesson = monitoringService.initializeLesson(title, desc, new Long(ldIdStr),
 		organisation.getOrganisationId(), user.getUserId(), null, false, enableLessonIntro, false, false,
-		true, true, false, false, null, null);
+		true, true, false, false, true, null, null);
 	// 2. create lessonClass for lesson
 	List<User> staffList = new LinkedList<User>();
 	staffList.add(user);
