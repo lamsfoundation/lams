@@ -400,6 +400,14 @@ public interface IScratchieService {
      */
     String[] getPresetMarks(Scratchie scratchie);
     
+    /**
+     * Return a maximum possible mark that user can get on answering all questions.
+     * 
+     * @param scratchie
+     * @return
+     */
+    int getMaxPossibleScore(Scratchie scratchie);
+    
     /** Get the raw marks for display in a graph in monitoring */
     List<Number> getMarksArray(Long contentId);
 

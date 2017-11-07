@@ -62,22 +62,13 @@ public class ScratchieOutputFactory extends OutputFactory {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 
 	if (toolContentObject != null) {
-
 	    Scratchie scratchie = (Scratchie) toolContentObject;
-	    int itemsNumber = scratchie.getScratchieItems().size();
 
 	    // calculate totalMarksPossible
-	    String[] presetMarks = scratchieService.getPresetMarks(scratchie);
-	    long totalMarksPossible = (presetMarks.length > 0) ? itemsNumber * Integer.parseInt(presetMarks[0]) : 0;
-
-	    // count in extra point if this option is ON
-
-	    if (scratchie.isExtraPoint()) {
-		totalMarksPossible += itemsNumber;
-	    }
+	    long maxPossibleScore = scratchieService.getMaxPossibleScore(scratchie);
 
 	    ToolOutputDefinition definition = buildRangeDefinition(ScratchieConstants.LEARNER_MARK, new Long(0),
-		    totalMarksPossible, true);
+		    maxPossibleScore, true);
 	    definitionMap.put(ScratchieConstants.LEARNER_MARK, definition);
 
 	}

@@ -243,6 +243,21 @@ public class ScratchieServiceImpl
 	return presetMarks.split(",");
     }
     
+    @Override
+    public int getMaxPossibleScore(Scratchie scratchie) {
+	int itemsNumber = scratchie.getScratchieItems().size();
+
+	// calculate totalMarksPossible
+	String[] presetMarks = getPresetMarks(scratchie);
+	int maxPossibleScore = (presetMarks.length > 0) ? itemsNumber * Integer.parseInt(presetMarks[0]) : 0;
+
+	// count an extra point if such option is ON
+	if (scratchie.isExtraPoint()) {
+	    maxPossibleScore += itemsNumber;
+	}
+
+	return maxPossibleScore;
+    }   
 
     @Override
     public void deleteScratchieItem(Long uid) {
