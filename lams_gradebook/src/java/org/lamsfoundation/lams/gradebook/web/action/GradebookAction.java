@@ -153,25 +153,22 @@ public class GradebookAction extends LamsDispatchAction {
 	return null;
     }
 
-    @SuppressWarnings("unchecked")
     public ActionForward getLessonCompleteGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	// Getting the params passed in from the jqGrid
-	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	UserDTO currentUserDTO = getUser();
 	Integer userId = currentUserDTO.getUserID();
-	if (!getSecurityService().isLessonParticipant(lessonID, userId, "get lesson complete gradebook data", false)) {
+	if (!getSecurityService().isLessonParticipant(lessonId, userId, "get lesson complete gradebook data", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the lesson");
 	    return null;
 	}
 
-	Object[] lessonCompleteData = getGradebookService().getGBLessonComplete(lessonID, userId);
-	List<GradebookGridRowDTO> gradebookActivityDTOs = (List<GradebookGridRowDTO>) lessonCompleteData[0];
+	List<GradebookGridRowDTO> gradebookActivityDTOs = getGradebookService().getGBLessonComplete(lessonId, userId);
 
 	JSONObject resultJSON = new JSONObject();
 	resultJSON.put(GradebookConstants.ELEMENT_RECORDS, gradebookActivityDTOs.size());
 
-	boolean isWeighted = (Boolean) lessonCompleteData[3];
 	JSONArray rowsJSON = new JSONArray();
 	for (GradebookGridRowDTO gradebookActivityDTO : gradebookActivityDTOs) {
 	    JSONObject rowJSON = new JSONObject();
@@ -188,8 +185,11 @@ public class GradebookAction extends LamsDispatchAction {
 	}
 	resultJSON.put(GradebookConstants.ELEMENT_ROWS, rowsJSON);
 
-	resultJSON.put("learnerLessonMark", GradebookUtil.niceFormatting((Double) lessonCompleteData[1], isWeighted));
-	resultJSON.put("averageLessonMark", GradebookUtil.niceFormatting((Double) lessonCompleteData[2], isWeighted));
+	boolean isWeighted = getGradebookService().isWeightedMarks(lessonId);
+	Double learnerLessonMark = getGradebookService().getGradebookUserLesson(lessonId, userId).getMark();
+	resultJSON.put("learnerLessonMark", GradebookUtil.niceFormatting(learnerLessonMark, isWeighted));
+	Double averageLessonMark = getGradebookService().getAverageMarkForLesson(lessonId);
+	resultJSON.put("averageLessonMark", GradebookUtil.niceFormatting(averageLessonMark, isWeighted));
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(resultJSON.toString());

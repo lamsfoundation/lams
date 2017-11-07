@@ -191,7 +191,7 @@ public class GradebookService implements IGradebookService {
     }
 
     @Override
-    public Object[] getGBLessonComplete(Long lessonId, Integer userId) {
+    public List<GradebookGridRowDTO> getGBLessonComplete(Long lessonId, Integer userId) {
 	GradebookService.logger
 		.debug("Getting lesson complete gradebook user data for lesson: " + lessonId + ". For user: " + userId);
 
@@ -226,9 +226,7 @@ public class GradebookService implements IGradebookService {
 	    gradebookActivityDTOs.add(activityDTO);
 	}
 
-	return new Object[] { gradebookActivityDTOs,
-		gradebookDAO.getGradebookUserDataForLesson(lessonId, userId).getMark(),
-		getAverageMarkForLesson(lessonId), isWeightedMarks(lesson.getLearningDesign()) };
+	return gradebookActivityDTOs;
     }
 
     @Override
@@ -665,6 +663,11 @@ public class GradebookService implements IGradebookService {
     }
 
     @Override
+    public boolean isWeightedMarks(Long lessonId) {
+	return isWeightedMarks(getLessonService().getLesson(lessonId).getLearningDesign());
+    }
+
+    @Override
     public List<String[]> getWeights(LearningDesign design) {
 	List<String[]> evaluations = new ArrayList<String[]>();
 	Set<Activity> activities = design.getActivities();
@@ -984,7 +987,8 @@ public class GradebookService implements IGradebookService {
 	Double lessonAverageMarkValue = getAverageMarkForLesson(lesson.getLessonId());
 	ExcelCell[] lessonAverageMark = new ExcelCell[2];
 	lessonAverageMark[0] = new ExcelCell(getMessage("gradebook.export.average.lesson.mark"), true);
-	ExcelCell markCell = isWeighted ? GradebookUtil.createPercentageCell(lessonAverageMarkValue, true) : new ExcelCell(lessonAverageMarkValue, false);
+	ExcelCell markCell = isWeighted ? GradebookUtil.createPercentageCell(lessonAverageMarkValue, true)
+		: new ExcelCell(lessonAverageMarkValue, false);
 	lessonAverageMark[1] = markCell;
 
 	ExcelCell[] lessonMedianTimeTaken = new ExcelCell[2];
@@ -1047,7 +1051,8 @@ public class GradebookService implements IGradebookService {
 	    userDataRow[2] = new ExcelCell(userRow.getLogin(), false);
 	    userDataRow[3] = new ExcelCell(getProgressMessage(userRow), false);
 	    userDataRow[4] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
-	    userDataRow[5] = isWeighted ? GradebookUtil.createPercentageCell(userRow.getMark(), true) : new ExcelCell(userRow.getMark(), false);
+	    userDataRow[5] = isWeighted ? GradebookUtil.createPercentageCell(userRow.getMark(), true)
+		    : new ExcelCell(userRow.getMark(), false);
 	    rowList.add(userDataRow);
 	}
 	rowList.add(GradebookService.EMPTY_ROW);
@@ -1108,7 +1113,8 @@ public class GradebookService implements IGradebookService {
 		}
 		userDataRow[count++] = new ExcelCell(userActivityMark, false);
 	    }
-	    userDataRow[count] = isWeighted ? GradebookUtil.createPercentageCell(userRow.getMark(), true) : new ExcelCell(userRow.getMark(), false);
+	    userDataRow[count] = isWeighted ? GradebookUtil.createPercentageCell(userRow.getMark(), true)
+		    : new ExcelCell(userRow.getMark(), false);
 	    rowList.add(userDataRow);
 	}
 
@@ -1383,7 +1389,9 @@ public class GradebookService implements IGradebookService {
 		    userDataRow[i++] = new ExcelCell(finishDate, false);
 		    userDataRow[i++] = new ExcelCell(timeTakenSeconds, false);
 		    userDataRow[i++] = new ExcelCell(feedback, false);
-		    userDataRow[i++] = isWeightedLessonMap.get(lesson.getLessonId()) ? GradebookUtil.createPercentageCell(mark, true) : new ExcelCell(mark, false);
+		    userDataRow[i++] = isWeightedLessonMap.get(lesson.getLessonId())
+			    ? GradebookUtil.createPercentageCell(mark, true)
+			    : new ExcelCell(mark, false);
 		}
 
 		rowList.add(userDataRow);
@@ -1568,16 +1576,16 @@ public class GradebookService implements IGradebookService {
 			Long rawActivityTotalMarks = 0l;
 			if (activityToTotalMarkMap.get(activity.getActivityId()) != null) {
 			    rawActivityTotalMarks = activityToTotalMarkMap.get(activity.getActivityId());
-			} 
+			}
 			Integer weight = weighted && activity.getEvaluation() != null
 				&& activity.getEvaluation().getWeight() != null ? activity.getEvaluation().getWeight()
 					: null;
 			Long weightedActivityTotalMarks = weight != null ? weight : rawActivityTotalMarks;
-			
+
 			Double mark = 0d;
 			if (gradebookUserActivity != null) {
 			    mark = gradebookUserActivity.getMark();
-			    if ( weight != null ) {
+			    if (weight != null) {
 				mark = doWeightedMarkCalc(mark, activity, weight, rawActivityTotalMarks);
 			    }
 			    if (!simplified) {
@@ -1590,10 +1598,11 @@ public class GradebookService implements IGradebookService {
 			}
 
 			if (!simplified) {
-			    if ( weightedActivityTotalMarks > 0 )
+			    if (weightedActivityTotalMarks > 0) {
 				userRow[i++] = new ExcelCell(weightedActivityTotalMarks, false);
-			    else 
+			    } else {
 				userRow[i++] = new ExcelCell("", false);
+			    }
 			}
 
 			lessonTotal += mark;
@@ -1603,17 +1612,19 @@ public class GradebookService implements IGradebookService {
 		    }
 
 		    if (simplified) {
-			if ( weighted ) {
-			    userRow[i++] = GradebookUtil.createPercentageCell(lessonTotal, true, false, ExcelCell.BORDER_STYLE_LEFT_THIN);
+			if (weighted) {
+			    userRow[i++] = GradebookUtil.createPercentageCell(lessonTotal, true, false,
+				    ExcelCell.BORDER_STYLE_LEFT_THIN);
 			} else {
-			    userRow[i++] = new ExcelCell(lessonTotal, ExcelCell.BORDER_STYLE_LEFT_THIN );
+			    userRow[i++] = new ExcelCell(lessonTotal, ExcelCell.BORDER_STYLE_LEFT_THIN);
 			}
 		    } else {
 			userRow[i++] = new ExcelCell(lessonTotal, ExcelCell.BORDER_STYLE_LEFT_THIN);
 			userRow[i++] = new ExcelCell(lessonMaxMark, false);
 			Double percentage = (lessonMaxMark != 0) ? lessonTotal / lessonMaxMark : 0d;
-			
-			userRow[i++] = GradebookUtil.createPercentageCell(percentage, false, false, ExcelCell.BORDER_STYLE_RIGHT_THICK);
+
+			userRow[i++] = GradebookUtil.createPercentageCell(percentage, false, false,
+				ExcelCell.BORDER_STYLE_RIGHT_THICK);
 		    }
 		}
 
@@ -1621,12 +1632,14 @@ public class GradebookService implements IGradebookService {
 		if (simplified) {
 		    userRow[i++] = new ExcelCell(overallTotal, ExcelCell.BORDER_STYLE_LEFT_THICK);
 		    userRow[i++] = new ExcelCell(overallMaxMark, false);
-		    userRow[i++] = GradebookUtil.createPercentageCell(percentage, false, false, ExcelCell.BORDER_STYLE_RIGHT_THICK);
+		    userRow[i++] = GradebookUtil.createPercentageCell(percentage, false, false,
+			    ExcelCell.BORDER_STYLE_RIGHT_THICK);
 		} else {
 		    i += 2;
 		    userRow[i++] = new ExcelCell(overallTotal, ExcelCell.BORDER_STYLE_LEFT_THIN);
 		    userRow[i++] = new ExcelCell(overallMaxMark, false);
-		    userRow[i++] = GradebookUtil.createPercentageCell(percentage, false, true, ExcelCell.BORDER_STYLE_RIGHT_THICK);
+		    userRow[i++] = GradebookUtil.createPercentageCell(percentage, false, true,
+			    ExcelCell.BORDER_STYLE_RIGHT_THICK);
 		}
 
 		rowList.add(userRow);

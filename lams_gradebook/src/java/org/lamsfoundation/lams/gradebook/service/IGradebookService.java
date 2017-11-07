@@ -94,10 +94,9 @@ public interface IGradebookService {
 	    String searchString, TimeZone userTimezone);
 
     /**
-     * Returns several outputs: leaner's rows for lesson's each activity, learner's mark for lesson, learners average
-     * mark for lesson, are the marks weighted.
+     * Returns output for gradebook on lesson complete.
      */
-    Object[] getGBLessonComplete(Long lessonId, Integer userId);
+    List<GradebookGridRowDTO> getGBLessonComplete(Long lessonId, Integer userId);
 
 //    /**
 //     * Gets the user rows containing only users' names. Do proper paging on DB side.
@@ -328,6 +327,9 @@ public interface IGradebookService {
 
     /** Will the marks caculation take into account weighting? */
     boolean isWeightedMarks(LearningDesign design);
+
+    /** Will the marks caculation take into account weighting? */
+    boolean isWeightedMarks(Long lessonId);
 
     /** Get a summary of the weightings */
     List<String[]> getWeights(LearningDesign design);
