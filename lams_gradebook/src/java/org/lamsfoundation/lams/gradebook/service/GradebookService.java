@@ -198,7 +198,6 @@ public class GradebookService implements IGradebookService {
 
 	Lesson lesson = lessonService.getLesson(lessonId);
 	User learner = (User) userService.findById(User.class, userId);
-
 	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
 
 	List<ToolActivity> activities = getLessonActivitiesForLearner(lesson, userId);
@@ -230,7 +229,7 @@ public class GradebookService implements IGradebookService {
 
 	return new Object[] { gradebookActivityDTOs,
 		gradebookDAO.getGradebookUserDataForLesson(lessonId, userId).getMark(),
-		getAverageMarkForLesson(lessonId) };
+		getAverageMarkForLesson(lessonId), isWeightedMarks(lesson.getLearningDesign()) };
     }
 
     @Override

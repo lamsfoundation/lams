@@ -95,7 +95,7 @@ public interface IGradebookService {
 
     /**
      * Returns several outputs: leaner's rows for lesson's each activity, learner's mark for lesson, learners average
-     * mark for lesson.
+     * mark for lesson, are the marks weighted.
      */
     Object[] getGBLessonComplete(Long lessonId, Integer userId);
 
