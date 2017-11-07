@@ -153,6 +153,7 @@ public class GradebookAction extends LamsDispatchAction {
 	return null;
     }
 
+    @SuppressWarnings("unchecked")
     public ActionForward getLessonCompleteGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	// Getting the params passed in from the jqGrid
@@ -164,7 +165,8 @@ public class GradebookAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	List<GradebookGridRowDTO> gradebookActivityDTOs = getGradebookService().getGBLessonComplete(lessonID, userId);
+	Object[] lessonCompleteData = getGradebookService().getGBLessonComplete(lessonID, userId);
+	List<GradebookGridRowDTO> gradebookActivityDTOs = (List<GradebookGridRowDTO>) lessonCompleteData[0];
 
 	JSONObject resultJSON = new JSONObject();
 	resultJSON.put(GradebookConstants.ELEMENT_RECORDS, gradebookActivityDTOs.size());
@@ -185,7 +187,8 @@ public class GradebookAction extends LamsDispatchAction {
 	}
 	resultJSON.put(GradebookConstants.ELEMENT_ROWS, rowsJSON);
 
-	resultJSON.put("averageLessonMark", getGradebookService().getAverageMarkForLesson(lessonID));
+	resultJSON.put("learnerLessonMark", lessonCompleteData[1]);
+	resultJSON.put("averageLessonMark", lessonCompleteData[2]);
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(resultJSON.toString());

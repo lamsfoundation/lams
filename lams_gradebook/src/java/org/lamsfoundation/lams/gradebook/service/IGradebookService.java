@@ -93,7 +93,11 @@ public interface IGradebookService {
     List<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson, int page, int size, String sortBy, String sortOrder,
 	    String searchString, TimeZone userTimezone);
 
-    List<GradebookGridRowDTO> getGBLessonComplete(Long lessonId, Integer userId);
+    /**
+     * Returns several outputs: leaner's rows for lesson's each activity, learner's mark for lesson, learners average
+     * mark for lesson.
+     */
+    Object[] getGBLessonComplete(Long lessonId, Integer userId);
 
 //    /**
 //     * Gets the user rows containing only users' names. Do proper paging on DB side.

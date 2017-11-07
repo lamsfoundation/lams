@@ -192,7 +192,7 @@ public class GradebookService implements IGradebookService {
     }
 
     @Override
-    public List<GradebookGridRowDTO> getGBLessonComplete(Long lessonId, Integer userId) {
+    public Object[] getGBLessonComplete(Long lessonId, Integer userId) {
 	GradebookService.logger
 		.debug("Getting lesson complete gradebook user data for lesson: " + lessonId + ". For user: " + userId);
 
@@ -228,7 +228,9 @@ public class GradebookService implements IGradebookService {
 	    gradebookActivityDTOs.add(activityDTO);
 	}
 
-	return gradebookActivityDTOs;
+	return new Object[] { gradebookActivityDTOs,
+		gradebookDAO.getGradebookUserDataForLesson(lessonId, userId).getMark(),
+		getAverageMarkForLesson(lessonId) };
     }
 
     @Override
