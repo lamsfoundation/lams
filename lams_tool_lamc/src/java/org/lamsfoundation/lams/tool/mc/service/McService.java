@@ -906,8 +906,11 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		}
 
-		// propagade new total mark to Gradebook if it was changed
+		// if the mark is changed, update user's lastAttemptTotalMark and also propagade it to the Gradebook
 		if (newTotalMark != oldTotalMark) {
+		    user.setLastAttemptTotalMark(newTotalMark);
+		    updateMcQueUsr(user);
+		    
 		    gradebookService.updateActivityMark(new Double(newTotalMark), null, user.getQueUsrId().intValue(),
 			    toolSessionId, false);
 		}
