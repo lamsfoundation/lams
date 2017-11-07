@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	    margin-right: auto;
 	}
 	
-	h4 {
+	h3, h4 {
 		text-align: center;
 	}
 </style> 
@@ -122,6 +122,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					}
 			    ],
 			    loadComplete : function(data) {
+			    	$('#learnerLessonMark').text(data.learnerLessonMark);
 				    $('#averageLessonMark').text(data.averageLessonMark);
 				},
 			    loadError : function(xhr,st,err) {
@@ -188,6 +189,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<div class="lead voffset20"><i class="fa fa-lg fa-list-ol text-success"></i>
 		&nbsp;<fmt:message key="gradebook.lesson.complete" /></div>
 		
+		<h3><fmt:message key="gradebook.learner.lesson.mark" />: <span id="learnerLessonMark"></span></h3>
 		<h4><fmt:message key="gradebook.columntitle.averageMark" />: <span id="averageLessonMark"></span></h4>
 		
 		<div class="grid-holder voffset20">

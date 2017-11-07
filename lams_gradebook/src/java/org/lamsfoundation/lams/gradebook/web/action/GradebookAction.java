@@ -153,6 +153,7 @@ public class GradebookAction extends LamsDispatchAction {
 	return null;
     }
 
+    @SuppressWarnings("unchecked")
     public ActionForward getLessonCompleteGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	// Getting the params passed in from the jqGrid
@@ -164,11 +165,13 @@ public class GradebookAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	List<GradebookGridRowDTO> gradebookActivityDTOs = getGradebookService().getGBLessonComplete(lessonID, userId);
+	Object[] lessonCompleteData = getGradebookService().getGBLessonComplete(lessonID, userId);
+	List<GradebookGridRowDTO> gradebookActivityDTOs = (List<GradebookGridRowDTO>) lessonCompleteData[0];
 
 	JSONObject resultJSON = new JSONObject();
 	resultJSON.put(GradebookConstants.ELEMENT_RECORDS, gradebookActivityDTOs.size());
 
+	boolean isWeighted = (Boolean) lessonCompleteData[3];
 	JSONArray rowsJSON = new JSONArray();
 	for (GradebookGridRowDTO gradebookActivityDTO : gradebookActivityDTOs) {
 	    JSONObject rowJSON = new JSONObject();
@@ -177,15 +180,16 @@ public class GradebookAction extends LamsDispatchAction {
 	    JSONArray cellJSON = new JSONArray();
 	    cellJSON.put(gradebookActivityDTO.getRowName());
 	    cellJSON.put(gradebookActivityDTO.getStatus());
-	    cellJSON.put(gradebookActivityDTO.getAverageMark());
-	    cellJSON.put(gradebookActivityDTO.getMark());
+	    cellJSON.put(GradebookUtil.niceFormatting(gradebookActivityDTO.getAverageMark(), isWeighted));
+	    cellJSON.put(GradebookUtil.niceFormatting(gradebookActivityDTO.getMark(), isWeighted));
 
 	    rowJSON.put(GradebookConstants.ELEMENT_CELL, cellJSON);
 	    rowsJSON.put(rowJSON);
 	}
 	resultJSON.put(GradebookConstants.ELEMENT_ROWS, rowsJSON);
 
-	resultJSON.put("averageLessonMark", getGradebookService().getAverageMarkForLesson(lessonID));
+	resultJSON.put("learnerLessonMark", GradebookUtil.niceFormatting((Double) lessonCompleteData[1], isWeighted));
+	resultJSON.put("averageLessonMark", GradebookUtil.niceFormatting((Double) lessonCompleteData[2], isWeighted));
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(resultJSON.toString());
