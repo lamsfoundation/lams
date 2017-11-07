@@ -12,32 +12,41 @@
 	<script>
         function init() {
             var tag = document.getElementById("currentTab");
-	    	if(tag.value != "")
-	    		selectTab(tag.value);
-            else
-                selectTab(1); //select the default tab;
+		    	if (tag.value != ""){
+		    		selectTab(tag.value);
+		    	} else {
+	        		selectTab(1); //select the default tab;
+		    	}
         }     
         
         function doSelectTab(tabId) {
-        	// start optional tab controller stuff
-        	var tag = document.getElementById("currentTab");
-	    	tag.value = tabId;
-	    	// end optional tab controller stuff
-	    	selectTab(tabId);
+	        	// start optional tab controller stuff
+	        	var tag = document.getElementById("currentTab");
+		    	tag.value = tabId;
+		    	// end optional tab controller stuff
+		    	selectTab(tabId);
         }
-        
-        function serializeOverallFeedbackForm() {
-        	$("#overallFeedbackList").val($('#advancedInputArea').contents().find('#overallFeedbackForm').serialize(true));
-        	
-        	//enable checkbox to allow its value been submitted
-        	$("#display-summary").removeAttr("disabled", "disabled");
-        	return true;
+
+        function validateQuestionBankIsNotEmpty() {
+            //check with a teacher whether he forgot to add questions to the question bank
+            var referenceCount = $("#referencesTable tr").length - 1;
+			if ((referenceCount == 0) && !confirm("<fmt:message key="label.no.questions.in.question.bank"/>")) {
+				return false;
+			}
+
+			//serialize overallFeedbackForm
+	        	$("#overallFeedbackList").val($('#advancedInputArea').contents().find('#overallFeedbackForm').serialize(true));
+	        	
+	        	//enable checkbox to allow its value been submitted
+	        	$("#display-summary").removeAttr("disabled", "disabled");
+
+        		return true;
         }
     </script>
 </lams:head>
 <body class="stripes" onLoad="init()">
 	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data"
-			onsubmit="return serializeOverallFeedbackForm();">
+			onsubmit="return validateQuestionBankIsNotEmpty();">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 	
 		<c:set var="title"><fmt:message key="label.author.title" /></c:set>
