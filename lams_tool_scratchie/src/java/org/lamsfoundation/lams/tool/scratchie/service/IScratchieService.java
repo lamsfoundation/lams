@@ -391,6 +391,15 @@ public interface IScratchieService {
 
     void saveOrUpdateScratchieConfigItem(ScratchieConfigItem item);
     
+    /**
+     * Return preset marks that is going to be used for calculating learners' marks. Return scratchie.presetMarks if
+     * it's not null, otherwise returns default setting stored as admin config setting.
+     * 
+     * @param scratchie
+     * @return
+     */
+    String[] getPresetMarks(Scratchie scratchie);
+    
     /** Get the raw marks for display in a graph in monitoring */
     List<Number> getMarksArray(Long contentId);
 

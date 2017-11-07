@@ -67,10 +67,8 @@ public class ScratchieOutputFactory extends OutputFactory {
 	    int itemsNumber = scratchie.getScratchieItems().size();
 
 	    // calculate totalMarksPossible
-	    String presetMarks = scratchieService.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS).getConfigValue();
-	    String[] presetMarksArray = presetMarks.split(",");
-	    long totalMarksPossible = (presetMarksArray.length > 0)
-		    ? itemsNumber * Integer.parseInt(presetMarksArray[0]) : 0;
+	    String[] presetMarks = scratchieService.getPresetMarks(scratchie);
+	    long totalMarksPossible = (presetMarks.length > 0) ? itemsNumber * Integer.parseInt(presetMarks[0]) : 0;
 
 	    // count in extra point if this option is ON
 

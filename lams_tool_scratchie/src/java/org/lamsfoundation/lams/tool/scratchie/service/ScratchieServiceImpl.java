@@ -227,6 +227,22 @@ public class ScratchieServiceImpl
     public void saveOrUpdateScratchieConfigItem(ScratchieConfigItem item) {
 	scratchieConfigItemDao.saveOrUpdate(item);
     }
+    
+    @Override
+    public String[] getPresetMarks(Scratchie scratchie) {
+	String presetMarks = "";
+	if (StringUtils.isNotEmpty(scratchie.getPresetMarks())) {
+	    presetMarks = scratchie.getPresetMarks();
+	} else {
+	    ScratchieConfigItem defaultPresetMarks = getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS);
+	    if (defaultPresetMarks != null) {
+		presetMarks = defaultPresetMarks.getConfigValue();
+	    }
+	}
+	
+	return presetMarks.split(",");
+    }
+    
 
     @Override
     public void deleteScratchieItem(Long uid) {
@@ -411,7 +427,7 @@ public class ScratchieServiceImpl
 	ScratchieSession session = this.getScratchieSessionBySessionId(sessionId);
 	Scratchie scratchie = session.getScratchie();
 	Set<ScratchieItem> items = scratchie.getScratchieItems();
-	String presetMarks = getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS).getConfigValue();
+	String[] presetMarks = getPresetMarks(scratchie);
 
 	// calculate mark
 	int mark = 0;
@@ -746,17 +762,15 @@ public class ScratchieServiceImpl
      * @return
      */
     private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs,
-	    String presetMarks) {
-
-	String[] marksArray = presetMarks.split(",");
+	    String[] presetMarks) {
 
 	int mark = 0;
 	// add mark only if an item was unraveled
 	if (isItemUnraveled(item, userLogs)) {
 
 	    int itemAttempts = calculateItemAttempts(userLogs, item);
-	    String markStr = (itemAttempts <= marksArray.length) ? marksArray[itemAttempts - 1]
-		    : marksArray[marksArray.length - 1];
+	    String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
+		    : presetMarks[presetMarks.length - 1];
 	    mark = Integer.parseInt(markStr);
 
 	    // add extra point if needed
@@ -1643,7 +1657,7 @@ public class ScratchieServiceImpl
     private List<GroupSummary> getSummaryByTeam(Scratchie scratchie, Collection<ScratchieItem> sortedItems) {
 	List<GroupSummary> groupSummaries = new ArrayList<>();
 
-	String presetMarks = getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS).getConfigValue();
+	String[] presetMarks = getPresetMarks(scratchie);
 
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
 	for (ScratchieSession session : sessionList) {
