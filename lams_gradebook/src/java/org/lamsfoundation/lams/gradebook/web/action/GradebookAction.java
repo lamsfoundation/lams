@@ -180,8 +180,8 @@ public class GradebookAction extends LamsDispatchAction {
 	    JSONArray cellJSON = new JSONArray();
 	    cellJSON.put(gradebookActivityDTO.getRowName());
 	    cellJSON.put(gradebookActivityDTO.getStatus());
-	    cellJSON.put(GradebookUtil.niceFormatting(gradebookActivityDTO.getAverageMark(), isWeighted));
-	    cellJSON.put(GradebookUtil.niceFormatting(gradebookActivityDTO.getMark(), isWeighted));
+	    cellJSON.put(GradebookUtil.niceFormatting(gradebookActivityDTO.getAverageMark()));
+	    cellJSON.put(GradebookUtil.niceFormatting(gradebookActivityDTO.getMark()));
 
 	    rowJSON.put(GradebookConstants.ELEMENT_CELL, cellJSON);
 	    rowsJSON.put(rowJSON);
