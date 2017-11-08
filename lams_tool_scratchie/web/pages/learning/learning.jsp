@@ -182,7 +182,7 @@
 		//autosave feature
 		<c:if test="${isUserLeader && (mode != 'teacher')}">
 			
-			var autosaveInterval = "30000"; // 30 seconds interval
+			var autosaveInterval = "60000"; // 60 seconds interval
 			window.setInterval(
 				function(){
 					if (isWaitingForConfirmation) return;

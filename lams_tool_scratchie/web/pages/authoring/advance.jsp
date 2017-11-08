@@ -49,31 +49,29 @@
 		<c:if test="${confidenceLevelsActivities == null}">
 			<div class="alert-warning" style="margin-bottom: 5px;">
 				<fmt:message key="label.save.learning.design" />
-			</div>		
+			</div>
 		</c:if>
-	
-		<label for="display-confidence-levels-activities">
-			<input type="checkbox" id="display-confidence-levels-activities"
-					<c:if test="${formBean.scratchie.confidenceLevelsActivityUiid != null}">checked="true"</c:if>
-					<c:if test="${fn:length(confidenceLevelsActivities) == 0}">disabled="disabled"</c:if>
-			/>
-			
-			<c:choose>
-				<c:when test="${fn:length(confidenceLevelsActivities) == 0}">
-					<fmt:message key="label.no.confidence.levels.activities" />
-				</c:when>
+		
+		<c:choose>
+			<c:when test="${fn:length(confidenceLevelsActivities) == 0}">
+				<fmt:message key="label.no.confidence.levels.activities" />
+			</c:when>
 				
-				<c:otherwise>
+			<c:otherwise>
+				<label for="display-confidence-levels-activities">
+					<input type="checkbox" id="display-confidence-levels-activities"
+							<c:if test="${formBean.scratchie.confidenceLevelsActivityUiid != null}">checked="true"</c:if>
+					/>
+				
 					<fmt:message key="label.show.confidence.level" />&nbsp;
 					<html:select property="scratchie.confidenceLevelsActivityUiid" styleClass="form-control input-sm" styleId="confidence-levels-activity">
 						<c:forEach var="confidenceProvidingActivity" items="${confidenceLevelsActivities}">
 							<html:option value="${confidenceProvidingActivity.activityUIID}">${confidenceProvidingActivity.title}</html:option>
 						</c:forEach>
 					</html:select>
-				</c:otherwise>
-			</c:choose>
-
-		</label>
+				</label>
+			</c:otherwise>
+		</c:choose>
 	</div>
 </lams:SimplePanel>
 

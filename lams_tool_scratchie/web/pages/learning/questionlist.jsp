@@ -175,7 +175,7 @@
 	</table>
 	
 	<%-- show burning questions --%>
-	<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled}">
+	<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">
 		<div class="form-group burning-question-container">
 			<a data-toggle="collapse" data-target="#burning-question-item${item.uid}">
 				<i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i>
@@ -183,7 +183,9 @@
 			</a>
 			
 			<div id="burning-question-item${item.uid}" class="collapse <c:if test="${not empty item.burningQuestion}">in</c:if>">
-				<textarea rows="5" name="burningQuestion${item.uid}" class="form-control">${item.burningQuestion}</textarea>
+				<textarea rows="5" name="burningQuestion${item.uid}" class="form-control"
+					<c:if test="${mode == 'teacher'}">disabled="disabled"</c:if>
+				>${item.burningQuestion}</textarea>
 			</div>
 		</div>
 	</c:if>
@@ -191,7 +193,7 @@
 </c:forEach>
 
 <%-- show general burning question --%>
-<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled}">
+<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">
 	<div class="form-group burning-question-container">
 		<a data-toggle="collapse" data-target="#burning-question-general">
 			<i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i>
@@ -199,7 +201,9 @@
 		</a>
 
 		<div id="burning-question-general" class="collapse <c:if test="${not empty sessionMap.generalBurningQuestion}">in</c:if>">
-			<textarea rows="5" name="generalBurningQuestion" class="form-control">${sessionMap.generalBurningQuestion}</textarea>
+			<textarea rows="5" name="generalBurningQuestion" class="form-control"
+				<c:if test="${mode == 'teacher'}">disabled="disabled"</c:if>
+			>${sessionMap.generalBurningQuestion}</textarea>
 		</div>
 	</div>
 </c:if>
