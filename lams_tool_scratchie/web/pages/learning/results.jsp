@@ -204,9 +204,6 @@
 		function continueReflect() {
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
-		function editBurningQuestions() {
-			document.location.href='<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}';
-		}
 		function refresh() {
 			location.reload();
 			return false;
@@ -257,12 +254,6 @@
 						<table id="burningQuestions${burningQuestionItemDto.scratchieItem.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
 					</div>
 				</c:forEach>
-
-				<c:if test="${(mode != 'teacher') && isUserLeader}">
-					<html:button property="finishButton" onclick="return editBurningQuestions()" styleClass="btn btn-sm btn-default">
-						<fmt:message key="label.edit" />
-					</html:button>
-				</c:if>
 			</div>
 		</c:if>
 
