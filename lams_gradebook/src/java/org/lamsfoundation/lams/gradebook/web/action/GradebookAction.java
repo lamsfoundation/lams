@@ -177,8 +177,10 @@ public class GradebookAction extends LamsDispatchAction {
 	    JSONArray cellJSON = new JSONArray();
 	    cellJSON.put(gradebookActivityDTO.getRowName());
 	    cellJSON.put(gradebookActivityDTO.getStatus());
-	    cellJSON.put(GradebookUtil.niceFormatting(gradebookActivityDTO.getAverageMark()));
-	    cellJSON.put(GradebookUtil.niceFormatting(gradebookActivityDTO.getMark()));
+	    cellJSON.put(gradebookActivityDTO.getAverageMark() == null ? GradebookConstants.CELL_EMPTY
+		    : GradebookUtil.niceFormatting(gradebookActivityDTO.getAverageMark()));
+	    cellJSON.put(gradebookActivityDTO.getMark() == null ? GradebookConstants.CELL_EMPTY
+		    : GradebookUtil.niceFormatting(gradebookActivityDTO.getMark()));
 
 	    rowJSON.put(GradebookConstants.ELEMENT_CELL, cellJSON);
 	    rowsJSON.put(rowJSON);
@@ -187,9 +189,11 @@ public class GradebookAction extends LamsDispatchAction {
 
 	boolean isWeighted = getGradebookService().isWeightedMarks(lessonId);
 	Double learnerLessonMark = getGradebookService().getGradebookUserLesson(lessonId, userId).getMark();
-	resultJSON.put("learnerLessonMark", GradebookUtil.niceFormatting(learnerLessonMark, isWeighted));
+	resultJSON.put("learnerLessonMark", learnerLessonMark == null ? GradebookConstants.CELL_EMPTY
+		: GradebookUtil.niceFormatting(learnerLessonMark, isWeighted));
 	Double averageLessonMark = getGradebookService().getAverageMarkForLesson(lessonId);
-	resultJSON.put("averageLessonMark", GradebookUtil.niceFormatting(averageLessonMark, isWeighted));
+	resultJSON.put("averageLessonMark", averageLessonMark == null ? GradebookConstants.CELL_EMPTY
+		: GradebookUtil.niceFormatting(averageLessonMark, isWeighted));
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(resultJSON.toString());
