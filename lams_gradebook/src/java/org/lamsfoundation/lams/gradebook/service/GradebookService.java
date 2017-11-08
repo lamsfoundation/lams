@@ -519,6 +519,7 @@ public class GradebookService implements IGradebookService {
 	if (lesson == null) {
 	    return;
 	}
+	boolean weighted = isWeightedMarks(lesson.getLearningDesign());
 
 	Map<Integer, GradebookUserLesson> userToGradebookUserLessonMap = getUserToGradebookUserLessonMap(lesson, null);
 
@@ -530,7 +531,7 @@ public class GradebookService implements IGradebookService {
 
 	    List<GradebookUserActivity> userActivities = gradebookDAO.getGradebookUserActivitiesForLesson(lessonId,
 		    userId);
-	    Double totalMark = calculateLessonMark(isWeightedMarks(lesson.getLearningDesign()), userActivities, null);
+	    Double totalMark = calculateLessonMark(weighted, userActivities, null);
 
 	    if (totalMark != null) {
 
@@ -1936,9 +1937,12 @@ public class GradebookService implements IGradebookService {
 	Double rawMark = inputRawMark != null ? inputRawMark : 0.0;
 	if (useWeightings) {
 	    ToolActivity activity = guact.getActivity();
-	    Long maxMark = toolService.getActivityMaxPossibleMark(activity);
-	    Integer weight = activity.getEvaluation().getWeight() != null ? activity.getEvaluation().getWeight() : 0;
-	    return doWeightedMarkCalc(rawMark, activity, weight, maxMark);
+	    if (activity.getEvaluation() == null || activity.getEvaluation().getWeight() == null) {
+		return 0.0;
+	    } else {
+		return doWeightedMarkCalc(rawMark, activity, activity.getEvaluation().getWeight(),
+			toolService.getActivityMaxPossibleMark(activity));
+	    }
 	}
 	return rawMark;
     }
