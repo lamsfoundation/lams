@@ -10,12 +10,13 @@
 		<c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 		
 		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
-		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
-		<link href="<html:rewrite page='/includes/css/monitoring.css'/>" rel="stylesheet" type="text/css">	
+		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet">
+		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
+		<link type="text/css" href="<html:rewrite page='/includes/css/monitoring.css'/>" rel="stylesheet">	
 		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
-	 	<script type="text/javascript" src="${lams}includes/javascript/jqGrid.confidenceLevelFormattter.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
   	    <script>
   	    	var isEdited = false;

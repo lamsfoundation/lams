@@ -3,8 +3,9 @@
 
 <link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
-<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
-<style media="screen,projection" type="text/css">
+<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
+<style type="text/css">
 	.ui-jqgrid {
 		border-left-style: none !important;
 		border-right-style: none !important;
@@ -34,7 +35,7 @@
 	};	
 </script>
 <script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
-<script type="text/javascript" src="${lams}/includes/javascript/jqGrid.confidenceLevelFormattter.js" ></script>
+<script type="text/javascript" src="${lams}/includes/javascript/jquery.jqGrid.confidence-level-formattter.js" ></script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
 	$(document).ready(function(){
