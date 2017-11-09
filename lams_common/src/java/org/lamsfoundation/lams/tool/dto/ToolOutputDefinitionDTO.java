@@ -39,10 +39,10 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
  *         information about the ToolOutput for a ToolActivity
  */
 public class ToolOutputDefinitionDTO {
-
     private String name;
     private String description;
     private String type;
+    private Boolean weightable;
     private String startValue;
     private String endValue;
     private String complexDefinition;
@@ -50,32 +50,19 @@ public class ToolOutputDefinitionDTO {
     private Boolean isDefaultGradebookMark;
     private ArrayList conditions;
 
-    public ToolOutputDefinitionDTO(String name, String description, String type, String startValue, String endValue,
-	    String complexDefinition, Boolean showConditionNameOnly) {
-	super();
-	this.name = name;
-	this.description = description;
-	this.type = type;
-
-	this.startValue = startValue;
-	this.endValue = endValue;
-
-	this.complexDefinition = complexDefinition;
-
-	this.showConditionNameOnly = showConditionNameOnly;
-    }
-
     public ToolOutputDefinitionDTO(ToolOutputDefinition definition) {
 	super();
 	this.name = definition.getName();
 	this.description = definition.getDescription();
 	this.type = (definition.getType() != null) ? definition.getType().toString() : null;
+	this.weightable = definition.getWeightable();
 
 	this.startValue = (definition.getStartValue() != null) ? definition.getStartValue().toString() : null;
 	this.endValue = (definition.getEndValue() != null) ? definition.getEndValue().toString() : null;
 
 	this.complexDefinition = (definition.getComplexDefinition() != null)
-		? definition.getComplexDefinition().toString() : null;
+		? definition.getComplexDefinition().toString()
+		: null;
 
 	this.showConditionNameOnly = definition.isShowConditionNameOnly();
 	if (definition.getConditions() != null && definition.getConditions().size() > 0) {
@@ -91,7 +78,7 @@ public class ToolOutputDefinitionDTO {
 
     /**
      * Returns the name.
-     * 
+     *
      * @return
      */
     public String getName() {
@@ -100,7 +87,7 @@ public class ToolOutputDefinitionDTO {
 
     /**
      * Returns the description.
-     * 
+     *
      * @return
      */
     public String getDescription() {
@@ -109,16 +96,24 @@ public class ToolOutputDefinitionDTO {
 
     /**
      * Returns the output type.
-     * 
+     *
      * @return
      */
     public String getType() {
 	return type;
     }
 
+    public Boolean getWeightable() {
+	return weightable;
+    }
+
+    public void setWeightable(Boolean weightable) {
+	this.weightable = weightable;
+    }
+
     /**
      * Returns the start value.
-     * 
+     *
      * @return
      */
     public String getStartValue() {
@@ -127,7 +122,7 @@ public class ToolOutputDefinitionDTO {
 
     /**
      * Returns the end value.
-     * 
+     *
      * @return
      */
     public String getEndValue() {
@@ -136,7 +131,7 @@ public class ToolOutputDefinitionDTO {
 
     /**
      * Returns the complex definition.
-     * 
+     *
      * @return
      */
     public String getComplexDefinition() {

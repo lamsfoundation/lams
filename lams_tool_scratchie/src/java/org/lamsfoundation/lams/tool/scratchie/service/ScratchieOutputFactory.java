@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scratchie.service;
 
 import java.util.List;
@@ -33,7 +32,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 
 public class ScratchieOutputFactory extends OutputFactory {
@@ -69,6 +67,7 @@ public class ScratchieOutputFactory extends OutputFactory {
 
 	    ToolOutputDefinition definition = buildRangeDefinition(ScratchieConstants.LEARNER_MARK, new Long(0),
 		    maxPossibleScore, true);
+	    definition.setWeightable(true);
 	    definitionMap.put(ScratchieConstants.LEARNER_MARK, definition);
 
 	}

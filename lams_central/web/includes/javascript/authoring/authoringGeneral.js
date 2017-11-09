@@ -1008,53 +1008,57 @@ GeneralInitLib = {
 			'title'			: LABELS.WEIGHTS_TITLE,
 			'data' 			: {
 				'prepareForOpen' : function(){
-					var tbody = $('tbody', weightsDialogContents).empty();
-					if (layout.activities.length == 0) {
-						tbody.append($('<tr />').append($('<td colspan="3" />').text('No activities with selected gradebook output')));
-						$('#sumWeightCell', layout.weightsDialog).empty();
-						return;
-					}
-					$.each(layout.activities, function(){
-						if (this.gradebookToolOutputDefinitionName) {
-							var activity = this,
-								row = $('<tr />').appendTo(tbody).data('activity', activity).hover(
-									function(){
-										var row = $(this);
-										row.siblings().each(function(){
+					var tbody = $('tbody', weightsDialogContents).empty(),
+						weightsEnabled = false;
+					if (layout.activities.length > 0) {
+						$.each(layout.activities, function(){
+							if (this.gradebookToolOutputDefinitionName && this.gradebookToolOutputDefinitionWeightable) {
+								weightsEnabled = true;
+								var activity = this,
+									row = $('<tr />').appendTo(tbody).data('activity', activity).hover(
+										function(){
+											var row = $(this);
+											row.siblings().each(function(){
+												$(this).removeClass('selected');
+											});
+											row.addClass('selected');
+											ActivityLib.removeSelectEffect();
+											ActivityLib.addSelectEffect(row.data('activity'), false);
+										},
+										function(){
 											$(this).removeClass('selected');
-										});
-										row.addClass('selected');
-										ActivityLib.removeSelectEffect();
-										ActivityLib.addSelectEffect(row.data('activity'), false);
+											ActivityLib.removeSelectEffect($(this).data('activity'));
+										}),
+									weight = $('<input maxlength="3" />');
+								$('<td />').text(activity.title).appendTo(row);
+								$('<td />').text(activity.gradebookToolOutputDefinitionDescription).appendTo(row);
+								$('<td />').append(weight).appendTo(row);
+								weight.spinner({
+									'min'    : 0,
+									'max'    : 100,
+									'change' : function(){
+										var value = $(this).val();
+										if (value == "" || isNaN(value)) {
+											value = null;
+										}
+										activity.gradebookToolOutputWeight = value;
+										layout.weightsDialog.data('sumWeights')();
 									},
-									function(){
-										$(this).removeClass('selected');
-										ActivityLib.removeSelectEffect($(this).data('activity'));
-									}),
-								weight = $('<input maxlength="3" />');
-							$('<td />').text(activity.title).appendTo(row);
-							$('<td />').text(activity.gradebookToolOutputDefinitionDescription).appendTo(row);
-							$('<td />').append(weight).appendTo(row);
-							weight.spinner({
-								'min'    : 0,
-								'max'    : 100,
-								'change' : function(){
-									var value = $(this).val();
-									if (value == "" || isNaN(value)) {
-										value = null;
+									'spin'  : function(event, ui) {
+										activity.gradebookToolOutputWeight = ui.value;
+										layout.weightsDialog.data('sumWeights')();
 									}
-									activity.gradebookToolOutputWeight = value;
-									layout.weightsDialog.data('sumWeights')();
-								},
-								'spin'  : function(event, ui) {
-									activity.gradebookToolOutputWeight = ui.value;
-									layout.weightsDialog.data('sumWeights')();
-								}
-							}).val(activity.gradebookToolOutputWeight);
-						}
-					});
+								}).val(activity.gradebookToolOutputWeight);
+							}
+						});
+					}
 					
-					layout.weightsDialog.data('sumWeights')(true);
+					if (weightsEnabled) {
+						layout.weightsDialog.data('sumWeights')(true);
+					} else {
+						tbody.append($('<tr />').append($('<td colspan="3" />').text(LABELS.WEIGHTS_NONE_FOUND_ERROR)));
+						$('#sumWeightCell', layout.weightsDialog).empty();
+					}
 				},
 				
 				'sumWeights' : function(firstRun){

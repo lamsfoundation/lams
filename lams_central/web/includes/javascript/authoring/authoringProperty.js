@@ -715,6 +715,7 @@ var PropertyDefs = {
 						$.each(activity.outputDefinitions, function(){
 							if (this.name == activity.gradebookToolOutputDefinitionName) {
 								activity.gradebookToolOutputDefinitionDescription = this.description;
+								activity.gradebookToolOutputDefinitionWeightable = this.weightable;
 								return false;
 							}
 						});

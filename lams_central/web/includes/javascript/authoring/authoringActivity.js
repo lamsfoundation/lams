@@ -1322,12 +1322,14 @@ ActivityLib = {
 					if (activity.gradebookToolOutputDefinitionName) {
 						if (this.name == activity.gradebookToolOutputDefinitionName) {
 							activity.gradebookToolOutputDefinitionDescription = this.description;
+							activity.gradebookToolOutputDefinitionWeightable = this.weightable;
 							return false;
 						}
 					} else {
 						if (this.isDefaultGradebookMark){
 							activity.gradebookToolOutputDefinitionName = this.name;
 							activity.gradebookToolOutputDefinitionDescription = this.description;
+							activity.gradebookToolOutputDefinitionWeightable = this.weightable;
 							return false;
 						}
 					}
