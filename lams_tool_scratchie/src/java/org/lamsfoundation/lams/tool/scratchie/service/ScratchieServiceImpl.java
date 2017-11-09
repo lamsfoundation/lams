@@ -895,7 +895,7 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId) {
+    public List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId, boolean includeEmptyItems) {
 
 	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
@@ -918,11 +918,14 @@ public class ScratchieServiceImpl
 		    burningQuestionDtosOfSpecifiedItem.add(burningQuestionDto);
 		}
 	    }
-
-	    BurningQuestionItemDTO burningQuestionItemDto = new BurningQuestionItemDTO();
-	    burningQuestionItemDto.setScratchieItem(item);
-	    burningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
-	    burningQuestionItemDtos.add(burningQuestionItemDto);
+	    
+	    //skip empty items if required
+	    if (!burningQuestionDtosOfSpecifiedItem.isEmpty() || includeEmptyItems) {
+		BurningQuestionItemDTO burningQuestionItemDto = new BurningQuestionItemDTO();
+		burningQuestionItemDto.setScratchieItem(item);
+		burningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
+		burningQuestionItemDtos.add(burningQuestionItemDto);
+	    }
 	}
 
 	// handle general burning question
@@ -941,7 +944,10 @@ public class ScratchieServiceImpl
 	    }
 	}
 	generalBurningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
-	burningQuestionItemDtos.add(generalBurningQuestionItemDto);
+	//don't display general burning question if it's empty and such rule is enforced
+	if (!burningQuestionDtosOfSpecifiedItem.isEmpty() || includeEmptyItems) {
+	    burningQuestionItemDtos.add(generalBurningQuestionItemDto);
+	}
 
 	//escape for Javascript
 	for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
@@ -1605,7 +1611,7 @@ public class ScratchieServiceImpl
 	    row[2] = new ExcelCell(getMessage("label.count"), IndexedColors.BLUE);
 	    rowList.add(row);
 
-	    List<BurningQuestionItemDTO> burningQuestionItemDtos = getBurningQuestionDtos(scratchie, null);
+	    List<BurningQuestionItemDTO> burningQuestionItemDtos = getBurningQuestionDtos(scratchie, null, true);
 	    for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
 		ScratchieItem item = burningQuestionItemDto.getScratchieItem();
 		row = new ExcelCell[1];

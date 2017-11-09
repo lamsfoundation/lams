@@ -279,9 +279,10 @@ public interface IScratchieService {
      * @param sessionId
      *            optional parameter, if it's specified, BurningQuestionDTOs will also contain information what leader
      *            of this group has liked
+     * @param includeEmptyItems whether it should include questions that don't have any burning questions
      * @return
      */
-    List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId);
+    List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId, boolean includeEmptyItems);
 
     boolean addLike(Long burningQuestionUid, Long sessionId);
 
