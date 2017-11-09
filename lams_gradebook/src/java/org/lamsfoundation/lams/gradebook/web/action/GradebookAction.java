@@ -188,9 +188,10 @@ public class GradebookAction extends LamsDispatchAction {
 	resultJSON.put(GradebookConstants.ELEMENT_ROWS, rowsJSON);
 
 	boolean isWeighted = getGradebookService().isWeightedMarks(lessonId);
-	Double learnerLessonMark = getGradebookService().getGradebookUserLesson(lessonId, userId).getMark();
-	resultJSON.put("learnerLessonMark", learnerLessonMark == null ? GradebookConstants.CELL_EMPTY
-		: GradebookUtil.niceFormatting(learnerLessonMark, isWeighted));
+	GradebookUserLesson gradebookUserLesson = getGradebookService().getGradebookUserLesson(lessonId, userId);
+	resultJSON.put("learnerLessonMark",
+		gradebookUserLesson == null || gradebookUserLesson.getMark() == null ? GradebookConstants.CELL_EMPTY
+			: GradebookUtil.niceFormatting(gradebookUserLesson.getMark(), isWeighted));
 	Double averageLessonMark = getGradebookService().getAverageMarkForLesson(lessonId);
 	resultJSON.put("averageLessonMark", averageLessonMark == null ? GradebookConstants.CELL_EMPTY
 		: GradebookUtil.niceFormatting(averageLessonMark, isWeighted));
