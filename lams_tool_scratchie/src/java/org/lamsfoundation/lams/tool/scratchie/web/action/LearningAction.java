@@ -169,6 +169,7 @@ public class LearningAction extends Action {
 	    request.setAttribute(ScratchieConstants.ATTR_GROUP_USERS, groupUserDtos);
 	    request.setAttribute(ScratchieConstants.PARAM_TOOL_SESSION_ID, toolSessionId);
 	    request.setAttribute(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
+	    request.setAttribute(AttributeNames.ATTR_MODE, mode);
 	    return mapping.findForward("waitforleader");
 	}
 
