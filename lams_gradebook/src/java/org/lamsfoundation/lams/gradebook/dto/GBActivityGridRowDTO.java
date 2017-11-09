@@ -26,12 +26,12 @@ package org.lamsfoundation.lams.gradebook.dto;
 import java.util.ArrayList;
 import java.util.Set;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.springframework.web.util.HtmlUtils;
 
 public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 
@@ -64,11 +64,11 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 
 	    this.groupId = groupId;
 	    // If grouped acitivty, append group name
-	    this.rowName = StringEscapeUtils.escapeHtml(activity.getTitle()) + " (" + groupName + ")";
+	    this.rowName = HtmlUtils.htmlEscape(activity.getTitle()) + " (" + groupName + ")";
 	} else {
 	    this.id = activity.getActivityId().toString();
 
-	    this.rowName = StringEscapeUtils.escapeHtml(activity.getTitle());
+	    this.rowName = HtmlUtils.htmlEscape(activity.getTitle());
 	}
 
 	String competenceMappingsStr = "";

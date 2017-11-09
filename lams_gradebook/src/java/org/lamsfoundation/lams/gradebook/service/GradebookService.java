@@ -1215,8 +1215,8 @@ public class GradebookService implements IGradebookService {
 			}
 		    }
 		    String activityRowName = (groupName != null && groupId != null)
-			    ? StringEscapeUtils.escapeHtml(activity.getTitle()) + " (" + groupName + ")"
-			    : StringEscapeUtils.escapeHtml(activity.getTitle());
+			    ? activity.getTitle() + " (" + groupName + ")"
+			    : activity.getTitle();
 
 		    String startDate = (userDto.getStartDate() == null) ? ""
 			    : FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(userDto.getStartDate());
