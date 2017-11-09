@@ -12,8 +12,10 @@
 			location.reload();
 		}
 
-		//refresh page every 30 sec
-		setTimeout("refresh();", 30000);
+		<c:if test="${mode != teacher}">
+			//refresh page every 30 sec
+			setTimeout("refresh();", 30000);
+		</c:if>
 	</script>
 </lams:head>
 <body class="stripes">
@@ -39,12 +41,13 @@
 				</div>
 		</div>
 
-		<div class="voffset10">
-			<html:button property="refreshButton" onclick="refresh();" styleClass="btn btn-sm btn-default pull-right">
-				<fmt:message key="label.refresh" />
-			</html:button>
-		</div>
-
+		<c:if test="${mode != teacher}">
+			<div class="voffset10">
+				<html:button property="refreshButton" onclick="refresh();" styleClass="btn btn-sm btn-default pull-right">
+					<fmt:message key="label.refresh" />
+				</html:button>
+			</div>
+		</c:if>
 
 		<div id="footer"></div>
 	</lams:Page>

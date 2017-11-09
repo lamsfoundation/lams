@@ -155,7 +155,7 @@ public class LearningAction extends Action {
 	ScratchieUser groupLeader = service.checkLeaderSelectToolForSessionLeader(user, toolSessionId);
 
 	// forwards to the leaderSelection page
-	if ((groupLeader == null) && !mode.isTeacher()) {
+	if (groupLeader == null) {
 
 	    // get group users and store it to request as DTO objects
 	    List<ScratchieUser> groupUsers = service.getUsersBySession(toolSessionId);
