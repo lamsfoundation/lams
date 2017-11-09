@@ -210,32 +210,6 @@
 
 </form>
 
-<%-- show reflection (only for teacher) --%>
-<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and (mode == 'teacher')}">
-	<div class="voffset5">
-		<div class="panel panel-default">
-			<div class="panel-heading-sm panel-title">
-				<fmt:message key="monitor.summary.td.notebookInstructions" />
-			</div>
-			<div class="panel-body-sm">
-				<div class="panel">
-					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
-				</div>
-				<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-							<fmt:message key="message.no.reflection.available" />
-					</c:when>
-					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
-					</c:otherwise>
-				</c:choose>
-			</div>
-		</div>
-	</div>
-</c:if>
-
 <c:if test="${mode != 'teacher'}">
 	<div class="voffset10 pull-right">
 		<c:choose>
