@@ -24,8 +24,13 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.tool.qa.web.action;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -41,10 +46,16 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
+import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -213,6 +224,85 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(new String(responsedata.toString()));
 	return null;
+    }
+
+    /**
+     * Start to download the page that has an HTML version of the answers. Calls answersDownload
+     * which forwards to the jsp to download the file.
+     * @throws ServletException 
+     */
+    public ActionForward getPrintAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException  {
+
+	IQaService qaService = getQAService();
+	Long allUserIdValue = -1L;
+	
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	QaSession qaSession = qaService.getSessionById(toolSessionID);
+	QaContent qaContent = qaSession.getQaContent();
+	
+	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	QaQueContent question = null;
+	for ( QaQueContent check : qaContent.getQaQueContents() ) {
+	    if ( check.getUid().equals(questionUid) ) {
+		question = check;
+		break;
+	    }
+	}
+	
+	if ( question == null ) {
+	    log.error("Cannot display printable answers as we cannot find question details for toolSessionId "+toolSessionID+" questionUid "+questionUid);
+	    throw new ServletException("Question details missing.");
+	}
+	
+	QaQuestionDTO questionDTO = new QaQuestionDTO(question);
+	request.setAttribute(QaAppConstants.QUESTION_DTO, questionDTO);
+	
+	List<QaUsrResp> responses = qaService.getResponsesForTablesorter(qaContent.getQaContentId(), 
+		toolSessionID, questionUid, allUserIdValue, qaContent.isUseSelectLeaderToolOuput(), 
+		1, 0, QaAppConstants.SORT_BY_USERNAME_ASC, null); 
+	request.setAttribute(QaAppConstants.RESPONSES, responses);
+	request.setAttribute(QaAppConstants.ATTR_CONTENT, qaContent);	
+	
+	boolean isAllowRateAnswers = qaContent.isAllowRateAnswers();
+	boolean isCommentsEnabled = false;
+	if ( isAllowRateAnswers ) {
+	    Set<LearnerItemRatingCriteria> criterias = qaContent.getRatingCriterias();
+	    for ( LearnerItemRatingCriteria criteria : criterias ) {
+		if ( criteria.isCommentRating() ) {
+		    isCommentsEnabled = true;
+		    break;
+		}
+	    }
+	}
+	request.setAttribute("isCommentsEnabled", isCommentsEnabled);
+
+	// handle rating criterias - even though we may have searched on ratings earlier we can't use the average ratings
+	// calculated as they may have been averages over more than one criteria.
+	Map<Long, Collection> criteriaMap = null;
+	Map<Long, List<RatingCommentDTO>> commentMap = null;
+	if (isAllowRateAnswers && !responses.isEmpty()) {
+	    //create itemIds list
+	    List<Long> itemIds = new LinkedList<Long>();
+	    for (QaUsrResp usrResponse : responses) {
+		itemIds.add(usrResponse.getResponseId());
+	    }
+	    List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(), toolSessionID, itemIds,
+		    true, allUserIdValue);
+	    if ( itemRatingDtos.size() > 0 ) {
+		criteriaMap = new HashMap<Long,Collection>();
+		commentMap = new HashMap<Long, List<RatingCommentDTO>>();
+		for ( ItemRatingDTO itemRatingDto: itemRatingDtos) {
+		    criteriaMap.put(itemRatingDto.getItemId(),  itemRatingDto.getCriteriaDtos());
+		    commentMap.put(itemRatingDto.getItemId(), itemRatingDto.getCommentDtos());
+		}
+	    }
+	}
+	request.setAttribute("criteriaMap", criteriaMap);
+	request.setAttribute("commentMap", commentMap);
+	request.setAttribute(QaAppConstants.ATTR_CONTENT, qaContent);
+	
+	return (mapping.findForward("PrintAnswers"));
     }
 
 }

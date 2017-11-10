@@ -52,6 +52,8 @@
 		<div class="panel panel-default"">
 			<div class="panel-heading">
 				<c:out value="${question.question}" escapeXml="false"/>
+				<a href="javascript:launchPopup('<html:rewrite page="/monitoring.do?dispatch=getPrintAnswers&questionUid=${question.uid}&toolSessionID=${groupDto.sessionId}"/>');"	
+					id="printAnswers" class="btn btn-default btn-xs pull-right"><i class="fa fa-print"></i></a>
 			</div>
 			<lams:TSTable numColumns="${content.allowRateAnswers ? (isCommentsEnabled ? 3 : 2) : (isCommentsEnabled ? 2 : 1)}"
 						  dataId="data-session-id='${groupDto.sessionId}' data-question-uid='${question.uid}'">
