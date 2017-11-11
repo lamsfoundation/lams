@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -110,6 +111,9 @@ public class LearningAction extends Action {
 	}
 	if (param.equals("showResults")) {
 	    return showResults(mapping, form, request, response);
+	}
+	if (param.equals("editBurningQuestion")) {
+	    return editBurningQuestion(mapping, form, request, response);
 	}
 	if (param.equals("like")) {
 	    return like(mapping, form, request, response);
@@ -484,7 +488,7 @@ public class LearningAction extends Action {
 	// display other groups' BurningQuestions
 	if (isBurningQuestionsEnabled) {
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = service.getBurningQuestionDtos(scratchie,
-		    toolSessionId);
+		    toolSessionId, false);
 	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 	}
 
@@ -512,6 +516,26 @@ public class LearningAction extends Action {
 	}
 
 	return mapping.findForward(ScratchieConstants.SUCCESS);
+    }
+    
+    /**
+     * Saves newly entered burning question. Used by jqGrid cellediting feature.
+     */
+    private ActionForward editBurningQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	if (!StringUtils.isEmpty(request.getParameter(ScratchieConstants.ATTR_ITEM_UID))
+		&& !StringUtils.isEmpty(request.getParameter(ScratchieConstants.PARAM_SESSION_ID))) {
+	    initializeScratchieService();
+
+	    Long itemUid = WebUtil.readLongParam(request, ScratchieConstants.ATTR_ITEM_UID) == 0 ? null
+		    : WebUtil.readLongParam(request, ScratchieConstants.ATTR_ITEM_UID);
+	    Long sessionId = WebUtil.readLongParam(request, ScratchieConstants.PARAM_SESSION_ID);
+	    String question = request.getParameter(ScratchieConstants.ATTR_BURNING_QUESTION_PREFIX);
+	    service.saveBurningQuestion(sessionId, itemUid, question);
+	}
+
+	return null;
     }
 
     private ActionForward like(ActionMapping mapping, ActionForm form, HttpServletRequest request,

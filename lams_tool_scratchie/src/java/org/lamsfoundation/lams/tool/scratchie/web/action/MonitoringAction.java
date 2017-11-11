@@ -145,7 +145,7 @@ public class MonitoringAction extends Action {
 
 	// Create BurningQuestionsDtos if BurningQuestions is enabled.
 	if (scratchie.isBurningQuestionsEnabled()) {
-	    List<BurningQuestionItemDTO> burningQuestionItemDtos = service.getBurningQuestionDtos(scratchie, null);
+	    List<BurningQuestionItemDTO> burningQuestionItemDtos = service.getBurningQuestionDtos(scratchie, null, true);
 	    sessionMap.put(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 	}
 
