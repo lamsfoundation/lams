@@ -153,6 +153,8 @@ public class MockLearner extends MockUser implements Runnable {
     private static final Set<Long> SCRIBE_FINISHED_TOOL_CONTENT = new TreeSet<Long>();
     private static final short SCRIBE_SUBMIT_REPORT_ATTEMPTS = 3;
 
+    private static final String NB_SUBSTRING = "/lams/tool/lanb11/";
+
     private static int joinLessonUserCount = 0;
     private static int topJoinLessonUserCount = 0;
     private boolean finished = false;
@@ -460,6 +462,8 @@ public class MockLearner extends MockUser implements Runnable {
 		return handleToolAssessment(resp, form);
 	    } else if (asText.contains(SCRIBE_TOOL_SUBSTRING)) {
 		return handleToolScribe(resp, form);
+	    } else if (asText.contains(NB_SUBSTRING)) {
+		handleToolNb(resp, form);
 	    }
 	}
 	log.debug("Filling form fillFormArbitrarily");
@@ -894,12 +898,21 @@ public class MockLearner extends MockUser implements Runnable {
 	}
     }
 
+    private void handleToolNb(WebResponse resp, WebForm form) throws IOException {
+	String asText = resp.getText();
+	if (asText.contains("submitForm('reflect')")) {
+	    form.setAttribute("action", form.getAction() + "?method=reflect");
+	} else {
+	    form.setAttribute("action", form.getAction() + "?method=finish");
+	}
+    }
+
     private WebResponse handleToolAssessment(WebResponse resp, WebForm form) throws SAXException, IOException {
 	String asText = resp.getText();
 	// check if current user is the leader
 	boolean hasEditRights = asText.contains(MockLearner.ASSESSMENT_HAS_EDIT_RIGHT_SUBSTRING);
 	Matcher m;
-	
+
 	boolean canFinish = asText.contains(MockLearner.ASSESSMENT_FINISH_BUTTON_SUBSTRING);
 	if (hasEditRights) {
 	    // this is a Leader or it is a non-Leader Assessmnt
@@ -946,7 +959,8 @@ public class MockLearner extends MockUser implements Runnable {
 	if (m.find()) {
 	    finishURL = m.group(1);
 	} else {
-	    throw new TestHarnessException("Finish URL "+MockLearner.ASSESSMENT_FINISH_PATTERN+" was not found in Assessment Tool");
+	    throw new TestHarnessException(
+		    "Finish URL " + MockLearner.ASSESSMENT_FINISH_PATTERN + " was not found in Assessment Tool");
 	}
 
 	return (WebResponse) new Call(wc, test, username + " finishes Assessment", finishURL).execute();
