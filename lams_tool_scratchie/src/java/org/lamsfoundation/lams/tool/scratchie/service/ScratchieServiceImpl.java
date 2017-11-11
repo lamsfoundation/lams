@@ -944,7 +944,7 @@ public class ScratchieServiceImpl
 	    }
 	}
 	generalBurningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
-	//don't display general burning question if it's empty and such rule is enforced
+	//skip empty item if required
 	if (!burningQuestionDtosOfSpecifiedItem.isEmpty() || includeEmptyItems) {
 	    burningQuestionItemDtos.add(generalBurningQuestionItemDto);
 	}
@@ -956,7 +956,7 @@ public class ScratchieServiceImpl
 		burningQuestionDto.setSessionName(escapedSessionName);
 
 		String escapedBurningQuestion = StringEscapeUtils.escapeJavaScript(
-			burningQuestionDto.getBurningQuestion().getQuestion().replaceAll("\\n", "<br>"));
+			burningQuestionDto.getBurningQuestion().getQuestion());
 		burningQuestionDto.setEscapedBurningQuestion(escapedBurningQuestion);
 	    }
 	}

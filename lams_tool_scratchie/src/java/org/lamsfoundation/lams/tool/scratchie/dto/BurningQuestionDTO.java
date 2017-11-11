@@ -31,7 +31,10 @@ public class BurningQuestionDTO {
     private String sessionName;
 
     private Integer likeCount;
+    //whether the leader of specified group liked this burningQuestion
     private boolean userLiked;
+    //whether the leader of specified group created this burningQuestion
+    private boolean userAuthor;
 
     public ScratchieBurningQuestion getBurningQuestion() {
 	return burningQuestion;
@@ -71,5 +74,16 @@ public class BurningQuestionDTO {
 
     public void setUserLiked(boolean userLiked) {
 	this.userLiked = userLiked;
+    }
+    
+    /**
+     * @return whether the leader of specified group created this burningQuestion
+     */
+    public boolean isUserAuthor() {
+	return userAuthor;
+    }
+
+    public void setUserAuthor(boolean userAuthor) {
+	this.userAuthor = userAuthor;
     }
 }

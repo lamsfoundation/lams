@@ -224,6 +224,10 @@
 			parameter="showResults" >
 			<forward name="success" path="/pages/learning/results.jsp" />		
 		</action>
+		<action path="/learning/editBurningQuestion"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
+			parameter="editBurningQuestion" >
+		</action>
 		<action path="/learning/finish"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
 			input="/pages/learning/learning.jsp"
