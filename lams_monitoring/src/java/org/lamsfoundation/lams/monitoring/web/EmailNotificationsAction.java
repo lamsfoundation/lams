@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -347,7 +348,6 @@ public class EmailNotificationsAction extends LamsDispatchAction {
      */
     public ActionForward emailUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, JSONException {
-
 	JSONObject JSONObject = new JSONObject();
 	IMonitoringService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
@@ -361,14 +361,20 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	if (scheduleDateParameter == null) {
 	    boolean isSuccessfullySent = true;
 	    String[] userIdStrs = request.getParameterValues("userId");
+	    Set<Integer> userIdInts = new HashSet<Integer>();
 	    for (String userIdStr : userIdStrs) {
 		int userId = Integer.parseInt(userIdStr);
+		userIdInts.add(userId);
 		boolean isHtmlFormat = false;
 		isSuccessfullySent &= getEventNotificationService().sendMessage(null, userId,
 			IEventNotificationService.DELIVERY_METHOD_MAIL, monitoringService.getMessageService()
 				.getMessage("event.emailnotifications.email.subject", new Object[] {}),
 			emailBody, isHtmlFormat);
 	    }
+	    monitoringService.archiveEmailNotification(
+		    WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true),
+		    WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true),
+		    WebUtil.readIntParam(request, "searchType", true), emailBody, userIdInts);
 
 	    JSONObject.put("isSuccessfullySent", isSuccessfullySent);
 
@@ -380,9 +386,6 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    try {
 		Calendar now = Calendar.getInstance();
 
-		Map<String, Object> searchParameters = new HashMap<String, Object>();
-		copySearchParametersFromRequestToMap(request, searchParameters);
-
 		// calculate scheduleDate
 		Date scheduleDateTeacherTimezone = new Date(scheduleDateParameter);
 		TimeZone teacherTimeZone = getCurrentUser().getTimeZone();
@@ -393,6 +396,9 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 			.withIdentity(EmailNotificationsAction.JOB_PREFIX_NAME + now.getTimeInMillis())
 			.withDescription("schedule email message to user(s)").usingJobData("emailBody", emailBody)
 			.build();
+
+		Map<String, Object> searchParameters = new HashMap<String, Object>();
+		copySearchParametersFromRequestToMap(request, searchParameters);
 		searchParameters.forEach(emailScheduleMessageJob.getJobDataMap()::putIfAbsent);
 
 		// create customized triggers

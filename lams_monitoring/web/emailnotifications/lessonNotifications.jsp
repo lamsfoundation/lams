@@ -99,12 +99,15 @@
     			
     			var isInstantEmailing = ($('#accordion').accordion('option', 'active') == 0);
     			var ids = jQuery("#list3").getGridParam('selarrrow');
-    			
-    			var params = "";
+
+    			var searchType = document.getElementById("searchType").value;
+    			var params = "&searchType=" + searchType;
+    		
     			if (isInstantEmailing && ids.length) {
     				for (var i=0;i<ids.length;i++) {
     			    	params += "&userId=" + ids[i];
     			    }
+    			    params += '&lessonID=${lesson.lessonId}';
     			} else if (isInstantEmailing && !ids.length) {
     				return;
     				
@@ -116,8 +119,7 @@
     					return;
     				}
         			       			
-    				var searchType = document.getElementById("searchType").value;
-    				params = "&searchType=" + searchType + "&scheduleDate=" + scheduleDate.getTime() + getSearchParams();
+    				params += "&scheduleDate=" + scheduleDate.getTime() + getSearchParams();
     			}
     			
     			var emailBody = encodeURIComponent(document.getElementById("emailBody").value);
@@ -190,7 +192,7 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<div class="btn-group pull-right">
-					<a href="<c:url value='/emailNotifications.do'/>?method=showScheduledEmails&$lessonID=${lesson.lessonId}"
+					<a href="<c:url value='/emailNotifications.do'/>?method=showScheduledEmails&lessonID=${lesson.lessonId}"
 					   id="listEmailsHref" class="btn btn-default btn-sm">
 						<fmt:message key="email.notifications.scheduled.messages.button" />
 					</a>

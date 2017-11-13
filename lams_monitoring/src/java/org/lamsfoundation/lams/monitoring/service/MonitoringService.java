@@ -50,6 +50,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -1661,6 +1662,16 @@ public class MonitoringService implements IMonitoringService {
 	return sortedUsers;
     }
 
+    @Override
+    public void archiveEmailNotification(Integer organisationId, Long lessonId, Integer searchType, String body,
+	    Set<Integer> recipients) {
+	if (organisationId == null && lessonId == null) {
+	    throw new MonitoringServiceException(
+		    "Missing both organisation ID and lesson ID when archiving an email notification");
+	}
+	baseDAO.insert(new EmailNotificationArchive(organisationId, lessonId, searchType, null, body, recipients));
+    }
+
     /**
      * Returns list of users who has already finished specified lesson.
      *
@@ -2551,5 +2562,4 @@ public class MonitoringService implements IMonitoringService {
 
 	return resetReadOnly;
     }
-
 }

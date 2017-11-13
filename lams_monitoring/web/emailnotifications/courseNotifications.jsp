@@ -120,11 +120,15 @@
     			
     			var isInstantEmailing = ($('#accordion').accordion('option', 'active') == 0);
     			var ids = jQuery("#list3").getGridParam('selarrrow');
-    			var params = "";
+
+    			var searchType = document.getElementById("searchType").value;
+    			var params =  "&searchType=" + searchType;
+    			
     			if(isInstantEmailing && ids.length) {
     			    for (var i=0;i<ids.length;i++) {
     			    	params += "&userId=" + ids[i];
     			    }
+    			    params += "&organisationID=${org.organisationId}";
     			} else if (isInstantEmailing && !ids.length) {
     				return;
 
@@ -136,8 +140,8 @@
     					return;
     				}
         			       			
-    				var searchType = document.getElementById("searchType").value;
-    				params = "&searchType=" + searchType + "&scheduleDate=" + scheduleDate.getTime() + getSearchParams(); 
+    				
+    				params += "&scheduleDate=" + scheduleDate.getTime() + getSearchParams(); 
     			}
     			
     			var emailBody = encodeURIComponent(document.getElementById("emailBody").value);

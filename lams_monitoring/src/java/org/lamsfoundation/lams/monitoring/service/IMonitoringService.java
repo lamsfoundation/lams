@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -416,6 +417,7 @@ public interface IMonitoringService {
      *            id of the activity.
      * @return the requested activity object.
      */
+    @SuppressWarnings("rawtypes")
     Activity getActivityById(Long activityId, Class clasz);
 
     /**
@@ -662,4 +664,10 @@ public interface IMonitoringService {
      * Get list of users who completed the given lesson.
      */
     List<User> getUsersCompletedLesson(Long lessonId, Integer limit, Integer offset, boolean orderAscending);
+
+    /**
+     * Save information about an email notification sent to learners.
+     */
+    void archiveEmailNotification(Integer organisationId, Long lessonId, Integer searchType, String body,
+	    Set<Integer> recipients);
 }
