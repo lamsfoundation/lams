@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -670,4 +671,8 @@ public interface IMonitoringService {
      */
     void archiveEmailNotification(Integer organisationId, Long lessonId, Integer searchType, String body,
 	    Set<Integer> recipients);
+
+    List<EmailNotificationArchive> getArchivedEmailNotifications(Integer organisationId);
+
+    List<EmailNotificationArchive> getArchivedEmailNotifications(Long lessonId);
 }

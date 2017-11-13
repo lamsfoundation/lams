@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -47,6 +48,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -247,7 +249,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
      */
     public ActionForward showArchivedEmails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, SchedulerException {
-	getUserManagementService();
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	boolean isLessonNotifications = (lessonId != null);
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
@@ -257,12 +260,18 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
 	    }
+
+	    List<EmailNotificationArchive> notifications = monitoringService.getArchivedEmailNotifications(lessonId);
+	    request.setAttribute("notifications", notifications);
 	} else {
 	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
 		    "show scheduled course course email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
 	    }
+	    List<EmailNotificationArchive> notifications = monitoringService
+		    .getArchivedEmailNotifications(organisationId);
+	    request.setAttribute("notifications", notifications);
 	}
 
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);

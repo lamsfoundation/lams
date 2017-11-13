@@ -17,6 +17,11 @@
 	
 	<lams:css/>	
 	<link type="text/css" href="<lams:LAMSURL/>/css/jquery-ui-smoothness-theme.css" rel="stylesheet" />
+	<style type="text/css">
+		td {
+			vertical-align: top;
+		}
+	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
@@ -30,7 +35,7 @@
 	<lams:Page title="${title}" type="admin">
 
 	<h4>
-		<fmt:message key="email.notifications.scheduled.messages.list"/>
+		<fmt:message key="email.notifications.archived.messages.list"/>
 	</h4>
 
 	<table class="table table-condensed table-striped">
@@ -43,16 +48,19 @@
 					<fmt:message key="email.notify.students.that"/>	
 				</td>
 				<th  class="text-left">
+					<fmt:message key="email.notifications.archived.messages.list.sent.count" />
+				</td>
+				<th  class="text-left">
 					<fmt:message key="email.notifications.scheduled.messages.list.email.body"/>		
 				</td>
 			</tr>
 		</thead>
-		<c:forEach var="email" items="${archiveList}">
+		<c:forEach var="email" items="${notifications}">
 			<tr>
-				<td style="vertical-align: top;">
-					${email.date}<BR/>
+				<td>
+					<lams:Date value="${email.sentOn}"/>
 				</td>
-				<td  style="vertical-align: top;">
+				<td>
 					<c:choose>
 						<c:when test="${email.searchType == 0}"><fmt:message key="email.notifications.user.search.property.0" /></c:when>
 						<c:when test="${email.searchType == 1}"><fmt:message key="email.notifications.user.search.property.1" /></c:when>
@@ -66,13 +74,13 @@
 						<c:when test="${email.searchType == 9}"><fmt:message key="email.notifications.user.search.property.9" /></c:when>
 						<c:when test="${email.searchType == 10}"><fmt:message key="email.notifications.user.search.property.10" /></c:when>
 					</c:choose>
-					<br />
-					<fmt:message key="email.notifications.archived.messages.list.sent.count" />
-					<a href="#" onClick="javascript:showLearners(${email.id}')">
-						${email.sentCount} <fmt:message key="email.notifications.archived.messages.list.learners" />
+				</td>
+				<td>
+					<a href="#" onClick="javascript:showLearners(${email.uid}')">
+						${fn:length(email.recipients)}&nbsp;<fmt:message key="email.notifications.archived.messages.list.learners" />
 					</a>
 				</td>
-				<td  style="vertical-align: top;">
+				<td>
 					${email.body}
 				</td>
 			</tr>

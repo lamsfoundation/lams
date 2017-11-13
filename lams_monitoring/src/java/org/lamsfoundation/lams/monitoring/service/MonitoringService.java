@@ -1672,6 +1672,18 @@ public class MonitoringService implements IMonitoringService {
 	baseDAO.insert(new EmailNotificationArchive(organisationId, lessonId, searchType, null, body, recipients));
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<EmailNotificationArchive> getArchivedEmailNotifications(Integer organisationId) {
+	return baseDAO.findByProperty(EmailNotificationArchive.class, "organisationId", organisationId);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<EmailNotificationArchive> getArchivedEmailNotifications(Long lessonId) {
+	return baseDAO.findByProperty(EmailNotificationArchive.class, "lessonId", lessonId);
+    }
+
     /**
      * Returns list of users who has already finished specified lesson.
      *
