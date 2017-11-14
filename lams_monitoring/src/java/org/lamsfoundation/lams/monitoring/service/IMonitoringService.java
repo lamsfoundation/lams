@@ -672,7 +672,18 @@ public interface IMonitoringService {
     void archiveEmailNotification(Integer organisationId, Long lessonId, Integer searchType, String body,
 	    Set<Integer> recipients);
 
+    /**
+     * Gets archived notifications for the given organisation.
+     */
     List<EmailNotificationArchive> getArchivedEmailNotifications(Integer organisationId);
 
+    /**
+     * Gets archived notifications for the given lesson.
+     */
     List<EmailNotificationArchive> getArchivedEmailNotifications(Long lessonId);
+
+    /**
+     * Gets pages recipients of the given archived email notification.
+     */
+    List<User> getArchivedEmailNotificationRecipients(Long emailNotificationUid, Integer limit, Integer offset);
 }

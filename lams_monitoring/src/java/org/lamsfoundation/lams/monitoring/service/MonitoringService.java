@@ -51,6 +51,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.events.EmailNotificationArchive;
+import org.lamsfoundation.lams.events.dao.EventDAO;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -167,6 +168,8 @@ public class MonitoringService implements IMonitoringService {
     private IGroupUserDAO groupUserDAO;
 
     private ILearnerProgressDAO learnerProgressDAO;
+
+    private EventDAO eventDAO;
 
     private IAuthoringService authoringService;
 
@@ -312,6 +315,10 @@ public class MonitoringService implements IMonitoringService {
      */
     public void setGroupingDAO(IGroupingDAO groupingDAO) {
 	this.groupingDAO = groupingDAO;
+    }
+
+    public void setEventDAO(EventDAO eventDAO) {
+	this.eventDAO = eventDAO;
     }
 
     /**
@@ -1682,6 +1689,11 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public List<EmailNotificationArchive> getArchivedEmailNotifications(Long lessonId) {
 	return baseDAO.findByProperty(EmailNotificationArchive.class, "lessonId", lessonId);
+    }
+
+    @Override
+    public List<User> getArchivedEmailNotificationRecipients(Long emailNotificationUid, Integer limit, Integer offset) {
+	return eventDAO.getArchivedEmailNotificationRecipients(emailNotificationUid, limit, offset);
     }
 
     /**

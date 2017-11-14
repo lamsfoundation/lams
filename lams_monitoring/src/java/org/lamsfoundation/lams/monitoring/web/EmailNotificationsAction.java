@@ -50,6 +50,7 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -197,7 +198,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    }
 	} else {
 	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
-		    "show scheduled course course email notifications", false)) {
+		    "show scheduled course email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
 	    }
@@ -256,7 +257,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	if (isLessonNotifications) {
 	    if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
-		    "show scheduled lesson email notifications", false)) {
+		    "show archived lesson email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
 	    }
@@ -265,7 +266,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    request.setAttribute("notifications", notifications);
 	} else {
 	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
-		    "show scheduled course course email notifications", false)) {
+		    "show archived course email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
 	    }
@@ -278,6 +279,63 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	request.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
 
 	return mapping.findForward("archivedEmailList");
+    }
+
+    public ActionForward getArchivedRecipients(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
+
+	Long emailNotificationUid = WebUtil.readLongParam(request, "emailNotificationUid");
+	EmailNotificationArchive notification = (EmailNotificationArchive) getUserManagementService()
+		.findById(EmailNotificationArchive.class, emailNotificationUid);
+
+	Long lessonId = notification.getLessonId();
+	Integer organisationId = notification.getOrganisationId();
+	boolean isLessonNotifications = (lessonId != null);
+	// check if the user is allowed to fetch this data
+	if (isLessonNotifications) {
+	    if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
+		    "show archived lesson email notification participants", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
+		return null;
+	    }
+	} else {
+	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
+		    "show archived course email notification participants", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
+		return null;
+	    }
+	}
+
+	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
+
+	// get only recipients we want on the page
+	List<User> recipients = monitoringService.getArchivedEmailNotificationRecipients(emailNotificationUid, rowLimit,
+		(page - 1) * rowLimit);
+
+	// build JSON which is understood by jqGrid 
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put(GradebookConstants.ELEMENT_PAGE, page);
+	responseJSON.put(GradebookConstants.ELEMENT_TOTAL, ((notification.getRecipients().size() - 1) / rowLimit) + 1);
+	responseJSON.put(GradebookConstants.ELEMENT_RECORDS, recipients.size());
+
+	JSONArray rowsJSON = new JSONArray();
+	for (User recipient : recipients) {
+	    JSONObject rowJSON = new JSONObject();
+	    rowJSON.put(GradebookConstants.ELEMENT_ID, recipient.getUserId());
+
+	    JSONArray cellJSON = new JSONArray();
+	    cellJSON.put(recipient.getFirstName() + " " + recipient.getLastName() + " [" + recipient.getLogin() + "]");
+
+	    rowJSON.put(GradebookConstants.ELEMENT_CELL, cellJSON);
+	    rowsJSON.put(rowJSON);
+	}
+
+	responseJSON.put(GradebookConstants.ELEMENT_ROWS, rowsJSON);
+	writeResponse(response, "text/json", LamsDispatchAction.ENCODING_UTF8, responseJSON.toString());
+	return null;
     }
 
     /**

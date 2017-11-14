@@ -15,8 +15,8 @@
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	</c:if>	
 	
-	<lams:css/>	
-	<link type="text/css" href="<lams:LAMSURL/>/css/jquery-ui-smoothness-theme.css" rel="stylesheet" />
+	<lams:css/>
+	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<style type="text/css">
 		td {
 			vertical-align: top;
@@ -24,8 +24,33 @@
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript">
-	
+		function showRecipients(notificationUid, link) {
+			$(link).closest('td').empty()
+							     .append($('<table />').attr('id', 'grid' + notificationUid));
+			$("#grid" + notificationUid).jqGrid({
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
+			   	url: "<c:url value='/emailNotifications.do'/>?method=getArchivedRecipients&emailNotificationUid=" + notificationUid,
+				datatype: "json",
+			   	colNames:['<fmt:message key="email.notifications.user.name"/>'],
+			   	colModel:[
+			        {
+					   'name'     : 'name', 
+					   'index'    : 'name',
+					   'sortable' : false,
+					   'title'    : false
+					}
+			   	],
+			   	rowNum: 10,
+			   	pager: true,
+			    height:'100%',
+			    width: '210px',
+			    ignoreCase: true
+			});
+		}
 	</script>
 
 </lams:head>
@@ -44,13 +69,13 @@
 				<th class="text-left" width="25%">
 					<fmt:message key="email.notifications.archived.messages.list.sent.date"/>		
 				</td>
-				<th  class="text-left">
+				<th class="text-left">
 					<fmt:message key="email.notify.students.that"/>	
 				</td>
-				<th  class="text-left">
+				<th class="text-left">
 					<fmt:message key="email.notifications.archived.messages.list.sent.count" />
 				</td>
-				<th  class="text-left">
+				<th class="text-left">
 					<fmt:message key="email.notifications.scheduled.messages.list.email.body"/>		
 				</td>
 			</tr>
@@ -76,7 +101,7 @@
 					</c:choose>
 				</td>
 				<td>
-					<a href="#" onClick="javascript:showLearners(${email.uid}')">
+					<a href="#" onClick="javascript:showRecipients(${email.uid}, this)">
 						${fn:length(email.recipients)}&nbsp;<fmt:message key="email.notifications.archived.messages.list.learners" />
 					</a>
 				</td>
