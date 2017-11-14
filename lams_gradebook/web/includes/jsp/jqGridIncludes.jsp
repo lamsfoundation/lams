@@ -186,4 +186,20 @@ Include this jsp in your jqGrid page head to get some jqGrid functionality
     };
 
 
+    <%-- Based on jqgrid internal functions --%>
+    function displayCellErrorMessage(table, iRow, iCol, errorLabel, errorMessage, buttonText ) {
+    		setTimeout(function () {
+			try {
+			    	var frozenRows = table.grid.fbRows,
+					tr = table.rows[iRow];
+			    	tr = frozenRows != null && frozenRows[0].cells.length > iCol ? frozenRows[tr.rowIndex] : tr;
+			    var td = tr != null && tr.cells != null ? $(tr.cells[iCol]) : $(),
+			    		rect = td[0].getBoundingClientRect();
+			    $.jgrid.info_dialog.call(table, errorLabel, errorMessage, buttonText, {left:rect.left-200, top:rect.top});
+			} catch (e) {
+				alert(errorMessage);
+			}
+		}, 50);
+	}
+	
 </script>

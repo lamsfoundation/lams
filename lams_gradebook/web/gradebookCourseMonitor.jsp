@@ -89,7 +89,7 @@
 			    ],
 			    loadError: function(xhr,st,err) {
 			    		jQuery("#organisationGrid").clearGridData();
-			   	 	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+			   	 	alert("<fmt:message key="gradebook.error.loaderror"/>");
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -136,7 +136,7 @@
 					     ],
 					     loadError: function(xhr,st,err) {
 				    		jQuery("#"+subgrid_table_id).clearGridData();
-				    		$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+				    		alert("<fmt:message key="gradebook.error.loaderror"/>");
 				    	 },
 				    	 formatCell: function(rowid, cellname,value, iRow, iCol) {
 					    	 if (cellname == "mark") {
@@ -213,7 +213,7 @@
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#userView").clearGridData();
-			    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+			    	alert("<fmt:message key="gradebook.error.loaderror"/>");
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -262,7 +262,7 @@
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
-						    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+						    	alert("<fmt:message key="gradebook.error.loaderror"/>");
 						     },
 						     formatCell: function(rowid, cellname,value, iRow, iCol) {
 					    	 	if (cellname == "mark") {
@@ -302,7 +302,7 @@
 					    	 		var currRowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
 						     		if (currRowData['marksAvailable'] != null && currRowData['marksAvailable'] != "") {
 						     			if (parseFloat(value) > parseFloat(currRowData['marksAvailable'])){
-						     				$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.markhigher"/>", "<fmt:message key="label.ok"/>");
+						     				displayCellErrorMessage(jQuery("#"+subgrid_table_id)[0], iRow, iCol, "<fmt:message key="label.error"/>", "<fmt:message key="error.markhigher"/>", "<fmt:message key="label.ok"/>");
 						     				jQuery("#"+subgrid_table_id).restoreCell( iRow, iCol);
 						     				throw("Mark must be lower than maximum mark");
 						     			}
@@ -328,7 +328,7 @@
 						     	$("#organisationGrid").trigger("reloadGrid");
 						     },
 						     errorCell: function(serverresponse, status) {
-						     	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.cellsave"/>", "<fmt:message key="label.ok"/>");
+						     	alert("<fmt:message key="error.cellsave"/>");
 						     },
 							 gridComplete: function(){
 								processLessonDateFields( lessonDatesHidden, jQuery("#"+subgrid_table_id) );
