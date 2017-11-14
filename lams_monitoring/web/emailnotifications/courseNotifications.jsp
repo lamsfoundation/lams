@@ -225,11 +225,11 @@
 				<div class="btn-group pull-right">
 					<a href="<c:url value='/emailNotifications.do'/>?method=showScheduledEmails&organisationID=${org.organisationId}"
 					   id="listEmailsHref" class="btn btn-default btn-sm">
-						<fmt:message key="email.notifications.scheduled.messages.button" />
+						<i class="fa fa-calendar"></i> <fmt:message key="email.notifications.scheduled.messages.button" />
 					</a>
 					<a href="<c:url value='/emailNotifications.do'/>?method=showArchivedEmails&organisationID=${org.organisationId}"
 					   id="archiveHref" class="btn btn-default btn-sm">
-						<fmt:message key="email.notifications.archived.messages.button" />
+						<i class="fa fa-archive"></i> <fmt:message key="email.notifications.archived.messages.button" />
 					</a>		
 				</div>
 			</div>
