@@ -33,6 +33,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -109,6 +110,8 @@ import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedExceptio
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.audit.AuditService;
@@ -204,6 +207,8 @@ public class MonitoringService implements IMonitoringService {
     private static final String FORCE_COMPLETE_STOP_MESSAGE_COMPLETED_TO_END = "force.complete.stop.message.completed.to.end";
 
     private static final String FORCE_COMPLETE_STOP_MESSAGE_STOPPED_UNEXPECTEDLY = "force.complete.stop.message.stopped.unexpectedly";
+
+    private static final ExcelCell[] EMPTY_ROW = new ExcelCell[1];
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
@@ -1694,6 +1699,53 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public List<User> getArchivedEmailNotificationRecipients(Long emailNotificationUid, Integer limit, Integer offset) {
 	return eventDAO.getArchivedEmailNotificationRecipients(emailNotificationUid, limit, offset);
+    }
+
+    @Override
+    public LinkedHashMap<String, ExcelCell[][]> exportArchivedEmailNotification(Long emailNotificationUid) {
+	EmailNotificationArchive notification = (EmailNotificationArchive) baseDAO.find(EmailNotificationArchive.class,
+		emailNotificationUid);
+
+	LinkedHashMap<String, ExcelCell[][]> sheets = new LinkedHashMap<String, ExcelCell[][]>();
+	List<ExcelCell[]> rows = new LinkedList<ExcelCell[]>();
+	ExcelCell[] row = new ExcelCell[3];
+	row[0] = new ExcelCell(messageService.getMessage("email.notifications.archived.messages.list.sent.date"), true);
+	row[1] = new ExcelCell(
+		messageService.getMessage("email.notifications.scheduled.messages.list.notify.sudents.that"), true);
+	row[2] = new ExcelCell(messageService.getMessage("email.notifications.scheduled.messages.list.email.body"),
+		true);
+	rows.add(row);
+
+	row = new ExcelCell[3];
+	row[0] = new ExcelCell(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(notification.getSentOn()),
+		false);
+	row[1] = new ExcelCell(
+		messageService.getMessage("email.notifications.user.search.property." + notification.getSearchType()),
+		false);
+	row[2] = new ExcelCell(notification.getBody(), false);
+	rows.add(row);
+	rows.add(EMPTY_ROW);
+
+	row = new ExcelCell[2];
+	row[0] = new ExcelCell(messageService.getMessage("email.notifications.archived.messages.list.sent.count"),
+		true);
+	row[1] = new ExcelCell(notification.getRecipients().size() + " "
+		+ messageService.getMessage("email.notifications.archived.messages.list.learners"), false);
+	rows.add(row);
+
+	// get all recipient objects, sorted by name
+	List<User> recipients = getArchivedEmailNotificationRecipients(emailNotificationUid, null, null);
+	for (User recipient : recipients) {
+	    row = new ExcelCell[1];
+	    row[0] = new ExcelCell(
+		    recipient.getFirstName() + " " + recipient.getLastName() + " [" + recipient.getLogin() + "]",
+		    false);
+	    rows.add(row);
+	}
+
+	sheets.put(messageService.getMessage("email.notifications.archived.export.sheet.name"),
+		rows.toArray(new ExcelCell[][] {}));
+	return sheets;
     }
 
     /**

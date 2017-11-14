@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,6 +67,9 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.ExcelUtil;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -315,7 +319,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	List<User> recipients = monitoringService.getArchivedEmailNotificationRecipients(emailNotificationUid, rowLimit,
 		(page - 1) * rowLimit);
 
-	// build JSON which is understood by jqGrid 
+	// build JSON which is understood by jqGrid
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put(GradebookConstants.ELEMENT_PAGE, page);
 	responseJSON.put(GradebookConstants.ELEMENT_TOTAL, ((notification.getRecipients().size() - 1) / rowLimit) + 1);
@@ -406,6 +410,51 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	jsonObject.put("deleteNotification", error == null ? "true" : error);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(jsonObject);
+	return null;
+
+    }
+
+    /**
+     * Exports the given archived email notification to excel.
+     */
+    public ActionForward exportArchivedNotification(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
+
+	Long emailNotificationUid = WebUtil.readLongParam(request, "emailNotificationUid");
+	EmailNotificationArchive notification = (EmailNotificationArchive) getUserManagementService()
+		.findById(EmailNotificationArchive.class, emailNotificationUid);
+
+	Long lessonId = notification.getLessonId();
+	Integer organisationId = notification.getOrganisationId();
+	boolean isLessonNotifications = (lessonId != null);
+	// check if the user is allowed to fetch this data
+	if (isLessonNotifications) {
+	    if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
+		    "export archived lesson email notification", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
+		return null;
+	    }
+	} else {
+	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
+		    "export archived course email notification", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
+		return null;
+	    }
+	}
+
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = monitoringService
+		.exportArchivedEmailNotification(emailNotificationUid);
+	String fileName = "email_notification_"
+		+ FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(notification.getSentOn()) + ".xlsx";
+	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
+
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+	ExcelUtil.createExcel(response.getOutputStream(), dataToExport,
+		monitoringService.getMessageService().getMessage("export.dateheader"), false);
 	return null;
 
     }

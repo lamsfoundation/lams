@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.monitoring.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +46,7 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -686,4 +688,9 @@ public interface IMonitoringService {
      * Gets pages recipients of the given archived email notification.
      */
     List<User> getArchivedEmailNotificationRecipients(Long emailNotificationUid, Integer limit, Integer offset);
+
+    /**
+     * Exports the given email notification to Excel sheet
+     */
+    LinkedHashMap<String, ExcelCell[][]> exportArchivedEmailNotification(Long emailNotificationUid);
 }

@@ -21,6 +21,10 @@
 		td {
 			vertical-align: top;
 		}
+		
+		#downloadFrame {
+			display: none;
+		}
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -50,6 +54,11 @@
 			    width: '210px',
 			    ignoreCase: true
 			});
+		}
+
+		function exportNotification(notificationUid) {
+			$('#downloadFrame').attr('src',
+					"<c:url value='/emailNotifications.do'/>?method=exportArchivedNotification&emailNotificationUid=" + notificationUid);
 		}
 	</script>
 
@@ -83,7 +92,11 @@
 		<c:forEach var="email" items="${notifications}">
 			<tr>
 				<td>
-					<lams:Date value="${email.sentOn}"/>
+					<lams:Date value="${email.sentOn}"/><br />
+					<a href="#" class="btn btn-default btn-sm" 
+						onclick="javascript:exportNotification(${email.uid})">
+						<i class="fa fa-download"></i> <fmt:message key="email.notifications.archived.export.button" />
+					</a>
 				</td>
 				<td>
 					<c:choose>
@@ -119,5 +132,6 @@
 	</a>
 	</lams:Page>
 	
+<iframe id="downloadFrame"></iframe>
 </body>
 </lams:html>
