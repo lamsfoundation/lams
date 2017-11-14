@@ -134,6 +134,11 @@
         path="/emailnotifications/scheduledEmailList.jsp"
         redirect="false"
       />
+     <forward
+        name="archivedEmailList"
+        path="/emailnotifications/archivedEmailList.jsp"
+        redirect="false"
+      />
     </action>
     <action
       path="/groupedBranching"

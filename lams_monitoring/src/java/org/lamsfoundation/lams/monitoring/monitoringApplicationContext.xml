@@ -40,6 +40,7 @@
 		<property name="activityDAO"><ref bean="activityDAO"/></property>	
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
 		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
+		<property name="eventDAO"><ref bean="eventDAO"/></property>
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>			
 		<property name="learnerService"><ref bean="learnerService"/></property>			
 		<property name="auditService"><ref bean="auditService"/></property>
@@ -79,7 +80,7 @@
 				<prop key="setGroupName">PROPAGATION_REQUIRED</prop>
 				<prop key="toggle*">PROPAGATION_REQUIRED</prop>
 				<prop key="generateLessonProgressEmail">PROPAGATION_REQUIRED</prop>
-				
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>    

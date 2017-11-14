@@ -6,9 +6,11 @@ import java.util.List;
 import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.events.DeliveryMethodNotification;
+import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.events.Event;
 import org.lamsfoundation.lams.events.Subscription;
 import org.lamsfoundation.lams.events.dao.EventDAO;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -26,6 +28,10 @@ class EventDAOHibernate extends LAMSBaseDAO implements EventDAO {
     private static final String COUNT_PENDING_NOTIFICATIONS = "SELECT COUNT(*) FROM " + Subscription.class.getName()
 	    + " AS s WHERE (s.lastOperationMessage IS NULL OR s.lastOperationMessage != '"
 	    + DeliveryMethodNotification.LAST_OPERATION_SEEN + "') AND s.userId = ? AND s.event.scope LIKE 'LESSON_%'";
+
+    private static final String GET_ARCHIVED_EMAIL_NOTIFICATION_RECIPIENTS = "SELECT u FROM " + User.class.getName()
+	    + " AS u, " + EmailNotificationArchive.class.getName()
+	    + " AS e WHERE e.uid = ? AND u.userId IN ELEMENTS(e.recipients) ORDER BY u.firstName, u.lastName";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -86,5 +92,19 @@ class EventDAOHibernate extends LAMSBaseDAO implements EventDAO {
 	    queryObject.setLong(1, lessonId);
 	}
 	return (Long) queryObject.uniqueResult();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getArchivedEmailNotificationRecipients(Long emailNotificationUid, Integer limit, Integer offset) {
+	Query queryObject = getSession().createQuery(EventDAOHibernate.GET_ARCHIVED_EMAIL_NOTIFICATION_RECIPIENTS);
+	queryObject.setLong(0, emailNotificationUid);
+	if (limit != null) {
+	    queryObject.setMaxResults(limit);
+	}
+	if (offset != null) {
+	    queryObject.setFirstResult(offset);
+	}
+	return queryObject.list();
     }
 }

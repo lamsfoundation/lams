@@ -120,11 +120,15 @@
     			
     			var isInstantEmailing = ($('#accordion').accordion('option', 'active') == 0);
     			var ids = jQuery("#list3").getGridParam('selarrrow');
-    			var params = "";
+
+    			var searchType = document.getElementById("searchType").value;
+    			var params =  "&searchType=" + searchType;
+    			
     			if(isInstantEmailing && ids.length) {
     			    for (var i=0;i<ids.length;i++) {
     			    	params += "&userId=" + ids[i];
     			    }
+    			    params += "&organisationID=${org.organisationId}";
     			} else if (isInstantEmailing && !ids.length) {
     				return;
 
@@ -136,8 +140,8 @@
     					return;
     				}
         			       			
-    				var searchType = document.getElementById("searchType").value;
-    				params = "&searchType=" + searchType + "&scheduleDate=" + scheduleDate.getTime() + getSearchParams(); 
+    				
+    				params += "&scheduleDate=" + scheduleDate.getTime() + getSearchParams(); 
     			}
     			
     			var emailBody = encodeURIComponent(document.getElementById("emailBody").value);
@@ -217,6 +221,20 @@
 
 	<lams:Page title="${title}" type="admin">
 		<div class="row">
+			<div class="col-sm-12">
+				<div class="btn-group pull-right">
+					<a href="<c:url value='/emailNotifications.do'/>?method=showScheduledEmails&organisationID=${org.organisationId}"
+					   id="listEmailsHref" class="btn btn-default btn-sm">
+						<i class="fa fa-calendar"></i> <fmt:message key="email.notifications.scheduled.messages.button" />
+					</a>
+					<a href="<c:url value='/emailNotifications.do'/>?method=showArchivedEmails&organisationID=${org.organisationId}"
+					   id="archiveHref" class="btn btn-default btn-sm">
+						<i class="fa fa-archive"></i> <fmt:message key="email.notifications.archived.messages.button" />
+					</a>		
+				</div>
+			</div>
+		</div>
+		<div class="row">
 			<div class="col-sm-6">
 				<h4><fmt:message key="email.notifications.notify.sudents.that"/></h4>
 				
@@ -262,7 +280,7 @@
 			</div>
 			<div class="col-sm-6">
 				<div id="emailTextareaDiv">
-				
+					<h4><fmt:message key="email.notifications.message.header"/></h4>
 					<c:set var="emailBody"><fmt:message key="email.notifications.course.email.body.header"/><br/><br/><fmt:message key="email.notifications.course.email.body.msg"/><br/><br/><br/>
 					</c:set>
 					<textarea rows="8" name="emailBody" id="emailBody" width="100%"  class="form-control" >${fn:replace(emailBody, '<br/>', newLineChar)}</textarea>

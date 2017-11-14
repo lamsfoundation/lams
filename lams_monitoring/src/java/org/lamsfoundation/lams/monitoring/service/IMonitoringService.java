@@ -26,10 +26,13 @@ package org.lamsfoundation.lams.monitoring.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 
+import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -43,6 +46,7 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -416,6 +420,7 @@ public interface IMonitoringService {
      *            id of the activity.
      * @return the requested activity object.
      */
+    @SuppressWarnings("rawtypes")
     Activity getActivityById(Long activityId, Class clasz);
 
     /**
@@ -662,4 +667,30 @@ public interface IMonitoringService {
      * Get list of users who completed the given lesson.
      */
     List<User> getUsersCompletedLesson(Long lessonId, Integer limit, Integer offset, boolean orderAscending);
+
+    /**
+     * Save information about an email notification sent to learners.
+     */
+    void archiveEmailNotification(Integer organisationId, Long lessonId, Integer searchType, String body,
+	    Set<Integer> recipients);
+
+    /**
+     * Gets archived notifications for the given organisation.
+     */
+    List<EmailNotificationArchive> getArchivedEmailNotifications(Integer organisationId);
+
+    /**
+     * Gets archived notifications for the given lesson.
+     */
+    List<EmailNotificationArchive> getArchivedEmailNotifications(Long lessonId);
+
+    /**
+     * Gets pages recipients of the given archived email notification.
+     */
+    List<User> getArchivedEmailNotificationRecipients(Long emailNotificationUid, Integer limit, Integer offset);
+
+    /**
+     * Exports the given email notification to Excel sheet
+     */
+    LinkedHashMap<String, ExcelCell[][]> exportArchivedEmailNotification(Long emailNotificationUid);
 }
