@@ -11,9 +11,13 @@
 <%@ attribute name="usePanel" required="false" rtexprvalue="true"%>
 <%@ attribute name="hideProgressBar" required="false" rtexprvalue="true"%>
 
+<%@ tag  import="org.lamsfoundation.lams.util.Configuration"%>
+<%@ tag  import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
+
 <c:if test="${empty usePanel}">				
 	<c:set var="usePanel">true</c:set>
 </c:if>
+<c:set var="displayPortrait"><%=Configuration.get(ConfigurationKeys.DISPLAY_PORTRAIT)%></c:set>
 
 <c:choose>
 
@@ -22,7 +26,7 @@
 		<div class="row no-gutter no-margin">
 		<div class="col-xs-12">
 		<div class="container" id="content">
-		<jsp:doBody />
+			<jsp:doBody />
 		</div>
 		</div>
 		</div>
@@ -47,6 +51,8 @@
 	
 		<%-- Links placed in body instead of head. Ugly, but it works. --%>
 		<lams:css suffix="progressBar"/>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 		
@@ -282,21 +288,52 @@
 					</button>
 					<a class="navbar-brand visible-xs hidden-sm hidden-md hidden-lg" href="#"><span class="lessonName"></span></a>
 				</div>
+				
 				<!-- Collect the nav links, forms, and other content for toggling -->
 				<div class="collapse navbar-collapse" id="bs-sidebar-navbar-collapse-1">
 					<ul class="nav navbar-nav">
-						<li><a href="#" class="hidden-xs visible-sm visible-md visible-lg slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
-							<i class="pull-right fa fa-bars"></i>
-							<p class="lessonName"></p></a></li>
-						<li><a href="#" onClick="javascript:closeWindow()" ><span id="exitlabel">Exit</span><i class="pull-right fa fa-times"></i></a></li>
-						<li><a href="#" onClick="javascript:viewNotebookEntries(); return false;" ><span id="notebooklabel">Notebook</span><i class="pull-right fa fa-book"></i></a></li>
-						<li id="restartitem" style="display:none"><a href="#" onClick="javascript:restartLesson()"><span id="restartlabel">Restart</span><i class="pull-right fa fa-fast-backward "></i></a></li>
-						<li id="supportitem" style="display:none"><a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
-							<span id="supportlabel">Support Activities</span><i class="pull-right fa fa-th-large"></i></a>
+						<li>
+							<c:if test="${displayPortrait}">
+								<a id="navbar-portrait" href="#" onclick="javascript:showMyPortraitDialog(); return false;">
+									<c:set var="userId"><lams:user property="userID" /></c:set>
+									<lams:Portrait userId="${userId}"/>	
+								</a>
+							</c:if>
+					
+							<a href="#" class="hidden-xs visible-sm visible-md visible-lg slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
+								<c:if test="${!displayPortrait}">
+									<i class="pull-right fa fa-bars"></i>
+								</c:if>
+								
+								<p class="lessonName <c:if test='${!displayPortrait}'>no-portrait</c:if>"></p>
+							</a>
+						</li>
+						<li>
+							<a href="#" onClick="javascript:viewNotebookEntries(); return false;" >
+								<span id="notebooklabel">Notebook</span>
+								<i class="pull-right fa fa-book"></i>
+							</a>
+						</li>
+						<li id="restartitem" style="display:none">
+							<a href="#" onClick="javascript:restartLesson()">
+								<span id="restartlabel">Restart</span>
+								<i class="pull-right fa fa-fast-backward "></i>
+							</a>
+						</li>
+						<li id="supportitem" style="display:none">
+							<a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
+								<span id="supportlabel">Support Activities</span>
+								<i class="pull-right fa fa-th-large"></i>
+							</a>
 							<div id="supportPart" class="progressBarContainer"></div>
-						<li><a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
-							<span id="progresslabel">My Progress</span><i class="pull-right fa fa-map"></i></a>
-							<div id="progressBarDiv" class="progressBarContainer"></div></li>
+						</li>
+						<li>
+							<a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
+								<span id="progresslabel">My Progress</span>
+								<i class="pull-right fa fa-map"></i>
+							</a>
+							<div id="progressBarDiv" class="progressBarContainer"></div>
+						</li>
 					</ul>
 				</div>
 			</div>

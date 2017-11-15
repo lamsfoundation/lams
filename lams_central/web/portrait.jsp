@@ -218,12 +218,14 @@
 			    </div>
 			</div>
 		</div>
-		
-		<div align="right">
-			<a class="btn btn-sm btn-file btn-default offset5" role="button" href="<c:url value='/index.do'/>?method=profile">
-				<fmt:message key="label.return.to.myprofile" />
-			</a>
-		</div>
+
+		<c:if test="${!param.isReturnButtonHidden}">
+			<div align="right">
+				<a class="btn btn-sm btn-file btn-default offset5" role="button" href="<c:url value='/index.do'/>?method=profile">
+					<fmt:message key="label.return.to.myprofile" />
+				</a>
+			</div>
+		</c:if>
 	</div>
 	</div>
 	</div>	

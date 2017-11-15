@@ -1,0 +1,70 @@
+/*DIALOGS*/
+.dialogContainer {
+	-webkit-overflow-scrolling: touch !important;
+}
+
+.dialogContainer .modal-body {
+	height : 100%;
+	max-height: calc(100% - 38px);
+	padding: 0;
+}
+
+.dialogContainer iframe {
+	width: 100%;
+	height: 100%;
+	border: none;
+}
+
+.dialogContainer button {
+	cursor: pointer;
+}
+.dialogContainer button:focus {
+	outline: none;
+}
+
+.dialogContainer button .fa {
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.dialogContainer .ui-draggable .modal-header {
+	cursor: move;
+}
+
+.dialogMin {
+	top: auto !important;
+	bottom: 5px !important;
+	overflow: hidden !important;
+	padding: 0 !important;
+	position: fixed !important;
+	width: 250px !important;
+	height: 35px !important;
+}
+
+.dialogMin .modal-title {
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.dialogMin .modal-dialog {
+	left: 0 !important;
+	top: 0 !important;
+}
+
+.dialogMin .modal-dialog, .dialogMin .modal-content {
+	width: 250px !important;
+	height: 35px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.dialogMin .modal-header {
+	height: 100%;
+	margin: 0 !important;
+	padding: 3px 5px !important;
+	cursor: default !important;
+}
+
+.ui-dialog .ui-dialog-content {
+	padding: 3px;
+}
