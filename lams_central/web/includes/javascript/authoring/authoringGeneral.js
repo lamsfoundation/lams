@@ -2122,7 +2122,8 @@ GeneralLib = {
 				this.orderID = null;
 			}
 			
-			if (this.gradebookToolOutputWeight || this.gradebookToolOutputWeight == 0) {
+			if (this.gradebookToolOutputDefinitionWeightable
+				&& (this.gradebookToolOutputWeight || this.gradebookToolOutputWeight == 0)) {
 				if (weightsSum == null) {
 					weightsSum = 0;
 				}

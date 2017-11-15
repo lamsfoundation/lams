@@ -719,6 +719,10 @@ var PropertyDefs = {
 								return false;
 							}
 						});
+					} else {
+						activity.gradebookToolOutputDefinitionDescription = null;
+						activity.gradebookToolOutputDefinitionWeightable = false;
+						activity.gradebookToolOutputDefinitionWeight = null;
 					}
 				}
 				
