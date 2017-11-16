@@ -560,6 +560,9 @@ function downHand() {
  * Set a learner as a speaker
  */
 function speak() {
+	if (!$('#raiseHandPrompt').is(':visible')) {
+		return;
+	}
 	var speakerId = $(this).attr('userId');
 	// the learner did not raise a hand; is the teacher sure to set him as a speaker?
 	if ($('#raiseHandContainer .learner[userId="' + speakerId + '"]').length == 0 
