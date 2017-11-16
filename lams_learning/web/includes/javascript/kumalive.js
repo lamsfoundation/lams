@@ -165,10 +165,19 @@ function init(message) {
 	roleTeacher = message.isTeacher && message.roleTeacher;
 	
 	// hide all buttons and enable ones appropriate for the role
-	$('#mainDiv button').hide();
+	$('#actionCell button').hide();
 	if (roleTeacher) {
 		$('#raiseHandPromptButton').click(raiseHandPrompt);
 		$('#downHandPromptButton').click(downHandPrompt);
+		$('#pollButton').click(pollSetup).show();
+		$('#pollSetupAnswer').change(function(){
+			if ($('#pollSetupAnswer option:selected').val() === 'custom') {
+				$('#pollSetupAnswerCustom').show();
+			} else {
+				$('#pollSetupAnswerCustom').hide();
+			}
+		});
+		$('#pollSetupCancelButton').click(pollSetupCancel);
 		$('#score i').click(score);
 		$('#finishButton').click(finish).show();
 	} else {
@@ -290,7 +299,6 @@ function processParticipants(message) {
 		}
 		learnerFadeIn(learnerDiv);
 	});
-	
 	// remove learners who left
 	$('.learner', learnersContainer).each(function(){
 		var learnerDiv = $(this),
@@ -601,6 +609,17 @@ function score(){
 	}
 }
 
+function pollSetup() {
+	$('#pollButton').prop('disabled', true);
+	$('#pollCell').show();
+}
+
+function pollSetupCancel() {
+	$('#pollCell').hide();
+	$('#pollCell input').val(null);
+	$('#pollCell select option:first-child').prop('selected', true);
+	$('#pollButton').prop('disabled', false);
+}
 
 /**
  * Create a new Kumalive

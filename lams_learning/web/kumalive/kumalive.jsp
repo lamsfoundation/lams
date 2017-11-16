@@ -64,12 +64,13 @@
 	</div>
 	<div id="mainDiv" class="container-fluid">
 		<div class="row">
-			<div id="actionCell" class="col-sm-11">
+			<div id="actionCell" class="col-md-1">
 				<div id="teacher" class="speaker">
 					<h3><fmt:message key="label.kumalive.teacher"/></h3>
 					<div class="profilePicture"></div>
 					<div class="name"></div>
 					<button id="raiseHandPromptButton" class="btn btn-default"><fmt:message key="button.kumalive.ask"/></button><br />
+					<button id="pollButton" class="btn btn-default"><fmt:message key="button.kumalive.poll"/></button><br />
 					<button id="finishButton" class="btn btn-default"><fmt:message key="button.kumalive.finish.kumalive"/></button>
 				</div>
 				<div id="raiseHandPrompt">
@@ -88,7 +89,41 @@
 					<hr />
 				</div>
 			</div>
-			<div id="learnersCell" class="col-sm-1">
+			<div id="pollCell" class="col-md-1">
+				<div id="pollSetup">
+					<div class="form-group">
+						<label for="pollSetupQuestion"><h4><fmt:message key="label.kumalive.poll.question"/></h4></label>
+						<input id="pollSetupQuestion" type="text" class="form-control" placeholder="<fmt:message key='label.kumalive.poll.question.tip'/>" />
+					</div>
+					<div class="form-group">
+						<label for="pollSetupAnswer"><h4><fmt:message key="label.kumalive.poll.answer"/></h4></label>
+						<select id="pollSetupAnswer" class="form-control">
+							<option value="true-false">
+								<fmt:message key='label.kumalive.poll.answer.true'/>,
+								<fmt:message key='label.kumalive.poll.answer.false'/>
+							</option>
+							<option value="yes-no">
+								<fmt:message key='label.kumalive.poll.answer.yes'/>,
+								<fmt:message key='label.kumalive.poll.answer.no'/>
+							</option>
+							<option value="positive-negative">
+								<fmt:message key='label.kumalive.poll.answer.positive'/>,
+								<fmt:message key='label.kumalive.poll.answer.negative'/>
+							</option>
+							<option value="custom">
+								<fmt:message key='label.kumalive.poll.answer.custom'/>
+							</option>
+						</select><br />
+						<input id="pollSetupAnswerCustom" type="text" class="form-control"
+							   placeholder="<fmt:message key='label.kumalive.poll.answer.custom.tip'/>" />
+					</div>
+					<div id="pollSetupButtons">
+						<button id="pollSetupStartButton" class="btn btn-primary"><fmt:message key='button.kumalive.poll.start'/></button><br />
+						<button id="pollSetupCancelButton" class="btn btn-default"><fmt:message key='label.cancel.button'/></button>
+					</div>
+				</div>
+			</div>
+			<div id="learnersCell">
 				<div id="raiseHandContainer">
 					<h4><fmt:message key="label.kumalive.raised.hands"/></h4>
 				</div>

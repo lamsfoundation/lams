@@ -36,18 +36,41 @@
 	vertical-align: top;
 }
 
-#learnersCell {
-	width: 100%;
-	padding: 0;
-}
-
 #actionCell button {
 	width: 70%;
 	margin-top: 10px;
 }
 
+#pollCell {
+	display: none;
+	padding-bottom: 10px;
+	border-bottom: $border-thin-black;
+}
+
+#pollSetupAnswer {
+	width: initial;
+}
+
+#pollSetupAnswerCustom {
+	display: none;
+}
+
+#pollSetupButtons {
+	text-align: center;
+}
+
+#pollSetupButtons button {
+	width: 70%;
+	margin-top: 10px;
+}
+
+#learnersCell {
+	width: 100%;
+	padding: 0;
+}
+
 #learnersContainer {
-	padding-left: 15px;
+	padding-left: 10px;
 }
 
 #raiseHandContainer {
@@ -121,6 +144,7 @@
 
 .score {
 	display: none;
+	margin-top: 10px;
 }
 
 .score span {
@@ -153,15 +177,22 @@
 	display: none;
 }
 
-@media (min-width : $screen-sm-min) {
+@media (min-width : $screen-md-min) {
 	#actionCell {
 		width: 350px;
 		height: 100vh;
+		margin-right: 10px;
 		border-bottom: none;
 		border-right: $border-thin-black;
 	}
-	#learnersCell {
-		width: calc(100% - 350px);
+	
+	#pollCell {
+		width: 500px;
+		height: 100vh;
+		padding-left: 0;
+		margin-right: 10px;
+		border-bottom: none;
+		border-right: $border-thin-black;
 	}
 	
 	.learner {
