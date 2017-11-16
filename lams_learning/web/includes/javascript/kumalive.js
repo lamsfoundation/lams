@@ -1,3 +1,5 @@
+"use strict"
+
 var kumaliveWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws') 
 		+ 'kumaliveWebsocket?organisationID=' + orgId + '&role=' +role),
 	kumaliveWebsocketPingTimeout = null,
@@ -23,7 +25,6 @@ var kumaliveWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
 	REFRESH_DELAY = 1000,
 	ANIMATION_DURATION = 1000,
 	PING_DELAY = 3*60*1000;
-
 
 kumaliveWebsocketPingFunc = function(skipPing){
 	if (kumaliveWebsocket.readyState == kumaliveWebsocket.CLOSING 

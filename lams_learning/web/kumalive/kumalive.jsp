@@ -17,6 +17,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 	<script type="text/javascript">
+		"use strict"
+		
 		var	orgId = ${param.organisationID},
 			userId = <lams:user property="userID"/>,
 			role = '${param.role}',
