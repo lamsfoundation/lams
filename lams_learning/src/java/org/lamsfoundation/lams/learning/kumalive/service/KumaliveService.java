@@ -48,6 +48,8 @@ import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.UserComparator;
 import org.lamsfoundation.lams.learning.kumalive.dao.IKumaliveDAO;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
+import org.lamsfoundation.lams.learning.kumalive.model.KumalivePoll;
+import org.lamsfoundation.lams.learning.kumalive.model.KumalivePollAnswer;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveScore;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -85,8 +87,6 @@ public class KumaliveService implements IKumaliveService {
 
     /**
      * Fetches or creates a Kumalive
-     *
-     * @throws JSONException
      */
     @Override
     public Kumalive startKumalive(Integer organisationId, Integer userId, String name, JSONArray rubricsJSON,
@@ -539,6 +539,40 @@ public class KumaliveService implements IKumaliveService {
 	}
 
 	return rows.toArray(new ExcelCell[][] {});
+    }
+
+    @Override
+    public KumalivePoll getPollByOrganisation(Integer organisationId) {
+	return kumaliveDAO.findPoll(organisationId);
+    }
+
+    /**
+     * Creates a poll
+     */
+    @Override
+    public Long startPoll(Long kumaliveId, String name, JSONArray answersJSON) throws JSONException {
+	Kumalive kumalive = getKumalive(kumaliveId);
+	if (kumalive == null) {
+	    return null;
+	}
+	KumalivePoll poll = new KumalivePoll(kumalive, name);
+	kumaliveDAO.insert(poll);
+
+	Set<KumalivePollAnswer> answers = new HashSet<>();
+	for (Short answerIndex = 0; answerIndex < answersJSON.length(); answerIndex++) {
+	    String answerName = answersJSON.getString(answerIndex.intValue());
+	    KumalivePollAnswer answer = new KumalivePollAnswer(poll, answerIndex, answerName);
+	    kumaliveDAO.insert(answer);
+	    answers.add(answer);
+	}
+	poll.setAnswers(answers);
+	kumaliveDAO.update(poll);
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Teacher started poll " + poll.getPollId());
+	}
+
+	return poll.getPollId();
     }
 
     public void setSecurityService(ISecurityService securityService) {

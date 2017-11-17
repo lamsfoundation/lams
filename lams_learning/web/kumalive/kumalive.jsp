@@ -96,7 +96,8 @@
 					<div id="pollSetupQuestionGroup" class="form-group">
 						<label for="pollSetupQuestion" class="control-label"><h4><fmt:message key="label.kumalive.poll.question"/></h4></label>
 						<input id="pollSetupQuestion" type="text" class="form-control"
-							   placeholder="<fmt:message key='label.kumalive.poll.question.tip'/>" required/>
+							   placeholder="<fmt:message key='label.kumalive.poll.question.tip'/>"
+							   maxlength="250" required/>
 					</div>
 					<div class="form-group">
 						<label for="pollSetupAnswer" class="control-label"><h4><fmt:message key="label.kumalive.poll.answer"/></h4></label>

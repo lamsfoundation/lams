@@ -67,6 +67,7 @@ public class KumaliveWebsocketServer {
 	private Integer speaker;
 	private final Map<String, KumaliveUser> learners = new ConcurrentHashMap<>();
 	private final JSONArray rubrics = new JSONArray();
+	private JSONObject poll = null;
 
 	private KumaliveDTO(Kumalive kumalive) throws JSONException {
 	    this.id = kumalive.getKumaliveId();
@@ -169,6 +170,9 @@ public class KumaliveWebsocketServer {
 		break;
 	    case "score":
 		score(requestJSON, session);
+		break;
+	    case "startPoll":
+		startPoll(requestJSON, session);
 		break;
 	    case "finish":
 		finish(requestJSON, session);
@@ -293,6 +297,8 @@ public class KumaliveWebsocketServer {
 	}
 	responseJSON.put("speaker", kumalive.speaker);
 
+	responseJSON.put("poll", kumalive.poll);
+
 	// each learner's details
 	JSONArray learnersJSON = new JSONArray();
 	JSONObject logins = new JSONObject();
@@ -332,7 +338,7 @@ public class KumaliveWebsocketServer {
     }
 
     /**
-     * Tell learners that the teacher asked
+     * Tell learners that the teacher asked a question
      */
     private void raiseHandPrompt(JSONObject requestJSON, Session websocket) throws IOException, JSONException {
 	Integer organisationId = Integer
@@ -497,6 +503,34 @@ public class KumaliveWebsocketServer {
 		    + " in Kumalive " + kumalive.id);
 	}
 
+	sendRefresh(kumalive);
+    }
+
+    /**
+     * Tell learners that the teacher started a poll
+     */
+    private void startPoll(JSONObject requestJSON, Session websocket) throws IOException, JSONException {
+	Integer organisationId = Integer
+		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_ORGANISATION_ID).get(0));
+	KumaliveDTO kumalive = kumalives.get(organisationId);
+
+	User user = getUser(websocket);
+	Integer userId = user.getUserId();
+
+	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive poll start", false)) {
+	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
+	    logger.warn(warning);
+	    return;
+	}
+
+	kumalive.poll = requestJSON.getJSONObject("poll");
+	Long pollId = KumaliveWebsocketServer.getKumaliveService().startPoll(kumalive.id,
+		kumalive.poll.getString("name"), kumalive.poll.getJSONArray("answers"));
+	kumalive.poll.put("id", pollId);
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Teacher " + userId + " started poll " + pollId + " in Kumalive " + kumalive.id);
+	}
 	sendRefresh(kumalive);
     }
 

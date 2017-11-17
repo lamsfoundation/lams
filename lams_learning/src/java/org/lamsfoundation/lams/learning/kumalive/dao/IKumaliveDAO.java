@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
+import org.lamsfoundation.lams.learning.kumalive.model.KumalivePoll;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveScore;
 
@@ -42,4 +43,6 @@ public interface IKumaliveDAO extends IBaseDAO {
     List<KumaliveScore> findKumaliveScore(Long kumaliveId, boolean isAscending);
 
     List<KumaliveScore> findKumaliveScore(Long kumaliveId, Integer userId);
+
+    KumalivePoll findPoll(Integer organisationId);
 }

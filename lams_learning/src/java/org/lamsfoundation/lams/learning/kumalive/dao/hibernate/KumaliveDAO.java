@@ -29,6 +29,7 @@ import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learning.kumalive.dao.IKumaliveDAO;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
+import org.lamsfoundation.lams.learning.kumalive.model.KumalivePoll;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveScore;
 import org.springframework.stereotype.Repository;
@@ -47,6 +48,8 @@ public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
 	    + " AS s WHERE s.rubric.kumalive.kumaliveId = ? ORDER BY s.user.firstName ";
     private static final String FIND_SCORE_BY_KUMALIVE_AND_USER = "FROM " + KumaliveScore.class.getName()
 	    + " AS s WHERE s.rubric.kumalive.kumaliveId = ? AND s.user.userId = ?";
+    private static final String FIND_CURRENT_POLL_BY_ORGANISATION = "FROM " + KumalivePoll.class.getName()
+	    + " AS p WHERE p.kumalive.organisation.organisationId = ? AND k.finishDate IS NULL";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -103,5 +106,12 @@ public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
     @Override
     public List<KumaliveScore> findKumaliveScore(Long kumaliveId, Integer userId) {
 	return (List<KumaliveScore>) doFind(FIND_SCORE_BY_KUMALIVE_AND_USER, kumaliveId, userId);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public KumalivePoll findPoll(Integer organisationId) {
+	List<KumalivePoll> result = (List<KumalivePoll>) doFind(FIND_CURRENT_POLL_BY_ORGANISATION, organisationId);
+	return result.isEmpty() ? null : result.get(0);
     }
 }

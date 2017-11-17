@@ -633,12 +633,13 @@ function startPoll(){
 	// validation
 	if (question) {
 		$('#pollSetupQuestionGroup').removeClass('has-error');
-		poll.question = question;
+		poll.name = question;
 	} else {
 		$('#pollSetupQuestionGroup').addClass('has-error');
 	}
 	
-	if ($('#pollSetupAnswer option:selected').val() === 'custom'){
+	var selectedOption = $('#pollSetupAnswer option:selected');
+	if (selectedOption.val() === 'custom'){
 		$('#pollSetupAnswerCustomParseError').hide();
 		var answerString = $('#pollSetupAnswerCustom').val();
 		// check if brackets are closed and there is nothing between them, for example "{aaa} {bb" or "{aaa} bb {ccc}"
@@ -685,12 +686,18 @@ function startPoll(){
 		} else {
 			$('#pollSetupAnswerCustomGroup').addClass('has-error');
 		}
+	} else {
+		var answers = [];
+		$.each(selectedOption.text().split(','), function() {
+			answers.push(this.trim());
+		});
+		poll.answers = answers;
 	}
 	
-	if (!poll.question || !poll.answers) {
+	if (!poll.name || !poll.answers) {
 		return;
 	}
-	
+
 	kumaliveWebsocket.send(JSON.stringify({
 		'type' : 'startPoll',
 		'poll' : poll
