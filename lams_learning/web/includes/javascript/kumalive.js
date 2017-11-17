@@ -170,7 +170,7 @@ function init(message) {
 	if (roleTeacher) {
 		$('#raiseHandPromptButton').click(raiseHandPrompt);
 		$('#downHandPromptButton').click(downHandPrompt);
-		$('#pollButton').click(pollSetup).show();
+		$('#pollButton').click(setupPoll).show();
 		$('#pollSetupAnswer').change(function(){
 			if ($('#pollSetupAnswer option:selected').val() === 'custom') {
 				$('#pollSetupAnswerCustom').show();
@@ -178,7 +178,8 @@ function init(message) {
 				$('#pollSetupAnswerCustom').hide();
 			}
 		});
-		$('#pollSetupCancelButton').click(pollSetupCancel);
+		$('#pollSetupCancelButton').click(setupPollCancel);
+		$('#pollSetupStartButton').click(startPoll);
 		$('#score i').click(score);
 		$('#finishButton').click(finish).show();
 	} else {
@@ -613,16 +614,87 @@ function score(){
 	}
 }
 
-function pollSetup() {
+function setupPoll() {
 	$('#pollButton').prop('disabled', true);
 	$('#pollCell').show();
+	$('#pollSetupQuestion').focus();
 }
 
-function pollSetupCancel() {
+function setupPollCancel() {
 	$('#pollCell').hide();
 	$('#pollCell input').val(null);
 	$('#pollCell select option:first-child').prop('selected', true);
 	$('#pollButton').prop('disabled', false);
+}
+
+function startPoll(){
+	var question = $('#pollSetupQuestion').val(),
+		poll = {};
+	// validation
+	if (question) {
+		$('#pollSetupQuestionGroup').removeClass('has-error');
+		poll.question = question;
+	} else {
+		$('#pollSetupQuestionGroup').addClass('has-error');
+	}
+	
+	if ($('#pollSetupAnswer option:selected').val() === 'custom'){
+		$('#pollSetupAnswerCustomParseError').hide();
+		var answerString = $('#pollSetupAnswerCustom').val();
+		// check if brackets are closed and there is nothing between them, for example "{aaa} {bb" or "{aaa} bb {ccc}"
+		if (answerString) {
+			var index = -1,
+				indexEnd = -1,
+				answers = [];
+			do {
+				// find opening bracket
+				index = answerString.indexOf('{', index + 1);
+				if (index >= 0) {
+					// is there anything other than whitespace between } and {
+					if (answerString.substring(indexEnd + 1, index).trim()) {
+						answers = [];
+						break;
+					}
+					// is there a matching }
+					indexEnd = answerString.indexOf('}', index + 1);
+					if (indexEnd < 0) {
+						answers = [];
+						break;
+					}
+					var answer = answerString.substring(index + 1, indexEnd);
+					// is the answer not empty, i.e. {   }
+					if (answer.trim()) {
+						answers.push(answer);
+					} else {
+						answers = [];
+						break;
+					}
+				} else if (indexEnd && answerString.substring(indexEnd + 1).trim()) {
+					// is there anything after last }
+					answers = [];
+					break;
+				}
+			} while (index >= 0);
+			if (answers.length === 0) {
+				$('#pollSetupAnswerCustomGroup').addClass('has-error');
+				$('#pollSetupAnswerCustomParseError').show();
+			} else {
+				$('#pollSetupAnswerCustomGroup').removeClass('has-error');
+				poll.answers = answers;
+			}
+		} else {
+			$('#pollSetupAnswerCustomGroup').addClass('has-error');
+		}
+	}
+	
+	if (!poll.question || !poll.answers) {
+		return;
+	}
+	
+	kumaliveWebsocket.send(JSON.stringify({
+		'type' : 'startPoll',
+		'poll' : poll
+	}));
 }
 
 /**

@@ -93,12 +93,13 @@
 			</div>
 			<div id="pollCell" class="col-md-1">
 				<div id="pollSetup">
-					<div class="form-group">
-						<label for="pollSetupQuestion"><h4><fmt:message key="label.kumalive.poll.question"/></h4></label>
-						<input id="pollSetupQuestion" type="text" class="form-control" placeholder="<fmt:message key='label.kumalive.poll.question.tip'/>" />
+					<div id="pollSetupQuestionGroup" class="form-group">
+						<label for="pollSetupQuestion" class="control-label"><h4><fmt:message key="label.kumalive.poll.question"/></h4></label>
+						<input id="pollSetupQuestion" type="text" class="form-control"
+							   placeholder="<fmt:message key='label.kumalive.poll.question.tip'/>" required/>
 					</div>
 					<div class="form-group">
-						<label for="pollSetupAnswer"><h4><fmt:message key="label.kumalive.poll.answer"/></h4></label>
+						<label for="pollSetupAnswer" class="control-label"><h4><fmt:message key="label.kumalive.poll.answer"/></h4></label>
 						<select id="pollSetupAnswer" class="form-control">
 							<option value="true-false">
 								<fmt:message key='label.kumalive.poll.answer.true'/>,
@@ -115,9 +116,14 @@
 							<option value="custom">
 								<fmt:message key='label.kumalive.poll.answer.custom'/>
 							</option>
-						</select><br />
-						<input id="pollSetupAnswerCustom" type="text" class="form-control"
-							   placeholder="<fmt:message key='label.kumalive.poll.answer.custom.tip'/>" />
+						</select>
+					</div>
+					<div id="pollSetupAnswerCustomGroup" class="form-group">
+						<input id="pollSetupAnswerCustom" type="text" class="form-control" aria-describedby="pollSetupAnswerCustomParseError"
+							   placeholder="<fmt:message key='label.kumalive.poll.answer.custom.tip'/>" required/>
+						<span id="pollSetupAnswerCustomParseError" class="help-block">
+							<fmt:message key='label.kumalive.poll.answer.custom.error.syntax'/>
+						</span>
 					</div>
 					<div id="pollSetupButtons">
 						<button id="pollSetupStartButton" class="btn btn-primary"><fmt:message key='button.kumalive.poll.start'/></button><br />
