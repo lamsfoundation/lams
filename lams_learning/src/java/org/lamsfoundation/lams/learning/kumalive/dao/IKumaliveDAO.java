@@ -44,5 +44,5 @@ public interface IKumaliveDAO extends IBaseDAO {
 
     List<KumaliveScore> findKumaliveScore(Long kumaliveId, Integer userId);
 
-    KumalivePoll findPoll(Integer organisationId);
+    KumalivePoll findPollByKumaliveId(Long kumaliveId);
 }

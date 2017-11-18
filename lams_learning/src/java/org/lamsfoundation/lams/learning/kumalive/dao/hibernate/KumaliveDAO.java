@@ -48,8 +48,8 @@ public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
 	    + " AS s WHERE s.rubric.kumalive.kumaliveId = ? ORDER BY s.user.firstName ";
     private static final String FIND_SCORE_BY_KUMALIVE_AND_USER = "FROM " + KumaliveScore.class.getName()
 	    + " AS s WHERE s.rubric.kumalive.kumaliveId = ? AND s.user.userId = ?";
-    private static final String FIND_CURRENT_POLL_BY_ORGANISATION = "FROM " + KumalivePoll.class.getName()
-	    + " AS p WHERE p.kumalive.organisation.organisationId = ? AND k.finishDate IS NULL";
+    private static final String FIND_CURRENT_POLL_BY_KUMALIVE = "FROM " + KumalivePoll.class.getName()
+	    + " AS p WHERE p.kumalive.kumaliveId = ? AND p.finishDate IS NULL";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -110,8 +110,8 @@ public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public KumalivePoll findPoll(Integer organisationId) {
-	List<KumalivePoll> result = (List<KumalivePoll>) doFind(FIND_CURRENT_POLL_BY_ORGANISATION, organisationId);
+    public KumalivePoll findPollByKumaliveId(Long kumaliveId) {
+	List<KumalivePoll> result = (List<KumalivePoll>) doFind(FIND_CURRENT_POLL_BY_KUMALIVE, kumaliveId);
 	return result.isEmpty() ? null : result.get(0);
     }
 }

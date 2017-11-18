@@ -61,7 +61,9 @@ public interface IKumaliveService {
 
     LinkedHashMap<String, ExcelCell[][]> exportKumalives(Integer organisationId);
 
-    KumalivePoll getPollByOrganisation(Integer organisationId);
+    KumalivePoll getPollByKumaliveId(Long kumaliveId);
 
-    Long startPoll(Long kumaliveId, String name, JSONArray answersJSON) throws JSONException;
+    KumalivePoll startPoll(Long kumaliveId, String name, JSONArray answersJSON) throws JSONException;
+
+    void finishPoll(Long pollId) throws JSONException;
 }

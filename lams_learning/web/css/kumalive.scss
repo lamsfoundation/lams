@@ -51,7 +51,7 @@
 	width: initial;
 }
 
-#pollSetupAnswerCustom, #pollSetupAnswerCustomParseError {
+#pollSetup, #pollSetupAnswerCustom, #pollSetupAnswerCustomParseError, #pollSetupAnswerCustomCountError {
 	display: none;
 }
 
@@ -62,6 +62,33 @@
 #pollSetupButtons button {
 	width: 70%;
 	margin-top: 10px;
+}
+
+#pollRun, #pollRunAnswerRadioTemplate, #pollRunFinishButton {
+	display: none;
+}
+
+#pollRun {
+	text-align: center;
+}
+
+#pollRunQuestion {
+	margin-top: 20px;
+}
+
+#pollRunAnswerRadios {
+	display: inline-block;
+	text-align: left;
+	margin: 0 auto;
+}
+
+#pollRunVoteButton {
+	margin-top: 20px;
+}
+
+#pollRunAnswerList .list-group-item {
+	margin: 5px 20px;
+	text-align: left;
 }
 
 #learnersCell {

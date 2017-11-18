@@ -38,7 +38,9 @@
 				<fmt:message key="message.kumalive.speak.not.raised.hand" var="SPEAK_CONFIRM_VAR"/>
 				SPEAK_CONFIRM : decoderDiv.html('<c:out value="${SPEAK_CONFIRM_VAR}" />').text(),
 				<fmt:message key="label.kumalive.finish.speak" var="SPEAK_FINISH_VAR"/>
-				SPEAK_FINISH : '<c:out value="${SPEAK_FINISH_VAR}" />'
+				SPEAK_FINISH : '<c:out value="${SPEAK_FINISH_VAR}" />',
+				<fmt:message key="message.kumalive.poll.finish.confirm" var="POLL_FINISH_CONFIRM_VAR"/>
+				POLL_FINISH_CONFIRM : decoderDiv.html('<c:out value="${POLL_FINISH_CONFIRM_VAR}" />').text()
 			};
 			
 	</script>
@@ -94,13 +96,17 @@
 			<div id="pollCell" class="col-md-1">
 				<div id="pollSetup">
 					<div id="pollSetupQuestionGroup" class="form-group">
-						<label for="pollSetupQuestion" class="control-label"><h4><fmt:message key="label.kumalive.poll.question"/></h4></label>
+						<label for="pollSetupQuestion" class="control-label">
+							<h4><fmt:message key="label.kumalive.poll.question"/></h4>
+						</label>
 						<input id="pollSetupQuestion" type="text" class="form-control"
 							   placeholder="<fmt:message key='label.kumalive.poll.question.tip'/>"
 							   maxlength="250" required/>
 					</div>
 					<div class="form-group">
-						<label for="pollSetupAnswer" class="control-label"><h4><fmt:message key="label.kumalive.poll.answer"/></h4></label>
+						<label for="pollSetupAnswer" class="control-label">
+							<h4><fmt:message key="label.kumalive.poll.answer"/></h4>
+						</label>
 						<select id="pollSetupAnswer" class="form-control">
 							<option value="true-false">
 								<fmt:message key='label.kumalive.poll.answer.true'/>,
@@ -120,16 +126,43 @@
 						</select>
 					</div>
 					<div id="pollSetupAnswerCustomGroup" class="form-group">
-						<input id="pollSetupAnswerCustom" type="text" class="form-control" aria-describedby="pollSetupAnswerCustomParseError"
+						<input id="pollSetupAnswerCustom" type="text" class="form-control"
 							   placeholder="<fmt:message key='label.kumalive.poll.answer.custom.tip'/>" required/>
 						<span id="pollSetupAnswerCustomParseError" class="help-block">
 							<fmt:message key='label.kumalive.poll.answer.custom.error.syntax'/>
 						</span>
+						<span id="pollSetupAnswerCustomCountError" class="help-block">
+							<fmt:message key='label.kumalive.poll.answer.custom.error.count'/>
+						</span>
 					</div>
 					<div id="pollSetupButtons">
-						<button id="pollSetupStartButton" class="btn btn-primary"><fmt:message key='button.kumalive.poll.start'/></button><br />
-						<button id="pollSetupCancelButton" class="btn btn-default"><fmt:message key='label.cancel.button'/></button>
+						<button id="pollSetupStartButton" class="btn btn-primary">
+							<fmt:message key='button.kumalive.poll.start'/>
+						</button><br />
+						<button id="pollSetupCancelButton" class="btn btn-default">
+							<fmt:message key='label.cancel.button'/>
+						</button>
 					</div>
+				</div>
+				<div id="pollRun">
+					<h3><fmt:message key='button.kumalive.poll'/></h3>
+					<h4 id="pollRunQuestion"></h4>
+					<div id="pollRunAnswerRadioTemplate" class="radio">
+  						<label><input type="radio" name="pollRunAnswer" /></label>
+					</div>
+					<div id="pollRunAnswerRadios"></div>
+					<br />
+					<button id="pollRunVoteButton" class="btn btn-primary">
+						<fmt:message key='button.kumalive.poll.vote'/>
+					</button>
+					<ul id="pollRunAnswerList" class="list-group"></ul>
+					<br />
+					<button id="pollRunFinishButton" class="btn btn-default">
+						<fmt:message key='button.kumalive.poll.finish'/>
+					</button>
+					<button id="pollRunCloseButton" class="btn btn-default">
+						<fmt:message key='button.kumalive.poll.close'/>
+					</button>
 				</div>
 			</div>
 			<div id="learnersCell">

@@ -542,15 +542,15 @@ public class KumaliveService implements IKumaliveService {
     }
 
     @Override
-    public KumalivePoll getPollByOrganisation(Integer organisationId) {
-	return kumaliveDAO.findPoll(organisationId);
+    public KumalivePoll getPollByKumaliveId(Long kumaliveId) {
+	return kumaliveDAO.findPollByKumaliveId(kumaliveId);
     }
 
     /**
      * Creates a poll
      */
     @Override
-    public Long startPoll(Long kumaliveId, String name, JSONArray answersJSON) throws JSONException {
+    public KumalivePoll startPoll(Long kumaliveId, String name, JSONArray answersJSON) throws JSONException {
 	Kumalive kumalive = getKumalive(kumaliveId);
 	if (kumalive == null) {
 	    return null;
@@ -572,7 +572,22 @@ public class KumaliveService implements IKumaliveService {
 	    logger.debug("Teacher started poll " + poll.getPollId());
 	}
 
-	return poll.getPollId();
+	return poll;
+    }
+
+    @Override
+    public void finishPoll(Long pollId) throws JSONException {
+	KumalivePoll poll = (KumalivePoll) kumaliveDAO.find(KumalivePoll.class, pollId);
+	if (poll.getFinishDate() != null) {
+	    logger.warn("Trying to finish poll " + pollId + " which is already finished");
+	    return;
+	}
+	poll.setFinishDate(new Date());
+	kumaliveDAO.update(poll);
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Teacher finished poll " + poll.getPollId());
+	}
     }
 
     public void setSecurityService(ISecurityService securityService) {

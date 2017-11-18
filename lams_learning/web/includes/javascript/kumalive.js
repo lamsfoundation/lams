@@ -16,6 +16,10 @@ var kumaliveWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
 	speakerId = null,
 	// rubrics to evaluate speaker
 	rubrics = null,
+	// is a poll running now and what ID
+	pollId = null,
+	// answers will be numbered 
+	pollAnswerBullets = 'abcdefghij',
 	// index of user icon colour currently used
 	learnerColorIndex = 1,
 	// template of a HTML structure of a learner
@@ -170,6 +174,7 @@ function init(message) {
 	if (roleTeacher) {
 		$('#raiseHandPromptButton').click(raiseHandPrompt);
 		$('#downHandPromptButton').click(downHandPrompt);
+		$('#score i').click(score);
 		$('#pollButton').click(setupPoll).show();
 		$('#pollSetupAnswer').change(function(){
 			if ($('#pollSetupAnswer option:selected').val() === 'custom') {
@@ -180,7 +185,8 @@ function init(message) {
 		});
 		$('#pollSetupCancelButton').click(setupPollCancel);
 		$('#pollSetupStartButton').click(startPoll);
-		$('#score i').click(score);
+		$('#pollRunFinishButton').click(finishPoll);
+		$('#pollRunCloseButton').click(closePoll);
 		$('#finishButton').click(finish).show();
 	} else {
 		$('#raiseHandButton').click(raiseHand);
@@ -214,11 +220,12 @@ function processRefresh(message) {
 	repeat |= processParticipants(message);
 	repeat |= processRaisedHand(message);
 	repeat |= toggleSpeak(message);
+	processPoll(message);
 
 	if (repeat || queuedMessage) {
 		setTimeout(function() {
 			// get the newest message
-			nextMessage = queuedMessage || message;
+			var nextMessage = queuedMessage || message;
 			queuedMessage = null;
 			processRefresh(nextMessage);
 		}, REFRESH_DELAY);
@@ -313,6 +320,65 @@ function processParticipants(message) {
 	});
 	
 	return result;
+}
+
+/**
+ * Display current poll results
+ */
+function processPoll(message) {
+	var poll = message.poll;
+	// is there a poll running now?
+	if (!poll) {
+		if (pollId) {
+			// there is no poll anymore, i.e. current poll was closed
+			pollId = null;
+			// close the panel
+			$('#pollCell').hide();
+			$('#pollButton').prop('disabled', false);
+		}
+		return;
+	}
+	
+	// open panel if closed
+	$('#pollCell, #pollRun').show();
+	
+	// init poll fields or make them read only after voting
+	if (poll.id != pollId || (poll.finished && $('#pollRunVoteButton').is(':visible'))) {
+		pollId = poll.id;
+		$('#pollRun button').hide();
+		$('#pollRunQuestion').text(poll.name);
+		var radioList = $('#pollRunAnswerRadios').empty(),
+			answerList = $('#pollRunAnswerList').empty();
+		// teachers can't vote; learner can't vote twice; learner can't vote for finished poll
+		if (roleTeacher || poll.voted || poll.finished) {
+			// build simple list of answers
+			$.each(poll.answers, function(index, answer){
+				var answerElement = $('<li />').addClass('list-group-item').text(pollAnswerBullets[index] + ') ' + answer)
+											   .appendTo(answerList);
+				if (poll.votes) {
+					// show votes if user is teacher or votes were released
+					$('<span />').addClass('badge').text(poll.votes[index]).appendTo(answerElement);
+				}
+			});
+			$('#pollRunAnswerList').show();
+			// extra options for teacher
+			if (roleTeacher) {
+				if (poll.finished) {
+					$('#pollRunCloseButton').show();
+				} else {
+					$('#pollRunFinishButton').show();
+				}
+			}
+		} else {
+			// learner can vote, build radio buttons
+			$.each(poll.answers, function(index, answer){
+				$('#pollRunAnswerRadioTemplate').clone().attr('id', null).appendTo(radioList)
+					.find('label').append($('<span />').text(pollAnswerBullets[index] + ') ' + answer))
+					.find('input').val(index);
+			});
+			$('#pollRunVoteButton').show();
+		}
+	}
 }
 
 /**
@@ -614,19 +680,36 @@ function score(){
 	}
 }
 
+/**
+ * Show form where teacher can build poll
+ */
 function setupPoll() {
 	$('#pollButton').prop('disabled', true);
-	$('#pollCell').show();
+	$('#pollRun').hide();
+	// reset form inputs
+	$('#pollSetup input').val(null);
+	$('#pollSetup select option:first-child').prop('selected', true);
+	$('#pollSetupAnswerCustom').hide();
+	$('#pollCell, #pollSetup').show();
 	$('#pollSetupQuestion').focus();
 }
 
+/**
+ * Cancel poll building
+ */
 function setupPollCancel() {
-	$('#pollCell').hide();
-	$('#pollCell input').val(null);
-	$('#pollCell select option:first-child').prop('selected', true);
-	$('#pollButton').prop('disabled', false);
+	$('#pollSetup').hide();
+	if (pollId) {
+		$('#pollRun').show();
+	} else {
+		$('#pollCell').hide();
+		$('#pollButton').prop('disabled', false);
+	}
 }
 
+/**
+ * Create a poll with parameters set up in form
+ */
 function startPoll(){
 	var question = $('#pollSetupQuestion').val(),
 		poll = {};
@@ -640,7 +723,7 @@ function startPoll(){
 	
 	var selectedOption = $('#pollSetupAnswer option:selected');
 	if (selectedOption.val() === 'custom'){
-		$('#pollSetupAnswerCustomParseError').hide();
+		$('#pollSetupAnswerCustomParseError, #pollSetupAnswerCustomCountError').hide();
 		var answerString = $('#pollSetupAnswerCustom').val();
 		// check if brackets are closed and there is nothing between them, for example "{aaa} {bb" or "{aaa} bb {ccc}"
 		if (answerString) {
@@ -679,6 +762,9 @@ function startPoll(){
 			if (answers.length === 0) {
 				$('#pollSetupAnswerCustomGroup').addClass('has-error');
 				$('#pollSetupAnswerCustomParseError').show();
+			} else if (answers.length > 10) {
+				$('#pollSetupAnswerCustomGroup').addClass('has-error');
+				$('#pollSetupAnswerCustomCountError').show();
 			} else {
 				$('#pollSetupAnswerCustomGroup').removeClass('has-error');
 				poll.answers = answers;
@@ -687,6 +773,7 @@ function startPoll(){
 			$('#pollSetupAnswerCustomGroup').addClass('has-error');
 		}
 	} else {
+		// parse simple options, for example "True, False"
 		var answers = [];
 		$.each(selectedOption.text().split(','), function() {
 			answers.push(this.trim());
@@ -694,13 +781,39 @@ function startPoll(){
 		poll.answers = answers;
 	}
 	
+	// there were errors, do not carry on
 	if (!poll.name || !poll.answers) {
 		return;
 	}
 
+	$('#pollSetup').hide();
 	kumaliveWebsocket.send(JSON.stringify({
 		'type' : 'startPoll',
 		'poll' : poll
+	}));
+}
+
+/**
+ * Prevent learners from voting
+ */
+function finishPoll() {
+	if (!confirm(LABELS.POLL_FINISH_CONFIRM)) {
+		return;
+	}
+	kumaliveWebsocket.send(JSON.stringify({
+		'type' : 'finishPoll',
+		'pollId' : pollId
+	}));
+	$('#pollRunFinishButton').hide();
+	$('#pollRunCloseButton').show();
+}
+
+/**
+ * Hide poll for everyone
+ */
+function closePoll() {
+	kumaliveWebsocket.send(JSON.stringify({
+		'type' : 'closePoll'
 	}));
 }
 
