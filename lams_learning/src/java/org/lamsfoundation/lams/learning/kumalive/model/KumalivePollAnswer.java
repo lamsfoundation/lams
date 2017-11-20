@@ -23,6 +23,8 @@
 package org.lamsfoundation.lams.learning.kumalive.model;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.Map;
 
 public class KumalivePollAnswer implements Serializable {
 
@@ -32,6 +34,7 @@ public class KumalivePollAnswer implements Serializable {
     private KumalivePoll poll;
     private Short orderId;
     private String name;
+    private Map<Integer, Date> votes;
 
     public KumalivePollAnswer() {
     }
@@ -72,5 +75,13 @@ public class KumalivePollAnswer implements Serializable {
 
     public void setName(String name) {
 	this.name = name;
+    }
+
+    public Map<Integer, Date> getVotes() {
+	return votes;
+    }
+
+    public void setVotes(Map<Integer, Date> votes) {
+	this.votes = votes;
     }
 }

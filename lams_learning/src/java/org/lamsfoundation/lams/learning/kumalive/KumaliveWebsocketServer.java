@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -51,26 +52,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @ServerEndpoint("/kumaliveWebsocket")
 public class KumaliveWebsocketServer {
 
-    private class KumaliveUser {
-	private class KumalivePollVote {
-	    private final Long pollId;
-	    private final Date time;
-	    private final int answer;
-
-	    private KumalivePollVote(Long pollId, Date time, int answer) {
-		this.pollId = pollId;
-		this.time = time;
-		this.answer = answer;
-	    }
-	}
-
+    private static class KumaliveUserDTO {
 	private final UserDTO userDTO;
 	private final Session websocket;
 	private final boolean isTeacher;
 	private final boolean roleTeacher;
-	private KumalivePollVote vote;
+	private KumalivePollVoteDTO vote;
 
-	private KumaliveUser(User user, Session websocket, boolean isTeacher, boolean roleTeacher) {
+	private KumaliveUserDTO(User user, Session websocket, boolean isTeacher, boolean roleTeacher) {
 	    this.userDTO = user.getUserDTO();
 	    this.websocket = websocket;
 	    this.isTeacher = isTeacher;
@@ -78,14 +67,14 @@ public class KumaliveWebsocketServer {
 	}
     }
 
-    private class KumaliveDTO {
+    private static class KumaliveDTO {
 	private Long id;
 	private String name;
 	private UserDTO createdBy;
 	private boolean raiseHandPrompt;
 	private final List<Integer> raisedHand = new CopyOnWriteArrayList<>();
 	private Integer speaker;
-	private final Map<String, KumaliveUser> learners = new ConcurrentHashMap<>();
+	private final Map<String, KumaliveUserDTO> learners = new ConcurrentHashMap<>();
 	private final JSONArray rubrics = new JSONArray();
 	private KumalivePollDTO poll;
 
@@ -102,12 +91,29 @@ public class KumaliveWebsocketServer {
 	}
     }
 
-    private class KumalivePollDTO {
+    private static class KumalivePollDTO {
+	private final Long pollId;
 	private final JSONObject pollJSON = new JSONObject();
+	private final List<Long> answerIds = new ArrayList<Long>();
 	private final ArrayList<List<UserDTO>> voters = new ArrayList<List<UserDTO>>();
 	private final JSONArray votersJSON = new JSONArray();
+	private boolean finished = false;
 	private boolean votesShown = false;
 	private boolean votersShown = false;
+
+	private KumalivePollDTO(Long pollId) {
+	    this.pollId = pollId;
+	}
+    }
+
+    private static class KumalivePollVoteDTO {
+	private final Long pollId;
+	private final int answer;
+
+	private KumalivePollVoteDTO(Long pollId, int answer) {
+	    this.pollId = pollId;
+	    this.answer = answer;
+	}
     }
 
     private static Logger logger = Logger.getLogger(KumaliveWebsocketServer.class);
@@ -145,7 +151,7 @@ public class KumaliveWebsocketServer {
 	if (kumalive == null) {
 	    return;
 	}
-	KumaliveUser user = kumalive.learners.remove(login);
+	KumaliveUserDTO user = kumalive.learners.remove(login);
 	if (user != null) {
 	    Integer userId = user.userDTO.getUserID();
 	    if (kumalive.raisedHand != null) {
@@ -202,6 +208,9 @@ public class KumaliveWebsocketServer {
 	    case "startPoll":
 		startPoll(requestJSON, session);
 		break;
+	    case "votePoll":
+		votePoll(requestJSON, session);
+		break;
 	    case "finishPoll":
 		finishPoll(requestJSON, session);
 		break;
@@ -243,7 +252,7 @@ public class KumaliveWebsocketServer {
 		KumalivePoll poll = KumaliveWebsocketServer.getKumaliveService()
 			.getPollByKumaliveId(kumalive.getKumaliveId());
 		if (poll != null) {
-		    KumaliveWebsocketServer.pollToJSON(kumaliveDTO, poll);
+		    KumaliveWebsocketServer.fillPollDTO(kumaliveDTO, poll);
 		}
 	    }
 	}
@@ -289,7 +298,7 @@ public class KumaliveWebsocketServer {
 			Role.MONITOR);
 	String role = websocket.getRequestParameterMap().get(AttributeNames.PARAM_ROLE).get(0);
 
-	KumaliveUser learner = kumalive.learners.get(login);
+	KumaliveUserDTO learner = kumalive.learners.get(login);
 	boolean roleTeacher = isTeacher && !Role.LEARNER.equalsIgnoreCase(role)
 		&& ("teacher".equalsIgnoreCase(role) || learner == null || learner.roleTeacher);
 	if (learner != null && !learner.websocket.getId().equals(websocket.getId())) {
@@ -298,14 +307,21 @@ public class KumaliveWebsocketServer {
 		    new CloseReason(CloseCodes.NOT_CONSISTENT, "Another websocket for same user was estabilished"));
 	}
 
-	learner = new KumaliveUser(user, websocket, isTeacher, roleTeacher);
+	learner = new KumaliveUserDTO(user, websocket, isTeacher, roleTeacher);
+	if (kumalive.poll != null) {
+	    for (int answerIndex = 0; answerIndex < kumalive.poll.voters.size(); answerIndex++) {
+		if (kumalive.poll.voters.get(answerIndex).contains(learner.userDTO)) {
+		    learner.vote = new KumalivePollVoteDTO(kumalive.poll.pollId, answerIndex);
+		}
+	    }
+	}
 	kumalive.learners.put(login, learner);
 
 	sendInit(kumalive, learner);
 	sendRefresh(kumalive);
     }
 
-    private void sendInit(KumaliveDTO kumalive, KumaliveUser user) throws JSONException, IOException {
+    private void sendInit(KumaliveDTO kumalive, KumaliveUserDTO user) throws JSONException, IOException {
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("type", "init");
 	// Kumalive title
@@ -340,7 +356,7 @@ public class KumaliveWebsocketServer {
 	// each learner's details
 	JSONArray learnersJSON = new JSONArray();
 	JSONObject loginsJSON = new JSONObject();
-	for (KumaliveUser participant : kumalive.learners.values()) {
+	for (KumaliveUserDTO participant : kumalive.learners.values()) {
 	    UserDTO participantDTO = participant.userDTO;
 
 	    JSONObject participantJSON = KumaliveWebsocketServer.participantToJSON(participantDTO,
@@ -351,57 +367,59 @@ public class KumaliveWebsocketServer {
 	}
 	responseJSON.put("learners", learnersJSON);
 
-	JSONArray pollVotesJSON = null;
+	JSONObject pollJSON = null;
 	// is there a poll running?
 	if (kumalive.poll != null) {
+	    pollJSON = new JSONObject(kumalive.poll.pollJSON.toString());
+
 	    // build votes count JSON
-	    pollVotesJSON = new JSONArray();
+	    JSONArray votesJSON = new JSONArray();
 	    for (int answerIndex = 0; answerIndex < kumalive.poll.voters.size(); answerIndex++) {
 		List<UserDTO> voters = kumalive.poll.voters.get(answerIndex);
 		// update voters JSON: add only new voters
 		synchronized (voters) {
-		    pollVotesJSON.put(voters.size());
-		    JSONArray votersJSON = kumalive.poll.votersJSON.getJSONArray(answerIndex);
-		    for (int voterIndex = votersJSON.length(); voterIndex < voters.size(); voterIndex++) {
-			votersJSON.put(KumaliveWebsocketServer.participantToJSON(voters.get(voterIndex), null));
+		    votesJSON.put(voters.size());
+		    JSONArray answerVotersJSON = kumalive.poll.votersJSON.getJSONArray(answerIndex);
+		    for (int voterIndex = answerVotersJSON.length(); voterIndex < voters.size(); voterIndex++) {
+			answerVotersJSON.put(KumaliveWebsocketServer.participantToJSON(voters.get(voterIndex), null));
 		    }
 		}
 	    }
-	    // put them in response only if teacher released them
-	    kumalive.poll.pollJSON.put("votes", kumalive.poll.votesShown ? pollVotesJSON : null);
-	    kumalive.poll.pollJSON.put("voters", kumalive.poll.votersShown ? kumalive.poll.voters : null);
-	    responseJSON.put("poll", kumalive.poll.pollJSON);
+
+	    pollJSON.put("votes", votesJSON);
+	    pollJSON.put("voters", kumalive.poll.votersJSON);
 	}
 
-	// send refresh to everyone
-	Long pollId = kumalive.poll == null ? null : kumalive.poll.pollJSON.getLong("id");
-	String teacherResponse = null;
 	String learnerResponse = responseJSON.toString();
-	for (KumaliveUser participant : kumalive.learners.values()) {
+	// send extra information to teachers
+	JSONObject teacherResponseJSON = new JSONObject(learnerResponse);
+	teacherResponseJSON.put("logins", loginsJSON);
+	teacherResponseJSON.put("poll", pollJSON);
+	String teacherResponse = teacherResponseJSON.toString();
+	// send refresh to everyone
+	for (KumaliveUserDTO participant : kumalive.learners.values()) {
 	    Basic channel = participant.websocket.getBasicRemote();
-	    if (participant.isTeacher) {
-		// send extra information to teachers
-		if (teacherResponse == null) {
-		    JSONObject teacherResponseJSON = new JSONObject(learnerResponse);
-		    teacherResponseJSON.put("logins", loginsJSON);
-		    // add poll votes and voters, if they were not already released and added for all users
-		    if (kumalive.poll != null) {
-			if (!kumalive.poll.votesShown) {
-			    teacherResponseJSON.getJSONObject("poll").put("votes", pollVotesJSON);
-			}
-			if (!kumalive.poll.votersShown) {
-			    teacherResponseJSON.getJSONObject("poll").put("voters", kumalive.poll.votersJSON);
-			}
-		    }
-		    teacherResponse = teacherResponseJSON.toString();
-		}
+	    if (participant.roleTeacher) {
 		channel.sendText(teacherResponse);
-	    } else if (kumalive.poll == null || kumalive.poll.pollJSON.getBoolean("finished")) {
+	    } else if (kumalive.poll == null) {
 		channel.sendText(learnerResponse);
 	    } else {
-		// mark this learner as voted
-		responseJSON.getJSONObject("poll").put("voted",
-			participant.vote != null && pollId != null && participant.vote.pollId.equals(pollId));
+		JSONObject learnerPollJSON = new JSONObject(pollJSON.toString());
+		boolean voted = participant.vote != null && kumalive.poll.pollId != null
+			&& participant.vote.pollId.equals(kumalive.poll.pollId);
+		// put them in response only if teacher released them and user voted
+		if (!kumalive.poll.votesShown || (!voted && !kumalive.poll.finished)) {
+		    learnerPollJSON.remove("votes");
+		}
+		if (!kumalive.poll.votersShown || (!voted && !kumalive.poll.finished)) {
+		    learnerPollJSON.remove("voters");
+		}
+		if (voted) {
+		    // mark this learner as voted
+		    learnerPollJSON.put("voted", participant.vote.answer);
+		}
+		responseJSON.put("poll", learnerPollJSON);
+
 		channel.sendText(responseJSON.toString());
 	    }
 	}
@@ -606,10 +624,51 @@ public class KumaliveWebsocketServer {
 	KumalivePoll poll = KumaliveWebsocketServer.getKumaliveService().startPoll(kumalive.id,
 		pollJSON.getString("name"), pollJSON.getJSONArray("answers"));
 	if (poll != null) {
-	    KumaliveWebsocketServer.pollToJSON(kumalive, poll);
+	    KumaliveWebsocketServer.fillPollDTO(kumalive, poll);
 	}
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Teacher " + userId + " started poll " + poll.getPollId() + " in Kumalive " + kumalive.id);
+	}
+	sendRefresh(kumalive);
+    }
+
+    /**
+     * Tell learners that the teacher started a poll
+     */
+    private void votePoll(JSONObject requestJSON, Session websocket) throws IOException, JSONException {
+	Integer organisationId = Integer
+		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_ORGANISATION_ID).get(0));
+	User user = getUser(websocket);
+	Integer userId = user.getUserId();
+
+	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.LEARNER }, "kumalive poll vote", false)) {
+	    String warning = "User " + userId + " is not a learner of organisation " + organisationId;
+	    logger.warn(warning);
+	    return;
+	}
+
+	KumaliveDTO kumalive = kumalives.get(organisationId);
+	if (kumalive.poll == null || kumalive.poll.finished) {
+	    logger.warn("Learner " + userId + " tried to vote but a poll is not started in Kumalive " + kumalive.id);
+	    return;
+	}
+	KumaliveUserDTO learnerDTO = kumalive.learners.get(user.getLogin());
+	if (learnerDTO.vote != null && learnerDTO.vote.pollId.equals(kumalive.poll.pollId)) {
+	    logger.warn("Learner " + userId + " tried to vote for poll " + kumalive.poll.pollId
+		    + " but he already voted in Kumalive " + kumalive.id);
+	    return;
+	}
+
+	Integer answerIndex = requestJSON.getInt("answerIndex");
+	Long answerId = kumalive.poll.answerIds.get(answerIndex);
+	KumaliveWebsocketServer.getKumaliveService().saveVote(answerId, userId);
+	learnerDTO.vote = new KumalivePollVoteDTO(kumalive.poll.pollId, answerIndex);
+	kumalive.poll.voters.get(answerIndex).add(learnerDTO.userDTO);
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug(
+		    "Learner " + userId + " voted in poll " + kumalive.poll.pollId + " in Kumalive " + kumalive.id);
 	}
 	sendRefresh(kumalive);
     }
@@ -635,6 +694,7 @@ public class KumaliveWebsocketServer {
 	KumaliveWebsocketServer.getKumaliveService().finishPoll(pollId);
 
 	KumaliveDTO kumalive = kumalives.get(organisationId);
+	kumalive.poll.finished = true;
 	kumalive.poll.pollJSON.put("finished", true);
 
 	if (logger.isDebugEnabled()) {
@@ -686,7 +746,7 @@ public class KumaliveWebsocketServer {
 	KumaliveDTO kumalive = kumalives.get(organisationId);
 	KumaliveWebsocketServer.getKumaliveService().finishKumalive(kumalive.id);
 	kumalives.remove(organisationId);
-	for (KumaliveUser participant : kumalive.learners.values()) {
+	for (KumaliveUserDTO participant : kumalive.learners.values()) {
 	    participant.websocket.getBasicRemote().sendText("{ \"type\" : \"finish\"}");
 	}
 
@@ -712,16 +772,41 @@ public class KumaliveWebsocketServer {
 	return participantJSON;
     }
 
-    private static void pollToJSON(KumaliveDTO kumaliveDTO, KumalivePoll poll) throws JSONException {
-	kumaliveDTO.poll.pollJSON.put("id", poll.getPollId());
-	kumaliveDTO.poll.pollJSON.put("name", poll.getName());
+    private static void fillPollDTO(KumaliveDTO kumalive, KumalivePoll poll) throws JSONException {
+	KumalivePollDTO pollDTO = new KumalivePollDTO(poll.getPollId());
+	pollDTO.pollJSON.put("id", poll.getPollId());
+	pollDTO.pollJSON.put("name", poll.getName());
 	JSONArray answersJSON = new JSONArray();
 	for (KumalivePollAnswer answer : poll.getAnswers()) {
 	    answersJSON.put(answer.getName());
-	    kumaliveDTO.poll.voters.add(Collections.synchronizedList(new LinkedList<UserDTO>()));
-	    kumaliveDTO.poll.votersJSON.put(new JSONArray());
+	    pollDTO.answerIds.add(answer.getAnswerId());
+
+	    List<UserDTO> answerVoters = Collections.synchronizedList(new LinkedList<UserDTO>());
+	    pollDTO.voters.add(answerVoters);
+	    JSONArray answerVotersJSON = new JSONArray();
+	    pollDTO.votersJSON.put(answerVotersJSON);
+	    if (answer.getVotes() != null) {
+		for (Entry<Integer, Date> vote : answer.getVotes().entrySet()) {
+		    Integer userId = vote.getKey();
+		    UserDTO userDTO = null;
+		    for (KumaliveUserDTO learner : kumalive.learners.values()) {
+			if (userId.equals(learner.userDTO.getUserID())) {
+			    userDTO = learner.userDTO;
+			    break;
+			}
+		    }
+		    if (userDTO == null) {
+			User user = (User) KumaliveWebsocketServer.getUserManagementService().findById(User.class,
+				userId);
+			userDTO = user.getUserDTO();
+		    }
+		    answerVoters.add(userDTO);
+		    answerVotersJSON.put(KumaliveWebsocketServer.participantToJSON(userDTO, null));
+		}
+	    }
 	}
-	kumaliveDTO.poll.pollJSON.put("answers", answersJSON);
+	pollDTO.pollJSON.put("answers", answersJSON);
+	kumalive.poll = pollDTO;
     }
 
     private static IKumaliveService getKumaliveService() {

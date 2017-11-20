@@ -19,5 +19,11 @@
 			class="org.lamsfoundation.lams.learning.kumalive.model.KumalivePoll">
 			<column name="poll_id" />
 		</many-to-one>
+		
+		 <map table="lams_kumalive_poll_vote" name="votes" lazy="false" order-by="vote_date ASC">
+	         <key column="answer_id"/>
+	         <index column="user_id" type="java.lang.Integer"/>
+	         <element column="vote_date" type="java.util.Date"/>
+     	</map>
 	</class>
 </hibernate-mapping>

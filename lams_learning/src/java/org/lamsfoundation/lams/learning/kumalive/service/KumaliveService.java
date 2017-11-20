@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -558,7 +559,7 @@ public class KumaliveService implements IKumaliveService {
 	KumalivePoll poll = new KumalivePoll(kumalive, name);
 	kumaliveDAO.insert(poll);
 
-	Set<KumalivePollAnswer> answers = new HashSet<>();
+	Set<KumalivePollAnswer> answers = new LinkedHashSet<>();
 	for (Short answerIndex = 0; answerIndex < answersJSON.length(); answerIndex++) {
 	    String answerName = answersJSON.getString(answerIndex.intValue());
 	    KumalivePollAnswer answer = new KumalivePollAnswer(poll, answerIndex, answerName);
@@ -575,6 +576,27 @@ public class KumaliveService implements IKumaliveService {
 	return poll;
     }
 
+    /**
+     * Store a user's vote for a poll
+     */
+    @Override
+    public void saveVote(Long answerId, Integer userId) {
+	KumalivePollAnswer answer = (KumalivePollAnswer) kumaliveDAO.find(KumalivePollAnswer.class, answerId);
+	if (answer.getVotes().containsKey(userId)) {
+	    logger.warn("Learner " + userId + " tried to vote for answer ID " + answerId + " but he already voted");
+	    return;
+	}
+	answer.getVotes().put(userId, new Date());
+	kumaliveDAO.update(answer);
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Learner " + userId + " voted for answer ID " + answerId);
+	}
+    }
+
+    /**
+     * Finishes a poll, i.e. prevents learners from voting
+     */
     @Override
     public void finishPoll(Long pollId) throws JSONException {
 	KumalivePoll poll = (KumalivePoll) kumaliveDAO.find(KumalivePoll.class, pollId);

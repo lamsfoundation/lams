@@ -26,6 +26,17 @@ CREATE TABLE lams_kumalive_poll_answer (
                   REFERENCES lams_kumalive_poll (poll_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE lams_kumalive_poll_vote (
+	   answer_id BIGINT(20) NOT NULL
+     , user_id BIGINT(20) NOT NULL
+     , vote_date DATETIME
+     , PRIMARY KEY (answer_id, user_id)
+     , CONSTRAINT FK_lams_kumalive_poll_vote_1 FOREIGN KEY (answer_id)
+                  REFERENCES lams_kumalive_poll_answer (answer_id) ON DELETE CASCADE ON UPDATE CASCADE
+     , CONSTRAINT FK_lams_kumalive_poll_vote_2 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 -- If there were no errors, commit and restore autocommit to on
 SET FOREIGN_KEY_CHECKS=0;
 COMMIT;

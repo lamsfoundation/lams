@@ -191,6 +191,7 @@ function init(message) {
 	} else {
 		$('#raiseHandButton').click(raiseHand);
 		$('#downHandButton').click(downHand);
+		$('#pollRunVoteButton').click(votePoll);
 	}
 	
 	// set dialog name
@@ -344,40 +345,23 @@ function processPoll(message) {
 	
 	// init poll fields or make them read only after voting
 	if (poll.id != pollId || (poll.finished && $('#pollRunVoteButton').is(':visible'))) {
-		pollId = poll.id;
-		$('#pollRun button').hide();
-		$('#pollRunQuestion').text(poll.name);
-		var radioList = $('#pollRunAnswerRadios').empty(),
-			answerList = $('#pollRunAnswerList').empty();
-		// teachers can't vote; learner can't vote twice; learner can't vote for finished poll
-		if (roleTeacher || poll.voted || poll.finished) {
-			// build simple list of answers
-			$.each(poll.answers, function(index, answer){
-				var answerElement = $('<li />').addClass('list-group-item').text(pollAnswerBullets[index] + ') ' + answer)
-											   .appendTo(answerList);
-				if (poll.votes) {
-					// show votes if user is teacher or votes were released
-					$('<span />').addClass('badge').text(poll.votes[index]).appendTo(answerElement);
-				}
-			});
-			$('#pollRunAnswerList').show();
-			// extra options for teacher
-			if (roleTeacher) {
-				if (poll.finished) {
-					$('#pollRunCloseButton').show();
-				} else {
-					$('#pollRunFinishButton').show();
-				}
+		initPoll(poll);
+	}
+	if (poll.votes) {
+		// show votes if user is teacher or votes were released
+		$.each(poll.votes, function(index, count) {
+			var answerElement = $('#pollAnswer' + index),
+				badge = $('.badge', answerElement);
+			// missing badge means that votes were made available just now
+			if (badge.length === 0) {
+				badge = $('<span />').addClass('badge').appendTo(answerElement);
 			}
-		} else {
-			// learner can vote, build radio buttons
-			$.each(poll.answers, function(index, answer){
-				$('#pollRunAnswerRadioTemplate').clone().attr('id', null).appendTo(radioList)
-					.find('label').append($('<span />').text(pollAnswerBullets[index] + ') ' + answer))
-					.find('input').val(index);
-			});
-			$('#pollRunVoteButton').show();
-		}
+			badge.text(count);
+		});
+	}
+	if (poll.voted != null) {
+		// highlight the answer user voted for
+		$('#pollAnswer' + poll.voted).addClass('active');
 	}
 }
 
@@ -708,6 +692,49 @@ function setupPollCancel() {
 }
 
 /**
+ * Create poll widgets: answer list, radio buttons etc.
+ */
+function initPoll(poll) {
+	pollId = poll.id;
+	$('#pollRun button').hide();
+	$('#pollRunQuestion').text(poll.name);
+	var radioList = $('#pollRunAnswerRadios').empty(),
+		answerList = $('#pollRunAnswerList').empty();
+
+	// teachers can't vote; learner can't vote twice; learner can't vote for finished poll
+	if (roleTeacher || (poll.voted != null) || poll.finished) {
+		// build simple list of answers
+		$.each(poll.answers, function(index, answer){
+			var answerElement = $('<li />').addClass('list-group-item').attr('id', 'pollAnswer' + index)
+										   .text(pollAnswerBullets[index] + ') ' + answer)
+										   .appendTo(answerList);
+			if (poll.votes) {
+				// show votes if user is teacher or votes were released
+				$('<span />').addClass('badge').text(poll.votes[index]).appendTo(answerElement);
+			}
+		});
+		$('#pollRunAnswerList').show();
+		// extra options for teacher
+	
+		if (roleTeacher) {
+			if (poll.finished) {
+				$('#pollRunCloseButton').show();
+			} else {
+				$('#pollRunFinishButton').show();
+			}
+		}
+	} else {
+		// learner can vote, build radio buttons
+		$.each(poll.answers, function(index, answer){
+			$('#pollRunAnswerRadioTemplate').clone().attr('id', null).appendTo(radioList)
+				.find('label').append($('<span />').text(pollAnswerBullets[index] + ') ' + answer))
+				.find('input').val(index);
+		});
+		$('#pollRunVoteButton').show();
+	}
+}
+
+/**
  * Create a poll with parameters set up in form
  */
 function startPoll(){
@@ -790,6 +817,21 @@ function startPoll(){
 	kumaliveWebsocket.send(JSON.stringify({
 		'type' : 'startPoll',
 		'poll' : poll
+	}));
+}
+
+/**
+ * Send vote to the server
+ */ 
+function votePoll() {
+	var checkedAnswer = $('#pollRunAnswerRadios input[name="pollAnswer"]:checked');
+	if (checkedAnswer.length !== 1) {
+		return;
+	}
+	pollId = null;
+	kumaliveWebsocket.send(JSON.stringify({
+		'type' 		  : 'votePoll',
+		'answerIndex' : checkedAnswer.val()
 	}));
 }
 

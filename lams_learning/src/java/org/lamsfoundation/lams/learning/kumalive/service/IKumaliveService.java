@@ -66,4 +66,6 @@ public interface IKumaliveService {
     KumalivePoll startPoll(Long kumaliveId, String name, JSONArray answersJSON) throws JSONException;
 
     void finishPoll(Long pollId) throws JSONException;
+
+    void saveVote(Long answerId, Integer userId);
 }

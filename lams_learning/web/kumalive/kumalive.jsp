@@ -148,7 +148,7 @@
 					<h3><fmt:message key='button.kumalive.poll'/></h3>
 					<h4 id="pollRunQuestion"></h4>
 					<div id="pollRunAnswerRadioTemplate" class="radio">
-  						<label><input type="radio" name="pollRunAnswer" /></label>
+  						<label><input type="radio" name="pollAnswer" /></label>
 					</div>
 					<div id="pollRunAnswerRadios"></div>
 					<br />
