@@ -589,7 +589,6 @@ a.button-add-item:before {
 	nav.sidebar{
 		  border-radius: $border-radius-large;
 		  box-shadow: $panel-box-shadow;
-		  min-height:300px;
 	}
  
 	/*Center Brand*/
@@ -631,7 +630,6 @@ a.button-add-item:before {
 	nav.sidebar .navbar-collapse, nav.sidebar .container-fluid{
 		padding: 0 0px 0 0px;
 		border:2px solid transparent;
-		box-shadow: $panel-box-shadow;
 	}
 
 	/*gives sidebar width/height*/
