@@ -503,6 +503,11 @@ public interface IMonitoringService {
     abstract void addUsersToGroup(Long activityID, Long groupID, String learnerIDs[]) throws LessonServiceException;
 
     /**
+     * Add learners to a group based on their logins. Doesn't necessarily check if the user is already in another group.
+     */
+    abstract int addUsersToGroupByLogins(Long activityID, String groupName, Set<String> logins) throws LessonServiceException;
+    
+    /**
      * Remove a user to a group. If the user is not in the group, then nothing is changed.
      *
      * @throws LessonServiceException

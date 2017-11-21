@@ -29,9 +29,9 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -71,8 +71,33 @@ public class ExcelUtil {
 
     public final static String DEFAULT_FONT_NAME = "Calibri-Regular";
 
+    
     /**
-     * Create .xlsx file out of provided data and then write out it to an OutputStream.
+     * Create .xls file out of provided data and then write out it to an OutputStream. It should be saved with the .xls extension.
+     * Only use if you want to read the file back in again afterwards. 
+     * 
+     * Warning: The styling is untested with this option and may fail. If you want full styling look at createExcel()
+     *
+     * @param out
+     *            output stream to which the file written; usually taken from HTTP response
+     * @param dataToExport
+     *            array of data to print out; first index of array describes a row, second a column
+     * @param dateHeader
+     *            text describing current date; if <code>NULL</code> then no date is printed; if not <code>NULL</code>
+     *            then text is written out along with current date in the cell; the date is formatted according to
+     *            {@link #EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT}
+     * @param displaySheetTitle
+     *            whether to display title (printed in the first (0,0) cell)
+     * @throws IOException
+     */
+    public static void createExcelXLS(OutputStream out, LinkedHashMap<String, ExcelCell[][]> dataToExport,
+	    String dateHeader, boolean displaySheetTitle) throws IOException {
+	Workbook workbook = new HSSFWorkbook(); 
+	create(workbook, out, dataToExport, dateHeader, displaySheetTitle);
+    }
+
+    /**
+     * Create .xlsx file out of provided data and then write out it to an OutputStream. It should be saved with the .xlsx extension.
      *
      * @param out
      *            output stream to which the file written; usually taken from HTTP response
@@ -89,7 +114,12 @@ public class ExcelUtil {
     public static void createExcel(OutputStream out, LinkedHashMap<String, ExcelCell[][]> dataToExport,
 	    String dateHeader, boolean displaySheetTitle) throws IOException {
 	Workbook workbook = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
-
+	create(workbook, out, dataToExport, dateHeader, displaySheetTitle);
+    }
+    
+    private static void create(Workbook workbook, OutputStream out, LinkedHashMap<String, ExcelCell[][]> dataToExport,
+	    String dateHeader, boolean displaySheetTitle) throws IOException {
+	
 	Font defaultFont = workbook.createFont();
 	defaultFont.setFontName(DEFAULT_FONT_NAME);
 

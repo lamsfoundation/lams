@@ -90,6 +90,10 @@ function addGroup(groupId, name, users) {
 	
 	fillGroup(users, group);
 	
+	// if any users are allocated, warn before doing spreadsheet reload
+	if ( users && users.length > 0 )
+		warnBeforeUpload = true;
+
 	return group;
 }
 
@@ -521,8 +525,130 @@ function markGroupLocked(container) {
 	$('.removeGroupButton', container).remove();
 	// $('input', container).attr('readonly', 'readonly');
 	$('div.draggableItem', container).off('click').draggable('disable');
+	// if any group is locked cannot do the spreadsheet upload
+	$('#accordionUploadGroupFile').css("display","none");
 }
 
+/** 
+ * *************** Import groups from a spreadsheet ***************
+ */
+	function enableButtons() {
+		// do not disable the file button or the file will be missing on the upload.
+		$('.btn-disable-on-downupload').prop('disabled', false);
+		$('a.btn-disable-on-downupload').show(); // links must be hidden, cannot be disabled
+		
+		// show the waiting area during the upload
+		var div = document.getElementById("attachmentArea_Busy");
+		if(div != null){
+			div.style.display = 'none';
+		}
+	}
+	function disableButtons() {
+		// do not disable the file button or the file will be missing on the upload.
+		$('.btn-disable-on-downupload').prop('disabled', true);
+		$('a.btn-disable-on-downupload').hide(); // links must be hidden, cannot be disabled
+		
+		// show the waiting area during the upload
+		var div = document.getElementById("attachmentArea_Busy");
+		if(div != null){
+			div.style.display = 'inline-block';
+		}
+	}
+	
+	function importGroupsFromSpreadsheet() {
+		disableButtons();
+		var file = getValidateSpreadsheetFile();
+		if ( file != null && ( ! warnBeforeUpload || confirm(LABELS.WARNING_REPLACE_GROUPS_LABEL) ) ) {
+			var form = $("#uploadForm")[0];
+			var formDataUpload = new FormData(form);
+			formDataUpload.append("organisationID", organisationId); 
+		    $.ajax({ 
+		        data: formDataUpload, 
+		        processData: false, // tell jQuery not to process the data
+		        contentType: false, // tell jQuery not to set contentType
+		        type: 'POST', 
+		        url: form.action,
+		        enctype: "multipart/form-data",
+				dataType : 'json',
+		        success: function (response) {
+		        		if ( response.result != 'OK') {
+		        			if ( response.error ) {
+		        				alert(response.error);
+		        				if ( response.reload ) {
+		        					window.location.reload(); // do not have another go, look at new data
+		        				} else {
+		        					enableButtons();  // let them have another go
+		        				}
+	        				}
+		        			else  {
+		        				// unknown failure on back end. 
+		        				alert(LABELS.GENERAL_ERROR_LABEL);
+				        		var div = document.getElementById("attachmentArea_Busy");
+				        		if(div != null){
+				        			div.style.display = 'none';
+				        		}
+		        			}
+		        		} else {
+		        			var msg = LABELS.LABEL_IMPORT_SUCCESSFUL_LABEL.replace("%1", response.added).replace("%2", response.skipped);
+		        			alert(msg);
+			        		window.location.reload();
+		        		}
+		        },
+		        error: function() {
+		        		// unknown failure on back end. 
+		        		alert(LABELS.GENERAL_ERROR_LABEL);
+		        		var div = document.getElementById("attachmentArea_Busy");
+		        		if(div != null){
+		        			div.style.display = 'none';
+		        		}
+		        }
+			});
+		} else {
+			enableButtons();
+		}
+	}
+	
+	function getValidateSpreadsheetFile() {
+		var file = null;
+		// check file
+		var fileSelect = document.getElementById('groupUploadFile');
+		var files = fileSelect.files;
+		if (files.length == 0) {
+			clearFileError();
+			var requiredMsg = LABELS.ERROR_FILE_REQUIRED_LABEL;
+			showFileError(requiredMsg);
+		} else if ( validateShowErrorSpreadsheetType(files[0], LABELS.ERROR_FILE_WRONG_FORMAT_LABEL, false) ) {
+			file = files[0];
+		}
+		return file;
+	}
+	
+	var fileDownloadCheckTimer;
+	
+	function downloadTemplate() {
+		disableButtons();
+		var token = new Date().getTime(); //use the current timestamp as the token value
+	
+		fileDownloadCheckTimer = window.setInterval(function () {
+			var cookieValue = $.cookie('fileDownloadToken');
+			if (cookieValue == token) {
+				enableButtons();
+			}
+		}, 1000);
+				
+		document.location.href = LAMS_URL + "groupingUpload.do?method=getGroupTemplateFile&activityID="+groupingActivityId
+				+"&organisationID="+organisationId+"&lessonID="+lessonId+"&downloadTokenValue=" + token;
+		return false;
+	}
+
+	$(document).ready(function(){
+	
+		//scroll to the bottom of the page on opening Advanced settings
+		$('#accordionUploadGroupFile').on('shown.bs.collapse', function () {
+			$("html, body").animate({ scrollTop: 170 }, 1000);
+		});
+	});
+	
 /**
  * *************** Save as a course grouping dialog ***************
  */

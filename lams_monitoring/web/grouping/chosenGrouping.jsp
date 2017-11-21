@@ -34,7 +34,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		iframe {
 			border: none;
 			width: 100%;
-			height: 425px;
+			height: 550px;
 		}
 	</style>
 </lams:head>

@@ -196,6 +196,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	    lesson = (Lesson) getUserManagementService().findById(Lesson.class, lessonId);
 	    organisationId = lesson.getOrganisation().getOrganisationId();
 	}
+	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId); // Needed for the download spreadsheet call.
 
 	// check if user is allowed to view and edit groups
 	if (!getSecurityService().hasOrgRole(organisationId, userId,

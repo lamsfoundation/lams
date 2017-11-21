@@ -267,6 +267,24 @@ public class LessonService implements ILessonService {
 	    groupingDAO.update(grouping);
 	}
     }
+    
+    @Override
+    public void removeAllLearnersFromGrouping(Grouping grouping)
+	    throws LessonServiceException {
+	if (grouping != null) {
+	    // get the real objects, not the CGLIB version
+	    grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
+	    Grouper grouper = grouping.getGrouper();
+	    if (grouper != null) {
+		try {
+		    grouper.removeAllLearnersFromGrouping(grouping);
+		} catch (GroupingException e) {
+		    throw new LessonServiceException(e);
+		}
+	    }
+	    groupingDAO.update(grouping);
+	}
+    }
 
     @Override
     public Group createGroup(Grouping grouping, String name) throws LessonServiceException {

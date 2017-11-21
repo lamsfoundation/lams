@@ -2110,6 +2110,56 @@ public class MonitoringService implements IMonitoringService {
 	return learners;
     }
 
+    @Override
+    public int addUsersToGroupByLogins(Long activityID, String groupName, Set<String> logins) throws LessonServiceException {
+
+	ArrayList<User> learners = new ArrayList<User>();
+	for (String login : logins) {
+	    User learner = (User) userManagementService.getUserByLogin(login);
+	    if (learner == null) {
+		MonitoringService.log.warn("Unable to add learner " + login + " for group in related to activity "
+			+ activityID + " as learner cannot be found.");
+	    } else {
+		learners.add(learner);
+	    }
+	}
+	
+	Activity activity = getActivityById(activityID);
+	Grouping grouping = getGroupingForActivity(activity, !activity.isChosenBranchingActivity(),
+		"addUsersToGroupByLogins");
+	
+	Group group = null;
+	Set<String> otherGroupNames = new HashSet<String>();
+	for ( Group checkGroup: grouping.getGroups() ) {
+	    if ( checkGroup.getGroupName().equalsIgnoreCase(groupName) ) {
+		group = checkGroup;
+		break;
+	    } else {
+		otherGroupNames.add(checkGroup.getGroupName());
+	    }
+	}
+	
+	if ( group == null ) {
+	    // Leave performGrouping to create any new groups as addGroup returns a group without an id, so it could not be
+	    // used by performGrouping. Fix up name afterwards. Clumsy way to find to find the new group but how else?
+	    // It may not be the only new group and hence not the only group with no id.
+	    lessonService.performGrouping(grouping, (Long) null, learners);
+	    for ( Group checkGroup: grouping.getGroups() ) {
+		if ( ! otherGroupNames.contains(checkGroup.getGroupName()) ) {
+			group = checkGroup;
+			break;
+		}
+	    }
+	    if ( group != null ) {
+		group.setGroupName(groupName);
+	    }
+	} else {
+	    lessonService.performGrouping(grouping, group.getGroupId(), learners);
+	}
+	
+	return learners.size();
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void createChosenBranchingGroups(Long branchingActivityID) {
