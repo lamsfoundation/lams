@@ -32,6 +32,9 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$("time.timeago").timeago();
+
+			//initialize bootstrap-sliders if "Enable confidence level" option is ON
+			$('.bootstrap-slider').bootstrapSlider();
 		});
 	
 		function disableButtons() {

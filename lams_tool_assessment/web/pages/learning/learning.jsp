@@ -66,9 +66,10 @@
 						$("[type=button][name=submit-hedging-question" + questionIndex + "]").prop("disabled", "true").addClass("button-disabled");
 					}
 				}).trigger("change");
-				
 			}
 
+			//initialize bootstrap-sliders if "Enable confidence level" option is ON
+			$('.bootstrap-slider').bootstrapSlider();
 		});
 		
 		function countHedgeQuestionSelectTotal(questionIndex) {

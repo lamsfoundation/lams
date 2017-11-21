@@ -29,6 +29,11 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
 	<script type="text/javaScript">
 
+		$(document).ready(function() {
+			//initialize bootstrap-sliders if "Enable confidence level" option is ON
+			$('.bootstrap-slider').bootstrapSlider();
+		});
+
         //autoSaveAnswers if hasEditRight
         if (${hasEditRight}) {
           var interval = "30000"; // = 30 seconds

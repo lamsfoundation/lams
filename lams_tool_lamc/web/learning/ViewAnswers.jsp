@@ -28,6 +28,11 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
 	<script type="text/javascript">
+		$(document).ready(function() {
+			//initialize bootstrap-sliders if "Enable confidence level" option is ON
+			$('.bootstrap-slider').bootstrapSlider();
+		});
+	
 		function disableFinishButton() {
 			var elem = document.getElementById("finishButton");
 			if (elem != null) {
@@ -167,7 +172,7 @@
 														<div>
 															<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
 																<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
-																	<input data-provide="slider" type="text" 
+																	<input class="bootstrap-slider" type="text" 
 																		data-slider-ticks="[0, 5, 10]" data-slider-ticks-labels='["0", "50", "100%"]' 
 																		data-slider-enabled="false" data-slider-tooltip="hide"
 																		<c:if test="${attemptEntry.value.confidenceLevel != -1}">data-slider-value="${attemptEntry.value.confidenceLevel}"</c:if>

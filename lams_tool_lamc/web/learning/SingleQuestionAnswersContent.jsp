@@ -62,7 +62,7 @@
 											</div>
 						
 											<div>
-												<input name="confidenceLevel${dto.questionUid}" data-provide="slider" type="text" 
+												<input name="confidenceLevel${dto.questionUid}" class="bootstrap-slider" type="text" 
 													data-slider-ticks="[0, 5, 10]" data-slider-ticks-labels='["0", "50", "100%"]' 
 													data-slider-enabled="true" data-slider-tooltip="hide"
 													<c:if test="${dto.confidenceLevel != -1}">data-slider-value="${dto.confidenceLevel}"</c:if>
