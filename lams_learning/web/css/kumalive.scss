@@ -1,5 +1,10 @@
 @import "_lams_variables.scss"; 
 
+button {
+	width: 70%;
+	margin-top: 10px;
+}
+
 #initDiv {
 	padding-top: 35vh;
 	text-align: center;
@@ -30,15 +35,14 @@
 	display: none;
 }
 
+#mainDiv > .row > div {
+	background-color: white;
+}
+
 #actionCell {
 	padding-bottom: 10px;
 	border-bottom: $border-thin-black;
 	vertical-align: top;
-}
-
-#actionCell button {
-	width: 70%;
-	margin-top: 10px;
 }
 
 #pollCell {
@@ -82,6 +86,10 @@
 	margin: 0 auto;
 }
 
+#pollRunAnswerList {
+	margin-bottom: 0;
+}
+
 #pollRunVoteButton {
 	margin-top: 20px;
 }
@@ -89,6 +97,21 @@
 #pollRunAnswerList .list-group-item {
 	margin: 5px 20px;
 	text-align: left;
+}
+
+#pollRunAnswerList .list-group-item .badge {
+	margin-left: 5px;
+}
+
+#pollRun .pollVoters {
+	margin-top: 10px;
+	text-align: left;
+	border-top: $border-thin-black;
+}
+
+#pollRun .pollVoters .badge {
+	float: right;
+	margin: 8px 0 0 5px;
 }
 
 #learnersCell {
@@ -137,6 +160,13 @@
 .name {
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+#learnersCell .learner .badge {
+	float: right;
+	position: relative;
+	right: 15px;
+	top: -10px;
 }
 
 .speaker {
@@ -235,6 +265,11 @@
 	.profilePicture:before {
 		line-height: 70px;	
 		font-size: 80px;
+	}
+	
+	#learnersCell .learner .badge {
+		top: 3px;
+		right: 2px;
 	}
 	
 	.speaker .profilePicture {

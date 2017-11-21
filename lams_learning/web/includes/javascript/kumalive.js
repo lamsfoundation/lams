@@ -175,7 +175,7 @@ function init(message) {
 		$('#raiseHandPromptButton').click(raiseHandPrompt);
 		$('#downHandPromptButton').click(downHandPrompt);
 		$('#score i').click(score);
-		$('#pollButton').click(setupPoll).show();
+		$('#actionCell .pollButton').click(setupPoll).show();
 		$('#pollSetupAnswer').change(function(){
 			if ($('#pollSetupAnswer option:selected').val() === 'custom') {
 				$('#pollSetupAnswerCustom').show();
@@ -335,17 +335,24 @@ function processPoll(message) {
 			pollId = null;
 			// close the panel
 			$('#pollCell').hide();
-			$('#pollButton').prop('disabled', false);
+			$('#actionCell .pollButton').prop('disabled', false);
+			
+			$('#learnersCell .learner .badge').remove();
 		}
 		return;
 	}
 	
 	// open panel if closed
+	$('#actionCell .pollButton').prop('disabled', true);
 	$('#pollCell, #pollRun').show();
 	
 	// init poll fields or make them read only after voting
 	if (poll.id != pollId || (poll.finished && $('#pollRunVoteButton').is(':visible'))) {
 		initPoll(poll);
+	}
+	if (poll.voted != null) {
+		// highlight the answer user voted for
+		$('#pollAnswer' + poll.voted).addClass('active');
 	}
 	if (poll.votes) {
 		// show votes if user is teacher or votes were released
@@ -359,9 +366,41 @@ function processPoll(message) {
 			badge.text(count);
 		});
 	}
-	if (poll.voted != null) {
-		// highlight the answer user voted for
-		$('#pollAnswer' + poll.voted).addClass('active');
+	if (poll.voters) {
+		$.each(poll.voters, function(answerIndex, answerVoters) {
+			var answerVotersContainer = $('#pollVoters' + answerIndex);
+			if (answerVotersContainer.length === 0) {
+				answerVotersContainer = $('<div />').attr('id', 'pollVoters' + answerIndex).addClass('pollVoters')
+											  .appendTo('#pollRun');
+				$('<span />').addClass('badge').appendTo(answerVotersContainer);
+				$('<h4 />').text(pollAnswerBullets[answerIndex] + ') ' + poll.answers[answerIndex]).appendTo(answerVotersContainer);
+			}
+			$('.badge', answerVotersContainer).text(poll.votes[answerIndex]);
+			
+			$.each(answerVoters, function(voterIndex, voter) {
+				if ($('.learner[userId="' + voter.id + '"]', answerVotersContainer).length !== 0) {
+					return true;
+				}
+				var voterDiv = learnerDivTemplate.clone()
+								.attr('userId', voter.id)
+								.appendTo(answerVotersContainer),
+					profilePicture = $('.profilePicture', voterDiv);
+				// use profile picture or a coloured icon
+				addPortrait(profilePicture, voter.portraitUuid, voter.id, "large", true, LAMS_URL);
+				$('.name', voterDiv).text(voter.firstName + ' ' + voter.lastName);
+				
+				if (roleTeacher) {
+					// teacher can see logins and chooses who speaks
+					voterDiv.attr('title', message.logins['user' + voter.id]);
+				}
+				learnerFadeIn(voterDiv);
+				
+				var learnerDiv = $('#learnersContainer .learner[userId="' + voter.id + '"]');
+				if ( $('.badge', learnerDiv).length === 0) {
+					$('<span />').addClass('badge').text(pollAnswerBullets[answerIndex]).prependTo(learnerDiv);
+				}
+			});
+		});
 	}
 }
 
@@ -668,7 +707,7 @@ function score(){
  * Show form where teacher can build poll
  */
 function setupPoll() {
-	$('#pollButton').prop('disabled', true);
+	$('#actionCell .pollButton').prop('disabled', true);
 	$('#pollRun').hide();
 	// reset form inputs
 	$('#pollSetup input').val(null);
@@ -687,7 +726,7 @@ function setupPollCancel() {
 		$('#pollRun').show();
 	} else {
 		$('#pollCell').hide();
-		$('#pollButton').prop('disabled', false);
+		$('#actionCell .pollButton').prop('disabled', false);
 	}
 }
 
@@ -710,7 +749,7 @@ function initPoll(poll) {
 										   .appendTo(answerList);
 			if (poll.votes) {
 				// show votes if user is teacher or votes were released
-				$('<span />').addClass('badge').text(poll.votes[index]).appendTo(answerElement);
+				$('<span />').addClass('badge').text(poll.votes[index]).prependTo(answerElement);
 			}
 		});
 		$('#pollRunAnswerList').show();
@@ -730,6 +769,7 @@ function initPoll(poll) {
 				.find('label').append($('<span />').text(pollAnswerBullets[index] + ') ' + answer))
 				.find('input').val(index);
 		});
+		radioList.append('<br />');
 		$('#pollRunVoteButton').show();
 	}
 }

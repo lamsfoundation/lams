@@ -74,7 +74,7 @@
 					<div class="profilePicture"></div>
 					<div class="name"></div>
 					<button id="raiseHandPromptButton" class="btn btn-default"><fmt:message key="button.kumalive.ask"/></button><br />
-					<button id="pollButton" class="btn btn-default"><fmt:message key="button.kumalive.poll"/></button><br />
+					<button class="pollButton btn btn-default"><fmt:message key="button.kumalive.poll"/></button><br />
 					<button id="finishButton" class="btn btn-default"><fmt:message key="button.kumalive.finish.kumalive"/></button>
 				</div>
 				<div id="raiseHandPrompt">
@@ -82,6 +82,7 @@
 					<button id="raiseHandButton" class="btn btn-default"><fmt:message key="button.kumalive.raise"/></button>
 					<button id="downHandButton" class="btn btn-default"><fmt:message key="button.kumalive.putdown"/></button>
 					<button id="downHandPromptButton" class="btn btn-default"><fmt:message key="button.kumalive.finish.question"/></button>
+					<button class="pollButton btn btn-default"><fmt:message key="button.kumalive.poll"/></button><br />
 				</div>
 				<div id="score" class="score">
 					<p></p>
@@ -151,12 +152,10 @@
   						<label><input type="radio" name="pollAnswer" /></label>
 					</div>
 					<div id="pollRunAnswerRadios"></div>
-					<br />
 					<button id="pollRunVoteButton" class="btn btn-primary">
 						<fmt:message key='button.kumalive.poll.vote'/>
 					</button>
 					<ul id="pollRunAnswerList" class="list-group"></ul>
-					<br />
 					<button id="pollRunFinishButton" class="btn btn-default">
 						<fmt:message key='button.kumalive.poll.finish'/>
 					</button>
