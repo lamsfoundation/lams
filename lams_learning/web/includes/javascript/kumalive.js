@@ -171,6 +171,7 @@ function init(message) {
 	
 	// hide all buttons and enable ones appropriate for the role
 	$('#actionCell button').hide();
+	$('#pollRunChartSwitch').click(switchPollChart);
 	if (roleTeacher) {
 		$('#raiseHandPromptButton').click(raiseHandPrompt);
 		$('#downHandPromptButton').click(downHandPrompt);
@@ -360,7 +361,7 @@ function processPoll(message) {
 	
 	// update counters and charts
 	if (poll.votes) {
-		$('#pollRunChart', pollRunDiv).show();
+		$('#pollRunChart, #pollRunChartSwitch', pollRunDiv).show();
 		
 		var chartData = [],
 			voterCount = 0;
@@ -386,10 +387,11 @@ function processPoll(message) {
 			// count all voters, no matter what they chose
 			voterCount += count;
 		});
-		
+
 		// rewrite number of voters into percent
 		var	learnerCount = voterCount + poll.missingVotes,
-			chartDiv = $('#pollRunChartPie', pollRunDiv);
+			chartPieDiv = $('#pollRunChartPie', pollRunDiv),
+			chartBarDiv = $('#pollRunChartBar', pollRunDiv);
 		$('#pollRunTotalVotes').text(voterCount + '/' + learnerCount + ' (' 
 				+ Math.round(voterCount / learnerCount * 100) + '%)');
 		$.each(chartData, function() {
@@ -401,18 +403,26 @@ function processPoll(message) {
 			'value': Math.round(poll.missingVotes / learnerCount * 100)
 		});
 		
-		if (chartDiv.is(':empty')) {
-			// draw a new chart
+		if (chartPieDiv.is(':empty')) {
+			// draw new charts
 			drawChart('pie', 'pollRunChartPie', chartData, false);
+			drawChart('bar', 'pollRunChartBar', chartData, false);
+			chartBarDiv.hide();
 		} else {
-			// update chart data using functions set in chart.js
-			var updateFunctions = chartDiv.data('updateFunctions');
-			d3.select(chartDiv[0]).selectAll('path').data(updateFunctions.pie(chartData))
+			// update pie chart data using functions stored in chart.js
+			var updateFunctions = chartPieDiv.data('updateFunctions');
+			d3.select(chartPieDiv[0]).selectAll('path').data(updateFunctions.pie(chartData))
 			  .transition().duration(750).attrTween("d", updateFunctions.arcTween);
 			// update legend
-			chartDiv.find('text').each(function(answerIndex, legendItem){
+			chartPieDiv.find('text').each(function(answerIndex, legendItem){
 				$(legendItem).text(chartData[answerIndex].name + ' (' + chartData[answerIndex].value + '%)');
 			});
+			
+			// update bar chart
+			updateFunctions = chartBarDiv.data('updateFunctions');
+			d3.select(chartBarDiv[0]).selectAll('.bar').data(chartData).transition().duration(750)
+			  .attr("y", updateFunctions.y)
+			  .attr("height", updateFunctions.height);
 		}
 	}
 	
@@ -1001,6 +1011,10 @@ function releaseVoters() {
 		'votersReleased' : true
 	}));
 	$('#pollRunReleaseVotesButton, #pollRunReleaseVotersButton').hide();
+}
+
+function switchPollChart() {
+	$('#pollRunChartPie, #pollRunChartBar').toggle();
 }
 
 /**

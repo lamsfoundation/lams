@@ -152,6 +152,12 @@ function _drawBarChart(chartDiv, legend, width, height, rawData, domainX, scaleC
 		// move the legend to the right of the chart
 		legend.attr('transform', 'translate(' + (canvasWidth + CHART_MARGIN.right) + ',' + (CHART_MARGIN.top + 20) + ')');
 	}
+	
+	// functions to animate changed data
+	chartDiv.data('updateFunctions', {
+		'y' 	 :  function(d) {return y(d.value);},
+		'height' :  function(d) {return height - y(d.value);}
+	});
 }
 
 /**

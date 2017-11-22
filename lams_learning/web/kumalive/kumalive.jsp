@@ -171,6 +171,9 @@
 					<button id="pollRunReleaseVotersButton" class="btn btn-default">
 						<fmt:message key='button.kumalive.poll.release.voters'/>
 					</button>
+					<button id="pollRunChartSwitch" class="btn btn-default">
+						<fmt:message key='button.kumalive.poll.chart.switch'/>
+					</button>
 					<button id="pollRunFinishButton" class="btn btn-default">
 						<fmt:message key='button.kumalive.poll.finish'/>
 					</button>

@@ -107,6 +107,7 @@ button {
 #pollRunAnswerList .list-group-item.voted {
 	border: $border-thin-primary;
 	border-width: thick;
+	padding-right: 10px;
 }
 
 #pollRunAnswerList .list-group-item .badge {
@@ -119,8 +120,8 @@ button {
 	margin-top: 10px;
 }
 
-#pollRunChartPie {
-	height: 320px;
+#pollRunChartPie, #pollRunChartBar {
+	height: 340px;
 }
 
 #pollRun .pollVoters {
