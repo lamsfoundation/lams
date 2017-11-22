@@ -68,4 +68,6 @@ public interface IKumaliveService {
     void finishPoll(Long pollId) throws JSONException;
 
     void saveVote(Long answerId, Integer userId);
+
+    void releasePollResults(Long pollId, boolean votesReleased, boolean votersReleased);
 }

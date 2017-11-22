@@ -595,6 +595,17 @@ public class KumaliveService implements IKumaliveService {
     }
 
     /**
+     * Set whether learners can see vote results and voters' names
+     */
+    @Override
+    public void releasePollResults(Long pollId, boolean votesReleased, boolean votersReleased) {
+	KumalivePoll poll = (KumalivePoll) kumaliveDAO.find(KumalivePoll.class, pollId);
+	poll.setVotesReleased(votesReleased || votersReleased);
+	poll.setVotersReleased(votersReleased);
+	kumaliveDAO.update(poll);
+    }
+
+    /**
      * Finishes a poll, i.e. prevents learners from voting
      */
     @Override

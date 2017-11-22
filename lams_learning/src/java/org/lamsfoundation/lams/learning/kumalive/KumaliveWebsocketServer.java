@@ -98,8 +98,8 @@ public class KumaliveWebsocketServer {
 	private final ArrayList<List<UserDTO>> voters = new ArrayList<List<UserDTO>>();
 	private final JSONArray votersJSON = new JSONArray();
 	private boolean finished = false;
-	private boolean votesShown = false;
-	private boolean votersShown = false;
+	private boolean votesReleased = false;
+	private boolean votersReleased = false;
 
 	private KumalivePollDTO(Long pollId) {
 	    this.pollId = pollId;
@@ -210,6 +210,9 @@ public class KumaliveWebsocketServer {
 		break;
 	    case "votePoll":
 		votePoll(requestJSON, session);
+		break;
+	    case "releasePollResults":
+		releasePollResults(requestJSON, session);
 		break;
 	    case "finishPoll":
 		finishPoll(requestJSON, session);
@@ -408,10 +411,10 @@ public class KumaliveWebsocketServer {
 		boolean voted = participant.vote != null && kumalive.poll.pollId != null
 			&& participant.vote.pollId.equals(kumalive.poll.pollId);
 		// put them in response only if teacher released them and user voted
-		if (!kumalive.poll.votesShown || (!voted && !kumalive.poll.finished)) {
+		if (!kumalive.poll.votesReleased || (!voted && !kumalive.poll.finished)) {
 		    learnerPollJSON.remove("votes");
 		}
-		if (!kumalive.poll.votersShown || (!voted && !kumalive.poll.finished)) {
+		if (!kumalive.poll.votersReleased || (!voted && !kumalive.poll.finished)) {
 		    learnerPollJSON.remove("voters");
 		}
 		if (voted) {
@@ -669,6 +672,39 @@ public class KumaliveWebsocketServer {
 	if (logger.isDebugEnabled()) {
 	    logger.debug(
 		    "Learner " + userId + " voted in poll " + kumalive.poll.pollId + " in Kumalive " + kumalive.id);
+	}
+	sendRefresh(kumalive);
+    }
+
+    /**
+     * Allow learners to see votes and/or voters
+     */
+    private void releasePollResults(JSONObject requestJSON, Session websocket) throws IOException, JSONException {
+	Integer organisationId = Integer
+		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_ORGANISATION_ID).get(0));
+
+	User user = getUser(websocket);
+	Integer userId = user.getUserId();
+
+	if (!KumaliveWebsocketServer.getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive poll release results", false)) {
+	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
+	    logger.warn(warning);
+	    return;
+	}
+
+	KumaliveDTO kumalive = kumalives.get(organisationId);
+	kumalive.poll.votersReleased |= requestJSON.optBoolean("votersReleased", false);
+	kumalive.poll.votesReleased |= kumalive.poll.votersReleased || requestJSON.optBoolean("votesReleased", false);
+	KumaliveWebsocketServer.getKumaliveService().releasePollResults(kumalive.poll.pollId,
+		kumalive.poll.votesReleased, kumalive.poll.votersReleased);
+	kumalive.poll.pollJSON.put("votesReleased", kumalive.poll.votesReleased);
+	kumalive.poll.pollJSON.put("votersReleased", kumalive.poll.votersReleased);
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Teacher " + userId + " released votes/voters ( " + kumalive.poll.votesReleased + "/"
+		    + kumalive.poll.votersReleased + ") of poll " + kumalive.poll.pollId + " in Kumalive "
+		    + kumalive.id);
 	}
 	sendRefresh(kumalive);
     }

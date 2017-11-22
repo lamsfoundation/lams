@@ -185,6 +185,8 @@ function init(message) {
 		});
 		$('#pollSetupCancelButton').click(setupPollCancel);
 		$('#pollSetupStartButton').click(startPoll);
+		$('#pollRunReleaseVotesButton').click(releaseVotes);
+		$('#pollRunReleaseVotersButton').click(releaseVoters);
 		$('#pollRunFinishButton').click(finishPoll);
 		$('#pollRunCloseButton').click(closePoll);
 		$('#finishButton').click(finish).show();
@@ -337,7 +339,7 @@ function processPoll(message) {
 			$('#pollCell').hide();
 			$('#actionCell .pollButton').prop('disabled', false);
 			
-			$('#learnersCell .learner .badge').remove();
+			$('#learnersCell .learner .badge, #pollCell .pollVoters').remove();
 		}
 		return;
 	}
@@ -756,6 +758,16 @@ function initPoll(poll) {
 		// extra options for teacher
 	
 		if (roleTeacher) {
+			if (poll.votesReleased)
+				$('#pollRunReleaseVotesButton').hide();
+			else {
+				$('#pollRunReleaseVotesButton').show();
+			}
+			if (poll.votersReleased)
+				$('#pollRunReleaseVotersButton').hide();
+			else {
+				$('#pollRunReleaseVotersButton').show();
+			}
 			if (poll.finished) {
 				$('#pollRunCloseButton').show();
 			} else {
@@ -873,6 +885,34 @@ function votePoll() {
 		'type' 		  : 'votePoll',
 		'answerIndex' : checkedAnswer.val()
 	}));
+}
+
+/**
+ * Tell server that votes were released
+ */ 
+function releaseVotes() {
+	if (!confirm(LABELS.POLL_RELEASE_VOTES_CONFIRM)){
+		return;
+	}
+	kumaliveWebsocket.send(JSON.stringify({
+		'type' 		    : 'releasePollResults',
+		'votesReleased' : true
+	}));
+	$('#pollRunReleaseVotesButton').hide();
+}
+
+/**
+ * Tell server that voters were released
+ */ 
+function releaseVoters() {
+	if (!confirm(LABELS.POLL_RELEASE_VOTERS_CONFIRM)){
+		return;
+	}
+	kumaliveWebsocket.send(JSON.stringify({
+		'type' 		     : 'releasePollResults',
+		'votersReleased' : true
+	}));
+	$('#pollRunReleaseVotesButton, #pollRunReleaseVotersButton').hide();
 }
 
 /**

@@ -9,6 +9,8 @@ CREATE TABLE lams_kumalive_poll (
 	   poll_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , kumalive_id BIGINT(20) NOT NULL
      , name VARCHAR(250)
+     , votes_released TINYINT(1) DEFAULT 0
+     , voters_released TINYINT(1) DEFAULT 0
      , start_date DATETIME NOT NULL
      , finish_date DATETIME
      , PRIMARY KEY (poll_id)

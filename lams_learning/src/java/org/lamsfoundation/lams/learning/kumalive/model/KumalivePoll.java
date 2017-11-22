@@ -34,6 +34,8 @@ public class KumalivePoll implements Serializable {
     private Long pollId;
     private Kumalive kumalive;
     private String name;
+    private Boolean votesReleased;
+    private Boolean votersReleased;
     private Date startDate;
     private Date finishDate;
     private Set<KumalivePollAnswer> answers;
@@ -70,6 +72,22 @@ public class KumalivePoll implements Serializable {
 
     public void setName(String name) {
 	this.name = name;
+    }
+
+    public Boolean getVotesReleased() {
+	return votesReleased;
+    }
+
+    public void setVotesReleased(Boolean votesReleased) {
+	this.votesReleased = votesReleased;
+    }
+
+    public Boolean getVotersReleased() {
+	return votersReleased;
+    }
+
+    public void setVotersReleased(Boolean votersReleased) {
+	this.votersReleased = votersReleased;
     }
 
     public Date getStartDate() {

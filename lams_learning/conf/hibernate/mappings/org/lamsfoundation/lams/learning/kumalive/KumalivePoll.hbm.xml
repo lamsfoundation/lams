@@ -13,6 +13,20 @@
 
 		<property name="name" type="java.lang.String" column="name" length="250" />
 		
+		<property
+            name="votesReleased"
+            type="java.lang.Boolean"
+            column="votes_released"
+            not-null="false"
+        />
+        
+		<property
+            name="votersReleased"
+            type="java.lang.Boolean"
+            column="voters_released"
+            not-null="false"
+        />
+        
         <property
             name="startDate"
             type="java.util.Date"

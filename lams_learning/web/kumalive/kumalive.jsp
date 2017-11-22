@@ -40,7 +40,11 @@
 				<fmt:message key="label.kumalive.finish.speak" var="SPEAK_FINISH_VAR"/>
 				SPEAK_FINISH : '<c:out value="${SPEAK_FINISH_VAR}" />',
 				<fmt:message key="message.kumalive.poll.finish.confirm" var="POLL_FINISH_CONFIRM_VAR"/>
-				POLL_FINISH_CONFIRM : decoderDiv.html('<c:out value="${POLL_FINISH_CONFIRM_VAR}" />').text()
+				POLL_FINISH_CONFIRM : decoderDiv.html('<c:out value="${POLL_FINISH_CONFIRM_VAR}" />').text(),
+				<fmt:message key="message.kumalive.poll.release.votes.confirm" var="POLL_RELEASE_VOTES_CONFIRM_VAR"/>
+				POLL_RELEASE_VOTES_CONFIRM : decoderDiv.html('<c:out value="${POLL_RELEASE_VOTES_CONFIRM_VAR}" />').text(),
+				<fmt:message key="message.kumalive.poll.release.voters.confirm" var="POLL_RELEASE_VOTERS_CONFIRM_VAR"/>
+				POLL_RELEASE_VOTERS_CONFIRM : decoderDiv.html('<c:out value="${POLL_RELEASE_VOTERS_CONFIRM_VAR}" />').text()
 			};
 			
 	</script>
@@ -74,7 +78,7 @@
 					<div class="profilePicture"></div>
 					<div class="name"></div>
 					<button id="raiseHandPromptButton" class="btn btn-default"><fmt:message key="button.kumalive.ask"/></button><br />
-					<button class="pollButton btn btn-default"><fmt:message key="button.kumalive.poll"/></button><br />
+					<button class="pollButton btn btn-default"><fmt:message key="button.kumalive.poll.create"/></button><br />
 					<button id="finishButton" class="btn btn-default"><fmt:message key="button.kumalive.finish.kumalive"/></button>
 				</div>
 				<div id="raiseHandPrompt">
@@ -96,6 +100,7 @@
 			</div>
 			<div id="pollCell" class="col-md-1">
 				<div id="pollSetup">
+					<h3><fmt:message key='button.kumalive.poll'/></h3>
 					<div id="pollSetupQuestionGroup" class="form-group">
 						<label for="pollSetupQuestion" class="control-label">
 							<h4><fmt:message key="label.kumalive.poll.question"/></h4>
@@ -156,6 +161,12 @@
 						<fmt:message key='button.kumalive.poll.vote'/>
 					</button>
 					<ul id="pollRunAnswerList" class="list-group"></ul>
+					<button id="pollRunReleaseVotesButton" class="btn btn-default">
+						<fmt:message key='button.kumalive.poll.release.votes'/>
+					</button>
+					<button id="pollRunReleaseVotersButton" class="btn btn-default">
+						<fmt:message key='button.kumalive.poll.release.voters'/>
+					</button>
 					<button id="pollRunFinishButton" class="btn btn-default">
 						<fmt:message key='button.kumalive.poll.finish'/>
 					</button>
