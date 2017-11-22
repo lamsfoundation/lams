@@ -51,7 +51,13 @@
 	
 		<%-- Links placed in body instead of head. Ugly, but it works. --%>
 		<lams:css suffix="progressBar"/>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+		<script type="text/javascript">
+			// Adding jquery-ui.js if it hasn't been loaded already
+			jQuery.ui || document.write('<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"><\/script>');
+		
+			// Adding bootstrap.js if it hasn't been loaded already
+			(typeof($.fn.modal) != 'undefined') || document.write('<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"><\/script>');
+		</script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
