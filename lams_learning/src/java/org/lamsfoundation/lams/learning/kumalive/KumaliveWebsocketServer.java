@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -96,6 +97,7 @@ public class KumaliveWebsocketServer {
 	private final JSONObject pollJSON = new JSONObject();
 	private final List<Long> answerIds = new ArrayList<Long>();
 	private final ArrayList<List<UserDTO>> voters = new ArrayList<List<UserDTO>>();
+	private final Set<String> voterLogins = ConcurrentHashMap.newKeySet();
 	private final JSONArray votersJSON = new JSONArray();
 	private boolean finished = false;
 	private boolean votesReleased = false;
@@ -384,13 +386,27 @@ public class KumaliveWebsocketServer {
 		    votesJSON.put(voters.size());
 		    JSONArray answerVotersJSON = kumalive.poll.votersJSON.getJSONArray(answerIndex);
 		    for (int voterIndex = answerVotersJSON.length(); voterIndex < voters.size(); voterIndex++) {
-			answerVotersJSON.put(KumaliveWebsocketServer.participantToJSON(voters.get(voterIndex), null));
+			UserDTO voter = voters.get(voterIndex);
+			// add voter to "all voters" poll so we can calculate missing voters later
+			kumalive.poll.voterLogins.add(voter.getLogin());
+			answerVotersJSON.put(KumaliveWebsocketServer.participantToJSON(voter, null));
 		    }
 		}
 	    }
 
 	    pollJSON.put("votes", votesJSON);
 	    pollJSON.put("voters", kumalive.poll.votersJSON);
+
+	    // calculate missing voters
+	    JSONArray missingVotersJSON = new JSONArray();
+	    for (Entry<String, KumaliveUserDTO> learnerEntry : kumalive.learners.entrySet()) {
+		if (!learnerEntry.getValue().roleTeacher
+			&& !kumalive.poll.voterLogins.contains(learnerEntry.getKey())) {
+		    missingVotersJSON.put(learnerEntry.getValue().userDTO.getUserID());
+		}
+	    }
+	    pollJSON.put("missingVotes", missingVotersJSON.length());
+	    pollJSON.put("missingVoters", missingVotersJSON);
 	}
 
 	String learnerResponse = responseJSON.toString();
@@ -413,9 +429,11 @@ public class KumaliveWebsocketServer {
 		// put them in response only if teacher released them and user voted
 		if (!kumalive.poll.votesReleased || (!voted && !kumalive.poll.finished)) {
 		    learnerPollJSON.remove("votes");
+		    learnerPollJSON.remove("missingVotes");
 		}
 		if (!kumalive.poll.votersReleased || (!voted && !kumalive.poll.finished)) {
 		    learnerPollJSON.remove("voters");
+		    learnerPollJSON.remove("missingVoters");
 		}
 		if (voted) {
 		    // mark this learner as voted
@@ -837,6 +855,7 @@ public class KumaliveWebsocketServer {
 			userDTO = user.getUserDTO();
 		    }
 		    answerVoters.add(userDTO);
+		    pollDTO.voterLogins.add(userDTO.getLogin());
 		    answerVotersJSON.put(KumaliveWebsocketServer.participantToJSON(userDTO, null));
 		}
 	    }

@@ -55,8 +55,13 @@ button {
 	width: initial;
 }
 
-#pollSetup, #pollSetupAnswerCustom, #pollSetupAnswerCustomParseError, #pollSetupAnswerCustomCountError {
+#pollSetupAnswerCustom, #pollSetupAnswerCustomParseError, #pollSetupAnswerCustomCountError {
 	display: none;
+}
+
+#pollSetup {
+	display: none;
+	padding: 0 10px;
 }
 
 #pollSetupButtons, #pollSetup h3 {
@@ -99,14 +104,29 @@ button {
 	text-align: left;
 }
 
+#pollRunAnswerList .list-group-item.voted {
+	border: $border-thin-primary;
+	border-width: thick;
+}
+
 #pollRunAnswerList .list-group-item .badge {
 	margin-left: 5px;
+}
+
+#pollRunChart {
+	display: none;
+	border-top: $border-thin-black;
+	margin-top: 10px;
+}
+
+#pollRunChartPie {
+	height: 320px;
 }
 
 #pollRun .pollVoters {
 	margin-top: 10px;
 	text-align: left;
-	border-top: $border-thin-black;
+	border-top: $border-thin-default-light;
 }
 
 #pollRun .pollVoters .badge {
@@ -117,6 +137,10 @@ button {
 #learnersCell {
 	width: 100%;
 	padding: 0;
+}
+
+#learnersCell h3 {
+	text-align: center;
 }
 
 #learnersContainer {
@@ -238,7 +262,6 @@ button {
 	#actionCell {
 		width: 350px;
 		height: 100vh;
-		margin-right: 10px;
 		border-bottom: none;
 		border-right: $border-thin-black;
 	}
@@ -246,15 +269,14 @@ button {
 	#pollCell {
 		width: 500px;
 		height: 100vh;
-		padding-left: 0;
-		margin-right: 10px;
+		padding: 0;
 		border-bottom: none;
 		border-right: $border-thin-black;
 	}
 	
 	.learner {
 		height: 120px;
-		margin-right: 20px;
+		margin-left: 20px;
 	}
 	
 	.profilePicture {

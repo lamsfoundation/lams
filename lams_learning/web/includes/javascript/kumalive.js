@@ -346,43 +346,110 @@ function processPoll(message) {
 	
 	// open panel if closed
 	$('#actionCell .pollButton').prop('disabled', true);
-	$('#pollCell, #pollRun').show();
+	$('#pollCell').show();
+	var pollRunDiv = $('#pollRun').show();
 	
 	// init poll fields or make them read only after voting
-	if (poll.id != pollId || (poll.finished && $('#pollRunVoteButton').is(':visible'))) {
+	if (poll.id != pollId || (poll.finished && $('#pollRunVoteButton', pollRunDiv).is(':visible'))) {
 		initPoll(poll);
 	}
 	if (poll.voted != null) {
 		// highlight the answer user voted for
-		$('#pollAnswer' + poll.voted).addClass('active');
+		$('#pollAnswer' + poll.voted, pollRunDiv).addClass('voted');
 	}
+	
+	// update counters and charts
 	if (poll.votes) {
+		$('#pollRunChart', pollRunDiv).show();
+		
+		var chartData = [],
+			voterCount = 0;
 		// show votes if user is teacher or votes were released
-		$.each(poll.votes, function(index, count) {
-			var answerElement = $('#pollAnswer' + index),
+		$.each(poll.votes, function(answerIndex, count) {
+			var answerElement = $('#pollAnswer' + answerIndex, pollRunDiv),
 				badge = $('.badge', answerElement);
 			// missing badge means that votes were made available just now
 			if (badge.length === 0) {
-				badge = $('<span />').addClass('badge').appendTo(answerElement);
+				// its colour corresponds to chart
+				badge = $('<span />').addClass('badge').css('background-color', d3.schemeCategory10[answerIndex])
+									 .appendTo(answerElement);
 			}
+			// update visual counter
 			badge.text(count);
+			
+			// build data to feed chart
+			chartData.push({
+				'name' : pollAnswerBullets[answerIndex],
+				'value': count
+			});
+			
+			// count all voters, no matter what they chose
+			voterCount += count;
 		});
+		
+		// rewrite number of voters into percent
+		var	learnerCount = voterCount + poll.missingVotes,
+			chartDiv = $('#pollRunChartPie', pollRunDiv);
+		$('#pollRunTotalVotes').text(voterCount + '/' + learnerCount + ' (' 
+				+ Math.round(voterCount / learnerCount * 100) + '%)');
+		$.each(chartData, function() {
+			this.value = Math.round(this.value / learnerCount * 100);
+		});
+		// add missing voters
+		chartData.push({
+			'name' : LABELS.MISSING_VOTERS,
+			'value': Math.round(poll.missingVotes / learnerCount * 100)
+		});
+		
+		if (chartDiv.is(':empty')) {
+			// draw a new chart
+			drawChart('pie', 'pollRunChartPie', chartData, false);
+		} else {
+			// update chart data using functions set in chart.js
+			var updateFunctions = chartDiv.data('updateFunctions');
+			d3.select(chartDiv[0]).selectAll('path').data(updateFunctions.pie(chartData))
+			  .transition().duration(750).attrTween("d", updateFunctions.arcTween);
+			// update legend
+			chartDiv.find('text').each(function(answerIndex, legendItem){
+				$(legendItem).text(chartData[answerIndex].name + ' (' + chartData[answerIndex].value + '%)');
+			});
+		}
 	}
+	
+	// update voter icons and counters
 	if (poll.voters) {
-		$.each(poll.voters, function(answerIndex, answerVoters) {
-			var answerVotersContainer = $('#pollVoters' + answerIndex);
-			if (answerVotersContainer.length === 0) {
+		// no voters yet, i.e. page refreshed or voters just released
+		if ($('.pollVoters', pollRunDiv).length === 0){
+			$.each(poll.voters, function(answerIndex, answerVoters) {
+				// build a container for each answer
+				var answerVotersContainer = $('#pollVoters' + answerIndex, pollRunDiv);
 				answerVotersContainer = $('<div />').attr('id', 'pollVoters' + answerIndex).addClass('pollVoters')
-											  .appendTo('#pollRun');
-				$('<span />').addClass('badge').appendTo(answerVotersContainer);
-				$('<h4 />').text(pollAnswerBullets[answerIndex] + ') ' + poll.answers[answerIndex]).appendTo(answerVotersContainer);
-			}
+											  .appendTo(pollRunDiv);
+				$('<span />').addClass('badge').css('background-color', d3.schemeCategory10[answerIndex])
+							 .appendTo(answerVotersContainer);
+				$('<h4 />').text(pollAnswerBullets[answerIndex] + ') ' + poll.answers[answerIndex])
+						   .appendTo(answerVotersContainer);
+			});
+			// build a container for missing voters
+			var missingVotersContainer = $('<div />').attr('id', 'pollVotersMissing').addClass('pollVoters').appendTo(pollRunDiv);
+			$('<span />').addClass('badge').css('background-color', d3.schemeCategory10[poll.voters.length])
+						 .appendTo(missingVotersContainer);
+			$('<h4 />').text("Not voted").appendTo(missingVotersContainer);
+		}
+		
+		// fill each voter container with voters
+		var learnerDivs = $('#learnersContainer .learner');
+		$.each(poll.voters, function(answerIndex, answerVoters) {
+			// update counter
+			var answerVotersContainer = $('#pollVoters' + answerIndex, pollRunDiv);
 			$('.badge', answerVotersContainer).text(poll.votes[answerIndex]);
 			
 			$.each(answerVoters, function(voterIndex, voter) {
+				// if a voter is already added, skip
 				if ($('.learner[userId="' + voter.id + '"]', answerVotersContainer).length !== 0) {
 					return true;
 				}
+				// create a voter icon
 				var voterDiv = learnerDivTemplate.clone()
 								.attr('userId', voter.id)
 								.appendTo(answerVotersContainer),
@@ -397,11 +464,36 @@ function processPoll(message) {
 				}
 				learnerFadeIn(voterDiv);
 				
-				var learnerDiv = $('#learnersContainer .learner[userId="' + voter.id + '"]');
+				// add bagde to user in Learners section
+				var learnerDiv = learnerDivs.filter('[userId="' + voter.id + '"]');
 				if ( $('.badge', learnerDiv).length === 0) {
-					$('<span />').addClass('badge').text(pollAnswerBullets[answerIndex]).prependTo(learnerDiv);
+					$('<span />').addClass('badge').css('background-color', d3.schemeCategory10[answerIndex])
+								 .text(pollAnswerBullets[answerIndex]).prependTo(learnerDiv);
 				}
 			});
+		});
+		
+		// fill missing voters container
+		var missingVotersContainer = $('#pollVotersMissing'),
+			missingVoters = $('.learner', missingVotersContainer);
+		
+		$('.badge', missingVotersContainer).text(poll.missingVotes);
+		
+		// remove missing voters because they voted or logged out
+		missingVoters.filter(function(){
+			return poll.missingVoters.indexOf(+$(this).attr('userId')) === -1;
+		}).each(function(){
+			learnerFadeOut($(this));
+		});
+		
+		// add missing voters
+		$.each(poll.missingVoters, function(){
+			if (missingVoters.index('.learner[userId="' + this + '"]') === -1) {
+				var learnerDiv = learnerDivs.filter('.learner[userId="' + this + '"]'),
+					voterDiv = learnerDiv.clone().removeClass('changing').css('cursor', 'default').appendTo(missingVotersContainer);
+				$('.badge', voterDiv).remove();
+				$('.profilePicture', voterDiv).removeClass('profilePictureHidden').css('opacity', '');
+			}
 		});
 	}
 }
@@ -749,10 +841,6 @@ function initPoll(poll) {
 			var answerElement = $('<li />').addClass('list-group-item').attr('id', 'pollAnswer' + index)
 										   .text(pollAnswerBullets[index] + ') ' + answer)
 										   .appendTo(answerList);
-			if (poll.votes) {
-				// show votes if user is teacher or votes were released
-				$('<span />').addClass('badge').text(poll.votes[index]).prependTo(answerElement);
-			}
 		});
 		$('#pollRunAnswerList').show();
 		// extra options for teacher
@@ -841,7 +929,7 @@ function startPoll(){
 			if (answers.length === 0) {
 				$('#pollSetupAnswerCustomGroup').addClass('has-error');
 				$('#pollSetupAnswerCustomParseError').show();
-			} else if (answers.length > 10) {
+			} else if (answers.length > 9) {
 				$('#pollSetupAnswerCustomGroup').addClass('has-error');
 				$('#pollSetupAnswerCustomCountError').show();
 			} else {

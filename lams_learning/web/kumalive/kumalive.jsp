@@ -16,6 +16,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/d3.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.js"></script>
 	<script type="text/javascript">
 		"use strict"
 		
@@ -44,7 +46,9 @@
 				<fmt:message key="message.kumalive.poll.release.votes.confirm" var="POLL_RELEASE_VOTES_CONFIRM_VAR"/>
 				POLL_RELEASE_VOTES_CONFIRM : decoderDiv.html('<c:out value="${POLL_RELEASE_VOTES_CONFIRM_VAR}" />').text(),
 				<fmt:message key="message.kumalive.poll.release.voters.confirm" var="POLL_RELEASE_VOTERS_CONFIRM_VAR"/>
-				POLL_RELEASE_VOTERS_CONFIRM : decoderDiv.html('<c:out value="${POLL_RELEASE_VOTERS_CONFIRM_VAR}" />').text()
+				POLL_RELEASE_VOTERS_CONFIRM : decoderDiv.html('<c:out value="${POLL_RELEASE_VOTERS_CONFIRM_VAR}" />').text(),
+				<fmt:message key="label.kumalive.poll.missing.voters" var="MISSING_VOTERS_VAR"/>
+				MISSING_VOTERS : '<c:out value="${MISSING_VOTERS_VAR}" />'
 			};
 			
 	</script>
@@ -86,7 +90,7 @@
 					<button id="raiseHandButton" class="btn btn-default"><fmt:message key="button.kumalive.raise"/></button>
 					<button id="downHandButton" class="btn btn-default"><fmt:message key="button.kumalive.putdown"/></button>
 					<button id="downHandPromptButton" class="btn btn-default"><fmt:message key="button.kumalive.finish.question"/></button>
-					<button class="pollButton btn btn-default"><fmt:message key="button.kumalive.poll"/></button><br />
+					<button class="pollButton btn btn-default"><fmt:message key="button.kumalive.poll.create"/></button><br />
 				</div>
 				<div id="score" class="score">
 					<p></p>
@@ -173,14 +177,20 @@
 					<button id="pollRunCloseButton" class="btn btn-default">
 						<fmt:message key='button.kumalive.poll.close'/>
 					</button>
+					<div id="pollRunChart">
+						<h3><fmt:message key='label.kumalive.poll.results'/></h3>
+						<h4><fmt:message key='label.kumalive.poll.votes.total'/>&nbsp;<span id="pollRunTotalVotes"></span></h4>
+						<div id="pollRunChartPie"></div>
+						<div id="pollRunChartBar"></div>
+					</div>
 				</div>
 			</div>
 			<div id="learnersCell">
 				<div id="raiseHandContainer">
-					<h4><fmt:message key="label.kumalive.raised.hands"/></h4>
+					<h3><fmt:message key="label.kumalive.raised.hands"/></h3>
 				</div>
 				<div id="learnersContainer">
-					<h4><fmt:message key="label.kumalive.learners"/></h4>
+					<h3><fmt:message key="label.kumalive.learners"/></h3>
 				</div>
 			</div>
 		</div>
