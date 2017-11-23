@@ -29,7 +29,7 @@ div#titleDiv button {
 }
 
 table#groupsTable {
-	height: calc(100% - 280px);
+	height: 420px; // do not use calc(100% - XXpx) but fix it so that iPad does not shift lengths when accordians are opened
 }
 table#groupsTable td {
 	vertical-align: top;
@@ -86,7 +86,7 @@ td#unassignedUserCell {
 }
 
 td#unassignedUserCell .userContainer {
-	height: 100%;
+	height: calc(100% - 10px);
 	overflow-x: auto;
 }
 
@@ -128,11 +128,14 @@ td#unassignedUserCell .userContainer {
 	margin-bottom: 0px;
 	margin-top: 20px;
 }
-#accordionUploadGroupFile {
-	margin-bottom: 0px;
-}
 .dialogContainer {
     display: none;
     -webkit-overflow-scrolling: touch !important;
     overflow: auto;
+}
+// override values from dialog.scss
+.dialogContainer .modal-body {
+	height : 100%;
+	max-height: calc(100% - 38px);
+	padding: 15px;
 }

@@ -184,7 +184,7 @@
 	</lams:AdvancedAccordian>
 
 	<c:if test="${canEdit}">
-	<div class="panel-group" id="accordionUploadGroupFile" role="tablist" aria-multiselectable="true"> 
+	<div class="panel-group voffset5" id="accordionUploadGroupFile" role="tablist" aria-multiselectable="true"> 
 	    <div class="panel panel-default" >
 	        <div class="panel-heading collapsable-icon-left" id="headingUploadGroupFile">
 		        	<span class="panel-title">
@@ -202,7 +202,7 @@
 						<fmt:message key="label.download.template" />
 					</button>
 				</div>
-				<div>
+				<div class="voffset5">
 					<html:form action="groupingUpload.do?method=importLearnersForGrouping" enctype="multipart/form-data" styleId="uploadForm">
 					<html:hidden property="activityID" styleId="activityID" value="${param.activityID}"/>
 					<html:hidden property="lessonID" styleId="lessonID" value="${lessonID}"/>
@@ -230,7 +230,7 @@
 	</span>
 		
 	<div>
-		<input id="dialog-course-grouping-name" type="text"/>
+		<input id="dialog-course-grouping-name" type="text" size="40"/>
 	</div>
 			
 	<div class="btn-group pull-right">
