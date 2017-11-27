@@ -66,10 +66,6 @@ public class PortraitSaveAction extends LamsDispatchAction {
     private static IAuditService auditService;
     private static MessageService messageService;
     private static CentralToolContentHandler centralToolContentHandler;
-    private static int LARGEST_DIMENSION_ORIGINAL = 400;
-    private static int LARGEST_DIMENSION_LARGE = 200;
-    private static int LARGEST_DIMENSION_MEDIUM = 80;
-    private static int LARGEST_DIMENSION_SMALL = 35;
     private static final String PORTRAIT_DELETE_AUDIT_KEY = "audit.delete.portrait";
 
     /**
@@ -111,7 +107,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	// write to content repository
 	NodeKey originalFileNode = null;
 	if ((file != null) && !StringUtils.isEmpty(fileName)) {
-	    
+
 	    //Create nice file name. If file name equals to "blob" - it means it was uploaded using webcam
 	    String fileNameWithoutExt;
 	    if (fileName.equals("blob")) {
@@ -131,21 +127,24 @@ public class PortraitSaveAction extends LamsDispatchAction {
 		    + originalFileNode.getVersion());
 
 	    //resize to the large size
-	    is = ResizePictureUtil.resize(file.getInputStream(), LARGEST_DIMENSION_LARGE);
+	    is = ResizePictureUtil.resize(file.getInputStream(),
+		    IUserManagementService.PORTRAIT_LARGEST_DIMENSION_LARGE);
 	    NodeKey node = getCentralToolContentHandler().updateFile(originalFileNode.getUuid(), is,
 		    fileNameWithoutExt + "_large.png", "image/png");
 	    is.close();
 	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
 
 	    //resize to the medium size
-	    is = ResizePictureUtil.resize(file.getInputStream(), LARGEST_DIMENSION_MEDIUM);
+	    is = ResizePictureUtil.resize(file.getInputStream(),
+		    IUserManagementService.PORTRAIT_LARGEST_DIMENSION_MEDIUM);
 	    node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_medium.png",
 		    "image/png");
 	    is.close();
 	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
 
 	    //resize to the small size
-	    is = ResizePictureUtil.resize(file.getInputStream(), LARGEST_DIMENSION_SMALL);
+	    is = ResizePictureUtil.resize(file.getInputStream(),
+		    IUserManagementService.PORTRAIT_LARGEST_DIMENSION_SMALL);
 	    node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_small.png",
 		    "image/png");
 	    is.close();
@@ -162,33 +161,35 @@ public class PortraitSaveAction extends LamsDispatchAction {
 
 	return mapping.findForward("profile");
     }
-    
+
     /** Called from sysadmin to delete an inappropriate portrait */
     public ActionForward deletePortrait(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
-	
+
 	// check user is sysadmin
 	if (!(request.isUserInRole(Role.SYSADMIN))) {
-	    log.error("Attempt to delete a portrait by user that is not sysadmin. User is "+request.getRemoteUser()+" portrait to be deleted is for user "+userId+".");
+	    log.error("Attempt to delete a portrait by user that is not sysadmin. User is " + request.getRemoteUser()
+		    + " portrait to be deleted is for user " + userId + ".");
 	    return deleteResponse(response, "error");
 	}
 
 	String responseValue = "deleted";
 	User userToModify = (User) getService().findById(User.class, userId);
 	if (userToModify != null && userToModify.getPortraitUuid() != null) {
-	    
-	    Object[] args = new Object[] { userToModify.getFullName(), userToModify.getLogin(), userToModify.getUserId(), userToModify.getPortraitUuid() };
+
+	    Object[] args = new Object[] { userToModify.getFullName(), userToModify.getLogin(),
+		    userToModify.getUserId(), userToModify.getPortraitUuid() };
 	    String auditMessage = getMessageService().getMessage(PORTRAIT_DELETE_AUDIT_KEY, args);
 	    getAuditService().log(CentralConstants.MODULE_NAME, auditMessage);
 
 	    try {
 		getCentralToolContentHandler().deleteFile(userToModify.getPortraitUuid());
-            	userToModify.setPortraitUuid(null);
-            	getService().saveUser(userToModify);
+		userToModify.setPortraitUuid(null);
+		getService().saveUser(userToModify);
 	    } catch (Exception e) {
-		log.error("Unable to delete a portrait for user "+userId+".", e);
+		log.error("Unable to delete a portrait for user " + userId + ".", e);
 		return deleteResponse(response, "error");
 	    }
 	}
@@ -200,7 +201,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	response.getWriter().write(data);
 	return null;
     }
-    
+
     private CentralToolContentHandler getCentralToolContentHandler() {
 	if (centralToolContentHandler == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
@@ -218,7 +219,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	}
 	return service;
     }
-    
+
     private IAuditService getAuditService() {
 	if (PortraitSaveAction.auditService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils

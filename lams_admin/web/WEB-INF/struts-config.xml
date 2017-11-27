@@ -945,7 +945,10 @@
         redirect="false"
       />
     </action>
-
+    <action
+      path="/uploadPortraits"
+      type="org.lamsfoundation.lams.admin.web.action.PortraitBatchUploadAction"
+    />
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

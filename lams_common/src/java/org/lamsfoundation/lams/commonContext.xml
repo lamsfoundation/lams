@@ -52,6 +52,7 @@
 		<property name="userDAO"><ref bean="userDAO"/></property>
 		<property name="userOrganisationDAO"><ref bean="userOrganisationDAO"/></property>
 		<property name="messageService"><ref bean="commonMessageService"/></property>
+		<property name="centralToolContentHandler"><ref bean="centralToolContentHandler"/></property>
 	</bean>	
 	
 	<!-- Transactional proxy for the user management primary business object -->
@@ -78,6 +79,7 @@
 				<prop key="is*">PROPAGATION_REQUIRED</prop>
 				<prop key="toggleOrganisationFavorite">PROPAGATION_REQUIRED</prop>
 				<prop key="userHasData">PROPAGATION_REQUIRED</prop>
+				<prop key="upload*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
