@@ -48,10 +48,15 @@ public class ToolContentVersionFilter {
 
     // container class for removed class
     private class RemovedField {
-	private Class ownerClass;
+	private String ownerClass;
 	private String fieldname;
 
 	private RemovedField(Class ownerClass, String fieldname) {
+	    this.ownerClass = ownerClass.getName();
+	    this.fieldname = fieldname;
+	}
+
+	private RemovedField(String ownerClass, String fieldname) {
 	    this.ownerClass = ownerClass;
 	    this.fieldname = fieldname;
 	}
@@ -59,11 +64,17 @@ public class ToolContentVersionFilter {
 
     // container class for added class
     private class AddedField {
-	private Class ownerClass;
+	private String ownerClass;
 	private String fieldname;
 	private String defaultValue;
 
 	private AddedField(Class ownerClass, String fieldname, String defaultValue) {
+	    this.ownerClass = ownerClass.getName();
+	    this.fieldname = fieldname;
+	    this.defaultValue = defaultValue;
+	}
+
+	private AddedField(String ownerClass, String fieldname, String defaultValue) {
 	    this.ownerClass = ownerClass;
 	    this.fieldname = fieldname;
 	    this.defaultValue = defaultValue;
@@ -72,14 +83,20 @@ public class ToolContentVersionFilter {
 
     // container class for renamed class
     private class RenamedField {
-	private Class ownerClass;
+	private String ownerClass;
 	private String oldFieldname;
 	private String newFieldname;
 
-	private RenamedField(Class ownerClass2, String oldFieldname2, String newFieldname2) {
-	    ownerClass = ownerClass2;
-	    oldFieldname = oldFieldname2;
-	    newFieldname = newFieldname2;
+	private RenamedField(Class ownerClass, String oldFieldname, String newFieldname) {
+	    this.ownerClass = ownerClass.getName();
+	    this.oldFieldname = oldFieldname;
+	    this.newFieldname = newFieldname;
+	}
+
+	private RenamedField(String ownerClass, String oldFieldname, String newFieldname) {
+	    this.ownerClass = ownerClass;
+	    this.oldFieldname = oldFieldname;
+	    this.newFieldname = newFieldname;
 	}
     }
 
@@ -94,6 +111,10 @@ public class ToolContentVersionFilter {
 	removedFieldList.add(new RemovedField(ownerClass, fieldname));
     }
 
+    public void removeField(String ownerClass, String fieldname) {
+	removedFieldList.add(new RemovedField(ownerClass, fieldname));
+    }
+
     /**
      * When a field is added to tool Hibernate POJO class, this method is optional in upXXXToYYY()/downXXXToYYY()
      * methods. It could set default value for this added fields.
@@ -105,6 +126,10 @@ public class ToolContentVersionFilter {
 	addedFieldList.add(new AddedField(ownerClass, fieldname, defaultValue));
     }
 
+    public void addField(String ownerClass, String fieldname, String defaultValue) {
+	addedFieldList.add(new AddedField(ownerClass, fieldname, defaultValue));
+    }
+
     /**
      * When a field is renamed in tool Hibernate POJO class, this method must be call in upXXXToYYY()/downXXXToYYY()
      * methods.
@@ -113,6 +138,10 @@ public class ToolContentVersionFilter {
      * @param fieldname
      */
     public void renameField(Class ownerClass, String oldFieldname, String newFieldname) {
+	renamedFieldList.add(new RenamedField(ownerClass, oldFieldname, newFieldname));
+    }
+
+    public void renameField(String ownerClass, String oldFieldname, String newFieldname) {
 	renamedFieldList.add(new RenamedField(ownerClass, oldFieldname, newFieldname));
     }
 
@@ -141,8 +170,8 @@ public class ToolContentVersionFilter {
 
     private void retrieveXML(Element root) throws IOException {
 	for (RemovedField remove : removedFieldList) {
-	    if (StringUtils.equals(root.getNodeName(), remove.ownerClass.getName())
-		    || StringUtils.equals(root.getAttribute("class"), remove.ownerClass.getName())) {
+	    if (StringUtils.equals(root.getNodeName(), remove.ownerClass)
+		    || StringUtils.equals(root.getAttribute("class"), remove.ownerClass)) {
 
 		Node node = root.getFirstChild();
 		while (node != null) {
@@ -150,8 +179,8 @@ public class ToolContentVersionFilter {
 		    node = node.getNextSibling();
 		    if (oldNode.getNodeName().equals(remove.fieldname)) {
 			root.removeChild(oldNode);
-			ToolContentVersionFilter.log.debug("Field " + remove.fieldname + " in class "
-				+ remove.ownerClass.getName() + " was removed.");
+			ToolContentVersionFilter.log.debug(
+				"Field " + remove.fieldname + " in class " + remove.ownerClass + " was removed.");
 		    }
 		}
 	    }
@@ -159,19 +188,19 @@ public class ToolContentVersionFilter {
 
 	// add all new fields for this class
 	for (AddedField added : addedFieldList) {
-	    if (StringUtils.equals(root.getNodeName(), added.ownerClass.getName())) {
+	    if (StringUtils.equals(root.getNodeName(), added.ownerClass)) {
 		Element element = root.getOwnerDocument().createElement(added.fieldname);
 		element.setTextContent(added.defaultValue);
 		root.appendChild(element);
 
-		ToolContentVersionFilter.log.debug("Field " + added.fieldname + " in class "
-			+ added.ownerClass.getName() + " was added by value " + added.defaultValue);
+		ToolContentVersionFilter.log.debug("Field " + added.fieldname + " in class " + added.ownerClass
+			+ " was added by value " + added.defaultValue);
 	    }
 	}
 
 	// rename all marked fields for this class
 	for (RenamedField renamed : renamedFieldList) {
-	    if (StringUtils.equals(root.getNodeName(), renamed.ownerClass.getName())) {
+	    if (StringUtils.equals(root.getNodeName(), renamed.ownerClass)) {
 		Node node = root.getFirstChild();
 		while (node != null) {
 		    Node oldNode = node;
@@ -188,7 +217,7 @@ public class ToolContentVersionFilter {
 			}
 			root.replaceChild(newElement, oldNode);
 			ToolContentVersionFilter.log.debug("Field " + renamed.oldFieldname + " in class "
-				+ renamed.ownerClass.getName() + " was renamed to " + renamed.newFieldname);
+				+ renamed.ownerClass + " was renamed to " + renamed.newFieldname);
 		    }
 		}
 	    }
