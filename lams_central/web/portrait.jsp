@@ -54,12 +54,7 @@
 					message : '<h1><img src="images/loading.gif" style="padding-right:25px;"> <fmt:message key="label.portrait.please.wait" /> </h1>'
 				});
 				
-				//Creates a Blob object representing the image contained in the canvas. Which we then upload to the server.
-				croppieWidget.croppie('result', 'blob').then(function(blob) {
-					var formData = new FormData();
-					formData.append("file", blob);
-					uploadProtraitToServerSide(formData);
-				});	
+				uploadProtraitToServerSide(croppieWidget);
 			});
 
 			//update dialog's height and title
@@ -93,30 +88,37 @@
 			    }
 			});
 			$('#save-upload-button').on('click', function (ev) {
-				$uploadCroppie.croppie('result', 'blob').then(function(blob) {
-					var formData = new FormData();
-					formData.append("file", blob);
-					uploadProtraitToServerSide(formData);
-				});
+				uploadProtraitToServerSide($uploadCroppie);
 			});
 		});
 
-		function uploadPortraitFile() {
-			var formData = new FormData(document.getElementById("PortraitActionForm"));
-			uploadProtraitToServerSide(formData);
-		}
-		
-		function uploadProtraitToServerSide(formData) {
-			$.ajax({ 
-				data : formData,
-				async : false,
-				processData : false, // tell jQuery not to process the data
-				contentType : false, // tell jQuery not to set contentType
-				type : $("#PortraitActionForm").attr('method'),
-				url : $("#PortraitActionForm").attr('action'),
-				success : function(data) {
-					window.parent.location.reload();
-				}
+		//Creates a Blob object representing the image contained in the canvas. Which we then upload to the server.
+		function uploadProtraitToServerSide(uploadCroppie) {
+			uploadCroppie.croppie('result', {
+		        type: 'blob',
+		        size: {
+		            width:  PORTRAIT_SIZE,
+		            height: PORTRAIT_SIZE,
+		          },
+		        format: 'jpeg',
+		        quality: 0.95,
+		        backgroundColor: '#FFF',
+    			}).then(function(blob) {
+				var formData = new FormData();
+				formData.append("file", blob);
+				
+				//upload protrait to server side
+				$.ajax({ 
+					data : formData,
+					async : false,
+					processData : false, // tell jQuery not to process the data
+					contentType : false, // tell jQuery not to set contentType
+					type : $("#PortraitActionForm").attr('method'),
+					url : $("#PortraitActionForm").attr('action'),
+					success : function(data) {
+						window.parent.location.reload();
+					}
+				});
 			});
 		}
 

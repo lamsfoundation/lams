@@ -573,9 +573,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    // prepare medium image
 	    InputStream mediumIS = ResizePictureUtil.resize(originalImage, mediumImageDimensions);
 	    String mediumFileName = ImageGalleryServiceImpl.MEDIUM_FILENAME_PREFIX
-		    + fileName.substring(0, fileName.indexOf('.')) + ".png";
+		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 	    NodeKey mediumNodeKey = imageGalleryToolContentHandler.uploadFile(mediumIS, mediumFileName,
-		    "image/png");
+		    "image/jpeg");
 	    image.setMediumFileUuid(mediumNodeKey.getUuid());
 	    //store MediumImageWidth and MediumImageHeight
 	    InputStream mediumIS2 = imageGalleryToolContentHandler.getFileNode(mediumNodeKey.getUuid()).getFile();
@@ -588,23 +588,17 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    InputStream originalIS2 = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
 	    InputStream thumbnailIS = ResizePictureUtil.resize(originalIS2, thumbnailImageDimensions);
 	    String thumbnailFileName = ImageGalleryServiceImpl.THUMBNAIL_FILENAME_PREFIX
-		    + fileName.substring(0, fileName.indexOf('.')) + ".png";
+		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 	    NodeKey thumbnailNodeKey = imageGalleryToolContentHandler.uploadFile(thumbnailIS, thumbnailFileName,
-		    "image/png");
+		    "image/jpeg");
 	    image.setThumbnailFileUuid(thumbnailNodeKey.getUuid());
 
 	} catch (RepositoryCheckedException e) {
-	    ImageGalleryServiceImpl.log
-		    .error(messageService.getMessage("error.msg.repository.checked.exception") + ":" + e.toString());
 	    throw new UploadImageGalleryFileException(
 		    messageService.getMessage("error.msg.repository.checked.exception"));
 	} catch (NumberFormatException e) {
-	    ImageGalleryServiceImpl.log
-		    .error(messageService.getMessage("error.msg.number.format.exception") + ":" + e.toString());
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.number.format.exception"));
 	} catch (IOException e) {
-	    ImageGalleryServiceImpl.log
-		    .error(messageService.getMessage("error.msg.io.exception.resizing") + ":" + e.toString());
 	    throw new ImageGalleryException(messageService.getMessage("error.msg.io.exception.resizing"));
 	}
     }

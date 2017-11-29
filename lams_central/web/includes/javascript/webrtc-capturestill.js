@@ -142,7 +142,10 @@
   	  	croppieWidget.croppie('bind', {
   	  	    url: objectURL
   	  	});
-      });
+      },
+      "image/jpeg",
+      1
+      );
       
       //*LAMS* commented out by LAMS
       //var data = canvas.toDataURL('image/png');
