@@ -89,7 +89,7 @@ public class ResizePictureUtil {
 	    ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("jpeg").next();
 	    ImageWriteParam jpgWriteParam = imageWriter.getDefaultWriteParam();
 	    jpgWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-	    jpgWriteParam.setCompressionQuality(1);
+	    jpgWriteParam.setCompressionQuality(.95f);
 
 	    // buffer all data in a circular buffer of infinite sizes
 	    CircularByteBuffer outputBuffer = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
