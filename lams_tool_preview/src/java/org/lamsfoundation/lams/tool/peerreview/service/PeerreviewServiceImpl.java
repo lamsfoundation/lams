@@ -56,7 +56,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
-import org.lamsfoundation.lams.rating.dto.StyledRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
@@ -79,6 +78,7 @@ import org.lamsfoundation.lams.tool.peerreview.dto.PeerreviewStatisticsDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
+import org.lamsfoundation.lams.tool.peerreview.util.EmailAnalysisBuilder;
 import org.lamsfoundation.lams.tool.peerreview.util.PeerreviewToolContentHandler;
 import org.lamsfoundation.lams.tool.peerreview.util.SpreadsheetBuilder;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -88,7 +88,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Andrey Balan
@@ -459,108 +458,36 @@ public class PeerreviewServiceImpl
 	return peerreviewUserDao.getPagedUsers(toolSessionId, page, size, sorting, searchString);
     }
 
-    @Override
-    public int emailReportToSessionUsers(Long toolContentId, Long sessionId) {
-	List<PeerreviewUser> users = peerreviewUserDao.getBySessionID(sessionId);
-	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
-	String subject = getResultsEmailSubject(peerreview);
-	List<RatingCriteria> criterias = getRatingCriterias(toolContentId);
-	int numEmailsSent = 0;
-	for (PeerreviewUser user : users) {
-	    if (emailReport(toolContentId, sessionId, user, peerreview, criterias, subject) != 1) {
-		log.error("Unable to email to all users in session " + sessionId + ". Have processed " + numEmailsSent
-			+ " so far.");
-		return -1;
-	    }
-	    numEmailsSent++;
-	}
-	return numEmailsSent;
-    }
-
-    @Override
-    public int emailReportToUser(Long toolContentId, Long sessionId, Long userId) {
-
-	PeerreviewUser user = peerreviewUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
-	return emailReport(toolContentId, sessionId, user, peerreview, getRatingCriterias(toolContentId),
-		getResultsEmailSubject(peerreview));
-    }
-
     private String getResultsEmailSubject(Peerreview peerreview) {
 	return getLocalisedMessage("event.sent.results.subject", new Object[] { peerreview.getTitle() });
     }
 
-    private int emailReport(Long toolContentId, Long sessionId, PeerreviewUser user, Peerreview peerreview,
-	    List<RatingCriteria> ratingCriterias, String subject) {
 
-	int userId = user.getUserId().intValue();
-	String name = StringEscapeUtils.escapeCsv(user.getFirstName() + " " + user.getLastName());
+    @Override
+    public int emailReportToUser(Long toolContentId, Long sessionId, Long userId) {
+	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
+	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
 
-	StringBuilder notificationMessage = new StringBuilder();
-
-	for (RatingCriteria criteria : ratingCriterias) {
-	    int sorting = (criteria.isStarStyleRating() || criteria.isHedgeStyleRating())
-		    ? PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC : PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
-	    StyledCriteriaRatingDTO dto = getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, sessionId, criteria,
-		    user.getUserId(), false, sorting, null, true, false);
-	    generateRatingEntryForEmail(notificationMessage, criteria, dto);
-	}
-
-	eventNotificationService.sendMessage(null, userId, IEventNotificationService.DELIVERY_METHOD_MAIL, subject,
-		getLocalisedMessage("event.sent.results.body", new Object[] { name, notificationMessage.toString() }),
-		true);
-
+	String email = new EmailAnalysisBuilder(peerreview, session, ratingService, peerreviewSessionDao,
+		peerreviewUserDao, this, messageService).generateHTMLEMailForLearner(userId);
+	eventNotificationService.sendMessage(null, userId.intValue(), IEventNotificationService.DELIVERY_METHOD_MAIL,
+		getResultsEmailSubject(peerreview), email, true);
 	return 1;
-
     }
 
-    private void generateRatingEntryForEmail(StringBuilder notificationMessage, RatingCriteria criteria,
-	    StyledCriteriaRatingDTO dto) {
-	String escapedTitle = StringEscapeUtils.escapeHtml(dto.getRatingCriteria().getTitle());
-	if (dto.getRatingDtos().size() >= 1) {
-	    if (criteria.isCommentRating()) {
-		StringBuilder comments = new StringBuilder();
-		for (StyledRatingDTO ratingDto : dto.getRatingDtos()) {
-		    if (ratingDto.getComment() != null) {
-			String escaped = StringEscapeUtils.escapeHtml(ratingDto.getComment());
-			comments.append("<li>").append(escaped).append("</li>");
-		    }
-		}
-		notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.comment",
-			new Object[] { escapedTitle, StringUtils.replace(comments.toString(), "&lt;BR&gt;", "<BR>") }));
-	    } else {
-		String avgRating = dto.getRatingDtos().get(0).getAverageRating().length() > 0
-			? dto.getRatingDtos().get(0).getAverageRating() : "0";
-		StringBuilder comments = null;
-		if (criteria.isStarStyleRating()) {
-		    if (criteria.isCommentsEnabled()) {
-			comments = new StringBuilder();
-			for (StyledRatingDTO ratingDto : dto.getRatingDtos()) {
-			    if (ratingDto.getComment() != null) {
-				String escaped = StringEscapeUtils.escapeHtml(ratingDto.getComment());
-				comments.append("<li>").append(escaped).append("</li>");
-			    }
-			}
-		    }
-		    notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.star",
-			    new Object[] { escapedTitle, avgRating, comments != null ? comments.toString() : "" }));
-		} else if (criteria.isRankingStyleRating()) {
-		    if (criteria.getMaxRating() > 0) {
-			notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.rank",
-				new Object[] { escapedTitle, avgRating, criteria.getMaxRating() }));
-		    } else {
-			notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.rankAll",
-				new Object[] { escapedTitle, avgRating }));
-		    }
-		} else { // hedge style rating
-		    notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.hedge",
-			    new Object[] { escapedTitle, avgRating, criteria.getMaxRating() }));
-		}
-	    }
-	} else {
-	    notificationMessage.append(escapedTitle).append(getLocalisedMessage("event.sent.results.no.results", null));
+    @Override
+    public int emailReportToSessionUsers(Long toolContentId, Long sessionId) {
+	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
+	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
+	Map<Long, String> emails = new EmailAnalysisBuilder(peerreview, session, ratingService,
+	    peerreviewSessionDao, peerreviewUserDao, this, messageService).generateHTMLEmailsForSession();
+	for ( Map.Entry<Long, String> entry : emails.entrySet() ) {
+	    eventNotificationService.sendMessage(null, entry.getKey().intValue(), 
+		    IEventNotificationService.DELIVERY_METHOD_MAIL, 
+		    getResultsEmailSubject(peerreview),
+		    entry.getValue(), true);
 	}
-	notificationMessage.append("\n");
+	return emails.size();
     }
 
     @Override

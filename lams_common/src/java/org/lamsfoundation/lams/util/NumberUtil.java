@@ -41,8 +41,31 @@ public class NumberUtil {
     }
 
     /**
+     * Format a given float or double to the I18N format specified by the locale, with a fixed number of decimal places. 
+     * If numFractionDigits is 2: 4.051 -> 4.05, 4 -> 4.00
+     *
+     * @param mark
+     * @param locale
+     * @param numFractionDigits
+     * @return
+     */
+    public static String formatLocalisedNumberForceDecimalPlaces(Number number, Locale locale, int numFractionDigits) {
+	NumberFormat format = null;
+	if (locale == null) {
+	    format = NumberFormat.getInstance(NumberUtil.getServerLocale());
+	} else {
+	    format = NumberFormat.getInstance(locale);
+	}
+	format.setMinimumFractionDigits(numFractionDigits);
+	return format.format(number);
+    }
+
+
+    /**
      * Format a given float or double to the I18N format specified by the locale. If no locale supplied, uses LAMS
      * server's default locale.
+     * 
+     * Will set it to numFractionDigits decimal places if needed. If numFractionDigits is 2: 4.051 -> 4.05, 4 stays as 4.
      *
      * @param mark
      * @param locale

@@ -51,7 +51,6 @@ import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledRatingDTO;
-import org.lamsfoundation.lams.rating.model.AuthoredItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingComment;
@@ -770,6 +769,15 @@ public class RatingService implements IRatingService {
     public String getRatingSelectJoinSQL(Integer ratingStyle, boolean getByUser) {
 	return ratingDAO.getRatingSelectJoinSQL(ratingStyle, getByUser);
     }
+    
+    /** 
+     * Get all the raw ratings for a combination of criteria and item ids. Used by Peer Review to do SPA analysis.
+     */
+    @Override
+    public List getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds) {
+	return ratingDAO.getRatingsByCriteriasAndItems(ratingCriteriaIds, itemIds);
+    }
+
     /* ********** Used by Spring to "inject" the linked objects ************* */
 
     public void setRatingDAO(IRatingDAO ratingDAO) {
