@@ -120,8 +120,8 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	    }
 
 	    // upload to the content repository
-	    originalFileNode = getCentralToolContentHandler().uploadFile(is, fileNameWithoutExt + "_original.png",
-		    "image/png");
+	    originalFileNode = getCentralToolContentHandler().uploadFile(is, fileNameWithoutExt + "_original.jpg",
+		    "image/jpeg");
 	    is.close();
 	    log.debug("saved file with uuid: " + originalFileNode.getUuid() + " and version: "
 		    + originalFileNode.getVersion());
@@ -130,23 +130,23 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	    is = ResizePictureUtil.resize(file.getInputStream(),
 		    IUserManagementService.PORTRAIT_LARGEST_DIMENSION_LARGE);
 	    NodeKey node = getCentralToolContentHandler().updateFile(originalFileNode.getUuid(), is,
-		    fileNameWithoutExt + "_large.png", "image/png");
+		    fileNameWithoutExt + "_large.jpg", "image/jpeg");
 	    is.close();
 	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
 
 	    //resize to the medium size
 	    is = ResizePictureUtil.resize(file.getInputStream(),
 		    IUserManagementService.PORTRAIT_LARGEST_DIMENSION_MEDIUM);
-	    node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_medium.png",
-		    "image/png");
+	    node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_medium.jpg",
+		    "image/jpeg");
 	    is.close();
 	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
 
 	    //resize to the small size
 	    is = ResizePictureUtil.resize(file.getInputStream(),
 		    IUserManagementService.PORTRAIT_LARGEST_DIMENSION_SMALL);
-	    node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_small.png",
-		    "image/png");
+	    node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_small.jpg",
+		    "image/jpeg");
 	    is.close();
 	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
 
