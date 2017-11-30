@@ -21,6 +21,9 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -39,7 +42,7 @@ import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
-import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.Configuration;
@@ -78,6 +81,8 @@ public class GradebookServlet extends HttpServlet {
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	getIntegrationService();
+	getUserManagementService();
 	HttpSession hses = request.getSession(true);
 
 	String username = request.getParameter(LoginRequestDispatcher.PARAM_USER_ID);
@@ -96,7 +101,7 @@ public class GradebookServlet extends HttpServlet {
 		|| ((lessonId == null) && (extCourseId == null))) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Gradebook request failed - invalid parameters");
 	} else {
-	    ExtServer extServer = getIntegrationService().getExtServer(serverId);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    try {
 		// if request comes from LoginRequest, method parameter was meaningful there
 		// if it's a direct call, it can be anything
@@ -105,38 +110,44 @@ public class GradebookServlet extends HttpServlet {
 			|| StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR);
 
 		if (lessonId == null) {
-		    String gradebookServletURL = isTeacher ? GradebookServlet.GRADEBOOK_MONITOR_ORGANISATION_URL
-			    : GradebookServlet.GRADEBOOK_LEARNER_ORGANISATION_URL;
+		    String gradebookServletURL = isTeacher ? GRADEBOOK_MONITOR_ORGANISATION_URL
+			    : GRADEBOOK_LEARNER_ORGANISATION_URL;
 
 		    // translate external course ID to internal organisation ID and then get the gradebook for it
-		    ExtUserUseridMap userMap = getIntegrationService().getExtUserUseridMap(extServer, username);
-		    ExtCourseClassMap orgMap = getIntegrationService().getExtCourseClassMap(extServer, userMap,
+		    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
+		    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap,
 			    extCourseId, courseName, countryIsoCode, langIsoCode,
 			    getUserManagementService().getRootOrganisation().getOrganisationId().toString(), isTeacher,
 			    false);
-		    Organisation org = orgMap.getOrganisation();
+		    Integer organisationId = orgMap.getOrganisation().getOrganisationId();
+		    
+		    //when displaying GRADEBOOK_MONITOR_ORGANISATION_URL we need to make sure user has ROLE_GROUP_MANAGER role
+		    if (isTeacher) {
+			List<String> roles = new ArrayList<String>(Arrays.asList(Role.ROLE_GROUP_MANAGER.toString()));
+			userManagementService.setRolesForUserOrganisation(userMap.getUser(), organisationId, roles);
+		    }
 
 		    response.sendRedirect(Configuration.get(ConfigurationKeys.SERVER_URL) + gradebookServletURL
-			    + org.getOrganisationId());
+			    + organisationId);
 		} else {
 		    if (isTeacher) {
 			// get gradebook for particular lesson
 			response.sendRedirect(Configuration.get(ConfigurationKeys.SERVER_URL)
-				+ GradebookServlet.GRADEBOOK_MONITOR_LESSON_URL + lessonId);
+				+ GRADEBOOK_MONITOR_LESSON_URL + lessonId);
 		    } else {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST,
 				"There is no lesson level gradebook for learner");
 		    }
 		}
 	    } catch (AuthenticationException e) {
-		GradebookServlet.log.error(e);
+		log.error(e);
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login failed - authentication error");
 	    } catch (UserInfoFetchException e) {
-		GradebookServlet.log.error(e);
+		log.error(e);
 		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 			"Gradebook request failed - user info fetch exception");
 	    } catch (UserInfoValidationException e) {
-		GradebookServlet.log.error(e);
+		log.error(e);
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Gradebook request failed. " + e.getMessage());
 	    }
 	}
@@ -162,20 +173,20 @@ public class GradebookServlet extends HttpServlet {
     }
 
     private IntegrationService getIntegrationService() {
-	if (GradebookServlet.integrationService == null) {
-	    GradebookServlet.integrationService = (IntegrationService) WebApplicationContextUtils
+	if (integrationService == null) {
+	    integrationService = (IntegrationService) WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
 	}
-	return GradebookServlet.integrationService;
+	return integrationService;
     }
 
     protected IUserManagementService getUserManagementService() {
-	if (GradebookServlet.userManagementService == null) {
-	    GradebookServlet.userManagementService = (IUserManagementService) WebApplicationContextUtils
+	if (userManagementService == null) {
+	    userManagementService = (IUserManagementService) WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServletContext())
 		    .getBean(CentralConstants.USER_MANAGEMENT_SERVICE_BEAN_NAME);
 
 	}
-	return GradebookServlet.userManagementService;
+	return userManagementService;
     }
 }
