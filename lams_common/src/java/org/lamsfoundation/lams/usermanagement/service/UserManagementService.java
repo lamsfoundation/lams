@@ -1042,7 +1042,7 @@ public class UserManagementService implements IUserManagementService {
     }
 
     /**
-     * Looks for [login].png images in /tmp/portraits of user IDs within given range and starting with the given prefix
+     * Looks for [login].jpg images in /tmp/portraits of user IDs within given range and starting with the given prefix
      */
     @Override
     public List<String> uploadPortraits(Integer minUserId, Integer maxUserId, String prefix) throws IOException {
@@ -1075,7 +1075,7 @@ public class UserManagementService implements IUserManagementService {
 		    }
 		    login = login.substring(prefixLength);
 		}
-		File portraitFile = new File(tmpDir, login + ".png");
+		File portraitFile = new File(tmpDir, login + ".jpg");
 		if (!portraitFile.canRead()) {
 		    if (log.isDebugEnabled()) {
 			log.debug("Portrait for user " + userId + " with login \"" + login
@@ -1088,7 +1088,7 @@ public class UserManagementService implements IUserManagementService {
 		FileInputStream is = new FileInputStream(portraitFile);
 		String fileNameWithoutExt = login;
 		NodeKey originalFileNode = centralToolContentHandler.uploadFile(is,
-			fileNameWithoutExt + "_original.png", "image/png");
+			fileNameWithoutExt + "_original.jpg", "image/jpeg");
 		is.close();
 		log.debug("Saved original portrait with uuid: " + originalFileNode.getUuid() + " and version: "
 			+ originalFileNode.getVersion());
@@ -1098,7 +1098,7 @@ public class UserManagementService implements IUserManagementService {
 		InputStream modifiedPortraitInputStream = ResizePictureUtil.resize(is,
 			PORTRAIT_LARGEST_DIMENSION_LARGE);
 		NodeKey node = centralToolContentHandler.updateFile(originalFileNode.getUuid(),
-			modifiedPortraitInputStream, fileNameWithoutExt + "_large.png", "image/png");
+			modifiedPortraitInputStream, fileNameWithoutExt + "_large.jpg", "image/jpeg");
 		modifiedPortraitInputStream.close();
 		is.close();
 		if (log.isDebugEnabled()) {
@@ -1110,7 +1110,7 @@ public class UserManagementService implements IUserManagementService {
 		is = new FileInputStream(portraitFile);
 		modifiedPortraitInputStream = ResizePictureUtil.resize(is, PORTRAIT_LARGEST_DIMENSION_MEDIUM);
 		node = centralToolContentHandler.updateFile(node.getUuid(), modifiedPortraitInputStream,
-			fileNameWithoutExt + "_medium.png", "image/png");
+			fileNameWithoutExt + "_medium.jpg", "image/jpeg");
 		modifiedPortraitInputStream.close();
 		is.close();
 		if (log.isDebugEnabled()) {
@@ -1122,7 +1122,7 @@ public class UserManagementService implements IUserManagementService {
 		is = new FileInputStream(portraitFile);
 		modifiedPortraitInputStream = ResizePictureUtil.resize(is, PORTRAIT_LARGEST_DIMENSION_SMALL);
 		node = centralToolContentHandler.updateFile(node.getUuid(), modifiedPortraitInputStream,
-			fileNameWithoutExt + "_small.png", "image/png");
+			fileNameWithoutExt + "_small.jpg", "image/jpeg");
 		modifiedPortraitInputStream.close();
 		is.close();
 		if (log.isDebugEnabled()) {
