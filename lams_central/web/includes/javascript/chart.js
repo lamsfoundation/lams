@@ -18,7 +18,7 @@ function drawChart(type, chartID, url, legendOnHover){
 		var rawData = response.data, 
 			chartDiv = $('#' + chartID).empty().show(),
 			width = chartDiv.width(),
-			//Changed for LDEV-4475
+			//Changed for LDEV-4475 Missing information in Legend for Pie Chart when more than 7 items
 		//	height = 410,
 			height = chartDiv.height()*1.5,
 			// add SVG elem
