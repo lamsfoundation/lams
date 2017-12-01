@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository.client;
 
 import java.io.BufferedInputStream;
@@ -291,7 +290,7 @@ public abstract class Download extends HttpServlet {
 	    Download.log.debug("Sending as inline");
 	    response.setHeader("Content-Disposition", "inline;filename=" + filename);
 	}
-	response.setHeader("Cache-control", "must-revalidate");
+	response.setHeader("Cache-control", "public, max-age=43200");
 	if (filename != null) {
 	    response.addHeader("Content-Description", filename);
 	}

@@ -500,7 +500,7 @@
                          -->
                     </host>
                 </server>
-                <servlet-container name="default">
+                <servlet-container name="default" disable-caching-for-secured-pages="false">
                     <jsp-config x-powered-by="false" trim-spaces="true"/>
                     <websockets/>
                 </servlet-container>
