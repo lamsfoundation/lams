@@ -18,7 +18,9 @@ function drawChart(type, chartID, url, legendOnHover){
 		var rawData = response.data, 
 			chartDiv = $('#' + chartID).empty().show(),
 			width = chartDiv.width(),
-			height = chartDiv.height(),
+			//Changed for LDEV-4475
+		//	height = 410,
+			height = chartDiv.height()*1.5,
 			// add SVG elem
 		    svg = d3.select(chartDiv[0])
 					.append('svg')
