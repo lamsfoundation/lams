@@ -122,6 +122,8 @@ function initializeJRating() {
 		  				if (HAS_RATING_LIMITS) {
 		   					handleRatingLimits(data.countRatedItems, itemId);
 		   				}
+		  			   //LDEV-4480 Acknowledgement when submitting a comment for a Q&A response 
+	    				alert("Submitted the comment successfully.");
 		   			}
 	    		},
 				onError : function(){
