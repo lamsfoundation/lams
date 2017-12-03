@@ -139,7 +139,7 @@
 	
 			<logic:notEqual name="PortraitActionForm" property="portraitUuid" value="0">
 				<img class="img-thumbnail" src="/lams/download/?uuid=<bean:write name="PortraitActionForm" 
-						property="portraitUuid" />&version=3&preferDownload=false" />
+						property="portraitUuid" />&version=2&preferDownload=false" />
 			</logic:notEqual>
 	
 			<logic:equal name="PortraitActionForm" property="portraitUuid"	value="0">
