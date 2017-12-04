@@ -55,6 +55,12 @@ public abstract class GradebookGridRowDTO {
 
     // Another unit of time that represents average time taken for a corresponding task
     protected Long medianTimeTaken;
+    
+    // Another unit of time that represents minimum time taken for a corresponding task
+    protected Long minTimeTaken;
+    
+    // Another unit of time that represents maximum time taken for a corresponding task
+    protected Long maxTimeTaken;
 
     // The mark for the corresponding gradebook grid row task
     protected Double mark;
@@ -182,6 +188,39 @@ public abstract class GradebookGridRowDTO {
 
     public void setMedianTimeTaken(Long medianTimeTaken) {
 	this.medianTimeTaken = medianTimeTaken;
+    }
+    
+    
+    public Long getMinTimeTaken() {
+        return minTimeTaken;
+    }
+    
+    public Long getMinTimeTakenSeconds() {
+	if (minTimeTaken != null) {
+	    return minTimeTaken / 1000;
+	} else {
+	    return null;
+	}
+    }
+
+    public void setMinTimeTaken(Long minTimeTaken) {
+        this.minTimeTaken = minTimeTaken;
+    }
+
+    public Long getMaxTimeTaken() {
+        return maxTimeTaken;
+    }
+    
+    public Long getMaxTimeTakenSeconds() {
+	if (maxTimeTaken != null) {
+	    return maxTimeTaken / 1000;
+	} else {
+	    return null;
+	}
+    }
+
+    public void setMaxTimeTaken(Long maxTimeTaken) {
+        this.maxTimeTaken = maxTimeTaken;
     }
 
     public Double getAverageMark() {

@@ -60,12 +60,21 @@ public interface IGradebookDAO extends IBaseDAO {
     long getMedianTimeTakenLesson(Long lessonID);
 
     long getMedianTimeTakenForActivity(Long activityID);
+    
+    long getMinTimeTakenForActivity(Long activityID);
+
+    long getMaxTimeTakenForActivity(Long activityID);
 
     Double getAverageMarkForActivity(Long activityID);
 
     Double getAverageMarkForGroupedActivity(Long activityID, Long groupID);
 
     long getMedianTimeTakenForGroupedActivity(Long activityID, Long groupID);
+    
+    long getMinTimeTakenForGroupedActivity(Long activityID, Long groupID);
+    
+    long getMaxTimeTakenForGroupedActivity(Long activityID, Long groupID);
+
 
     List<Lesson> getLessonsByGroupAndUser(final Integer userId, final Integer orgId, int page, int size, String sortBy,
 	    String sortOrder, String searchString);
