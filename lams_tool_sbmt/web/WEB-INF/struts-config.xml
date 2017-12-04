@@ -114,6 +114,11 @@
         path="/learner/submissionDeadline.jsp"
         redirect="false"
       />
+      <forward
+        name="waitForLeaderTimeLimit"
+        path="/learner/waitForLeaderTimeLimit.jsp"
+        redirect="false"
+      />
     </action>
     <action
       path="/pedagogicalPlanner"

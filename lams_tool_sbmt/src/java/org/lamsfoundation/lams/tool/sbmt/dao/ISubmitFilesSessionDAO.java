@@ -51,4 +51,14 @@ public interface ISubmitFilesSessionDAO extends IBaseDAO {
     public void createSession(SubmitFilesSession submitSession);
 
     public List<SubmitFilesSession> getSubmitFilesSessionByContentID(Long contentID);
+    
+    
+    
+    /**
+     * Generic method to save an object - handles both update and insert.
+     *
+     * @param o
+     *            the object to save
+     */
+    public void saveObject(Object o);
 }

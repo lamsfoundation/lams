@@ -65,6 +65,11 @@ public class SubmissionDetailsDAO extends LAMSBaseDAO implements ISubmissionDeta
 	getSession().saveOrUpdate(session);
 
     }
+    
+    @Override
+    public void save(SubmissionDetails submissionDetails) {
+	getSession().save(submissionDetails);
+    }
 
     /*
      * (non-Javadoc)

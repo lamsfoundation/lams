@@ -221,6 +221,23 @@
 <table class="table table-striped table-condensed">
 	<tr>
 		<td>
+			<fmt:message key="label.use.select.leader.tool.output" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${authoring.useSelectLeaderToolOuput}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+		
+	<tr>
+		<td>
 			<fmt:message key="label.authoring.advance.lock.on.finished" />
 		</td>
 		

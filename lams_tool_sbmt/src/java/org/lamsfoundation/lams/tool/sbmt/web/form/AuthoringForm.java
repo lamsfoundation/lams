@@ -32,6 +32,8 @@ public class AuthoringForm extends ValidatorForm {
     // file and display fields
 
     private boolean limitUpload;
+    
+    private boolean useSelectLeaderToolOuput;
 
     private int limitUploadNumber;
 
@@ -46,6 +48,7 @@ public class AuthoringForm extends ValidatorForm {
     @Override
     public void reset(ActionMapping mapping, HttpServletRequest request) {
 	lockOnFinished = false;
+	useSelectLeaderToolOuput = false;
 	limitUpload = false;
 	reflectOnActivity = false;
 
@@ -61,7 +64,7 @@ public class AuthoringForm extends ValidatorForm {
 	title = content.getTitle();
 	instructions = content.getInstruction();
 	lockOnFinished = content.isLockOnFinished();
-
+	useSelectLeaderToolOuput = content.isUseSelectLeaderToolOuput();
 	limitUpload = content.isLimitUpload();
 	limitUploadNumber = content.getLimitUploadNumber();
 
@@ -176,5 +179,13 @@ public class AuthoringForm extends ValidatorForm {
 
     public void setNotifyTeachersOnFileSubmit(boolean notifyTeachersOnFileSubmit) {
 	this.notifyTeachersOnFileSubmit = notifyTeachersOnFileSubmit;
+    }
+    
+    public boolean isUseSelectLeaderToolOuput() {
+   	return useSelectLeaderToolOuput;
+    }
+
+    public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
+   	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 }

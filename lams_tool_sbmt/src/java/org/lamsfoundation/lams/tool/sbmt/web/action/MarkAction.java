@@ -111,8 +111,8 @@ public class MarkAction extends LamsDispatchAction {
 	}
 
 	// Update the mark based on the form
-	submitFilesService.updateMarks(markForm.getReportID(), marks, comments, markForm.getMarkFile());
-
+	submitFilesService.updateMarks(markForm.getReportID(), marks, comments, markForm.getMarkFile(),markForm.getToolSessionID());
+	
 	// Return to the appropriate screen based upon the updateMode
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, markForm.getToolSessionID());
 	if (StringUtils.equals(markForm.getUpdateMode(), "listMark")) {
