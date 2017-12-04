@@ -70,6 +70,12 @@ public class SbmtConstants {
     public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
 
     public static final String PARAM_MIN_UPLOAD = "minUpload";
+    
+    public static final String ATTR_GROUP_USERS = "groupUsers";
+    
+    public static final String ATTR_USE_SEL_LEADER = "useSelectLeaderToolOuput";
+    
+    public static final String ATTR_GROUP_LEADER = "groupLeader";
 
     public static final String ATTR_LIMIT_UPLOAD = "limitUpload";
 
@@ -79,7 +85,19 @@ public class SbmtConstants {
 
     public static final String ATTR_USER_FINISHED = "userFinished";
 
-    public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
+    public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";    
+    
+    public static final String ATTR_SUBMIT_FILES = "submittedFilesMap";
+    
+    public static final String WAIT_FOR_LEADER = "waitForLeader";
+    
+    public static final String WAIT_FOR_LEADER_TIME_LIMIT = "waitForLeaderTimeLimit";
+    
+    public static final String ATTR_IS_USER_LEADER = "isUserLeader";
+    
+    public static final String ATTR_HAS_EDIT_RIGHT = "hasEditRight";
+    
+    public static final String PARAM_WAITING_MESSAGE_KEY = "waitingMessageKey";
 
     public static final String ATTR_UPLOAD_MAX_FILE_SIZE = "uploadMaxFileSize";
 

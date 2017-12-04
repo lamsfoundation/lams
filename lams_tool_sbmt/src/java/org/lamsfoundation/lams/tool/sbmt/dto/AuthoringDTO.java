@@ -48,6 +48,8 @@ public class AuthoringDTO implements Serializable {
     private String instruction;
 
     // advance
+    private boolean useSelectLeaderToolOuput;
+    
     private boolean lockOnFinished;
 
     private boolean limitUpload;
@@ -187,5 +189,13 @@ public class AuthoringDTO implements Serializable {
 
     public void setNotifyTeachersOnFileSubmit(boolean notifyTeachersOnFileSubmit) {
 	this.notifyTeachersOnFileSubmit = notifyTeachersOnFileSubmit;
+    }
+    
+    public boolean isUseSelectLeaderToolOuput() {
+   	return useSelectLeaderToolOuput;
+    }
+
+    public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
+   	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 }

@@ -186,7 +186,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	JSONArray rows = new JSONArray();
 	JSONObject responsedata = new JSONObject();
 	responsedata.put("total_rows", service.getCountUsersBySession(sessionID, searchString));
-
+	SubmitUser groupLeader = new SubmitUser();
+	 if (spreadsheet.isUseSelectLeaderToolOuput()) {
+		SubmitFilesSession session = service.getSessionById(sessionID);
+		groupLeader = session.getGroupLeader();
+	 }
 	for (Object[] userAndReflection : users) {
 
 	    JSONObject responseRow = new JSONObject();
@@ -212,8 +216,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	    if (userAndReflection.length > 5) {
 		responseRow.put(SbmtConstants.ATTR_USER_REFLECTION, userAndReflection[5]);
 	    }
-
-	    rows.put(responseRow);
+	    if(!spreadsheet.isUseSelectLeaderToolOuput()|| (spreadsheet.isUseSelectLeaderToolOuput() && groupLeader==user)){
+		rows.put(responseRow);
+	    }
 	}
 
 	responsedata.put("rows", rows);
@@ -244,8 +249,16 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private void statistic(HttpServletRequest request, Long contentID) {
 	SortedSet<StatisticDTO> statistics = new TreeSet<StatisticDTO>(new StatisticComparator());
-	statistics.addAll(submitFilesService.getStatisticsBySession(contentID));
-	request.setAttribute("statisticList", statistics);
+	ISubmitFilesService service = getSubmitFilesService();
+	SubmitFilesContent spreadsheet = service.getSubmitFilesContent(contentID);
+	if (spreadsheet.isUseSelectLeaderToolOuput()) {
+	    statistics.addAll(submitFilesService.getLeaderStatisticsBySession(contentID));
+	    request.setAttribute("statisticList", statistics);
+	}
+	else{
+    	statistics.addAll(submitFilesService.getStatisticsBySession(contentID));
+    	request.setAttribute("statisticList", statistics);
+	}
     }
 
     /**

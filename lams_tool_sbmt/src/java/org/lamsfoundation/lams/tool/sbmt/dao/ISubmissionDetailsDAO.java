@@ -52,6 +52,8 @@ public interface ISubmissionDetailsDAO extends IBaseDAO {
      * @param session
      */
     public void saveOrUpdate(SubmitFilesSession session);
+    
+    public void save(SubmissionDetails submissionDetails);
 
     /**
      * @param sessionID
