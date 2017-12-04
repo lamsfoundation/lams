@@ -170,6 +170,8 @@ public class GradebookService implements IGradebookService {
 	    // Setting averages
 	    activityDTO.setAverageMark(gradebookDAO.getAverageMarkForActivity(activity.getActivityId()));
 	    activityDTO.setMedianTimeTaken(gradebookDAO.getMedianTimeTakenForActivity(activity.getActivityId()));
+	    activityDTO.setMaxTimeTaken(gradebookDAO.getMaxTimeTakenForActivity(activity.getActivityId()));
+	    activityDTO.setMinTimeTaken(gradebookDAO.getMinTimeTakenForActivity(activity.getActivityId()));
 
 	    // Get the tool outputs for this user if there are any
 	    ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
@@ -1006,22 +1008,26 @@ public class GradebookService implements IGradebookService {
 	rowList.add(activityAverageTitle);
 
 	// Setting up the activity summary table
-	ExcelCell[] activityAverageRow = new ExcelCell[4];
+	ExcelCell[] activityAverageRow = new ExcelCell[6];
 	activityAverageRow[0] = new ExcelCell(getMessage("gradebook.export.activity"), true);
 	activityAverageRow[1] = new ExcelCell(getMessage("gradebook.columntitle.competences"), true);
 	activityAverageRow[2] = new ExcelCell(getMessage("gradebook.export.average.time.taken.seconds"), true);
 	activityAverageRow[3] = new ExcelCell(getMessage("gradebook.columntitle.averageMark"), true);
+	activityAverageRow[4] = new ExcelCell(getMessage("gradebook.export.min.time.taken.seconds"), true);
+	activityAverageRow[5] = new ExcelCell(getMessage("gradebook.export.max.time.taken.seconds"), true);
 	rowList.add(activityAverageRow);
 
 	Iterator it = activityRows.iterator();
 	while (it.hasNext()) {
 	    GBActivityGridRowDTO activityRow = (GBActivityGridRowDTO) it.next();
 	    // Add the activity average data
-	    ExcelCell[] activityDataRow = new ExcelCell[4];
+	    ExcelCell[] activityDataRow = new ExcelCell[6];
 	    activityDataRow[0] = new ExcelCell(activityRow.getRowName(), false);
 	    activityDataRow[1] = new ExcelCell(activityRow.getCompetences(), false);
 	    activityDataRow[2] = new ExcelCell(activityRow.getMedianTimeTakenSeconds(), false);
 	    activityDataRow[3] = new ExcelCell(activityRow.getAverageMark(), false);
+	    activityDataRow[4] = new ExcelCell(activityRow.getMinTimeTakenSeconds(), false);
+	    activityDataRow[5] = new ExcelCell(activityRow.getMaxTimeTakenSeconds(), false);
 	    rowList.add(activityDataRow);
 	}
 	rowList.add(GradebookService.EMPTY_ROW);
@@ -1980,11 +1986,18 @@ public class GradebookService implements IGradebookService {
 		    .setAverageMark(gradebookDAO.getAverageMarkForGroupedActivity(activity.getActivityId(), groupId));
 	    activityDTO.setMedianTimeTaken(
 		    gradebookDAO.getMedianTimeTakenForGroupedActivity(activity.getActivityId(), groupId));
+	    activityDTO.setMinTimeTaken(
+		    gradebookDAO.getMinTimeTakenForGroupedActivity(activity.getActivityId(), groupId));
+	    activityDTO.setMaxTimeTaken(
+		    gradebookDAO.getMaxTimeTakenForGroupedActivity(activity.getActivityId(), groupId));
 
 	} else {
 	    // Setting averages for lesson
 	    activityDTO.setAverageMark(gradebookDAO.getAverageMarkForActivity(activity.getActivityId()));
 	    activityDTO.setMedianTimeTaken(gradebookDAO.getMedianTimeTakenForActivity(activity.getActivityId()));
+	    activityDTO.setMinTimeTaken(gradebookDAO.getMinTimeTakenForActivity(activity.getActivityId()));
+	    activityDTO.setMaxTimeTaken(gradebookDAO.getMaxTimeTakenForActivity(activity.getActivityId()));
+
 	}
 
 	// Set the possible marks if applicable
