@@ -8,6 +8,7 @@ function removeGrouping(groupingId) {
 }
 
 function viewGroups(groupingId, force) {
+	debugger;
 	var url = LAMS_URL + 'OrganisationGroup.do?method=viewGroups&organisationID=' + organisationId;
 	if (lessonId) {
 		url += '&lessonID=' + lessonId;

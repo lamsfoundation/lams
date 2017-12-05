@@ -133,6 +133,11 @@ td#unassignedUserCell .userContainer {
     -webkit-overflow-scrolling: touch !important;
     overflow: auto;
 }
+
+#print-button {
+	color: $text-color
+}
+
 // override values from dialog.scss
 .dialogContainer .modal-body {
 	height : 100%;

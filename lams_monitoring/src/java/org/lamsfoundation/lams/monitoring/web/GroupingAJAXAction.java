@@ -103,7 +103,13 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     @SuppressWarnings("unchecked")
     public ActionForward startGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-
+	
+	return startGrouping(mapping, form, request, response, false);
+    }
+    
+    private ActionForward startGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response, boolean forcePrintView) throws IOException, ServletException {
+    
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	IMonitoringService monitoringService = MonitoringServiceProxy
@@ -123,7 +129,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	request.setAttribute(GroupingAJAXAction.PARAM_ACTIVITY_TITLE, activity.getTitle());
 	request.setAttribute(GroupingAJAXAction.PARAM_ACTIVITY_DESCRIPTION, activity.getDescription());
 
-	if (grouping.isChosenGrouping()) {
+	if ( !forcePrintView && grouping.isChosenGrouping()) {
 	    // can I remove groups/users - can't if tool sessions have been created
 	    Set<Group> groups = grouping.getGroups();
 	    Iterator<Group> iter = groups.iterator();
@@ -162,7 +168,46 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	// go to a view only screen for random grouping
 	return mapping.findForward(GroupingAJAXAction.VIEW_GROUPS_SCREEN);
     }
+    
+    /**
+     * Called by the chosen grouping / course grouping screen to show a print version of the grouping.
+     */
+    public ActionForward printGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	
+	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
+	if ( activityID != null ) {
+	    // normal activity based processing, startGrouping can handle it as it supports the normal view screen in monitoring
+	    return startGrouping(mapping, form, request, response, true);
+	}
+	
+	// Not activity? Then it must be the course grouping print view request
+	Long orgGroupingId = WebUtil.readLongParam(request, "groupingId", true);
+	OrganisationGrouping orgGrouping = null;
+	if (orgGroupingId != null) {
+	    IUserManagementService userManagementService = MonitoringServiceProxy
+			.getUserManagementService(getServlet().getServletContext());
+	    orgGrouping = (OrganisationGrouping) userManagementService.findById(OrganisationGrouping.class,
+		    orgGroupingId);
+	}
 
+	SortedSet<OrganisationGroup> groups = new TreeSet<OrganisationGroup>();
+	if ( orgGrouping != null ) {
+	    groups.addAll(orgGrouping.getGroups());
+
+	    // sort users with first, then last name, then login
+	    Comparator<User> userComparator = new FirstNameAlphabeticComparator();
+	    for (OrganisationGroup group : groups) {
+		Set<User> sortedUsers = new TreeSet<User>(userComparator);
+		sortedUsers.addAll(group.getUsers());
+		group.setUsers(sortedUsers);
+	    }
+	}
+
+	request.setAttribute(GroupingAction.GROUPS, groups);
+	request.setAttribute("isCourseGrouping", true); // flag to page it is a course grouping so use the field names for OrganisationGroup
+	return mapping.findForward(GroupingAJAXAction.VIEW_GROUPS_SCREEN);
+    }
     /**
      * Moves users between groups, removing them from previous group and creating a new one, if needed.
      */

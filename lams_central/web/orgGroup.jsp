@@ -130,6 +130,7 @@
 			<fmt:message key="label.course.groups.viewonly.title" />
 		</c:otherwise>
 	</c:choose>
+	<span class="pull-right"><a href="#none" onClick="javascript:showPrintPage();"><i id="print-button" class="fa fa-print roffset10" title="<fmt:message key="label.print"/>"></i></a></span>
 </div>
 
 <table id="groupsTable">
