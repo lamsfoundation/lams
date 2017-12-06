@@ -1,4 +1,4 @@
-﻿// for user selecting and sorting purposes
+﻿﻿// for user selecting and sorting purposes
 var sortOrderAscending = {};
 var lastSelectedUsers = {};
 
@@ -538,7 +538,7 @@ function showPrintPage() {
 		url += '&activityID='+groupingActivityId;
 	if ( lessonId )
 		url += '&lessonID='+lessonId;
-	if ( grouping.groupingId )
+	if ( grouping && grouping.groupingId )
 		url += '&groupingId='+grouping.groupingId;
 	var height = Math.min(550, $(window).height()),
 		width = Math.max(1093, $(window).width());
@@ -571,56 +571,124 @@ function showPrintPage() {
 	}
 	
 	function importGroupsFromSpreadsheet() {
+		if (!canEdit) {
+			return false;
+		}
+
 		disableButtons();
 		var file = getValidateSpreadsheetFile();
 		if ( file != null && ( ! warnBeforeUpload || confirm(LABELS.WARNING_REPLACE_GROUPS_LABEL) ) ) {
 			var form = $("#uploadForm")[0];
 			var formDataUpload = new FormData(form);
 			formDataUpload.append("organisationID", organisationId); 
-		    $.ajax({ 
-		        data: formDataUpload, 
-		        processData: false, // tell jQuery not to process the data
-		        contentType: false, // tell jQuery not to set contentType
-		        type: 'POST', 
-		        url: form.action,
-		        enctype: "multipart/form-data",
-				dataType : 'json',
-		        success: function (response) {
-		        		if ( response.result != 'OK') {
-		        			if ( response.error ) {
-		        				alert(response.error);
-		        				if ( response.reload ) {
-		        					window.location.reload(); // do not have another go, look at new data
-		        				} else {
-		        					enableButtons();  // let them have another go
-		        				}
-	        				}
-		        			else  {
-		        				// unknown failure on back end. 
-		        				alert(LABELS.GENERAL_ERROR_LABEL);
-				        		var div = document.getElementById("attachmentArea_Busy");
-				        		if(div != null){
-				        			div.style.display = 'none';
-				        		}
-		        			}
-		        		} else {
-		        			var msg = LABELS.LABEL_IMPORT_SUCCESSFUL_LABEL.replace("%1", response.added).replace("%2", response.skipped);
-		        			alert(msg);
-			        		window.location.reload();
-		        		}
-		        },
-		        error: function() {
-		        		// unknown failure on back end. 
-		        		alert(LABELS.GENERAL_ERROR_LABEL);
-		        		var div = document.getElementById("attachmentArea_Busy");
-		        		if(div != null){
-		        			div.style.display = 'none';
-		        		}
-		        }
-			});
+			formDataUpload.append("lessonMode", lessonMode);
+			if ( lessonMode ) {
+				callImportURL(form, formDataUpload);
+
+			} else if ( grouping && grouping.groupingId  ) {
+				// course grouping - grouping already exists so just upload users
+				formDataUpload.append("groupingId", grouping.groupingId);
+				callImportURL(form, formDataUpload);
+			} else {
+				// New course grouping. Need to check name okay first.
+
+				$('.errorMessage').hide();
+				var groupingName = $('#groupingName').val();
+				// course grouping name can not be blank
+				if (!groupingName) {
+					$('#grouping-name-blank-error').show();
+					$('#groupingName').focus();
+					enableButtons();
+					return false;
+				}
+				
+				// course grouping name should be unique
+				var isGroupingNameUnique = false;
+				$.ajax({
+					dataType : 'json',
+					url : LAMS_URL + 'monitoring/grouping.do',
+					cache : false,
+					async : false,
+					data : {
+						'method'    : 'checkGroupingNameUnique',
+						'organisationID' : grouping.organisationId,
+						'name'  : groupingName
+					},		
+					success : function(response) {
+						if ( response.isGroupingNameUnique ) {
+							formDataUpload.append("name",  groupingName)
+							callImportURL(form, formDataUpload);
+						} else {
+							$('#grouping-name-non-unique-error').show();
+							$('#groupingName').focus();
+							enableButtons();
+							return false;		
+						}
+					}
+				});
+			}
+
 		} else {
 			enableButtons();
 		}
+	}
+	
+	function reloadIframe(returnedGroupingId) {
+		if ( !lessonMode && returnedGroupingId ) {
+			var locationUrl = window.location.href;
+			if ( locationUrl.indexOf('groupingId') == -1  ) {
+				// if course grouping we need to add the new grouping id if this was a new grouping.
+				locationUrl += '&groupingId=' + returnedGroupingId;
+				window.location.assign(locationUrl);
+				return;
+			}
+		} 
+		window.location.reload(); 
+	} 
+	function callImportURL(form, formDataUpload) {
+	    $.ajax({ 
+	        data: formDataUpload, 
+	        processData: false, // tell jQuery not to process the data
+	        contentType: false, // tell jQuery not to set contentType
+	        type: 'POST', 
+	        url: form.action,
+	        enctype: "multipart/form-data",
+			dataType : 'json',
+	        success: function (response) {
+	        		var returnedGroupingId = response.groupingId;
+	        		if ( response.result != 'OK') {
+	        			if ( response.error ) {
+	        				alert(response.error);
+	        				if ( response.reload ) {
+	        					// do not have another go, look at new data
+	        					reloadIframe(returnedGroupingId);
+	        				} else {
+	        					enableButtons();  // let them have another go
+	        				}
+        				}
+	        			else  {
+	        				// unknown failure on back end. 
+	        				alert(LABELS.GENERAL_ERROR_LABEL);
+			        		var div = document.getElementById("attachmentArea_Busy");
+			        		if(div != null){
+			        			div.style.display = 'none';
+			        		}
+	        			}
+	        		} else {
+	        			var msg = LABELS.LABEL_IMPORT_SUCCESSFUL_LABEL.replace("%1", response.added).replace("%2", response.skipped);
+	        			alert(msg);
+	        			reloadIframe(returnedGroupingId);
+	        		}
+	        },
+	        error: function() {
+	        		// unknown failure on back end. 
+	        		alert(LABELS.GENERAL_ERROR_LABEL);
+	        		var div = document.getElementById("attachmentArea_Busy");
+	        		if(div != null){
+	        			div.style.display = 'none';
+	        		}
+	        }
+		});
 	}
 	
 	function getValidateSpreadsheetFile() {
@@ -651,8 +719,12 @@ function showPrintPage() {
 			}
 		}, 1000);
 				
-		document.location.href = LAMS_URL + "groupingUpload.do?method=getGroupTemplateFile&activityID="+groupingActivityId
-				+"&organisationID="+organisationId+"&lessonID="+lessonId+"&downloadTokenValue=" + token;
+		var url = LAMS_URL + "groupingUpload.do?method=getGroupTemplateFile&activityID="+groupingActivityId
+		+"&organisationID="+organisationId+"&lessonID="+lessonId+"&downloadTokenValue=" + token;
+		if ( grouping && grouping.groupingId) {
+			url += "&groupingId=" + grouping.groupingId;
+		}
+		document.location.href = url;
 		return false;
 	}
 

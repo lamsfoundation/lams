@@ -1,4 +1,4 @@
-﻿﻿var gtbDialog = null;
+﻿﻿﻿var gtbDialog = null;
 
 function removeGrouping(groupingId) {
 	if (!lessonMode && confirm(LABELS.REMOVE_GROUPING_CONFIRM_LABEL)) {
@@ -8,7 +8,6 @@ function removeGrouping(groupingId) {
 }
 
 function viewGroups(groupingId, force) {
-	debugger;
 	var url = LAMS_URL + 'OrganisationGroup.do?method=viewGroups&organisationID=' + organisationId;
 	if (lessonId) {
 		url += '&lessonID=' + lessonId;

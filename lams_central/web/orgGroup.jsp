@@ -183,46 +183,47 @@
 		</div>
 		
 	</lams:AdvancedAccordian>
+</c:if>
 
-	<c:if test="${canEdit}">
-	<div class="panel-group voffset5" id="accordionUploadGroupFile" role="tablist" aria-multiselectable="true"> 
-	    <div class="panel panel-default" >
-	        <div class="panel-heading collapsable-icon-left" id="headingUploadGroupFile">
-		        	<span class="panel-title">
-				    	<a class="collapsed" role="button" data-toggle="collapse" href="#collapseUploadGroupFile" aria-expanded="false" aria-controls="collapseUploadGroupFile" >
-			          	<fmt:message key="label.import.groups.from.template" />
-			        	</a>
-			     </span>
-	        </div>
-	        <div id="collapseUploadGroupFile" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingUploadGroupFile">
-	        		<div id="upload-group-file-settings">
-				<fmt:message key="label.import.groups.from.template.description" />
-				<div>
-					<button id="download-template" class="btn btn-sm btn-default btn-disable-on-downupload" onClick="javascript:downloadTemplate();">
-						<i class="fa fa-save"></i>
-						<fmt:message key="label.download.template" />
-					</button>
-				</div>
-				<div class="voffset5">
-					<html:form action="groupingUpload.do?method=importLearnersForGrouping" enctype="multipart/form-data" styleId="uploadForm">
-					<html:hidden property="activityID" styleId="activityID" value="${param.activityID}"/>
-					<html:hidden property="lessonID" styleId="lessonID" value="${lessonID}"/>
-					<%-- <html:hidden property="organisationID" styleId="organisationID"/> Value is set in Javascript as it comes in the JSON --%>
-					<button id="import" class="pull-right btn btn-sm btn-primary btn-disable-on-downupload" onClick="javascript:importGroupsFromSpreadsheet();return false;">
-						<fmt:message key="button.import" />
-					</button>
-					<lams:FileUpload fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
-						uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-					</html:form>
-				</div>
-				<lams:WaitingSpinner id="attachmentArea_Busy"/>
-				</div>
+<c:if test="${canEdit}">
+<div class="panel-group ${lessonMode?'voffset5':'voffset20'}" id="accordionUploadGroupFile" role="tablist" aria-multiselectable="true"> 
+    <div class="panel panel-default" >
+        <div class="panel-heading collapsable-icon-left" id="headingUploadGroupFile">
+	        	<span class="panel-title">
+			    	<a class="collapsed" role="button" data-toggle="collapse" href="#collapseUploadGroupFile" aria-expanded="false" aria-controls="collapseUploadGroupFile" >
+		          	<fmt:message key="label.import.groups.from.template" />
+		        	</a>
+		     </span>
+        </div>
+        <div id="collapseUploadGroupFile" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingUploadGroupFile">
+        		<div id="upload-group-file-settings">
+			<fmt:message key="label.import.groups.from.template.description" />
+			<div>
+				<button id="download-template" class="btn btn-sm btn-default btn-disable-on-downupload" onClick="javascript:downloadTemplate();">
+					<i class="fa fa-save"></i>
+					<fmt:message key="label.download.template" />
+				</button>
+			</div>
+			<div class="voffset5">
+				<html:form action="groupingUpload.do?method=importLearnersForGrouping" enctype="multipart/form-data" styleId="uploadForm">
+				<html:hidden property="activityID" styleId="activityID" value="${param.activityID}"/>
+				<html:hidden property="lessonID" styleId="lessonID" value="${lessonID}"/>
+				<%-- <html:hidden property="organisationID" styleId="organisationID"/> Value is set in Javascript as it comes in the JSON --%>
+				<%-- <thml:hidden property="groupingId" styleId="groupingId" value="${groupingId}"/> Value is set in Javascript as only used for some modes  --%>
+				<button id="import" class="pull-right btn btn-sm btn-primary btn-disable-on-downupload" onClick="javascript:importGroupsFromSpreadsheet();return false;">
+					<fmt:message key="button.import" />
+				</button>
+				<lams:FileUpload fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
+					uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+				</html:form>
+			</div>
+			<lams:WaitingSpinner id="attachmentArea_Busy"/>
 			</div>
 		</div>
 	</div>
-	</c:if>
-	
+</div>
 </c:if>
+	
 
 <!-- Inner dialog placeholders -->
 <div id="save-course-grouping-dialog-contents" class="dialogContainer">
