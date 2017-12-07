@@ -3,7 +3,7 @@ SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
 ----------------------Put all sql statements below here-------------------------
 
--- LDEV-
+-- LDEV-4482
 
 
 ALTER TABLE tl_lasbmt11_content ADD COLUMN use_select_leader_tool_ouput TINYINT(1) NOT NULL DEFAULT 0;
