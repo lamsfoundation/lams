@@ -61,14 +61,5 @@ public interface ISubmitUserDAO extends IBaseDAO {
     List<StatisticDTO> getLeaderStatisticsBySession(final Long contentId);
     
     List<Long> getReportsForGroup(final Long sessionId, final Long reportId);
-
-    
-    /**
-     * Generic method to save an object - handles both update and insert.
-     *
-     * @param o
-     *            the object to save
-     */
-    public void saveObject(Object o);
     
 }

@@ -732,7 +732,6 @@ public class SubmitFilesService
 	
 	
 	SubmitFilesSession session = getSessionById(sessionID);
-	System.out.println("MARK FILE NAME>>"+markFile.getFileName());
 	SubmitFilesContent content = session.getContent();
 	if (content.isUseSelectLeaderToolOuput()) {
 	    List<Long> reportIDs = submitUserDAO.getReportsForGroup(sessionID, reportID);
@@ -1411,7 +1410,7 @@ public class SubmitFilesService
 
 		// set group leader
 		submitFileSession.setGroupLeader(leader);
-		submitFilesSessionDAO.saveObject(submitFileSession);
+		submitFilesSessionDAO.insertOrUpdate(submitFileSession);
 	    }
 	}
 
@@ -1428,7 +1427,7 @@ public class SubmitFilesService
 	// Save it no matter if the user already exists.
 	// At checkLeaderSelectToolForSessionLeader() the user is added to session.
 	// Sometimes session save is earlier that user save in another thread, leading to an exception.
-	submitUserDAO.saveObject(user);
+	submitUserDAO.insertOrUpdate(user);
     }
     
     
