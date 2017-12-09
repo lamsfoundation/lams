@@ -247,7 +247,6 @@ public class SubmitFilesService
 	    List<SubmissionDetails> submissions = submissionDetailsDAO.getBySessionAndLearner(session.getSessionID(),
 		    userId);
 	    submissionDetailsDAO.deleteAll(submissions);
-
 	    SubmitUser user = submitUserDAO.getLearner(session.getSessionID(), userId);
 	    if (user != null) {
 		NotebookEntry entry = getEntry(session.getSessionID(), CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -255,7 +254,6 @@ public class SubmitFilesService
 		if (entry != null) {
 		    submitFilesContentDAO.delete(entry);
 		}
-
 		gradebookService.updateActivityMark(null, null, user.getUserID(), session.getSessionID(), false);
 
 		submitUserDAO.delete(user);
@@ -270,7 +268,7 @@ public class SubmitFilesService
 
 	List<SubmissionDetails> leadersubmissions = submissionDetailsDAO.getBySessionAndLearner(fromUser.getSessionID(),fromUser.getUserID());
 	for (SubmissionDetails leadersubmission : leadersubmissions) {
-	    if(leadersubmission.getSubmitFileSession().getSessionID()==toUser.getSessionID()){
+	    if(leadersubmission.getSubmitFileSession().getSessionID().equals(toUser.getSessionID())){
 		SubmissionDetails usersubmission = new SubmissionDetails();
 		    usersubmission.setLearner(toUser);
 		    usersubmission.setDateOfSubmission(new Date());
@@ -948,6 +946,16 @@ public class SubmitFilesService
 	SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);
 	learner.setFinished(true);
 	submitUserDAO.saveOrUpdateUser(learner);
+	
+	SubmitFilesContent content = getSessionById(sessionID).getContent();
+
+	if(content.isUseSelectLeaderToolOuput()){
+        	SubmitFilesSession sbmtFilesSession = submitFilesSessionDAO.getSessionByID(sessionID);
+        	if(sbmtFilesSession.getGroupLeader()==learner){
+                	sbmtFilesSession.setGroupLeader(learner);
+                	submitFilesSessionDAO.insertOrUpdate(sbmtFilesSession);
+        	}
+	}
     }
 
     /**
@@ -1388,7 +1396,6 @@ public class SubmitFilesService
 	// check leader select tool for a leader only in case QA tool doesn't know it. As otherwise it will screw
 	// up previous scratches done
 	if (leader == null) {
-
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserID().intValue());
 	    if (leaderUserId != null) {
 		leader = submitUserDAO.getLearner(toolSessionId, (Integer)leaderUserId.intValue());
@@ -1439,6 +1446,9 @@ public class SubmitFilesService
 
 	return (groupLeader != null) && user.getUserID().equals(groupLeader.getUserID());
     }
+    
+    
+    
 
 
 }

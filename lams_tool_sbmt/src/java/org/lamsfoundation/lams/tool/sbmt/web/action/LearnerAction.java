@@ -105,6 +105,8 @@ public class LearnerAction extends DispatchAction {
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	
+
 	((LearnerForm) form).setSessionMapID(sessionMap.getSessionID());
 
 	// get parameters from Request
@@ -205,7 +207,6 @@ public class LearnerAction extends DispatchAction {
 
 	
 	SortedMap submittedFilesMap = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
-	System.out.println("Deadline coming soon 1>>"+content.isUseSelectLeaderToolOuput());
 	// support for leader select feature  
             	SubmitUser groupLeader = content.isUseSelectLeaderToolOuput()
 			? submitFilesService.checkLeaderSelectToolForSessionLeader(learner, new Long(sessionID).longValue())
@@ -227,7 +228,7 @@ public class LearnerAction extends DispatchAction {
 		 if (isNonLeader && !learner.isFinished()) {
 		     List filesUploadedByLeader = submitFilesService.getFilesUploadedByUser(groupLeader.getUserID(), sessionID, request.getLocale(), false);
 
-			//show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK button to launch time limit
+		     
 			if (filesUploadedByLeader == null ) {
 			    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader.launch.time.limit");
 			    return mapping.findForward(SbmtConstants.WAIT_FOR_LEADER_TIME_LIMIT);
@@ -242,7 +243,6 @@ public class LearnerAction extends DispatchAction {
 		 
 		 // check if leader has submitted all answers
 		    if (groupLeader.isFinished()) {
-
 			submitFilesService.copyLearnerContent(groupLeader,learner);
 			filesUploaded = submitFilesService.getFilesUploadedByUser(learner.getUserID(), learner.getSessionID(), request.getLocale(), false);
 			setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
