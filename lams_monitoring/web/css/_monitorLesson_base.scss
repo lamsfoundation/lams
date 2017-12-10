@@ -177,6 +177,11 @@ td.sectionHeader {
 	margin-right: 5px;
 }
 
+#lessonStateLabel{
+	font-size:13px; // Larger than buttons but smaller than the date text next to it.
+    vertical-align: inherit;
+}
+
 #lessonStateField {
 	width: 114px;
 }

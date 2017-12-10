@@ -331,11 +331,9 @@ function updateLessonTab(){
 					startDateField.hide();
 					lessonStateChanger.hide();
 					break;
-				//schedules lesson
+				//scheduled lesson
 				case 2:
 					scheduleControls.css('display','inline');
-					$("#scheduleDatetimeField").hide();
-					$("#scheduleLessonButton").hide();
 					startDateField.text(response.startDate).add('#startLessonButton').css('display','inline');
 					lessonStateChanger.hide();
 					break;

@@ -520,34 +520,40 @@ public class MonitoringService implements IMonitoringService {
 	    return;
 	}
 
-	if (requestedLesson.getScheduleStartDate() != null) {
-	    // can't reschedule!
-	    MonitoringService.log
-		    .error("Lesson for id=" + lessonId + " is already scheduled and cannot be rescheduled.");
-	    return;
-	}
-
+	
 	// Change client/users schedule date to server's timezone.
 	User user = (User) baseDAO.find(User.class, userId);
 	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
 	Date tzStartLessonDate = DateUtil.convertFromTimeZoneToDefault(userTimeZone, startDate);
-
-	// setup the message for scheduling job
-	JobDetail startLessonJob = JobBuilder.newJob(StartScheduleLessonJob.class)
-		.withIdentity("startLessonOnSchedule:" + lessonId)
-		.withDescription(requestedLesson.getLessonName() + ":"
-			+ (requestedLesson.getUser() == null ? "" : requestedLesson.getUser().getFullName()))
-		.usingJobData(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId))
-		.usingJobData(MonitoringConstants.KEY_USER_ID, new Integer(userId)).build();
-
-	// create customized triggers
-	Trigger startLessonTrigger = TriggerBuilder.newTrigger()
-		.withIdentity("startLessonOnScheduleTrigger:" + lessonId).startAt(tzStartLessonDate).build();
-
+	String triggerKey = "startLessonOnScheduleTrigger:" + lessonId;
+	
 	// start the scheduling job
 	try {
+	    if (requestedLesson.getScheduleStartDate() == null) {
+		// setup the message for scheduling job
+		JobDetail startLessonJob = JobBuilder.newJob(StartScheduleLessonJob.class)
+			.withIdentity("startLessonOnSchedule:" + lessonId)
+			.withDescription(requestedLesson.getLessonName() + ":"
+				+ (requestedLesson.getUser() == null ? "" : requestedLesson.getUser().getFullName()))
+			.usingJobData(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId))
+			.usingJobData(MonitoringConstants.KEY_USER_ID, new Integer(userId)).build();
+
+		// create customized triggers
+		Trigger startLessonTrigger = TriggerBuilder.newTrigger()
+			.withIdentity(triggerKey).startAt(tzStartLessonDate).build();
+
+		scheduler.scheduleJob(startLessonJob, startLessonTrigger);
+
+	    } else {
+		// update existing lesson trigger
+		Trigger oldTrigger = scheduler.getTrigger(new TriggerKey(triggerKey));
+		TriggerBuilder tb = oldTrigger.getTriggerBuilder();
+		Trigger newTrigger = tb.startAt(tzStartLessonDate).build();
+		scheduler.rescheduleJob(oldTrigger.getKey(), newTrigger);
+		
+	    } 
+	    
 	    requestedLesson.setScheduleStartDate(tzStartLessonDate);
-	    scheduler.scheduleJob(startLessonJob, startLessonTrigger);
 	    setLessonState(requestedLesson, Lesson.NOT_STARTED_STATE);
 	} catch (SchedulerException e) {
 	    throw new MonitoringServiceException(
@@ -555,7 +561,7 @@ public class MonitoringService implements IMonitoringService {
 	}
 
 	if (MonitoringService.log.isDebugEnabled()) {
-	    MonitoringService.log.debug("Start lesson  [" + lessonId + "] on schedule is configured");
+	    MonitoringService.log.debug("Start lesson  [" + lessonId + "] on schedule is configured to start at " + DateUtil.convertToStringForTimeagoJSON(tzStartLessonDate));
 	}
     }
 

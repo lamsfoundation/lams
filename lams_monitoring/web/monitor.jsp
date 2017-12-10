@@ -283,7 +283,7 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-sm-9 col-xs-6">
+						<div class="col-sm-9 col-xs-7">
 						
 							<!-- Lesson details -->
 							<dl id="lessonDetails" class="dl-horizontal">
@@ -295,10 +295,12 @@
 										</div>
 									</dd>
 								</c:if>
-								<dt><fmt:message key="lesson.state"/></dt>
+								<dt><fmt:message key="lesson.state"/>
+								</dt>
 								<dd>
 									<span data-toggle="collapse" data-target="#changeState" id="lessonStateLabel"></span>
-								  
+								  	<span id="lessonStartDateSpan" class="lessonManageField loffset10"></span>
+								  	 
 									<!--  Change lesson status or start/schedule start -->
 									<div class="collapse offset10" id="changeState">
 										<div id="lessonScheduler">
@@ -307,7 +309,6 @@
 													<label for="scheduleDatetimeField"><fmt:message key="lesson.start"/></label>
 													<input class="lessonManageField input-sm" id="scheduleDatetimeField" type="text"/>
 													
-													<span id="lessonStartDateSpan" class="lessonManageField"></span>
 													<a id="scheduleLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
 														   onClick="javascript:scheduleLesson()"
 														   title='<fmt:message key="button.schedule.tooltip"/>'>
