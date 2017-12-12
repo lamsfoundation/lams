@@ -4,17 +4,21 @@
 
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 <link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
-<style>
+<style >
 	table.infoDisplay {
 		margin-left:5px; 
 		padding-top:10px; 
 		width:100%;
 	}
-/* 	.indentPad {
-		margin-left:5px; 
-		padding-top:10px;
+	
+	.panel-heading {
+		height: 45px;
 	}
- */
+	
+	.panel-heading .panel-title > span {
+		display: inline-block;
+		margin-top: 5px;
+	}
 </style>
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
@@ -150,6 +154,7 @@
 					
 					<% if (request.isUserInRole(Role.SYSADMIN)) { %>
 						<a href="clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-clone"></i><span class="hidden-xs"> <fmt:message key="title.clone.lessons" /></span></a>
+						<a href="organisation.do?method=deleteAllLessonsInit&groupId=<c:out value="${OrgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-bomb"></i><span class="hidden-xs"> <fmt:message key="admin.delete.lessons" /></span></a>
 					<% } %>
 				</div>
 			</div>

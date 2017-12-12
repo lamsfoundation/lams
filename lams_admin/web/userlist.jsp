@@ -3,6 +3,16 @@
 
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+<style type="text/css">
+	#courseHeading {
+		height: 45px;
+	}
+	
+	#courseHeading .panel-title {
+		display: inline-block;
+		margin-top: 5px;
+	}
+</style>
 
 <script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 <script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
@@ -44,7 +54,7 @@
 </p>
 
 <div class="panel panel-default voffset5" >
-	<div class="panel-heading">
+	<div id="courseHeading" class="panel-heading">
 		<span class="panel-title">
 			<logic:equal name="orgType" value="1">
 				<fmt:message key="admin.global.roles.manage" />
