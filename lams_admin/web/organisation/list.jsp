@@ -154,7 +154,7 @@
 					
 					<% if (request.isUserInRole(Role.SYSADMIN)) { %>
 						<a href="clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-clone"></i><span class="hidden-xs"> <fmt:message key="title.clone.lessons" /></span></a>
-						<a href="organisation.do?method=deleteAllLessonsInit&groupId=<c:out value="${OrgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-bomb"></i><span class="hidden-xs"> <fmt:message key="admin.delete.lessons" /></span></a>
+						<a href="organisation.do?method=deleteAllLessonsInit&orgId=<c:out value="${OrgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-bomb"></i><span class="hidden-xs"> <fmt:message key="admin.delete.lessons" /></span></a>
 					<% } %>
 				</div>
 			</div>
@@ -228,17 +228,18 @@
 	
 	<div class="panel panel-default voffset5" >
 		<div class="panel-heading">
-			<span class="panel-title">
-				<bean:write name="OrgManageForm" property="parentName"/>
-			</span>
-			<div class="btn-group btn-group-sm  pull-right">
-				<logic:equal name="editGroup" value="true">
-					<input class="btn btn-default" type="button" value="<fmt:message key="admin.edit" />&nbsp;<bean:write name="OrgManageForm" property="parentName"/>" onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
-				</logic:equal>
-				<input class="btn btn-default" type="button" value="<fmt:message key="admin.user.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
-				<% if (request.isUserInRole(Role.SYSADMIN)) { %>
-						<input class="btn btn-default" type="button" value="<fmt:message key="title.clone.lessons" />" onclick="javascript:document.location='clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>';">
-				<% } %>
+			<div class="panel-title">
+				<span><bean:write name="OrgManageForm" property="parentName"/></span>
+				<div class="btn-group btn-group-sm  pull-right">
+					<logic:equal name="editGroup" value="true">
+						<input class="btn btn-default" type="button" value="<fmt:message key="admin.edit" />&nbsp;<bean:write name="OrgManageForm" property="parentName"/>" onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
+					</logic:equal>
+					<input class="btn btn-default" type="button" value="<fmt:message key="admin.user.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+					<% if (request.isUserInRole(Role.SYSADMIN)) { %>
+							<input class="btn btn-default" type="button" value="<fmt:message key="title.clone.lessons" />" onclick="javascript:document.location='clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>';">
+							<a href="organisation.do?method=deleteAllLessonsInit&orgId=<c:out value="${OrgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-bomb"></i><span class="hidden-xs"> <fmt:message key="admin.delete.lessons" /></span></a>
+					<% } %>
+			</div>
 			</div>
 		</div>
 
