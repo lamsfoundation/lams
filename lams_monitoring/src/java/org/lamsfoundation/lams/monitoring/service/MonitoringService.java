@@ -917,6 +917,9 @@ public class MonitoringService implements IMonitoringService {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	Integer lessonState = requestedLesson.getLessonStateId();
 
+	// remove any triggers waiting to suspend the lesson
+	removeScheduleDisableTrigger(requestedLesson);
+	
 	// if lesson has 'suspended'('disabled') state - then unsuspend it first so its previous lesson state will be 'started'
 	if (Lesson.SUSPENDED_STATE.equals(lessonState)) {
 	    unsuspendLesson(lessonId, userId);
@@ -931,6 +934,8 @@ public class MonitoringService implements IMonitoringService {
     public void unarchiveLesson(long lessonId, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "unarchive lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+	// remove any triggers waiting to suspend the lesson
+	removeScheduleDisableTrigger(requestedLesson);
 	revertLessonState(requestedLesson);
     }
 
@@ -943,13 +948,17 @@ public class MonitoringService implements IMonitoringService {
 	    setLessonState(lesson, Lesson.SUSPENDED_STATE);
 	}
 	if (clearScheduleDetails) {
-	    String triggerName = getFinishLesssonTriggerName(lessonId);
-	    try {
-		scheduler.unscheduleJob(TriggerKey.triggerKey(triggerName));
-		lesson.setScheduleEndDate(null);
-	    } catch (SchedulerException e) {
-		MonitoringService.log.error("Error while removing lesson suspend trigger \"" + triggerName + "\"", e);
-	    }
+	    removeScheduleDisableTrigger(lesson);
+	}
+    }
+
+    private void removeScheduleDisableTrigger(Lesson lesson) {
+	String triggerName = getFinishLesssonTriggerName(lesson.getLessonId());
+	try {
+	    scheduler.unscheduleJob(TriggerKey.triggerKey(triggerName));
+	    lesson.setScheduleEndDate(null);
+	} catch (SchedulerException e) {
+	    MonitoringService.log.error("Error while removing lesson suspend trigger \"" + triggerName + "\"", e);
 	}
     }
 
@@ -962,6 +971,8 @@ public class MonitoringService implements IMonitoringService {
 	if (!Lesson.SUSPENDED_STATE.equals(state)) {
 	    throw new MonitoringServiceException("Lesson is not suspended lesson. It can not be unsuspended.");
 	}
+	// remove any triggers waiting to suspend the lesson
+	removeScheduleDisableTrigger(lesson);
 	revertLessonState(lesson);
     }
 
@@ -1070,6 +1081,8 @@ public class MonitoringService implements IMonitoringService {
     public void removeLesson(long lessonId, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "remove lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+	// remove any triggers waiting to suspend the lesson
+	removeScheduleDisableTrigger(requestedLesson);
 	setLessonState(requestedLesson, Lesson.REMOVED_STATE);
     }
 
