@@ -367,6 +367,9 @@ public interface IMonitoringService {
      */
     GateActivity closeGate(Long gateId);
 
+    /** Update the schedule gate date/time */
+    GateActivity scheduleGate(Long gateId, Date schedulingDatetime, Integer userId);
+    
     /**
      * Returns users by search type criteria. It's sorted by first and last user names.
      *

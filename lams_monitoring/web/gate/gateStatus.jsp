@@ -3,7 +3,7 @@
 				<c:if test="${not GateForm.map.readOnly}">
 					<html:form action="/gate?method=openGate" target="_self">
 						<input type="hidden" name="activityId" value="${GateForm.map.activityId}" />
-						<p><html:submit styleClass="btn btn-primary btn-sm"><fmt:message key="label.gate.open"/></html:submit></p>
+						<p><html:submit styleClass="btn btn-primary btn-sm voffset10"><fmt:message key="label.gate.open"/></html:submit></p>
 					</html:form>
 				</c:if>        
         

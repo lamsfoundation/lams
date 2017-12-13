@@ -340,6 +340,9 @@ public interface ILessonService {
      */
     Integer getCountLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
 
+    /** Gets the count of the users who are currently in an activity */
+    Integer getCountLearnersInCurrentActivity(Activity activity);
+    
     /**
      * Returns map of lessons in an organisation for a particular learner or staff user.
      *

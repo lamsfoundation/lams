@@ -834,6 +834,77 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
+    public GateActivity scheduleGate(Long gateId, Date schedulingDatetime, Integer userId) {
+	if (MonitoringService.log.isDebugEnabled()) {
+	    MonitoringService.log.debug("Setting gate schedule for gate " + gateId + "to " + schedulingDatetime);
+	}
+
+	User user = (User) baseDAO.find(User.class, userId);
+	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
+	Date tzSchedulingDatetime = DateUtil.convertFromTimeZoneToDefault(userTimeZone, schedulingDatetime);
+
+	GateActivity gateActivity = (GateActivity) activityDAO.getActivityByActivityId(gateId);
+	if (gateActivity != null && gateActivity.isScheduleGate()) {
+	    if (tzSchedulingDatetime.getTime() < System.currentTimeMillis()) {
+		// too late! Time already passed
+		openGate(gateId);
+	    } else {
+
+		ScheduleGateActivity gate = (ScheduleGateActivity) activityDAO
+			.getActivityByActivityId(gateActivity.getActivityId());
+
+		// work out new offset in minutes from lesson start time to the given date
+		Lesson lesson = learnerService.getLessonByActivity(gate);
+		Date lessonStartingTime = lesson.getStartDateTime();
+		if (lessonStartingTime != null) {
+		    // Should never be null, so just skip that case. If it was null how did the initial trigger get set up?
+		    long offset = (tzSchedulingDatetime.getTime() - lessonStartingTime.getTime()) / 60000;
+		    if (offset > 0) {
+
+			String triggerName = "openGateTrigger:" + gate.getActivityId();
+			Trigger openGateTrigger = null;
+			boolean alreadyScheduled = false;
+
+			try {
+			    openGateTrigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName));
+			    alreadyScheduled = openGateTrigger != null;
+			} catch (SchedulerException e) {
+			    MonitoringService.log.error("Error while fetching Quartz trigger \"" + triggerName + "\"",
+				    e);
+			}
+
+			try {
+			    if (alreadyScheduled) {
+				openGateTrigger = openGateTrigger.getTriggerBuilder().startAt(tzSchedulingDatetime)
+					.build();
+				scheduler.rescheduleJob(openGateTrigger.getKey(), openGateTrigger);
+			    } else {
+				// setup the message for scheduling job
+				JobDetail openScheduleGateJob = JobBuilder.newJob(OpenScheduleGateJob.class)
+					.withIdentity("openGate:" + gate.getActivityId())
+					.withDescription(gate.getTitle() + ":" + lesson.getLessonName())
+					.usingJobData("gateId", gate.getActivityId()).build();
+				openGateTrigger = TriggerBuilder.newTrigger()
+					.withIdentity("openGateTrigger:" + gate.getActivityId())
+					.startAt(tzSchedulingDatetime).build();
+				// start the scheduling job
+				scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
+			    }
+			} catch (SchedulerException e) {
+			    MonitoringService.log.error(
+				    "Error while setting up gate open trigger. Trigger name \"" + triggerName + "\"",
+				    e);
+			}
+
+			gate.setGateStartTimeOffset(offset);
+			activityDAO.update(gate);
+		    }
+		}
+	    }
+	}
+	return gateActivity;
+    }
+    
     public void finishLesson(long lessonId, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "finish lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));

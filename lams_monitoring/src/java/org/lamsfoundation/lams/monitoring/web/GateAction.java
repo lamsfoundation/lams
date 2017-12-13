@@ -24,6 +24,9 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
@@ -36,6 +39,7 @@ import java.util.TimeZone;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
@@ -52,8 +56,10 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
@@ -105,7 +111,9 @@ public class GateAction extends LamsDispatchAction {
     private static final String ACTIVITY_FORM_FIELD = "activityId";
     private static final String TOTAL_LEARNERS_FORM_FIELD = "totalLearners";
     private static final String USER_ID = "userId";
+    private static final String SCHEDULE_DATE = "scheduleDate";
 
+    private static final DateFormat SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm");
     // ---------------------------------------------------------------------
     // Struts Dispatch Method
     // ---------------------------------------------------------------------
@@ -229,9 +237,30 @@ public class GateAction extends LamsDispatchAction {
 	return findViewByGateType(mapping, gateForm, gate);
     }
 
+    public ActionForward scheduleGate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, ParseException {
+	monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+
+	DynaActionForm gateForm = (DynaActionForm) form;
+	Long gateId = (Long) gateForm.get(GateAction.ACTIVITY_FORM_FIELD);
+	String dateAsString = (String) gateForm.get(GateAction.SCHEDULE_DATE);
+	GateActivity gate = null;
+	if (dateAsString != null && dateAsString.trim().length() > 0) {
+	    gate = monitoringService.scheduleGate(gateId, SCHEDULING_DATETIME_FORMAT.parse(dateAsString), getUserId());
+	} else {
+	    gate = (GateActivity) monitoringService.getActivityById(gateId);
+	}
+	return findViewByGateType(mapping, gateForm, gate);
+    }
     // ---------------------------------------------------------------------
     // Helper Methods
     // ---------------------------------------------------------------------
+    private Integer getUserId() {
+ 	HttpSession ss = SessionManager.getSession();
+ 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+ 	return user != null ? user.getUserID() : null;
+     }
+
     /**
      * Dispatch view the according to the gate type.
      *
@@ -255,6 +284,7 @@ public class GateAction extends LamsDispatchAction {
 	gateForm.set("forbiddenLearnerList", null);
 	gateForm.set("startingTime", null);
 	gateForm.set("endingTime", null);
+	gateForm.set(GateAction.SCHEDULE_DATE, null);
 
 	gateForm.set("gate", gate);
 
@@ -268,11 +298,11 @@ public class GateAction extends LamsDispatchAction {
 
 	// dispatch the view according to the type of the gate.
 	if (gate.isSynchGate()) {
-	    Integer waitingLearnerCount = lessonService.getCountLearnersHaveAttemptedActivity(gate);
+	    Integer waitingLearnerCount = lessonService.getCountLearnersInCurrentActivity(gate);
 	    gateForm.set("waitingLearners", waitingLearnerCount);
 	    return mapping.findForward(GateAction.VIEW_SYNCH_GATE);
 	} else if (gate.isScheduleGate()) {
-	    Integer waitingLearnerCount = lessonService.getCountLearnersHaveAttemptedActivity(gate);
+	    Integer waitingLearnerCount = lessonService.getCountLearnersInCurrentActivity(gate);
 	    gateForm.set("waitingLearners", waitingLearnerCount);
 	    return viewScheduleGate(mapping, gateForm, (ScheduleGateActivity) gate);
 	} else if (gate.isPermissionGate() || gate.isSystemGate() || gate.isConditionGate()) {
@@ -317,6 +347,7 @@ public class GateAction extends LamsDispatchAction {
 	if (Boolean.TRUE.equals(scheduleGate.getGateActivityCompletionBased())) {
 	    gateForm.set("activityCompletionBased", true);
 	} else {
+	    gateForm.set("activityCompletionBased", false);
 	    learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
 	    Lesson lesson = learnerService.getLessonByActivity(scheduleGate);
 	    Calendar startingTime = new GregorianCalendar(TimeZone.getDefault());

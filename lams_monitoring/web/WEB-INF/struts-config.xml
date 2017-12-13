@@ -25,6 +25,7 @@
 	<form-property name="forbiddenLearnerList" type="java.util.Collection" />
 	<form-property name="allowedToPassLearnerList" type="java.util.Collection" />
 	<form-property name="userId" type="java.lang.String" />
+	<form-property name="scheduleDate" type="java.lang.String" />
 </form-bean>
 
   </form-beans>
