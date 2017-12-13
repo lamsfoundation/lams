@@ -10,7 +10,7 @@
 
 	<script type="text/javascript">
 		function refresh() {
-			location.reload();
+			location.reload(true);
 		}
 		
 		//refresh page every 30 sec
