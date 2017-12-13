@@ -525,11 +525,22 @@ public class MonitoringService implements IMonitoringService {
 	User user = (User) baseDAO.find(User.class, userId);
 	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
 	Date tzStartLessonDate = DateUtil.convertFromTimeZoneToDefault(userTimeZone, startDate);
-	String triggerKey = "startLessonOnScheduleTrigger:" + lessonId;
-	
+	String triggerName = "startLessonOnScheduleTrigger:" + lessonId;
+
+	Trigger startLessonTrigger = null;
+	boolean alreadyScheduled = false;
+
+	try {
+	    startLessonTrigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName));
+	    alreadyScheduled = startLessonTrigger != null;
+	} catch (SchedulerException e) {
+	    MonitoringService.log.error("Error while fetching Quartz trigger \"" + triggerName + "\"", e);
+	}
+
 	// start the scheduling job
 	try {
-	    if (requestedLesson.getScheduleStartDate() == null) {
+
+	    if ( ! alreadyScheduled ) {
 		// setup the message for scheduling job
 		JobDetail startLessonJob = JobBuilder.newJob(StartScheduleLessonJob.class)
 			.withIdentity("startLessonOnSchedule:" + lessonId)
@@ -539,17 +550,15 @@ public class MonitoringService implements IMonitoringService {
 			.usingJobData(MonitoringConstants.KEY_USER_ID, new Integer(userId)).build();
 
 		// create customized triggers
-		Trigger startLessonTrigger = TriggerBuilder.newTrigger()
-			.withIdentity(triggerKey).startAt(tzStartLessonDate).build();
+		startLessonTrigger = TriggerBuilder.newTrigger()
+			.withIdentity(triggerName).startAt(tzStartLessonDate).build();
 
 		scheduler.scheduleJob(startLessonJob, startLessonTrigger);
 
 	    } else {
-		// update existing lesson trigger
-		Trigger oldTrigger = scheduler.getTrigger(new TriggerKey(triggerKey));
-		TriggerBuilder tb = oldTrigger.getTriggerBuilder();
-		Trigger newTrigger = tb.startAt(tzStartLessonDate).build();
-		scheduler.rescheduleJob(oldTrigger.getKey(), newTrigger);
+		    
+		startLessonTrigger = startLessonTrigger.getTriggerBuilder().startAt(tzStartLessonDate).build();
+		scheduler.rescheduleJob(startLessonTrigger.getKey(), startLessonTrigger);
 		
 	    } 
 	    
@@ -566,12 +575,31 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId) {
+    public void finishLessonOnSchedule(long lessonId, Date userEnteredEndDate, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "finish lesson on schedule", true);
+	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+	if (requestedLesson == null) {
+	    String error = "Unable to schedule lesson end as lesson is missing. Lesson Id " + lessonId;
+	    MonitoringService.log.error(error);
+	    throw new IllegalArgumentException("Error occurred at [finishLessonOnSchedule]- " + error);
+	}
+
+	// Change client/users schedule date to server's timezone.
+	User user = (User) baseDAO.find(User.class, userId);
+	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
+	Date tzEndLessonDate = DateUtil.convertFromTimeZoneToDefault(userTimeZone, userEnteredEndDate);
+	finishLessonOnScheduleAsServerDate(requestedLesson, tzEndLessonDate, userId);
+    }
+
+    /**
+     * Set up the job to end the lesson on endDate. EndDate is assumed to be converted to the LAMS's default
+     * timezone. If endDate == null then remove any existing scheduling.
+     */
+    private void finishLessonOnScheduleAsServerDate(Lesson requestedLesson, Date endDate, Integer userId) {
 
 	// we get the lesson want to finish
-	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	String triggerName = "finishLessonOnScheduleTrigger:" + lessonId;
+	long lessonId = requestedLesson.getLessonId();
+	String triggerName = getFinishLesssonTriggerName(lessonId);
 	Trigger finishLessonTrigger = null;
 	JobDetail finishLessonJob = null;
 	boolean alreadyScheduled = false;
@@ -580,6 +608,69 @@ public class MonitoringService implements IMonitoringService {
 	    alreadyScheduled = finishLessonTrigger != null;
 	} catch (SchedulerException e) {
 	    MonitoringService.log.error("Error while fetching Quartz trigger \"" + triggerName + "\"", e);
+	}
+
+	// start the scheduling job
+	try {
+	    if (endDate != null) {
+		if (alreadyScheduled) {
+		    finishLessonTrigger = finishLessonTrigger.getTriggerBuilder().startAt(endDate).build();
+		} else {
+		    // setup the message for scheduling job
+		    finishLessonJob = JobBuilder.newJob(FinishScheduleLessonJob.class)
+			    .withIdentity("finishLessonOnSchedule:" + lessonId)
+			    .withDescription(requestedLesson.getLessonName() + ":"
+				    + (requestedLesson.getUser() == null ? ""
+					    : requestedLesson.getUser().getFullName()))
+			    .usingJobData(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId))
+			    .usingJobData(MonitoringConstants.KEY_USER_ID, new Integer(userId)).build();
+
+		    finishLessonTrigger = TriggerBuilder.newTrigger().withIdentity(triggerName).startAt(endDate)
+			    .build();
+		}
+
+		requestedLesson.setScheduleEndDate(endDate);
+		lessonDAO.updateLesson(requestedLesson);
+		if (alreadyScheduled) {
+		    scheduler.rescheduleJob(finishLessonTrigger.getKey(), finishLessonTrigger);
+		    if (MonitoringService.log.isDebugEnabled()) {
+			MonitoringService.log
+				.debug("Finish lesson  [" + lessonId + "] job has been rescheduled to " + endDate);
+		    }
+		} else {
+		    scheduler.scheduleJob(finishLessonJob, finishLessonTrigger);
+		    if (MonitoringService.log.isDebugEnabled()) {
+			MonitoringService.log
+				.debug("Finish lesson  [" + lessonId + "] job has been scheduled to " + endDate);
+		    }
+		}
+	    } else {
+		if (alreadyScheduled) {
+		    scheduler.deleteJob(finishLessonTrigger.getJobKey());
+		    if (MonitoringService.log.isDebugEnabled()) {
+			MonitoringService.log.debug("Finish lesson  [" + lessonId + "] job has been removed");
+		    }
+		}
+	    }
+	} catch (SchedulerException e) {
+	    throw new MonitoringServiceException(
+		    "Error occurred at " + "[finishLessonOnSchedule]- fail to start scheduling", e);
+	}
+    }
+
+    private String getFinishLesssonTriggerName(long lessonId) {
+	return "finishLessonOnScheduleTrigger:" + lessonId;
+    }
+
+    @Override
+    public void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId) {
+	securityService.isLessonMonitor(lessonId, userId, "finish lesson on schedule", true);
+
+	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+	if (requestedLesson == null) {
+	    String error = "Unable to schedule lesson end as lesson is missing. Lesson Id " + lessonId;
+	    MonitoringService.log.error(error);
+	    throw new IllegalArgumentException("Error occurred at [finishLessonOnSchedule]- " + error);
 	}
 
 	Date endDate = null;
@@ -600,48 +691,10 @@ public class MonitoringService implements IMonitoringService {
 		throw new IllegalArgumentException("Lesson scheduled finish date is already in the past");
 	    }
 
-	    if (alreadyScheduled) {
-		finishLessonTrigger = finishLessonTrigger.getTriggerBuilder().startAt(endDate).build();
-	    } else {
-		// setup the message for scheduling job
-		finishLessonJob = JobBuilder.newJob(FinishScheduleLessonJob.class)
-			.withIdentity("finishLessonOnSchedule:" + lessonId)
-			.withDescription(requestedLesson.getLessonName() + ":"
-				+ (requestedLesson.getUser() == null ? "" : requestedLesson.getUser().getFullName()))
-			.usingJobData(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId))
-			.usingJobData(MonitoringConstants.KEY_USER_ID, new Integer(userId)).build();
-
-		finishLessonTrigger = TriggerBuilder.newTrigger().withIdentity(triggerName).startAt(endDate).build();
-	    }
-	}
-
-	// start the scheduling job
-	try {
-	    requestedLesson.setScheduleEndDate(endDate);
-	    lessonDAO.updateLesson(requestedLesson);
-	    if (alreadyScheduled) {
-		if (scheduledNumberDaysToLessonFinish > 0) {
-		    scheduler.rescheduleJob(finishLessonTrigger.getKey(), finishLessonTrigger);
-		    if (MonitoringService.log.isDebugEnabled()) {
-			MonitoringService.log
-				.debug("Finish lesson  [" + lessonId + "] job has been rescheduled to " + endDate);
-		    }
-		} else {
-		    scheduler.deleteJob(finishLessonTrigger.getJobKey());
-		    if (MonitoringService.log.isDebugEnabled()) {
-			MonitoringService.log.debug("Finish lesson  [" + lessonId + "] job has been removed");
-		    }
-		}
-	    } else if (scheduledNumberDaysToLessonFinish > 0) {
-		scheduler.scheduleJob(finishLessonJob, finishLessonTrigger);
-		if (MonitoringService.log.isDebugEnabled()) {
-		    MonitoringService.log
-			    .debug("Finish lesson  [" + lessonId + "] job has been scheduled to " + endDate);
-		}
-	    }
-	} catch (SchedulerException e) {
-	    throw new MonitoringServiceException(
-		    "Error occurred at " + "[finishLessonOnSchedule]- fail to start scheduling", e);
+	    finishLessonOnScheduleAsServerDate(requestedLesson, endDate, userId);
+	} else {
+	    // remove any existing schedule jobs
+	    finishLessonOnScheduleAsServerDate(requestedLesson, null, userId);
 	}
     }
 
@@ -811,12 +864,21 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void suspendLesson(long lessonId, Integer userId) {
+    public void suspendLesson(long lessonId, Integer userId, boolean clearScheduleDetails) {
 	securityService.isLessonMonitor(lessonId, userId, "suspend lesson", true);
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	if (!Lesson.SUSPENDED_STATE.equals(lesson.getLessonStateId())
 		&& !Lesson.REMOVED_STATE.equals(lesson.getLessonStateId())) {
 	    setLessonState(lesson, Lesson.SUSPENDED_STATE);
+	}
+	if (clearScheduleDetails) {
+	    String triggerName = getFinishLesssonTriggerName(lessonId);
+	    try {
+		scheduler.unscheduleJob(TriggerKey.triggerKey(triggerName));
+		lesson.setScheduleEndDate(null);
+	    } catch (SchedulerException e) {
+		MonitoringService.log.error("Error while removing lesson suspend trigger \"" + triggerName + "\"", e);
+	    }
 	}
     }
 

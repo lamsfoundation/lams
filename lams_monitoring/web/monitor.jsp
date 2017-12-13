@@ -197,7 +197,11 @@
 				<fmt:message key="progress.email.title" var="PROGRESS_EMAIL_TITLE_VAR"/>
 				PROGRESS_EMAIL_TITLE : '<c:out value="${PROGRESS_EMAIL_TITLE_VAR}" />',
 				<fmt:message key="error.date.in.past" var="ERROR_DATE_IN_PAST_VAR"/>
-				ERROR_DATE_IN_PAST : '<c:out value="${ERROR_DATE_IN_PAST_VAR}" />'
+				ERROR_DATE_IN_PAST : '<c:out value="${ERROR_DATE_IN_PAST_VAR}" />',
+				<fmt:message key="label.lesson.starts" var="LESSON_START_VAR"><fmt:param value="%0"/></fmt:message>
+				LESSON_START : '<c:out value="${LESSON_START_VAR}"/>',
+				<fmt:message key="label.lesson.finishes" var="LESSON_FINISH_VAR"><fmt:param value="%0"/></fmt:message>
+				LESSON_FINISH : '<c:out value="${LESSON_FINISH_VAR}" />'
 		}
 	    
 		$(document).ready(function(){
@@ -298,8 +302,9 @@
 								<dt><fmt:message key="lesson.state"/>
 								</dt>
 								<dd>
-									<span data-toggle="collapse" data-target="#changeState" id="lessonStateLabel"></span>
-								  	<span id="lessonStartDateSpan" class="lessonManageField loffset10"></span>
+									<span data-toggle="collapse" data-target="#changeState" id="lessonStateLabel" class="lessonManageField"></span>
+								  	<span id="lessonStartDateSpan" class="lessonManageField loffset5"></span>
+								  	<span id="lessonFinishDateSpan" class="lessonManageField loffset5"></span>
 								  	 
 									<!--  Change lesson status or start/schedule start -->
 									<div class="collapse offset10" id="changeState">
@@ -325,16 +330,31 @@
 										</div>
 										
 										<div id="lessonStateChanger">
-											<select id="lessonStateField" class="btn btn-xs">
+											<select id="lessonStateField" class="btn btn-xs" onchange="lessonStateFieldChanged()">
 												<option value="-1"><fmt:message key="lesson.select.state"/></option>
 											</select>
-											<button type="button" class="btn btn-xs btn-primary"
+											<span id="lessonStateApply">
+											<button type="button" class="lessonManageField btn btn-xs btn-primary"
 													onClick="javascript:changeLessonState()"
 													title='<fmt:message key="lesson.change.state.tooltip"/>'>
 										   		<i class="fa fa-check"></i> 
 										   		<span class="hidden-xs"><fmt:message key="button.apply"/></span>
-									    	</button>
-								    	</div>					
+										    	</button>
+										    	</span>
+											<span id="lessonDisableApply">	
+												<input class="lessonManageField input-sm" id="disableDatetimeField" type="text"/>
+												<a id="scheduleDisableLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
+														   onClick="javascript:scheduleDisableLesson()"
+														   title='<fmt:message key="button.schedule.disable.tooltip"/>'>
+												   <fmt:message key="button.schedule"/>
+												</a>
+												<a id="disableLessonButton" class="btn btn-xs btn-default" href="#"
+														   onClick="javascript:disableLesson()"
+														   title='<fmt:message key="button.disable.now.tooltip"/>'>
+													   <fmt:message key="button.disable.now"/>
+												</a>
+											</span>
+								    		</div>					
 									</div>
 								</dd>
 								
