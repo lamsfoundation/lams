@@ -951,7 +951,7 @@ public class SubmitFilesService
 
 	if(content.isUseSelectLeaderToolOuput()){
         	SubmitFilesSession sbmtFilesSession = submitFilesSessionDAO.getSessionByID(sessionID);
-        	if(sbmtFilesSession.getGroupLeader()==learner){
+        	if(sbmtFilesSession.getGroupLeader().getUserID().equals(learner.getUserID())){
                 	sbmtFilesSession.setGroupLeader(learner);
                 	submitFilesSessionDAO.insertOrUpdate(sbmtFilesSession);
         	}
