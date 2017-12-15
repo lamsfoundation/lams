@@ -197,10 +197,13 @@ public class GateAction extends LamsDispatchAction {
 		Calendar startingTime = new GregorianCalendar(TimeZone.getDefault());
 		startingTime.setTime(reachTime);
 		startingTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
+		gateForm.set("startingTime", startingTime.getTime());
 		long diff = startingTime.getTimeInMillis() - new Date().getTime();
 		long remainTime = diff / 1000;
 		gateForm.set("remainTime", remainTime);
+		gateForm.set("endingTime", null);
 	    } else {
+		gateForm.set("startOffset", null);
 		gateForm.set("reachDate", null);
 		Calendar startingTime = new GregorianCalendar(TimeZone.getDefault());
 		startingTime.setTime(lesson.getStartDateTime());

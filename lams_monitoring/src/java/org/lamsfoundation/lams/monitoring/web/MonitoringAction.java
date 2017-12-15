@@ -458,20 +458,17 @@ public class MonitoringAction extends LamsDispatchAction {
      * The purpose of suspending is to hide the lesson from learners temporarily. It doesn't make any sense to suspend a
      * created or a not started (ie scheduled) lesson as they will not be shown on the learner interface anyway! If the
      * teacher tries to suspend a lesson that is not in the STARTED_STATE, then an error should be returned to UI.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward suspendLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException, ParseException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_END_DATE, true);
 	try {
-	    getMonitoringService().suspendLesson(lessonId, getUserId());
+	    if (dateStr == null || dateStr.length() == 0)
+		getMonitoringService().suspendLesson(lessonId, getUserId(), true);
+	    else
+		getMonitoringService().finishLessonOnSchedule(lessonId,
+			MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateStr), getUserId());
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -1002,13 +999,24 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate()
 		: lesson.getStartDateTime();
+	Date finishDate = lesson.getScheduleEndDate();
+	DateFormat indfm = null;
+
+	if ( startOrScheduleDate != null || finishDate != null )
+	    indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
+	
 	if (startOrScheduleDate != null) {
-	    DateFormat indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
 	    Date tzStartDate = DateUtil.convertToTimeZoneFromDefault(user.getTimeZone(), startOrScheduleDate);
 	    responseJSON.put("startDate",
 		    indfm.format(tzStartDate) + " " + user.getTimeZone().getDisplayName(userLocale));
 	}
 
+	if ( finishDate != null ) {
+	    Date tzFinishDate = DateUtil.convertToTimeZoneFromDefault(user.getTimeZone(), finishDate);
+	    responseJSON.put("finishDate",
+		    indfm.format(tzFinishDate) + " " + user.getTimeZone().getDisplayName(userLocale));	    
+	}
+	
 	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, false);
 	if (contributeActivities != null) {
 	    Gson gson = new GsonBuilder().create();

@@ -204,7 +204,7 @@ public interface IMonitoringService {
     void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) throws UserAccessDeniedException;
 
     /**
-     * Finish a lesson on scheduled datetime.
+     * Finish a lesson on scheduled datetime based on days in the lesson runs for
      *
      * @param lessonId
      * @param endDate
@@ -213,6 +213,18 @@ public interface IMonitoringService {
      *            checks that the user is a staff member for this lesson
      */
     void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId)
+	    throws UserAccessDeniedException;
+
+    /**
+     * Finish a lesson on scheduled datetime.
+     *
+     * @param lessonId
+     * @param endDate
+     *            number of days since lesson start when the lesson should be closed.
+     * @param userId
+     *            checks that the user is a staff member for this lesson
+     */
+    void finishLessonOnSchedule(long lessonId, Date endDate, Integer userId)
 	    throws UserAccessDeniedException;
 
     /**
@@ -286,16 +298,20 @@ public interface IMonitoringService {
     void unarchiveLesson(long lessonId, Integer userId);
 
     /**
-     * A lesson can only be suspended if it is started. The purpose of suspending is to hide the lesson from learners
+     * Suspend lesson now! A lesson can only be suspended if it is started. The purpose of suspending is to hide the lesson from learners
      * temporarily.
      *
      * @param lessonId
      *            the lesson ID which will be suspended.
      * @param userId
      *            checks that the user is a staff member for this lesson
+     * @param clearScheduleDetails
+     * 		  should it remove any triggers set up to suspend the lesson and clear the schedule date field. true if user suspending right now,
+     * 		  false if this is being called by the trigger
      */
-    void suspendLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+    void suspendLesson(long lessonId, Integer userId, boolean removeTriggers) throws UserAccessDeniedException;
 
+    
     /**
      * Unsuspend a lesson, which state must be Lesson.SUSPEND_STATE. Returns the lesson back to its previous state.
      * Otherwise an exception will be thrown.
@@ -351,6 +367,9 @@ public interface IMonitoringService {
      */
     GateActivity closeGate(Long gateId);
 
+    /** Update the schedule gate date/time */
+    GateActivity scheduleGate(Long gateId, Date schedulingDatetime, Integer userId);
+    
     /**
      * Returns users by search type criteria. It's sorted by first and last user names.
      *

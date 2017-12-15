@@ -98,6 +98,10 @@ function initLessonTab(){
 	$('#scheduleDatetimeField').datetimepicker({
 		'minDate' : 0
 	});
+	// sets up calendar for schedule date choice
+	$('#disableDatetimeField').datetimepicker({
+		'minDate' : 0
+	});
 	
 	// sets up dialog for editing class
 	var classDialog = showDialog('classDialog',{
@@ -183,8 +187,28 @@ function showLessonLearnersDialog() {
 	showLearnerGroupDialog(ajaxProperties, LABELS.LESSON_GROUP_DIALOG_CLASS, true, false, false, true);
 }
 
+/** 
+ * Lesson state field changed but the apply button not yet pressed
+ */
+function lessonStateFieldChanged() {
+
+	//state chosen in the dropdown menu
+	var state = +$('#lessonStateField').val();
+	switch (state) {
+		//'disable' is chosen
+		case 4: 
+			$('#lessonDisableApply').show();
+			$('#lessonStateApply').hide();
+			break;
+		default:
+			$('#lessonDisableApply').hide();
+			$('#lessonStateApply').show();		
+			break;
+	}
+}
+
 /**
- * Changes lesson state and updates widgets.
+ * Apply the lesson state change and update widgets.
  */
 function changeLessonState(){
 	var method = null;
@@ -205,11 +229,10 @@ function changeLessonState(){
 			}
 			break;
 			
-		//'disable' is chosen
-		case 4: 
-			method = "suspendLesson";
-			break;
 			
+		//'disable' is handled by scheduleDisableLesson, disableLesson
+		// case 4:
+
 		//'archive' is chosen
 		case 6: 
 			method = "archiveLesson";
@@ -226,25 +249,46 @@ function changeLessonState(){
 	}
 	
 	if (method) {
-		$.ajax({
-			url : LAMS_URL + 'monitoring/monitoring.do',
-			cache : false,
-			data : {
-				'method'    : method,
-				'lessonID'  : lessonId
-			},
-			success : function() {
-				if (state == 7) {
-					// user chose to finish the lesson, close monitoring and refresh the lesson list
-					closeMonitorLessonDialog(true);
-				} else {
-					refreshMonitor('lesson');
-				}
-			}
-		});
+		applyStateChange(state, method)
 	}
 }
 
+function scheduleDisableLesson() {
+	var date = $('#disableDatetimeField').val();
+	if (date) {
+		applyStateChange(4, "suspendLesson", date);
+	} else {
+		alert(LABELS.LESSON_ERROR_SCHEDULE_DATE);
+	}
+}			
+
+function disableLesson() {
+	applyStateChange(4, "suspendLesson");
+}			
+
+function applyStateChange(state, method, lessonEndDate) {
+	var params = {
+			'method'    : method,
+			'lessonID'  : lessonId,
+		};
+	if ( lessonEndDate ) {
+		params.lessonEndDate = lessonEndDate;
+	}
+	
+	$.ajax({
+		url : LAMS_URL + 'monitoring/monitoring.do',
+		cache : false,
+		data : params,
+		success : function() {
+			if (state == 7) {
+				// user chose to finish the lesson, close monitoring and refresh the lesson list
+				closeMonitorLessonDialog(true);
+			} else {
+				refreshMonitor('lesson');
+			}
+		}
+	});
+}
 
 /**
  * Updates widgets in lesson tab according to response sent to refreshMonitor()
@@ -322,6 +366,8 @@ function updateLessonTab(){
 			// show/remove widgets for lesson scheduling
 			var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton, #lessonScheduler'),
 				startDateField = $('#lessonStartDateSpan'),
+				lessonFinishDateSpan = $('#lessonFinishDateSpan'),
+				disableDateSpan = $('#lessonDisableApply'),
 				lessonStateChanger = $('#lessonStateChanger'),
 				stateLabel = $('#lessonStateLabel');
 			switch (lessonStateId) {
@@ -329,20 +375,26 @@ function updateLessonTab(){
 				case 1:
 					scheduleControls.css('display','inline');
 					startDateField.hide();
+					lessonFinishDateSpan.hide();
 					lessonStateChanger.hide();
 					break;
-				//schedules lesson
+				//scheduled lesson
 				case 2:
 					scheduleControls.css('display','inline');
-					$("#scheduleDatetimeField").hide();
-					$("#scheduleLessonButton").hide();
-					startDateField.text(response.startDate).add('#startLessonButton').css('display','inline');
+					startDateField.text(LABELS.LESSON_START.replace("%0",response.startDate)).add('#startLessonButton').css('display','inline');
+					lessonFinishDateSpan.hide();
 					lessonStateChanger.hide();
 					break;
 				//started lesson
 				default: 			
 					scheduleControls.hide();
 				 	startDateField.text(response.startDate).hide();
+				 	if ( response.finishDate ) {
+				 		lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','inline');
+				 	} else {
+				 		lessonFinishDateSpan.text("").css('display','none');
+				 	}
+				 	disableDateSpan.hide();
 				 	lessonStateChanger.css('display','inline');
 				 	stateLabel.attr('title',response.startDate);
 				 	break;

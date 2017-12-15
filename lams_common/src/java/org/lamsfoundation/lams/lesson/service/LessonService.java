@@ -614,6 +614,9 @@ public class LessonService implements ILessonService {
 	return learnerProgressDAO.getNumUsersAttemptedActivity(activity);
     }
 
+    public Integer getCountLearnersInCurrentActivity(Activity activity){
+	return learnerProgressDAO.getNumUsersCurrentActivity(activity);
+    }
     @Override
     public Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId,
 	    Integer userRole) {
