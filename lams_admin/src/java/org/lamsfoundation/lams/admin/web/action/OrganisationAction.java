@@ -55,12 +55,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Fei Yang
- *
- *
- *
- *
- *
- *
  */
 public class OrganisationAction extends LamsDispatchAction {
 
@@ -69,6 +63,7 @@ public class OrganisationAction extends LamsDispatchAction {
     private static List<SupportedLocale> locales;
     private static List status;
 
+    @SuppressWarnings("unchecked")
     public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	OrganisationAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
@@ -94,6 +89,18 @@ public class OrganisationAction extends LamsDispatchAction {
 			orgForm.set("stateId", org.getOrganisationState().getOrganisationStateId());
 			SupportedLocale locale = org.getLocale();
 			orgForm.set("localeId", locale != null ? locale.getLocaleId() : null);
+
+			// find a course or subcourse with any lessons, so we warn user when he tries to delete the course
+			Integer courseToDeleteLessons = org.getLessons().size() > 0 ? orgId : null;
+			if (courseToDeleteLessons == null) {
+			    for (Organisation subcourse : (Set<Organisation>) org.getChildOrganisations()) {
+				if (subcourse.getLessons().size() > 0) {
+				    courseToDeleteLessons = subcourse.getOrganisationId();
+				    break;
+				}
+			    }
+			}
+			request.setAttribute("courseToDeleteLessons", courseToDeleteLessons);
 		    }
 		    request.getSession().setAttribute("locales", OrganisationAction.locales);
 		    request.getSession().setAttribute("status", OrganisationAction.status);

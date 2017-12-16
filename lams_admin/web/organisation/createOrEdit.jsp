@@ -1,6 +1,29 @@
 <%@ include file="/taglibs.jsp"%>
 
-<html-el:form action="/orgsave.do" method="post">
+<script type="text/javascript">
+	function warnIfRemoved(){
+		// check if "Remove" state was selected
+		var state = document.querySelector('select[name="stateId"]'),
+			selected = state.options[state.options.selectedIndex].value;
+		if (selected == 4) {
+			// check if the course or one of its subcourses contain lessons
+			if (${not empty courseToDeleteLessons}) {
+				// confirm redirect to "delete all lessons" page
+				if (confirm('<fmt:message key="msg.delete.organisation.delete.lessons.confirm"/>')) {
+					document.location.href = 'organisation.do?method=deleteAllLessonsInit&orgId=${courseToDeleteLessons}';
+				}
+				return false;
+			}
+			// confirm removal of empty course
+			if (!confirm('<fmt:message key="msg.delete.organisation.confirm"/>')) {
+				return false;
+			}
+		}
+		return true;
+	}
+</script>
+
+<html-el:form action="/orgsave.do" method="post" onsubmit="return warnIfRemoved()">
 <html-el:hidden property="orgId" />
 <html-el:hidden property="parentId" />
 <html-el:hidden property="typeId" />
@@ -30,6 +53,12 @@
 </h4>
 
 <div align="center"><html-el:errors/></div>
+
+<div id="deleteAllLessonsBox" class="alert alert-info" style="display: none">
+	<fmt:message key="label.delete.all.lesson.count" />&nbsp;<span id="lessonCount"></span> / <span id="totalLessonCount"></span>
+	<fmt:message key="label.delete.all.lesson.progress" />
+</div>
+
 
 <table class="table table-condensed table-no-border">
 	<tr>
