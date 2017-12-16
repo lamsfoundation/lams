@@ -139,7 +139,7 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 		sortByParam = "o.code";
 		break;
 	    case "description":
-		sortByParam = "o.description";
+		sortByParam = "o.createDate";
 		break;
 	}
 

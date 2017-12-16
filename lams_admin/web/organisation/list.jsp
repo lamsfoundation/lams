@@ -78,7 +78,7 @@
 							rows += '</td>';
 
 							rows += '<td>';
-							rows += 	orgData["description"];
+							rows += 	orgData["createDate"];
 							rows += '</td>';
 							
 							rows += '</tr>';
@@ -298,7 +298,7 @@
 			<fmt:message key="admin.organisation.code"/>
 		</th>
 		<th width="20%" align="center">
-			<fmt:message key="admin.organisation.description"/>
+			<fmt:message key="admin.organisation.create.date"/>
 		</th>
 	</lams:TSTable>
 	</div>
