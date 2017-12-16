@@ -1,6 +1,8 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.Role" %>
+<%@ page import=" org.lamsfoundation.lams.util.FileUtil" %>
 <c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="datePattern"><%= FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.toPattern() %></c:set>
 
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 <link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
@@ -78,7 +80,7 @@
 							rows += '</td>';
 
 							rows += '<td>';
-							rows += 	orgData["description"];
+							rows += 	orgData["createDate"];
 							rows += '</td>';
 							
 							rows += '</tr>';
@@ -175,6 +177,10 @@
 				<td id="courseStatus"><c:out value="${org.organisationState.description}" /></td>
 			</tr>
 			<tr>
+				<td><fmt:message key="admin.organisation.create.date"/>:</td>
+				<td><fmt:formatDate value="${org.createDate}" pattern="${datePattern}" /></td>
+			</tr>
+			<tr>
 				<td><fmt:message key="admin.organisation.locale"/>:</td>
 				<td><c:out value="${org.locale.description}" /></td>
 			</tr>
@@ -261,6 +267,10 @@
 				<td><c:out value="${org.organisationState.description}" /></td>
 			</tr>
 			<tr>
+				<td><fmt:message key="admin.organisation.create.date"/>:</td>
+				<td><fmt:formatDate value="${org.createDate}" pattern="${datePattern}" /></td>
+			</tr>
+			<tr>
 				<td><fmt:message key="admin.organisation.locale"/>:</td>
 				<td><c:out value="${org.locale.description}" /></td>
 			</tr>
@@ -298,7 +308,7 @@
 			<fmt:message key="admin.organisation.code"/>
 		</th>
 		<th width="20%" align="center">
-			<fmt:message key="admin.organisation.description"/>
+			<fmt:message key="admin.organisation.create.date"/>
 		</th>
 	</lams:TSTable>
 	</div>

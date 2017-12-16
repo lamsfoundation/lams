@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -190,7 +191,7 @@ public class OrgManageAction extends LamsDispatchAction {
 	    sortOrder = isSort3.equals(0) ? "ASC" : "DESC";
 
 	} else if (isSort4 != null) {
-	    sortBy = "description";
+	    sortBy = "createDate";
 	    sortOrder = isSort4.equals(0) ? "ASC" : "DESC";
 
 	}
@@ -211,8 +212,9 @@ public class OrgManageAction extends LamsDispatchAction {
 	    responseRow.put("name", StringEscapeUtils.escapeHtml(orgName));
 	    String orgCode = organisation.getCode() == null ? "" : organisation.getCode();
 	    responseRow.put("code", StringEscapeUtils.escapeHtml(orgCode));
-	    String orgDescription = organisation.getDescription() == null ? "" : organisation.getDescription();
-	    responseRow.put("description", StringEscapeUtils.escapeHtml(orgDescription));
+	    String orgCreateDate = organisation.getCreateDate() == null ? ""
+		    : FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(organisation.getCreateDate());
+	    responseRow.put("createDate", orgCreateDate);
 
 	    rows.put(responseRow);
 	}
