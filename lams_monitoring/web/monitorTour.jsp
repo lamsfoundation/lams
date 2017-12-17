@@ -34,6 +34,11 @@
 			        content: "<fmt:message key="tour.tab.refresh.content"/>",
 		        	placement: "left",
 			      },{
+			        element: "#description",
+			        title: "<fmt:message key="summery.desc.lbl"/>",
+			        content: "<fmt:message key="tour.lesson.description"/>",
+			        placement: "bottom",
+			      },{
 			        element: "#lessonStateLabel:first-child",
 			        title: "<fmt:message key="lesson.state"/>",
 			        content: "<p><fmt:message key="tour.lesson.state.content.1"/></p><p><fmt:message key="tour.lesson.state.content.2"/></p><p><fmt:message key="tour.lesson.state.content.3"/></p><p><fmt:message key="tour.lesson.state.content.4"/></p><p><fmt:message key="tour.lesson.state.content.5"/></p>",
@@ -57,6 +62,16 @@
 			        element: "#notificationButton",
 			        title: "<fmt:message key="email.notifications"/>",
 			        content: "<fmt:message key="tour.email.notifications.content"/>",
+			        placement: "top",
+			      },{
+			        element: "#editIntroButton",
+			        title: "<fmt:message key="label.lesson.introduction"/>",
+			        content: "<fmt:message key="tour.edit.lesson.introduction"/>",
+			        placement: "top",
+			      },{
+			        element: "#gradebookOnCompleteButton",
+			        title: "<fmt:message key="label.display.activity.scores"/>",
+			        content: "<fmt:message key="tour.display.activity.scores.content"/>",
 			        placement: "top",
 			      },{
 			        element: "#tour-lesson-im",

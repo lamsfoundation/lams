@@ -269,6 +269,24 @@ td.contributeEntryCell a {
 	@include checkboxInTable;
 }
 
+
+@media (min-width: 768px) {
+#lessonActions {
+	display: inline-block;
+}
+
+#lessonActions2 {
+	display: block;
+	margin-top: 5px;
+	}
+}
+
+@media (max-width: 767px) {
+#lessonActions {
+	display: inline;
+}
+}
+
 /********** SEQUENCE TAB STYLES **********/
 div#sequenceCanvas {
 	text-align: center;

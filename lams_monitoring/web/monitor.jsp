@@ -201,7 +201,11 @@
 				<fmt:message key="label.lesson.starts" var="LESSON_START_VAR"><fmt:param value="%0"/></fmt:message>
 				LESSON_START : '<c:out value="${LESSON_START_VAR}"/>',
 				<fmt:message key="label.lesson.finishes" var="LESSON_FINISH_VAR"><fmt:param value="%0"/></fmt:message>
-				LESSON_FINISH : '<c:out value="${LESSON_FINISH_VAR}" />'
+				LESSON_FINISH : '<c:out value="${LESSON_FINISH_VAR}" />',
+				<fmt:message key="lesson.display.activity.scores.alert" var="LESSON_ACTIVITY_SCORES_ENABLE_ALERT_VAR"/>
+				LESSON_ACTIVITY_SCORES_ENABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_ACTIVITY_SCORES_ENABLE_ALERT_VAR}" />').text(),
+				<fmt:message key="lesson.hide.activity.scores.alert" var="LESSON_ACTIVITY_SCORES_DISABLE_ALERT_VAR"/>
+				LESSON_ACTIVITY_SCORES_DISABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_ACTIVITY_SCORES_DISABLE_ALERT_VAR}" />').text()
 		}
 	    
 		$(document).ready(function(){
@@ -386,15 +390,26 @@
 												<span class="hidden-xs"><fmt:message key="email.notifications"/></span>
 											</button>
 										</c:if>
-										
+									</div>
+									
+									<div class="btn-group btn-group-xs" role="group" id="lessonActions2">
 										<c:if test="${lesson.enableLessonIntro}">
-											<button id="editIntroButton" class="btn btn-default"
+											<button id="editIntroButton" class="btn btn-default roffset10"
 													type="button" onClick="javascript:showIntroductionDialog(${lesson.lessonID})">
 												<i class="fa fa-sm fa-info"></i>
 												<span class="hidden-xs"><fmt:message key="label.lesson.introduction"/></span>
 											</button>
 										</c:if>							  
+
+										<button id="gradebookOnCompleteButton" class="btn btn-default
+											<c:if test="${lesson.gradebookOnComplete}">
+												btn-success
+											</c:if>
+											">
+											<i class="fa fa-sm fa-list-ol"></i><span class="hidden-xs">&nbsp;<fmt:message key="label.display.activity.scores"/></span> 
+ 										</button>
 									</div>
+										
 								</dd>
 		
 								<!-- IM & Presence -->
@@ -448,7 +463,7 @@
 										</button>
 									</div>
 								</dd>
-								
+
 								<!--  encodedLessonID -->
 								<c:if test="${ALLOW_DIRECT_LESSON_LAUNCH}">
                                     <dt class="text-muted"><small><fmt:message key="lesson.learner.url"/></small></dt>

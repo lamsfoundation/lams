@@ -1187,6 +1187,15 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
+    public Boolean toggleGradebookOnComplete(long lessonId, Integer userId, Boolean gradebookOnComplete) {
+	securityService.isLessonMonitor(lessonId, userId, "set gradebook on complete", true);
+	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+	requestedLesson.setGradebookOnComplete(gradebookOnComplete != null ? gradebookOnComplete : Boolean.FALSE);
+	lessonDAO.updateLesson(requestedLesson);
+	return requestedLesson.getGradebookOnComplete();
+    }
+
+    @Override
     public GateActivity openGate(Long gateId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
 	if (gate != null) {

@@ -1515,6 +1515,25 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 	return null;
     }
+    
+    /**
+     * Set whether or not the activity scores / gradebook values are shown to the learner at the end of the lesson. 
+     * Expects parameters lessonID and presenceAvailable.
+     */
+    public ActionForward gradebookOnComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+
+	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
+	Integer userID = getUserId();
+	Boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
+
+	try {
+	    getMonitoringService().toggleGradebookOnComplete(lessonID, userID, gradebookOnComplete);
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	}
+	return null;
+    }
 
     /** Open Time Chart display */
     public ActionForward viewTimeChart(ActionMapping mapping, ActionForm form, HttpServletRequest request,

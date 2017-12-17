@@ -276,6 +276,9 @@ public interface IMonitoringService {
      */
     Boolean toggleLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled);
 
+    /** Set whether or not to display the gradebook activity scores at the end of a lesson */
+    Boolean toggleGradebookOnComplete(long lessonId, Integer userId, Boolean gradebookOnComplete);
+    
     String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId,
 	    boolean removeLearnerContent);
 

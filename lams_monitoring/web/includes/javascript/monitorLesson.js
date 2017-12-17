@@ -170,6 +170,28 @@ function initLessonTab(){
 	//initialize datetimepicker
 	$("#emaildatePicker").datetimepicker();
 
+	// sets gradebook on complete functionality
+	$('#gradebookOnCompleteButton').click(function(){
+		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
+		$.ajax({
+			url : LAMS_URL + 'monitoring/monitoring.do',
+			cache : false,
+			data : {
+				'method'    : 'gradebookOnComplete',
+				'gradebookOnComplete' : checked,
+				'lessonID'      : lessonId
+			},
+			success : function() {
+				if (checked) {
+					alert(LABELS.LESSON_ACTIVITY_SCORES_ENABLE_ALERT);
+				} else {
+					alert(LABELS.LESSON_ACTIVITY_SCORES_DISABLE_ALERT);
+				}
+			}
+		});
+	});
+	
+
 }
 
 /**
