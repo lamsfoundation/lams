@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-        
-
 <%@include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+
 <lams:html>
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
@@ -76,9 +75,8 @@
 				</c:otherwise>
 			</c:choose>
 		</div>
-	<div id="footer">
-	</div>
-	<!--closes footer-->
-</lams:Page>
+		
+		<div id="footer"></div>
+	</lams:Page>
 </body>
 </lams:html>

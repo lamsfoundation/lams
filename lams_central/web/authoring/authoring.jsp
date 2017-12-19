@@ -134,6 +134,9 @@
 				FOLDER_MOVE_TO_CHILD_ERROR : decoderDiv.html('<c:out value="${FOLDER_MOVE_TO_CHILD_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.weights.sum.error" var="WEIGHTS_SUM_ERROR_VAR"/>
 				WEIGHTS_SUM_ERROR : decoderDiv.html('<c:out value="${WEIGHTS_SUM_ERROR_VAR}" />').text(),
+				<fmt:message key="authoring.fla.weights.none" var="WEIGHTS_NONE_FOUND_ERROR_VAR"/>
+				WEIGHTS_NONE_FOUND_ERROR : decoderDiv.html('<c:out value="${WEIGHTS_NONE_FOUND_ERROR_VAR}" />').text(),
+				
 				
 				// HandlerLib
 				<fmt:message key="authoring.fla.transition.from.exists.error" var="TRANSITION_FROM_EXISTS_ERROR_VAR"/>

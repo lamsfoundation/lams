@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -160,6 +161,11 @@ public class LeaderselectionService
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<>();
+    }
+
+    @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
+	return null;
     }
 
     @Override

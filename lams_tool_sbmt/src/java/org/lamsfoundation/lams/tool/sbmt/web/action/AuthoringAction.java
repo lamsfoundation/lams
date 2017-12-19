@@ -199,6 +199,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	content.setReflectInstructions(authForm.getReflectInstructions());
 	content.setReflectOnActivity(authForm.isReflectOnActivity());
 	content.setLimitUpload(authForm.isLimitUpload());
+	content.setUseSelectLeaderToolOuput(authForm.isUseSelectLeaderToolOuput());
 	content.setLimitUploadNumber(authForm.getLimitUploadNumber());
 	content.setNotifyLearnersOnMarkRelease(authForm.isNotifyLearnersOnMarkRelease());
 	content.setNotifyTeachersOnFileSubmit(authForm.isNotifyTeachersOnFileSubmit());

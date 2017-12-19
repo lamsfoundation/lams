@@ -50,7 +50,7 @@ public class FinishScheduleLessonJob extends MonitoringJob {
 	    log.debug("Lesson [" + lessonId + "] is suspending...");
 	}
 
-	monitoringService.suspendLesson(lessonId, userId);
+	monitoringService.suspendLesson(lessonId, userId, false);
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Lesson [" + lessonId + "] suspended");

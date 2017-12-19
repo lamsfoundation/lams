@@ -62,6 +62,7 @@ public class LessonDetailsDTO {
     private String encodedLessonID;
     private Boolean enabledLessonNotifications;
     private Boolean enableLessonIntro;
+    private Boolean gradebookOnComplete;
 
     /**
      * Create the DTO based on the lesson. Sets up all the fields except numberStartedLearners
@@ -122,6 +123,7 @@ public class LessonDetailsDTO {
 	this.isPreview = lesson.isPreviewLesson();
 	this.enabledLessonNotifications = lesson.getEnableLessonNotifications();
 	this.enableLessonIntro = lesson.isEnableLessonIntro();
+	this.gradebookOnComplete = lesson.getGradebookOnComplete();
     }
 
     public Date getScheduleEndDate() {
@@ -407,5 +409,13 @@ public class LessonDetailsDTO {
 
     public void setEnableLessonIntro(Boolean enableLessonIntro) {
 	this.enableLessonIntro = enableLessonIntro;
+    }
+
+    public Boolean getGradebookOnComplete() {
+        return gradebookOnComplete;
+    }
+
+    public void setGradebookOnComplete(Boolean gradebookOnComplete) {
+        this.gradebookOnComplete = gradebookOnComplete;
     }
 }

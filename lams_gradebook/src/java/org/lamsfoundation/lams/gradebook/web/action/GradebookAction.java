@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook.web.action;
 
 import java.util.ArrayList;
@@ -61,10 +60,14 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author lfoxton
  *
- * Handles the general requests for content in gradebook
+ *         Handles the general requests for content in gradebook
  */
 public class GradebookAction extends LamsDispatchAction {
 
@@ -110,7 +113,7 @@ public class GradebookAction extends LamsDispatchAction {
 	String searchOper = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_OPERATION, true);
 	String searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_STRING, true);
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
-	
+
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonParticipant(lessonID, getUser().getUserID(), "get activity gradebook data",
 		false)) {
@@ -134,9 +137,11 @@ public class GradebookAction extends LamsDispatchAction {
 	// Get the user gradebook list from the db
 	// A slightly different list is needed for userview or activity view
 	if ((view == GBGridView.MON_USER) || (view == GBGridView.LRN_ACTIVITY)) {//2nd level && from personal marks page (2nd level or 1st)
-	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLearner(lessonID, userID, currentUserDTO.getTimeZone());
+	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLearner(lessonID, userID,
+		    currentUserDTO.getTimeZone());
 	} else if (view == GBGridView.MON_ACTIVITY) {
-	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLesson(lessonID, currentUserDTO.getTimeZone());
+	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLesson(lessonID,
+		    currentUserDTO.getTimeZone());
 	}
 
 	if ((sortBy == null) || sortBy.equals("")) {
@@ -147,6 +152,54 @@ public class GradebookAction extends LamsDispatchAction {
 		searchString, sortOrder, rowLimit, page);
 
 	writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_XML, LamsDispatchAction.ENCODING_UTF8, ret);
+	return null;
+    }
+
+    public ActionForward getLessonCompleteGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	// Getting the params passed in from the jqGrid
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	UserDTO currentUserDTO = getUser();
+	Integer userId = currentUserDTO.getUserID();
+	if (!getSecurityService().isLessonParticipant(lessonId, userId, "get lesson complete gradebook data", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the lesson");
+	    return null;
+	}
+
+	List<GradebookGridRowDTO> gradebookActivityDTOs = getGradebookService().getGBLessonComplete(lessonId, userId);
+
+	ObjectNode resultJSON = JsonNodeFactory.instance.objectNode();
+	resultJSON.put(GradebookConstants.ELEMENT_RECORDS, gradebookActivityDTOs.size());
+
+	ArrayNode rowsJSON = JsonNodeFactory.instance.arrayNode();
+	for (GradebookGridRowDTO gradebookActivityDTO : gradebookActivityDTOs) {
+	    ObjectNode rowJSON = JsonNodeFactory.instance.objectNode();
+	    rowJSON.put(GradebookConstants.ELEMENT_ID, gradebookActivityDTO.getId());
+
+	    ArrayNode cellJSON = JsonNodeFactory.instance.arrayNode();
+	    cellJSON.add(gradebookActivityDTO.getRowName());
+	    cellJSON.add(gradebookActivityDTO.getStatus());
+	    cellJSON.add(gradebookActivityDTO.getAverageMark() == null ? GradebookConstants.CELL_EMPTY
+		    : GradebookUtil.niceFormatting(gradebookActivityDTO.getAverageMark()));
+	    cellJSON.add(gradebookActivityDTO.getMark() == null ? GradebookConstants.CELL_EMPTY
+		    : GradebookUtil.niceFormatting(gradebookActivityDTO.getMark()));
+
+	    rowJSON.set(GradebookConstants.ELEMENT_CELL, cellJSON);
+	    rowsJSON.add(rowJSON);
+	}
+	resultJSON.set(GradebookConstants.ELEMENT_ROWS, rowsJSON);
+
+	boolean isWeighted = getGradebookService().isWeightedMarks(lessonId);
+	GradebookUserLesson gradebookUserLesson = getGradebookService().getGradebookUserLesson(lessonId, userId);
+	resultJSON.put("learnerLessonMark",
+		gradebookUserLesson == null || gradebookUserLesson.getMark() == null ? GradebookConstants.CELL_EMPTY
+			: GradebookUtil.niceFormatting(gradebookUserLesson.getMark(), isWeighted));
+	Double averageLessonMark = getGradebookService().getAverageMarkForLesson(lessonId);
+	resultJSON.put("averageLessonMark", averageLessonMark == null ? GradebookConstants.CELL_EMPTY
+		: GradebookUtil.niceFormatting(averageLessonMark, isWeighted));
+
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(resultJSON.toString());
 	return null;
     }
 
@@ -180,7 +233,6 @@ public class GradebookAction extends LamsDispatchAction {
 	String sortBy = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
 	Boolean isSearch = WebUtil.readBooleanParam(request, GradebookConstants.PARAM_SEARCH);
 	String searchField = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_FIELD, true);
-	String searchOper = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_OPERATION, true);
 	String searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_STRING, true);
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
@@ -191,7 +243,6 @@ public class GradebookAction extends LamsDispatchAction {
 	// parameters
 	if (isSearch && (searchField == null)) {
 	    searchField = GradebookConstants.PARAM_ROW_NAME;
-	    searchOper = GradebookConstants.SEARCH_CONTAINS;
 	    searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_ROW_NAME, true);
 	}
 
@@ -252,7 +303,7 @@ public class GradebookAction extends LamsDispatchAction {
 		}
 	    }
 
-	    // 2nd table of gradebook course monitor 
+	    // 2nd table of gradebook course monitor
 	    // if organisationID is specified (but not lessonID) then show results for organisation
 	} else if (organisationID != null) {
 	    if (!getSecurityService().isGroupMonitor(organisationID, user.getUserID(), "get gradebook", false)) {
@@ -511,7 +562,6 @@ public class GradebookAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	Lesson lesson = getLessonService().getLesson(lessonID);
 	Double averageMark = getGradebookService().getAverageMarkForLesson(lessonID);
 
 	if (averageMark != null) {

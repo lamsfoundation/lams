@@ -162,3 +162,4 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 1.2.25 Release Fixes
 ====================
 * LDEV-4418: Change back button javascript
+* LDEV-4478: Add ability to display LAMS CourseGradebook 

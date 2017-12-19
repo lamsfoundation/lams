@@ -46,7 +46,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.confidencelevel.ConfidenceLevel;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -207,7 +206,7 @@ public class MonitoringAction extends Action {
 	initAssessmentService();
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_SESSION_ID);
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);	
+	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	AssessmentResultDTO result = service.getUserMasterDetail(sessionId, userId);
 
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
@@ -402,8 +401,9 @@ public class MonitoringAction extends Action {
 	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " " + userDto.getLastName());
 	    userData.add(fullName);
 	    userData.add(userDto.getGrade());
-	    if (userDto.getPortraitId() != null ) 
+	    if (userDto.getPortraitId() != null) {
 		userData.add(userDto.getPortraitId());
+	    }
 
 	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);
@@ -488,10 +488,6 @@ public class MonitoringAction extends Action {
 		Math.ceil(new Integer(countSessionUsers).doubleValue() / new Integer(rowLimit).doubleValue()))
 			.intValue();
 
-	List<ConfidenceLevel> confidenceLevels = assessment.isEnableConfidenceLevels()
-		? service.getConfidenceLevelsByQuestionAndSession(questionUid, sessionId)
-		: null;
-
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	int i = 1;
 	for (AssessmentUserDTO userDto : userDtos) {
@@ -507,22 +503,16 @@ public class MonitoringAction extends Action {
 		userData.add(questionResult.getMaxMark());
 		userData.add(fullName);
 		userData.add(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
-		
-		// prepare for displaying purposes confidence levels 
+		// show confidence levels if this feature is turned ON
 		if (assessment.isEnableConfidenceLevels()) {
-		    //find according confidenceLevel
-		    int confidence = -1;
-		    for (ConfidenceLevel confidenceLevel : confidenceLevels) {
-			if (questionResult.getAssessmentQuestion().getUid().equals(confidenceLevel.getQuestionUid())) {
-			    confidence = confidenceLevel.getConfidenceLevel();
-			    break;
-			}
-		    }
-		    userData.add(confidence);
+		    userData.add(questionResult.getConfidenceLevel());
 		}
-		
+
 		userData.add(questionResult.getMark());
-		
+		if (userDto.getPortraitId() != null) {
+		    userData.add(userDto.getPortraitId());
+		}
+
 	    } else {
 		userData.add("");
 		userData.add("");

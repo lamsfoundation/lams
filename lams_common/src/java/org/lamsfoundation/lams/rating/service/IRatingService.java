@@ -217,5 +217,9 @@ public interface IRatingService {
 
     Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Long toolSessionId,
 	    final Collection<Long> itemIds, Integer excludeUserId);
+    /** 
+     * Get all the raw ratings for a combination of criteria and item ids. Used by Peer Review to do SPA analysis.
+     */
+    List getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds);
 
 }

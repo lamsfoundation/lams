@@ -93,6 +93,11 @@ public interface IGradebookService {
     List<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson, int page, int size, String sortBy, String sortOrder,
 	    String searchString, TimeZone userTimezone);
 
+    /**
+     * Returns output for gradebook on lesson complete.
+     */
+    List<GradebookGridRowDTO> getGBLessonComplete(Long lessonId, Integer userId);
+
 //    /**
 //     * Gets the user rows containing only users' names. Do proper paging on DB side.
 //     *
@@ -311,9 +316,10 @@ public interface IGradebookService {
      */
     LinkedHashMap<String, ExcelCell[][]> exportSelectedLessonsGradebook(Integer userId, Integer organisationId,
 	    String[] lessonIds, boolean simplified);
-    
+
     /**
      * Get the raw overall marks for a lesson for charting purposes
+     * 
      * @param lessonId
      * @return
      */
@@ -321,7 +327,10 @@ public interface IGradebookService {
 
     /** Will the marks caculation take into account weighting? */
     boolean isWeightedMarks(LearningDesign design);
-    
+
+    /** Will the marks caculation take into account weighting? */
+    boolean isWeightedMarks(Long lessonId);
+
     /** Get a summary of the weightings */
     List<String[]> getWeights(LearningDesign design);
 

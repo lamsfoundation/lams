@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.SortedMap;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -51,6 +52,7 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -103,6 +105,8 @@ public class LearnerAction extends DispatchAction {
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	
+
 	((LearnerForm) form).setSessionMapID(sessionMap.getSessionID());
 
 	// get parameters from Request
@@ -130,6 +134,7 @@ public class LearnerAction extends DispatchAction {
 	}
 
 	ISubmitFilesService submitFilesService = getService();
+	ToolContentManager contentManager = getContentManager();
 	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 	SubmitFilesContent content = session.getContent();
 
@@ -145,6 +150,7 @@ public class LearnerAction extends DispatchAction {
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
 	sessionMap.put(SbmtConstants.ATTR_FINISH_LOCK, lock);
 	sessionMap.put(SbmtConstants.ATTR_LOCK_ON_FINISH, content.isLockOnFinished());
+	sessionMap.put(SbmtConstants.ATTR_USE_SEL_LEADER, content.isUseSelectLeaderToolOuput());
 	sessionMap.put(SbmtConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
 	sessionMap.put(SbmtConstants.ATTR_REFLECTION_INSTRUCTION, content.getReflectInstructions());
 	sessionMap.put(SbmtConstants.ATTR_TITLE, content.getTitle());
@@ -199,6 +205,59 @@ public class LearnerAction extends DispatchAction {
 		    IEventNotificationService.DELIVERY_METHOD_MAIL);
 	}
 
+	
+	SortedMap submittedFilesMap = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
+	// support for leader select feature  
+            	SubmitUser groupLeader = content.isUseSelectLeaderToolOuput()
+			? submitFilesService.checkLeaderSelectToolForSessionLeader(learner, new Long(sessionID).longValue())
+			: null;
+	
+	if (content.isUseSelectLeaderToolOuput() && !mode.isTeacher()) {
+	    
+	 // forwards to the leaderSelection page
+	    if (groupLeader == null) {
+		List<SubmitUser> groupUsers = submitFilesService.getUsersBySession(new Long(sessionID).longValue());
+		request.setAttribute(SbmtConstants.ATTR_GROUP_USERS, groupUsers);
+		request.setAttribute(SbmtConstants.ATTR_SUBMIT_FILES, submittedFilesMap);
+		return mapping.findForward(SbmtConstants.WAIT_FOR_LEADER);
+	    }
+	    
+	    // forwards to the waitForLeader pages
+		boolean isNonLeader = !userID.equals(groupLeader.getUserID());	    
+
+		 if (isNonLeader && !learner.isFinished()) {
+		     List filesUploadedByLeader = submitFilesService.getFilesUploadedByUser(groupLeader.getUserID(), sessionID, request.getLocale(), false);
+
+		     
+			if (filesUploadedByLeader == null ) {
+			    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader.launch.time.limit");
+			    return mapping.findForward(SbmtConstants.WAIT_FOR_LEADER_TIME_LIMIT);
+			}		
+			
+			//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
+			if ( !groupLeader.isFinished()) {
+			    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader.finish");
+			    return mapping.findForward(SbmtConstants.WAIT_FOR_LEADER_TIME_LIMIT);
+			}
+		    }
+		 
+		 // check if leader has submitted all answers
+		    if (groupLeader.isFinished()) {
+			submitFilesService.copyLearnerContent(groupLeader,learner);
+			filesUploaded = submitFilesService.getFilesUploadedByUser(learner.getUserID(), learner.getSessionID(), request.getLocale(), false);
+			setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
+		    }
+	}
+	
+	    sessionMap.put(SbmtConstants.ATTR_GROUP_LEADER, groupLeader);
+	    boolean isUserLeader = submitFilesService.isUserGroupLeader(learner, sessionID);
+	    sessionMap.put(SbmtConstants.ATTR_IS_USER_LEADER, isUserLeader);
+	    
+	    boolean hasEditRight = !content.isUseSelectLeaderToolOuput()
+			|| content.isUseSelectLeaderToolOuput() && isUserLeader;
+	   sessionMap.put(SbmtConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
+
+	
 	return mapping.findForward(SbmtConstants.SUCCESS);
     }
 
@@ -329,6 +388,12 @@ public class LearnerAction extends DispatchAction {
 	ISubmitFilesService submitFilesService = SubmitFilesServiceProxy
 		.getSubmitFilesService(this.getServlet().getServletContext());
 	return submitFilesService;
+    }
+    
+    private ToolContentManager getContentManager() {
+	ToolContentManager contentManager = SubmitFilesServiceProxy.
+		getSubmitFilesContentManager(this.getServlet().getServletContext());
+	return contentManager;
     }
 
     // validate uploaded form

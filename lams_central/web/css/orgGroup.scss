@@ -27,8 +27,9 @@ div#titleDiv button {
 	margin-top: 7px;
 	border-bottom: $border-thin-dotted;
 }
+
 table#groupsTable {
-	height: calc(100% - 110px);
+	height: 420px; // do not use calc(100% - XXpx) but fix it so that iPad does not shift lengths when accordians are opened
 }
 table#groupsTable td {
 	vertical-align: top;
@@ -85,7 +86,7 @@ td#unassignedUserCell {
 }
 
 td#unassignedUserCell .userContainer {
-	height: 100%;
+	height: calc(100% - 10px);
 	overflow-x: auto;
 }
 
@@ -112,6 +113,14 @@ td#unassignedUserCell .userContainer {
     width: 100%;
     padding: 10px;
 }
+
+ #upload-group-file-settings {
+    display: inline-block;
+    width: 100%;
+    padding: 10px;
+    min-height: 150px; // allow a bit extra so the whole accordian is seen on iPad
+}
+
 #save-course-grouping-button {
 	margin-top: 10px;
 }
@@ -123,4 +132,15 @@ td#unassignedUserCell .userContainer {
     display: none;
     -webkit-overflow-scrolling: touch !important;
     overflow: auto;
+}
+
+#print-button {
+	color: $text-color
+}
+
+// override values from dialog.scss
+.dialogContainer .modal-body {
+	height : 100%;
+	max-height: calc(100% - 38px);
+	padding: 15px;
 }

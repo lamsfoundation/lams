@@ -7,11 +7,12 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/tabbedheader.jsp" %>
-		<link href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet" type="text/css" >
-		<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css" >
+		<link href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet" type="text/css">
+		<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css">
 		<link href="${lams}css/thickbox.css" rel="stylesheet" rel="stylesheet" type="text/css">
-		<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>		
+		<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css">		
  		<lams:css suffix="chart"/>
+ 		<link href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet" type="text/css">
  		<link href="<html:rewrite page='/includes/css/monitoring.css'/>" rel="stylesheet" type="text/css">	
  		
 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
@@ -40,7 +41,7 @@
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
  		<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
- 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/monitoring.js'/>"></script>
+ 		<script type="text/javascript" src="${lams}/includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
  		
 		<script>        
 		    function doSelectTab(tabId) {

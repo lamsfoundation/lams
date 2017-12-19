@@ -26,7 +26,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.CircularByteBuffer;
@@ -66,8 +70,7 @@ public class ResizePictureUtil {
 
     /**
      * Reads the original image, creates a resized copy of it and returns its input stream. largestDimension is the
-     * largest
-     * dimension of the resized image, the other dimension is scaled accordingly.
+     * largest dimension of the resized image, the other dimension is scaled accordingly.
      *
      * @param image
      *            original image
@@ -81,13 +84,23 @@ public class ResizePictureUtil {
 	try {
 	    //resize to 150 pixels max
 	    BufferedImage outImage = Scalr.resize(image, Method.QUALITY, largestDimension);
+	    
+	    //set jpeg compression quality explicitly
+	    ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("jpeg").next();
+	    ImageWriteParam jpgWriteParam = imageWriter.getDefaultWriteParam();
+	    jpgWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+	    jpgWriteParam.setCompressionQuality(.95f);
 
-	    // buffer all data in a circular buffer of infinite size
-	    CircularByteBuffer cbb = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
-	    ImageIO.write(outImage, "PNG", cbb.getOutputStream());
-	    cbb.getOutputStream().close();
+	    // buffer all data in a circular buffer of infinite sizes
+	    CircularByteBuffer outputBuffer = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
+	    ImageOutputStream ios = ImageIO.createImageOutputStream(outputBuffer.getOutputStream());
+	    imageWriter.setOutput(ios);
+	    IIOImage outputImage = new IIOImage(outImage, null, null);
+	    imageWriter.write(null, outputImage, jpgWriteParam);
+	    imageWriter.dispose();
+	    outputBuffer.getOutputStream().close();
 
-	    return cbb.getInputStream();
+	    return outputBuffer.getInputStream();
 
 	} catch (IOException e) {
 	    log.error(e.getStackTrace());

@@ -165,6 +165,11 @@ public class Lesson implements Serializable {
     private Boolean allowLearnerRestart;
 
     /**
+     * Should learners be displayed activity gradebook on lesson complete.
+     */
+    private Boolean gradebookOnComplete;
+
+    /**
      * For lesson conditional release
      */
     private Set<Lesson> precedingLessons;
@@ -185,11 +190,12 @@ public class Lesson implements Serializable {
 	    Integer previousLessonStateId, LearningDesign learningDesign, Set learnerProgresses,
 	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerPresenceAvailable,
 	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
-	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Integer scheduledNumberDaysTolessonFinish) {
+	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Boolean gradebookOnComplete,
+	    Integer scheduledNumberDaysTolessonFinish) {
 	this(null, name, description, createDateTime, null, null, user, lessonStateId, previousLessonStateId,
 		enableLessonIntro, displayDesignImage, false, learningDesign, null, null, learnerProgresses,
 		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
-		forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysTolessonFinish);
+		forceLearnerRestart, allowLearnerRestart, gradebookOnComplete, scheduledNumberDaysTolessonFinish);
     }
 
     /** full constructor */
@@ -198,7 +204,8 @@ public class Lesson implements Serializable {
 	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean lockedForEdit, LearningDesign learningDesign,
 	    LessonClass lessonClass, Organisation organisation, Set learnerProgresses, Boolean learnerPresenceAvailable,
 	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
-	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Integer scheduledNumberDaysToLessonFinish) {
+	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Boolean gradebookOnComplete,
+	    Integer scheduledNumberDaysToLessonFinish) {
 	this.lessonId = lessonId;
 	this.lessonName = name;
 	this.lessonDescription = description;
@@ -221,6 +228,7 @@ public class Lesson implements Serializable {
 	this.enableLessonNotifications = enableLessonNotifications;
 	this.forceLearnerRestart = forceLearnerRestart;
 	this.allowLearnerRestart = allowLearnerRestart;
+	this.gradebookOnComplete = gradebookOnComplete;
 	this.gradebookUserLessons = new HashSet<GradebookUserLesson>();
 	this.marksReleased = false;
 	this.scheduledNumberDaysToLessonFinish = scheduledNumberDaysToLessonFinish;
@@ -239,11 +247,12 @@ public class Lesson implements Serializable {
     public static Lesson createNewLessonWithoutClass(String lessonName, String lessonDescription, User user,
 	    LearningDesign ld, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerPresenceAvailable,
 	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
-	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Integer scheduledNumberDaysToLessonFinish) {
+	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Boolean gradebookOnComplete,
+	    Integer scheduledNumberDaysToLessonFinish) {
 	return new Lesson(lessonName, lessonDescription, new Date(System.currentTimeMillis()), user, Lesson.CREATED,
 		null, ld, new HashSet(), enableLessonIntro, displayDesignImage, learnerPresenceAvailable,
 		learnerImAvailable, liveEditEnabled, enableLessonNotifications, forceLearnerRestart,
-		allowLearnerRestart, scheduledNumberDaysToLessonFinish);
+		allowLearnerRestart, gradebookOnComplete, scheduledNumberDaysToLessonFinish);
     }
 
     // ---------------------------------------------------------------------
@@ -570,6 +579,14 @@ public class Lesson implements Serializable {
 
     public void setAllowLearnerRestart(Boolean allowLearnerRestart) {
 	this.allowLearnerRestart = allowLearnerRestart;
+    }
+
+    public Boolean getGradebookOnComplete() {
+	return gradebookOnComplete;
+    }
+
+    public void setGradebookOnComplete(Boolean gradebookOnComplete) {
+	this.gradebookOnComplete = gradebookOnComplete;
     }
 
     public Set<Lesson> getPrecedingLessons() {

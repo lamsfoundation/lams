@@ -50,11 +50,11 @@ public class AssessmentQuestionResult {
     private float penalty;
     private Set<AssessmentOptionAnswer> optionAnswers;
     private Date finishDate;
+    private int confidenceLevel;
 
     // DTO fields:
     private AssessmentUser user;
     private String answerStringEscaped;
-    private int confidenceLevel;
 
     public AssessmentQuestionResult() {
 	optionAnswers = new LinkedHashSet<AssessmentOptionAnswer>();
@@ -240,6 +240,14 @@ public class AssessmentQuestionResult {
     public void setFinishDate(Date finishDate) {
 	this.finishDate = finishDate;
     }
+    
+    public int getConfidenceLevel() {
+	return confidenceLevel;
+    }
+
+    public void setConfidenceLevel(int confidenceLevel) {
+	this.confidenceLevel = confidenceLevel;
+    }
 
     public AssessmentUser getUser() {
 	return user;
@@ -255,14 +263,6 @@ public class AssessmentQuestionResult {
 
     public void setAnswerStringEscaped(String answerStringEscaped) {
 	this.answerStringEscaped = answerStringEscaped;
-    }
-    
-    public int getConfidenceLevel() {
-	return confidenceLevel;
-    }
-
-    public void setConfidenceLevel(int confidenceLevel) {
-	this.confidenceLevel = confidenceLevel;
     }
 
 }

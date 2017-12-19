@@ -148,6 +148,10 @@ public class ScratchieConstants {
     public static final String ATTR_REFLECTION_ON = "reflectOn";
 
     public static final String ATTR_IS_BURNING_QUESTIONS_ENABLED = "isBurningQuestionsEnabled";
+    
+    public static final String ATTR_IS_PRESET_MARKS_OVERWRITTEN = "isPresetMarksOverwritten";
+    
+    public static final String ATTR_DEFAULT_PRESET_MARKS = "defaultPresetMarks";
 
     public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
 
@@ -180,6 +184,8 @@ public class ScratchieConstants {
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
     public static final String ATTR_ANSWER_UIDS = "answerUids";
+    
+    public static final String ATTR_CONFIDENCE_LEVELS_ACTIVITIES = "confidenceLevelsActivities";
 
     public static final String LEARNER_MARK = "learner.mark";
 

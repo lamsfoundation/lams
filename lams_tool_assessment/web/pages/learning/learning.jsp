@@ -30,15 +30,6 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
-	<style media="screen,projection" type="text/css">
-		.slider-tick {
-			width: 0;
-			height 0;
-		}
-		.slider.slider-horizontal {
-		    margin-left: 5px;
-		}
-	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
@@ -75,9 +66,10 @@
 						$("[type=button][name=submit-hedging-question" + questionIndex + "]").prop("disabled", "true").addClass("button-disabled");
 					}
 				}).trigger("change");
-				
 			}
 
+			//initialize bootstrap-sliders if "Enable confidence level" option is ON
+			$('.bootstrap-slider').bootstrapSlider();
 		});
 		
 		function countHedgeQuestionSelectTotal(questionIndex) {

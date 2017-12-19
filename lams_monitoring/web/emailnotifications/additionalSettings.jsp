@@ -26,17 +26,5 @@
 			<label for="datePicker"><fmt:message key="email.notifications.by.this.date" /></label>
 			<input type="text" class="form-control" name="datePicker" id="datePicker" value=""/>
 		</div>
-		
-		<c:choose>
-			<c:when test="${lesson.lessonId != null}">
-				<c:set var="additionalParams">lessonID=${lesson.lessonId}</c:set>
-			</c:when>
-			<c:otherwise>
-				<c:set var="additionalParams">organisationID=${org.organisationId}</c:set>
-			</c:otherwise>
-		</c:choose>
-		<a href="<c:url value='/emailNotifications.do'/>?method=showScheduledEmails&${additionalParams}" id="listEmailsHref" class="btn btn-default btn-sm">
-			<fmt:message key="email.notifications.scheduled.messages.list" />
-		</a>				
 	</div>
 </div>	

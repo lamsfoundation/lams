@@ -127,6 +127,14 @@
             insert="true"
             column="finish_date"
         />
+        
+        <property
+            name="confidenceLevel"
+            type="int"
+            update="true"
+            insert="true"
+            column="confidence_level"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

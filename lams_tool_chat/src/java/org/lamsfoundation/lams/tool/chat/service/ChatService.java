@@ -36,6 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -203,6 +204,11 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<>();
+    }
+
+    @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
+	return null;
     }
 
     @Override

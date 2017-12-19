@@ -90,6 +90,8 @@ public class McContent implements Serializable {
 
     /** nullable persistent field */
     private Integer passMark;
+    
+    private boolean enableConfidenceLevels;
 
     private String reflectionSubject;
 
@@ -101,10 +103,10 @@ public class McContent implements Serializable {
 
     /** full constructor */
     public McContent(Long mcContentId, String title, String instructions, boolean defineLater, Date creationDate,
-	    Date updateDate, boolean questionsSequenced, long createdBy, Integer passMark, boolean showReport,
-	    boolean randomize, boolean displayAnswers, boolean showMarks, boolean useSelectLeaderToolOuput,
-	    boolean prefixAnswersWithLetters, boolean retries, boolean reflect, String reflectionSubject,
-	    Set mcQueContents, Set mcSessions) {
+	    Date updateDate, boolean questionsSequenced, long createdBy, Integer passMark,
+	    boolean enableConfidenceLevels, boolean showReport, boolean randomize, boolean displayAnswers,
+	    boolean showMarks, boolean useSelectLeaderToolOuput, boolean prefixAnswersWithLetters, boolean retries,
+	    boolean reflect, String reflectionSubject, Set mcQueContents, Set mcSessions) {
 
 	this.mcContentId = mcContentId;
 	this.title = title;
@@ -118,6 +120,7 @@ public class McContent implements Serializable {
 	this.reflectionSubject = reflectionSubject;
 	this.reflect = reflect;
 	this.passMark = passMark;
+	this.enableConfidenceLevels = enableConfidenceLevels;
 	this.showReport = showReport;
 	this.randomize = randomize;
 	this.displayAnswers = displayAnswers;
@@ -154,9 +157,10 @@ public class McContent implements Serializable {
     public static McContent newInstance(McContent mc, Long newContentId) {
 	McContent newContent = new McContent(newContentId, mc.getTitle(), mc.getInstructions(), mc.isDefineLater(),
 		mc.getCreationDate(), mc.getUpdateDate(), mc.isQuestionsSequenced(), mc.getCreatedBy(),
-		mc.getPassMark(), mc.isShowReport(), mc.isRandomize(), mc.isDisplayAnswers(), mc.isShowMarks(),
-		mc.isUseSelectLeaderToolOuput(), mc.isPrefixAnswersWithLetters(), mc.isRetries(), mc.isReflect(),
-		mc.getReflectionSubject(), new TreeSet(), new TreeSet());
+		mc.getPassMark(), mc.isEnableConfidenceLevels(), mc.isShowReport(), mc.isRandomize(),
+		mc.isDisplayAnswers(), mc.isShowMarks(), mc.isUseSelectLeaderToolOuput(),
+		mc.isPrefixAnswersWithLetters(), mc.isRetries(), mc.isReflect(), mc.getReflectionSubject(),
+		new TreeSet(), new TreeSet());
 	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
 
 	return newContent;
@@ -252,6 +256,18 @@ public class McContent implements Serializable {
     public void setPassMark(Integer passMark) {
 	this.passMark = passMark;
     }
+    
+    /**
+    *
+    * @return
+    */
+   public boolean isEnableConfidenceLevels() {
+	return enableConfidenceLevels;
+   }
+
+   public void setEnableConfidenceLevels(boolean enableConfidenceLevels) {
+	this.enableConfidenceLevels = enableConfidenceLevels;
+   }
 
     public Set getMcQueContents() {
 	if (this.mcQueContents == null) {

@@ -363,8 +363,8 @@ function showOrgGroupingDialog(orgID, activityID) {
 function showOrgGroupDialog(url) {
 	$('#dialogOrgGrouping').modal('hide');
 	showDialog("dialogOrgGroup", {
-		'width' : Math.max(380, Math.min(850, $(window).width() - 60)),
-		'height': Math.max(380, Math.min(470, $(window).height() - 30)),
+		'width' : Math.max(380, Math.min(960, $(window).width() - 60)),
+		'height': Math.max(380, Math.min(750, $(window).height() - 30)),
 		'title' : LABELS.COURSE_GROUPS_TITLE,
 		'open' : function() {
 			// load contents after opening the dialog

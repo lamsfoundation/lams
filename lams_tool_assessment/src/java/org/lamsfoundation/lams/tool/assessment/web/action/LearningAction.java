@@ -53,7 +53,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
-import org.lamsfoundation.lams.confidencelevel.ConfidenceLevel;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -367,22 +366,6 @@ public class LearningAction extends Action {
 		    }
 		});
 		questionDto.setMatchingPairOptions(new LinkedHashSet<>(optionsSortedByOptionString));
-	    }
-	}
-
-	// populate user entered confidence levels
-	if (assessment.isEnableConfidenceLevels()) {
-	    List<ConfidenceLevel> confidenceLevels = service.getConfidenceLevelsByUser(user.getUserId().intValue(),
-		    toolSessionId);
-	    
-	    for (QuestionDTO questionDto : questionDtos) {
-		//find according confidenceLevel
-		for (ConfidenceLevel confidenceLevel : confidenceLevels) {
-		    if (questionDto.getUid().equals(confidenceLevel.getQuestionUid())) {
-			questionDto.setConfidenceLevel(confidenceLevel.getConfidenceLevel());
-			break;
-		    }
-		}
 	    }
 	}
 
@@ -1237,6 +1220,7 @@ public class LearningAction extends Action {
 			questionDto.setMark(questionResult.getMark());
 			questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
 			questionDto.setPenalty(questionResult.getPenalty());
+			questionDto.setConfidenceLevel(questionResult.getConfidenceLevel());
 
 			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 

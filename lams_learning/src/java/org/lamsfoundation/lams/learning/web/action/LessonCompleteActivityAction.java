@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.UnsupportedEncodingException;
@@ -56,9 +55,9 @@ public class LessonCompleteActivityAction extends ActivityAction {
     public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
 	    HttpServletResponse response) throws UnsupportedEncodingException {
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, getLearnerService());
-
-	Set<Lesson> releasedLessons = getLessonService().getReleasedSucceedingLessons(
-		learnerProgress.getLesson().getLessonId(), learnerProgress.getUser().getUserId());
+	Lesson lesson = learnerProgress.getLesson();
+	Set<Lesson> releasedLessons = getLessonService().getReleasedSucceedingLessons(lesson.getLessonId(),
+		learnerProgress.getUser().getUserId());
 	if (!releasedLessons.isEmpty()) {
 	    StringBuilder releasedLessonNames = new StringBuilder();
 	    for (Lesson releasedLesson : releasedLessons) {
@@ -70,11 +69,12 @@ public class LessonCompleteActivityAction extends ActivityAction {
 
 	//checks for lessonFinishUrl parameter
 	String lessonFinishCallbackUrl = getIntegrationService().getLessonFinishCallbackUrl(learnerProgress.getUser(),
-		learnerProgress.getLesson());
+		lesson);
 	if (lessonFinishCallbackUrl != null) {
 	    request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
 	}
-	request.setAttribute("lessonID", learnerProgress.getLesson().getLessonId());
+	request.setAttribute("lessonID", lesson.getLessonId());
+	request.setAttribute("gradebookOnComplete", lesson.getGradebookOnComplete());
 
 	return mapping.findForward("lessonComplete");
     }

@@ -386,7 +386,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    // 1. init lesson
 	    Lesson lesson = monitoringService.initializeLesson(title, desc, ldId, organisation.getOrganisationId(),
 		    user.getUserId(), customCSV, false, false, presenceEnable, imEnable, true, enableNotifications,
-		    false, false, null, null);
+		    false, false, true, null, null);
 	    // 2. create lessonClass for lesson
 	    LessonManagerServlet.createLessonClass(lesson, organisation, user);
 	    // 3. start lesson
@@ -413,7 +413,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    // 1. init lesson
 	    Lesson lesson = monitoringService.initializeLesson(title, desc, ldId,
 		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false,
-		    false, presenceEnable, imEnable, true, enableNotifications, false, false, null, null);
+		    false, presenceEnable, imEnable, true, enableNotifications, false, false, true, null, null);
 	    // 2. create lessonClass for lesson
 	    LessonManagerServlet.createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. schedule lesson

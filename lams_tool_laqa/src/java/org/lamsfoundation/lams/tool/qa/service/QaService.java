@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -903,6 +904,11 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();
+    }
+
+    @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
+	return null;
     }
 
     @Override

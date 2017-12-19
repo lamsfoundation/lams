@@ -29,8 +29,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lastName"><lams:user property="lastName"/></c:set>
 <c:set var="firstName"><lams:user property="firstName"/></c:set>
 
+<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet" />
+<style type="text/css">
+	.grid-holder .ui-jqgrid {
+	    margin-left: auto;
+	    margin-right: auto;
+	}
+	
+	h3, h4 {
+		text-align: center;
+	}
+</style> 
+
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 <script type="text/javascript">
 	function restartLesson(){
 		if (confirm('<fmt:message key="message.learner.progress.restart.confirm"/>')) {
@@ -62,6 +75,66 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		    }
 		});
 	}
+
+	<c:if test="${gradebookOnComplete}">
+		$(document).ready(function(){
+			// Create the organisation view grid with sub grid for users	
+			$("#userGradebookGrid").jqGrid({
+			    datatype		   : "json",
+			    url				   : "<lams:LAMSURL />gradebook/gradebook.do?dispatch=getLessonCompleteGridData&lessonID=${lessonID}",
+			    height			   : "100%",
+			    // use new theme
+			    guiStyle 		   : "bootstrap",
+			    iconSet 		   : 'fontAwesome',
+			    autoencode		   : false,
+				colNames : [
+					'<fmt:message key="gradebook.columntitle.activity"/>',
+					'<fmt:message key="gradebook.columntitle.progress"/>',
+					'<fmt:message key="gradebook.columntitle.averageMark"/>',
+					'<fmt:message key="gradebook.columntitle.mark"/>'
+				],
+			    colModel : [
+			        {
+					   'name'  : 'name', 
+					   'index' : 'name',
+					   'title' : false
+					},
+			        {
+					   'name'  : 'progress', 
+					   'index' : 'progress',
+					   'align' : 'center',
+					   'width' : 100,
+					   'title' : false
+				    },
+			        {
+					   'name'  : 'averageMark', 
+					   'index' : 'averageMark',
+					   'align' : 'center',
+					   'width' : 100,
+					   'title' : false
+			        },
+			        {
+					   'name'  : 'mark', 
+					   'index' : 'mark',
+					   'align' : 'center',
+					   'width' : 100,
+					   'title' : false
+					}
+			    ],
+			    loadComplete : function(data) {
+			    	$('#learnerLessonMark').text(data.learnerLessonMark);
+				    $('#averageLessonMark').text(data.averageLessonMark);
+				},
+			    loadError : function(xhr,st,err) {
+			    	$("#userGradebookGrid").clearGridData();
+			    	$.jgrid.info_dialog('<fmt:message key="error.title"/>', 
+	    					'<fmt:message key="message.lesson.finished.report.load.error"/>',
+	    					'<fmt:message key="message.lesson.finished.ok"/>');
+			    }
+			});
+		});
+	</c:if>
+
 </script>
 
 <lams:Page type="learner">
@@ -112,4 +185,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</div>
 	</c:if>
 	
+	<c:if test="${gradebookOnComplete}">
+		<div class="lead voffset20"><i class="fa fa-lg fa-list-ol text-success"></i>
+		&nbsp;<fmt:message key="gradebook.lesson.complete" /></div>
+		
+		<h3><fmt:message key="gradebook.learner.lesson.mark" />: <span id="learnerLessonMark"></span></h3>
+		<h4><fmt:message key="gradebook.columntitle.averageMark" />: <span id="averageLessonMark"></span></h4>
+		
+		<div class="grid-holder voffset20">
+			<table id="userGradebookGrid"></table>
+		</div>
+	</c:if>
 </lams:Page>

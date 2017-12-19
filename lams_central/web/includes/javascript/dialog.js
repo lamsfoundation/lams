@@ -389,3 +389,28 @@ function showNotificationsDialog(orgID, lessonID) {
 		}
 	}, true);
 }
+
+
+//used by Page.tag
+function showMyPortraitDialog() {
+	showDialog("dialogMyProfile", {
+		'title' : "Portrait",
+		'modal' : true,
+		'width' : Math.max(380, Math.min(770, $(window).width() - 60)),
+		'open' : function() {
+			var dialog = $(this);
+			// load contents after opening the dialog
+			$('iframe', dialog).attr('src', LAMS_URL + 'index.do?method=portrait&isReturnButtonHidden=true');
+			
+			// in case of mobile devices allow iframe scrolling
+			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+			    setTimeout(function() {
+			    	dialog.css({
+			    		'overflow-y' : 'scroll',
+			    		'-webkit-overflow-scrolling' : 'touch'
+			    	});
+			    },500);
+			}
+		}
+	});
+}

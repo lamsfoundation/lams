@@ -57,4 +57,9 @@ public interface ISubmitUserDAO extends IBaseDAO {
     int getCountUsersBySession(final Long sessionId, String searchString);
 
     List<StatisticDTO> getStatisticsBySession(final Long contentId);
+    
+    List<StatisticDTO> getLeaderStatisticsBySession(final Long contentId);
+    
+    List<Long> getReportsForGroup(final Long sessionId, final Long reportId);
+    
 }

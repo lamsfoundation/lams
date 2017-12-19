@@ -73,6 +73,16 @@
             column="session_name"
             length="250"
         />
+        
+        <many-to-one
+            name="groupLeader"
+            class="org.lamsfoundation.lams.tool.sbmt.SubmitUser"
+            cascade="all"
+            
+            update="true"
+            insert="true"
+            column="group_leader_uid"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

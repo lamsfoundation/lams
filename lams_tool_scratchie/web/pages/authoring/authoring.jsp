@@ -1,8 +1,6 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.scratchie.ScratchieConstants"%>
-
 
 <lams:html>
 <lams:head>
@@ -10,22 +8,32 @@
 
 	<%@ include file="/common/tabbedheader.jsp"%>
 	<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
+	<style type="text/css">
+		#confidence-levels-activity {
+			display: inline-block;
+			width: 200px;
+		}
+		#display-confidence-levels-activities {
+			margin-top: 8px;
+		}
+	</style>
 	
 	<script>
         function init(){
             var tag = document.getElementById("currentTab");
-	    	if(tag.value != "")
-	    		selectTab(tag.value);
-            else
-                selectTab(1); //select the default tab;
+		    	if (tag.value != "") {
+		    		selectTab(tag.value);
+		    	} else {
+	            selectTab(1); //select the default tab;
+		    	}
         }     
         
         function doSelectTab(tabId) {
-        	// start optional tab controller stuff
-        	var tag = document.getElementById("currentTab");
-	    	tag.value = tabId;
-	    	// end optional tab controller stuff
-	    	selectTab(tabId);	    	
+        		// start optional tab controller stuff
+        		var tag = document.getElementById("currentTab");
+	    		tag.value = tabId;
+	    		// end optional tab controller stuff
+	    		selectTab(tabId);	    	
         }
     </script>
  

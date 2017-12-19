@@ -197,7 +197,15 @@
 				<fmt:message key="progress.email.title" var="PROGRESS_EMAIL_TITLE_VAR"/>
 				PROGRESS_EMAIL_TITLE : '<c:out value="${PROGRESS_EMAIL_TITLE_VAR}" />',
 				<fmt:message key="error.date.in.past" var="ERROR_DATE_IN_PAST_VAR"/>
-				ERROR_DATE_IN_PAST : '<c:out value="${ERROR_DATE_IN_PAST_VAR}" />'
+				ERROR_DATE_IN_PAST : '<c:out value="${ERROR_DATE_IN_PAST_VAR}" />',
+				<fmt:message key="label.lesson.starts" var="LESSON_START_VAR"><fmt:param value="%0"/></fmt:message>
+				LESSON_START : '<c:out value="${LESSON_START_VAR}"/>',
+				<fmt:message key="label.lesson.finishes" var="LESSON_FINISH_VAR"><fmt:param value="%0"/></fmt:message>
+				LESSON_FINISH : '<c:out value="${LESSON_FINISH_VAR}" />',
+				<fmt:message key="lesson.display.activity.scores.alert" var="LESSON_ACTIVITY_SCORES_ENABLE_ALERT_VAR"/>
+				LESSON_ACTIVITY_SCORES_ENABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_ACTIVITY_SCORES_ENABLE_ALERT_VAR}" />').text(),
+				<fmt:message key="lesson.hide.activity.scores.alert" var="LESSON_ACTIVITY_SCORES_DISABLE_ALERT_VAR"/>
+				LESSON_ACTIVITY_SCORES_DISABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_ACTIVITY_SCORES_DISABLE_ALERT_VAR}" />').text()
 		}
 	    
 		$(document).ready(function(){
@@ -283,7 +291,7 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-sm-9 col-xs-6">
+						<div class="col-sm-9 col-xs-7">
 						
 							<!-- Lesson details -->
 							<dl id="lessonDetails" class="dl-horizontal">
@@ -295,10 +303,13 @@
 										</div>
 									</dd>
 								</c:if>
-								<dt><fmt:message key="lesson.state"/></dt>
+								<dt><fmt:message key="lesson.state"/>
+								</dt>
 								<dd>
-									<span data-toggle="collapse" data-target="#changeState" id="lessonStateLabel"></span>
-								  
+									<span data-toggle="collapse" data-target="#changeState" id="lessonStateLabel" class="lessonManageField"></span>
+								  	<span id="lessonStartDateSpan" class="lessonManageField loffset5"></span>
+								  	<span id="lessonFinishDateSpan" class="lessonManageField loffset5"></span>
+								  	 
 									<!--  Change lesson status or start/schedule start -->
 									<div class="collapse offset10" id="changeState">
 										<div id="lessonScheduler">
@@ -307,7 +318,6 @@
 													<label for="scheduleDatetimeField"><fmt:message key="lesson.start"/></label>
 													<input class="lessonManageField input-sm" id="scheduleDatetimeField" type="text"/>
 													
-													<span id="lessonStartDateSpan" class="lessonManageField"></span>
 													<a id="scheduleLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
 														   onClick="javascript:scheduleLesson()"
 														   title='<fmt:message key="button.schedule.tooltip"/>'>
@@ -324,16 +334,31 @@
 										</div>
 										
 										<div id="lessonStateChanger">
-											<select id="lessonStateField" class="btn btn-xs">
+											<select id="lessonStateField" class="btn btn-xs" onchange="lessonStateFieldChanged()">
 												<option value="-1"><fmt:message key="lesson.select.state"/></option>
 											</select>
-											<button type="button" class="btn btn-xs btn-primary"
+											<span id="lessonStateApply">
+											<button type="button" class="lessonManageField btn btn-xs btn-primary"
 													onClick="javascript:changeLessonState()"
 													title='<fmt:message key="lesson.change.state.tooltip"/>'>
 										   		<i class="fa fa-check"></i> 
 										   		<span class="hidden-xs"><fmt:message key="button.apply"/></span>
-									    	</button>
-								    	</div>					
+										    	</button>
+										    	</span>
+											<span id="lessonDisableApply">	
+												<input class="lessonManageField input-sm" id="disableDatetimeField" type="text"/>
+												<a id="scheduleDisableLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
+														   onClick="javascript:scheduleDisableLesson()"
+														   title='<fmt:message key="button.schedule.disable.tooltip"/>'>
+												   <fmt:message key="button.schedule"/>
+												</a>
+												<a id="disableLessonButton" class="btn btn-xs btn-default" href="#"
+														   onClick="javascript:disableLesson()"
+														   title='<fmt:message key="button.disable.now.tooltip"/>'>
+													   <fmt:message key="button.disable.now"/>
+												</a>
+											</span>
+								    		</div>					
 									</div>
 								</dd>
 								
@@ -365,15 +390,26 @@
 												<span class="hidden-xs"><fmt:message key="email.notifications"/></span>
 											</button>
 										</c:if>
-										
+									</div>
+									
+									<div class="btn-group btn-group-xs" role="group" id="lessonActions2">
 										<c:if test="${lesson.enableLessonIntro}">
-											<button id="editIntroButton" class="btn btn-default"
+											<button id="editIntroButton" class="btn btn-default roffset10"
 													type="button" onClick="javascript:showIntroductionDialog(${lesson.lessonID})">
 												<i class="fa fa-sm fa-info"></i>
 												<span class="hidden-xs"><fmt:message key="label.lesson.introduction"/></span>
 											</button>
 										</c:if>							  
+
+										<button id="gradebookOnCompleteButton" class="btn btn-default
+											<c:if test="${lesson.gradebookOnComplete}">
+												btn-success
+											</c:if>
+											">
+											<i class="fa fa-sm fa-list-ol"></i><span class="hidden-xs">&nbsp;<fmt:message key="label.display.activity.scores"/></span> 
+ 										</button>
 									</div>
+										
 								</dd>
 		
 								<!-- IM & Presence -->
@@ -427,7 +463,7 @@
 										</button>
 									</div>
 								</dd>
-								
+
 								<!--  encodedLessonID -->
 								<c:if test="${ALLOW_DIRECT_LESSON_LAUNCH}">
                                     <dt class="text-muted"><small><fmt:message key="lesson.learner.url"/></small></dt>

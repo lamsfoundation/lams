@@ -1,11 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
-
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
 <%-- param has higher level for request attribute --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 </c:if>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 <c:set var="scratchie" value="${sessionMap.scratchie}" />
@@ -58,14 +59,13 @@
 	
 	// set up timer for the first time
 	scratchieWebsocketPingFunc(true);
-
 	
 	// run when the server pushes new reports and vote statistics
 	scratchieWebsocket.onmessage = function(e) {
 		// create JSON object
 		var input = JSON.parse(e.data);
 
-		//time limit is expired but leader hasn't submitted required notebook/burning questions yet. Non-leaders
+		//time limit is expired but leader hasn't submitted required notebook yet. Non-leaders
         //will need to refresh the page in order to stop showing them questions page.
 		if (input.pageRefresh) {
 			location.reload();
@@ -92,6 +92,8 @@
 	</script>
 </c:if>
 
+<form id="burning-questions" name="burning-questions" method="post" action="">
+
 <c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 	<div class="lead">
 		<c:out value="${item.title}" escapeXml="true" />
@@ -103,7 +105,8 @@
 	<table id="scratches" class="table table-hover">
 		<c:forEach var="answer" items="${item.answers}" varStatus="status">
 			<tr id="tr${answer.uid}">
-				<td style="width: 40px;"><c:choose>
+				<td style="width: 40px;">
+					<c:choose>
 						<c:when test="${answer.scratched && answer.correct}">
 							<img src="<html:rewrite page='/includes/images/scratchie-correct.png'/>" class="scartchie-image"
 								 id="image-${item.uid}-${answer.uid}">
@@ -123,57 +126,93 @@
 								id="image-${item.uid}-${answer.uid}" />
 							</a>
 						</c:otherwise>
-					</c:choose> <c:if test="${(mode == 'teacher') && (answer.attemptOrder != -1)}">
+					</c:choose> 
+					
+					<c:if test="${(mode == 'teacher') && (answer.attemptOrder != -1)}">
 						<div style="text-align: center; margin-top: 2px;">
 							<fmt:message key="label.choice.number">
 								<fmt:param>${answer.attemptOrder}</fmt:param>
 							</fmt:message>
 						</div>
-					</c:if></td>
+					</c:if>
+				</td>
 
-				<td style="vertical-align: middle;"><c:out value="${answer.description}" escapeXml="false" /></td>
+				<td 
+					<c:if test="${fn:length(answer.confidenceLevelDtos) > 0}">class="answer-with-confidence-level-portrait"</c:if>
+				>
+					<c:out value="${answer.description}" escapeXml="false" />
+					
+					<c:if test="${scratchie.confidenceLevelsActivityUiid != null}">
+						<div id="user-confidence-levels">
+							<c:forEach var="confidenceLevelDto" items="${answer.confidenceLevelDtos}" varStatus="status">
+							
+								<div class="c100 p${confidenceLevelDto.level}0 small">
+									<span>
+										<c:choose>
+										<c:when test="${confidenceLevelDto.portraitUuid == null}">
+											<div class="portrait-generic-sm portrait-color-${confidenceLevelDto.userId % 7}"></div>
+										</c:when>
+										<c:otherwise>
+			    								<img class="portrait-sm portrait-round" src="${lams}download/?uuid=${confidenceLevelDto.portraitUuid}&preferDownload=false&version=4" alt="">
+										</c:otherwise>
+										</c:choose>
+									</span>
+									<div class="slice">
+										<div class="bar"></div>
+										<div class="fill"></div>
+									</div>
+									<div class="confidence-level-percentage">
+										${confidenceLevelDto.level}0%
+									</div>
+								</div>
+	    
+							</c:forEach>
+						</div>
+					</c:if>
+				</td>
 			</tr>
 		</c:forEach>
 	</table>
+	
+	<%-- show burning questions --%>
+	<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">
+		<div class="form-group burning-question-container">
+			<a data-toggle="collapse" data-target="#burning-question-item${item.uid}">
+				<i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i>
+				<fmt:message key="label.burning.question" />
+			</a>
+			
+			<div id="burning-question-item${item.uid}" class="collapse <c:if test="${not empty item.burningQuestion}">in</c:if>">
+				<textarea rows="5" name="burningQuestion${item.uid}" class="form-control"
+					<c:if test="${mode == 'teacher'}">disabled="disabled"</c:if>
+				>${item.burningQuestion}</textarea>
+			</div>
+		</div>
+	</c:if>
 
 </c:forEach>
 
-<%-- show reflection (only for teacher) --%>
-<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and (mode == 'teacher')}">
-	<div class="voffset5">
-		<div class="panel panel-default">
-			<div class="panel-heading-sm panel-title">
-				<fmt:message key="monitor.summary.td.notebookInstructions" />
-			</div>
-			<div class="panel-body-sm">
-				<div class="panel">
-					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
-				</div>
-				<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-							<fmt:message key="message.no.reflection.available" />
-					</c:when>
-					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
-					</c:otherwise>
-				</c:choose>
-			</div>
+<%-- show general burning question --%>
+<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">
+	<div class="form-group burning-question-container">
+		<a data-toggle="collapse" data-target="#burning-question-general">
+			<i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i>
+			<fmt:message key="label.general.burning.question" />
+		</a>
+
+		<div id="burning-question-general" class="collapse <c:if test="${not empty sessionMap.generalBurningQuestion}">in</c:if>">
+			<textarea rows="5" name="generalBurningQuestion" class="form-control"
+				<c:if test="${mode == 'teacher'}">disabled="disabled"</c:if>
+			>${sessionMap.generalBurningQuestion}</textarea>
 		</div>
 	</div>
 </c:if>
 
+</form>
+
 <c:if test="${mode != 'teacher'}">
 	<div class="voffset10 pull-right">
 		<c:choose>
-			<c:when test="${isUserLeader && sessionMap.isBurningQuestionsEnabled}">
-				<input type="hidden" name="method" id="method" value="showBurningQuestions">
-				<html:button property="finishButton" styleId="finishButton" onclick="return finish(false);"
-					styleClass="btn btn-sm btn-default">
-					<fmt:message key="label.continue.burning.questions" />
-				</html:button>
-			</c:when>
 			<c:when test="${isUserLeader && sessionMap.reflectOn}">
 				<input type="hidden" name="method" id="method" value="newReflection">
 				<html:button property="finishButton" styleId="finishButton" onclick="return finish(false);"

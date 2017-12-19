@@ -57,9 +57,9 @@ public class MCOutputFactory extends OutputFactory {
 
 	if (toolContentObject != null) {
 	    McContent content = (McContent) toolContentObject;
-
 	    definition = buildRangeDefinition(McAppConstants.OUTPUT_NAME_LEARNER_MARK, new Long(0),
 		    new Long(content.getTotalMarksPossible().longValue()), true);
+	    definition.setWeightable(true);
 	    definitionMap.put(McAppConstants.OUTPUT_NAME_LEARNER_MARK, definition);
 	} else {
 	    log.error(

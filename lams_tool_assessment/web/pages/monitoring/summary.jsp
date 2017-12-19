@@ -103,11 +103,7 @@
 	  			   	{name:'title', index:'title', width: 200},
 	  			   	{name:'response', index:'response', width:443, sortable:false},
 	  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
-	  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align',
-	                        formatter: function (cellvalue) {
-	                            return gradientNumberFormat(cellvalue);
-	                        }
-		  			   	},
+	  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 	  			  	</c:if>
 	  			   	{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' }
 			   	],

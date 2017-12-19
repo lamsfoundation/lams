@@ -24,29 +24,57 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-function" prefix="fn" %>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<style type="text/css">
-	.user-container {
-		padding: 2px;
-	}
-</style>
+<lams:css webapp="monitoring" suffix="monitorLesson"/>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-<lams:Page type="learner" title="${title}">
-	<div class="table-responsive">
-		<table class="table table-condensed table-hover" cellspacing="0">
-			<logic:iterate id="group" name="groups">
-				<tr>
-					<td width="15%"><strong><c:out value="${group.groupName}" /></strong></td>
-					<td><c:forEach items="${group.users}" var="user">
-							<div name="u-${user.userId}" class="user-container">
-								<lams:Portrait userId="${user.userId}"/><c:out value="${user.firstName}" />&nbsp<c:out value="${user.lastName}" />
-							</div>
-						</c:forEach>
-					</td>
-				</tr>
-			</logic:iterate>
-		</table>
-	</div>
+<lams:Page type="monitor" title="${title}">
 
+	<div class="container-fluid">
+		<c:choose>
+		<c:when test="${empty groups}">
+			<fmt:message key="label.grouping.no.groups.created"/>
+		</c:when>
+		<c:otherwise>
+		
+			<!--  4 columns (or less if fewer groups), stacks on a smaller screen -->
+			<c:set var="numGroups" value="${fn:length(groups)}"/> 
+			<c:choose>
+			<c:when test="${numGroups == 1}">
+				<c:set var="colClass">col-xs-12</c:set>
+			</c:when>
+			<c:when test="${numGroups == 2}">
+				<c:set var="colClass">col-xs-6</c:set>
+			</c:when>
+			<c:when test="${numGroups == 3}">
+				<c:set var="colClass">col-xs-4</c:set>
+			</c:when>
+			<c:otherwise>
+				<c:set var="colClass">col-md-3</c:set>
+			</c:otherwise>
+			</c:choose>
+			
+			<c:forEach items="${groups}" var="group" varStatus="groupCounter">
+			<c:if test="${(groupCounter.index mod 4) == 0}"><div class="row"></c:if>
+	 			<div class="${colClass}">
+					<h4><c:out value="${isCourseGrouping?group.name:group.groupName}" /></h4>
+					<c:choose> 
+					<c:when test="${empty group.users}">
+						<span><fmt:message key="label.no.learners"/></span>
+					</c:when>
+					<c:otherwise>
+					<table class="group-table table table-condensed table-striped">
+					<c:forEach items="${group.users}" var="user">
+						<tr><td>	<lams:Portrait userId="${user.userId}"/><span class="loffset5"><c:out value="${user.firstName} ${user.lastName}" /></span></td></tr>
+					</c:forEach>
+					</table>
+					</c:otherwise>
+					</c:choose>
+				</div>
+			<c:if test="${(groupCounter.last) or (((groupCounter.index+1) mod 4) == 0)}"></div></c:if>
+			</c:forEach> 
+		</c:otherwise>
+		</c:choose>	
+	</div>
 	<div id="footer"></div>
 </lams:Page>

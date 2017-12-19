@@ -110,6 +110,7 @@ public class McStarterAction extends Action {
 	mcAuthoringForm.setReflectionSubject(mcContent.getReflectionSubject());
 	mcAuthoringForm.setTitle(mcContent.getTitle());
 	mcAuthoringForm.setInstructions(mcContent.getInstructions());
+	mcAuthoringForm.setEnableConfidenceLevels(mcContent.isEnableConfidenceLevels());
 
 	List<McQuestionDTO> questionDtos = AuthoringUtil.buildDefaultQuestions(mcContent);
 	sessionMap.put(McAppConstants.QUESTION_DTOS, questionDtos);

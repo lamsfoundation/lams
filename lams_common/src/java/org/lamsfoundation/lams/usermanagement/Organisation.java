@@ -117,6 +117,7 @@ public class Organisation implements Serializable, Comparable {
 	this.enableGradebookForLearners = Boolean.FALSE;
 	this.enableSingleActivityLessons = Boolean.FALSE;
 	this.enableLiveEdit = Boolean.FALSE;
+	this.enableKumalive = Boolean.FALSE;
     }
 
     public Integer getOrganisationId() {

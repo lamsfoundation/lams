@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.usermanagement.service;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -51,6 +52,9 @@ import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public interface IUserManagementService {
+    static int PORTRAIT_LARGEST_DIMENSION_LARGE = 200;
+    static int PORTRAIT_LARGEST_DIMENSION_MEDIUM = 80;
+    static int PORTRAIT_LARGEST_DIMENSION_SMALL = 35;
 
     /**
      * save(insert or update)
@@ -518,10 +522,15 @@ public interface IUserManagementService {
      * Stores organisation (course) groups and removes the unnecessary ones.
      */
     void saveOrganisationGrouping(OrganisationGrouping grouping, Collection<OrganisationGroup> newGroups);
-    
+
     /**
-     * Returns the SQL needed to look up portrait details for a given user. This is an efficient way to get the entries 
-     * at the same time as retrieving the tool data, rather than making a separate lookup. 
+     * Returns the SQL needed to look up portrait details for a given user. This is an efficient way to get the entries
+     * at the same time as retrieving the tool data, rather than making a separate lookup.
      */
     String[] getPortraitSQL(String userIdString);
+
+    /**
+     * Looks for [login].png images in /tmp/portraits of user IDs within given range and starting with the given prefix
+     */
+    List<String> uploadPortraits(Integer minUserId, Integer maxUserId, String prefix) throws IOException;
 }

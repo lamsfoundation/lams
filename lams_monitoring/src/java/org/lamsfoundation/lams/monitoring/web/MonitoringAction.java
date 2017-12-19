@@ -184,6 +184,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
 	Boolean forceRestart = WebUtil.readBooleanParam(request, "forceRestart", false);
 	Boolean allowRestart = WebUtil.readBooleanParam(request, "allowRestart", false);
+	boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
 
 	Lesson newLesson = null;
 	if ((copyType != null) && copyType.equals(LearningDesign.COPY_TYPE_PREVIEW)) {
@@ -193,7 +194,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    try {
 		newLesson = getMonitoringService().initializeLesson(title, desc, ldId, organisationId, getUserId(),
 			customCSV, false, false, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, false,
-			forceRestart, allowRestart, null, null);
+			forceRestart, allowRestart, gradebookOnComplete, null, null);
 	    } catch (SecurityException e) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
@@ -289,6 +290,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean timeLimitIndividualField = WebUtil.readBooleanParam(request, "timeLimitIndividual", false);
 	Integer timeLimitIndividual = timeLimitEnable && timeLimitIndividualField ? timeLimitDays : null;
 	Integer timeLimitLesson = timeLimitEnable && !timeLimitIndividualField ? timeLimitDays : null;
+	boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
 
 	IUserManagementService userManagementService = MonitoringServiceProxy
 		.getUserManagementService(getServlet().getServletContext());
@@ -338,7 +340,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    try {
 		lesson = getMonitoringService().initializeLesson(lessonInstanceName, introDescription, ldId,
 			organisationId, userId, null, introEnable, introImage, presenceEnable, imEnable, enableLiveEdit,
-			notificationsEnable, forceRestart, allowRestart, timeLimitIndividual, precedingLessonId);
+			notificationsEnable, forceRestart, allowRestart, gradebookOnComplete, timeLimitIndividual,
+			precedingLessonId);
 
 		getMonitoringService().createLessonClassForLesson(lesson.getLessonId(), organisation,
 			learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
@@ -454,20 +457,17 @@ public class MonitoringAction extends LamsDispatchAction {
      * The purpose of suspending is to hide the lesson from learners temporarily. It doesn't make any sense to suspend a
      * created or a not started (ie scheduled) lesson as they will not be shown on the learner interface anyway! If the
      * teacher tries to suspend a lesson that is not in the STARTED_STATE, then an error should be returned to UI.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward suspendLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException, ParseException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_END_DATE, true);
 	try {
-	    getMonitoringService().suspendLesson(lessonId, getUserId());
+	    if (dateStr == null || dateStr.length() == 0)
+		getMonitoringService().suspendLesson(lessonId, getUserId(), true);
+	    else
+		getMonitoringService().finishLessonOnSchedule(lessonId,
+			MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateStr), getUserId());
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -998,13 +998,24 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate()
 		: lesson.getStartDateTime();
+	Date finishDate = lesson.getScheduleEndDate();
+	DateFormat indfm = null;
+
+	if ( startOrScheduleDate != null || finishDate != null )
+	    indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
+	
 	if (startOrScheduleDate != null) {
-	    DateFormat indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
 	    Date tzStartDate = DateUtil.convertToTimeZoneFromDefault(user.getTimeZone(), startOrScheduleDate);
 	    responseJSON.put("startDate",
 		    indfm.format(tzStartDate) + " " + user.getTimeZone().getDisplayName(userLocale));
 	}
 
+	if ( finishDate != null ) {
+	    Date tzFinishDate = DateUtil.convertToTimeZoneFromDefault(user.getTimeZone(), finishDate);
+	    responseJSON.put("finishDate",
+		    indfm.format(tzFinishDate) + " " + user.getTimeZone().getDisplayName(userLocale));	    
+	}
+	
 	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, false);
 	if (contributeActivities != null) {
 	    responseJSON.set("contributeActivities", JsonUtil.readArray(contributeActivities));
@@ -1496,6 +1507,25 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	try {
 	    getMonitoringService().togglePresenceImAvailable(lessonID, userID, presenceImAvailable);
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	}
+	return null;
+    }
+
+    /**
+     * Set whether or not the activity scores / gradebook values are shown to the learner at the end of the lesson. 
+     * Expects parameters lessonID and presenceAvailable.
+     */
+    public ActionForward gradebookOnComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+
+	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
+	Integer userID = getUserId();
+	Boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
+
+	try {
+	    getMonitoringService().toggleGradebookOnComplete(lessonID, userID, gradebookOnComplete);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}

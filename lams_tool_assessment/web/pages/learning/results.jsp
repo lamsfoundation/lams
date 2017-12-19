@@ -7,15 +7,6 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
-	<style media="screen,projection" type="text/css">
-		.slider-tick {
-			width: 0;
-			height 0;
-		}
-		.slider.slider-horizontal {
-		    margin-left: 5px;
-		}
-	</style>
 	
 	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script> 
@@ -41,6 +32,9 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$("time.timeago").timeago();
+
+			//initialize bootstrap-sliders if "Enable confidence level" option is ON
+			$('.bootstrap-slider').bootstrapSlider();
 		});
 	
 		function disableButtons() {

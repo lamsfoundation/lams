@@ -18,30 +18,31 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-	
-	<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
-	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
+
+	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="<lams:LAMSURL />/includes/font-awesome/css/font-awesome.min.css">
-	<style media="screen,projection" type="text/css">
+	<style type="text/css">
 		#reflections-div {
-			padding: 10px 0 20px;
+			padding-bottom: 20px;
 		}
 		.burning-question-dto {
 			padding-bottom: 5px; 
 		}
-		.ui-jqgrid tr.jqgrow td {
-		    white-space: normal !important;
-		    height:auto;
-		    vertical-align:text-top;
-		    padding-top:2px;
-		}
-		.ui-jqgrid tr.jqgrow td {
-			vertical-align:middle !important
-		}
+	    .ui-jqgrid tr.jqgrow td {
+	        word-wrap: break-word; /* IE 5.5+ and CSS3 */
+	        white-space: pre-wrap; /* CSS3 */
+	        white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+	        white-space: -pre-wrap; /* Opera 4-6 */
+	        white-space: -o-pre-wrap; /* Opera 7 */
+	        overflow: hidden;
+	        height: auto;
+	        vertical-align: middle;
+	        padding-top: 3px;
+	        padding-bottom: 3px
+	    }
 	</style>
 
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript">
 		function likeEntry(scratchieItemUid, rowid, burningQuestionUid) {
 			
@@ -108,8 +109,11 @@
 					height: 'auto',
 					autowidth: true,
 					shrinkToFit: false,
+					guiStyle: "bootstrap",
+					iconSet: 'fontAwesome',
 				   	colNames:[
 						'#',
+						'isUserAuthor',
 						"<fmt:message key='label.monitoring.summary.user.name' />",
 						"<fmt:message key='label.burning.questions' />",
 						"<fmt:message key='label.like' />",
@@ -117,19 +121,36 @@
 					],
 				   	colModel:[
 				   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
+				   		{name:'isUserAuthor', width:0, hidden: true},
 				   		{name:'groupName', index:'groupName', width:200},
-				   		{name:'feedback', index:'feedback', width:401},
-				   		{name:'like', index:'like', width:60, align: "center"},
+				   		{name:'burningQuestion', index:'burningQuestion', width:401, edittype: 'textarea', editoptions:{rows:"5"},
+				   			editable: function (options) {
+				   	            var item = $(this).jqGrid("getLocalRow", options.rowid);
+				   	            return ${isUserLeader} && eval(item.isUserAuthor);
+				   	        }
+						},
+				   		{name:'like', index:'like', width:60, align: "center", 
+					   		formatter:function(cellvalue, options, rowObject) {
+								return cellvalue;
+			   				}
+						},
 				   		{name:'count', index:'count', width:50, align:"right"}
 				   	],
-				   	caption: "${scratchieItem.title}"
+				   	caption: "${scratchieItem.title}",
+					cellurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItem.uid}',
+	  				cellEdit: true,
+	  				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
+	  					var itemUid = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
+	  					return {itemUid:itemUid};
+	  				}
 				});
 				
 			    <c:forEach var="burningQuestionDto" items="${burningQuestionItemDto.burningQuestionDtos}" varStatus="i">			    
-			    	jQuery("#burningQuestions${scratchieItem.uid}").addRowData(${i.index + 1}, {
+			    		jQuery("#burningQuestions${scratchieItem.uid}").addRowData(${i.index + 1}, {
 			   			id:"${i.index + 1}",
+			   			isUserAuthor:"${burningQuestionDto.userAuthor}",
 			   	     	groupName:"${burningQuestionDto.sessionName}",
-				   	    feedback:"${burningQuestionDto.escapedBurningQuestion}",
+				   	    burningQuestion:"${burningQuestionDto.escapedBurningQuestion}",
 				   	 	<c:choose>
 				   			<c:when test="${!isUserLeader && burningQuestionDto.userLiked}">
 				   				like:'<span class="fa fa-thumbs-up fa-2x"></span>',
@@ -160,9 +181,12 @@
 				height: 'auto',
 				autowidth: true,
 				shrinkToFit: false,
-			   	colNames:['#',
-						"<fmt:message key='label.monitoring.summary.user.name' />",
-					    "<fmt:message key='label.learners.feedback' />"
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
+			   	colNames:[
+				   	'#',
+					"<fmt:message key='label.monitoring.summary.user.name' />",
+					"<fmt:message key='label.learners.feedback' />"
 				],
 			   	colModel:[
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
@@ -172,7 +196,7 @@
 			   	caption: "<fmt:message key='label.other.groups' />"
 			});
 		    <c:forEach var="reflectDTO" items="${reflections}" varStatus="i">
-		    	jQuery("#reflections").addRowData(${i.index + 1}, {
+		    		jQuery("#reflections").addRowData(${i.index + 1}, {
 		   			id:"${i.index + 1}",
 		   	     	groupName:"${reflectDTO.groupName}",
 			   	    feedback:"<lams:out value='${reflectDTO.reflection}' escapeHtml='true' />"
@@ -203,9 +227,6 @@
 		}
 		function continueReflect() {
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-		}
-		function editBurningQuestions() {
-			document.location.href='<c:url value="/learning/showBurningQuestions.do?sessionMapID=${sessionMapID}"/>';
 		}
 		function refresh() {
 			location.reload();
@@ -240,13 +261,12 @@
 		</lams:Alert>
 	
 		<div class="row voffset5" >
-				<html:button property="refreshButton" onclick="return refresh();" styleClass="btn btn-default voffset5 roffset5 pull-right">
-					<fmt:message key="label.refresh" />
-				</html:button>
+			<html:button property="refreshButton" onclick="return refresh();" styleClass="btn btn-default voffset5 roffset5 pull-right">
+				<fmt:message key="label.refresh" />
+			</html:button>
 		</div>
 
 		<!-- Display burningQuestionItemDtos -->
-
 		<c:if test="${sessionMap.isBurningQuestionsEnabled}">
 			<div class="voffset5">
 				<div class="lead">
@@ -258,17 +278,12 @@
 						<table id="burningQuestions${burningQuestionItemDto.scratchieItem.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
 					</div>
 				</c:forEach>
-
-				<c:if test="${(mode != 'teacher') && isUserLeader}">
-					<html:button property="finishButton" onclick="return editBurningQuestions()" styleClass="btn btn-sm btn-default">
-						<fmt:message key="label.edit" />
-					</html:button>
-				</c:if>
 			</div>
 		</c:if>
 
+		<!-- Display reflections -->
 		<c:if test="${sessionMap.reflectOn}">
-			<div class="voffset10">
+			<div class="voffset20">
 				<div class="panel panel-default">
 					<div class="panel-heading-sm  bg-success">
 						<fmt:message key="monitor.summary.td.notebookInstructions" />
@@ -308,6 +323,7 @@
 			</div>
 		</c:if>
 
+		<!-- Display finish buttons -->
 		<c:if test="${mode != 'teacher'}">
 			<div class="voffset10 pull-right">
 				<html:link href="#nogo" property="finishButton" styleId="finishButton" onclick="return finishSession()"
@@ -325,7 +341,6 @@
 		</c:if>
 
 		<div id="footer"></div>
-		<!--closes footer-->
 	</lams:Page>
 </body>
 </lams:html>

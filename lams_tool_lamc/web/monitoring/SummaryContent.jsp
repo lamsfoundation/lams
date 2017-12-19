@@ -3,11 +3,9 @@
 
 <link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
-<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
-
-<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
-
-<style media="screen,projection" type="text/css">
+<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
+<style type="text/css">
 	.ui-jqgrid {
 		border-left-style: none !important;
 		border-right-style: none !important;
@@ -22,6 +20,7 @@
 		border-style: none !important;
 	}
 </style>
+
 <script type="text/javascript"> 
 	//pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
@@ -35,6 +34,8 @@
 		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 	};	
 </script>
+<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
+<script type="text/javascript" src="${lams}/includes/javascript/jquery.jqGrid.confidence-level-formattter.js" ></script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -54,11 +55,12 @@
 				viewrecords:true,
 			   	/* caption: "${sessionDto.sessionName}", */
 			   	colNames:[
-						'userUid',
-						'userId',
-						"<fmt:message key="label.monitoring.summary.user.name" />",
-					    "<fmt:message key="label.monitoring.summary.total" />",
-					    'portraitId'],
+					'userUid',
+					'userId',
+					"<fmt:message key="label.monitoring.summary.user.name" />",
+					"<fmt:message key="label.monitoring.summary.total" />",
+					'portraitId'
+				],
 			   	colModel:[
 			   		{name:'userUid',index:'userUid', width:0, hidden: true},
 			   		{name:'userId',index:'userId', width:0, hidden: true},
@@ -75,16 +77,16 @@
 			    	},
 			  	onSelectRow: function(rowid) { 
 			  	    if(rowid == null) { 
-			  	    	rowid=0; 
+			  	    		rowid=0; 
 			  	    } 
 			   		var userUid = jQuery("#group${sessionDto.sessionId}").getCell(rowid, 'userUid');
 					var userMasterDetailUrl = '<c:url value="/monitoring.do"/>';
 		  	        jQuery("#userSummary${sessionDto.sessionId}").clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
 		  	        $("#masterDetailArea").load(
-		  	        	userMasterDetailUrl,
-		  	        	{
-		  	        		dispatch: "userMasterDetail",
-		  	        		userUid: userUid
+		  	        		userMasterDetailUrl,
+		  	        		{
+		  	        			dispatch: "userMasterDetail",
+		  	        			userUid: userUid
 		  	       		}
 		  	       	);
 	  	  		} 
@@ -104,21 +106,27 @@
 				autowidth: true,
 				shrinkToFit: true,
 				caption: "<fmt:message key="label.monitoring.summary.learner.summary" />",
-			   	colNames:['#',
-						'userAttemptUid',
-  						'Question',
-  						"<fmt:message key="label.monitoring.user.summary.response" />",
-  						"<fmt:message key="label.monitoring.user.summary.grade" />"],
-					    
+			   	colNames:[
+				   	'#',
+					'userAttemptUid',
+  					'Question',
+  					"<fmt:message key="label.monitoring.user.summary.response" />",
+  					<c:if test="${enableConfidenceLevels}">
+						"<fmt:message key="label.confidence" />",
+					</c:if>
+  					"<fmt:message key="label.monitoring.user.summary.grade" />"
+  				],   
 			   	colModel:[
-	  			   		{name:'id', index:'id', width:20, sorttype:"int"},
-	  			   		{name:'userAttemptUid', index:'userAttemptUid', width:0, hidden: true},
-	  			   		{name:'title', index:'title', width: 200},
-	  			   		{name:'response', index:'response', width:443, sortable:false},
-	  			   		{name:'grade', index:'grade', width:80, sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }
+	  			   	{name:'id', index:'id', width:20, sorttype:"int"},
+	  			   	{name:'userAttemptUid', index:'userAttemptUid', width:0, hidden: true},
+	  			   	{name:'title', index:'title', width: 200},
+	  			   	{name:'response', index:'response', width:443, sortable:false},
+	  			   	<c:if test="${enableConfidenceLevels}">
+	  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
+	  			  	</c:if>
+	  			   	{name:'grade', index:'grade', width:80, sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }
 			   	],
 			   	multiselect: false,
-
 				cellurl: '<c:url value="/monitoring.do?dispatch=saveUserMark"/>',
   				cellEdit: true,
   				afterEditCell: function (rowid,name,val,iRow,iCol){

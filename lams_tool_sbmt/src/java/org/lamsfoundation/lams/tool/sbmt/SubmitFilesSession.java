@@ -62,6 +62,8 @@ public class SubmitFilesSession implements Serializable, Cloneable {
     /** persistent field, but not cloned to avoid to clone block */
     private SubmitFilesContent content;
 
+    private SubmitUser groupLeader;
+    
     /** full constructor */
     public SubmitFilesSession(Long sessionID, int status) {
 	this.sessionID = sessionID;
@@ -197,5 +199,13 @@ public class SubmitFilesSession implements Serializable, Cloneable {
      */
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
+    }
+    
+    public SubmitUser getGroupLeader() {
+   	return groupLeader;
+    }
+
+    public void setGroupLeader(SubmitUser groupLeader) {
+   	this.groupLeader = groupLeader;
     }
 }

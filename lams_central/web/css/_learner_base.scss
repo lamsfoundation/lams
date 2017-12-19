@@ -589,7 +589,6 @@ a.button-add-item:before {
 	nav.sidebar{
 		  border-radius: $border-radius-large;
 		  box-shadow: $panel-box-shadow;
-		  min-height:300px;
 	}
  
 	/*Center Brand*/
@@ -611,11 +610,6 @@ a.button-add-item:before {
 	nav.sidebar.slidesidemenu{
 		padding:10px 10px 10px 12px;
 	}
-	/*Hide text when compressed*/
-	nav.sidebar p{
-		padding-right: 35px;
-		text-align: center;
-	}
  
 	/* colour in top box to match panel heading */
 	nav.sidebar .navbar-nav > li:first-child{
@@ -636,7 +630,6 @@ a.button-add-item:before {
 	nav.sidebar .navbar-collapse, nav.sidebar .container-fluid{
 		padding: 0 0px 0 0px;
 		border:2px solid transparent;
-		box-shadow: $panel-box-shadow;
 	}
 
 	/*gives sidebar width/height*/
@@ -645,7 +638,7 @@ a.button-add-item:before {
 		height: 100%;
 		margin-left: -135px;
 		float: left;
-		z-index: 8000;
+		z-index: 1000;
 		margin-top: 0px;
 		margin-bottom: 0px;
 	}
@@ -677,6 +670,33 @@ a.button-add-item:before {
 	
 }
 
+/*alter portrait for displaying it in collapsed pregress bar*/
+@media (min-width: 768px) and (max-width: 1329px) {
+	
+	nav.sidebar:not(.expandmenu) #navbar-portrait {
+		float: right;
+    		padding: 5px 0 0;
+	}
+
+	nav.sidebar:not(.expandmenu) #navbar-portrait img{
+		border: 4px solid whitesmoke;
+	}
+
+	nav.sidebar:not(.expandmenu) .portrait-generic-sm::before{
+		font-size: 30px;
+		margin-right: 3px;
+	}
+
+	nav.sidebar:not(.expandmenu) p{
+		padding-right: 35px;
+	}
+}
+
+/*in case when portrait is not shown in a progress bar - give extra space to hamburger button*/
+nav.sidebar p.no-portrait{
+	padding-right: 35px;
+}
+
 /* .....NavBar: Fully showing nav bar..... */
 
 @media (min-width: 1330px) {
@@ -698,6 +718,11 @@ a.button-add-item:before {
 	nav.sidebar .forAnimate{
 		opacity: 1;
 	}
+}
+
+/* center portrait */
+nav.sidebar .navbar-nav > li:first-child{
+	text-align: center;
 }
 
 nav.sidebar .navbar-nav .open .dropdown-menu>li>a:hover, nav.sidebar .navbar-nav .open .dropdown-menu>li>a:focus {
@@ -791,23 +816,6 @@ div.growlUI h1,div.growlUI h2 {
     @include box-shadow(0 5px 10px rgba(0,0,0,.2));
 }
 
-// Popovers used in Gradebook to display portraits
-// popover links forced to be the usual link color or jqgrid can interfere
-.popover-link {
-    color: $a-link-default !important;
-}
-
-.popover-link:hover {
-    color: $a-link-default-hover !important;
-}
-
-.popover-link:focus {
-    color: $a-link-default-focus !important;
-}
-
-.popover-title {
-	background-color: $gray-light-mid;
-}
 
 // clickable panel created in CKEditor
 .lams-bootpanel .clickable {
@@ -1080,4 +1088,27 @@ $portrait-size-image-xl: 400px;
 	h4 {
 	    margin-bottom: 0px;
 	}
+}
+
+// Popovers used in Gradebook to display portraits
+// popover links forced to be the usual link color or jqgrid can interfere
+.popover-link {
+    color: $a-link-default !important;
+}
+
+.popover-link:hover {
+    color: $a-link-default-hover !important;
+}
+
+.popover-link:focus {
+    color: $a-link-default-focus !important;
+}
+
+.popover-title {
+	background-color: $gray-light-mid;
+}
+
+.popover-content-with-portrait {
+	min-height: $portrait-size-image-lg + 20;
+	min-width:  $portrait-size-image-lg + 20;
 }

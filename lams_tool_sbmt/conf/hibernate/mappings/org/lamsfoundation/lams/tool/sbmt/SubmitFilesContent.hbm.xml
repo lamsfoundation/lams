@@ -103,6 +103,14 @@
             insert="true"
             column="limit_upload_number"
         />
+        
+        <property
+            name="useSelectLeaderToolOuput"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="use_select_leader_tool_ouput"
+        />
 
         <property
             name="created"

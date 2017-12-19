@@ -506,7 +506,7 @@
                  	<access-log pattern="combined" />
                 </host>
             </server>
-            <servlet-container name="default" default-encoding="UTF-8">
+            <servlet-container name="default" default-encoding="UTF-8" disable-caching-for-secured-pages="false">
                 <jsp-config x-powered-by="false" development="true" trim-spaces="true"/>
                 <websockets/>
             </servlet-container>

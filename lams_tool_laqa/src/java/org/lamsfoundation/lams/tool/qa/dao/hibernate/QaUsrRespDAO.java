@@ -234,10 +234,13 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	}
 	query.setLong("questionId", questionId.longValue())
 		.setLong("qaSessionId", qaSessionId.longValue())
-    		.setLong("excludeUserId", excludeUserId.longValue())
-    		.setFirstResult(page * size)
-    		.setMaxResults(size);
+    		.setLong("excludeUserId", excludeUserId.longValue());
 
+	if ( size > 0 ) {
+	    query.setFirstResult(page * size);
+	    query.setMaxResults(size);
+	}
+	
 	List<Object[]> list = (List<Object[]>) query.list();
 	List<QaUsrResp> respList = new ArrayList<QaUsrResp>(list.size());
 	for ( Object[] row : list ) {

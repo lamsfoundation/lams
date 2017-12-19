@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scratchie.service;
 
 import java.util.List;
@@ -33,7 +32,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 
 public class ScratchieOutputFactory extends OutputFactory {
@@ -62,24 +60,14 @@ public class ScratchieOutputFactory extends OutputFactory {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 
 	if (toolContentObject != null) {
-
 	    Scratchie scratchie = (Scratchie) toolContentObject;
-	    int itemsNumber = scratchie.getScratchieItems().size();
 
 	    // calculate totalMarksPossible
-	    String presetMarks = scratchieService.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS).getConfigValue();
-	    String[] presetMarksArray = presetMarks.split(",");
-	    long totalMarksPossible = (presetMarksArray.length > 0)
-		    ? itemsNumber * Integer.parseInt(presetMarksArray[0]) : 0;
-
-	    // count in extra point if this option is ON
-
-	    if (scratchie.isExtraPoint()) {
-		totalMarksPossible += itemsNumber;
-	    }
+	    long maxPossibleScore = scratchieService.getMaxPossibleScore(scratchie);
 
 	    ToolOutputDefinition definition = buildRangeDefinition(ScratchieConstants.LEARNER_MARK, new Long(0),
-		    totalMarksPossible, true);
+		    maxPossibleScore, true);
+	    definition.setWeightable(true);
 	    definitionMap.put(ScratchieConstants.LEARNER_MARK, definition);
 
 	}

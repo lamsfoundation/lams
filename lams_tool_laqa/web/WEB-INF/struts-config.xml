@@ -296,7 +296,11 @@
 	      parameter="dispatch"
 	      unknown="false"
 	      validate="true">
-
+	  	<forward
+		    name="PrintAnswers"
+		    path="/monitoring/PrintAnswers.jsp"
+		    redirect="false"
+	  	/>
 	</action>
 	
 	<action path="/clearsession" type="org.lamsfoundation.lams.tool.qa.web.action.ClearSessionAction">

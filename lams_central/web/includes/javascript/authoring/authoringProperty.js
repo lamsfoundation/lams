@@ -715,9 +715,14 @@ var PropertyDefs = {
 						$.each(activity.outputDefinitions, function(){
 							if (this.name == activity.gradebookToolOutputDefinitionName) {
 								activity.gradebookToolOutputDefinitionDescription = this.description;
+								activity.gradebookToolOutputDefinitionWeightable = this.weightable;
 								return false;
 							}
 						});
+					} else {
+						activity.gradebookToolOutputDefinitionDescription = null;
+						activity.gradebookToolOutputDefinitionWeightable = false;
+						activity.gradebookToolOutputDefinitionWeight = null;
 					}
 				}
 				

@@ -80,6 +80,9 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	    + "from LearnerProgress prog WHERE prog.currentActivity.activityId IN (:activityIds) "
 	    + "GROUP BY prog.currentActivity.activityId";
 
+    private final static String COUNT_SINGLE_CURRENT_ACTIVITY = "select count(*) from LearnerProgress prog "
+	    + "WHERE prog.currentActivity.activityId = :activityId ";
+
     private final static String LOAD_PROGRESS_BY_LESSON = "from LearnerProgress p "
 	    + " where p.lesson.id = :lessonId order by p.user.lastName, p.user.firstName, p.user.userId";
 
@@ -344,6 +347,15 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	}
 	return result;
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Integer getNumUsersCurrentActivity(Activity activity) {
+	Object value = getSession().createQuery(LearnerProgressDAO.COUNT_SINGLE_CURRENT_ACTIVITY)
+		.setLong("activityId", activity.getActivityId().longValue()).uniqueResult();
+	return new Integer(((Number) value).intValue());
+    }
+
 
     @Override
     public Integer getLearnerProgressArchiveMaxAttemptID(Integer userId, Long lessonId) {

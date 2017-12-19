@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" scope="request" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" scope="request" />
 <c:set var="mode" value="${sessionMap.mode}" scope="request" />
@@ -14,13 +12,13 @@
 <lams:head>
 	<title><fmt:message key="activity.title" /></title>
 	<lams:css />
+	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
 	<style media="screen,projection" type="text/css">
-
 		div.growlUI h1, div.growlUI h2 {
-		color: white;
-		margin: 5px 5px 5px 0px;
-		text-align: center;
-		font-size: 18px;
+			color: white;
+			margin: 5px 5px 5px 0px;
+			text-align: center;
+			font-size: 18px;
 		}
 	</style>
 
@@ -28,7 +26,13 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
 	<script type="text/javaScript">
+
+		$(document).ready(function() {
+			//initialize bootstrap-sliders if "Enable confidence level" option is ON
+			$('.bootstrap-slider').bootstrapSlider();
+		});
 
         //autoSaveAnswers if hasEditRight
         if (${hasEditRight}) {

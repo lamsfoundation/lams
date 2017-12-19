@@ -12,6 +12,9 @@
  	   	   		userAttemptUid: "${userAttempt.uid}",
  	   	   		title: "${userAttempt.mcQueContent.escapedQuestion}",
  	   	   		response: "${userAttempt.mcOptionsContent.escapedOptionText}",
+ 	   	   		<c:if test="${content.enableConfidenceLevels}">
+	   	   			confidence: "${userAttempt.confidenceLevel}",
+	   	   		</c:if>
  	   	   		grade: "<fmt:formatNumber value='${userAttempt.mark}' maxFractionDigits='3'/>"
  	   	   	 });
  	     	

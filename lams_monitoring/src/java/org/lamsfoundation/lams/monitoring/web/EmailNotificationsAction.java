@@ -27,7 +27,10 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -43,8 +46,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.util.LessonComparator;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
@@ -58,6 +64,9 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.ExcelUtil;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -109,6 +118,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
     /**
      * Shows "Email notification" page for particular lesson.
      */
+    @SuppressWarnings("unchecked")
     public ActionForward getLessonView(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
@@ -127,7 +137,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	Set activities = lesson.getLearningDesign().getActivities();
+	Set<Activity> activities = lesson.getLearningDesign().getActivities();
 	request.setAttribute("lesson", lesson);
 	request.setAttribute("activities", activities);
 
@@ -137,6 +147,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
     /**
      * Shows "Email notification" page for particular course.
      */
+    @SuppressWarnings("unchecked")
     public ActionForward getCourseView(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	int orgId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
@@ -192,7 +203,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    }
 	} else {
 	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
-		    "show scheduled course course email notifications", false)) {
+		    "show scheduled course email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
 	    }
@@ -237,6 +248,99 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	request.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
 
 	return mapping.findForward("scheduledEmailList");
+    }
+
+    /**
+     * Renders a page listing all archived emails.
+     */
+    public ActionForward showArchivedEmails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, SchedulerException {
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
+	boolean isLessonNotifications = (lessonId != null);
+	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
+	if (isLessonNotifications) {
+	    if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
+		    "show archived lesson email notifications", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
+		return null;
+	    }
+
+	    List<EmailNotificationArchive> notifications = monitoringService.getArchivedEmailNotifications(lessonId);
+	    request.setAttribute("notifications", notifications);
+	} else {
+	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
+		    "show archived course email notifications", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
+		return null;
+	    }
+	    List<EmailNotificationArchive> notifications = monitoringService
+		    .getArchivedEmailNotifications(organisationId);
+	    request.setAttribute("notifications", notifications);
+	}
+
+	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
+	request.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
+
+	return mapping.findForward("archivedEmailList");
+    }
+
+    public ActionForward getArchivedRecipients(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
+
+	Long emailNotificationUid = WebUtil.readLongParam(request, "emailNotificationUid");
+	EmailNotificationArchive notification = (EmailNotificationArchive) getUserManagementService()
+		.findById(EmailNotificationArchive.class, emailNotificationUid);
+
+	Long lessonId = notification.getLessonId();
+	Integer organisationId = notification.getOrganisationId();
+	boolean isLessonNotifications = (lessonId != null);
+	// check if the user is allowed to fetch this data
+	if (isLessonNotifications) {
+	    if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
+		    "show archived lesson email notification participants", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
+		return null;
+	    }
+	} else {
+	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
+		    "show archived course email notification participants", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
+		return null;
+	    }
+	}
+
+	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
+
+	// get only recipients we want on the page
+	List<User> recipients = monitoringService.getArchivedEmailNotificationRecipients(emailNotificationUid, rowLimit,
+		(page - 1) * rowLimit);
+
+	// build JSON which is understood by jqGrid
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put(GradebookConstants.ELEMENT_PAGE, page);
+	responseJSON.put(GradebookConstants.ELEMENT_TOTAL, ((notification.getRecipients().size() - 1) / rowLimit) + 1);
+	responseJSON.put(GradebookConstants.ELEMENT_RECORDS, recipients.size());
+
+	ArrayNode rowsJSON = JsonNodeFactory.instance.arrayNode();
+	for (User recipient : recipients) {
+	    ObjectNode rowJSON = JsonNodeFactory.instance.objectNode();
+	    rowJSON.put(GradebookConstants.ELEMENT_ID, recipient.getUserId());
+
+	    ArrayNode cellJSON = JsonNodeFactory.instance.arrayNode();
+	    cellJSON.add(recipient.getFirstName() + " " + recipient.getLastName() + " [" + recipient.getLogin() + "]");
+
+	    rowJSON.set(GradebookConstants.ELEMENT_CELL, cellJSON);
+	    rowsJSON.add(rowJSON);
+	}
+
+	responseJSON.set(GradebookConstants.ELEMENT_ROWS, rowsJSON);
+	writeResponse(response, "text/json", LamsDispatchAction.ENCODING_UTF8, responseJSON.toString());
+	return null;
     }
 
     /**
@@ -312,6 +416,51 @@ public class EmailNotificationsAction extends LamsDispatchAction {
     }
 
     /**
+     * Exports the given archived email notification to excel.
+     */
+    public ActionForward exportArchivedNotification(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
+
+	Long emailNotificationUid = WebUtil.readLongParam(request, "emailNotificationUid");
+	EmailNotificationArchive notification = (EmailNotificationArchive) getUserManagementService()
+		.findById(EmailNotificationArchive.class, emailNotificationUid);
+
+	Long lessonId = notification.getLessonId();
+	Integer organisationId = notification.getOrganisationId();
+	boolean isLessonNotifications = (lessonId != null);
+	// check if the user is allowed to fetch this data
+	if (isLessonNotifications) {
+	    if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
+		    "export archived lesson email notification", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
+		return null;
+	    }
+	} else {
+	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
+		    "export archived course email notification", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
+		return null;
+	    }
+	}
+
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = monitoringService
+		.exportArchivedEmailNotification(emailNotificationUid);
+	String fileName = "email_notification_"
+		+ FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(notification.getSentOn()) + ".xlsx";
+	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
+
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+	ExcelUtil.createExcel(response.getOutputStream(), dataToExport,
+		monitoringService.getMessageService().getMessage("export.dateheader"), false);
+	return null;
+
+    }
+
+    /**
      * Method called via Ajax. It either emails selected users or schedules these emails to be sent on specified date.
      */
     public ActionForward emailUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -330,14 +479,20 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	if (scheduleDateParameter == null) {
 	    boolean isSuccessfullySent = true;
 	    String[] userIdStrs = request.getParameterValues("userId");
+	    Set<Integer> userIdInts = new HashSet<Integer>();
 	    for (String userIdStr : userIdStrs) {
 		int userId = Integer.parseInt(userIdStr);
+		userIdInts.add(userId);
 		boolean isHtmlFormat = false;
 		isSuccessfullySent &= getEventNotificationService().sendMessage(null, userId,
 			IEventNotificationService.DELIVERY_METHOD_MAIL, monitoringService.getMessageService()
 				.getMessage("event.emailnotifications.email.subject", new Object[] {}),
 			emailBody, isHtmlFormat);
 	    }
+	    monitoringService.archiveEmailNotification(
+		    WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true),
+		    WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true),
+		    WebUtil.readIntParam(request, "searchType", true), emailBody, userIdInts);
 
 	    ObjectNode.put("isSuccessfullySent", isSuccessfullySent);
 
@@ -349,9 +504,6 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    try {
 		Calendar now = Calendar.getInstance();
 
-		Map<String, Object> searchParameters = new HashMap<>();
-		copySearchParametersFromRequestToMap(request, searchParameters);
-
 		// calculate scheduleDate
 		Date scheduleDateTeacherTimezone = new Date(scheduleDateParameter);
 		TimeZone teacherTimeZone = getCurrentUser().getTimeZone();
@@ -362,6 +514,9 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 			.withIdentity(EmailNotificationsAction.JOB_PREFIX_NAME + now.getTimeInMillis())
 			.withDescription("schedule email message to user(s)").usingJobData("emailBody", emailBody)
 			.build();
+
+		Map<String, Object> searchParameters = new HashMap<String, Object>();
+		copySearchParametersFromRequestToMap(request, searchParameters);
 		searchParameters.forEach(emailScheduleMessageJob.getJobDataMap()::putIfAbsent);
 
 		// create customized triggers

@@ -29,7 +29,10 @@
       name="emailForm"
       type="org.lamsfoundation.lams.web.EmailForm"
     />
-
+   <form-bean
+      name="uploadForm"
+      type="org.lamsfoundation.lams.monitoring.web.FileUploadForm"
+    />
    <form-bean
   name="PedagogicalPlannerGroupingForm"
   type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerGroupingForm"
@@ -787,6 +790,19 @@
 		scope="request">
 		<!--  JSON response on success -->
 	</action>
+	<action
+      path="/groupingUpload"
+      type="org.lamsfoundation.lams.monitoring.web.GroupingUploadAJAXAction"
+      name="uploadForm"
+      parameter="method"
+	  scope="request"
+      validate="false"
+    >
+		<!--  text response on success -->
+    </action>
+
+
+
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

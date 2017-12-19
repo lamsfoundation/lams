@@ -91,13 +91,13 @@
 			    		if (marksReleased) {
 			    			marksReleased = false;
 			    		} else {
-			    			marksReleased = true;
-			    		}
-			    		displayReleaseOption();
-			    	} else {
-			    		
-			    		$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.releasemarks.fail"/>", "<fmt:message key="label.ok"/>");
-			    	}
+		    			marksReleased = true;
+		    		}
+		    		displayReleaseOption();
+		    	} else {
+		    		
+		    		alert("<fmt:message key="error.releasemarks.fail"/>");
+		    	}
 			    });
 		    }
 		}
@@ -185,8 +185,8 @@
 			      {name:'portraitId', index:'portraitId', width:0, hidden: true}
 			      ],
 			    loadError: function(xhr,st,err) {
-			    	jQuery("#userView").clearGridData();
-			    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+				    	jQuery("#userView").clearGridData();
+				    	alert("<fmt:message key="gradebook.error.loaderror"/>");
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -230,8 +230,8 @@
 								{name:'mark', index:'mark', sortable:true, editable: true, editrules:{number:true}, width:50, align:"center" }
 						     ],
 						     loadError: function(xhr,st,err) {
-						    	jQuery("#"+subgrid_table_id).clearGridData();
-						    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+						    		jQuery("#"+subgrid_table_id).clearGridData();
+						 	 	alert("<fmt:message key="gradebook.error.loaderror"/>");
 						     },
 						     formatCell: function(rowid, cellname,value, iRow, iCol) {
 					    	 	if (cellname == "mark") {
@@ -271,7 +271,7 @@
 					    	 		var currRowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
 						     		if (currRowData['marksAvailable'] != null && currRowData['marksAvailable'] != "") {
 						     			if (parseFloat(value) > parseFloat(currRowData['marksAvailable'])){
-						     				$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.markhigher"/>", "<fmt:message key="label.ok"/>");
+						     				displayCellErrorMessage(jQuery("#"+subgrid_table_id)[0], iRow, iCol, "<fmt:message key="label.error"/>", "<fmt:message key="error.markhigher"/>", "<fmt:message key="label.ok"/>");
 						     				jQuery("#"+subgrid_table_id).restoreCell( iRow, iCol);
 						     				throw("Mark must be lower than maximum mark");
 						     			}
@@ -299,7 +299,7 @@
 						     	}
 						     },
 						     errorCell: function(serverresponse, status) {
-						     	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.cellsave"/>", "<fmt:message key="label.ok"/>");
+						     	alert("<fmt:message key="error.cellsave"/>");
 						     },
 							 gridComplete: function(){
 							 	toolTip($(".jqgrow"), "jqgridTooltip");
@@ -351,9 +351,9 @@
 				      {name:'avgMark',index:'avgMark', sortable:true, editable:false, width:50, align:"center"}
 				    ],
 				    loadError: function(xhr,st,err) {
-			    		jQuery("#activityView").clearGridData();
-			    		$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
-			    	},
+			    			jQuery("#activityView").clearGridData();
+			    			alert("<fmt:message key="gradebook.error.loaderror"/>");
+			    		},
 				    subGrid: true,
 					subGridRowExpanded: function(subgrid_id, row_id) {
 					   var subgrid_table_id;
@@ -404,9 +404,9 @@
 						     	{name:'activityURL', index:'activityURL', width:0, hidden: true}
 						     ],
 						     loadError: function(xhr,st,err) {
-					    		jQuery("#"+subgrid_table_id).clearGridData();
-					    		$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
-					    	 },
+						    		jQuery("#"+subgrid_table_id).clearGridData();
+						    		alert("<fmt:message key="gradebook.error.loaderror"/>");
+						    	 },
 					    	 formatCell: function(rowid, cellname,value, iRow, iCol) {
 					    	 	if (cellname == "mark") {
 					    	 		
@@ -444,7 +444,7 @@
 					    	 		var currRowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
 						     		if (currRowData['marksAvailable'] != null && currRowData['marksAvailable'] != "") {
 						     			if (parseFloat(value) > parseFloat(currRowData['marksAvailable'])){
-						     				$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.markhigher"/>", "<fmt:message key="label.ok"/>");
+						     				displayCellErrorMessage(jQuery("#"+subgrid_table_id)[0], iRow, iCol, "<fmt:message key="label.error"/>", "<fmt:message key="error.markhigher"/>", "<fmt:message key="label.ok"/>");
 						     				jQuery("#"+subgrid_table_id).restoreCell( iRow, iCol);
 						     				throw("Mark must be lower than maximum mark");
 						     			}
@@ -468,7 +468,7 @@
 						     	}
 						     },
 						     errorCell: function(serverresponse, status) {
-						     	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.cellsave"/>", "<fmt:message key="label.ok"/>");
+						     	alert("<fmt:message key="error.cellsave"/>");
 						     },
 							 gridComplete: function(){
 							 	toolTip($(".jqgrow"), "jqgridTooltip");	// applying tooltips for this grid
@@ -506,12 +506,12 @@
 		        })
 
 		        	function userNameFormatter (cellvalue, options, rowObject) {
-					return definePortraitPopover(rowObject[8].innerHTML, rowObject.id, cellvalue);
+					return definePortraitPopover(rowObject[8].innerHTML, rowObject.id, cellvalue, cellvalue, true);
 				}
 
 		        // Combine portraits with activityURL. Both are optional so it is mix and match.
 	       	 	function userNameFormatterActivity (cellvalue, options, rowObject) {
-	       	 		var portProcessed = definePortraitPopover(rowObject[9].innerHTML, rowObject.id, cellvalue);
+	       	 		var portProcessed = definePortraitPopover(rowObject[9].innerHTML, rowObject.id, cellvalue, cellvalue, true);
 	       	 		if ( rowObject.children.length > 10 && rowObject[10].innerHTML.length > 0 ) {
 	       	 			var activityURL = rowObject[10].innerHTML;
 	       	 			if ( portProcessed.indexOf('<a') != -1 ) {

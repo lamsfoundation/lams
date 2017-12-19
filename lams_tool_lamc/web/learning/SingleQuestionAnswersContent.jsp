@@ -36,7 +36,9 @@
 										<tr>
 											<td class="text-nowrap" style="vertical-align: top;">
 												<input type="radio"	id="${dto.questionUid}-${option.uid}" name="checkedCa" class="noBorder"
-												value="${dto.questionUid}-${option.uid}" <c:if test="${option.selected}">checked="checked"</c:if> /> 
+														value="${dto.questionUid}-${option.uid}" 
+														<c:if test="${option.selected}">checked="checked"</c:if> 
+												/> 
 												<c:if test="${isPrefixAnswersWithLetters}">
 													<c:set var="seqLetter" value="${status.index}" />
 													<%=Character.toChars(97 + (Integer) pageContext.getAttribute("seqLetter"))%>)
@@ -51,6 +53,24 @@
 
 										</tr>
 									</c:forEach>
+									
+									<c:if test="${sessionMap.content.enableConfidenceLevels}">
+						                <tr>
+						                  <td colspan="2">
+						                  	<div class="question-type">
+												<fmt:message key="label.what.is.your.confidence.level" />
+											</div>
+						
+											<div>
+												<input name="confidenceLevel${dto.questionUid}" class="bootstrap-slider" type="text" 
+													data-slider-ticks="[0, 5, 10]" data-slider-ticks-labels='["0", "50", "100%"]' 
+													data-slider-enabled="true" data-slider-tooltip="hide"
+													<c:if test="${dto.confidenceLevel != -1}">data-slider-value="${dto.confidenceLevel}"</c:if>
+												/>
+											</div>
+						                  </td>
+						                </tr>
+					                </c:if>
 
 								</tbody>
 							</table>

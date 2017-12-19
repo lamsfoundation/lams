@@ -215,7 +215,7 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
 	this.getSession().delete(activity);
     }
 
-    /**
+    /*
      * @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getActivityByUIID(java.lang.Integer,
      *      org.lamsfoundation.lams.learningdesign.LearningDesign)
      */
@@ -231,7 +231,7 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
 	return null;
     }
 
-    /**
+    /*
      * @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getActivitiesByLibraryID(java.lang.Long)
      */
     @Override
@@ -240,7 +240,7 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
 	return list;
     }
 
-    /** @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getTemplateActivityByLibraryID(java.lang.Long) */
+    /* @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getTemplateActivityByLibraryID(java.lang.Long) */
     @Override
     public Activity getTemplateActivityByLibraryID(Long libraryID) {
 	List list = this.doFind(ActivityDAO.FIND_BY_LIBRARY_ID, libraryID);

@@ -17,10 +17,11 @@
         }     
         
         function doSelectTab(tabId) {
-	    	// end optional tab controller stuff
-	    	if ( tabId == 3 )
-	    		doStatistic();
-	    	selectTab(tabId);
+		    	// end optional tab controller stuff
+		    	if ( tabId == 3 ) {
+		    		doStatistic();
+		    	}
+		    	selectTab(tabId);
         }
 
 		function doStatistic(){

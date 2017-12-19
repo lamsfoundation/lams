@@ -104,7 +104,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				var youUser = document.getElementsByName('u-${userId}');
 				if (youUser) {
 					youUser[0].className += ' alert-info you';
-					document.getElementsByName('ui-${userId}')[0].className = 'fa fa-sm fa-star';
 				}
 			}
 			window.onload = codeAddress;

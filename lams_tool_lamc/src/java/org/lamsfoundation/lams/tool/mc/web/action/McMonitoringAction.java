@@ -260,6 +260,7 @@ public class McMonitoringAction extends LamsDispatchAction {
 	    }
 	}
 
+	request.setAttribute(McAppConstants.ATTR_CONTENT, user.getMcSession().getMcContent());
 	request.setAttribute(McAppConstants.USER_ATTEMPTS, userAttempts);
 	request.setAttribute(McAppConstants.TOOL_SESSION_ID, user.getMcSession().getMcSessionId());
 	return (userAttempts == null || userAttempts.isEmpty()) ? null

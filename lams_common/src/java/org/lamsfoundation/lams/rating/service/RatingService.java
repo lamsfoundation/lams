@@ -787,6 +787,15 @@ public class RatingService implements IRatingService {
     public String getRatingSelectJoinSQL(Integer ratingStyle, boolean getByUser) {
 	return ratingDAO.getRatingSelectJoinSQL(ratingStyle, getByUser);
     }
+    
+    /** 
+     * Get all the raw ratings for a combination of criteria and item ids. Used by Peer Review to do SPA analysis.
+     */
+    @Override
+    public List getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds) {
+	return ratingDAO.getRatingsByCriteriasAndItems(ratingCriteriaIds, itemIds);
+    }
+
     /* ********** Used by Spring to "inject" the linked objects ************* */
 
     public void setRatingDAO(IRatingDAO ratingDAO) {

@@ -51,6 +51,8 @@
 	<c:forEach var="question" items="${questionDTOs}">
 		<div class="panel panel-default"">
 			<div class="panel-heading">
+				<a href="javascript:launchPopup('<html:rewrite page="/monitoring.do?dispatch=getPrintAnswers&questionUid=${question.uid}&toolSessionID=${groupDto.sessionId}"/>');"	
+					id="printAnswers" class="btn btn-default btn-xs pull-right"><i class="fa fa-print"></i></a>
 				<c:out value="${question.question}" escapeXml="false"/>
 			</div>
 			<lams:TSTable numColumns="${content.allowRateAnswers ? (isCommentsEnabled ? 3 : 2) : (isCommentsEnabled ? 2 : 1)}"

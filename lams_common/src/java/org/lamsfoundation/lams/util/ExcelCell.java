@@ -42,6 +42,7 @@ public class ExcelCell {
     
     private Object cellValue;
     private Boolean isBold;
+    private Boolean isPercentage = false;
     private IndexedColors color;
     private int borderStyle = 0;
     private int alignment = 0;
@@ -88,7 +89,16 @@ public class ExcelCell {
 	this.isBold = isBold;
     }
 
-    public IndexedColors getColor() {
+    public Boolean isPercentage() {
+ 	return isPercentage;
+     }
+
+     public ExcelCell setIsPercentage(Boolean isPercentage) {
+ 	this.isPercentage = isPercentage;
+ 	return this;
+     }
+
+     public IndexedColors getColor() {
 	return color;
     }
 
