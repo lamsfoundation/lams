@@ -182,10 +182,6 @@ a#tutorialVideoHref:hover {
 	cursor: pointer;
 }
 
-img#tutorialVideoImg {
-	border: none;
-}
-
 #content a.activityButton {
 	border: none;
 	text-decoration: none;
