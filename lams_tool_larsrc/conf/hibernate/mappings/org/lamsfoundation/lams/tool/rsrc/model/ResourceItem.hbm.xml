@@ -195,6 +195,14 @@
             column="is_allow_rating"
         />
 
+        <property
+            name="allowComments"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="is_allow_comments"
+        />
+
 
         <!--
             To add non XDoclet property mappings, create a file named

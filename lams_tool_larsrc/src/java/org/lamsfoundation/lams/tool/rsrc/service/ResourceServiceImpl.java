@@ -32,7 +32,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -454,6 +453,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	    // get all item which is accessed by users in this session
 	    Map<Long, Integer> visitCountMap = resourceItemVisitDao.getSummary(contentId, session.getSessionId());
+	    boolean allowComments = false;
 	    for (ResourceItem item : items) {
 		ResourceItemDTO resourceItemDTO = new ResourceItemDTO(item);
 		// set viewNumber according visit log
@@ -464,6 +464,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		if ( item.isAllowRating() ) {
 		    itemsToRate.add(item.getUid());
 		}
+		allowComments = allowComments || item.isAllowComments();
 	    }
 	    
 	    List<ItemRatingDTO> itemRatingDtos = null;
@@ -485,6 +486,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		    }
 		}
 	    }
+	    
+	    group.setAllowComments(allowComments);
 
 	    groupList.add(group);
 	}

@@ -59,6 +59,9 @@
 						<c:if test="${groupSummary.allowRating}">
 					    "<fmt:message key="label.rating" />",
 					   	</c:if>
+						<c:if test="${groupSummary.allowComments}">
+					    "<fmt:message key="label.comments" />",
+					   	</c:if>
 					    "<fmt:message key="monitoring.label.actions" />" 
 				],
 			   	colModel:[
@@ -70,6 +73,9 @@
 			   		{name:'viewNumber', index:'viewNumber', width:100, align:"center", sorttype:"int"},
 					<c:if test="${groupSummary.allowRating}">
 					{name:'rating', index:'rating', width:200, align:"center"},
+				   	</c:if>
+					<c:if test="${groupSummary.allowComments}">
+					{name:'comments', index:'comments', width:200, align:"center"},
 				   	</c:if>
 			   		{name:'actions', index:'actions', width:120, align:"center"}		
 			   	],
@@ -158,6 +164,18 @@
 				<c:set var="ratingHTML">${ratingHTML}</div></c:set>
 				</c:if>
 				
+				<c:if test="${groupSummary.allowComments}">
+				<c:set var="commentButtonText"><fmt:message key="label.view.comments"/></c:set>
+				<c:choose>
+				<c:when test="${item.allowComments}">
+					<c:set var="commentHTML"><a href="#nogo" onclick="javascript:viewComments(${item.itemUid}, ${groupSummary.sessionId}); return false;">${commentButtonText}</a></c:set>
+				</c:when>
+				<c:otherwise>
+					<c:set var="commentHTML">&nbsp;</c:set>
+				</c:otherwise>
+				</c:choose>
+				</c:if>
+				
    	     		jQuery("#group${groupSummary.sessionId}").addRowData(${i.index + 1}, {
    	   	     		id:		"${i.index + 1}",
    	   	     		itemUid:	"${item.itemUid}",
@@ -168,6 +186,9 @@
 					<c:if test="${groupSummary.allowRating}">
 					rating: '${ratingHTML}',
 				   	</c:if>
+					<c:if test="${groupSummary.allowComments}">
+					comments: '${commentHTML}',
+					</c:if>
    	   	     		actions:	"${changeItemVisibility}"
    	   	   	    });
 	        </c:forEach>

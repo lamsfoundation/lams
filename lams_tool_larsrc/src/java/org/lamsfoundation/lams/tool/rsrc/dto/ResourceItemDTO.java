@@ -56,6 +56,7 @@ public class ResourceItemDTO {
     private String username;
     private int viewNumber;
     private boolean allowRating;
+    private boolean allowComments;
     private ItemRatingDTO ratingDTO;
 
     // true: initial group item, false, belong to some group.
@@ -82,6 +83,7 @@ public class ResourceItemDTO {
 	    this.itemTitle = item.getTitle();
 	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getLoginName();
 	    this.setAllowRating(item.isAllowRating());
+	    this.setAllowComments(item.isAllowComments());
 	} else {
 	    this.itemUid = new Long(-1);
 	}
@@ -173,5 +175,13 @@ public class ResourceItemDTO {
 
     public void setAllowRating(boolean allowRating) {
 	this.allowRating = allowRating;
+    }
+
+    public boolean isAllowComments() {
+        return allowComments;
+    }
+
+    public void setAllowComments(boolean allowComments) {
+        this.allowComments = allowComments;
     }
 }

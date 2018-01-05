@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.comments;
 public class CommentConstants {
 
     public static final String ATTR_EXTERNAL_ID = "externalID";
+    public static final String ATTR_EXTERNAL_SECONDARY_ID = "externalSecondaryID";
     public static final String ATTR_EXTERNAL_SIG = "externalSig";
     public static final String ATTR_EXTERNAL_TYPE = "externalType";
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";

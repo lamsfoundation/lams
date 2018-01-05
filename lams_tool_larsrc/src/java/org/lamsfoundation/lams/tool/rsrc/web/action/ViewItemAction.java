@@ -130,6 +130,8 @@ public class ViewItemAction extends Action {
 	request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL,
 		getReviewUrl(item, sessionMapID, mode, itemIdx));
 
+	request.setAttribute(ResourceConstants.ATTR_ALLOW_COMMENTS, item.isAllowComments());
+	
 	// these attribute will be use to instruction navigator page
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
 	request.setAttribute(ResourceConstants.PARAM_ITEM_INDEX, itemIdx);

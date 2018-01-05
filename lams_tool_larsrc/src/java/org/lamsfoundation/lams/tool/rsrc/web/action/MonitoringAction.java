@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
+import org.lamsfoundation.lams.tool.rsrc.dto.ResourceItemDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
@@ -88,6 +89,9 @@ public class MonitoringAction extends Action {
 	}
 	if (param.equals("viewReflection")) {
 	    return viewReflection(mapping, form, request, response);
+	}
+	if (param.equals("viewComments")) {
+	    return viewComments(mapping, form, request, response);
 	}
 
 	return mapping.findForward(ResourceConstants.ERROR);
@@ -243,6 +247,33 @@ public class MonitoringAction extends Action {
 	return mapping.findForward("success");
     }
 
+    private ActionForward viewComments(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.ATTR_RESOURCE_ITEM_UID);
+	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+
+	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	List<SessionDTO> sessionList = (List<SessionDTO>) sessionMap.get(ResourceConstants.ATTR_SUMMARY_LIST);
+	for (SessionDTO session : sessionList) {
+	    if (session.getSessionId().equals(sessionId)) {
+		for (ResourceItemDTO item : session.getItems()) {
+		    if (item.getItemUid().equals(itemUid)) {
+			request.setAttribute("itemTitle", item.getItemTitle());
+			break;
+		    }
+		}
+		break;
+	    }
+	}
+
+	request.setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_UID, itemUid);
+	request.setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID, sessionId);
+	request.setAttribute("mode", "teacher");
+	return mapping.findForward("success");
+    }
     // *************************************************************************************
     // Private method
     // *************************************************************************************

@@ -79,6 +79,7 @@ public class ResourceItem implements Cloneable {
     private ResourceUser createBy;
     
     private boolean allowRating;
+    private boolean allowComments;
 
     // ***********************************************
     // DTO fields:
@@ -376,5 +377,14 @@ public class ResourceItem implements Cloneable {
     public void setAllowRating(boolean allowRating) {
 	this.allowRating = allowRating;
     }
+
+    public boolean isAllowComments() {
+        return allowComments;
+    }
+
+    public void setAllowComments(boolean allowComments) {
+        this.allowComments = allowComments;
+    }
+
 
 }

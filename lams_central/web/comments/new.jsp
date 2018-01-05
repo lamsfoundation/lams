@@ -84,7 +84,7 @@
 	}
 </script>
 
-<div class="row no-gutter">
+<%-- <div class="row no-gutter">
 	<div class="col-xs-12">
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -94,7 +94,7 @@
 			</div>
 			<div class="panel-body">
 
-				<div class="form-group">
+ --%>				<div class="form-group">
 					<div class="comment-entry">
 						<form id="newForm" method="GET"
 							action="<lams:LAMSURL />comments/newComment.do">
@@ -116,14 +116,14 @@
 						</form>
 					</div>
 				</div>
-
+<!-- 
 			</div>
-			<!-- end panel body -->
+			end panel body
 		</div>
-		<!-- end comment panel -->
+		end comment panel
 	</div>
-	<!-- end col-*-12 -->
+	end col-*-12
 </div>
-<!-- end row no-gutter -->
-
+end row no-gutter
+ -->
 

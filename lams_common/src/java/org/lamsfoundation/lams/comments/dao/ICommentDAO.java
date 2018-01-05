@@ -16,7 +16,7 @@ public interface ICommentDAO {
      * @param sessionId
      * @return
      */
-    public abstract Comment getRootTopic(Long externalId, Integer externalIdType, String externalSignature);
+    public abstract Comment getRootTopic(Long externalId, Long externalSecondaryId, Integer externalIdType, String externalSignature);
 
     public abstract SortedSet<Comment> getThreadByThreadId(Long threadCommentId, Integer sortBy, Integer userId);
 

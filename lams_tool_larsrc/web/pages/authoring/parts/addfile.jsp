@@ -90,10 +90,9 @@
 					</span>
 					<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
 				</div>			
-	
+
 				<div class="form-group">
-					<html:checkbox property="allowRating" styleId="allowRating"/>
-					&nbsp;<label for="allowRating"><fmt:message key="label.enable.rating" /></label>
+					<%@ include file="ratings.jsp"%>	
 				</div>
 			</html:form>
 	

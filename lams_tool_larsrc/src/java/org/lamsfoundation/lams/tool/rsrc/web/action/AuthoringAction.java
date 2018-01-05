@@ -778,6 +778,7 @@ public class AuthoringAction extends Action {
 	form.setUrl(item.getUrl());
 	form.setOpenUrlNewWindow(item.isOpenUrlNewWindow());
 	form.setAllowRating(item.isAllowRating());
+	form.setAllowComments(item.isAllowComments());
 	if (itemIdx >= 0) {
 	    form.setItemIndex(new Integer(itemIdx).toString());
 	}
@@ -886,6 +887,7 @@ public class AuthoringAction extends Action {
 	item.setCreateByAuthor(true);
 	item.setHide(false);
 	item.setAllowRating(itemForm.isAllowRating());
+	item.setAllowComments(itemForm.isAllowComments());
 	// set instructions
 	Set instructions = new LinkedHashSet();
 	int idx = 0;

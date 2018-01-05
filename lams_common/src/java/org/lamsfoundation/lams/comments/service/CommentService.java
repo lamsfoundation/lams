@@ -62,13 +62,14 @@ public class CommentService implements ICommentService {
     private ICommentLikeDAO commentLikeDAO;
 
     @Override
-    public List<CommentDTO> getTopicThread(Long externalId, Integer externalType, String externalSignature,
-	    Long lastCommentSeqId, Integer pageSize, Integer sortBy, String extraSortParam, Integer userId) {
+    public List<CommentDTO> getTopicThread(Long externalId, Long externalSecondaryId, Integer externalType,
+	    String externalSignature, Long lastCommentSeqId, Integer pageSize, Integer sortBy, String extraSortParam,
+	    Integer userId) {
 
 	long lastThreadMessageUid = lastCommentSeqId != null ? lastCommentSeqId.longValue() : 0L;
 
 	// hidden root of all the threads!
-	Comment rootTopic = commentDAO.getRootTopic(externalId, externalType, externalSignature);
+	Comment rootTopic = commentDAO.getRootTopic(externalId, externalSecondaryId, externalType, externalSignature);
 
 	// first time through - no root topic.
 	if (rootTopic == null) {
@@ -81,11 +82,11 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public List<CommentDTO> getTopicStickyThread(Long externalId, Integer externalType, String externalSignature,
+    public List<CommentDTO> getTopicStickyThread(Long externalId, Long externalSecondaryId, Integer externalType, String externalSignature,
 	    Integer sortBy, String extraSortParam, Integer userId) {
 
 	// hidden root of all the threads!
-	Comment rootTopic = commentDAO.getRootTopic(externalId, externalType, externalSignature);
+	Comment rootTopic = commentDAO.getRootTopic(externalId, externalSecondaryId, externalType, externalSignature);
 
 	// first time through - no root topic.
 	if (rootTopic == null) {
@@ -117,20 +118,21 @@ public class CommentService implements ICommentService {
     // Do we need to synchronize this method? Would be nice but it is the equivalent of tool session creation
     // and we don't synchonize them!
     @Override
-    public Comment createOrGetRoot(Long externalId, Integer externalIdType, String externalSignature, User user) {
-	Comment rootComment = commentDAO.getRootTopic(externalId, externalIdType, externalSignature);
-	return (rootComment != null ? rootComment : createRoot(externalId, externalIdType, externalSignature, user));
+    public Comment createOrGetRoot(Long externalId, Long externalSecondaryId, Integer externalIdType, String externalSignature, User user) {
+	Comment rootComment = commentDAO.getRootTopic(externalId, externalSecondaryId, externalIdType, externalSignature);
+	return (rootComment != null ? rootComment : createRoot(externalId, externalSecondaryId, externalIdType, externalSignature, user));
     }
 
     @Override
-    public Comment getRoot(Long externalId, Integer externalIdType, String externalSignature) {
-	return commentDAO.getRootTopic(externalId, externalIdType, externalSignature);
+    public Comment getRoot(Long externalId, Long externalSecondaryId, Integer externalIdType, String externalSignature) {
+	return commentDAO.getRootTopic(externalId, externalSecondaryId, externalIdType, externalSignature);
     }
 
-    private Comment createRoot(Long externalId, Integer externalIdType, String externalSignature, User user) {
+    private Comment createRoot(Long externalId, Long externalSecondaryId, Integer externalIdType, String externalSignature, User user) {
 
 	CommentSession session = new CommentSession();
 	session.setExternalId(externalId);
+	session.setExternalSecondaryId(externalSecondaryId);
 	session.setExternalIdType(externalIdType);
 	session.setExternalSignature(externalSignature);
 
