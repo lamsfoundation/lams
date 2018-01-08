@@ -1,7 +1,76 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="tool"><lams:WebAppURL /></c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+
 <c:set var="dto" value="${gmapDTO}" />
 
+<script type="text/javascript">
+	$(document).ready(function(){
+	    
+		$(".tablesorter").tablesorter({
+			theme: 'bootstrap',
+			headerTemplate : '{content} {icon}',
+		    sortInitialOrder: 'desc',
+            sortList: [[0]],
+            widgets: [ "uitheme", "resizable", "filter" ],
+            headers: { 1: { filter: false} }, 
+            widgetOptions: {
+            	resizable: true,
+            	// include column filters 
+                filter_columnFilters: true, 
+                filter_placeholder: { search : '<fmt:message key="label.search"/>' }, 
+                filter_searchDelay: 700 
+            }
+		});
+		
+		$(".tablesorter").each(function() {
+			
+			$(this).tablesorterPager({
+				savePages: false,
+		        container: $(this).find(".ts-pager"),
+		        output: '{startRow} to {endRow} ({totalRows})',
+		        cssPageDisplay: '.pagedisplay',
+		        cssPageSize: '.pagesize',
+				ajaxUrl : "<c:url value='/monitoring.do'/>?dispatch=getUsers&toolContentID=${dto.toolContentId}&page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolSessionID=" + $(this).attr('data-session-id'),
+				ajaxProcessing: function (data, table) {
+					if (data && data.hasOwnProperty('rows')) {
+			    		var rows = [],
+			            json = {};
+					
+			    		for (i = 0; i < data.rows.length; i++){
+							var userData = data.rows[i],
+								userId = userData["userId"], 
+								fullName = userData["fullName"];
+
+							rows += '<tr>';
+ 							rows += '<td>'+ definePortraitPopover(userData["portraitId"], userId, fullName, fullName) +'</td>';
+
+							<c:if test="${dto.reflectOnActivity}">
+							rows += '<td width="75%">';
+							if ( userData["reflection"] ) {
+								rows += userData["reflection"];
+							} else {
+								rows += '-';
+							}
+							rows += '</td>';
+							</c:if>
+							
+							rows += '</tr>';
+						}
+			            
+						json.total = data.total_rows;
+						json.rows = $(rows);
+						return json;
+			            
+			    	}
+			}
+			}).bind('pagerInitialized pagerComplete', function(event, options){
+				initializePortraitPopover('${lams}');
+            })
+		});
+  	});
+
+</script>
 <div class="panel">
 	<h4>
 	    <c:out value="${dto.title}" escapeXml="true"/>
@@ -12,117 +81,44 @@
 	
 </div>
 
-<c:choose>
-<c:when test="${empty dto.sessionDTOs}">
+<c:if test="${empty dto.sessionDTOs}">
 	<lams:Alert type="info" id="no-session-summary" close="false">
 		<fmt:message key="label.nogroups" />
 	</lams:Alert>
-</c:when>
-<c:otherwise>
+</c:if>
 
-	<h4><fmt:message key="monitor.summary.title.groups"/></h4>
-	
-<c:choose>
-<c:when test="${dto.reflectOnActivity}">
-	
-	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
-	
-	<c:forEach var="session" items="${dto.sessionDTOs}" varStatus="status">
-		<c:set var="toggleJS">javascript:clearMap();addUsersForSession${session.sessionID}();addMarkersForSession${session.sessionID}();</c:set>
-		<div id="sessionDiv${session.sessionID}">
-
+<c:forEach var="session" items="${dto.sessionDTOs}" varStatus="status">
+	<c:set var="toggleJS">javascript:clearMap();addUsersForSession${session.sessionID}();addMarkersForSession${session.sessionID}();</c:set>
+		
+	<c:if test="${isGroupedActivity}">	
 	    <div class="panel panel-default" >
         <div class="panel-heading" id="heading${session.sessionID}">
-			<div class="row no-gutter">
-				<div class="col-sm-5">
-					<span  class="collapsable-icon-left">
-		        	<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${session.sessionID}" onClick="${toggleJS}"
-						aria-expanded="false" aria-controls="collapse${session.sessionID}" >
-					<b><c:out value="${session.sessionName}" /></b>
-					</span>
-				</div>
-				<div class="col-sm-5">
-					<fmt:message key="heading.totalLearners" />:&nbsp;${session.numberOfLearners}</a>
-				</div>
-				<div class="col-sm-2">
-					<a href="${toggleJS}"
-						class="btn btn-default btn-xs pull-right"><fmt:message key="label.show.on.map"/></a>
-				</div>
-			</div>
+        	<span class="panel-title collapsable-icon-left">
+        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${session.sessionID}" 
+					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${session.sessionID}" >
+			<fmt:message key="heading.table.group" />:	<c:out value="${session.sessionName}" /></a>
+			</span>
+		<a href="${toggleJS}" class="btn btn-default btn-xs pull-right"><fmt:message key="label.show.on.map"/></a>
+			
         </div>
         
-        <div id="collapse${session.sessionID}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading${session.sessionID}">
-		
-		<table class="table table-condensed table-striped">
-		<c:forEach var="user" items="${session.userDTOs}">
-			<tr>
-				<td>
-					<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
-				</td>
-				<td>
-					<c:if test="${user.finishedReflection}">
-						<c:url value="monitoring.do" var="openNotebook">
-							<c:param name="dispatch" value="openNotebook" />
-							<c:param name="userID" value="${user.userId}" />
-							<c:param name="toolSessionID" value="${session.sessionID}" />
-						</c:url>
-				
-						<html:link styleClass="btn btn-default btn-xs pull-right"
-							href="javascript:launchPopup('${openNotebook}')">
-							<fmt:message key="pageTitle.monitoring.notebook" />
-						</html:link>
-					</c:if>
-				</td>
-			</tr>	
-		</c:forEach>
-		</table>
-		
+        <div id="collapse${session.sessionID}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${session.sessionID}">
+	</c:if>
+	
+	<lams:TSTable numColumns="${dto.reflectOnActivity ? 2 : 1}" dataId="data-session-id='${session.sessionID}'">
+			<th><fmt:message key="monitoring.user.fullname"/></th>
+			<c:if test="${dto.reflectOnActivity}">
+				<th align="center" class="sorter-false" width="75%"><fmt:message key="monitoring.user.reflection"/></th>
+			</c:if>
+	</lams:TSTable>
+	
+	<c:if test="${isGroupedActivity}">
 		</div> <!-- end collapse area  -->
 		</div> <!-- end collapse panel  -->
-
-		<c:if test="${!status.last}"><div class="voffset5">&nbsp;</div></c:if>
+	</c:if>
+	${ !isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
 		
-		</div>
-	</c:forEach>
-
-	</div> <!--  end panel group -->
-
-</c:when> 
-
-<c:otherwise>
-    <div class="panel panel-default" >
-	<table class="table table-condensed table-striped">
-		<tr>
-			<th>
-				<fmt:message key="heading.table.group" />
-			</th>
-			<th>
-				<fmt:message key="heading.totalLearners" />
-			</th>
-			<th></th>
-		</tr>
-		
-		<c:forEach var="session" items="${dto.sessionDTOs}">
-			<tr>
-				<td>
-					${session.sessionName}
-				</td>
-				<td>
-					${session.numberOfLearners}
-				</td>
-				<td>
-					<a href="javascript:clearMap();addUsersForSession${session.sessionID}();addMarkersForSession${session.sessionID}();"
-					class="btn btn-default btn-xs pull-right"><fmt:message key="label.show.on.map"/></a>
-				</td>
-			</tr>
-		</c:forEach>
-	</table>	
-	</div>
-</c:otherwise>
-</c:choose>
-
-</c:otherwise>
-</c:choose>
+</c:forEach>
 
 	<html:form action="/monitoring" method="post">
 		<html:hidden property="dispatch" styleId = "dispatch" value="unspecified" />

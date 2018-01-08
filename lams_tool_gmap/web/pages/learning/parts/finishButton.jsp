@@ -53,7 +53,7 @@
 	<div class="space-bottom-top align-right">
 		<c:choose>
 			<c:when test="${!gmapUserDTO.finishedActivity and gmapDTO.reflectOnActivity}">
-				<html:submit styleClass="btn btn-primary voffset10 pull-right" onclick="javascript:document.getElementById('dispatch').value = 'openNotebook'; return serialiseMarkers();">
+				<html:submit styleClass="btn btn-primary voffset10 pull-right" styleId="continueButton" onclick="javascript:document.getElementById('dispatch').value = 'openNotebook'; return serialiseMarkers();">
 					<fmt:message key="button.continue" />
 				</html:submit>
 			</c:when>
