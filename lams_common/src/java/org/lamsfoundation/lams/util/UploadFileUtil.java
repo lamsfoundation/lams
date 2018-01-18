@@ -188,7 +188,13 @@ public class UploadFileUtil {
      * Returns dir where images and other resources can be uploaded.
      */
     public static File getUploadDir(String contentFolderID, String type) {
-	File uploadDir = new File(UploadFileUtil.getUploadBaseDir(), contentFolderID + File.separatorChar + type);
+	File uploadDir = UploadFileUtil.getUploadBaseDir();
+	// get content folder ID split into folders of 2 characters
+	String[] splitContentDir = UploadFileUtil.splitContentDir(contentFolderID);
+	for (int groupIndex = 0; groupIndex < splitContentDir.length; groupIndex++) {
+	    uploadDir = new File(uploadDir, splitContentDir[groupIndex]);
+	}
+	uploadDir = new File(uploadDir, type);
 	uploadDir.mkdirs();
 	return uploadDir;
     }
@@ -214,9 +220,8 @@ public class UploadFileUtil {
      */
     public static String getUploadWebPath(String contentFolderID, String type) {
 	return "/" + Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH) + "/"
-		+ AuthoringConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR
-		+ (contentFolderID.startsWith("/") ? "" : "/") + contentFolderID
-		+ (contentFolderID.endsWith("/") ? "" : "/") + type;
+		+ AuthoringConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR + "/"
+		+ String.join("/", UploadFileUtil.splitContentDir(contentFolderID)) + "/" + type;
     }
 
     public static String getFileNameWithoutExtension(String fileName) {
@@ -225,5 +230,18 @@ public class UploadFileUtil {
 
     public static String getFileExtension(String fileName) {
 	return fileName.substring(fileName.lastIndexOf(".") + 1);
+    }
+
+    /**
+     * Take first 12 characters of content folder ID (without "-" and "/")
+     * and split them in pairs of 2
+     */
+    private static String[] splitContentDir(String contentFolderID) {
+	String[] result = new String[6];
+	String trimmedFolder = contentFolderID.replace("-", "").replace("/", "");
+	for (int groupIndex = 0; groupIndex < 6; groupIndex++) {
+	    result[groupIndex] = "" + trimmedFolder.charAt(groupIndex * 2) + trimmedFolder.charAt(groupIndex * 2 + 1);
+	}
+	return result;
     }
 }
