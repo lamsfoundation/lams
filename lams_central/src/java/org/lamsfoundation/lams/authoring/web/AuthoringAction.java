@@ -215,7 +215,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	try {
 	    authoringService.finishEditOnFly(learningDesignID, getUserId(), cancelled);
 	} catch (Exception e) {
-	    String errorMsg = "Error occured ending EditOnFly" + e.getMessage()+" learning design id "+learningDesignID;
+	    String errorMsg = "Error occured ending EditOnFly" + e.getMessage() + " learning design id "
+		    + learningDesignID;
 	    log.error(errorMsg, e);
 	    throw new IOException(e);
 	}
@@ -313,9 +314,9 @@ public class AuthoringAction extends LamsDispatchAction {
 		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	ToolContentManager toolManager = (ToolContentManager) wac.getBean(tool.getServiceName());
 	String title = toolManager.getToolContentTitle(toolContentID);
-	if ( title == null || title.trim().length() == 0 ) {
+	if (title == null || title.trim().length() == 0) {
 	    title = getLearningDesignService().internationaliseActivityTitle(learningLibraryID);
-	} 
+	}
 	// create the LD and put it in Run Sequences folder in the given organisation
 	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(title, toolID, toolContentID,
 		learningLibraryID, contentFolderID, organisationID);
@@ -449,13 +450,18 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 
 	// prepare the dir and the file
-	File thumbnailDirectory = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER);
-	if (!thumbnailDirectory.exists()) {
-	    thumbnailDirectory.mkdirs();
+	File thumbnailDir = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER);
+	String thumbnailSubdir = String.valueOf(learningDesignID);
+	if (thumbnailSubdir.length() % 2 == 1) {
+	    thumbnailSubdir = "0" + thumbnailSubdir;
 	}
+	for (int charIndex = 0; charIndex < thumbnailSubdir.length(); charIndex += 2) {
+	    thumbnailDir = new File(thumbnailDir,
+		    "" + thumbnailSubdir.charAt(charIndex) + thumbnailSubdir.charAt(charIndex + 1));
+	}
+	thumbnailDir.mkdirs();
 
-	String absoluteFilePath = FileUtil.getFullPath(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER,
-		learningDesignID + ".svg");
+	String absoluteFilePath = FileUtil.getFullPath(thumbnailDir.getAbsolutePath(), learningDesignID + ".svg");
 
 	// write out the content
 	try (FileOutputStream fos = new FileOutputStream(absoluteFilePath);
