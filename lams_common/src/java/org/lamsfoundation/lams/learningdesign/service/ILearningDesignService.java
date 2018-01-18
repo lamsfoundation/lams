@@ -37,12 +37,17 @@ import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.tool.dto.ToolDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileUtil;
 
 /**
  * @author Mitchell Seaton
  */
 
 public interface ILearningDesignService {
+    static final String LD_SVG_TOP_DIR = FileUtil.getFullPath(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR),
+	    "lams-www.war\\secure\\learning-design-images");
 
     /**
      * Get the learning design DTO
@@ -82,6 +87,6 @@ public interface ILearningDesignService {
     List<ToolDTO> getToolDTOs(boolean includeParallel, boolean includeInvalid, String userName) throws IOException;
 
     void fillLearningLibraryID(AuthoringActivityDTO activity);
-    
+
     String internationaliseActivityTitle(Long learningLibraryID);
 }

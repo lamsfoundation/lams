@@ -82,6 +82,7 @@ import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
+import org.lamsfoundation.lams.learningdesign.service.LearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.LogEvent;
@@ -123,8 +124,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     protected Logger log = Logger.getLogger(AuthoringService.class);
 
-    private static final String[] LD_IMAGE_EXTENSIONS = new String[] { "png", "svg" };
-
     /** Required DAO's */
     protected ILearningDesignDAO learningDesignDAO;
 
@@ -165,7 +164,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     protected IWorkspaceManagementService workspaceManagementService;
 
     protected ILogEventService logEventService;
-    
+
     protected IGradebookService gradebookService;
 
     protected ToolContentIDGenerator contentIDGenerator;
@@ -343,7 +342,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     public void setGradebookService(IGradebookService gradebookService) {
-        this.gradebookService = gradebookService;
+	this.gradebookService = gradebookService;
     }
 
     public void setWorkspaceManagementService(IWorkspaceManagementService workspaceManagementService) {
@@ -508,7 +507,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	}
 	// only the user who is editing the design may unlock it
 	if (design.getEditOverrideUser().equals(user)) {
-	    
+
 	    design.setEditOverrideLock(false);
 	    design.setEditOverrideUser(null);
 
@@ -543,7 +542,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		initialiseToolActivityForRuntime(design, lesson);
 
 		learningDesignDAO.update(design);
-		
+
 		// Always recalculate marks as we can't tell if weightings have been changed/added/removed.
 		// This will override any Gradebook entered *lesson* marks, but will calculate based on
 		// Gradebook entered *activity* marks.
@@ -870,8 +869,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	updateCompetenceMappings(newLearningDesign.getCompetences(), newActivities);
 
 	try {
-	    AuthoringService.copyLearningDesignImages(originalLearningDesign.getLearningDesignId(),
-		    newLearningDesign.getLearningDesignId());
+	    FileUtils.copyFile(
+		    new File(LearningDesignService
+			    .getLearningDesignSVGPath(originalLearningDesign.getLearningDesignId())),
+		    new File(LearningDesignService.getLearningDesignSVGPath(newLearningDesign.getLearningDesignId())),
+		    false);
 	} catch (IOException e) {
 	    log.error("Error while copying Learning Design " + originalLearningDesign.getLearningDesignId() + " image",
 		    e);
@@ -1809,22 +1811,5 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	access.setUserId(userId);
 	access.setAccessDate(new Date());
 	learningDesignDAO.insertOrUpdate(access);
-    }
-
-    /**
-     * Copies LD thumbnails, SVG and PNG.
-     */
-    private static void copyLearningDesignImages(long originalLearningDesignID, long newLearningDesignID)
-	    throws IOException {
-	for (String extension : AuthoringService.LD_IMAGE_EXTENSIONS) {
-	    String fullExtension = "." + extension;
-	    File image = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER,
-		    originalLearningDesignID + fullExtension);
-	    if (image.canRead()) {
-		FileUtils.copyFile(image,
-			new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER, newLearningDesignID + fullExtension),
-			false);
-	    }
-	}
     }
 }

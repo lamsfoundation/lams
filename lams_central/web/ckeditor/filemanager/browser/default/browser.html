@@ -75,7 +75,14 @@ function GetUrlParam( paramName )
 
 var oConnector = new Object() ;
 oConnector.CurrentFolder	= '/' ;
-oConnector.DesignFolder     = GetUrlParam( 'CurrentFolder' );
+//LDEV-4497 split content folder ID into dir structure of 2 characters each
+var designFolder = GetUrlParam( 'CurrentFolder' ).replace(new RegExp("[/\\-]", 'g'), "");
+var splitDesignFolder = "/";
+for (var charIndex = 0; charIndex < 6; charIndex++){
+	splitDesignFolder += designFolder[charIndex * 2] + designFolder[charIndex * 2  + 1] + "/";
+}
+oConnector.DesignFolder     = splitDesignFolder;
+
 
 var sConnUrl = GetUrlParam( 'Connector' ) ;
 document.CKEditorFuncNum = GetUrlParam( 'CKEditorFuncNum');
