@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -254,7 +255,9 @@ public class LearningAction extends Action {
 	if (scratchie.isShuffleItems()) {
 	    //items is a Set at this moment
 	    ArrayList<ScratchieItem> shuffledItems = new ArrayList<ScratchieItem>(items);
-	    Collections.shuffle(shuffledItems);
+	    //use random with a seed so people from the same group get the "same shuffle"
+	    Random randomGenerator = new Random(toolSessionId);
+	    Collections.shuffle(shuffledItems, randomGenerator);
 	    items = shuffledItems;
 	}
 
