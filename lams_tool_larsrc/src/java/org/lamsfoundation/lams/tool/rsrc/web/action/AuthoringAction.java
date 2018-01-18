@@ -514,12 +514,6 @@ public class AuthoringAction extends Action {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	ActionMessages errors = validate(resourceForm, mapping, request);
-	if (!errors.isEmpty()) {
-	    saveErrors(request, errors);
-	    return mapping.findForward(ResourceConstants.SUCCESS);
-	}
-
 	Resource resource = resourceForm.getResource();
 	IResourceService service = getResourceService();
 	
@@ -956,16 +950,6 @@ public class AuthoringAction extends Action {
 		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
 	    }
 	}
-	return errors;
-    }
-
-    private ActionMessages validate(ResourceForm resourceForm, ActionMapping mapping, HttpServletRequest request) {
-	ActionMessages errors = new ActionMessages();
-	if (StringUtils.isBlank(resourceForm.getResource().getTitle())) {
-	    ActionMessage error = new ActionMessage("error.resource.item.title.blank");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	}
-
 	return errors;
     }
 

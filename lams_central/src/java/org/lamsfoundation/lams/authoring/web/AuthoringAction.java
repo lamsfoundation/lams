@@ -313,6 +313,9 @@ public class AuthoringAction extends LamsDispatchAction {
 		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	ToolContentManager toolManager = (ToolContentManager) wac.getBean(tool.getServiceName());
 	String title = toolManager.getToolContentTitle(toolContentID);
+	if ( title == null || title.trim().length() == 0 ) {
+	    title = getLearningDesignService().internationaliseActivityTitle(learningLibraryID);
+	} 
 	// create the LD and put it in Run Sequences folder in the given organisation
 	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(title, toolID, toolContentID,
 		learningLibraryID, contentFolderID, organisationID);

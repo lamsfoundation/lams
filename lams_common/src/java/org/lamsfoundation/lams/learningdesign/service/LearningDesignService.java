@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
@@ -378,6 +379,35 @@ public class LearningDesignService implements ILearningDesignService {
 	}
     }
 
+    @Override
+    public String internationaliseActivityTitle(Long learningLibraryID) {
+	
+	ToolActivity templateActivity = (ToolActivity) activityDAO.getTemplateActivityByLibraryID(learningLibraryID);
+
+	if ( templateActivity != null ) {
+	    Locale locale = LocaleContextHolder.getLocale();
+	    String languageFilename = templateActivity.getLanguageFile();
+	    if (languageFilename != null) {
+		MessageSource toolMessageSource = toolActMessageService.getMessageService(languageFilename);
+		if (toolMessageSource != null) {
+		    String title = toolMessageSource.getMessage(Activity.I18N_TITLE, null,
+			    templateActivity.getTitle(), locale);
+		    if ( title != null && title.trim().length() > 0 )
+			return title;
+		} else {
+		    log.warn("Unable to internationalise the library activity " 
+			    + templateActivity.getTitle() + " message file " + templateActivity.getLanguageFile()
+			    + ". Activity Message source not available");
+		}
+	    }
+	}
+	
+	if ( templateActivity.getTitle() != null && templateActivity.getTitle().trim().length() > 0) 
+	    return  templateActivity.getTitle();
+	else 
+	    return "Untitled"; // should never get here - just return something in case there is a bug. A blank title affect the layout of the main page
+    }
+    
     private void internationaliseActivities(Collection<LibraryActivityDTO> activities) {
 	Iterator<LibraryActivityDTO> iter = activities.iterator();
 	Locale locale = LocaleContextHolder.getLocale();

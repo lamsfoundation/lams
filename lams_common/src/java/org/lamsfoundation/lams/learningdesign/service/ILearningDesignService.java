@@ -82,4 +82,6 @@ public interface ILearningDesignService {
     List<ToolDTO> getToolDTOs(boolean includeParallel, boolean includeInvalid, String userName) throws IOException;
 
     void fillLearningLibraryID(AuthoringActivityDTO activity);
+    
+    String internationaliseActivityTitle(Long learningLibraryID);
 }
