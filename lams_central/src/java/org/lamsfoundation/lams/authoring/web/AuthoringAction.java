@@ -450,7 +450,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 
 	// prepare the dir and the file
-	File thumbnailDir = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER);
+	File thumbnailDir = new File(ILearningDesignService.LD_SVG_TOP_DIR);
 	String thumbnailSubdir = String.valueOf(learningDesignID);
 	if (thumbnailSubdir.length() % 2 == 1) {
 	    thumbnailSubdir = "0" + thumbnailSubdir;

@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.learningdesign.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,8 +55,6 @@ import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dto.ToolDTO;
 import org.lamsfoundation.lams.tool.dto.ToolDTONameComparator;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.ILoadedMessageSourceService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -85,8 +84,6 @@ public class LearningDesignService implements ILearningDesignService {
 
     protected ILearningLibraryDAO learningLibraryDAO;
     protected ILoadedMessageSourceService toolActMessageService;
-
-    private static final String LD_SVG_DIR = "lams-www.war\\secure\\learning-design-images";
 
     // words found both in current complex learning library descriptions and in old exported LD XML files
     private static final String[][] COMPLEX_LEARNING_LIBRARY_KEY_WORDS = { { "Share", "Forum" }, { "Chat", "Scribe" },
@@ -381,33 +378,35 @@ public class LearningDesignService implements ILearningDesignService {
 
     @Override
     public String internationaliseActivityTitle(Long learningLibraryID) {
-	
+
 	ToolActivity templateActivity = (ToolActivity) activityDAO.getTemplateActivityByLibraryID(learningLibraryID);
 
-	if ( templateActivity != null ) {
+	if (templateActivity != null) {
 	    Locale locale = LocaleContextHolder.getLocale();
 	    String languageFilename = templateActivity.getLanguageFile();
 	    if (languageFilename != null) {
 		MessageSource toolMessageSource = toolActMessageService.getMessageService(languageFilename);
 		if (toolMessageSource != null) {
-		    String title = toolMessageSource.getMessage(Activity.I18N_TITLE, null,
-			    templateActivity.getTitle(), locale);
-		    if ( title != null && title.trim().length() > 0 )
+		    String title = toolMessageSource.getMessage(Activity.I18N_TITLE, null, templateActivity.getTitle(),
+			    locale);
+		    if (title != null && title.trim().length() > 0) {
 			return title;
+		    }
 		} else {
-		    log.warn("Unable to internationalise the library activity " 
-			    + templateActivity.getTitle() + " message file " + templateActivity.getLanguageFile()
+		    log.warn("Unable to internationalise the library activity " + templateActivity.getTitle()
+			    + " message file " + templateActivity.getLanguageFile()
 			    + ". Activity Message source not available");
 		}
 	    }
 	}
-	
-	if ( templateActivity.getTitle() != null && templateActivity.getTitle().trim().length() > 0) 
-	    return  templateActivity.getTitle();
-	else 
+
+	if (templateActivity.getTitle() != null && templateActivity.getTitle().trim().length() > 0) {
+	    return templateActivity.getTitle();
+	} else {
 	    return "Untitled"; // should never get here - just return something in case there is a bug. A blank title affect the layout of the main page
+	}
     }
-    
+
     private void internationaliseActivities(Collection<LibraryActivityDTO> activities) {
 	Iterator<LibraryActivityDTO> iter = activities.iterator();
 	Locale locale = LocaleContextHolder.getLocale();
@@ -462,8 +461,20 @@ public class LearningDesignService implements ILearningDesignService {
      * Gets LD SVG file path.
      */
     public static String getLearningDesignSVGPath(long learningDesignId) {
-	String earDirPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
-	String svgDirPath = FileUtil.getFullPath(earDirPath, LearningDesignService.LD_SVG_DIR);
-	return FileUtil.getFullPath(svgDirPath, learningDesignId + ".svg");
+	File thumbnailDir = new File(ILearningDesignService.LD_SVG_TOP_DIR);
+	String thumbnailFileName = learningDesignId + ".svg";
+	File thumbnailFile = new File(thumbnailDir, thumbnailFileName);
+	if (!thumbnailFile.canRead()) {
+	    // the file is missing, try the new folder structure
+	    String thumbnailSubdir = String.valueOf(learningDesignId);
+	    if (thumbnailSubdir.length() % 2 == 1) {
+		thumbnailSubdir = "0" + thumbnailSubdir;
+	    }
+	    for (int charIndex = 0; charIndex < thumbnailSubdir.length(); charIndex += 2) {
+		thumbnailDir = new File(thumbnailDir,
+			"" + thumbnailSubdir.charAt(charIndex) + thumbnailSubdir.charAt(charIndex + 1));
+	    }
+	}
+	return FileUtil.getFullPath(thumbnailDir.getAbsolutePath(), thumbnailFileName);
     }
 }
