@@ -94,6 +94,8 @@
 				SEQUENCE_VALIDATION_ISSUES : '<c:out value="${SEQUENCE_VALIDATION_ISSUES_VAR}" />',
 				<fmt:message key="authoring.fla.save.successful" var="SAVE_SUCCESSFUL_VAR"/>
 				SAVE_SUCCESSFUL : decoderDiv.html('<c:out value="${SAVE_SUCCESSFUL_VAR}" />').text(),
+				<fmt:message key="authoring.fla.save.successful.check.grouping" var="SAVE_SUCCESSFUL_CHECK_GROUPING_VAR"/>
+				SAVE_SUCCESSFUL_CHECK_GROUPING : decoderDiv.html('<c:out value="${SAVE_SUCCESSFUL_CHECK_GROUPING_VAR}" />').text(),
 				<fmt:message key="authoring.fla.liveedit.save.successful" var="LIVEEDIT_SAVE_SUCCESSFUL_VAR"/>
 				LIVEEDIT_SAVE_SUCCESSFUL : decoderDiv.html('<c:out value="${LIVEEDIT_SAVE_SUCCESSFUL_VAR}" />').text(),
 				<fmt:message key="authoring.fla.delete.node.confirm" var="DELETE_NODE_CONFIRM_VAR"/>

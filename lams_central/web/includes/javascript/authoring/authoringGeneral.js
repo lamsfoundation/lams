@@ -1479,6 +1479,52 @@ GeneralLib = {
 	},
 	
 	/**
+	 * If sequence starts with of Grouping->(MCQ or Assessment)->Leader Selection->Scratchie,
+	 * there is a good chance this is a TBL sequence and all activities must be grouped.
+	 */
+	checkTBLGrouping : function(){
+		var firstGroupingActivity = null;
+		$.each(layout.activities, function(){
+			if (this instanceof ActivityDefs.GroupingActivity && this.transitions 
+					&& this.transitions.to.length === 0 && this.transitions.from.length > 0){
+				firstGroupingActivity = this;
+				return false;
+			}
+		});
+		if (!firstGroupingActivity) {
+			return true;
+		}
+		var secondActivity = firstGroupingActivity.transitions.from.length > 0 ? firstGroupingActivity.transitions.from[0].toActivity : null; 
+		var templateContainer = $('#templateContainerCell');
+		var isTBL = secondActivity instanceof ActivityDefs.ToolActivity
+			&& (secondActivity.learningLibraryID == $('.template[learningLibraryTitle="Assessment"]', templateContainer).attr('learningLibraryId')
+			    || secondActivity.learningLibraryID == $('.template[learningLibraryTitle="MCQ"]', templateContainer).attr('learningLibraryId'));
+		if (!isTBL){
+			return true;
+		}
+		var thirdActivity = secondActivity.transitions.from.length > 0 ? secondActivity.transitions.from[0].toActivity : null;
+		isTBL = thirdActivity instanceof ActivityDefs.ToolActivity 
+				&& thirdActivity.learningLibraryID == $('.template[learningLibraryTitle="Leaderselection"]', templateContainer).attr('learningLibraryId');
+		if (!isTBL){
+			return true;
+		}
+		var fourthActivity = thirdActivity.transitions.from.length > 0 ? thirdActivity.transitions.from[0].toActivity : null;
+		isTBL = fourthActivity instanceof ActivityDefs.ToolActivity 
+				&& fourthActivity.learningLibraryID == $('.template[learningLibraryTitle="Scratchie"]', templateContainer).attr('learningLibraryId');
+		if (!isTBL){
+			return true;
+		}
+		var result = true;
+		$.each(layout.activities, function(){
+			if (this != firstGroupingActivity && this instanceof ActivityDefs.ToolActivity && !this.grouping){
+				result = false;
+				return false;
+			}
+		});
+		return result;
+	},
+	
+	/**
 	 * Escapes HTML tags to prevent XSS injection.
 	 */
 	escapeHtml : function(unsafe) {
@@ -2695,7 +2741,11 @@ GeneralLib = {
 								GeneralLib.setModified(false);
 								
 								// close the Live Edit dialog
-								alert(LABELS.LIVEEDIT_SAVE_SUCCESSFUL);
+								if (GeneralLib.checkTBLGrouping()) {
+									alert(LABELS.LIVEEDIT_SAVE_SUCCESSFUL);
+								} else {
+									alert(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
+								}
 								window.parent.closeDialog('dialogAuthoring');
 							}
 						});
@@ -2709,8 +2759,12 @@ GeneralLib = {
 						alert(LABELS.SVG_SAVE_ERROR);
 					}
 					
-					if (response.validation.length == 0) {
-						alert(LABELS.SAVE_SUCCESSFUL);
+					if (!layout.ld.invalid) {
+						if (GeneralLib.checkTBLGrouping()) {
+							alert(LABELS.SAVE_SUCCESSFUL);
+						} else {
+							alert(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
+						}
 					}
 					
 					GeneralLib.setModified(false);
