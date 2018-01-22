@@ -135,7 +135,8 @@ public class UserSearchAction extends LamsDispatchAction {
 	    responseRow.put("lastName", StringEscapeUtils.escapeHtml(lastName));
 	    String email = userDto.getEmail() == null ? "" : userDto.getEmail();
 	    responseRow.put("email", StringEscapeUtils.escapeHtml(email));
-
+	    if ( userDto.getPortraitUuid() != null )
+		responseRow.put("portraitId", userDto.getPortraitUuid());
 	    rows.put(responseRow);
 	}
 	responcedata.put("rows", rows);
