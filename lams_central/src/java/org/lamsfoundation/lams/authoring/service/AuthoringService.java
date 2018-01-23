@@ -89,7 +89,6 @@ import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
-import org.lamsfoundation.lams.planner.dao.PedagogicalPlannerDAO;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
@@ -149,8 +148,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     protected ISystemToolDAO systemToolDAO;
 
-    protected PedagogicalPlannerDAO pedagogicalPlannerDAO;
-
     protected ILamsCoreToolService lamsCoreToolService;
 
     protected ILearningDesignService learningDesignService;
@@ -175,11 +172,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     protected IBranchActivityEntryDAO branchActivityEntryDAO;
 
     public AuthoringService() {
-
-    }
-
-    public void setPedagogicalPlannerDAO(PedagogicalPlannerDAO pedagogicalPlannerDAO) {
-	this.pedagogicalPlannerDAO = pedagogicalPlannerDAO;
     }
 
     /***************************************************************************

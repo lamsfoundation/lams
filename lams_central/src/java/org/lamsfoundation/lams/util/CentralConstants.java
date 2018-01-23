@@ -148,28 +148,6 @@ public class CentralConstants {
     public static final String ATTR_RESULT_CODE = "resultCode";
 
     public static final String ATTR_RESULT_TEXT = "resultText";
-    // Pedagogical Planner constants
-    public static final String ATTR_PLANNER = "planner";
-
-    public static final String PARAM_CALL_ATTEMPTED_ID = "callAttemptedID";
-
-    public static final String PARAM_SEQUENCE_TITLE = "sequenceTitle";
-
-    public static final String PARAM_ACTIVITY_METADATA = "activityMetadataField";
-
-    public static final String PARAM_FORM_MESSAGE = "formMessage";
-
-    public static final String ERROR_PLANNER_TITLE_BLANK = "error.planner.title.blank";
-
-    public static final String RESOURCE_KEY_BRANCH_EMPTY = "label.planner.branch.empty";
-
-    public static final int PLANNER_MAX_BRANCHES = 4;
-
-    public static final int PLANNER_MAX_OPTIONS = 4;
-
-    public static final int PLANNER_MAX_PARALLEL_ACTIVITIES = 4;
-
-    public static final int PLANNER_RECENT_LD_MAX_COUNT = 10;
 
     public static final String MONITORING_SERVICE_BEAN_NAME = "monitoringService";
 

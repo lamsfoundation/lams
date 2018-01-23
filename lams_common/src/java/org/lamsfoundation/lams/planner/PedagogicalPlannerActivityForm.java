@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.lams.web.planner;
+package org.lamsfoundation.lams.planner;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -52,12 +52,12 @@
 		
 		function openPedagogicalPlanner() {
 			if(isMac) {
-					authorWin = window.open('pedagogicalPlanner.do','aWindow','width='+pedagogical_planner_width+',height='+pedagogical_planner_height+',resizable,scrollbars');
+					authorWin = window.open('planner/pedagogicalPlanner.do','aWindow','width='+pedagogical_planner_width+',height='+pedagogical_planner_height+',resizable,scrollbars');
 			} else {
 				if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('pedagogicalPlanner.do') > -1) {
 					authorWin.focus();
 				} else {
-					authorWin = window.open('pedagogicalPlanner.do','aWindow','width='+pedagogical_planner_width+',height='+pedagogical_planner_height+',resizable,scrollbars');
+					authorWin = window.open('planner/pedagogicalPlanner.do','aWindow','width='+pedagogical_planner_width+',height='+pedagogical_planner_height+',resizable,scrollbars');
 					authorWin.focus();
 				}
 			}

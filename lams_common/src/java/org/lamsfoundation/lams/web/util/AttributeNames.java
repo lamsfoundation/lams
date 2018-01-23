@@ -98,12 +98,6 @@ public class AttributeNames {
     public static final String ATTR_ITEM_RATING_DTOS = "itemRatingDtos";
     public static final String ATTR_COUNT_RATED_ITEMS = "countRatedItems";
 
-    // for Pedagogical Planner
-    public static final String PARAM_COMMAND = "command";
-    public static final String COMMAND_GET_EDITING_ADVICE = "getEditingAdvice";
-    public static final String COMMAND_CHECK_EDITING_ADVICE = "checkEditingAdvice";
-    public static final String PARAM_ACTIVITY_INDEX = "activityIndex";
-
     // for tutorial videos
     public static final String ATTR_PAGE_STR = "pageString";
     public static final String ATTR_DO_NOT_SHOW_AGAIN = "doNotShowAgain";

@@ -33,14 +33,6 @@
       name="uploadForm"
       type="org.lamsfoundation.lams.monitoring.web.FileUploadForm"
     />
-   <form-bean
-  name="PedagogicalPlannerGroupingForm"
-  type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerGroupingForm"
-/>
-<form-bean
-  name="PedagogicalPlannerSequenceNodeForm"
-  type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerSequenceNodeForm"
-/>
 
 <form-bean name="UserForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="userId" type="java.lang.Integer" />
@@ -303,76 +295,6 @@
       <forward
         name="message"
         path=".message"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/pedagogicalPlanner"
-      type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction"
-      name="PedagogicalPlannerSequenceNodeForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="true"
-    >
-      <forward
-        name="template"
-        path="/pedagogical_planner/templateBase.jsp"
-        redirect="false"
-      />
-      <forward
-        name="preview"
-        path="/home.do?method=learner"
-        redirect="false"
-      />
-      <forward
-        name="sequenceChooser"
-        path="/pedagogical_planner/sequenceChooser.jsp"
-        redirect="false"
-      />
-      <forward
-        name="grouping"
-        path="/pedagogical_planner/grouping.jsp"
-        redirect="false"
-      />
-      <forward
-        name="editAuthors"
-        path="/pedagogical_planner/editAuthors.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/pedagogicalPlanner/grouping"
-      type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction"
-      name="PedagogicalPlannerGroupingForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="template"
-        path="/pedagogical_planner/templateBase.jsp"
-        redirect="false"
-      />
-      <forward
-        name="preview"
-        path="/home.do?method=learner"
-        redirect="false"
-      />
-      <forward
-        name="sequenceChooser"
-        path="/pedagogical_planner/sequenceChooser.jsp"
-        redirect="false"
-      />
-      <forward
-        name="grouping"
-        path="/pedagogical_planner/grouping.jsp"
-        redirect="false"
-      />
-      <forward
-        name="editAuthors"
-        path="/pedagogical_planner/editAuthors.jsp"
         redirect="false"
       />
     </action>
