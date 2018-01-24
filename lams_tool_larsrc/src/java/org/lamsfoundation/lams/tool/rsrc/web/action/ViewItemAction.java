@@ -268,7 +268,7 @@ public class ViewItemAction extends Action {
 	return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
     }
 
-    private static Pattern wikipediaPattern = Pattern.compile("wikipedia",
+    private static Pattern usePopupButtonForURL = Pattern.compile("wikipedia|google",
 	    Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 
     private Object getReviewUrl(ResourceItem item, String sessionMapID, String mode, int itemIdx) {
@@ -277,10 +277,10 @@ public class ViewItemAction extends Action {
 	switch (type) {
 	    case ResourceConstants.RESOURCE_TYPE_URL:
 		// See LDEV-1736 regarding wikipedia regex
-		Matcher matcher = wikipediaPattern.matcher(item.getUrl());
-		boolean wikipediaInURL = matcher.find();
+		Matcher matcher = usePopupButtonForURL.matcher(item.getUrl());
+		boolean usePopup = matcher.find();
 
-		if (item.isOpenUrlNewWindow() || wikipediaInURL) {
+		if (item.isOpenUrlNewWindow() || usePopup) {
 		    url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
 		} else {
 		    url = ResourceWebUtils.protocol(item.getUrl());
