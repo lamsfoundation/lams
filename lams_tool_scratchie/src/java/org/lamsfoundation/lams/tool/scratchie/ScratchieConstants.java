@@ -28,8 +28,6 @@ public class ScratchieConstants {
 
     public static final String SCRATCHIE_SERVICE = "scratchieService";
 
-    public static final String TOOL_CONTENT_HANDLER_NAME = "scratchieToolContentHandler";
-
     public static final int COMPLETED = 1;
 
     public static final int INITIAL_ANSWERS_NUMBER = 4;

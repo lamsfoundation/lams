@@ -32,8 +32,6 @@ import java.util.regex.Pattern;
 public interface ForumConstants {
     public static final String TOOL_SIGNATURE = "lafrum11";
 
-    public static final String TOOL_CONTENT_HANDLER_NAME = "forumToolContentHandler";
-
     public static final int SORT_BY_NO = 0;
     public static final int SORT_BY_USER_NAME_ASC = 1;
     public static final int SORT_BY_USER_NAME_DESC = 2;

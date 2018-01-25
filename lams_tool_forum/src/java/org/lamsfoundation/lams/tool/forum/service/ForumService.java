@@ -46,16 +46,9 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.exception.LoginException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.exception.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -145,8 +138,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private ILamsToolService toolService;
 
     private ForumToolContentHandler forumToolContentHandler;
-
-    private IRepositoryService repositoryService;
 
     private ILearnerService learnerService;
 
@@ -751,31 +742,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return node;
     }
 
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     *
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     *
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws ForumException {
-	ICredentials credentials = new SimpleCredentials(forumToolContentHandler.getRepositoryUser(),
-		forumToolContentHandler.getRepositoryId());
-	try {
-	    ITicket ticket = repositoryService.login(credentials, forumToolContentHandler.getRepositoryWorkspaceName());
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new ForumException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new ForumException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new ForumException("Login failed." + e.getMessage());
-	}
-    }
-
     private Forum getDefaultForum() {
 	Long defaultForumId = new Long(toolService.getToolDefaultContentIdBySignature(ForumConstants.TOOL_SIGNATURE));
 	if (defaultForumId.equals(0L)) {
@@ -1324,14 +1290,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     public void setForumUserDao(IForumUserDAO forumUserDao) {
 	this.forumUserDao = forumUserDao;
-    }
-
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     public ForumToolContentHandler getForumToolContentHandler() {

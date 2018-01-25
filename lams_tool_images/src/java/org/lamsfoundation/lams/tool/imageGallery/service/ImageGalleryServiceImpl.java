@@ -560,7 +560,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    String fileName = file.getFileName();
 
 	    
-	    InputStream originalIS = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
+	    InputStream originalIS = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getUuid());
 	    BufferedImage originalImage = ImageIO.read(originalIS);
 	    //throw exception if image was not successfully read
 	    if (originalImage == null) {
@@ -578,14 +578,14 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 		    "image/jpeg");
 	    image.setMediumFileUuid(mediumNodeKey.getUuid());
 	    //store MediumImageWidth and MediumImageHeight
-	    InputStream mediumIS2 = imageGalleryToolContentHandler.getFileNode(mediumNodeKey.getUuid()).getFile();
+	    InputStream mediumIS2 = imageGalleryToolContentHandler.getFileInputStream(mediumNodeKey.getUuid());
 	    BufferedImage mediumImage = ImageIO.read(mediumIS2);
 	    image.setMediumImageWidth(mediumImage.getWidth(null));
 	    image.setMediumImageHeight(mediumImage.getHeight(null));
 	    mediumIS2.close();
 	    
 	    // prepare thumbnail image
-	    InputStream originalIS2 = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
+	    InputStream originalIS2 = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getUuid());
 	    InputStream thumbnailIS = ResizePictureUtil.resize(originalIS2, thumbnailImageDimensions);
 	    String thumbnailFileName = ImageGalleryServiceImpl.THUMBNAIL_FILENAME_PREFIX
 		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";

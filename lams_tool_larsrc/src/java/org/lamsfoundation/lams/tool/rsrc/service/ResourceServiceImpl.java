@@ -49,17 +49,9 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.exception.LoginException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.exception.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -94,7 +86,6 @@ import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.ResourceItemDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
-import org.lamsfoundation.lams.tool.rsrc.ims.ImscpApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.ims.SimpleContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
@@ -138,7 +129,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     private MessageService messageService;
 
     // system services
-    private IRepositoryService repositoryService;
 
     private ILamsToolService toolService;
 
@@ -158,82 +148,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     private ResourceOutputFactory resourceOutputFactory;
 
-    @Override
-    public IVersionedNode getFileNode(Long itemUid, String relPathString) throws ResourceApplicationException {
-	ResourceItem item = (ResourceItem) resourceItemDao.getObject(ResourceItem.class, itemUid);
-	if (item == null) {
-	    throw new ResourceApplicationException("Reource item " + itemUid + " not found.");
-	}
-
-	return getFile(item.getFileUuid(), item.getFileVersionId(), relPathString);
-    }
-
     // *******************************************************************************
     // Service method
     // *******************************************************************************
-    /**
-     * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
-     * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
-     *
-     * @param uuid
-     * @param versionId
-     * @param relativePath
-     * @param attemptCount
-     * @return file node
-     * @throws ImscpApplicationException
-     */
-    private IVersionedNode getFile(Long uuid, Long versionId, String relativePath) throws ResourceApplicationException {
-
-	ITicket tic = getRepositoryLoginTicket();
-
-	try {
-
-	    return repositoryService.getFileItem(tic, uuid, versionId, relativePath);
-
-	} catch (AccessDeniedException e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + ".";
-
-	    error = error + "AccessDeniedException: " + e.getMessage() + " Unable to retry further.";
-	    ResourceServiceImpl.log.error(error);
-	    throw new ResourceApplicationException(error, e);
-
-	} catch (Exception e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + "." + " Exception: " + e.getMessage();
-	    ResourceServiceImpl.log.error(error);
-	    throw new ResourceApplicationException(error, e);
-
-	}
-    }
-
-    /**
-     * This method verifies the credentials of the Share Resource Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     *
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     *
-     * @return ITicket The ticket for repostory access
-     * @throws ResourceApplicationException
-     */
-    private ITicket getRepositoryLoginTicket() throws ResourceApplicationException {
-	ICredentials credentials = new SimpleCredentials(resourceToolContentHandler.getRepositoryUser(),
-		resourceToolContentHandler.getRepositoryId());
-	try {
-	    ITicket ticket = repositoryService.login(credentials,
-		    resourceToolContentHandler.getRepositoryWorkspaceName());
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new ResourceApplicationException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new ResourceApplicationException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new ResourceApplicationException("Login failed." + e.getMessage());
-	}
-    }
 
     @Override
     public Resource getResourceByContentId(Long contentId) {
@@ -281,14 +198,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ResourceApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
-	} catch (Exception e) {
-	    throw new ResourceApplicationException(
-		    "Exception occured while deleting files from" + " the repository " + e.getMessage());
-	}
+    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws InvalidParameterException, RepositoryCheckedException {
+	resourceToolContentHandler.deleteFile(fileUuid);
     }
 
     @Override
@@ -1146,10 +1057,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     public void setResourceDao(ResourceDAO resourceDao) {

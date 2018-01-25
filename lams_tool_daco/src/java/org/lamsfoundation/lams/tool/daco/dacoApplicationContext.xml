@@ -70,9 +70,6 @@
         <property name="dacoToolContentHandler">
             <ref bean="dacoToolContentHandler"/>
         </property>
-        <property name="repositoryService">
-            <ref bean="repositoryService"/>
-        </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
    		</property>

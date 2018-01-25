@@ -28,8 +28,6 @@ public class AssessmentConstants {
 
     public static final String ASSESSMENT_SERVICE = "laasseAssessmentService";
 
-    public static final String TOOL_CONTENT_HANDLER_NAME = "laasseAssessmentToolContentHandler";
-
     public static final int COMPLETED = 1;
 
     public static final int INITIAL_OPTIONS_NUMBER = 3;

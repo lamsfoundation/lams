@@ -29,7 +29,8 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.commonCartridge.dto.ReflectDTO;
@@ -47,16 +48,6 @@ import org.lamsfoundation.lams.usermanagement.User;
  *         Interface that defines the contract that all ShareCommonCartridge service provider must follow.
  */
 public interface ICommonCartridgeService {
-
-    /**
-     * Get file <code>IVersiondNode</code> by given package id and path.
-     *
-     * @param packageId
-     * @param relPathString
-     * @return
-     * @throws CommonCartridgeApplicationException
-     */
-    IVersionedNode getFileNode(Long packageId, String relPathString) throws CommonCartridgeApplicationException;
 
     /**
      * Get <code>CommonCartridge</code> by toolContentID.
@@ -122,8 +113,10 @@ public interface ICommonCartridgeService {
     // ********** Repository methods ***********************
     /**
      * Delete file from repository.
+     * @throws RepositoryCheckedException 
+     * @throws InvalidParameterException 
      */
-    void deleteFromRepository(Long fileUuid, Long fileVersionId) throws CommonCartridgeApplicationException;
+    void deleteFromRepository(Long fileUuid, Long fileVersionId) throws CommonCartridgeApplicationException, InvalidParameterException, RepositoryCheckedException;
 
     /**
      * Save or update commonCartridge into database.

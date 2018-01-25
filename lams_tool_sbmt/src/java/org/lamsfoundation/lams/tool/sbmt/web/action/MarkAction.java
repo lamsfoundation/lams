@@ -49,15 +49,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author lfoxton
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 public class MarkAction extends LamsDispatchAction {
 
@@ -183,9 +174,11 @@ public class MarkAction extends LamsDispatchAction {
      * @param request
      * @param response
      * @return
+     * @throws RepositoryCheckedException 
+     * @throws InvalidParameterException 
      */
     public ActionForward removeMarkFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws InvalidParameterException, RepositoryCheckedException {
 	MarkForm markForm = (MarkForm) form;
 
 	if (submitFilesService == null) {

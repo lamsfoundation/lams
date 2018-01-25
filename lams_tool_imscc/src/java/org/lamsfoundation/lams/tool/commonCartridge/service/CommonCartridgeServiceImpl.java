@@ -42,14 +42,8 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.exception.LoginException;
-import org.lamsfoundation.lams.contentrepository.exception.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -120,7 +114,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     private MessageService messageService;
 
     // system services
-    private IRepositoryService repositoryService;
 
     private ILamsToolService toolService;
 
@@ -138,84 +131,9 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     private ILessonService lessonService;
 
-    @Override
-    public IVersionedNode getFileNode(Long itemUid, String relPathString) throws CommonCartridgeApplicationException {
-	CommonCartridgeItem item = (CommonCartridgeItem) commonCartridgeItemDao.getObject(CommonCartridgeItem.class,
-		itemUid);
-	if (item == null) {
-	    throw new CommonCartridgeApplicationException("Reource item " + itemUid + " not found.");
-	}
-
-	return getFile(item.getFileUuid(), item.getFileVersionId(), relPathString);
-    }
-
     // *******************************************************************************
     // Service method
     // *******************************************************************************
-    /**
-     * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
-     * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
-     *
-     * @param uuid
-     * @param versionId
-     * @param relativePath
-     * @param attemptCount
-     * @return file node
-     * @throws ImscpApplicationException
-     */
-    private IVersionedNode getFile(Long uuid, Long versionId, String relativePath)
-	    throws CommonCartridgeApplicationException {
-
-	ITicket tic = getRepositoryLoginTicket();
-
-	try {
-
-	    return repositoryService.getFileItem(tic, uuid, versionId, relativePath);
-
-	} catch (AccessDeniedException e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + ".";
-
-	    error = error + "AccessDeniedException: " + e.getMessage() + " Unable to retry further.";
-	    CommonCartridgeServiceImpl.log.error(error);
-	    throw new CommonCartridgeApplicationException(error, e);
-
-	} catch (Exception e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + "." + " Exception: " + e.getMessage();
-	    CommonCartridgeServiceImpl.log.error(error);
-	    throw new CommonCartridgeApplicationException(error, e);
-
-	}
-    }
-
-    /**
-     * This method verifies the credentials of the CommonCartridge Tool and gives it the <code>Ticket</code> to login
-     * and access the Content Repository.
-     *
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     *
-     * @return ITicket The ticket for repostory access
-     * @throws CommonCartridgeApplicationException
-     */
-    private ITicket getRepositoryLoginTicket() throws CommonCartridgeApplicationException {
-	ICredentials credentials = new SimpleCredentials(commonCartridgeToolContentHandler.getRepositoryUser(),
-		commonCartridgeToolContentHandler.getRepositoryId());
-	try {
-	    ITicket ticket = repositoryService.login(credentials,
-		    commonCartridgeToolContentHandler.getRepositoryWorkspaceName());
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new CommonCartridgeApplicationException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new CommonCartridgeApplicationException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new CommonCartridgeApplicationException("Login failed." + e.getMessage());
-	}
-    }
 
     @Override
     public CommonCartridge getCommonCartridgeByContentId(Long contentId) {
@@ -263,14 +181,8 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     }
 
     @Override
-    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws CommonCartridgeApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
-	} catch (Exception e) {
-	    throw new CommonCartridgeApplicationException(
-		    "Exception occured while deleting files from" + " the repository " + e.getMessage());
-	}
+    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws InvalidParameterException, RepositoryCheckedException {
+	commonCartridgeToolContentHandler.deleteFile(fileUuid);
     }
 
     @Override
@@ -614,10 +526,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     public void setCommonCartridgeDao(CommonCartridgeDAO commonCartridgeDao) {

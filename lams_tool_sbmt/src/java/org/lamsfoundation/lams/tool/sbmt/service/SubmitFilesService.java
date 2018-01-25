@@ -47,20 +47,10 @@ import org.apache.struts.upload.FormFile;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.exception.FileException;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.exception.LoginException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.exception.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -94,7 +84,6 @@ import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitUserDAO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
-import org.lamsfoundation.lams.tool.sbmt.util.SbmtToolContentHandler;
 import org.lamsfoundation.lams.tool.sbmt.util.SubmitFilesException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -129,8 +118,6 @@ public class SubmitFilesService
     private ILamsToolService toolService;
 
     private ILearnerService learnerService;
-
-    private IRepositoryService repositoryService;
 
     private IExportToolContentService exportContentService;
 
@@ -419,42 +406,6 @@ public class SubmitFilesService
 	return submitFilesReportDAO.getReportByID(reportID);
     }
 
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     *
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     *
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws SubmitFilesException {
-	ICredentials credentials = new SimpleCredentials(SbmtToolContentHandler.repositoryUser,
-		SbmtToolContentHandler.repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials, SbmtToolContentHandler.repositoryWorkspaceName);
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new SubmitFilesException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new SubmitFilesException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new SubmitFilesException("Login failed." + e.getMessage());
-	}
-    }
-
-    @Override
-    public void deleteFromRepository(Long uuid, Long versionID) throws SubmitFilesException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new SubmitFilesException(
-		    "Exception occured while deleting files from" + " the repository " + e.getMessage());
-	}
-    }
-
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) {
 	// pre-condition validation
@@ -542,7 +493,11 @@ public class SubmitFilesService
 	    Iterator fileIterator = filesUploaded.iterator();
 	    while (fileIterator.hasNext()) {
 		SubmissionDetails details = (SubmissionDetails) fileIterator.next();
-		deleteFromRepository(details.getUuid(), details.getVersionID());
+		try {
+		    sbmtToolContentHandler.deleteFile(details.getUuid());
+		} catch (RepositoryCheckedException e) {
+		    log.error("Exception was thrown on trying to remove file with uiid=" + details.getUuid(), e);
+		}
 		submissionDetailsDAO.delete(details);
 	    }
 	}
@@ -803,10 +758,10 @@ public class SubmitFilesService
     }
 
     @Override
-    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID) {
+    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID) throws InvalidParameterException, RepositoryCheckedException {
 	SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
 	if (report != null) {
-	    deleteFromRepository(markFileUUID, markFileVersionID);
+	    sbmtToolContentHandler.deleteFile(markFileUUID);
 	    report.setMarkFileName(null);
 	    report.setMarkFileUUID(null);
 	    report.setMarkFileVersionID(null);
@@ -856,24 +811,6 @@ public class SubmitFilesService
 	String auditMsg = getLocalisedMessage(i18nKey, new Object[] { instructorTxt.toString(), detail.getFilePath(),
 	    learnerTxt.toString() });
 	auditService.log(SbmtConstants.AUDIT_LOG_MODULE_NAME, auditMsg);
-    }
-
-
-    @Override
-    public IVersionedNode downloadFile(Long uuid, Long versionID) throws SubmitFilesException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    IVersionedNode node = repositoryService.getFileItem(ticket, uuid, null);
-	    return node;
-	} catch (AccessDeniedException ae) {
-	    throw new SubmitFilesException(
-		    "AccessDeniedException occured while trying to download file " + ae.getMessage());
-	} catch (FileException fe) {
-	    throw new SubmitFilesException("FileException occured while trying to download file " + fe.getMessage());
-	} catch (ItemNotFoundException ie) {
-	    throw new SubmitFilesException(
-		    "ItemNotFoundException occured while trying to download file " + ie.getMessage());
-	}
     }
 
     @Override
@@ -1228,14 +1165,6 @@ public class SubmitFilesService
 
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
-    }
-
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     public ILamsToolService getToolService() {

@@ -71,7 +71,7 @@ public class DacoToolContentHandler extends ToolContentHandler {
      */
     @Override
     public char[] getRepositoryId() {
-	return DacoToolContentHandler.repositoryId;
+	return repositoryId;
     }
 
 }

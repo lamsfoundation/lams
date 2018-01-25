@@ -229,8 +229,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	return result;
     }
 
-    public static Leaderselection newInstance(Leaderselection fromContent, Long toContentId,
-	    IToolContentHandler leaderselectionToolContentHandler) {
+    public static Leaderselection newInstance(Leaderselection fromContent, Long toContentId) {
 	Leaderselection toContent = new Leaderselection();
 	toContent = (Leaderselection) fromContent.clone();
 	toContent.setToolContentId(toContentId);

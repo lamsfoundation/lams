@@ -74,9 +74,6 @@
         <property name="commonCartridgeToolContentHandler">
             <ref bean="commonCartridgeToolContentHandler"/>
         </property>
-        <property name="repositoryService">
-            <ref bean="repositoryService"/>
-        </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
    		</property>

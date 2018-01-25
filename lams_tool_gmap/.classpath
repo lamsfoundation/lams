@@ -16,7 +16,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="/lams_common/src/java/org/lamsfoundation/lams/dao/hibernate"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_contentrepository"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
 	<classpathentry kind="output" path="bin"/>

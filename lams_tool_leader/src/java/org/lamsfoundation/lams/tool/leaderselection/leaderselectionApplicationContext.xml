@@ -38,7 +38,6 @@
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		   		<property name="leaderselectionOutputFactory"><ref bean="leaderselectionOutputFactory"/></property>
-		   		<property name="repositoryService"><ref bean="repositoryService"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">

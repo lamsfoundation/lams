@@ -813,7 +813,7 @@ public class AuthoringAction extends Action {
 	CommonCartridgePedagogicalPlannerForm plannerForm = (CommonCartridgePedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	CommonCartridge taskList = getCommonCartridgeService().getCommonCartridgeByContentId(toolContentID);
-	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
+	String command = WebUtil.readStrParam(request, "command", true);
 	if (command == null) {
 	    plannerForm.fillForm(taskList);
 	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
