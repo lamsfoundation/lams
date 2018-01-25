@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.util.Set;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.exception.FileException;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
@@ -165,7 +164,7 @@ public interface IToolContentHandler {
     public abstract NodeKey copyFile(Long uuid) throws ItemNotFoundException, RepositoryCheckedException;
 
     /**
-     * Get a file node.
+     * Get the file, as an inputstream.
      * 
      * @param uuid
      *            id of the file node. Mandatory
@@ -176,33 +175,10 @@ public interface IToolContentHandler {
      * @throws RepositoryCheckedException
      *             Some other error occured.
      */
-    public abstract IVersionedNode getFileNode(Long uuid)
-	    throws ItemNotFoundException, FileException, RepositoryCheckedException;
-
-    /**
-     * Get just the properties of a file. Convenience method - equivalent of
-     * calling getFileNode(uuid).getProperties(). Useful if all you want are
-     * the properties and you don't want to access the file itself.
-     *
-     * @param uuid
-     *            id of the file node. Mandatory
-     * @throws FileException
-     *             An error occured writing the input stream to disk.
-     * @throws ItemNotFoundException
-     *             This file node does not exist, so cannot delete it.
-     * @throws RepositoryCheckedException
-     *             Some other error occured.
-     */
-    public abstract Set getFileProperties(Long uuid)
+    public abstract InputStream getFileInputStream(Long uuid)
 	    throws ItemNotFoundException, FileException, RepositoryCheckedException;
 
     public abstract IRepositoryService getRepositoryService();
-
-    /**
-     * @param repositoryService
-     *            The repositoryService to set.
-     */
-    public abstract void setRepositoryService(IRepositoryService repositoryService);
 
     /**
      * Save content in repository into local file by given <code>toFileName</code>.
