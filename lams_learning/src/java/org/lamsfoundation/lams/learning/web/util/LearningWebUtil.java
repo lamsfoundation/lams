@@ -35,9 +35,9 @@ import org.apache.struts.action.ActionForward;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -215,24 +215,6 @@ public class LearningWebUtil {
 	    return null;
 	}
 	ActivityPositionDTO positionDTO = learnerService.getActivityPosition(activityId);
-	if (positionDTO != null) {
-	    request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
-	}
-	return positionDTO;
-    }
-
-    /**
-     * Finds activity position within Learning Design and stores it as request attribute.
-     */
-    public static ActivityPositionDTO putActivityPositionInRequestByToolSessionId(Long toolSessionId,
-	    HttpServletRequest request, ServletContext context) {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
-	ILearnerService learnerService = (ILearnerService) wac.getBean("learnerService");
-	if (learnerService == null) {
-	    LearningWebUtil.log.warn("Can not set activity position, no Learner service in servlet context.");
-	    return null;
-	}
-	ActivityPositionDTO positionDTO = learnerService.getActivityPositionByToolSessionId(toolSessionId);
 	if (positionDTO != null) {
 	    request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
 	}

@@ -1,28 +1,29 @@
 package org.lamsfoundation.lams.util;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * helper methods useful for servlets
@@ -618,5 +619,23 @@ public class WebUtil {
 	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(9), '9');
 
 	return decodedLessonId;
+    }
+
+    /**
+     * Finds activity position within Learning Design and stores it as request attribute.
+     */
+    public static ActivityPositionDTO putActivityPositionInRequestByToolSessionId(Long toolSessionId,
+	    HttpServletRequest request, ServletContext context) {
+	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
+	ILearnerService learnerService = (ILearnerService) wac.getBean("learnerService");
+	if (learnerService == null) {
+	    log.warn("Can not set activity position, no Learner service in servlet context.");
+	    return null;
+	}
+	ActivityPositionDTO positionDTO = learnerService.getActivityPositionByToolSessionId(toolSessionId);
+	if (positionDTO != null) {
+	    request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
+	}
+	return positionDTO;
     }
 }

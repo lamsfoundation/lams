@@ -39,12 +39,11 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.command.dao.ICommandDAO;
 import org.lamsfoundation.lams.learning.command.model.Command;
+import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
+import org.lamsfoundation.lams.learning.kumalive.service.IKumaliveService;
 import org.lamsfoundation.lams.learning.progress.ProgressBuilder;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
-import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -71,6 +70,9 @@ import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
+import org.lamsfoundation.lams.learningdesign.dto.GateActivityDTO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -118,6 +120,7 @@ public class LearnerService implements ICoreLearnerService {
     private static HashMap<Integer, Long> syncMap = new HashMap<Integer, Long>();
     private IGradebookService gradebookService;
     private ILogEventService logEventService;
+    private IKumaliveService kumaliveService;
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
@@ -216,6 +219,10 @@ public class LearnerService implements ICoreLearnerService {
 
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
+    }
+    
+    public void setKumaliveService(IKumaliveService kumaliveService) {
+	this.kumaliveService = kumaliveService;
     }
 
     // ---------------------------------------------------------------------
@@ -1389,7 +1396,9 @@ public class LearnerService implements ICoreLearnerService {
 	commandDAO.insert(command);
     }
 
-    @Override
+    /**
+     * Used by <code>CommandWebsocketServer</code>.
+     */
     public List<Command> getCommandsForLesson(Long lessonId, Date laterThan) {
 	return commandDAO.getNewCommands(lessonId, laterThan);
     }
@@ -1595,6 +1604,12 @@ public class LearnerService implements ICoreLearnerService {
 	}
 	return status;
 
+    }
+    
+    @Override
+    public boolean isKumaliveDisabledForOrganisation(Integer organisationId) {
+	Kumalive kumalive = kumaliveService.getKumaliveByOrganisation(organisationId);
+	return kumalive == null || kumalive.getFinished();
     }
 
     @Override

@@ -23,11 +23,7 @@
 
 package org.lamsfoundation.lams.learning.service;
 
-import java.util.Date;
-import java.util.List;
-
-import org.lamsfoundation.lams.learning.command.model.Command;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.tool.ToolOutput;
 
 /**
@@ -58,6 +54,4 @@ public interface ILearnerService {
     ActivityPositionDTO getActivityPositionByToolSessionId(Long toolSessionId);
 
     void createCommandForLearner(Long lessonId, String userName, String jsonCommand);
-
-    List<Command> getCommandsForLesson(Long lessonId, Date laterThan);
 }
