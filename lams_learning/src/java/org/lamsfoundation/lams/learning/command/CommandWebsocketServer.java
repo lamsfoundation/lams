@@ -17,7 +17,7 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.command.model.Command;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.LearnerService;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -32,7 +32,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @ServerEndpoint("/commandWebsocket")
 public class CommandWebsocketServer {
 
-    private static ILearnerService learnerService;
+    private static LearnerService learnerService;
 
     /**
      * A singleton which updates Learners with messages and commands.
@@ -157,11 +157,11 @@ public class CommandWebsocketServer {
 	lessonWebsockets.remove(login);
     }
 
-    private static ILearnerService getLearnerService() {
+    private static LearnerService getLearnerService() {
 	if (learnerService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getWebApplicationContext(SessionManager.getServletContext());
-	    learnerService = (ILearnerService) ctx.getBean("learnerService");
+	    learnerService = (LearnerService) ctx.getBean("learnerService");
 	}
 	return learnerService;
     }

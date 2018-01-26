@@ -69,17 +69,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * </p>
  *
  * @author Jacky Fang
- * @since 2005-3-29
- * @version 1.1
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 public class GroupingAction extends LamsDispatchAction {
 

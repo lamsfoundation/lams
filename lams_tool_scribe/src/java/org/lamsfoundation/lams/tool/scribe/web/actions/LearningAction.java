@@ -35,7 +35,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONException;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -101,8 +100,7 @@ public class LearningAction extends LamsDispatchAction {
 	    scribeService.saveOrUpdateScribe(scribe);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet().getServletContext());
 
 	// Retrieve the current user
 	ScribeUser scribeUser = getCurrentUser(toolSessionID);
@@ -245,8 +243,8 @@ public class LearningAction extends LamsDispatchAction {
 
 	request.setAttribute("scribeDTO", scribeDTO);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(scribeUser.getScribeSession().getSessionId(),
-		request, getServlet().getServletContext());
+	WebUtil.putActivityPositionInRequestByToolSessionId(scribeUser.getScribeSession().getSessionId(), request,
+		getServlet().getServletContext());
 
 	return mapping.findForward("notebook");
     }
@@ -289,7 +287,7 @@ public class LearningAction extends LamsDispatchAction {
 	    setupOtherGroupReportDTO(request, session, scribeUser);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(session.getSessionId(), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(session.getSessionId(), request,
 		getServlet().getServletContext());
 
 	return mapping.findForward("report");

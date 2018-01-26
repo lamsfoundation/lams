@@ -48,7 +48,6 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -173,8 +172,7 @@ public class LearnerAction extends DispatchAction {
 	content.setDefineLater(false);
 	submitFilesService.saveOrUpdateContent(content);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request,
-		getServlet().getServletContext());
+	WebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request, getServlet().getServletContext());
 
 	// check if there is submission deadline
 	Date submissionDeadline = content.getSubmissionDeadline();
@@ -282,8 +280,7 @@ public class LearnerAction extends DispatchAction {
 	// set the mode into http session
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request,
-		getServlet().getServletContext());
+	WebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request, getServlet().getServletContext());
 
 	if (validateUploadForm(learnerForm, request)) {
 	    // get session from shared session.

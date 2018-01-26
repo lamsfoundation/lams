@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.learning.web.bean;
+package org.lamsfoundation.lams.learningdesign.dto;
 
 import java.util.List;
 

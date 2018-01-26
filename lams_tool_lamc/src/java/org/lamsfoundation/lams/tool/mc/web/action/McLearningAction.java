@@ -41,7 +41,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -354,7 +353,7 @@ public class McLearningAction extends LamsDispatchAction {
 	mcGeneralLearnerFlowDTO.setQuestionIndex(questionIndex);
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
 		getServlet().getServletContext());
 
 	request.setAttribute("sessionMapID", sessionMap.getSessionID());
@@ -508,7 +507,7 @@ public class McLearningAction extends LamsDispatchAction {
 
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
 		getServlet().getServletContext());
 
 	return mapping.findForward(McAppConstants.VIEW_ANSWERS);

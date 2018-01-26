@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.lams.learning.web.bean;
+package org.lamsfoundation.lams.learningdesign.dto;
 
 /**
  * Marks activity position within Learning Design. It can be extended to find out exact position (for example, 4th
