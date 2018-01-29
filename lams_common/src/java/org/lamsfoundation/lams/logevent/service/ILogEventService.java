@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.LogEventType;
 
 /**
  * Manages <code>LogEvent</code>s.
@@ -34,6 +35,10 @@ import org.lamsfoundation.lams.logevent.LogEvent;
  * @author Andrey Balan
  */
 public interface ILogEventService {
+    
+    /** Constants used for sorting */
+    static final int SORT_BY_DATE_ASC = 0;
+    static final int SORT_BY_DATE_DESC = 1;
 
     /**
      * Records event of specified type in database.
@@ -42,6 +47,14 @@ public interface ILogEventService {
      * @param userId
      */
     void logEvent(Integer logEventTypeId, Integer userId, Long learningDesignId, Long lessonId, Long activityId);
+
+    /**
+     * Records event of specified type in database.
+     *
+     * @param logEventTypeId
+     * @param userId
+     */
+    void logEvent(Integer logEventTypeId, Integer userId, Long learningDesignId, Long lessonId, Long activityId, String description);
 
     /**
      * Returns event by the given id.
@@ -68,5 +81,17 @@ public interface ILogEventService {
      * @return
      */
     List<LogEvent> getEventsOccurredBetween(Date startDate, Date finishDate);
+
+    /** Get the Log Event Types in a structured form */
+    List<LogEventType> getEventTypes();
+     
+    /** Get the date of the oldest event log entry. Handy for letting a user select a date range */
+    Date getOldestEventDate();
+    
+    /** Used for displaying paged lists of events */
+    List<LogEvent> getEventsForTablesorter(int page, int size, int sorting, String searchString, Date startDate,
+	    Date endDate, String area, Integer typeId);
+
+    int countEventsWithRestrictions(String searchString, Date startDate, Date endDate, String area, Integer typeId);
 
 }

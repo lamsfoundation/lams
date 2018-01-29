@@ -1746,7 +1746,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	LogEvent logEvent = new LogEvent();
 	logEvent.setLogEventTypeId(LogEvent.TYPE_TEACHER_LEARNING_DESIGN_CREATE);
-	logEvent.setLearningDesignId(learningDesingID);
+	logEvent.setTargetId(learningDesingID); // TODO fix ids
 	logEvent.setUser(user);
 	logEvent.setOccurredDateTime(learningDesign.getCreateDateTime());
 	baseDAO.insert(logEvent);

@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.LogEventType;
 import org.lamsfoundation.lams.logevent.dao.ILogEventDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -70,8 +71,13 @@ public class LogEventService implements ILogEventService {
     }
 
     @Override
-    public void logEvent(Integer logEventTypeId, Integer userId, Long learningDesignId, Long lessonId,
+    public void logEvent(Integer logEventTypeId, Integer userId, Long targetUserId, Long lessonId,
 	    Long activityId) {
+	logEvent(logEventTypeId, userId, targetUserId, lessonId, activityId, null);
+    }
+    @Override
+    public void logEvent(Integer logEventTypeId, Integer userId, Long targetUserId, Long lessonId,
+		    Long activityId, String description) {
 	User user = (userId != null) ? (User) userManagementService.findById(User.class, userId) : null;
 	if (user == null) {
 	    throw new RuntimeException("User can't be null");
@@ -79,9 +85,10 @@ public class LogEventService implements ILogEventService {
 	LogEvent logEvent = new LogEvent();
 	logEvent.setLogEventTypeId(logEventTypeId);
 	logEvent.setUser(user);
-	logEvent.setLearningDesignId(learningDesignId);
+	logEvent.setTargetId(targetUserId);
 	logEvent.setLessonId(lessonId);
 	logEvent.setActivityId(activityId);
+	logEvent.setDescription(description);
 	logEventDAO.save(logEvent);
     }
 
@@ -100,6 +107,27 @@ public class LogEventService implements ILogEventService {
 	return logEventDAO.getEventsOccurredBetween(startDate, finishDate);
     }
 
+    @Override
+    public List<LogEventType> getEventTypes() {
+	return logEventDAO.getEventTypes();
+    }
+    
+    @Override
+    public Date getOldestEventDate() {
+	return logEventDAO.getOldestEventDate();
+    }
+
+    @Override
+    public List<LogEvent> getEventsForTablesorter(int page, int size, int sorting, String searchString, Date startDate,
+	    Date endDate, String area, Integer typeId) {
+	return logEventDAO.getEventsForTablesorter(page, size, sorting, searchString, startDate, endDate, area, typeId);
+    }
+    
+    @Override
+    public int countEventsWithRestrictions(String searchString, Date startDate, Date endDate, String area, Integer typeId) {
+	return logEventDAO.countEventsWithRestrictions(searchString, startDate, endDate, area, typeId);
+    }
+    
     /**
      *
      * @param logEventDAO

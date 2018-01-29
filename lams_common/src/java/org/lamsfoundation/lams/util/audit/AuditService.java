@@ -24,11 +24,15 @@
 
 package org.lamsfoundation.lams.util.audit;
 
+import java.util.Set;
+
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -38,7 +42,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * Write out audit entries to a log4j based log file. Gets the user details from the shared session.
  */
 /*
- * Relies on the followig two entries in the log4j configuration file:
+ * Relies on the following two entries in the log4j configuration file:
  *
  * <category name="org.lamsfoundation.lams.util.audit" additivity="false"> <priority value="INFO"/> <appender-ref
  * ref="AUDITFILE"/> </category>
@@ -56,7 +60,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class AuditService implements IAuditService {
 
-    static Logger logger = Logger.getLogger(AuditService.class.getName());
+//    static Logger logger = Logger.getLogger(AuditService.class.getName());
+    ILogEventService logEventService;
 
     private final String AUDIT_CHANGE_I18N_KEY = "audit.change.entry";
     private final String AUDIT_MARK_CHANGE_I18N_KEY = "audit.change.mark";
@@ -68,6 +73,18 @@ public class AuditService implements IAuditService {
 	    
     protected MessageService messageService;
     protected IActivityDAO activityDao;
+
+    private Integer getUserID() {
+	HttpSession ss = SessionManager.getSession();
+	if (ss != null) {
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    if (user != null) {
+		return user.getUserID();
+	    }
+	}
+	return null;
+    }
+
 
     private String getUserString() {
 	HttpSession ss = SessionManager.getSession();
@@ -86,12 +103,33 @@ public class AuditService implements IAuditService {
 
     @Override
     public void log(String moduleName, String message) {
-	logger.info(getUserString() + moduleName + ": " + message);
+	logEventService.logEvent(LogEvent.UNKNOWN,  getUserID(), null, null, null, getUserString() + moduleName + ": " + message);
     }
 
     @Override
     public void log(UserDTO userDTO, String moduleName, String message) {
-	logger.info(getUserString(userDTO) + moduleName + ": " + message);
+	logEventService.logEvent(LogEvent.UNKNOWN,  getUserID(), null, null, null, getUserString(userDTO) + moduleName + ": " + message);
+    }
+
+    
+    @SuppressWarnings("unchecked")
+    private void logEvent(Integer logEventTypeId, Long targetUserId, Long toolContentId, String description) {
+	Integer userId = getUserID();
+	Long lessonId = null;
+	Long activityId = null;
+	if ( toolContentId != null ) {
+	    ToolActivity toolActivity = activityDao.getToolActivityByToolContentId(toolContentId);
+	    if ( toolActivity != null ) {
+		activityId = toolActivity.getActivityId();
+		Set<Lesson> lessons = (Set<Lesson>) toolActivity.getLearningDesign().getLessons();
+		// DB allows the same learning design to be used for multiple lessons but in practice it is 1-1.
+		if ( lessons.size() > 0) {
+		    lessonId = lessons.iterator().next().getLessonId();
+		}
+	    }
+	    // lookup lessonId from activityId
+	}
+	logEventService.logEvent(logEventTypeId, userId, targetUserId, lessonId, activityId, description);
     }
 
     @Override
@@ -102,7 +140,7 @@ public class AuditService implements IAuditService {
 	args[1] = originalText;
 	args[2] = newText;
 	String message = messageService.getMessage(AUDIT_CHANGE_I18N_KEY, args);
-	log(moduleName, message);
+	logEvent(LogEvent.LEARNER_CONTENT_UPDATED, originalUserId, null, message.toString());
     }
 
     @Override
@@ -112,17 +150,17 @@ public class AuditService implements IAuditService {
 	args[0] = originalUserLogin + "(" + originalUserId + ")";
 	args[1] = originalMark;
 	args[2] = newMark;
-	String message = messageService.getMessage(AUDIT_MARK_CHANGE_I18N_KEY, args);
-	log(moduleName, message);
+	StringBuilder message = new StringBuilder(moduleName).append(messageService.getMessage(AUDIT_MARK_CHANGE_I18N_KEY, args));
+	logEvent(LogEvent.MARK_UPDATED, originalUserId, null, message.toString());
     }
-
+    
     @Override
     public void logHideEntry(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem) {
 	String[] args = new String[3];
 	args[0] = originalUserLogin + "(" + originalUserId + ")";
 	args[1] = hiddenItem;
 	String message = messageService.getMessage(AUDIT_HIDE_I18N_KEY, args);
-	log(moduleName, message);
+	logEvent(LogEvent.LEARNER_CONTENT_SHOW_HIDE, originalUserId, null, message.toString());
     }
 
     @Override
@@ -131,8 +169,8 @@ public class AuditService implements IAuditService {
 	args[0] = originalUserLogin + "(" + originalUserId + ")";
 	args[1] = hiddenItem;
 	String message = messageService.getMessage(AUDIT_SHOW_I18N_KEY, args);
-	log(moduleName, message);
-    }
+	logEvent(LogEvent.LEARNER_CONTENT_SHOW_HIDE, originalUserId, null, message.toString());
+   }
     
     @Override
     public void logStartEditingActivityInMonitor(Long toolContentId) {
@@ -158,7 +196,7 @@ public class AuditService implements IAuditService {
 	String[] args = new String[] { user.getLogin() + "(" + user.getUserID() + ")",
 		"(activityId:" + toolActivity.getActivityId() + ")" };
 	String message = messageService.getMessage(messageKey, args);
-	log(toolSignature, message);
+	logEvent(LogEvent.TYPE_ACTIVITY_EDIT, null, null, message.toString());
     }
 
     /* *** Spring Injection Methods ************ */
@@ -177,6 +215,14 @@ public class AuditService implements IAuditService {
 
     public void setActivityDao(IActivityDAO activityDao) {
 	this.activityDao = activityDao;
+    }
+
+    public ILogEventService getLogEventService() {
+        return logEventService;
+    }
+
+    public void setLogEventService(ILogEventService logEventService) {
+        this.logEventService = logEventService;
     }
 
 }

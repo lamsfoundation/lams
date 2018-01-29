@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.LogEventType;
 
 /**
  * DAO interface for <code>LogEvent</code>.
@@ -67,5 +68,17 @@ public interface ILogEventDAO {
      * @return
      */
     List<LogEvent> getEventsOccurredBetween(Date startDate, Date finishDate);
+
+    /** Get the generic event types */
+    List<LogEventType> getEventTypes();
+    
+    /** Get the date of the oldest log event */
+    Date getOldestEventDate();
+
+    /** Used for displaying paged lists of events */
+    List<LogEvent> getEventsForTablesorter(int page, int size, int sorting, String searchString, Date startDate,
+	    Date endDate, String area, Integer typeId);
+
+    int countEventsWithRestrictions(String searchString, Date startDate, Date endDate, String area, Integer typeId);
 
 }

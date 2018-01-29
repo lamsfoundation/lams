@@ -59,11 +59,11 @@
         />
 
         <property
-            name="learningDesignId"
+            name="targetId"
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="learning_design_id"
+            column="target_id"
         />
 
         <property
@@ -81,6 +81,15 @@
             insert="true"
             column="activity_id"
         />
+
+        <property
+            name="description"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="description"
+        />
+
 
         <!--
             To add non XDoclet property mappings, create a file named

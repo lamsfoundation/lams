@@ -448,6 +448,7 @@
 	
 	<!-- auditing service -->
 	<bean id="auditService" class="org.lamsfoundation.lams.util.audit.AuditService" >
+		<property name="logEventService"><ref bean="logEventService"/></property>
 		<property name="messageService"><ref bean="commonMessageService"/></property>
 		<property name="activityDao"><ref bean="activityDAO"/></property>
     </bean>

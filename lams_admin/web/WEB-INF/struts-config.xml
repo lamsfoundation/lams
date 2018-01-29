@@ -875,6 +875,27 @@
       />
     </action>
     <action
+      path="/logevent"
+      type="org.lamsfoundation.lams.admin.web.action.LogEventAction"
+      name="logevent"
+      scope="request"
+      input=".logevent"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path=".logevent"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/disabledmanage"
       type="org.lamsfoundation.lams.admin.web.action.DisabledUserManageAction"
       unknown="false"

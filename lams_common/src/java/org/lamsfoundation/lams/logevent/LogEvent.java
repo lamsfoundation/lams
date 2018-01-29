@@ -49,6 +49,19 @@ public class LogEvent implements Serializable {
     public static final int TYPE_LEARNER_ACTIVITY_FINISH = 6;
     public static final int TYPE_LEARNER_LESSON_COMPLETE = 7;
     public static final int TYPE_LEARNER_LESSON_MARK_SUBMIT = 8;
+    public static final int TYPE_ACTIVITY_EDIT = 9; // Audit Service
+    public static final int TYPE_USER_ORG_ADMIN = 10;
+    public static final int TYPE_LOGIN_AS  = 11;
+    public static final int TYPE_PASSWORD_CHANGE  = 12;
+    public static final int TYPE_ROLE_FAILURE = 13;
+    public static final int TYPE_ACCOUNT_LOCKED = 14;
+    public static final int TYPE_NOTIFICATION  = 15;
+    public static final int MARK_UPDATED = 16;  // Audit Service
+    public static final int MARK_RELEASED = 17; 
+    public static final int LEARNER_CONTENT_UPDATED = 18; // Audit Service
+    public static final int LEARNER_CONTENT_SHOW_HIDE = 19; // Audit Service
+    public static final int UNKNOWN = 20; // catch all for conversion
+
     /** *************************************************************** */
 
     /** identifier field */
@@ -65,13 +78,15 @@ public class LogEvent implements Serializable {
     private Date occurredDateTime;
 
     /**  */
-    private Long learningDesignId;
+    private Long targetId;
 
     /**  */
     private Long lessonId;
 
     /**  */
     private Long activityId;
+    
+    private String description;
 
     /*
      * For the occurredDateTime fields, if the value is null, then it will default to the current time.
@@ -134,12 +149,12 @@ public class LogEvent implements Serializable {
     /**
      *
      */
-    public Long getLearningDesignId() {
-	return learningDesignId;
+    public Long getTargetId() {
+	return targetId;
     }
 
-    public void setLearningDesignId(Long learningDesignId) {
-	this.learningDesignId = learningDesignId;
+    public void setTargetId(Long targetId) {
+	this.targetId = targetId;
     }
 
     /**
@@ -162,5 +177,13 @@ public class LogEvent implements Serializable {
 
     public void setActivityId(Long activityId) {
 	this.activityId = activityId;
+    }
+
+    public String getDescription() {
+	return description;
+    }
+
+    public void setDescription(String description) {
+	this.description = description;
     }
 }
