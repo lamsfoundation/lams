@@ -44,6 +44,8 @@ import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -55,6 +57,8 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -75,6 +79,7 @@ public class GradebookAction extends LamsDispatchAction {
     private static IUserManagementService userService;
     private static ILessonService lessonService;
     private static ISecurityService securityService;
+    private static ICoreLearnerService learnerService;
 
     @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -153,6 +158,7 @@ public class GradebookAction extends LamsDispatchAction {
 	return null;
     }
 
+    @SuppressWarnings("unchecked")
     public ActionForward getLessonCompleteGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	// Getting the params passed in from the jqGrid
@@ -186,6 +192,25 @@ public class GradebookAction extends LamsDispatchAction {
 	    rowsJSON.put(rowJSON);
 	}
 	resultJSON.put(GradebookConstants.ELEMENT_ROWS, rowsJSON);
+
+	// make a mapping of activity ID -> URL, same as in progress bar
+	JSONObject activityURLJSON = new JSONObject();
+	Object[] ret = getLearnerService().getStructuredActivityURLs(userId, lessonId);
+	for (ActivityURL activity : (List<ActivityURL>) ret[0]) {
+	    String url = activity.getUrl();
+	    if (url != null) {
+		if (url.startsWith("learner.do")) {
+		    url = "learning/" + url;
+		}
+		String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
+		if (!url.startsWith(serverUrl)) {
+		    // monitor mode URLs should be prepended with server URL
+		    url = serverUrl + url;
+		}
+		activityURLJSON.put(activity.getActivityId().toString(), activity.getUrl());
+	    }
+	}
+	resultJSON.put("urls", activityURLJSON);
 
 	boolean isWeighted = getGradebookService().isWeightedMarks(lessonId);
 	GradebookUserLesson gradebookUserLesson = getGradebookService().getGradebookUserLesson(lessonId, userId);
@@ -621,5 +646,14 @@ public class GradebookAction extends LamsDispatchAction {
 	}
 
 	return GradebookAction.securityService;
+    }
+
+    private ICoreLearnerService getLearnerService() {
+	if (GradebookAction.learnerService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    GradebookAction.learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
+	}
+	return GradebookAction.learnerService;
     }
 }

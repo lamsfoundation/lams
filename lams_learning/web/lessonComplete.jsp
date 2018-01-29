@@ -121,7 +121,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					   'title' : false
 					}
 			    ],
+			    beforeProcessing : function(data) {
+				    // Wrap each activity name in a link to show same pop up
+				    // as if the user clicked the activity in progress bar.
+				    // The code depends on progressBar.js import in Page.tag
+				    $.each(data.rows, function() {
+					    this.cell[0] = '<a href="#" onClick="javascript:openActivity(\'' 
+						    			+ data.urls[this.id] + '\')">' + this.cell[0] + '</a>';
+					});
+				},
 			    loadComplete : function(data) {
+				    // display non-grid data
 			    	$('#learnerLessonMark').text(data.learnerLessonMark);
 				    $('#averageLessonMark').text(data.averageLessonMark);
 				},
