@@ -902,9 +902,18 @@ public class AssessmentServiceImpl
 
     @Override
     public AssessmentResult getLastFinishedAssessmentResultNotFromChache(Long assessmentUid, Long userId) {
-	AssessmentResult result = getLastFinishedAssessmentResult(assessmentUid, userId);
-	assessmentQuestionDao.evict(result);
-	return getLastFinishedAssessmentResult(assessmentUid, userId);
+	AssessmentResult finishedResult = getLastFinishedAssessmentResult(assessmentUid, userId);
+	
+	//in case user played tricks with accessing Assessment using two tabs, finishedResult can be null and thus we need to request the last *not finished* result
+	if (finishedResult == null) {
+	    AssessmentResult notFinishedResult = getLastAssessmentResult(assessmentUid, userId);
+	    assessmentQuestionDao.evict(notFinishedResult);
+	    return getLastAssessmentResult(assessmentUid, userId);
+	    
+	} else {
+	    assessmentQuestionDao.evict(finishedResult);
+	    return getLastFinishedAssessmentResult(assessmentUid, userId);
+	}
     }
 
     @Override
