@@ -1131,7 +1131,7 @@ public class LearningAction extends Action {
 		}
 	    }
 
-	    Date timeTaken = new Date(result.getFinishDate().getTime() - result.getStartDate().getTime());
+	    Date timeTaken = result.getFinishDate() == null ? new Date(0) : new Date(result.getFinishDate().getTime() - result.getStartDate().getTime());
 	    result.setTimeTaken(timeTaken);
 	    if (assessment.isAllowOverallFeedbackAfterQuestion()) {
 		int percentageCorrectAnswers = (int) (result.getGrade() * 100 / result.getMaximumGrade());
