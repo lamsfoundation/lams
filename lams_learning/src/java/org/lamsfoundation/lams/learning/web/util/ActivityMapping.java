@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ForwardingActionForward;
 import org.apache.struts.action.RedirectingActionForward;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.action.DisplayActivityAction;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -113,7 +113,7 @@ public class ActivityMapping implements Serializable {
      * @throws UnsupportedEncodingException
      */
     public ActionForward getProgressForward(LearnerProgress progress, boolean redirect, boolean displayParallelFrames,
-	    HttpServletRequest request, ICoreLearnerService learnerService) throws UnsupportedEncodingException {
+	    HttpServletRequest request, ILearnerFullService learnerService) throws UnsupportedEncodingException {
 	ActionForward actionForward = null;
 
 	if (progress.isComplete()) {

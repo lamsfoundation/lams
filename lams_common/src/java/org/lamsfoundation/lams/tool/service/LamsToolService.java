@@ -24,8 +24,6 @@
 package org.lamsfoundation.lams.tool.service;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -39,19 +37,20 @@ import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
+import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.learningdesign.FloatingActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
-import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
@@ -59,6 +58,7 @@ import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -86,6 +86,9 @@ public class LamsToolService implements ILamsToolService {
     private IGradebookService gradebookService;
     private ILamsCoreToolService lamsCoreToolService;
     private ILessonService lessonService;
+    private ILearnerService learnerService;
+    private IUserManagementService userManagementService;
+    private IDataFlowDAO dataFlowDAO;
 
     @Override
     public IToolVO getToolByID(Long toolId) {
@@ -130,15 +133,14 @@ public class LamsToolService implements ILamsToolService {
 	toolDAO.saveOrUpdateTool(tool);
     }
 
-    /**
-     * Get the tool session object using the toolSessionId
-     *
-     * @param toolSessionId
-     * @return
-     */
     @Override
     public ToolSession getToolSession(Long toolSessionId) {
 	return toolSessionDAO.getToolSession(toolSessionId);
+    }
+    
+    @Override
+    public String completeToolSession(Long toolSessionId, Long learnerId) {
+	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
     @SuppressWarnings("unchecked")
@@ -186,6 +188,19 @@ public class LamsToolService implements ILamsToolService {
 	    gradebookService.recalculateGradebookMarksForActivity(toolActivity);
 	}
 
+    }
+    
+    @Override
+    public ToolOutput getToolInput(Long requestingToolContentId, Integer assigmentId, Integer learnerId) {
+	DataFlowObject dataFlowObject = dataFlowDAO.getAssignedDataFlowObject(requestingToolContentId,
+		assigmentId);
+	User learner = (User) userManagementService.findById(User.class, learnerId);
+	Activity activity = dataFlowObject.getDataTransition().getFromActivity();
+	String outputName = dataFlowObject.getName();
+	ToolSession session = lamsCoreToolService.getToolSessionByLearner(learner, activity);
+	ToolOutput output = lamsCoreToolService.getOutputFromTool(outputName, session, learnerId);
+
+	return output;
     }
 
     @Override
@@ -428,6 +443,10 @@ public class LamsToolService implements ILamsToolService {
 	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
 	return session.getLearners().size();
     }
+    
+    // ---------------------------------------------------------------------
+    // Inversion of Control Methods - Method injection
+    // ---------------------------------------------------------------------
 
     /**
      * @param toolDAO
@@ -450,7 +469,6 @@ public class LamsToolService implements ILamsToolService {
     }
 
     /**
-     *
      * @param toolContentDAO
      */
     public void setToolContentDAO(IToolContentDAO toolContentDAO) {
@@ -462,7 +480,6 @@ public class LamsToolService implements ILamsToolService {
     }
 
     /**
-     *
      * @param toolContentDAO
      */
     public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
@@ -471,5 +488,21 @@ public class LamsToolService implements ILamsToolService {
 
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
+    }
+    
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
+    }
+    
+    /**
+     * @param userService
+     *            User Management Service
+     */
+    public void setUserManagementService(IUserManagementService userService) {
+	this.userManagementService = userService;
+    }
+    
+    public void setDataFlowDAO(IDataFlowDAO dataFlowDAO) {
+	this.dataFlowDAO = dataFlowDAO;
     }
 }

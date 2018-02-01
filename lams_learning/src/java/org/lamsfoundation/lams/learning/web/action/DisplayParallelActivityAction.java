@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -48,13 +48,7 @@ import org.lamsfoundation.lams.web.action.LamsAction;
 /**
  * Action class to display a ParallelActivity.
  *
- * XDoclet definition:
- *
  * @author daveg
- *
- *
- *
- *
  */
 public class DisplayParallelActivityAction extends ActivityAction {
 
@@ -66,7 +60,7 @@ public class DisplayParallelActivityAction extends ActivityAction {
 	    HttpServletResponse response) {
 
 	ActivityForm form = (ActivityForm) actionForm;
-	ICoreLearnerService learnerService = getLearnerService();
+	ILearnerFullService learnerService = getLearnerService();
 
 	ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 

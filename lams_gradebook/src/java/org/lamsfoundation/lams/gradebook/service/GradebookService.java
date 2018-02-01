@@ -53,7 +53,7 @@ import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.gradebook.util.LessonComparator;
 import org.lamsfoundation.lams.gradebook.util.UserComparator;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -124,7 +124,7 @@ public class GradebookService implements IGradebookService {
     private IActivityDAO activityDAO;
     private MessageService messageService;
     private IAuditService auditService;
-    private static ICoreLearnerService learnerService;
+    private static ILearnerService learnerService;
 
     @Override
     public List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId, TimeZone userTimezone) {
@@ -2266,13 +2266,13 @@ public class GradebookService implements IGradebookService {
 	return gradebookDAO.getAllMarksForLesson(lessonId);
     }
 
-    private ICoreLearnerService getLearnerService() {
-	if (GradebookService.learnerService == null) {
+    private ILearnerService getLearnerService() {
+	if (learnerService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getWebApplicationContext(SessionManager.getServletContext());
-	    GradebookService.learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
+	    learnerService = (ILearnerService) ctx.getBean("learnerService");
 	}
-	return GradebookService.learnerService;
+	return learnerService;
     }
 
     @Override
@@ -2353,5 +2353,4 @@ public class GradebookService implements IGradebookService {
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
-    // -------------------------------------------------------------------------
 }

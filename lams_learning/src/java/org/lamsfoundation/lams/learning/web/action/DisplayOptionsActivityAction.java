@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.form.OptionsActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -50,14 +50,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * Action class to display an OptionsActivity.
  *
  * @author daveg
- *
- *         XDoclet definition:
- *
- *
- *
- *
- *
- *
  */
 public class DisplayOptionsActivityAction extends ActivityAction {
 
@@ -71,7 +63,7 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 	OptionsActivityForm form = (OptionsActivityForm) actionForm;
 	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 
-	ICoreLearnerService learnerService = getLearnerService();
+	ILearnerFullService learnerService = getLearnerService();
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	if (!(activity instanceof OptionsActivity)) {

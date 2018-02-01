@@ -44,14 +44,13 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.timezone.Timezone;
 import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
-import org.lamsfoundation.lams.timezone.util.TimezoneDTOComparator;
 import org.lamsfoundation.lams.timezone.util.TimezoneIDComparator;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -77,7 +76,7 @@ public class ProfileAction extends LamsDispatchAction {
 
     private static List<SupportedLocale> locales;
 
-    private static ICoreLearnerService learnerService;
+    private static ILearnerService learnerService;
 
     private static IThemeService themeService;
 
@@ -263,11 +262,11 @@ public class ProfileAction extends LamsDispatchAction {
 	return service;
     }
 
-    private ICoreLearnerService getLearnerService() {
+    private ILearnerService getLearnerService() {
 	if (learnerService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
+	    learnerService = (ILearnerService) ctx.getBean("learnerService");
 	}
 	return learnerService;
     }

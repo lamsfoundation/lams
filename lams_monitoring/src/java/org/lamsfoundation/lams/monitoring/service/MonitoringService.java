@@ -53,7 +53,7 @@ import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.events.dao.EventDAO;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
@@ -142,7 +142,7 @@ import org.quartz.TriggerKey;
  * @since 2/02/2005
  * @version 1.1
  */
-public class MonitoringService implements IMonitoringService {
+public class MonitoringService implements IMonitoringFullService {
 
     // ---------------------------------------------------------------------
     // Instance variables
@@ -176,7 +176,7 @@ public class MonitoringService implements IMonitoringService {
 
     private IAuthoringService authoringService;
 
-    private ICoreLearnerService learnerService;
+    private ILearnerService learnerService;
 
     private ILessonService lessonService;
 
@@ -250,7 +250,7 @@ public class MonitoringService implements IMonitoringService {
      *
      * @param learnerService
      */
-    public void setLearnerService(ICoreLearnerService learnerService) {
+    public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
     }
 
@@ -1774,11 +1774,10 @@ public class MonitoringService implements IMonitoringService {
 		break;
 
 	    case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_ANY_LESSONS:
-		List<User> allUSers = learnerService.getUserManagementService().getUsersFromOrganisation(orgId);
+		List<User> allUSers = userManagementService.getUsersFromOrganisation(orgId);
 		Set<User> usersStartedAtLest1Lesson = new TreeSet<User>();
 
-		Organisation org = (Organisation) learnerService.getUserManagementService().findById(Organisation.class,
-			orgId);
+		Organisation org = getOrganisation(orgId);
 		Set<Lesson> lessons = org.getLessons();
 		for (Lesson les : lessons) {
 		    Activity firstActivity = les.getLearningDesign().getFirstActivity();

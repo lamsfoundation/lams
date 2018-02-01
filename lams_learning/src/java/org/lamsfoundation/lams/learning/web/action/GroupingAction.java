@@ -38,7 +38,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -118,7 +118,7 @@ public class GroupingAction extends LamsDispatchAction {
 	boolean forceGroup = WebUtil.readBooleanParam(request, GroupingAction.PARAM_FORCE_GROUPING, false);
 
 	// initialize service object
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	ILearnerFullService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	if (!(activity instanceof GroupingActivity)) {
@@ -186,7 +186,7 @@ public class GroupingAction extends LamsDispatchAction {
 	// make sure the lesson id is always in the request for the progress bar.
 	if (request.getAttribute(AttributeNames.PARAM_LESSON_ID) == null) {
 	    if (learnerProgress == null) {
-		ICoreLearnerService learnerService = LearnerServiceProxy
+		ILearnerFullService learnerService = LearnerServiceProxy
 			.getLearnerService(getServlet().getServletContext());
 		learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	    }
@@ -209,7 +209,7 @@ public class GroupingAction extends LamsDispatchAction {
     public ActionForward completeActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	// initialize service object
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	ILearnerFullService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	LearnerProgress progress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	Integer learnerId = LearningWebUtil.getUserId();
@@ -228,7 +228,7 @@ public class GroupingAction extends LamsDispatchAction {
     @SuppressWarnings("unchecked")
     private void prepareGroupData(HttpServletRequest request) {
 
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	ILearnerFullService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
 	SortedSet<Group> groups = new TreeSet<Group>(new GroupComparator());
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
@@ -264,7 +264,7 @@ public class GroupingAction extends LamsDispatchAction {
      */
     public ActionForward learnerChooseGroup(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	ILearnerFullService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	Long groupId = WebUtil.readLongParam(request, "groupId");
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);

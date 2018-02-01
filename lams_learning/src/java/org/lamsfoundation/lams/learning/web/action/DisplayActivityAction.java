@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -48,20 +48,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  * Request values: lessonID (mandatory), InitialDisplay (optional - Set to "true" for normal display, set to "false"
  * when you want it to assume it is inside parallel frameset. Defaults to true).
- *
- * XDoclet definition:
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 public class DisplayActivityAction extends ActivityAction {
 
@@ -81,7 +67,7 @@ public class DisplayActivityAction extends ActivityAction {
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
 	    HttpServletResponse response) throws UnsupportedEncodingException {
-	ICoreLearnerService learnerService = getLearnerService();
+	ILearnerFullService learnerService = getLearnerService();
 
 	// UI can only send the lessonID as that is all it has...
 	Integer learnerId = LearningWebUtil.getUserId();

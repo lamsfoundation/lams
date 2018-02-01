@@ -26,8 +26,6 @@ package org.lamsfoundation.lams.learning.web.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -37,34 +35,22 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.hibernate.SessionFactory;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignProcessor;
 import org.lamsfoundation.lams.learningdesign.SimpleActivity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
-import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.tool.Tool;
-import org.lamsfoundation.lams.tool.ToolCompletionStatus;
-import org.lamsfoundation.lams.tool.ToolSession;
-import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.orm.hibernate4.SessionHolder;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -75,14 +61,14 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 
     private static IAuditService auditService;
     private static ILessonService lessonService;
-    private static ICoreLearnerService learnerService;
+    private static ILearnerFullService learnerService;
 
     @Override
     public void init() throws ServletException {
 	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-	RepopulateProgressMarksServlet.auditService = (IAuditService) ctx.getBean("auditService");
-	RepopulateProgressMarksServlet.lessonService = (ILessonService) ctx.getBean("lessonService");
-	RepopulateProgressMarksServlet.learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
+	auditService = (IAuditService) ctx.getBean("auditService");
+	lessonService = (ILessonService) ctx.getBean("lessonService");
+	learnerService = (ILearnerFullService) ctx.getBean("learnerService");
     }
 
     @Override

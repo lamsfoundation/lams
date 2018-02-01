@@ -99,7 +99,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
  *
  * @author chris, Jacky Fang
  */
-public class LearnerService implements ICoreLearnerService {
+public class LearnerService implements ILearnerFullService {
     // ---------------------------------------------------------------------
     // Instance variables
     // ---------------------------------------------------------------------
@@ -111,7 +111,6 @@ public class LearnerService implements ICoreLearnerService {
     private IGroupingDAO groupingDAO;
     private IGroupUserDAO groupUserDAO;
     private ProgressEngine progressEngine;
-    private IDataFlowDAO dataFlowDAO;
     private ICommandDAO commandDAO;
     private ILamsCoreToolService lamsCoreToolService;
     private ActivityMapping activityMapping;
@@ -553,8 +552,7 @@ public class LearnerService implements ICoreLearnerService {
      * @throws LearnerServiceException
      *             in case of problems.
      */
-    @Override
-    public void calculateProgress(Activity completedActivity, Integer learnerId, LearnerProgress learnerProgress) {
+    private void calculateProgress(Activity completedActivity, Integer learnerId, LearnerProgress learnerProgress) {
 	try {
 	    progressEngine.calculateProgress(learnerProgress.getUser(), completedActivity, learnerProgress);
 	    learnerProgressDAO.updateLearnerProgress(learnerProgress);
@@ -564,9 +562,6 @@ public class LearnerService implements ICoreLearnerService {
 
     }
 
-    /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeToolSession(java.lang.Long, java.lang.Long)
-     */
     @Override
     public String completeToolSession(Long toolSessionId, Long learnerId) {
 	// this method is called by tools, so it mustn't do anything that relies on all the tools' Spring beans
@@ -1285,37 +1280,12 @@ public class LearnerService implements ICoreLearnerService {
 	this.gradebookService = gradebookService;
     }
 
-    public IDataFlowDAO getDataFlowDAO() {
-	return dataFlowDAO;
-    }
-
-    public void setDataFlowDAO(IDataFlowDAO dataFlowDAO) {
-	this.dataFlowDAO = dataFlowDAO;
-    }
-
     public ICommandDAO getCommandDAO() {
 	return commandDAO;
     }
 
     public void setCommandDAO(ICommandDAO commandDAO) {
 	this.commandDAO = commandDAO;
-    }
-
-    /**
-     * Gets the concreted tool output (not the definition) from a tool. This method is called by target tool in order to
-     * get data from source tool.
-     */
-    @Override
-    public ToolOutput getToolInput(Long requestingToolContentId, Integer assigmentId, Integer learnerId) {
-	DataFlowObject dataFlowObject = getDataFlowDAO().getAssignedDataFlowObject(requestingToolContentId,
-		assigmentId);
-	User learner = (User) getUserManagementService().findById(User.class, learnerId);
-	Activity activity = dataFlowObject.getDataTransition().getFromActivity();
-	String outputName = dataFlowObject.getName();
-	ToolSession session = lamsCoreToolService.getToolSessionByLearner(learner, activity);
-	ToolOutput output = lamsCoreToolService.getOutputFromTool(outputName, session, learnerId);
-
-	return output;
     }
 
     /**

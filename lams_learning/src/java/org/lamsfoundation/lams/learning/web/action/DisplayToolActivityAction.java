@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -42,11 +42,6 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  * Action class to forward the user to a Tool.
  *
  * @author daveg
- *
- *         XDoclet definition:
- *
- *
- *
  */
 public class DisplayToolActivityAction extends ActivityAction {
 
@@ -59,7 +54,7 @@ public class DisplayToolActivityAction extends ActivityAction {
 	//ActivityForm form = (ActivityForm)actionForm;
 	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 
-	ICoreLearnerService learnerService = getLearnerService();
+	ILearnerFullService learnerService = getLearnerService();
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 

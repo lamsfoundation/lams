@@ -53,7 +53,6 @@
 				<property name="lessonService"><ref bean="lessonService"/></property>
 				<property name="gradebookService"><ref bean="gradebookService"/></property>
 				<property name="logEventService"><ref bean="logEventService"/></property>
-				<property name="dataFlowDAO"><ref bean="dataFlowDAO"/></property>
 				<property name="commandDAO"><ref bean="commandDAO"/></property>
 				<property name="kumaliveService"><ref bean="kumaliveService"/></property>
 			</bean>

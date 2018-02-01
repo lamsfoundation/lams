@@ -52,7 +52,7 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.util.LessonComparator;
@@ -127,7 +127,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	ICoreLearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
+	ILearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
 	Lesson lesson = learnerService.getLesson(lessonId);
 	if (!lesson.getEnableLessonNotifications()) {
 	    getAuditService().log(MonitoringConstants.MONITORING_MODULE_NAME,
@@ -156,10 +156,10 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	ICoreLearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 
 	// getting the organisation
-	Organisation org = (Organisation) learnerService.getUserManagementService().findById(Organisation.class, orgId);
+	Organisation org = monitoringService.getOrganisation(orgId);
 
 	// sort and filter lesson list
 	Set<Lesson> lessons = new TreeSet<Lesson>(new LessonComparator());

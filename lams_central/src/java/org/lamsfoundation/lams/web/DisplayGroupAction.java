@@ -43,7 +43,7 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonService;
@@ -70,7 +70,7 @@ public class DisplayGroupAction extends Action {
     private static LessonService lessonService;
     private static ILearningDesignService learningDesignService;
     private static ISecurityService securityService;
-    private static ICoreLearnerService learnerService;
+    private static ILearnerService learnerService;
 
     @Override
     @SuppressWarnings({ "unchecked" })
@@ -394,11 +394,11 @@ public class DisplayGroupAction extends Action {
 	return securityService;
     }
 
-    private ICoreLearnerService getLearnerService() {
+    private ILearnerService getLearnerService() {
 	if (learnerService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
+	    learnerService = (ILearnerService) ctx.getBean("learnerService");
 	}
 	return learnerService;
     }

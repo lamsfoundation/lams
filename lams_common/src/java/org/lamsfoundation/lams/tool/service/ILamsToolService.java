@@ -27,9 +27,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.util.FileUtilException;
 
@@ -66,7 +68,29 @@ public interface ILamsToolService {
 
     Tool getPersistToolBySignature(final String toolSignature);
 
+    /**
+     * Get the tool session object using the toolSessionId
+     *
+     * @param toolSessionId
+     * @return
+     */
     ToolSession getToolSession(Long toolSessionId);
+
+    /**
+     * Marks an tool session as complete and calculates the next activity against the learning design. This method is
+     * for tools to redirect the client on complete.
+     *
+     * Do not change learnerId to Integer (to match the other calls) as all the tools expect this to be a Long.
+     *
+     * @param toolSessionId
+     *            , session ID for completed tool
+     * @param learnerId
+     *            the learner who is completing the tool session.
+     * @return the URL for the next activity
+     * @throws LearnerServiceException
+     *             in case of problems.
+     */
+    String completeToolSession(Long toolSessionId, Long learnerId);
 
     /**
      * Allows the tool to ask whether or not the activity is grouped and therefore it should expect more than one tool
@@ -92,6 +116,12 @@ public interface ILamsToolService {
      * @param toolOutputDefinition
      */
     void setActivityEvaluation(Long toolContentId, String toolOutputDefinition);
+
+    /**
+     * Gets the concreted tool output (not the definition) from a tool. This method is called by target tool in order to
+     * get data from source tool.
+     */
+    ToolOutput getToolInput(Long requestingToolContentId, Integer assigmentId, Integer learnerId);
 
     /**
      * Get tool's ActivityEvaluation that has been set in authoring.

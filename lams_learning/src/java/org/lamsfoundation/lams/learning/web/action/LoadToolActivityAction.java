@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -47,14 +47,6 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  * Action class to forward the user to a Tool using an intermediate loading page. Can handle regular tools + grouping
  * and gates (system tools). Displays the activity that is in the request. This allows it to show any arbitrary
  * activity, not just the current activity.
- *
- * XDoclet definition:
- *
- *
- *
- *
- *
- *
  */
 public class LoadToolActivityAction extends ActivityAction {
 
@@ -73,7 +65,7 @@ public class LoadToolActivityAction extends ActivityAction {
 	ActivityForm form = (ActivityForm) actionForm;
 	ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 
-	ICoreLearnerService learnerService = getLearnerService();
+	ILearnerFullService learnerService = getLearnerService();
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
