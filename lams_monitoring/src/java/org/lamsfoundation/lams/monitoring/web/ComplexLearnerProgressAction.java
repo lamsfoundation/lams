@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -56,10 +57,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author jliew
- *
- *
- *
- *
  */
 public class ComplexLearnerProgressAction extends Action {
 
@@ -73,7 +70,7 @@ public class ComplexLearnerProgressAction extends Action {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, false);
 	Integer userID = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false);
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	Activity activity = monitoringService.getActivityById(activityID);
 
@@ -197,7 +194,7 @@ public class ComplexLearnerProgressAction extends Action {
      * @param parentContributeActivityDTO
      * @throws IOException
      */
-    private void processSequenceChildren(Long lessonID, Integer userID, IMonitoringService monitoringService,
+    private void processSequenceChildren(Long lessonID, Integer userID, IMonitoringFullService monitoringService,
 	    UserDTO user, HashMap<Long, Byte> statusMap, HashMap<Long, String> urlMap, LearnerProgress learnerProgress,
 	    SequenceActivity sequenceActivity, ContributeActivityDTO parentContributeActivityDTO,
 	    List<ContributeActivityDTO> subActivities) throws IOException {

@@ -25,7 +25,7 @@
 package org.lamsfoundation.lams.monitoring.quartz.job;
 
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerContext;
@@ -52,8 +52,8 @@ public abstract class MonitoringJob extends QuartzJobBean {
 	}
     }
 
-    protected IMonitoringService getMonitoringService(JobExecutionContext context) throws JobExecutionException {
-	return (IMonitoringService) getService(context, MonitoringJob.MONITORING_SERVICE_NAME);
+    protected IMonitoringFullService getMonitoringService(JobExecutionContext context) throws JobExecutionException {
+	return (IMonitoringFullService) getService(context, MonitoringJob.MONITORING_SERVICE_NAME);
     }
 
     protected IEventNotificationService getEventNotificationService(JobExecutionContext context)

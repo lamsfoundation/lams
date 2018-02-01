@@ -76,6 +76,7 @@ import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -132,7 +133,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private static ISecurityService securityService;
 
-    private static IMonitoringService monitoringService;
+    private static IMonitoringFullService monitoringService;
 
     private static IUserManagementService userManagementService;
 
@@ -1297,7 +1298,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	long activityBid = WebUtil.readLongParam(request, "activityB");
 	boolean result = false;
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	Activity precedingActivity = monitoringService.getActivityById(activityBid);
 
@@ -1421,11 +1422,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	return MonitoringAction.lessonService;
     }
 
-    private IMonitoringService getMonitoringService() {
+    private IMonitoringFullService getMonitoringService() {
 	if (MonitoringAction.monitoringService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    MonitoringAction.monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
+	    MonitoringAction.monitoringService = (IMonitoringFullService) ctx.getBean("monitoringService");
 	}
 	return MonitoringAction.monitoringService;
     }

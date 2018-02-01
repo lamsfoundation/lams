@@ -52,7 +52,7 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -87,7 +87,7 @@ public class GateAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
     // private static Logger log = Logger.getLogger(GateAction.class);
 
-    private IMonitoringService monitoringService;
+    private IMonitoringFullService monitoringService;
     private ILearnerService learnerService;
     private ILessonService lessonService;
     // ---------------------------------------------------------------------

@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.lesson.util.LessonComparator;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.EmailScheduleMessageJobDTO;
 import org.lamsfoundation.lams.monitoring.quartz.job.EmailScheduleMessageJob;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -156,7 +157,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+	IMonitoringFullService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 
 	// getting the organisation
 	Organisation org = monitoringService.getOrganisation(orgId);
@@ -254,7 +255,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
      */
     public ActionForward showArchivedEmails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, SchedulerException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	boolean isLessonNotifications = (lessonId != null);
@@ -287,7 +288,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
     public ActionForward getArchivedRecipients(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 
 	Long emailNotificationUid = WebUtil.readLongParam(request, "emailNotificationUid");
@@ -356,7 +357,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	boolean isLessonNotifications = (lessonId != null);
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	getUserManagementService();
 	Scheduler scheduler = getScheduler();
@@ -419,7 +420,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
      */
     public ActionForward exportArchivedNotification(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 
 	Long emailNotificationUid = WebUtil.readLongParam(request, "emailNotificationUid");
@@ -465,7 +466,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
     public ActionForward emailUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, JSONException {
 	JSONObject JSONObject = new JSONObject();
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 
 	String emailBody = WebUtil.readStrParam(request, "emailBody");
@@ -579,7 +580,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    }
 	}
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 
 	int searchType = (Integer) map.get("searchType");

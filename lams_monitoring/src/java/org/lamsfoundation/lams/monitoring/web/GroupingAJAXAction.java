@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -78,8 +79,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Fiona Malikoff
  */
 public class GroupingAJAXAction extends LamsDispatchAction {
-
-    // ---------------------------------------------------------------------
 
     private static final String CHOSEN_GROUPING_SCREEN = "chosenGrouping";
     private static final String VIEW_GROUPS_SCREEN = "viewGroups";
@@ -112,7 +111,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	Activity activity = monitoringService.getActivityById(activityID);
 
@@ -222,7 +221,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	String[] members = StringUtils.isBlank(membersParam) ? null : membersParam.split(",");
 
 	// remove users from current group
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	if (members != null) {
 	    Activity activity = monitoringService.getActivityById(activityID);
@@ -303,7 +302,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
      */
     public ActionForward saveAsCourseGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	IUserManagementService userManagementService = MonitoringServiceProxy
 		.getUserManagementService(getServlet().getServletContext());
@@ -362,7 +361,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	    if (LamsDispatchAction.log.isDebugEnabled()) {
 		LamsDispatchAction.log.debug("Renaming group  " + groupID + " to \"" + name + "\"");
 	    }
-	    IMonitoringService monitoringService = MonitoringServiceProxy
+	    IMonitoringFullService monitoringService = MonitoringServiceProxy
 		    .getMonitoringService(getServlet().getServletContext());
 	    monitoringService.setGroupName(groupID, name);
 	}
@@ -402,7 +401,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	response.setContentType("application/json;charset=utf-8");
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	boolean result = true;
 

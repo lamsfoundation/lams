@@ -55,8 +55,8 @@ public class MonitoringServiceProxy {
      *            the servletContext for current application
      * @return monitoring service object.
      */
-    public static final IMonitoringService getMonitoringService(ServletContext servletContext) {
-	return (IMonitoringService) MonitoringServiceProxy.getDomainService(servletContext, "monitoringService");
+    public static final IMonitoringFullService getMonitoringService(ServletContext servletContext) {
+	return (IMonitoringFullService) MonitoringServiceProxy.getDomainService(servletContext, "monitoringService");
     }
 
     /**

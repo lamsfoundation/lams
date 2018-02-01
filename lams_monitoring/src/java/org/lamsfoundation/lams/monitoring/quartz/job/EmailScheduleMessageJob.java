@@ -29,7 +29,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -51,7 +51,7 @@ public class EmailScheduleMessageJob extends MonitoringJob {
     @SuppressWarnings("rawtypes")
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-	IMonitoringService monitoringService = getMonitoringService(context);
+	IMonitoringFullService monitoringService = getMonitoringService(context);
 	IEventNotificationService eventNotificationService = getEventNotificationService(context);
 
 	Map properties = context.getJobDetail().getJobDataMap();

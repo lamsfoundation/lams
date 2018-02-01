@@ -18,8 +18,6 @@ import javax.websocket.server.ServerEndpoint;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.command.model.Command;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learning.service.LearnerService;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;

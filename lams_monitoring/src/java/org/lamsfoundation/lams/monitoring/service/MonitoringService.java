@@ -785,8 +785,25 @@ public class MonitoringService implements IMonitoringFullService {
 	return newMaxId;
     }
 
-    @Override
-    public ScheduleGateActivity runGateScheduler(ScheduleGateActivity scheduleGate, Date schedulingStartTime,
+    /**
+     * <p>
+     * Runs the system scheduler to start the scheduling for opening gate and closing gate. It invlovs a couple of steps
+     * to start the scheduler:
+     * </p>
+     * <li>1. Initialize the resource needed by scheduling job by setting them into the job data map.</li>
+     * <li>2. Create customized triggers for the scheduling.</li>
+     * <li>3. start the scheduling job</li>
+     *
+     * @param scheduleGate
+     *            the gate that needs to be scheduled.
+     * @param schedulingStartTime
+     *            the time on which the gate open should be based if an offset is used. For starting a lesson, this is
+     *            the lessonStartTime. For live edit, it is now.
+     * @param lessonName
+     *            the name lesson incorporating this gate - used for the description of the Quartz job. Optional.
+     * @returns An updated gate, that should be saved by the calling code.
+     */
+    private ScheduleGateActivity runGateScheduler(ScheduleGateActivity scheduleGate, Date schedulingStartTime,
 	    String lessonName) {
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("Running scheduler for gate " + scheduleGate.getActivityId() + "...");
@@ -903,12 +920,6 @@ public class MonitoringService implements IMonitoringFullService {
 	    }
 	}
 	return gateActivity;
-    }
-    
-    public void finishLesson(long lessonId, Integer userId) {
-	securityService.isLessonMonitor(lessonId, userId, "finish lesson", true);
-	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	setLessonState(requestedLesson, Lesson.FINISHED_STATE);
     }
 
     @Override
