@@ -115,9 +115,6 @@
 		<property name="toolService">
 			<ref bean="lamsToolService" />
 		</property>
-		<property name="learnerService">
-			<ref bean="learnerService" />
-		</property>
 		<property name="userManagementService">
 			<ref bean="userManagementService" />
 		</property>

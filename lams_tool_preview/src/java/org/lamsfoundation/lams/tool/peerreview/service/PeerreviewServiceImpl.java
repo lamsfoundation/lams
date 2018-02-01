@@ -47,7 +47,6 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -110,8 +109,6 @@ public class PeerreviewServiceImpl
     // system services
 
     private ILamsToolService toolService;
-
-    private ILearnerService learnerService;
 
     private IUserManagementService userManagementService;
 
@@ -774,7 +771,7 @@ public class PeerreviewServiceImpl
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find peerreview session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -889,10 +886,6 @@ public class PeerreviewServiceImpl
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;

@@ -53,7 +53,6 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -131,8 +130,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     // system services
 
     private ILamsToolService toolService;
-
-    private ILearnerService learnerService;
 
     private IAuditService auditService;
 
@@ -974,7 +971,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared resource session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -1049,10 +1046,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     // *****************************************************************************
     public void setAuditService(IAuditService auditService) {
 	this.auditService = auditService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public void setMessageService(MessageService messageService) {

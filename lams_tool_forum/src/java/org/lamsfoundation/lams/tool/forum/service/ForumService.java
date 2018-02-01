@@ -51,7 +51,6 @@ import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterExcep
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -138,8 +137,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private ILamsToolService toolService;
 
     private ForumToolContentHandler forumToolContentHandler;
-
-    private ILearnerService learnerService;
 
     private IAuditService auditService;
 
@@ -1124,7 +1121,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find submit file session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -1298,14 +1295,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     public void setForumToolContentHandler(ForumToolContentHandler toolContentHandler) {
 	forumToolContentHandler = toolContentHandler;
-    }
-
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public IExportToolContentService getExportContentService() {

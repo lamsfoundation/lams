@@ -51,7 +51,6 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -135,8 +134,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     // system services
 
     private ILamsToolService toolService;
-
-    private ILearnerService learnerService;
 
     private IAuditService auditService;
 
@@ -658,10 +655,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	this.auditService = auditService;
     }
 
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
@@ -1026,7 +1019,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared imageGallery session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override

@@ -77,8 +77,7 @@
 					<property name="mcQueContentDAO"><ref bean="mcQueContentDAO"/></property>
 					<property name="mcOptionsContentDAO"><ref bean="mcOptionsContentDAO"/></property>								
 					<property name="mcUsrAttemptDAO"><ref bean="mcUsrAttemptDAO"/></property>	
-					<property name="toolService"><ref bean="lamsToolService"/></property>
-			 		<property name="learnerService"><ref bean="learnerService"/></property>		
+					<property name="toolService"><ref bean="lamsToolService"/></property>	
 					<property name="mcToolContentHandler"><ref bean="mcToolContentHandler"/></property>		
 					<property name="auditService"><ref bean="auditService"/></property>					
 					<property name="exportContentService"><ref bean="exportToolContentService"/></property>

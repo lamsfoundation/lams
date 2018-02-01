@@ -78,8 +78,7 @@
 					<property name="qaUsrRespDAO"><ref bean="qaUsrRespDAO"/></property>	
 					<property name="qaConfigItemDAO"><ref bean="qaConfigItemDAO"/></property>
 					<property name="qaWizardDAO"><ref bean="qaWizardDAO"/></property>								
-					<property name="toolService"><ref bean="lamsToolService"/></property>
-					<property name="learnerService"><ref bean="learnerService"/></property>			
+					<property name="toolService"><ref bean="lamsToolService"/></property>		
 					<property name="auditService"><ref bean="auditService"/></property>
 					<property name="qaOutputFactory"><ref bean="qaOutputFactory"/></property>
 					<property name="qaToolContentHandler"><ref bean="qaToolContentHandler"/></property>								

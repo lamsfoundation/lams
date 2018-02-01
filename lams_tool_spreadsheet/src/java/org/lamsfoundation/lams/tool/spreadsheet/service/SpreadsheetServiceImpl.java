@@ -36,7 +36,6 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -90,7 +89,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     private MessageService messageService;
     // system services
     private ILamsToolService toolService;
-    private ILearnerService learnerService;
     private IUserManagementService userManagementService;
     private IExportToolContentService exportContentService;
     private ICoreNotebookService coreNotebookService;
@@ -370,10 +368,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
@@ -624,7 +618,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared spreadsheet session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override

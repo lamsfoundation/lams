@@ -41,7 +41,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -97,8 +96,6 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 
     private IGmapUserDAO gmapUserDAO = null;
 
-    private ILearnerService learnerService;
-
     private ILamsToolService toolService;
 
     private IUserManagementService userManagementService;
@@ -147,7 +144,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -662,14 +659,6 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 
     public void setGmapUserDAO(IGmapUserDAO userDAO) {
 	gmapUserDAO = userDAO;
-    }
-
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public IExportToolContentService getExportContentService() {

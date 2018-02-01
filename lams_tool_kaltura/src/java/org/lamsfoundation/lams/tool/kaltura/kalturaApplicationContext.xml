@@ -37,7 +37,6 @@
 				<property name="kalturaCommentDao"><ref bean="kalturaCommentDao"/></property>
 				<property name="kalturaRatingDao"><ref bean="kalturaRatingDao"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
-				<property name="learnerService"><ref bean="learnerService"/></property>	
 				<property name="auditService"><ref bean="auditService"/></property>		
  				<property name="kalturaToolContentHandler"><ref bean="kalturaToolContentHandler"/></property>
  				<property name="userManagementService"><ref bean="userManagementService"/></property>

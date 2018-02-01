@@ -25,8 +25,7 @@
 				<property name="nbContentDAO"><ref bean="nbContentDAO"/></property>
 				<property name="nbSessionDAO"><ref bean="nbSessionDAO"/></property>
 				<property name="nbUserDAO"><ref bean="nbUserDAO"/></property>
-				<property name="toolService"><ref bean="lamsToolService"/></property>
-				<property name="learnerService"><ref bean="learnerService"/></property>			
+				<property name="toolService"><ref bean="lamsToolService"/></property>	
 				<property name="nbToolContentHandler"><ref bean="nbToolContentHandler"/></property>			
 				<property name="exportContentService"><ref bean="exportToolContentService"/></property>
 				<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>

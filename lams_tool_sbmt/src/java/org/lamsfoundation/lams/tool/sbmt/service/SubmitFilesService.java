@@ -53,7 +53,6 @@ import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterExcep
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -116,8 +115,6 @@ public class SubmitFilesService
     private IToolContentHandler sbmtToolContentHandler;
 
     private ILamsToolService toolService;
-
-    private ILearnerService learnerService;
 
     private IExportToolContentService exportContentService;
 
@@ -458,7 +455,7 @@ public class SubmitFilesService
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find submit file session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -1157,14 +1154,6 @@ public class SubmitFilesService
      */
     public void setSubmitUserDAO(ISubmitUserDAO learnerDAO) {
 	submitUserDAO = learnerDAO;
-    }
-
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public ILamsToolService getToolService() {

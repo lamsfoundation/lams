@@ -37,7 +37,6 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -98,7 +97,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     private IMindmapUserDAO mindmapUserDAO = null;
     private IMindmapNodeDAO mindmapNodeDAO = null;
     private IMindmapRequestDAO mindmapRequestDAO = null;
-    private ILearnerService learnerService;
     private ILamsToolService toolService;
     private IToolContentHandler mindmapToolContentHandler = null;
     private IAuditService auditService = null;
@@ -138,7 +136,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -826,14 +824,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     public void setMindmapUserDAO(IMindmapUserDAO userDAO) {
 	mindmapUserDAO = userDAO;
-    }
-
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public IExportToolContentService getExportContentService() {

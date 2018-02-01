@@ -38,7 +38,6 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -89,8 +88,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
     private INotebookUserDAO notebookUserDAO = null;
 
-    private ILearnerService learnerService;
-
     private ILamsToolService toolService;
 
     private IToolContentHandler notebookToolContentHandler = null;
@@ -135,7 +132,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -548,14 +545,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
     public void setNotebookUserDAO(INotebookUserDAO userDAO) {
 	notebookUserDAO = userDAO;
-    }
-
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public IExportToolContentService getExportContentService() {

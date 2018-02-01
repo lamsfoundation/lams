@@ -45,7 +45,6 @@ import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -116,8 +115,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     // system services
 
     private ILamsToolService toolService;
-
-    private ILearnerService learnerService;
 
     private IAuditService auditService;
 
@@ -520,10 +517,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	this.auditService = auditService;
     }
 
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
@@ -834,7 +827,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared commonCartridge session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override

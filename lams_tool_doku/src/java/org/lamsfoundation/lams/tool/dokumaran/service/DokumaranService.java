@@ -43,7 +43,6 @@ import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -107,8 +106,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     // system services
 
     private ILamsToolService toolService;
-
-    private ILearnerService learnerService;
 
     private IAuditService auditService;
 
@@ -1002,7 +999,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared dokumaran session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -1057,10 +1054,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     // *****************************************************************************
     public void setAuditService(IAuditService auditService) {
 	this.auditService = auditService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public void setMessageService(MessageService messageService) {

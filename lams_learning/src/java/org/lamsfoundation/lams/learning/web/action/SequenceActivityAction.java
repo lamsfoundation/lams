@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -46,9 +46,6 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  *
  * Normally this will display the first activity inside a sequence activity. If there are no activities within the
  * sequence activity then it will display an "empty" message.
- *
- *
- *
  */
 public class SequenceActivityAction extends ActivityAction {
 
@@ -66,7 +63,7 @@ public class SequenceActivityAction extends ActivityAction {
 	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 	Integer learnerId = LearningWebUtil.getUserId();
 
-	ICoreLearnerService learnerService = getLearnerService();
+	ILearnerFullService learnerService = getLearnerService();
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	if (!(activity instanceof SequenceActivity)) {

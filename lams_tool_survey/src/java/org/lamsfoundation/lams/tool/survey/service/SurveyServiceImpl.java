@@ -43,7 +43,6 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -112,8 +111,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     // system services
 
     private ILamsToolService toolService;
-
-    private ILearnerService learnerService;
 
     private IUserManagementService userManagementService;
 
@@ -823,7 +820,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    SurveyServiceImpl.log.error("Fail to leave tool Session based on null learner.");
 	    throw new ToolException("Fail to remove tool Session based on null learner.");
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -871,10 +868,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;

@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -78,7 +77,6 @@ public class NoticeboardService
 	implements INoticeboardService, ToolContentManager, ToolSessionManager, ToolRestManager {
     private static Logger log = Logger.getLogger(NoticeboardService.class);
 
-    private ILearnerService learnerService;
     private ILamsToolService toolService;
     private IExportToolContentService exportContentService;
     private IToolContentHandler nbToolContentHandler;
@@ -496,7 +494,7 @@ public class NoticeboardService
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	getAndCheckSessionIDandObject(toolSessionId);
 
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -565,10 +563,6 @@ public class NoticeboardService
 
     public void setNbUserDAO(INoticeboardUserDAO nbUserDAO) {
 	this.nbUserDAO = nbUserDAO;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public void setToolService(ILamsToolService toolService) {

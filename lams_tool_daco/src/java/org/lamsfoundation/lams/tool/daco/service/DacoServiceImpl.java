@@ -42,7 +42,6 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -101,9 +100,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     private MessageService messageService;
 
     private ILamsToolService toolService;
-
-    private ILearnerService learnerService;
-
+    
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
@@ -691,7 +688,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared daco session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -885,10 +882,6 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public void setMessageService(MessageService messageService) {

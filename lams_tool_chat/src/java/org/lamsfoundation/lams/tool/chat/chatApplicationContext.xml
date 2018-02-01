@@ -34,7 +34,6 @@
 				<property name="chatUserDAO"><ref bean="chatUserDAO"/></property>
 				<property name="chatDAO"><ref bean="chatDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
-				<property name="learnerService"><ref bean="learnerService"/></property>	
 				<property name="auditService"><ref bean="auditService"/></property>		
  				<property name="chatToolContentHandler"><ref bean="chatToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
