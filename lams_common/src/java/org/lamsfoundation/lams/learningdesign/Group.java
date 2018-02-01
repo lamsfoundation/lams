@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.util.Nullable;
 
 public class Group implements Serializable, Nullable, Comparable<Group> {
 
-    public final static int STAFF_GROUP_ORDER_ID = 1;
+    public final static int STAFF_GROUP_ORDER_ID = 2;
     public final static String NAME_OF_STAFF_GROUP = "Staff Group";
 
     /** identifier field */

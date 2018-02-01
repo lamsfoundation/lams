@@ -229,7 +229,7 @@ public interface ICoreLearnerService extends ILearnerService {
      * @return the maximum number of learners per group;<code>null</code> if the requirement for equal number of
      *         learners in groups was not set
      */
-    Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Grouping grouping);
+    Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Long groupingId);
 
     Grouping getGrouping(Long groupingId);
 

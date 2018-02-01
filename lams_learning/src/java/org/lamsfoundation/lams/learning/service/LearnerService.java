@@ -890,8 +890,8 @@ public class LearnerService implements ICoreLearnerService {
     public Lesson getLessonByActivity(Activity activity) {
 	Lesson lesson = lessonDAO.getLessonForActivity(activity.getActivityId());
 	if (lesson == null) {
-	    LearnerService.log
-		    .warn("Tried to get lesson id for a non-lesson based activity. An error is likely to be thrown soon. Activity was "
+	    LearnerService.log.warn(
+		    "Tried to get lesson id for a non-lesson based activity. An error is likely to be thrown soon. Activity was "
 			    + activity);
 	}
 	return lesson;
@@ -1031,8 +1031,8 @@ public class LearnerService implements ICoreLearnerService {
 		    SequenceActivity.class);
 	} else {
 	    if (LearnerService.log.isDebugEnabled()) {
-		LearnerService.log
-			.debug("No branches match and no default branch exists. Uable to allocate learner to a branch for the branching activity"
+		LearnerService.log.debug(
+			"No branches match and no default branch exists. Uable to allocate learner to a branch for the branching activity"
 				+ branchingActivity.getActivityId() + ":" + branchingActivity.getTitle()
 				+ " for learner " + learner.getUserId() + ":" + learner.getLogin());
 	    }
@@ -1241,11 +1241,11 @@ public class LearnerService implements ICoreLearnerService {
      * {@inheritDoc}
      */
     @Override
-    public Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Grouping grouping) {
-	Lesson lesson = getLesson(lessonId);
+    public Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Long groupingId) {
+	LearnerChoiceGrouping grouping = (LearnerChoiceGrouping) getGrouping(groupingId);
 	LearnerChoiceGrouping learnerChoiceGrouping = (LearnerChoiceGrouping) grouping;
 	Integer maxNumberOfLearnersPerGroup = null;
-	int learnerCount = lesson.getAllLearners().size();
+	int learnerCount = lessonService.getCountLessonLearners(lessonId, null);
 	int groupCount = grouping.getGroups().size();
 	if (learnerChoiceGrouping.getLearnersPerGroup() == null) {
 	    if (groupCount == 0) {

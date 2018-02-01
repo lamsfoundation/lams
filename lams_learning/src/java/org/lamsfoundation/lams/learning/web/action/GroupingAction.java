@@ -153,11 +153,10 @@ public class GroupingAction extends LamsDispatchAction {
 	// forward to group choosing page
 	if (((GroupingActivity) activity).getCreateGrouping().isLearnerChoiceGrouping()) {
 	    Long groupingId = ((GroupingActivity) activity).getCreateGrouping().getGroupingId();
+	    Integer maxNumberOfLeaernersPerGroup = learnerService.calculateMaxNumberOfLearnersPerGroup(lessonId,
+		    groupingId);
 
 	    LearnerChoiceGrouping grouping = (LearnerChoiceGrouping) learnerService.getGrouping(groupingId);
-	    Integer maxNumberOfLeaernersPerGroup = learnerService.calculateMaxNumberOfLearnersPerGroup(lessonId,
-		    grouping);
-
 	    prepareGroupData(request);
 	    request.setAttribute(GroupingAction.MAX_LEARNERS_PER_GROUP, maxNumberOfLeaernersPerGroup);
 	    request.setAttribute(GroupingAction.LOCAL_FILES, Boolean.FALSE);
@@ -236,7 +235,6 @@ public class GroupingAction extends LamsDispatchAction {
      *
      * @param request
      */
-    @SuppressWarnings("unchecked")
     private void prepareGroupData(HttpServletRequest request) {
 
 	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
@@ -287,9 +285,9 @@ public class GroupingAction extends LamsDispatchAction {
 	}
 	Long groupingId = ((GroupingActivity) activity).getCreateGrouping().getGroupingId();
 
+	Integer maxNumberOfLeaernersPerGroup = learnerService.calculateMaxNumberOfLearnersPerGroup(lessonId,
+		groupingId);
 	LearnerChoiceGrouping grouping = (LearnerChoiceGrouping) learnerService.getGrouping(groupingId);
-	Integer maxNumberOfLeaernersPerGroup = learnerService.calculateMaxNumberOfLearnersPerGroup(lessonId, grouping);
-
 	prepareGroupData(request);
 	request.setAttribute(GroupingAction.MAX_LEARNERS_PER_GROUP, maxNumberOfLeaernersPerGroup);
 	request.setAttribute(GroupingAction.LOCAL_FILES, Boolean.FALSE);
