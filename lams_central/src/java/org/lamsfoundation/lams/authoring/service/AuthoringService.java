@@ -869,11 +869,13 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	updateCompetenceMappings(newLearningDesign.getCompetences(), newActivities);
 
 	try {
-	    FileUtils.copyFile(
-		    new File(LearningDesignService
-			    .getLearningDesignSVGPath(originalLearningDesign.getLearningDesignId())),
-		    new File(LearningDesignService.getLearningDesignSVGPath(newLearningDesign.getLearningDesignId())),
-		    false);
+	    File sourceSVG = new File(
+		    LearningDesignService.getLearningDesignSVGPath(originalLearningDesign.getLearningDesignId()));
+	    if (sourceSVG.canRead()) {
+		FileUtils.copyFile(sourceSVG, new File(
+			LearningDesignService.getLearningDesignSVGPath(newLearningDesign.getLearningDesignId())),
+			false);
+	    }
 	} catch (IOException e) {
 	    log.error("Error while copying Learning Design " + originalLearningDesign.getLearningDesignId() + " image",
 		    e);
