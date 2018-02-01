@@ -714,7 +714,7 @@ public class LearnerService implements ICoreLearnerService {
      * {@inheritDoc}
      */
     @Override
-    public boolean learnerChooseGroup(Long lessonId, Long groupingActivityId, Long groupId, Integer learnerId)
+    public void learnerChooseGroup(Long lessonId, Long groupingActivityId, Long groupId, Integer learnerId)
 	    throws LearnerServiceException {
 	GroupingActivity groupingActivity = (GroupingActivity) activityDAO.getActivityByActivityId(groupingActivityId,
 		GroupingActivity.class);
@@ -725,7 +725,7 @@ public class LearnerService implements ICoreLearnerService {
 
 		User learner = (User) userManagementService.findById(User.class, learnerId);
 		if (grouping.doesLearnerExist(learner)) {
-		    return true;
+		    return;
 		}
 		if (learner != null) {
 		    Integer maxNumberOfLearnersPerGroup = null;
@@ -747,18 +747,16 @@ public class LearnerService implements ICoreLearnerService {
 			for (Group group : groups) {
 			    if (group.getGroupId().equals(groupId)) {
 				if (group.getUsers().size() >= maxNumberOfLearnersPerGroup) {
-				    return false;
+				    return;
 				}
 			    }
 			}
 		    }
 
 		    lessonService.performGrouping(grouping, groupId, learner);
-		    return true;
 		}
 	    }
 	}
-	return false;
     }
 
     private boolean forceGrouping(Lesson lesson, Grouping grouping, Group group, User learner) {

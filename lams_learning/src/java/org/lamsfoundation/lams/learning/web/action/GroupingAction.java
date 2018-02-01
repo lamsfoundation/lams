@@ -38,6 +38,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.apache.struts.action.RedirectingActionForward;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -69,16 +70,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * </p>
  *
  * @author Jacky Fang
- * @since 2005-3-29
- * @version 1.1
- *
- *
- *
- *
- *
- *
- *
- *
  *
  */
 public class GroupingAction extends LamsDispatchAction {
@@ -278,21 +269,13 @@ public class GroupingAction extends LamsDispatchAction {
 	Long groupId = WebUtil.readLongParam(request, "groupId");
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Long lessonId = learnerProgress.getLesson().getLessonId();
-	boolean learnerGroupped = learnerService.learnerChooseGroup(lessonId, activity.getActivityId(), groupId,
-		LearningWebUtil.getUserId());
-	if (learnerGroupped) {
-	    return viewGrouping(mapping, form, request, response, learnerProgress);
-	}
-	Long groupingId = ((GroupingActivity) activity).getCreateGrouping().getGroupingId();
+	learnerService.learnerChooseGroup(lessonId, activity.getActivityId(), groupId, LearningWebUtil.getUserId());
 
-	Integer maxNumberOfLeaernersPerGroup = learnerService.calculateMaxNumberOfLearnersPerGroup(lessonId,
-		groupingId);
-	LearnerChoiceGrouping grouping = (LearnerChoiceGrouping) learnerService.getGrouping(groupingId);
-	prepareGroupData(request);
-	request.setAttribute(GroupingAction.MAX_LEARNERS_PER_GROUP, maxNumberOfLeaernersPerGroup);
-	request.setAttribute(GroupingAction.LOCAL_FILES, Boolean.FALSE);
-	request.setAttribute(GroupingAction.VIEW_STUDENTS_BEFORE_SELECTION, grouping.getViewStudentsBeforeSelection());
-	return mapping.findForward(GroupingAction.CHOOSE_GROUP);
+	String redirectURL = "/grouping.do";
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, "method", "performGrouping");
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, "activityID", activity.getActivityId().toString());
+
+	return new RedirectingActionForward(redirectURL);
     }
 
 }
