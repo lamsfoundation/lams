@@ -8,7 +8,7 @@
 >
 
     <class
-        name="org.lamsfoundation.lams.gradebook.GradebookUserActivityArchive"
+        name="org.lamsfoundation.lams.gradebook.model.GradebookUserActivityArchive"
         table="lams_gradebook_user_activity_archive"
     >
 

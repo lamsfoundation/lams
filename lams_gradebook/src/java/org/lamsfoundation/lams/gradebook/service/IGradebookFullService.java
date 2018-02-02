@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
-import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
@@ -41,7 +40,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.ExcelCell;
 
-public interface IGradebookService {
+public interface IGradebookFullService extends IGradebookService {
 
     /**
      * Gets all the activity rows for a lesson, with the mark for each activity being the average for all users in the
@@ -125,24 +124,6 @@ public interface IGradebookService {
     int getCountUsersByOrganisation(Integer orgId, String searchString);
 
     /**
-     * Updates all user marks in specified activity. It recalculates all UserActivityGradebooks and
-     * UserLessonGradebooks.
-     * 
-     * @param activity
-     */
-    void recalculateGradebookMarksForActivity(Activity activity);
-
-    /**
-     * Recalculates total marks for all users in a lesson. Then stores that mark in a gradebookUserLesson. Doesn't
-     * affect anyhow gradebookUserActivity objects. If total mark is positive but there is no gradebookUserLesson
-     * available - throws exception.
-     * 
-     * @param lessonId
-     * @throws Exception
-     */
-    void recalculateTotalMarksForLesson(Long lessonId) throws Exception;
-
-    /**
      * Updates a user's lesson mark, this will make it desynchronised with the aggregated marks from the activities
      *
      * @param lesson
@@ -150,14 +131,6 @@ public interface IGradebookService {
      * @param mark
      */
     void updateUserLessonGradebookMark(Lesson lesson, User learner, Double mark);
-
-    /**
-     * If specified activity is set to produce ToolOutput, calculates and stores mark to gradebook.
-     *
-     * @param toolActivity
-     * @param progress
-     */
-    void updateUserActivityGradebookMark(Lesson lesson, Activity activity, User learner);
 
     /**
      * Updates a user's activity mark, this will automatically add up all the user's activity marks for a lesson and set
@@ -171,7 +144,7 @@ public interface IGradebookService {
      * @param isAuditLogRequired
      *            should this event be logged with audit service
      */
-    void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark,
+    void updateGradebookUserActivityMark(Lesson lesson, User learner, Activity activity, Double mark,
 	    Boolean markedInGradebook, boolean isAuditLogRequired);
 
     /**
@@ -181,7 +154,7 @@ public interface IGradebookService {
      * @param learner
      * @param feedback
      */
-    void updateUserActivityGradebookFeedback(Activity activity, User learner, String feedback);
+    void updateGradebookUserActivityFeedback(Activity activity, User learner, String feedback);
 
     /**
      * Updates the user's feedback for a lesson
@@ -214,23 +187,6 @@ public interface IGradebookService {
 	    int page, int size, String sortBy, String sortOrder, String searchString, TimeZone userTimeZone);
 
     /**
-     * Gets a gradebook lesson mark/feedback for a given user and lesson
-     *
-     * @param lessonID
-     * @param userID
-     * @return
-     */
-    GradebookUserLesson getGradebookUserLesson(Long lessonID, Integer userID);
-
-    /**
-     * Gets a gradebook lesson mark/feedback for all users in a given lesson
-     *
-     * @param lessonID
-     * @return
-     */
-    List<GradebookUserLesson> getGradebookUserLesson(Long lessonID);
-
-    /**
      * Gets a gradebook activity mark/feedback for a given activity and user
      *
      * @param activityID
@@ -260,27 +216,12 @@ public interface IGradebookService {
     Double getAverageMarkForLesson(Long lessonID);
 
     /**
-     * Method for updating an activity mark that tools can call
-     *
-     * @param mark
-     * @param feedback
-     * @param userID
-     * @param toolSessionID
-     */
-    void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
-	    Boolean markedInGradebook);
-
-    /**
      * Get an activity from the db by id
      *
      * @param activityID
      * @return
      */
     Activity getActivityById(Long activityID);
-
-    void removeLearnerFromLesson(Long lessonId, Integer learnerId);
-
-    void archiveLearnerMarks(Long lessonId, Integer learnerId);
 
     /**
      * Get a language label

@@ -51,7 +51,6 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -142,8 +141,6 @@ public class ScratchieServiceImpl
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
-
-    private IGradebookService gradebookService;
 
     private IAuditService auditService;
 
@@ -380,7 +377,7 @@ public class ScratchieServiceImpl
 	List<ScratchieUser> users = this.getUsersBySession(sessionId);
 	for (ScratchieUser user : users) {
 
-	    gradebookService.updateActivityMark(new Double(newMark), null, user.getUserId().intValue(),
+	    toolService.updateActivityMark(new Double(newMark), null, user.getUserId().intValue(),
 		    user.getSession().getSessionId(), false);
 
 	    // record mark change with audit service
@@ -457,7 +454,7 @@ public class ScratchieServiceImpl
 	if (isPropagateToGradebook) {
 	    List<ScratchieUser> users = this.getUsersBySession(sessionId);
 	    for (ScratchieUser user : users) {
-		gradebookService.updateActivityMark(new Double(mark), null, user.getUserId().intValue(),
+		toolService.updateActivityMark(new Double(mark), null, user.getUserId().intValue(),
 			user.getSession().getSessionId(), false);
 	    }
 	}
@@ -2026,7 +2023,7 @@ public class ScratchieServiceImpl
 
 		scratchieUserDao.removeObject(ScratchieUser.class, user.getUid());
 
-		gradebookService.updateActivityMark(null, null, userId, session.getSessionId(), false);
+		toolService.updateActivityMark(null, null, userId, session.getSessionId(), false);
 	    }
 	}
     }
@@ -2132,10 +2129,6 @@ public class ScratchieServiceImpl
 
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
-    }
-
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
     }
 
     public void setAuditService(IAuditService auditService) {

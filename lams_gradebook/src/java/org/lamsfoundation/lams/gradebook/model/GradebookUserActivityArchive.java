@@ -20,10 +20,11 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.gradebook;
+package org.lamsfoundation.lams.gradebook.model;
 
 import java.util.Date;
 
+import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.usermanagement.User;
 

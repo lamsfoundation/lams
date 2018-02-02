@@ -13,7 +13,6 @@
 		</property>										
 	</bean>
 
-
     <!-- core beans -->
     <bean id="spreadsheetDao" class="org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate.SpreadsheetDAOHibernate">
         <property name="sessionFactory">
@@ -80,11 +79,7 @@
    			<ref bean="exportToolContentService"/>
    		</property>
    		<property name="messageService"><ref bean="spreadsheetMessageService"/></property>
-		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   		
-		<property name="gradebookService">
-			<ref bean="gradebookService" />
-		</property>
-		
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
     </bean>
 
     <bean id="spreadsheetService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

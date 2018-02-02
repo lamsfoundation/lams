@@ -19,7 +19,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/websocket/api/main/jboss-websocket-api_1.1_spec-1.1.0.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/websocket"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_gradebook"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/hibernate/main/hibernate-core-4.3.7.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/hibernate-core">
 		<attributes>
 			<attribute name="javadoc_location" value="http://docs.jboss.org/hibernate/orm/4.3/javadocs/"/>

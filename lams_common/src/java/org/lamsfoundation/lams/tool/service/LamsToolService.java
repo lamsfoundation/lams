@@ -142,6 +142,12 @@ public class LamsToolService implements ILamsToolService {
     public String completeToolSession(Long toolSessionId, Long learnerId) {
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
+    
+    @Override
+    public void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
+	    Boolean markedInGradebook) {
+	gradebookService.updateGradebookUserActivityMark(mark, feedback, userID, toolSessionID, markedInGradebook);
+    }
 
     @SuppressWarnings("unchecked")
     @Override

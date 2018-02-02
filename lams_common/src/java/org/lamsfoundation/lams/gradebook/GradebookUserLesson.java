@@ -27,11 +27,9 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
+ * This class maps to one learner's entire mark for a lesson
+ * 
  * @author lfoxton
- *
- *         This class maps to one learner's entire mark for a lesson
- *
- *
  */
 public class GradebookUserLesson {
     private long uid;

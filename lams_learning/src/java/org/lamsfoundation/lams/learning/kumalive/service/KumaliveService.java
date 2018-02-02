@@ -44,8 +44,6 @@ import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
-import org.lamsfoundation.lams.gradebook.util.UserComparator;
 import org.lamsfoundation.lams.learning.kumalive.dao.IKumaliveDAO;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
@@ -53,6 +51,8 @@ import org.lamsfoundation.lams.learning.kumalive.model.KumaliveScore;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -63,7 +63,7 @@ public class KumaliveService implements IKumaliveService {
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##",
 	    new DecimalFormatSymbols(Locale.ENGLISH));
     private static final ExcelCell[] EMPTY_ROW = new ExcelCell[1];
-    private static final Comparator<User> USER_COMPARATOR = new UserComparator();
+    private static final Comparator<User> USER_COMPARATOR = new LastNameAlphabeticComparator();
 
     private IKumaliveDAO kumaliveDAO;
     private ISecurityService securityService;
@@ -194,9 +194,9 @@ public class KumaliveService implements IKumaliveService {
 
 	JSONObject resultJSON = new JSONObject();
 
-	resultJSON.put(GradebookConstants.ELEMENT_PAGE, page);
-	resultJSON.put(GradebookConstants.ELEMENT_TOTAL, totalPages);
-	resultJSON.put(GradebookConstants.ELEMENT_RECORDS, kumalives.size());
+	resultJSON.put(CommonConstants.ELEMENT_PAGE, page);
+	resultJSON.put(CommonConstants.ELEMENT_TOTAL, totalPages);
+	resultJSON.put(CommonConstants.ELEMENT_RECORDS, kumalives.size());
 
 	JSONArray rowsJSON = new JSONArray();
 
@@ -205,13 +205,13 @@ public class KumaliveService implements IKumaliveService {
 
 	for (Kumalive kumalive : kumalives) {
 	    JSONObject rowJSON = new JSONObject();
-	    rowJSON.put(GradebookConstants.ELEMENT_ID, kumalive.getKumaliveId());
+	    rowJSON.put(CommonConstants.ELEMENT_ID, kumalive.getKumaliveId());
 
 	    JSONArray cellJSON = new JSONArray();
 	    cellJSON.put(order);
 	    cellJSON.put(kumalive.getName());
 
-	    rowJSON.put(GradebookConstants.ELEMENT_CELL, cellJSON);
+	    rowJSON.put(CommonConstants.ELEMENT_CELL, cellJSON);
 	    rowsJSON.put(rowJSON);
 
 	    if (isAscending) {
@@ -221,7 +221,7 @@ public class KumaliveService implements IKumaliveService {
 	    }
 	}
 
-	resultJSON.put(GradebookConstants.ELEMENT_ROWS, rowsJSON);
+	resultJSON.put(CommonConstants.ELEMENT_ROWS, rowsJSON);
 
 	return resultJSON;
     }
@@ -244,13 +244,13 @@ public class KumaliveService implements IKumaliveService {
 				Collectors.mapping(KumaliveScore::getScore, Collectors.toList()))));
 
 	JSONObject resultJSON = new JSONObject();
-	resultJSON.put(GradebookConstants.ELEMENT_RECORDS, scores.size());
+	resultJSON.put(CommonConstants.ELEMENT_RECORDS, scores.size());
 
 	JSONArray rowsJSON = new JSONArray();
 	for (Entry<User, Map<Long, List<Short>>> userEntry : scores.entrySet()) {
 	    JSONObject rowJSON = new JSONObject();
 	    User user = userEntry.getKey();
-	    rowJSON.put(GradebookConstants.ELEMENT_ID, user.getUserId());
+	    rowJSON.put(CommonConstants.ELEMENT_ID, user.getUserId());
 
 	    JSONArray cellJSON = new JSONArray();
 	    cellJSON.put(user.getFirstName() + " " + user.getLastName());
@@ -271,11 +271,11 @@ public class KumaliveService implements IKumaliveService {
 		cellJSON.put(score == null ? "" : DECIMAL_FORMAT.format(score / attempts.size()));
 	    }
 
-	    rowJSON.put(GradebookConstants.ELEMENT_CELL, cellJSON);
+	    rowJSON.put(CommonConstants.ELEMENT_CELL, cellJSON);
 	    rowsJSON.put(rowJSON);
 	}
 
-	resultJSON.put(GradebookConstants.ELEMENT_ROWS, rowsJSON);
+	resultJSON.put(CommonConstants.ELEMENT_ROWS, rowsJSON);
 
 	return resultJSON;
     }
@@ -297,14 +297,14 @@ public class KumaliveService implements IKumaliveService {
 			Collectors.toMap(score -> score.getRubric().getRubricId(), KumaliveScore::getScore)));
 
 	JSONObject resultJSON = new JSONObject();
-	resultJSON.put(GradebookConstants.ELEMENT_RECORDS, scores.size());
+	resultJSON.put(CommonConstants.ELEMENT_RECORDS, scores.size());
 
 	JSONArray rowsJSON = new JSONArray();
 	// just normal ordering of questions
 	short order = 1;
 	for (Entry<Long, Map<Long, Short>> batchEntry : scores.entrySet()) {
 	    JSONObject rowJSON = new JSONObject();
-	    rowJSON.put(GradebookConstants.ELEMENT_ID, order);
+	    rowJSON.put(CommonConstants.ELEMENT_ID, order);
 
 	    JSONArray cellJSON = new JSONArray();
 	    cellJSON.put(order);
@@ -314,11 +314,11 @@ public class KumaliveService implements IKumaliveService {
 		cellJSON.put(score == null ? "" : score);
 	    }
 
-	    rowJSON.put(GradebookConstants.ELEMENT_CELL, cellJSON);
+	    rowJSON.put(CommonConstants.ELEMENT_CELL, cellJSON);
 	    rowsJSON.put(rowJSON);
 	}
 
-	resultJSON.put(GradebookConstants.ELEMENT_ROWS, rowsJSON);
+	resultJSON.put(CommonConstants.ELEMENT_ROWS, rowsJSON);
 
 	return resultJSON;
     }

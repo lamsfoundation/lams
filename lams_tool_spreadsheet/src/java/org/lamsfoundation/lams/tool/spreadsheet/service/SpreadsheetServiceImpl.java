@@ -35,7 +35,6 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -92,7 +91,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     private IUserManagementService userManagementService;
     private IExportToolContentService exportContentService;
     private ICoreNotebookService coreNotebookService;
-    private IGradebookService gradebookService;
 
     // *******************************************************************************
     // Service method
@@ -321,7 +319,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		// send marks to gradebook where applicable
 		if (mark.getMarks() != null) {
 		    Double doubleMark = new Double(mark.getMarks());
-		    gradebookService.updateActivityMark(doubleMark, null, user.getUserId().intValue(), sessionId,
+		    toolService.updateActivityMark(doubleMark, null, user.getUserId().intValue(), sessionId,
 			    false);
 		}
 	    }
@@ -687,14 +685,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
-    }
-
-    public IGradebookService getGradebookService() {
-	return gradebookService;
-    }
-
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
     }
 
     @Override

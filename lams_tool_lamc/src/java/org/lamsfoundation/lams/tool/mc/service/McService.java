@@ -56,7 +56,6 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -135,10 +134,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     private ILamsToolService toolService;
     private IToolContentHandler mcToolContentHandler = null;
     private IExportToolContentService exportContentService;
-    private IGradebookService gradebookService;
-
     private ICoreNotebookService coreNotebookService;
-
     private MessageService messageService;
 
     public McService() {
@@ -775,7 +771,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    updateMcQueUsr(user);
 
 	    // propagate changes to Gradebook
-	    gradebookService.updateActivityMark(new Double(totalMark), null, user.getQueUsrId().intValue(), 
+	    toolService.updateActivityMark(new Double(totalMark), null, user.getQueUsrId().intValue(), 
 		    mcSession.getMcSessionId(), false);
 
 	    // record mark change with audit service
@@ -909,7 +905,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    user.setLastAttemptTotalMark(newTotalMark);
 		    updateMcQueUsr(user);
 		    
-		    gradebookService.updateActivityMark(new Double(newTotalMark), null, user.getQueUsrId().intValue(),
+		    toolService.updateActivityMark(new Double(newTotalMark), null, user.getQueUsrId().intValue(),
 			    toolSessionId, false);
 		}
 
@@ -1307,7 +1303,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		    mcUserDAO.removeMcUser(user);
 
-		    gradebookService.updateActivityMark(null, null, userId, session.getMcSessionId(), false);
+		    toolService.updateActivityMark(null, null, userId, session.getMcSessionId(), false);
 		}
 	    }
 	}
@@ -1694,10 +1690,6 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
-    }
-
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
     }
 
     public void setMcOutputFactory(MCOutputFactory mcOutputFactory) {

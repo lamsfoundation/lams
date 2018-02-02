@@ -51,7 +51,6 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -67,6 +66,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
@@ -313,8 +313,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    }
 	}
 
-	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
+	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
 
 	// get only recipients we want on the page
 	List<User> recipients = monitoringService.getArchivedEmailNotificationRecipients(emailNotificationUid, rowLimit,
@@ -322,23 +322,23 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
 	// build JSON which is understood by jqGrid
 	JSONObject responseJSON = new JSONObject();
-	responseJSON.put(GradebookConstants.ELEMENT_PAGE, page);
-	responseJSON.put(GradebookConstants.ELEMENT_TOTAL, ((notification.getRecipients().size() - 1) / rowLimit) + 1);
-	responseJSON.put(GradebookConstants.ELEMENT_RECORDS, recipients.size());
+	responseJSON.put(CommonConstants.ELEMENT_PAGE, page);
+	responseJSON.put(CommonConstants.ELEMENT_TOTAL, ((notification.getRecipients().size() - 1) / rowLimit) + 1);
+	responseJSON.put(CommonConstants.ELEMENT_RECORDS, recipients.size());
 
 	JSONArray rowsJSON = new JSONArray();
 	for (User recipient : recipients) {
 	    JSONObject rowJSON = new JSONObject();
-	    rowJSON.put(GradebookConstants.ELEMENT_ID, recipient.getUserId());
+	    rowJSON.put(CommonConstants.ELEMENT_ID, recipient.getUserId());
 
 	    JSONArray cellJSON = new JSONArray();
 	    cellJSON.put(recipient.getFirstName() + " " + recipient.getLastName() + " [" + recipient.getLogin() + "]");
 
-	    rowJSON.put(GradebookConstants.ELEMENT_CELL, cellJSON);
+	    rowJSON.put(CommonConstants.ELEMENT_CELL, cellJSON);
 	    rowsJSON.put(rowJSON);
 	}
 
-	responseJSON.put(GradebookConstants.ELEMENT_ROWS, rowsJSON);
+	responseJSON.put(CommonConstants.ELEMENT_ROWS, rowsJSON);
 	writeResponse(response, "text/json", LamsDispatchAction.ENCODING_UTF8, responseJSON.toString());
 	return null;
     }

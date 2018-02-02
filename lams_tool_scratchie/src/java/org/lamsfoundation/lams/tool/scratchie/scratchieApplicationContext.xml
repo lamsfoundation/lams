@@ -104,7 +104,6 @@
    		<property name="exportContentService">
    			<ref bean="exportToolContentService"/>
    		</property>
-   		<property name="gradebookService"><ref bean="gradebookService" /></property>
    		<property name="auditService"><ref bean="auditService"/></property>
    		<property name="messageService"><ref bean="scratchieMessageService"/></property>
 		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   

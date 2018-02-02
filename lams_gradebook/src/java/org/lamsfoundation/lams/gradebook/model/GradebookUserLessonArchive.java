@@ -20,8 +20,9 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.gradebook;
+package org.lamsfoundation.lams.gradebook.model;
 
+import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 

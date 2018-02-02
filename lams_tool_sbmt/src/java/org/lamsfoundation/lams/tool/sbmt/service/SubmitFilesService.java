@@ -52,7 +52,6 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -125,8 +124,6 @@ public class SubmitFilesService
     private IEventNotificationService eventNotificationService;
 
     private MessageService messageService;
-
-    private IGradebookService gradebookService;
 
     private IAuditService auditService;
 
@@ -238,7 +235,7 @@ public class SubmitFilesService
 		if (entry != null) {
 		    submitFilesContentDAO.delete(entry);
 		}
-		gradebookService.updateActivityMark(null, null, user.getUserID(), session.getSessionID(), false);
+		toolService.updateActivityMark(null, null, user.getUserID(), session.getSessionID(), false);
 
 		submitUserDAO.delete(user);
 	    }
@@ -919,7 +916,7 @@ public class SubmitFilesService
 	    }
 	    if (totalMark != null) {
 		Double mark = new Double(totalMark);
-		gradebookService.updateActivityMark(mark, null, user.getUserID(), toolSessionID, false);
+		toolService.updateActivityMark(mark, null, user.getUserID(), toolSessionID, false);
 	    }
 	}
     }
@@ -1213,10 +1210,6 @@ public class SubmitFilesService
 
     public void setAuditService(IAuditService auditService) {
         this.auditService = auditService;
-    }
-
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
     }
 
     @Override

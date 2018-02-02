@@ -53,7 +53,6 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -148,8 +147,6 @@ public class AssessmentServiceImpl
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
-
-    private IGradebookService gradebookService;
 
     private ICoreNotebookService coreNotebookService;
 
@@ -1970,7 +1967,7 @@ public class AssessmentServiceImpl
 	    assessmentResultDao.saveObject(result);
 
 	    // propagade changes to Gradebook
-	    gradebookService.updateActivityMark(new Double(totalMark), null, userId.intValue(), toolSessionId, false);
+	    toolService.updateActivityMark(new Double(totalMark), null, userId.intValue(), toolSessionId, false);
 
 	    // records mark change with audit service
 	    auditService.logMarkChange(AssessmentConstants.TOOL_SIGNATURE, userId, user.getLoginName(), "" + oldMark,
@@ -2239,7 +2236,7 @@ public class AssessmentServiceImpl
 			// if this is the last finished assessment result - propagade total mark to Gradebook
 			if (lastFinishedAssessmentResult != null
 				&& lastFinishedAssessmentResult.getUid().equals(assessmentResult.getUid())) {
-			    gradebookService.updateActivityMark(new Double(assessmentMark), null,
+			    toolService.updateActivityMark(new Double(assessmentMark), null,
 				    user.getUserId().intValue(), toolSessionId, false);
 			}
 		    }
@@ -2584,7 +2581,7 @@ public class AssessmentServiceImpl
 		}
 
 		// propagade changes to Gradebook
-		gradebookService.updateActivityMark(null, null, userId, session.getSessionId(), false);
+		toolService.updateActivityMark(null, null, userId, session.getSessionId(), false);
 
 		assessmentUserDao.removeObject(AssessmentUser.class, user.getUid());
 	    }
@@ -2781,10 +2778,6 @@ public class AssessmentServiceImpl
 
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
-    }
-
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
     }
 
     public IUserManagementService getUserManagementService() {

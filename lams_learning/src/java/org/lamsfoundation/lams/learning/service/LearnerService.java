@@ -654,7 +654,7 @@ public class LearnerService implements ILearnerFullService {
     public void updateGradebookMark(Activity activity, LearnerProgress progress) {
 	User learner = progress.getUser();
 	Lesson lesson = progress.getLesson();
-	gradebookService.updateUserActivityGradebookMark(lesson, activity, learner);
+	gradebookService.updateGradebookUserActivityMark(lesson, activity, learner);
     }
 
     /**
@@ -1428,7 +1428,7 @@ public class LearnerService implements ILearnerFullService {
 			    || TOOL_SIGNATURE_MCQ.equals(tool.getToolSignature())) {
 			auditLogBuilder.append("Pushing mark to Gradebook for activity ")
 				.append(activity.getActivityId()).append(" ").append(activity.getTitle()).append("\n");
-			gradebookService.updateUserActivityGradebookMark(lesson, activity, learner);
+			gradebookService.updateGradebookUserActivityMark(lesson, activity, learner);
 		    }
 		}
 	    }

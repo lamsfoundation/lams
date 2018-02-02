@@ -50,7 +50,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
@@ -69,6 +68,7 @@ import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
@@ -347,10 +347,10 @@ public class MonitoringAction extends Action {
 	Long sessionId = WebUtil.readLongParam(request, "sessionId");
 
 	// Getting the params passed in from the jqGrid
-	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
-	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
-	String sortBy = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
+	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
 	if (StringUtils.isEmpty(sortBy)) {
 	    sortBy = "userName";
 	}
@@ -435,10 +435,10 @@ public class MonitoringAction extends Action {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 
 	// Getting the params passed in from the jqGrid
-	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
-	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
-	String sortBy = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
+	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
 	if (StringUtils.isEmpty(sortBy)) {
 	    sortBy = "userName";
 	}

@@ -91,6 +91,17 @@ public interface ILamsToolService {
      *             in case of problems.
      */
     String completeToolSession(Long toolSessionId, Long learnerId);
+    
+    /**
+     * Method for updating an activity mark that tools can call
+     *
+     * @param mark
+     * @param feedback
+     * @param userID
+     * @param toolSessionID
+     */
+    void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
+	    Boolean markedInGradebook);
 
     /**
      * Allows the tool to ask whether or not the activity is grouped and therefore it should expect more than one tool

@@ -40,19 +40,18 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
-import org.lamsfoundation.lams.gradebook.GradebookUserActivityArchive;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
-import org.lamsfoundation.lams.gradebook.GradebookUserLessonArchive;
 import org.lamsfoundation.lams.gradebook.dao.IGradebookDAO;
 import org.lamsfoundation.lams.gradebook.dto.GBActivityGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
+import org.lamsfoundation.lams.gradebook.model.GradebookUserActivityArchive;
+import org.lamsfoundation.lams.gradebook.model.GradebookUserLessonArchive;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.gradebook.util.LessonComparator;
-import org.lamsfoundation.lams.gradebook.util.UserComparator;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
@@ -84,6 +83,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -101,9 +101,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * This service handles all gradebook-related service calls
  *
  * @author lfoxton
- *
  */
-public class GradebookService implements IGradebookService {
+public class GradebookService implements IGradebookFullService {
 
     private static Logger logger = Logger.getLogger(GradebookService.class);
 
@@ -361,7 +360,7 @@ public class GradebookService implements IGradebookService {
 	    //size will be 0 in case of excel export
 	    if (size == 0) {
 		learners = new LinkedList<User>(lesson.getAllLearners());
-		Collections.sort(learners, new UserComparator());
+		Collections.sort(learners, new LastNameAlphabeticComparator());
 
 		userToLearnerProgressMap = getUserToLearnerProgressMap(lesson, null);
 		userToGradebookUserLessonMap = getUserToGradebookUserLessonMap(lesson, null);
@@ -597,7 +596,7 @@ public class GradebookService implements IGradebookService {
     }
 
     @Override
-    public void updateUserActivityGradebookMark(Lesson lesson, Activity activity, User learner) {
+    public void updateGradebookUserActivityMark(Lesson lesson, Activity activity, User learner) {
 	ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
 
 	if ((toolSession == null) || (toolSession == null) || (learner == null) || (lesson == null)
@@ -624,7 +623,7 @@ public class GradebookService implements IGradebookService {
 
 		    // Only set the mark if it hasnt previously been set by a teacher
 		    if ((gradebookUserActivity == null) || !gradebookUserActivity.getMarkedInGradebook()) {
-			updateUserActivityGradebookMark(lesson, learner, toolActivity, outputDouble, false, false);
+			updateGradebookUserActivityMark(lesson, learner, toolActivity, outputDouble, false, false);
 		    }
 		}
 	    }
@@ -636,7 +635,7 @@ public class GradebookService implements IGradebookService {
     }
 
     @Override
-    public void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark,
+    public void updateGradebookUserActivityMark(Lesson lesson, User learner, Activity activity, Double mark,
 	    Boolean markedInGradebook, boolean isAuditLogRequired) {
 
 	GradebookUserActivity gradebookUserActivity = gradebookDAO
@@ -752,7 +751,7 @@ public class GradebookService implements IGradebookService {
     }
 
     @Override
-    public void updateUserActivityGradebookFeedback(Activity activity, User learner, String feedback) {
+    public void updateGradebookUserActivityFeedback(Activity activity, User learner, String feedback) {
 
 	GradebookUserActivity gradebookUserActivity = gradebookDAO
 		.getGradebookUserDataForActivity(activity.getActivityId(), learner.getUserId());
@@ -896,7 +895,7 @@ public class GradebookService implements IGradebookService {
 
 	Map<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = new LinkedHashMap<ToolActivity, List<GBUserGridRowDTO>>();
 
-	Set<User> learners = new TreeSet<User>(new UserComparator());
+	Set<User> learners = new TreeSet<User>(new LastNameAlphabeticComparator());
 	if (lesson.getAllLearners() != null) {
 	    learners.addAll(lesson.getAllLearners());
 	}
@@ -926,7 +925,7 @@ public class GradebookService implements IGradebookService {
 
 	    if (activity instanceof SequenceActivity) {
 		// use only a subset of learners for this branch of the branching activity based on who has started the branch
-		complexLearners = new TreeSet<User>(new UserComparator());
+		complexLearners = new TreeSet<User>(new LastNameAlphabeticComparator());
 		for (User learner : learners) {
 		    LearnerProgress learnerProgress = userToLearnerProgressMap.get(learner.getUserId());
 		    if (learnerProgress != null && (learnerProgress.getCompletedActivities().get(activity) != null
@@ -1177,7 +1176,7 @@ public class GradebookService implements IGradebookService {
 
 	// -------------------- process Learner View page --------------------------------
 
-	Set<User> learners = new TreeSet<User>(new UserComparator());
+	Set<User> learners = new TreeSet<User>(new LastNameAlphabeticComparator());
 	if (lesson.getAllLearners() != null) {
 	    learners.addAll(lesson.getAllLearners());
 	}
@@ -1317,7 +1316,7 @@ public class GradebookService implements IGradebookService {
 	    }
 
 	    //sort users by last name
-	    TreeSet<User> sortedLearners = new TreeSet<User>(new UserComparator());
+	    TreeSet<User> sortedLearners = new TreeSet<User>(new LastNameAlphabeticComparator());
 	    sortedLearners.addAll(allLearners);
 
 	    for (User learner : sortedLearners) {
@@ -1722,7 +1721,7 @@ public class GradebookService implements IGradebookService {
     }
 
     @Override
-    public void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
+    public void updateGradebookUserActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
 	    Boolean markedInGradebook) {
 	ToolSession toolSession = toolService.getToolSessionById(toolSessionID);
 	User learner = (User) userService.findById(User.class, userID);
@@ -1733,9 +1732,9 @@ public class GradebookService implements IGradebookService {
 	    // If gradebook user activity is null or the mark is set by teacher or was set previously by user - save the
 	    // mark and feedback
 	    if ((gradebookUserActivity == null) || markedInGradebook || !gradebookUserActivity.getMarkedInGradebook()) {
-		updateUserActivityGradebookMark(toolSession.getLesson(), learner, activity, mark, markedInGradebook,
+		updateGradebookUserActivityMark(toolSession.getLesson(), learner, activity, mark, markedInGradebook,
 			false);
-		updateUserActivityGradebookFeedback(activity, learner, feedback);
+		updateGradebookUserActivityFeedback(activity, learner, feedback);
 	    }
 	}
     }

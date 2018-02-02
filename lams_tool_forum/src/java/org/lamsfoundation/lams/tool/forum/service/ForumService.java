@@ -50,7 +50,6 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -149,8 +148,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private ICoreNotebookService coreNotebookService;
 
     private ForumOutputFactory forumOutputFactory;
-
-    private IGradebookService gradebookService;
 
     private IEventNotificationService eventNotificationService;
 
@@ -924,7 +921,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		user.setSessionFinished(false);
 		forumUserDao.save(user);
 
-		gradebookService.updateActivityMark(null, null, userId, session.getSessionId(), false);
+		toolService.updateActivityMark(null, null, userId, session.getSessionId(), false);
 	    }
 	}
     }
@@ -1208,7 +1205,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    }
 	    if (totalMark != null) {
 		Double mark = new Double(totalMark);
-		gradebookService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionID, false);
+		toolService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionID, false);
 	    }
 	}
 
@@ -1335,10 +1332,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return messageService.getMessage(key, args);
     }
 
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
-    }
-
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
@@ -1347,9 +1340,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.activityDAO = activityDAO;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String createTextSearchConditionName(Collection<ForumCondition> existingConditions) {
 	String uniqueNumber = null;

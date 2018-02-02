@@ -47,9 +47,6 @@
 		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>
 		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>	
 		<property name="messageService"><ref bean="commonMessageService"/></property>
-		<property name="learnerService"><ref bean="learnerService"/></property>
-		<property name="dataFlowDAO"><ref bean="dataFlowDAO"/></property>
-		<property name="userManagementService"><ref bean="userManagementService"/></property>
 	</bean>	
 	
 	<bean id="lamsCoreToolService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -92,6 +89,9 @@
 					<property name="gradebookService"><ref bean="gradebookService"/></property>				
 			   		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
 			   		<property name="lessonService"><ref bean="lessonService"/></property>
+					<property name="learnerService"><ref bean="learnerService"/></property>
+					<property name="dataFlowDAO"><ref bean="dataFlowDAO"/></property>
+					<property name="userManagementService"><ref bean="userManagementService"/></property>
 				</bean>
 			</property>
 		<property name="transactionAttributes">
