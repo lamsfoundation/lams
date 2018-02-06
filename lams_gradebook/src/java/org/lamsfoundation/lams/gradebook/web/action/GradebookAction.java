@@ -178,7 +178,14 @@ public class GradebookAction extends LamsDispatchAction {
 	JSONArray rowsJSON = new JSONArray();
 	for (GradebookGridRowDTO gradebookActivityDTO : gradebookActivityDTOs) {
 	    JSONObject rowJSON = new JSONObject();
-	    rowJSON.put(GradebookConstants.ELEMENT_ID, gradebookActivityDTO.getId());
+	    String id = gradebookActivityDTO.getId();
+	    String[] idParts = id.split("_");
+	    if (idParts.length > 1) {
+		// if activity is grouped, use just the real activity ID and leave out group ID
+		// as we know there will be no ID clash in this single learner gradebook table
+		id = idParts[0];
+	    }
+	    rowJSON.put(GradebookConstants.ELEMENT_ID, id);
 
 	    JSONArray cellJSON = new JSONArray();
 	    cellJSON.put(gradebookActivityDTO.getRowName());
