@@ -24,8 +24,6 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -45,14 +43,13 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
+import org.lamsfoundation.lams.learningdesign.dto.GroupDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.util.FirstNameAlphabeticComparator;
+import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -226,24 +223,21 @@ public class GroupingAction extends LamsDispatchAction {
      *
      * @param request
      */
+    @SuppressWarnings("unchecked")
     private void prepareGroupData(HttpServletRequest request) {
 
 	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
-	SortedSet<Group> groups = new TreeSet<Group>(new GroupComparator());
+	SortedSet<GroupDTO> groups = new TreeSet<GroupDTO>(GroupDTO.GROUP_NAME_COMPARATOR);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
 	Grouping grouping = ((GroupingActivity) activity).getCreateGrouping();
 	if (grouping != null) {
-	    groups.addAll(grouping.getGroups());
-	}
-
-	// sort users with first, then last name, then login
-	Comparator<User> userComparator = new FirstNameAlphabeticComparator();
-	for (Group group : groups) {
-	    Set<User> sortedUsers = new TreeSet<User>(userComparator);
-	    sortedUsers.addAll(group.getUsers());
-	    group.setUsers(sortedUsers);
+	    for (Group group : grouping.getGroups()) {
+		GroupDTO groupDTO = new GroupDTO(group, true);
+		groupDTO.getUserList().sort(UserBasicDTO.USER_BASIC_DTO_COMPARATOR);
+		groups.add(groupDTO);
+	    }
 	}
 
 	request.setAttribute(GroupingAction.GROUPS, groups);
