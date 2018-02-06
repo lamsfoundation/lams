@@ -50,17 +50,18 @@ public class LogEvent implements Serializable {
     public static final int TYPE_LEARNER_LESSON_COMPLETE = 7;
     public static final int TYPE_LEARNER_LESSON_MARK_SUBMIT = 8;
     public static final int TYPE_ACTIVITY_EDIT = 9; // Audit Service
-    public static final int TYPE_USER_ORG_ADMIN = 10;
-    public static final int TYPE_LOGIN_AS  = 11;
-    public static final int TYPE_PASSWORD_CHANGE  = 12;
-    public static final int TYPE_ROLE_FAILURE = 13;
-    public static final int TYPE_ACCOUNT_LOCKED = 14;
-    public static final int TYPE_NOTIFICATION  = 15;
-    public static final int MARK_UPDATED = 16;  // Audit Service
-    public static final int MARK_RELEASED = 17; 
-    public static final int LEARNER_CONTENT_UPDATED = 18; // Audit Service
-    public static final int LEARNER_CONTENT_SHOW_HIDE = 19; // Audit Service
-    public static final int UNKNOWN = 20; // catch all for conversion
+    public static final int TYPE_FORCE_COMPLETE = 10; // Audit Service
+    public static final int TYPE_USER_ORG_ADMIN = 11;
+    public static final int TYPE_LOGIN_AS  = 12;
+    public static final int TYPE_PASSWORD_CHANGE  = 13;
+    public static final int TYPE_ROLE_FAILURE = 14;
+    public static final int TYPE_ACCOUNT_LOCKED = 15;
+    public static final int TYPE_NOTIFICATION  = 16;
+    public static final int TYPE_MARK_UPDATED = 17;  // Audit Service
+    public static final int TYPE_MARK_RELEASED = 18; 
+    public static final int TYPE_LEARNER_CONTENT_UPDATED = 19; // Audit Service
+    public static final int TYPE_LEARNER_CONTENT_SHOW_HIDE = 20; // Audit Service
+    public static final int TYPE_UNKNOWN = 21; // catch all for conversion
 
     /** *************************************************************** */
 
@@ -78,7 +79,7 @@ public class LogEvent implements Serializable {
     private Date occurredDateTime;
 
     /**  */
-    private Long targetId;
+    private Integer targetUserId;
 
     /**  */
     private Long lessonId;
@@ -149,12 +150,12 @@ public class LogEvent implements Serializable {
     /**
      *
      */
-    public Long getTargetId() {
-	return targetId;
+    public Integer getTargetUserId() {
+	return targetUserId;
     }
 
-    public void setTargetId(Long targetId) {
-	this.targetId = targetId;
+    public void setTargetUserId(Integer targetUserId) {
+	this.targetUserId = targetUserId;
     }
 
     /**

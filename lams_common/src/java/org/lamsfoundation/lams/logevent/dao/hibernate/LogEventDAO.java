@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.SQLQuery;
+import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.LogEventType;
@@ -101,10 +102,10 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
     @Override
     @SuppressWarnings("unchecked")
     /**
-     * Will return List<[ForumUser, String], [ForumUser, String], ... , [ForumUser, String]>
-     * where the String is the notebook entry. No notebook entries needed? Will return "null" in their place.
+     * Will return List<[LogEvent, String], [LogEvent, String], ... , [LogEvent, String]>
+     * where the String is the lesson name. Lesson name may be null.
      */
-    public List<LogEvent> getEventsForTablesorter(int page, int size, int sorting, String searchString, Date startDate,
+    public List<Object[]> getEventsForTablesorter(int page, int size, int sorting, String searchString, Date startDate,
 	    Date endDate, String area, Integer typeId) {
 	String sortingOrder;
 	switch (sorting) {
@@ -121,7 +122,9 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 
-	queryText.append("SELECT * FROM lams_log_event e ");
+	queryText.append(
+		"SELECT le.*, lesson.name lessonName FROM lams_log_event le LEFT JOIN lams_lesson lesson ON le.lesson_id = lesson.lesson_id");
+
 	addWhereClause(startDate, endDate, area, typeId, queryText);
 //	// If filtering by name add a name based where clause (LDEV-3779: must come before the Notebook JOIN statement)
 //	buildNameSearch(queryText, searchString);
@@ -131,6 +134,7 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
 	query.addEntity("event", LogEvent.class);
+	query.addScalar("lessonName", StringType.INSTANCE);
 	addParameters(startDate, endDate, area, typeId, query);
 	query.setFirstResult(page * size).setMaxResults(size);
 	return query.list();

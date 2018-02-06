@@ -39,15 +39,15 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.CentralToolContentHandler;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -63,7 +63,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 
     private static Logger log = Logger.getLogger(PortraitSaveAction.class);
     private static IUserManagementService service;
-    private static IAuditService auditService;
+    private static ILogEventService logEventService;
     private static MessageService messageService;
     private static CentralToolContentHandler centralToolContentHandler;
     private static final String PORTRAIT_DELETE_AUDIT_KEY = "audit.delete.portrait";
@@ -179,10 +179,11 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	User userToModify = (User) getService().findById(User.class, userId);
 	if (userToModify != null && userToModify.getPortraitUuid() != null) {
 
+	    UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	    Object[] args = new Object[] { userToModify.getFullName(), userToModify.getLogin(),
 		    userToModify.getUserId(), userToModify.getPortraitUuid() };
 	    String auditMessage = getMessageService().getMessage(PORTRAIT_DELETE_AUDIT_KEY, args);
-	    getAuditService().log(CentralConstants.MODULE_NAME, auditMessage);
+	    getLogEventService().logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin.getUserID(), userId, null, null, auditMessage);
 
 	    try {
 		getCentralToolContentHandler().deleteFile(userToModify.getPortraitUuid());
@@ -220,13 +221,13 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	return service;
     }
 
-    private IAuditService getAuditService() {
-	if (PortraitSaveAction.auditService == null) {
+    private ILogEventService getLogEventService() {
+	if (PortraitSaveAction.logEventService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    PortraitSaveAction.auditService = (IAuditService) ctx.getBean("auditService");
+	    PortraitSaveAction.logEventService = (ILogEventService) ctx.getBean("logEventService");
 	}
-	return PortraitSaveAction.auditService;
+	return PortraitSaveAction.logEventService;
     }
 
     private MessageService getMessageService() {

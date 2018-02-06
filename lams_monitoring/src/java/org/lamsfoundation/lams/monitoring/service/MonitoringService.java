@@ -114,7 +114,6 @@ import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.audit.AuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobBuilder;
@@ -189,8 +188,6 @@ public class MonitoringService implements IMonitoringService {
     private Scheduler scheduler;
 
     private MessageService messageService;
-
-    private AuditService auditService;
 
     private ILogEventService logEventService;
 
@@ -350,10 +347,6 @@ public class MonitoringService implements IMonitoringService {
 	this.scheduler = scheduler;
     }
 
-    public void setAuditService(AuditService auditService) {
-	this.auditService = auditService;
-    }
-
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
     }
@@ -403,8 +396,9 @@ public class MonitoringService implements IMonitoringService {
 
 	Long initializedLearningDesignId = initializedLesson.getLearningDesign().getLearningDesignId();
 	auditLogLessonStateChange(initializedLesson, null, initializedLesson.getLessonStateId());
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CREATE, userID, initializedLearningDesignId,
-		initializedLesson.getLessonId(), null);
+	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CREATE, userID, null,
+		initializedLesson.getLessonId(), null,
+		"Lesson created using learning design id "+initializedLearningDesignId);
 
 	return initializedLesson;
     }
@@ -745,7 +739,9 @@ public class MonitoringService implements IMonitoringService {
 	    MonitoringService.log.debug("=============Lesson " + lessonId + " started===============");
 	}
 	auditLogLessonStateChange(requestedLesson, null, requestedLesson.getLessonStateId());
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_START, userId, null, lessonId, null);
+	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_START, userId, null,
+		lessonId, null,
+		"Lesson started");
     }
 
     @Override
@@ -988,7 +984,8 @@ public class MonitoringService implements IMonitoringService {
 	requestedLesson.setLessonStateId(status);
 	lessonDAO.updateLesson(requestedLesson);
 	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson.getUser().getUserId(), null,
-		requestedLesson.getLessonId(), null);
+		requestedLesson.getLessonId(), null,
+		"Lesson state changed");
     }
 
     private void auditLogLessonStateChange(Lesson lesson, Integer previousStatus, Integer newStatus) {
@@ -1074,7 +1071,8 @@ public class MonitoringService implements IMonitoringService {
 
 	auditLogLessonStateChange(requestedLesson, currentStatus, newStatus);
 	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson.getUser().getUserId(), null,
-		requestedLesson.getLessonId(), null);
+		requestedLesson.getLessonId(), null,
+		"Lesson state reverted");
     }
 
     @Override
@@ -2826,7 +2824,9 @@ public class MonitoringService implements IMonitoringService {
      */
     private void writeAuditLog(String messageKey, Object[] args) {
 	String message = messageService.getMessage(messageKey, args);
-	auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, message);
+	// TODO refactor!
+	logEventService.logEvent(LogEvent.TYPE_UNKNOWN, null, null, null, null, message);
+//	auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, message);
     }
 
     /**

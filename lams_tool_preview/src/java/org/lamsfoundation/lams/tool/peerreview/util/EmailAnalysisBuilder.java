@@ -364,7 +364,7 @@ public class EmailAnalysisBuilder {
 	    if (criteriaData != null) {
 		String selfRating = roundTo2Places(criteriaData.selfRating);
 		String peerRatingExcSelf = roundTo2Places(criteriaData.peerRatingExcSelf);
-		htmlText.append("<tr><td rowspan=\"2\" style=\"width:25%;").append(evenRow ? zebraEvenRow : zebraOddRow)
+		htmlText.append("<tr><td rowspan=\"3\" style=\"width:25%;").append(evenRow ? zebraEvenRow : zebraOddRow)
 			.append("\"><span style=\"").append(bold).append("\">").append(criteria.getTitle())
 			.append("</span></td><td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
 			.append("\"><span style=\"").append(bold).append("\">").append(selfRatingString)
@@ -391,6 +391,10 @@ public class EmailAnalysisBuilder {
 			    .append("</span></td>");
 		    spaDone = true;
 		}
+		htmlText.append("</tr>\n<tr><td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
+			.append("\"><span style=\"").append(bold).append("\">").append("Self & Peers' Rating")
+			.append("</span></td><td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow).append("\">")
+			.append(roundTo2Places(criteriaData.peerRatingIncSelf)).append("</td>");
 		htmlText.append("</tr>\n");
 		evenRow = !evenRow;
 	    } else {

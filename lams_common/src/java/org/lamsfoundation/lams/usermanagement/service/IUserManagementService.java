@@ -384,9 +384,10 @@ public interface IUserManagementService {
      */
     Theme getDefaultTheme();
 
-    void auditPasswordChanged(User user, String moduleName);
+    void logPasswordChanged(User user, User modifiedBy);
 
-    void auditUserCreated(User user, String moduleName);
+    void logUserCreated(User user, User createdBy);
+    void logUserCreated(User user, UserDTO createdBy);
 
     Integer getCountUsers();
 

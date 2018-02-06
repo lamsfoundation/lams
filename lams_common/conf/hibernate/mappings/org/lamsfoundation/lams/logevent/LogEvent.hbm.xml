@@ -59,11 +59,11 @@
         />
 
         <property
-            name="targetId"
-            type="java.lang.Long"
+            name="targetUserId"
+            type="java.lang.Integer"
             update="true"
             insert="true"
-            column="target_id"
+            column="target_user_id"
         />
 
         <property

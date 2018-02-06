@@ -80,7 +80,7 @@ public interface IImportService {
      * @return
      * @throws IOException
      */
-    public List parseGroupSpreadsheet(FormFile fileItem) throws IOException;
+    public List parseGroupSpreadsheet(FormFile fileItem, String sessionId) throws IOException;
 
     /**
      * Returns number of rows found in spreadsheet.

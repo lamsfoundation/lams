@@ -30,10 +30,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * Contains methods for checking and logging user access to LAMS content. Should be used throughout the whole project.
@@ -43,14 +44,13 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 public class SecurityService implements ISecurityService {
     private static Logger log = Logger.getLogger(SecurityService.class);
 
-    private static final String SECURITY_MODULE_NAME = "security";
     private static final String[] GROUP_MONITOR_ROLES = new String[] { Role.GROUP_MANAGER, Role.MONITOR };
     private static final List<String> GROUP_SUPER_ROLES = Collections
 	    .unmodifiableList(Arrays.asList(Role.GROUP_ADMIN, Role.GROUP_MANAGER));
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private ISecurityDAO securityDAO;
-    private IAuditService auditService;
+    private ILogEventService logEventService;
 
     @Override
     public boolean isLessonLearner(Long lessonId, Integer userId, String action, boolean escalate)
@@ -59,6 +59,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "Missing lesson ID when checking if user " + userId + " is learner and can \"" + action
 		    + "\"";
 	    SecurityService.log.error(error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -69,6 +70,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "Missing user ID when checking if is learner in lesson " + lessonId + " and can \"" + action
 		    + "\"";
 	    SecurityService.log.error(error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -81,7 +83,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "Could not find lesson " + lessonId + " when checking if user " + userId
 		    + " is learner and can \"" + action + "\"";
 	    SecurityService.log.error(error);
-	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -98,7 +100,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "User " + userId + " is not learner in lesson " + lessonId + " and can not \"" + action
 		    + "\"";
 	    SecurityService.log.error(error);
-	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -116,6 +118,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "Missing lesson ID when checking if user " + userId + " is monitor and can \"" + action
 		    + "\"";
 	    SecurityService.log.error(error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -126,6 +129,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "Missing user ID when checking if is monitor in lesson " + lessonId + " and can \"" + action
 		    + "\"";
 	    SecurityService.log.error(error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -138,7 +142,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "Could not find lesson " + lessonId + " when checking if user " + userId
 		    + " is monitor and can \"" + action + "\"";
 	    SecurityService.log.error(error);
-	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -157,7 +161,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "User " + userId + " is not monitor in lesson " + lessonId + " and can not \"" + action
 		    + "\"";
 	    SecurityService.log.error(error);
-	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -174,6 +178,7 @@ public class SecurityService implements ISecurityService {
 	if (lessonId == null) {
 	    String error = "Missing lesson ID when checking if user " + userId + " is owner and can \"" + action + "\"";
 	    SecurityService.log.error(error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -184,6 +189,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "Missing user ID when checking if is owner of lesson " + lessonId + " and can \"" + action
 		    + "\"";
 	    SecurityService.log.error(error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -196,7 +202,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "Could not find lesson " + lessonId + " when checking if user " + userId
 		    + " is owner and can \"" + action + "\"";
 	    SecurityService.log.error(error);
-	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -207,7 +213,7 @@ public class SecurityService implements ISecurityService {
 	if (!lesson.getUser().getUserId().equals(userId)) {
 	    String error = "User " + userId + " is not owner of lesson " + lessonId + " and can not \"" + action + "\"";
 	    SecurityService.log.error(error);
-	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -225,7 +231,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "Missing lesson ID when checking if user " + userId + " is participant and can \"" + action
 		    + "\"";
 	    SecurityService.log.error(error);
-	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -236,6 +242,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "Missing user ID when checking if is participant in lesson " + lessonId + " and can \""
 		    + action + "\"";
 	    SecurityService.log.error(error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -248,7 +255,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "Could not find lesson " + lessonId + " when checking if user " + userId
 		    + " is participant and can \"" + action + "\"";
 	    SecurityService.log.error(error);
-	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -268,7 +275,7 @@ public class SecurityService implements ISecurityService {
 	    String error = "User " + userId + " is not participant in lesson " + lessonId + " and can not \"" + action
 		    + "\"";
 	    SecurityService.log.error(error);
-	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -284,13 +291,14 @@ public class SecurityService implements ISecurityService {
 	if (userId == null) {
 	    String error = "Missing user ID when checking if is sysadmin and can \"" + action + "\"";
 	    SecurityService.log.error(error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
 	    throw new SecurityException(error);
 	}
 
 	if (!securityDAO.isSysadmin(userId)) {
 	    String error = "User " + userId + " is not sysadmin and can not \"" + action + "\"";
 	    SecurityService.log.error(error);
-	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {
@@ -357,7 +365,7 @@ public class SecurityService implements ISecurityService {
 	String error = "User " + userId + " does not have any of " + Arrays.toString(roles) + " roles in organisation "
 		+ orgId + " and can not \"" + action + "\"";
 	SecurityService.log.error(error);
-	auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
 	if (escalate) {
 	    throw new SecurityException(error);
 	} else {
@@ -369,7 +377,7 @@ public class SecurityService implements ISecurityService {
 	this.securityDAO = securityDAO;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 }

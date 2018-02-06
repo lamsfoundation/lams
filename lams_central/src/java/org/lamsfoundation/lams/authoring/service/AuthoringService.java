@@ -1509,10 +1509,16 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    copyLearningDesignToolContent(design, design, design.getCopyTypeID(), customCSV);
 	}
 
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LEARNING_DESIGN_CREATE, userID, design.getLearningDesignId(),
-		null, null);
+	insertEventLogEntry(user, design, null);
 
 	return design;
+    }
+
+    private void insertEventLogEntry(User user, LearningDesign design, Date createDate) {
+	String message = new StringBuilder("Learning design ").append(design.getTitle()).append("(")
+		.append(design.getLearningDesignId()).append(") created by ").append(user.getLogin())
+		.append("(").append(user.getUserId()).append(").").toString();
+	logEventService.logEvent(LogEvent.TYPE_TEACHER_LEARNING_DESIGN_CREATE, user.getUserId(), null, null, null, message, createDate);
     }
 
     /**
@@ -1744,12 +1750,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	Long learningDesingID = learningDesign.getLearningDesignId();
 
-	LogEvent logEvent = new LogEvent();
-	logEvent.setLogEventTypeId(LogEvent.TYPE_TEACHER_LEARNING_DESIGN_CREATE);
-	logEvent.setTargetId(learningDesingID); // TODO fix ids
-	logEvent.setUser(user);
-	logEvent.setOccurredDateTime(learningDesign.getCreateDateTime());
-	baseDAO.insert(logEvent);
+	insertEventLogEntry(user, learningDesign, learningDesign.getCreateDateTime());
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Created a single activity LD with ID: " + learningDesingID);

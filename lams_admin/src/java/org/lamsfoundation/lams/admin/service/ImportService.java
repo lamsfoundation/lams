@@ -38,7 +38,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.admin.AdminConstants;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -53,7 +54,6 @@ import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -70,7 +70,7 @@ public class ImportService implements IImportService {
     private static Logger log = Logger.getLogger(ImportService.class);
     public IUserManagementService service;
     public MessageService messageService;
-    public IAuditService auditService;
+    public ILogEventService logEventService;
 
     public IUserManagementService getService() {
 	return service;
@@ -88,12 +88,12 @@ public class ImportService implements IImportService {
 	this.messageService = messageService;
     }
 
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     // spreadsheet column indexes for user spreadsheet
@@ -175,12 +175,13 @@ public class ImportService implements IImportService {
     // each item in the list lists the id, name, and parent's id of that org; otherwise
     // the items in the list are error messages.
     @Override
-    public List parseGroupSpreadsheet(FormFile fileItem) throws IOException {
+    public List parseGroupSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
 	results = new ArrayList<ArrayList>();
 	parentOrg = service.getRootOrganisation();
 	HSSFSheet sheet = getSheet(fileItem);
 	int startRow = sheet.getFirstRowNum();
 	int endRow = sheet.getLastRowNum();
+	UserDTO userDTO = (UserDTO) SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
 
 	ImportService.log.debug("Parsing spreadsheet rows " + startRow + " through " + endRow);
 
@@ -213,7 +214,7 @@ public class ImportService implements IImportService {
 		rowResult.add(org.getName());
 		rowResult.add(org.getParentOrganisation().getOrganisationId().toString());
 		rowResult.add(org.getOrganisationType().getOrganisationTypeId().toString());
-		writeOrgAuditLog(org);
+		writeOrgAuditLog(org, userDTO);
 		// if we just added a group, then the rows under it become it's subgroups
 		if (parentOrg.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE)) {
 		    parentOrg = org;
@@ -222,7 +223,7 @@ public class ImportService implements IImportService {
 	    }
 	}
 	ImportService.log.debug("Found " + results.size() + " orgs in spreadsheet.");
-	writeSuccessAuditLog(successful, null, "audit.successful.organisation.import");
+	writeSuccessAuditLog(successful, userDTO, "audit.successful.organisation.import");
 	return results;
     }
 
@@ -274,7 +275,8 @@ public class ImportService implements IImportService {
 
 	org.setOrganisationType((OrganisationType) service.findById(OrganisationType.class,
 		parentOrg.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE)
-			? OrganisationType.COURSE_TYPE : OrganisationType.CLASS_TYPE));
+			? OrganisationType.COURSE_TYPE
+			: OrganisationType.CLASS_TYPE));
 
 	org.setParentOrganisation(parentOrg);
 	org.setCourseAdminCanAddNewUsers(parseBooleanCell(row.getCell(ImportService.ADMIN_ADD_NEW_USERS)));
@@ -811,15 +813,18 @@ public class ImportService implements IImportService {
 	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
 	args[1] = user.getFullName();
 	String message = messageService.getMessage("audit.user.create", args);
-	auditService.log(userDTO, AdminConstants.MODULE_NAME, message);
+	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, userDTO != null ? userDTO.getUserID() : null,
+		user.getUserId(), null, null, message);
+
     }
 
-    private void writeOrgAuditLog(Organisation org) {
+    private void writeOrgAuditLog(Organisation org, UserDTO userDTO) {
 	String[] args = new String[2];
 	args[0] = org.getName() + "(" + org.getOrganisationId() + ")";
 	args[1] = org.getOrganisationType().getName();
 	String message = messageService.getMessage("audit.organisation.create", args);
-	auditService.log(AdminConstants.MODULE_NAME, message);
+	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, userDTO != null ? userDTO.getUserID() : null, null, null,
+		null, message);
     }
 
     private void writeErrorsAuditLog(int row, List<String> list, UserDTO userDTO) {
@@ -831,16 +836,14 @@ public class ImportService implements IImportService {
     private void writeErrorAuditLog(int row, String error, UserDTO userDTO) {
 	String[] args = { Integer.toString(row), error };
 	String message = messageService.getMessage("audit.spreadsheet.error", args);
-	auditService.log(userDTO, AdminConstants.MODULE_NAME, message);
+	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, userDTO != null ? userDTO.getUserID() : null, null, null,
+		null, message);
     }
 
     private void writeSuccessAuditLog(int successful, UserDTO userDTO, String key) {
 	String[] args = { Integer.toString(successful) };
 	String message = messageService.getMessage(key, args);
-	if (userDTO == null) {
-	    auditService.log(AdminConstants.MODULE_NAME, message);
-	} else {
-	    auditService.log(userDTO, AdminConstants.MODULE_NAME, message);
-	}
+	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, userDTO != null ? userDTO.getUserID() : null, null, null,
+		null, message);
     }
 }

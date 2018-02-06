@@ -33,7 +33,7 @@
 				<property name="notebookDAO"><ref bean="notebookDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property>	
-				<property name="auditService"><ref bean="auditService"/></property>		
+				<property name="logEventService"><ref bean="logEventService"/></property>		
  				<property name="notebookToolContentHandler"><ref bean="notebookToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>

@@ -223,8 +223,8 @@ public class ProgressEngine {
 	}
 
 	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_START, progress.getUser().getUserId(),
-		activity.getLearningDesign().getLearningDesignId(), progress.getLesson().getLessonId(),
-		activity.getActivityId());
+		progress.getUser().getUserId(), progress.getLesson().getLessonId(),
+		activity.getActivityId(), null);
 
 	// update activity
 	activityDAO.insertOrUpdate(activity);
@@ -372,8 +372,9 @@ public class ProgressEngine {
 	learnerProgress.setLessonComplete(completionStatus);
 
 	// log learner has completed the current lesson event
-	logEventService.logEvent(LogEvent.TYPE_LEARNER_LESSON_COMPLETE, learnerProgress.getUser().getUserId(), null,
-		learnerProgress.getLesson().getLessonId(), null);
+	logEventService.logEvent(LogEvent.TYPE_LEARNER_LESSON_COMPLETE, learnerProgress.getUser().getUserId(), 
+		learnerProgress.getUser().getUserId(),
+		learnerProgress.getLesson().getLessonId(), null, null);
 
 	return learnerProgress;
     }

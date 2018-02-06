@@ -18,6 +18,9 @@
 
 <script type="text/javascript">
 
+	<fmt:message key="label.lesson.with.name" var="LESSON_LABEL_VAR"><fmt:param value="{0}"/></fmt:message>
+	const LESSON_LABEL = '<c:out value="${LESSON_LABEL_VAR}" />';
+
 	var areaMenu, 
 		typeMenu,
 		areaTypeMenus = {},
@@ -27,7 +30,7 @@
 	$(document).ready(function(){
 		debugger;
 		<c:forEach var="eventType" items="${eventLogTypes}">
-			addEventType('${eventType.id}','${eventType.description}','${eventType.areaCode}','${eventType.areaDescription}');
+			addEventType("${eventType.id}","${eventType.description}","${eventType.areaCode}","${eventType.areaDescription}");
 		</c:forEach>		
 		
 		areaMenu = document.getElementById("areaMenu");
@@ -55,7 +58,8 @@
 		    sortInitialOrder: 'desc',
 		    sortList: [[0]],
 		    widgets: [ "uitheme", "resizable", "filter" ],
-		    headers: { 0: { filter: false}, 1: { filter: false}, 2: { filter: false, sorter: false}, 3: { filter: false, sort: false} }, 
+		    headers: { 0: { filter: false}, 1: { filter: false, sorter: false}, 2: { filter: false, sorter: false}, 3: { filter: false, sort: false} }, 
+		    sortList : [[0,1]],
 		    widgetOptions: {
 		    	resizable: true,
 		    	// include column filters 
@@ -89,7 +93,7 @@
 							
 							rows += '<tr>';
 
-							rows += '<td>';
+							rows += '<td style="width:20%">';
 							rows += 	logData['dateOccurred'];
 							rows += '</td>';
 
@@ -106,11 +110,22 @@
 							rows += '</td>';
 
 							rows += '<td>';
-							rows += 	definePortraitPopover(logData['userPortraitId'], logData['userId'], logData['userName'], logData['userName']);
+							if ( logData['userId'] ) {
+								rows += 	definePortraitPopover(logData['userPortraitId'], logData['userId'], logData['userName'], logData['userName']);
+							} else {
+								rows += '-';
+							}
 							rows += '</td>';
 
 							rows += '<td>';
-							rows += 	logData['description'] ? logData['description'] : '-';
+							if ( logData['lesson'] && logData['description'] ) {
+								debugger;
+								rows += LESSON_LABEL.replace('{0}',logData['lesson'])+'<BR/>'+logData['description'];
+							} else if ( logData['lesson'] ) {
+								rows += 	logData['lesson'];
+							} else if ( logData['description'] ) {
+								rows += 	logData['description'];
+							}
 							rows += '</td>';
 
 							rows += '</tr>';
@@ -205,7 +220,7 @@
 
 	<div class="voffset10">	
 	<lams:TSTable numColumns="4" dataId="data-session-id='1'">
-			<th><fmt:message key="label.date"/></th>
+			<th style="width:20%"><fmt:message key="label.date"/></th>
 			<th><fmt:message key="label.event.type"/></th>
 			<th><fmt:message key="admin.user.login"/></th>
 			<th></th>

@@ -49,7 +49,6 @@ import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
-import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.gradebook.util.LessonComparator;
 import org.lamsfoundation.lams.gradebook.util.UserComparator;
@@ -73,6 +72,8 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -90,7 +91,6 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -123,7 +123,7 @@ public class GradebookService implements IGradebookService {
     private IBaseDAO baseDAO;
     private IActivityDAO activityDAO;
     private MessageService messageService;
-    private IAuditService auditService;
+    private ILogEventService logEventService;
     private static ICoreLearnerService learnerService;
 
     @Override
@@ -511,7 +511,7 @@ public class GradebookService implements IGradebookService {
 	    String[] args = new String[] { learner.getLogin() + "(" + learner.getUserId() + ")",
 		    lesson.getLessonId().toString(), oldMark, mark.toString() };
 	    String message = messageService.getMessage("audit.lesson.change.mark", args);
-	    auditService.log(monitorUser, GradebookConstants.MODULE_NAME, message);
+	    logEventService.logEvent(LogEvent.TYPE_MARK_UPDATED, monitorUser.getUserID(), learner.getUserId(), lesson.getLessonId(), null, message);
 	}
     }
 
@@ -717,7 +717,8 @@ public class GradebookService implements IGradebookService {
 			activity.getActivityId().toString(), lesson.getLessonId().toString(), oldMark.toString(),
 			markStr };
 		String message = messageService.getMessage("audit.activity.change.mark", args);
-		auditService.log(monitorUser, GradebookConstants.MODULE_NAME, message);
+		logEventService.logEvent(LogEvent.TYPE_MARK_UPDATED, monitorUser.getUserID(), learner.getUserId(),
+			lesson.getLessonId(), activity.getActivityId(), message);
 	    }
 	}
     }
@@ -764,7 +765,7 @@ public class GradebookService implements IGradebookService {
 	UserDTO monitor = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	String messageKey = (isMarksReleased) ? "audit.marks.released.off" : "audit.marks.released.on";
 	String message = messageService.getMessage(messageKey, new String[] { lessonId.toString() });
-	auditService.log(monitor, GradebookConstants.MODULE_NAME, message);
+	logEventService.logEvent(LogEvent.TYPE_MARK_RELEASED, monitor.getUserID(), null, lessonId, null, message);
     }
 
     @Override
@@ -2274,8 +2275,8 @@ public class GradebookService implements IGradebookService {
 
     // Getter and setter methods -----------------------------------------------
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public ILamsCoreToolService getToolService() {

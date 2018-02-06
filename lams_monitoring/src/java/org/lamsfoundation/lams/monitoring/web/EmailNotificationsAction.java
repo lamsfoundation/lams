@@ -55,6 +55,8 @@ import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.util.LessonComparator;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.EmailScheduleMessageJobDTO;
 import org.lamsfoundation.lams.monitoring.quartz.job.EmailScheduleMessageJob;
@@ -70,7 +72,6 @@ import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -106,7 +107,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
     private static IEventNotificationService eventNotificationService;
     private static IUserManagementService userManagementService;
-    private static IAuditService auditService;
+    private static ILogEventService logEventService;
     private static ISecurityService securityService;
 
     // ---------------------------------------------------------------------
@@ -129,8 +130,9 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	ICoreLearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
 	Lesson lesson = learnerService.getLesson(lessonId);
 	if (!lesson.getEnableLessonNotifications()) {
-	    getAuditService().log(MonitoringConstants.MONITORING_MODULE_NAME,
-		    "Notifications are disabled in lesson " + lessonId);
+	    getLogEventService().logEvent(LogEvent.TYPE_NOTIFICATION, getCurrentUser().getUserID(), null,
+		    lessonId, null,
+		    "Attempted to send notification when notifications are disabled in lesson " + lessonId);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Notifications are disabled in the lesson");
 	    return null;
 	}
@@ -389,7 +391,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
 			JobDetail jobDetail = scheduler.getJobDetail(trigger.getJobKey());
 			JobDataMap jobDataMap = jobDetail.getJobDataMap();
-			getAuditService().log(MonitoringConstants.MONITORING_MODULE_NAME,
+			getLogEventService().logEvent(LogEvent.TYPE_NOTIFICATION,
+				userId, null, lessonId, null,
 				"Deleting unsent scheduled notification " + jobKey + " "
 					+ jobDataMap.getString("emailBody"));
 
@@ -545,7 +548,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	}
 
 	//audit log
-	getAuditService().log(MonitoringConstants.MONITORING_MODULE_NAME,
+	getLogEventService().logEvent(LogEvent.TYPE_NOTIFICATION, getCurrentUser().getUserID(), null,
+		null, null, 
 		"User " + getCurrentUser().getLogin() + " set a notification " + emailClauseStr + " " + scheduleDateStr
 			+ " with the following notice:  " + emailBody);
 
@@ -700,13 +704,13 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	return userManagementService;
     }
 
-    private IAuditService getAuditService() {
-	if (auditService == null) {
+    private ILogEventService getLogEventService() {
+	if (logEventService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    auditService = (IAuditService) ctx.getBean("auditService");
+	    logEventService = (ILogEventService) ctx.getBean("logEventService");
 	}
-	return auditService;
+	return logEventService;
     }
 
     private ISecurityService getSecurityService() {

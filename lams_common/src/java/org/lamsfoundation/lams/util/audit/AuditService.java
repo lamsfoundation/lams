@@ -101,16 +101,17 @@ public class AuditService implements IAuditService {
 	return userDTO.getLogin() + "(" + userDTO.getUserID() + "): ";
     }
 
+    // used by submit - keep till that is updated
     @Override
     public void log(String moduleName, String message) {
-	logEventService.logEvent(LogEvent.UNKNOWN,  getUserID(), null, null, null, getUserString() + moduleName + ": " + message);
+	logEventService.logEvent(LogEvent.TYPE_UNKNOWN,  getUserID(), null, null, null, getUserString() + moduleName + ": " + message);
     }
-
-    @Override
-    public void log(UserDTO userDTO, String moduleName, String message) {
-	logEventService.logEvent(LogEvent.UNKNOWN,  getUserID(), null, null, null, getUserString(userDTO) + moduleName + ": " + message);
-    }
-
+//
+//    @Override
+//    public void log(UserDTO userDTO, String moduleName, String message) {
+//	logEventService.logEvent(LogEvent.UNKNOWN,  getUserID(), null, null, null, getUserString(userDTO) + moduleName + ": " + message);
+//    }
+//
     
     @SuppressWarnings("unchecked")
     private void logEvent(Integer logEventTypeId, Long targetUserId, Long toolContentId, String description) {
@@ -129,7 +130,7 @@ public class AuditService implements IAuditService {
 	    }
 	    // lookup lessonId from activityId
 	}
-	logEventService.logEvent(logEventTypeId, userId, targetUserId, lessonId, activityId, description);
+	logEventService.logEvent(logEventTypeId, userId, targetUserId != null ? targetUserId.intValue() : null, lessonId, activityId, description);
     }
 
     @Override
@@ -140,7 +141,7 @@ public class AuditService implements IAuditService {
 	args[1] = originalText;
 	args[2] = newText;
 	String message = messageService.getMessage(AUDIT_CHANGE_I18N_KEY, args);
-	logEvent(LogEvent.LEARNER_CONTENT_UPDATED, originalUserId, null, message.toString());
+	logEvent(LogEvent.TYPE_LEARNER_CONTENT_UPDATED, originalUserId, null, message.toString());
     }
 
     @Override
@@ -151,7 +152,7 @@ public class AuditService implements IAuditService {
 	args[1] = originalMark;
 	args[2] = newMark;
 	StringBuilder message = new StringBuilder(moduleName).append(messageService.getMessage(AUDIT_MARK_CHANGE_I18N_KEY, args));
-	logEvent(LogEvent.MARK_UPDATED, originalUserId, null, message.toString());
+	logEvent(LogEvent.TYPE_MARK_UPDATED, originalUserId, null, message.toString());
     }
     
     @Override
@@ -160,7 +161,7 @@ public class AuditService implements IAuditService {
 	args[0] = originalUserLogin + "(" + originalUserId + ")";
 	args[1] = hiddenItem;
 	String message = messageService.getMessage(AUDIT_HIDE_I18N_KEY, args);
-	logEvent(LogEvent.LEARNER_CONTENT_SHOW_HIDE, originalUserId, null, message.toString());
+	logEvent(LogEvent.TYPE_LEARNER_CONTENT_SHOW_HIDE, originalUserId, null, message.toString());
     }
 
     @Override
@@ -169,7 +170,7 @@ public class AuditService implements IAuditService {
 	args[0] = originalUserLogin + "(" + originalUserId + ")";
 	args[1] = hiddenItem;
 	String message = messageService.getMessage(AUDIT_SHOW_I18N_KEY, args);
-	logEvent(LogEvent.LEARNER_CONTENT_SHOW_HIDE, originalUserId, null, message.toString());
+	logEvent(LogEvent.TYPE_LEARNER_CONTENT_SHOW_HIDE, originalUserId, null, message.toString());
    }
     
     @Override

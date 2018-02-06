@@ -57,7 +57,7 @@ public class LogEventType implements Serializable {
     }
     
     public String getAreaI18NKey() {
-	return "label."+area.toLowerCase().replace("_", ".");
+	return "label.area."+area.toLowerCase().replace("_", ".");
     }
 
 }

@@ -24,8 +24,6 @@
 
 package org.lamsfoundation.lams.util.audit;
 
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-
 /** Public interface for a service that writes audit records */
 public interface IAuditService {
 
@@ -39,15 +37,15 @@ public interface IAuditService {
      */
     void log(String moduleName, String message);
 
-    /**
-     * Same as above, but logs message using given userDTO instead of current session DTO. Useful when importing users
-     * in a separate thread which isn't linked to main session.
-     *
-     * @param userDTO
-     * @param moduleName
-     * @param message
-     */
-    void log(UserDTO userDTO, String moduleName, String message);
+//    /**
+//     * Same as above, but logs message using given userDTO instead of current session DTO. Useful when importing users
+//     * in a separate thread which isn't linked to main session.
+//     *
+//     * @param userDTO
+//     * @param moduleName
+//     * @param message
+//     */
+//    void log(UserDTO userDTO, String moduleName, String message);
 
     /**
      * Log a data change. The username, date, moduleName and change details are recorded in the audit log.

@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.logevent.service;
 
 import java.util.Date;
@@ -35,7 +34,7 @@ import org.lamsfoundation.lams.logevent.LogEventType;
  * @author Andrey Balan
  */
 public interface ILogEventService {
-    
+
     /** Constants used for sorting */
     static final int SORT_BY_DATE_ASC = 0;
     static final int SORT_BY_DATE_DESC = 1;
@@ -46,7 +45,8 @@ public interface ILogEventService {
      * @param logEventTypeId
      * @param userId
      */
-    void logEvent(Integer logEventTypeId, Integer userId, Long learningDesignId, Long lessonId, Long activityId);
+    void logEvent(Integer logEventTypeId, Integer userId, Integer targetUserId, Long lessonId, Long activityId,
+	    String description, Date eventDate);
 
     /**
      * Records event of specified type in database.
@@ -54,7 +54,8 @@ public interface ILogEventService {
      * @param logEventTypeId
      * @param userId
      */
-    void logEvent(Integer logEventTypeId, Integer userId, Long learningDesignId, Long lessonId, Long activityId, String description);
+    void logEvent(Integer logEventTypeId, Integer userId, Integer targetUserId, Long lessonId, Long activityId,
+	    String description);
 
     /**
      * Returns event by the given id.
@@ -84,14 +85,30 @@ public interface ILogEventService {
 
     /** Get the Log Event Types in a structured form */
     List<LogEventType> getEventTypes();
-     
+
     /** Get the date of the oldest event log entry. Handy for letting a user select a date range */
     Date getOldestEventDate();
-    
+
     /** Used for displaying paged lists of events */
-    List<LogEvent> getEventsForTablesorter(int page, int size, int sorting, String searchString, Date startDate,
+    List<Object[]> getEventsForTablesorter(int page, int size, int sorting, String searchString, Date startDate,
 	    Date endDate, String area, Integer typeId);
 
     int countEventsWithRestrictions(String searchString, Date startDate, Date endDate, String area, Integer typeId);
 
+    /* ***************************** Helper methods used by tools to keep the audit entries consistent *****************/
+    void logChangeLearnerContent(Long learnerUserId, String learnerUserLogin, Long toolContentId, String originalText,
+	    String newText);
+
+    void logMarkChange(Long learnerUserId, String learnerUserLogin, Long toolContentId, String originalMark,
+	    String newMark);
+
+    void logHideLearnerContent(Long learnerUserId, String learnerUserLogin, Long toolContentId, String hiddenItem);
+
+    void logShowLearnerContent(Long learnerUserId, String learnerUserLogin, Long toolContentId, String hiddenItem);
+
+    void logStartEditingActivityInMonitor(Long toolContentId);
+
+    void logFinishEditingActivityInMonitor(Long toolContentId);
+
+    void logCancelEditingActivityInMonitor(Long toolContentId);
 }

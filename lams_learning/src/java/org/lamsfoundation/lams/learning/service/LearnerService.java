@@ -646,8 +646,8 @@ public class LearnerService implements ICoreLearnerService {
 	}
 	// }
 	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_FINISH, learnerId,
-		activity.getLearningDesign().getLearningDesignId(), progress.getLesson().getLessonId(),
-		activity.getActivityId());
+		null, progress.getLesson().getLessonId(),
+		activity.getActivityId(), "ADD COMMENT HERE");
     }
 
     @Override
@@ -758,8 +758,8 @@ public class LearnerService implements ICoreLearnerService {
 	    }
 	}
     }
-
-    private boolean forceGrouping(Lesson lesson, Grouping grouping, Group group, User learner) {
+    
+     private boolean forceGrouping(Lesson lesson, Grouping grouping, Group group, User learner) {
 	boolean groupingDone = false;
 	if (lesson.isPreviewLesson()) {
 	    ArrayList<User> learnerList = new ArrayList<User>();

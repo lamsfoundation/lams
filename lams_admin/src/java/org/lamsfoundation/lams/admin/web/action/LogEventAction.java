@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.logevent.dto.LogEventTypeDTO;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -60,6 +61,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class LogEventAction extends LamsDispatchAction {
 
     private static ILogEventService logEventService;
+    private MessageService messageService;
     private static SimpleDateFormat START_DATE_FORMAT = new SimpleDateFormat("YYYY-MM-DD");
 
     @Override
@@ -82,20 +84,24 @@ public class LogEventAction extends LamsDispatchAction {
 
 	logEventService = getLogEventService();
 
+	if (messageService == null) {
+	    messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+	}
+
 	// get the log type data and return display for user selection. Also get the start and stop dates from the log.
 	// TODO check conversion the dates to the user's timezone
 	List<LogEventType> types = logEventService.getEventTypes();
 	List<LogEventTypeDTO> convertedTypes = new ArrayList<LogEventTypeDTO>(types.size());
-	for ( LogEventType type : types ) {
-	    // TODO get message from the I18N files
-	    convertedTypes.add(new LogEventTypeDTO(type, type.getDescription().toLowerCase(), type.getArea().toLowerCase()));
+	for (LogEventType type : types) {
+	    convertedTypes.add(new LogEventTypeDTO(type, messageService.getMessage(type.getDescriptionI18NKey()),
+		    messageService.getMessage(type.getAreaI18NKey())));
 	}
 	request.setAttribute("eventLogTypes", convertedTypes);
 	
 	// jsp page expects date of the first audit log entry as YYYY-DD-MM. 
 	Date oldestDate = logEventService.getOldestEventDate();
 //	oldestDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, oldestDate);
-	request.setAttribute("startDate", START_DATE_FORMAT.format(oldestDate));
+	request.setAttribute("startDate", START_DATE_FORMAT.format(oldestDate != null ? oldestDate : new Date()) );
 	return mapping.findForward("success");
     }
 
@@ -156,26 +162,31 @@ public class LogEventAction extends LamsDispatchAction {
 	
 	String area = WebUtil.readStrParam(request,  "area", true);
 	Integer typeId = WebUtil.readIntParam(request,  "typeId", true);
-	List<LogEvent> events = logEventService.getEventsForTablesorter(page, size, sorting, null, startDate, endDate, area, typeId);
+	List<Object[]> events = logEventService.getEventsForTablesorter(page, size, sorting, null, startDate, endDate, area, typeId);
 	    
 	JSONArray rows = new JSONArray();
 	JSONObject responsedata = new JSONObject();
 	responsedata.put("total_rows", logEventService.countEventsWithRestrictions(null, startDate, endDate, area, typeId));
 
-	for (LogEvent event: events) {
+	for (Object[] eventDetails : events) {
+	    if (eventDetails.length > 0) {
+		LogEvent event = (LogEvent) eventDetails[0];
+		JSONObject responseRow = new JSONObject();
 
-	    JSONObject responseRow = new JSONObject();
-
-	    responseRow.put("dateOccurred", event.getOccurredDateTime());
-	    responseRow.put("typeId", event.getLogEventTypeId());
-	    responseRow.put("description", event.getDescription());
-	    User user = event.getUser();
-	    if ( user != null ) {
-		responseRow.put("userPortraitId", user.getPortraitUuid());
-	    	responseRow.put("userId", user.getUserId());
-	    	responseRow.put("userName", user.getLogin());
+		responseRow.put("dateOccurred", event.getOccurredDateTime());
+		responseRow.put("typeId", event.getLogEventTypeId());
+		responseRow.put("description", event.getDescription());
+		User user = event.getUser();
+		if (user != null) {
+		    responseRow.put("userPortraitId", user.getPortraitUuid());
+		    responseRow.put("userId", user.getUserId());
+		    responseRow.put("userName", user.getLogin());
+		}
+		if ( eventDetails.length > 1 && eventDetails[1] != null ) {
+		    responseRow.put("lesson", eventDetails[1] );
+		}
+		rows.put(responseRow);
 	    }
-	    rows.put(responseRow);
 	}
 	responsedata.put("rows", rows);
 	response.setContentType("application/json;charset=utf-8");
