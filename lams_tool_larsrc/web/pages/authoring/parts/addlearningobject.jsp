@@ -17,7 +17,7 @@
 			});		
 		  
 			$.validator.addMethod("fileType", function(value, element) {
-				return this.optional(element) || (element.files[0].type == 'application/zip')
+				return this.optional(element) || element.files[0].type == 'application/zip' || element.files[0].type == 'application/x-zip-compressed'
 			});
 			
 			$.validator.addMethod('validateSize', function (value, element, param) {
