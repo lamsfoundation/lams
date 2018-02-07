@@ -28,6 +28,7 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
+import org.lamsfoundation.lams.learning.kumalive.model.KumaliveLog;
 import org.lamsfoundation.lams.learning.kumalive.model.KumalivePoll;
 import org.lamsfoundation.lams.learning.kumalive.model.KumalivePollAnswer;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
@@ -526,6 +527,7 @@ public class KumaliveWebsocketServer {
 	}
 
 	kumalive.raisedHand.add(userId);
+	KumaliveWebsocketServer.getKumaliveService().log(kumalive.id, userId, new Date(), KumaliveLog.TYPE_HAND_UP);
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Learner " + userId + " raised hand in Kumalive " + kumalive.id);
 	}
@@ -556,6 +558,7 @@ public class KumaliveWebsocketServer {
 	}
 
 	kumalive.raisedHand.remove(userId);
+	KumaliveWebsocketServer.getKumaliveService().log(kumalive.id, userId, new Date(), KumaliveLog.TYPE_HAND_DOWN);
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Learner " + userId + " put hand down in Kumalive " + kumalive.id);
 	}
