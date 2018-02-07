@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.UserComparator;
 import org.lamsfoundation.lams.learning.kumalive.dao.IKumaliveDAO;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
+import org.lamsfoundation.lams.learning.kumalive.model.KumaliveLog;
 import org.lamsfoundation.lams.learning.kumalive.model.KumalivePoll;
 import org.lamsfoundation.lams.learning.kumalive.model.KumalivePollAnswer;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
@@ -621,6 +622,15 @@ public class KumaliveService implements IKumaliveService {
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Teacher finished poll " + poll.getPollId());
 	}
+    }
+
+    /**
+     * Logs an activity in the given Kumalive
+     */
+    @Override
+    public void log(Long kumaliveId, Integer userId, Date date, short type) {
+	KumaliveLog log = new KumaliveLog(kumaliveId, userId, date, type);
+	kumaliveDAO.insert(log);
     }
 
     public void setSecurityService(ISecurityService securityService) {

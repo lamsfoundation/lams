@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping>
+	<class name="org.lamsfoundation.lams.learning.kumalive.model.KumaliveLog" table="lams_kumalive_log">
+
+		<id name="logId" type="java.lang.Long" column="log_id">
+			<generator class="native" />
+		</id>
+		
+		<property name="kumaliveId" type="java.lang.Long" column="kumalive_id" />
+		<property name="userId" type="java.lang.Integer" column="user_id" />
+		<property name="date" type="java.util.Date" column="log_date" not-null="true"  />
+		<property name="type" type="java.lang.Short" column="log_type" not-null="true" />
+	</class>
+</hibernate-mapping>

@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.learning.kumalive.service;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -70,4 +71,6 @@ public interface IKumaliveService {
     void saveVote(Long answerId, Integer userId);
 
     void releasePollResults(Long pollId, boolean votesReleased, boolean votersReleased);
+
+    void log(Long kumaliveId, Integer userId, Date date, short type);
 }

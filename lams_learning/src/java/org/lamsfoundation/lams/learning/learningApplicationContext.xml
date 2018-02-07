@@ -101,6 +101,7 @@
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="export*">PROPAGATION_REQUIRED</prop>
 				<prop key="release*">PROPAGATION_REQUIRED</prop>
+				<prop key="log*">PROPAGATION_REQUIRED</prop>
    			</props>
 		</property>
 	</bean> 
