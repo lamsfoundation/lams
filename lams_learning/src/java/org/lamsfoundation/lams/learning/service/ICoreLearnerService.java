@@ -213,10 +213,9 @@ public interface ICoreLearnerService extends ILearnerService {
      *            id of the group chosen by the learner
      * @param learnerId
      *            the learner who triggers the grouping.
-     * @return true if the learner was successfully added to the group; false if the group was empty
      * @throws LearnerServiceException
      */
-    boolean learnerChooseGroup(Long lessonId, Long groupingActivityId, Long groupId, Integer learnerId)
+    void learnerChooseGroup(Long lessonId, Long groupingActivityId, Long groupId, Integer learnerId)
 	    throws LearnerServiceException;
 
     /**
@@ -229,7 +228,7 @@ public interface ICoreLearnerService extends ILearnerService {
      * @return the maximum number of learners per group;<code>null</code> if the requirement for equal number of
      *         learners in groups was not set
      */
-    Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Grouping grouping);
+    Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Long groupingId);
 
     Grouping getGrouping(Long groupingId);
 

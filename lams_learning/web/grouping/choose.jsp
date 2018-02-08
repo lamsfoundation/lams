@@ -72,24 +72,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<td width="25%" class="first"><strong><c:out value="${group.groupName}" /></strong></td>
 					<td width="60%">
 					<c:if test="${viewStudentsBeforeSelection}">
-							<c:forEach items="${group.users}" var="user">
-								<div name="u-${user.userId}" class="user-container">
-								<lams:Portrait userId="${user.userId}"/>&nbsp;<c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />
+							<c:forEach items="${group.userList}" var="user">
+								<div name="u-${user.userID}" class="user-container">
+								<lams:Portrait userId="${user.userID}"/>&nbsp;<c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />
 								</div>
 							</c:forEach>
 					</c:if></td>
 					<td><c:choose>
-							<c:when test="${not empty maxLearnersPerGroup and fn:length(group.users)>=maxLearnersPerGroup}">
+							<c:when test="${not empty maxLearnersPerGroup and fn:length(group.userList)>=maxLearnersPerGroup}">
 								<fmt:message key="label.learner.choice.group.full" />
 							</c:when>
 							<c:otherwise>
 								<html:form
-									action="/grouping.do?method=learnerChooseGroup&userId=${user.userID}&activityID=${activityID}&groupId=${group.groupId}"
-									styleId="form${user.userID}${activityID}${group.groupId}" target="_self">
+									action="/grouping.do?method=learnerChooseGroup&userId=${user.userID}&activityID=${activityID}&groupId=${group.groupID}"
+									styleId="form${user.userID}${activityID}${group.groupID}" target="_self">
 								</html:form>							
 								<button type="button" class="btn btn-sm btn-primary" 
 									data-toggle="modal" data-target="#confirmationModal" 
-									data-u="form${user.userID}${activityID}${group.groupId}" 
+									data-u="form${user.userID}${activityID}${group.groupID}" 
 									data-gn="<c:out value="${group.groupName}" />"><fmt:message key="label.choose.group.button" />
 								</button>							
 								
