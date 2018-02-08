@@ -159,7 +159,7 @@ public class PeerreviewServiceImpl
 
     @Override
     public void createUser(PeerreviewUser peerreviewUser) {
-	peerreviewUserDao.saveObject(peerreviewUser);
+	peerreviewUserDao.insert(peerreviewUser);
     }
 
     @Override
@@ -174,7 +174,7 @@ public class PeerreviewServiceImpl
 
     @Override
     public void saveOrUpdatePeerreview(Peerreview peerreview) {
-	peerreviewDao.saveObject(peerreview);
+	peerreviewDao.insertOrUpdate(peerreview);
     }
 
     @Override
@@ -193,14 +193,14 @@ public class PeerreviewServiceImpl
 
     @Override
     public void saveOrUpdatePeerreviewSession(PeerreviewSession resSession) {
-	peerreviewSessionDao.saveObject(resSession);
+	peerreviewSessionDao.insertOrUpdate(resSession);
     }
 
     @Override
     public void markUserFinished(Long toolSessionId, Long userId) {
 	PeerreviewUser user = peerreviewUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(true);
-	peerreviewUserDao.saveObject(user);
+	peerreviewUserDao.update(user);
     }
 
     @Override
@@ -246,7 +246,7 @@ public class PeerreviewServiceImpl
     public int getCountUsersBySession(final Long toolSessionId, final Long excludeUserId) {
 	return peerreviewUserDao.getCountUsersBySession(toolSessionId, excludeUserId);
     }
-    
+
     @Override
     public int getCountUsersBySession(final Long toolSessionId) {
 	return peerreviewUserDao.getCountUsersBySession(toolSessionId);
@@ -276,7 +276,7 @@ public class PeerreviewServiceImpl
 
     @Override
     public PeerreviewUser getUser(Long uid) {
-	return (PeerreviewUser) peerreviewUserDao.getObject(PeerreviewUser.class, uid);
+	return (PeerreviewUser) peerreviewUserDao.find(PeerreviewUser.class, uid);
     }
 
     @Override
@@ -321,23 +321,25 @@ public class PeerreviewServiceImpl
 	if (user == null) {
 	    return;
 	}
-	
+
 	//If user is marked as hidden - it will automatically remove all rating left by him to prevent statistics mess up.
 	if (isHidden) {
 	    ratingService.removeUserCommitsByContent(toolContentId, user.getUserId().intValue());
 	}
-	
+
 	user.setHidden(isHidden);
-	peerreviewUserDao.saveObject(user);
+	peerreviewUserDao.update(user);
     }
 
     @Override
-    public int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Map<Long, Float> newRatings) {
+    public int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId,
+	    Map<Long, Float> newRatings) {
 	return ratingService.rateItems(ratingCriteria, toolSessionId, userId, newRatings);
     }
 
     @Override
-    public void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId, String comment) {
+    public void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId,
+	    String comment) {
 	ratingService.commentItem(ratingCriteria, toolSessionId, userId, itemId, comment);
     }
 
@@ -356,11 +358,10 @@ public class PeerreviewServiceImpl
 	}
 
 	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria,
-		currentUserId, null, null, sorting, searchString, getByUser, ratingService,
-		userManagementService);
+		currentUserId, null, null, sorting, searchString, getByUser, ratingService, userManagementService);
 
 	for (Object[] raw : rawData) {
-	    raw[raw.length - 2] = (Object) StringEscapeUtils.escapeCsv((String)raw[raw.length - 2]);
+	    raw[raw.length - 2] = StringEscapeUtils.escapeCsv((String) raw[raw.length - 2]);
 	}
 	// if !getByUser -> is get current user's ratings from other users ->
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
@@ -376,12 +377,12 @@ public class PeerreviewServiceImpl
 		currentUserId, page, size, sorting, searchString, getByUser, ratingService, userManagementService);
 
 	for (Object[] raw : rawData) {
-	    raw[raw.length - 2] = (Object) StringEscapeUtils.escapeCsv((String)raw[raw.length - 2]);
+	    raw[raw.length - 2] = StringEscapeUtils.escapeCsv((String) raw[raw.length - 2]);
 	}
 	// if !getByUser -> is get current user's ratings from other users ->
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
-	return ratingService.convertToStyledJSON(criteria, toolSessionId, currentUserId, !getByUser || getAllUsers, rawData,
-		needRatesPerUser);
+	return ratingService.convertToStyledJSON(criteria, toolSessionId, currentUserId, !getByUser || getAllUsers,
+		rawData, needRatesPerUser);
     }
 
     @Override
@@ -394,10 +395,10 @@ public class PeerreviewServiceImpl
 	List<Object[]> rawData = peerreviewUserDao.getDetailedRatingsComments(toolContentId, toolSessionId, criteriaId,
 		itemId);
 	for (Object[] raw : rawData) {
-	    raw[2] = (raw[2] == null ? null : numberFormat.format((Float) raw[2])); // format rating
+	    raw[2] = (raw[2] == null ? null : numberFormat.format(raw[2])); // format rating
 	    // format name
 	    StringBuilder description = new StringBuilder((String) raw[3]).append(" ").append((String) raw[4]);
-	    raw[4] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	    raw[4] = StringEscapeUtils.escapeCsv(description.toString());
 
 	}
 	return rawData;
@@ -412,7 +413,7 @@ public class PeerreviewServiceImpl
 
 	// raw data: user_id, comment_count, first_name  last_name, portrait id
 	for (Object[] raw : rawData) {
-	    raw[2] = (Object) StringEscapeUtils.escapeCsv((String)raw[2]);
+	    raw[2] = StringEscapeUtils.escapeCsv((String) raw[2]);
 	}
 
 	return rawData;
@@ -422,10 +423,10 @@ public class PeerreviewServiceImpl
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
@@ -446,7 +447,7 @@ public class PeerreviewServiceImpl
 
 	for (Object[] raw : rawData) {
 	    StringBuilder description = new StringBuilder((String) raw[1]).append(" ").append((String) raw[2]);
-	    raw[2] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	    raw[2] = StringEscapeUtils.escapeCsv(description.toString());
 	}
 
 	return rawData;
@@ -461,7 +462,6 @@ public class PeerreviewServiceImpl
     private String getResultsEmailSubject(Peerreview peerreview) {
 	return getLocalisedMessage("event.sent.results.subject", new Object[] { peerreview.getTitle() });
     }
-
 
     @Override
     public int emailReportToUser(Long toolContentId, Long sessionId, Long userId) {
@@ -479,12 +479,11 @@ public class PeerreviewServiceImpl
     public int emailReportToSessionUsers(Long toolContentId, Long sessionId) {
 	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
 	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
-	Map<Long, String> emails = new EmailAnalysisBuilder(peerreview, session, ratingService,
-	    peerreviewSessionDao, peerreviewUserDao, this, messageService).generateHTMLEmailsForSession();
-	for ( Map.Entry<Long, String> entry : emails.entrySet() ) {
-	    eventNotificationService.sendMessage(null, entry.getKey().intValue(), 
-		    IEventNotificationService.DELIVERY_METHOD_MAIL, 
-		    getResultsEmailSubject(peerreview),
+	Map<Long, String> emails = new EmailAnalysisBuilder(peerreview, session, ratingService, peerreviewSessionDao,
+		peerreviewUserDao, this, messageService).generateHTMLEmailsForSession();
+	for (Map.Entry<Long, String> entry : emails.entrySet()) {
+	    eventNotificationService.sendMessage(null, entry.getKey().intValue(),
+		    IEventNotificationService.DELIVERY_METHOD_MAIL, getResultsEmailSubject(peerreview),
 		    entry.getValue(), true);
 	}
 	return emails.size();
@@ -511,7 +510,8 @@ public class PeerreviewServiceImpl
 
 	ArrayList<Long> itemIds = new ArrayList<Long>(1);
 	itemIds.add(userId);
-	Map<Long, Long> numRatingsForUserMap = ratingService.countUsersRatedEachItem(toolContentId, toolSessionId, itemIds, -1);
+	Map<Long, Long> numRatingsForUserMap = ratingService.countUsersRatedEachItem(toolContentId, toolSessionId,
+		itemIds, -1);
 	Long numRatingsForUser = numRatingsForUserMap.get(userId);
 	retValue[0] = numRatingsForUser != null ? numRatingsForUser.intValue() : 0;
 
@@ -623,7 +623,7 @@ public class PeerreviewServiceImpl
 	    }
 	    toolContentObj.setCreatedBy(user);
 
-	    peerreviewDao.saveObject(toolContentObj);
+	    peerreviewDao.insertOrUpdate(toolContentObj);
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
 	}
@@ -654,7 +654,7 @@ public class PeerreviewServiceImpl
 	}
 
 	Peerreview toContent = Peerreview.newInstance(peerreview, toContentId);
-	peerreviewDao.saveObject(toContent);
+	peerreviewDao.insert(toContent);
     }
 
     @Override
@@ -736,7 +736,7 @@ public class PeerreviewServiceImpl
 		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
 			PeerreviewConstants.TOOL_SIGNATURE, userId);
 		if (entry != null) {
-		    peerreviewDao.removeObject(NotebookEntry.class, entry.getUid());
+		    peerreviewDao.deleteById(NotebookEntry.class, entry.getUid());
 		}
 
 	    }
@@ -750,7 +750,7 @@ public class PeerreviewServiceImpl
 	session.setSessionName(toolSessionName);
 	Peerreview peerreview = peerreviewDao.getByContentId(toolContentId);
 	session.setPeerreview(peerreview);
-	peerreviewSessionDao.saveObject(session);
+	peerreviewSessionDao.insert(session);
     }
 
     @Override
@@ -767,7 +767,7 @@ public class PeerreviewServiceImpl
 	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(toolSessionId);
 	if (session != null) {
 	    session.setStatus(PeerreviewConstants.COMPLETED);
-	    peerreviewSessionDao.saveObject(session);
+	    peerreviewSessionDao.update(session);
 	} else {
 	    log.error("Fail to leave tool Session.Could not find peerreview " + "session by given session id: "
 		    + toolSessionId);
@@ -806,17 +806,18 @@ public class PeerreviewServiceImpl
     @Override
     public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
-	return ratingService.getRatingCriteriaDtos(contentId, toolSessionId, itemIds, isCommentsByOtherUsersRequired, userId);
+	return ratingService.getRatingCriteriaDtos(contentId, toolSessionId, itemIds, isCommentsByOtherUsersRequired,
+		userId);
     }
 
     @Override
     public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId, boolean isCountUsersRatedEachItem) {
-	List<ItemRatingDTO> itemRatingDTOs = getRatingCriteriaDtos(contentId, toolSessionId, itemIds, isCommentsByOtherUsersRequired,
-		userId);
+	List<ItemRatingDTO> itemRatingDTOs = getRatingCriteriaDtos(contentId, toolSessionId, itemIds,
+		isCommentsByOtherUsersRequired, userId);
 
 	if (isCountUsersRatedEachItem) {
-	    Map<Long, Long> itemIdToRatedUsersCountMap = ratingService.countUsersRatedEachItem(contentId, toolSessionId, 
+	    Map<Long, Long> itemIdToRatedUsersCountMap = ratingService.countUsersRatedEachItem(contentId, toolSessionId,
 		    itemIds, userId.intValue());
 
 	    for (ItemRatingDTO itemRatingDTO : itemRatingDTOs) {
@@ -835,6 +836,7 @@ public class PeerreviewServiceImpl
 	return ratingService.getCountItemsRatedByUser(toolContentId, userId);
     }
 
+    @Override
     public int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId) {
 	return ratingService.getCountItemsRatedByUserByCriteria(criteriaId, userId);
     }
@@ -870,7 +872,7 @@ public class PeerreviewServiceImpl
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
