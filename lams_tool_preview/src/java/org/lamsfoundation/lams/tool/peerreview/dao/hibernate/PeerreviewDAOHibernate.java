@@ -65,11 +65,6 @@ public class PeerreviewDAOHibernate extends LAMSBaseDAO implements PeerreviewDAO
 	return (Peerreview) getObject(Peerreview.class, peerreviewUid);
     }
 
-    @Override
-    public void delete(Peerreview peerreview) {
-	delete(peerreview);
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId) {

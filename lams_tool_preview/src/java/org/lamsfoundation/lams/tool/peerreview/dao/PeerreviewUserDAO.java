@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.peerreview.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
@@ -32,10 +33,10 @@ import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
-public interface PeerreviewUserDAO extends DAO {
+public interface PeerreviewUserDAO extends IBaseDAO {
 
     PeerreviewUser getUserByUserIDAndSessionID(Long userID, Long sessionId);
-    
+
     PeerreviewUser getUserByUid(Long userUid);
 
     PeerreviewUser getUserByUserIDAndContentID(Long userId, Long contentId);
@@ -44,40 +45,40 @@ public interface PeerreviewUserDAO extends DAO {
 
     /**
      * Counts number of users in a session excluding specified user. Besides, it also *excludes all hidden users*.
-     * 
+     *
      * @param toolSessionId
      * @param excludeUserId
-     * @param includeHiddenUsers whether hidden users should be counted as well or not
+     * @param includeHiddenUsers
+     *            whether hidden users should be counted as well or not
      * @return
      */
     int getCountUsersBySession(final Long toolSessionId, final Long excludeUserId);
 
-    List<Object[]> getRatingsComments(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long userId, Integer page,
-	    Integer size, int sorting, String searchString, boolean getByUser, IRatingService coreRatingService,
-	    IUserManagementService userManagementService);
-	
-    List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
-	    Integer page, Integer size, int sorting, String searchString,
-	    IUserManagementService userManagementService);
-	
-    List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId );
-    
+    List<Object[]> getRatingsComments(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long userId,
+	    Integer page, Integer size, int sorting, String searchString, boolean getByUser,
+	    IRatingService coreRatingService, IUserManagementService userManagementService);
+
+    List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Integer page,
+	    Integer size, int sorting, String searchString, IUserManagementService userManagementService);
+
+    List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId);
+
     /**
      * Counts number of users in a specified session. It counts it regardless whether a user is hidden or not.
-     * 
+     *
      * @param toolSessionId
      * @return
      */
     int getCountUsersBySession(Long toolSessionId);
 
     int createUsersForSession(PeerreviewSession session);
-    
-    List<Object[]> getUserNotebookEntriesForTablesorter(final Long toolSessionId, int page, int size, int sorting, String searchString, 
-	    ICoreNotebookService coreNotebookService);
-    
+
+    List<Object[]> getUserNotebookEntriesForTablesorter(final Long toolSessionId, int page, int size, int sorting,
+	    String searchString, ICoreNotebookService coreNotebookService);
+
     /**
      * Returns list of <userUid, userName> pairs. Used by monitor's manageUsers functionality.
-     * 
+     *
      * @param toolSessionId
      * @param page
      * @param size
