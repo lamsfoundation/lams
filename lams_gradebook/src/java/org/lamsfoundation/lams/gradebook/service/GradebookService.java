@@ -373,7 +373,7 @@ public class GradebookService implements IGradebookService {
 		userToGradebookUserLessonMap = getUserToGradebookUserLessonMap(lesson, learners);
 	    }
 
-	    boolean isWeighted = isWeightedMarks(lesson.getLearningDesign());
+	    boolean isWeighted = toolService.isWeightedMarks(lesson.getLearningDesign());
 
 	    for (User learner : learners) {
 		LearnerProgress learnerProgress = userToLearnerProgressMap.get(learner.getUserId());
@@ -521,7 +521,7 @@ public class GradebookService implements IGradebookService {
 	if (lesson == null) {
 	    return;
 	}
-	boolean weighted = isWeightedMarks(lesson.getLearningDesign());
+	boolean weighted = toolService.isWeightedMarks(lesson.getLearningDesign());;
 
 	Map<Integer, GradebookUserLesson> userToGradebookUserLessonMap = getUserToGradebookUserLessonMap(lesson, null);
 
@@ -650,24 +650,9 @@ public class GradebookService implements IGradebookService {
     }
 
     @Override
-    public boolean isWeightedMarks(LearningDesign design) {
-	Set<Activity> activities = design.getActivities();
-	for (Activity activity : activities) {
-	    if (activity.isToolActivity()) {
-		// fetch real object, otherwise there is a cast error
-		ToolActivity act = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
-		ActivityEvaluation eval = act.getEvaluation();
-		if (eval != null && eval.getWeight() != null && eval.getWeight() > 0) {
-		    return true;
-		}
-	    }
-	}
-	return false;
-    }
-
-    @Override
     public boolean isWeightedMarks(Long lessonId) {
-	return isWeightedMarks(getLessonService().getLesson(lessonId).getLearningDesign());
+	Lesson lesson = lessonService.getLesson(lessonId);
+	return toolService.isWeightedMarks(lesson.getLearningDesign());
     }
 
     @Override
@@ -721,8 +706,8 @@ public class GradebookService implements IGradebookService {
 		gradebookUserLesson.setLesson(lesson);
 	    }
 
-	    aggregateTotalMarkForLesson(isWeightedMarks(lesson.getLearningDesign()), gradebookUserLesson,
-		    gradebookUserActivity, oldActivityMark);
+	    boolean isWeightedMarks = toolService.isWeightedMarks(lesson.getLearningDesign());
+	    aggregateTotalMarkForLesson(isWeightedMarks, gradebookUserLesson, gradebookUserActivity, oldActivityMark);
 
 	    // audit log changed gradebook mark
 	    if (isAuditLogRequired) {
@@ -812,7 +797,8 @@ public class GradebookService implements IGradebookService {
 		    lessonRows.add(lessonRow);
 		    lessonRow.setLessonName(lesson.getLessonName());
 		    lessonRow.setId(lesson.getLessonId().toString());
-		    lessonRow.setDisplayMarkAsPercent(isWeightedMarks(lesson.getLearningDesign()));
+		    boolean isWeightedMarks = toolService.isWeightedMarks(lesson.getLearningDesign());
+		    lessonRow.setDisplayMarkAsPercent(isWeightedMarks);
 
 		    if (view == GBGridView.LIST) {
 			continue;
@@ -977,7 +963,7 @@ public class GradebookService implements IGradebookService {
     @SuppressWarnings("unchecked")
     public LinkedHashMap<String, ExcelCell[][]> exportLessonGradebook(Lesson lesson) {
 
-	boolean isWeighted = isWeightedMarks(lesson.getLearningDesign());
+	boolean isWeighted = toolService.isWeightedMarks(lesson.getLearningDesign());;
 
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
@@ -1305,7 +1291,8 @@ public class GradebookService implements IGradebookService {
 		Set dbLessonUsers = lesson.getAllLearners();
 		allLearners.addAll(dbLessonUsers);
 		lessonIds.add(lesson.getLessonId());
-		isWeightedLessonMap.put(lesson.getLessonId(), isWeightedMarks(lesson.getLearningDesign()));
+		boolean isWeightedMarks = toolService.isWeightedMarks(lesson.getLearningDesign());
+		isWeightedLessonMap.put(lesson.getLessonId(), isWeightedMarks);
 	    }
 
 	    // Fetching the user data
@@ -1444,7 +1431,8 @@ public class GradebookService implements IGradebookService {
 	    }
 
 	    selectedLessons.add(lesson);
-	    isWeightedLessonMap.put(lesson.getLessonId(), isWeightedMarks(lesson.getLearningDesign()));
+	    boolean isWeightedMarks = toolService.isWeightedMarks(lesson.getLearningDesign());
+	    isWeightedLessonMap.put(lesson.getLessonId(), isWeightedMarks);
 
 	    allLearners.addAll(lesson.getAllLearners());
 
