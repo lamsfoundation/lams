@@ -28,6 +28,7 @@ import java.util.SortedMap;
 
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.Tool;
@@ -306,6 +307,9 @@ public interface ILamsCoreToolService {
      * @return
      */
     Long getLessonMaxPossibleMark(Lesson lesson);
+
+    /** Will the marks caculation take into account weighting? */
+    boolean isWeightedMarks(LearningDesign design);
 
     /**
      * Update the tool session data.

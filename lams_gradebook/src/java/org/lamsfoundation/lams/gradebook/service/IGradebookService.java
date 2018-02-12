@@ -326,9 +326,6 @@ public interface IGradebookService {
     List<Number> getMarksArray(Long lessonId);
 
     /** Will the marks caculation take into account weighting? */
-    boolean isWeightedMarks(LearningDesign design);
-
-    /** Will the marks caculation take into account weighting? */
     boolean isWeightedMarks(Long lessonId);
 
     /** Get a summary of the weightings */

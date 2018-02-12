@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -676,6 +677,22 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    }
 	}
 	return lessonMaxPossibleMark;
+    }
+
+    @Override
+    public boolean isWeightedMarks(LearningDesign design) {
+	Set<Activity> activities = design.getActivities();
+	for (Activity activity : activities) {
+	    if (activity.isToolActivity()) {
+		// fetch real object, otherwise there is a cast error
+		ToolActivity act = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
+		ActivityEvaluation eval = act.getEvaluation();
+		if (eval != null && eval.getWeight() != null && eval.getWeight() > 0) {
+		    return true;
+		}
+	    }
+	}
+	return false;
     }
 
     /**
