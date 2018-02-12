@@ -1065,14 +1065,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    lessonElement.setAttribute("lessonName", lesson.getLessonName());
 
 	    // calculate lesson's MaxPossibleMark
-	    Set<ToolActivity> activities = getLessonActivities(lesson);
-	    Long lessonMaxPossibleMark = 0L;
-	    for (ToolActivity activity : activities) {
-		Long activityMaxPossibleMark = toolService.getActivityMaxPossibleMark(activity);
-		if (activityMaxPossibleMark != null) {
-		    lessonMaxPossibleMark += activityMaxPossibleMark;
-		}
-	    }
+	    Long lessonMaxPossibleMark = toolService.getLessonMaxPossibleMark(lesson);
 	    lessonElement.setAttribute("lessonMaxPossibleMark", lessonMaxPossibleMark.toString());
 
 	    List<ExtUserUseridMap> allUsers = integrationService.getExtUserUseridMapByExtServer(extServer);
