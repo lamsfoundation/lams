@@ -335,7 +335,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     @Override
     public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns)
 	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
-	return getFolderContentsJSON(folderID, userID, allowInvalidDesigns, false, null);
+	return getFolderContentsJSON(folderID, userID, allowInvalidDesigns, false, "all");
     }
 
     @Override

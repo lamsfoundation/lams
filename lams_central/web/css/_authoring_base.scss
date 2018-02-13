@@ -506,3 +506,47 @@ td#canvasContainerCell {
 	overflow: auto;
 	vertical-align: top;
 }
+
+/**** Template styles */
+#templateErrorMessages {
+    line-height: 200%;
+    border-radius: 4px;
+    background: $state-danger-bg;
+}
+    
+#rootwizard table.table-condensed {
+  margin-bottom: 0px; }
+
+#rootwizard .required:after {
+  content: "*";
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  margin-left: 5px; }
+
+#rootwizard .container {
+    margin-right: 4px;
+    margin-left: 4px;
+    padding: 0px;
+}
+    
+#rootwizard .navbar {
+	margin-bottom: 0px;
+}
+
+#rootwizard .navbar-inner {
+	background: $gray-lightest;
+    border-radius: 4px;
+}
+
+#rootwizard .nav-pills > li > a {
+	top: -4px;
+    left: 0px;
+    border-radius: 4px;
+}
+
+#rootwizard .progress {
+    border-radius: 4px;
+    box-shadow: none;
+    margin-bottom: 10px;
+}

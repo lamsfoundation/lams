@@ -138,6 +138,9 @@
 				WEIGHTS_SUM_ERROR : decoderDiv.html('<c:out value="${WEIGHTS_SUM_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.weights.none" var="WEIGHTS_NONE_FOUND_ERROR_VAR"/>
 				WEIGHTS_NONE_FOUND_ERROR : decoderDiv.html('<c:out value="${WEIGHTS_NONE_FOUND_ERROR_VAR}" />').text(),
+				<fmt:message key="authoring.learning.design.templates" var="TEMPLATES_VAR"/>
+				TEMPLATES : decoderDiv.html('<c:out value="${TEMPLATES_VAR}" />').text(),
+				
 				
 				
 				// HandlerLib
@@ -290,11 +293,20 @@
 	
 	<div id="toolbar" class="buttons btn-group-sm">
 	
-		<button id="newButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.newLearningDesign(false)">
-			<i class="fa fa-plus"></i> 
-			<span><fmt:message key="authoring.fla.page.menu.new" /></span>
-		</button>
-
+		<div class="btn-group btn-group-sm">
+			<button id="newButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.newLearningDesign(false)">
+				<i class="fa fa-plus"></i> 
+				<span><fmt:message key="authoring.fla.page.menu.new" /></span>
+			</button>
+			<button type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<span class="caret"></span>
+				<span class="sr-only">Toggle Dropdown</span>
+			</button>
+			<ul class="dropdown-menu dropdown-menu-right desktopButton">
+				<li id="useTemplate" onClick="javascript:MenuLib.useTemplateToCreateLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.new.template" /></a></li>
+			</ul>
+		</div>
+		
 		<div class="btn-group btn-group-sm">
 			<button type="button" class="btn btn-default" onClick="javascript:MenuLib.openLearningDesign()">
 				<i class="fa fa-folder-open-o"></i>
