@@ -662,7 +662,6 @@ var MenuLib = {
 		}
 
 		var dialog = showDialog("ldTemplate", {
-				'modal' : true,
 				'height' : Math.max(300, $(window).height() - 30),
 				'width' :  Math.max(380, Math.min(1024, $(window).width() - 60)),
 				'draggable' : true,
@@ -694,7 +693,7 @@ var MenuLib = {
 						}
 					});
 				},
-			}, false),
+			}, true),
 			currentLearningDesignID = null,
 			regEx = /learningDesignID=(\d+)/g,
 			// since window.onload does not really work after submitting a form inside the window,

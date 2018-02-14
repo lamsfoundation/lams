@@ -15,7 +15,7 @@
 		</select>
 		&nbsp;
 		<input type="radio" name="groupControl" value="numGroups" id="groupControlGroups" checked> <fmt:message key="authoring.label.numgroups"/></input> 
-		<input name="numGroups" id="numGroups" type="number" min="1" step="1" value="1" size="3"  class="inputclass form-control input-sm form-control-inline"/>
+		<input name="numGroups" id="numGroups" type="number" min="1" step="1" value="2" size="3"  class="inputclass form-control input-sm form-control-inline"/>
 		&nbsp;
 		<input type="radio" name="groupControl" value="numLearners" id="groupControlLearners" class="voffset5"><span id="numLearnersSpan"> <fmt:message key="authoring.label.numlearners"/></span></input> 
 		<input name="numLearners" id="numLearners" type="number" step="1" min="1" value="1" size="3"  class="inputclass form-control input-sm form-control-inline voffset5" disabled/>

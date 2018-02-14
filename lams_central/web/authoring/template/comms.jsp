@@ -138,6 +138,7 @@
 					newDiv.remove();
 				} else {
 					$('#numAssessments').val(nextNum);
+					newDiv.scrollIntoView();
 				}
 			});
 		}		
@@ -164,6 +165,7 @@
 				} else {
 					numQuestions.val(nextNum);
 					newDiv.focus();
+					newDiv.scrollIntoView();
 				}
 			});
 		}		
@@ -191,6 +193,8 @@
 					// need to add the down button to the previous last option!
 					var image = document.getElementById('question'+questionNum+'option'+currNum+'DownButton')
 					image.style.display="inline";
+					newDiv.scrollIntoView();
+					
 				}
 			});
 		}		
@@ -244,6 +248,7 @@
 				} else {
 					numTopics.val(nextNum);
 					newDiv.focus();
+					newDiv.scrollIntoView();
 				}
 			});
 		}		

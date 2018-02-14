@@ -545,8 +545,16 @@ td#canvasContainerCell {
     border-radius: 4px;
 }
 
+#rootwizard .nav-pills > li.active > a {
+    background-color: $brand-primary;
+}
+  
 #rootwizard .progress {
     border-radius: 4px;
     box-shadow: none;
     margin-bottom: 10px;
+}
+
+#rootwizard .progress-bar {
+     background-color: $brand-primary;
 }
