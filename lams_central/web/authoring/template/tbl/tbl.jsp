@@ -94,7 +94,7 @@
 
 	<div class="tab-content">
 	    <div class="tab-pane" id="tab1">
-	 		<%@ include file="tblintro.jsp" %>
+		    	<jsp:include page="../genericintro.jsp" ><jsp:param name="templateName" value="tbl"/></jsp:include>
 	    </div>
 	    <div class="tab-pane" id="tab2">
 	 		<div class="form-group">			
