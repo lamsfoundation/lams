@@ -1,0 +1,326 @@
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+package org.lamsfoundation.lams.authoring.template.web;
+
+import java.util.Enumeration;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.authoring.template.TemplateData;
+import org.lamsfoundation.lams.rest.RestTags;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
+
+/**
+ * A Team Based Learning template.
+ */
+public class TBLTemplateAction extends LdTemplateAction {
+
+    private static Logger log = Logger.getLogger(TBLTemplateAction.class);
+    private static String templateCode = "TBL";
+
+    /**
+     * Sets up the CKEditor stuff
+     */
+    @Override
+    public ActionForward init(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	request.setAttribute("questionNumber", "1");
+	return super.init(mapping, form, request, response);
+    }
+
+    @Override
+    protected JSONObject createLearningDesign(HttpServletRequest request)
+	    throws Exception {
+
+	TBLData data = new TBLData(request);
+	if (data.getErrorMessages() != null && data.getErrorMessages().size() > 0) {
+	    JSONObject restRequestJSON = new JSONObject();
+	    restRequestJSON.put("errors", new JSONArray(data.getErrorMessages()));
+	    return restRequestJSON;
+	}
+
+	HttpSession ss = SessionManager.getSession();
+	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Integer workspaceFolderID = getWorkspaceManagementService().getUserWorkspaceFolder(userDTO.getUserID())
+		.getResourceID().intValue();
+	AtomicInteger maxUIID = new AtomicInteger();
+	int order = 0;
+
+	// create activities
+	JSONArray activities = new JSONArray();
+	JSONArray groupings = new JSONArray();
+
+	// Welcome
+	String activityTitle = data.getText("boilerplate.introduction.title");
+	Long welcomeToolContentId = createNoticeboardToolContent(userDTO, activityTitle,
+		data.getText("boilerplate.introduction.instructions"), null);
+	activities.put(createNoticeboardActivity(maxUIID, order++, new Integer[] { 20, 125 }, welcomeToolContentId,
+		data.contentFolderID, null, null, null, activityTitle));
+
+	// Grouping
+	JSONObject[] groupingJSONs = createGroupingActivity(maxUIID, order++, new Integer[] { 170, 125 },
+		data.groupingType, data.numLearners, data.numGroups, null, null);
+	activities.put(groupingJSONs[0]);
+	groupings.put(groupingJSONs[1]);
+	Integer groupingUIID = groupingJSONs[1].getInt("groupingUIID");
+
+	// Stop!
+	activities.put(createGateActivity(maxUIID, order++, new Integer[] { 290, 77 }));
+
+	// iRA Test - MCQ
+	activityTitle = data.getText("boilerplate.ira.title");
+	Long iRAToolContentId = createMCQToolContent(userDTO, activityTitle,
+		data.getText("boilerplate.ira.instructions"), false, new JSONArray(data.testQuestions.values()));
+	activities.put(createMCQActivity(maxUIID, order++, new Integer[] { 320, 125 }, iRAToolContentId,
+		data.contentFolderID, groupingUIID, null, null, activityTitle));
+
+	// Stop!
+	activities.put(createGateActivity(maxUIID, order++, new Integer[] { 470, 130 }));
+
+	// Leader Selection
+	activityTitle = data.getText("boilerplate.leader.title");
+	Long leaderSelectionToolContentId = createLeaderSelectionToolContent(userDTO, activityTitle,
+		data.getText("boilerplate.leader.instructions"));
+	activities.put(createLeaderSelectionActivity(maxUIID, order++, new Integer[] { 534, 125 },
+		leaderSelectionToolContentId, data.contentFolderID, groupingUIID, null, null, activityTitle));
+
+	// tRA Test
+	activityTitle = data.getText("boilerplate.tra.title");
+	Long tRAToolContentId = createScratchieToolContent(userDTO, activityTitle,
+		data.getText("boilerplate.tra.instructions"), false, new JSONArray(data.testQuestions.values()));
+	activities.put(createScratchieActivity(maxUIID, order++, new Integer[] { 670, 125 }, tRAToolContentId,
+		data.contentFolderID, groupingUIID, null, null, activityTitle));
+
+	// Stop!
+	activities.put(createGateActivity(maxUIID, order++, new Integer[] { 830, 130 }));
+
+	Integer[] baseActivityPosition = new Integer[] { 20, 125 }; // the very first activity, all other locations can be calculated from here if needed!
+
+	// Application Exercise - could be any number of them.
+	Integer[] aePos = new Integer[] { 20, 250 };
+	int displayOrder = 1;
+	for (String exerciseQuestion : data.applicationExercises.values()) {
+	    String applicationExerciseTitle = data.getText("boilerplate.ae.application.exercise.num",
+		    displayOrder > 1 ? new String[] { Integer.toString(displayOrder) } : new String[] { "" });
+	    JSONObject question = createAssessmentQuestionEssayType(applicationExerciseTitle, exerciseQuestion,
+		    displayOrder, true);
+	    JSONArray questions = new JSONArray().put(question);
+	    Long aetoolContentId = createAssessmentToolContent(userDTO, applicationExerciseTitle,
+		    data.getText("boilerplate.ae.instructions"), null, questions);
+	    activities.put(createAssessmentActivity(maxUIID, order++, aePos, aetoolContentId, data.contentFolderID,
+		    null, null, null, applicationExerciseTitle));
+
+	    aePos = calcPositionNextRight(aePos);
+	    displayOrder++;
+	}
+
+	// Stop!
+	activities.put(createGateActivity(maxUIID, order++, new Integer[] { aePos[0], aePos[1] + 5 }));
+
+	// Individual Reflection
+	activityTitle = data.getText("boilerplate.individual.reflection.title");
+	Long reflectionToolContentId = createNotebookToolContent(userDTO, activityTitle,
+		data.getText("boilerplate.individual.reflection.instructions"), false, false);
+	activities.put(createNotebookActivity(maxUIID, order++, new Integer[] { aePos[0] + 70, aePos[1] },
+		reflectionToolContentId, data.contentFolderID, null, null, null, activityTitle));
+
+	JSONArray transitions = createTransitions(maxUIID, activities);
+
+	// fill in required LD data and send it to the LearningDesignRestServlet
+	return saveLearningDesign(templateCode, data.sequenceTitle, "", workspaceFolderID,
+		data.contentFolderID, maxUIID.get(), activities, transitions, groupings, null);
+
+    }
+
+    /**
+     * TBLData contains all the data we need for the current instance. Created for each call to ensure that we have the
+     * correct locale, messages, etc for this particular call.
+     *
+     * The complex types are converted straight to JSON objects ready for sending to the tools. No need to process
+     * twice!
+     *
+     * For the test questions need to meet the spec: The questions entry should be JSONArray containing JSON objects,
+     * which in turn must contain "questionText", "displayOrder" (Integer) and a JSONArray "answers". The options entry
+     * should be JSONArray containing JSON objects, which in turn must contain "answerText", "displayOrder" (Integer),
+     * "correctOption" (Boolean).
+     */
+    class TBLData extends TemplateData {
+	/* Fields from form */
+	String contentFolderID;
+	String sequenceTitle;
+	Integer groupingType;
+	Integer numLearners;
+	Integer numGroups;
+	SortedMap<Integer, JSONObject> testQuestions;
+	SortedMap<Integer, String> applicationExercises;
+
+	TBLData(HttpServletRequest request) throws JSONException {
+	    super(request, templateCode);
+
+	    contentFolderID = getTrimmedString(request, "contentFolderID", false);
+
+	    sequenceTitle = getTrimmedString(request, "sequenceTitle", false);
+
+	    groupingType = WebUtil.readIntParam(request, "grouping");
+	    numLearners = WebUtil.readIntParam(request, "numLearners", true);
+	    numGroups = WebUtil.readIntParam(request, "numGroups", true);
+
+	    testQuestions = new TreeMap<Integer, JSONObject>();
+	    applicationExercises = new TreeMap<Integer, String>();
+
+	    TreeMap<Integer, Integer> correctAnswers = new TreeMap<Integer, Integer>();
+	    Enumeration parameterNames = request.getParameterNames();
+	    while (parameterNames.hasMoreElements()) {
+		String name = (String) parameterNames.nextElement();
+		if (name.startsWith("question")) {
+		    int correctIndex = name.indexOf("correct");
+		    if (correctIndex > 0) { // question1correct
+			Integer questionDisplayOrder = Integer.valueOf(name.substring(8, correctIndex));
+			Integer correctValue = WebUtil.readIntParam(request, name);
+			correctAnswers.put(questionDisplayOrder, correctValue);
+		    } else {
+			int optionIndex = name.indexOf("option");
+			if (optionIndex > 0) {
+			    Integer questionDisplayOrder = Integer.valueOf(name.substring(8, optionIndex));
+			    Integer optionDisplayOrder = Integer.valueOf(name.substring(optionIndex + 6));
+			    processTestQuestion(name, null, questionDisplayOrder, optionDisplayOrder,
+				    getTrimmedString(request, name, true));
+			} else {
+			    Integer questionDisplayOrder = Integer.valueOf(name.substring(8));
+			    processTestQuestion(name, getTrimmedString(request, name, true), questionDisplayOrder, null,
+				    null);
+			}
+		    }
+		} else if (name.startsWith("assessment")) {
+		    Integer exerciseOrder = Integer.valueOf(name.substring(10));
+		    String question = getTrimmedString(request, name, true);
+		    if (question != null) {
+			applicationExercises.put(exerciseOrder, question);
+		    }
+		}
+	    }
+	    updateCorrectAnswers(correctAnswers);
+
+	    validate();
+
+	}
+
+	void processTestQuestion(String name, String questionText, Integer questionDisplayOrder,
+		Integer optionDisplayOrder, String optionText) throws JSONException {
+
+	    JSONObject question = testQuestions.get(questionDisplayOrder);
+	    if (question == null) {
+		question = new JSONObject();
+		question.put(RestTags.ANSWERS, new JSONArray());
+		question.put(RestTags.DISPLAY_ORDER, questionDisplayOrder);
+		testQuestions.put(questionDisplayOrder, question);
+	    }
+
+	    if (questionText != null) {
+		question.put(RestTags.QUESTION_TEXT, questionText);
+		question.put(RestTags.QUESTION_TITLE, "Q" + questionDisplayOrder.toString()); // only used for
+											      // Scratchie, not MCQ but
+											      // won't hurt MCQ by being
+											      // there!
+	    }
+
+	    if (optionDisplayOrder != null && optionText != null) {
+		JSONObject newOption = new JSONObject();
+		newOption.put(RestTags.DISPLAY_ORDER, optionDisplayOrder);
+		newOption.put(RestTags.CORRECT, false);
+		newOption.put(RestTags.ANSWER_TEXT, optionText);
+		question.getJSONArray(RestTags.ANSWERS).put(newOption);
+	    }
+
+	}
+
+	void updateCorrectAnswers(TreeMap<Integer, Integer> correctAnswers) throws JSONException {
+	    for (Entry<Integer, JSONObject> entry : testQuestions.entrySet()) {
+		Integer questionNumber = entry.getKey();
+		JSONObject question = entry.getValue();
+		if (!question.has(RestTags.QUESTION_TEXT)) {
+		    addValidationErrorMessage("authoring.error.question.num", new Integer[] { questionNumber });
+		}
+
+		Integer correctAnswerDisplay = correctAnswers.get(entry.getKey());
+		if (correctAnswerDisplay == null) {
+		    addValidationErrorMessage("authoring.error.question.correct.num", new Integer[] { questionNumber });
+		} else {
+
+		    JSONArray answers = question.getJSONArray(RestTags.ANSWERS);
+		    if (answers == null || answers.length() == 0) {
+			addValidationErrorMessage("authoring.error.question.must.have.answer.num",
+				new Integer[] { questionNumber });
+		    } else {
+			boolean correctAnswerFound = false; // may not exist as the user didn't put any text in!
+			for (int i = 0; i < answers.length(); i++) {
+			    JSONObject option = answers.getJSONObject(i);
+			    if (correctAnswerDisplay.equals(option.getInt(RestTags.DISPLAY_ORDER))) {
+				option.remove(RestTags.CORRECT);
+				option.put(RestTags.CORRECT, true);
+				correctAnswerFound = true;
+			    }
+			}
+			if (!correctAnswerFound) {
+			    addValidationErrorMessage("authoring.error.question.correct.num", new Integer[] { questionNumber });
+			}
+		    }
+		}
+	    }
+	}
+
+	// do any additional validation not included in other checking
+	void validate() {
+	    if (contentFolderID == null) {
+		addValidationErrorMessage("authoring.error.content.id", null);
+	    }
+	    if (sequenceTitle == null) {
+		addValidationErrorMessage("authoring.error.sequence.title", null);
+	    }
+	    if (applicationExercises.size() == 0) {
+		addValidationErrorMessage("authoring.error.application.exercise.num", new Integer[] { 1 });
+		// grouping is enforced on the front end by the layout & by requiring the groupingType
+		// questions are validated in updateCorrectAnswers
+	    }
+
+	}
+
+    }
+
+}

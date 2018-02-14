@@ -650,5 +650,67 @@ var MenuLib = {
 			$('#ldDescriptionHideTip').text($(this).is(':visible') ? '▲' : '▼');
 			$('.templateContainer').height($('#ldDescriptionDiv').height() + $('#canvas').height() - 10);
 		});
-	}
+	},
+	
+	
+	/**
+	 * Opens a pop up for template window that generates a learning design
+	 */
+	useTemplateToCreateLearningDesign : function(){
+		if (layout.modified && !confirm(LABELS.CLEAR_CANVAS_CONFIRM)) {
+			return;
+		}
+
+		var dialog = showDialog("ldTemplate", {
+				'modal' : true,
+				'height' : Math.max(300, $(window).height() - 30),
+				'width' :  Math.max(380, Math.min(1024, $(window).width() - 60)),
+				'draggable' : true,
+				'resizable' : true,
+				'title' : LABELS.TEMPLATES,
+				'beforeClose' : function(event){
+					// ask the user if he really wants to exit before saving his work
+					var iframe = $('iframe', this);
+					if (iframe[0].contentWindow.doCancel) {
+						iframe[0].contentWindow.doCancel();
+						return false;
+					}
+				},
+				'close' : function(){
+					// stop checking in LD was 
+					clearInterval(loadCheckInterval);
+					$(this).remove();
+				},
+				'open' : function() {
+					var dialog = $(this);
+					// load contents after opening the dialog
+					$('iframe', dialog).attr('src', LAMS_URL + '/authoring/template/list.jsp').load(function(){
+						// override the close function so it works with the dialog, not window
+						this.contentWindow.closeWindow = function(){
+							// detach the 'beforeClose' handler above, attach the standard one and close the dialog
+							dialog.off('hide.bs.modal').on('hide.bs.modal', function(){
+								$('iframe', this).attr('src', null);
+							}).modal('hide');
+						}
+					});
+				},
+			}, false),
+			currentLearningDesignID = null,
+			regEx = /learningDesignID=(\d+)/g,
+			// since window.onload does not really work after submitting a form inside the window,
+			// this trick checks periodically for changes
+			loadCheckInterval = setInterval(function(){
+				var body = $('body', $('iframe', dialog).contents()).html(),
+					match = regEx.exec(body);
+				// check if ID was found and it's not the same as previously set
+				if (match && match[1] != currentLearningDesignID) {
+					currentLearningDesignID = match[1];
+					// load the imported LD
+					GeneralLib.openLearningDesign(currentLearningDesignID);
+					
+					// generate images of the imported LD
+					GeneralLib.saveLearningDesignImage();
+				}
+			}, 1000);
+	},
 };

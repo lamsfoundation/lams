@@ -499,6 +499,11 @@ ul.dropdown-menu {
 	right: 0;
 }
 
+ul.dropdown-menu-right {
+	left: 0;
+	right: auto;
+}    
+
 /** Authoring */
 /*layout of adding a topic button */
 a.button-add-item:before {

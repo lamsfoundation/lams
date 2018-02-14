@@ -441,6 +441,26 @@
         redirect="false"
       />
     </action>
+    
+	<!--
+		Learning Design Sequence Templates
+  		-->
+    <action
+      path="/authoring/template/tbl"
+      type="org.lamsfoundation.lams.authoring.template.web.TBLTemplateAction"
+      parameter="method"
+      validate="false"
+      scope="request"
+    >
+    <forward name="init" path="/authoring/template/tbl/tbl.jsp" />
+    <forward name="question" path="/authoring/template/tool/mcquestion.jsp" />
+    <forward name="questionoption" path="/authoring/template/tool/mcoption.jsp" />
+    <forward name="assess" path="/authoring/template/tool/assessment.jsp" />
+    <forward name="redooption" path="/authoring/template/tool/mcredooption.jsp" />
+    
+    </action>
+
+
     <action
       path="/portrait"
       type="org.lamsfoundation.lams.web.PortraitAction"
