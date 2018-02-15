@@ -2743,10 +2743,15 @@ GeneralLib = {
 								// close the Live Edit dialog
 								if (GeneralLib.checkTBLGrouping()) {
 									alert(LABELS.LIVEEDIT_SAVE_SUCCESSFUL);
+									window.parent.closeDialog('dialogAuthoring');
 								} else {
-									alert(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
+									$('.modal-body', layout.infoDialog).text(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
+									layout.infoDialog.modal('show');
+									
+									setTimeout(function(){
+										window.parent.closeDialog('dialogAuthoring');
+									}, 7000);
 								}
-								window.parent.closeDialog('dialogAuthoring');
 							}
 						});
 						
@@ -2763,7 +2768,13 @@ GeneralLib = {
 						if (GeneralLib.checkTBLGrouping()) {
 							alert(LABELS.SAVE_SUCCESSFUL);
 						} else {
-							alert(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
+							$('.modal-body', layout.infoDialog).text(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
+							layout.infoDialog.modal('show');
+							
+							setTimeout(function(){
+								$('.modal-body', layout.infoDialog).empty();
+								layout.infoDialog.modal('hide');
+							}, 5000);
 						}
 					}
 					
