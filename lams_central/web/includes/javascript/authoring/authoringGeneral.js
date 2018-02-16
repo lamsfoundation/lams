@@ -981,19 +981,23 @@ GeneralInitLib = {
 			'resizable'     : false,
 			'draggable'     : false,
 			'width'			: 290,
+			'title'			: 'Click to dismiss',
 			'close' : null,
 			'data' : {
 				'position' : {
-					'my' : 'right top',
-					'at' : 'right+10px top+10px',
+					'my' : 'center top',
+					'at' : 'center top+20px',
 					'of' : '#canvas'
+				},
+				'show' : function(html){
+					$('.modal-body', layout.infoDialog).html(html);
+					layout.infoDialog.modal('show');
 				}
 			}
+		}).click(function(){
+			$(this).modal('hide').find('.modal-body').empty();
 		});
 		
-		// remove the title along with X button
-		$('.modal-header', layout.infoDialog).remove();
-
 		layout.dialogs.push(layout.infoDialog);
 		
 		
@@ -2133,13 +2137,7 @@ GeneralLib = {
 				GeneralLib.updateAccess(response.access);
 				
 				if (!ld.validDesign && !isReadOnlyMode) {
-					$('.modal-body', layout.infoDialog).html(LABELS.SEQUENCE_NOT_VALID);
-					layout.infoDialog.modal('show');
-					
-					setTimeout(function(){
-						$('.modal-body', layout.infoDialog).empty();
-						layout.infoDialog.modal('hide');
-					}, 5000);
+					layout.infoDialog.data('show')(LABELS.SEQUENCE_NOT_VALID);
 				}
 			}
 		});
@@ -2745,12 +2743,7 @@ GeneralLib = {
 									alert(LABELS.LIVEEDIT_SAVE_SUCCESSFUL);
 									window.parent.closeDialog('dialogAuthoring');
 								} else {
-									$('.modal-body', layout.infoDialog).text(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
-									layout.infoDialog.modal('show');
-									
-									setTimeout(function(){
-										window.parent.closeDialog('dialogAuthoring');
-									}, 7000);
+									layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
 								}
 							}
 						});
@@ -2768,13 +2761,7 @@ GeneralLib = {
 						if (GeneralLib.checkTBLGrouping()) {
 							alert(LABELS.SAVE_SUCCESSFUL);
 						} else {
-							$('.modal-body', layout.infoDialog).text(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
-							layout.infoDialog.modal('show');
-							
-							setTimeout(function(){
-								$('.modal-body', layout.infoDialog).empty();
-								layout.infoDialog.modal('hide');
-							}, 5000);
+							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
 						}
 					}
 					
