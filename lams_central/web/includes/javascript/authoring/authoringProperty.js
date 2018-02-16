@@ -72,7 +72,7 @@ var PropertyDefs = {
 						branchingActivity.title = newTitle;
 						redrawNeeded = true;
             		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			layout.infoDialog.data('show')(LABELS.TITLE_VALIDATION_ERROR);
             			$('.propertiesContentFieldTitle', content).val(branchingActivity.title);
             		}
 				}
@@ -204,7 +204,7 @@ var PropertyDefs = {
 						activity.title = newTitle;
 						redrawNeeded = true;
             		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			layout.infoDialog.data('show')(LABELS.TITLE_VALIDATION_ERROR);
             			$('.propertiesContentFieldTitle', content).val(activity.title);
             		}
 				}
@@ -313,7 +313,7 @@ var PropertyDefs = {
 						activity.title = newTitle;
 						redrawNeeded = true;
             		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			layout.infoDialog.data('show')(LABELS.TITLE_VALIDATION_ERROR);
             			$('.propertiesContentFieldTitle', content).val(activity.title);
             		}
 				}
@@ -440,7 +440,7 @@ var PropertyDefs = {
 						label.title = newTitle;
 						redrawNeeded = true;
             		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			layout.infoDialog.data('show')(LABELS.TITLE_VALIDATION_ERROR);
             			$('.propertiesContentFieldTitle', content).val(label.title);
             		}
 				}
@@ -504,7 +504,7 @@ var PropertyDefs = {
 						ActivityLib.addSelectEffect(activity, true);
 						GeneralLib.setModified(true);
             		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			layout.infoDialog.data('show')(LABELS.TITLE_VALIDATION_ERROR);
             			$('.propertiesContentFieldTitle', content).val(activity.title);
             		}
 				}
@@ -573,7 +573,7 @@ var PropertyDefs = {
 						activity.title = newTitle;
 						redrawNeeded = true;
             		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			layout.infoDialog.data('show')(LABELS.TITLE_VALIDATION_ERROR);
             			$('.propertiesContentFieldTitle', content).val(activity.title);
             		}
 				}
@@ -641,7 +641,7 @@ var PropertyDefs = {
 						region.title = newTitle;
 						redrawNeeded = true;
             		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			layout.infoDialog.data('show')(LABELS.TITLE_VALIDATION_ERROR);
             			$('.propertiesContentFieldTitle', content).val(region.title);
             		}
 				}
@@ -694,7 +694,7 @@ var PropertyDefs = {
 						activity.title = newTitle;
 						redrawNeeded = true;
             		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			layout.infoDialog.data('show')(LABELS.TITLE_VALIDATION_ERROR);
             			$('.propertiesContentFieldTitle', content).val(activity.title);
             		}
 				}
@@ -774,7 +774,7 @@ var PropertyDefs = {
 						}
 						redrawNeeded = true;
             		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			layout.infoDialog.data('show')(LABELS.TITLE_VALIDATION_ERROR);
             			$('.propertiesContentFieldTitle', content).val(transition.title);
             		}
 				}
@@ -852,7 +852,7 @@ PropertyLib = {
 			}); 
 			
 			if (error) {
-				alert(error);
+				layout.infoDialog.data('show')(error);
 				return;
 			}
 			
@@ -1277,7 +1277,7 @@ PropertyLib = {
 						|| (typeof condition.endValue == 'undefined'
 							&& (typeof existingCondition.endValue == 'undefined' || existingCondition.endValue >= condition.startValue))
 						|| (!(condition.startValue > existingCondition.endValue) && !(condition.endValue < existingCondition.startValue))) {
-						alert(LABELS.RANGE_CONDITION_ADD_START_ERROR);
+						layout.infoDialog.data('show')(LABELS.RANGE_CONDITION_ADD_START_ERROR);
 						condition = null;
 						return false;
 					}
@@ -1286,7 +1286,7 @@ PropertyLib = {
 						|| (typeof condition.startValue == 'undefined'
 							&& (typeof existingCondition.startValue == 'undefined' || existingCondition.startValue <= condition.endValue))
 						|| (!(condition.endValue < existingCondition.startValue) && !(condition.startValue > existingCondition.endValue))) {
-						alert(LABELS.RANGE_CONDITION_ADD_END_ERROR);
+						layout.infoDialog.data('show')(LABELS.RANGE_CONDITION_ADD_END_ERROR);
 						condition = null;
 						return false;
 					}
@@ -1917,7 +1917,7 @@ PropertyLib = {
 						   + ', ';
 			});
 			message = message.substring(0, message.length - 2);
-			alert(message);
+			layout.infoDialog.data('show')(message);
 		}
 	}
 };

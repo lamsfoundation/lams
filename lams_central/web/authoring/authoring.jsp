@@ -88,6 +88,8 @@
 				SEQUENCE : '<c:out value="${SEQUENCE_VAR}" />',
 				<fmt:message key="authoring.fla.weights.title" var="WEIGHTS_TITLE_VAR"/>
 				WEIGHTS_TITLE : '<c:out value="${WEIGHTS_TITLE_VAR}" />',
+				<fmt:message key="authoring.fla.info.dialog.title" var="INFO_DIALOG_TITLE_VAR"/>
+				INFO_DIALOG_TITLE : '<c:out value="${INFO_DIALOG_TITLE_VAR}" />',
 				<fmt:message key="authoring.fla.sequence.not.valid" var="SEQUENCE_NOT_VALID_VAR"/>
 				SEQUENCE_NOT_VALID : decoderDiv.html('<c:out value="${SEQUENCE_NOT_VALID_VAR}" />').text(),
 				<fmt:message key="authoring.fla.sequence.validation.issues" var="SEQUENCE_VALIDATION_ISSUES_VAR"/>
