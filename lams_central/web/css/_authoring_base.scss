@@ -152,6 +152,22 @@ input.groupName {
 	width: 95%;
 }
 
+div#infoDialog {
+	cursor: pointer;
+}
+
+div#infoDialog .modal-content {
+	border-color: $brand-primary-darker;
+}
+
+div#infoDialog .close {
+	display : none;
+}
+
+div#infoDialog .modal-header {
+	text-align: center;
+	color: $brand-primary-darker;
+}
 
 div#infoDialog .modal-body {
 	font-weight: bold;
