@@ -515,7 +515,7 @@ var MenuLib = {
 			dataType : 'text',
 			success : function(lessonID) {
 				if (!lessonID) {
-					alert(LABELS.PREVIEW_ERROR);
+					layout.infoDialog.data('show')(LABELS.PREVIEW_ERROR);
 					previewButton.button('reset');
 					return;
 				}
@@ -563,7 +563,7 @@ var MenuLib = {
 		}
 		// only tool activities can be copied (todo?)
 		if (!(activity instanceof ActivityDefs.ToolActivity)) {
-			alert(LABELS.PASTE_ERROR);
+			layout.infoDialog.data('show')(LABELS.PASTE_ERROR);
 			return;
 		}
 		

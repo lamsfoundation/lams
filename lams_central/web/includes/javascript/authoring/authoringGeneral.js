@@ -990,8 +990,13 @@ GeneralInitLib = {
 					'of' : '#canvas'
 				},
 				'show' : function(html){
-					$('.modal-body', layout.infoDialog).html(html);
-					layout.infoDialog.modal('show');
+					var body = $('.modal-body', layout.infoDialog);
+					if (layout.infoDialog.hasClass('in')) {
+						body.html(body.html() + '<br /><br />' + html);
+					} else {
+						body.html(html);
+						layout.infoDialog.modal('show');
+					}
 				}
 			}
 		}).click(function(){
@@ -1604,7 +1609,7 @@ GeneralLib = {
 			success : function(response) {
 				if (!response) {
 					if (!isReadOnlyMode) {
-						alert(LABELS.SEQUENCE_LOAD_ERROR);
+						layout.infoDialog.data('show')(LABELS.SEQUENCE_LOAD_ERROR);
 					}
 					return;
 				}
@@ -2177,7 +2182,7 @@ GeneralLib = {
 		
 		if (weightsSum != null && weightsSum != 100) {
 			if (displayErrors) {
-				alert(LABELS.WEIGHTS_SUM_ERROR);
+				layout.infoDialog.data('show')(LABELS.WEIGHTS_SUM_ERROR);
 			}
 			return false;
 		}
@@ -2249,7 +2254,7 @@ GeneralLib = {
 									// the branch is shared between two branchings
 									// it should have been detected when adding a transition
 									if (displayErrors) {
-										alert(LABELS.CROSS_BRANCHING_ERROR);
+										layout.infoDialog.data('show')(LABELS.CROSS_BRANCHING_ERROR);
 									}
 									return false;
 								}
@@ -2267,7 +2272,7 @@ GeneralLib = {
 						
 						if (error) {
 							if (displayErrors) {
-								alert(branchingActivity.title + LABELS.END_MATCH_ERROR);
+								layout.infoDialog.data('show')(branchingActivity.title + LABELS.END_MATCH_ERROR);
 							}
 							return false;
 						}
@@ -2524,7 +2529,7 @@ GeneralLib = {
 		
 		if (error) {
 			if (displayErrors) {
-				alert(error);
+				layout.infoDialog.data('show')(error);
 			}
 			return false;
 		}
@@ -2669,7 +2674,7 @@ GeneralLib = {
 				
 				// check if there were any validation errors
 				if (layout.ld.invalid) {
-					var message = LABELS.SEQUENCE_VALIDATION_ISSUES + '\n';
+					var message = LABELS.SEQUENCE_VALIDATION_ISSUES + '<br/>';
 					$.each(response.validation, function() {
 						var uiid = this.UIID,
 							title = '';
@@ -2681,10 +2686,10 @@ GeneralLib = {
 								}
 							});
 						}
-						message += title + this.message + '\n';
+						message += title + this.message + '<br/>';
 					});
 					
-					alert(message);
+					layout.infoDialog.data('show')(message);
 				}
 				
 				// if save (even partially) was successful
@@ -2731,7 +2736,7 @@ GeneralLib = {
 								// create the updated LD image
 								var svgSaveSuccessful = GeneralLib.saveLearningDesignImage();
 								if (!svgSaveSuccessful) {
-									alert(LABELS.SVG_SAVE_ERROR);
+									layout.infoDialog.data('show')(LABELS.SVG_SAVE_ERROR);
 									return;
 								}
 								
@@ -2740,8 +2745,10 @@ GeneralLib = {
 								
 								// close the Live Edit dialog
 								if (GeneralLib.checkTBLGrouping()) {
-									alert(LABELS.LIVEEDIT_SAVE_SUCCESSFUL);
-									window.parent.closeDialog('dialogAuthoring');
+									layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL);
+									layout.infoDialog.one('click', function(){
+										window.parent.closeDialog('dialogAuthoring');
+									});
 								} else {
 									layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
 								}
@@ -2754,12 +2761,12 @@ GeneralLib = {
 					
 					var svgSaveSuccessful = GeneralLib.saveLearningDesignImage();
 					if (!svgSaveSuccessful) {
-						alert(LABELS.SVG_SAVE_ERROR);
+						layout.infoDialog.data('show')(LABELS.SVG_SAVE_ERROR);
 					}
 					
 					if (!layout.ld.invalid) {
 						if (GeneralLib.checkTBLGrouping()) {
-							alert(LABELS.SAVE_SUCCESSFUL);
+							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL);
 						} else {
 							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
 						}
@@ -2770,7 +2777,7 @@ GeneralLib = {
 				}
 			},
 			error : function(){
-				alert(LABELS.SEQUENCE_SAVE_ERROR);
+				layout.infoDialog.data('show')(LABELS.SEQUENCE_SAVE_ERROR);
 			}
 		});
 		return result;
