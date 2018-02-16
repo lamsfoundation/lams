@@ -479,7 +479,7 @@ GeneralInitLib = {
     			return;
     		}
     		if (!ldNode.data.canModify) {
-    			alert("You can not modify this");
+    			alert(LABELS.RESOURCE_MODIFY_ERROR);
     			return;
     		}
     		var isFolder = !ldNode.data.learningDesignId,
@@ -981,7 +981,7 @@ GeneralInitLib = {
 			'resizable'     : false,
 			'draggable'     : false,
 			'width'			: 290,
-			'title'			: 'Click to dismiss',
+			'title'			: LABELS.INFO_DIALOG_TITLE,
 			'close' : null,
 			'data' : {
 				'position' : {
