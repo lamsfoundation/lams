@@ -995,25 +995,43 @@ GeneralInitLib = {
 					'of' : '#canvas'
 				},
 				'show' : function(html, temporary){
+					var timeout = layout.infoDialog.data('temporaryTimeout');
+					if (timeout) {
+						clearTimeout(timeout);
+					}
+					
 					var body = $('#infoDialogBody', layout.infoDialog),
-						visible = layout.infoDialog.hasClass('in');
-					if (visible || !temporary) {
-						$('.modal-header, #infoDialogButtons', layout.infoDialog).show();
-						body.removeClass('temporary');
+						// is dialog already open?
+						visible = layout.infoDialog.hasClass('in'),
+						// should be initialised/kept in temporary mode?
+						temporaryMode = visible ? body.hasClass('temporary') : temporary;
+					if (visible) {
+						if (temporaryMode) {
+							body.html(html);
+						} else {
+							body.html(body.html() + '<br /><br />' + html);
+						}
 					} else {
+						body.html(html);
+					}
+					
+					if (temporaryMode) {
+						// temporary dialog hides after 5 seconds or on click
 						$('.modal-header, #infoDialogButtons', layout.infoDialog).hide();
 						body.addClass('temporary').one('click', function(){
 							layout.infoDialog.modal('hide');
 						});
-						setTimeout(function(){
+						var timeout = setTimeout(function(){
 							body.off('click');
 							layout.infoDialog.modal('hide');
 						}, 5000);
-					}
-					if (visible) {
-						body.html(body.html() + '<br /><br />' + html);
+						layout.infoDialog.data('temporaryTimeout', timeout);
 					} else {
-						body.html(html);
+						$('.modal-header, #infoDialogButtons', layout.infoDialog).show();
+						body.removeClass('temporary');
+					}
+					
+					if (!visible) {
 						layout.infoDialog.modal('show');
 					}
 				}
@@ -2763,10 +2781,10 @@ GeneralLib = {
 								
 								// close the Live Edit dialog
 								if (GeneralLib.checkTBLGrouping()) {
-									layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL);
-									layout.infoDialog.one('click', function(){
+									layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL, true);
+									setTimeout(function(){
 										window.parent.closeDialog('dialogAuthoring');
-									});
+									}, 5000);
 								} else {
 									layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
 								}
@@ -2784,7 +2802,7 @@ GeneralLib = {
 					
 					if (!layout.ld.invalid) {
 						if (GeneralLib.checkTBLGrouping()) {
-							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL);
+							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL, true);
 						} else {
 							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
 						}
