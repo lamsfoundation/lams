@@ -974,7 +974,12 @@ GeneralInitLib = {
 		});
 		
 		GeneralLib.updateAccess(initAccess);
-
+		
+		var infoDialogContents = $('#infoDialogContents');
+		$('#infoDialogOKButton', infoDialogContents).click(function(){
+			layout.infoDialog.modal('hide');
+		});
+		
 		layout.infoDialog = showDialog('infoDialog',{
 			'autoOpen'      : false,
 			'modal'			: false,
@@ -990,7 +995,7 @@ GeneralInitLib = {
 					'of' : '#canvas'
 				},
 				'show' : function(html){
-					var body = $('.modal-body', layout.infoDialog);
+					var body = $('#infoDialogBody', layout.infoDialog);
 					if (layout.infoDialog.hasClass('in')) {
 						body.html(body.html() + '<br /><br />' + html);
 					} else {
@@ -999,10 +1004,9 @@ GeneralInitLib = {
 					}
 				}
 			}
-		}).click(function(){
-			$(this).modal('hide').find('.modal-body').empty();
 		});
 		
+		$('.modal-body', layout.infoDialog).empty().append(infoDialogContents.show());
 		layout.dialogs.push(layout.infoDialog);
 		
 		
