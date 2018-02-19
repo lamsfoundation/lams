@@ -276,10 +276,9 @@ var HandlerLib = {
 		      .off('mousemove');
 		
 		// if the user started adding a branching and did not finish it
-		if (layout.addBranchingStart){			
-			$('.modal-body', layout.infoDialog).empty();
+		if (layout.addBranchingStart){
 			layout.infoDialog.modal('hide');
-				
+			
 			if (layout.addBranchingStart instanceof ActivityDefs.BranchingEdgeActivity) {
 				layout.activities.splice(layout.activities.indexOf(layout.addBranchingStart), 1);
 				layout.addBranchingStart.items.remove();
