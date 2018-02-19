@@ -9,11 +9,11 @@ REFERENCES lams_learning_design (learning_design_id) ON DELETE CASCADE ON UPDATE
 
 ALTER TABLE lams_learning_activity DROP FOREIGN KEY FK_lams_learning_activity_15;
 ALTER TABLE lams_learning_activity ADD CONSTRAINT FK_lams_learning_activity_15 FOREIGN KEY (transition_to_id)
-REFERENCES lams_learning_transition (transition_id) ON DELETE SET NULL ON UPDATE SET NULL;
+REFERENCES lams_learning_transition (transition_id) ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE lams_learning_activity DROP FOREIGN KEY FK_lams_learning_activity_16;
 ALTER TABLE lams_learning_activity ADD CONSTRAINT FK_lams_learning_activity_16 FOREIGN KEY (transition_from_id)
-REFERENCES lams_learning_transition (transition_id) ON DELETE SET NULL ON UPDATE SET NULL;
+REFERENCES lams_learning_transition (transition_id) ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE lams_learning_transition DROP FOREIGN KEY lddefn_transition_ibfk_1;
 ALTER TABLE lams_learning_transition ADD CONSTRAINT lddefn_transition_ibfk_1 FOREIGN KEY (learning_design_id)
