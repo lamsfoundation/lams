@@ -994,9 +994,23 @@ GeneralInitLib = {
 					'at' : 'center top+20px',
 					'of' : '#canvas'
 				},
-				'show' : function(html){
-					var body = $('#infoDialogBody', layout.infoDialog);
-					if (layout.infoDialog.hasClass('in')) {
+				'show' : function(html, temporary){
+					var body = $('#infoDialogBody', layout.infoDialog),
+						visible = layout.infoDialog.hasClass('in');
+					if (visible || !temporary) {
+						$('.modal-header, #infoDialogButtons', layout.infoDialog).show();
+						body.removeClass('temporary');
+					} else {
+						$('.modal-header, #infoDialogButtons', layout.infoDialog).hide();
+						body.addClass('temporary').one('click', function(){
+							layout.infoDialog.modal('hide');
+						});
+						setTimeout(function(){
+							body.off('click');
+							layout.infoDialog.modal('hide');
+						}, 5000);
+					}
+					if (visible) {
 						body.html(body.html() + '<br /><br />' + html);
 					} else {
 						body.html(html);
