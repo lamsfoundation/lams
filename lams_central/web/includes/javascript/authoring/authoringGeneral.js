@@ -974,7 +974,12 @@ GeneralInitLib = {
 		});
 		
 		GeneralLib.updateAccess(initAccess);
-
+		
+		var infoDialogContents = $('#infoDialogContents');
+		$('#infoDialogOKButton', infoDialogContents).click(function(){
+			layout.infoDialog.modal('hide');
+		});
+		
 		layout.infoDialog = showDialog('infoDialog',{
 			'autoOpen'      : false,
 			'modal'			: false,
@@ -989,20 +994,51 @@ GeneralInitLib = {
 					'at' : 'center top+20px',
 					'of' : '#canvas'
 				},
-				'show' : function(html){
-					var body = $('.modal-body', layout.infoDialog);
-					if (layout.infoDialog.hasClass('in')) {
-						body.html(body.html() + '<br /><br />' + html);
+				'show' : function(html, temporary){
+					var timeout = layout.infoDialog.data('temporaryTimeout');
+					if (timeout) {
+						clearTimeout(timeout);
+					}
+					
+					var body = $('#infoDialogBody', layout.infoDialog),
+						// is dialog already open?
+						visible = layout.infoDialog.hasClass('in'),
+						// should be initialised/kept in temporary mode?
+						temporaryMode = visible ? body.hasClass('temporary') : temporary;
+					if (visible) {
+						if (temporaryMode) {
+							body.html(html);
+						} else {
+							body.html(body.html() + '<br /><br />' + html);
+						}
 					} else {
 						body.html(html);
+					}
+					
+					if (temporaryMode) {
+						// temporary dialog hides after 5 seconds or on click
+						$('.modal-header, #infoDialogButtons', layout.infoDialog).hide();
+						body.addClass('temporary').one('click', function(){
+							layout.infoDialog.modal('hide');
+						});
+						var timeout = setTimeout(function(){
+							body.off('click');
+							layout.infoDialog.modal('hide');
+						}, 5000);
+						layout.infoDialog.data('temporaryTimeout', timeout);
+					} else {
+						$('.modal-header, #infoDialogButtons', layout.infoDialog).show();
+						body.removeClass('temporary');
+					}
+					
+					if (!visible) {
 						layout.infoDialog.modal('show');
 					}
 				}
 			}
-		}).click(function(){
-			$(this).modal('hide').find('.modal-body').empty();
 		});
 		
+		$('.modal-body', layout.infoDialog).empty().append(infoDialogContents.show());
 		layout.dialogs.push(layout.infoDialog);
 		
 		
@@ -2745,10 +2781,10 @@ GeneralLib = {
 								
 								// close the Live Edit dialog
 								if (GeneralLib.checkTBLGrouping()) {
-									layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL);
-									layout.infoDialog.one('click', function(){
+									layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL, true);
+									setTimeout(function(){
 										window.parent.closeDialog('dialogAuthoring');
-									});
+									}, 5000);
 								} else {
 									layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
 								}
@@ -2766,7 +2802,7 @@ GeneralLib = {
 					
 					if (!layout.ld.invalid) {
 						if (GeneralLib.checkTBLGrouping()) {
-							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL);
+							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL, true);
 						} else {
 							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
 						}

@@ -9,14 +9,10 @@ var MenuLib = {
 	addAnnotationLabel : function() {
 		HandlerLib.resetCanvasMode();
 		
-		$('.modal-body', layout.infoDialog).text(LABELS.ANNOTATION_LABEL_PLACE_PROMPT);
-		layout.infoDialog.modal('show');
+		layout.infoDialog.data('show')(LABELS.ANNOTATION_LABEL_PLACE_PROMPT, true);
 
 		canvas.css('cursor', 'pointer').click(function(event){
-			$('.modal-body', layout.infoDialog).empty();
 			layout.infoDialog.modal('hide');
-
-
 			var translatedEvent = GeneralLib.translateEventOnCanvas(event),
 				x = translatedEvent[0],
 				y = translatedEvent[1];
@@ -34,13 +30,10 @@ var MenuLib = {
 	addAnnotationRegion : function() {
 		HandlerLib.resetCanvasMode();
 		
-		$('.modal-body', layout.infoDialog).text(LABELS.ANNOTATION_REGION_PLACE_PROMPT);
-		layout.infoDialog.modal('show');
+		layout.infoDialog.data('show')(LABELS.ANNOTATION_REGION_PLACE_PROMPT, true);
 	
 		canvas.css('cursor', 'crosshair').mousedown(function(event){
-			$('.modal-body', layout.infoDialog).empty();
 			layout.infoDialog.modal('hide');
-			
 			var	targetElement = Snap.getElementByPoint(event.pageX, event.pageY);
 			
 			if (targetElement.type == 'svg') {
@@ -59,8 +52,7 @@ var MenuLib = {
 	addBranching : function(){
 		HandlerLib.resetCanvasMode();
 		
-		$('.modal-body', layout.infoDialog).text(LABELS.BRANCHING_START_PLACE_PROMPT);
-		layout.infoDialog.modal('show');
+		layout.infoDialog.data('show')(LABELS.BRANCHING_START_PLACE_PROMPT, true);
 		
 		layout.addBranchingStart = true;
 		
@@ -81,7 +73,6 @@ var MenuLib = {
 				layout.addBranchingStart = null;
 				HandlerLib.resetCanvasMode(true);
 				
-				$('.modal-body', layout.infoDialog).empty();
 				layout.infoDialog.modal('hide');
 				
 				GeneralLib.setModified(true);
@@ -89,7 +80,7 @@ var MenuLib = {
 				// extract main branchingActivity structure from created start point
 				branchingActivity = branchingEdge.branchingActivity;
 				layout.addBranchingStart = branchingEdge;
-				$('.modal-body', layout.infoDialog).text(LABELS.BRANCHING_END_PLACE_PROMPT);
+				layout.infoDialog.data('show')(LABELS.BRANCHING_END_PLACE_PROMPT, true);
 			}
 		});
 	},
@@ -105,13 +96,10 @@ var MenuLib = {
 		}
 		HandlerLib.resetCanvasMode();
 		
-		$('.modal-body', layout.infoDialog).text(LABELS.SUPPORT_ACTIVITY_PLACE_PROMPT);
-		layout.infoDialog.modal('show');
+		layout.infoDialog.data('show')(LABELS.SUPPORT_ACTIVITY_PLACE_PROMPT, true);
 	
 		canvas.css('cursor', 'pointer').click(function(event){
-			$('.modal-body', layout.infoDialog).empty();
 			layout.infoDialog.modal('hide');
-
 			var translatedEvent = GeneralLib.translateEventOnCanvas(event),
 				x = translatedEvent[0],
 				y = translatedEvent[1];
@@ -186,13 +174,10 @@ var MenuLib = {
 	addOptionalActivity : function() {
 			HandlerLib.resetCanvasMode();
 			
-			$('.modal-body', layout.infoDialog).text(LABELS.OPTIONAL_ACTIVITY_PLACE_PROMPT);
-			layout.infoDialog.modal('show');
+			layout.infoDialog.data('show')(LABELS.OPTIONAL_ACTIVITY_PLACE_PROMPT, true);
 		
 			canvas.css('cursor', 'pointer').click(function(event){
-				$('.modal-body', layout.infoDialog).empty();
 				layout.infoDialog.modal('hide');
-	
 				var translatedEvent = GeneralLib.translateEventOnCanvas(event),
 					x = translatedEvent[0],
 					y = translatedEvent[1];
@@ -212,20 +197,17 @@ var MenuLib = {
 		if (layout.isTransitionStarted) {
 			layout.isTransitionStarted = false;
 			HandlerLib.resetCanvasMode(true);
-			$('.modal-body', layout.infoDialog).empty();
 			layout.infoDialog.modal('hide');
 			$('#transitionButton').blur();
 		} else {
 			layout.isTransitionStarted = true;
 			HandlerLib.resetCanvasMode();
 			
-			$('.modal-body', layout.infoDialog).text(LABELS.TRANSITION_PLACE_PROMPT);
-			layout.infoDialog.modal('show');
+			layout.infoDialog.data('show')(LABELS.TRANSITION_PLACE_PROMPT, true);
 			
 			canvas.css('cursor', 'pointer').click(function(event){
 				layout.isTransitionStarted = false;
 				
-				$('.modal-body', layout.infoDialog).empty();
 				layout.infoDialog.modal('hide');
 				
 				var startActivity = null,
