@@ -22,6 +22,11 @@ package org.lamsfoundation.lams.integration.security;
 
 import java.util.Random;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.ValidationUtil;
+
 /**
  * RandomPasswordGenerator generates a random password with the specified length.
  *
@@ -29,9 +34,23 @@ import java.util.Random;
  */
 public class RandomPasswordGenerator {
 
+    private static final char[] UPPER_CASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+
+    private static final char[] LOWER_CASE = "abedefghijklmnopqrstuvwxyz".toCharArray();
+
+    private static final char[] DIGITS = "0123456789".toCharArray();
+
+    private static final char[] SYMBOLS = "`~!@#$%^&*\\()_-+={}[]|:;\"'<>,.?/".toCharArray();
+
     //define the legal characters in our random password
-    private static final char[] CHAR_ARRAY = "ABCDEFGHIJKLMNOPQRSTUVWXYZabedefghijklmnopqrstuvwxyz01234567890"
-	    .toCharArray();
+    private static final char[] SIMPLE_PASSWORD_RANGE = ArrayUtils.addAll(ArrayUtils.addAll(UPPER_CASE, LOWER_CASE),
+	    DIGITS);
+
+    private static final char[] FULL_PASSWORD_RANGE = ArrayUtils.addAll(SIMPLE_PASSWORD_RANGE, SYMBOLS);
+
+    private static final char NULL_CHAR = '\u0000';
+
+    private static final int MINIMUM_PASSWORD_LENGTH = 10;
 
     /**
      * Get the next random password
@@ -45,9 +64,44 @@ public class RandomPasswordGenerator {
 	Random generator = new Random();
 
 	for (int i = 0; i < length; i++) {
-	    res[i] = CHAR_ARRAY[generator.nextInt(CHAR_ARRAY.length)];
+	    res[i] = SIMPLE_PASSWORD_RANGE[generator.nextInt(SIMPLE_PASSWORD_RANGE.length)];
 	}
 
 	return new String(res);
+    }
+
+    /**
+     * Build a password that passes configured validation
+     */
+    public static String nextPasswordValidated() {
+	Random generator = new Random();
+	int length = Math.max(MINIMUM_PASSWORD_LENGTH,
+		Configuration.getAsInt(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS));
+	char res[] = new char[length];
+	int index = 0;
+	// make sure that there is at least one character of each set
+	for (char[] set : new char[][] { UPPER_CASE, LOWER_CASE, DIGITS, SYMBOLS }) {
+	    do {
+		index = generator.nextInt(length);
+		if (res[index] == NULL_CHAR) {
+		    res[index] = set[generator.nextInt(set.length)];
+		    break;
+		}
+	    } while (true);
+	}
+
+	// fill other characters
+	for (index = 0; index < length; index++) {
+	    if (res[index] == NULL_CHAR) {
+		res[index] = FULL_PASSWORD_RANGE[generator.nextInt(FULL_PASSWORD_RANGE.length)];
+	    }
+	}
+
+	String result = String.valueOf(res);
+	if (!ValidationUtil.isPasswordValueValid(result, result)) {
+	    throw new RuntimeException("Password generator created password which does not pass validation: " + result);
+	}
+
+	return result;
     }
 }
