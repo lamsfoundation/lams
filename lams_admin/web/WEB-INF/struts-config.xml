@@ -159,6 +159,16 @@
 	<form-property name="loginTabActive" type="java.lang.Boolean" initial="0" />
 	<form-property name="context" type="java.lang.String" />
 </form-bean>
+
+<form-bean name="OrgPasswordChangeForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="organisationID" type="java.lang.Integer" />
+	<form-property name="learners" type="java.lang.String" />
+	<form-property name="staff" type="java.lang.String" />
+	<form-property name="learnerPass" type="java.lang.String" />
+	<form-property name="staffPass" type="java.lang.String" />
+	<form-property name="email" type="java.lang.Boolean" initial="0" />
+	<form-property name="prompt" type="java.lang.Boolean" initial="0" />
+</form-bean>
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -954,6 +964,17 @@
       path="/uploadPortraits"
       type="org.lamsfoundation.lams.admin.web.action.PortraitBatchUploadAction"
     />
+    <action
+      path="/orgPasswordChange"
+      type="org.lamsfoundation.lams.admin.web.action.OrgPasswordChangeAction"
+      name="OrgPasswordChangeForm"
+    >
+      <forward
+        name="start"
+        path=".orgPasswordChange"
+        redirect="false"
+      />
+    </action>
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

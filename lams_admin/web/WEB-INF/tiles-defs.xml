@@ -244,4 +244,8 @@
 		<put name="content" value="signupmanagement/list.jsp" />
 	</definition>
 	
+	<definition name=".orgPasswordChange" path="/template.jsp">
+		<put name="title" value="admin.org.password.change.title"/>
+		<put name="content" value="orgPasswordChange.jsp" />	
+	</definition>
 </tiles-definitions>

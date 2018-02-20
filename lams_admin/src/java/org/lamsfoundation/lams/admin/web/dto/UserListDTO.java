@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.admin.web.dto;
 
 import java.util.List;
@@ -34,12 +33,12 @@ import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
  *         Created at 13:47:02 on 9/06/2006
  */
 public class UserListDTO {
-
     private List<UserManageBean> userManageBeans;
     private Integer orgId;
     private String orgName;
     private Boolean courseAdminCanAddNewUsers;
     private Boolean courseAdminCanBrowseAllUsers;
+    private Boolean canResetOrgPassword;
 
     public List<UserManageBean> getUserManageBeans() {
 	return userManageBeans;
@@ -80,4 +79,13 @@ public class UserListDTO {
     public void setCourseAdminCanBrowseAllUsers(Boolean courseAdminCanBrowseAllUsers) {
 	this.courseAdminCanBrowseAllUsers = courseAdminCanBrowseAllUsers;
     }
+
+    public Boolean getCanResetOrgPassword() {
+	return canResetOrgPassword;
+    }
+
+    public void setCanResetOrgPassword(Boolean canResetOrgPassword) {
+	this.canResetOrgPassword = canResetOrgPassword;
+    }
+
 }
