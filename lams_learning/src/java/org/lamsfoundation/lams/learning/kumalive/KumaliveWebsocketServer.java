@@ -154,6 +154,11 @@ public class KumaliveWebsocketServer {
 	if (kumalive == null) {
 	    return;
 	}
+	KumaliveWebsocketServer.unregisterUser(kumalive, login);
+	KumaliveWebsocketServer.sendRefresh(kumalive);
+    }
+
+    private static void unregisterUser(KumaliveDTO kumalive, String login) {
 	KumaliveUserDTO user = kumalive.learners.remove(login);
 	if (user != null) {
 	    Integer userId = user.userDTO.getUserID();
@@ -164,8 +169,6 @@ public class KumaliveWebsocketServer {
 		kumalive.speaker = null;
 	    }
 	}
-
-	sendRefresh(kumalive);
     }
 
     @OnMessage
@@ -323,11 +326,11 @@ public class KumaliveWebsocketServer {
 	}
 	kumalive.learners.put(login, learner);
 
-	sendInit(kumalive, learner);
-	sendRefresh(kumalive);
+	KumaliveWebsocketServer.sendInit(kumalive, learner);
+	KumaliveWebsocketServer.sendRefresh(kumalive);
     }
 
-    private void sendInit(KumaliveDTO kumalive, KumaliveUserDTO user) throws JSONException, IOException {
+    private static void sendInit(KumaliveDTO kumalive, KumaliveUserDTO user) throws JSONException, IOException {
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("type", "init");
 	// Kumalive title
@@ -348,7 +351,7 @@ public class KumaliveWebsocketServer {
     /**
      * Send full Kumalive state to all learners and teachers
      */
-    private void sendRefresh(KumaliveDTO kumalive) throws JSONException, IOException {
+    private static void sendRefresh(KumaliveDTO kumalive) throws JSONException, IOException {
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("type", "refresh");
 
@@ -418,6 +421,12 @@ public class KumaliveWebsocketServer {
 	String teacherResponse = teacherResponseJSON.toString();
 	// send refresh to everyone
 	for (KumaliveUserDTO participant : kumalive.learners.values()) {
+	    if (!participant.websocket.isOpen()) {
+		// make sure that websocket is open before sending anything
+		KumaliveWebsocketServer.unregisterUser(kumalive, participant.userDTO.getLogin());
+		continue;
+	    }
+
 	    Basic channel = participant.websocket.getBasicRemote();
 	    if (participant.roleTeacher) {
 		channel.sendText(teacherResponse);
@@ -469,7 +478,7 @@ public class KumaliveWebsocketServer {
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Teacher " + userId + " asked a question in Kumalive " + kumalive.id);
 	}
-	sendRefresh(kumalive);
+	KumaliveWebsocketServer.sendRefresh(kumalive);
     }
 
     /**
@@ -496,7 +505,7 @@ public class KumaliveWebsocketServer {
 	    logger.debug("Teacher " + userId + " finished a question in Kumalive " + kumalive.id);
 	}
 
-	sendRefresh(kumalive);
+	KumaliveWebsocketServer.sendRefresh(kumalive);
     }
 
     /**
@@ -532,7 +541,7 @@ public class KumaliveWebsocketServer {
 	    logger.debug("Learner " + userId + " raised hand in Kumalive " + kumalive.id);
 	}
 
-	sendRefresh(kumalive);
+	KumaliveWebsocketServer.sendRefresh(kumalive);
     }
 
     /**
@@ -563,7 +572,7 @@ public class KumaliveWebsocketServer {
 	    logger.debug("Learner " + userId + " put hand down in Kumalive " + kumalive.id);
 	}
 
-	sendRefresh(kumalive);
+	KumaliveWebsocketServer.sendRefresh(kumalive);
     }
 
     /**
@@ -585,7 +594,7 @@ public class KumaliveWebsocketServer {
 
 	KumaliveDTO kumalive = kumalives.get(organisationId);
 	kumalive.speaker = requestJSON.optInt("speaker");
-	sendRefresh(kumalive);
+	KumaliveWebsocketServer.sendRefresh(kumalive);
     }
 
     /**
@@ -615,7 +624,7 @@ public class KumaliveWebsocketServer {
 		    + " in Kumalive " + kumalive.id);
 	}
 
-	sendRefresh(kumalive);
+	KumaliveWebsocketServer.sendRefresh(kumalive);
     }
 
     /**
@@ -653,7 +662,7 @@ public class KumaliveWebsocketServer {
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Teacher " + userId + " started poll " + poll.getPollId() + " in Kumalive " + kumalive.id);
 	}
-	sendRefresh(kumalive);
+	KumaliveWebsocketServer.sendRefresh(kumalive);
     }
 
     /**
@@ -694,7 +703,7 @@ public class KumaliveWebsocketServer {
 	    logger.debug(
 		    "Learner " + userId + " voted in poll " + kumalive.poll.pollId + " in Kumalive " + kumalive.id);
 	}
-	sendRefresh(kumalive);
+	KumaliveWebsocketServer.sendRefresh(kumalive);
     }
 
     /**
@@ -727,7 +736,7 @@ public class KumaliveWebsocketServer {
 		    + kumalive.poll.votersReleased + ") of poll " + kumalive.poll.pollId + " in Kumalive "
 		    + kumalive.id);
 	}
-	sendRefresh(kumalive);
+	KumaliveWebsocketServer.sendRefresh(kumalive);
     }
 
     /**
@@ -757,7 +766,7 @@ public class KumaliveWebsocketServer {
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Teacher " + userId + " finished poll " + pollId + " in Kumalive " + kumalive.id);
 	}
-	sendRefresh(kumalive);
+	KumaliveWebsocketServer.sendRefresh(kumalive);
     }
 
     private void closePoll(JSONObject requestJSON, Session websocket) throws IOException, JSONException {
@@ -780,7 +789,7 @@ public class KumaliveWebsocketServer {
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Teacher " + userId + " closed poll in Kumalive " + kumalive.id);
 	}
-	sendRefresh(kumalive);
+	KumaliveWebsocketServer.sendRefresh(kumalive);
     }
 
     /**
@@ -804,6 +813,10 @@ public class KumaliveWebsocketServer {
 	KumaliveWebsocketServer.getKumaliveService().finishKumalive(kumalive.id);
 	kumalives.remove(organisationId);
 	for (KumaliveUserDTO participant : kumalive.learners.values()) {
+	    if (!participant.websocket.isOpen()) {
+		// make sure that websocket is open before sending anything
+		continue;
+	    }
 	    participant.websocket.getBasicRemote().sendText("{ \"type\" : \"finish\"}");
 	}
 
