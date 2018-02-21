@@ -17,7 +17,7 @@
 	.changeContainer .pass {
 		display: inline-block;
 		margin-left: 20px;
-		width: 200px;
+		width: 260px;
 	}
 	.changeContainer .fa {
 		cursor: pointer;
@@ -178,6 +178,8 @@
 					</td>
 					<td>
 						<input type="text" id="staffPass" name="staffPass" class="pass form-control" maxlength="25"
+						       placeholder="<fmt:message key='admin.org.password.change.custom' />"
+						       title="<fmt:message key='admin.org.password.change.custom' />"
 							   value="<bean:write name='OrgPasswordChangeForm' property='staffPass' />" />
 						<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
 					</td>
@@ -191,6 +193,8 @@
 					</td>
 					<td>
 						<input type="text" id="learnerPass" name="learnerPass" class="pass form-control" maxlength="25"
+							   placeholder="<fmt:message key='admin.org.password.change.custom' />"
+						       title="<fmt:message key='admin.org.password.change.custom' />"
 							   value="<bean:write name='OrgPasswordChangeForm' property='learnerPass' />" />
 						<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
 					</td>
