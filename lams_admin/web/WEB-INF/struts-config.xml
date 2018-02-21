@@ -162,6 +162,7 @@
 
 <form-bean name="OrgPasswordChangeForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="organisationID" type="java.lang.Integer" />
+	<form-property name="orgName" type="java.lang.String" />
 	<form-property name="isStaffChange" type="java.lang.Boolean" initial="1" />
 	<form-property name="isLearnerChange" type="java.lang.Boolean" initial="1" />
 	<form-property name="learners" type="java.lang.String" />

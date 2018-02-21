@@ -22,6 +22,9 @@
 	.changeContainer .fa {
 		cursor: pointer;
 	}
+	h3 {
+		text-align: center;
+	}
 </style>
 <%-- javascript --%>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -109,6 +112,7 @@
 
 <form id="OrgPasswordChangeForm" action="orgPasswordChange.do" method="post">
 	<div class="panel panel-default panel-body">
+		<h3><bean:write name='OrgPasswordChangeForm' property='orgName' /></h3>
 		<lams:Alert type="info" id="passwordConditions" close="false">
 			<fmt:message key='label.password.must.contain' />:
 			<ul class="list-unstyled" style="line-height: 1.2">

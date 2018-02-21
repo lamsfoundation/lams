@@ -32,7 +32,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -46,8 +49,13 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	DynaActionForm passForm = (DynaActionForm) form;
 	passForm.set(AttributeNames.PARAM_ORGANISATION_ID, organisationID);
+	IUserManagementService userManagementService = AdminServiceProxy.getService(getServlet().getServletContext());
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
+	passForm.set(AttributeNames.PARAM_ORGANISATION_NAME, organisation.getName());
+
 	passForm.set("staffPass", RandomPasswordGenerator.nextPasswordValidated());
 	passForm.set("learnerPass", RandomPasswordGenerator.nextPasswordValidated());
+
 	return mapping.findForward("start");
     }
 }
