@@ -49,10 +49,16 @@
 	 });
 
 	$(function() {
-		$('#isStaffChange, #isLearnerChange').change(function(){
+		var changeCheckboxes = $('#isStaffChange, #isLearnerChange').change(function(){
+			// prevent both checkboxes from being unchecked
+			if (!changeCheckboxes.is(':checked')) {
+				$(this).prop('checked', true);
+			}
+			// disable/enable password input depending on checkbox state
 			$(this).closest('.changeContainer').find('.pass').prop('disabled', !$(this).prop('checked'));
 		});
 
+		// generate new password on click
 		$('.generatePassword').click(function(){
 			var container = $(this).closest('.changeContainer');
 			if (!container.find('input[type="checkbox"]').prop('checked')) {
