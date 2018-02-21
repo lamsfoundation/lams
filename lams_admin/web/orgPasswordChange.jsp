@@ -52,6 +52,21 @@
 		$('#isStaffChange, #isLearnerChange').change(function(){
 			$(this).closest('.changeContainer').find('.pass').prop('disabled', !$(this).prop('checked'));
 		});
+
+		$('.generatePassword').click(function(){
+			var container = $(this).closest('.changeContainer');
+			if (!container.find('input[type="checkbox"]').prop('checked')) {
+				return;
+			}
+			$.ajax({
+				'url' : 'orgPasswordChange.do',
+				'data': {
+					'method' : 'generatePassword'
+				}
+			}).done(function(password){
+				container.find('.pass').val(password);
+			});
+		});
 		
 		
 		
@@ -164,7 +179,7 @@
 					<td>
 						<input type="text" id="staffPass" name="staffPass" class="pass form-control" maxlength="25"
 							   value="<bean:write name='OrgPasswordChangeForm' property='staffPass' />" />
-						<i class="fa fa-refresh" title="<fmt:message key='admin.org.password.change.generate' />"></i>
+						<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
 					</td>
 				</tr>
 				<tr class="changeContainer">
@@ -177,7 +192,7 @@
 					<td>
 						<input type="text" id="learnerPass" name="learnerPass" class="pass form-control" maxlength="25"
 							   value="<bean:write name='OrgPasswordChangeForm' property='learnerPass' />" />
-						<i class="fa fa-refresh" title="<fmt:message key='admin.org.password.change.generate' />"></i>
+						<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
 					</td>
 				</tr>
 			</table>

@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.admin.web.action;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,7 +46,7 @@ public class OrgPasswordChangeAction extends DispatchAction {
     private static Logger log = Logger.getLogger(OrgPasswordChangeAction.class);
 
     @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	DynaActionForm passForm = (DynaActionForm) form;
@@ -57,5 +59,12 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	passForm.set("learnerPass", RandomPasswordGenerator.nextPasswordValidated());
 
 	return mapping.findForward("start");
+    }
+
+    public ActionForward generatePassword(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().print(RandomPasswordGenerator.nextPasswordValidated());
+	return null;
     }
 }

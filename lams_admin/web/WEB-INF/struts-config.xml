@@ -971,6 +971,7 @@
       path="/orgPasswordChange"
       type="org.lamsfoundation.lams.admin.web.action.OrgPasswordChangeAction"
       name="OrgPasswordChangeForm"
+      parameter="method"
     >
       <forward
         name="start"
