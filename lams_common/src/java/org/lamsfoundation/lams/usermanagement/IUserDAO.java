@@ -26,6 +26,9 @@ public interface IUserDAO extends IBaseDAO {
      */
     List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchPhrase);
 
+    List<UserDTO> getAllUsersPaged(Integer organisationID, String[] roleNames, int page, int size, String sortBy,
+	    String sortOrder, String searchPhrase);
+
     /**
      * Count total number of users excluding disabled ones and applying searchString filter.
      */
@@ -40,4 +43,5 @@ public interface IUserDAO extends IBaseDAO {
     List<User> findUsers(String searchPhrase, Integer orgId, boolean includeChildOrgs);
 
     List<User> findUsersWithEmail(String email);
+
 }

@@ -45,7 +45,7 @@ public class RoleDAO extends LAMSBaseDAO implements IRoleDAO {
 	    + "uor.role.id = :roleId";
 
     private final static String COUNT_ROLE_FOR_ORG = "select count(distinct uor.userOrganisation.user) from "
-	    + UserOrganisationRole.class.getName() + " uor where uor.role.roleId = :roleId"
+	    + UserOrganisationRole.class.getName() + " uor where uor.role.roleId IN (:roleIds)"
 	    + " and uor.userOrganisation.organisation.organisationId = :orgId";
 
     @Override
@@ -55,7 +55,7 @@ public class RoleDAO extends LAMSBaseDAO implements IRoleDAO {
     }
 
     @Override
-    public Integer getCountRoleForOrg(Integer roleId, Integer orgId, String searchPhrase) {
+    public Integer getCountRoleForOrg(Integer[] roleIds, Integer orgId, String searchPhrase) {
 	StringBuilder queryTextBuilder = new StringBuilder(RoleDAO.COUNT_ROLE_FOR_ORG);
 	if (!StringUtils.isBlank(searchPhrase)) {
 	    String[] tokens = searchPhrase.trim().split("\\s+");
@@ -67,7 +67,7 @@ public class RoleDAO extends LAMSBaseDAO implements IRoleDAO {
 	}
 
 	Query query = getSession().createQuery(queryTextBuilder.toString());
-	query.setInteger("roleId", roleId.intValue());
+	query.setParameterList("roleIds", roleIds);
 	query.setInteger("orgId", orgId.intValue());
 	Object value = query.uniqueResult();
 	return new Integer(((Number) value).intValue());

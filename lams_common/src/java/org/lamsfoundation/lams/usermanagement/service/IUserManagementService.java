@@ -377,6 +377,8 @@ public interface IUserManagementService {
      */
     Integer getCountRoleForOrg(Integer orgId, Integer roleId, String searchPhrase);
 
+    Integer getCountRoleForOrg(Integer orgId, Integer[] roleIds, String searchPhrase);
+
     /**
      * Get default html theme of server.
      *
@@ -465,6 +467,9 @@ public interface IUserManagementService {
      * @return paged list of users
      */
     List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString);
+
+    List<UserDTO> getAllUsersPaged(Integer organisationID, String[] roleNames, int page, int size, String sortBy,
+	    String sortOrder, String searchString);
 
     /**
      * Get all users, except for disabled users and users that are members of filteredOrg.

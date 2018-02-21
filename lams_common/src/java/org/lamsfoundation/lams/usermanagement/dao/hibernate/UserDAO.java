@@ -16,32 +16,58 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  */
 public class UserDAO extends LAMSBaseDAO implements IUserDAO {
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchPhrase) {
+	return getAllUsersPage(
+		"SELECT user.userId, user.login, user.firstName, user.lastName, user.email, user.portraitUuid FROM User user WHERE user.disabledFlag=0 ",
+		"user", page, size, sortBy, sortOrder, searchPhrase);
+    }
 
+    @Override
+    public List<UserDTO> getAllUsersPaged(Integer organisationID, String[] roleNames, int page, int size, String sortBy,
+	    String sortOrder, String searchPhrase) {
+	String query = "SELECT DISTINCT uo.user.userId, uo.user.login, uo.user.firstName, uo.user.lastName, uo.user.email, uo.user.portraitUuid "
+		+ "FROM UserOrganisation uo INNER JOIN uo.userOrganisationRoles r WHERE uo.organisation.organisationId="
+		+ organisationID;
+	// see if roles are required and build a condition
+	String roleNamesCondition = null;
+	if (roleNames != null) {
+	    roleNamesCondition = "(";
+	    for (String role : roleNames) {
+		roleNamesCondition += "'" + role + "',";
+	    }
+	    roleNamesCondition = roleNamesCondition.substring(0, roleNamesCondition.length() - 1) + ") ";
+	}
+	if (roleNamesCondition != null) {
+	    query += " AND r.role.name IN " + roleNamesCondition;
+	}
+	return getAllUsersPage(query, "uo.user", page, size, sortBy, sortOrder, searchPhrase);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<UserDTO> getAllUsersPage(String queryText, String entityName, int page, int size, String sortBy,
+	    String sortOrder, String searchPhrase) {
 	switch (sortBy) {
 	    case "userId":
-		sortBy = "user.userId + 0 ";
+		sortBy = entityName + ".userId + 0 ";
 		break;
 	    case "login":
-		sortBy = "user.login ";
+		sortBy = entityName + ".login ";
 		break;
 	    case "firstName":
-		sortBy = "user.firstName ";
+		sortBy = entityName + ".firstName ";
 		break;
 	    case "lastName":
-		sortBy = "user.lastName ";
+		sortBy = entityName + ".lastName ";
 		break;
 	    case "email":
-		sortBy = "user.email ";
+		sortBy = entityName + ".email ";
 		break;
 	}
 
-	StringBuilder queryBuilder = new StringBuilder(
-		"SELECT user.userId, user.login, user.firstName, user.lastName, user.email, user.portraitUuid FROM User user WHERE user.disabledFlag=0 ");
+	StringBuilder queryBuilder = new StringBuilder(queryText);
 	// support for custom search from a toolbar
-	UserDAO.addNameSearch(queryBuilder, "user", searchPhrase);
+	UserDAO.addNameSearch(queryBuilder, entityName, searchPhrase);
 	//order by
 	queryBuilder.append(" ORDER BY ").append(sortBy).append(sortOrder);
 

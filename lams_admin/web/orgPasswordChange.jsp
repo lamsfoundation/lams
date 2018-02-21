@@ -10,6 +10,7 @@
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
 
 <lams:css />
+<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet" />
 <style type="text/css">
 	.changeContainer .checkbox {
 		display: inline-block;
@@ -25,12 +26,20 @@
 	h3 {
 		text-align: center;
 	}
+	#changeTable > tbody > tr > td{
+		padding-left: 50px;
+	}
+	#changeTable > tbody > tr > td:first-child {
+		border-right: thin solid black;
+		padding-right: 50px;
+	}
 </style>
 <%-- javascript --%>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 <script type="text/javascript">
      var mustHaveUppercase = ${mustHaveUppercase},
 	     mustHaveNumerics  = ${mustHaveNumerics},
@@ -123,6 +132,56 @@
 			}
 		});
 
+		var jqGridURL = "orgPasswordChange.do?method=getGridUsers&organisationID=<bean:write name='OrgPasswordChangeForm' property='organisationID' />&role=",
+			jqGridSettings = {
+				datatype		   : "json",
+			    height			   : "100%",
+			    // use new theme
+			    guiStyle 		   : "bootstrap",
+			    iconSet 		   : 'fontAwesome',
+			    autowidth		   : true,
+			    shrinkToFit 	   : true,
+			    multiselect 	   : true,
+			    multiPageSelection : true,
+			    // it gets ordered by 
+			    sortorder		   : "asc", 
+			    sortname		   : "firstName", 
+			    pager			   : true,
+			    rowNum			   : 10,
+				colNames : [
+					'<fmt:message key="admin.org.password.change.grid.name"/>',
+					'<fmt:message key="admin.org.password.change.grid.login"/>',
+					'<fmt:message key="admin.org.password.change.grid.email"/>'
+				],
+			    colModel : [
+			        {
+						   'name'  : 'name', 
+						   'index' : 'firstName',
+						   'title' : false
+					},
+					{
+					   'name'  : 'login', 
+					   'index' : 'login',
+					   'title' : false
+					},
+			        {
+					   'name'  : 'email', 
+					   'index' : 'email',
+					   'title' : false
+					}
+			    ],
+			    loadError : function(xhr,st,err) {
+			    	$.jgrid.info_dialog('<fmt:message key="admin.error"/>', 
+	    					'<fmt:message key="admin.org.password.change.grid.error.load"/>',
+	    					'<fmt:message key="label.ok"/>');
+			    }
+		};
+		
+		jqGridSettings.url = jqGridURL + 'learner'
+		$("#learnerGrid").jqGrid(jqGridSettings);
+		jqGridSettings.url = jqGridURL + 'staff'
+		$("#staffGrid").jqGrid(jqGridSettings);
+
 	});
 </script>
 
@@ -173,40 +232,6 @@
 			</lams:Alert>
 		</logic:messagesPresent>
 		
-		<div class="changeContainer form-group">
-			<table>
-				<tr class="changeContainer">
-					<td class="checkbox">
-						<label>
-							<input id="isStaffChange" name="isStaffChange" value="true" type="checkbox" checked="checked"/>
-							<fmt:message key="admin.org.password.change.is.staff" />
-						</label>
-					</td>
-					<td>
-						<input type="text" id="staffPass" name="staffPass" class="pass form-control" maxlength="25"
-						       placeholder="<fmt:message key='admin.org.password.change.custom' />"
-						       title="<fmt:message key='admin.org.password.change.custom' />"
-							   value="<bean:write name='OrgPasswordChangeForm' property='staffPass' />" />
-						<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
-					</td>
-				</tr>
-				<tr class="changeContainer">
-					<td class="checkbox">
-						<label>
-							<input id="isLearnerChange" name="isLearnerChange" value="true" type="checkbox" checked="checked"/>
-							<fmt:message key="admin.org.password.change.is.learners" />
-						</label>
-					</td>
-					<td>
-						<input type="text" id="learnerPass" name="learnerPass" class="pass form-control" maxlength="25"
-							   placeholder="<fmt:message key='admin.org.password.change.custom' />"
-						       title="<fmt:message key='admin.org.password.change.custom' />"
-							   value="<bean:write name='OrgPasswordChangeForm' property='learnerPass' />" />
-						<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
-					</td>
-				</tr>
-			</table>
-		</div>
 		<div class="form-group">
 			<div class="checkbox">
 				<label>
@@ -219,5 +244,45 @@
 				</label>
 			</div>
 		</div>
+		<table id="changeTable">
+			<tbody>
+				<tr>
+					<td class="changeContainer">
+						<div class="checkbox">
+							<label>
+								<input id="isStaffChange" name="isStaffChange" value="true" type="checkbox" checked="checked"/>
+								<fmt:message key="admin.org.password.change.is.staff" />
+							</label>
+						</div>
+						<input type="text" id="staffPass" name="staffPass" class="pass form-control" maxlength="25"
+						       placeholder="<fmt:message key='admin.org.password.change.custom' />"
+						       title="<fmt:message key='admin.org.password.change.custom' />"
+							   value="<bean:write name='OrgPasswordChangeForm' property='staffPass' />" />
+						<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
+					</td>
+					<td class="changeContainer">
+						<div class="checkbox">
+							<label>
+								<input id="isLearnerChange" name="isLearnerChange" value="true" type="checkbox" checked="checked"/>
+								<fmt:message key="admin.org.password.change.is.learners" />
+							</label>
+						</div>
+						<input type="text" id="learnerPass" name="learnerPass" class="pass form-control" maxlength="25"
+							   placeholder="<fmt:message key='admin.org.password.change.custom' />"
+						       title="<fmt:message key='admin.org.password.change.custom' />"
+							   value="<bean:write name='OrgPasswordChangeForm' property='learnerPass' />" />
+						<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<table id="staffGrid"></table>
+					</td>
+					<td>
+						<table id="learnerGrid"></table>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </form>
