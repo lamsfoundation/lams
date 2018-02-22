@@ -46,6 +46,7 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -53,6 +54,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -172,7 +174,6 @@ public class OrgPasswordChangeAction extends DispatchAction {
 
 	Boolean isStaffChange = (Boolean) passForm.get("isStaffChange");
 	Boolean isLearnerChange = (Boolean) passForm.get("isLearnerChange");
-	Set<Integer> changedUserIDs = new HashSet<Integer>();
 	// get data needed for each group
 	if (isStaffChange) {
 	    JSONArray excludedStaff = new JSONArray((String) passForm.get("excludedStaff"));
@@ -181,22 +182,36 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	    // get users from both roles and add them to the same set
 	    users.addAll(userManagementService.getUsersFromOrganisationByRole(organisationID, Role.AUTHOR, true));
 	    users.addAll(userManagementService.getUsersFromOrganisationByRole(organisationID, Role.MONITOR, true));
-	    changedUserIDs.addAll(changePassword(staffPass, users, excludedStaff, force, email));
+	    Collection<Integer> changedUserIDs = changePassword(staffPass, users, excludedStaff, force);
+	    if (email && !changedUserIDs.isEmpty()) {
+		notifyOnPasswordChange(changedUserIDs, staffPass);
+	    }
 	}
 	if (isLearnerChange) {
 	    JSONArray excludedLearners = new JSONArray((String) passForm.get("excludedLearners"));
 	    String learnerPass = (String) passForm.get("learnerPass");
 	    Collection<User> users = userManagementService.getUsersFromOrganisationByRole(organisationID, Role.LEARNER,
 		    true);
-	    changedUserIDs.addAll(changePassword(learnerPass, users, excludedLearners, force, email));
+	    Collection<Integer> changedUserIDs = changePassword(learnerPass, users, excludedLearners, force);
+	    if (email && !changedUserIDs.isEmpty()) {
+		notifyOnPasswordChange(changedUserIDs, learnerPass);
+	    }
 	}
 
 	request.setAttribute("success", true);
 	return mapping.findForward("display");
     }
 
-    private Set<Integer> changePassword(String password, Collection<User> users, JSONArray excludedUsers, boolean force,
-	    boolean email) throws JSONException {
+    private void notifyOnPasswordChange(Collection<Integer> userIDs, String password) {
+	MessageService messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+	AdminServiceProxy.getEventNotificationService(getServlet().getServletContext()).sendMessage(null,
+		userIDs.toArray(new Integer[] {}), IEventNotificationService.DELIVERY_METHOD_MAIL,
+		messageService.getMessage("admin.org.password.change.email.subject"),
+		messageService.getMessage("admin.org.password.change.email.body", new String[] { password }), false);
+    }
+
+    private Set<Integer> changePassword(String password, Collection<User> users, JSONArray excludedUsers, boolean force)
+	    throws JSONException {
 	if (!ValidationUtil.isPasswordValueValid(password, password)) {
 	    // this should have been picked up by JS validator on the page!
 	    throw new InvalidParameterException("Password does not pass validation");
