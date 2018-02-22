@@ -46,8 +46,6 @@ public class RandomPasswordGenerator {
     private static final char[] SIMPLE_PASSWORD_RANGE = ArrayUtils.addAll(ArrayUtils.addAll(UPPER_CASE, LOWER_CASE),
 	    DIGITS);
 
-    private static final char[] FULL_PASSWORD_RANGE = ArrayUtils.addAll(SIMPLE_PASSWORD_RANGE, SYMBOLS);
-
     private static final char NULL_CHAR = '\u0000';
 
     private static final int MINIMUM_PASSWORD_LENGTH = 10;
@@ -93,7 +91,7 @@ public class RandomPasswordGenerator {
 	// fill other characters
 	for (index = 0; index < length; index++) {
 	    if (res[index] == NULL_CHAR) {
-		res[index] = FULL_PASSWORD_RANGE[generator.nextInt(FULL_PASSWORD_RANGE.length)];
+		res[index] = SIMPLE_PASSWORD_RANGE[generator.nextInt(SIMPLE_PASSWORD_RANGE.length)];
 	    }
 	}
 
