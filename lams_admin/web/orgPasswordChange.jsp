@@ -33,8 +33,19 @@
 		border-right: thin solid black;
 		padding-right: 50px;
 	}
+	
+	.jqgh_cbox {
+		visibility: hidden;
+	}
+	
+	.ui-jqgrid-btable tr[role="row"] {
+		cursor: pointer;	
+	}
+	
+	.ui-jqgrid-btable tr.success > td {
+		background-color: transparent !important;
+	}
 </style>
-<%-- javascript --%>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
@@ -44,7 +55,9 @@
      var mustHaveUppercase = ${mustHaveUppercase},
 	     mustHaveNumerics  = ${mustHaveNumerics},
 	     mustHaveLowercase  = ${mustHaveLowercase},
-	     mustHaveSymbols   = ${mustHaveSymbols};
+	     mustHaveSymbols   = ${mustHaveSymbols},
+	     excludedLearners = JSON.parse("<bean:write name='OrgPasswordChangeForm' property='excludedLearners' />"),
+	     excludedStaff = JSON.parse("<bean:write name='OrgPasswordChangeForm' property='excludedStaff' />");
 
      $.validator.addMethod("pwcheck", function(value) {
 	      return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
@@ -147,7 +160,7 @@
 			    sortorder		   : "asc", 
 			    sortname		   : "firstName", 
 			    pager			   : true,
-			    rowNum			   : 10,
+			    rowNum			   : 3,
 				colNames : [
 					'<fmt:message key="admin.org.password.change.grid.name"/>',
 					'<fmt:message key="admin.org.password.change.grid.login"/>',
@@ -170,6 +183,34 @@
 					   'title' : false
 					}
 			    ],
+			    onSelectRow : function(id, status, event) {
+				    var grid = $(this),
+						excluded = grid.data('excluded'),
+						index = excluded.indexOf(+id);
+					// if row is deselected, add it to excluded array
+					if (index < 0) {
+						if (!status) {
+							excluded.push(+id);
+						}
+					} else if (status) {
+						excluded.splice(index, 1);
+					}
+				},
+				gridComplete : function(){
+					var grid = $(this),
+						// get excludedLearners or excludedStaff
+						excluded = grid.data('excluded');
+					// go through each loaded row
+					$('[role="row"]', grid).each(function(){
+						var id = +$(this).attr('id'),
+							selected = $(this).hasClass('success');
+						// if row is not selected and is not excluded, select it
+						if (!selected && !excluded.includes(id)) {
+							// select without triggering onSelectRow
+							grid.jqGrid('setSelection', id, false);
+						}
+					});
+				},
 			    loadError : function(xhr,st,err) {
 			    	$.jgrid.info_dialog('<fmt:message key="admin.error"/>', 
 	    					'<fmt:message key="admin.org.password.change.grid.error.load"/>',
@@ -178,9 +219,9 @@
 		};
 		
 		jqGridSettings.url = jqGridURL + 'learner'
-		$("#learnerGrid").jqGrid(jqGridSettings);
+		$("#learnerGrid").data('excluded', excludedLearners).jqGrid(jqGridSettings);
 		jqGridSettings.url = jqGridURL + 'staff'
-		$("#staffGrid").jqGrid(jqGridSettings);
+		$("#staffGrid").data('excluded', excludedStaff).jqGrid(jqGridSettings);
 
 	});
 </script>

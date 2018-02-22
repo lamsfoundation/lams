@@ -165,8 +165,8 @@
 	<form-property name="orgName" type="java.lang.String" />
 	<form-property name="isStaffChange" type="java.lang.Boolean" initial="1" />
 	<form-property name="isLearnerChange" type="java.lang.Boolean" initial="1" />
-	<form-property name="learners" type="java.lang.String" />
-	<form-property name="staff" type="java.lang.String" />
+	<form-property name="excludedLearners" type="java.lang.String" initial="[]"/>
+	<form-property name="excludedStaff" type="java.lang.String" initial="[]"/>
 	<form-property name="learnerPass" type="java.lang.String" />
 	<form-property name="staffPass" type="java.lang.String" />
 	<form-property name="email" type="java.lang.Boolean" initial="0" />
