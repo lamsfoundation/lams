@@ -1,8 +1,7 @@
 <%@ include file="/taglibs.jsp"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
+
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-<%@ page import="org.apache.struts.action.ActionMessages"%>
 <c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
 <c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
@@ -50,6 +49,11 @@
 	
 	.ui-jqgrid-btable tr.success > td {
 		background-color: transparent !important;
+	}
+	
+	#formValidationErrors {
+		display: none;
+		text-align: center;		
 	}
 </style>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -120,18 +124,17 @@
 		
 		// Setup form validation 
 		$("#OrgPasswordChangeForm").validate({
-			debug : true,
-			errorClass : 'help-block',
-			//  validation rules
+			errorLabelContainer : '#formValidationErrors',
+			errorClass : 'errorMessage',
 			rules : {
-				learnerPassword : {
+				learnerPass : {
 					required: false,
 					minlength : <c:out value="${minNumChars}"/>,
 					maxlength : 25,
 					charactersAllowed : true,
 					pwcheck : true
 				},
-				staffPassword: {
+				staffPass: {
 					required: false,
 					minlength : <c:out value="${minNumChars}"/>,
 					maxlength : 25,
@@ -143,17 +146,17 @@
 
 			// Specify the validation error messages
 			messages : {
-				learnerPassword : {
+				learnerPass : {
 					required : "<fmt:message key='error.password.empty'/>",
-					minlength : "<fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message>",
-					maxlength : "<fmt:message key='label.password.max.length'/>",
+					minlength : "<fmt:message key='admin.org.password.change.error.prefix.learner'/> <fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message>",
+					maxlength : "<fmt:message key='admin.org.password.change.error.prefix.learner'/> <fmt:message key='label.password.max.length'/>",
 					charactersAllowed : "<fmt:message key='label.password.symbols.allowed'/> ` ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] \ | : ; \" ' < > , . ? /",
 					pwcheck : "<fmt:message key='label.password.restrictions'/>"
 				},
-				staffPassword: {
+				staffPass: {
 					required : "<fmt:message key='error.password.empty'/>",
-					minlength : "<fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message>",
-					maxlength : "<fmt:message key='label.password.max.length'/>",
+					minlength : "<fmt:message key='admin.org.password.change.error.prefix.staff'/> <fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message>",
+					maxlength : "<fmt:message key='admin.org.password.change.error.prefix.staff'/> <fmt:message key='label.password.max.length'/>",
 					charactersAllowed : "<fmt:message key='label.password.symbols.allowed'/> ` ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] \ | : ; \" ' < > , . ? /",
 					pwcheck : "<fmt:message key='label.password.restrictions'/>"
 				}
@@ -161,6 +164,8 @@
 			},
 
 			submitHandler : function(form) {
+				$('#excludedLearners').val(JSON.stringify(excludedLearners));
+				$('#excludedStaff').val(JSON.stringify(excludedStaff));
 				form.submit();
 			}
 		});
@@ -188,9 +193,9 @@
 				],
 			    colModel : [
 			        {
-						   'name'  : 'name', 
-						   'index' : 'firstName',
-						   'title' : false
+					   'name'  : 'name', 
+					   'index' : 'firstName',
+					   'title' : false
 					},
 					{
 					   'name'  : 'login', 
@@ -251,47 +256,44 @@
 	<fmt:message key="admin.user.manage" /></a>
 </p>
 
-<form id="OrgPasswordChangeForm" action="orgPasswordChange.do" method="post">
-	<div class="panel panel-default panel-body">
-		<h3><bean:write name='OrgPasswordChangeForm' property='orgName' /></h3>
-		<lams:Alert type="info" id="passwordConditions" close="false">
-			<fmt:message key='label.password.must.contain' />:
-			<ul class="list-unstyled" style="line-height: 1.2">
+<div class="panel panel-default panel-body">
+	<h3><bean:write name='OrgPasswordChangeForm' property='orgName' /></h3>
+	
+	<lams:Alert type="info" id="passwordConditions" close="false">
+		<fmt:message key='label.password.must.contain' />:
+		<ul class="list-unstyled" style="line-height: 1.2">
+			<li><span class="fa fa-check"></span> <fmt:message
+					key='label.password.min.length'>
+					<fmt:param value='${minNumChars}' />
+				</fmt:message></li>
+
+			<c:if test="${mustHaveUppercase}">
 				<li><span class="fa fa-check"></span> <fmt:message
-						key='label.password.min.length'>
-						<fmt:param value='${minNumChars}' />
-					</fmt:message></li>
+						key='label.password.must.ucase' /></li>
+			</c:if>
+			<c:if test="${mustHaveLowercase}">
+				<li><span class="fa fa-check"></span> <fmt:message
+						key='label.password.must.lcase' /></li>
+			</c:if>
 
-				<c:if test="${mustHaveUppercase}">
-					<li><span class="fa fa-check"></span> <fmt:message
-							key='label.password.must.ucase' /></li>
-				</c:if>
-				<c:if test="${mustHaveLowercase}">
-					<li><span class="fa fa-check"></span> <fmt:message
-							key='label.password.must.lcase' /></li>
-				</c:if>
-
-				<c:if test="${mustHaveNumerics}">
-					<li><span class="fa fa-check"></span> <fmt:message
-							key='label.password.must.number' /></li>
-				</c:if>
+			<c:if test="${mustHaveNumerics}">
+				<li><span class="fa fa-check"></span> <fmt:message
+						key='label.password.must.number' /></li>
+			</c:if>
 
 
-				<c:if test="${mustHaveSymbols}">
-					<li><span class="fa fa-check"></span> <fmt:message
-							key='label.password.must.symbol' /></li>
-				</c:if>
-			</ul>
-			
-		</lams:Alert>
-		<logic:messagesPresent>
-			<lams:Alert type="danger" id="form-error" close="false">
-				<html:messages id="error">
-					<c:out value="${error}" escapeXml="false" />
-					<br />
-				</html:messages>
-			</lams:Alert>
-		</logic:messagesPresent>
+			<c:if test="${mustHaveSymbols}">
+				<li><span class="fa fa-check"></span> <fmt:message
+						key='label.password.must.symbol' /></li>
+			</c:if>
+		</ul>
+		
+	</lams:Alert>
+	
+	<form id="OrgPasswordChangeForm" action="orgPasswordChange.do" method="post">
+		<input type="hidden" name="method" value="changePassword" />
+		<input type="hidden" id="excludedLearners" name="excludedLearners" value="[]" />
+		<input type="hidden" id="excludedStaff" name="excludedStaff" value="[]" />
 		
 		<div class="form-group">
 			<div class="checkbox">
@@ -304,6 +306,16 @@
 					<input name="force" value="true" type="checkbox"/><fmt:message key="admin.org.password.change.force" />
 				</label>
 			</div>
+		</div>
+		
+		<c:if test="${success}">
+			<lams:Alert type="info" id="passwordConditions" close="false">
+				<h4><fmt:message key="admin.org.password.change.success" /></h4>
+			</lams:Alert>
+		</c:if>
+		
+		<div id="formValidationErrors">
+			<ul></ul>
 		</div>
 		<h4><fmt:message key="admin.org.password.change.choose" /></h4>
 		<table id="changeTable">
@@ -326,7 +338,7 @@
 						<div class="checkbox">
 							<label>
 								<input id="isLearnerChange" name="isLearnerChange" value="true" type="checkbox" checked="checked"/>
-								<fmt:message key="admin.org.password.change.is.learners" />
+								<fmt:message key="admin.org.password.change.is.learner" />
 							</label>
 						</div>
 						<input type="text" id="learnerPass" name="learnerPass" class="pass form-control" maxlength="25"
@@ -346,5 +358,8 @@
 				</tr>
 			</tbody>
 		</table>
-	</div>
-</form>
+		<div class="pull-right voffset20">
+			<input type="submit" class="btn btn-primary" value="<fmt:message key='admin.org.password.change.submit' />" />
+		</div>
+	</form>
+</div>

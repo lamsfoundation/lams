@@ -974,7 +974,7 @@
       parameter="method"
     >
       <forward
-        name="start"
+        name="display"
         path=".orgPasswordChange"
         redirect="false"
       />

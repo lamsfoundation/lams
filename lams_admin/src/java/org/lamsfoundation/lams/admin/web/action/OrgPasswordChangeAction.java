@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.admin.web.action;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,8 +45,10 @@ import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -67,7 +70,7 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	passForm.set("staffPass", RandomPasswordGenerator.nextPasswordValidated());
 	passForm.set("learnerPass", RandomPasswordGenerator.nextPasswordValidated());
 
-	return mapping.findForward("start");
+	return mapping.findForward("display");
     }
 
     public ActionForward generatePassword(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -139,6 +142,44 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(resultJSON.toString());
 	return null;
+    }
+
+    public ActionForward changePassword(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, JSONException {
+	UserDTO userDTO = getUserDTO();
+	Integer currentUserId = userDTO.getUserID();
+	if (!AdminServiceProxy.getSecurityService(getServlet().getServletContext()).isSysadmin(currentUserId,
+		"org password change", false)) {
+	    String warning = "User " + currentUserId + " is not a sysadmin";
+	    log.warn(warning);
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
+	    return null;
+	}
+
+	DynaActionForm passForm = (DynaActionForm) form;
+	Integer organisationID = (Integer) passForm.get(AttributeNames.PARAM_ORGANISATION_ID);
+	Boolean email = (Boolean) passForm.get("email");
+	Boolean force = (Boolean) passForm.get("force");
+
+	Boolean isStaffChange = (Boolean) passForm.get("isStaffChange");
+	Boolean isLearnerChange = (Boolean) passForm.get("isLearnerChange");
+	if (isStaffChange) {
+	    JSONArray excludedStaff = new JSONArray((String) passForm.get("excludedStaff"));
+	    String staffPass = (String) passForm.get("staffPass");
+	}
+	if (isLearnerChange) {
+	    JSONArray excludedLearners = new JSONArray((String) passForm.get("excludedLearners"));
+	    String learnerPass = (String) passForm.get("learnerPass");
+	}
+
+	request.setAttribute("success", true);
+	return mapping.findForward("display");
+    }
+
+    private void changePassword(String password, List<User> users, boolean force, boolean email) {
+	if (!ValidationUtil.isPasswordValueValid(password, password)) {
+	    throw new InvalidParameterException("Password does not pass validation");
+	}
     }
 
     private UserDTO getUserDTO() {
