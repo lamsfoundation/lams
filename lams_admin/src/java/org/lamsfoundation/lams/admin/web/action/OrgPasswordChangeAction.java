@@ -25,7 +25,11 @@ package org.lamsfoundation.lams.admin.web.action;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,6 +52,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -66,7 +71,8 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	IUserManagementService userManagementService = AdminServiceProxy.getService(getServlet().getServletContext());
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
 	passForm.set(AttributeNames.PARAM_ORGANISATION_NAME, organisation.getName());
-
+	passForm.set("isStaffChange", true);
+	passForm.set("isLearnerChange", true);
 	passForm.set("staffPass", RandomPasswordGenerator.nextPasswordValidated());
 	passForm.set("learnerPass", RandomPasswordGenerator.nextPasswordValidated());
 
@@ -144,10 +150,12 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	return null;
     }
 
+    @SuppressWarnings({ "unchecked" })
     public ActionForward changePassword(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException {
 	UserDTO userDTO = getUserDTO();
 	Integer currentUserId = userDTO.getUserID();
+	// security check
 	if (!AdminServiceProxy.getSecurityService(getServlet().getServletContext()).isSysadmin(currentUserId,
 		"org password change", false)) {
 	    String warning = "User " + currentUserId + " is not a sysadmin";
@@ -156,6 +164,7 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	    return null;
 	}
 
+	IUserManagementService userManagementService = AdminServiceProxy.getService(getServlet().getServletContext());
 	DynaActionForm passForm = (DynaActionForm) form;
 	Integer organisationID = (Integer) passForm.get(AttributeNames.PARAM_ORGANISATION_ID);
 	Boolean email = (Boolean) passForm.get("email");
@@ -163,23 +172,61 @@ public class OrgPasswordChangeAction extends DispatchAction {
 
 	Boolean isStaffChange = (Boolean) passForm.get("isStaffChange");
 	Boolean isLearnerChange = (Boolean) passForm.get("isLearnerChange");
+	Set<Integer> changedUserIDs = new HashSet<Integer>();
+	// get data needed for each group
 	if (isStaffChange) {
 	    JSONArray excludedStaff = new JSONArray((String) passForm.get("excludedStaff"));
 	    String staffPass = (String) passForm.get("staffPass");
+	    Set<User> users = new HashSet<User>();
+	    // get users from both roles and add them to the same set
+	    users.addAll(userManagementService.getUsersFromOrganisationByRole(organisationID, Role.AUTHOR, true));
+	    users.addAll(userManagementService.getUsersFromOrganisationByRole(organisationID, Role.MONITOR, true));
+	    changedUserIDs.addAll(changePassword(staffPass, users, excludedStaff, force, email));
 	}
 	if (isLearnerChange) {
 	    JSONArray excludedLearners = new JSONArray((String) passForm.get("excludedLearners"));
 	    String learnerPass = (String) passForm.get("learnerPass");
+	    Collection<User> users = userManagementService.getUsersFromOrganisationByRole(organisationID, Role.LEARNER,
+		    true);
+	    changedUserIDs.addAll(changePassword(learnerPass, users, excludedLearners, force, email));
 	}
 
 	request.setAttribute("success", true);
 	return mapping.findForward("display");
     }
 
-    private void changePassword(String password, List<User> users, boolean force, boolean email) {
+    private Set<Integer> changePassword(String password, Collection<User> users, JSONArray excludedUsers, boolean force,
+	    boolean email) throws JSONException {
 	if (!ValidationUtil.isPasswordValueValid(password, password)) {
+	    // this should have been picked up by JS validator on the page!
 	    throw new InvalidParameterException("Password does not pass validation");
 	}
+	Set<Integer> changedUserIDs = new TreeSet<Integer>();
+	IUserManagementService userManagementService = AdminServiceProxy.getService(getServlet().getServletContext());
+	for (User user : users) {
+	    boolean excluded = false;
+	    // skip excluded (unchecked on the page) users
+	    for (int index = 0; index < excludedUsers.length(); index++) {
+		Integer excludedUserID = excludedUsers.getInt(index);
+		if (user.getUserId().equals(excludedUserID)) {
+		    excluded = true;
+		    break;
+		}
+	    }
+	    if (excluded) {
+		continue;
+	    }
+	    // change password
+	    String salt = HashUtil.salt();
+	    user.setSalt(salt);
+	    user.setPassword(HashUtil.sha256(password, salt));
+	    if (force) {
+		user.setChangePassword(true);
+	    }
+	    userManagementService.saveUser(user);
+	    changedUserIDs.add(user.getUserId());
+	}
+	return changedUserIDs;
     }
 
     private UserDTO getUserDTO() {

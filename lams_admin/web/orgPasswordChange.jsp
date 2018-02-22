@@ -18,6 +18,7 @@
 	.changeContainer .pass {
 		display: inline-block;
 		margin-left: 20px;
+		margin-right: 10px;
 		width: 260px;
 	}
 	
@@ -93,14 +94,16 @@
 										}
 										
 										var	enabled = checkbox.prop('checked'),
-											grid = $('#' + checkbox.data('grid')).closest('.ui-jqgrid');
+											grid = $('#' + checkbox.data('grid')).closest('.ui-jqgrid'),
+											pass = checkbox.closest('.changeContainer').find('.pass');
 										// disable/enable password input depending on checkbox state
-										checkbox.closest('.changeContainer').find('.pass').prop('disabled', !enabled);
 										// hide/show users grid
 										if (enabled) {
 											grid.slideDown();
+											pass.prop('disabled', false);
 										} else {
 											grid.slideUp();
+											pass.val(null).prop('disabled', true);
 										}
 									});
 
@@ -235,6 +238,8 @@
 							grid.jqGrid('setSelection', id, false);
 						}
 					});
+
+					changeCheckboxes.trigger('change');
 				},
 			    loadError : function(xhr,st,err) {
 			    	$.jgrid.info_dialog('<fmt:message key="admin.error"/>', 
@@ -290,20 +295,22 @@
 		
 	</lams:Alert>
 	
-	<form id="OrgPasswordChangeForm" action="orgPasswordChange.do" method="post">
+	<html:form action="orgPasswordChange.do" styleId="OrgPasswordChangeForm">
 		<input type="hidden" name="method" value="changePassword" />
-		<input type="hidden" id="excludedLearners" name="excludedLearners" value="[]" />
-		<input type="hidden" id="excludedStaff" name="excludedStaff" value="[]" />
+		<html:hidden property="organisationID" />
+		<html:hidden property="orgName" />
+		<html:hidden property="excludedLearners" styleId="excludedLearners" />
+		<html:hidden property="excludedStaff" styleId="excludedStaff" />
 		
 		<div class="form-group">
 			<div class="checkbox">
 				<label>
-					<input name="email" value="true" type="checkbox"/><fmt:message key="admin.org.password.change.email" />
+					<html:checkbox property="email"><fmt:message key="admin.org.password.change.email" /></html:checkbox>
 				</label>
 			</div>
 			<div class="checkbox">
 				<label>
-					<input name="force" value="true" type="checkbox"/><fmt:message key="admin.org.password.change.force" />
+					<html:checkbox property="force"><fmt:message key="admin.org.password.change.force" /></html:checkbox>
 				</label>
 			</div>
 		</div>
@@ -324,27 +331,25 @@
 					<td class="changeContainer">
 						<div class="checkbox">
 							<label>
-								<input id="isStaffChange" name="isStaffChange" value="true" type="checkbox" checked="checked"/>
-								<fmt:message key="admin.org.password.change.is.staff" />
+								<html:checkbox property="isStaffChange" styleId="isStaffChange">
+									<fmt:message key="admin.org.password.change.is.staff" />
+								</html:checkbox>
 							</label>
 						</div>
-						<input type="text" id="staffPass" name="staffPass" class="pass form-control" maxlength="25"
-						       placeholder="<fmt:message key='admin.org.password.change.custom' />"
-						       title="<fmt:message key='admin.org.password.change.custom' />"
-							   value="<bean:write name='OrgPasswordChangeForm' property='staffPass' />" />
+						<html:text property="staffPass" styleId="staffPass" styleClass="pass form-control" maxlength="25"
+								   title="<fmt:message key='admin.org.password.change.custom' />" />
 						<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
 					</td>
 					<td class="changeContainer">
 						<div class="checkbox">
 							<label>
-								<input id="isLearnerChange" name="isLearnerChange" value="true" type="checkbox" checked="checked"/>
-								<fmt:message key="admin.org.password.change.is.learner" />
+								<html:checkbox property="isLearnerChange" styleId="isLearnerChange">
+									<fmt:message key="admin.org.password.change.is.learner" />
+								</html:checkbox>
 							</label>
 						</div>
-						<input type="text" id="learnerPass" name="learnerPass" class="pass form-control" maxlength="25"
-							   placeholder="<fmt:message key='admin.org.password.change.custom' />"
-						       title="<fmt:message key='admin.org.password.change.custom' />"
-							   value="<bean:write name='OrgPasswordChangeForm' property='learnerPass' />" />
+						<html:text property="learnerPass" styleId="learnersPass" styleClass="pass form-control" maxlength="25"
+							   title="<fmt:message key='admin.org.password.change.custom' />" />
 						<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
 					</td>
 				</tr>
@@ -361,5 +366,5 @@
 		<div class="pull-right voffset20">
 			<input type="submit" class="btn btn-primary" value="<fmt:message key='admin.org.password.change.submit' />" />
 		</div>
-	</form>
+	</html:form>
 </div>
