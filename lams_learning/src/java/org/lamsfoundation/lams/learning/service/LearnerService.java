@@ -91,6 +91,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * This class is a facade over the Learning middle tier.
@@ -118,6 +119,7 @@ public class LearnerService implements ICoreLearnerService {
     private static HashMap<Integer, Long> syncMap = new HashMap<Integer, Long>();
     private IGradebookService gradebookService;
     private ILogEventService logEventService;
+    private MessageService messageService;
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
@@ -216,6 +218,10 @@ public class LearnerService implements ICoreLearnerService {
 
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
+    }
+
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
     }
 
     // ---------------------------------------------------------------------
@@ -646,8 +652,10 @@ public class LearnerService implements ICoreLearnerService {
 	}
 	// }
 	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_FINISH, learnerId,
-		null, progress.getLesson().getLessonId(),
-		activity.getActivityId(), "ADD COMMENT HERE");
+		learnerId, progress.getLesson().getLessonId(),
+		activity.getActivityId(), 
+		messageService.getMessage(ProgressEngine.AUDIT_ACTIVITY_STOP_KEY, new Object[] { progress.getUser().getLogin(),
+			progress.getUser().getUserId(), activity.getTitle(), activity.getActivityId() }));
     }
 
     @Override

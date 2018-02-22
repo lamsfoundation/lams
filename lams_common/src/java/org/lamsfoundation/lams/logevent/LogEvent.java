@@ -79,7 +79,7 @@ public class LogEvent implements Serializable {
     private Date occurredDateTime;
 
     /**  */
-    private Integer targetUserId;
+    private User targetUser;
 
     /**  */
     private Long lessonId;
@@ -150,12 +150,12 @@ public class LogEvent implements Serializable {
     /**
      *
      */
-    public Integer getTargetUserId() {
-	return targetUserId;
+    public User getTargetUser() {
+	return targetUser;
     }
 
-    public void setTargetUserId(Integer targetUserId) {
-	this.targetUserId = targetUserId;
+    public void setTargetUser(User targetUser) {
+	this.targetUser = targetUser;
     }
 
     /**

@@ -98,6 +98,7 @@ public interface ILogEventService {
     /* ***************************** Helper methods used by tools to keep the audit entries consistent *****************/
     void logChangeLearnerContent(Long learnerUserId, String learnerUserLogin, Long toolContentId, String originalText,
 	    String newText);
+    void logChangeLearnerArbitraryChange(Long learnerUserId, String learnerUserLogin, Long toolContentId, String message);
 
     void logMarkChange(Long learnerUserId, String learnerUserLogin, Long toolContentId, String originalMark,
 	    String newMark);
@@ -111,4 +112,5 @@ public interface ILogEventService {
     void logFinishEditingActivityInMonitor(Long toolContentId);
 
     void logCancelEditingActivityInMonitor(Long toolContentId);
+    
 }

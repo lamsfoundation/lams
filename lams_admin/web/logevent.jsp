@@ -20,6 +20,8 @@
 
 	<fmt:message key="label.lesson.with.name" var="LESSON_LABEL_VAR"><fmt:param value="{0}"/></fmt:message>
 	const LESSON_LABEL = '<c:out value="${LESSON_LABEL_VAR}" />';
+	<fmt:message key="label.activity.with.name" var="ACTIVITY_LABEL_VAR"><fmt:param value="{0}"/></fmt:message>
+	const ACTIVITY_LABEL = '<c:out value="${ACTIVITY_LABEL_VAR}" />';
 
 	var areaMenu, 
 		typeMenu,
@@ -40,10 +42,11 @@
 		}
 		typeMenu = document.getElementById("typeMenu");
 		
-		$("#endDatePicker").datetimepicker();
+		$("#endDatePicker").datepicker();
 		var now = new Date();
 		$("#endDatePicker").datepicker( "setDate", now );
-		$("#startDatePicker").datetimepicker();
+		$("#startDatePicker").datepicker();
+		debugger;
 		var startDateParts = "${startDate}".split("-"); 	// YYYY-MM-DD
 		if ( startDateParts.length == 3 ) {
 			var startDate = new Date(startDateParts[0], startDateParts[1]-1, startDateParts[2]);
@@ -58,7 +61,7 @@
 		    sortInitialOrder: 'desc',
 		    sortList: [[0]],
 		    widgets: [ "uitheme", "resizable", "filter" ],
-		    headers: { 0: { filter: false}, 1: { filter: false, sorter: false}, 2: { filter: false, sorter: false}, 3: { filter: false, sort: false} }, 
+		    headers: { 0: { filter: false}, 1: { filter: false, sorter: false}, 2: { filter: false, sorter: false}, 3: { filter: false, sorter: false}, 4: { filter: false, sorter: false},  }, 
 		    sortList : [[0,1]],
 		    widgetOptions: {
 		    	resizable: true,
@@ -118,13 +121,39 @@
 							rows += '</td>';
 
 							rows += '<td>';
-							if ( logData['lesson'] && logData['description'] ) {
-								debugger;
-								rows += LESSON_LABEL.replace('{0}',logData['lesson'])+'<BR/>'+logData['description'];
-							} else if ( logData['lesson'] ) {
-								rows += 	logData['lesson'];
-							} else if ( logData['description'] ) {
-								rows += 	logData['description'];
+							if ( logData['targetUserId'] ) {
+								rows += 	definePortraitPopover(logData['targetUserPortraitId'], logData['targetUserId'], logData['targetUserName'], logData['targetUserName']);
+							} else {
+								rows += '-';
+							}
+							rows += '</td>';
+
+							rows += '<td>';
+							var lesson = null, activity = null, description = null, lineCount = 0;
+							if ( logData['lessonId'] ) {
+								lesson = LESSON_LABEL.replace('{0}',logData['lessonName']).replace('{1}',logData['lessonId']);
+								lineCount++;
+							}
+							if ( logData['activityId'] ) {
+								activity = ACTIVITY_LABEL.replace('{0}',logData['activityName']).replace('{1}',logData['activityId']);
+								lineCount++;
+							}
+							if ( logData['description'] ) {
+								description = logData['description'];
+								lineCount++;
+							}
+							if ( lesson != null ) {
+								rows+=lesson; 
+								if ( lineCount > 1 )
+									rows+='<BR/>';
+							}
+							if ( activity != null ) {
+								rows+=activity; 
+								if ( lineCount > 1 )
+									rows+='<BR/>';
+							}
+							if ( description != null ) {
+								rows+=description; 
 							}
 							rows += '</td>';
 
@@ -209,6 +238,8 @@
 
 <p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
+<p>${startDate}</p>
+
 	<div class="form form-inline">
 		<span><select id="areaMenu" class="form-control" onchange="javascript:configureTypeDropdown(this.value)"></select>&nbsp;
 		<select id="typeMenu" class="form-control"></select></span>
@@ -219,10 +250,11 @@
 	</div>
 
 	<div class="voffset10">	
-	<lams:TSTable numColumns="4" dataId="data-session-id='1'">
+	<lams:TSTable numColumns="5" dataId="data-session-id='1'">
 			<th style="width:20%"><fmt:message key="label.date"/></th>
 			<th><fmt:message key="label.event.type"/></th>
-			<th><fmt:message key="admin.user.login"/></th>
+			<th style="width:10%"><fmt:message key="audit.change.made.by"/></th>
+			<th style="width:10%"><fmt:message key="audit.change.made.to"/></th>
 			<th></th>
 	</lams:TSTable>
 	</div>

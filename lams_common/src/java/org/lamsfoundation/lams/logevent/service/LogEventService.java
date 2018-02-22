@@ -97,10 +97,11 @@ public class LogEventService implements ILogEventService {
     public void logEvent(Integer logEventTypeId, Integer userId, Integer targetUserId, Long lessonId, Long activityId,
 	    String description, Date eventDate) {
 	User user = (userId != null) ? (User) userManagementService.findById(User.class, userId) : null;
+	User targetUser = (targetUserId != null) ? (User) userManagementService.findById(User.class, targetUserId) : null;
 	LogEvent logEvent = new LogEvent();
 	logEvent.setLogEventTypeId(logEventTypeId);
 	logEvent.setUser(user);
-	logEvent.setTargetUserId(targetUserId);
+	logEvent.setTargetUser(targetUser);
 	logEvent.setLessonId(lessonId);
 	logEvent.setActivityId(activityId);
 	logEvent.setDescription(description);
@@ -166,11 +167,10 @@ public class LogEventService implements ILogEventService {
 	return null;
     }
 
-    // can I replace module name with tool signature?
     @Override
     public void logChangeLearnerContent(Long learnerUserId, String learnerUserLogin, Long toolContentId,
 	    String originalText, String newText) {
-	String[] args = new String[4];
+	Object[] args = new Object[5];
 	args[0] = learnerUserLogin + "(" + learnerUserId + ")";
 	args[1] = originalText;
 	args[2] = newText;
@@ -181,7 +181,7 @@ public class LogEventService implements ILogEventService {
     @Override
     public void logMarkChange(Long learnerUserId, String learnerUserLogin, Long toolContentId, String originalMark,
 	    String newMark) {
-	String[] args = new String[4];
+	Object[] args = new Object[5];
 	args[0] = learnerUserLogin + "(" + learnerUserId + ")";
 	args[1] = originalMark;
 	args[2] = newMark;
@@ -191,7 +191,7 @@ public class LogEventService implements ILogEventService {
     @Override
     public void logHideLearnerContent(Long learnerUserId, String learnerUserLogin, Long toolContentId,
 	    String hiddenItem) {
-	String[] args = new String[3];
+	Object[] args = new Object[4];
 	args[0] = learnerUserLogin + "(" + learnerUserId + ")";
 	args[1] = hiddenItem;
 	logLearnerChange(LogEvent.TYPE_LEARNER_CONTENT_SHOW_HIDE, learnerUserId, toolContentId, AUDIT_HIDE_I18N_KEY,
@@ -201,7 +201,7 @@ public class LogEventService implements ILogEventService {
     @Override
     public void logShowLearnerContent(Long learnerUserId, String learnerUserLogin, Long toolContentId,
 	    String hiddenItem) {
-	String[] args = new String[3];
+	Object[] args = new Object[4];
 	args[0] = learnerUserLogin + "(" + learnerUserId + ")";
 	args[1] = hiddenItem;
 	logLearnerChange(LogEvent.TYPE_LEARNER_CONTENT_SHOW_HIDE, learnerUserId, toolContentId, AUDIT_SHOW_I18N_KEY,
@@ -209,25 +209,42 @@ public class LogEventService implements ILogEventService {
     }
 
     private void logLearnerChange(int eventType, Long learnerUserId, Long toolContentId, String messageKey,
-	    String[] args) {
+	    Object[] args) {
 	Long lessonId = null;
 	Long activityId = null;
-	String toolSignature = null;
 	if (toolContentId != null) {
-	    // ToolActivity toolActivity = 
-	    Object[] ids = lessonDAO.getLessonActivityForActivity(toolContentId);
+	    Object[] ids = lessonDAO.getLessonActivityIdsForToolContentId(toolContentId);
 	    if (ids != null) {
 		lessonId = (Long) ids[0];
 		activityId = (Long) ids[1];
-		toolSignature = (String) ids[2];
 	    }
 	}
-
-	args[args.length - 1] = toolSignature;
-	logEvent(eventType, getCurrentUserId(), learnerUserId != null ? learnerUserId.intValue() : null, lessonId,
+	UserDTO currentUser = getCurrentUser();
+	
+	args[args.length - 1] = currentUser.getUserID();
+	args[args.length - 2] = currentUser.getLogin();
+	logEvent(eventType, currentUser.getUserID(), learnerUserId != null ? learnerUserId.intValue() : null, lessonId,
 		activityId, messageService.getMessage(messageKey, args));
     }
 
+    @Override
+    // Use for unusual changes such as adding/removing file
+    public void logChangeLearnerArbitraryChange(Long learnerUserId, String learnerUserLogin, Long toolContentId, String message) {
+	Long lessonId = null;
+	Long activityId = null;
+	if (toolContentId != null) {
+	    // ToolActivity toolActivity = 
+	    Object[] ids = lessonDAO.getLessonActivityIdsForToolContentId(toolContentId);
+	    if (ids != null) {
+		lessonId = (Long) ids[0];
+		activityId = (Long) ids[1];
+	    }
+	}
+	
+	logEvent(LogEvent.TYPE_LEARNER_CONTENT_UPDATED, getCurrentUserId(), learnerUserId != null ? learnerUserId.intValue() : null, lessonId,
+		activityId, message);
+    }
+    
     @Override
     public void logStartEditingActivityInMonitor(Long toolContentId) {
 	logEditActivityInMonitor(toolContentId, AUDIT_STARTED_EDITING_I18N_KEY);
@@ -247,28 +264,26 @@ public class LogEventService implements ILogEventService {
 
 	Number lessonId = null;
 	Number activityId = null;
-	String toolSignature = null;
 	if (toolContentId != null) {
 	    // ToolActivity toolActivity = 
-	    Object[] ids = lessonDAO.getLessonActivityForActivity(toolContentId);
+	    Object[] ids = lessonDAO.getLessonActivityIdsForToolContentId(toolContentId);
 	    if (ids != null) {
 		lessonId = (Number) ids[0];
 		activityId = (Number) ids[1];
-		toolSignature = (String) ids[2];
 	    }
 	}
 
 	UserDTO user = getCurrentUser();
 	String userString = user != null
-		? new StringBuilder(user.getLogin()).append("(").append(user.getUserID()).append(")").toString()
+		? new StringBuilder(user.getLogin()).append(" (").append(user.getUserID()).append(")").toString()
 		: "";
-	String activityString = new StringBuilder(toolSignature).append(" (activityId:").append(activityId).append(")")
-		.toString();
-	String message = messageService.getMessage(messageKey, new String[] { userString, activityString });
+	String activityString = new StringBuilder(" (").append(activityId).append(")").toString();
+	String message = messageService.getMessage(messageKey, new Object[] { userString, activityString });
 	logEvent(LogEvent.TYPE_ACTIVITY_EDIT, getCurrentUserId(), null, lessonId != null ? lessonId.longValue() : null,
 		activityId != null ? activityId.longValue() : null, message.toString());
     }
 
+    // ******************  End of tool helper methods ****************************************************************
     /**
      *
      * @param logEventDAO

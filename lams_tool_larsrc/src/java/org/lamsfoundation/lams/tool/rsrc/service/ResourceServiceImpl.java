@@ -65,6 +65,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -111,7 +112,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -144,7 +144,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     private ILearnerService learnerService;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
 
     private IUserManagementService userManagementService;
 
@@ -553,7 +553,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public void setItemVisible(Long itemUid, boolean visible) {
+    public void setItemVisible(Long itemUid, Long sessionId, boolean visible) {
 	ResourceItem item = resourceItemDao.getByUid(itemUid);
 	if (item != null) {
 	    // createBy should be null for system default value.
@@ -563,10 +563,17 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		userId = item.getCreateBy().getUserId();
 		loginName = item.getCreateBy().getLoginName();
 	    }
-	    if (visible) {
-		auditService.logShowEntry(ResourceConstants.TOOL_SIGNATURE, userId, loginName, item.toString());
+	    Long toolContentId = null;
+	    ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
+	    if (session != null) {
+		toolContentId = session.getResource().getContentId();
 	    } else {
-		auditService.logHideEntry(ResourceConstants.TOOL_SIGNATURE, userId, loginName, item.toString());
+		ResourceServiceImpl.log.error("setItemVisible: Failed get ResourceSession by ID [" + sessionId + "]. Audit log entry will be created but will be missing tool content id");
+	    }
+	    if (visible) {
+		logEventService.logShowLearnerContent(userId, loginName, toolContentId, item.toString());
+	    } else {
+		logEventService.logHideLearnerContent(userId, loginName, toolContentId, item.toString());
 	    }
 	    item.setHide(!visible);
 	    resourceItemDao.saveObject(item);
@@ -1136,8 +1143,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public void setLearnerService(ILearnerService learnerService) {

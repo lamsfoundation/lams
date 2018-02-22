@@ -28,8 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.tools.Tool;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.FetchMode;
@@ -38,6 +36,7 @@ import org.hibernate.criterion.Restrictions;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
@@ -65,11 +64,10 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     private final static String FIND_LESSON_FOR_ACTIVITY = "select lesson from " + Lesson.class.getName() + " lesson, "
 	    + Activity.class.getName() + " activity "
 	    + " where activity.activityId=:activityId and activity.learningDesign=lesson.learningDesign";
-    private final static String FIND_LESSON_ACTIVITY_BY_TOOL_CONTENT_ID = "SELECT lesson.lessonId, activity.activityId, tool.toolSignature FROM "
-	    + Lesson.class.getName() + " lesson, "
-	    + Activity.class.getName() + " activity "
-	    + Tool.class.getName() + " tool "
-	    + " WHERE activity.toolContentId=:toolContentId activity.toolId = tool.toolId and activity.learningDesign=lesson.learningDesign";
+    private final static String FIND_LESSON_ACTIVITY_IDS_BY_TOOL_CONTENT_ID = "SELECT lesson.lessonId, toolActivity.activityId FROM "
+	    + Lesson.class.getName() + " lesson, " + ToolActivity.class.getName() + " toolActivity "
+	    + " WHERE toolActivity.learningDesign = lesson.learningDesign "
+	    + " AND toolActivity.toolContentId = :toolContentId";
     private final static String LESSONS_WITH_ORIGINAL_LEARNING_DESIGN = "select l from " + Lesson.class.getName()
 	    + " l " + "where l.learningDesign.originalLearningDesign.learningDesignId = ? "
 	    + "and l.learningDesign.copyTypeID != " + LearningDesign.COPY_TYPE_PREVIEW + " " + "and l.lessonStateId = "
@@ -95,7 +93,6 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	    + " AS lesson WHERE lesson.learningDesign.copyTypeID = " + LearningDesign.COPY_TYPE_PREVIEW;
     private final static String FIND_PREVIEW_LESSON_IDS = "SELECT lesson.lessonId FROM " + Lesson.class.getName()
 	    + " AS lesson WHERE lesson.learningDesign.copyTypeID = " + LearningDesign.COPY_TYPE_PREVIEW;
-
 
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
@@ -272,8 +269,8 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * Returns an array of two longs.
      */
     @Override
-    public Object[] getLessonActivityForActivity(long toolContentId) {
-	Query query = getSession().createQuery(LessonDAO.FIND_LESSON_ACTIVITY_BY_TOOL_CONTENT_ID);
+    public Object[] getLessonActivityIdsForToolContentId(long toolContentId) {
+	Query query = getSession().createQuery(LessonDAO.FIND_LESSON_ACTIVITY_IDS_BY_TOOL_CONTENT_ID);
 	query.setLong("toolContentId", toolContentId);
 	List list = query.list();
 	return list.size() > 0 ? (Object[]) list.get(0) : null;

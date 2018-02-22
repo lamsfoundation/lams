@@ -35,10 +35,12 @@ import org.lamsfoundation.lams.comments.dao.ICommentDAO;
 import org.lamsfoundation.lams.comments.dao.ICommentLikeDAO;
 import org.lamsfoundation.lams.comments.dao.ICommentSessionDAO;
 import org.lamsfoundation.lams.comments.dto.CommentDTO;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  *
@@ -56,7 +58,8 @@ public class CommentService implements ICommentService {
     // Services
     private IUserManagementService userService;
     private MessageService messageService;
-    private IAuditService auditService;
+    private ILogEventService logEventService;
+    private ILamsToolService toolService;
     private ICommentSessionDAO commentSessionDAO;
     private ICommentDAO commentDAO;
     private ICommentLikeDAO commentLikeDAO;
@@ -201,6 +204,19 @@ public class CommentService implements ICommentService {
 	Comment comment = commentDAO.getById(commentUid);
 	comment.setHideFlag(status);
 	commentDAO.saveOrUpdate(comment);
+
+	Long learnerUserId = 0L;
+	String loginName = "Default";
+	if (comment.getCreatedBy() != null) {
+	    learnerUserId = comment.getCreatedBy().getUserId().longValue();
+	    loginName = comment.getCreatedBy().getLogin();
+	}
+	Long toolContentId = getToolContentIdForAuditing(commentUid, comment);
+	if ( status )
+	    getLogEventService().logHideLearnerContent(learnerUserId, loginName, toolContentId, comment.toString());
+	else
+	    getLogEventService().logShowLearnerContent(learnerUserId, loginName, toolContentId, comment.toString());
+	    
 	return comment;
     }
 
@@ -218,13 +234,15 @@ public class CommentService implements ICommentService {
 
 	if (comment != null && user != null) {
 	    if (makeAuditEntry) {
-		Long userId = 0L;
+		Long learnerUserId = 0L;
 		String loginName = "Default";
 		if (comment.getCreatedBy() != null) {
-		    userId = comment.getCreatedBy().getUserId().longValue();
+		    learnerUserId = comment.getCreatedBy().getUserId().longValue();
 		    loginName = comment.getCreatedBy().getLogin();
 		}
-		getAuditService().logChange(MODULE_NAME, userId, loginName, comment.getBody(), newBody);
+		Long toolContentId = getToolContentIdForAuditing(commentUid, comment);
+		getLogEventService().logChangeLearnerContent(learnerUserId, loginName, toolContentId, comment.getBody(),
+			newBody);
 	    }
 
 	    comment.setBody(newBody);
@@ -237,6 +255,27 @@ public class CommentService implements ICommentService {
 		    + " new body " + newBody + " user " + (user != null ? user.getLogin() : " missing"));
 	    return null;
 	}
+    }
+
+    private Long getToolContentIdForAuditing(Long commentUid, Comment comment) {
+	Long toolContentId = null;
+	String externalSignature = comment.getSession().getExternalSignature();
+	if (externalSignature != null) {
+	    Long externalId = comment.getSession().getExternalId(); // current this is toolSessionId
+	    ToolSession session = getToolService().getToolSession(externalId);
+	    if (session != null
+		    && externalSignature.equals(session.getToolActivity().getTool().getToolSignature())) {
+		// consistent session id and tool signature so we should be safe. If this fails we have something
+		// else but a tool using the comment module
+		toolContentId = session.getToolActivity().getToolContentId();
+	    }
+	}
+	if (toolContentId == null) {
+	    log.error(
+		    "Unexpected data for comment. Will create incomplete audit entry - cannot determine toolContentId. CommentUid="
+			    + commentUid);
+	}
+	return toolContentId;
     }
 
     @Override
@@ -277,12 +316,20 @@ public class CommentService implements ICommentService {
 	this.messageService = messageService;
     }
 
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
+    }
+
+    public ILamsToolService getToolService() {
+        return toolService;
+    }
+
+    public void setToolService(ILamsToolService toolService) {
+        this.toolService = toolService;
     }
 
     public ICommentSessionDAO getCommentSessionDAO() {

@@ -24,8 +24,6 @@
 package org.lamsfoundation.lams.tool.service;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -47,11 +45,10 @@ import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
-import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
@@ -61,7 +58,6 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * @author Jacky Fang
@@ -79,7 +75,7 @@ public class LamsToolService implements ILamsToolService {
     private static final String TOOL_SIGNATURE_MCQ = "lamc11";
 
     private IActivityDAO activityDAO;
-    private IAuditService auditService;
+    private ILogEventService logEventService;
     private IToolDAO toolDAO;
     private IToolSessionDAO toolSessionDAO;
     private IToolContentDAO toolContentDAO;
@@ -152,7 +148,7 @@ public class LamsToolService implements ILamsToolService {
 
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-	auditService.logStartEditingActivityInMonitor(toolContentID);
+	logEventService.logStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
@@ -441,8 +437,8 @@ public class LamsToolService implements ILamsToolService {
 	this.activityDAO = activityDAO;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public void setToolSessionDAO(IToolSessionDAO toolSessionDAO) {

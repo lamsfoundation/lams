@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 
@@ -386,5 +387,9 @@ public class ResourceItem implements Cloneable {
         this.allowComments = allowComments;
     }
 
+    @Override
+    public String toString() {
+	return new ToStringBuilder(this).append("uid", uid).append(" type", type).append(" title", title).toString();
+    }
 
 }

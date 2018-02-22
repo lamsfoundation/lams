@@ -394,12 +394,7 @@ public class MonitoringService implements IMonitoringService {
 		forceLearnerRestart, allowLearnerRestart, gradebookOnComplete, scheduledNumberDaysToLessonFinish,
 		precedingLesson);
 
-	Long initializedLearningDesignId = initializedLesson.getLearningDesign().getLearningDesignId();
-	auditLogLessonStateChange(initializedLesson, null, initializedLesson.getLessonStateId());
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CREATE, userID, null,
-		initializedLesson.getLessonId(), null,
-		"Lesson created using learning design id "+initializedLearningDesignId);
-
+	logLessonStateChange(LogEvent.TYPE_TEACHER_LESSON_CREATE, initializedLesson, userID, null, initializedLesson.getLessonStateId());
 	return initializedLesson;
     }
 
@@ -434,8 +429,9 @@ public class MonitoringService implements IMonitoringService {
 		displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
 		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, gradebookOnComplete,
 		scheduledNumberDaysToLessonFinish, precedingLesson);
-	writeAuditLog(MonitoringService.AUDIT_LESSON_CREATED_KEY,
-		new Object[] { lessonName, learningDesign.getTitle() });
+	logLessonGeneralChange(LogEvent.TYPE_TEACHER_LESSON_CREATE, user != null ? user.getUserId() : null,
+		lesson != null ? lesson.getLessonId() : null, MonitoringService.AUDIT_LESSON_CREATED_KEY,
+		new Object[] { lessonName, learningDesign.getTitle(), learningDesign.getLearningDesignId() });
 	return lesson;
     }
 
@@ -462,8 +458,9 @@ public class MonitoringService implements IMonitoringService {
 		displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
 		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, gradebookOnComplete,
 		scheduledNumberDaysToLessonFinish, precedingLesson);
-	writeAuditLog(MonitoringService.AUDIT_LESSON_CREATED_KEY,
-		new Object[] { lessonName, copiedLearningDesign.getTitle() });
+	logLessonGeneralChange(LogEvent.TYPE_TEACHER_LESSON_CREATE, user != null ? user.getUserId() : null,
+		lesson != null ? lesson.getLessonId() : null, MonitoringService.AUDIT_LESSON_CREATED_KEY,
+		new Object[] { lessonName, copiedLearningDesign.getTitle(), copiedLearningDesign.getLearningDesignId() });
 	return lesson;
     }
 
@@ -557,7 +554,7 @@ public class MonitoringService implements IMonitoringService {
 	    } 
 	    
 	    requestedLesson.setScheduleStartDate(tzStartLessonDate);
-	    setLessonState(requestedLesson, Lesson.NOT_STARTED_STATE);
+	    setLessonState(requestedLesson, Lesson.NOT_STARTED_STATE, userId);
 	} catch (SchedulerException e) {
 	    throw new MonitoringServiceException(
 		    "Error occurred at " + "[startLessonOnSchedule]- fail to start scheduling", e);
@@ -738,10 +735,7 @@ public class MonitoringService implements IMonitoringService {
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("=============Lesson " + lessonId + " started===============");
 	}
-	auditLogLessonStateChange(requestedLesson, null, requestedLesson.getLessonStateId());
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_START, userId, null,
-		lessonId, null,
-		"Lesson started");
+	logLessonStateChange(LogEvent.TYPE_TEACHER_LESSON_START, requestedLesson, userId, null, requestedLesson.getLessonStateId());
     }
 
     @Override
@@ -904,7 +898,7 @@ public class MonitoringService implements IMonitoringService {
     public void finishLesson(long lessonId, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "finish lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	setLessonState(requestedLesson, Lesson.FINISHED_STATE);
+	setLessonState(requestedLesson, Lesson.FINISHED_STATE, userId);
     }
 
     @Override
@@ -922,7 +916,7 @@ public class MonitoringService implements IMonitoringService {
 	}
 
 	if (!Lesson.ARCHIVED_STATE.equals(lessonState) && !Lesson.REMOVED_STATE.equals(lessonState)) {
-	    setLessonState(requestedLesson, Lesson.ARCHIVED_STATE);
+	    setLessonState(requestedLesson, Lesson.ARCHIVED_STATE, userId);
 	}
     }
 
@@ -932,7 +926,7 @@ public class MonitoringService implements IMonitoringService {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	// remove any triggers waiting to suspend the lesson
 	removeScheduleDisableTrigger(requestedLesson);
-	revertLessonState(requestedLesson);
+	revertLessonState(requestedLesson, userId);
     }
 
     @Override
@@ -941,7 +935,7 @@ public class MonitoringService implements IMonitoringService {
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	if (!Lesson.SUSPENDED_STATE.equals(lesson.getLessonStateId())
 		&& !Lesson.REMOVED_STATE.equals(lesson.getLessonStateId())) {
-	    setLessonState(lesson, Lesson.SUSPENDED_STATE);
+	    setLessonState(lesson, Lesson.SUSPENDED_STATE, userId);
 	}
 	if (clearScheduleDetails) {
 	    removeScheduleDisableTrigger(lesson);
@@ -969,7 +963,7 @@ public class MonitoringService implements IMonitoringService {
 	}
 	// remove any triggers waiting to suspend the lesson
 	removeScheduleDisableTrigger(lesson);
-	revertLessonState(lesson);
+	revertLessonState(lesson, userId);
     }
 
     /**
@@ -978,22 +972,29 @@ public class MonitoringService implements IMonitoringService {
      * @param requestedLesson
      * @param status
      */
-    private void setLessonState(Lesson requestedLesson, Integer status) {
-	auditLogLessonStateChange(requestedLesson, requestedLesson.getLessonStateId(), status);
+    private void setLessonState(Lesson requestedLesson, Integer status, Integer userId) {
+	logLessonStateChange(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson, userId, requestedLesson.getLessonStateId(), status);
 	requestedLesson.setPreviousLessonStateId(requestedLesson.getLessonStateId());
 	requestedLesson.setLessonStateId(status);
 	lessonDAO.updateLesson(requestedLesson);
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson.getUser().getUserId(), null,
-		requestedLesson.getLessonId(), null,
-		"Lesson state changed");
     }
 
-    private void auditLogLessonStateChange(Lesson lesson, Integer previousStatus, Integer newStatus) {
+    private void logLessonStateChange(Integer eventType, Lesson lesson, Integer userId, Integer previousStatus,
+	    Integer newStatus) {
 	String fromState = getStateDescription(previousStatus);
 	String toState = getStateDescription(newStatus);
-	writeAuditLog(MonitoringService.AUDIT_LESSON_STATUS_CHANGED,
+	String message = messageService.getMessage(MonitoringService.AUDIT_LESSON_STATUS_CHANGED,
 		new Object[] { lesson.getLessonName(), lesson.getLessonId(), fromState, toState });
+	logEventService.logEvent(eventType != null ? eventType : LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, userId,
+		null, lesson.getLessonId(), null, message);
     }
+
+    private void logLessonGeneralChange(int logEventType, Integer userId, Long lessonId, String messageKey, Object[] args) {
+	String message = messageService.getMessage(messageKey, args);
+	logEventService.logEvent(logEventType, userId, null, lessonId, null, message);
+    }
+
+
 
     private String getStateDescription(Integer status) {
 	if (status != null) {
@@ -1028,7 +1029,7 @@ public class MonitoringService implements IMonitoringService {
      * @param requestedLesson
      * @param status
      */
-    private void revertLessonState(Lesson requestedLesson) {
+    private void revertLessonState(Lesson requestedLesson, Integer userId) {
 	Integer currentStatus = requestedLesson.getLessonStateId();
 	Integer newStatus;
 
@@ -1069,10 +1070,7 @@ public class MonitoringService implements IMonitoringService {
 	}
 	lessonDAO.updateLesson(requestedLesson);
 
-	auditLogLessonStateChange(requestedLesson, currentStatus, newStatus);
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson.getUser().getUserId(), null,
-		requestedLesson.getLessonId(), null,
-		"Lesson state reverted");
+	logLessonStateChange(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson, userId, currentStatus, newStatus);
     }
 
     @Override
@@ -1081,7 +1079,7 @@ public class MonitoringService implements IMonitoringService {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	// remove any triggers waiting to suspend the lesson
 	removeScheduleDisableTrigger(requestedLesson);
-	setLessonState(requestedLesson, Lesson.REMOVED_STATE);
+	setLessonState(requestedLesson, Lesson.REMOVED_STATE, userId);
     }
 
     @SuppressWarnings("unchecked")
@@ -1153,7 +1151,8 @@ public class MonitoringService implements IMonitoringService {
 	// finally remove the learning design
 	lessonDAO.delete(learningDesign);
 
-	writeAuditLog(MonitoringService.AUDIT_LESSON_REMOVED_PERMANENTLY_KEY,
+	logLessonGeneralChange(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, userId, lessonId, 
+		MonitoringService.AUDIT_LESSON_REMOVED_PERMANENTLY_KEY,
 		new Object[] { lesson.getLessonName(), lesson.getLessonId() });
     }
 
@@ -2814,19 +2813,6 @@ public class MonitoringService implements IMonitoringService {
 	    }
 	}
 	return staffUsers;
-    }
-
-    /**
-     * Write out audit log entry
-     *
-     * @param messageKey
-     * @param args
-     */
-    private void writeAuditLog(String messageKey, Object[] args) {
-	String message = messageService.getMessage(messageKey, args);
-	// TODO refactor!
-	logEventService.logEvent(LogEvent.TYPE_UNKNOWN, null, null, null, null, message);
-//	auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, message);
     }
 
     /**

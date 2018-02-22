@@ -122,8 +122,9 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 
-	queryText.append(
-		"SELECT le.*, lesson.name lessonName FROM lams_log_event le LEFT JOIN lams_lesson lesson ON le.lesson_id = lesson.lesson_id");
+	queryText.append("SELECT le.*, lesson.name lessonName, activity.title activityName FROM lams_log_event le ")
+		.append(" LEFT JOIN lams_lesson lesson ON le.lesson_id = lesson.lesson_id")
+		.append(" LEFT JOIN lams_learning_activity activity ON le.activity_id = activity.activity_id");
 
 	addWhereClause(startDate, endDate, area, typeId, queryText);
 //	// If filtering by name add a name based where clause (LDEV-3779: must come before the Notebook JOIN statement)
@@ -135,6 +136,7 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
 	query.addEntity("event", LogEvent.class);
 	query.addScalar("lessonName", StringType.INSTANCE);
+	query.addScalar("activityName", StringType.INSTANCE);
 	addParameters(startDate, endDate, area, typeId, query);
 	query.setFirstResult(page * size).setMaxResults(size);
 	return query.list();
@@ -146,7 +148,7 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
 	if ((startDate != null && endDate != null) || area != null || typeId != null) {
 	    queryText.append(" WHERE ");
 	    if (startDate != null && endDate != null) {
-		queryText.append("( occurred_date_time > :startDate AND occurred_date_time <= :endDate )");
+		queryText.append("( occurred_date_time BETWEEN :startDate AND DATE_ADD(:endDate,INTERVAL 1 DAY)) ");
 		needAnd = true;
 	    }
 	    if (typeId != null) {

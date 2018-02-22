@@ -90,8 +90,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	 * write out the audit log entry. If you move this after the update of the response, then make sure you update
 	 * the audit call to use a copy of the original answer
 	 */
-	qaService.getAuditService().logChange(QaAppConstants.MY_SIGNATURE, qaUsrResp.getQaQueUser().getQueUsrId(),
-		qaUsrResp.getQaQueUser().getUsername(), qaUsrResp.getAnswer(), updatedResponse);
+	Long toolContentId = null;
+	if (qaUsrResp.getQaQuestion() != null && qaUsrResp.getQaQuestion().getQaContent() != null) {
+	    toolContentId = qaUsrResp.getQaQuestion().getQaContent().getQaContentId();
+	}
+	qaService.getLogEventService().logChangeLearnerContent(qaUsrResp.getQaQueUser().getQueUsrId(),
+		qaUsrResp.getQaQueUser().getUsername(), toolContentId, qaUsrResp.getAnswer(), updatedResponse);
 
 	qaUsrResp.setAnswer(updatedResponse);
 	qaService.updateUserResponse(qaUsrResp);

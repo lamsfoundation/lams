@@ -1515,10 +1515,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     private void insertEventLogEntry(User user, LearningDesign design, Date createDate) {
-	String message = new StringBuilder("Learning design ").append(design.getTitle()).append("(")
-		.append(design.getLearningDesignId()).append(") created by ").append(user.getLogin())
-		.append("(").append(user.getUserId()).append(").").toString();
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LEARNING_DESIGN_CREATE, user.getUserId(), null, null, null, message, createDate);
+	String message = messageService.getMessage("audit.design.created",
+		new Object[] { design.getTitle(), design.getLearningDesignId(), user.getLogin(), user.getUserId() });
+	logEventService.logEvent(LogEvent.TYPE_TEACHER_LEARNING_DESIGN_CREATE, user.getUserId(), null, null, null,
+		message, createDate);
     }
 
     /**

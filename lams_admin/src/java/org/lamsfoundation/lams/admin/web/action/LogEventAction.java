@@ -62,7 +62,7 @@ public class LogEventAction extends LamsDispatchAction {
 
     private static ILogEventService logEventService;
     private MessageService messageService;
-    private static SimpleDateFormat START_DATE_FORMAT = new SimpleDateFormat("YYYY-MM-DD");
+    private static SimpleDateFormat START_DATE_FORMAT = new SimpleDateFormat("YYYY-MM-dd");
 
     @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -176,14 +176,28 @@ public class LogEventAction extends LamsDispatchAction {
 		responseRow.put("dateOccurred", event.getOccurredDateTime());
 		responseRow.put("typeId", event.getLogEventTypeId());
 		responseRow.put("description", event.getDescription());
+		if ( event.getLessonId() != null ) 
+		    responseRow.put("lessonId", event.getLessonId());
+		if ( event.getActivityId() != null ) 
+		    responseRow.put("activityId", event.getActivityId());
+		
 		User user = event.getUser();
 		if (user != null) {
 		    responseRow.put("userPortraitId", user.getPortraitUuid());
 		    responseRow.put("userId", user.getUserId());
 		    responseRow.put("userName", user.getLogin());
 		}
+		User targetUser = event.getTargetUser();
+		if (targetUser != null) {
+		    responseRow.put("targetUserPortraitId", targetUser.getPortraitUuid());
+		    responseRow.put("targetUserId", targetUser.getUserId());
+		    responseRow.put("targetUserName", targetUser.getLogin());
+		}
 		if ( eventDetails.length > 1 && eventDetails[1] != null ) {
-		    responseRow.put("lesson", eventDetails[1] );
+		    responseRow.put("lessonName", eventDetails[1] );
+		}
+		if ( eventDetails.length > 2 && eventDetails[2] != null ) {
+		    responseRow.put("activityName", eventDetails[2] );
 		}
 		rows.put(responseRow);
 	    }

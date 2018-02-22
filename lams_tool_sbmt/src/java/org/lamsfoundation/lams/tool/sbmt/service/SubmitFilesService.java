@@ -67,6 +67,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -103,7 +104,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -144,7 +144,7 @@ public class SubmitFilesService
 
     private IGradebookService gradebookService;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
 
     private SubmitFilesOutputFactory submitFilesOutputFactory;
 
@@ -848,16 +848,20 @@ public class SubmitFilesService
 
     private void auditRemoveRestore(UserDTO monitor, SubmissionDetails detail, String i18nKey) {
 	SubmitUser learner = detail.getLearner();
-	StringBuilder instructorTxt = new StringBuilder(monitor.getLogin()).append(" (").append(monitor.getUserID()).append(") ")
-	    .append(monitor.getFirstName()).append(" ").append(monitor.getLastName());
-	StringBuilder learnerTxt = new StringBuilder(learner.getLogin()).append("  (").append(learner.getUserID()).append(") ")
-	    .append(learner.getFirstName()).append(" ").append(learner.getLastName());
+	StringBuilder instructorTxt = new StringBuilder(monitor.getLogin()).append(" (").append(monitor.getUserID())
+		.append(") ");
+	StringBuilder learnerTxt = new StringBuilder(learner.getLogin()).append("  (").append(learner.getUserID())
+		.append(") ");
 
-	String auditMsg = getLocalisedMessage(i18nKey, new Object[] { instructorTxt.toString(), detail.getFilePath(),
-	    learnerTxt.toString() });
-	auditService.log(SbmtConstants.AUDIT_LOG_MODULE_NAME, auditMsg);
+	String auditMsg = getLocalisedMessage(i18nKey,
+		new Object[] { instructorTxt.toString(), detail.getFilePath(), learnerTxt.toString() });
+	Long toolContentId = null;
+	if (detail.getSubmitFileSession() != null && detail.getSubmitFileSession().getContent() != null) {
+	    toolContentId = detail.getSubmitFileSession().getContent().getContentID();
+	}
+	logEventService.logChangeLearnerArbitraryChange(learner.getUserID().longValue(), learner.getLogin(),
+		toolContentId, auditMsg);
     }
-
 
     @Override
     public IVersionedNode downloadFile(Long uuid, Long versionID) throws SubmitFilesException {
@@ -1289,12 +1293,12 @@ public class SubmitFilesService
 	this.messageService = messageService;
     }
 
-    public IAuditService getAuditService() {
-        return auditService;
+    public ILogEventService getLogEventService() {
+        return logEventService;
     }
 
-    public void setAuditService(IAuditService auditService) {
-        this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+        this.logEventService = logEventService;
     }
 
     public void setGradebookService(IGradebookService gradebookService) {

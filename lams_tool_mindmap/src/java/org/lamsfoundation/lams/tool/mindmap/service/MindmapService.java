@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -77,7 +78,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
@@ -101,7 +101,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     private ILearnerService learnerService;
     private ILamsToolService toolService;
     private IToolContentHandler mindmapToolContentHandler = null;
-    private IAuditService auditService = null;
+    private ILogEventService logEventService = null;
     private IExportToolContentService exportContentService;
     private ICoreNotebookService coreNotebookService;
     private MindmapOutputFactory mindmapOutputFactory;
@@ -777,12 +777,12 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return mindmapUser;
     }
 
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     // =========================================================================================

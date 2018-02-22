@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -112,7 +113,6 @@ import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * @author Andrey Balan
@@ -146,7 +146,7 @@ public class AssessmentServiceImpl
 
     private ILearnerService learnerService;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
 
     private IUserManagementService userManagementService;
 
@@ -1981,11 +1981,11 @@ public class AssessmentServiceImpl
 	    result.setGrade(totalMark);
 	    assessmentResultDao.saveObject(result);
 
-	    // propagade changes to Gradebook
+	    // propagate changes to Gradebook
 	    gradebookService.updateActivityMark(new Double(totalMark), null, userId.intValue(), toolSessionId, false);
 
 	    // records mark change with audit service
-	    auditService.logMarkChange(AssessmentConstants.TOOL_SIGNATURE, userId, user.getLoginName(), "" + oldMark,
+	    logEventService.logMarkChange(userId, user.getLoginName(), assessment.getContentId(), "" + oldMark,
 		    "" + totalMark);
 	}
 
@@ -2400,8 +2400,8 @@ public class AssessmentServiceImpl
     // set methods for Spring Bean
     // *****************************************************************************
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public void setLearnerService(ILearnerService learnerService) {
