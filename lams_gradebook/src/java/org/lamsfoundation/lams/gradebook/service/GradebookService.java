@@ -714,7 +714,7 @@ public class GradebookService implements IGradebookService {
 		UserDTO monitorUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 		String markStr = mark == null ? "" : mark.toString();
 		String[] args = new String[] { learner.getLogin() + "(" + learner.getUserId() + ")",
-			activity.getActivityId().toString(), lesson.getLessonId().toString(), oldMark.toString(),
+			lesson.getLessonId().toString(), activity.getActivityId().toString(), oldMark.toString(),
 			markStr };
 		String message = messageService.getMessage("audit.activity.change.mark", args);
 		logEventService.logEvent(LogEvent.TYPE_MARK_UPDATED, monitorUser.getUserID(), learner.getUserId(),
