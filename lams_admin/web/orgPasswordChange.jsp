@@ -15,20 +15,26 @@
 	.changeContainer .checkbox {
 		display: inline-block;
 	}
+	
 	.changeContainer .pass {
 		display: inline-block;
 		margin-left: 20px;
 		width: 260px;
 	}
+	
 	.changeContainer .fa {
 		cursor: pointer;
 	}
-	h3 {
+	
+	h3, h4 {
 		text-align: center;
 	}
+	
 	#changeTable > tbody > tr > td{
 		padding-left: 50px;
+		padding-top: 20px;
 	}
+	
 	#changeTable > tbody > tr > td:first-child {
 		border-right: thin solid black;
 		padding-right: 50px;
@@ -71,14 +77,28 @@
 	 });
 
 	$(function() {
-		var changeCheckboxes = $('#isStaffChange, #isLearnerChange').change(function(){
-			// prevent both checkboxes from being unchecked
-			if (!changeCheckboxes.is(':checked')) {
-				$(this).prop('checked', true);
-			}
-			// disable/enable password input depending on checkbox state
-			$(this).closest('.changeContainer').find('.pass').prop('disabled', !$(this).prop('checked'));
-		});
+		// assign grid ID to each checkbox and define what happens when it gets (un)checked
+		var changeCheckboxes = $('#isStaffChange').data('grid', 'staffGrid')
+							  .add($('#isLearnerChange').data('grid', 'learnerGrid'))
+							  .change(function(){
+								  		var checkbox = $(this);
+										// prevent both checkboxes from being unchecked
+										if (!changeCheckboxes.is(':checked')) {
+											checkbox.prop('checked', true);
+											return;
+										}
+										
+										var	enabled = checkbox.prop('checked'),
+											grid = $('#' + checkbox.data('grid')).closest('.ui-jqgrid');
+										// disable/enable password input depending on checkbox state
+										checkbox.closest('.changeContainer').find('.pass').prop('disabled', !enabled);
+										// hide/show users grid
+										if (enabled) {
+											grid.slideDown();
+										} else {
+											grid.slideUp();
+										}
+									});
 
 		// generate new password on click
 		$('.generatePassword').click(function(){
@@ -160,7 +180,7 @@
 			    sortorder		   : "asc", 
 			    sortname		   : "firstName", 
 			    pager			   : true,
-			    rowNum			   : 3,
+			    rowNum			   : 10,
 				colNames : [
 					'<fmt:message key="admin.org.password.change.grid.name"/>',
 					'<fmt:message key="admin.org.password.change.grid.login"/>',
@@ -285,6 +305,7 @@
 				</label>
 			</div>
 		</div>
+		<h4><fmt:message key="admin.org.password.change.choose" /></h4>
 		<table id="changeTable">
 			<tbody>
 				<tr>
