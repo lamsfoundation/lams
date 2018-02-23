@@ -40,6 +40,10 @@
 		padding-right: 50px;
 	}
 	
+	.gridCell {
+		vertical-align: top;
+	}
+	
 	.jqgh_cbox {
 		visibility: hidden;
 	}
@@ -354,10 +358,10 @@
 					</td>
 				</tr>
 				<tr>
-					<td>
+					<td class="gridCell">
 						<table id="staffGrid"></table>
 					</td>
-					<td>
+					<td class="gridCell">
 						<table id="learnerGrid"></table>
 					</td>
 				</tr>

@@ -972,13 +972,13 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString) {
+    public List<UserDTO> getAllUsers(Integer page, Integer size, String sortBy, String sortOrder, String searchString) {
 	return userDAO.getAllUsersPaged(page, size, sortBy, sortOrder, searchString);
     }
 
     @Override
-    public List<UserDTO> getAllUsersPaged(Integer organisationID, String[] roleNames, int page, int size, String sortBy,
-	    String sortOrder, String searchString) {
+    public List<UserDTO> getAllUsers(Integer organisationID, String[] roleNames, Integer page, Integer size,
+	    String sortBy, String sortOrder, String searchString) {
 	return userDAO.getAllUsersPaged(organisationID, roleNames, page, size, sortBy, sortOrder, searchString);
     }
 

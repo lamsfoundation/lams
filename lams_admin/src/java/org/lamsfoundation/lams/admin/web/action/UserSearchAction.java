@@ -118,7 +118,7 @@ public class UserSearchAction extends LamsDispatchAction {
 	    sortOrder = isSort5.equals(0) ? "ASC" : "DESC";
 	}
 
-	List<UserDTO> userDtos = service.getAllUsersPaged(page, size, sortBy, sortOrder, searchString);
+	List<UserDTO> userDtos = service.getAllUsers(page, size, sortBy, sortOrder, searchString);
 
 	JSONObject responcedata = new JSONObject();
 	responcedata.put("total_rows", service.getCountUsers(searchString));

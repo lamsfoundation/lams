@@ -466,9 +466,9 @@ public interface IUserManagementService {
      *            filters results by course name. It can be null and then doesn't affect results
      * @return paged list of users
      */
-    List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString);
+    List<UserDTO> getAllUsers(Integer page, Integer size, String sortBy, String sortOrder, String searchString);
 
-    List<UserDTO> getAllUsersPaged(Integer organisationID, String[] roleNames, int page, int size, String sortBy,
+    List<UserDTO> getAllUsers(Integer organisationID, String[] roleNames, Integer page, Integer size, String sortBy,
 	    String sortOrder, String searchString);
 
     /**

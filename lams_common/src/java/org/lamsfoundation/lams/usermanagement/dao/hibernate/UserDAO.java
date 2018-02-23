@@ -17,15 +17,16 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 public class UserDAO extends LAMSBaseDAO implements IUserDAO {
 
     @Override
-    public List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchPhrase) {
+    public List<UserDTO> getAllUsersPaged(Integer page, Integer size, String sortBy, String sortOrder,
+	    String searchPhrase) {
 	return getAllUsersPage(
 		"SELECT user.userId, user.login, user.firstName, user.lastName, user.email, user.portraitUuid FROM User user WHERE user.disabledFlag=0 ",
 		"user", page, size, sortBy, sortOrder, searchPhrase);
     }
 
     @Override
-    public List<UserDTO> getAllUsersPaged(Integer organisationID, String[] roleNames, int page, int size, String sortBy,
-	    String sortOrder, String searchPhrase) {
+    public List<UserDTO> getAllUsersPaged(Integer organisationID, String[] roleNames, Integer page, Integer size,
+	    String sortBy, String sortOrder, String searchPhrase) {
 	String query = "SELECT DISTINCT uo.user.userId, uo.user.login, uo.user.firstName, uo.user.lastName, uo.user.email, uo.user.portraitUuid "
 		+ "FROM UserOrganisation uo INNER JOIN uo.userOrganisationRoles r WHERE uo.organisation.organisationId="
 		+ organisationID;
@@ -45,8 +46,8 @@ public class UserDAO extends LAMSBaseDAO implements IUserDAO {
     }
 
     @SuppressWarnings("unchecked")
-    private List<UserDTO> getAllUsersPage(String queryText, String entityName, int page, int size, String sortBy,
-	    String sortOrder, String searchPhrase) {
+    private List<UserDTO> getAllUsersPage(String queryText, String entityName, Integer page, Integer size,
+	    String sortBy, String sortOrder, String searchPhrase) {
 	switch (sortBy) {
 	    case "userId":
 		sortBy = entityName + ".userId + 0 ";
@@ -72,8 +73,12 @@ public class UserDAO extends LAMSBaseDAO implements IUserDAO {
 	queryBuilder.append(" ORDER BY ").append(sortBy).append(sortOrder);
 
 	Query query = getSession().createQuery(queryBuilder.toString());
-	query.setFirstResult(page * size);
-	query.setMaxResults(size);
+	if (size != null) {
+	    query.setMaxResults(size);
+	    if (page != null) {
+		query.setFirstResult(page * size);
+	    }
+	}
 	List<Object[]> list = query.list();
 
 	//group by userId as long as it returns all completed visitLogs for each user

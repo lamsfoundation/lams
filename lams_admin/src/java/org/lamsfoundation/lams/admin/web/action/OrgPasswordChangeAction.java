@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -109,28 +110,31 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	String sortColumn = WebUtil.readStrParam(request, AdminConstants.PARAM_SIDX, true);
 
 	// fetch staff or learners
-	IUserManagementService userManagementService = AdminServiceProxy.getService(getServlet().getServletContext());
-	String[] roles = role.equals("staff") ? new String[] { Role.AUTHOR, Role.MONITOR }
-		: new String[] { Role.LEARNER };
-	List<UserDTO> users = userManagementService.getAllUsersPaged(organisationID, roles, page - 1, rowLimit,
-		sortColumn, sortOrder, null);
+	List<UserDTO> users = getUsersByRole(organisationID, role.equalsIgnoreCase("staff"), sortColumn, sortOrder);
 
-	// prepare data needed for paging
-	int totalUsers = userManagementService.getCountRoleForOrg(organisationID,
-		role.equals("staff") ? new Integer[] { Role.ROLE_AUTHOR, Role.ROLE_MONITOR }
-			: new Integer[] { Role.ROLE_LEARNER },
-		null);
-	int totalPages = new Double(
-		Math.ceil(new Integer(totalUsers).doubleValue() / new Integer(rowLimit).doubleValue())).intValue();
+	// paging
+	int totalPages = 1;
+	int totalUsers = users.size();
+	if (rowLimit < users.size()) {
+	    totalPages = new Double(
+		    Math.ceil(new Integer(users.size()).doubleValue() / new Integer(rowLimit).doubleValue()))
+			    .intValue();
+	    int firstRow = (page - 1) * rowLimit;
+	    int lastRow = firstRow + rowLimit;
+
+	    if (lastRow > users.size()) {
+		users = users.subList(firstRow, users.size());
+	    } else {
+		users = users.subList(firstRow, lastRow);
+	    }
+	}
 
 	JSONObject resultJSON = new JSONObject();
-
 	resultJSON.put(AdminConstants.ELEMENT_PAGE, page);
 	resultJSON.put(AdminConstants.ELEMENT_TOTAL, totalPages);
 	resultJSON.put(AdminConstants.ELEMENT_RECORDS, totalUsers);
 
 	JSONArray rowsJSON = new JSONArray();
-
 	// build rows for grid
 	for (UserDTO user : users) {
 	    JSONObject rowJSON = new JSONObject();
@@ -152,7 +156,6 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	return null;
     }
 
-    @SuppressWarnings({ "unchecked" })
     public ActionForward changePassword(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException {
 	UserDTO userDTO = getUserDTO();
@@ -166,7 +169,6 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	    return null;
 	}
 
-	IUserManagementService userManagementService = AdminServiceProxy.getService(getServlet().getServletContext());
 	DynaActionForm passForm = (DynaActionForm) form;
 	Integer organisationID = (Integer) passForm.get(AttributeNames.PARAM_ORGANISATION_ID);
 	Boolean email = (Boolean) passForm.get("email");
@@ -178,10 +180,7 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	if (isStaffChange) {
 	    JSONArray excludedStaff = new JSONArray((String) passForm.get("excludedStaff"));
 	    String staffPass = (String) passForm.get("staffPass");
-	    Set<User> users = new HashSet<User>();
-	    // get users from both roles and add them to the same set
-	    users.addAll(userManagementService.getUsersFromOrganisationByRole(organisationID, Role.AUTHOR, true));
-	    users.addAll(userManagementService.getUsersFromOrganisationByRole(organisationID, Role.MONITOR, true));
+	    Collection<User> users = getUsersByRole(organisationID, true);
 	    Collection<Integer> changedUserIDs = changePassword(staffPass, users, excludedStaff, force);
 	    if (email && !changedUserIDs.isEmpty()) {
 		notifyOnPasswordChange(changedUserIDs, staffPass);
@@ -190,8 +189,7 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	if (isLearnerChange) {
 	    JSONArray excludedLearners = new JSONArray((String) passForm.get("excludedLearners"));
 	    String learnerPass = (String) passForm.get("learnerPass");
-	    Collection<User> users = userManagementService.getUsersFromOrganisationByRole(organisationID, Role.LEARNER,
-		    true);
+	    Collection<User> users = getUsersByRole(organisationID, false);
 	    Collection<Integer> changedUserIDs = changePassword(learnerPass, users, excludedLearners, force);
 	    if (email && !changedUserIDs.isEmpty()) {
 		notifyOnPasswordChange(changedUserIDs, learnerPass);
@@ -242,6 +240,47 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	    changedUserIDs.add(user.getUserId());
 	}
 	return changedUserIDs;
+    }
+
+    /**
+     * Get unsorted users for password change
+     */
+    @SuppressWarnings("unchecked")
+    private List<User> getUsersByRole(Integer organisationID, boolean isStaff) {
+	IUserManagementService userManagementService = AdminServiceProxy.getService(getServlet().getServletContext());
+	Set<User> staff = new HashSet<User>();
+	staff.addAll(userManagementService.getUsersFromOrganisationByRole(organisationID, Role.AUTHOR, true));
+	staff.addAll(userManagementService.getUsersFromOrganisationByRole(organisationID, Role.MONITOR, true));
+
+	Set<User> users = null;
+	if (isStaff) {
+	    users = staff;
+	} else {
+	    users = new HashSet<User>();
+	    users.addAll(userManagementService.getUsersFromOrganisationByRole(organisationID, Role.LEARNER, true));
+	    users.removeAll(staff);
+	}
+	return new LinkedList<User>(users);
+    }
+
+    /**
+     * Gets sorted users for grids
+     */
+    private List<UserDTO> getUsersByRole(Integer organisationID, boolean isStaff, String sortBy, String sortOrder) {
+	IUserManagementService userManagementService = AdminServiceProxy.getService(getServlet().getServletContext());
+	List<UserDTO> staff = userManagementService.getAllUsers(organisationID,
+		new String[] { Role.AUTHOR, Role.MONITOR }, null, null, sortBy, sortOrder, null);
+
+	List<UserDTO> users = null;
+	if (isStaff) {
+	    users = staff;
+	} else {
+	    users = new LinkedList<UserDTO>();
+	    users.addAll(userManagementService.getAllUsers(organisationID, new String[] { Role.LEARNER }, null, null,
+		    sortBy, sortOrder, null));
+	    users.removeAll(staff);
+	}
+	return users;
     }
 
     private UserDTO getUserDTO() {
