@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.admin.web.action;
 
 import java.util.Collections;
@@ -122,6 +121,7 @@ public class UserManageAction extends Action {
 	} else {
 	    return forwardError(mapping, request, "error.authorisation");
 	}
+	userManageForm.setCanResetOrgPassword(request.isUserInRole(Role.SYSADMIN));
 
 	userManageForm.setOrgId(orgId);
 	userManageForm.setOrgName(orgName);

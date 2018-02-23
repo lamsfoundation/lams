@@ -871,13 +871,18 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public Integer getCountRoleForOrg(Integer orgId, Integer roleId, String searchPhrase) {
-	Integer count = roleDAO.getCountRoleForOrg(roleId, orgId, searchPhrase);
+    public Integer getCountRoleForOrg(Integer orgId, Integer[] roleIds, String searchPhrase) {
+	Integer count = roleDAO.getCountRoleForOrg(roleIds, orgId, searchPhrase);
 	if (count != null) {
 	    return count;
 	} else {
 	    return new Integer(0);
 	}
+    }
+
+    @Override
+    public Integer getCountRoleForOrg(Integer orgId, Integer roleId, String searchPhrase) {
+	return getCountRoleForOrg(orgId, new Integer[] { roleId }, searchPhrase);
     }
 
     @Override
@@ -967,8 +972,14 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString) {
+    public List<UserDTO> getAllUsers(Integer page, Integer size, String sortBy, String sortOrder, String searchString) {
 	return userDAO.getAllUsersPaged(page, size, sortBy, sortOrder, searchString);
+    }
+
+    @Override
+    public List<UserDTO> getAllUsers(Integer organisationID, String[] roleNames, Integer page, Integer size,
+	    String sortBy, String sortOrder, String searchString) {
+	return userDAO.getAllUsersPaged(organisationID, roleNames, page, size, sortBy, sortOrder, searchString);
     }
 
     @Override
