@@ -64,11 +64,13 @@ import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -135,6 +137,9 @@ public class MonitoringAction extends LamsDispatchAction {
     private static IMonitoringService monitoringService;
 
     private static IUserManagementService userManagementService;
+
+    // *LKC* added the next variable
+    private static ILearningDesignDAO learningDesignDAO;
 
     private static ILearnerService learnerService;
 
@@ -931,8 +936,64 @@ public class MonitoringAction extends LamsDispatchAction {
 		.isUserInRole(user.getUserID(), organisation.getOrganisationId(), Role.AUTHOR);
 	request.setAttribute("enableLiveEdit", enableLiveEdit);
 	request.setAttribute("lesson", lessonDTO);
+	request.setAttribute("isTBLSequence", isTBLSequence(lessonId));
 
 	return mapping.findForward("monitorLesson");
+    }
+    
+    /**
+	 * If sequence starts with of Grouping->(MCQ or Assessment)->Leader Selection->Scratchie,
+	 * there is a good chance this is a TBL sequence and all activities must be grouped.
+	 */
+    private boolean isTBLSequence(Long lessonId) {
+	Lesson lesson = getLessonService().getLesson(lessonId);
+	Long firstActivityId = lesson.getLearningDesign().getFirstActivity().getActivityId();
+	//Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity
+	Activity firstActivity = getMonitoringService().getActivityById(firstActivityId);
+	//the first activity should be a grouping
+	if (!(firstActivity instanceof GroupingActivity)) {
+	    return false;
+	} 
+	    
+	Transition transitionFromGrouping = firstActivity.getTransitionFrom();
+	if (transitionFromGrouping == null) {
+	    return false;
+	}
+	// query activity from DB as transition holds only proxied activity object
+	Long secondActivityId = transitionFromGrouping.getToActivity().getActivityId();
+	Activity secondActivity = monitoringService.getActivityById(secondActivityId);
+	//the second activity shall be a MCQ or Assessment
+	if (!(secondActivity.isToolActivity() && 
+		(CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(((ToolActivity) secondActivity).getTool().getToolSignature())
+		|| CentralConstants.TOOL_SIGNATURE_MCQ.equals(((ToolActivity) secondActivity).getTool().getToolSignature())))) {
+	    return false;
+	}
+	
+	Transition transitionFromSecondActivity = secondActivity.getTransitionFrom();
+	if (transitionFromSecondActivity == null) {
+	    return false;
+	}
+	Long thirdActivityId = transitionFromSecondActivity.getToActivity().getActivityId();
+	Activity thirdActivity = monitoringService.getActivityById(thirdActivityId);
+	//the third activity shall be a Leader Selection
+	if (!(thirdActivity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_LEADERSELECTION
+		.equals(((ToolActivity) thirdActivity).getTool().getToolSignature()))) {
+	    return false;
+	}
+	
+	Transition transitionFromThirdActivity = thirdActivity.getTransitionFrom();
+	if (transitionFromThirdActivity == null) {
+	    return false;
+	}
+	Long fourthActivityId = transitionFromThirdActivity.getToActivity().getActivityId();
+	Activity fourthActivity = monitoringService.getActivityById(fourthActivityId);
+	//the third activity shall be a Scratchie
+	if (!(fourthActivity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_SCRATCHIE
+		.equals(((ToolActivity) fourthActivity).getTool().getToolSignature()))) {
+	    return false;
+	}
+
+	return true;
     }
 
     /**

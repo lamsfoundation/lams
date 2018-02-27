@@ -474,6 +474,11 @@ public class GradebookService implements IGradebookService {
     public GradebookUserActivity getGradebookUserActivity(Long activityID, Integer userID) {
 	return gradebookDAO.getGradebookUserDataForActivity(activityID, userID);
     }
+    
+    @Override
+    public List<GradebookUserActivity> getGradebookUserActivities(Long activityId) {
+	return gradebookDAO.getAllGradebookUserActivitiesForActivity(activityId);
+    }
 
     @Override
     public Double getAverageMarkForActivity(Long activityID, Long groupID) {

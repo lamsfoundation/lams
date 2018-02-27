@@ -78,12 +78,6 @@ import org.w3c.dom.ls.LSSerializer;
 @SuppressWarnings("serial")
 public class LessonManagerServlet extends HttpServlet {
 
-    private static final String TOOL_SIGNATURE_ASSESSMENT = "laasse10";
-
-    public static final String TOOL_SIGNATURE_SCRATCHIE = "lascrt11";
-
-    public static final String TOOL_SIGNATURE_MCQ = "lamc11";
-
     private static Logger log = Logger.getLogger(LessonManagerServlet.class);
 
     private static IntegrationService integrationService = null;
@@ -1302,8 +1296,9 @@ public class LessonManagerServlet extends HttpServlet {
 	boolean hasNumericToolOutput = false;
 	for (ToolActivity activity : activities) {
 	    String toolSignature = activity.getTool().getToolSignature();
-	    hasNumericToolOutput |= TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
-		    || TOOL_SIGNATURE_MCQ.equals(toolSignature) || TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature);
+	    hasNumericToolOutput |= CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
+		    || CentralConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
+		    || CentralConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature);
 	}
 
 	// Create the root node of the xml document
