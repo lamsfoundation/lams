@@ -84,24 +84,19 @@ public class TblMonitoringAction extends LamsDispatchAction {
 
 	    // build candidate dtos
 	    List<McOptionDTO> optionDtos = new LinkedList<McOptionDTO>();
-	    Long totalPercentage = 0L;
 	    for (McOptsContent option : (Set<McOptsContent>) question.getMcOptionsContents()) {
 		int optionAttemptCount = mcService.getAttemptsCountPerOption(option.getUid());
 
-		Long percentage = (long) ((optionAttemptCount * 100) / totalNumberOfUsers);
-		totalPercentage += percentage;
+		float percentage =  (float)(optionAttemptCount * 100) / totalNumberOfUsers;
 
 		McOptionDTO optionDTO = new McOptionDTO(option);
-//		optionDTO.setCandidateAnswer(StringEscapeUtils.escapeJavaScript(option.getMcQueOptionText()));
-		optionDTO.setUid(percentage);
+		optionDTO.setPercentage(percentage);
 		optionDtos.add(optionDTO);
 	    }
 
 	    McQuestionDTO questionDto = new McQuestionDTO();
 	    questionDto.setUid(question.getUid());
 	    questionDto.setQuestion(question.getQuestion());
-//	    questionDto.setFeedback(StringEscapeUtils.escapeJavaScript(question.getQuestion()));
-	    questionDto.setMark("" + (100 - totalPercentage));
 	    questionDto.setOptionDtos(optionDtos);
 
 	    questionDtos.add(questionDto);

@@ -56,9 +56,6 @@
 						${ALPHABET_CAPITAL_LETTERS[i]}
 					</th>
 				</c:forEach>
-				<th class="text-center">
-					<fmt:message key="label.n.a"/>
-				</th>
 			</tr>
 		</thead>
 		
@@ -73,15 +70,13 @@
 					
 					<c:forEach var="optionDto" items="${questionDto.optionDtos}">
 						<td class="normal <c:if test='${optionDto.correct == "Correct"}'>success</c:if>">
-							${optionDto.uid}%
+							<fmt:formatNumber type="number" maxFractionDigits="2" value="${optionDto.percentage}"/>%
 						</td>
 					</c:forEach>
 					
 					<c:forEach begin="1" end="${maxOptionsInQuestion - fn:length(questionDto.optionDtos)}" var="j">
 						<td class="normal"></td>
 					</c:forEach>
-					
-					<td class="normal">${questionDto.mark}%</td>
 				</tr>
 			</c:forEach>
 		</tbody>
@@ -119,22 +114,10 @@
 										<c:out value="${optionDto.candidateAnswer}" escapeXml="false"/>
 									</td>
 									<td class="${cssClass}">
-										${optionDto.uid}%
+										<fmt:formatNumber type="number" maxFractionDigits="2" value="${optionDto.percentage}"/>%
 									</td>
 								</tr>
 							</c:forEach>
-							
-							<tr>
-								<td width="5px">
-									${ALPHABET[fn:length(questionDto.optionDtos)]}.
-								</td>
-								<td>
-									<fmt:message key="label.n.a"/>
-								</td>
-								<td>
-									${questionDto.mark}%
-								</td>
-							</tr>
 							
 						</tbody>
 					</table>
