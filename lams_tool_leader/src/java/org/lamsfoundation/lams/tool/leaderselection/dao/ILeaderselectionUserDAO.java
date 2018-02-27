@@ -41,6 +41,8 @@ public interface ILeaderselectionUserDAO extends IBaseDAO {
      * @return
      */
     LeaderselectionUser getByUserIdAndSessionId(Long userId, Long toolSessionId);
+    
+    LeaderselectionUser getByUserIdAndContentId(Long userId, Long toolContentId);
 
     void saveOrUpdate(LeaderselectionUser leaderselectionUser);
 

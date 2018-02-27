@@ -34,7 +34,7 @@ import org.springframework.stereotype.Repository;
 public class ScratchieUserDAOHibernate extends LAMSBaseDAO implements ScratchieUserDAO {
 
     private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + ScratchieUser.class.getName()
-	    + " as u where u.userId =? and u.scratchie.contentId=?";
+	    + " as u where u.userId =? and u.session.scratchie.contentId=?";
     private static final String FIND_BY_USER_ID_SESSION_ID = "from " + ScratchieUser.class.getName()
 	    + " as u where u.userId =? and u.session.sessionId=?";
     private static final String FIND_BY_SESSION_ID = "from " + ScratchieUser.class.getName()
@@ -63,5 +63,17 @@ public class ScratchieUserDAOHibernate extends LAMSBaseDAO implements ScratchieU
     public List<ScratchieUser> getBySessionID(Long sessionId) {
 	return (List<ScratchieUser>) this.doFind(FIND_BY_SESSION_ID, sessionId);
     }
-
+    
+    @Override
+    public int countUsersByContentId(Long contentId) {
+	final String COUNT_USERS_BY_CONTENT_ID = "SELECT COUNT(*) FROM " + ScratchieUser.class.getName()
+		+ " as user WHERE user.session.scratchie.contentId = :contentId ";
+	    
+	List list = getSession().createQuery(COUNT_USERS_BY_CONTENT_ID).setLong("contentId", contentId).list();
+	if (list == null || list.size() == 0) {
+	    return 0;
+	} else {
+	    return ((Number) list.get(0)).intValue();
+	}
+    }
 }

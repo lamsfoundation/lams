@@ -119,7 +119,7 @@ public class AssessmentOutputFactory extends OutputFactory {
 
 	TreeMap<String, ToolOutput> output = new TreeMap<String, ToolOutput>();
 
-	AssessmentSession session = assessmentService.getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentSession session = assessmentService.getSessionBySessionId(toolSessionId);
 	if ((session != null) && (session.getAssessment() != null)) {
 	    Assessment assessment = session.getAssessment();
 
@@ -162,7 +162,7 @@ public class AssessmentOutputFactory extends OutputFactory {
     public ToolOutput getToolOutput(String name, IAssessmentService assessmentService, Long toolSessionId,
 	    Long learnerId) {
 	if (name != null) {
-	    AssessmentSession session = assessmentService.getAssessmentSessionBySessionId(toolSessionId);
+	    AssessmentSession session = assessmentService.getSessionBySessionId(toolSessionId);
 
 	    if ((session != null) && (session.getAssessment() != null)) {
 		Assessment assessment = session.getAssessment();

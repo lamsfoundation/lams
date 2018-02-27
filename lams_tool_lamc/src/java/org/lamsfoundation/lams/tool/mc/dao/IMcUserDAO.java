@@ -47,6 +47,8 @@ public interface IMcUserDAO {
      * @return the persistent instance of a McQueUsr or null if not found
      */
     McQueUsr getMcUserByUID(Long uid);
+    
+    McQueUsr getMcUserByContentId(Long userId, Long contentId);
 
     McQueUsr getMcUserBySession(Long userId, Long sessionUid);
     

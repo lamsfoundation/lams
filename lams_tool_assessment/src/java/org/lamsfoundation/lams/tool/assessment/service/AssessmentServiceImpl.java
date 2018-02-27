@@ -164,7 +164,7 @@ public class AssessmentServiceImpl
     @Override
     public boolean isUserGroupLeader(AssessmentUser user, Long toolSessionId) {
 
-	AssessmentSession session = getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentSession session = getSessionBySessionId(toolSessionId);
 	AssessmentUser groupLeader = session.getGroupLeader();
 
 	return (groupLeader != null) && user.getUserId().equals(groupLeader.getUserId());
@@ -176,7 +176,7 @@ public class AssessmentServiceImpl
 	    return null;
 	}
 
-	AssessmentSession assessmentSession = getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentSession assessmentSession = getSessionBySessionId(toolSessionId);
 	AssessmentUser leader = assessmentSession.getGroupLeader();
 	// check leader select tool for a leader only in case QA tool doesn't know it. As otherwise it will screw
 	// up previous scratches done
@@ -343,6 +343,11 @@ public class AssessmentServiceImpl
     public int getCountUsersBySession(Long sessionId, String searchString) {
 	return assessmentUserDao.getCountUsersBySession(sessionId, searchString);
     }
+    
+    @Override
+    public int getCountUsersByContentId(Long contentId) {
+	return assessmentUserDao.getCountUsersByContentId(contentId);
+    }
 
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page,
@@ -396,8 +401,13 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public AssessmentUser getUserByIDAndContent(Long userId, Long contentId) {
-	return assessmentUserDao.getUserByUserIDAndContentID(userId, contentId);
+    public AssessmentUser getUserCreatedAssessment(Long userId, Long contentId) {
+	return assessmentUserDao.getUserCreatedAssessment(userId, contentId);
+    }
+    
+    @Override
+    public AssessmentUser getUserByIdAndContent(Long userId, Long contentId) {
+	return assessmentUserDao.getUserByIdAndContent(userId, contentId);
     }
 
     @Override
@@ -442,8 +452,13 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public AssessmentSession getAssessmentSessionBySessionId(Long sessionId) {
+    public AssessmentSession getSessionBySessionId(Long sessionId) {
 	return assessmentSessionDao.getSessionBySessionId(sessionId);
+    }
+    
+    @Override
+    public List<AssessmentSession> getSessionsByContentId(Long toolContentId) {
+	return assessmentSessionDao.getByContentId(toolContentId);
     }
 
     @Override
@@ -1280,7 +1295,7 @@ public class AssessmentServiceImpl
 		    // in case of UseSelectLeaderToolOuput - display only one user
 		    if (assessment.isUseSelectLeaderToolOuput()) {
 
-			AssessmentSession session = getAssessmentSessionBySessionId(sessionId);
+			AssessmentSession session = getSessionBySessionId(sessionId);
 			AssessmentUser groupLeader = session.getGroupLeader();
 
 			if (groupLeader != null) {
@@ -1691,7 +1706,7 @@ public class AssessmentServiceImpl
 		sessionTitle[0] = new ExcelCell(sessionDTO.getSessionName(), true);
 		userSummaryTab.add(sessionTitle);
 
-		AssessmentSession assessmentSession = getAssessmentSessionBySessionId(sessionDTO.getSessionId());
+		AssessmentSession assessmentSession = getSessionBySessionId(sessionDTO.getSessionId());
 
 		Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
 
@@ -2489,7 +2504,7 @@ public class AssessmentServiceImpl
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
-	    AssessmentUser user = assessmentUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()),
+	    AssessmentUser user = assessmentUserDao.getUserCreatedAssessment(new Long(newUserUid.longValue()),
 		    toolContentId);
 	    if (user == null) {
 		user = new AssessmentUser();
@@ -2751,7 +2766,7 @@ public class AssessmentServiceImpl
     public void forceCompleteUser(Long toolSessionId, User user) {
 	Long userId = user.getUserId().longValue();
 
-	AssessmentSession session = getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentSession session = getSessionBySessionId(toolSessionId);
 	if ((session == null) || (session.getAssessment() == null)) {
 	    return;
 	}
@@ -2929,7 +2944,7 @@ public class AssessmentServiceImpl
 		    "Assessment Tool does not support Overall Feedback for REST Authoring. " + toolContentJSON);
 	}
 
-	AssessmentUser assessmentUser = getUserByIDAndContent(userID.longValue(), toolContentID);
+	AssessmentUser assessmentUser = getUserCreatedAssessment(userID.longValue(), toolContentID);
 	if (assessmentUser == null) {
 	    assessmentUser = new AssessmentUser();
 	    assessmentUser.setFirstName(toolContentJSON.getString("firstName"));

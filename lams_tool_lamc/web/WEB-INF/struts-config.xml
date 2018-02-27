@@ -303,6 +303,30 @@
 	  	
 	</action>  
 	
+   <!--TBL Monitoring Action -->
+   <action 	path="/tblmonitoring" 
+   			type="org.lamsfoundation.lams.tool.mc.web.action.TblMonitoringAction"
+	      	scope="request"
+      		parameter="method"
+      		unknown="false"
+      		validate="false"> 
+	  	<forward
+			name="mcq"
+			path="/tblmonitoring/mcq.jsp"
+			redirect="false"
+	  	/>
+	  	<forward
+		    name="mcqStudentChoices"
+		    path="/tblmonitoring/mcqStudentChoices.jsp"
+		    redirect="false"
+	  	/>
+	  	<forward
+		    name="teams"
+		    path="/tblmonitoring/teams.jsp"
+		    redirect="false"
+	  	/>
+	</action> 
+	
    <action 	path="/clearsession" 
    			type="org.lamsfoundation.lams.tool.mc.web.action.ClearSessionAction"> 
 	</action>    

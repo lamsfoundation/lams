@@ -247,6 +247,21 @@
 			<role-name>SYSADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>TBL Monitor interface</web-resource-name>
+			<url-pattern>/tblmonitoring.do</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<!-- Author can preview the lesson -->
+			<role-name>MONITOR</role-name>
+			<role-name>GROUP ADMIN</role-name>
+			<role-name>GROUP MANAGER</role-name>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
 
 	<security-constraint>
 		<web-resource-collection>
