@@ -202,8 +202,12 @@ public class ScratchieServiceImpl
 
     @Override
     public ScratchieUser getUserByIDAndSession(Long userId, Long sessionId) {
-
 	return scratchieUserDao.getUserByUserIDAndSessionID(userId, sessionId);
+    }
+    
+    @Override
+    public int countUsersByContentId(Long contentId) {
+	return scratchieUserDao.countUsersByContentId(contentId);
     }
 
     @Override
@@ -404,6 +408,11 @@ public class ScratchieServiceImpl
     @Override
     public ScratchieSession getScratchieSessionBySessionId(Long sessionId) {
 	return scratchieSessionDao.getSessionBySessionId(sessionId);
+    }
+ 
+    @Override
+    public int countSessionsByContentId(Long toolContentId) {
+	return scratchieSessionDao.getByContentId(toolContentId).size();
     }
 
     @Override
@@ -627,6 +636,11 @@ public class ScratchieServiceImpl
     @Override
     public List<ScratchieUser> getUsersBySession(Long toolSessionId) {
 	return scratchieUserDao.getBySessionID(toolSessionId);
+    }
+    
+    @Override
+    public ScratchieUser getUserByUserIDAndContentID(Long userId, Long contentId) {
+	return scratchieUserDao.getUserByUserIDAndContentID(userId, contentId);
     }
 
     @Override
@@ -1893,7 +1907,6 @@ public class ScratchieServiceImpl
 		user.setLastName(sysUser.getLastName());
 		user.setLoginName(sysUser.getLogin());
 		user.setUserId(new Long(newUserUid.longValue()));
-		user.setScratchie(toolContentObj);
 	    }
 
 	    scratchieDao.saveObject(toolContentObj);

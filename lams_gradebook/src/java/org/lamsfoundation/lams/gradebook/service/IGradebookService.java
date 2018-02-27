@@ -238,6 +238,15 @@ public interface IGradebookService {
      * @return
      */
     GradebookUserActivity getGradebookUserActivity(Long activityID, Integer userID);
+    
+    /**
+     * Gets all available gradebookUserActivity objects for the specified activity
+     *
+     * @param activityID
+     * @param userID
+     * @return
+     */
+    List<GradebookUserActivity> getGradebookUserActivities(Long activityId);
 
     /**
      * Returns the average mark for a given activity. Activity can be grouped - then supply according groupId to receive

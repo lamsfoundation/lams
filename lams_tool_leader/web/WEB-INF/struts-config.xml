@@ -97,6 +97,16 @@
         redirect="false"
       />
     </action>
+    <action
+      path="/tblmonitoring"
+      type="org.lamsfoundation.lams.tool.leaderselection.web.actions.TblMonitoringAction"
+      name="monitoringForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+    </action>
 
   </action-mappings>
 

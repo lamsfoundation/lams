@@ -377,13 +377,13 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public McQueUsr getMcUserByUID(Long uid) throws McApplicationException {
-	try {
-	    return mcUserDAO.getMcUserByUID(uid);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is getting the mc QueUsr by uid." + e.getMessage(), e);
-	}
+    public McQueUsr getMcUserByUID(Long uid) {
+	return mcUserDAO.getMcUserByUID(uid);
+    }
+    
+    @Override
+    public McQueUsr getMcUserByContentId(Long userId, Long contentId) {
+	return mcUserDAO.getMcUserByContentId(userId, contentId);
     }
 
     @Override
@@ -472,6 +472,11 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    throw new McApplicationException("Exception occured when lams is updating mc UsrAttempt: " + e.getMessage(),
 		    e);
 	}
+    }
+    
+    @Override
+    public int getAttemptsCountPerOption(Long optionUid) {
+	return mcUsrAttemptDAO.getAttemptsCountPerOption(optionUid);
     }
 
     @Override

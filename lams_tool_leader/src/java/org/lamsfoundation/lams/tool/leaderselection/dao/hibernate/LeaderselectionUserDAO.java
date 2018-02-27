@@ -37,10 +37,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class LeaderselectionUserDAO extends LAMSBaseDAO implements ILeaderselectionUserDAO {
 
-    public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from " + LeaderselectionUser.class.getName()
+    private static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from " + LeaderselectionUser.class.getName()
 	    + " as f" + " where user_id=? and f.leaderselectionSession.sessionId=?";
 
-    public static final String SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID = "from " + LeaderselectionUser.class.getName()
+    private static final String SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID = "from " + LeaderselectionUser.class.getName()
 	    + " as f where login_name=? and f.leaderselectionSession.sessionId=?";
 
     private static final String SQL_QUERY_FIND_BY_UID = "from " + LeaderselectionUser.class.getName() + " where uid=?";
@@ -51,11 +51,21 @@ public class LeaderselectionUserDAO extends LAMSBaseDAO implements ILeaderselect
     @Override
     public LeaderselectionUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
 	List list = doFind(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID, new Object[] { userId, toolSessionId });
-
 	if (list == null || list.isEmpty()) {
 	    return null;
 	}
-
+	return (LeaderselectionUser) list.get(0);
+    }
+    
+    @Override
+    public LeaderselectionUser getByUserIdAndContentId(Long userId, Long toolContentId) {
+	final String SQL_QUERY_FIND_BY_USER_ID_CONTENT_ID = "from " + LeaderselectionUser.class.getName()
+		    + " as user where user.userId=? and user.leaderselectionSession.leaderselection.toolContentId=?";
+	
+	List list = doFind(SQL_QUERY_FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, toolContentId });
+	if (list == null || list.isEmpty()) {
+	    return null;
+	}
 	return (LeaderselectionUser) list.get(0);
     }
 
@@ -68,11 +78,9 @@ public class LeaderselectionUserDAO extends LAMSBaseDAO implements ILeaderselect
     @Override
     public LeaderselectionUser getByUID(Long uid) {
 	List list = doFind(SQL_QUERY_FIND_BY_UID, new Object[] { uid });
-
 	if (list == null || list.isEmpty()) {
 	    return null;
 	}
-
 	return (LeaderselectionUser) list.get(0);
     }
 

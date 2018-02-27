@@ -72,6 +72,15 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
     public McQueUsr getMcUserByUID(Long uid) {
 	return (McQueUsr) this.getSession().get(McQueUsr.class, uid);
     }
+    
+    @Override
+    public McQueUsr getMcUserByContentId(Long userId, Long contentId) {
+	final String GET_USER_BY_USER_ID_AND_CONTENT_ID = "from " + McQueUsr.class.getName()
+		+ " user where user.queUsrId=:userId and user.mcSession.mcContent.mcContentId=:contentId";
+	
+	return (McQueUsr) getSessionFactory().getCurrentSession().createQuery(GET_USER_BY_USER_ID_AND_CONTENT_ID)
+	.setLong("userId", userId).setLong("contentId", contentId).uniqueResult();
+    }
 
     @SuppressWarnings("rawtypes")
     @Override

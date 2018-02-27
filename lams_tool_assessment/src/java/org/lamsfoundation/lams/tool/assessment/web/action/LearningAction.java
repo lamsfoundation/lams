@@ -416,7 +416,7 @@ public class LearningAction extends Action {
 	IAssessmentService service = getAssessmentService();
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	AssessmentSession session = service.getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentSession session = service.getSessionBySessionId(toolSessionId);
 	AssessmentUser leader = session.getGroupLeader();
 
 	//in case of time limit - prevent user from seeing questions page longer than time limit allows
@@ -1296,7 +1296,7 @@ public class LearningAction extends Action {
 	AssessmentUser assessmentUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()), sessionId);
 
 	if (assessmentUser == null) {
-	    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+	    AssessmentSession session = service.getSessionBySessionId(sessionId);
 	    assessmentUser = new AssessmentUser(user, session);
 	    service.createUser(assessmentUser);
 	}

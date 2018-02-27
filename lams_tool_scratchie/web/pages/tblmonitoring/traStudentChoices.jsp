@@ -1,0 +1,174 @@
+<%@ include file="/common/taglibs.jsp"%>
+
+<script>
+	function exportExcel(){
+		location.href = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring.do?method=exportExcel&toolContentID=${toolContentID}&reqID=" + (new Date()).getTime();
+	};
+</script>
+
+<!-- Header -->
+<div class="row no-gutter">
+	<div class="col-xs-12 col-md-12 col-lg-8">
+		<h3>
+			<fmt:message key="label.tra.questions.marks"/>
+		</h3>
+	</div>
+</div>
+<!-- End header -->
+
+<!-- Notifications -->  
+<div class="row">
+	<div class="col-md-6 col-lg-4 ">
+	</div>
+	
+	<div class="col-xs-12 col-md-6 col-lg-4 col-lg-offset-2">
+		<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
+				onclick="javascript:loadTab('tra'); return false;">
+			<i class="fa fa-undo"></i>
+			<fmt:message key="label.hide.students.choices"/>
+		</a>
+		<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-sm btn-default buttons_column">
+			<i class="fa fa-print"></i>
+			<fmt:message key="label.print"/>
+		</a>
+		<a href="#nogo" onclick="javascript:exportExcel(); return false;" type="button" class="btn btn-sm btn-default buttons_column">
+			<i class="fa fa-file"></i>
+			<fmt:message key="label.export.excel"/>
+		</a>
+	</div>
+</div>
+<br>
+<!-- End notifications -->
+
+<!-- Table --> 
+<div class="row no-gutter">
+<div class="col-xs-12 col-md-12 col-lg-10">
+<div class="panel">
+<div class="panel-body table-responsive">
+          
+	<table id="questions-data" class="table table-responsive table-striped table-bordered table-hover table-condensed">
+		<thead>
+			<tr role="row">
+			
+				<th></th>
+				<c:forEach var="item" items="${items}" varStatus="i">
+					<th class="text-center">
+						<a data-toggle="modal" href="#question${i.index}Modal">
+							<fmt:message key="label.authoring.basic.question.text"/> ${i.index + 1}
+						</a>
+					</th>
+				</c:forEach>
+				<th class="text-center">
+					<fmt:message key="label.total"/>
+				</th>
+				<th class="text-center">
+					<fmt:message key="label.total"/> %
+				</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+		
+			<tr>
+				<td>
+					<b>
+						<fmt:message key="label.correct.answer"/>
+					</b>
+				</td>
+				<c:forEach begin="1" end="${fn:length(correctAnswers) - 1}" var="i">
+					<td class="text-center">
+						${correctAnswers[i].cellValue}
+					</td>
+				</c:forEach>
+				<td class="text-center"></td>
+				<td class="text-center"></td>
+			</tr>
+			
+			<tr>
+				<td colspan="7" style="font-weight: bold;">
+					<fmt:message key="label.teams.notuppercase"/>
+				</td> 
+			</tr>
+			
+			<c:forEach var="groupRow" items="${groupRows}" varStatus="i">
+				<tr>
+					<td class="text-center">
+						${groupRow[0].cellValue}
+					</td>
+					
+					<c:choose>
+						<c:when test="${fn:length(groupRow) == 1}">
+							<c:forEach begin="1" end="${fn:length(items) + 2}">
+								<td></td>
+							</c:forEach>
+						</c:when>
+						<c:otherwise>
+							<c:forEach begin="1" end="${fn:length(groupRow) - 1}" var="j">
+								<td class="text-center <c:if test="${groupRow[j].color == 'GREEN'}">success</c:if>"
+								>
+									${groupRow[j].cellValue}
+								</td>
+							</c:forEach>
+						</c:otherwise>
+					</c:choose>
+					
+				</tr>
+			</c:forEach>                                               
+		</tbody>
+	</table>
+</div>
+</div>
+</div>          
+</div>
+
+<!-- Question detail modal -->
+<c:forEach var="item" items="${items}" varStatus="i">
+	<div class="modal fade" id="question${i.index}Modal">
+	<div class="modal-dialog">
+	<div class="modal-content">
+	<div class="modal-body">
+	
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title"><span class="float-left space-right">Q${i.index+1})</span> ${item.title}</h4>
+			</div>
+			<div class="panel-body">
+			
+				<div>
+					${item.description}
+				</div>
+			
+				<div class="table-responsive voffset10">
+					<table class="table table-striped table-hover">
+						<tbody>
+						
+							<c:forEach var="answer" items="${item.answers}" varStatus="j">
+								<c:set var="cssClass"><c:if test='${answer.correct}'>bg-success</c:if></c:set>
+								<tr>
+									<td width="5px" class="${cssClass}">
+										${ALPHABET[j.index]}.
+									</td>
+									<td class="${cssClass}">
+										<c:out value="${answer.description}" escapeXml="false"/>
+									</td>
+								</tr>
+							</c:forEach>
+							
+						</tbody>
+					</table>
+				</div>
+			</div> 
+		</div>
+	            
+		<div class="modal-footer">	
+			<a href="#" data-dismiss="modal" class="btn btn-default">
+				<fmt:message key="button.close"/>
+			</a>
+		</div>
+	
+	</div>
+	</div>
+	</div>
+	</div>
+</c:forEach>
+<!-- End question detail modal -->

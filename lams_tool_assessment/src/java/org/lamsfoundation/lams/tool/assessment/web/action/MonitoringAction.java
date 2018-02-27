@@ -361,7 +361,7 @@ public class MonitoringAction extends Action {
 	//in case of UseSelectLeaderToolOuput - display only one user
 	if (assessment.isUseSelectLeaderToolOuput()) {
 
-	    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+	    AssessmentSession session = service.getSessionBySessionId(sessionId);
 	    AssessmentUser groupLeader = session.getGroupLeader();
 
 	    if (groupLeader != null) {
@@ -449,7 +449,7 @@ public class MonitoringAction extends Action {
 	//in case of UseSelectLeaderToolOuput - display only one user
 	if (assessment.isUseSelectLeaderToolOuput()) {
 
-	    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+	    AssessmentSession session = service.getSessionBySessionId(sessionId);
 	    AssessmentUser groupLeader = session.getGroupLeader();
 
 	    if (groupLeader != null) {
@@ -590,14 +590,14 @@ public class MonitoringAction extends Action {
 	    HttpServletResponse response) throws IOException {
 	initAssessmentService();
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
 	String fileName = null;
 	boolean showUserNames = true;
 
 	Long contentId = null;
 	List<SessionDTO> sessionDtos;
-	if (sessionMap != null) {
+	if (sessionMapID != null) {
+	    SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		    .getAttribute(sessionMapID);
 	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
 	    showUserNames = true;
