@@ -47,7 +47,7 @@
 #page-content-wrapper {
     width:100%;
     position:absolute;
-/*    padding:15px;*/
+    padding: 10px 20px;
 }
 
 #wrapper.toggled #page-content-wrapper {
@@ -175,7 +175,6 @@ table.tablesorter {
     }
 
     #page-content-wrapper {
-        padding: 20px;
         position: relative;
     }
 
@@ -342,13 +341,13 @@ i.fa.fa-user{
 }
 
 .panel-heading a:after {
-    font-family:'Glyphicons Halflings';
-    content:"\e114";
+    font-family: FontAwesome;
+    content:"\f13a";
     float: right;
     color: grey;
 }
 .panel-heading a.collapsed:after {
-    content:"\e080";
+    content:"\f139";
 }
 
 .table > tbody > tr > td.success,

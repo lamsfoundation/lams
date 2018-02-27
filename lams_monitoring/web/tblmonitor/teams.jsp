@@ -169,13 +169,13 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title panel-collapse">
-					<a data-toggle="collapse" data-target="#collapseOne" href="#collapseOne" class="collapsed" id="group-name-${groupDto.groupID}">
+					<a data-toggle="collapse" data-target="#collapse-${groupDto.groupID}" href="#collapse-${groupDto.groupID}" class="collapsed" id="group-name-${groupDto.groupID}">
 						${groupDto.groupName}
 					</a>
 				</h4>
 			</div>
 	
-			<div id="collapseOne" class="panel-collapse collapse in">
+			<div id="collapse-${groupDto.groupID}" class="panel-collapse collapse in">
 				<div class="panel-body">
 	
 					<div class="table-responsive">
