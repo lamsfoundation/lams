@@ -138,9 +138,6 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private static IUserManagementService userManagementService;
 
-    // *LKC* added the next variable
-    private static ILearningDesignDAO learningDesignDAO;
-
     private static ILearnerService learnerService;
 
     private static ILamsToolService toolService;
@@ -942,58 +939,85 @@ public class MonitoringAction extends LamsDispatchAction {
     }
     
     /**
-	 * If sequence starts with of Grouping->(MCQ or Assessment)->Leader Selection->Scratchie,
-	 * there is a good chance this is a TBL sequence and all activities must be grouped.
-	 */
+     * If learning design contains the following activities Grouping->(MCQ or Assessment)->Leader Selection->Scratchie
+     * (potentially with some other gates or activities in the middle), there is a good chance this is a TBL sequence
+     * and all activities must be grouped.
+     */
     private boolean isTBLSequence(Long lessonId) {
+	
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	Long firstActivityId = lesson.getLearningDesign().getFirstActivity().getActivityId();
 	//Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity
 	Activity firstActivity = getMonitoringService().getActivityById(firstActivityId);
-	//the first activity should be a grouping
-	if (!(firstActivity instanceof GroupingActivity)) {
-	    return false;
-	} 
+	
+	return verifyNextActivityFitsTbl(firstActivity, "Grouping");
+    }
+    
+    /**
+     * Traverses the learning design verifying it follows typical TBL structure
+     * 
+     * @param activity
+     * @param anticipatedActivity could be either "Grouping", "MCQ or Assessment", "Leaderselection" or "Scratchie"
+     */
+    private boolean verifyNextActivityFitsTbl(Activity activity, String anticipatedActivity) {
 	    
-	Transition transitionFromGrouping = firstActivity.getTransitionFrom();
-	if (transitionFromGrouping == null) {
+	Transition transitionFromActivity = activity.getTransitionFrom();
+	//TBL can finish with the Scratchie
+	if (transitionFromActivity == null && !"Scratchie".equals(anticipatedActivity)) {
 	    return false;
 	}
 	// query activity from DB as transition holds only proxied activity object
-	Long secondActivityId = transitionFromGrouping.getToActivity().getActivityId();
-	Activity secondActivity = monitoringService.getActivityById(secondActivityId);
-	//the second activity shall be a MCQ or Assessment
-	if (!(secondActivity.isToolActivity() && 
-		(CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(((ToolActivity) secondActivity).getTool().getToolSignature())
-		|| CentralConstants.TOOL_SIGNATURE_MCQ.equals(((ToolActivity) secondActivity).getTool().getToolSignature())))) {
-	    return false;
-	}
+	Long nextActivityId = transitionFromActivity == null ? null : transitionFromActivity.getToActivity().getActivityId();
+	Activity nextActivity = nextActivityId == null ? null : monitoringService.getActivityById(nextActivityId);
 	
-	Transition transitionFromSecondActivity = secondActivity.getTransitionFrom();
-	if (transitionFromSecondActivity == null) {
-	    return false;
-	}
-	Long thirdActivityId = transitionFromSecondActivity.getToActivity().getActivityId();
-	Activity thirdActivity = monitoringService.getActivityById(thirdActivityId);
-	//the third activity shall be a Leader Selection
-	if (!(thirdActivity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_LEADERSELECTION
-		.equals(((ToolActivity) thirdActivity).getTool().getToolSignature()))) {
-	    return false;
-	}
-	
-	Transition transitionFromThirdActivity = thirdActivity.getTransitionFrom();
-	if (transitionFromThirdActivity == null) {
-	    return false;
-	}
-	Long fourthActivityId = transitionFromThirdActivity.getToActivity().getActivityId();
-	Activity fourthActivity = monitoringService.getActivityById(fourthActivityId);
-	//the third activity shall be a Scratchie
-	if (!(fourthActivity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_SCRATCHIE
-		.equals(((ToolActivity) fourthActivity).getTool().getToolSignature()))) {
-	    return false;
-	}
+	switch (anticipatedActivity) {
+	    case "Grouping":
+		//the first activity should be a grouping
+		if (activity instanceof GroupingActivity) {
+		    return verifyNextActivityFitsTbl(nextActivity, "MCQ or Assessment");
+		    
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "Grouping");
+		}
 
-	return true;
+	    case "MCQ or Assessment":
+		//the second activity shall be a MCQ or Assessment
+		if (activity.isToolActivity() && (CentralConstants.TOOL_SIGNATURE_ASSESSMENT
+			.equals(((ToolActivity) activity).getTool().getToolSignature())
+			|| CentralConstants.TOOL_SIGNATURE_MCQ
+				.equals(((ToolActivity) activity).getTool().getToolSignature()))) {
+		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection");
+		    
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "MCQ or Assessment");
+		}
+
+	    case "Leaderselection":
+		//the third activity shall be a Leader Selection
+		if (activity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_LEADERSELECTION
+			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
+		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie");
+		    
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection");
+		}
+		
+	    case "Scratchie":
+		//the fourth activity shall be Scratchie
+		if (activity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_SCRATCHIE
+			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
+		    return true;
+		    
+		} else if (nextActivity == null) {
+		    return false;
+		    
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie");
+		}
+
+	    default:
+		return false;
+	}
     }
 
     /**
