@@ -330,7 +330,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    rowJSON.put(GradebookConstants.ELEMENT_ID, recipient.getUserId());
 
 	    JSONArray cellJSON = new JSONArray();
-	    cellJSON.put(recipient.getFirstName() + " " + recipient.getLastName() + " [" + recipient.getLogin() + "]");
+	    cellJSON.put(new StringBuilder(recipient.getLastName()).append(", ").append(recipient.getFirstName())
+		    .append(" [").append(recipient.getLogin()).append("]").toString());
 
 	    rowJSON.put(GradebookConstants.ELEMENT_CELL, cellJSON);
 	    rowsJSON.put(rowJSON);
@@ -598,9 +599,9 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	// data is going into a jquery UI table that doesn't need to it be escaped. LDEV-4514
 	for (User user : users) {
 	    JSONArray cell = new JSONArray();
-	    cell.put(new StringBuilder(user.getFirstName()).append(" ")
-		    .append(user.getLastName()).append(" (")
-		    .append(user.getLogin()) + ")").toString();
+	    cell.put(new StringBuilder(user.getLastName()).append(", ")
+		    .append(user.getFirstName()).append(" (")
+		    .append(user.getLogin()).append(")").toString());
 
 	    JSONObject cellobj = new JSONObject();
 	    cellobj.put("id", "" + user.getUserId());
