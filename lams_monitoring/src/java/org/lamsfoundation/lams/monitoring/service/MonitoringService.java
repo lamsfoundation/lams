@@ -1898,9 +1898,9 @@ public class MonitoringService implements IMonitoringService {
 	List<User> recipients = getArchivedEmailNotificationRecipients(emailNotificationUid, null, null);
 	for (User recipient : recipients) {
 	    row = new ExcelCell[1];
-	    row[0] = new ExcelCell(
-		    recipient.getFirstName() + " " + recipient.getLastName() + " [" + recipient.getLogin() + "]",
-		    false);
+	    String recipientName = new StringBuilder(recipient.getLastName()).append(", ")
+		    .append(recipient.getFirstName()).append(" [").append(recipient.getLogin()).append("]").toString();
+	    row[0] = new ExcelCell(recipientName, false);
 	    rows.add(row);
 	}
 

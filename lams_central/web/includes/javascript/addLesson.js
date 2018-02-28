@@ -555,7 +555,7 @@ function fillUserContainer(users, containerId) {
 									'userId'  : userJSON.userID
 									})
 			                    .addClass('draggableItem')
-    						    .text(userJSON.firstName + ' ' + userJSON.lastName 
+    						    .text(userJSON.lastName + ', ' + userJSON.firstName 
     						    		  + ' (' + userJSON.login + ')'
     						    	 )
     		);
