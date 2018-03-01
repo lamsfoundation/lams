@@ -12,7 +12,7 @@
 
 <script>
 	function exportExcel(){
-		location.href = "<lams:LAMSURL/>tool/laasse10/monitoring/exportSummary.do?toolContentID=${toolContentID}&fileName=assessment_export&reqID=" + (new Date()).getTime();
+		location.href = "<lams:LAMSURL/>tool/laasse10/monitoring/exportSummary.do?toolContentID=${toolContentID}&downloadTokenValue=dummy&fileName=assessment_export.xlsx&reqID=" + (new Date()).getTime();
 	};
 </script>
 
