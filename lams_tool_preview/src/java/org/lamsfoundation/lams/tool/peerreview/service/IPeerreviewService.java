@@ -71,7 +71,7 @@ public interface IPeerreviewService extends ToolRatingManager {
     /**
      * Create a new user in database.
      */
-    void createUser(PeerreviewUser peerreviewUser);
+    void updateUser(PeerreviewUser peerreviewUser);
 
     /**
      * Get user by given userID and toolContentID.

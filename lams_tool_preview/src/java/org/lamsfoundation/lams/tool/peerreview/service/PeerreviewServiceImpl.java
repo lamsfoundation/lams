@@ -158,8 +158,8 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public void createUser(PeerreviewUser peerreviewUser) {
-	peerreviewUserDao.insert(peerreviewUser);
+    public void updateUser(PeerreviewUser peerreviewUser) {
+	peerreviewUserDao.insertOrUpdate(peerreviewUser);
     }
 
     @Override
