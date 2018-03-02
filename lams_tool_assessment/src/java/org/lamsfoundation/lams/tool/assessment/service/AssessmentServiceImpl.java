@@ -914,6 +914,11 @@ public class AssessmentServiceImpl
     public Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastFinishedAssessmentResultTimeTaken(assessmentUid, userId);
     }
+    
+    @Override
+    public int countAttemptsPerOption(Long optionUid) {
+	return assessmentResultDao.countAttemptsPerOption(optionUid);
+    }
 
     @Override
     public AssessmentResult getLastFinishedAssessmentResultNotFromChache(Long assessmentUid, Long userId) {

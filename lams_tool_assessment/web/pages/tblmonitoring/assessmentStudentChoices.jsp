@@ -1,15 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="method">
-	<c:choose>
-		<c:when test="${param.isIraAssessment}">
-			iraAssessment
-		</c:when>
-		<c:otherwise>
-			aes
-		</c:otherwise>
-	</c:choose>
-</c:set>
-
 <script>
 	function exportExcel(){
 		location.href = "<lams:LAMSURL/>tool/laasse10/monitoring/exportSummary.do?toolContentID=${toolContentID}&downloadTokenValue=dummy&fileName=assessment_export.xlsx&reqID=" + (new Date()).getTime();
@@ -20,14 +9,7 @@
 <div class="row no-gutter">
 	<div class="col-xs-12 col-md-12 col-lg-8">
 		<h3>
-			<c:choose>
-				<c:when test="${param.isIraAssessment}">
-					<fmt:message key="label.ira.questions.marks"/>
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.ae.questions.marks"/>
-				</c:otherwise>
-			</c:choose>
+			<fmt:message key="label.ira.questions.marks"/>
 		</h3>
 	</div>
 </div>
@@ -40,7 +22,7 @@
 	
 	<div class="col-xs-12 col-md-6 col-lg-4 col-lg-offset-2">
 		<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
-				onclick="javascript:loadTab('${method}', ${toolContentID}); return false;">
+				onclick="javascript:loadTab('aes', ${toolContentID}); return false;">
 			<i class="fa fa-undo"></i>
 			<fmt:message key="label.hide.students.choices"/>
 		</a>

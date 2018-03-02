@@ -2,7 +2,6 @@ package org.lamsfoundation.lams.tool.assessment.web.action;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,33 +9,24 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONException;
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
-import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
-import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentQuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentQuestionResultDTO;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
@@ -44,8 +34,6 @@ import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
-import org.lamsfoundation.lams.util.ExcelCell;
-import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -62,21 +50,72 @@ public class TblMonitoringAction extends LamsDispatchAction {
     */
    public ActionForward iraAssessment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-       initAssessmentService();
+	initAssessmentService();
+	Long toolContentId = WebUtil.readLongParam(request, "toolContentID");
 
-	Long toolContentId = WebUtil.readLongParam(request, "assessmentToolContentIds");
-	String assessmentActivityTitle = request.getParameter("assessmentActivityTitles");
-	
-	String[] toolContentIds = new String[] {toolContentId.toString()};
-	String[] activityTitles = new String[] {assessmentActivityTitle};
-	
+	String[] toolContentIds = new String[] { toolContentId.toString() };
+	String[] activityTitles = new String[] { "" };
 	List<TblAssessmentDTO> assessmentDtos = getAssessmentDtos(toolContentIds, activityTitles);
 	request.setAttribute("assessmentDtos", assessmentDtos);
-	
+
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	request.setAttribute("isIraAssessment", true);
 	return mapping.findForward("assessment");
-   }
+    }
+   
+   /**
+   * Shows ira page in case of Assessment activity
+   */
+  public ActionForward iraAssessmentStudentChoices(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	initAssessmentService();
+
+	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
+	
+	//prepare list of the questions, filtering out questions that aren't supposed to be answered
+	Set<AssessmentQuestion> questionList = new TreeSet<AssessmentQuestion>();
+	//in case there is at least one random question - we need to show all questions in a drop down select
+	if (assessment.hasRandomQuestion()) {
+	    questionList.addAll(assessment.getQuestions());
+
+	//show only questions from question list otherwise
+	} else {
+	    for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
+		questionList.add(reference.getQuestion());
+	    }
+	}
+	//keep only MCQ type of questions
+	Set<AssessmentQuestion> mcqQuestions = new TreeSet<AssessmentQuestion>();
+	int maxOptionsInQuestion = 0;
+	for (AssessmentQuestion question : questionList) {
+	    if (AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE == question.getType()) {
+		mcqQuestions.add(question);
+		
+		//calculate maxOptionsInQuestion
+		if (question.getOptions().size() > maxOptionsInQuestion) {
+		    maxOptionsInQuestion = question.getOptions().size();
+		}
+	    }
+	}
+	request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
+
+	int totalNumberOfUsers = assessmentService.getCountUsersByContentId(toolContentId);
+	for (AssessmentQuestion question : mcqQuestions) {
+
+	    // build candidate dtos
+	    for (AssessmentQuestionOption option : question.getOptions()) {
+		int optionAttemptCount = assessmentService.countAttemptsPerOption(option.getUid());
+
+		float percentage =  (float)(optionAttemptCount * 100) / totalNumberOfUsers;
+		option.setPercentage(percentage);
+	    }
+	}
+	request.setAttribute("questions", mcqQuestions);
+
+	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
+	return mapping.findForward("iraAssessmentStudentChoices");
+    }
    
    private List<TblAssessmentDTO> getAssessmentDtos(String[] toolContentIds, String[] activityTitles) {
 	List<TblAssessmentDTO> assessmentDtos = new ArrayList<TblAssessmentDTO>();
@@ -288,39 +327,6 @@ public class TblMonitoringAction extends LamsDispatchAction {
 
 	return null;
     }
-
-//    /**
-//     * Excel Summary Export.
-//     *
-//     * @param mapping
-//     * @param form
-//     * @param request
-//     * @param response
-//     * @return
-//     * @throws IOException
-//     */
-//    public ActionForward exportExcelAssessment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-//	    HttpServletResponse response) throws IOException, ServletException {
-//	initAssessmentService();
-//
-//	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-//	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
-//
-//	List<SessionDTO> sessionDtos = assessmentService.getSessionDtos(toolContentId, false);
-//	boolean showUserNames = true;
-//	LinkedHashMap<String, ExcelCell[][]> dataToExport = assessmentService.exportSummary(assessment, sessionDtos,
-//		showUserNames);
-//
-//	response.setContentType("application/x-download");
-//	String fileName = "assessment_" + assessment.getUid() + "_export.xlsx";
-//	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-//	log.debug("Exporting assessment to a spreadsheet: " + assessment.getContentId());
-//
-//	ServletOutputStream out = response.getOutputStream();
-//	ExcelUtil.createExcel(out, dataToExport, "Exported on", true);
-//
-//	return null;
-//    }
     
     /**
      * Get ModalDialog for Teams tab.
@@ -338,106 +344,8 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	AssessmentResultDTO result = assessmentService.getUserMasterDetail(user.getSession().getSessionId(), userId);
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
 	
-	
-//	// release object from the cache (it's required when we have modified result object in the same request)
-//	AssessmentResult result = assessmentService.getLastFinishedAssessmentResultNotFromChache(assessment.getUid(), userId);
-//
-//	for (Set<QuestionDTO> questionsForOnePage : pagedQuestionDtos) {
-//	    for (QuestionDTO questionDto : questionsForOnePage) {
-//
-//		// find corresponding questionResult
-//		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-//		    if (questionDto.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
-//
-//			// copy questionResult's info to the question
-//			questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
-//
-//			// required for showing right/wrong answers icons on results page correctly
-//			if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
-//				|| questionDto.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
-//			    boolean isAnsweredCorrectly = false;
-//			    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-//				if (optionDto.getUid().equals(questionResult.getSubmittedOptionUid())) {
-//				    isAnsweredCorrectly = optionDto.getGrade() > 0;
-//				    break;
-//				}
-//			    }
-//			    questionDto.setAnswerBoolean(isAnsweredCorrectly);
-//			}
-//
-//			// required for markandpenalty area and if it's on - on question's summary page
-//			List<Object[]> questionResults = assessmentService.getAssessmentQuestionResultList(assessment.getUid(),
-//				userId, questionDto.getUid());
-//			questionDto.setQuestionResults(questionResults);
-//		    }
-//		}
-//	    }
-//	}
-	
 	return mapping.findForward("teams");
     }
-
-//  /**
-//   * Used only for excell export (for getUserSummaryData() method).
-//   */
-//  private static TBLAssessmentQuestionResult getAssessmentTBLQuestionResult(AssessmentQuestionResult questionResult) {
-//	AssessmentQuestion question = questionResult.getAssessmentQuestion();
-//	String answer = "";
-//
-//	switch (question.getType()) {
-//	case AssessmentConstants.QUESTION_TYPE_ESSAY:
-//	    answer = questionResult.getAnswerString();
-//
-//	case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
-//	    for (AssessmentQuestionOption option : question.getOptions()) {
-//		sb.append("[" + option.getQuestion() + ", " + option.getOptionString() + "] \n");
-//	    }
-//	    return sb.toString();
-//
-//	case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
-//	    for (AssessmentQuestionOption option : question.getOptions()) {
-//		if (option.getGrade() == 100f) {
-//		    return option.getOptionString();
-//		}
-//	    }
-//
-//	case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
-//	    return question.getAnswerString();
-//
-//	case AssessmentConstants.QUESTION_TYPE_ORDERING:
-//	    TreeSet<AssessmentQuestionOption> correctOptionSet = new TreeSet<AssessmentQuestionOption>(
-//		    new SequencableComparator());
-//	    correctOptionSet.addAll(question.getOptions());
-//
-//	    for (AssessmentQuestionOption option : question.getOptions()) {
-//		sb.append(option.getOptionString() + "\n");
-//	    }
-//	    return sb.toString();
-//
-//	case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
-//	    return question.getAnswerString();
-//
-//	case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
-//	    return new Boolean(question.getAnswerBoolean()).toString();
-//
-//	case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
-//	    for (AssessmentQuestionOption option : question.getOptions()) {
-//		if (option.isCorrect()) {
-//		    return option.getOptionString();
-//		}
-//	    }
-//
-//	default:
-//	    return null;
-//	}
-//
-//	TBLAssessmentQuestionResult tblQuestionResult = new TBLAssessmentQuestionResult();
-//	String answer = AssessmentEscapeUtils.printResponsesForJqgrid(questionResult);
-//	tblQuestionResult.setAnswer(answer);
-//	boolean correct = (questionResult.getPenalty() + questionResult.getMark() + 0.1) >= questionResult.getMaxMark();
-//	tblQuestionResult.setCorrect(correct);
-//	return tblQuestionResult;
-//  }
     
     // *************************************************************************************
     // Private method

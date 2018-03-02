@@ -81,4 +81,12 @@ public interface AssessmentResultDAO extends DAO {
     int getAssessmentResultCount(Long assessmentUid, Long userId);
 
     AssessmentResult getAssessmentResultByUid(Long assessmentResultUid);
+    
+    /**
+     * Count how many last finished attempts selected specified option.
+     * 
+     * @param optionUid
+     * @return
+     */
+    int countAttemptsPerOption(Long optionUid);
 }

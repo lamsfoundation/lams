@@ -1,5 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
-
+<c:set var="method">
+	<c:choose>
+		<c:when test="${isIraAssessment}">
+			iraAssessmentStudentChoices
+		</c:when>
+		<c:otherwise>
+			aesStudentChoices
+		</c:otherwise>
+	</c:choose>
+</c:set>
 <script>
 	$(document).ready(function(){
 		// change attempted and all learners numbers
@@ -50,7 +59,7 @@
 
 	<div class="col-xs-6 col-md-4 col-md-offset-4 col-lg-4 col-lg-offset-2">
 		<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
-				onclick="javascript:loadTab('aesStudentChoices', document.getElementById('selected-content-id').value, ${isIraAssessment}); return false;">
+				onclick="javascript:loadTab('${method}', document.getElementById('selected-content-id').value); return false;">
 			<i class="fa fa-file"></i>
 			<fmt:message key="label.show.students.choices"/>
 		</a>
