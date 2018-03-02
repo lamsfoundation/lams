@@ -314,6 +314,11 @@ public interface IAssessmentService {
      * @return
      */
     Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId);
+    
+    /**
+     * Count how many last finished attempts selected specified option.
+     */
+    int countAttemptsPerOption(Long optionUid);
 
     /**
      * Return the latest *finished* result (the same as the method above). But previously evicting it from the cache. It

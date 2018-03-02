@@ -48,7 +48,7 @@
 			}
 		});
 
-		function loadTab(method, toolContentID, isIraAssessment) {
+		function loadTab(method, toolContentID) {
 			var url = "<c:url value='tblmonitor.do'/>";
 			var options = {};
 			
@@ -60,12 +60,9 @@
 				toolContentID = "${iraToolContentId}";
 				url = "<lams:LAMSURL/>tool/lamc11/tblmonitoring.do";
 				
-			} else if (method == "iraAssessment") {
+			} else if (method == "iraAssessment" || method == "iraAssessmentStudentChoices") {
+				toolContentID = "${iraToolContentId}";
 				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring.do";
-				options = {
-					assessmentToolContentIds: "${iraToolContentId}",
-					assessmentActivityTitles: "${iraAssessmentActivityTitle}"
-				};
 	
 			} else if (method == "aes" || method == "aesStudentChoices") {
 				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring.do";
@@ -84,8 +81,7 @@
 			$.extend( options, {
 				method: method,
 				lessonID: ${lesson.lessonId},
-				toolContentID: toolContentID,
-				isIraAssessment: isIraAssessment
+				toolContentID: toolContentID
 			});
 
 			$("#tblmonitor-tab-content").load(

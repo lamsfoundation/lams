@@ -190,7 +190,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     public int getCountUsersByContentId(Long contentId) {
 
 	String LOAD_USERS_ORDERED_BY_NAME = "SELECT COUNT(*) FROM " + AssessmentUser.class.getName() + " user"
-		+ " WHERE user.assessment.contentId = :contentId ";
+		+ " WHERE user.session.assessment.contentId = :contentId ";
 
 	Query query = getSession().createQuery(LOAD_USERS_ORDERED_BY_NAME);
 	query.setLong("contentId", contentId);

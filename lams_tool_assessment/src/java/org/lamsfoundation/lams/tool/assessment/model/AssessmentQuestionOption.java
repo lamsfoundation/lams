@@ -56,6 +56,8 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
     private String questionEscaped;
 
     private String optionStringEscaped;
+    
+    private float percentage;
 
     // **********************************************************
     // Get/Set methods
@@ -208,6 +210,14 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
 
     public void setOptionStringEscaped(String optionStringEscaped) {
 	this.optionStringEscaped = optionStringEscaped;
+    }
+    
+    public float getPercentage() {
+	return percentage;
+    }
+    
+    public void setPercentage(float percentage) {
+	this.percentage = percentage;
     }
 
     @Override

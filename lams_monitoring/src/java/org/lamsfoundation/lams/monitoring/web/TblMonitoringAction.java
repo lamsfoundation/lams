@@ -361,7 +361,6 @@ public class TblMonitoringAction extends LamsDispatchAction {
 			
 		    } else {
 			request.setAttribute("isIraAssessmentAvailable", true);
-			request.setAttribute("iraAssessmentActivityTitle", toolTitle);
 		    }
 		    request.setAttribute("iraToolContentId", toolContentId);
 		    request.setAttribute("iraToolActivityId", toolActivityId);

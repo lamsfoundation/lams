@@ -381,6 +381,11 @@
 			    path="/pages/tblmonitoring/teams.jsp"
 			    redirect="false"
 		  	/>
+		  	<forward
+			    name="iraAssessmentStudentChoices"
+			    path="/pages/tblmonitoring/iraAssessmentStudentChoices.jsp"
+			    redirect="false"
+		  	/>
 		</action>
 		<!-- ========== Common Definitions ============================== -->
 		<action path="/clearsession"

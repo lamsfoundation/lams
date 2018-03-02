@@ -108,7 +108,6 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	}
 	request.setAttribute("questionDtos", questionDtos);
 
-	request.setAttribute("questions", questions);
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	return mapping.findForward("mcqStudentChoices");
     }
