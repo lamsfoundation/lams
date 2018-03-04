@@ -76,6 +76,8 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
@@ -94,7 +96,6 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -128,7 +129,7 @@ public class MonitoringAction extends LamsDispatchAction {
     private static final int LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
     private static final int USER_PAGE_SIZE = 10;
 
-    private static IAuditService auditService;
+    private static ILogEventService logEventService;
 
     private static ILessonService lessonService;
 
@@ -560,7 +561,7 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward forceComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, JSONException {
-	getAuditService();
+
 	// get parameters
 	Long activityId = null;
 	String actId = request.getParameter(AttributeNames.PARAM_ACTIVITY_ID);
@@ -608,7 +609,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	String messageKey = (activityId == null) ? "audit.force.complete.end.lesson" : "audit.force.complete";
 	Object[] args = new Object[] { learnerIDs, activityId, lessonId };
 	String auditMessage = getMonitoringService().getMessageService().getMessage(messageKey, args);
-	MonitoringAction.auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, auditMessage + " " + message);
+	getLogEventService().logEvent(LogEvent.TYPE_FORCE_COMPLETE, requesterId, null, lessonId, null,
+		auditMessage + " " + message);
 
 	PrintWriter writer = response.getWriter();
 	writer.println(message);
@@ -1483,18 +1485,13 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
-    /**
-     * Get AuditService bean.
-     *
-     * @return
-     */
-    private IAuditService getAuditService() {
-	if (MonitoringAction.auditService == null) {
+    private ILogEventService getLogEventService() {
+	if (MonitoringAction.logEventService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    MonitoringAction.auditService = (IAuditService) ctx.getBean("auditService");
+	    MonitoringAction.logEventService = (ILogEventService) ctx.getBean("logEventService");
 	}
-	return MonitoringAction.auditService;
+	return MonitoringAction.logEventService;
     }
 
     private ILessonService getLessonService() {

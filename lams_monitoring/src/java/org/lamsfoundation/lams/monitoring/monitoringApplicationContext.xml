@@ -43,7 +43,6 @@
 		<property name="eventDAO"><ref bean="eventDAO"/></property>
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>			
 		<property name="learnerService"><ref bean="learnerService"/></property>			
-		<property name="auditService"><ref bean="auditService"/></property>
 		<property name="logEventService"><ref bean="logEventService"/></property>				
 		<property name="lessonService"><ref bean="lessonService"/></property>			
 		<property name="userManagementService"><ref bean="userManagementService"/></property>			

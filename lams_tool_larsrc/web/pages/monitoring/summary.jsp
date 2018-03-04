@@ -130,10 +130,10 @@
    	        <c:forEach var="item" items="${groupSummary.items}" varStatus="i">
 				<c:choose>
 					<c:when test="${item.itemHide}">
-						<c:set var="changeItemVisibility"><a href='#nogo' onclick='javascript:changeItemVisibility(this, ${item.itemUid}, false); return false;'> <fmt:message key='monitoring.label.show' /> </a></c:set>
+						<c:set var="changeItemVisibility"><a href='#nogo' onclick='javascript:changeItemVisibility(this, ${item.itemUid}, ${groupSummary.sessionId}, false); return false;'> <fmt:message key='monitoring.label.show' /> </a></c:set>
 					</c:when>
 					<c:otherwise>
-						<c:set var="changeItemVisibility"><a href='#nogo' onclick='javascript:changeItemVisibility(this, ${item.itemUid}, true); return false;'> <fmt:message key='monitoring.label.hide' /> </a></c:set>
+						<c:set var="changeItemVisibility"><a href='#nogo' onclick='javascript:changeItemVisibility(this, ${item.itemUid}, ${groupSummary.sessionId}, true); return false;'> <fmt:message key='monitoring.label.hide' /> </a></c:set>
 					</c:otherwise>
 				</c:choose>
 				
@@ -215,23 +215,23 @@
 		return definePortraitPopover(rowObject[5], rowObject[0],  rowObject[1]);
 	}
 	
-	function changeItemVisibility(linkObject, itemUid, isHideItem) {
+	function changeItemVisibility(linkObject, itemUid, toolSessionId, isHideItem) {
 		<c:set var="hideShowLink"><a href='<c:url value='/monitoring/changeItemVisibility.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}' class='button'> <fmt:message key='monitoring.label.show' /> </a></c:set>
         $.ajax({
             url: '<c:url value="/monitoring/changeItemVisibility.do"/>',
-            data: 'sessionMapID=${sessionMapID}&itemUid=' + itemUid + '&isHideItem=' + isHideItem,
+            data: 'sessionMapID=${sessionMapID}&toolSessionID='+toolSessionId+'&itemUid=' + itemUid + '&isHideItem=' + isHideItem,
             type: 'post',
             success: function () {
             	if (isHideItem) {
             		linkObject.innerHTML = '<fmt:message key='monitoring.label.show' />' ;
             		linkObject.onclick = function (){
-            			changeItemVisibility(this, itemUid, false); 
+            			changeItemVisibility(this, itemUid, toolSessionId, false); 
             			return false;
             		}
             	} else {
             		linkObject.innerHTML = '<fmt:message key='monitoring.label.hide' />' ;
             		linkObject.onclick = function (){
-            			changeItemVisibility(this, itemUid, true); 
+            			changeItemVisibility(this, itemUid, toolSessionId, true); 
             			return false;
             		}
             	}

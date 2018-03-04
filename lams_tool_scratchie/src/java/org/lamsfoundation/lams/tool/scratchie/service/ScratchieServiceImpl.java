@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -100,11 +101,9 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
-import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * @author Andrey Balan
@@ -148,7 +147,7 @@ public class ScratchieServiceImpl
 
     private IGradebookService gradebookService;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
 
     private ICoreNotebookService coreNotebookService;
 
@@ -391,8 +390,12 @@ public class ScratchieServiceImpl
 		    user.getSession().getSessionId(), false);
 
 	    // record mark change with audit service
-	    auditService.logMarkChange(ScratchieConstants.TOOL_SIGNATURE, user.getUserId(), user.getLoginName(),
-		    "" + oldMark, "" + newMark);
+	    Long toolContentId = null;
+	    if (session.getScratchie() != null) {
+		    toolContentId = session.getScratchie().getContentId();
+		}
+
+	    logEventService.logMarkChange(user.getUserId(), user.getLoginName(), toolContentId, "" + oldMark, "" + newMark);
 	}
 
     }
@@ -2157,8 +2160,8 @@ public class ScratchieServiceImpl
 	this.gradebookService = gradebookService;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public IUserManagementService getUserManagementService() {

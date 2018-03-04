@@ -48,6 +48,8 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.FavoriteOrganisation;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
@@ -73,7 +75,6 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -113,7 +114,7 @@ public class UserManagementService implements IUserManagementService {
 
     protected MessageService messageService;
 
-    private static IAuditService auditService;
+    private static ILogEventService logEventService;
 
     private IToolContentHandler centralToolContentHandler;
 
@@ -893,20 +894,29 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public void auditPasswordChanged(User user, String moduleName) {
+    public void logPasswordChanged(User user, User modifiedBy) {
 	String[] args = new String[1];
 	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
 	String message = messageService.getMessage("audit.user.password.change", args);
-	getAuditService().log(moduleName, message);
+	getLogEventService().logEvent(LogEvent.TYPE_PASSWORD_CHANGE, modifiedBy != null ? modifiedBy.getUserId() : null , user.getUserId(), null, null, message);
     }
 
     @Override
-    public void auditUserCreated(User user, String moduleName) {
+    public void logUserCreated(User user, User createdBy) {
 	String[] args = new String[2];
 	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
 	args[1] = user.getFullName();
 	String message = messageService.getMessage("audit.user.create", args);
-	getAuditService().log(moduleName, message);
+	getLogEventService().logEvent(LogEvent.TYPE_USER_ORG_ADMIN, createdBy != null ? createdBy.getUserId() : null, user.getUserId(), null, null, message);
+    }
+
+    @Override
+    public void logUserCreated(User user, UserDTO createdBy) {
+	String[] args = new String[2];
+	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
+	args[1] = user.getFullName();
+	String message = messageService.getMessage("audit.user.create", args);
+	getLogEventService().logEvent(LogEvent.TYPE_USER_ORG_ADMIN, createdBy != null ? createdBy.getUserID() : null, user.getUserId(), null, null, message);
     }
 
     @Override
@@ -1196,13 +1206,13 @@ public class UserManagementService implements IUserManagementService {
 	this.favoriteOrganisationDAO = favoriteOrganisationDAO;
     }
 
-    private IAuditService getAuditService() {
-	if (UserManagementService.auditService == null) {
+    private ILogEventService getLogEventService() {
+	if (UserManagementService.logEventService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getWebApplicationContext(SessionManager.getServletContext());
-	    UserManagementService.auditService = (IAuditService) ctx.getBean("auditService");
+	    UserManagementService.logEventService = (ILogEventService) ctx.getBean("logEventService");
 	}
-	return UserManagementService.auditService;
+	return UserManagementService.logEventService;
     }
 
     public void setCentralToolContentHandler(IToolContentHandler centralToolContentHandler) {

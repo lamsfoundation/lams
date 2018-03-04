@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.admin.web.action;
 
 import java.util.ArrayList;
@@ -39,9 +38,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.dto.UserOrgRoleDTO;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.timezone.Timezone;
@@ -57,11 +57,14 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Jun-Dir Liew
@@ -129,7 +132,8 @@ public class UserAction extends LamsDispatchAction {
 	    if (!canEdit) {
 		OrganisationType orgType = org.getOrganisationType();
 		Integer orgIdOfCourse = orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)
-			? org.getParentOrganisation().getOrganisationId() : orgId;
+			? org.getParentOrganisation().getOrganisationId()
+			: orgId;
 		User requestor = service.getUserByLogin(request.getRemoteUser());
 		if (service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_ADMIN)
 			|| service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER)) {
@@ -176,7 +180,7 @@ public class UserAction extends LamsDispatchAction {
 	    }
 	    userForm.set("userTheme", userSelectedTheme);
 	    userForm.set("initialPortraitId", user.getPortraitUuid());
-	    
+
 	    //property available for modification only to sysadmins
 	    userForm.set("twoFactorAuthenticationEnabled", user.isTwoFactorAuthenticationEnabled());
 	} else { // create a user
@@ -188,7 +192,7 @@ public class UserAction extends LamsDispatchAction {
 	    }
 	}
 	userForm.set("orgId", (org == null ? null : org.getOrganisationId()));
-	
+
 	// sysadmins can mark users as required to use two-factor authentication
 	if (request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("isSysadmin", true);
@@ -314,6 +318,7 @@ public class UserAction extends LamsDispatchAction {
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return mapping.findForward("error");
 	}
+	UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 	Integer userId = WebUtil.readIntParam(request, "userId");
@@ -321,8 +326,9 @@ public class UserAction extends LamsDispatchAction {
 	String[] args = new String[1];
 	args[0] = userId.toString();
 	String message = messageService.getMessage("audit.user.disable", args);
-	AdminServiceProxy.getAuditService(getServlet().getServletContext()).log(AdminConstants.MODULE_NAME, message);
-
+	ILogEventService logEventService = AdminServiceProxy.getLogEventService(getServlet().getServletContext());
+	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
+		null, null, message);
 	if ((orgId == null) || (orgId == 0)) {
 	    return mapping.findForward("usersearch");
 	} else {
@@ -341,6 +347,7 @@ public class UserAction extends LamsDispatchAction {
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return mapping.findForward("error");
 	}
+	UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 	Integer userId = WebUtil.readIntParam(request, "userId");
@@ -354,8 +361,9 @@ public class UserAction extends LamsDispatchAction {
 	String[] args = new String[1];
 	args[0] = userId.toString();
 	String message = messageService.getMessage("audit.user.delete", args);
-	AdminServiceProxy.getAuditService(getServlet().getServletContext()).log(AdminConstants.MODULE_NAME, message);
-
+	ILogEventService logEventService = AdminServiceProxy.getLogEventService(getServlet().getServletContext());
+	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
+		null, null, message);
 	if ((orgId == null) || (orgId == 0)) {
 	    return mapping.findForward("usersearch");
 	} else {

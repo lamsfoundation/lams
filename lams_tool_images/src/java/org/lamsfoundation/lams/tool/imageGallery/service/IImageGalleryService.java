@@ -235,7 +235,7 @@ public interface IImageGalleryService extends ToolRatingManager {
      *
      * @param itemUid
      */
-    void toggleImageVisibility(Long itemUid);
+    void toggleImageVisibility(Long itemUid, Long toolContentId);
 
     /**
      * Create refection entry into notebook tool.

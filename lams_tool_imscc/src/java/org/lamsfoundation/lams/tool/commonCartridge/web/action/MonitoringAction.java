@@ -85,14 +85,15 @@ public class MonitoringAction extends Action {
     private ActionForward hideitem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	Long itemUid = WebUtil.readLongParam(request, CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID);
-	ICommonCartridgeService service = getCommonCartridgeService();
-	service.setItemVisible(itemUid, false);
-
 	// get back SessionMap
 	String sessionMapID = request.getParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	Long toolContentId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
+
+	Long itemUid = WebUtil.readLongParam(request, CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID);
+	ICommonCartridgeService service = getCommonCartridgeService();
+	service.setItemVisible(itemUid, toolContentId, false);
 
 	// update session value
 	List<List> groupList = (List<List>) sessionMap.get(CommonCartridgeConstants.ATTR_SUMMARY_LIST);
@@ -112,14 +113,16 @@ public class MonitoringAction extends Action {
 
     private ActionForward showitem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	Long itemUid = WebUtil.readLongParam(request, CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID);
-	ICommonCartridgeService service = getCommonCartridgeService();
-	service.setItemVisible(itemUid, true);
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	Long toolContentId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	
+	Long itemUid = WebUtil.readLongParam(request, CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID);
+	ICommonCartridgeService service = getCommonCartridgeService();
+	service.setItemVisible(itemUid, toolContentId, true);
 
 	// update session value
 	List<List> groupList = (List<List>) sessionMap.get(CommonCartridgeConstants.ATTR_SUMMARY_LIST);

@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.imageGallery.model;
 
 import java.util.Date;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 
 /**
@@ -365,5 +366,10 @@ public class ImageGalleryItem implements Cloneable {
 
     public void setDescriptionEscaped(String descriptionEscaped) {
 	this.descriptionEscaped = descriptionEscaped;
+    }
+    
+    @Override
+    public String toString() {
+	return new ToStringBuilder(this).append("uid", uid).append(" title", title).toString();
     }
 }

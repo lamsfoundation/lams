@@ -408,7 +408,9 @@
 		</property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.logevent.service.LogEventService">
+				<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 				<property name="logEventDAO"><ref bean="logEventDAO"/></property>
+				<property name="messageService"><ref bean="commonMessageService"/></property>
 				<property name="userManagementService"><ref bean="userManagementService"/></property>
 			</bean>	
 		</property>
@@ -445,17 +447,10 @@
 		</property>
 	</bean>
 
-	
-	<!-- auditing service -->
-	<bean id="auditService" class="org.lamsfoundation.lams.util.audit.AuditService" >
-		<property name="messageService"><ref bean="commonMessageService"/></property>
-		<property name="activityDao"><ref bean="activityDAO"/></property>
-    </bean>
-
 	<!-- Security service -->
 	<bean id="securityServiceTarget" class="org.lamsfoundation.lams.security.SecurityService">
 		<property name="securityDAO"><ref bean="securityDAO"/></property>
-		<property name="auditService"><ref bean="auditService"/></property>
+		<property name="logEventService"><ref bean="logEventService"/></property>
 	</bean>	
 	
 	<bean id="securityService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

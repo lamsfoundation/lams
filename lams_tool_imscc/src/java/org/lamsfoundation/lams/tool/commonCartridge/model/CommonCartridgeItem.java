@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 
 /**
@@ -429,4 +430,11 @@ public class CommonCartridgeItem implements Cloneable {
     public boolean isComplete() {
 	return complete;
     }
+    
+    @Override
+    public String toString() {
+	return new ToStringBuilder(this).append(" uid", uid).append(" type", type).append(" title", title).toString();
+    }
+
+
 }

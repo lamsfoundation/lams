@@ -42,13 +42,14 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -63,7 +64,7 @@ import com.warrenstrange.googleauth.GoogleAuthenticator;
  *
  */
 public class SsoHandler implements ServletExtension {
-    private static IAuditService auditService = null;
+    private static ILogEventService logEventService = null;
     private static IUserManagementService userManagementService = null;
 
     protected static final String SESSION_KEY = "io.undertow.servlet.form.auth.redirect.location";
@@ -204,9 +205,12 @@ public class SsoHandler implements ServletExtension {
 			Long currentTimeMillis = System.currentTimeMillis();
 			Date date = new Date(currentTimeMillis + lockOutTimeMillis);
 			user.setLockOutTime(date);
-			getAuditService(session.getServletContext()).log(userDTO, "sso",
-				"User is locked out for " + Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME)
-					+ " mins after " + failedAttempts + " failed attempts.");
+			String message = new StringBuilder("User ").append(user.getLogin()).append("(")
+				.append(user.getUserId()).append(") is locked out for ")
+				.append(Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME)).append(" mins after ")
+				.append(failedAttempts).append(" failed attempts.").toString();
+			getLogEventService(session.getServletContext()).logEvent(LogEvent.TYPE_ACCOUNT_LOCKED,
+				user.getUserId(), user.getUserId(), null, null, message);
 		    }
 		    getUserManagementService(session.getServletContext()).save(user);
 		}
@@ -300,11 +304,11 @@ public class SsoHandler implements ServletExtension {
 	return SsoHandler.userManagementService;
     }
 
-    protected IAuditService getAuditService(ServletContext context) {
-	if (SsoHandler.auditService == null) {
+    protected ILogEventService getLogEventService(ServletContext context) {
+	if (SsoHandler.logEventService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(context);
-	    SsoHandler.auditService = (IAuditService) ctx.getBean("auditService");
+	    SsoHandler.logEventService = (ILogEventService) ctx.getBean("logEventService");
 	}
-	return SsoHandler.auditService;
+	return SsoHandler.logEventService;
     }
 }

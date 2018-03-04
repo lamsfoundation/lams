@@ -31,14 +31,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.security.UniversalLoginModule;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -68,10 +68,10 @@ public class LoginAsAction extends Action {
 		if (user != null) {
 		    // audit log when loginas
 		    UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-		    IAuditService auditService = (IAuditService) ctx.getBean("auditService");
+		    ILogEventService logEventService = (ILogEventService) ctx.getBean("logEventService");
 		    String[] args = new String[] { sysadmin.getLogin() + "(" + sysadmin.getUserID() + ")", login };
 		    String message = messageService.getMessage("audit.admin.loginas", args);
-		    auditService.log(CentralConstants.MODULE_NAME, message);
+		    logEventService.logEvent(LogEvent.TYPE_LOGIN_AS, sysadmin.getUserID(), user.getUserId(), null, null, message);
 
 		    // login.jsp knows what to do with these
 		    request.setAttribute("login", login);
