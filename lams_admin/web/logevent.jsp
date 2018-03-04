@@ -215,30 +215,11 @@
 	}
 	
 	function getEvents() {
-		debugger;
 		$(".tablesorter").trigger('pagerUpdate', 1);
 	}
-/* 	function loadGroupStats(orgId) {
-		if (orgId) {
-			jQuery.ajax({		
-				type: "GET",
-				url: "<lams:WebAppURL/>/statistics.do",
-				data: {method : "groupStats", orgId : orgId},
-				cache: false,
-				success: function (html) {
-					jQuery("#groupDiv").html(html);
-				}
-			});
-		} else {
-			jQuery("#groupDiv").html(null);
-		}
-	}
- */
  </script>
 
 <p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
-
-<p>${startDate}</p>
 
 	<div class="form form-inline">
 		<span><select id="areaMenu" class="form-control" onchange="javascript:configureTypeDropdown(this.value)"></select>&nbsp;
