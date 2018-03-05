@@ -238,7 +238,7 @@ public interface IGradebookService {
      * @return
      */
     GradebookUserActivity getGradebookUserActivity(Long activityID, Integer userID);
-    
+
     /**
      * Gets all available gradebookUserActivity objects for the specified activity
      *
@@ -278,6 +278,11 @@ public interface IGradebookService {
      */
     void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
 	    Boolean markedInGradebook);
+
+    /**
+     * Delete user activity mark and updates aggregates
+     */
+    void removeActivityMark(Integer userID, Long toolSessionID);
 
     /**
      * Get an activity from the db by id
@@ -339,5 +344,4 @@ public interface IGradebookService {
 
     /** Get a summary of the weightings */
     List<String[]> getWeights(LearningDesign design);
-
 }
