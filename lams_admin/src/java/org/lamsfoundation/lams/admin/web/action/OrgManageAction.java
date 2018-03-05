@@ -29,7 +29,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -54,6 +53,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * <p>
@@ -209,9 +209,9 @@ public class OrgManageAction extends LamsDispatchAction {
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("id", organisation.getOrganisationId());
 	    String orgName = organisation.getName() == null ? "" : organisation.getName();
-	    responseRow.put("name", StringEscapeUtils.escapeHtml(orgName));
+	    responseRow.put("name", HtmlUtils.htmlEscape(orgName));
 	    String orgCode = organisation.getCode() == null ? "" : organisation.getCode();
-	    responseRow.put("code", StringEscapeUtils.escapeHtml(orgCode));
+	    responseRow.put("code", HtmlUtils.htmlEscape(orgCode));
 	    String orgCreateDate = organisation.getCreateDate() == null ? ""
 		    : FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(organisation.getCreateDate());
 	    responseRow.put("createDate", orgCreateDate);

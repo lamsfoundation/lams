@@ -75,10 +75,10 @@
 						<fmt:message key="heading.selectScribe" />
 						<html:select property="appointedScribeUID" styleClass="form-control input-sm loffset5">
 							<c:forEach var="user" items="${session.userDTOs}">
-								<html:option value="${user.uid}">
-									${user.firstName} ${user.lastName}
+ 								<html:option value="${user.uid}">
+ 									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 								</html:option>
-							</c:forEach>
+ 							</c:forEach>
 						</html:select>
 						<html:submit styleClass="btn btn-default btn-sm loffset5">
 							<fmt:message key="button.select" />
@@ -94,12 +94,12 @@
 			</c:otherwise>
 		</c:choose>
 	
-		<c:if test="${session.appointedScribe != null}">
+ 		<c:if test="${session.appointedScribe != null}">
 			<strong>
 				<fmt:message key="heading.appointedScribe" />: <lams:Portrait userId="${session.appointedScribeUserId}" hover="true"><c:out value="${session.appointedScribe}" escapeXml="true"/></lams:Portrait>
 			</strong>
 		</c:if>
-	</div>
+ 	</div>
 		
 	<c:if test="${session.appointedScribe != null}">
 		<c:set var="scribeSessionDTO" value="${session}" scope="request"/>
@@ -108,14 +108,14 @@
         <div class="panel-heading ${subpanelHeadingClass}"><span class="panel-title"><fmt:message key="heading.report" /></span></div>
         <div class="panel-body">
 			<c:forEach var="report" items="${session.reportDTOs}">
-				<p>
+ 				<p>
 					<c:out value="${report.headingDTO.headingText}" escapeXml="false" />
 				</p>
 				<p>
 					<lams:out value="${report.entryText}" escapeHtml="true"/>
-				</p>
+ 				</p>
 				<hr />
-			</c:forEach>
+ 			</c:forEach>
 	
 			<%@include file="/pages/parts/voteDisplay.jsp"%>
 	

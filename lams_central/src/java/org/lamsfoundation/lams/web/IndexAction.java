@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -56,6 +55,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  *
@@ -210,7 +210,7 @@ public class IndexAction extends LamsDispatchAction {
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("id", orgDto.getOrganisationID());
 	    String orgName = orgDto.getName() == null ? "" : orgDto.getName();
-	    responseRow.put("name", StringEscapeUtils.escapeHtml(orgName));
+	    responseRow.put("name", HtmlUtils.htmlEscape(orgName));
 
 	    rows.put(responseRow);
 	}

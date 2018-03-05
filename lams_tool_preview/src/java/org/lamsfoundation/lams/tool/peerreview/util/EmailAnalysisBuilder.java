@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.tool.peerreview.util.EmailAnalysisBuilder.LearnerData.SingleCriteriaData;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * Creates the Self and Peer Assessment email, comparing the learner's self assessment against their peers' assessment
@@ -423,7 +424,7 @@ public class EmailAnalysisBuilder {
     private void generateCommentEntry(StringBuilder htmlText, StyledCriteriaRatingDTO dto, boolean showCommentTitle) {
 
 	int rowCount = 1;
-	String escapedTitle = StringEscapeUtils.escapeHtml(dto.getRatingCriteria().getTitle());
+	String escapedTitle = HtmlUtils.htmlEscape(dto.getRatingCriteria().getTitle());
 	if (dto.getRatingCriteria().isCommentRating() || dto.getRatingCriteria().isCommentsEnabled()) {
 	    if (dto.getRatingDtos().size() < 1) {
 		htmlText.append("<tr><td style=\"width:25%\"><span style=\"").append(bold).append("\">")
@@ -432,7 +433,7 @@ public class EmailAnalysisBuilder {
 	    } else {
 		for (StyledRatingDTO ratingDto : dto.getRatingDtos()) {
 		    if (ratingDto.getComment() != null) {
-			String escapedComment = StringEscapeUtils.escapeHtml(ratingDto.getComment());
+			String escapedComment = HtmlUtils.htmlEscape(ratingDto.getComment());
 			escapedComment = StringUtils.replace(escapedComment, "&lt;BR&gt;", "<BR>");
 			htmlText.append("<tr>");
 			if (showCommentTitle) {

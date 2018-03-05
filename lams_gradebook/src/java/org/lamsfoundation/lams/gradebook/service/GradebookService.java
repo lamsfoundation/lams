@@ -36,7 +36,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
@@ -95,6 +94,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  *
@@ -2127,7 +2127,7 @@ public class GradebookService implements IGradebookService {
 		    && (learnerProgress.getAttemptedActivities().size() > 0)) {
 
 		String currentActivityTitle = learnerProgress.getCurrentActivity() == null ? ""
-			: StringEscapeUtils.escapeHtml(learnerProgress.getCurrentActivity().getTitle());
+			: HtmlUtils.htmlEscape(learnerProgress.getCurrentActivity().getTitle());
 		status = "<i class='fa fa-cog' title='" + currentActivityTitle + "'></i>";
 	    }
 	}
@@ -2148,7 +2148,7 @@ public class GradebookService implements IGradebookService {
 	    byte statusByte = learnerProgress.getProgressState(activity);
 	    if (statusByte == LearnerProgress.ACTIVITY_ATTEMPTED && learnerProgress.getCurrentActivity() != null) {
 		return "<i class='fa fa-cog' title='"
-			+ StringEscapeUtils.escapeHtml(learnerProgress.getCurrentActivity().getTitle()) + "'></i>";
+			+ HtmlUtils.htmlEscape(learnerProgress.getCurrentActivity().getTitle()) + "'></i>";
 	    } else if (statusByte == LearnerProgress.ACTIVITY_COMPLETED) {
 		return "<i class='fa fa-check text-success'></i>";
 	    }

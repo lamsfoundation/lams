@@ -17,7 +17,6 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
@@ -32,6 +31,7 @@ import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * Receives, processes and sends Scribe reports and votes to Learners.
@@ -140,7 +140,7 @@ public class LearningWebsocketServer {
 		for (ScribeReportEntry storedReport : (Set<ScribeReportEntry>) scribeSession.getScribeReportEntries()) {
 		    Long uid = storedReport.getUid();
 		    String cachedReportText = sessionCache.reports.get(uid);
-		    String storedReportText = StringEscapeUtils.escapeHtml(storedReport.getEntryText());
+		    String storedReportText = HtmlUtils.htmlEscape(storedReport.getEntryText());
 		    storedReportText = storedReportText != null ? storedReportText.replaceAll("\n", "<br>") : null;
 		    if (cachedReportText == null ? storedReportText != null
 			    : (storedReportText == null) || (cachedReportText.length() != storedReportText.length())

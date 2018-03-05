@@ -38,7 +38,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -62,6 +61,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
@@ -311,7 +311,7 @@ public class MonitoringAction extends Action {
 	// ratings left by others for this user
 	List<Object[]> ratings = service.getDetailedRatingsComments(toolContentId, toolSessionId, criteriaId, itemId );
 	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
-	String title = StringEscapeUtils.escapeHtml(criteria.getTitle());
+	String title = HtmlUtils.htmlEscape(criteria.getTitle());
 	
 	// processed data from db is userId, comment, rating, first_name, escaped( firstname + last_name)
 	// if no rating or comment, then the entries will be null and not an empty string
@@ -344,7 +344,7 @@ public class MonitoringAction extends Action {
 		    JSONArray userData = new JSONArray();
 		    userData.put(i);
 		    userData.put(ratingDetails[4]);
-		    String commentText = StringEscapeUtils.escapeHtml(comment);
+		    String commentText = HtmlUtils.htmlEscape(comment);
 		    commentText = StringUtils.replace(commentText, "&lt;BR&gt;", "<BR/>");
 		    userData.put(commentText);
 		    userData.put("Comments");
@@ -465,7 +465,7 @@ public class MonitoringAction extends Action {
     		    userData.put(nameField.toString());
     		}
     		
-    		userData.put(StringEscapeUtils.escapeHtml((String)nbEntry[3]));
+    		userData.put(HtmlUtils.htmlEscape((String)nbEntry[3]));
 
     		JSONObject userRow = new JSONObject();
     		userRow.put("id", i++);
