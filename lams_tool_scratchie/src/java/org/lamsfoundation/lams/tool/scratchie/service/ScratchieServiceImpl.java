@@ -203,7 +203,7 @@ public class ScratchieServiceImpl
     public ScratchieUser getUserByIDAndSession(Long userId, Long sessionId) {
 	return scratchieUserDao.getUserByUserIDAndSessionID(userId, sessionId);
     }
-    
+
     @Override
     public int countUsersByContentId(Long contentId) {
 	return scratchieUserDao.countUsersByContentId(contentId);
@@ -230,7 +230,7 @@ public class ScratchieServiceImpl
     public void saveOrUpdateScratchieConfigItem(ScratchieConfigItem item) {
 	scratchieConfigItemDao.saveOrUpdate(item);
     }
-    
+
     @Override
     public String[] getPresetMarks(Scratchie scratchie) {
 	String presetMarks = "";
@@ -242,10 +242,10 @@ public class ScratchieServiceImpl
 		presetMarks = defaultPresetMarks.getConfigValue();
 	    }
 	}
-	
+
 	return presetMarks.split(",");
     }
-    
+
     @Override
     public int getMaxPossibleScore(Scratchie scratchie) {
 	int itemsNumber = scratchie.getScratchieItems().size();
@@ -260,22 +260,22 @@ public class ScratchieServiceImpl
 	}
 
 	return maxPossibleScore;
-    }   
+    }
 
     @Override
     public void deleteScratchieItem(Long uid) {
 	scratchieItemDao.removeObject(ScratchieItem.class, uid);
     }
-    
+
     @Override
     public void populateItemsWithConfidenceLevels(Long userId, Long toolSessionId, Integer confidenceLevelsActivityUiid,
 	    Collection<ScratchieItem> items) {
 	List<ConfidenceLevelDTO> confidenceLevelDtos = toolService
 		.getConfidenceLevelsByActivity(confidenceLevelsActivityUiid, userId.intValue(), toolSessionId);
-	
+
 	//populate Scratchie items with confidence levels
 	for (ScratchieItem item : items) {
-	    
+
 	    //init answers' confidenceLevelDtos list
 	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
 		LinkedList<ConfidenceLevelDTO> confidenceLevelDtosTemp = new LinkedList<ConfidenceLevelDTO>();
@@ -284,7 +284,7 @@ public class ScratchieServiceImpl
 
 	    //Assessment (similar with Scratchie) adds '\n' at the end of question, MCQ - '\r\n'
 	    String question = item.getDescription() == null ? "" : item.getDescription().replaceAll("(\\r|\\n)", "");
-	    
+
 	    //find according confidenceLevelDto
 	    for (ConfidenceLevelDTO confidenceLevelDto : confidenceLevelDtos) {
 		if (question.equals(confidenceLevelDto.getQuestion().replaceAll("(\\r|\\n)", ""))) {
@@ -296,13 +296,13 @@ public class ScratchieServiceImpl
 			    answer.getConfidenceLevelDtos().add(confidenceLevelDto);
 			}
 		    }
-		    
+
 		}
 	    }
-	    
+
 	}
     }
-    
+
     @Override
     public Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId) {
 	return toolService.getPrecedingConfidenceLevelsActivities(toolContentId);
@@ -365,7 +365,7 @@ public class ScratchieServiceImpl
 	    notebookEntry = getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		    ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId().intValue());
 	}
-	
+
 	// return whether it's waiting for the leader to submit notebook
 	return isReflectOnActivity && (notebookEntry == null);
     }
@@ -392,10 +392,11 @@ public class ScratchieServiceImpl
 	    // record mark change with audit service
 	    Long toolContentId = null;
 	    if (session.getScratchie() != null) {
-		    toolContentId = session.getScratchie().getContentId();
-		}
+		toolContentId = session.getScratchie().getContentId();
+	    }
 
-	    logEventService.logMarkChange(user.getUserId(), user.getLoginName(), toolContentId, "" + oldMark, "" + newMark);
+	    logEventService.logMarkChange(user.getUserId(), user.getLoginName(), toolContentId, "" + oldMark,
+		    "" + newMark);
 	}
 
     }
@@ -412,7 +413,7 @@ public class ScratchieServiceImpl
     public ScratchieSession getScratchieSessionBySessionId(Long sessionId) {
 	return scratchieSessionDao.getSessionBySessionId(sessionId);
     }
- 
+
     @Override
     public int countSessionsByContentId(Long toolContentId) {
 	return scratchieSessionDao.getByContentId(toolContentId).size();
@@ -640,7 +641,7 @@ public class ScratchieServiceImpl
     public List<ScratchieUser> getUsersBySession(Long toolSessionId) {
 	return scratchieUserDao.getBySessionID(toolSessionId);
     }
-    
+
     @Override
     public ScratchieUser getUserByUserIDAndContentID(Long userId, Long contentId) {
 	return scratchieUserDao.getUserByUserIDAndContentID(userId, contentId);
@@ -652,7 +653,8 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    /* If isIncludeOnlyLeaders then include the portrait ids needed for monitoring. If false then it
+    /*
+     * If isIncludeOnlyLeaders then include the portrait ids needed for monitoring. If false then it
      * is probably the export and that doesn't need portraits.
      */
     public List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders) {
@@ -912,7 +914,8 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId, boolean includeEmptyItems) {
+    public List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId,
+	    boolean includeEmptyItems) {
 
 	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
@@ -935,7 +938,7 @@ public class ScratchieServiceImpl
 		    burningQuestionDtosOfSpecifiedItem.add(burningQuestionDto);
 		}
 	    }
-	    
+
 	    //skip empty items if required
 	    if (!burningQuestionDtosOfSpecifiedItem.isEmpty() || includeEmptyItems) {
 		BurningQuestionItemDTO burningQuestionItemDto = new BurningQuestionItemDTO();
@@ -972,8 +975,8 @@ public class ScratchieServiceImpl
 		String escapedSessionName = StringEscapeUtils.escapeJavaScript(burningQuestionDto.getSessionName());
 		burningQuestionDto.setSessionName(escapedSessionName);
 
-		String escapedBurningQuestion = StringEscapeUtils.escapeJavaScript(
-			burningQuestionDto.getBurningQuestion().getQuestion());
+		String escapedBurningQuestion = StringEscapeUtils
+			.escapeJavaScript(burningQuestionDto.getBurningQuestion().getQuestion());
 		burningQuestionDto.setEscapedBurningQuestion(escapedBurningQuestion);
 	    }
 	}
@@ -2048,7 +2051,7 @@ public class ScratchieServiceImpl
 
 		scratchieUserDao.removeObject(ScratchieUser.class, user.getUid());
 
-		gradebookService.updateActivityMark(null, null, userId, session.getSessionId(), false);
+		gradebookService.removeActivityMark(userId, session.getSessionId());
 	    }
 	}
     }
@@ -2117,7 +2120,7 @@ public class ScratchieServiceImpl
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<>();
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
