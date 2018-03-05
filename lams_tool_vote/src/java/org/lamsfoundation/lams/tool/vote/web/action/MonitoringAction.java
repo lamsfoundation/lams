@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -72,6 +71,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * @author Ozgur Demirtas
@@ -191,7 +191,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put(VoteAppConstants.ATTR_USER_ID, userAndAnswers[0]);
-	    responseRow.put(VoteAppConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml((String) userAndAnswers[2]));
+	    responseRow.put(VoteAppConstants.ATTR_USER_NAME, HtmlUtils.htmlEscape((String) userAndAnswers[2]));
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME,
 		    DateUtil.convertToStringForJSON((Date) userAndAnswers[3], request.getLocale()));
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME_TIMEAGO,
@@ -234,9 +234,9 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put(VoteAppConstants.ATTR_USER_ID, userAndReflection[0]);
 	    responseRow.put(VoteAppConstants.ATTR_USER_NAME,
-		    StringEscapeUtils.escapeHtml((String) userAndReflection[2]));
+		    HtmlUtils.htmlEscape((String) userAndReflection[2]));
 	    if (userAndReflection.length > 3 && userAndReflection[3] != null) {
-		String reflection = StringEscapeUtils.escapeHtml((String) userAndReflection[3]);
+		String reflection = HtmlUtils.htmlEscape((String) userAndReflection[3]);
 		responseRow.put(VoteAppConstants.NOTEBOOK, reflection.replaceAll("\n", "<br>"));
 	    }
 	    if (userAndReflection.length > 4) {
@@ -310,10 +310,10 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 
 	    responseRow.put("uid", userAndAttempt.getUserUid());
 	    responseRow.put(VoteAppConstants.ATTR_USER_NAME,
-		    StringEscapeUtils.escapeHtml(userAndAttempt.getFullName()));
+		    HtmlUtils.htmlEscape(userAndAttempt.getFullName()));
 
 	    responseRow.put("userEntryUid", userAndAttempt.getUserEntryUid());
-	    responseRow.put("userEntry", StringEscapeUtils.escapeHtml(userAndAttempt.getUserEntry()));
+	    responseRow.put("userEntry", HtmlUtils.htmlEscape(userAndAttempt.getUserEntry()));
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME,
 		    DateUtil.convertToStringForJSON(userAndAttempt.getAttemptTime(), request.getLocale()));
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME_TIMEAGO,

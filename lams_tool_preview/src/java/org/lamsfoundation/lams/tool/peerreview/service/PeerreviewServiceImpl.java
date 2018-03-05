@@ -40,7 +40,6 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
@@ -88,6 +87,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * @author Andrey Balan
@@ -361,7 +361,7 @@ public class PeerreviewServiceImpl
 		currentUserId, null, null, sorting, searchString, getByUser, ratingService, userManagementService);
 
 	for (Object[] raw : rawData) {
-	    raw[raw.length - 2] = StringEscapeUtils.escapeCsv((String) raw[raw.length - 2]);
+	    raw[raw.length - 2] = HtmlUtils.htmlEscape((String) raw[raw.length - 2]);
 	}
 	// if !getByUser -> is get current user's ratings from other users ->
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
@@ -377,7 +377,7 @@ public class PeerreviewServiceImpl
 		currentUserId, page, size, sorting, searchString, getByUser, ratingService, userManagementService);
 
 	for (Object[] raw : rawData) {
-	    raw[raw.length - 2] = StringEscapeUtils.escapeCsv((String) raw[raw.length - 2]);
+	    raw[raw.length - 2] = HtmlUtils.htmlEscape((String) raw[raw.length - 2]);
 	}
 	// if !getByUser -> is get current user's ratings from other users ->
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
@@ -398,7 +398,7 @@ public class PeerreviewServiceImpl
 	    raw[2] = (raw[2] == null ? null : numberFormat.format(raw[2])); // format rating
 	    // format name
 	    StringBuilder description = new StringBuilder((String) raw[3]).append(" ").append((String) raw[4]);
-	    raw[4] = StringEscapeUtils.escapeCsv(description.toString());
+	    raw[4] = HtmlUtils.htmlEscape(description.toString());
 
 	}
 	return rawData;
@@ -413,7 +413,7 @@ public class PeerreviewServiceImpl
 
 	// raw data: user_id, comment_count, first_name  last_name, portrait id
 	for (Object[] raw : rawData) {
-	    raw[2] = StringEscapeUtils.escapeCsv((String) raw[2]);
+	    raw[2] = HtmlUtils.htmlEscape((String) raw[2]);
 	}
 
 	return rawData;
@@ -447,7 +447,7 @@ public class PeerreviewServiceImpl
 
 	for (Object[] raw : rawData) {
 	    StringBuilder description = new StringBuilder((String) raw[1]).append(" ").append((String) raw[2]);
-	    raw[2] = StringEscapeUtils.escapeCsv(description.toString());
+	    raw[2] = HtmlUtils.htmlEscape(description.toString());
 	}
 
 	return rawData;

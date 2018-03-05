@@ -48,7 +48,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -70,7 +69,6 @@ import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
-import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -101,6 +99,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -1081,7 +1080,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId, null));
 	responseJSON.put("lessonStateID", lesson.getLessonStateId());
 
-	responseJSON.put("lessonName", StringEscapeUtils.escapeHtml(lesson.getLessonName()));
+	responseJSON.put("lessonName", HtmlUtils.htmlEscape(lesson.getLessonName()));
 	responseJSON.put("lessonDescription", lesson.getLessonDescription());
 
 	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate()

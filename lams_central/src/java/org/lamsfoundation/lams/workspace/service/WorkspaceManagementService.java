@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
@@ -59,6 +58,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * @author Manpreet Minhas
@@ -482,7 +482,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		LearningDesign design = (LearningDesign) iterator.next();
 		if ((searchPattern == null) || (searchPattern.matcher(design.getTitle()).find())) {
 		    JSONObject learningDesignJSON = new JSONObject();
-		    learningDesignJSON.put("name", StringEscapeUtils.escapeHtml(design.getTitle()));
+		    learningDesignJSON.put("name", HtmlUtils.htmlEscape(design.getTitle()));
 		    learningDesignJSON.put("learningDesignId", design.getLearningDesignId());
 		    learningDesignJSON.putOpt("type", design.getDesignType() != null ? design.getDesignType()
 			    : WorkspaceManagementService.DEFAULT_DESIGN_TYPE);

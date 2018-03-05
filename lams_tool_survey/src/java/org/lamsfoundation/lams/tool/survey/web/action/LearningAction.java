@@ -444,7 +444,7 @@ public class LearningAction extends Action {
 
 	for (String response : responses) {
 	    //JSONArray cell=new JSONArray();
-	    //cell.put(StringEscapeUtils.escapeHtml(user.getFirstName()) + " " + StringEscapeUtils.escapeHtml(user.getLastName()) + " [" + StringEscapeUtils.escapeHtml(user.getLogin()) + "]");
+	    //cell.put(HtmlUtils.htmlEscape(user.getFirstName()) + " " + HtmlUtils.htmlEscape(user.getLastName()) + " [" + HtmlUtils.htmlEscape(user.getLogin()) + "]");
 
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("answer", StringEscapeUtils.escapeCsv(response));

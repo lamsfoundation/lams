@@ -35,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -64,6 +63,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
@@ -177,7 +177,7 @@ public class MonitoringAction extends Action {
 
 	    JSONArray visitLogData = new JSONArray();
 	    visitLogData.put(visitLogDto.getUserId());
-	    String fullName = StringEscapeUtils.escapeHtml(visitLogDto.getUserFullName());
+	    String fullName = HtmlUtils.htmlEscape(visitLogDto.getUserFullName());
 	    visitLogData.put(fullName);
 	    String accessDate = (visitLogDto.getAccessDate() == null) ? ""
 		    : dateFormatter.format(

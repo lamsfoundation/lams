@@ -25,10 +25,10 @@ package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.springframework.web.util.HtmlUtils;
 
 public class GBUserGridRowDTO extends GradebookGridRowDTO {
 
@@ -49,7 +49,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 
     public GBUserGridRowDTO(User user) {
 	this.id = user.getUserId().toString();
-	this.rowName = StringEscapeUtils.escapeHtml(user.getLastName() + ", " + user.getFirstName());
+	this.rowName = HtmlUtils.htmlEscape(user.getLastName() + ", " + user.getFirstName());
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.login = user.getLogin();

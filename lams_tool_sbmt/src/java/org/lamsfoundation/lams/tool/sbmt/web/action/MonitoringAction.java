@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -72,6 +71,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * @author Manpreet Minhas
@@ -198,7 +198,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    SubmitUser user = (SubmitUser) userAndReflection[0];
 	    responseRow.put(SbmtConstants.ATTR_USER_UID, user.getUid());
 	    responseRow.put(SbmtConstants.USER_ID, user.getUserID());
-	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, StringEscapeUtils.escapeHtml(user.getFullName()));
+	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, HtmlUtils.htmlEscape(user.getFullName()));
 
 	    if (userAndReflection.length > 2) {
 		responseRow.put(SbmtConstants.ATTR_PORTRAIT_ID, (Integer)userAndReflection[1]);

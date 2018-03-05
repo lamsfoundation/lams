@@ -40,7 +40,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -75,6 +74,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 public class MonitoringAction extends Action {
 
@@ -232,7 +232,7 @@ public class MonitoringAction extends Action {
 
 	    SurveyUser user = (SurveyUser) userAndAnswers[0];
 	    responseRow.put(SurveyConstants.ATTR_USER_NAME,
-		    StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+		    HtmlUtils.htmlEscape(user.getLastName() + " " + user.getFirstName()));
 	    responseRow.put(SurveyConstants.ATTR_USER_ID, user.getUserId());
 
 	    if (userAndAnswers.length > 1 && userAndAnswers[1] != null) {
@@ -251,7 +251,7 @@ public class MonitoringAction extends Action {
 		    answer = (String) userAndAnswers[2];
 		} else {
 		    // need to escape it, as it isn't escaped in the database
-		    answer = StringEscapeUtils.escapeHtml((String) userAndAnswers[2]);
+		    answer = HtmlUtils.htmlEscape((String) userAndAnswers[2]);
 		    answer = answer.replaceAll("\n", "<br>");
 		}
 		responseRow.put("answerText", answer);
@@ -309,11 +309,11 @@ public class MonitoringAction extends Action {
 
 	    SurveyUser user = (SurveyUser) userAndReflection[0];
 	    responseRow.put(SurveyConstants.ATTR_USER_NAME,
-		    StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+		    HtmlUtils.htmlEscape(user.getLastName() + " " + user.getFirstName()));
 	    responseRow.put(SurveyConstants.ATTR_USER_ID, user.getUserId());
 	    
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
-		String reflection = StringEscapeUtils.escapeHtml((String) userAndReflection[1]);
+		String reflection = HtmlUtils.htmlEscape((String) userAndReflection[1]);
 		responseRow.put(SurveyConstants.ATTR_REFLECTION, reflection.replaceAll("\n", "<br>"));
 	    }
 

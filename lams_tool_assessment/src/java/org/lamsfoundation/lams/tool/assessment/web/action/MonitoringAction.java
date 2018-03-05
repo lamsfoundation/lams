@@ -40,7 +40,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -78,6 +77,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
@@ -396,7 +396,7 @@ public class MonitoringAction extends Action {
 	    JSONArray userData = new JSONArray();
 	    userData.put(userDto.getUserId());
 	    userData.put(sessionId);
-	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " " + userDto.getLastName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFirstName() + " " + userDto.getLastName());
 	    userData.put(fullName);
 	    userData.put(userDto.getGrade());
 	    if (userDto.getPortraitId() != null ) 
@@ -490,7 +490,7 @@ public class MonitoringAction extends Action {
 	for (AssessmentUserDTO userDto : userDtos) {
 
 	    Long questionResultUid = userDto.getQuestionResultUid();
-	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " " + userDto.getLastName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFirstName() + " " + userDto.getLastName());
 
 	    JSONArray userData = new JSONArray();
 	    if (questionResultUid != null) {
