@@ -474,7 +474,7 @@ public class GradebookService implements IGradebookService {
     public GradebookUserActivity getGradebookUserActivity(Long activityID, Integer userID) {
 	return gradebookDAO.getGradebookUserDataForActivity(activityID, userID);
     }
-    
+
     @Override
     public List<GradebookUserActivity> getGradebookUserActivities(Long activityId) {
 	return gradebookDAO.getAllGradebookUserActivitiesForActivity(activityId);
@@ -516,7 +516,8 @@ public class GradebookService implements IGradebookService {
 	    String[] args = new String[] { learner.getLogin() + "(" + learner.getUserId() + ")",
 		    lesson.getLessonId().toString(), oldMark, mark.toString() };
 	    String message = messageService.getMessage("audit.lesson.change.mark", args);
-	    logEventService.logEvent(LogEvent.TYPE_MARK_UPDATED, monitorUser.getUserID(), learner.getUserId(), lesson.getLessonId(), null, message);
+	    logEventService.logEvent(LogEvent.TYPE_MARK_UPDATED, monitorUser.getUserID(), learner.getUserId(),
+		    lesson.getLessonId(), null, message);
 	}
     }
 
@@ -526,7 +527,7 @@ public class GradebookService implements IGradebookService {
 	if (lesson == null) {
 	    return;
 	}
-	boolean weighted = toolService.isWeightedMarks(lesson.getLearningDesign());;
+	boolean weighted = toolService.isWeightedMarks(lesson.getLearningDesign());
 
 	Map<Integer, GradebookUserLesson> userToGradebookUserLessonMap = getUserToGradebookUserLessonMap(lesson, null);
 
@@ -969,7 +970,8 @@ public class GradebookService implements IGradebookService {
     @SuppressWarnings("unchecked")
     public LinkedHashMap<String, ExcelCell[][]> exportLessonGradebook(Lesson lesson) {
 
-	boolean isWeighted = toolService.isWeightedMarks(lesson.getLearningDesign());;
+	boolean isWeighted = toolService.isWeightedMarks(lesson.getLearningDesign());
+	;
 
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
@@ -1735,6 +1737,29 @@ public class GradebookService implements IGradebookService {
     }
 
     @Override
+    public void removeActivityMark(Integer userID, Long toolSessionID) {
+	ToolSession toolSession = toolService.getToolSessionById(toolSessionID);
+	User learner = (User) userService.findById(User.class, userID);
+	if ((learner != null) && (toolSession != null)) {
+	    ToolActivity activity = toolSession.getToolActivity();
+	    GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(activity.getActivityId(), userID);
+	    if (gradebookUserActivity != null) {
+		// act as if the mark was updated to 0 so lesson mark calculates correctly
+		Double oldActivityMark = gradebookUserActivity.getMark();
+		gradebookUserActivity.setMark(0D);
+		Lesson lesson = (Lesson) activity.getLearningDesign().getLessons().iterator().next();
+		boolean isWeightedMarks = toolService.isWeightedMarks(lesson.getLearningDesign());
+		GradebookUserLesson gradebookUserLesson = getGradebookUserLesson(lesson.getLessonId(), userID);
+		aggregateTotalMarkForLesson(isWeightedMarks, gradebookUserLesson, gradebookUserActivity,
+			oldActivityMark);
+
+		// finally completely remove the activity mark
+		gradebookDAO.delete(gradebookUserActivity);
+	    }
+	}
+    }
+
+    @Override
     public Activity getActivityById(Long activityID) {
 	return activityDAO.getActivityByActivityId(activityID);
     }
@@ -1901,7 +1926,7 @@ public class GradebookService implements IGradebookService {
 	    totalMark = calculateLessonMark(useWeightings, userActivities, markedActivity);
 	} else if (!useWeightings) {
 	    totalMark = gradebookUserLesson.getMark() - oldActivityMark;
-	    if (markedActivity.getMark() != null) {
+	    if (markedActivity != null && markedActivity.getMark() != null) {
 		totalMark += markedActivity.getMark();
 	    }
 	} else {
@@ -1980,10 +2005,10 @@ public class GradebookService implements IGradebookService {
 		    .setAverageMark(gradebookDAO.getAverageMarkForGroupedActivity(activity.getActivityId(), groupId));
 	    activityDTO.setMedianTimeTaken(
 		    gradebookDAO.getMedianTimeTakenForGroupedActivity(activity.getActivityId(), groupId));
-	    activityDTO.setMinTimeTaken(
-		    gradebookDAO.getMinTimeTakenForGroupedActivity(activity.getActivityId(), groupId));
-	    activityDTO.setMaxTimeTaken(
-		    gradebookDAO.getMaxTimeTakenForGroupedActivity(activity.getActivityId(), groupId));
+	    activityDTO
+		    .setMinTimeTaken(gradebookDAO.getMinTimeTakenForGroupedActivity(activity.getActivityId(), groupId));
+	    activityDTO
+		    .setMaxTimeTaken(gradebookDAO.getMaxTimeTakenForGroupedActivity(activity.getActivityId(), groupId));
 
 	} else {
 	    // Setting averages for lesson

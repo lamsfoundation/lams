@@ -305,7 +305,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		userId = message.getCreatedBy().getUserId();
 		loginName = message.getCreatedBy().getLoginName();
 	    }
-	    if ( message.getToolSession() != null && message.getToolSession().getForum() != null ) {
+	    if (message.getToolSession() != null && message.getToolSession().getForum() != null) {
 		toolContentId = message.getToolSession().getForum().getContentId();
 	    }
 	    if (hideFlag) {
@@ -965,7 +965,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		user.setSessionFinished(false);
 		forumUserDao.save(user);
 
-		gradebookService.updateActivityMark(null, null, userId, session.getSessionId(), false);
+		gradebookService.removeActivityMark(userId, session.getSessionId());
 	    }
 	}
     }
@@ -1198,7 +1198,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<>();
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
