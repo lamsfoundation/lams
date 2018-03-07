@@ -331,9 +331,24 @@ public class AuthoringAction extends Action {
 	SortedSet<TaskListItem> items = getTaskListItemList(sessionMap);
 	for (TaskListItem item : items) {
 	    if (item != null) {
-		// This flushs user UID info to message if this user is a new user.
-		item.setCreateBy(taskListUser);
-		itemList.add(item);
+		if ( item.getUid() == null ) {
+		    // This flushs user UID info to message if this user is a new user.
+		    item.setCreateBy(taskListUser);
+		    itemList.add(item);
+		} else {
+		    // Do not update if it is not null otherwise Edit Activity will overwrite the learner id for learner entered tasks
+		    // But taskListUser & .getCreatedBy() are a stale lazy loaded object so need to the real things from the session
+		    TaskListItem itemPO = service.getTaskListItemByUid(item.getUid());
+		    if ( itemPO != null ) {
+			updateTaskListItemFromSession(itemPO, item);
+			itemList.add(itemPO);
+		    } else {
+			// something weird happened. Uid exists but can't find the task. Make it an authored task
+			item.setCreateBy(taskListUser);
+			item.setCreateByAuthor(true);
+			itemList.add(item);
+		    }
+		}
 	    }
 	}
 	taskListPO.setTaskListItems(itemList);
@@ -752,6 +767,30 @@ public class AuthoringAction extends Action {
 	item.setParentTaskName(itemForm.getParentTaskName());
     }
 
+    /**
+     * Extract session request version of a taskListItem update the DB version of the taskListItem.
+     * @throws TaskListException
+     */
+    private void updateTaskListItemFromSession(TaskListItem itemPO, TaskListItem itemFromSession) throws Exception {
+	/*
+	 * BE CAREFUL: This method will copy necessary info from session to an existing TaskListItem instance. It
+	 * gets all info EXCEPT uid, createDate, createBy, createByAuthor, attachments and comments which need be left the same
+	 * as they were previously. If you change them then LiveEdit will change Learner created items.
+	 */
+
+	itemPO.setTitle(itemFromSession.getTitle());
+	itemPO.setDescription(itemFromSession.getDescription());
+	itemPO.setSequenceId(itemFromSession.getSequenceId());
+	itemPO.setRequired(itemFromSession.isRequired());
+	itemPO.setCommentsAllowed(itemFromSession.isCommentsAllowed());
+	itemPO.setCommentsRequired(itemFromSession.isCommentsRequired());
+	itemPO.setFilesAllowed(itemFromSession.isFilesAllowed());
+	itemPO.setFilesRequired(itemFromSession.isFilesRequired());
+	itemPO.setCommentsFilesAllowed(itemFromSession.isCommentsFilesAllowed());
+	itemPO.setShowCommentsToAll(itemFromSession.getShowCommentsToAll());
+	itemPO.setChildTask(itemFromSession.isChildTask());
+	itemPO.setParentTaskName(itemFromSession.getParentTaskName());
+    }
     /**
      * Vaidate taskList item regards to their type (url/file/learning object/website zip file)
      *

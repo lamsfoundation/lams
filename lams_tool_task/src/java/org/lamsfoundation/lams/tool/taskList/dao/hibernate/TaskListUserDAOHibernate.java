@@ -177,7 +177,7 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 
 		Long userId = ((Number) element[0]).longValue();
 		String fullName = (String) element[1];
-		boolean isCompleted = element[2] == null ? false : new Boolean(((Byte) element[2]).intValue() == 1);
+		boolean isCompleted = element[2] == null ? false : (Boolean) element[2];
 		Date accessDate = element[3] == null ? null : new Date(((Timestamp) element[3]).getTime());
 
 		TaskListUserDTO userDto = new TaskListUserDTO();
