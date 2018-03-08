@@ -1680,6 +1680,11 @@ public class VoteService
     }
 
     @Override
+    public void updateEntry(NotebookEntry notebookEntry) {
+	coreNotebookService.updateEntry(notebookEntry);
+    }
+
+    @Override
     public List<VoteQueContent> getAllQuestionsSorted(final long voteContentId) {
 	return voteQueContentDAO.getAllQuestionsSorted(voteContentId);
     }

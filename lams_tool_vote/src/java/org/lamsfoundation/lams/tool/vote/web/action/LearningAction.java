@@ -559,19 +559,31 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	repopulateRequestParameters(request, voteLearningForm);
 
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	logger.info("Tool Session Id" + toolSessionID);
-	voteLearningForm.setToolSessionID(toolSessionID);
+	String toolSessionIDString = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	voteLearningForm.setToolSessionID(toolSessionIDString);
+	Long toolSessionID = new Long(toolSessionIDString);
 
-	String userID = request.getParameter("userID");
-	logger.info("User Id:" + userID);
-	voteLearningForm.setUserID(userID);
+	String userIDString = request.getParameter("userID");
+	voteLearningForm.setUserID(userIDString);
+	Integer userID = new Integer(userIDString);
 
 	String reflectionEntry = request.getParameter(ENTRY_TEXT);
-	logger.info("reflection entry: " + reflectionEntry);
 
-	voteService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE,
-		new Integer(userID), reflectionEntry);
+	// check for existing notebook entry
+	NotebookEntry entry = voteService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		MY_SIGNATURE, userID);
+
+	if (entry == null) {
+	    // create new entry
+	    voteService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE,
+		    userID, reflectionEntry);
+	} else {
+	    // update existing entry
+	    entry.setEntry(reflectionEntry);
+	    entry.setLastModified(new Date());
+	    voteService.updateEntry(entry);
+	}
+
 
 	voteLearningForm.resetUserActions(); /* resets all except submitAnswersContent */
 	return learnerFinished(mapping, form, request, response);
