@@ -166,7 +166,7 @@ public class EmailAnalysisBuilder {
 	// must not be called until data analysis calculations are done - needs averageOfAverages
 	protected Double getSPAFactor() {
 	    if (spa == null) {
-		spa = averageOfAverages > 0 ? individualCriteriaAverage / averageOfAverages : 0D;
+		spa = (averageOfAverages > 0 && individualCriteriaAverage != null) ? individualCriteriaAverage / averageOfAverages : 0D;
 	    }
 	    return spa;
 	}
@@ -311,12 +311,13 @@ public class EmailAnalysisBuilder {
 		    itemMap.put(rating.getRatingCriteria().getRatingCriteriaId(), sd);
 		}
 	    }
-	    sd.peerRatingIncSelf += rating.getRating();
+	    Float newRating = rating.getRating() != null ? rating.getRating() : 0.0f;
+	    sd.peerRatingIncSelf += newRating;
 	    sd.numRatingsIncSelf++;
 	    if ( rating.getItemId().longValue() == rating.getLearner().getUserId().longValue() ) {
-		sd.selfRating = rating.getRating();
+		sd.selfRating = newRating;
 	    } else {
-		sd.peerRatingExcSelf += rating.getRating();
+		sd.peerRatingExcSelf += newRating;
 		sd.numRatingsExcSelf++;
 	    }
 	}
