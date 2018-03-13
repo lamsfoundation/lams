@@ -242,6 +242,14 @@
 				
 				<!-- Dropdown menu for choosing a user search type -->
 				<div>
+					<c:choose>
+					<c:when test="${empty lessons}">
+						<!--  only valid type is not started lessons -->
+						<select id="searchType" onchange="getUsers();">
+							<option selected="selected" value="9"><fmt:message key="email.notifications.user.search.property.9" /></option>
+						</select>
+					</c:when>
+					<c:otherwise>
 					<select id="searchType" onchange="getUsers();">
 						<option selected="selected" value="7"><fmt:message key="email.notifications.user.search.property.7" /></option>
 						<option value="8"><fmt:message key="email.notifications.user.search.property.8" /></option>
@@ -249,6 +257,8 @@
 						<option value="10"><fmt:message key="email.notifications.user.search.property.10" /></option>
 						<option value="11"><fmt:message key="email.notifications.user.search.property.11" /></option>
 					</select>
+					</c:otherwise>
+					</c:choose>
 				</div>
 				
 				<div id="additionalParameters">
