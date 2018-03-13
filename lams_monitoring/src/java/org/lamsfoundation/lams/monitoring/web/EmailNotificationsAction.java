@@ -23,12 +23,12 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,10 +51,11 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
+import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.util.LessonComparator;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
@@ -64,6 +65,7 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -109,6 +111,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
     private static IUserManagementService userManagementService;
     private static ILogEventService logEventService;
     private static ISecurityService securityService;
+    private static ILessonService lessonService;
 
     // ---------------------------------------------------------------------
     // Struts Dispatch Method
@@ -159,23 +162,25 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
 	ICoreLearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
 
-	// getting the organisation
+	// getting the organisation 
 	Organisation org = (Organisation) learnerService.getUserManagementService().findById(Organisation.class, orgId);
 
-	// sort and filter lesson list
-	Set<Lesson> lessons = new TreeSet<Lesson>(new LessonComparator());
-	for (Lesson lesson : (Set<Lesson>) org.getLessons()) {
-	    if (!Lesson.REMOVED_STATE.equals(lesson.getLessonStateId())
-		    && !Lesson.FINISHED_STATE.equals(lesson.getLessonStateId())) {
-		lessons.add(lesson);
+	boolean isGroupMonitor = getSecurityService().hasOrgRole(orgId, getCurrentUser().getUserID(), 
+		new String[] { Role.GROUP_MANAGER }, "show course email notifications", false);
+	Integer userRole = isGroupMonitor ? Role.ROLE_GROUP_MANAGER : Role.ROLE_MONITOR;
+	Map<Long, IndexLessonBean> staffMap = getLessonService().getLessonsByOrgAndUserWithCompletedFlag(getCurrentUser().getUserID(), orgId,
+		userRole);
+
+	// Already sorted, just double check that it does not contain finished or removed lessons
+	// This call should not be returning REMOVED lessons anyway so test for finished ones.
+	ArrayList<IndexLessonBean> lessons = new ArrayList<IndexLessonBean>(staffMap.size());
+	for (IndexLessonBean lesson : (Collection<IndexLessonBean>) staffMap.values()) {
+	    if (!Lesson.FINISHED_STATE.equals(lesson.getState())) {
+		    lessons.add(lesson);
 	    }
 	}
 
-	Lesson firstLesson = null;
-	Iterator<Lesson> lessonIter = lessons.iterator();
-	if (lessonIter.hasNext()) {
-	    firstLesson = lessonIter.next();
-	}
+	IndexLessonBean firstLesson = lessons.size() > 0 ? lessons.get(0) : null;
 
 	request.setAttribute("org", org);
 	request.setAttribute("lessons", lessons);
@@ -712,6 +717,15 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    logEventService = (ILogEventService) ctx.getBean("logEventService");
 	}
 	return logEventService;
+    }
+
+    private ILessonService getLessonService() {
+	if (lessonService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    lessonService = (ILessonService) ctx.getBean("lessonService");
+	}
+	return lessonService;
     }
 
     private ISecurityService getSecurityService() {
