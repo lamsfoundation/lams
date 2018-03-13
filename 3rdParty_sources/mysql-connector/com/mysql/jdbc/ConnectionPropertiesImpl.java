@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2002, 2017, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2002, 2018, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -878,7 +878,7 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
             Messages.getString("ConnectionProperties.loadBalanceStrategy"), "5.0.6", PERFORMANCE_CATEGORY, Integer.MIN_VALUE);
 
     private StringConnectionProperty serverAffinityOrder = new StringConnectionProperty("serverAffinityOrder", "", null,
-            Messages.getString("ConnectionProperties.serverAffinityOrder"), "5.1.4.", PERFORMANCE_CATEGORY, Integer.MIN_VALUE);
+            Messages.getString("ConnectionProperties.serverAffinityOrder"), "5.1.43", PERFORMANCE_CATEGORY, Integer.MIN_VALUE);
 
     private IntegerConnectionProperty loadBalanceBlacklistTimeout = new IntegerConnectionProperty("loadBalanceBlacklistTimeout", 0, 0, Integer.MAX_VALUE,
             Messages.getString("ConnectionProperties.loadBalanceBlacklistTimeout"), "5.1.0", MISC_CATEGORY, Integer.MIN_VALUE);
@@ -980,7 +980,7 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
     private BooleanConnectionProperty nullNamePatternMatchesAll = new BooleanConnectionProperty("nullNamePatternMatchesAll", true,
             Messages.getString("ConnectionProperties.nullNamePatternMatchesAll"), "3.1.8", MISC_CATEGORY, Integer.MIN_VALUE);
 
-    private IntegerConnectionProperty packetDebugBufferSize = new IntegerConnectionProperty("packetDebugBufferSize", 20, 0, Integer.MAX_VALUE,
+    private IntegerConnectionProperty packetDebugBufferSize = new IntegerConnectionProperty("packetDebugBufferSize", 20, 1, Integer.MAX_VALUE,
             Messages.getString("ConnectionProperties.packetDebugBufferSize"), "3.1.3", DEBUGING_PROFILING_CATEGORY, 7);
 
     private BooleanConnectionProperty padCharsWithSpace = new BooleanConnectionProperty("padCharsWithSpace", false,
@@ -1334,6 +1334,9 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
     private StringConnectionProperty enabledSSLCipherSuites = new StringConnectionProperty("enabledSSLCipherSuites", null,
             Messages.getString("ConnectionProperties.enabledSSLCipherSuites"), "5.1.35", SECURITY_CATEGORY, 11);
 
+    private StringConnectionProperty enabledTLSProtocols = new StringConnectionProperty("enabledTLSProtocols", null,
+            Messages.getString("ConnectionProperties.enabledTLSProtocols"), "5.1.44", SECURITY_CATEGORY, 12);
+
     private BooleanConnectionProperty enableEscapeProcessing = new BooleanConnectionProperty("enableEscapeProcessing", true,
             Messages.getString("ConnectionProperties.enableEscapeProcessing"), "5.1.37", PERFORMANCE_CATEGORY, Integer.MIN_VALUE);
 
@@ -1390,6 +1393,32 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
         }
 
         return info;
+    }
+
+    public Properties exposeAsProperties(Properties props, boolean explicitOnly) throws SQLException {
+        if (props == null) {
+            props = new Properties();
+        }
+
+        int numPropertiesToSet = PROPERTY_LIST.size();
+
+        for (int i = 0; i < numPropertiesToSet; i++) {
+            java.lang.reflect.Field propertyField = PROPERTY_LIST.get(i);
+
+            try {
+                ConnectionProperty propToGet = (ConnectionProperty) propertyField.get(this);
+
+                Object propValue = propToGet.getValueAsObject();
+
+                if (propValue != null && (!explicitOnly || propToGet.isExplicitlySet())) {
+                    props.setProperty(propToGet.getPropertyName(), propValue.toString());
+                }
+            } catch (IllegalAccessException iae) {
+                throw SQLError.createSQLException("Internal properties failure", SQLError.SQL_STATE_GENERAL_ERROR, iae, getExceptionInterceptor());
+            }
+        }
+
+        return props;
     }
 
     class XmlMap {
@@ -4946,6 +4975,14 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
 
     public void setEnabledSSLCipherSuites(String cipherSuites) {
         this.enabledSSLCipherSuites.setValue(cipherSuites);
+    }
+
+    public String getEnabledTLSProtocols() {
+        return this.enabledTLSProtocols.getValueAsString();
+    }
+
+    public void setEnabledTLSProtocols(String protocols) {
+        this.enabledTLSProtocols.setValue(protocols);
     }
 
     public boolean getEnableEscapeProcessing() {

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2002, 2017, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2002, 2018, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -54,6 +54,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.zip.Deflater;
 
+import com.mysql.jdbc.authentication.CachingSha2PasswordPlugin;
 import com.mysql.jdbc.authentication.MysqlClearPasswordPlugin;
 import com.mysql.jdbc.authentication.MysqlNativePasswordPlugin;
 import com.mysql.jdbc.authentication.MysqlOldPasswordPlugin;
@@ -480,7 +481,7 @@ public class MysqlIO {
     }
 
     // We do this to break the chain between MysqlIO and Connection, so that we can have PhantomReferences on connections that let the driver clean up the
-    // socket connection without having to use finalize() somewhere (which although more straightforward, is horribly inefficent).
+    // socket connection without having to use finalize() somewhere (which although more straightforward, is horribly inefficient).
     protected NetworkResources getNetworkResources() {
         return new NetworkResources(this.mysqlConnection, this.mysqlInput, this.mysqlOutput);
     }
@@ -824,7 +825,7 @@ public class MysqlIO {
             changeUserPacket.writeByte((byte) MysqlDefs.COM_CHANGE_USER);
 
             if (versionMeetsMinimum(4, 1, 1)) {
-                secureAuth411(changeUserPacket, packLength, userName, password, database, false);
+                secureAuth411(changeUserPacket, packLength, userName, password, database, false, true);
             } else {
                 secureAuth(changeUserPacket, packLength, userName, password, database, false);
             }
@@ -846,9 +847,6 @@ public class MysqlIO {
 
             if (localUseConnectWithDb) {
                 packet.writeString(database);
-            } else {
-                //Not needed, old server does not require \0
-                //packet.writeString("");
             }
 
             send(packet, packet.getPosition());
@@ -1275,7 +1273,7 @@ public class MysqlIO {
                 this.clientParam |= CLIENT_SECURE_CONNECTION;
 
                 if ((versionMeetsMinimum(4, 1, 1) || ((this.protocolVersion > 9) && (this.serverCapabilities & CLIENT_PROTOCOL_41) != 0))) {
-                    secureAuth411(null, packLength, user, password, database, true);
+                    secureAuth411(null, packLength, user, password, database, true, false);
                 } else {
                     secureAuth(null, packLength, user, password, database, true);
                 }
@@ -1322,9 +1320,9 @@ public class MysqlIO {
 
             if ((this.serverCapabilities & CLIENT_SECURE_CONNECTION) != 0) {
                 if (versionMeetsMinimum(4, 1, 1)) {
-                    secureAuth411(null, packLength, user, password, database, true);
+                    secureAuth411(null, packLength, user, password, database, true, false);
                 } else {
-                    secureAuth411(null, packLength, user, password, database, true);
+                    secureAuth411(null, packLength, user, password, database, true, false);
                 }
             } else {
 
@@ -1463,6 +1461,12 @@ public class MysqlIO {
         }
 
         plugin = new Sha256PasswordPlugin();
+        plugin.init(this.connection, this.connection.getProperties());
+        if (addAuthenticationPlugin(plugin)) {
+            defaultIsFound = true;
+        }
+
+        plugin = new CachingSha2PasswordPlugin();
         plugin.init(this.connection, this.connection.getProperties());
         if (addAuthenticationPlugin(plugin)) {
             defaultIsFound = true;
@@ -1746,6 +1750,8 @@ public class MysqlIO {
                             throw SQLError.createSQLException(Messages.getString("Connection.BadAuthenticationPlugin", new Object[] { pluginName }),
                                     getExceptionInterceptor());
                         }
+                    } else {
+                        plugin.reset();
                     }
 
                     checkConfidentiality(plugin);
@@ -1856,9 +1862,6 @@ public class MysqlIO {
 
                     if (this.useConnectWithDb) {
                         last_sent.writeString(database, enc, this.connection);
-                    } else {
-                        /* For empty database */
-                        last_sent.writeByte((byte) 0);
                     }
 
                     if ((this.serverCapabilities & CLIENT_PLUGIN_AUTH) != 0) {
@@ -4185,7 +4188,9 @@ public class MysqlIO {
 
     void scanForAndThrowDataTruncation() throws SQLException {
         if ((this.streamingData == null) && versionMeetsMinimum(4, 1, 0) && this.connection.getJdbcCompliantTruncation() && this.warningCount > 0) {
+            int warningCountOld = this.warningCount;
             SQLError.convertShowWarningsToSQLWarnings(this.connection, this.warningCount, true);
+            this.warningCount = warningCountOld;
         }
     }
 
@@ -4332,10 +4337,12 @@ public class MysqlIO {
      * @param password
      * @param database
      * @param writeClientParams
+     * @param forChangeUser
      * 
      * @throws SQLException
      */
-    void secureAuth411(Buffer packet, int packLength, String user, String password, String database, boolean writeClientParams) throws SQLException {
+    void secureAuth411(Buffer packet, int packLength, String user, String password, String database, boolean writeClientParams, boolean forChangeUser)
+            throws SQLException {
         String enc = getEncodingForHandshake();
         //	SERVER:  public_seed=create_random_string()
         //			 send(public_seed)
@@ -4403,7 +4410,7 @@ public class MysqlIO {
 
         if (this.useConnectWithDb) {
             packet.writeString(database, enc, this.connection);
-        } else {
+        } else if (forChangeUser) {
             /* For empty database */
             packet.writeByte((byte) 0);
         }
@@ -4432,6 +4439,10 @@ public class MysqlIO {
 
             /* Read what server thinks about out new auth message report */
             checkErrorPacket();
+        }
+
+        if (!this.useConnectWithDb) {
+            changeDatabaseTo(database);
         }
     }
 

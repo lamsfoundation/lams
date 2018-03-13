@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2002, 2017, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2002, 2018, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
@@ -190,18 +190,20 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
      * names soon will, so current catalog is a (hidden) component of the name.
      */
     static class CompoundCacheKey {
-        String componentOne;
+        final String componentOne;
 
-        String componentTwo;
+        final String componentTwo;
 
-        int hashCode;
+        final int hashCode;
 
         CompoundCacheKey(String partOne, String partTwo) {
             this.componentOne = partOne;
             this.componentTwo = partTwo;
 
-            // Handle first component (in most cases, currentCatalog being NULL....
-            this.hashCode = (((this.componentOne != null) ? this.componentOne : "") + this.componentTwo).hashCode();
+            int hc = 17;
+            hc = 31 * hc + (this.componentOne != null ? this.componentOne.hashCode() : 0);
+            hc = 31 * hc + (this.componentTwo != null ? this.componentTwo.hashCode() : 0);
+            this.hashCode = hc;
         }
 
         /*
@@ -211,20 +213,15 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof CompoundCacheKey) {
-                CompoundCacheKey another = (CompoundCacheKey) obj;
-
-                boolean firstPartEqual = false;
-
-                if (this.componentOne == null) {
-                    firstPartEqual = (another.componentOne == null);
-                } else {
-                    firstPartEqual = this.componentOne.equals(another.componentOne);
-                }
-
-                return (firstPartEqual && this.componentTwo.equals(another.componentTwo));
+            if (this == obj) {
+                return true;
             }
-
+            if (obj != null && CompoundCacheKey.class.isAssignableFrom(obj.getClass())) {
+                CompoundCacheKey another = (CompoundCacheKey) obj;
+                if (this.componentOne == null ? another.componentOne == null : this.componentOne.equals(another.componentOne)) {
+                    return this.componentTwo == null ? another.componentTwo == null : this.componentTwo.equals(another.componentTwo);
+                }
+            }
             return false;
         }
 
@@ -440,7 +437,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
      * synchronization and at the same time save memory (each charset converter
      * takes approx 65K of static data).
      */
-    private Map<String, Object> charsetConverterMap = new HashMap<String, Object>(CharsetMapping.getNumberOfCharsetsConfigured());
+    private final Map<String, Object> charsetConverterMap = new HashMap<String, Object>(CharsetMapping.getNumberOfCharsetsConfigured());
 
     /** The point in time when this connection was created */
     private long connectionCreationTimeMillis = 0;
@@ -554,7 +551,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
      */
     private final CopyOnWriteArrayList<Statement> openStatements = new CopyOnWriteArrayList<Statement>();
 
-    private LRUCache parsedCallableStatementCache;
+    private LRUCache<CompoundCacheKey, CallableStatement.CallableStatementParamInfo> parsedCallableStatementCache;
 
     private boolean parserKnowsUnicode = false;
 
@@ -581,7 +578,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
     private boolean readOnly = false;
 
     /** Cache of ResultSet metadata */
-    protected LRUCache resultSetMetadataCache;
+    protected LRUCache<String, CachedResultSetMetaData> resultSetMetadataCache;
 
     /** The timezone of the server */
     private TimeZone serverTimezoneTZ = null;
@@ -614,8 +611,8 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
      */
     private boolean useServerPreparedStmts = false;
 
-    private LRUCache serverSideStatementCheckCache;
-    private LRUCache serverSideStatementCache;
+    private LRUCache<String, Boolean> serverSideStatementCheckCache;
+    private LRUCache<CompoundCacheKey, ServerPreparedStatement> serverSideStatementCache;
     private Calendar sessionCalendar;
 
     private Calendar utcCalendar;
@@ -1009,7 +1006,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
 
         if (getCachePreparedStatements()) {
             synchronized (this.serverSideStatementCheckCache) {
-                Boolean flag = (Boolean) this.serverSideStatementCheckCache.get(sql);
+                Boolean flag = this.serverSideStatementCheckCache.get(sql);
 
                 if (flag != null) {
                     return flag.booleanValue();
@@ -1280,15 +1277,10 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
      * @throws SQLException
      */
     private void checkTransactionIsolationLevel() throws SQLException {
-        String txIsolationName = null;
-
-        if (versionMeetsMinimum(4, 0, 3)) {
-            txIsolationName = "tx_isolation";
-        } else {
-            txIsolationName = "transaction_isolation";
+        String s = this.serverVariables.get("transaction_isolation");
+        if (s == null) {
+            s = this.serverVariables.get("tx_isolation");
         }
-
-        String s = this.serverVariables.get(txIsolationName);
 
         if (s != null) {
             Integer intTI = mapTransIsolationNameToValue.get(s);
@@ -2319,14 +2311,14 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
             }
 
             if (getUseServerPreparedStmts()) {
-                this.serverSideStatementCheckCache = new LRUCache(cacheSize);
+                this.serverSideStatementCheckCache = new LRUCache<String, Boolean>(cacheSize);
 
-                this.serverSideStatementCache = new LRUCache(cacheSize) {
+                this.serverSideStatementCache = new LRUCache<CompoundCacheKey, ServerPreparedStatement>(cacheSize) {
 
                     private static final long serialVersionUID = 7692318650375988114L;
 
                     @Override
-                    protected boolean removeEldestEntry(java.util.Map.Entry<Object, Object> eldest) {
+                    protected boolean removeEldestEntry(java.util.Map.Entry<CompoundCacheKey, ServerPreparedStatement> eldest) {
                         if (this.maxElements <= 1) {
                             return false;
                         }
@@ -2334,7 +2326,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
                         boolean removeIt = super.removeEldestEntry(eldest);
 
                         if (removeIt) {
-                            ServerPreparedStatement ps = (ServerPreparedStatement) eldest.getValue();
+                            ServerPreparedStatement ps = eldest.getValue();
                             ps.isCached = false;
                             ps.setClosed(false);
 
@@ -2469,7 +2461,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
 
             this.lastQueryFinishedTime = 0; // we're busy!
 
-            if ((getHighAvailability()) && (this.autoCommit || getAutoReconnectForPools()) && this.needsPing && !isBatch) {
+            if (getHighAvailability() && (this.autoCommit || getAutoReconnectForPools()) && this.needsPing && !isBatch) {
                 try {
                     pingInternal(false, 0);
 
@@ -2506,19 +2498,23 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
                     sqlE = appendMessageToException(sqlE, messageBuf.toString(), getExceptionInterceptor());
                 }
 
-                if ((getHighAvailability())) {
-                    this.needsPing = true;
-                } else {
-                    String sqlState = sqlE.getSQLState();
-
-                    if ((sqlState != null) && sqlState.equals(SQLError.SQL_STATE_COMMUNICATION_LINK_FAILURE)) {
-                        cleanup(sqlE);
+                if (getHighAvailability()) {
+                    if (SQLError.SQL_STATE_COMMUNICATION_LINK_FAILURE.equals(sqlE.getSQLState())) {
+                        // IO may be dirty or damaged beyond repair, force close it.
+                        this.io.forceClose();
                     }
+                    this.needsPing = true;
+                } else if (SQLError.SQL_STATE_COMMUNICATION_LINK_FAILURE.equals(sqlE.getSQLState())) {
+                    cleanup(sqlE);
                 }
 
                 throw sqlE;
             } catch (Exception ex) {
                 if (getHighAvailability()) {
+                    if (ex instanceof IOException) {
+                        // IO may be dirty or damaged beyond repair, force close it.
+                        this.io.forceClose();
+                    }
                     this.needsPing = true;
                 } else if (ex instanceof IOException) {
                     cleanup(ex);
@@ -2900,11 +2896,13 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
     }
 
     public java.sql.Statement getMetadataSafeStatement() throws SQLException {
+        return getMetadataSafeStatement(0);
+    }
+
+    public java.sql.Statement getMetadataSafeStatement(int maxRows) throws SQLException {
         java.sql.Statement stmt = createStatement();
 
-        if (stmt.getMaxRows() != 0) {
-            stmt.setMaxRows(0);
-        }
+        stmt.setMaxRows(maxRows == -1 ? 0 : maxRows);
 
         stmt.setEscapeProcessing(false);
 
@@ -2997,30 +2995,20 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
                 java.sql.ResultSet rs = null;
 
                 try {
-                    stmt = getMetadataSafeStatement();
-
-                    String query = null;
-
-                    int offset = 0;
-
-                    if (versionMeetsMinimum(4, 0, 3)) {
-                        query = "SELECT @@session.tx_isolation";
-                        offset = 1;
-                    } else {
-                        query = "SHOW VARIABLES LIKE 'transaction_isolation'";
-                        offset = 2;
-                    }
-
+                    stmt = getMetadataSafeStatement(this.sessionMaxRows);
+                    String query = versionMeetsMinimum(8, 0, 3) || (versionMeetsMinimum(5, 7, 20) && !versionMeetsMinimum(8, 0, 0))
+                            ? "SELECT @@session.transaction_isolation" : "SELECT @@session.tx_isolation";
                     rs = stmt.executeQuery(query);
 
                     if (rs.next()) {
-                        String s = rs.getString(offset);
+                        String s = rs.getString(1);
 
                         if (s != null) {
                             Integer intTI = mapTransIsolationNameToValue.get(s);
 
                             if (intTI != null) {
-                                return intTI.intValue();
+                                this.isolationLevel = intTI.intValue();
+                                return this.isolationLevel;
                             }
                         }
 
@@ -3169,7 +3157,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
         }
 
         if (getCacheCallableStatements()) {
-            this.parsedCallableStatementCache = new LRUCache(getCallableStatementCacheSize());
+            this.parsedCallableStatementCache = new LRUCache<CompoundCacheKey, CallableStatement.CallableStatementParamInfo>(getCallableStatementCacheSize());
         }
 
         if (getAllowMultiQueries()) {
@@ -3177,7 +3165,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
         }
 
         if (getCacheResultSetMetadata()) {
-            this.resultSetMetadataCache = new LRUCache(getMetadataCacheSize());
+            this.resultSetMetadataCache = new LRUCache<String, CachedResultSetMetaData>(getMetadataCacheSize());
         }
 
         if (getSocksProxyHost() != null) {
@@ -3248,6 +3236,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
                     for (int i = 1; i < CharsetMapping.COLLATION_INDEX_TO_COLLATION_NAME.length; i++) {
                         if (CharsetMapping.COLLATION_INDEX_TO_COLLATION_NAME[i].equals(collationServer)) {
                             this.io.serverCharsetIndex = i;
+                            break;
                         }
                     }
                 } else {
@@ -3399,8 +3388,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
     }
 
     public boolean isQueryCacheEnabled() {
-        return "YES".equalsIgnoreCase(this.serverVariables.get("have_query_cache")) && "ON".equalsIgnoreCase(this.serverVariables.get("query_cache_type"))
-                && !"0".equalsIgnoreCase(this.serverVariables.get("query_cache_size"));
+        return "ON".equalsIgnoreCase(this.serverVariables.get("query_cache_type")) && !"0".equalsIgnoreCase(this.serverVariables.get("query_cache_size"));
     }
 
     private int getServerVariableAsInt(String variableName, int fallbackValue) throws SQLException {
@@ -3546,9 +3534,10 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
 
             try {
                 try {
-                    stmt = getMetadataSafeStatement();
+                    stmt = getMetadataSafeStatement(this.sessionMaxRows);
 
-                    rs = stmt.executeQuery("select @@session.tx_read_only");
+                    rs = stmt.executeQuery(versionMeetsMinimum(8, 0, 3) || (versionMeetsMinimum(5, 7, 20) && !versionMeetsMinimum(8, 0, 0))
+                            ? "select @@session.transaction_read_only" : "select @@session.tx_read_only");
                     if (rs.next()) {
                         return rs.getInt(1) != 0; // mysql has a habit of tri+ state booleans
                     }
@@ -3758,6 +3747,9 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
 
             this.serverVariables = new HashMap<String, String>();
 
+            boolean currentJdbcComplTrunc = this.getJdbcCompliantTruncation();
+            setJdbcCompliantTruncation(false); // Temporarily disabling data truncation check avoids unnecessary SHOW WARNINGS on deprecated vars.  
+
             try {
                 if (versionMeetsMinimum(5, 1, 0)) {
                     StringBuilder queryBuf = new StringBuilder(versionComment).append("SELECT");
@@ -3777,11 +3769,18 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
                     queryBuf.append(", @@max_allowed_packet AS max_allowed_packet");
                     queryBuf.append(", @@net_buffer_length AS net_buffer_length");
                     queryBuf.append(", @@net_write_timeout AS net_write_timeout");
-                    queryBuf.append(", @@have_query_cache AS have_query_cache");
+                    if (!versionMeetsMinimum(8, 0, 3)) {
+                        queryBuf.append(", @@query_cache_size AS query_cache_size");
+                        queryBuf.append(", @@query_cache_type AS query_cache_type");
+                    }
                     queryBuf.append(", @@sql_mode AS sql_mode");
                     queryBuf.append(", @@system_time_zone AS system_time_zone");
                     queryBuf.append(", @@time_zone AS time_zone");
-                    queryBuf.append(", @@tx_isolation AS tx_isolation");
+                    if (versionMeetsMinimum(8, 0, 3) || (versionMeetsMinimum(5, 7, 20) && !versionMeetsMinimum(8, 0, 0))) {
+                        queryBuf.append(", @@transaction_isolation AS transaction_isolation");
+                    } else {
+                        queryBuf.append(", @@tx_isolation AS transaction_isolation");
+                    }
                     queryBuf.append(", @@wait_timeout AS wait_timeout");
 
                     results = stmt.executeQuery(queryBuf.toString());
@@ -3791,18 +3790,6 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
                             this.serverVariables.put(rsmd.getColumnLabel(i), results.getString(i));
                         }
                     }
-
-                    if ("YES".equalsIgnoreCase(this.serverVariables.get("have_query_cache"))) {
-                        results.close();
-                        results = stmt.executeQuery("SELECT @@query_cache_size AS query_cache_size, @@query_cache_type AS query_cache_type");
-                        if (results.next()) {
-                            ResultSetMetaData rsmd = results.getMetaData();
-                            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                                this.serverVariables.put(rsmd.getColumnLabel(i), results.getString(i));
-                            }
-                        }
-                    }
-
                 } else {
                     results = stmt.executeQuery(versionComment + "SHOW VARIABLES");
                     while (results.next()) {
@@ -3816,6 +3803,8 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
                 if (ex.getErrorCode() != MysqlErrorNumbers.ER_MUST_CHANGE_PASSWORD || getDisconnectOnExpiredPasswords()) {
                     throw ex;
                 }
+            } finally {
+                setJdbcCompliantTruncation(currentJdbcComplTrunc);
             }
 
             if (getCacheServerConfiguration()) {
@@ -3970,8 +3959,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
                 synchronized (this.parsedCallableStatementCache) {
                     CompoundCacheKey key = new CompoundCacheKey(getCatalog(), sql);
 
-                    CallableStatement.CallableStatementParamInfo cachedParamInfo = (CallableStatement.CallableStatementParamInfo) this.parsedCallableStatementCache
-                            .get(key);
+                    CallableStatement.CallableStatementParamInfo cachedParamInfo = this.parsedCallableStatementCache.get(key);
 
                     if (cachedParamInfo != null) {
                         cStmt = CallableStatement.getInstance(getMultiHostSafeProxy(), cachedParamInfo);
@@ -4083,8 +4071,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
             if (this.useServerPreparedStmts && canServerPrepare) {
                 if (this.getCachePreparedStatements()) {
                     synchronized (this.serverSideStatementCache) {
-                        pStmt = (com.mysql.jdbc.ServerPreparedStatement) this.serverSideStatementCache
-                                .remove(makePreparedStatementCacheKey(this.database, sql));
+                        pStmt = this.serverSideStatementCache.remove(new CompoundCacheKey(this.database, sql));
 
                         if (pStmt != null) {
                             ((com.mysql.jdbc.ServerPreparedStatement) pStmt).setClosed(false);
@@ -4274,20 +4261,14 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
 
     }
 
-    private String makePreparedStatementCacheKey(String catalog, String query) {
-        StringBuilder key = new StringBuilder();
-        key.append("/*").append(catalog).append("*/");
-        key.append(query);
-        return key.toString();
-    }
-
     public void recachePreparedStatement(ServerPreparedStatement pstmt) throws SQLException {
         synchronized (getConnectionMutex()) {
             if (getCachePreparedStatements() && pstmt.isPoolable()) {
                 synchronized (this.serverSideStatementCache) {
-                    Object oldServerPrepStmt = this.serverSideStatementCache.put(makePreparedStatementCacheKey(pstmt.currentCatalog, pstmt.originalSql), pstmt);
-                    if (oldServerPrepStmt != null) {
+                    Object oldServerPrepStmt = this.serverSideStatementCache.put(new CompoundCacheKey(pstmt.currentCatalog, pstmt.originalSql), pstmt);
+                    if (oldServerPrepStmt != null && oldServerPrepStmt != pstmt) {
                         ((ServerPreparedStatement) oldServerPrepStmt).isCached = false;
+                        ((ServerPreparedStatement) oldServerPrepStmt).setClosed(false);
                         ((ServerPreparedStatement) oldServerPrepStmt).realClose(true, true);
                     }
                 }
@@ -4299,7 +4280,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
         synchronized (getConnectionMutex()) {
             if (getCachePreparedStatements() && pstmt.isPoolable()) {
                 synchronized (this.serverSideStatementCache) {
-                    this.serverSideStatementCache.remove(makePreparedStatementCacheKey(pstmt.currentCatalog, pstmt.originalSql));
+                    this.serverSideStatementCache.remove(new CompoundCacheKey(pstmt.currentCatalog, pstmt.originalSql));
                 }
             }
         }
@@ -5229,7 +5210,7 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
     public CachedResultSetMetaData getCachedMetaData(String sql) {
         if (this.resultSetMetadataCache != null) {
             synchronized (this.resultSetMetadataCache) {
-                return (CachedResultSetMetaData) this.resultSetMetadataCache.get(sql);
+                return this.resultSetMetadataCache.get(sql);
             }
         }
 

@@ -35,7 +35,7 @@ jLaTexMath 1.0.6
 
 JSP API 2.3
 
-MySQL Connector/J 5.1.43
+MySQL Connector/J 5.1.46
 
 oauth 20100527
 
