@@ -31,7 +31,7 @@ jlatexmath		  jlatexmath-1.0.6.jar                  1.0.6
 
 json-simple       json-simple-1.1.1.jar                 1.1.1                  Apache License 2.0            fangyidong                       A simple Java toolkit for JSON
 
-mysql             mysql-connector-java-5.1.43-bin.jar	5.1.43				   GPL							 Oracle 						  Java connector for MySQL                                                                          
+mysql             mysql-connector-java-5.1.46-bin.jar	5.1.46				   GPL							 Oracle 						  Java connector for MySQL                                                                          
 
 odmg              odmg-3.0.jar                          3.0                                                                                   
 
