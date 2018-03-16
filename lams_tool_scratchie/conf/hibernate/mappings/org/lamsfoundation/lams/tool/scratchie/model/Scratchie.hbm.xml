@@ -167,12 +167,14 @@
             insert="true"
             column="preset_marks"
         />
-
-        <!--
-            To add non XDoclet property mappings, create a file named
-                hibernate-properties-Scratchie.xml
-            containing the additional properties and place it in your merge dir.
-        -->
+        
+       <property
+            name="showScrachiesInResults"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="show_scratchies_in_results"
+        />
 
     </class>
 

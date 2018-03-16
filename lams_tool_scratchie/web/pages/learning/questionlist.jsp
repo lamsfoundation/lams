@@ -94,9 +94,7 @@
 
 <form id="burning-questions" name="burning-questions" method="post" action="">
 
-<c:if test="${showResults}">
-	<%@ include file="scratchies.jsp"%>
-</c:if>
+<%@ include file="scratchies.jsp"%>
 
 <%-- show general burning question --%>
 <c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">

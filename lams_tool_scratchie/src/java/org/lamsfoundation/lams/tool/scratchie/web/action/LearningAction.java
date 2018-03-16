@@ -528,8 +528,10 @@ public class LearningAction extends Action {
 	    request.setAttribute(ScratchieConstants.ATTR_REFLECTIONS, reflections);
 	}
 
-	storeItemsToSessionMap(toolSessionId, scratchie, sessionMap, true);
-	request.setAttribute(ScratchieConstants.ATTR_SHOW_RESULTS, true);
+	if (scratchie.isShowScrachiesInResults()) {
+	    storeItemsToSessionMap(toolSessionId, scratchie, sessionMap, true);
+	    request.setAttribute(ScratchieConstants.ATTR_SHOW_RESULTS, true);
+	}
 
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }

@@ -266,8 +266,10 @@
 			</html:button>
 		</div>
 		
-		<%@ include file="scratchies.jsp"%>
-
+		<c:if test="${showResults}">
+			<%@ include file="scratchies.jsp"%>
+		</c:if>
+		
 		<!-- Display burningQuestionItemDtos -->
 		<c:if test="${sessionMap.isBurningQuestionsEnabled}">
 			<div class="voffset5">
