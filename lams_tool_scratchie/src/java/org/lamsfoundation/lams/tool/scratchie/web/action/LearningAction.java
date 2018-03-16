@@ -248,64 +248,11 @@ public class LearningAction extends Action {
 	    }
 	}
 
-	// set scratched flag for display purpose
-	Collection<ScratchieItem> items = service.getItemsWithIndicatedScratches(toolSessionId);
+	storeItemsToSessionMap(toolSessionId, scratchie, sessionMap, mode.isTeacher());
 
-	// shuffling items
-	if (scratchie.isShuffleItems()) {
-	    //items is a Set at this moment
-	    ArrayList<ScratchieItem> shuffledItems = new ArrayList<ScratchieItem>(items);
-	    //use random with a seed so people from the same group get the "same shuffle"
-	    Random randomGenerator = new Random(toolSessionId);
-	    Collections.shuffle(shuffledItems, randomGenerator);
-	    items = shuffledItems;
-	}
-
-	// for teacher in monitoring display the number of attempt.
-	if (mode.isTeacher()) {
-	    service.getScratchesOrder(items, toolSessionId);
-	}
-	
-	//display confidence levels 
-	if (scratchie.isConfidenceLevelsEnabled()) {
-	    service.populateItemsWithConfidenceLevels(user.getUserId(), toolSessionId, scratchie.getConfidenceLevelsActivityUiid(), items);
-	}
-
-	// populate items with the existing burning questions for displaying purposes
-	List<ScratchieBurningQuestion> burningQuestions = null;
-	if (scratchie.isBurningQuestionsEnabled()) {
-
-	    burningQuestions = service.getBurningQuestionsBySession(toolSessionId);
-	    for (ScratchieItem item : items) {
-
-		// find corresponding burningQuestion
-		String question = "";
-		for (ScratchieBurningQuestion burningQuestion : burningQuestions) {
-		    if (!burningQuestion.isGeneralQuestion()
-			    && burningQuestion.getScratchieItem().getUid().equals(item.getUid())) {
-			question = burningQuestion.getQuestion();
-			break;
-		    }
-		}
-		item.setBurningQuestion(question);
-	    }
-
-	    // find general burning question
-	    String generalBurningQuestion = "";
-	    for (ScratchieBurningQuestion burningQuestion : burningQuestions) {
-		if (burningQuestion.isGeneralQuestion()) {
-		    generalBurningQuestion = burningQuestion.getQuestion();
-		    break;
-		}
-	    }
-	    sessionMap.put(ScratchieConstants.ATTR_GENERAL_BURNING_QUESTION, generalBurningQuestion);
-	}
-
+	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 	// calculate max score
 	int maxScore = service.getMaxPossibleScore(scratchie);
-
-	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
-	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 	sessionMap.put(ScratchieConstants.ATTR_MAX_SCORE, maxScore);
 
 	boolean isScratchingFinished = toolSession.isScratchingFinished();
@@ -319,7 +266,7 @@ public class LearningAction extends Action {
 	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
 	    return redirect;
 
-	// show results page
+	    // show results page
 	} else if (isShowResults) {
 
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
@@ -327,7 +274,7 @@ public class LearningAction extends Action {
 	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
 	    return redirect;
 
-	// show learning.jsp page
+	    // show learning.jsp page
 	} else {
 
 	    // time limit feature
@@ -378,6 +325,68 @@ public class LearningAction extends Action {
 	    return mapping.findForward(ScratchieConstants.SUCCESS);
 	}
 
+    }
+
+    /**
+     * Stores into session map all data needed to display scratchies and answers
+     */
+    private void storeItemsToSessionMap(Long toolSessionId, Scratchie scratchie, SessionMap<String, Object> sessionMap,
+	    boolean showOrder) {
+	// set scratched flag for display purpose
+	Collection<ScratchieItem> items = service.getItemsWithIndicatedScratches(toolSessionId);
+
+	// shuffling items
+	if (scratchie.isShuffleItems()) {
+	    //items is a Set at this moment
+	    ArrayList<ScratchieItem> shuffledItems = new ArrayList<ScratchieItem>(items);
+	    //use random with a seed so people from the same group get the "same shuffle"
+	    Random randomGenerator = new Random(toolSessionId);
+	    Collections.shuffle(shuffledItems, randomGenerator);
+	    items = shuffledItems;
+	}
+
+	// for teacher in monitoring display the number of attempt.
+	if (showOrder) {
+	    service.getScratchesOrder(items, toolSessionId);
+	}
+
+	//display confidence levels 
+	if (scratchie.isConfidenceLevelsEnabled()) {
+	    service.populateItemsWithConfidenceLevels((Long) sessionMap.get(ScratchieConstants.ATTR_USER_ID),
+		    toolSessionId, scratchie.getConfidenceLevelsActivityUiid(), items);
+	}
+
+	// populate items with the existing burning questions for displaying purposes
+	List<ScratchieBurningQuestion> burningQuestions = null;
+	if (scratchie.isBurningQuestionsEnabled()) {
+
+	    burningQuestions = service.getBurningQuestionsBySession(toolSessionId);
+	    for (ScratchieItem item : items) {
+
+		// find corresponding burningQuestion
+		String question = "";
+		for (ScratchieBurningQuestion burningQuestion : burningQuestions) {
+		    if (!burningQuestion.isGeneralQuestion()
+			    && burningQuestion.getScratchieItem().getUid().equals(item.getUid())) {
+			question = burningQuestion.getQuestion();
+			break;
+		    }
+		}
+		item.setBurningQuestion(question);
+	    }
+
+	    // find general burning question
+	    String generalBurningQuestion = "";
+	    for (ScratchieBurningQuestion burningQuestion : burningQuestions) {
+		if (burningQuestion.isGeneralQuestion()) {
+		    generalBurningQuestion = burningQuestion.getQuestion();
+		    break;
+		}
+	    }
+	    sessionMap.put(ScratchieConstants.ATTR_GENERAL_BURNING_QUESTION, generalBurningQuestion);
+	}
+
+	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
     }
 
     /**
@@ -472,9 +481,10 @@ public class LearningAction extends Action {
 	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
 	Scratchie scratchie = toolSession.getScratchie();
 	Long userUid = (Long) sessionMap.get(ScratchieConstants.ATTR_USER_UID);
-	
+
 	//handle burning questions saving if needed
-	if (toolSession.isUserGroupLeader(userUid) && scratchie.isBurningQuestionsEnabled() && !toolSession.isScratchingFinished()) {
+	if (toolSession.isUserGroupLeader(userUid) && scratchie.isBurningQuestionsEnabled()
+		&& !toolSession.isScratchingFinished()) {
 	    saveBurningQuestions(request);
 	}
 
@@ -518,9 +528,14 @@ public class LearningAction extends Action {
 	    request.setAttribute(ScratchieConstants.ATTR_REFLECTIONS, reflections);
 	}
 
+	if (scratchie.isShowScrachiesInResults()) {
+	    storeItemsToSessionMap(toolSessionId, scratchie, sessionMap, true);
+	    request.setAttribute(ScratchieConstants.ATTR_SHOW_RESULTS, true);
+	}
+
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
-    
+
     /**
      * Saves newly entered burning question. Used by jqGrid cellediting feature.
      */
@@ -633,20 +648,20 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
-	final Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);	
-	
+	final Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+
 	// only leader is allowed to submit burning questions
 	ScratchieUser leader = getCurrentUser(sessionId);
 	ScratchieSession toolSession = service.getScratchieSessionBySessionId(sessionId);
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
 	    return null;
 	}
-	
+
 	saveBurningQuestions(request);
 
 	return null;
     }
-    
+
     /**
      * Saves burning questions entered by user. It also updates its values in SessionMap.
      */
@@ -662,7 +677,8 @@ public class LearningAction extends Action {
 	for (ScratchieItem item : items) {
 	    final Long itemUid = item.getUid();
 
-	    final String burningQuestion = request.getParameter(ScratchieConstants.ATTR_BURNING_QUESTION_PREFIX + itemUid);
+	    final String burningQuestion = request
+		    .getParameter(ScratchieConstants.ATTR_BURNING_QUESTION_PREFIX + itemUid);
 	    // update question in sessionMap
 	    item.setBurningQuestion(burningQuestion);
 
@@ -707,9 +723,10 @@ public class LearningAction extends Action {
 
 	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
 	Scratchie scratchie = toolSession.getScratchie();
-	
+
 	//handle burning questions saving if needed
-	if (toolSession.isUserGroupLeader(userUid) && scratchie.isBurningQuestionsEnabled() && !toolSession.isScratchingFinished()) {
+	if (toolSession.isUserGroupLeader(userUid) && scratchie.isBurningQuestionsEnabled()
+		&& !toolSession.isScratchingFinished()) {
 	    saveBurningQuestions(request);
 	}
 

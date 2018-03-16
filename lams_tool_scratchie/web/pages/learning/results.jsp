@@ -261,11 +261,15 @@
 		</lams:Alert>
 	
 		<div class="row voffset5" >
-			<html:button property="refreshButton" onclick="return refresh();" styleClass="btn btn-default voffset5 roffset5 pull-right">
+			<html:button property="refreshButton" onclick="return refresh();" styleClass="btn btn-default voffset5 roffset10 pull-right">
 				<fmt:message key="label.refresh" />
 			</html:button>
 		</div>
-
+		
+		<c:if test="${showResults}">
+			<%@ include file="scratchies.jsp"%>
+		</c:if>
+		
 		<!-- Display burningQuestionItemDtos -->
 		<c:if test="${sessionMap.isBurningQuestionsEnabled}">
 			<div class="voffset5">

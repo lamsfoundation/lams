@@ -68,19 +68,21 @@ public class Scratchie implements Cloneable {
     private boolean extraPoint;
 
     private boolean burningQuestionsEnabled;
-    
+
     private boolean shuffleItems;
-    
+
     private int timeLimit;
-    
+
     private Integer confidenceLevelsActivityUiid;
-    
+
     //overwrites default preset marks stored as admin config setting
     private String presetMarks;
 
     private boolean reflectOnActivity;
 
     private String reflectInstructions;
+
+    private boolean showScrachiesInResults;
 
     /**
      * Default contruction method.
@@ -350,19 +352,19 @@ public class Scratchie implements Cloneable {
     public void setBurningQuestionsEnabled(boolean burningQuestionsEnabled) {
 	this.burningQuestionsEnabled = burningQuestionsEnabled;
     }
-    
-    /**
-    *
-    * @return
-    */
-   public boolean isShuffleItems() {
-	return shuffleItems;
-   }
 
-   public void setShuffleItems(boolean shuffleItems) {
+    /**
+     *
+     * @return
+     */
+    public boolean isShuffleItems() {
+	return shuffleItems;
+    }
+
+    public void setShuffleItems(boolean shuffleItems) {
 	this.shuffleItems = shuffleItems;
-   }
-    
+    }
+
     /**
      * @return Returns the time limitation, that students have to complete an attempt.
      */
@@ -377,14 +379,14 @@ public class Scratchie implements Cloneable {
     public void setTimeLimit(int timeLimit) {
 	this.timeLimit = timeLimit;
     }
-    
+
     /**
      * @return which preceding activity should be queried for confidence levels
      */
     public boolean isConfidenceLevelsEnabled() {
 	return confidenceLevelsActivityUiid != null;
     }
-    
+
     /**
      * @return which preceding activity should be queried for confidence levels
      */
@@ -399,18 +401,26 @@ public class Scratchie implements Cloneable {
     public void setConfidenceLevelsActivityUiid(Integer confidenceLevelsActivityUiid) {
 	this.confidenceLevelsActivityUiid = confidenceLevelsActivityUiid;
     }
-    
+
     /**
      * This property holds value that can overwrite default preset marks stored in admin config setting. It can be null
      * and therefore ScratchieService.getPresetMarks() method should be used instead when calculating actual marks.
      *
      * @return
      */
-   public String getPresetMarks() {
+    public String getPresetMarks() {
 	return presetMarks;
-   }
+    }
 
-   public void setPresetMarks(String presetMarks) {
+    public void setPresetMarks(String presetMarks) {
 	this.presetMarks = presetMarks;
-   }
+    }
+
+    public boolean isShowScrachiesInResults() {
+	return showScrachiesInResults;
+    }
+
+    public void setShowScrachiesInResults(boolean showScrachiesInResults) {
+	this.showScrachiesInResults = showScrachiesInResults;
+    }
 }
