@@ -223,7 +223,7 @@
 				</div>
 				
   			<div class="generalFeedback">
-				  <a data-toggle="collapse" data-target="#general-feedback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.general.feedback" /></a>
+				  <a data-toggle="collapse" data-target="#general-feedback" href="#general-feedback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.general.feedback" /></a>
 					<div id="general-feedback"  class="voffset5 collapse <c:if test="${not empty formBean.generalFeedback}">in</c:if> form-group">
 						<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}" contentFolderID="${formBean.contentFolderID}" />
 					</div>

@@ -17,7 +17,7 @@
 
 <div class="form-group">
     <label for="optionFeedback${status.index}">
-    	<a data-toggle="collapse" data-target="#feedback${status.index}"><i class="fa fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.option.feedback"></fmt:message></a>
+    	<a data-toggle="collapse" data-target="#feedback${status.index}" href="#feedback${status.index}"><i class="fa fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.option.feedback"></fmt:message></a>
     </label>
     <div id="feedback${status.index}" class="collapse <c:if test="${not empty option.feedback}">in</c:if>">
      <lams:CKEditor id="optionFeedback${status.index}" value="${option.feedback}" contentFolderID="${contentFolderID}" />

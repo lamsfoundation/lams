@@ -177,7 +177,7 @@
 	<%-- show burning questions --%>
 	<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">
 		<div class="form-group burning-question-container">
-			<a data-toggle="collapse" data-target="#burning-question-item${item.uid}">
+			<a data-toggle="collapse" data-target="#burning-question-item${item.uid}" href="#burning-question-item${item.uid}">
 				<i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i>
 				<fmt:message key="label.burning.question" />
 			</a>
@@ -195,7 +195,7 @@
 <%-- show general burning question --%>
 <c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">
 	<div class="form-group burning-question-container">
-		<a data-toggle="collapse" data-target="#burning-question-general">
+		<a data-toggle="collapse" data-target="#burning-question-general" href="#burning-question-general">
 			<i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i>
 			<fmt:message key="label.general.burning.question" />
 		</a>
