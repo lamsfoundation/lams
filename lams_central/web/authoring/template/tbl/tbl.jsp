@@ -21,6 +21,8 @@
 
 		<%@ include file="../comms.jsp" %>
 
+		var minimumWordsSpinnerArray  = new Array(); // Peer Review Tab.
+
 		$(document).ready(function() {
 			groupingChanged();
 
@@ -80,6 +82,7 @@
 			<li><a href="#tab2" data-toggle="tab"><fmt:message key="authoring.section.lessondetails" /> </a></li>
 			<li><a href="#tab3" data-toggle="tab"><fmt:message key="authoring.section.questionsanalysis" /></a></li>
 			<li><a href="#tab4" data-toggle="tab"><fmt:message key="authoring.section.applicationexercise" /></a></li>
+			<li><a href="#tab5" data-toggle="tab"><fmt:message key="authoring.section.peerreview" /></a></li>
 		</ul>
 		</div>
 	  </div>
@@ -120,7 +123,7 @@
 			<a href="#" id="createQuestionButton" onclick="javascript:createQuestion('numQuestions', 'divq', 'divquestions', '', '');" class="btn btn-default"><fmt:message key="authoring.create.question"/></a>
 	    </div>
 		<div class="tab-pane" id="tab4">
-			<h4><span class="field-name"><fmt:message key="authoring.tbl.desc.ae" /></span></h4>
+			<span class="field-name"><fmt:message key="authoring.tbl.desc.ae" /></span>
 			
 		 	<input type="hidden" name="numAssessments" id="numAssessments" value="1"/>
 	
@@ -133,6 +136,21 @@
 			
 			<a href="#" onclick="javascript:createAssessment();" class="btn btn-default voffset10"><fmt:message key="authoring.create.question"/></a>
 	    </div>
+	    	<div class="tab-pane" id="tab5">
+			<span class="field-name"><fmt:message key="authoring.tbl.desc.peer.review" /></span>
+			
+		 	<input type="hidden" name="numRatingCriterias" id="numRatingCriterias" value="1"/>
+	
+			<div id="divratings">
+			<div id="divrating1" class="space-top">
+			<c:set scope="request" var="criteriaNumber">1</c:set>
+			<%@ include file="../tool/peerreviewstar.jsp" %>
+			</div>
+			</div>
+			
+			<a href="#" onclick="javascript:createPeerReviewCriteria();" class="btn btn-default voffset10"><fmt:message key="authoring.create.criteria"/></a>
+	    </div>
+	    
 	    <div id="navigation-buttons" class="voffset10">
 	    		<div style="float:right">
 		  	<a href="#" class='btn btn-sm btn-primary button-next'><fmt:message key="button.next"/></a>

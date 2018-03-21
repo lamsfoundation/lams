@@ -457,7 +457,7 @@
     <forward name="questionoption" path="/authoring/template/tool/mcoption.jsp" />
     <forward name="assess" path="/authoring/template/tool/assessment.jsp" />
     <forward name="redooption" path="/authoring/template/tool/mcredooption.jsp" />
-    
+    <forward name="peerreviewstar" path="/authoring/template/tool/peerreviewstar.jsp" />
     </action>
 
 

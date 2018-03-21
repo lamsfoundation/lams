@@ -24,8 +24,10 @@ package org.lamsfoundation.lams.authoring.template.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -47,8 +49,10 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.authoring.template.AssessMCAnswer;
 import org.lamsfoundation.lams.authoring.template.Option;
+import org.lamsfoundation.lams.authoring.template.TextUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
@@ -121,6 +125,8 @@ public abstract class LdTemplateAction extends DispatchAction {
     protected static final String MINDMAP_ICON = "tool/lamind10/images/icon_mindmap.swf";
     protected static final String VOTE_TOOL_SIGNATURE = "lavote11";
     protected static final String VOTE_ICON = "tool/lavote11/images/icon_ranking.swf";
+    protected static final String PEER_REVIEW_TOOL_SIGNATURE = "laprev11";
+    protected static final String PEER_REVIEW_ICON = "tool/laprev11/images/icon_peerreview.svg";
 
     protected static final String CHAT_SCRIBE_DESC = "Combined Chat and Scribe";
     protected static final String FORUM_SCRIBE_DESC = "Combined Forum and Scribe";
@@ -171,23 +177,6 @@ public abstract class LdTemplateAction extends DispatchAction {
 	request.setAttribute(RestTags.CONTENT_FOLDER_ID, contentFolderID);
 	return mapping.findForward("init");
     }
-
-//	
-//	String responseBody = null;
-//	try {
-//	    HttpResponse httpResponse = httpClient.execute(httpPost);
-//	    int statusCode = httpResponse.getStatusLine().getStatusCode();
-//	    if (statusCode != HttpStatus.SC_OK) {
-//		LdTemplateAction.log.error("Error while calling REST servlet: " + url);
-//		return null;
-//	    }
-//	    responseBody = EntityUtils.toString(httpResponse.getEntity());
-//	} finally {
-//	    httpPost.releaseConnection();
-//	}
-//
-//	return new JSONObject(responseBody);
-//    }
 
     protected abstract JSONObject createLearningDesign(HttpServletRequest request)
 	    throws Exception;
@@ -255,7 +244,9 @@ public abstract class LdTemplateAction extends DispatchAction {
     }
 
     protected static final int rowHeightSpace = 100;
-    protected static final int activityWidthSpace = 150;
+    protected static final int activityWidthSpace = 185;
+    protected static final int gateHeightOffset = 5;
+    protected static final int gateWidthOffset = 50;
 
     /**
      * Calculate where to draw an activity. Aim for 4 activities per line. Returns Integer[x,y]
@@ -291,6 +282,15 @@ public abstract class LdTemplateAction extends DispatchAction {
 	newPos[1] = currPos[1] + rowHeightSpace; // move y co-ord down a row.
 	return newPos;
     }
+
+    /** Work out the offset for a gate icon - different size to an ordinary icons */
+    protected Integer[] calcGateOffset(Integer[] currPos) {
+	Integer[] newPos = new Integer[2];
+	newPos[1] = currPos[1] + gateHeightOffset; 
+	newPos[0] = currPos[0] + gateWidthOffset; 
+	return newPos;
+    }
+
 
     /**
      * Create a unique title for this learning design, within the right length for the database. The title will
@@ -384,7 +384,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 
     /** Create a group activity's JSON objects */
     protected JSONObject[] createGroupingActivity(AtomicInteger uiid, int order, Integer[] layoutCoords,
-	    Integer groupingTypeID, Integer numLearners, Integer numGroups, String title, String[] groupNames)
+	    Integer groupingTypeID, Integer numLearners, Integer numGroups, String title, String[] groupNames,
+	    ResourceBundle appBundle, MessageFormat formatter)
 	    throws JSONException {
 	JSONObject[] responseJSONs = new JSONObject[2];
 
@@ -393,13 +394,18 @@ public abstract class LdTemplateAction extends DispatchAction {
 	int groupingUIID = uiid.incrementAndGet();
 	groupingJSON.put(AuthoringJsonTags.GROUPING_UIID, groupingUIID);
 	groupingJSON.put(AuthoringJsonTags.GROUPING_TYPE_ID, groupingTypeID);
-	groupingJSON.put(AuthoringJsonTags.NUMBER_OF_GROUPS, numGroups);
+	if ( groupingTypeID.equals(Grouping.CHOSEN_GROUPING_TYPE) ) {
+	    groupingJSON.put(AuthoringJsonTags.MAX_NUMBER_OF_GROUPS, numGroups);
+	} else {
+	    groupingJSON.put(AuthoringJsonTags.NUMBER_OF_GROUPS, numGroups);
+	}
 	groupingJSON.put(AuthoringJsonTags.LEARNERS_PER_GROUP, numLearners);
 	groupingJSON.put(AuthoringJsonTags.EQUAL_NUMBER_OF_LEARNERS_PER_GROUP, Boolean.FALSE);
 
-	int orderId = 0;
+	// mimic what Authoring is doing for the group name creations
+	JSONArray groups = new JSONArray();
 	if (groupNames != null) {
-	    JSONArray groups = new JSONArray();
+	    int orderId = 0;
 	    for (String groupName : groupNames) {
 		JSONObject group = new JSONObject();
 		group.put(AuthoringJsonTags.GROUP_NAME, groupName);
@@ -407,8 +413,18 @@ public abstract class LdTemplateAction extends DispatchAction {
 		group.put(AuthoringJsonTags.GROUP_UIID, uiid.incrementAndGet());
 		groups.put(group);
 	    }
-	    groupingJSON.put(AuthoringJsonTags.GROUPS, groups);
-	}
+	} else { 
+	    Integer useNumGroups = ( numGroups != null && numGroups > 0) ? numGroups : 2;
+	    for ( int orderId = 0, groupNum = 1; orderId < useNumGroups; orderId++, groupNum++ ) {
+		JSONObject group = new JSONObject();
+		group.put(AuthoringJsonTags.GROUP_NAME, 
+			TextUtil.getText(appBundle, formatter, "label.course.groups.prefix", null) + groupNum);
+		group.put(AuthoringJsonTags.ORDER_ID, orderId);
+		group.put(AuthoringJsonTags.GROUP_UIID, uiid.incrementAndGet());
+		groups.put(group);
+	    }
+	} 
+	groupingJSON.put(AuthoringJsonTags.GROUPS, groups);
 
 	Integer[] pos = layoutCoords != null ? layoutCoords : calcPosition(order);
 
@@ -1258,6 +1274,38 @@ public abstract class LdTemplateAction extends DispatchAction {
 		LdTemplateAction.WIKI_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Wiki", Activity.CATEGORY_COLLABORATION);
     }
+
+    /**
+     * Helper method to create a Peer Review tool content. 
+     * Required fields in toolContentJSON: "title", "instructions", "questions", "firstName", "lastName", "lastName",
+     * "questions" and "references".
+     *
+     * The criterias entry should be JSONArray as defined in PeerReviewCriters object.
+     */
+    protected Long createPeerReviewToolContent(UserDTO user, String title, String instructions,
+	    String reflectionInstructions, JSONArray criterias)
+	    throws JSONException, HttpException, IOException {
+
+	JSONObject toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions, null, null,
+		user);
+	toolContentJSON.put("criterias", criterias);
+	return createToolContent(user, LdTemplateAction.PEER_REVIEW_TOOL_SIGNATURE, toolContentJSON);
+    }
+
+    /**
+     * Creates a PeerRev activity's JSON details.
+     */
+    protected JSONObject createPeerReviewActivity(AtomicInteger uiid, int order, Integer[] layoutCoords,
+	    Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
+	    Integer parentActivityType, String activityTitle) throws JSONException {
+
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.PEER_REVIEW_TOOL_SIGNATURE,
+		LdTemplateAction.PEER_REVIEW_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+		parentActivityType, activityTitle != null ? activityTitle : "Peer Review", Activity.CATEGORY_CONTENT);
+    }
+
+    /**
+ 
     /* ************************************** Service related methods ********************************************** */
     /* ************************************** I18N related methods ************************************************* */
 
@@ -1396,7 +1444,6 @@ public abstract class LdTemplateAction extends DispatchAction {
 	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber);
 	// reorder the options and setup the return value
 	LinkedList<Option> options = new LinkedList<Option>();
-	int displayOrder = 1;
 
 	Option swap = null;
 	for (Option option : optionsMap.values()) {
@@ -1464,5 +1511,16 @@ public abstract class LdTemplateAction extends DispatchAction {
 	request.setAttribute("branchNumber", request.getParameter("branchNumber"));
 	return mapping.findForward("branch");
     }
+
+    /**
+     * Specialised call to create a new rating criteria for the Peer Review fields. Returns a fragment of HTML
+     * which sets up the new fields.
+     */
+    public ActionForward createRatingCriteria(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	request.setAttribute("criteriaNumber", WebUtil.readIntParam(request, "criteriaNumber"));
+	return mapping.findForward("peerreviewstar");
+    }
+
 
 }

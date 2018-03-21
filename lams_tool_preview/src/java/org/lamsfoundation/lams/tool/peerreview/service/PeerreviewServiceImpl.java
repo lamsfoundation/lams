@@ -957,8 +957,7 @@ public class PeerreviewServiceImpl
     /**
      * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: title, instructions, peerreview,
      * user fields firstName, lastName and loginName Peerreview must contain a JSONArray of JSONObject objects, which
-     * have the following mandatory fields: title, description, type. If there are instructions for a peerreview, the
-     * instructions are a JSONArray of Strings. There should be at least one peerreview object in the peerreview array.
+     * have the following mandatory fields: title, description, type. It will create 
      */
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
@@ -971,6 +970,7 @@ public class PeerreviewServiceImpl
 	peerreview.setTitle(toolContentJSON.getString(RestTags.TITLE));
 	peerreview.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
 	peerreview.setCreated(updateDate);
+	peerreview.setUpdated(updateDate);
 
 	peerreview.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 	peerreview.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
@@ -990,7 +990,31 @@ public class PeerreviewServiceImpl
 
 	peerreview.setCreatedBy(peerreviewUser);
 
+	// not expecting to get these but add them in case an Authoring Template does want them
+	peerreview.setMinimumRates(JsonUtil.opt(toolContentJSON, "minimumRates", 0));
+	peerreview.setMaximumRates(JsonUtil.opt(toolContentJSON, "maximumRate", 0));
+	peerreview.setMaximumRatesPerUser(JsonUtil.opt(toolContentJSON, "maximumRatesPerUser", 0));
+	peerreview.setShowRatingsLeftForUser(JsonUtil.opt(toolContentJSON, "showRatingsLeftForUser", Boolean.TRUE));
+	peerreview.setShowRatingsLeftByUser(JsonUtil.opt(toolContentJSON, "showRatingsLeftByUser", Boolean.FALSE));
+	peerreview.setSelfReview(JsonUtil.opt(toolContentJSON, "notifyUsersOfResults", Boolean.FALSE));
+	peerreview.setNotifyUsersOfResults(JsonUtil.opt(toolContentJSON, "notifyUsersOfResults", Boolean.TRUE));
+
 	saveOrUpdatePeerreview(peerreview);
 
+	// Criterias
+	JSONArray criterias = toolContentJSON.getJSONArray("criterias");
+	for (int i = 0; i < criterias.length(); i++) {
+	    JSONObject criteriaData = (JSONObject) criterias.get(i);
+	    // allowComment true, minWords defaults to 1. allowComment is false, minWords defaults to 0
+	    boolean allowComment = criteriaData.has("commentsEnabled") ? criteriaData.getBoolean("commentsEnabled")
+		    : false;
+	    int minWords = criteriaData.has("minWordsInComment") ? criteriaData.getInt("minWordsInComment")
+		    : allowComment ? 1 : 0;
+	    ratingService.saveLearnerItemRatingCriteria(toolContentID, criteriaData.getString("title"),
+		    criteriaData.getInt("orderId"), criteriaData.getInt("ratingStyle"), allowComment, minWords);
+	}
+
+	saveOrUpdatePeerreview(peerreview);
     }
+
 }

@@ -39,6 +39,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.authoring.template.PeerReviewCriteria;
 import org.lamsfoundation.lams.authoring.template.TemplateData;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -86,54 +87,64 @@ public class TBLTemplateAction extends LdTemplateAction {
 	JSONArray activities = new JSONArray();
 	JSONArray groupings = new JSONArray();
 
+	Integer[] firstActivityInRowPosition = new Integer[] { 20, 125 }; // the very first activity, all other locations can be calculated from here if needed!
+
 	// Welcome
 	String activityTitle = data.getText("boilerplate.introduction.title");
 	Long welcomeToolContentId = createNoticeboardToolContent(userDTO, activityTitle,
 		data.getText("boilerplate.introduction.instructions"), null);
-	activities.put(createNoticeboardActivity(maxUIID, order++, new Integer[] { 20, 125 }, welcomeToolContentId,
+	activities.put(createNoticeboardActivity(maxUIID, order++, firstActivityInRowPosition, welcomeToolContentId,
 		data.contentFolderID, null, null, null, activityTitle));
 
 	// Grouping
-	JSONObject[] groupingJSONs = createGroupingActivity(maxUIID, order++, new Integer[] { 170, 125 },
-		data.groupingType, data.numLearners, data.numGroups, null, null);
+	Integer[] currentActivityPosition = calcPositionNextRight(firstActivityInRowPosition);
+	JSONObject[] groupingJSONs = createGroupingActivity(maxUIID, order++, currentActivityPosition,
+		data.groupingType, data.numLearners, data.numGroups, null, null, data.getUIBundle(), data.getFormatter());
 	activities.put(groupingJSONs[0]);
 	groupings.put(groupingJSONs[1]);
 	Integer groupingUIID = groupingJSONs[1].getInt("groupingUIID");
 
 	// Stop!
-	activities.put(createGateActivity(maxUIID, order++, new Integer[] { 290, 77 }));
+	currentActivityPosition = calcPositionNextRight(currentActivityPosition);
+	activities.put(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition)));
 
 	// iRA Test - MCQ
+	currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	activityTitle = data.getText("boilerplate.ira.title");
 	Long iRAToolContentId = createMCQToolContent(userDTO, activityTitle,
 		data.getText("boilerplate.ira.instructions"), false, new JSONArray(data.testQuestions.values()));
-	activities.put(createMCQActivity(maxUIID, order++, new Integer[] { 320, 125 }, iRAToolContentId,
+	activities.put(createMCQActivity(maxUIID, order++, currentActivityPosition, iRAToolContentId,
 		data.contentFolderID, groupingUIID, null, null, activityTitle));
 
 	// Stop!
-	activities.put(createGateActivity(maxUIID, order++, new Integer[] { 470, 130 }));
+	currentActivityPosition = calcPositionNextRight(currentActivityPosition);
+	activities.put(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition)));
 
 	// Leader Selection
+	firstActivityInRowPosition = calcPositionBelow(firstActivityInRowPosition);
 	activityTitle = data.getText("boilerplate.leader.title");
 	Long leaderSelectionToolContentId = createLeaderSelectionToolContent(userDTO, activityTitle,
 		data.getText("boilerplate.leader.instructions"));
-	activities.put(createLeaderSelectionActivity(maxUIID, order++, new Integer[] { 534, 125 },
+	activities.put(createLeaderSelectionActivity(maxUIID, order++, firstActivityInRowPosition,
 		leaderSelectionToolContentId, data.contentFolderID, groupingUIID, null, null, activityTitle));
 
 	// tRA Test
+	currentActivityPosition = calcPositionNextRight(firstActivityInRowPosition);
 	activityTitle = data.getText("boilerplate.tra.title");
 	Long tRAToolContentId = createScratchieToolContent(userDTO, activityTitle,
 		data.getText("boilerplate.tra.instructions"), false, new JSONArray(data.testQuestions.values()));
-	activities.put(createScratchieActivity(maxUIID, order++, new Integer[] { 670, 125 }, tRAToolContentId,
+	activities.put(createScratchieActivity(maxUIID, order++, currentActivityPosition, tRAToolContentId,
 		data.contentFolderID, groupingUIID, null, null, activityTitle));
 
 	// Stop!
-	activities.put(createGateActivity(maxUIID, order++, new Integer[] { 830, 130 }));
+	currentActivityPosition = calcPositionNextRight(currentActivityPosition);
+	activities.put(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition)));
 
-	Integer[] baseActivityPosition = new Integer[] { 20, 125 }; // the very first activity, all other locations can be calculated from here if needed!
-
-	// Application Exercise - could be any number of them.
-	Integer[] aePos = new Integer[] { 20, 250 };
+	// Application Exercise - could be any number of them. Have 5 per row. If there are only 1 or 2 left on the last row, then the 
+	// following activities will go on the same row, otherwise the following activities go on the next line
+	firstActivityInRowPosition = calcPositionBelow(firstActivityInRowPosition);
+	currentActivityPosition = firstActivityInRowPosition;
+	int numAEInRow = 5;
 	int displayOrder = 1;
 	for (String exerciseQuestion : data.applicationExercises.values()) {
 	    String applicationExerciseTitle = data.getText("boilerplate.ae.application.exercise.num",
@@ -143,21 +154,50 @@ public class TBLTemplateAction extends LdTemplateAction {
 	    JSONArray questions = new JSONArray().put(question);
 	    Long aetoolContentId = createAssessmentToolContent(userDTO, applicationExerciseTitle,
 		    data.getText("boilerplate.ae.instructions"), null, questions);
-	    activities.put(createAssessmentActivity(maxUIID, order++, aePos, aetoolContentId, data.contentFolderID,
-		    null, null, null, applicationExerciseTitle));
+	    activities.put(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId, data.contentFolderID,
+		    groupingUIID, null, null, applicationExerciseTitle));
 
-	    aePos = calcPositionNextRight(aePos);
+	    if ( (displayOrder % numAEInRow) == 0 ) {
+		firstActivityInRowPosition = calcPositionBelow(firstActivityInRowPosition);
+		currentActivityPosition = firstActivityInRowPosition;
+	    } else {
+		currentActivityPosition = calcPositionNextRight(currentActivityPosition);
+	    }
 	    displayOrder++;
 	}
 
+	if ( (displayOrder % numAEInRow) > 3 ) {
+	    firstActivityInRowPosition = calcPositionBelow(firstActivityInRowPosition);
+	    currentActivityPosition = firstActivityInRowPosition;
+	} 
+
+	// Peer Review - optional. Start by eliminating all criterias with no title. Then if any are left 
+	// we create the tool data and activity
+    	JSONArray criterias = new JSONArray();
+    	for (PeerReviewCriteria criteria : data.peerReviewCriteria.values()) {
+    	    if ( criteria.getTitle() != null && criteria.getTitle().length() > 0 )
+    		criterias.put(criteria.getAsJSONObject());
+    	}
+	if ( criterias.length() > 0 ) {
+            	String peerReviewTitle = data.getText("boilerplate.peerreview");
+            	Long prtoolContentId = createPeerReviewToolContent(userDTO, 
+            		peerReviewTitle,
+            		data.getText("boilerplate.peerreview.instructions"), null, criterias);
+            	activities.put(createPeerReviewActivity(maxUIID, order++, currentActivityPosition, prtoolContentId, data.contentFolderID,
+            		groupingUIID, null, null, peerReviewTitle));
+            	displayOrder++;
+    	    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
+	}
+	
 	// Stop!
-	activities.put(createGateActivity(maxUIID, order++, new Integer[] { aePos[0], aePos[1] + 5 }));
+	activities.put(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition)));
 
 	// Individual Reflection
+	currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	activityTitle = data.getText("boilerplate.individual.reflection.title");
 	Long reflectionToolContentId = createNotebookToolContent(userDTO, activityTitle,
 		data.getText("boilerplate.individual.reflection.instructions"), false, false);
-	activities.put(createNotebookActivity(maxUIID, order++, new Integer[] { aePos[0] + 70, aePos[1] },
+	activities.put(createNotebookActivity(maxUIID, order++, currentActivityPosition,
 		reflectionToolContentId, data.contentFolderID, null, null, null, activityTitle));
 
 	JSONArray transitions = createTransitions(maxUIID, activities);
@@ -189,6 +229,8 @@ public class TBLTemplateAction extends LdTemplateAction {
 	Integer numGroups;
 	SortedMap<Integer, JSONObject> testQuestions;
 	SortedMap<Integer, String> applicationExercises;
+	SortedMap<Integer, PeerReviewCriteria> peerReviewCriteria;
+	
 
 	TBLData(HttpServletRequest request) throws JSONException {
 	    super(request, templateCode);
@@ -203,6 +245,7 @@ public class TBLTemplateAction extends LdTemplateAction {
 
 	    testQuestions = new TreeMap<Integer, JSONObject>();
 	    applicationExercises = new TreeMap<Integer, String>();
+	    peerReviewCriteria = new TreeMap<Integer, PeerReviewCriteria>();
 
 	    TreeMap<Integer, Integer> correctAnswers = new TreeMap<Integer, Integer>();
 	    Enumeration parameterNames = request.getParameterNames();
@@ -233,6 +276,8 @@ public class TBLTemplateAction extends LdTemplateAction {
 		    if (question != null) {
 			applicationExercises.put(exerciseOrder, question);
 		    }
+		} else if ( name.startsWith("peerreview")) {
+		    processInputPeerReviewRequestField(name, request);
 		}
 	    }
 	    updateCorrectAnswers(correctAnswers);
@@ -241,6 +286,32 @@ public class TBLTemplateAction extends LdTemplateAction {
 
 	}
 
+	void processInputPeerReviewRequestField(String name, HttpServletRequest request) {
+	    log.debug("process peer review "+name+" order "+name.substring(10));
+	    int fieldIndex = name.indexOf("EnableComments");
+	    if (fieldIndex > 0) { // peerreview1EnableComments
+		Integer criteriaNumber = Integer.valueOf(name.substring(10, fieldIndex));
+		findCriteriaInMap(criteriaNumber).setCommentsEnabled(WebUtil.readBooleanParam(request, name, false));
+	    } else {
+		fieldIndex = name.indexOf("MinWordsLimit");
+		if (fieldIndex > 0) {
+		    Integer criteriaNumber = Integer.valueOf(name.substring(10, fieldIndex));
+		    findCriteriaInMap(criteriaNumber).setCommentsMinWordsLimit(WebUtil.readIntParam(request, name, true));
+		} else {
+		    Integer criteriaNumber = Integer.valueOf(name.substring(10));
+		    findCriteriaInMap(criteriaNumber).setTitle(getTrimmedString(request, name, true));
+		}
+	    }
+	}
+
+	private PeerReviewCriteria findCriteriaInMap(Integer criteriaNumber) {
+	    PeerReviewCriteria criteria = peerReviewCriteria.get(criteriaNumber);
+	    if ( criteria == null ) {
+	        criteria = new PeerReviewCriteria(criteriaNumber);
+	        peerReviewCriteria.put(criteriaNumber, criteria);
+	    }
+	    return criteria;
+	}
 	void processTestQuestion(String name, String questionText, Integer questionDisplayOrder,
 		Integer optionDisplayOrder, String optionText) throws JSONException {
 

@@ -292,6 +292,26 @@
 			});
 		}		
 		
+		function createPeerReviewCriteria() {
+			var currNum = $('#numRatingCriterias').val();
+			var nextNum = +currNum + 1;
+			var newDiv = document.createElement("div");
+			newDiv.id = 'divrating'+nextNum;
+			newDiv.className = 'space-top';
+			var url=getSubmissionURL()+"?method=createRatingCriteria&criteriaNumber="+nextNum;
+			$('#divratings').append(newDiv);
+			$.ajaxSetup({ cache: true });
+			$(newDiv).load(url, function( response, status, xhr ) {
+				if ( status == "error" ) {
+					console.log( xhr.status + " " + xhr.statusText );
+					newDiv.remove();
+				} else {
+					$('#numRatingCriterias').val(nextNum);
+					newDiv.scrollIntoView();
+				}
+			});
+		}		
+		
 		function testURL(urlField) {
 			launchPopup($('#'+urlField).val(),'popupUrl');
 		}
