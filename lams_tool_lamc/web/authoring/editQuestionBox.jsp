@@ -183,7 +183,7 @@
 			</div>
 
 			<div class="form-group">
-				<a data-toggle="collapse" data-target="#feedbackDiv" href="#feedbackDiv"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.feedback" /></a>
+				<a data-toggle="collapse" data-target="#feedbackDiv" href="#fdbackDiv"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.feedback" /></a>
 				<div id="feedbackDiv" class="panel-body collapse <c:if test="${not empty questionDto.feedback}">in</c:if>">
 					<lams:CKEditor id="feedback"
 						value="${questionDto.feedback}"

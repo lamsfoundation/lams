@@ -81,7 +81,8 @@
 	<%-- show burning questions --%>
 	<c:if test="${!showResults && scratchie.burningQuestionsEnabled && (isUserLeader || (mode == 'teacher'))}">
 		<div class="form-group burning-question-container">
-			<a data-toggle="collapse" data-target="#burning-question-item${item.uid}" href="#burning-question-item${item.uid}">
+			<!-- LDEV-4532: href is needed for the collapsing to work on an ipad but do not make it the same as the data-target here or the screen will jump around. -->
+			<a data-toggle="collapse" data-target="#burning-question-item${item.uid}" href="#bqi${item.uid}">
 				<i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i>
 				<fmt:message key="label.burning.question" />
 			</a>
