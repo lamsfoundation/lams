@@ -35,6 +35,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ExceptionHandler;
 import org.apache.struts.config.ExceptionConfig;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 
 /**
  * @author Jacky
@@ -73,16 +75,19 @@ public class CustomStrutsExceptionHandler extends ExceptionHandler {
 	// Construct the forward object
 	forward = new ActionForward(path);
 
-	String errorMessage = ex.getMessage() == null ? UNKNOWN_EXCEPTION : ex.getMessage();
-	request.setAttribute("errorMessage", errorMessage);
-	request.setAttribute("errorName", ex.getClass().getName());
 	ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	PrintStream os = new PrintStream(bos);
 	ex.printStackTrace(os);
 	String errorStack = new String(bos.toByteArray());
-	request.setAttribute("errorStack", errorStack);
 	logger.fatal(errorStack);
-
+	
+	if ( Configuration.getAsBoolean(ConfigurationKeys.ERROR_STACK_TRACE)  ) {
+	    String errorMessage = ex.getMessage() == null ? UNKNOWN_EXCEPTION : ex.getMessage();
+	    request.setAttribute("errorMessage", errorMessage);
+	    request.setAttribute("errorName", ex.getClass().getName());
+	    request.setAttribute("errorStack", errorStack);
+	}
+	
 	// process the exception as normal
 	return forward;
     }
