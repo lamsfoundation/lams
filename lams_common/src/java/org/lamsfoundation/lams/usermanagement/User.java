@@ -255,6 +255,10 @@ public class User implements Serializable, Comparable {
 	return this.getFirstName() + " " + this.getLastName();
     }
 
+    public String getFullNameMonitoringStyle() {
+	return new StringBuilder(this.getLastName()).append(", ").append(this.getFirstName()).toString();
+    }
+
     public String getAddressLine1() {
 	return addressLine1;
     }

@@ -80,6 +80,7 @@ import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
+import org.lamsfoundation.lams.learningdesign.service.LearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.LogEvent;
@@ -123,8 +124,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     protected Logger log = Logger.getLogger(AuthoringService.class);
-
-    private static final String[] LD_IMAGE_EXTENSIONS = new String[] { "png", "svg" };
 
     /** Required DAO's */
     protected ILearningDesignDAO learningDesignDAO;
@@ -870,8 +869,13 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	updateCompetenceMappings(newLearningDesign.getCompetences(), newActivities);
 
 	try {
-	    AuthoringService.copyLearningDesignImages(originalLearningDesign.getLearningDesignId(),
-		    newLearningDesign.getLearningDesignId());
+	    File sourceSVG = new File(
+		    LearningDesignService.getLearningDesignSVGPath(originalLearningDesign.getLearningDesignId()));
+	    if (sourceSVG.canRead()) {
+		FileUtils.copyFile(sourceSVG, new File(
+			LearningDesignService.getLearningDesignSVGPath(newLearningDesign.getLearningDesignId())),
+			false);
+	    }
 	} catch (IOException e) {
 	    log.error("Error while copying Learning Design " + originalLearningDesign.getLearningDesignId() + " image",
 		    e);
@@ -1504,10 +1508,16 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    copyLearningDesignToolContent(design, design, design.getCopyTypeID(), customCSV);
 	}
 
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LEARNING_DESIGN_CREATE, userID, design.getLearningDesignId(),
-		null, null);
+	insertEventLogEntry(user, design, null);
 
 	return design;
+    }
+
+    private void insertEventLogEntry(User user, LearningDesign design, Date createDate) {
+	String message = messageService.getMessage("audit.design.created",
+		new Object[] { design.getTitle(), design.getLearningDesignId(), user.getLogin(), user.getUserId() });
+	logEventService.logEvent(LogEvent.TYPE_TEACHER_LEARNING_DESIGN_CREATE, user.getUserId(), null, null, null,
+		message, createDate);
     }
 
     /**
@@ -1739,12 +1749,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	Long learningDesingID = learningDesign.getLearningDesignId();
 
-	LogEvent logEvent = new LogEvent();
-	logEvent.setLogEventTypeId(LogEvent.TYPE_TEACHER_LEARNING_DESIGN_CREATE);
-	logEvent.setLearningDesignId(learningDesingID);
-	logEvent.setUser(user);
-	logEvent.setOccurredDateTime(learningDesign.getCreateDateTime());
-	baseDAO.insert(logEvent);
+	insertEventLogEntry(user, learningDesign, learningDesign.getCreateDateTime());
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Created a single activity LD with ID: " + learningDesingID);
@@ -1808,22 +1813,5 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	access.setUserId(userId);
 	access.setAccessDate(new Date());
 	learningDesignDAO.insertOrUpdate(access);
-    }
-
-    /**
-     * Copies LD thumbnails, SVG and PNG.
-     */
-    private static void copyLearningDesignImages(long originalLearningDesignID, long newLearningDesignID)
-	    throws IOException {
-	for (String extension : AuthoringService.LD_IMAGE_EXTENSIONS) {
-	    String fullExtension = "." + extension;
-	    File image = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER,
-		    originalLearningDesignID + fullExtension);
-	    if (image.canRead()) {
-		FileUtils.copyFile(image,
-			new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER, newLearningDesignID + fullExtension),
-			false);
-	    }
-	}
     }
 }

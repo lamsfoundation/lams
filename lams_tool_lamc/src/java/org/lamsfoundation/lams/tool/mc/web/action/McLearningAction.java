@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.mc.web.action;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -626,6 +627,7 @@ public class McLearningAction extends LamsDispatchAction {
 
 	if (notebookEntry != null) {
 	    notebookEntry.setEntry(reflectionEntry);
+	    notebookEntry.setLastModified(new Date());
 	    mcService.updateEntry(notebookEntry);
 	} else {
 	    mcService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,

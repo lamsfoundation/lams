@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -324,7 +325,7 @@ public class McMonitoringAction extends LamsDispatchAction {
 	    visitLogData.add(userUid);
 	    visitLogData.add(userDto.getUserId());
 
-	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFullName());
 	    if (groupLeader != null && groupLeader.getUid().equals(userUid)) {
 		fullName += " (" + mcService.getLocalizedMessage("label.monitoring.group.leader") + ")";
 	    }

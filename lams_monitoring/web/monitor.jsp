@@ -216,8 +216,8 @@
 			refreshMonitor();
 			<c:if test="${not empty lesson.lessonDescription}">
 				$('#description').readmore({
-						  speed: 500,
-						  collapsedHeight: 85
+					speed: 500,
+					collapsedHeight: 85
 				});
 			</c:if>
 			
@@ -226,17 +226,17 @@
 		});
 			
         function doSelectTab(tabId) {
-        	if ( tourInProgress )  {
-        		alert(LABELS.TOUR_DISABLED_ELEMENT);
-        		return;
-        	}
-        	actualDoSelectTab(tabId);
+	        	if ( tourInProgress )  {
+	        		alert(LABELS.TOUR_DISABLED_ELEMENT);
+	        		return;
+	        	}
+	        	actualDoSelectTab(tabId);
         }
 
         function actualDoSelectTab(tabId) {
-	    	selectTab(tabId);
+	    		selectTab(tabId);
 			var sequenceInfoDialog = $('#sequenceInfoDialog');
-	    	if ( tabId == '2' ) {
+	    		if ( tabId == '2' ) {
 				if (sequenceTabShowInfo) {
 					sequenceInfoDialog.modal("show");
 					sequenceTabShowInfo = false; // only show it once
@@ -244,11 +244,19 @@
 			} else {
 				sequenceInfoDialog.modal("hide");
             }
-	    	if ( tabId == '4' ) {
-	    		updateGradebookTab();
-	    	}
+	    		if ( tabId == '4' ) {
+	    			updateGradebookTab();
+	    		}
         }
-        
+
+        function switchToTblMonitor() {
+			$("#content").load(
+				"<c:url value='tblmonitor.do'/>",
+				{
+					lessonID: ${lesson.lessonID}
+				}
+			);
+    		}
 
     	<%@ include file="monitorTour.jsp" %> 
 
@@ -266,7 +274,14 @@
 	</div>
 	
 	<lams:Page type="navbar">
-		<lams:Tabs control="true">
+		<c:if test="${isTBLSequence}">
+			<c:set var="tblMonitorButton">
+				<i class="fa fa fa-heartbeat" title="<fmt:message key="label.tblmonitor" />"
+			 		onclick="javascript:switchToTblMonitor();" id="tbl-monitor-control">  <fmt:message key="label.tbl.monitor"/></i>
+			</c:set>
+		</c:if>
+	
+		<lams:Tabs control="true" extraControl="${tblMonitorButton}">
 			<lams:Tab id="1" key="tab.lesson" />
 			<lams:Tab id="2" key="tab.sequence" />
 			<lams:Tab id="3" key="tab.learners" />

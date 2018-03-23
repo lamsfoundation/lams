@@ -35,8 +35,11 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -52,14 +55,14 @@ public class RecalculateTotalMarksForLessonServlet extends HttpServlet {
 
     private static Logger log = Logger.getLogger(RecalculateTotalMarksForLessonServlet.class);
 
-    private static IAuditService auditService;
+    private static ILogEventService logEventService;
     private static ILessonService lessonService;
     private static IGradebookService gradebookService;
 
     @Override
     public void init() throws ServletException {
 	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-	auditService = (IAuditService) ctx.getBean("auditService");
+	logEventService = (ILogEventService) ctx.getBean("logEventService");
 	lessonService = (ILessonService) ctx.getBean("lessonService");
 	gradebookService = (IGradebookService) ctx.getBean("gradebookService");
     }
@@ -88,8 +91,10 @@ public class RecalculateTotalMarksForLessonServlet extends HttpServlet {
 	    return;
 	}
 
+	// audit log changed gradebook mark
 	String msg = "Total marks have been successfully recalculated for lessonId " + lessonId;
-	auditService.log("RecalculateTotalMarksForLessonServlet", msg);
+	UserDTO monitorUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	logEventService.logEvent(LogEvent.TYPE_MARK_UPDATED, monitorUser.getUserID(), null, lessonId, null, msg);
 	out.println(msg);
 	out.close();
     }

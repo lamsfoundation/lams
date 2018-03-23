@@ -122,6 +122,8 @@ public interface IAssessmentService {
 	    String searchString);
 
     int getCountUsersBySession(Long sessionId, String searchString);
+    
+    int getCountUsersByContentId(Long contentId);
 
     List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page, int size,
 	    String sortBy, String sortOrder, String searchString);
@@ -151,12 +153,20 @@ public interface IAssessmentService {
     void createUser(AssessmentUser assessmentUser);
 
     /**
+     * Get user created current Assessment.
+     *
+     * @param long1
+     * @return
+     */
+    AssessmentUser getUserCreatedAssessment(Long userID, Long contentId);
+    
+    /**
      * Get user by given userID and toolContentID.
      *
      * @param long1
      * @return
      */
-    AssessmentUser getUserByIDAndContent(Long userID, Long contentId);
+    AssessmentUser getUserByIdAndContent(Long userID, Long contentId);    
 
     /**
      * Get user by sessionID and UserID
@@ -197,7 +207,15 @@ public interface IAssessmentService {
      * @param sessionId
      * @return
      */
-    AssessmentSession getAssessmentSessionBySessionId(Long sessionId);
+    AssessmentSession getSessionBySessionId(Long sessionId);
+ 
+    /**
+     * Get all assessment toolSessions by toolContentId
+     *
+     * @param toolContentId
+     * @return
+     */
+    List<AssessmentSession> getSessionsByContentId(Long toolContentId);
 
     /**
      * Save or update assessment result.
@@ -296,6 +314,11 @@ public interface IAssessmentService {
      * @return
      */
     Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId);
+    
+    /**
+     * Count how many last finished attempts selected specified option.
+     */
+    int countAttemptsPerOption(Long optionUid);
 
     /**
      * Return the latest *finished* result (the same as the method above). But previously evicting it from the cache. It

@@ -285,6 +285,11 @@
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
 			parameter="changeItemVisibility" >
 		</action>
+		<action path="/monitoring/viewComments"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
+			parameter="viewComments" >
+			<forward name="success" path="/pages/monitoring/comments.jsp" />
+		</action>
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.ClearSessionAction">

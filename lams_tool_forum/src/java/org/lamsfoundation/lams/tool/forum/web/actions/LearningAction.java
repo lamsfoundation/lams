@@ -990,11 +990,15 @@ public class LearningAction extends Action {
 	if (makeAuditEntry) {
 	    Long userId = 0L;
 	    String loginName = "Default";
-	    if (message.getCreatedBy() != null) {
-		userId = message.getCreatedBy().getUserId();
-		loginName = message.getCreatedBy().getLoginName();
+	    Long toolContentId = null;
+	    if (messagePO.getCreatedBy() != null) {
+		userId = messagePO.getCreatedBy().getUserId();
+		loginName = messagePO.getCreatedBy().getLoginName();
 	    }
-	    forumService.getAuditService().logChange(ForumConstants.TOOL_SIGNATURE, userId, loginName, oldMessageString,
+	    if ( messagePO.getToolSession() != null && messagePO.getToolSession().getForum() != null ) {
+		toolContentId = messagePO.getToolSession().getForum().getContentId();
+	    }
+	    forumService.getLogEventService().logChangeLearnerContent(userId, loginName, toolContentId, oldMessageString,
 		    messagePO.toString());
 	}
 

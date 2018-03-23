@@ -36,7 +36,7 @@
 	};
 
 	$(document).ready(function(){
-
+ 
 		<c:forEach var="sessionEntry" items="${notebookDTO.sessions}">
 			<c:set var="sessionId" value ="${sessionEntry.key}"/>
 			<c:set var="sessionName" value ="${sessionEntry.value}"/>
@@ -58,13 +58,13 @@
 					alert("Error has occured "+error);
 				},	
 				
-				subGrid: true,
+ 				subGrid: true,
 			    subGridOptions: {
 			        reloadOnExpand: false, // Prevent jqGrid from wiping out the subgrid data.
 			    },
 
  				gridComplete: function() {	
- 					initializePortraitPopover('${lams}');
+  					initializePortraitPopover('${lams}');
 					var dop = $("#group${sessionId}");
  			    	//expand subgrids that have available notebook entry, reformatting 
  			    	// the comment data for the "comment summary / comment sort" field.
@@ -86,10 +86,10 @@
  	                	if (entry && entry.length > 0) {
  	                		$("#group${sessionId}").expandSubGridRow(rowId);
  	                	}
- 	                });
+ 	                }); 
  	               $("time.timeago").timeago();
  	            },
- 				subGridRowExpanded: function(subgridDivId, rowId) {
+  				subGridRowExpanded: function(subgridDivId, rowId) {
  					var subgrid = jQuery("#"+subgridDivId);
  					
  					//display "not available" sign if there is no entry
@@ -126,7 +126,7 @@
  					    cancelButton: "<fmt:message key='button.cancel' />"
  					});
  				},
-
+ 
 				pager : '#group${sessionId}pager',
 				pagerpos: "left",
 				rowNum: 10,
@@ -138,34 +138,34 @@
 				
 			   	colNames:['#',
 						'userUid',
-						"<fmt:message key="label.user.name" />",
+ 						"<fmt:message key="label.user.name" />",
+ 					    "<fmt:message key="label.lastModified" />",
 					    "<fmt:message key="label.lastModified" />",
 					    "<fmt:message key="label.lastModified" />",
-					    "<fmt:message key="label.lastModified" />",
-					    'entry',
+	 				    'entry',
 					    "<fmt:message key="label.comment" />",  // comment summary for sorting
 					    'actualComment',
-						'userId',
+	 					'userId',
 						'portraitId'],
 					    
 			   	colModel:[
 			   		{name:'id',index:'id', width:10, hidden: true, search: false},
 			   		{name:'userUid',index:'userUid', width:0, hidden: true, search: false},
-			   		{name:'userName',index:'userName', width:200, formatter:userNameFormatter},
-			   		{name:'lastEdited',index:'lastEdited', hidden: true, width:0, search: false},		
+ 			   		{name:'userName',index:'userName', width:200, formatter:userNameFormatter},
+ 			   		{name:'lastEdited',index:'lastEdited', hidden: true, width:0, search: false},		
 			   		{name:'lastEditedTimeago',index:'lastEditedTimeago', hidden: true, width:0,  search: false},		
 			   		{name:'lastEditedTimeagoOutput',index:'lastEditedTimeagoOutput', width:120, search: false},		
-			   		{name:'entry',index:'entry', hidden: true, width:0, search: false},	
+ 			   		{name:'entry',index:'entry', hidden: true, width:0, search: false},	
 			   		{name:'commentsort',index:'commentsort', width:40, search: false },
 			   		{name:'comment',index:'comment', hidden: true, width:0, search: false},
-			   		{name:'userId',index:'userId', width:0, hidden: true, search: false},
+ 			   		{name:'userId',index:'userId', width:0, hidden: true, search: false},
 			   		{name:'portraitId',index:'portraitId', width:0, hidden: true, search: false}
 			   	],
 			   	
 			   	multiselect: false,
 			}).jqGrid('filterToolbar',{searchOnEnter: false});
 		</c:forEach>
-		
+		 
 		
         //jqgrid autowidth (http://stackoverflow.com/a/1610197)
         $(window).bind('resize', function() {
@@ -209,7 +209,7 @@
 	</c:if>
 	
 </div>
-
+ 
 <c:if test="${isGroupedActivity}">
 	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
 </c:if>
@@ -229,10 +229,10 @@
         <div id="collapse${session.key}" class="panel-collapse collapse ${status.first ? 'in' : ''}"
         	 role="tabpanel" aria-labelledby="heading${session.key}">
 	</c:if>
-	
-	<table id="group${session.key}" class="scroll" cellpadding="0" cellspacing="0" ></table>
+ 
+ 	<table id="group${session.key}" class="scroll" cellpadding="0" cellspacing="0" ></table>
 	<div id="group${session.key}pager"></div>
-	
+ 
 	<c:if test="${isGroupedActivity}">
 		</div> <!-- end collapse area  -->
 		</div> <!-- end collapse panel  -->
@@ -242,7 +242,7 @@
 	
 <c:if test="${isGroupedActivity}">
 	</div> <!--  end panel group -->
-</c:if>
+</c:if> 
 
 <%@include file="advanceOptions.jsp"%>
 

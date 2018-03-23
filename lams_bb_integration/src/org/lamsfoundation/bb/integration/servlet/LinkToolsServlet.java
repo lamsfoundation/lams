@@ -380,7 +380,7 @@ public class LinkToolsServlet extends HttpServlet {
 	User teacher = BlackboardUtil.getCourseTeacher(courseId);
 
 	//find all lessons that should be updated
-	List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
+	List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId, false);
 	for (Content content : lamsContents) {
 
 	    String _content_id = content.getId().toExternalString();
@@ -446,7 +446,7 @@ public class LinkToolsServlet extends HttpServlet {
 	    User teacher = BlackboardUtil.getCourseTeacher(courseId);
 
 	    //find all lessons that should be updated
-	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
+	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId, false);
 	    for (Content content : lamsContents) {
 
 		String _content_id = content.getId().toExternalString();
@@ -558,7 +558,7 @@ public class LinkToolsServlet extends HttpServlet {
 	    User teacher = BlackboardUtil.getCourseTeacher(courseId);
 
 	    //find all lessons that should be updated
-	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
+	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId, false);
 	    for (Content content : lamsContents) {
 
 		// update lesson id

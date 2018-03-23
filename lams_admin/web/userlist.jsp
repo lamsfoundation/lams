@@ -65,6 +65,9 @@
 		</span>
 		<div class="pull-right btn-group btn-group-sm">
 			<input id="addRemoveUsers" class="btn btn-default" type="button" value="<fmt:message key="admin.user.add"/>" onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' />
+			<logic:equal name="UserManageForm" property="canResetOrgPassword" value="true">
+				<a class="btn btn-default" href="orgPasswordChange.do?organisationID=<bean:write name='UserManageForm' property='orgId'/>"><fmt:message key='admin.org.password.change.button'/></a>
+			</logic:equal>
 			<logic:equal name="UserManageForm" property="courseAdminCanAddNewUsers" value="true">
 				<input class="btn btn-default" type="button" value="<fmt:message key="admin.user.create"/>" onclick=javascript:document.location='user.do?method=edit&orgId=<bean:write name="UserManageForm" property="orgId"/>' />
 			</logic:equal>

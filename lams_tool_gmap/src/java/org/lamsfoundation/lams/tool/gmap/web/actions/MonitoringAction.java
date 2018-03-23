@@ -21,8 +21,10 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.gmap.web.actions;
+
+import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,11 +33,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapSessionDTO;
-import org.lamsfoundation.lams.tool.gmap.dto.GmapUserDTO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 import org.lamsfoundation.lams.tool.gmap.model.GmapConfigItem;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
@@ -46,10 +45,16 @@ import org.lamsfoundation.lams.tool.gmap.util.GmapConstants;
 import org.lamsfoundation.lams.tool.gmap.util.GmapException;
 import org.lamsfoundation.lams.tool.gmap.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.util.HtmlUtils;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author
@@ -94,20 +99,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	    for (GmapSessionDTO sessionDTO : gmapDT0.getSessionDTOs()) {
 		Long toolSessionID = sessionDTO.getSessionID();
 		sessionDTO.setMarkerDTOs(gmapService.getGmapMarkersBySessionId(toolSessionID));
-
-		for (GmapUserDTO userDTO : sessionDTO.getUserDTOs()) {
-		    // get the notebook entry.
-		    NotebookEntry notebookEntry = gmapService.getEntry(toolSessionID,
-			    CoreNotebookConstants.NOTEBOOK_TOOL, GmapConstants.TOOL_SIGNATURE,
-			    userDTO.getUserId().intValue());
-		    if (notebookEntry != null) {
-			userDTO.setFinishedReflection(true);
-			//userDTO.setNotebookEntry(notebookEntry.getEntry());
-		    } else {
-			userDTO.setFinishedReflection(false);
-		    }
-		    sessionDTO.getUserDTOs().add(userDTO);
-		}
 	    }
 	}
 
@@ -195,32 +186,54 @@ public class MonitoringAction extends LamsDispatchAction {
 	return gmapUser;
     }
 
-    /**
-     * Opens a user's reflection
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    /** Ajax call to populate the tablesorter */
+    public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
 
-	//MonitoringForm monitorForm = (MonitoringForm) form;
-	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionID", false);
-	Long userID = WebUtil.readLongParam(request, "userID", false);
+	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
+	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 
-	GmapUser gmapUser = gmapService.getUserByUserIdAndSessionId(userID, toolSessionId);
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
+	String searchString = request.getParameter("fcol[0]");
 
-	NotebookEntry notebookEntry = gmapService.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		GmapConstants.TOOL_SIGNATURE, userID.intValue());
+	int sorting = GmapConstants.SORT_BY_NO;
+	if (sortByName != null) {
+	    sorting = sortByName.equals(0) ? GmapConstants.SORT_BY_USERNAME_ASC : GmapConstants.SORT_BY_USERNAME_DESC;
+	}
 
-	GmapUserDTO gmapUserDTO = new GmapUserDTO(gmapUser);
-	gmapUserDTO.setNotebookEntry(notebookEntry.getEntry());
+	// return user list according to the given sessionID
+	GmapSession session = gmapService.getSessionBySessionId(sessionID);
+	List<Object[]> users = gmapService.getUsersForTablesorter(sessionID, page, size, sorting, searchString,
+		session.getGmap().isReflectOnActivity());
 
-	request.setAttribute("gmapUserDTO", gmapUserDTO);
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
+	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
+	responsedata.put("total_rows", gmapService.getCountUsersBySession(session.getUid(), searchString));
+	for (Object[] userAndReflection : users) {
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
+	    responseRow.set(GmapConstants.ATTR_USER_ID, JsonUtil.readObject(userAndReflection[0]));
+	    String fullName = new StringBuilder((String) userAndReflection[1]).append(" ")
+		    .append((String) userAndReflection[2]).toString();
+	    responseRow.put(GmapConstants.ATTR_USER_FULLNAME, HtmlUtils.htmlEscape(fullName));
 
-	return mapping.findForward("notebook");
+	    if (userAndReflection.length > 3) {
+		responseRow.put(GmapConstants.ATTR_PORTRAIT_ID, (Integer) userAndReflection[3]);
+	    }
+
+	    if (userAndReflection.length > 4) {
+		responseRow.set(GmapConstants.ATTR_USER_REFLECTION, JsonUtil.readObject(userAndReflection[4]));
+	    }
+	    rows.add(responseRow);
+	}
+
+	responsedata.set("rows", rows);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responsedata.toString()));
+	return null;
+
     }
+
 }

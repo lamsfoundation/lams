@@ -94,6 +94,8 @@
 				SEQUENCE_VALIDATION_ISSUES : '<c:out value="${SEQUENCE_VALIDATION_ISSUES_VAR}" />',
 				<fmt:message key="authoring.fla.save.successful" var="SAVE_SUCCESSFUL_VAR"/>
 				SAVE_SUCCESSFUL : decoderDiv.html('<c:out value="${SAVE_SUCCESSFUL_VAR}" />').text(),
+				<fmt:message key="authoring.fla.save.successful.check.grouping" var="SAVE_SUCCESSFUL_CHECK_GROUPING_VAR"/>
+				SAVE_SUCCESSFUL_CHECK_GROUPING : decoderDiv.html('<c:out value="${SAVE_SUCCESSFUL_CHECK_GROUPING_VAR}" />').text(),
 				<fmt:message key="authoring.fla.liveedit.save.successful" var="LIVEEDIT_SAVE_SUCCESSFUL_VAR"/>
 				LIVEEDIT_SAVE_SUCCESSFUL : decoderDiv.html('<c:out value="${LIVEEDIT_SAVE_SUCCESSFUL_VAR}" />').text(),
 				<fmt:message key="authoring.fla.delete.node.confirm" var="DELETE_NODE_CONFIRM_VAR"/>
@@ -136,6 +138,9 @@
 				WEIGHTS_SUM_ERROR : decoderDiv.html('<c:out value="${WEIGHTS_SUM_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.weights.none" var="WEIGHTS_NONE_FOUND_ERROR_VAR"/>
 				WEIGHTS_NONE_FOUND_ERROR : decoderDiv.html('<c:out value="${WEIGHTS_NONE_FOUND_ERROR_VAR}" />').text(),
+				<fmt:message key="authoring.learning.design.templates" var="TEMPLATES_VAR"/>
+				TEMPLATES : decoderDiv.html('<c:out value="${TEMPLATES_VAR}" />').text(),
+				
 				
 				
 				// HandlerLib
@@ -288,11 +293,20 @@
 	
 	<div id="toolbar" class="buttons btn-group-sm">
 	
-		<button id="newButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.newLearningDesign(false)">
-			<i class="fa fa-plus"></i> 
-			<span><fmt:message key="authoring.fla.page.menu.new" /></span>
-		</button>
-
+		<div class="btn-group btn-group-sm">
+			<button id="newButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.newLearningDesign(false)">
+				<i class="fa fa-plus"></i> 
+				<span><fmt:message key="authoring.fla.page.menu.new" /></span>
+			</button>
+			<button type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<span class="caret"></span>
+				<span class="sr-only">Toggle Dropdown</span>
+			</button>
+			<ul class="dropdown-menu dropdown-menu-right desktopButton">
+				<li id="useTemplate" onClick="javascript:MenuLib.useTemplateToCreateLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.new.template" /></a></li>
+			</ul>
+		</div>
+		
 		<div class="btn-group btn-group-sm">
 			<button type="button" class="btn btn-default" onClick="javascript:MenuLib.openLearningDesign()">
 				<i class="fa fa-folder-open-o"></i>
@@ -1102,6 +1116,16 @@
 				</tr>
 			</tfoot>
 		</table>
+	</div>
+	
+	<!-- INFO DIALOG -->
+	<div id="infoDialogContents" class="dialogContents">
+		<div id="infoDialogBody"></div>
+		<div id="infoDialogButtons">
+			<button id="infoDialogOKButton" class="btn btn-default pull-right">
+				<span><fmt:message key="authoring.fla.ok.button" /></span>
+			</button>
+		</div>
 	</div>
 </body>
 </lams:html>

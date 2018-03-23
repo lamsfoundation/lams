@@ -108,7 +108,7 @@
 			jQuery("#lessonsTable").jqGrid('filterToolbar',{stringResult: true, searchOnEnter: true, defaultSearch: 'cn'});
 			
 			<c:forEach var="lesson" items="${lessons}" varStatus="i">
-				jQuery("#lessonsTable").jqGrid('addRowData',${lesson.lessonId}, {id2:'${lesson.lessonId}',name:'${fn:escapeXml(lesson.lessonName)}'});
+				jQuery("#lessonsTable").jqGrid('addRowData',${lesson.id}, {id2:'${lesson.id}',name:'${fn:escapeXml(lesson.name)}'});
 			</c:forEach>
 			
 			$("#lessonsTable").parents('div.ui-jqgrid-bdiv').css("max-height","10000px");
@@ -242,6 +242,14 @@
 				
 				<!-- Dropdown menu for choosing a user search type -->
 				<div>
+					<c:choose>
+					<c:when test="${empty lessons}">
+						<!--  only valid type is not started lessons -->
+						<select id="searchType" onchange="getUsers();">
+							<option selected="selected" value="9"><fmt:message key="email.notifications.user.search.property.9" /></option>
+						</select>
+					</c:when>
+					<c:otherwise>
 					<select id="searchType" onchange="getUsers();">
 						<option selected="selected" value="7"><fmt:message key="email.notifications.user.search.property.7" /></option>
 						<option value="8"><fmt:message key="email.notifications.user.search.property.8" /></option>
@@ -249,6 +257,8 @@
 						<option value="10"><fmt:message key="email.notifications.user.search.property.10" /></option>
 						<option value="11"><fmt:message key="email.notifications.user.search.property.11" /></option>
 					</select>
+					</c:otherwise>
+					</c:choose>
 				</div>
 				
 				<div id="additionalParameters">
@@ -258,7 +268,7 @@
 						</h4>
 						<select id="lessonId" onchange="getUsers();">
 							<c:forEach var="lesson" items="${lessons}">
-								<option <c:if test="${lesson.lessonId==firstLesson.lessonId}">selected="selected"</c:if> value="${lesson.lessonId}">${fn:escapeXml(lesson.lessonName)}</option>
+								<option <c:if test="${lesson.id==firstLesson.id}">selected="selected"</c:if> value="${lesson.id}">${fn:escapeXml(lesson.name)}</option>
 							</c:forEach>
 						</select>				
 					</div>

@@ -62,6 +62,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -110,7 +111,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -150,7 +150,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     private ILearnerService learnerService;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
 
     private MessageService messageService;
 
@@ -175,13 +175,13 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     // ---------------------------------------------------------------------
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     @Override
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
     public void setMessageService(MessageService messageService) {
@@ -300,14 +300,18 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	if (message != null) {
 	    Long userId = 0L;
 	    String loginName = "Default";
+	    Long toolContentId = null;
 	    if (message.getCreatedBy() != null) {
 		userId = message.getCreatedBy().getUserId();
 		loginName = message.getCreatedBy().getLoginName();
 	    }
+	    if (message.getToolSession() != null && message.getToolSession().getForum() != null) {
+		toolContentId = message.getToolSession().getForum().getContentId();
+	    }
 	    if (hideFlag) {
-		auditService.logHideEntry(ForumConstants.TOOL_SIGNATURE, userId, loginName, message.toString());
+		logEventService.logHideLearnerContent(userId, loginName, toolContentId, message.toString());
 	    } else {
-		auditService.logShowEntry(ForumConstants.TOOL_SIGNATURE, userId, loginName, message.toString());
+		logEventService.logShowLearnerContent(userId, loginName, toolContentId, message.toString());
 	    }
 
 	    message.setHideFlag(hideFlag);
@@ -961,7 +965,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		user.setSessionFinished(false);
 		forumUserDao.save(user);
 
-		gradebookService.updateActivityMark(null, null, userId, session.getSessionId(), false);
+		gradebookService.removeActivityMark(userId, session.getSessionId());
 	    }
 	}
     }

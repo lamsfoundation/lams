@@ -33,13 +33,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
-import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -121,12 +121,12 @@ public class PasswordChangeAction extends Action {
 			service.saveUser(user);
 
 			// make 'password changed' audit log entry
-			IAuditService auditService = (IAuditService) ctx.getBean("auditService");
+			ILogEventService logEventService = (ILogEventService) ctx.getBean("logEventService");
 			MessageService messageService = (MessageService) ctx.getBean("centralMessageService");
 			String[] args = new String[1];
 			args[0] = user.getLogin() + "(" + user.getUserId() + ")";
 			String message = messageService.getMessage("audit.user.password.change", args);
-			auditService.log(CentralConstants.MODULE_NAME, message);
+			logEventService.logEvent(LogEvent.TYPE_LOGIN_AS, user.getUserId(), user.getUserId(), null, null, message);
 		    }
 		}
 

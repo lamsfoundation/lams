@@ -131,7 +131,7 @@
 				</div>
 								
 				<div class="generalFeedback">
-				  <a data-toggle="collapse" data-target="#general-feedback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.general.feedback" /></a>
+				  <a data-toggle="collapse" data-target="#general-feedback" href="#general-fdback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.general.feedback" /></a>
 					<div id="general-feedback"  class="collapse <c:if test="${not empty formBean.generalFeedback}">in</c:if> form-group">
 						<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}" contentFolderID="${formBean.contentFolderID}" />
 					</div>
@@ -149,7 +149,7 @@
 					</html:select>
 				</div>
 				
-				<a data-toggle="collapse" data-target="#feedback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.option.feedback"></fmt:message></a>
+				<a data-toggle="collapse" data-target="#feedback" href="#fdback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.option.feedback"></fmt:message></a>
 				<div id="feedback" class="voffset5 collapse  <c:if test="${(not empty formBean.feedbackOnCorrect) || (not empty formBean.feedbackOnIncorrect)}">in</c:if>">
 					<div class="form-group voffset10">
 						<label for="feedbackOnCorrect">

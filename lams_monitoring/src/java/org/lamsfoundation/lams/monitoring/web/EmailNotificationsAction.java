@@ -23,12 +23,12 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -49,10 +48,13 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
+import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.util.LessonComparator;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.EmailScheduleMessageJobDTO;
 import org.lamsfoundation.lams.monitoring.quartz.job.EmailScheduleMessageJob;
@@ -60,6 +62,7 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -68,7 +71,6 @@ import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -108,8 +110,9 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
     private static IEventNotificationService eventNotificationService;
     private static IUserManagementService userManagementService;
-    private static IAuditService auditService;
+    private static ILogEventService logEventService;
     private static ISecurityService securityService;
+    private static ILessonService lessonService;
 
     // ---------------------------------------------------------------------
     // Struts Dispatch Method
@@ -131,8 +134,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	ICoreLearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
 	Lesson lesson = learnerService.getLesson(lessonId);
 	if (!lesson.getEnableLessonNotifications()) {
-	    getAuditService().log(MonitoringConstants.MONITORING_MODULE_NAME,
-		    "Notifications are disabled in lesson " + lessonId);
+	    getLogEventService().logEvent(LogEvent.TYPE_NOTIFICATION, getCurrentUser().getUserID(), null, lessonId,
+		    null, "Attempted to send notification when notifications are disabled in lesson " + lessonId);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Notifications are disabled in the lesson");
 	    return null;
 	}
@@ -162,20 +165,22 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	// getting the organisation
 	Organisation org = (Organisation) learnerService.getUserManagementService().findById(Organisation.class, orgId);
 
-	// sort and filter lesson list
-	Set<Lesson> lessons = new TreeSet<>(new LessonComparator());
-	for (Lesson lesson : (Set<Lesson>) org.getLessons()) {
-	    if (!Lesson.REMOVED_STATE.equals(lesson.getLessonStateId())
-		    && !Lesson.FINISHED_STATE.equals(lesson.getLessonStateId())) {
+	boolean isGroupMonitor = getSecurityService().hasOrgRole(orgId, getCurrentUser().getUserID(),
+		new String[] { Role.GROUP_MANAGER }, "show course email notifications", false);
+	Integer userRole = isGroupMonitor ? Role.ROLE_GROUP_MANAGER : Role.ROLE_MONITOR;
+	Map<Long, IndexLessonBean> staffMap = getLessonService()
+		.getLessonsByOrgAndUserWithCompletedFlag(getCurrentUser().getUserID(), orgId, userRole);
+
+	// Already sorted, just double check that it does not contain finished or removed lessons
+	// This call should not be returning REMOVED lessons anyway so test for finished ones.
+	ArrayList<IndexLessonBean> lessons = new ArrayList<IndexLessonBean>(staffMap.size());
+	for (IndexLessonBean lesson : staffMap.values()) {
+	    if (!Lesson.FINISHED_STATE.equals(lesson.getState())) {
 		lessons.add(lesson);
 	    }
 	}
 
-	Lesson firstLesson = null;
-	Iterator<Lesson> lessonIter = lessons.iterator();
-	if (lessonIter.hasNext()) {
-	    firstLesson = lessonIter.next();
-	}
+	IndexLessonBean firstLesson = lessons.size() > 0 ? lessons.get(0) : null;
 
 	request.setAttribute("org", org);
 	request.setAttribute("lessons", lessons);
@@ -332,7 +337,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    rowJSON.put(GradebookConstants.ELEMENT_ID, recipient.getUserId());
 
 	    ArrayNode cellJSON = JsonNodeFactory.instance.arrayNode();
-	    cellJSON.add(recipient.getFirstName() + " " + recipient.getLastName() + " [" + recipient.getLogin() + "]");
+	    cellJSON.add(new StringBuilder(recipient.getLastName()).append(", ").append(recipient.getFirstName())
+		    .append(" [").append(recipient.getLogin()).append("]").toString());
 
 	    rowJSON.set(GradebookConstants.ELEMENT_CELL, cellJSON);
 	    rowsJSON.add(rowJSON);
@@ -391,7 +397,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
 			JobDetail jobDetail = scheduler.getJobDetail(trigger.getJobKey());
 			JobDataMap jobDataMap = jobDetail.getJobDataMap();
-			getAuditService().log(MonitoringConstants.MONITORING_MODULE_NAME,
+			getLogEventService().logEvent(LogEvent.TYPE_NOTIFICATION, userId, null, lessonId, null,
 				"Deleting unsent scheduled notification " + jobKey + " "
 					+ jobDataMap.getString("emailBody"));
 
@@ -548,7 +554,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	}
 
 	//audit log
-	getAuditService().log(MonitoringConstants.MONITORING_MODULE_NAME,
+	getLogEventService().logEvent(LogEvent.TYPE_NOTIFICATION, getCurrentUser().getUserID(), null, null, null,
 		"User " + getCurrentUser().getLogin() + " set a notification " + emailClauseStr + " " + scheduleDateStr
 			+ " with the following notice:  " + emailBody);
 
@@ -600,9 +606,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
 	for (User user : users) {
 	    ArrayNode cell = JsonNodeFactory.instance.arrayNode();
-	    cell.add(StringEscapeUtils.escapeHtml(user.getFirstName()) + " "
-		    + StringEscapeUtils.escapeHtml(user.getLastName()) + " ["
-		    + StringEscapeUtils.escapeHtml(user.getLogin()) + "]");
+	    cell.add(new StringBuilder(user.getLastName()).append(", ").append(user.getFirstName()).append(" (")
+		    .append(user.getLogin()).append(")").toString());
 
 	    ObjectNode cellobj = JsonNodeFactory.instance.objectNode();
 	    cellobj.put("id", "" + user.getUserId());
@@ -702,13 +707,22 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	return userManagementService;
     }
 
-    private IAuditService getAuditService() {
-	if (auditService == null) {
+    private ILogEventService getLogEventService() {
+	if (logEventService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    auditService = (IAuditService) ctx.getBean("auditService");
+	    logEventService = (ILogEventService) ctx.getBean("logEventService");
 	}
-	return auditService;
+	return logEventService;
+    }
+
+    private ILessonService getLessonService() {
+	if (lessonService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    lessonService = (ILessonService) ctx.getBean("lessonService");
+	}
+	return lessonService;
     }
 
     private ISecurityService getSecurityService() {

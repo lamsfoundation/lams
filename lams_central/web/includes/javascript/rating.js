@@ -75,7 +75,20 @@ function initializeJRating() {
  			handleError();
 		}
 	});
-		
+
+	// LDEV-4495 Add an already rated on to stash of already rated ids. Then they won't be disabled when the user has 
+	// already rated as many as they can but they return to the screen to reeerate
+    if (HAS_RATING_LIMITS && MAX_RATES != 0) {
+		$(".rating-stars-new").filter($(".rating-stars")).each(function() {
+			var average = $(this).data("average"); // unrated have average 0 to start
+			if ( average > 0 ) {
+				var newItemId = getItemIdFromObjectId($(this).data("id"));
+				if ( idsBeingRated.indexOf(newItemId) == -1 ) 
+					idsBeingRated.push(newItemId)
+			}
+		});
+    }
+
 	$(".rating-stars-new").filter($(".rating-stars-disabled")).jRating({
 		rateMax : 5,
 		isDisabled : true

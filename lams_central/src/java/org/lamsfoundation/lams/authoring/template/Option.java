@@ -20,37 +20,53 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
+package org.lamsfoundation.lams.authoring.template;
 
+/** DTO used for generating options on a JSP page */
+public class Option {
 
-package org.lamsfoundation.lams.tool.rsrc.util;
+    private int displayOrder;
+    private boolean correct; // used for MCQ
+    private String text;
+    private String grade; // used for assessment
 
-import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
+    public Option(int displayOrder, boolean correct, String text, String grade) {
+	this.displayOrder = displayOrder;
+	this.correct = correct;
+	this.text = text;
+	this.setGrade(grade);
+    }
 
-/**
- * Contains helper methods used by the Action Servlets
- *
- * @author Anthony Sukkar
- *
- */
-public class ResourceWebUtils {
+    public int getDisplayOrder() {
+	return displayOrder;
+    }
 
-    /**
-     * If there is not url prefix, such as http://, https:// or ftp:// etc, this
-     * method will add default url protocol.
-     * 
-     * @param url
-     * @return
-     */
-    public static String protocol(String url) {
-	if (url == null) {
-	    return "";
-	}
+    public boolean isCorrect() {
+	return correct;
+    }
 
-	if (!url.matches("^" + ResourceConstants.ALLOW_PROTOCOL_REFIX + ".*")) {
-	    url = ResourceConstants.DEFUALT_PROTOCOL_REFIX + url;
-	}
+    public String getText() {
+	return text;
+    }
 
-	return url;
+    public void setDisplayOrder(int displayOrder) {
+	this.displayOrder = displayOrder;
+    }
+
+    public void setCorrect(boolean correct) {
+	this.correct = correct;
+    }
+
+    public void setText(String text) {
+	this.text = text;
+    }
+
+    public String getGrade() {
+	return grade;
+    }
+
+    public void setGrade(String grade) {
+	this.grade = grade;
     }
 
 }

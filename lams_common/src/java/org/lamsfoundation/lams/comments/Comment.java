@@ -257,7 +257,7 @@ public class Comment implements Cloneable {
 
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("uid", uid).append("body", body).toString();
+	return new ToStringBuilder(this).append("uid", uid).append(" body", body).toString();
     }
 
 }

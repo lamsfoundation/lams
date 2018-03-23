@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -99,7 +100,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.dao.DataAccessException;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -142,7 +142,7 @@ public class SubmitFilesService
 
     private IGradebookService gradebookService;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
 
     private SubmitFilesOutputFactory submitFilesOutputFactory;
 
@@ -254,37 +254,35 @@ public class SubmitFilesService
 		    submitFilesContentDAO.delete(entry);
 		}
 
-		gradebookService.updateActivityMark(null, null, user.getUserID(), session.getSessionID(), false);
+		gradebookService.removeActivityMark(user.getUserID(), session.getSessionID());
 
 		submitUserDAO.delete(user);
 	    }
 	}
     }
 
- 
-    
     @Override
     public void copyLearnerContent(SubmitUser fromUser, SubmitUser toUser) throws ToolException {
 
-	List<SubmissionDetails> leadersubmissions = submissionDetailsDAO.getBySessionAndLearner(fromUser.getSessionID(),fromUser.getUserID());
+	List<SubmissionDetails> leadersubmissions = submissionDetailsDAO.getBySessionAndLearner(fromUser.getSessionID(),
+		fromUser.getUserID());
 	for (SubmissionDetails leadersubmission : leadersubmissions) {
-	    if(leadersubmission.getSubmitFileSession().getSessionID().equals(toUser.getSessionID())){
+	    if (leadersubmission.getSubmitFileSession().getSessionID().equals(toUser.getSessionID())) {
 		SubmissionDetails usersubmission = new SubmissionDetails();
-		    usersubmission.setLearner(toUser);
-		    usersubmission.setDateOfSubmission(new Date());
-		    usersubmission.setFileDescription(leadersubmission.getFileDescription());
-		    usersubmission.setFilePath(leadersubmission.getFilePath());
-		    usersubmission.setSubmitFileSession(leadersubmission.getSubmitFileSession());
-		    usersubmission.setVersionID(leadersubmission.getVersionID());
-		    SubmitFilesReport report1 = new SubmitFilesReport();
-		    usersubmission.setReport(report1);
-		    usersubmission.setRemoved(leadersubmission.isRemoved());
-		    usersubmission.setUuid(leadersubmission.getUuid());
-        	    submissionDetailsDAO.save(usersubmission);
+		usersubmission.setLearner(toUser);
+		usersubmission.setDateOfSubmission(new Date());
+		usersubmission.setFileDescription(leadersubmission.getFileDescription());
+		usersubmission.setFilePath(leadersubmission.getFilePath());
+		usersubmission.setSubmitFileSession(leadersubmission.getSubmitFileSession());
+		usersubmission.setVersionID(leadersubmission.getVersionID());
+		SubmitFilesReport report1 = new SubmitFilesReport();
+		usersubmission.setReport(report1);
+		usersubmission.setRemoved(leadersubmission.isRemoved());
+		usersubmission.setUuid(leadersubmission.getUuid());
+		submissionDetailsDAO.save(usersubmission);
 	    }
 	}
     }
-
 
     @Override
     public List<SubmitFilesSession> getSessionsByContentID(Long toolContentID) {
@@ -729,7 +727,6 @@ public class SubmitFilesService
     public void updateMarks(Long reportID, Float marks, String comments, FormFile markFile, Long sessionID)
 	    throws InvalidParameterException, RepositoryCheckedException {
 
-	
 	SubmitFilesSession session = getSessionById(sessionID);
 	SubmitFilesContent content = session.getContent();
 	if (content.isUseSelectLeaderToolOuput()) {
@@ -765,40 +762,39 @@ public class SubmitFilesService
 
 		    submitFilesReportDAO.update(report);
 		}
-	    
+
 	    }
 
-	}
-	else{
-	IToolContentHandler toolContentHandler = getSbmtToolContentHandler();
-	SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
-	if (report != null) {
-	    report.setComments(comments);
-	    report.setMarks(marks);
+	} else {
+	    IToolContentHandler toolContentHandler = getSbmtToolContentHandler();
+	    SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
+	    if (report != null) {
+		report.setComments(comments);
+		report.setMarks(marks);
 
-	    // If there is a new file, delete the existing and add the mark file
-	    if ((markFile != null) && !StringUtils.isEmpty(markFile.getFileName())) {
+		// If there is a new file, delete the existing and add the mark file
+		if ((markFile != null) && !StringUtils.isEmpty(markFile.getFileName())) {
 
-		// Delete the existing
-		if (report.getMarkFileUUID() != null) {
-		    toolContentHandler.deleteFile(report.getMarkFileUUID());
-		    report.setMarkFileName(null);
-		    report.setMarkFileUUID(null);
-		    report.setMarkFileVersionID(null);
+		    // Delete the existing
+		    if (report.getMarkFileUUID() != null) {
+			toolContentHandler.deleteFile(report.getMarkFileUUID());
+			report.setMarkFileName(null);
+			report.setMarkFileUUID(null);
+			report.setMarkFileVersionID(null);
+		    }
+
+		    // Add the new file
+		    NodeKey nodeKey = this.processFile(markFile);
+		    // NodeKey nodeKey = toolContentHandler.uploadFile(marksFileInputStream, marksFileName, null,
+		    // IToolContentHandler.TYPE_ONLINE);
+
+		    report.setMarkFileName(markFile.getFileName());
+		    report.setMarkFileUUID(nodeKey.getUuid());
+		    report.setMarkFileVersionID(nodeKey.getVersion());
 		}
 
-		// Add the new file
-		NodeKey nodeKey = this.processFile(markFile);
-		// NodeKey nodeKey = toolContentHandler.uploadFile(marksFileInputStream, marksFileName, null,
-		// IToolContentHandler.TYPE_ONLINE);
-
-		report.setMarkFileName(markFile.getFileName());
-		report.setMarkFileUUID(nodeKey.getUuid());
-		report.setMarkFileVersionID(nodeKey.getVersion());
+		submitFilesReportDAO.update(report);
 	    }
-
-	    submitFilesReportDAO.update(report);
-	}
 	}
 
     }
@@ -849,13 +845,18 @@ public class SubmitFilesService
     private void auditRemoveRestore(UserDTO monitor, SubmissionDetails detail, String i18nKey) {
 	SubmitUser learner = detail.getLearner();
 	StringBuilder instructorTxt = new StringBuilder(monitor.getLogin()).append(" (").append(monitor.getUserID())
-		.append(") ").append(monitor.getFirstName()).append(" ").append(monitor.getLastName());
+		.append(") ");
 	StringBuilder learnerTxt = new StringBuilder(learner.getLogin()).append("  (").append(learner.getUserID())
-		.append(") ").append(learner.getFirstName()).append(" ").append(learner.getLastName());
+		.append(") ");
 
 	String auditMsg = getLocalisedMessage(i18nKey,
 		new Object[] { instructorTxt.toString(), detail.getFilePath(), learnerTxt.toString() });
-	auditService.log(SbmtConstants.AUDIT_LOG_MODULE_NAME, auditMsg);
+	Long toolContentId = null;
+	if (detail.getSubmitFileSession() != null && detail.getSubmitFileSession().getContent() != null) {
+	    toolContentId = detail.getSubmitFileSession().getContent().getContentID();
+	}
+	logEventService.logChangeLearnerArbitraryChange(learner.getUserID().longValue(), learner.getLogin(),
+		toolContentId, auditMsg);
     }
 
     @Override
@@ -945,15 +946,15 @@ public class SubmitFilesService
 	SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);
 	learner.setFinished(true);
 	submitUserDAO.saveOrUpdateUser(learner);
-	
+
 	SubmitFilesContent content = getSessionById(sessionID).getContent();
 
-	if(content.isUseSelectLeaderToolOuput()){
-        	SubmitFilesSession sbmtFilesSession = submitFilesSessionDAO.getSessionByID(sessionID);
-        	if(sbmtFilesSession.getGroupLeader().getUserID().equals(learner.getUserID())){
-                	sbmtFilesSession.setGroupLeader(learner);
-                	submitFilesSessionDAO.insertOrUpdate(sbmtFilesSession);
-        	}
+	if (content.isUseSelectLeaderToolOuput()) {
+	    SubmitFilesSession sbmtFilesSession = submitFilesSessionDAO.getSessionByID(sessionID);
+	    if (sbmtFilesSession.getGroupLeader().getUserID().equals(learner.getUserID())) {
+		sbmtFilesSession.setGroupLeader(learner);
+		submitFilesSessionDAO.insertOrUpdate(sbmtFilesSession);
+	    }
 	}
     }
 
@@ -1106,7 +1107,6 @@ public class SubmitFilesService
 	return submitUserDAO.getStatisticsBySession(contentId);
     }
 
-    
     @Override
     public List<StatisticDTO> getLeaderStatisticsBySession(final Long contentId) {
 	return submitUserDAO.getLeaderStatisticsBySession(contentId);
@@ -1261,9 +1261,8 @@ public class SubmitFilesService
 	this.coreNotebookService = coreNotebookService;
     }
 
-    
     public IUserManagementService getUserManagementService() {
-   	return userManagementService;
+	return userManagementService;
     }
 
     public void setUserManagementService(IUserManagementService userManagementService) {
@@ -1288,12 +1287,12 @@ public class SubmitFilesService
 	this.messageService = messageService;
     }
 
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public void setGradebookService(IGradebookService gradebookService) {
@@ -1370,7 +1369,8 @@ public class SubmitFilesService
 	content.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	content.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 	content.setLimitUpload(JsonUtil.optBoolean(toolContentJSON, "limitUpload", Boolean.FALSE));
-	content.setUseSelectLeaderToolOuput(JsonUtil.optBoolean(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
+	content.setUseSelectLeaderToolOuput(
+		JsonUtil.optBoolean(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
 	content.setLimitUploadNumber(JsonUtil.optInt(toolContentJSON, "limitUploadNumber", 0));
 	// submissionDeadline is set in monitoring
 
@@ -1385,7 +1385,6 @@ public class SubmitFilesService
 
     }
 
-    
     @Override
     public SubmitUser checkLeaderSelectToolForSessionLeader(SubmitUser user, Long toolSessionId) {
 	if ((user == null) || (toolSessionId == null)) {
@@ -1400,15 +1399,15 @@ public class SubmitFilesService
 	if (leader == null) {
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserID().intValue());
 	    if (leaderUserId != null) {
-		leader = submitUserDAO.getLearner(toolSessionId, (Integer)leaderUserId.intValue());
+		leader = submitUserDAO.getLearner(toolSessionId, leaderUserId.intValue());
 		// create new user in a DB
 		if (leader == null) {
 		    SubmitFilesService.log.debug("creating new user with userId: " + leaderUserId);
 		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
 		    String userName = leaderDto.getLogin();
 		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
-		  //  leader = new SubmitUser(leaderDto.getUserDTO(), submitFileSession);
-		    leader = new SubmitUser();		   	
+		    //  leader = new SubmitUser(leaderDto.getUserDTO(), submitFileSession);
+		    leader = new SubmitUser();
 		    leader.setLogin(leaderDto.getLogin());
 		    leader.setFirstName(leaderDto.getFirstName());
 		    leader.setLastName(leaderDto.getLastName());
@@ -1425,7 +1424,7 @@ public class SubmitFilesService
 
 	return leader;
     }
-    
+
     @Override
     public void createUser(SubmitUser submitUser) {
 	// make sure the user was not created in the meantime
@@ -1438,8 +1437,7 @@ public class SubmitFilesService
 	// Sometimes session save is earlier that user save in another thread, leading to an exception.
 	submitUserDAO.insertOrUpdate(user);
     }
-    
-    
+
     @Override
     public boolean isUserGroupLeader(SubmitUser user, Long toolSessionId) {
 
@@ -1448,9 +1446,5 @@ public class SubmitFilesService
 
 	return (groupLeader != null) && user.getUserID().equals(groupLeader.getUserID());
     }
-    
-    
-    
-
 
 }

@@ -93,8 +93,8 @@
    		<property name="learnerService">
    			<ref bean="learnerService"/>
    		</property>
-   		<property name="auditService">
-   			<ref bean="auditService"/>
+   		<property name="logEventService">
+   			<ref bean="logEventService"/>
    		</property>
    		<property name="userManagementService">
    			<ref bean="userManagementService"/>

@@ -396,23 +396,9 @@ public class RatingService implements IRatingService {
 	criteria.setTitle(title);
 	criteria.setCommentsEnabled(withComments);
 	criteria.setCommentsMinWordsLimit(minWordsInComment);
-	criteria.setMinimumRates(null);
-	criteria.setMaximumRates(null);
-
-	Integer maxRating = null;
-	switch (ratingStyle) {
-	    case RatingCriteria.RATING_STYLE_STAR:
-		maxRating = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX;
-		break;
-	    case RatingCriteria.RATING_STYLE_RANKING:
-		maxRating = RatingCriteria.RATING_STYLE_RANKING_DEFAULT_MAX;
-		break;
-	    case RatingCriteria.RATING_STYLE_HEDGING:
-	    case RatingCriteria.RATING_STYLE_COMMENT:
-		maxRating = 0;
-		break;
-	}
-	criteria.setMaxRating(maxRating);
+	criteria.setMinimumRates(0);
+	criteria.setMaximumRates(0);
+	criteria.setMaxRating(RatingCriteria.getDefaultMaxRating(ratingStyle));
 	return criteria;
     }
 
@@ -432,9 +418,9 @@ public class RatingService implements IRatingService {
 			log.error(msg);
 			throw new RatingException(msg);
 		    }
+		    criteria = (LearnerItemRatingCriteria) c;
+		    break;
 		}
-		criteria = (LearnerItemRatingCriteria) c;
-		break;
 	    }
 	}
 	criteria = updateLearnerItemRatingCriteria(criteria, toolContentId, title, orderId, ratingStyle, withComments,
@@ -485,18 +471,7 @@ public class RatingService implements IRatingService {
 
 	    Integer maxRating = WebUtil.readIntParam(request, "maxRating" + i, true);
 	    if (maxRating == null) {
-		switch (ratingStyle) {
-		    case RatingCriteria.RATING_STYLE_STAR:
-			maxRating = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX;
-			break;
-		    case RatingCriteria.RATING_STYLE_RANKING:
-			maxRating = RatingCriteria.RATING_STYLE_RANKING_DEFAULT_MAX;
-			break;
-		    case RatingCriteria.RATING_STYLE_HEDGING:
-		    case RatingCriteria.RATING_STYLE_COMMENT:
-			maxRating = 0;
-			break;
-		}
+		maxRating = RatingCriteria.getDefaultMaxRating(ratingStyle);
 	    }
 
 	    Integer minRatings = 0;
@@ -659,8 +634,8 @@ public class RatingService implements IRatingService {
 
 		    StyledRatingDTO dto = new StyledRatingDTO(((BigInteger) row[0]).longValue());
 		    dto.setComment((String) row[2]);
-		    dto.setItemDescription( row[numColumns - 2] != null ? row[numColumns - 2].toString() : null);
-		    dto.setItemDescription2( row[numColumns - 1] != null ? row[numColumns - 1].toString() : null);
+		    dto.setItemDescription(row[numColumns - 2] != null ? row[numColumns - 2].toString() : null);
+		    dto.setItemDescription2(row[numColumns - 1] != null ? row[numColumns - 1].toString() : null);
 		    if (!isComment) {
 			dto.setUserRating(row[3] == null ? "" : numberFormat.format(row[3]));
 			dto.setAverageRating(row[4] == null ? "" : numberFormat.format(row[4]));
@@ -676,10 +651,10 @@ public class RatingService implements IRatingService {
 
     /**
      * Convert the raw data from the database to JSON, similar on StyledCriteriaRatingDTO and StyleRatingDTO.
-     * The rating service expects the potential itemId followed by rating.* (its own fields) and the last two items 
-     * in the array will be two item descriptions fields (eg formatted user's name, portrait id). Will go back to 
-     * the database for the justification comment that would apply to hedging. 
-     * 
+     * The rating service expects the potential itemId followed by rating.* (its own fields) and the last two items
+     * in the array will be two item descriptions fields (eg formatted user's name, portrait id). Will go back to
+     * the database for the justification comment that would apply to hedging.
+     *
      * If includeCurrentUser == true will include the current users' records (used for SelfReview and Monitoring)
      * otherwise skips the current user, so they do not rate themselves!
      *
@@ -738,8 +713,8 @@ public class RatingService implements IRatingService {
 		    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 		    userRow.put("itemId", itemId);
 		    userRow.put("comment", row[2] == null ? "" : (String) row[2]);
-    		    userRow.put("itemDescription", row[numColumns - 2] == null ? "" : row[numColumns - 2].toString());
-    		    userRow.put("itemDescription2", row[numColumns - 1] == null ? "" : row[numColumns - 1].toString());
+		    userRow.put("itemDescription", row[numColumns - 2] == null ? "" : row[numColumns - 2].toString());
+		    userRow.put("itemDescription2", row[numColumns - 1] == null ? "" : row[numColumns - 1].toString());
 		    if (!isComment) {
 			userRow.put("userRating", row[3] == null ? "" : numberFormat.format(row[3]));
 			userRow.put("averageRating", row[4] == null ? "" : numberFormat.format(row[4]));
@@ -787,8 +762,8 @@ public class RatingService implements IRatingService {
     public String getRatingSelectJoinSQL(Integer ratingStyle, boolean getByUser) {
 	return ratingDAO.getRatingSelectJoinSQL(ratingStyle, getByUser);
     }
-    
-    /** 
+
+    /**
      * Get all the raw ratings for a combination of criteria and item ids. Used by Peer Review to do SPA analysis.
      */
     @Override

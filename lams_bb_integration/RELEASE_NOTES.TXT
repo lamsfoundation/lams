@@ -162,4 +162,11 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 1.2.25 Release Fixes
 ====================
 * LDEV-4418: Change back button javascript
+
+1.2.26 Release Fixes
+====================
 * LDEV-4478: Add ability to display LAMS CourseGradebook 
+
+1.2.27 Release Fixes
+====================
+* LDEV-4494: Avoid cloning and importing the lessons created by old NTU plugin

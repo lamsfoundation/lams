@@ -17,7 +17,7 @@
 			});		
 		  
 			$.validator.addMethod("fileType", function(value, element) {
-				return this.optional(element) || (element.files[0].type == 'application/zip')
+				return this.optional(element) || element.files[0].type == 'application/zip' || element.files[0].type == 'application/x-zip-compressed'
 			});
 			
 			$.validator.addMethod('validateSize', function (value, element, param) {
@@ -94,10 +94,8 @@
 				<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
 	
 				<div class="form-group">
-					<html:checkbox property="allowRating" styleId="allowRating"/>
-					&nbsp;<label for="allowRating"><fmt:message key="label.enable.rating" /></label>
+					<%@ include file="ratings.jsp"%>	
 				</div>
-				
 			</html:form>
 
 			<!-- Instructions -->

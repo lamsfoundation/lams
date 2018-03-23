@@ -36,6 +36,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.service.IImportService;
 import org.lamsfoundation.lams.admin.web.form.ImportExcelForm;
+import org.lamsfoundation.lams.web.session.SessionManager;
 
 /**
  * @author jliew
@@ -69,7 +70,8 @@ public class ImportGroupsAction extends Action {
 	    return mapping.findForward("importGroups");
 	}
 
-	List results = importService.parseGroupSpreadsheet(file);
+	String sessionId = SessionManager.getSession().getId();
+	List results = importService.parseGroupSpreadsheet(file, sessionId);
 	request.setAttribute("results", results);
 
 	return mapping.findForward("importGroups");

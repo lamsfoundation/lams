@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -45,6 +46,9 @@ import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.UserComparator;
 import org.lamsfoundation.lams.learning.kumalive.dao.IKumaliveDAO;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
+import org.lamsfoundation.lams.learning.kumalive.model.KumaliveLog;
+import org.lamsfoundation.lams.learning.kumalive.model.KumalivePoll;
+import org.lamsfoundation.lams.learning.kumalive.model.KumalivePollAnswer;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveScore;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -86,8 +90,6 @@ public class KumaliveService implements IKumaliveService {
 
     /**
      * Fetches or creates a Kumalive
-     *
-     * @throws JSONException
      */
     @Override
     public Kumalive startKumalive(Integer organisationId, Integer userId, String name, ArrayNode rubricsJSON,
@@ -540,6 +542,96 @@ public class KumaliveService implements IKumaliveService {
 	}
 
 	return rows.toArray(new ExcelCell[][] {});
+    }
+
+    @Override
+    public KumalivePoll getPollByKumaliveId(Long kumaliveId) {
+	return kumaliveDAO.findPollByKumaliveId(kumaliveId);
+    }
+
+    /**
+     * Creates a poll
+     */
+    @Override
+    public KumalivePoll startPoll(Long kumaliveId, String name, ArrayNode answersJSON) {
+	Kumalive kumalive = getKumalive(kumaliveId);
+	if (kumalive == null) {
+	    return null;
+	}
+	KumalivePoll poll = new KumalivePoll(kumalive, name);
+	kumaliveDAO.insert(poll);
+
+	Set<KumalivePollAnswer> answers = new LinkedHashSet<>();
+	for (Short answerIndex = 0; answerIndex < answersJSON.size(); answerIndex++) {
+	    String answerName = answersJSON.get(answerIndex.intValue()).asText();
+	    KumalivePollAnswer answer = new KumalivePollAnswer(poll, answerIndex, answerName);
+	    kumaliveDAO.insert(answer);
+	    answers.add(answer);
+	}
+	poll.setAnswers(answers);
+	kumaliveDAO.update(poll);
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Teacher started poll " + poll.getPollId());
+	}
+
+	return poll;
+    }
+
+    /**
+     * Store a user's vote for a poll
+     */
+    @Override
+    public void saveVote(Long answerId, Integer userId) {
+	KumalivePollAnswer answer = (KumalivePollAnswer) kumaliveDAO.find(KumalivePollAnswer.class, answerId);
+	if (answer.getVotes().containsKey(userId)) {
+	    logger.warn("Learner " + userId + " tried to vote for answer ID " + answerId + " but he already voted");
+	    return;
+	}
+	answer.getVotes().put(userId, new Date());
+	kumaliveDAO.update(answer);
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Learner " + userId + " voted for answer ID " + answerId);
+	}
+    }
+
+    /**
+     * Set whether learners can see vote results and voters' names
+     */
+    @Override
+    public void releasePollResults(Long pollId, boolean votesReleased, boolean votersReleased) {
+	KumalivePoll poll = (KumalivePoll) kumaliveDAO.find(KumalivePoll.class, pollId);
+	poll.setVotesReleased(votesReleased || votersReleased);
+	poll.setVotersReleased(votersReleased);
+	kumaliveDAO.update(poll);
+    }
+
+    /**
+     * Finishes a poll, i.e. prevents learners from voting
+     */
+    @Override
+    public void finishPoll(Long pollId) {
+	KumalivePoll poll = (KumalivePoll) kumaliveDAO.find(KumalivePoll.class, pollId);
+	if (poll.getFinishDate() != null) {
+	    logger.warn("Trying to finish poll " + pollId + " which is already finished");
+	    return;
+	}
+	poll.setFinishDate(new Date());
+	kumaliveDAO.update(poll);
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Teacher finished poll " + poll.getPollId());
+	}
+    }
+
+    /**
+     * Logs an activity in the given Kumalive
+     */
+    @Override
+    public void log(Long kumaliveId, Integer userId, Date date, short type) {
+	KumaliveLog log = new KumaliveLog(kumaliveId, userId, date, type);
+	kumaliveDAO.insert(log);
     }
 
     public void setSecurityService(ISecurityService securityService) {

@@ -20,7 +20,6 @@ import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.FileUtilException;
@@ -253,7 +252,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 	if (nowLong < cutoffTime) {
 	    User user = (User) userService.findById(User.class, fp.getUserId());
 	    userService.updatePassword(user.getLogin(), newPassword);
-	    userService.auditPasswordChanged(user, CentralConstants.MODULE_NAME);
+	    userService.logPasswordChanged(user, user);
 	    languageKey = ForgotPasswordServlet.SUCCESS_CHANGE_PASS;
 	    success = 1;
 	} else {

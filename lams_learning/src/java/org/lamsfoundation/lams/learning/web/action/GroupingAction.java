@@ -24,8 +24,6 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -38,20 +36,20 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.apache.struts.action.RedirectingActionForward;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
+import org.lamsfoundation.lams.learningdesign.dto.GroupDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.util.FirstNameAlphabeticComparator;
+import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -69,16 +67,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * </p>
  *
  * @author Jacky Fang
- * @since 2005-3-29
- * @version 1.1
- *
- *
- *
- *
- *
- *
- *
- *
  *
  */
 public class GroupingAction extends LamsDispatchAction {
@@ -153,11 +141,10 @@ public class GroupingAction extends LamsDispatchAction {
 	// forward to group choosing page
 	if (((GroupingActivity) activity).getCreateGrouping().isLearnerChoiceGrouping()) {
 	    Long groupingId = ((GroupingActivity) activity).getCreateGrouping().getGroupingId();
+	    Integer maxNumberOfLeaernersPerGroup = learnerService.calculateMaxNumberOfLearnersPerGroup(lessonId,
+		    groupingId);
 
 	    LearnerChoiceGrouping grouping = (LearnerChoiceGrouping) learnerService.getGrouping(groupingId);
-	    Integer maxNumberOfLeaernersPerGroup = learnerService.calculateMaxNumberOfLearnersPerGroup(lessonId,
-		    grouping);
-
 	    prepareGroupData(request);
 	    request.setAttribute(GroupingAction.MAX_LEARNERS_PER_GROUP, maxNumberOfLeaernersPerGroup);
 	    request.setAttribute(GroupingAction.LOCAL_FILES, Boolean.FALSE);
@@ -241,20 +228,16 @@ public class GroupingAction extends LamsDispatchAction {
 
 	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
-	SortedSet<Group> groups = new TreeSet<Group>(new GroupComparator());
+	SortedSet<GroupDTO> groups = new TreeSet<GroupDTO>(GroupDTO.GROUP_NAME_COMPARATOR);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
 	Grouping grouping = ((GroupingActivity) activity).getCreateGrouping();
 	if (grouping != null) {
-	    groups.addAll(grouping.getGroups());
-	}
-
-	// sort users with first, then last name, then login
-	Comparator<User> userComparator = new FirstNameAlphabeticComparator();
-	for (Group group : groups) {
-	    Set<User> sortedUsers = new TreeSet<User>(userComparator);
-	    sortedUsers.addAll(group.getUsers());
-	    group.setUsers(sortedUsers);
+	    for (Group group : grouping.getGroups()) {
+		GroupDTO groupDTO = new GroupDTO(group, true);
+		groupDTO.getUserList().sort(UserBasicDTO.USER_BASIC_DTO_COMPARATOR);
+		groups.add(groupDTO);
+	    }
 	}
 
 	request.setAttribute(GroupingAction.GROUPS, groups);
@@ -280,21 +263,13 @@ public class GroupingAction extends LamsDispatchAction {
 	Long groupId = WebUtil.readLongParam(request, "groupId");
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Long lessonId = learnerProgress.getLesson().getLessonId();
-	boolean learnerGroupped = learnerService.learnerChooseGroup(lessonId, activity.getActivityId(), groupId,
-		LearningWebUtil.getUserId());
-	if (learnerGroupped) {
-	    return viewGrouping(mapping, form, request, response, learnerProgress);
-	}
-	Long groupingId = ((GroupingActivity) activity).getCreateGrouping().getGroupingId();
+	learnerService.learnerChooseGroup(lessonId, activity.getActivityId(), groupId, LearningWebUtil.getUserId());
 
-	LearnerChoiceGrouping grouping = (LearnerChoiceGrouping) learnerService.getGrouping(groupingId);
-	Integer maxNumberOfLeaernersPerGroup = learnerService.calculateMaxNumberOfLearnersPerGroup(lessonId, grouping);
+	String redirectURL = "/grouping.do";
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, "method", "performGrouping");
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, "activityID", activity.getActivityId().toString());
 
-	prepareGroupData(request);
-	request.setAttribute(GroupingAction.MAX_LEARNERS_PER_GROUP, maxNumberOfLeaernersPerGroup);
-	request.setAttribute(GroupingAction.LOCAL_FILES, Boolean.FALSE);
-	request.setAttribute(GroupingAction.VIEW_STUDENTS_BEFORE_SELECTION, grouping.getViewStudentsBeforeSelection());
-	return mapping.findForward(GroupingAction.CHOOSE_GROUP);
+	return new RedirectingActionForward(redirectURL);
     }
 
 }

@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -105,7 +106,6 @@ import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
@@ -132,7 +132,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     private IMcUsrAttemptDAO mcUsrAttemptDAO;
     private MCOutputFactory mcOutputFactory;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
     private IUserManagementService userManagementService;
     private ILearnerService learnerService;
     private ILamsToolService toolService;
@@ -378,13 +378,13 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public McQueUsr getMcUserByUID(Long uid) throws McApplicationException {
-	try {
-	    return mcUserDAO.getMcUserByUID(uid);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is getting the mc QueUsr by uid." + e.getMessage(), e);
-	}
+    public McQueUsr getMcUserByUID(Long uid) {
+	return mcUserDAO.getMcUserByUID(uid);
+    }
+
+    @Override
+    public McQueUsr getMcUserByContentId(Long userId, Long contentId) {
+	return mcUserDAO.getMcUserByContentId(userId, contentId);
     }
 
     @Override
@@ -474,6 +474,11 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    throw new McApplicationException("Exception occured when lams is updating mc UsrAttempt: " + e.getMessage(),
 		    e);
 	}
+    }
+
+    @Override
+    public int getAttemptsCountPerOption(Long optionUid) {
+	return mcUsrAttemptDAO.getAttemptsCountPerOption(optionUid);
     }
 
     @Override
@@ -784,8 +789,12 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    mcSession.getMcSessionId(), false);
 
 	    // record mark change with audit service
-	    auditService.logMarkChange(McAppConstants.TOOL_SIGNATURE, user.getQueUsrId(), user.getUsername(),
-		    "" + oldMark, "" + totalMark);
+	    Long toolContentId = null;
+	    if (mcSession.getMcContent() != null) {
+		toolContentId = mcSession.getMcContent().getMcContentId();
+	    }
+	    logEventService.logMarkChange(user.getQueUsrId(), user.getUsername(), toolContentId, "" + oldMark,
+		    "" + totalMark);
 
 	}
     }
@@ -1312,7 +1321,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		    mcUserDAO.removeMcUser(user);
 
-		    gradebookService.updateActivityMark(null, null, userId, session.getMcSessionId(), false);
+		    gradebookService.removeActivityMark(userId, session.getMcSessionId());
 		}
 	    }
 	}
@@ -1536,7 +1545,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	McContent content = getMcSessionById(toolSessionId).getMcContent();
 
-	//in case McContent is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor  
+	//in case McContent is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor
 	List<Object[]> userAttemptsAndPortraits = content.isUseSelectLeaderToolOuput()
 		? mcUsrAttemptDAO.getLeadersFinalizedAttemptsByContentId(content.getMcContentId())
 		: mcUsrAttemptDAO.getFinalizedAttemptsBySessionId(toolSessionId);
@@ -1547,7 +1556,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    : ((Number) userAttemptAndPortraitIter[1]).longValue();
 	    Long userId = userAttempt.getQueUsrId();
 
-	    //fill in question's and user answer's hashes 
+	    //fill in question's and user answer's hashes
 	    McQueContent question = userAttempt.getMcQueContent();
 	    String answer = userAttempt.getMcOptionsContent().getMcQueOptionText();
 
@@ -1776,18 +1785,18 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     /**
-     * @return Returns the auditService.
+     * @return Returns the logEventService.
      */
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
     /**
-     * @param auditService
-     *            The auditService to set.
+     * @param logEventService
+     *            The logEventService to set.
      */
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     /**

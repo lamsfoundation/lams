@@ -1,15 +1,14 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<c:url var="tutorialActionUrl" value="tutorial.do" />
 
 <!DOCTYPE html>
 <html>
 <head>
 	<!-- This page is used to display a tutorial video. Content and other parameters are passed in request. -->
-	
-	<c:url var="tutorialActionUrl" value="tutorial.do" />
-	
    	<lams:css/>
+   	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css">
    	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
@@ -97,6 +96,8 @@
    <div style="float: left;">
 	   <input id="doNotShowAgain" style="margin: 12px 0px 0px 15px;" type="checkbox"><fmt:message key="label.tutorial.video.never.show.again" /></input>
    </div>
-   <a class="button" style="margin: 8px 10px 0px 0px; float: right;" href="javascript:closeTutorial();"><fmt:message key="button.close" /></a>
+   <button class="ui-button ui-corner-all pull-right" onclick="javascript:closeTutorial();">
+   	<fmt:message key="button.close" />
+   	</button>
 </body>
 <html>

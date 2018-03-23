@@ -40,8 +40,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements AssessmentUserDAO {
 
-    private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + AssessmentUser.class.getName()
-	    + " as u where u.userId =? and u.assessment.contentId=?";
     private static final String FIND_BY_USER_ID_SESSION_ID = "from " + AssessmentUser.class.getName()
 	    + " as u where u.userId =? and u.session.sessionId=?";
     private static final String FIND_BY_SESSION_ID = "from " + AssessmentUser.class.getName()
@@ -74,7 +72,22 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 
     @SuppressWarnings("rawtypes")
     @Override
-    public AssessmentUser getUserByUserIDAndContentID(Long userId, Long contentId) {
+    public AssessmentUser getUserCreatedAssessment(Long userId, Long contentId) {
+	final String FIND_BY_USER_ID_CONTENT_ID = "from " + AssessmentUser.class.getName()
+		+ " as u where u.userId =? and u.assessment.contentId=?";
+
+	List list = doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	if (list == null || list.size() == 0) {
+	    return null;
+	}
+	return (AssessmentUser) list.get(0);
+    }
+
+    @Override
+    public AssessmentUser getUserByIdAndContent(Long userId, Long contentId) {
+	final String FIND_BY_USER_ID_CONTENT_ID = "from " + AssessmentUser.class.getName()
+		+ " as u where u.userId =? and u.session.assessment.contentId=?";
+
 	List list = doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0) {
 	    return null;
@@ -164,6 +177,23 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
 	query.setString("searchString", searchString);
+	List list = query.list();
+
+	if ((list == null) || (list.size() == 0)) {
+	    return 0;
+	} else {
+	    return ((Number) list.get(0)).intValue();
+	}
+    }
+    
+    @Override
+    public int getCountUsersByContentId(Long contentId) {
+
+	String LOAD_USERS_ORDERED_BY_NAME = "SELECT COUNT(*) FROM " + AssessmentUser.class.getName() + " user"
+		+ " WHERE user.session.assessment.contentId = :contentId ";
+
+	Query query = getSession().createQuery(LOAD_USERS_ORDERED_BY_NAME);
+	query.setLong("contentId", contentId);
 	List list = query.list();
 
 	if ((list == null) || (list.size() == 0)) {

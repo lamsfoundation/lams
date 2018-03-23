@@ -55,6 +55,7 @@
 				<property name="logEventService"><ref bean="logEventService"/></property>
 				<property name="dataFlowDAO"><ref bean="dataFlowDAO"/></property>
 				<property name="commandDAO"><ref bean="commandDAO"/></property>
+				<property name="messageService"><ref bean="learningMessageService"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">
@@ -100,6 +101,8 @@
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="export*">PROPAGATION_REQUIRED</prop>
+				<prop key="release*">PROPAGATION_REQUIRED</prop>
+				<prop key="log*">PROPAGATION_REQUIRED</prop>
    			</props>
 		</property>
 	</bean> 
@@ -143,6 +146,7 @@
 	<bean id="progressEngine" class="org.lamsfoundation.lams.learning.progress.ProgressEngine" >
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="logEventService"><ref bean="logEventService"/></property>
+		<property name="messageService"><ref bean="learningMessageService"/></property>
 	</bean>
 	
 	<bean id="activityMapping" class="org.lamsfoundation.lams.learning.web.util.ActivityMapping" >

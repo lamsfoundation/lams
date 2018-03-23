@@ -40,7 +40,6 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -85,6 +84,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -158,8 +158,8 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public void createUser(PeerreviewUser peerreviewUser) {
-	peerreviewUserDao.saveObject(peerreviewUser);
+    public void updateUser(PeerreviewUser peerreviewUser) {
+	peerreviewUserDao.insertOrUpdate(peerreviewUser);
     }
 
     @Override
@@ -174,7 +174,7 @@ public class PeerreviewServiceImpl
 
     @Override
     public void saveOrUpdatePeerreview(Peerreview peerreview) {
-	peerreviewDao.saveObject(peerreview);
+	peerreviewDao.insertOrUpdate(peerreview);
     }
 
     @Override
@@ -193,14 +193,14 @@ public class PeerreviewServiceImpl
 
     @Override
     public void saveOrUpdatePeerreviewSession(PeerreviewSession resSession) {
-	peerreviewSessionDao.saveObject(resSession);
+	peerreviewSessionDao.insertOrUpdate(resSession);
     }
 
     @Override
     public void markUserFinished(Long toolSessionId, Long userId) {
 	PeerreviewUser user = peerreviewUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(true);
-	peerreviewUserDao.saveObject(user);
+	peerreviewUserDao.update(user);
     }
 
     @Override
@@ -276,7 +276,7 @@ public class PeerreviewServiceImpl
 
     @Override
     public PeerreviewUser getUser(Long uid) {
-	return (PeerreviewUser) peerreviewUserDao.getObject(PeerreviewUser.class, uid);
+	return (PeerreviewUser) peerreviewUserDao.find(PeerreviewUser.class, uid);
     }
 
     @Override
@@ -328,7 +328,7 @@ public class PeerreviewServiceImpl
 	}
 
 	user.setHidden(isHidden);
-	peerreviewUserDao.saveObject(user);
+	peerreviewUserDao.update(user);
     }
 
     @Override
@@ -358,11 +358,10 @@ public class PeerreviewServiceImpl
 	}
 
 	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria,
-		currentUserId, null, null, sorting, searchString, getByUser, ratingService,
-		userManagementService);
+		currentUserId, null, null, sorting, searchString, getByUser, ratingService, userManagementService);
 
 	for (Object[] raw : rawData) {
-	  raw[raw.length - 2] = (Object) StringEscapeUtils.escapeCsv((String)raw[raw.length - 2]);
+	    raw[raw.length - 2] = HtmlUtils.htmlEscape((String) raw[raw.length - 2]);
 	}
 	// if !getByUser -> is get current user's ratings from other users ->
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
@@ -378,7 +377,7 @@ public class PeerreviewServiceImpl
 		currentUserId, page, size, sorting, searchString, getByUser, ratingService, userManagementService);
 
 	for (Object[] raw : rawData) {
-	    raw[raw.length - 2] = (Object) StringEscapeUtils.escapeCsv((String)raw[raw.length - 2]);
+	    raw[raw.length - 2] = HtmlUtils.htmlEscape((String) raw[raw.length - 2]);
 	}
 	// if !getByUser -> is get current user's ratings from other users ->
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
@@ -399,7 +398,7 @@ public class PeerreviewServiceImpl
 	    raw[2] = (raw[2] == null ? null : numberFormat.format(raw[2])); // format rating
 	    // format name
 	    StringBuilder description = new StringBuilder((String) raw[3]).append(" ").append((String) raw[4]);
-	    raw[4] = StringEscapeUtils.escapeCsv(description.toString());
+	    raw[4] = HtmlUtils.htmlEscape(description.toString());
 
 	}
 	return rawData;
@@ -414,7 +413,7 @@ public class PeerreviewServiceImpl
 
 	// raw data: user_id, comment_count, first_name  last_name, portrait id
 	for (Object[] raw : rawData) {
-	    raw[2] = (Object) StringEscapeUtils.escapeCsv((String)raw[2]);
+	    raw[2] = HtmlUtils.htmlEscape((String) raw[2]);
 	}
 
 	return rawData;
@@ -448,7 +447,7 @@ public class PeerreviewServiceImpl
 
 	for (Object[] raw : rawData) {
 	    StringBuilder description = new StringBuilder((String) raw[1]).append(" ").append((String) raw[2]);
-	    raw[2] = StringEscapeUtils.escapeCsv(description.toString());
+	    raw[2] = HtmlUtils.htmlEscape(description.toString());
 	}
 
 	return rawData;
@@ -462,9 +461,9 @@ public class PeerreviewServiceImpl
 
     private String getResultsEmailSubject(Peerreview peerreview) {
 	return getLocalisedMessage("event.sent.results.subject", new Object[] { peerreview.getTitle() });
-	    }
+    }
 
-   @Override
+    @Override
     public int emailReportToUser(Long toolContentId, Long sessionId, Long userId) {
 	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
 	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
@@ -480,17 +479,16 @@ public class PeerreviewServiceImpl
     public int emailReportToSessionUsers(Long toolContentId, Long sessionId) {
 	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
 	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
-	Map<Long, String> emails = new EmailAnalysisBuilder(peerreview, session, ratingService,
-	    peerreviewSessionDao, peerreviewUserDao, this, messageService).generateHTMLEmailsForSession();
-	for ( Map.Entry<Long, String> entry : emails.entrySet() ) {
-	    eventNotificationService.sendMessage(null, entry.getKey().intValue(), 
-		    IEventNotificationService.DELIVERY_METHOD_MAIL, 
-		    getResultsEmailSubject(peerreview),
+	Map<Long, String> emails = new EmailAnalysisBuilder(peerreview, session, ratingService, peerreviewSessionDao,
+		peerreviewUserDao, this, messageService).generateHTMLEmailsForSession();
+	for (Map.Entry<Long, String> entry : emails.entrySet()) {
+	    eventNotificationService.sendMessage(null, entry.getKey().intValue(),
+		    IEventNotificationService.DELIVERY_METHOD_MAIL, getResultsEmailSubject(peerreview),
 		    entry.getValue(), true);
 	}
 	return emails.size();
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public LinkedHashMap<String, ExcelCell[][]> exportTeamReportSpreadsheet(Long toolContentId) {
@@ -625,7 +623,7 @@ public class PeerreviewServiceImpl
 	    }
 	    toolContentObj.setCreatedBy(user);
 
-	    peerreviewDao.saveObject(toolContentObj);
+	    peerreviewDao.insertOrUpdate(toolContentObj);
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
 	}
@@ -656,7 +654,7 @@ public class PeerreviewServiceImpl
 	}
 
 	Peerreview toContent = Peerreview.newInstance(peerreview, toContentId);
-	peerreviewDao.saveObject(toContent);
+	peerreviewDao.insert(toContent);
     }
 
     @Override
@@ -738,7 +736,7 @@ public class PeerreviewServiceImpl
 		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
 			PeerreviewConstants.TOOL_SIGNATURE, userId);
 		if (entry != null) {
-		    peerreviewDao.removeObject(NotebookEntry.class, entry.getUid());
+		    peerreviewDao.deleteById(NotebookEntry.class, entry.getUid());
 		}
 
 	    }
@@ -752,7 +750,7 @@ public class PeerreviewServiceImpl
 	session.setSessionName(toolSessionName);
 	Peerreview peerreview = peerreviewDao.getByContentId(toolContentId);
 	session.setPeerreview(peerreview);
-	peerreviewSessionDao.saveObject(session);
+	peerreviewSessionDao.insert(session);
     }
 
     @Override
@@ -769,7 +767,7 @@ public class PeerreviewServiceImpl
 	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(toolSessionId);
 	if (session != null) {
 	    session.setStatus(PeerreviewConstants.COMPLETED);
-	    peerreviewSessionDao.saveObject(session);
+	    peerreviewSessionDao.update(session);
 	} else {
 	    log.error("Fail to leave tool Session.Could not find peerreview " + "session by given session id: "
 		    + toolSessionId);
@@ -958,9 +956,8 @@ public class PeerreviewServiceImpl
 
     /**
      * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: title, instructions, peerreview,
-     * user fields firstName, lastName and loginName Peerreview must contain a ArrayNode of ObjectNode objects, which
-     * have the following mandatory fields: title, description, type. If there are instructions for a peerreview, the
-     * instructions are a ArrayNode of Strings. There should be at least one peerreview object in the peerreview array.
+     * user fields firstName, lastName and loginName Peerreview must contain a JSONArray of JSONObject objects, which
+     * have the following mandatory fields: title, description, type. It will create
      */
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
@@ -972,6 +969,7 @@ public class PeerreviewServiceImpl
 	peerreview.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
 	peerreview.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 	peerreview.setCreated(updateDate);
+	peerreview.setUpdated(updateDate);
 
 	peerreview
 		.setLockWhenFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
@@ -993,7 +991,31 @@ public class PeerreviewServiceImpl
 
 	peerreview.setCreatedBy(peerreviewUser);
 
+	// not expecting to get these but add them in case an Authoring Template does want them
+	peerreview.setMinimumRates(JsonUtil.optInt(toolContentJSON, "minimumRates", 0));
+	peerreview.setMaximumRates(JsonUtil.optInt(toolContentJSON, "maximumRate", 0));
+	peerreview.setMaximumRatesPerUser(JsonUtil.optInt(toolContentJSON, "maximumRatesPerUser", 0));
+	peerreview.setShowRatingsLeftForUser(
+		JsonUtil.optBoolean(toolContentJSON, "showRatingsLeftForUser", Boolean.TRUE));
+	peerreview
+		.setShowRatingsLeftByUser(JsonUtil.optBoolean(toolContentJSON, "showRatingsLeftByUser", Boolean.FALSE));
+	peerreview.setSelfReview(JsonUtil.optBoolean(toolContentJSON, "notifyUsersOfResults", Boolean.FALSE));
+	peerreview.setNotifyUsersOfResults(JsonUtil.optBoolean(toolContentJSON, "notifyUsersOfResults", Boolean.TRUE));
+
 	saveOrUpdatePeerreview(peerreview);
 
+	// Criterias
+	ArrayNode criterias = JsonUtil.optArray(toolContentJSON, "criterias");
+	for (int i = 0; i < criterias.size(); i++) {
+	    ObjectNode criteriaData = (ObjectNode) criterias.get(i);
+	    // allowComment true, minWords defaults to 1. allowComment is false, minWords defaults to 0
+	    boolean allowComment = JsonUtil.optBoolean(criteriaData, "commentsEnabled", false);
+	    int minWords = JsonUtil.optInt(criteriaData, "minWordsInComment", allowComment ? 1 : 0);
+	    ratingService.saveLearnerItemRatingCriteria(toolContentID, JsonUtil.optString(criteriaData, "title"),
+		    JsonUtil.optInt(criteriaData, "orderId"), JsonUtil.optInt(criteriaData, "ratingStyle"),
+		    allowComment, minWords);
+	}
+
+	saveOrUpdatePeerreview(peerreview);
     }
 }

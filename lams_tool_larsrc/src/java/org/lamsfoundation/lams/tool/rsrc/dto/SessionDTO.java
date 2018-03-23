@@ -32,6 +32,7 @@ public class SessionDTO {
     private String sessionName;
     private List<ResourceItemDTO> items;
     private boolean allowRating;
+    private boolean allowComments;
 
     public SessionDTO() {
 	items = new LinkedList<ResourceItemDTO>();
@@ -67,5 +68,13 @@ public class SessionDTO {
 
     public void setAllowRating(boolean allowRating) {
 	this.allowRating = allowRating;
+    }
+
+    public boolean isAllowComments() {
+	return allowComments;
+    }
+
+    public void setAllowComments(boolean allowComments) {
+	this.allowComments = allowComments;
     }
 }

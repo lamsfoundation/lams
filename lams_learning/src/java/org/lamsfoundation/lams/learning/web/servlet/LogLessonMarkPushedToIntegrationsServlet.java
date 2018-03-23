@@ -70,7 +70,7 @@ public class LogLessonMarkPushedToIntegrationsServlet extends HttpServlet {
 	}
 
 	//log mark has been successfullly pushed to the integrated server
-	logEventService.logEvent(LogEvent.TYPE_LEARNER_LESSON_MARK_SUBMIT, user.getUserID(), null, lessonID, null);
+	logEventService.logEvent(LogEvent.TYPE_LEARNER_LESSON_MARK_SUBMIT, user.getUserID(), null, lessonID, null, "ADD COMMENT HERE");
 
 	response.setContentType("text/html");
 	PrintWriter out = response.getWriter();

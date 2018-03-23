@@ -33,6 +33,7 @@ public class CommentSession implements Cloneable {
     private Long externalId;
     private Integer externalIdType;
     private String externalSignature;
+    private Long externalSecondaryId;
 
     public CommentSession() {
     }
@@ -67,6 +68,14 @@ public class CommentSession implements Cloneable {
 
     public void setExternalSignature(String externalSignature) {
 	this.externalSignature = externalSignature;
+    }
+
+    public Long getExternalSecondaryId() {
+	return externalSecondaryId;
+    }
+
+    public void setExternalSecondaryId(Long externalSecondaryId) {
+	this.externalSecondaryId = externalSecondaryId;
     }
 
 }

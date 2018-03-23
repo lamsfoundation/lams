@@ -139,6 +139,7 @@ public class CommentAction extends Action {
 	SessionMap<String, Object> sessionMap;
 
 	Long externalId;
+	Long externalSecondaryId;
 	int externalType;
 	String externalSignature;
 	String mode;
@@ -151,6 +152,7 @@ public class CommentAction extends Action {
 	if (sessionMapID != null) {
 	    sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	    externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
+	    externalSecondaryId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_SECONDARY_ID);
 	    externalType = (Integer) sessionMap.get(CommentConstants.ATTR_EXTERNAL_TYPE);
 	    externalSignature = (String) sessionMap.get(CommentConstants.ATTR_EXTERNAL_SIG);
 	    mode = (String) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -162,6 +164,7 @@ public class CommentAction extends Action {
 	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	    externalId = WebUtil.readLongParam(request, CommentConstants.ATTR_EXTERNAL_ID);
+	    externalSecondaryId = WebUtil.readLongParam(request, CommentConstants.ATTR_EXTERNAL_SECONDARY_ID, true);
 	    externalType = WebUtil.readIntParam(request, CommentConstants.ATTR_EXTERNAL_TYPE);
 	    externalSignature = WebUtil.readStrParam(request, CommentConstants.ATTR_EXTERNAL_SIG);
 	    likeAndDislike = WebUtil.readBooleanParam(request, CommentConstants.ATTR_LIKE_AND_DISLIKE);
@@ -177,6 +180,9 @@ public class CommentAction extends Action {
 
 	    sessionMap.put(CommentConstants.ATTR_EXTERNAL_ID, externalId);
 	    sessionMap.put(CommentConstants.ATTR_EXTERNAL_TYPE, externalType);
+	    if ( externalSecondaryId != null ) {
+		sessionMap.put(CommentConstants.ATTR_EXTERNAL_SECONDARY_ID, externalSecondaryId);
+	    }
 	    sessionMap.put(CommentConstants.ATTR_EXTERNAL_SIG, externalSignature);
 	    sessionMap.put(CommentConstants.ATTR_LIKE_AND_DISLIKE, likeAndDislike);
 	    sessionMap.put(CommentConstants.ATTR_READ_ONLY, readOnly);
@@ -192,7 +198,7 @@ public class CommentAction extends Action {
 	    throwException("Unknown comment type ", user.getLogin(), externalId, externalType, externalSignature);
 	}
 
-	Comment rootComment = getCommentService().createOrGetRoot(externalId, externalType, externalSignature, user);
+	Comment rootComment = getCommentService().createOrGetRoot(externalId, externalSecondaryId, externalType, externalSignature, user);
 	sessionMap.put(CommentConstants.ATTR_ROOT_COMMENT_UID, rootComment.getUid());
 	return viewTopicImpl(mapping, form, request, response, sessionMap, pageSize, sortBy, true);
     }
@@ -261,6 +267,7 @@ public class CommentAction extends Action {
 	    boolean includeSticky) {
 
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
+	Long externalSecondaryId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_SECONDARY_ID);
 	Integer externalType = (Integer) sessionMap.get(CommentConstants.ATTR_EXTERNAL_TYPE);
 	String externalSignature = (String) sessionMap.get(CommentConstants.ATTR_EXTERNAL_SIG);
 
@@ -280,14 +287,14 @@ public class CommentAction extends Action {
 	    sortBy = (Integer) sessionMap.get(CommentConstants.ATTR_SORT_BY);
 	}
 
-	List<CommentDTO> msgDtoList = commentService.getTopicThread(externalId, externalType, externalSignature,
-		lastMsgSeqId, pageSize, sortBy, currentLikeCount, user.getUserID());
+	List<CommentDTO> msgDtoList = commentService.getTopicThread(externalId, externalSecondaryId, externalType,
+		externalSignature, lastMsgSeqId, pageSize, sortBy, currentLikeCount, user.getUserID());
 	updateMessageFlag(msgDtoList, user.getUserID());
 	request.setAttribute(CommentConstants.ATTR_COMMENT_THREAD, msgDtoList);
 
 	if (includeSticky) {
-	    List<CommentDTO> stickyList = commentService.getTopicStickyThread(externalId, externalType,
-		    externalSignature, sortBy, currentLikeCount, user.getUserID());
+	    List<CommentDTO> stickyList = commentService.getTopicStickyThread(externalId, externalSecondaryId,
+		    externalType, externalSignature, sortBy, currentLikeCount, user.getUserID());
 	    updateMessageFlag(stickyList, user.getUserID());
 	    request.setAttribute(CommentConstants.ATTR_STICKY, stickyList);
 	}
@@ -372,6 +379,7 @@ public class CommentAction extends Action {
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
+	Long externalSecondaryId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_SECONDARY_ID);
 	Integer externalType = (Integer) sessionMap.get(CommentConstants.ATTR_EXTERNAL_TYPE);
 	String externalSignature = (String) sessionMap.get(CommentConstants.ATTR_EXTERNAL_SIG);
 
@@ -397,7 +405,7 @@ public class CommentAction extends Action {
 			externalId, externalType, externalSignature);
 	    }
 
-	    Comment rootSeq = commentService.getRoot(externalId, externalType, externalSignature);
+	    Comment rootSeq = commentService.getRoot(externalId, externalSecondaryId, externalType, externalSignature);
 
 	    // save message into database
 	    Comment newComment = commentService.createReply(rootSeq, commentText, user, isMonitor);

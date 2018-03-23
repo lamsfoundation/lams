@@ -54,7 +54,7 @@
 		<c:if test="${isLeadershipEnabled}">
 			<h4>
 				<fmt:message key="label.group.leader">
-					<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
+					<fmt:param><c:out value="${sessionMap.groupLeader.fullname}" escapeXml="true"/></fmt:param>
 				</fmt:message>
 			</h4>
 		</c:if>

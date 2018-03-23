@@ -57,7 +57,7 @@
 		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
 		<property name="repositoryService"><ref bean="repositoryService" /></property>
 		<property name="gradebookService"><ref bean="gradebookService" /></property>
-		<property name="auditService"><ref bean="auditService" /></property>
+		<property name="logEventService"><ref bean="logEventService" /></property>
 		<property name="submitFilesOutputFactory"><ref bean="submitFilesOutputFactory"/></property>
 	</bean>
 	

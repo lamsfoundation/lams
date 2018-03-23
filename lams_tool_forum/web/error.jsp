@@ -1,18 +1,23 @@
-<!DOCTYPE html> 
-	
-
 <%@ page language="java" isErrorPage="true" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<c:set var="showErrorStack"><lams:Configuration key='<%= ConfigurationKeys.ERROR_STACK_TRACE %>'/></c:set>
+
+<!DOCTYPE html>
 <lams:html>
+
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
 
 <%-- Catch JSP Servlet Exception --%>
+<%-- The javascript method checkForErrorScreen in error.js is coded to match this page exactly.
+---- If you change this page, please change the javascript. --%>
 <%
-if (exception != null) {
+if ( Configuration.getAsBoolean(ConfigurationKeys.ERROR_STACK_TRACE)  ) {
+if (exception != null ) {
 %>
 <c:set var="errorMessage">
 	<%=exception.getMessage()%>
@@ -51,18 +56,21 @@ if (exception != null) {
 </c:set>
 <%
 }
+}
 %>
-<body class="stripes">
+<body>
 <form action="${lams}errorpages/error.jsp" method="post" id="errorForm">
+	<c:if test="${showErrorStack}">
 	<input type="hidden" name="errorName" value="<c:out value='${errorName}' />"/>
 	<input type="hidden" name="errorMessage" value="<c:out value='${errorMessage}' />"/>
 	<input type="hidden" name="errorStack" value="<c:out value='${errorStack}' />"/>
+	</c:if>
 </form>
 
 <script type="text/javascript">
-
-if(window.top != null)
+if(window.top != null)  {
 	document.getElementById("errorForm").target = "_parent";
+}
 document.getElementById("errorForm").submit();
 
 </script>

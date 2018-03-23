@@ -37,7 +37,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.themes.Theme;
@@ -92,6 +91,7 @@ public class UserSaveAction extends LamsDispatchAction {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only Sysadmin has edit permisions");
 	    return null;
 	}
+	UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	UserSaveAction.log.debug("orgId: " + orgId);
 	Boolean edit = false;
@@ -214,7 +214,7 @@ public class UserSaveAction extends LamsDispatchAction {
 			UserSaveAction.service.saveUser(user);
 
 			// make 'create user' audit log entry
-			UserSaveAction.service.auditUserCreated(user, AdminConstants.MODULE_NAME);
+			UserSaveAction.service.logUserCreated(user, sysadmin);
 
 			UserSaveAction.log.debug("user: " + user.toString());
 		    }

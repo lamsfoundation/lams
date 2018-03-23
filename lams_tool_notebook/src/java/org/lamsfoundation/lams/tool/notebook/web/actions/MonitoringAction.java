@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -52,6 +51,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -147,13 +147,14 @@ public class MonitoringAction extends LamsDispatchAction {
 	    responseRow.put("id", id++);
 	    responseRow.put(NotebookConstants.PARAM_USER_UID, user.getUid());
 	    responseRow.put(NotebookConstants.PARAM_NAME,
-		    StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+		    HtmlUtils.htmlEscape(user.getLastName() + " " + user.getFirstName()));
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
-		responseRow.put(NotebookConstants.PARAM_ENTRY, (String) userAndReflection[1]);
+		responseRow.put(NotebookConstants.PARAM_ENTRY, HtmlUtils.htmlEscape((String) userAndReflection[1]));
 	    }
-	    if (user.getTeachersComment() != null && user.getTeachersComment().length() > 0) {
-		responseRow.put(NotebookConstants.PARAM_COMMENT, user.getTeachersComment());
-	    }
+//	    if (user.getTeachersComment() != null && user.getTeachersComment().length() > 0) {
+//		responseRow.put(NotebookConstants.PARAM_COMMENT,
+//			HtmlUtils.htmlEscape((String) user.getTeachersComment()));
+//	    }
 
 	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
 		Date modifiedDate = (Date) userAndReflection[2];

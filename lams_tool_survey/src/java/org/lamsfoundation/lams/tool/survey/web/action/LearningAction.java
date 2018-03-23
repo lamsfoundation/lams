@@ -444,7 +444,7 @@ public class LearningAction extends Action {
 
 	for (String response : responses) {
 	    //ArrayNode cell=JsonNodeFactory.instance.arrayNode();
-	    //cell.put(StringEscapeUtils.escapeHtml(user.getFirstName()) + " " + StringEscapeUtils.escapeHtml(user.getLastName()) + " [" + StringEscapeUtils.escapeHtml(user.getLogin()) + "]");
+	    //cell.put(HtmlUtils.htmlEscape(user.getFirstName()) + " " + HtmlUtils.htmlEscape(user.getLastName()) + " [" + HtmlUtils.htmlEscape(user.getLogin()) + "]");
 
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 	    responseRow.put("answer", StringEscapeUtils.escapeCsv(response));

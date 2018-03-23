@@ -48,7 +48,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -61,6 +60,7 @@ import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
@@ -71,6 +71,8 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
@@ -90,12 +92,12 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -125,7 +127,7 @@ public class MonitoringAction extends LamsDispatchAction {
     private static final int LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
     private static final int USER_PAGE_SIZE = 10;
 
-    private static IAuditService auditService;
+    private static ILogEventService logEventService;
 
     private static ILessonService lessonService;
 
@@ -463,11 +465,12 @@ public class MonitoringAction extends LamsDispatchAction {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_END_DATE, true);
 	try {
-	    if (dateStr == null || dateStr.length() == 0)
+	    if (dateStr == null || dateStr.length() == 0) {
 		getMonitoringService().suspendLesson(lessonId, getUserId(), true);
-	    else
+	    } else {
 		getMonitoringService().finishLessonOnSchedule(lessonId,
 			MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateStr), getUserId());
+	    }
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -557,7 +560,7 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward forceComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	getAuditService();
+
 	// get parameters
 	Long activityId = null;
 	String actId = request.getParameter(AttributeNames.PARAM_ACTIVITY_ID);
@@ -605,7 +608,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	String messageKey = (activityId == null) ? "audit.force.complete.end.lesson" : "audit.force.complete";
 	Object[] args = new Object[] { learnerIDs, activityId, lessonId };
 	String auditMessage = getMonitoringService().getMessageService().getMessage(messageKey, args);
-	MonitoringAction.auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, auditMessage + " " + message);
+	getLogEventService().logEvent(LogEvent.TYPE_FORCE_COMPLETE, requesterId, null, lessonId, null,
+		auditMessage + " " + message);
 
 	PrintWriter writer = response.getWriter();
 	writer.println(message);
@@ -930,8 +934,93 @@ public class MonitoringAction extends LamsDispatchAction {
 		.isUserInRole(user.getUserID(), organisation.getOrganisationId(), Role.AUTHOR);
 	request.setAttribute("enableLiveEdit", enableLiveEdit);
 	request.setAttribute("lesson", lessonDTO);
+	request.setAttribute("isTBLSequence", isTBLSequence(lessonId));
 
 	return mapping.findForward("monitorLesson");
+    }
+
+    /**
+     * If learning design contains the following activities Grouping->(MCQ or Assessment)->Leader Selection->Scratchie
+     * (potentially with some other gates or activities in the middle), there is a good chance this is a TBL sequence
+     * and all activities must be grouped.
+     */
+    private boolean isTBLSequence(Long lessonId) {
+
+	Lesson lesson = getLessonService().getLesson(lessonId);
+	Long firstActivityId = lesson.getLearningDesign().getFirstActivity().getActivityId();
+	//Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity
+	Activity firstActivity = getMonitoringService().getActivityById(firstActivityId);
+
+	return verifyNextActivityFitsTbl(firstActivity, "Grouping");
+    }
+
+    /**
+     * Traverses the learning design verifying it follows typical TBL structure
+     *
+     * @param activity
+     * @param anticipatedActivity
+     *            could be either "Grouping", "MCQ or Assessment", "Leaderselection" or "Scratchie"
+     */
+    private boolean verifyNextActivityFitsTbl(Activity activity, String anticipatedActivity) {
+
+	Transition transitionFromActivity = activity.getTransitionFrom();
+	//TBL can finish with the Scratchie
+	if (transitionFromActivity == null && !"Scratchie".equals(anticipatedActivity)) {
+	    return false;
+	}
+	// query activity from DB as transition holds only proxied activity object
+	Long nextActivityId = transitionFromActivity == null ? null
+		: transitionFromActivity.getToActivity().getActivityId();
+	Activity nextActivity = nextActivityId == null ? null : monitoringService.getActivityById(nextActivityId);
+
+	switch (anticipatedActivity) {
+	    case "Grouping":
+		//the first activity should be a grouping
+		if (activity instanceof GroupingActivity) {
+		    return verifyNextActivityFitsTbl(nextActivity, "MCQ or Assessment");
+
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "Grouping");
+		}
+
+	    case "MCQ or Assessment":
+		//the second activity shall be a MCQ or Assessment
+		if (activity.isToolActivity() && (CentralConstants.TOOL_SIGNATURE_ASSESSMENT
+			.equals(((ToolActivity) activity).getTool().getToolSignature())
+			|| CentralConstants.TOOL_SIGNATURE_MCQ
+				.equals(((ToolActivity) activity).getTool().getToolSignature()))) {
+		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection");
+
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "MCQ or Assessment");
+		}
+
+	    case "Leaderselection":
+		//the third activity shall be a Leader Selection
+		if (activity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_LEADERSELECTION
+			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
+		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie");
+
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection");
+		}
+
+	    case "Scratchie":
+		//the fourth activity shall be Scratchie
+		if (activity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_SCRATCHIE
+			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
+		    return true;
+
+		} else if (nextActivity == null) {
+		    return false;
+
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie");
+		}
+
+	    default:
+		return false;
+	}
     }
 
     /**
@@ -993,7 +1082,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId, null));
 	responseJSON.put("lessonStateID", lesson.getLessonStateId());
 
-	responseJSON.put("lessonName", StringEscapeUtils.escapeHtml(lesson.getLessonName()));
+	responseJSON.put("lessonName", HtmlUtils.htmlEscape(lesson.getLessonName()));
 	responseJSON.put("lessonDescription", lesson.getLessonDescription());
 
 	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate()
@@ -1001,21 +1090,22 @@ public class MonitoringAction extends LamsDispatchAction {
 	Date finishDate = lesson.getScheduleEndDate();
 	DateFormat indfm = null;
 
-	if ( startOrScheduleDate != null || finishDate != null )
+	if (startOrScheduleDate != null || finishDate != null) {
 	    indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
-	
+	}
+
 	if (startOrScheduleDate != null) {
 	    Date tzStartDate = DateUtil.convertToTimeZoneFromDefault(user.getTimeZone(), startOrScheduleDate);
 	    responseJSON.put("startDate",
 		    indfm.format(tzStartDate) + " " + user.getTimeZone().getDisplayName(userLocale));
 	}
 
-	if ( finishDate != null ) {
+	if (finishDate != null) {
 	    Date tzFinishDate = DateUtil.convertToTimeZoneFromDefault(user.getTimeZone(), finishDate);
 	    responseJSON.put("finishDate",
-		    indfm.format(tzFinishDate) + " " + user.getTimeZone().getDisplayName(userLocale));	    
+		    indfm.format(tzFinishDate) + " " + user.getTimeZone().getDisplayName(userLocale));
 	}
-	
+
 	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, false);
 	if (contributeActivities != null) {
 	    responseJSON.set("contributeActivities", JsonUtil.readArray(contributeActivities));
@@ -1395,18 +1485,13 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
-    /**
-     * Get AuditService bean.
-     *
-     * @return
-     */
-    private IAuditService getAuditService() {
-	if (MonitoringAction.auditService == null) {
+    private ILogEventService getLogEventService() {
+	if (MonitoringAction.logEventService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    MonitoringAction.auditService = (IAuditService) ctx.getBean("auditService");
+	    MonitoringAction.logEventService = (ILogEventService) ctx.getBean("logEventService");
 	}
-	return MonitoringAction.auditService;
+	return MonitoringAction.logEventService;
     }
 
     private ILessonService getLessonService() {
@@ -1514,7 +1599,7 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /**
-     * Set whether or not the activity scores / gradebook values are shown to the learner at the end of the lesson. 
+     * Set whether or not the activity scores / gradebook values are shown to the learner at the end of the lesson.
      * Expects parameters lessonID and presenceAvailable.
      */
     public ActionForward gradebookOnComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,

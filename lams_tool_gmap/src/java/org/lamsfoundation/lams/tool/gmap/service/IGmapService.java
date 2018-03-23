@@ -186,4 +186,10 @@ public interface IGmapService {
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);
 
+    /** Get the list of users for a session for the monitoring tablesorter */
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
+	    String searchString, boolean getNotebookEntries);
+    
+    /** Get the number of users in a session for the tablesorter */
+    int getCountUsersBySession(Long sessionId, String searchString);
 }

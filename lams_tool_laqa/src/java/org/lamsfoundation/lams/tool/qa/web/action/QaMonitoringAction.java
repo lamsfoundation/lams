@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -58,6 +57,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -86,8 +86,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	 * write out the audit log entry. If you move this after the update of the response, then make sure you update
 	 * the audit call to use a copy of the original answer
 	 */
-	qaService.getAuditService().logChange(QaAppConstants.MY_SIGNATURE, qaUsrResp.getQaQueUser().getQueUsrId(),
-		qaUsrResp.getQaQueUser().getUsername(), qaUsrResp.getAnswer(), updatedResponse);
+	Long toolContentId = null;
+	if (qaUsrResp.getQaQuestion() != null && qaUsrResp.getQaQuestion().getQaContent() != null) {
+	    toolContentId = qaUsrResp.getQaQuestion().getQaContent().getQaContentId();
+	}
+	qaService.getLogEventService().logChangeLearnerContent(qaUsrResp.getQaQueUser().getQueUsrId(),
+		qaUsrResp.getQaQueUser().getUsername(), toolContentId, qaUsrResp.getAnswer(), updatedResponse);
 
 	qaUsrResp.setAnswer(updatedResponse);
 	qaService.updateUserResponse(qaUsrResp);
@@ -209,9 +213,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	for (Object[] userAndReflection : users) {
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
-	    responseRow.put("username", StringEscapeUtils.escapeHtml((String) userAndReflection[1]));
+	    responseRow.put("username", HtmlUtils.htmlEscape((String) userAndReflection[1]));
 	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
-		String reflection = StringEscapeUtils.escapeHtml((String) userAndReflection[2]);
+		String reflection = HtmlUtils.htmlEscape((String) userAndReflection[2]);
 		responseRow.put(QaAppConstants.NOTEBOOK, reflection.replaceAll("\n", "<br>"));
 	    }
 	    rows.add(responseRow);
@@ -225,47 +229,49 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     /**
      * Start to download the page that has an HTML version of the answers. Calls answersDownload
      * which forwards to the jsp to download the file.
-     * @throws ServletException 
+     * 
+     * @throws ServletException
      */
     public ActionForward getPrintAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException  {
+	    HttpServletResponse response) throws ServletException {
 
 	IQaService qaService = getQAService();
 	Long allUserIdValue = -1L;
-	
+
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	QaSession qaSession = qaService.getSessionById(toolSessionID);
 	QaContent qaContent = qaSession.getQaContent();
-	
+
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	QaQueContent question = null;
-	for ( QaQueContent check : qaContent.getQaQueContents() ) {
-	    if ( check.getUid().equals(questionUid) ) {
+	for (QaQueContent check : qaContent.getQaQueContents()) {
+	    if (check.getUid().equals(questionUid)) {
 		question = check;
 		break;
 	    }
 	}
-	
-	if ( question == null ) {
-	    log.error("Cannot display printable answers as we cannot find question details for toolSessionId "+toolSessionID+" questionUid "+questionUid);
+
+	if (question == null) {
+	    log.error("Cannot display printable answers as we cannot find question details for toolSessionId "
+		    + toolSessionID + " questionUid " + questionUid);
 	    throw new ServletException("Question details missing.");
 	}
-	
+
 	QaQuestionDTO questionDTO = new QaQuestionDTO(question);
 	request.setAttribute(QaAppConstants.QUESTION_DTO, questionDTO);
-	
-	List<QaUsrResp> responses = qaService.getResponsesForTablesorter(qaContent.getQaContentId(), 
-		toolSessionID, questionUid, allUserIdValue, qaContent.isUseSelectLeaderToolOuput(), 
-		1, 0, QaAppConstants.SORT_BY_USERNAME_ASC, null); 
+
+	List<QaUsrResp> responses = qaService.getResponsesForTablesorter(qaContent.getQaContentId(), toolSessionID,
+		questionUid, allUserIdValue, qaContent.isUseSelectLeaderToolOuput(), 1, 0,
+		QaAppConstants.SORT_BY_USERNAME_ASC, null);
 	request.setAttribute(QaAppConstants.RESPONSES, responses);
-	request.setAttribute(QaAppConstants.ATTR_CONTENT, qaContent);	
-	
+	request.setAttribute(QaAppConstants.ATTR_CONTENT, qaContent);
+
 	boolean isAllowRateAnswers = qaContent.isAllowRateAnswers();
 	boolean isCommentsEnabled = false;
-	if ( isAllowRateAnswers ) {
+	if (isAllowRateAnswers) {
 	    Set<LearnerItemRatingCriteria> criterias = qaContent.getRatingCriterias();
-	    for ( LearnerItemRatingCriteria criteria : criterias ) {
-		if ( criteria.isCommentRating() ) {
+	    for (LearnerItemRatingCriteria criteria : criterias) {
+		if (criteria.isCommentRating()) {
 		    isCommentsEnabled = true;
 		    break;
 		}
@@ -283,13 +289,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    for (QaUsrResp usrResponse : responses) {
 		itemIds.add(usrResponse.getResponseId());
 	    }
-	    List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(), toolSessionID, itemIds,
-		    true, allUserIdValue);
-	    if ( itemRatingDtos.size() > 0 ) {
-		criteriaMap = new HashMap<Long,Collection>();
+	    List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(),
+		    toolSessionID, itemIds, true, allUserIdValue);
+	    if (itemRatingDtos.size() > 0) {
+		criteriaMap = new HashMap<Long, Collection>();
 		commentMap = new HashMap<Long, List<RatingCommentDTO>>();
-		for ( ItemRatingDTO itemRatingDto: itemRatingDtos) {
-		    criteriaMap.put(itemRatingDto.getItemId(),  itemRatingDto.getCriteriaDtos());
+		for (ItemRatingDTO itemRatingDto : itemRatingDtos) {
+		    criteriaMap.put(itemRatingDto.getItemId(), itemRatingDto.getCriteriaDtos());
 		    commentMap.put(itemRatingDto.getItemId(), itemRatingDto.getCommentDtos());
 		}
 	    }
@@ -297,7 +303,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	request.setAttribute("criteriaMap", criteriaMap);
 	request.setAttribute("commentMap", commentMap);
 	request.setAttribute(QaAppConstants.ATTR_CONTENT, qaContent);
-	
+
 	return (mapping.findForward("PrintAnswers"));
     }
 

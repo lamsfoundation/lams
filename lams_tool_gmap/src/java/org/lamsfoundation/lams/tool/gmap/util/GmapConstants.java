@@ -45,6 +45,16 @@ public interface GmapConstants {
     public static final String ATTR_USER_DTO = "gmapUserDTO";
     public static final String ATTR_USER = "gmapUser";
 
+    public static final String ATTR_USER_ID = "userId";
+    public static final String ATTR_PORTRAIT_ID = "portraitId";
+    public static final String ATTR_USER_FULLNAME = "fullName";
+    public static final String ATTR_NUM_MARKERS = "numMarkers";
+    public static final String ATTR_USER_REFLECTION = "reflection";
+    
+    public static final int SORT_BY_NO = 1;
+    public static final int SORT_BY_USERNAME_ASC = 2;
+    public static final int SORT_BY_USERNAME_DESC = 3;
+
     // Parameter names
     public static final String PARAM_PARENT_PAGE = "parentPage";
 

@@ -23,10 +23,12 @@
 
 package org.lamsfoundation.lams.learning.kumalive.service;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
+import org.lamsfoundation.lams.learning.kumalive.model.KumalivePoll;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
 import org.lamsfoundation.lams.util.ExcelCell;
 
@@ -58,4 +60,16 @@ public interface IKumaliveService {
     LinkedHashMap<String, ExcelCell[][]> exportKumalives(List<Long> kumaliveIds);
 
     LinkedHashMap<String, ExcelCell[][]> exportKumalives(Integer organisationId);
+
+    KumalivePoll getPollByKumaliveId(Long kumaliveId);
+
+    KumalivePoll startPoll(Long kumaliveId, String name, ArrayNode answersJSON);
+
+    void finishPoll(Long pollId);
+
+    void saveVote(Long answerId, Integer userId);
+
+    void releasePollResults(Long pollId, boolean votesReleased, boolean votersReleased);
+
+    void log(Long kumaliveId, Integer userId, Date date, short type);
 }

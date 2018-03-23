@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -75,6 +74,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -363,7 +363,7 @@ public class MonitoringAction extends Action {
 	//in case of UseSelectLeaderToolOuput - display only one user
 	if (assessment.isUseSelectLeaderToolOuput()) {
 
-	    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+	    AssessmentSession session = service.getSessionBySessionId(sessionId);
 	    AssessmentUser groupLeader = session.getGroupLeader();
 
 	    if (groupLeader != null) {
@@ -398,7 +398,7 @@ public class MonitoringAction extends Action {
 	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 	    userData.add(userDto.getUserId());
 	    userData.add(sessionId);
-	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " " + userDto.getLastName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFirstName() + " " + userDto.getLastName());
 	    userData.add(fullName);
 	    userData.add(userDto.getGrade());
 	    if (userDto.getPortraitId() != null) {
@@ -452,7 +452,7 @@ public class MonitoringAction extends Action {
 	//in case of UseSelectLeaderToolOuput - display only one user
 	if (assessment.isUseSelectLeaderToolOuput()) {
 
-	    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+	    AssessmentSession session = service.getSessionBySessionId(sessionId);
 	    AssessmentUser groupLeader = session.getGroupLeader();
 
 	    if (groupLeader != null) {
@@ -493,7 +493,7 @@ public class MonitoringAction extends Action {
 	for (AssessmentUserDTO userDto : userDtos) {
 
 	    Long questionResultUid = userDto.getQuestionResultUid();
-	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " " + userDto.getLastName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFirstName() + " " + userDto.getLastName());
 
 	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 	    if (questionResultUid != null) {
@@ -595,14 +595,14 @@ public class MonitoringAction extends Action {
 	    HttpServletResponse response) throws IOException {
 	initAssessmentService();
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
 	String fileName = null;
 	boolean showUserNames = true;
 
 	Long contentId = null;
 	List<SessionDTO> sessionDtos;
-	if (sessionMap != null) {
+	if (sessionMapID != null) {
+	    SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		    .getAttribute(sessionMapID);
 	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
 	    showUserNames = true;

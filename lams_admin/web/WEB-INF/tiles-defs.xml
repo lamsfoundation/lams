@@ -211,6 +211,11 @@
 		<put name="title" value="admin.statistics.title"/>
 		<put name="content" value="statistics.jsp"/>
 	</definition>
+
+	<definition name=".logevent" path="/template.jsp">
+		<put name="title" value="label.event.log"/>
+		<put name="content" value="logevent.jsp"/>
+	</definition>
 	
 	<definition name=".themeManagement" path="/template.jsp">
 		<put name="title" value="admin.themes.title"/>
@@ -244,4 +249,8 @@
 		<put name="content" value="signupmanagement/list.jsp" />
 	</definition>
 	
+	<definition name=".orgPasswordChange" path="/template.jsp">
+		<put name="title" value="admin.org.password.change.title"/>
+		<put name="content" value="orgPasswordChange.jsp" />	
+	</definition>
 </tiles-definitions>

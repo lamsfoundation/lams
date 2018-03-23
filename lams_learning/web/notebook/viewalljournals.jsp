@@ -41,7 +41,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<!-- set user check flag -->
 			<c:if test="${status.first}">
 				<c:set var="userToCheck" value="${entry.user.userId}" />
-				<h4><lams:Portrait userId="${entry.user.userId}"/><c:out value="${entry.user.fullName}" escapeXml="false" /></h4>
+				<h4><lams:Portrait userId="${entry.user.userId}"/><c:out value="${entry.user.fullNameMonitoringStyle}" escapeXml="false" /></h4>
 				<tr>
 					<th scope="col" width="30%" colspan="2"><fmt:message key="mynotes.entry.title.label" /></th>
 					<th scope="col" width="25%" align="center"><fmt:message key="mynotes.entry.create.date.label" /></th>

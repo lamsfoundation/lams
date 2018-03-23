@@ -62,11 +62,25 @@ public class CommentDAO extends LAMSBaseDAO implements ICommentDAO {
 	    + " where cs.parent is null and cs.session.externalId=:externalId and "
 	    + " cs.session.externalIdType=:externalIdType and cs.session.externalSignature=:externalSignature";
 
+    private static final String SQL_QUERY_FIND_ROOT_TOPICS_EXTRA_ID = "from " + Comment.class.getName() + " cs "
+	    + " where cs.parent is null and cs.session.externalId=:externalId and "
+	    + " cs.session.externalSecondaryId=:externalSecondaryId and "
+	    + " cs.session.externalIdType=:externalIdType and cs.session.externalSignature=:externalSignature";
+
     @Override
-    public Comment getRootTopic(Long externalId, Integer externalIdType, String externalSignature) {
+    public Comment getRootTopic(Long externalId, Long externalSecondaryId, Integer externalIdType,
+	    String externalSignature) {
 	@SuppressWarnings("rawtypes")
-	List list = getSession().createQuery(SQL_QUERY_FIND_ROOT_TOPICS).setLong("externalId", externalId)
-		.setInteger("externalIdType", externalIdType).setString("externalSignature", externalSignature).list();
+	List list = null;
+	if (externalSecondaryId == null)
+	    list = getSession().createQuery(SQL_QUERY_FIND_ROOT_TOPICS).setLong("externalId", externalId)
+		    .setInteger("externalIdType", externalIdType).setString("externalSignature", externalSignature)
+		    .list();
+	else
+	    list = getSession().createQuery(SQL_QUERY_FIND_ROOT_TOPICS_EXTRA_ID).setLong("externalId", externalId)
+		    .setLong("externalSecondaryId", externalSecondaryId).setInteger("externalIdType", externalIdType)
+		    .setString("externalSignature", externalSignature).list();
+
 	if (list != null && list.size() > 0) {
 	    return (Comment) list.get(0);
 	}

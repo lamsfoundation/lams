@@ -27,6 +27,11 @@
 				var myUrl = "<c:url value="/reviewItem.do"/>?mode=teacher&itemUid=" + itemUid + "&sessionMapID=${sessionMapID}";
 				launchPopup(myUrl,"MonitoringReview");
 			}
+			
+			function viewComments(itemUid, toolSessionID){
+				var myUrl = "<c:url value='/monitoring/viewComments.do'/>?mode=teacher&itemUid=" + itemUid + "&toolSessionID=" + toolSessionID + "&sessionMapID=${sessionMapID}";
+				launchPopup(myUrl,"MonitoringReview");
+			}
 		</script>		 
 	</lams:head>
 	<body class="stripes" onLoad="init()">

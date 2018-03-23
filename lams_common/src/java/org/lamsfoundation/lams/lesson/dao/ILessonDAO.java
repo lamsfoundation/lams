@@ -142,6 +142,12 @@ public interface ILessonDAO extends IBaseDAO {
     Lesson getLessonForActivity(long activityId);
 
     /**
+     * Get the lesson and activity ids that apply to the tool activity associated with this tool content id. 
+     * Returns an array of two longs.
+     */
+     Object[] getLessonActivityIdsForToolContentId(long toolContentId);
+    
+    /**
      * Gets all non-removed lessons for a user in an org; set userRole parameter to learner if you want lessons where
      * user is in the learner list, or to monitor if in the staff list.
      *

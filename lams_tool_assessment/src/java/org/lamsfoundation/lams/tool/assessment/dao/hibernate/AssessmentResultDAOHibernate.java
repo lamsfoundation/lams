@@ -259,6 +259,23 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	}
 	return (AssessmentResult) list.get(0);
     }
+    
+    @Override
+    public int countAttemptsPerOption(Long optionUid) {
+	String COUNT_ATTEMPTS_BY_OPTION_UID = "SELECT count(*) "
+		+ "FROM tl_laasse10_assessment_result AS result "
+		+ "JOIN tl_laasse10_question_result AS questionResult ON result.uid = questionResult.result_uid "
+		+ "JOIN tl_laasse10_option_answer AS optionAnswer ON questionResult.uid = optionAnswer.question_result_uid AND optionAnswer.answer_boolean=1 AND optionAnswer.question_option_uid = :optionUid "
+		+ "WHERE (result.finish_date IS NOT NULL) AND result.latest=1";
+
+	SQLQuery query = getSession().createSQLQuery(COUNT_ATTEMPTS_BY_OPTION_UID);
+	query.setLong("optionUid", optionUid);
+	List list = query.list();
+	if (list == null || list.size() == 0) {
+	    return 0;
+	}
+	return ((Number) list.get(0)).intValue();
+    }
 
     private List<AssessmentUserDTO> convertResultsToAssessmentUserDTOList(List<Object[]> list) {
 

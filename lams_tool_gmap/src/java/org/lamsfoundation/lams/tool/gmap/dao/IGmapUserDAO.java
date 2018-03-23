@@ -24,8 +24,12 @@
 
 package org.lamsfoundation.lams.tool.gmap.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**
  * DAO for accessing the GmapUser objects - interface defining
@@ -56,4 +60,10 @@ public interface IGmapUserDAO extends IBaseDAO {
      * @return
      */
     GmapUser getByUID(Long uid);
+    
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
+	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService,
+	    IUserManagementService userManagementService);
+    
+    int getCountUsersBySession(final Long sessionUid, String searchString);
 }

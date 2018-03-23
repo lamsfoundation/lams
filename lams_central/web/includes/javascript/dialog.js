@@ -373,7 +373,7 @@ function showNotificationsDialog(orgID, lessonID) {
 		"isCreateInParentWindow" : !isTopLevelWindow,		
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
 		'open' : function() {
-			var dialog = $(this),
+			var dialog = this,
 				lessonID = dialog.data('lessonID');
 			// if lesson ID is given, use lesson view; otherwise use course view
 			if (lessonID) {

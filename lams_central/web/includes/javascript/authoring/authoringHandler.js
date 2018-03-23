@@ -276,10 +276,9 @@ var HandlerLib = {
 		      .off('mousemove');
 		
 		// if the user started adding a branching and did not finish it
-		if (layout.addBranchingStart){			
-			$('.modal-body', layout.infoDialog).empty();
+		if (layout.addBranchingStart){
 			layout.infoDialog.modal('hide');
-				
+			
 			if (layout.addBranchingStart instanceof ActivityDefs.BranchingEdgeActivity) {
 				layout.activities.splice(layout.activities.indexOf(layout.addBranchingStart), 1);
 				layout.addBranchingStart.items.remove();
@@ -320,7 +319,7 @@ HandlerActivityLib = {
 			if (tapLength < HandlerActivityLib.tapTimeout && tapLength > 0) {
 				event.preventDefault();
 				if (activity.readOnly) {
-					alert(LABELS.LIVEEDIT_READONLY_ACTIVITY_ERROR);
+					layout.infoDialog.data('show')(LABELS.LIVEEDIT_READONLY_ACTIVITY_ERROR);
 				} else {
 					ActivityLib.openActivityAuthoring(activity);
 				}
@@ -356,16 +355,16 @@ HandlerActivityLib = {
 					// check if the activity or its parent are read-only
 					if (activity.readOnly) {
 						canRemove = false;
-						alert(LABELS.LIVEEDIT_REMOVE_ACTIVITY_ERROR);
+						layout.infoDialog.data('show')(LABELS.LIVEEDIT_REMOVE_ACTIVITY_ERROR);
 					} else if (activity.branchingActivity){
 						if (activity.branchingActivity.readOnly) {
 							canRemove = false;
-							alert(LABELS.LIVEEDIT_REMOVE_ACTIVITY_ERROR);
+							layout.infoDialog.data('show')(LABELS.LIVEEDIT_REMOVE_ACTIVITY_ERROR);
 						}
 					}
 					else if (activity.parentActivity && activity.parentActivity.readOnly){
 						canRemove = false;
-						alert(LABELS.LIVEEDIT_REMOVE_PARENT_ERROR);
+						layout.infoDialog.data('show')(LABELS.LIVEEDIT_REMOVE_PARENT_ERROR);
 					}
 					
 					if (canRemove) {
@@ -450,13 +449,13 @@ HandlerDecorationLib = {
 					var canRemove = true;
 					if (container.readOnly) {
 						canRemove = false;
-						alert(LABELS.LIVEEDIT_REMOVE_ACTIVITY_ERROR);
+						layout.infoDialog.data('show')(LABELS.LIVEEDIT_REMOVE_ACTIVITY_ERROR);
 					} else if (container.childActivities){
 						// if any of the child activities is read-only, the parent activity can not be removed
 						$.each(container.childActivities, function(){
 							if (this.readOnly) {
 								canRemove = false;
-								alert(LABELS.LIVEEDIT_REMOVE_CHILD_ERROR);
+								layout.infoDialog.data('show')(LABELS.LIVEEDIT_REMOVE_CHILD_ERROR);
 								return false;
 							}
 						});
@@ -672,7 +671,7 @@ HandlerTransitionLib = {
 	 */
 	drawTransitionStartHandler : function(activity, event, x, y) {
 		if (activity.fromTransition && !(activity instanceof ActivityDefs.BranchingEdgeActivity)) {
-			alert(LABELS.TRANSITION_FROM_EXISTS_ERROR);
+			layout.infoDialog.data('show')(LABELS.TRANSITION_FROM_EXISTS_ERROR);
 		}
 		
 		HandlerLib.resetCanvasMode();
@@ -761,7 +760,7 @@ HandlerTransitionLib = {
 		var mouseupHandler = function(event){
 			if (HandlerLib.isElemenentBinned(event)) {
 				if (transition.toActivity.readOnly || transition.fromActivity.readOnly) {
-					alert(LABELS.LIVEEDIT_REMOVE_TRANSITION_ERROR);
+					layout.infoDialog.data('show')(LABELS.LIVEEDIT_REMOVE_TRANSITION_ERROR);
 					// just draw it again in the original place
 					transition.draw();
 				} else {

@@ -34,4 +34,6 @@ public interface ScratchieUserDAO extends DAO {
     ScratchieUser getUserByUserIDAndContentID(Long userId, Long contentId);
 
     List<ScratchieUser> getBySessionID(Long sessionId);
+    
+    int countUsersByContentId(Long contentId);
 }

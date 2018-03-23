@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -110,7 +111,6 @@ import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -148,7 +148,7 @@ public class AssessmentServiceImpl
 
     private ILearnerService learnerService;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
 
     private IUserManagementService userManagementService;
 
@@ -166,7 +166,7 @@ public class AssessmentServiceImpl
     @Override
     public boolean isUserGroupLeader(AssessmentUser user, Long toolSessionId) {
 
-	AssessmentSession session = getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentSession session = getSessionBySessionId(toolSessionId);
 	AssessmentUser groupLeader = session.getGroupLeader();
 
 	return (groupLeader != null) && user.getUserId().equals(groupLeader.getUserId());
@@ -178,7 +178,7 @@ public class AssessmentServiceImpl
 	    return null;
 	}
 
-	AssessmentSession assessmentSession = getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentSession assessmentSession = getSessionBySessionId(toolSessionId);
 	AssessmentUser leader = assessmentSession.getGroupLeader();
 	// check leader select tool for a leader only in case QA tool doesn't know it. As otherwise it will screw
 	// up previous scratches done
@@ -337,13 +337,18 @@ public class AssessmentServiceImpl
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
-	return assessmentUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, 
-		searchString, userManagementService);
+	return assessmentUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString,
+		userManagementService);
     }
 
     @Override
     public int getCountUsersBySession(Long sessionId, String searchString) {
 	return assessmentUserDao.getCountUsersBySession(sessionId, searchString);
+    }
+
+    @Override
+    public int getCountUsersByContentId(Long contentId) {
+	return assessmentUserDao.getCountUsersByContentId(contentId);
     }
 
     @Override
@@ -355,13 +360,13 @@ public class AssessmentServiceImpl
 
     @Override
     public Long getPortraitId(Long userId) {
-	if ( userId != null ) {
+	if (userId != null) {
 	    User user = (User) userManagementService.findById(User.class, userId.intValue());
 	    return user != null ? user.getPortraitUuid() : null;
 	}
 	return null;
     }
-    
+
     @Override
     public Assessment getAssessmentByContentId(Long contentId) {
 	Assessment rs = assessmentDao.getByContentId(contentId);
@@ -398,8 +403,13 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public AssessmentUser getUserByIDAndContent(Long userId, Long contentId) {
-	return assessmentUserDao.getUserByUserIDAndContentID(userId, contentId);
+    public AssessmentUser getUserCreatedAssessment(Long userId, Long contentId) {
+	return assessmentUserDao.getUserCreatedAssessment(userId, contentId);
+    }
+
+    @Override
+    public AssessmentUser getUserByIdAndContent(Long userId, Long contentId) {
+	return assessmentUserDao.getUserByIdAndContent(userId, contentId);
     }
 
     @Override
@@ -412,9 +422,9 @@ public class AssessmentServiceImpl
 	//update questions' hashes in case questions' titles or descriptions got changed
 	for (AssessmentQuestion question : (Set<AssessmentQuestion>) assessment.getQuestions()) {
 	    String newHash = question.getQuestion() == null ? null : HashUtil.sha1(question.getQuestion());
-		question.setQuestionHash(newHash);
-	    }
-	
+	    question.setQuestionHash(newHash);
+	}
+
 	//store object in DB
 	assessmentDao.saveObject(assessment);
     }
@@ -444,8 +454,13 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public AssessmentSession getAssessmentSessionBySessionId(Long sessionId) {
+    public AssessmentSession getSessionBySessionId(Long sessionId) {
 	return assessmentSessionDao.getSessionBySessionId(sessionId);
+    }
+
+    @Override
+    public List<AssessmentSession> getSessionsByContentId(Long toolContentId) {
+	return assessmentSessionDao.getByContentId(toolContentId);
     }
 
     @Override
@@ -700,7 +715,7 @@ public class AssessmentServiceImpl
 	} else if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
 	    //clear previous answer
 	    questionResult.setSubmittedOptionUid(null);
-	    
+
 	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 
 		//prepare regex which takes into account only * special character
@@ -908,10 +923,24 @@ public class AssessmentServiceImpl
     }
 
     @Override
+    public int countAttemptsPerOption(Long optionUid) {
+	return assessmentResultDao.countAttemptsPerOption(optionUid);
+    }
+
+    @Override
     public AssessmentResult getLastFinishedAssessmentResultNotFromChache(Long assessmentUid, Long userId) {
-	AssessmentResult result = getLastFinishedAssessmentResult(assessmentUid, userId);
-	assessmentQuestionDao.evict(result);
-	return getLastFinishedAssessmentResult(assessmentUid, userId);
+	AssessmentResult finishedResult = getLastFinishedAssessmentResult(assessmentUid, userId);
+
+	//in case user played tricks with accessing Assessment using two tabs, finishedResult can be null and thus we need to request the last *not finished* result
+	if (finishedResult == null) {
+	    AssessmentResult notFinishedResult = getLastAssessmentResult(assessmentUid, userId);
+	    assessmentQuestionDao.evict(notFinishedResult);
+	    return getLastAssessmentResult(assessmentUid, userId);
+
+	} else {
+	    assessmentQuestionDao.evict(finishedResult);
+	    return getLastFinishedAssessmentResult(assessmentUid, userId);
+	}
     }
 
     @Override
@@ -1088,7 +1117,7 @@ public class AssessmentServiceImpl
 		    }
 		}
 	    }
-	    
+
 	    resultDto.setQuestionResults(questionResultsToDisplay);
 
 	    //escaping
@@ -1290,7 +1319,7 @@ public class AssessmentServiceImpl
 		    // in case of UseSelectLeaderToolOuput - display only one user
 		    if (assessment.isUseSelectLeaderToolOuput()) {
 
-			AssessmentSession session = getAssessmentSessionBySessionId(sessionId);
+			AssessmentSession session = getSessionBySessionId(sessionId);
 			AssessmentUser groupLeader = session.getGroupLeader();
 
 			if (groupLeader != null) {
@@ -1719,7 +1748,7 @@ public class AssessmentServiceImpl
 		sessionTitle[0] = new ExcelCell(sessionDTO.getSessionName(), true);
 		userSummaryTab.add(sessionTitle);
 
-		AssessmentSession assessmentSession = getAssessmentSessionBySessionId(sessionDTO.getSessionId());
+		AssessmentSession assessmentSession = getSessionBySessionId(sessionDTO.getSessionId());
 
 		Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
 
@@ -2001,11 +2030,11 @@ public class AssessmentServiceImpl
 	    result.setGrade(totalMark);
 	    assessmentResultDao.saveObject(result);
 
-	    // propagade changes to Gradebook
+	    // propagate changes to Gradebook
 	    gradebookService.updateActivityMark(new Double(totalMark), null, userId.intValue(), toolSessionId, false);
 
 	    // records mark change with audit service
-	    auditService.logMarkChange(AssessmentConstants.TOOL_SIGNATURE, userId, user.getLoginName(), "" + oldMark,
+	    logEventService.logMarkChange(userId, user.getLoginName(), assessment.getContentId(), "" + oldMark,
 		    "" + totalMark);
 	}
 
@@ -2424,8 +2453,8 @@ public class AssessmentServiceImpl
     // set methods for Spring Bean
     // *****************************************************************************
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public void setLearnerService(ILearnerService learnerService) {
@@ -2513,7 +2542,7 @@ public class AssessmentServiceImpl
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
-	    AssessmentUser user = assessmentUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()),
+	    AssessmentUser user = assessmentUserDao.getUserCreatedAssessment(new Long(newUserUid.longValue()),
 		    toolContentId);
 	    if (user == null) {
 		user = new AssessmentUser();
@@ -2624,7 +2653,7 @@ public class AssessmentServiceImpl
 		}
 
 		// propagade changes to Gradebook
-		gradebookService.updateActivityMark(null, null, userId, session.getSessionId(), false);
+		gradebookService.removeActivityMark(userId, session.getSessionId());
 
 		assessmentUserDao.removeObject(AssessmentUser.class, user.getUid());
 	    }
@@ -2703,9 +2732,9 @@ public class AssessmentServiceImpl
 	if (toolSessionId == null) {
 	    return confidenceLevelDtos;
 	}
-	
+
 	Assessment assessment = getAssessmentBySessionId(toolSessionId);
-	//in case Assessment is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor  
+	//in case Assessment is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor
 	List<Object[]> assessmentResultsAndPortraits = assessment.isUseSelectLeaderToolOuput()
 		? assessmentResultDao.getLeadersLastFinishedAssessmentResults(assessment.getContentId())
 		: assessmentResultDao.getLastFinishedAssessmentResultsBySession(toolSessionId);
@@ -2715,18 +2744,19 @@ public class AssessmentServiceImpl
 	    Long portraitUuid = assessmentResultsAndPortraitIter[1] == null ? null
 		    : ((Number) assessmentResultsAndPortraitIter[1]).longValue();
 	    Long userId = assessmentResult.getUser().getUserId();
-	    
-	    //fill in question's and user answer's hashes 
+
+	    //fill in question's and user answer's hashes
 	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
 		AssessmentQuestion question = questionResult.getAssessmentQuestion();
-		
+
 		List<String> answers = new LinkedList<String>();
-		
+
 		if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
-		    
+
 		    for (AssessmentQuestionOption option : question.getOptions()) {
 			for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
-			    if (optionAnswer.getAnswerBoolean() && (optionAnswer.getOptionUid().equals(option.getUid()))) {
+			    if (optionAnswer.getAnswerBoolean()
+				    && (optionAnswer.getOptionUid().equals(option.getUid()))) {
 				answers.add(option.getOptionString());
 			    }
 			}
@@ -2744,16 +2774,16 @@ public class AssessmentServiceImpl
 		    if (questionResult.getAnswerString() != null) {
 			answers.add("" + questionResult.getAnswerBoolean());
 		    }
-		    
+
 		} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ESSAY) {
 		    answers.add(questionResult.getAnswerString());
 
 		} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 
 		} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
-		    
+
 		}
-		
+
 		for (String answer : answers) {
 		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 		    confidenceLevelDto.setUserId(userId.intValue());
@@ -2761,11 +2791,11 @@ public class AssessmentServiceImpl
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
 		    confidenceLevelDto.setQuestion(question.getQuestion());
 		    confidenceLevelDto.setAnswer(answer);
-		    
+
 		    confidenceLevelDtos.add(confidenceLevelDto);
 		}
 	    }
-	    
+
 	}
 
 	return confidenceLevelDtos;
@@ -2775,7 +2805,7 @@ public class AssessmentServiceImpl
     public void forceCompleteUser(Long toolSessionId, User user) {
 	Long userId = user.getUserId().longValue();
 
-	AssessmentSession session = getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentSession session = getSessionBySessionId(toolSessionId);
 	if ((session == null) || (session.getAssessment() == null)) {
 	    return;
 	}
@@ -2963,7 +2993,7 @@ public class AssessmentServiceImpl
 		    "Assessment Tool does not support Overall Feedback for REST Authoring. " + toolContentJSON);
 	}
 
-	AssessmentUser assessmentUser = getUserByIDAndContent(userID.longValue(), toolContentID);
+	AssessmentUser assessmentUser = getUserCreatedAssessment(userID.longValue(), toolContentID);
 	if (assessmentUser == null) {
 	    assessmentUser = new AssessmentUser();
 	    assessmentUser.setFirstName(toolContentJSON.get("firstName").asText());

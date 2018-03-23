@@ -42,6 +42,8 @@ import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -53,6 +55,8 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -77,6 +81,7 @@ public class GradebookAction extends LamsDispatchAction {
     private static IUserManagementService userService;
     private static ILessonService lessonService;
     private static ISecurityService securityService;
+    private static ICoreLearnerService learnerService;
 
     @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -155,6 +160,7 @@ public class GradebookAction extends LamsDispatchAction {
 	return null;
     }
 
+    @SuppressWarnings("unchecked")
     public ActionForward getLessonCompleteGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	// Getting the params passed in from the jqGrid
@@ -174,7 +180,14 @@ public class GradebookAction extends LamsDispatchAction {
 	ArrayNode rowsJSON = JsonNodeFactory.instance.arrayNode();
 	for (GradebookGridRowDTO gradebookActivityDTO : gradebookActivityDTOs) {
 	    ObjectNode rowJSON = JsonNodeFactory.instance.objectNode();
-	    rowJSON.put(GradebookConstants.ELEMENT_ID, gradebookActivityDTO.getId());
+	    String id = gradebookActivityDTO.getId();
+	    String[] idParts = id.split("_");
+	    if (idParts.length > 1) {
+		// if activity is grouped, use just the real activity ID and leave out group ID
+		// as we know there will be no ID clash in this single learner gradebook table
+		id = idParts[0];
+	    }
+	    rowJSON.put(GradebookConstants.ELEMENT_ID, id);
 
 	    ArrayNode cellJSON = JsonNodeFactory.instance.arrayNode();
 	    cellJSON.add(gradebookActivityDTO.getRowName());
@@ -188,6 +201,25 @@ public class GradebookAction extends LamsDispatchAction {
 	    rowsJSON.add(rowJSON);
 	}
 	resultJSON.set(GradebookConstants.ELEMENT_ROWS, rowsJSON);
+
+	// make a mapping of activity ID -> URL, same as in progress bar
+	ObjectNode activityURLJSON = JsonNodeFactory.instance.objectNode();
+	Object[] ret = getLearnerService().getStructuredActivityURLs(userId, lessonId);
+	for (ActivityURL activity : (List<ActivityURL>) ret[0]) {
+	    String url = activity.getUrl();
+	    if (url != null) {
+		if (url.startsWith("learner.do")) {
+		    url = "learning/" + url;
+		}
+		String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
+		if (!url.startsWith(serverUrl)) {
+		    // monitor mode URLs should be prepended with server URL
+		    url = serverUrl + url;
+		}
+		activityURLJSON.put(activity.getActivityId().toString(), activity.getUrl());
+	    }
+	}
+	resultJSON.set("urls", activityURLJSON);
 
 	boolean isWeighted = getGradebookService().isWeightedMarks(lessonId);
 	GradebookUserLesson gradebookUserLesson = getGradebookService().getGradebookUserLesson(lessonId, userId);
@@ -623,5 +655,14 @@ public class GradebookAction extends LamsDispatchAction {
 	}
 
 	return GradebookAction.securityService;
+    }
+
+    private ICoreLearnerService getLearnerService() {
+	if (GradebookAction.learnerService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    GradebookAction.learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
+	}
+	return GradebookAction.learnerService;
     }
 }

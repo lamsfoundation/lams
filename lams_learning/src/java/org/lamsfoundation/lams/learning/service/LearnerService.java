@@ -91,6 +91,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * This class is a facade over the Learning middle tier.
@@ -118,6 +119,7 @@ public class LearnerService implements ICoreLearnerService {
     private static HashMap<Integer, Long> syncMap = new HashMap<Integer, Long>();
     private IGradebookService gradebookService;
     private ILogEventService logEventService;
+    private MessageService messageService;
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
@@ -216,6 +218,10 @@ public class LearnerService implements ICoreLearnerService {
 
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
+    }
+
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
     }
 
     // ---------------------------------------------------------------------
@@ -646,8 +652,10 @@ public class LearnerService implements ICoreLearnerService {
 	}
 	// }
 	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_FINISH, learnerId,
-		activity.getLearningDesign().getLearningDesignId(), progress.getLesson().getLessonId(),
-		activity.getActivityId());
+		learnerId, progress.getLesson().getLessonId(),
+		activity.getActivityId(), 
+		messageService.getMessage(ProgressEngine.AUDIT_ACTIVITY_STOP_KEY, new Object[] { progress.getUser().getLogin(),
+			progress.getUser().getUserId(), activity.getTitle(), activity.getActivityId() }));
     }
 
     @Override
@@ -714,7 +722,7 @@ public class LearnerService implements ICoreLearnerService {
      * {@inheritDoc}
      */
     @Override
-    public boolean learnerChooseGroup(Long lessonId, Long groupingActivityId, Long groupId, Integer learnerId)
+    public void learnerChooseGroup(Long lessonId, Long groupingActivityId, Long groupId, Integer learnerId)
 	    throws LearnerServiceException {
 	GroupingActivity groupingActivity = (GroupingActivity) activityDAO.getActivityByActivityId(groupingActivityId,
 		GroupingActivity.class);
@@ -725,7 +733,7 @@ public class LearnerService implements ICoreLearnerService {
 
 		User learner = (User) userManagementService.findById(User.class, learnerId);
 		if (grouping.doesLearnerExist(learner)) {
-		    return true;
+		    return;
 		}
 		if (learner != null) {
 		    Integer maxNumberOfLearnersPerGroup = null;
@@ -747,21 +755,19 @@ public class LearnerService implements ICoreLearnerService {
 			for (Group group : groups) {
 			    if (group.getGroupId().equals(groupId)) {
 				if (group.getUsers().size() >= maxNumberOfLearnersPerGroup) {
-				    return false;
+				    return;
 				}
 			    }
 			}
 		    }
 
 		    lessonService.performGrouping(grouping, groupId, learner);
-		    return true;
 		}
 	    }
 	}
-	return false;
     }
-
-    private boolean forceGrouping(Lesson lesson, Grouping grouping, Group group, User learner) {
+    
+     private boolean forceGrouping(Lesson lesson, Grouping grouping, Group group, User learner) {
 	boolean groupingDone = false;
 	if (lesson.isPreviewLesson()) {
 	    ArrayList<User> learnerList = new ArrayList<User>();
@@ -890,8 +896,8 @@ public class LearnerService implements ICoreLearnerService {
     public Lesson getLessonByActivity(Activity activity) {
 	Lesson lesson = lessonDAO.getLessonForActivity(activity.getActivityId());
 	if (lesson == null) {
-	    LearnerService.log
-		    .warn("Tried to get lesson id for a non-lesson based activity. An error is likely to be thrown soon. Activity was "
+	    LearnerService.log.warn(
+		    "Tried to get lesson id for a non-lesson based activity. An error is likely to be thrown soon. Activity was "
 			    + activity);
 	}
 	return lesson;
@@ -1031,8 +1037,8 @@ public class LearnerService implements ICoreLearnerService {
 		    SequenceActivity.class);
 	} else {
 	    if (LearnerService.log.isDebugEnabled()) {
-		LearnerService.log
-			.debug("No branches match and no default branch exists. Uable to allocate learner to a branch for the branching activity"
+		LearnerService.log.debug(
+			"No branches match and no default branch exists. Uable to allocate learner to a branch for the branching activity"
 				+ branchingActivity.getActivityId() + ":" + branchingActivity.getTitle()
 				+ " for learner " + learner.getUserId() + ":" + learner.getLogin());
 	    }
@@ -1241,11 +1247,11 @@ public class LearnerService implements ICoreLearnerService {
      * {@inheritDoc}
      */
     @Override
-    public Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Grouping grouping) {
-	Lesson lesson = getLesson(lessonId);
+    public Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Long groupingId) {
+	LearnerChoiceGrouping grouping = (LearnerChoiceGrouping) getGrouping(groupingId);
 	LearnerChoiceGrouping learnerChoiceGrouping = (LearnerChoiceGrouping) grouping;
 	Integer maxNumberOfLearnersPerGroup = null;
-	int learnerCount = lesson.getAllLearners().size();
+	int learnerCount = lessonService.getCountLessonLearners(lessonId, null);
 	int groupCount = grouping.getGroups().size();
 	if (learnerChoiceGrouping.getLearnersPerGroup() == null) {
 	    if (groupCount == 0) {

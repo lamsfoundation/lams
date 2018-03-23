@@ -240,6 +240,15 @@ public interface IGradebookService {
     GradebookUserActivity getGradebookUserActivity(Long activityID, Integer userID);
 
     /**
+     * Gets all available gradebookUserActivity objects for the specified activity
+     *
+     * @param activityID
+     * @param userID
+     * @return
+     */
+    List<GradebookUserActivity> getGradebookUserActivities(Long activityId);
+
+    /**
      * Returns the average mark for a given activity. Activity can be grouped - then supply according groupId to receive
      * AverageMarkForGroupedActivity.
      *
@@ -269,6 +278,11 @@ public interface IGradebookService {
      */
     void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
 	    Boolean markedInGradebook);
+
+    /**
+     * Delete user activity mark and updates aggregates
+     */
+    void removeActivityMark(Integer userID, Long toolSessionID);
 
     /**
      * Get an activity from the db by id
@@ -326,12 +340,8 @@ public interface IGradebookService {
     List<Number> getMarksArray(Long lessonId);
 
     /** Will the marks caculation take into account weighting? */
-    boolean isWeightedMarks(LearningDesign design);
-
-    /** Will the marks caculation take into account weighting? */
     boolean isWeightedMarks(Long lessonId);
 
     /** Get a summary of the weightings */
     List<String[]> getWeights(LearningDesign design);
-
 }

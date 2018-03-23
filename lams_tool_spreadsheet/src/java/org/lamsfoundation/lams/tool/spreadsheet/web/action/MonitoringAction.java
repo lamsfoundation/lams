@@ -32,7 +32,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -61,6 +60,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -170,7 +170,7 @@ public class MonitoringAction extends Action {
 	    SpreadsheetUser user = (SpreadsheetUser) userAndReflection[0];
 	    responseRow.put(SpreadsheetConstants.ATTR_USER_UID, user.getUid());
 	    responseRow.put(SpreadsheetConstants.ATTR_USER_ID, user.getUserId());
-	    responseRow.put(SpreadsheetConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml(user.getFullUsername()));
+	    responseRow.put(SpreadsheetConstants.ATTR_USER_NAME, HtmlUtils.htmlEscape(user.getFullUsername()));
 	    if (user.getUserModifiedSpreadsheet() != null) {
 		responseRow.put("userModifiedSpreadsheet", "true");
 		if (user.getUserModifiedSpreadsheet().getMark() != null) {
@@ -181,7 +181,7 @@ public class MonitoringAction extends Action {
 	    }
 
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
-		responseRow.put("reflection", (String) userAndReflection[1]);
+		responseRow.put("reflection", HtmlUtils.htmlEscape((String) userAndReflection[1]));
 	    }
 
 	    rows.add(responseRow);

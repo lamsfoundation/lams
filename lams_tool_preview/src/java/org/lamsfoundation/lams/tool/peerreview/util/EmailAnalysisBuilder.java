@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.tool.peerreview.util.EmailAnalysisBuilder.LearnerData.SingleCriteriaData;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * Creates the Self and Peer Assessment email, comparing the learner's self assessment against their peers' assessment
@@ -165,7 +166,7 @@ public class EmailAnalysisBuilder {
 	// must not be called until data analysis calculations are done - needs averageOfAverages
 	protected Double getSPAFactor() {
 	    if (spa == null) {
-		spa = averageOfAverages > 0 ? individualCriteriaAverage / averageOfAverages : 0D;
+		spa = (averageOfAverages > 0 && individualCriteriaAverage != null) ? individualCriteriaAverage / averageOfAverages : 0D;
 	    }
 	    return spa;
 	}
@@ -310,12 +311,13 @@ public class EmailAnalysisBuilder {
 		    itemMap.put(rating.getRatingCriteria().getRatingCriteriaId(), sd);
 		}
 	    }
-	    sd.peerRatingIncSelf += rating.getRating();
+	    Float newRating = rating.getRating() != null ? rating.getRating() : 0.0f;
+	    sd.peerRatingIncSelf += newRating;
 	    sd.numRatingsIncSelf++;
 	    if ( rating.getItemId().longValue() == rating.getLearner().getUserId().longValue() ) {
-		sd.selfRating = rating.getRating();
+		sd.selfRating = newRating;
 	    } else {
-		sd.peerRatingExcSelf += rating.getRating();
+		sd.peerRatingExcSelf += newRating;
 		sd.numRatingsExcSelf++;
 	    }
 	}
@@ -364,7 +366,7 @@ public class EmailAnalysisBuilder {
 	    if (criteriaData != null) {
 		String selfRating = roundTo2Places(criteriaData.selfRating);
 		String peerRatingExcSelf = roundTo2Places(criteriaData.peerRatingExcSelf);
-		htmlText.append("<tr><td rowspan=\"2\" style=\"width:25%;").append(evenRow ? zebraEvenRow : zebraOddRow)
+		htmlText.append("<tr><td rowspan=\"3\" style=\"width:25%;").append(evenRow ? zebraEvenRow : zebraOddRow)
 			.append("\"><span style=\"").append(bold).append("\">").append(criteria.getTitle())
 			.append("</span></td><td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
 			.append("\"><span style=\"").append(bold).append("\">").append(selfRatingString)
@@ -391,6 +393,10 @@ public class EmailAnalysisBuilder {
 			    .append("</span></td>");
 		    spaDone = true;
 		}
+		htmlText.append("</tr>\n<tr><td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
+			.append("\"><span style=\"").append(bold).append("\">").append("Self & Peers' Rating")
+			.append("</span></td><td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow).append("\">")
+			.append(roundTo2Places(criteriaData.peerRatingIncSelf)).append("</td>");
 		htmlText.append("</tr>\n");
 		evenRow = !evenRow;
 	    } else {
@@ -419,7 +425,7 @@ public class EmailAnalysisBuilder {
     private void generateCommentEntry(StringBuilder htmlText, StyledCriteriaRatingDTO dto, boolean showCommentTitle) {
 
 	int rowCount = 1;
-	String escapedTitle = StringEscapeUtils.escapeHtml(dto.getRatingCriteria().getTitle());
+	String escapedTitle = HtmlUtils.htmlEscape(dto.getRatingCriteria().getTitle());
 	if (dto.getRatingCriteria().isCommentRating() || dto.getRatingCriteria().isCommentsEnabled()) {
 	    if (dto.getRatingDtos().size() < 1) {
 		htmlText.append("<tr><td style=\"width:25%\"><span style=\"").append(bold).append("\">")
@@ -428,7 +434,7 @@ public class EmailAnalysisBuilder {
 	    } else {
 		for (StyledRatingDTO ratingDto : dto.getRatingDtos()) {
 		    if (ratingDto.getComment() != null) {
-			String escapedComment = StringEscapeUtils.escapeHtml(ratingDto.getComment());
+			String escapedComment = HtmlUtils.htmlEscape(ratingDto.getComment());
 			escapedComment = StringUtils.replace(escapedComment, "&lt;BR&gt;", "<BR>");
 			htmlText.append("<tr>");
 			if (showCommentTitle) {

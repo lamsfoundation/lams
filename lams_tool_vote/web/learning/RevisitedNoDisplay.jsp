@@ -20,7 +20,7 @@
 			<i class="fa fa-xs fa-check text-success"></i>
 		</div>
 		<div class="media-body">
-			<c:out value="${entry}" escapeXml="false" />
+			<c:out value="${entry}" escapeXml="true" />
 		</div>
 	</div>
 </c:forEach>

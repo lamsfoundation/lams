@@ -163,7 +163,7 @@ public class LdapService implements ILdapService {
 		user.setTutorialsDisabled(false);
 		user.setFirstLogin(true);
 		service.saveUser(user);
-		service.auditUserCreated(user, "common");
+		service.logUserCreated(user, (User)null);
 		return true;
 	    } else {
 		log.error("===> Login name from LDAP is empty - user not created.");

@@ -78,6 +78,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  *
@@ -243,7 +244,7 @@ public class LearningAction extends Action {
 
 	// escape characters
 	for (ImageGalleryItem image : images) {
-	    String titleEscaped = StringEscapeUtils.escapeJavaScript(image.getTitle());
+	    String titleEscaped = HtmlUtils.htmlEscape(image.getTitle());
 	    image.setTitleEscaped(titleEscaped);
 	    String descriptionEscaped = StringEscapeUtils.escapeJavaScript(image.getDescription());
 	    image.setDescriptionEscaped(descriptionEscaped);

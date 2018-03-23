@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
+﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null,
 // DIV container for lesson SVG
@@ -935,7 +935,7 @@ function initSequenceTab(){
 	});
 
 	// small info box on Sequence tab, activated when the tab is showed
-	showDialog('sequenceInfoDialog', {
+	var sequenceInfoDialog = showDialog('sequenceInfoDialog', {
 		'autoOpen'   : false,
 		'width'      : 300,
 		'modal'      : false, 
@@ -956,7 +956,8 @@ function initSequenceTab(){
 				'of' : '#sequenceCanvas'
 			}
 		}
-	}, false).click(function(){
+	}, false);
+	$(sequenceInfoDialog).click(function(){
 		$('#sequenceInfoDialog').modal('hide');
 	}).find('.modal-header').remove();
 	
@@ -2306,8 +2307,8 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
  * Formats learner name.
  */
 function getLearnerDisplayName(learner, raw) {
-	return raw ? learner.firstName + ' ' + learner.lastName + ' (' + learner.login + ')'
-			   : escapeHtml(learner.firstName) + ' ' + escapeHtml(learner.lastName) + ' (' + escapeHtml(learner.login) + ')';
+	return raw ? learner.lastName + ', ' + learner.firstName + ' (' + learner.login + ')'
+			   : escapeHtml(learner.lastName) + ', ' + escapeHtml(learner.firstName) + ' (' + escapeHtml(learner.login) + ')';
 }
 
 

@@ -479,7 +479,7 @@ GeneralInitLib = {
     			return;
     		}
     		if (!ldNode.data.canModify) {
-    			alert("You can not modify this");
+    			alert(LABELS.RESOURCE_MODIFY_ERROR);
     			return;
     		}
     		var isFolder = !ldNode.data.learningDesignId,
@@ -974,26 +974,71 @@ GeneralInitLib = {
 		});
 		
 		GeneralLib.updateAccess(initAccess);
-
+		
+		var infoDialogContents = $('#infoDialogContents');
+		$('#infoDialogOKButton', infoDialogContents).click(function(){
+			layout.infoDialog.modal('hide');
+		});
+		
 		layout.infoDialog = showDialog('infoDialog',{
 			'autoOpen'      : false,
 			'modal'			: false,
 			'resizable'     : false,
 			'draggable'     : false,
 			'width'			: 290,
+			'title'			: LABELS.INFO_DIALOG_TITLE,
 			'close' : null,
 			'data' : {
 				'position' : {
-					'my' : 'right top',
-					'at' : 'right+10px top+10px',
+					'my' : 'center top',
+					'at' : 'center top+20px',
 					'of' : '#canvas'
+				},
+				'show' : function(html, temporary){
+					var timeout = layout.infoDialog.data('temporaryTimeout');
+					if (timeout) {
+						clearTimeout(timeout);
+					}
+					
+					var body = $('#infoDialogBody', layout.infoDialog),
+						// is dialog already open?
+						visible = layout.infoDialog.hasClass('in'),
+						// should be initialised/kept in temporary mode?
+						temporaryMode = visible ? body.hasClass('temporary') : temporary;
+					if (visible) {
+						if (temporaryMode) {
+							body.html(html);
+						} else {
+							body.html(body.html() + '<br /><br />' + html);
+						}
+					} else {
+						body.html(html);
+					}
+					
+					if (temporaryMode) {
+						// temporary dialog hides after 5 seconds or on click
+						$('.modal-header, #infoDialogButtons', layout.infoDialog).hide();
+						body.addClass('temporary').one('click', function(){
+							layout.infoDialog.modal('hide');
+						});
+						var timeout = setTimeout(function(){
+							body.off('click');
+							layout.infoDialog.modal('hide');
+						}, 5000);
+						layout.infoDialog.data('temporaryTimeout', timeout);
+					} else {
+						$('.modal-header, #infoDialogButtons', layout.infoDialog).show();
+						body.removeClass('temporary');
+					}
+					
+					if (!visible) {
+						layout.infoDialog.modal('show');
+					}
 				}
 			}
 		});
 		
-		// remove the title along with X button
-		$('.modal-header', layout.infoDialog).remove();
-
+		$('.modal-body', layout.infoDialog).empty().append(infoDialogContents.show());
 		layout.dialogs.push(layout.infoDialog);
 		
 		
@@ -1479,6 +1524,52 @@ GeneralLib = {
 	},
 	
 	/**
+	 * If sequence starts with of Grouping->(MCQ or Assessment)->Leader Selection->Scratchie,
+	 * there is a good chance this is a TBL sequence and all activities must be grouped.
+	 */
+	checkTBLGrouping : function(){
+		var firstGroupingActivity = null;
+		$.each(layout.activities, function(){
+			if (this instanceof ActivityDefs.GroupingActivity && this.transitions 
+					&& this.transitions.to.length === 0 && this.transitions.from.length > 0){
+				firstGroupingActivity = this;
+				return false;
+			}
+		});
+		if (!firstGroupingActivity) {
+			return true;
+		}
+		var secondActivity = firstGroupingActivity.transitions.from.length > 0 ? firstGroupingActivity.transitions.from[0].toActivity : null; 
+		var templateContainer = $('#templateContainerCell');
+		var isTBL = secondActivity instanceof ActivityDefs.ToolActivity
+			&& (secondActivity.learningLibraryID == $('.template[learningLibraryTitle="Assessment"]', templateContainer).attr('learningLibraryId')
+			    || secondActivity.learningLibraryID == $('.template[learningLibraryTitle="MCQ"]', templateContainer).attr('learningLibraryId'));
+		if (!isTBL){
+			return true;
+		}
+		var thirdActivity = secondActivity.transitions.from.length > 0 ? secondActivity.transitions.from[0].toActivity : null;
+		isTBL = thirdActivity instanceof ActivityDefs.ToolActivity 
+				&& thirdActivity.learningLibraryID == $('.template[learningLibraryTitle="Leaderselection"]', templateContainer).attr('learningLibraryId');
+		if (!isTBL){
+			return true;
+		}
+		var fourthActivity = thirdActivity.transitions.from.length > 0 ? thirdActivity.transitions.from[0].toActivity : null;
+		isTBL = fourthActivity instanceof ActivityDefs.ToolActivity 
+				&& fourthActivity.learningLibraryID == $('.template[learningLibraryTitle="Scratchie"]', templateContainer).attr('learningLibraryId');
+		if (!isTBL){
+			return true;
+		}
+		var result = true;
+		$.each(layout.activities, function(){
+			if (this != firstGroupingActivity && this instanceof ActivityDefs.ToolActivity && !this.grouping){
+				result = false;
+				return false;
+			}
+		});
+		return result;
+	},
+	
+	/**
 	 * Escapes HTML tags to prevent XSS injection.
 	 */
 	escapeHtml : function(unsafe) {
@@ -1554,7 +1645,7 @@ GeneralLib = {
 			success : function(response) {
 				if (!response) {
 					if (!isReadOnlyMode) {
-						alert(LABELS.SEQUENCE_LOAD_ERROR);
+						layout.infoDialog.data('show')(LABELS.SEQUENCE_LOAD_ERROR);
 					}
 					return;
 				}
@@ -2087,13 +2178,7 @@ GeneralLib = {
 				GeneralLib.updateAccess(response.access);
 				
 				if (!ld.validDesign && !isReadOnlyMode) {
-					$('.modal-body', layout.infoDialog).html(LABELS.SEQUENCE_NOT_VALID);
-					layout.infoDialog.modal('show');
-					
-					setTimeout(function(){
-						$('.modal-body', layout.infoDialog).empty();
-						layout.infoDialog.modal('hide');
-					}, 5000);
+					layout.infoDialog.data('show')(LABELS.SEQUENCE_NOT_VALID);
 				}
 			}
 		});
@@ -2133,7 +2218,7 @@ GeneralLib = {
 		
 		if (weightsSum != null && weightsSum != 100) {
 			if (displayErrors) {
-				alert(LABELS.WEIGHTS_SUM_ERROR);
+				layout.infoDialog.data('show')(LABELS.WEIGHTS_SUM_ERROR);
 			}
 			return false;
 		}
@@ -2205,7 +2290,7 @@ GeneralLib = {
 									// the branch is shared between two branchings
 									// it should have been detected when adding a transition
 									if (displayErrors) {
-										alert(LABELS.CROSS_BRANCHING_ERROR);
+										layout.infoDialog.data('show')(LABELS.CROSS_BRANCHING_ERROR);
 									}
 									return false;
 								}
@@ -2223,7 +2308,7 @@ GeneralLib = {
 						
 						if (error) {
 							if (displayErrors) {
-								alert(branchingActivity.title + LABELS.END_MATCH_ERROR);
+								layout.infoDialog.data('show')(branchingActivity.title + LABELS.END_MATCH_ERROR);
 							}
 							return false;
 						}
@@ -2480,7 +2565,7 @@ GeneralLib = {
 		
 		if (error) {
 			if (displayErrors) {
-				alert(error);
+				layout.infoDialog.data('show')(error);
 			}
 			return false;
 		}
@@ -2625,7 +2710,7 @@ GeneralLib = {
 				
 				// check if there were any validation errors
 				if (layout.ld.invalid) {
-					var message = LABELS.SEQUENCE_VALIDATION_ISSUES + '\n';
+					var message = LABELS.SEQUENCE_VALIDATION_ISSUES + '<br/>';
 					$.each(response.validation, function() {
 						var uiid = this.UIID,
 							title = '';
@@ -2637,10 +2722,10 @@ GeneralLib = {
 								}
 							});
 						}
-						message += title + this.message + '\n';
+						message += title + this.message + '<br/>';
 					});
 					
-					alert(message);
+					layout.infoDialog.data('show')(message);
 				}
 				
 				// if save (even partially) was successful
@@ -2687,7 +2772,7 @@ GeneralLib = {
 								// create the updated LD image
 								var svgSaveSuccessful = GeneralLib.saveLearningDesignImage();
 								if (!svgSaveSuccessful) {
-									alert(LABELS.SVG_SAVE_ERROR);
+									layout.infoDialog.data('show')(LABELS.SVG_SAVE_ERROR);
 									return;
 								}
 								
@@ -2695,8 +2780,14 @@ GeneralLib = {
 								GeneralLib.setModified(false);
 								
 								// close the Live Edit dialog
-								alert(LABELS.LIVEEDIT_SAVE_SUCCESSFUL);
-								window.parent.closeDialog('dialogAuthoring');
+								if (GeneralLib.checkTBLGrouping()) {
+									layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL, true);
+									setTimeout(function(){
+										window.parent.closeDialog('dialogAuthoring');
+									}, 5000);
+								} else {
+									layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
+								}
 							}
 						});
 						
@@ -2706,11 +2797,15 @@ GeneralLib = {
 					
 					var svgSaveSuccessful = GeneralLib.saveLearningDesignImage();
 					if (!svgSaveSuccessful) {
-						alert(LABELS.SVG_SAVE_ERROR);
+						layout.infoDialog.data('show')(LABELS.SVG_SAVE_ERROR);
 					}
 					
-					if (response.validation.length == 0) {
-						alert(LABELS.SAVE_SUCCESSFUL);
+					if (!layout.ld.invalid) {
+						if (GeneralLib.checkTBLGrouping()) {
+							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL, true);
+						} else {
+							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
+						}
 					}
 					
 					GeneralLib.setModified(false);
@@ -2718,7 +2813,7 @@ GeneralLib = {
 				}
 			},
 			error : function(){
-				alert(LABELS.SEQUENCE_SAVE_ERROR);
+				layout.infoDialog.data('show')(LABELS.SEQUENCE_SAVE_ERROR);
 			}
 		});
 		return result;

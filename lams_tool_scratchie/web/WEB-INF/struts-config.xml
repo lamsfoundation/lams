@@ -299,7 +299,16 @@
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
 			parameter="statistic" >
 			<forward name="success" path="/pages/monitoring/parts/statisticpart.jsp" />
-		</action>			
+		</action>
+		
+		<action path="/tblmonitoring"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.TblMonitorAction"
+			parameter="method" >
+			<forward name="tra" path="/pages/tblmonitoring/tra.jsp" />
+			<forward name="traStudentChoices" path="/pages/tblmonitoring/traStudentChoices.jsp" />
+			<forward name="burningQuestions" path="/pages/tblmonitoring/burningQuestions.jsp" />
+			<forward name="teams" path="/pages/tblmonitoring/teams.jsp" />
+		</action>
 		
 		<!-- ========== Admin Definitions ============================== -->		
 		<action path="/admin/start"
