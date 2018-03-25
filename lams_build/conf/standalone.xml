@@ -142,11 +142,6 @@
                 <pattern-formatter
                     pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t:%x] %-5p %c - %m%n" />
             </formatter>
-            <formatter name="AUDITPATTERN">
-                <pattern-formatter
-                    pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t:%x] %-5p %c - %m%n" />
-            </formatter>
-
             <!-- ABSOLUTE date format -->
             <formatter name="CONSOLEPATTERN">
                 <pattern-formatter pattern="%d{HH:mm:ss,SSS} %-5p [%c{1}] %m%n" />
