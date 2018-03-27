@@ -20,15 +20,6 @@
  */
 package org.lamsfoundation.lams.integration.security;
 
-import io.undertow.Handlers;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.server.session.Session;
-import io.undertow.servlet.ServletExtension;
-import io.undertow.servlet.api.DeploymentInfo;
-import io.undertow.servlet.handlers.ServletRequestContext;
-import io.undertow.servlet.spec.HttpSessionImpl;
-import io.undertow.util.Headers;
-
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.Date;
@@ -56,6 +47,15 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
+
+import io.undertow.Handlers;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.server.session.Session;
+import io.undertow.servlet.ServletExtension;
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.handlers.ServletRequestContext;
+import io.undertow.servlet.spec.HttpSessionImpl;
+import io.undertow.util.Headers;
 
 /**
  * Allows access to LAMS WARs when an user logs in.
@@ -154,7 +154,7 @@ public class SsoHandler implements ServletExtension {
 
 		// prevent session fixation attack
 		// This will become obsolete on Undertow upgrade to version 1.1.10+
-		SessionManager.removeSessionByID(session.getId(), false);
+		SessionManager.removeSessionByID(session.getId(), false, false);
 		request.changeSessionId();
 		session = request.getSession();
 
@@ -224,12 +224,12 @@ public class SsoHandler implements ServletExtension {
      * Forward to the login page with a specific error message. Avoids a redirect. Based on the
      * ServletFormAuthenticationMechanism method. The location should be relative to the current
      * context and start with "/" e.g. /login.jsp
-     * 
+     *
      * @throws IOException
      * @throws ServletException
      */
-    protected Integer serveLoginPage(final HttpServerExchange exchange, final String location) throws ServletException,
-	    IOException {
+    protected Integer serveLoginPage(final HttpServerExchange exchange, final String location)
+	    throws ServletException, IOException {
 
 	ServletRequestContext context = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
 	HttpServletRequest request = (HttpServletRequest) context.getServletRequest();
