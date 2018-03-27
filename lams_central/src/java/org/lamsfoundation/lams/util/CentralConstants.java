@@ -210,4 +210,5 @@ public class CentralConstants {
     public static final String TOOL_SIGNATURE_LEADERSELECTION = "lalead11";
     public static final String TOOL_SIGNATURE_MCQ = "lamc11";
     public static final String TOOL_SIGNATURE_SCRATCHIE = "lascrt11";
+    public static final String TOOL_SIGNATURE_PEER_REVIEW = "laprev11";
 }

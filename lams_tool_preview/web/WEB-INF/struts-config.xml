@@ -227,6 +227,12 @@
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
 			parameter="setUserHidden" >
 		</action>
+		
+		<action path="/tblmonitoring"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.TblMonitoringAction"
+			parameter="method" >
+			<forward name="summary" path="/pages/monitoring/summary.jsp" />
+		</action>
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.ClearSessionAction">

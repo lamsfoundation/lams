@@ -230,6 +230,24 @@ public class TblMonitoringAction extends LamsDispatchAction {
 
 	return mapping.findForward("forum");
     }
+    
+    /**
+     * Shows peerreview page
+     */
+    public ActionForward peerreview(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	
+	long peerreviewActivityId = WebUtil.readLongParam(request, "activityId");
+	ToolActivity peerreviewActivity = (ToolActivity) monitoringService.getActivityById(peerreviewActivityId);
+	
+	int attemptedLearnersNumber = lessonService.getCountLearnersHaveAttemptedActivity(peerreviewActivity);
+	request.setAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
+
+	Set<ToolSession> toolSessions = peerreviewActivity.getToolSessions();
+	request.setAttribute("toolSessions", toolSessions);
+
+	return mapping.findForward("peerreview");
+    }
 
     /**
      * Shows sequence diagram page
@@ -378,6 +396,10 @@ public class TblMonitoringAction extends LamsDispatchAction {
 		} else if (CentralConstants.TOOL_SIGNATURE_FORUM.equals(toolSignature)) {
 		    request.setAttribute("isForumAvailable", true);
 		    request.setAttribute("forumActivityId", toolActivityId);
+		    
+		} else if (CentralConstants.TOOL_SIGNATURE_PEER_REVIEW.equals(toolSignature)) {
+		    request.setAttribute("isPeerreviewAvailable", true);
+		    request.setAttribute("peerreviewToolContentId", toolContentId);
 
 		//tRA is the first scratchie activity
 		} else if (!scratchiePassed && CentralConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
