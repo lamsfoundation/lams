@@ -16,6 +16,7 @@
 	}
 </style>
 
+<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
 <script type="text/javascript">
 	//var for jquery.jRating.js
@@ -64,7 +65,7 @@
 
 <script type="text/javascript">
 	function exportResults() {
-		var exportExcelUrl = 'exportTeamReport.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
+		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
 		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<fmt:message key="label.file.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	}
 </script>
@@ -120,7 +121,7 @@
 		</c:when>
 		<c:otherwise>
 			<c:forEach var="criteria" items="${criterias}">
-				<c:set var='url'>criteria.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&criteriaId=${criteria.ratingCriteriaId}</c:set>
+				<c:set var='url'><c:url value="/monitoring/criteria.do"/>?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&criteriaId=${criteria.ratingCriteriaId}</c:set>
 				<button onclick="javascript:launchPopup('${url}');return false;" class="btn btn-default btn-disable-on-submit voffset5 loffset5">
 					<fmt:message key="label.monitoring.view"><fmt:param><c:out value="${criteria.title}" escapeXml="true"/></fmt:param></fmt:message></button>
 			</c:forEach>
@@ -131,7 +132,7 @@
 	<div id="btns${groupSummary.sessionId}" class="offset5">
 		<c:set var="offset"></c:set>
 		<c:if test="${sessionMap.peerreview.reflectOnActivity}">
-			<c:set var='url'>reflections.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}</c:set>
+			<c:set var='url'><c:url value="/monitoring/reflections.do"/>?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}</c:set>
 			<button onclick="javascript:launchPopup('${url}');return false;" class="btn btn-default  btn-disable-on-submit ${offset}"><fmt:message key="title.reflection"/></button>
 			<c:set var="offset">loffset5</c:set>
 		</c:if>
@@ -170,4 +171,6 @@
 	</c:if>
 </div>
 
-<%@ include file="advanceoptions.jsp"%>
+<c:if test="${!sessionMap.tblMonitoring}">
+	<%@ include file="advanceoptions.jsp"%>
+</c:if>
