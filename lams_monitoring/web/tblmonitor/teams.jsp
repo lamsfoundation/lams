@@ -1,9 +1,16 @@
 <%@ include file="/template/taglibs.jsp"%>
+<style>
+	.font-weight-bold {
+		font-weight: bold;
+	}
+</style>
 
 <!-- ChartJS-->
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chartjs.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 <script>
 	$(document).ready(function(){
+		initializePortraitPopover(LAMS_URL);
 	
 		//Change leader button handler 
 		$('.change-leader-button').click(function () {
@@ -49,7 +56,7 @@
 
 			var userNames = [];
 			$(".belong-to-group-" + groupId).each(function() { 
-				userNames.push($(this).html().trim());
+				userNames.push($(this).html().trim().replace("&nbsp;", " "));
 			 });
 			
 			var canvas = $(this).find('.modal-body canvas');
@@ -205,17 +212,13 @@
 								
 									<tr>
 										<td class="col-md-7">
-											<c:choose>
-												<c:when test="${userDto.groupLeader}">
-													<strong>
-														<span id="user-name-${userDto.userID}" class="belong-to-group-${groupDto.groupID}">${userDto.firstName} ${userDto.lastName}</span>
-													</strong>
-													<abbr title="Leader" class="fa fa-user-plus" style="color:darkorange"></abbr>
-												</c:when>
-												<c:otherwise>
-													<span id="user-name-${userDto.userID}" class="belong-to-group-${groupDto.groupID}">${userDto.firstName} ${userDto.lastName}</span>
-												</c:otherwise>
-											</c:choose>
+											<span id="user-name-${userDto.userID}" class="belong-to-group-${groupDto.groupID} new-popover <c:if test="${userDto.groupLeader}">font-weight-bold</c:if>" 
+													data-portrait="${userDto.portraitUuid}" data-fullname="${userDto.lastName},&nbsp;${userDto.firstName}">
+												${userDto.lastName},&nbsp;${userDto.firstName} 
+											</span>
+											<c:if test="${userDto.groupLeader}">
+												<abbr title="Leader" class="fa fa-user-plus" style="color:darkorange"></abbr>
+											</c:if>
 										</td>
 										
 										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
@@ -392,7 +395,7 @@
 					<small>
 						<fmt:message key="label.current.leader"/>
 						<c:if test="${not empty groupDto.groupLeader}">
-							${groupDto.groupLeader.firstName} ${groupDto.groupLeader.lastName}
+							${groupDto.groupLeader.lastName},&nbsp;${groupDto.groupLeader.firstName} 
 						</c:if>
 					</small>
 				</div>
@@ -400,7 +403,7 @@
 				<div class="panel-body">
 					<select class="select-picker" id="change-leader-select-${groupDto.groupID}">
 						<c:forEach var="userDto" items="${groupDto.userList}">
-							<option value="${userDto.userID}">${userDto.firstName} ${userDto.lastName}</option>
+							<option value="${userDto.userID}">${userDto.lastName},&nbsp;${userDto.firstName}</option>
 						</c:forEach>
 					</select>
 				</div>
