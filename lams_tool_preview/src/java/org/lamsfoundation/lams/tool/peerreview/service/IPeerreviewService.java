@@ -310,11 +310,14 @@ public interface IPeerreviewService extends ToolRatingManager {
      */
     List<Object[]> getPagedUsers(Long toolSessionId, Integer page, Integer size, int sorting, String searchString);
 
+    /** Generate and return the email that would be sent to a learner. Used to preview the email */
+    String generateEmailReportToUser(Long toolContentId, Long sessionId, Long userId);
+    
     /** Send an email with the user's results to each user in the session */
     int emailReportToSessionUsers(Long toolContentId, Long sessionId);
 
-    /** Send an email with the user's results to the specified user in the session */
-    int emailReportToUser(Long toolContentId, Long sessionId, Long userId);
+    /** Send an email (generated previously with generateEmailReportToUser()) to the specified user in the session */
+    int emailReportToUser(Long toolContentId, Long sessionId, Long userId, String emailReportToUser);
 
     /** Spreadsheet */
     LinkedHashMap<String, ExcelCell[][]> exportTeamReportSpreadsheet(Long toolContentId);

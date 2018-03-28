@@ -202,9 +202,14 @@
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
 			parameter="getReflections" >
 		</action>
-		<action path="/monitoring/sendResultsToUser"
+		<action path="/monitoring/previewResultsToUser"
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
-			parameter="sendResultsToUser" >
+			parameter="previewResultsToUser" >
+			<forward name="success" path="/pages/monitoring/emailpreview.jsp" />
+		</action>
+		<action path="/monitoring/sendPreviewedResultsToUser"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
+			parameter="sendPreviewedResultsToUser" >
 		</action>
 		<action path="/monitoring/sendResultsToSessionUsers"
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
