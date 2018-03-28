@@ -165,7 +165,7 @@
 			<c:url value="/monitoring/manageUsers.do"/>?sessionMapID=${sessionMapID}
 		</c:set>
 		<button onClick="javascript:launchPopup('${url}');return false;" class="btn btn-default btn-disable-on-submit pull-right">
-			<i class="fa fa-check-square" aria-hidden="true"></i> 
+			<i class="fa fa-user-circle-o" aria-hidden="true"></i> 
 			<fmt:message key="label.manage.users" />
 		</button>
 	</c:if>
