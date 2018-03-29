@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -35,7 +36,6 @@ import org.lamsfoundation.lams.usermanagement.User;
  *
  */
 public abstract class GateActivity extends SimpleActivity implements Serializable, ISystemToolActivity {
-
     public static final int LEARNER_GATE_LEVEL = 1;
 
     public static final int GROUP_GATE_LEVEL = 2;
@@ -50,6 +50,10 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 
     /** persistent field */
     private Boolean gateOpen;
+
+    private User gateOpenUser;
+
+    private Date gateOpenTime;
 
     /**
      * The learners who passed the gate.
@@ -107,6 +111,21 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 	this.gateOpen = gateOpen;
     }
 
+    public User getGateOpenUser() {
+	return gateOpenUser;
+    }
+
+    public void setGateOpenUser(User gateOpenUser) {
+	this.gateOpenUser = gateOpenUser;
+    }
+
+    public Date getGateOpenTime() {
+	return gateOpenTime;
+    }
+
+    public void setGateOpenTime(Date gateOpenTime) {
+	this.gateOpenTime = gateOpenTime;
+    }
     // ---------------------------------------------------------------------
     // Domain service methods
     // ---------------------------------------------------------------------
