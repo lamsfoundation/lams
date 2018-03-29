@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.learningdesign.strategy;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -71,6 +72,7 @@ public abstract class GateActivityStrategy extends SimpleActivityStrategy {
 	    return true;
 	} else if (isOpenConditionMet(expectedLearnerCount, waitingLearnerCount)) {
 	    gateActivity.setGateOpen(true);
+	    gateActivity.setGateOpenTime(new Date());
 	    if (!gateActivity.getAllowedToPassLearners().isEmpty()) {
 		gateActivity.getAllowedToPassLearners().clear();
 	    }

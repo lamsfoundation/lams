@@ -16,10 +16,18 @@
 						<i class="fa fa-lg fa-sign-in"></i>
 					</div>
 					<div class="media-body">
-						<strong><fmt:message key="label.gate.gate.open"/></strong>
+						<strong><fmt:message key="label.gate.gate.open"/>
+						<c:if test="${not empty GateForm.map.gate.gateOpenTime}">
+							&nbsp;<lams:Date value="${GateForm.map.gate.gateOpenTime}" timeago="true" />
+						</c:if>
+						<c:if test="${not empty GateForm.map.gate.gateOpenUser}">
+							&nbsp;<fmt:message key="label.gate.gate.open.user">
+								<fmt:param value="${GateForm.map.gate.gateOpenUser.firstName} ${GateForm.map.gate.gateOpenUser.lastName}" />
+							</fmt:message>
+						</c:if>
+						</strong>
 					</div>
 				</div>
 	</div>
 
 </c:if>
-

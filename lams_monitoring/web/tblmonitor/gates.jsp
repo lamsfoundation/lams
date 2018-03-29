@@ -22,13 +22,21 @@
 			
 			<div class="panel-body">
 				<c:out value="${permissionGate.title}" escapeXml="false"/>
-			
 				<c:choose>
 					<c:when test="${permissionGate.complete}">
+						<br />
+						<small>
+						<fmt:message key="label.gate.gate.open"/>
+						<c:if test="${not empty permissionGate.openTime}">
+							&nbsp;<lams:Date value="${permissionGate.openTime}" timeago="true" />
+						</c:if>
+						<c:if test="${not empty permissionGate.openUser}">
+							&nbsp;<fmt:message key="label.gate.gate.open.user">
+								<fmt:param value="${permissionGate.openUser}" />
+							</fmt:message>
+						</c:if>
+						</small>
 						<i class="fa fa-check-square"></i>
-						<!-- <br/>
-							<small class="m-r">Opened 2 hours ago</small>
-						 -->
 					</c:when>
 					<c:otherwise>
 						<c:if test="${permissionGate.waitingLearnersCount > 0}">

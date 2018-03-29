@@ -146,16 +146,6 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 		waitingLearnerCount);
     }
 
-    /**
-     * Force the gate to open, irrespective of the strategy. Used for preview. Opens the gate and clears any "waiting"
-     * list.
-     *
-     * @return the gate is open or closed.
-     */
-    public void forceGateOpen() {
-	setGateOpen(true);
-    }
-
     // ---------------------------------------------------------------------
     // Helper methods
     // ---------------------------------------------------------------------
