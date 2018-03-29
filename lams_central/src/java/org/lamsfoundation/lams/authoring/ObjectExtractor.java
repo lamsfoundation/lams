@@ -1233,7 +1233,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	GateActivity gateActivity = (GateActivity) activity;
 	gateActivity.setGateActivityLevelId(
 		(Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID));
-	gateActivity.setGateOpen((Boolean) JsonUtil.opt(activityDetails, AuthoringJsonTags.GATE_OPEN));
 
     }
 
