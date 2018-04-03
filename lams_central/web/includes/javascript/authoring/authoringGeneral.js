@@ -724,7 +724,7 @@ GeneralInitLib = {
 				});
 				// limit size of the canvas so dialog does not resize after SVG loads
 				$('#ldStoreDialogCanvasDiv', dialog).css({
-					'max-width' : $(window).width() - 275 + 'px',
+					'max-width' : $(window).width() - 425 + 'px',
 					'max-height':  $(window).height() - 190 + 'px',
 				});
 				
