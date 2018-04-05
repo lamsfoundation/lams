@@ -743,11 +743,10 @@ GeneralInitLib = {
 			},
 			'close' : null,
 			'data' : {
-				'prepareForOpen' : function(dialogTitle, learningDesignTitle, shownElementIDs, highlightFirstTreeChild){
-					var tree = MenuLib.loadLearningDesignTree();
-					if (highlightFirstTreeChild) {
-						tree.getRoot().children[0].highlight();
-					}
+				'prepareForOpen' : function(dialogTitle, learningDesignTitle, shownElementIDs, highlightFolder){
+					// only Save As uses highlightFolder; otherwise the first folder in top level gets expanded and highlighted
+					layout.folderPathCurrent = highlightFolder && layout.ld.folderPath ? layout.ld.folderPath.slice() : [];
+					MenuLib.loadLearningDesignTree();
 					
 					$('#ldStoreDialogNameContainer input', layout.ldStoreDialog).val(learningDesignTitle);
 					$('.modal-title', layout.ldStoreDialog).text(dialogTitle);
@@ -933,6 +932,9 @@ GeneralInitLib = {
 						new YAHOO.widget.TextNode(this, node);
 					});
 			}
+			
+			// expand the folder where existing LD resides, if applicable
+			MenuLib.highlightFolder(node);
 			
 			// required by YUI
 			callback();
@@ -1657,6 +1659,7 @@ GeneralLib = {
 				layout.ld = {
 					'learningDesignID' : ld.learningDesignID,
 					'folderID'		   : ld.workspaceFolderID,
+					'folderPath'	   : ld.folderPath,
 					'contentFolderID'  : ld.contentFolderID,
 					'title'			   : ld.title,
 					'maxUIID'		   : 0,
