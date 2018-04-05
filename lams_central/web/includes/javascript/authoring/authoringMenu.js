@@ -361,7 +361,7 @@ var MenuLib = {
 								  	 'label'           : this.isRunSequencesFolder ?
 								  			 				LABELS.RUN_SEQUENCES_FOLDER : this.name,
 								  	 'folderID'		   : this.folderID,
-								  	 'canSave'		   : !this.isRunSequencesFolder,
+								  	 'canSave'		   : this.folderID > 0 && !this.isRunSequencesFolder,
 						  	         'canModify'	   : this.canModify
 									 });
 					});
