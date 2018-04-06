@@ -428,6 +428,16 @@ public class AssessmentServiceImpl
     }
 
     @Override
+    public void updateAssessmentQuestion(AssessmentQuestion question) {
+	//update question's hash in case question's title or description got changed
+	String newHash = question.getQuestion() == null ? null : HashUtil.sha1(question.getQuestion());
+	question.setQuestionHash(newHash);
+
+	//store object in DB
+	assessmentQuestionDao.update(question);
+    }
+
+    @Override
     public void releaseFromCache(Object object) {
 	assessmentQuestionDao.evict(object);
     }
@@ -639,7 +649,7 @@ public class AssessmentServiceImpl
 	    }
 	}
 
-	//if teacher edited content in monitor (modified question) it led to removal if autosaved questionResult 
+	//if teacher edited content in monitor (modified question) it led to removal if autosaved questionResult
 	if (assessment.isContentModifiedInMonitor(assessmentResult.getStartDate()) && questionResult == null) {
 	    //update questionDto
 	    AssessmentQuestion modifiedQuestion = assessmentQuestionDao.getByUid(questionDto.getUid());
@@ -1362,13 +1372,16 @@ public class AssessmentServiceImpl
 			userResultRow[2] = new ExcelCell(grade, false);
 			summaryTabLearnerList.add(userResultRow);
 
-			if (grade < minGrade || minGrade == -9999999)
+			if (grade < minGrade || minGrade == -9999999) {
 			    minGrade = grade;
-			if (grade > maxGrade)
+			}
+			if (grade > maxGrade) {
 			    maxGrade = grade;
+			}
 		    }
-		    if (minGrade == -9999999)
+		    if (minGrade == -9999999) {
 			minGrade = 0;
+		    }
 
 		    LinkedHashMap<String, Integer> markSummary = getMarksSummaryForSession(userDtos, minGrade, maxGrade,
 			    10);
@@ -1402,7 +1415,7 @@ public class AssessmentServiceImpl
 		    binSummaryRow[2] = new ExcelCell(getMessage("label.percentage"), true,
 			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		    summaryTab.add(binSummaryRow);
-		    float totalNumEntriesAsFloat = (float) totalNumEntries;
+		    float totalNumEntriesAsFloat = totalNumEntries;
 		    for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
 			binSummaryRow = new ExcelCell[3];
 			binSummaryRow[0] = new ExcelCell(entry.getKey(), false);
@@ -2359,8 +2372,9 @@ public class AssessmentServiceImpl
 	LinkedHashMap<String, Integer> summary = new LinkedHashMap<String, Integer>();
 	TreeMap<Integer, Integer> inProgress = new TreeMap<Integer, Integer>();
 
-	if (numBuckets == null)
+	if (numBuckets == null) {
 	    numBuckets = 10;
+	}
 
 	int bucketSize = 1;
 	int intMinGrade = (int) Math.floor(minGrade);
@@ -2395,15 +2409,16 @@ public class AssessmentServiceImpl
 
 	for (Map.Entry<Integer, Integer> entry : inProgress.entrySet()) {
 	    String key;
-	    if (bucketSize == 1)
+	    if (bucketSize == 1) {
 		key = entry.getKey().toString();
-	    else {
+	    } else {
 		if (maxGrade >= entry.getKey() && maxGrade <= entry.getKey() + bucketSize - 1) {
-		    if ((int) maxGrade == entry.getKey())
+		    if ((int) maxGrade == entry.getKey()) {
 			key = NumberUtil.formatLocalisedNumber(maxGrade, (Locale) null, 2);
-		    else
+		    } else {
 			key = new StringBuilder().append(entry.getKey()).append(" - ")
 				.append(NumberUtil.formatLocalisedNumber(maxGrade, (Locale) null, 2)).toString();
+		    }
 		} else {
 		    key = new StringBuilder().append(entry.getKey()).append(" - ")
 			    .append(entry.getKey() + bucketSize - .01).toString();
@@ -2727,7 +2742,7 @@ public class AssessmentServiceImpl
 	}
 
 	Assessment assessment = getAssessmentBySessionId(toolSessionId);
-	//in case Assessment is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor  
+	//in case Assessment is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor
 	List<Object[]> assessmentResultsAndPortraits = assessment.isUseSelectLeaderToolOuput()
 		? assessmentResultDao.getLeadersLastFinishedAssessmentResults(assessment.getContentId())
 		: assessmentResultDao.getLastFinishedAssessmentResultsBySession(toolSessionId);
@@ -2738,7 +2753,7 @@ public class AssessmentServiceImpl
 		    : ((Number) assessmentResultsAndPortraitIter[1]).longValue();
 	    Long userId = assessmentResult.getUser().getUserId();
 
-	    //fill in question's and user answer's hashes 
+	    //fill in question's and user answer's hashes
 	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
 		AssessmentQuestion question = questionResult.getAssessmentQuestion();
 
@@ -2905,16 +2920,19 @@ public class AssessmentServiceImpl
 	Date startDate = null;
 	Date finishDate = null;
 	for (AssessmentResult result : results) {
-	    if (startDate == null || (result.getStartDate() != null && result.getStartDate().before(startDate)))
+	    if (startDate == null || (result.getStartDate() != null && result.getStartDate().before(startDate))) {
 		startDate = result.getStartDate();
-	    if (finishDate == null || (result.getFinishDate() != null && result.getFinishDate().after(finishDate)))
+	    }
+	    if (finishDate == null || (result.getFinishDate() != null && result.getFinishDate().after(finishDate))) {
 		finishDate = result.getFinishDate();
+	    }
 	}
 
-	if (learner.isSessionFinished())
+	if (learner.isSessionFinished()) {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, finishDate);
-	else
+	} else {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
+	}
     }
     // ****************** REST methods *************************
 
@@ -3100,5 +3118,10 @@ public class AssessmentServiceImpl
 	// public static final short QUESTION_TYPE_NUMERICAL = 4;
 	// public static final short QUESTION_TYPE_TRUE_FALSE = 5;
 	// public static final short QUESTION_TYPE_ORDERING = 7;
+    }
+
+    @Override
+    public AssessmentQuestion getAssessmentQuestionByUid(Long questionUid) {
+	return assessmentQuestionDao.getByUid(questionUid);
     }
 }

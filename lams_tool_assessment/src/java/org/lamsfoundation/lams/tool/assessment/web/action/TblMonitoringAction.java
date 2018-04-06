@@ -42,13 +42,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class TblMonitoringAction extends LamsDispatchAction {
     private static Logger logger = Logger.getLogger(TblMonitoringAction.class.getName());
-    
+
     private IAssessmentService assessmentService;
-    
+
     /**
-    * Shows ira page in case of Assessment activity
-    */
-   public ActionForward iraAssessment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+     * Shows ira page in case of Assessment activity
+     */
+    public ActionForward iraAssessment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	initAssessmentService();
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentID");
@@ -62,24 +62,24 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	request.setAttribute("isIraAssessment", true);
 	return mapping.findForward("assessment");
     }
-   
-   /**
-   * Shows ira page in case of Assessment activity
-   */
-  public ActionForward iraAssessmentStudentChoices(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+
+    /**
+     * Shows ira page in case of Assessment activity
+     */
+    public ActionForward iraAssessmentStudentChoices(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	initAssessmentService();
 
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
-	
+
 	//prepare list of the questions, filtering out questions that aren't supposed to be answered
 	Set<AssessmentQuestion> questionList = new TreeSet<AssessmentQuestion>();
 	//in case there is at least one random question - we need to show all questions in a drop down select
 	if (assessment.hasRandomQuestion()) {
 	    questionList.addAll(assessment.getQuestions());
 
-	//show only questions from question list otherwise
+	    //show only questions from question list otherwise
 	} else {
 	    for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
 		questionList.add(reference.getQuestion());
@@ -91,7 +91,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	for (AssessmentQuestion question : questionList) {
 	    if (AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE == question.getType()) {
 		mcqQuestions.add(question);
-		
+
 		//calculate maxOptionsInQuestion
 		if (question.getOptions().size() > maxOptionsInQuestion) {
 		    maxOptionsInQuestion = question.getOptions().size();
@@ -107,7 +107,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	    for (AssessmentQuestionOption option : question.getOptions()) {
 		int optionAttemptCount = assessmentService.countAttemptsPerOption(option.getUid());
 
-		float percentage =  (float)(optionAttemptCount * 100) / totalNumberOfUsers;
+		float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
 		option.setPercentage(percentage);
 	    }
 	}
@@ -116,19 +116,19 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	return mapping.findForward("iraAssessmentStudentChoices");
     }
-   
-   private List<TblAssessmentDTO> getAssessmentDtos(String[] toolContentIds, String[] activityTitles) {
+
+    private List<TblAssessmentDTO> getAssessmentDtos(String[] toolContentIds, String[] activityTitles) {
 	List<TblAssessmentDTO> assessmentDtos = new ArrayList<TblAssessmentDTO>();
 	int i = 0;
 	for (String toolContentIdStr : toolContentIds) {
 	    String activityTitle = activityTitles[i++];
-	    
+
 	    //skip empty contentIds
 	    if (toolContentIdStr.length() == 0) {
 		continue;
 	    }
 	    Long toolContentId = Long.parseLong(toolContentIdStr);
-	    
+
 	    TblAssessmentDTO assessmentDto = new TblAssessmentDTO();
 
 	    int attemptedLearnersNumber = assessmentService.getCountUsersByContentId(toolContentId);
@@ -140,11 +140,11 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	    assessmentDto.setQuestions(prepareQuestionsList(assessment));
 	    assessmentDtos.add(assessmentDto);
 	}
-	
+
 	return assessmentDtos;
-   }
-   
-   private Set<AssessmentQuestion> prepareQuestionsList(Assessment assessment) {
+    }
+
+    private Set<AssessmentQuestion> prepareQuestionsList(Assessment assessment) {
 	// question list to display
 	Set<AssessmentQuestion> questions = new TreeSet<AssessmentQuestion>();
 	boolean hasRandomQuestion = false;
@@ -155,7 +155,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	if (hasRandomQuestion) {
 	    questions.addAll(assessment.getQuestions());
 
-	// show only questions from question list otherwise
+	    // show only questions from question list otherwise
 	} else {
 	    for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
 		//sort questions the same way references are sorted (as per LKC request)
@@ -165,7 +165,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	    }
 	}
 	return questions;
-   }
+    }
 
     /**
      * Shows aes page
@@ -179,7 +179,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 
 	List<TblAssessmentDTO> assessmentDtos = getAssessmentDtos(toolContentIds, activityTitles);
 	request.setAttribute("assessmentDtos", assessmentDtos);
-	
+
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, true);
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 
@@ -327,10 +327,10 @@ public class TblMonitoringAction extends LamsDispatchAction {
 
 	return null;
     }
-    
+
     /**
      * Get ModalDialog for Teams tab.
-     * 
+     *
      * @throws JSONException
      * @throws IOException
      */
@@ -339,14 +339,44 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	initAssessmentService();
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
-	
+
 	AssessmentUser user = assessmentService.getUserByIdAndContent(userId, toolContentId);
 	AssessmentResultDTO result = assessmentService.getUserMasterDetail(user.getSession().getSessionId(), userId);
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
-	
+
 	return mapping.findForward("teams");
     }
-    
+
+    /**
+     * Allows displaying correct answers to learners
+     */
+    public ActionForward discloseCorrectAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	initAssessmentService();
+
+	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	AssessmentQuestion question = assessmentService.getAssessmentQuestionByUid(questionUid);
+	question.setCorrectAnswersDisclosed(true);
+	assessmentService.updateAssessmentQuestion(question);
+
+	return null;
+    }
+
+    /**
+     * Allows displaying other groups' answers to learners
+     */
+    public ActionForward discloseGroupsAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	initAssessmentService();
+
+	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	AssessmentQuestion question = assessmentService.getAssessmentQuestionByUid(questionUid);
+	question.setGroupsAnswersDisclosed(true);
+	assessmentService.updateAssessmentQuestion(question);
+
+	return null;
+    }
+
     // *************************************************************************************
     // Private method
     // *************************************************************************************

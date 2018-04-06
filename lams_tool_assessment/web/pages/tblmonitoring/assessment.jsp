@@ -24,6 +24,21 @@
 
 		//insert total learners number taken from the parent tblmonitor.jsp
 		$("#total-learners-number").html(TOTAL_LESSON_LEARNERS_NUMBER);
+
+		// disclose correct/group answers on click
+		$('.disclose-button-group .btn').not('[disabled]').one('click', function(){
+				var button = $(this);
+				$.ajax({
+					'url'  : '<lams:WebAppURL />tblmonitoring.do',
+					'data' : {
+						'method' 	  : button.hasClass('disclose-correct-button') ? 'discloseCorrectAnswers' : 'discloseGroupsAnswers',
+						'questionUid' : button.closest('.disclose-button-group').attr('questionUid')
+					}
+				}).done(function(){
+					// disable the button after click
+					button.attr('disabled', true).html('<i class="fa fa-check text-success">&nbsp;</i>' + button.text());
+				});
+		});
 	});
 </script>
 
@@ -97,9 +112,28 @@
 				<div class="col-xs-12 col-md-12 col-lg-10">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h4 class="panel-title">
+						<div class="panel-title">
 							<span class="float-left space-right">Q${i.index+1})</span> <c:out value="${question.title}" escapeXml="false"/>
-						</h4> 
+							<div class="btn-group-xs pull-right disclose-button-group" questionUid="${question.uid}">
+								<%-- Allow disclosing correct answers only for multiple choice questions --%>
+								<c:if test="${question.type == 1}">
+									<div class="btn btn-default disclose-correct-button"
+										<c:if test="${question.correctAnswersDisclosed}">
+											disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
+										</c:if>
+										>
+										<fmt:message key="label.disclose.correct.answers"/>
+									</div>
+								</c:if>
+								<div class="btn btn-default disclose-groups-button"
+									<c:if test="${question.groupsAnswersDisclosed}">
+										disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
+									</c:if>
+									>
+									<fmt:message key="label.disclose.groups.answers"/>
+								</div>
+							</div>
+						</div>
 					</div>
 					
 					<div class="panel-body">

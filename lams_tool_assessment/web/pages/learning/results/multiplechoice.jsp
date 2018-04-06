@@ -16,10 +16,12 @@
 		<c:forEach var="option" items="${question.optionDtos}">
 			<tr>
 				<td class="complete-item-gif">
-				    <c:if test="${assessment.allowRightAnswersAfterQuestion && option.answerBoolean && (option.grade > 0)}">
+				    <c:if test="${(assessment.allowDiscloseAnswers ? question.correctAnswersDisclosed : assessment.allowRightAnswersAfterQuestion)
+				    			   && option.answerBoolean && (option.grade > 0)}">
 					    <i class="fa fa-check text-success"></i>
 		            </c:if>
-				    <c:if test="${assessment.allowWrongAnswersAfterQuestion && option.answerBoolean && (option.grade <= 0)}">
+				    <c:if test="${(assessment.allowDiscloseAnswers ? question.correctAnswersDisclosed : assessment.allowWrongAnswersAfterQuestion)
+				    			  && option.answerBoolean && (option.grade <= 0)}">
 					    <i class="fa fa-times text-danger"></i>	
 				    </c:if>			
                 </td>
