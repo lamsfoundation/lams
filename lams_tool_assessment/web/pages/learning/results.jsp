@@ -94,6 +94,10 @@
 		<%@ include file="results/attemptsummary.jsp"%>
 		
 		<c:if test="${assessment.displaySummary}">
+			<c:if test="${assessment.allowDiscloseAnswers}">
+				<%@ include file="results/tblsummary.jsp"%>
+			</c:if>
+			
 			<div class="form-group">
 				<%@ include file="results/allquestions.jsp"%>
 				
