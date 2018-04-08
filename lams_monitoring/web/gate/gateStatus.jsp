@@ -1,3 +1,13 @@
+<%@ taglib uri="tags-function" prefix="fn" %>
+
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.timeago.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {$("time.timeago").timeago();});
+</script>
+	        
 <c:if test="${not GateForm.map.gate.gateOpen}">
 
 				<c:if test="${not GateForm.map.readOnly}">

@@ -1,5 +1,13 @@
 <%@ include file="/template/taglibs.jsp"%>
 
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.timeago.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {$("time.timeago").timeago();});
+</script>
+
 <!-- Header -->
 <div class="row no-gutter">
 	<div class="col-xs-12 col-md-12 col-lg-8">
