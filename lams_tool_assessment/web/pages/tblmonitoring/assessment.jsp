@@ -25,21 +25,64 @@
 		//insert total learners number taken from the parent tblmonitor.jsp
 		$("#total-learners-number").html(TOTAL_LESSON_LEARNERS_NUMBER);
 
-		// disclose correct/group answers on click
-		$('.disclose-button-group .btn').not('[disabled]').one('click', function(){
-				var button = $(this);
-				$.ajax({
-					'url'  : '<lams:WebAppURL />tblmonitoring.do',
-					'data' : {
-						'method' 	  : button.hasClass('disclose-correct-button') ? 'discloseCorrectAnswers' : 'discloseGroupsAnswers',
-						'questionUid' : button.closest('.disclose-button-group').attr('questionUid')
-					}
-				}).done(function(){
-					// disable the button after click
-					button.attr('disabled', true).html('<i class="fa fa-check text-success">&nbsp;</i>' + button.text());
+		// go through each AE and set up disclose buttons there
+		$('.assessmentPane').each(function(){
+			var assessmentPane = $(this),
+				// are any correct/groups buttons clickable?
+				discloseAllCorrectEnabled = false,
+				discloseAllGroupsEnabled = false; 
+			
+			// disclose correct/group answers on click
+			$('.disclose-button-group .btn', assessmentPane).not('[disabled]').each(function(){
+				let button = $(this),
+					isCorrectButton = button.hasClass('disclose-correct-button');
+				if (isCorrectButton) {
+					discloseAllCorrectEnabled = true;
+				} else {
+					discloseAllGroupsEnabled = true;
+				}
+				
+				button.one('click', function() {		
+					$.ajax({
+						'url'  : '<lams:WebAppURL />tblmonitoring.do',
+						'data' : {
+							'method' 	  : isCorrectButton ? 'discloseCorrectAnswers' : 'discloseGroupsAnswers',
+							'questionUid' : button.closest('.disclose-button-group').attr('questionUid')
+						}
+					}).done(function(){
+						// disable the button after click
+						disabledAndCheckButton(button);
+					});
 				});
+			});
+
+			// if disclose all correct/groups answers buttons are clickable, add a click handler
+			// and disable if not
+			var allCorrectButton = $('.disclose-all-correct-button', assessmentPane);
+			if (discloseAllCorrectEnabled) {
+				allCorrectButton.one('click', function(){
+					$('.disclose-correct-button', assessmentPane).not('[disabled]').click();
+					disabledAndCheckButton(allCorrectButton);
+				});
+			} else {
+				disabledAndCheckButton(allCorrectButton);
+			}
+
+			var allGroupsButton = $('.disclose-all-groups-button', assessmentPane);
+			if (discloseAllGroupsEnabled) {
+				allGroupsButton.one('click', function(){
+					$('.disclose-groups-button', assessmentPane).not('[disabled]').click();
+					disabledAndCheckButton(allGroupsButton);
+				});
+			} else {
+				disabledAndCheckButton(allGroupsButton);
+			}
 		});
 	});
+
+	function disabledAndCheckButton(button){
+		button.attr('disabled', true).html('<i class="fa fa-check text-success">&nbsp;</i>' + button.text());
+	}
 </script>
 
 <!-- Header -->
@@ -105,8 +148,25 @@
 <!-- Tables -->
 <div class="tab-content">
 	<c:forEach var="assessmentDto" items="${assessmentDtos}" varStatus="k">
-		<div id="assessment-${assessmentDto.assessment.uid}" class="tab-pane 
+		<div id="assessment-${assessmentDto.assessment.uid}" class="assessmentPane tab-pane 
 			<c:if test="${(k.index == 0 && toolContentID == null) || (toolContentID != null && assessmentDto.assessment.contentId == toolContentID)}">active</c:if>">
+			
+			<c:if test="${assessmentDto.assessment.allowDiscloseAnswers}">
+				<%-- Release correct/groups answers for all questions in this assessment --%>
+				<div class="row no-gutter">
+					<div class="col-xs-12 col-md-12 col-lg-10">
+						<div class="btn-group-sm pull-right disclose-all-button-group">
+							<div class="btn btn-default disclose-all-correct-button">
+								<fmt:message key="label.disclose.all.correct.answers"/>
+							</div>
+							<div class="btn btn-default disclose-all-groups-button">
+								<fmt:message key="label.disclose.all.groups.answers"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</c:if>
+			
 			<c:forEach var="question" items="${assessmentDto.questions}" varStatus="i">
 				<div class="row no-gutter">
 				<div class="col-xs-12 col-md-12 col-lg-10">
