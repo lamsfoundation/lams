@@ -351,7 +351,7 @@ public interface IMonitoringService {
      * @param gate
      *            the id of the gate we need to open.
      */
-    GateActivity openGate(Long gateId);
+    GateActivity openGate(Long gateId, Integer openerId);
 
     /**
      * Allows a single learner to pass the gate.

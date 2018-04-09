@@ -221,7 +221,7 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     public void setMessageService(MessageService messageService) {
-        this.messageService = messageService;
+	this.messageService = messageService;
     }
 
     // ---------------------------------------------------------------------
@@ -651,11 +651,11 @@ public class LearnerService implements ICoreLearnerService {
 	    updateGradebookMark(activity, progress);
 	}
 	// }
-	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_FINISH, learnerId,
-		learnerId, progress.getLesson().getLessonId(),
-		activity.getActivityId(), 
-		messageService.getMessage(ProgressEngine.AUDIT_ACTIVITY_STOP_KEY, new Object[] { progress.getUser().getLogin(),
-			progress.getUser().getUserId(), activity.getTitle(), activity.getActivityId() }));
+	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_FINISH, learnerId, learnerId,
+		progress.getLesson().getLessonId(), activity.getActivityId(),
+		messageService.getMessage(ProgressEngine.AUDIT_ACTIVITY_STOP_KEY,
+			new Object[] { progress.getUser().getLogin(), progress.getUser().getUserId(),
+				activity.getTitle(), activity.getActivityId() }));
     }
 
     @Override
@@ -766,8 +766,8 @@ public class LearnerService implements ICoreLearnerService {
 	    }
 	}
     }
-    
-     private boolean forceGrouping(Lesson lesson, Grouping grouping, Group group, User learner) {
+
+    private boolean forceGrouping(Lesson lesson, Grouping grouping, Group group, User learner) {
 	boolean groupingDone = false;
 	if (lesson.isPreviewLesson()) {
 	    ArrayList<User> learnerList = new ArrayList<User>();
@@ -826,6 +826,8 @@ public class LearnerService implements ICoreLearnerService {
 	    if (lesson.isPreviewLesson()) {
 		// special case for preview - if forceGate is true then brute force open the gate
 		gate.setGateOpen(true);
+		gate.setGateOpenUser(knocker);
+		gate.setGateOpenTime(new Date());
 		gateOpen = true;
 	    }
 	}
@@ -1249,7 +1251,7 @@ public class LearnerService implements ICoreLearnerService {
     @Override
     public Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Long groupingId) {
 	LearnerChoiceGrouping grouping = (LearnerChoiceGrouping) getGrouping(groupingId);
-	LearnerChoiceGrouping learnerChoiceGrouping = (LearnerChoiceGrouping) grouping;
+	LearnerChoiceGrouping learnerChoiceGrouping = grouping;
 	Integer maxNumberOfLearnersPerGroup = null;
 	int learnerCount = lessonService.getCountLessonLearners(lessonId, null);
 	int groupCount = grouping.getGroups().size();

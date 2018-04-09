@@ -1,6 +1,9 @@
 package org.lamsfoundation.lams.monitoring.dto;
 
-import org.lamsfoundation.lams.learningdesign.Activity;
+import java.util.Date;
+
+import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * DTO used to return the activity details needed for the contribute activities list
@@ -8,7 +11,6 @@ import org.lamsfoundation.lams.learningdesign.Activity;
  * @author Andrey Balan
  */
 public class PermissionGateDTO {
-
     private String title;
     private String url;
     private Long activityID;
@@ -16,10 +18,17 @@ public class PermissionGateDTO {
     private Integer orderID;
     private int waitingLearnersCount;
     private boolean complete;
+    private String openUser;
+    private Date openTime;
 
-    public PermissionGateDTO(Activity activity) {
-	this.title = activity.getTitle();
-	this.activityID = activity.getActivityId();
+    public PermissionGateDTO(PermissionGateActivity gate) {
+	this.title = gate.getTitle();
+	this.activityID = gate.getActivityId();
+	this.openTime = gate.getGateOpenTime();
+	User openUser = gate.getGateOpenUser();
+	if (openUser != null) {
+	    this.openUser = openUser.getFirstName() + " " + openUser.getLastName();
+	}
     }
 
     /**
@@ -78,4 +87,11 @@ public class PermissionGateDTO {
 	this.complete = complete;
     }
 
+    public String getOpenUser() {
+	return openUser;
+    }
+
+    public Date getOpenTime() {
+	return openTime;
+    }
 }
