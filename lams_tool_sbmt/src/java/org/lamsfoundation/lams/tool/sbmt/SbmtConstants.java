@@ -37,7 +37,7 @@ public class SbmtConstants {
 
     public static final String USER_ID = "userID";
 
-    public static final String PAGE_EDITABLE = "isPageEditable";
+    public static final String CONTENT_IN_USE = "isContentInUse";
 
     public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 

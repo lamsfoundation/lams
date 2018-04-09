@@ -468,13 +468,17 @@ public class LearnerAction extends DispatchAction {
 	}
 
 	// preset
+	// Monitor can edit the activity and set a limit / decreased the limit with
+	// the learner having already uploaded more files so ensure code handles that case.
 	boolean limitUpload = (Boolean) sessionMap.get(SbmtConstants.ATTR_LIMIT_UPLOAD);
 	if (limitUpload && filesUploaded != null) {
 	    int limit = (Integer) sessionMap.get(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER);
-	    if (limit == filesUploaded.size()) {
+	    int limitUploadLeft = 0;
+	    if (limit <= filesUploaded.size()) {
 		sessionMap.put(SbmtConstants.ATTR_ARRIVE_LIMIT, true);
+	    } else {
+		limitUploadLeft = limit - filesUploaded.size();
 	    }
-	    int limitUploadLeft = limit - filesUploaded.size();
 	    dto.setLimitUploadLeft(limitUploadLeft);
 	}
 
