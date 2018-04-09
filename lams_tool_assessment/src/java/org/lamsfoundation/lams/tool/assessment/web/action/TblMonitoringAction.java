@@ -349,30 +349,40 @@ public class TblMonitoringAction extends LamsDispatchAction {
 
     /**
      * Allows displaying correct answers to learners
+     * 
+     * @throws JSONException
      */
     public ActionForward discloseCorrectAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	initAssessmentService();
-
+	    HttpServletResponse response) throws JSONException {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+
+	initAssessmentService();
 	AssessmentQuestion question = assessmentService.getAssessmentQuestionByUid(questionUid);
 	question.setCorrectAnswersDisclosed(true);
 	assessmentService.updateAssessmentQuestion(question);
+
+	assessmentService.notifyLearnersOnAnswerDisclose(toolContentId);
 
 	return null;
     }
 
     /**
      * Allows displaying other groups' answers to learners
+     *
+     * @throws JSONException
      */
     public ActionForward discloseGroupsAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	initAssessmentService();
-
+	    HttpServletResponse response) throws JSONException {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+
+	initAssessmentService();
 	AssessmentQuestion question = assessmentService.getAssessmentQuestionByUid(questionUid);
 	question.setGroupsAnswersDisclosed(true);
 	assessmentService.updateAssessmentQuestion(question);
+
+	assessmentService.notifyLearnersOnAnswerDisclose(toolContentId);
 
 	return null;
     }

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -3123,5 +3124,20 @@ public class AssessmentServiceImpl
     @Override
     public AssessmentQuestion getAssessmentQuestionByUid(Long questionUid) {
 	return assessmentQuestionDao.getByUid(questionUid);
+    }
+
+    @Override
+    public void notifyLearnersOnAnswerDisclose(long toolContentId) throws JSONException {
+	List<AssessmentSession> sessions = assessmentSessionDao.getByContentId(toolContentId);
+	Set<Integer> userIds = new HashSet<Integer>();
+	for (AssessmentSession session : sessions) {
+	    for (AssessmentUser user : session.getAssessmentUsers()) {
+		userIds.add(user.getUserId().intValue());
+	    }
+	}
+
+	JSONObject jsonCommand = new JSONObject();
+	jsonCommand.put("hookTrigger", "assessment-results-refresh-" + toolContentId);
+	learnerService.createCommandForLearners(toolContentId, userIds, jsonCommand.toString());
     }
 }

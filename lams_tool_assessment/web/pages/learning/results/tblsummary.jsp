@@ -1,3 +1,14 @@
+<script>
+	// command websocket stuff for refreshing
+	// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+	commandWebsocketHookTrigger = 'assessment-results-refresh-${assessment.contentId}';
+	// if the trigger is recognised, the following action occurs
+	commandWebsocketHook = function() {
+		location.reload();
+	};
+</script>
+
+
 <div class="panel">
 <div class="panel-body table-responsive">
 <table id="questions-data" class="table table-responsive table-striped table-bordered table-hover table-condensed">

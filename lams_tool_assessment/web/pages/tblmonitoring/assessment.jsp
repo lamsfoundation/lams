@@ -46,8 +46,9 @@
 					$.ajax({
 						'url'  : '<lams:WebAppURL />tblmonitoring.do',
 						'data' : {
-							'method' 	  : isCorrectButton ? 'discloseCorrectAnswers' : 'discloseGroupsAnswers',
-							'questionUid' : button.closest('.disclose-button-group').attr('questionUid')
+							'method' 	    : isCorrectButton ? 'discloseCorrectAnswers' : 'discloseGroupsAnswers',
+							'questionUid'   : button.closest('.disclose-button-group').attr('questionUid'),
+							'toolContentID' : $('#selected-content-id').val()
 						}
 					}).done(function(){
 						// disable the button after click

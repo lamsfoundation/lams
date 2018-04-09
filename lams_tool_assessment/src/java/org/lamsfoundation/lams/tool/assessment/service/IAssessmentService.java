@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -533,4 +534,10 @@ public interface IAssessmentService {
     Long getPortraitId(Long userId);
 
     AssessmentQuestion getAssessmentQuestionByUid(Long questionUid);
+
+    /**
+     * Sends a websocket command to learners who have assessment results open
+     * to refresh page because new data is available
+     */
+    void notifyLearnersOnAnswerDisclose(long toolContentId) throws JSONException;
 }
