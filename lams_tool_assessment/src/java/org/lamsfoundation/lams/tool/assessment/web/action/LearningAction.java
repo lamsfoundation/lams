@@ -635,14 +635,14 @@ public class LearningAction extends Action {
 	    loadupLastAttempt(sessionMap);
 	}
 
-	sessionMap.put(AssessmentConstants.ATTR_SHOW_RESULTS, true);
-
-	// populate info for displaying results page
-	showResults(request, mapping, sessionMap);
-
-	//use redirect to prevent form resubmission
-	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(AssessmentConstants.SHOW_RESULTS));
-	redirect.addParameter(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	//redirect to main path to display results
+	ActionRedirect redirect = new ActionRedirect("start.do");
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	if (mode != null) {
+	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
+	}
+	redirect.addParameter(AssessmentConstants.ATTR_TOOL_SESSION_ID,
+		sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
 	return redirect;
     }
 
