@@ -686,6 +686,11 @@ public class MonitoringAction extends Action {
 
 	service.notifyLearnersOnAnswerDisclose(toolContentId);
 
+	if (log.isDebugEnabled()) {
+	    log.debug("Disclosed correct answers for Assessment tool content ID " + toolContentId + " and question ID "
+		    + questionUid);
+	}
+
 	return null;
     }
 
@@ -703,6 +708,11 @@ public class MonitoringAction extends Action {
 	service.updateAssessmentQuestion(question);
 
 	service.notifyLearnersOnAnswerDisclose(toolContentId);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Disclosed other groups' answers for Assessment tool content ID " + toolContentId
+		    + " and question ID " + questionUid);
+	}
 
 	return null;
     }
