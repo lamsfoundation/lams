@@ -44,9 +44,10 @@
 				
 				button.one('click', function() {		
 					$.ajax({
-						'url'  : '<lams:WebAppURL />tblmonitoring.do',
+						'url'  : '<lams:WebAppURL />monitoring/' 
+								  + (isCorrectButton ? 'discloseCorrectAnswers' : 'discloseGroupsAnswers')
+								  + '.do',
 						'data' : {
-							'method' 	    : isCorrectButton ? 'discloseCorrectAnswers' : 'discloseGroupsAnswers',
 							'questionUid'   : button.closest('.disclose-button-group').attr('questionUid'),
 							'toolContentID' : $('#selected-content-id').val()
 						}

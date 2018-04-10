@@ -358,6 +358,14 @@
 			parameter="statistic" >
 			<forward name="success" path="/pages/monitoring/statisticpart.jsp" />
 		</action>
+		<action path="/monitoring/discloseCorrectAnswers"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
+			parameter="discloseCorrectAnswers" >
+		</action>
+		<action path="/monitoring/discloseGroupsAnswers"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
+			parameter="discloseGroupsAnswers" >
+		</action>
 		
 		<!--TBL Monitoring Action -->
    		<action 	path="/tblmonitoring" 
