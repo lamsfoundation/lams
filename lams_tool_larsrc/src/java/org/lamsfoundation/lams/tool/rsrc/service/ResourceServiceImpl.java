@@ -492,7 +492,35 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    groupList.add(group);
 	}
 
+	if ( groupList.size() == 0) {
+	    // no sessions but we still need to be able to view the resources in monitoring
+	    groupList.add(createAuthoredItemsGroupList(contentId, resource));
+	}
 	return groupList;
+    }
+
+    private SessionDTO createAuthoredItemsGroupList(Long contentId, Resource resource) {
+	SessionDTO group = new SessionDTO();
+	group.setSessionId(0L);
+	group.setSessionName("");
+
+	Set<ResourceItem> items = new TreeSet<ResourceItem>(new ResourceItemComparator());
+	// get the authored items
+	items.addAll(resource.getResourceItems());
+
+	// get all item which is accessed by users in this session
+	for (ResourceItem item : items) {
+	    ResourceItemDTO resourceItemDTO = new ResourceItemDTO(item);
+	    group.getItems().add(resourceItemDTO);
+	    if ( item.isAllowRating() ) {
+		group.setAllowRating(true);
+	    }
+	    if ( item.isAllowComments() ) {
+		group.setAllowComments(true);
+	    }
+	}
+
+	return group;
     }
 
     @Override
@@ -553,7 +581,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public void setItemVisible(Long itemUid, Long sessionId, boolean visible) {
+    public void setItemVisible(Long itemUid, Long sessionId, Long contentId, boolean visible) {
 	ResourceItem item = resourceItemDao.getByUid(itemUid);
 	if (item != null) {
 	    // createBy should be null for system default value.
@@ -563,12 +591,15 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		userId = item.getCreateBy().getUserId();
 		loginName = item.getCreateBy().getLoginName();
 	    }
-	    Long toolContentId = null;
-	    ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
-	    if (session != null) {
-		toolContentId = session.getResource().getContentId();
-	    } else {
-		ResourceServiceImpl.log.error("setItemVisible: Failed get ResourceSession by ID [" + sessionId + "]. Audit log entry will be created but will be missing tool content id");
+	    Long toolContentId = contentId;
+	    if (toolContentId == null) {
+		ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
+		if (session != null) {
+		    toolContentId = session.getResource().getContentId();
+		} else {
+		    ResourceServiceImpl.log.error("setItemVisible: Failed get ResourceSession by ID [" + sessionId
+			    + "]. Audit log entry will be created but will be missing tool content id");
+		}
 	    }
 	    if (visible) {
 		logEventService.logShowLearnerContent(userId, loginName, toolContentId, item.toString());

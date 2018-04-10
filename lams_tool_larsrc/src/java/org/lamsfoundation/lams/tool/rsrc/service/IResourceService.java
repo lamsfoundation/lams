@@ -214,7 +214,7 @@ public interface IResourceService {
      * @param visible
      *            true, item is visible. False, item is invisible.
      */
-    void setItemVisible(Long itemUid, Long sessionId, boolean visible);
+    void setItemVisible(Long itemUid, Long sessionId, Long contentId, boolean visible);
 
     /**
      * Create refection entry into notebook tool.
