@@ -725,7 +725,7 @@
 		
 	<div id="classDialogContents" class="dialogContainer">
 		<div id="classDialogTable">
-			<div class="row">
+			<div class="row no-margin">
 				<div id="leftLearnerTable" class="col-xs-6">
 					<table id="classLearnerTable" class="table table-condensed">
 						<tr class="active">
