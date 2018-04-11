@@ -110,7 +110,7 @@
 												<%-- Find the matching option to check if it is correct and get its text --%>
 												<c:forEach var="option" items="${question.optionDtos}">
 													<c:if test='${option.uid == sessionOption.optionUid}'>
-														<c:if test="${option.grade == 1}">
+														<c:if test="${question.correctAnswersDisclosed && option.grade == 1}">
 															<c:set var="cssClass" value="bg-success" />
 														</c:if>
 														<c:set var="answer" value="${option.optionString}" />
