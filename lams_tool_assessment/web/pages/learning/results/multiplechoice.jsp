@@ -14,14 +14,20 @@
 <div class="table-responsive">
 	<table class="table table-hover table-condensed">
 		<c:forEach var="option" items="${question.optionDtos}">
-			<tr>
+			<c:set var="isCorrect" 
+				   value="${(assessment.allowDiscloseAnswers 
+				   			 ? question.correctAnswersDisclosed : assessment.allowRightAnswersAfterQuestion)
+				    		 && option.answerBoolean && (option.grade > 0)}" />
+			<c:set var="isWrong"
+				   value="${(assessment.allowDiscloseAnswers 
+				   			 ? question.correctAnswersDisclosed : assessment.allowWrongAnswersAfterQuestion)
+				    		&& option.answerBoolean && (option.grade <= 0)}" />
+			<tr ${isCorrect ? 'class="bg-success"' : '' }>
 				<td class="complete-item-gif">
-				    <c:if test="${(assessment.allowDiscloseAnswers ? question.correctAnswersDisclosed : assessment.allowRightAnswersAfterQuestion)
-				    			   && option.answerBoolean && (option.grade > 0)}">
+				    <c:if test="${isCorrect}">
 					    <i class="fa fa-check text-success"></i>
 		            </c:if>
-				    <c:if test="${(assessment.allowDiscloseAnswers ? question.correctAnswersDisclosed : assessment.allowWrongAnswersAfterQuestion)
-				    			  && option.answerBoolean && (option.grade <= 0)}">
+				    <c:if test="${isWrong}">
 					    <i class="fa fa-times text-danger"></i>	
 				    </c:if>			
                 </td>
@@ -59,6 +65,50 @@
 		</c:forEach>
 	</table>
 </div>	
+
+<c:if test="${assessment.allowDiscloseAnswers && fn:length(sessions) > 1}">
+	<table class="table table-responsive table-striped table-bordered table-hover table-condensed">
+		<tr role="row">
+			<td colspan="2" class="text-center"><b><fmt:message key="label.learning.summary.other.team.answers"/></b></td>
+		</tr>
+		<c:forEach var="session" items="${sessions}" varStatus="status">
+			<%-- Now groups other than this one --%>
+			<c:if test="${sessionMap.toolSessionID != session.sessionId}">
+				<tr role="row">
+					<td class="text-center" style="width: 33%">
+						<%-- Sessions are named after groups --%>
+						<c:out value="${session.sessionName}" escapeXml="true"/> 
+					</td>
+					<c:set var="cssClass" value="" />
+					<c:set var="answer" value="?" />
+					<c:if test="${question.groupsAnswersDisclosed}">
+						<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
+						<c:set var="sessionResults" 
+							value="${questionSummaries[question.uid].questionResultsPerSession[status.index]}" />
+						<c:set var="sessionResults" value="${sessionResults[fn:length(sessionResults)-1]}" />
+						<c:forEach var="sessionOption" items="${sessionResults.optionAnswers}">
+							<%-- This option was chosen by the user --%>
+							<c:if test="${sessionOption.answerBoolean}">
+								<%-- Find the matching option to check if it is correct and get its text --%>
+								<c:forEach var="option" items="${question.optionDtos}">
+									<c:if test='${option.uid == sessionOption.optionUid}'>
+										<c:if test="${question.correctAnswersDisclosed && option.grade == 1}">
+											<c:set var="cssClass" value="bg-success" />
+										</c:if>
+										<c:set var="answer" value="${option.optionString}" />
+									</c:if>
+								</c:forEach>
+							</c:if>
+						</c:forEach>
+					</c:if>
+					<td class="text-center ${cssClass}">
+						<c:out value="${answer}" escapeXml="false" /> 
+					</td>
+				</tr>
+			</c:if>
+		</c:forEach>
+	</table>
+</c:if>
 
 <c:if test="${assessment.allowQuestionFeedback}">
 	<div class="feedback">

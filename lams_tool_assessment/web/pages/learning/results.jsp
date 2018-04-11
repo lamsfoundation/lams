@@ -28,15 +28,22 @@
 	<c:set var="result" value="${sessionMap.assessmentResult}" />
 	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
 	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
-	
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$("time.timeago").timeago();
 
 			//initialize bootstrap-sliders if "Enable confidence level" option is ON
 			$('.bootstrap-slider').bootstrapSlider();
+
+			// command websocket stuff for refreshing
+			// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+			commandWebsocketHookTrigger = 'assessment-results-refresh-${assessment.contentId}';
+			// if the trigger is recognised, the following action occurs
+			commandWebsocketHook = function() {
+				location.reload();
+			};
 		});
-	
+
 		function disableButtons() {
 			$('.btn').prop('disabled',true);
 		}
@@ -94,10 +101,6 @@
 		<%@ include file="results/attemptsummary.jsp"%>
 		
 		<c:if test="${assessment.displaySummary}">
-			<c:if test="${assessment.allowDiscloseAnswers}">
-				<%@ include file="results/tblsummary.jsp"%>
-			</c:if>
-			
 			<div class="form-group">
 				<%@ include file="results/allquestions.jsp"%>
 				
