@@ -132,7 +132,9 @@ var paper = null,
 			'optionalActivityBorder'    : '#00007f',
 			// dashed border around a selected activity 
 			'selectEffect'        : 'black',
-			'transition'   		  : 'rgb(119,126,157)'
+			'transition'   		  : 'rgb(119,126,157)',
+			// highlight TBL activities which should be grouped
+			'activityRequireGrouping' : 'red'
 		},
 	
 		'defaultTextAttributes' : {
@@ -1596,6 +1598,8 @@ GeneralLib = {
 		for (var activity of activities) {
 			if (!activity.grouping){
 				activitiesToGroup.push(activity);
+				activity.requireGrouping = true;
+				activity.draw();
 			}
 		}
 		return activitiesToGroup.length === 0 ? null : activitiesToGroup;
