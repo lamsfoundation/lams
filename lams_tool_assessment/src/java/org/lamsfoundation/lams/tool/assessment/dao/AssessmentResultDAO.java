@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 
 public interface AssessmentResultDAO extends DAO {
 
@@ -37,6 +38,14 @@ public interface AssessmentResultDAO extends DAO {
     List<AssessmentResult> getFinishedAssessmentResultsByUser(Long sessionId, Long userId);
 
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
+    
+    /**
+     * Checks whether the last attempt started by user is finished.
+     * 
+     * @param user
+     * @return true if user has finished it, false otherwise
+     */
+    Boolean isLastAttemptFinishedByUser(AssessmentUser user);
 
     AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId);
 

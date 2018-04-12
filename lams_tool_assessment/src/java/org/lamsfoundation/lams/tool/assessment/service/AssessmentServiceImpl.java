@@ -880,6 +880,11 @@ public class AssessmentServiceImpl
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
     }
+    
+    @Override
+    public Boolean isLastAttemptFinishedByUser(AssessmentUser user) {
+	return assessmentResultDao.isLastAttemptFinishedByUser(user);
+    }  
 
     @Override
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
@@ -2833,7 +2838,7 @@ public class AssessmentServiceImpl
 	    AssessmentUser groupLeader = session.getGroupLeader();
 
 	    // check if leader has submitted answers
-	    if ((groupLeader != null) && groupLeader.isSessionFinished()) {
+	    if ((groupLeader != null) && isLastAttemptFinishedByUser(groupLeader)) {
 
 		// we need to make sure specified user has the same scratches as a leader
 		copyAnswersFromLeader(assessmentUser, groupLeader);

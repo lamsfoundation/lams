@@ -258,6 +258,14 @@ public interface IAssessmentService {
      * @return
      */
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
+    
+    /**
+     * Checks whether the last attempt started by user is finished.
+     * 
+     * @param user
+     * @return true if user has finished it, false otherwise
+     */
+    Boolean isLastAttemptFinishedByUser(AssessmentUser user);
 
     /**
      * Return the latest *finished* result.

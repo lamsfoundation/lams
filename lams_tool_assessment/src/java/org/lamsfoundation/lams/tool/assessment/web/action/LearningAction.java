@@ -205,11 +205,13 @@ public class LearningAction extends Action {
 		return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER);
 	    }
 
+	    AssessmentResult lastLeaderResult = service.getLastAssessmentResult(assessment.getUid(),
+		    groupLeader.getUserId());
+	    boolean isLastAttemptFinishedByLeader = lastLeaderResult != null && lastLeaderResult.getFinishDate() != null;
+
 	    // forwards to the waitForLeader pages
 	    boolean isNonLeader = !user.getUserId().equals(groupLeader.getUserId());
-	    if (assessment.getTimeLimit() != 0 && isNonLeader && !user.isSessionFinished()) {
-		AssessmentResult lastLeaderResult = service.getLastAssessmentResult(assessment.getUid(),
-			groupLeader.getUserId());
+	    if (assessment.getTimeLimit() != 0 && isNonLeader && !isLastAttemptFinishedByLeader) {
 
 		//show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK button to launch time limit
 		if (lastLeaderResult == null || lastLeaderResult.getTimeLimitLaunchedDate() == null) {
@@ -220,7 +222,7 @@ public class LearningAction extends Action {
 
 		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
 		boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(assessment, groupLeader);
-		if (isTimeLimitExceeded && !groupLeader.isSessionFinished()) {
+		if (isTimeLimitExceeded) {
 		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY,
 			    "label.waiting.for.leader.finish");
 		    return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER_TIME_LIMIT);
@@ -228,7 +230,7 @@ public class LearningAction extends Action {
 	    }
 
 	    // check if leader has submitted all answers
-	    if (groupLeader.isSessionFinished()) {
+	    if (isLastAttemptFinishedByLeader) {
 
 		// in case user joins the lesson after leader has answers some answers already - we need to make sure
 		// he has the same scratches as leader
@@ -269,11 +271,13 @@ public class LearningAction extends Action {
 	    }
 	}
 
-	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), user.getUserId());
+	//user is allowed to answer questions if assessment activity doesn't have leaders or he is the leader
 	boolean hasEditRight = !assessment.isUseSelectLeaderToolOuput()
 		|| assessment.isUseSelectLeaderToolOuput() && isUserLeader;
-	//showResults if either session or the last result is finished
-	boolean showResults = user.isSessionFinished() || (lastResult != null) && (lastResult.getFinishDate() != null);
+
+	//showResults if user has finished the last result
+	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), user.getUserId());
+	boolean showResults = (lastResult != null) && (lastResult.getFinishDate() != null);
 
 	// get notebook entry
 	String entryText = new String();
@@ -428,7 +432,7 @@ public class LearningAction extends Action {
 
 	//in case of time limit - prevent user from seeing questions page longer than time limit allows
 	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(session.getAssessment(), leader);
-	boolean isLeaderResponseFinalized = leader.isSessionFinished();
+	boolean isLeaderResponseFinalized = service.isLastAttemptFinishedByUser(leader);
 
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put("isPageRefreshRequested", isLeaderResponseFinalized || isTimeLimitExceeded);
