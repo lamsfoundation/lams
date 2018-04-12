@@ -17,17 +17,17 @@
 			<c:set var="isCorrect" 
 				   value="${(assessment.allowDiscloseAnswers 
 				   			 ? question.correctAnswersDisclosed : assessment.allowRightAnswersAfterQuestion)
-				    		 && option.answerBoolean && (option.grade > 0)}" />
+				    		 && (option.grade == 1)}" />
 			<c:set var="isWrong"
 				   value="${(assessment.allowDiscloseAnswers 
 				   			 ? question.correctAnswersDisclosed : assessment.allowWrongAnswersAfterQuestion)
-				    		&& option.answerBoolean && (option.grade <= 0)}" />
+				    		&& (option.grade < 1)}" />
 			<tr ${isCorrect ? 'class="bg-success"' : '' }>
 				<td class="complete-item-gif">
-				    <c:if test="${isCorrect}">
+				    <c:if test="${option.answerBoolean && isCorrect}">
 					    <i class="fa fa-check text-success"></i>
 		            </c:if>
-				    <c:if test="${isWrong}">
+				    <c:if test="${option.answerBoolean && isWrong}">
 					    <i class="fa fa-times text-danger"></i>	
 				    </c:if>			
                 </td>
