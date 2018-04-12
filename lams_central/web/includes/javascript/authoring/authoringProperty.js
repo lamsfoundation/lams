@@ -705,6 +705,10 @@ var PropertyDefs = {
 					if (newGroupingValue != activity.grouping) {
 						activity.grouping = newGroupingValue;
 						redrawNeeded = true;
+						if (activity.requireGrouping && newGroupingValue != null) {
+							// get rid of red border set by TBL check
+							activity.requireGrouping = false;
+						}
 					}
 				}
 				
