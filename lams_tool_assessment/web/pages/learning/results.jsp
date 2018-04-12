@@ -7,6 +7,15 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
+	<style>
+		tr.selected-by-groups td {
+			border-top: none !important;
+		}
+		
+		tr.selected-by-groups span {
+			font-weight: bold;
+		}
+	</style>
 	
 	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script> 

@@ -24,6 +24,7 @@
 				<tr role="row">
 					<td class="text-center" style="width: 33%">
 						<%-- Sessions are named after groups --%>
+						<lams:Portrait userId="${session.groupLeader.userId}"/>&nbsp;
 						<c:out value="${session.sessionName}" escapeXml="true"/> 
 					</td>
 					<c:set var="answer" value="?" />
