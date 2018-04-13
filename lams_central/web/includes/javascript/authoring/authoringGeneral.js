@@ -1533,7 +1533,15 @@ GeneralLib = {
 	 */
 	checkTBLGrouping : function(){
 		var firstActivity = null,
-			activities = [];
+			activities = [],
+			getNextActivity = function(activity) {
+				var nextActivity = activity;
+				do {
+					nextActivity = nextActivity.transitions.from.length > 0 ? nextActivity.transitions.from[0].toActivity : null;
+					// skip gates along the way
+				} while (nextActivity instanceof ActivityDefs.GateActivity);
+				return nextActivity;
+			};
 		// find first activity in the sequence
 		// it can be wrong if not all activities are connected
 		$.each(layout.activities, function(){
@@ -1548,14 +1556,14 @@ GeneralLib = {
 		// the first activity can be grouping or the second one
 		var firstGroupingActivity = firstActivity instanceof ActivityDefs.GroupingActivity ? firstActivity : null;
 		if (!firstGroupingActivity) {
-			firstGroupingActivity = firstActivity.transitions.from[0].toActivity;
+			firstGroupingActivity = getNextActivity(firstActivity);
 			if (!(firstGroupingActivity instanceof ActivityDefs.GroupingActivity)){
 				return null;
 			}
 		}
 
 		// then it is Assessment or MCQ
-		var secondActivity = firstGroupingActivity.transitions.from.length > 0 ? firstGroupingActivity.transitions.from[0].toActivity : null,
+		var secondActivity = getNextActivity(firstGroupingActivity),
 			templateContainer = $('#templateContainerCell'),
 			isTBL = secondActivity instanceof ActivityDefs.ToolActivity
 			&& (secondActivity.learningLibraryID == $('.template[learningLibraryTitle="Assessment"]', templateContainer).attr('learningLibraryId')
@@ -1565,7 +1573,7 @@ GeneralLib = {
 		}
 		activities.push(secondActivity);
 		// then leader selection
-		var thirdActivity = secondActivity.transitions.from.length > 0 ? secondActivity.transitions.from[0].toActivity : null;
+		var thirdActivity = getNextActivity(secondActivity);
 		isTBL = thirdActivity instanceof ActivityDefs.ToolActivity 
 				&& thirdActivity.learningLibraryID == $('.template[learningLibraryTitle="Leaderselection"]', templateContainer).attr('learningLibraryId');
 		if (!isTBL){
@@ -1573,7 +1581,7 @@ GeneralLib = {
 		}
 		activities.push(thirdActivity);
 		// then scratchie
-		var fourthActivity = thirdActivity.transitions.from.length > 0 ? thirdActivity.transitions.from[0].toActivity : null;
+		var fourthActivity = getNextActivity(thirdActivity);
 		isTBL = fourthActivity instanceof ActivityDefs.ToolActivity 
 				&& fourthActivity.learningLibraryID == $('.template[learningLibraryTitle="Scratchie"]', templateContainer).attr('learningLibraryId');
 		if (!isTBL){
@@ -1584,7 +1592,7 @@ GeneralLib = {
 		// then optional assessments
 		var nextActivity = fourthActivity;
 		do {
-			nextActivity = nextActivity.transitions.from.length > 0 ? nextActivity.transitions.from[0].toActivity : null;
+			nextActivity = getNextActivity(nextActivity);
 			if (nextActivity instanceof ActivityDefs.ToolActivity
 				&& nextActivity.learningLibraryID == $('.template[learningLibraryTitle="Assessment"]', templateContainer).attr('learningLibraryId')) {
 				activities.push(nextActivity);
