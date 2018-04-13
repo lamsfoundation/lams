@@ -79,12 +79,11 @@
 											value="${activityURL.activityId}">
 									</c:when>
 									<c:when test="${activityURL.complete}">
-										<i class="fa fa-lg fa-check text-success"></i>
+										<i class="fa fa-lg fa-check text-success radio-button-offset"></i>
 									</c:when>
 								</c:choose> <c:choose>
-									<c:when test="${not activityURL.complete}">
-										<c:out value="${activityURL.title}" />
-
+									<c:when test="${activityURL.complete}">
+										<a href="${activityURL.url}"><c:out value="${activityURL.title}" /></a>
 									</c:when>
 									<c:otherwise>
 										<c:out value="${activityURL.title}" />
@@ -141,7 +140,6 @@
 			<input type="hidden" name="activityID" value="<c:out value='${optionsActivityForm.activityID}' />">
 			<input type="hidden" name="lessonID" value="<c:out value='${optionsActivityForm.lessonID}' />">
 			<input type="hidden" name="progressID" value="<c:out value='${optionsActivityForm.progressID}' />">
-
 
 			<p class="voffset10 help-text">
 				<c:choose>

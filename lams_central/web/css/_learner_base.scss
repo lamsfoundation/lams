@@ -1117,3 +1117,8 @@ $portrait-size-image-xl: 400px;
 	min-height: $portrait-size-image-lg + 20;
 	min-width:  $portrait-size-image-lg + 20;
 }
+
+// Use the same offset as the radio buttons in Bootstrap so that ticks line up with radio buttons on pages like Optional Activities
+.radio-button-offset {
+	margin-left: -20px;
+}
