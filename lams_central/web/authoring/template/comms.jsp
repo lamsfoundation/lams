@@ -123,13 +123,14 @@
 		}
 
 
-		function createAssessment() {
+		function createAssessment(questionType) {
+			var type = questionType ? questionType : 'essay';
 			var currNum = $('#numAssessments').val();
 			var nextNum = +currNum + 1;
 			var newDiv = document.createElement("div");
 			newDiv.id = 'divassess'+nextNum;
 			newDiv.className = 'space-top';
-			var url=getSubmissionURL()+"?method=createAssessment&questionNumber="+nextNum;
+			var url=getSubmissionURL()+"?method=createAssessment&questionNumber="+nextNum+"&questionType="+type;
 			$('#divassessments').append(newDiv);
 			$.ajaxSetup({ cache: true });
 			$(newDiv).load(url, function( response, status, xhr ) {
@@ -199,13 +200,46 @@
 			});
 		}		
 				
-		function swapOptions(questionNum, optionNum1, optionNum2) {
+		function createAssessmentOption(questionNum, maxOptionCount) {
+			var currNum = $('#assmcq'+questionNum+'numOptions').val();
+			var nextNum = +currNum + 1;
+			var newDiv = document.createElement("div");
+			newDiv.id = 'divassmcq'+questionNum+'opt'+nextNum;
+			var optionsDiv=$('#divassmcq'+questionNum+'options');
+			var lastChild=optionsDiv.children().filter(':last');
+			$(lastChild).after(newDiv);
+
+			var url=getSubmissionURL()+"?method=createOption&questionNumber="+questionNum+"&optionNumber="+nextNum+"&assess=true";
+			$.ajaxSetup({ cache: true });
+			$(newDiv).load(url, function( response, status, xhr ) {
+				if ( status == "error" ) {
+					console.log( xhr.status + " " + xhr.statusText );
+					newDiv.remove();
+				} else {
+					$('#assmcq'+questionNum+'numOptions').val(nextNum);
+					if ( nextNum >= maxOptionCount  ) {
+						$('#createAssessmentOptionButton'+questionNum).hide();
+					}
+					// need to add the down button to the previous last option!
+					var image = document.getElementById('assmcq'+questionNum+'option'+currNum+'DownButton')
+					image.style.display="inline";
+					newDiv.scrollIntoView();
+					
+				}
+			});
+		}		
+		
+		function swapOptions(questionNum, optionNum1, optionNum2, divToLoad, assessment) {
 			refreshCKEditors() ;
 
 			var data = $('#templateForm').serialize();
-			var url=getSubmissionURL()+"?method=swapOption&questionNumber="+questionNum+"&optionNumber1="+optionNum1+"&optionNumber2="+optionNum2+"&"+data;
+			var url=getSubmissionURL()+"?method=swapOption&questionNumber="+questionNum+"&optionNumber1="+optionNum1+"&optionNumber2="+optionNum2;
+			if ( assessment ) 
+				url += "&assess=true";
+			url += "&"+data
 			$.ajaxSetup({ cache: true });
-			$('#divq'+questionNum+'options').load(url, function( response, status, xhr ) {
+			jqueryDivToLoad = divToLoad ? $('#'+divToLoad) : $('#divq'+questionNum+'options');
+			jqueryDivToLoad.load(url, function( response, status, xhr ) {
 				if ( status == "error" ) {
 					alert("Swap failed. See server logs for details. "+xhr.statusText);
 					console.log( xhr.status + " " + xhr.statusText );
@@ -213,13 +247,17 @@
 			});
 		}
 
-		function removeOption(questionNum, optionNum) {
+		function removeOption(questionNum, optionNum, divToLoad, assessment) {
 			refreshCKEditors() ;
 
 			var data = $('#templateForm').serialize();
-			var url=getSubmissionURL()+"?method=deleteOption&questionNumber="+questionNum+"&optionNumber="+optionNum+"&"+data;
+			var url=getSubmissionURL()+"?method=deleteOption&questionNumber="+questionNum+"&optionNumber="+optionNum;
+			if ( assessment ) 
+				url += "&assess=true";
+			url += "&"+data
 			$.ajaxSetup({ cache: true });
-			$('#divq'+questionNum+'options').load(url, function( response, status, xhr ) {
+			jqueryDivToLoad = divToLoad ? $('#'+divToLoad) : $('#divq'+questionNum+'options');
+			jqueryDivToLoad.load(url, function( response, status, xhr ) {
 				if ( status == "error" ) {
 					alert("Delete failed. See server logs for details. "+xhr.statusText);
 					console.log( xhr.status + " " + xhr.statusText );

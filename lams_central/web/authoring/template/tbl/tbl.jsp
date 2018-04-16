@@ -60,7 +60,6 @@
 			// catch the editor update and redo validation otherwise error message won't go away when the user enters text.
 			initializeWizard(validator);
 			reconfigureCKEditorInstance(CKEDITOR.instances.question1);
-			reconfigureCKEditorInstance(CKEDITOR.instances.assessment1);
 
 		});
 
@@ -80,7 +79,7 @@
 		<ul>
 		  	<li><a href="#tab1" data-toggle="tab"><fmt:message key="authoring.section.introduction" /> </a></li>
 			<li><a href="#tab2" data-toggle="tab"><fmt:message key="authoring.section.lessondetails" /> </a></li>
-			<li><a href="#tab3" data-toggle="tab"><fmt:message key="authoring.section.questionsanalysis" /></a></li>
+			<li><a href="#tab3" data-toggle="tab"><fmt:message key="authoring.section.questions" /></a></li>
 			<li><a href="#tab4" data-toggle="tab"><fmt:message key="authoring.section.applicationexercise" /></a></li>
 			<li><a href="#tab5" data-toggle="tab"><fmt:message key="authoring.section.peerreview" /></a></li>
 		</ul>
@@ -125,16 +124,13 @@
 		<div class="tab-pane" id="tab4">
 			<span class="field-name"><fmt:message key="authoring.tbl.desc.ae" /></span>
 			
-		 	<input type="hidden" name="numAssessments" id="numAssessments" value="1"/>
+		 	<input type="hidden" name="numAssessments" id="numAssessments" value="0"/>
 	
 			<div id="divassessments">
-			<div id="divassess1" class="space-top">
-			<c:set scope="request" var="questionNumber">1</c:set>
-			<%@ include file="../tool/assessment.jsp" %>
-			</div>
 			</div>
 			
-			<a href="#" onclick="javascript:createAssessment();" class="btn btn-default voffset10"><fmt:message key="authoring.create.question"/></a>
+			<a href="#" onclick="javascript:createAssessment('essay');" class="btn btn-default voffset10"><fmt:message key="authoring.create.essay.question"/></a>
+			<a href="#" onclick="javascript:createAssessment('mcq');" class="btn btn-default voffset10"><fmt:message key="authoring.create.mc.question"/></a>
 	    </div>
 	    	<div class="tab-pane" id="tab5">
 			<span class="field-name"><fmt:message key="authoring.tbl.desc.peer.review" /></span>

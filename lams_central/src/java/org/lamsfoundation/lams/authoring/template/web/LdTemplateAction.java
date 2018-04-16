@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
@@ -47,7 +46,6 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
-import org.lamsfoundation.lams.authoring.template.AssessMCAnswer;
 import org.lamsfoundation.lams.authoring.template.Option;
 import org.lamsfoundation.lams.authoring.template.TextUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -78,7 +76,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public abstract class LdTemplateAction extends DispatchAction {
 
     private static Logger log = Logger.getLogger(LdTemplateAction.class);
-    public static final int MAX_OPTION_COUNT = 5;
+    public static final int MAX_OPTION_COUNT = 6;
     public static final int MAX_FLOATING_ACTIVITY_OPTIONS = 6; // Hardcoded in the Flash client
 
     public static final String PARENT_ACTIVITY_TYPE = "parentActivityType"; // used to work out transitions - not used by the authoring module
@@ -728,11 +726,12 @@ public abstract class LdTemplateAction extends DispatchAction {
      * to be expanded.
      */
     protected Long createAssessmentToolContent(UserDTO user, String title, String instructions,
-	    String reflectionInstructions, JSONArray questions)
+	    String reflectionInstructions, boolean selectLeaderToolOutput, JSONArray questions)
 	    throws JSONException, HttpException, IOException {
 
 	JSONObject toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions, null, null,
 		user);
+	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
 	toolContentJSON.put(RestTags.QUESTIONS, questions);
 
 	JSONArray references = new JSONArray();
@@ -744,40 +743,6 @@ public abstract class LdTemplateAction extends DispatchAction {
 	toolContentJSON.put("references", references);
 
 	return createToolContent(user, LdTemplateAction.ASSESSMENT_TOOL_SIGNATURE, toolContentJSON);
-    }
-
-    // assessment type - copied from ResourceConstants
-    // question type;
-    public static final short ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE = 1;
-    public static final short ASSESSMENT_QUESTION_TYPE_MATCHING_PAIRS = 2;
-    public static final short ASSESSMENT_QUESTION_TYPE_SHORT_ANSWER = 3;
-    public static final short ASSESSMENT_QUESTION_TYPE_NUMERICAL = 4;
-    public static final short ASSESSMENT_QUESTION_TYPE_TRUE_FALSE = 5;
-    public static final short ASSESSMENT_QUESTION_TYPE_ESSAY = 6;
-    public static final short ASSESSMENT_QUESTION_TYPE_ORDERING = 7;
-
-    protected JSONObject createAssessmentQuestionEssayType(String questionTitle, String questionText, int displayOrder,
-	    boolean required) throws JSONException {
-	JSONObject essayJSON = new JSONObject();
-	essayJSON.put(RestTags.QUESTION_TITLE, questionTitle != null ? questionTitle : "");
-	essayJSON.put(RestTags.QUESTION_TEXT, questionText != null ? questionText : "");
-	essayJSON.put("type", ASSESSMENT_QUESTION_TYPE_ESSAY);
-	essayJSON.put(RestTags.DISPLAY_ORDER, displayOrder);
-	essayJSON.put("answerRequired", required);
-	return essayJSON;
-    }
-
-    protected JSONObject createAssessmentQuestionMultipleChoiceType(String questionTitle, String questionText,
-	    int displayOrder, boolean required, List<AssessMCAnswer> answers) throws JSONException {
-	JSONObject mcJSON = createAssessmentQuestionEssayType(questionTitle, questionText, displayOrder, required);
-	JSONArray answersJSON = new JSONArray();
-	for (AssessMCAnswer answer : answers) {
-	    answersJSON.put(answer.getAsJSONObject());
-	}
-	mcJSON.put(RestTags.ANSWERS, answersJSON);
-	mcJSON.put("type", ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
-	log.debug("assessment: " + mcJSON);
-	return mcJSON;
     }
 
     /**
@@ -1126,7 +1091,6 @@ public abstract class LdTemplateAction extends DispatchAction {
 
 	JSONObject toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	toolContentJSON.put(RestTags.QUESTIONS, questions);
-	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, useSelectLeaderToolOuput);
 	return createToolContent(user, LdTemplateAction.SCRATCHIE_TOOL_SIGNATURE, toolContentJSON);
     }
 
@@ -1362,12 +1326,20 @@ public abstract class LdTemplateAction extends DispatchAction {
 
     /**
      * Specialised call to create a new question for the Assessment fields. Returns a fragment of HTML
-     * which sets up a new CKEditor.
+     * which sets up a new CKEditor. Defaults to essay. If questionType = "mcq" then it will do a multiple choice
      */
     public ActionForward createAssessment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+
 	request.setAttribute("questionNumber", WebUtil.readIntParam(request, "questionNumber"));
-	return mapping.findForward("assess");
+
+	String questionType = WebUtil.readStrParam(request, "questionType");
+	if (questionType == null || !questionType.equalsIgnoreCase("mcq")) {
+	    return mapping.findForward("assess");
+	} else {
+	    return mapping.findForward("assessmcq");
+	}
+
     }
 
     /**
@@ -1397,15 +1369,17 @@ public abstract class LdTemplateAction extends DispatchAction {
     }
 
     /**
-     * Specialised call to create a new option for a multiple choice question (mcoption.jsp) or Survey question
-     * (surveyoption.jsp) Returns a fragment of HTML which sets up the editing field. The template's
+     * Specialised call to create a new option for a multiple choice question (mcoption.jsp), Survey question
+     * (surveyoption.jsp) or assessment multiple choice (assessmcq.jsp). 
+     * Returns a fragment of HTML which sets up the editing field. The template's
      * struts action determines which jsp is used (see TBL and Inquiry uses).
      */
     public ActionForward createOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	request.setAttribute("questionNumber", WebUtil.readIntParam(request, "questionNumber"));
 	request.setAttribute("optionNumber", WebUtil.readIntParam(request, "optionNumber"));
-	return mapping.findForward("questionoption");
+	boolean useAssessmentVersion = WebUtil.readBooleanParam(request, "assess", false);
+	return mapping.findForward(useAssessmentVersion?"assessoption":"questionoption");
     }
 
     public ActionForward deleteOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -1413,7 +1387,9 @@ public abstract class LdTemplateAction extends DispatchAction {
 
 	Integer questionNumber = WebUtil.readIntParam(request, "questionNumber", true);
 	Integer delete = WebUtil.readIntParam(request, "optionNumber");
-	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber);
+	boolean useAssessmentVersion = WebUtil.readBooleanParam(request, "assess", false);
+
+	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber, useAssessmentVersion);
 	optionsMap.remove(delete);
 	// reorder the displayOrder and setup the return value
 	LinkedList<Option> options = new LinkedList<Option>();
@@ -1425,7 +1401,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	request.setAttribute("questionNumber", questionNumber);
 	request.setAttribute("options", options);
 	request.setAttribute("optionCount", options.size());
-	return mapping.findForward("redooption");
+	return mapping.findForward(useAssessmentVersion?"assessredooption":"redooption");
     }
 
     public ActionForward swapOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -1441,7 +1417,9 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    swap1 = swap2;
 	}
 
-	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber);
+	boolean useAssessmentVersion = WebUtil.readBooleanParam(request, "assess", false);
+	
+	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber, useAssessmentVersion);
 	// reorder the options and setup the return value
 	LinkedList<Option> options = new LinkedList<Option>();
 
@@ -1466,23 +1444,26 @@ public abstract class LdTemplateAction extends DispatchAction {
 	request.setAttribute("questionNumber", questionNumber);
 	request.setAttribute("options", options);
 	request.setAttribute("optionCount", options.size());
-	return mapping.findForward("redooption");
+	return mapping.findForward(useAssessmentVersion?"assessredooption":"redooption");
     }
 
-    private TreeMap<Integer, Option> getOptions(HttpServletRequest request, Integer questionNumber) {
+    // if mcq paramPrefix = "question". if assessment multiple choice paramPrefix = assmcq
+    private TreeMap<Integer, Option> getOptions(HttpServletRequest request, Integer questionNumber, boolean useAssessmentVersion) {
 
+	String paramPrefix =  useAssessmentVersion ? "assmcq" : "question"; 
+	    
 	// correctDisplayIdInteger is used for MCQ but not Survey - the value will be ignored by the
 	// survey jsp page.
-	Integer correctDisplayIdInteger = WebUtil.readIntParam(request, "question" + questionNumber + "correct", true);
+	Integer correctDisplayIdInteger = WebUtil.readIntParam(request, paramPrefix + questionNumber + "correct", true);
 	int correctDisplayId = correctDisplayIdInteger != null ? correctDisplayIdInteger.intValue() : 0;
 
 	TreeMap<Integer, Option> optionDtos = new TreeMap<Integer, Option>();
 
 	for (int i = 1; i <= MAX_OPTION_COUNT; i++) {
-	    String optionText = request.getParameter("question" + questionNumber + "option" + i);
+	    String optionText = request.getParameter(paramPrefix + questionNumber + "option" + i);
 	    if (optionText != null) {
 		// Grade is used for assessment
-		String grade = request.getParameter("question" + questionNumber + "option" + i + "grade");
+		String grade = request.getParameter(paramPrefix + questionNumber + "option" + i + "grade");
 		Option option = new Option(i, i == correctDisplayId, optionText, grade);
 		optionDtos.put(new Integer(i), option);
 	    }

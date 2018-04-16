@@ -23,6 +23,8 @@
 package org.lamsfoundation.lams.authoring.template.web;
 
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -39,6 +41,8 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.authoring.template.AssessMCAnswer;
+import org.lamsfoundation.lams.authoring.template.Assessment;
 import org.lamsfoundation.lams.authoring.template.PeerReviewCriteria;
 import org.lamsfoundation.lams.authoring.template.TemplateData;
 import org.lamsfoundation.lams.rest.RestTags;
@@ -146,14 +150,13 @@ public class TBLTemplateAction extends LdTemplateAction {
 	currentActivityPosition = firstActivityInRowPosition;
 	int numAEInRow = 5;
 	int displayOrder = 1;
-	for (String exerciseQuestion : data.applicationExercises.values()) {
+	for (Assessment exerciseQuestion : data.applicationExercises.values()) {
 	    String applicationExerciseTitle = data.getText("boilerplate.ae.application.exercise.num",
 		    displayOrder > 1 ? new String[] { Integer.toString(displayOrder) } : new String[] { "" });
-	    JSONObject question = createAssessmentQuestionEssayType(applicationExerciseTitle, exerciseQuestion,
-		    displayOrder, true);
-	    JSONArray questions = new JSONArray().put(question);
+	    exerciseQuestion.setTitle(applicationExerciseTitle);
+	    JSONArray questions = new JSONArray().put(exerciseQuestion.getAsJSONObject(displayOrder));
 	    Long aetoolContentId = createAssessmentToolContent(userDTO, applicationExerciseTitle,
-		    data.getText("boilerplate.ae.instructions"), null, questions);
+		    data.getText("boilerplate.ae.instructions"), null, true, questions);
 	    activities.put(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId, data.contentFolderID,
 		    groupingUIID, null, null, applicationExerciseTitle));
 
@@ -228,8 +231,11 @@ public class TBLTemplateAction extends LdTemplateAction {
 	Integer numLearners;
 	Integer numGroups;
 	SortedMap<Integer, JSONObject> testQuestions;
-	SortedMap<Integer, String> applicationExercises;
+	SortedMap<Integer, Assessment> applicationExercises;
 	SortedMap<Integer, PeerReviewCriteria> peerReviewCriteria;
+	
+	int questionOffset = 8;
+	int assessmentOffset = 10;
 	
 
 	TBLData(HttpServletRequest request) throws JSONException {
@@ -244,7 +250,7 @@ public class TBLTemplateAction extends LdTemplateAction {
 	    numGroups = WebUtil.readIntParam(request, "numGroups", true);
 
 	    testQuestions = new TreeMap<Integer, JSONObject>();
-	    applicationExercises = new TreeMap<Integer, String>();
+	    applicationExercises = new TreeMap<Integer, Assessment>();
 	    peerReviewCriteria = new TreeMap<Integer, PeerReviewCriteria>();
 
 	    TreeMap<Integer, Integer> correctAnswers = new TreeMap<Integer, Integer>();
@@ -254,36 +260,67 @@ public class TBLTemplateAction extends LdTemplateAction {
 		if (name.startsWith("question")) {
 		    int correctIndex = name.indexOf("correct");
 		    if (correctIndex > 0) { // question1correct
-			Integer questionDisplayOrder = Integer.valueOf(name.substring(8, correctIndex));
+			Integer questionDisplayOrder = Integer.valueOf(name.substring(questionOffset, correctIndex));
 			Integer correctValue = WebUtil.readIntParam(request, name);
 			correctAnswers.put(questionDisplayOrder, correctValue);
 		    } else {
 			int optionIndex = name.indexOf("option");
 			if (optionIndex > 0) {
-			    Integer questionDisplayOrder = Integer.valueOf(name.substring(8, optionIndex));
+			    Integer questionDisplayOrder = Integer.valueOf(name.substring(questionOffset, optionIndex));
 			    Integer optionDisplayOrder = Integer.valueOf(name.substring(optionIndex + 6));
 			    processTestQuestion(name, null, questionDisplayOrder, optionDisplayOrder,
 				    getTrimmedString(request, name, true));
 			} else {
-			    Integer questionDisplayOrder = Integer.valueOf(name.substring(8));
+			    Integer questionDisplayOrder = Integer.valueOf(name.substring(questionOffset));
 			    processTestQuestion(name, getTrimmedString(request, name, true), questionDisplayOrder, null,
 				    null);
 			}
-		    }
-		} else if (name.startsWith("assessment")) {
-		    Integer exerciseOrder = Integer.valueOf(name.substring(10));
-		    String question = getTrimmedString(request, name, true);
-		    if (question != null) {
-			applicationExercises.put(exerciseOrder, question);
 		    }
 		} else if ( name.startsWith("peerreview")) {
 		    processInputPeerReviewRequestField(name, request);
 		}
 	    }
+	    
 	    updateCorrectAnswers(correctAnswers);
+
+	    processAssessments(request); 
 
 	    validate();
 
+	}
+
+	// Assessment entries can't be deleted or rearranged so the count should always line up with numAssessments
+	private void processAssessments(HttpServletRequest request) {
+	    int numAssessments = WebUtil.readIntParam(request, "numAssessments");
+	    for (int i = 1; i <= numAssessments; i++) {
+		String assessmentPrefix = "assessment" + i;
+		String questionText = getTrimmedString(request, assessmentPrefix, true);
+		Assessment assessment = new Assessment();
+		if (questionText != null) {
+		    assessment.setQuestionText(questionText);
+		    assessment.setType(WebUtil.readStrParam(request, assessmentPrefix + "type"));
+		    assessment.setRequired(true);
+		    if (assessment.getType() == Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
+			String optionPrefix = "assmcq" + i;
+			optionPrefix = optionPrefix + "option";
+			for (int o = 1, order = 0; o <= MAX_OPTION_COUNT; o++) {
+			    String answer = getTrimmedString(request, optionPrefix + o, true);
+			    if (answer != null) {
+				String grade = request.getParameter(optionPrefix + o + "grade");
+				try {
+				    assessment.getAnswers()
+					    .add(new AssessMCAnswer(order++, answer, Float.valueOf(grade)));
+				} catch (Exception e) {
+				    log.error("Error parsing " + grade + " for float", e);
+				    addValidationErrorMessage(
+					    "authoring.error.application.exercise.not.blank.and.grade", new Object[i]);
+				}
+			    }
+			}
+		    }
+		    applicationExercises.put(i, assessment);
+		}
+	    }
 	}
 
 	void processInputPeerReviewRequestField(String name, HttpServletRequest request) {
@@ -386,10 +423,15 @@ public class TBLTemplateAction extends LdTemplateAction {
 	    }
 	    if (applicationExercises.size() == 0) {
 		addValidationErrorMessage("authoring.error.application.exercise.num", new Integer[] { 1 });
-		// grouping is enforced on the front end by the layout & by requiring the groupingType
-		// questions are validated in updateCorrectAnswers
+	    } else {
+		for ( Map.Entry<Integer, Assessment> assessmentEntry : applicationExercises.entrySet() ) {
+		    List<String> errors = assessmentEntry.getValue().validate(appBundle, formatter, assessmentEntry.getKey());
+		    if ( errors != null ) 
+			errorMessages.addAll(errors);
+		}
 	    }
-
+	    // grouping is enforced on the front end by the layout & by requiring the groupingType
+	    // questions are validated in updateCorrectAnswers
 	}
 
     }

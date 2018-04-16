@@ -2252,12 +2252,13 @@ public class ScratchieServiceImpl
 	scratchie.setTitle(toolContentJSON.getString(RestTags.TITLE));
 	scratchie.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
 
-	scratchie.setBurningQuestionsEnabled(JsonUtil.opt(toolContentJSON, "burningQuestionsEnabled", false));
+	scratchie.setBurningQuestionsEnabled(JsonUtil.opt(toolContentJSON, "burningQuestionsEnabled", Boolean.TRUE));
 	scratchie.setTimeLimit(JsonUtil.opt(toolContentJSON, "timeLimit", 0));
 	scratchie.setExtraPoint(JsonUtil.opt(toolContentJSON, "extraPoint", false));
 	scratchie.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	scratchie.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
-
+	scratchie.setShowScrachiesInResults(JsonUtil.opt(toolContentJSON, "showScrachiesInResults", Boolean.TRUE));
+	
 	// Scratchie Items
 	Set<ScratchieItem> newItems = new LinkedHashSet<>();
 

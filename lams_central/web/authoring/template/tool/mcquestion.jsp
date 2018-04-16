@@ -29,10 +29,10 @@
 		</table>
 		
 		<div id="divq${questionNumber}options">
-		<input type="hidden" name="numOptionsQuestion${questionNumber}" id="numOptionsQuestion${questionNumber}" value="3"/>
+		<input type="hidden" name="numOptionsQuestion${questionNumber}" id="numOptionsQuestion${questionNumber}" value="4"/>
 		<div id="divq${questionNumber}opt1">
 		<c:set scope="request" var="optionText"></c:set>
-		<c:set scope="request" var="optionCount">3</c:set>
+		<c:set scope="request" var="optionCount">4</c:set>
 		<c:set scope="request" var="optionNumber">1</c:set>
 		<%@ include file="mcoption.jsp" %>
 		</div>
@@ -42,6 +42,10 @@
 		</div>
 		<div id="divq${questionNumber}opt3">
 		<c:set scope="request" var="optionNumber">3</c:set>
+		<%@ include file="mcoption.jsp" %>
+		</div>
+		<div id="divq${questionNumber}opt4">
+		<c:set scope="request" var="optionNumber">4</c:set>
 		<%@ include file="mcoption.jsp" %>
 		</div>
 		</div>
