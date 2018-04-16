@@ -144,38 +144,27 @@ public class TBLTemplateAction extends LdTemplateAction {
 	currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	activities.put(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition)));
 
-	// Application Exercise - could be any number of them. Have 5 per row. If there are only 1 or 2 left on the last row, then the 
-	// following activities will go on the same row, otherwise the following activities go on the next line
+	// Application Exercise - all the questions go into one exercise
 	firstActivityInRowPosition = calcPositionBelow(firstActivityInRowPosition);
 	currentActivityPosition = firstActivityInRowPosition;
-	int numAEInRow = 5;
+	JSONArray questionsJSONArray = new JSONArray();
 	int displayOrder = 1;
 	for (Assessment exerciseQuestion : data.applicationExercises.values()) {
 	    String applicationExerciseTitle = data.getText("boilerplate.ae.application.exercise.num",
-		    displayOrder > 1 ? new String[] { Integer.toString(displayOrder) } : new String[] { "" });
+		    new String[] { Integer.toString(displayOrder) });
 	    exerciseQuestion.setTitle(applicationExerciseTitle);
-	    JSONArray questions = new JSONArray().put(exerciseQuestion.getAsJSONObject(displayOrder));
-	    Long aetoolContentId = createAssessmentToolContent(userDTO, applicationExerciseTitle,
-		    data.getText("boilerplate.ae.instructions"), null, true, questions);
-	    activities.put(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId, data.contentFolderID,
-		    groupingUIID, null, null, applicationExerciseTitle));
-
-	    if ( (displayOrder % numAEInRow) == 0 ) {
-		firstActivityInRowPosition = calcPositionBelow(firstActivityInRowPosition);
-		currentActivityPosition = firstActivityInRowPosition;
-	    } else {
-		currentActivityPosition = calcPositionNextRight(currentActivityPosition);
-	    }
+	    questionsJSONArray.put(exerciseQuestion.getAsJSONObject(displayOrder));
 	    displayOrder++;
 	}
-
-	if ( (displayOrder % numAEInRow) > 3 ) {
-	    firstActivityInRowPosition = calcPositionBelow(firstActivityInRowPosition);
-	    currentActivityPosition = firstActivityInRowPosition;
-	} 
+	String overallAssessmentTitle = data.getText("boilerplate.ae.application.exercise.num", new String[] { "" });
+	Long aetoolContentId = createAssessmentToolContent(userDTO, overallAssessmentTitle,
+		    data.getText("boilerplate.ae.instructions"), null, true, questionsJSONArray);
+	activities.put(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId, data.contentFolderID,
+		    groupingUIID, null, null, overallAssessmentTitle));
 
 	// Peer Review - optional. Start by eliminating all criterias with no title. Then if any are left 
 	// we create the tool data and activity
+	currentActivityPosition = calcPositionNextRight(currentActivityPosition);
     	JSONArray criterias = new JSONArray();
     	for (PeerReviewCriteria criteria : data.peerReviewCriteria.values()) {
     	    if ( criteria.getTitle() != null && criteria.getTitle().length() > 0 )
