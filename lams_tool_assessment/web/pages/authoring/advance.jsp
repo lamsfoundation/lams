@@ -36,14 +36,19 @@
 			if ($(this).prop('checked')) {
 				$("#display-summary").prop("checked", true).prop("disabled", true);
 				$('#display-summary-area').show('slow');
+				$('#allowDiscloseAnswers').prop('disabled', false);
 			} else {
 				$("#display-summary").prop("disabled", false);
+				$('#allowDiscloseAnswers').prop("checked", false).prop('disabled', true).change();
 			}		
 		});
 		
 		<c:if test="${formBean.assessment.passingMark == 0}">$("#passingMark").prop("disabled", true);</c:if>
 		<c:if test="${formBean.assessment.passingMark > 0}">$("#attemptsAllowed").prop("disabled", true);</c:if>
 		<c:if test="${formBean.assessment.useSelectLeaderToolOuput}">$("#display-summary").prop("disabled", true);</c:if>
+		<c:if test="${formBean.assessment.allowDiscloseAnswers}">
+			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('disabled', true)
+		;</c:if>
 	});
 </script>
 
