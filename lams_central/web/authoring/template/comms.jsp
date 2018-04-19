@@ -69,8 +69,8 @@
 			$('#error-message').empty();
 			refreshCKEditors();
        		
-            var jqxhr = $.ajax( {
-	        		method: $(this).attr('method'),
+             var jqxhr = $.ajax( {
+	        		method: $(form).attr('method'),
 					url: getSubmissionURL(),
                 	data: $(form).serialize()
 	            	})
@@ -228,18 +228,35 @@
 				}
 			});
 		}		
+
+		function getOptionData(questionNum, assessment) {
+			var paramPrefix  =  assessment ? "assmcq" : "question"; 
+			paramPrefix = paramPrefix + questionNum;
+			var data = { };
+			var correctField = paramPrefix + "correct";
+			$('#templateForm').find('input, textarea, select').each(function() {
+				if ( this.name == correctField ) {
+					if ( this.checked ) {
+			    			data[this.name] = $(this).val();
+					}
+				} else if ( this.name.startsWith(paramPrefix) ) {
+		    			data[this.name] = $(this).val();
+		    		}
+		    });
+		    return data;
+		}
 		
 		function swapOptions(questionNum, optionNum1, optionNum2, divToLoad, assessment) {
 			refreshCKEditors() ;
-
-			var data = $('#templateForm').serialize();
 			var url=getSubmissionURL()+"?method=swapOption&questionNumber="+questionNum+"&optionNumber1="+optionNum1+"&optionNumber2="+optionNum2;
-			if ( assessment ) 
+			if ( assessment ) {
 				url += "&assess=true";
-			url += "&"+data
+			}
+			var data = getOptionData(questionNum, assessment);
+
 			$.ajaxSetup({ cache: true });
 			jqueryDivToLoad = divToLoad ? $('#'+divToLoad) : $('#divq'+questionNum+'options');
-			jqueryDivToLoad.load(url, function( response, status, xhr ) {
+			jqueryDivToLoad.load(url, data, function( response, status, xhr ) {
 				if ( status == "error" ) {
 					alert("Swap failed. See server logs for details. "+xhr.statusText);
 					console.log( xhr.status + " " + xhr.statusText );
@@ -249,15 +266,14 @@
 
 		function removeOption(questionNum, optionNum, divToLoad, assessment) {
 			refreshCKEditors() ;
-
-			var data = $('#templateForm').serialize();
 			var url=getSubmissionURL()+"?method=deleteOption&questionNumber="+questionNum+"&optionNumber="+optionNum;
 			if ( assessment ) 
 				url += "&assess=true";
-			url += "&"+data
+			var data = getOptionData(questionNum, assessment);
+				
 			$.ajaxSetup({ cache: true });
 			jqueryDivToLoad = divToLoad ? $('#'+divToLoad) : $('#divq'+questionNum+'options');
-			jqueryDivToLoad.load(url, function( response, status, xhr ) {
+			jqueryDivToLoad.load(url, data, function( response, status, xhr ) {
 				if ( status == "error" ) {
 					alert("Delete failed. See server logs for details. "+xhr.statusText);
 					console.log( xhr.status + " " + xhr.statusText );
