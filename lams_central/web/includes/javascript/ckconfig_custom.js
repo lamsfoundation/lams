@@ -2,12 +2,12 @@
 // Main difference Source became Sourcedialog and Maximize and Preview were dropped.
 
 CKEDITOR.config.toolbar_Default = [
-	['Source','-','Maximize','Preview','PasteFromWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
+	['Source','-','Maximize','Preview','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
 	['Embed','Image','Link','Iframe','Table','HorizontalRule','Emojione','Format','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_DefaultInline = [
-	['Sourcedialog','Preview','-','PasteFromWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
+	['Sourcedialog','Preview','-','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath','-'], 
     ['Embed','Image','Link','Iframe','Table','HorizontalRule','Emojione','-','bootsnippets-text','bootsnippets-image','bootsnippets-multimedia','bootsnippets-advanced-layout','Format','Font','FontSize']
 ];
 
@@ -19,7 +19,7 @@ CKEDITOR.config.toolbar_DefaultDokuInline = [
 // To include it back, just add 'VideoRecorder' in between the MoviePlayer and Kaltura
 
 CKEDITOR.config.toolbar_DefaultLearner = [
-	['Preview','PasteFromWord'],
+	['Preview'],
 	['Undo','Redo'],
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent'],
@@ -31,7 +31,6 @@ CKEDITOR.config.toolbar_DefaultLearner = [
 ];
 
 CKEDITOR.config.toolbar_DefaultLearnerInline = [
-  	['PasteFromWord'],
   	['Undo','Redo'],
   	['Bold','Italic','Underline', '-','Subscript','Superscript'],
   	['NumberedList','BulletedList','-','Outdent','Indent'],
@@ -43,7 +42,7 @@ CKEDITOR.config.toolbar_DefaultLearnerInline = [
   ];
 
 CKEDITOR.config.toolbar_DefaultMonitor = [
-	['Preview','PasteFromWord'],
+	['Preview'],
 	['Undo','Redo'],
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent'],
@@ -55,7 +54,6 @@ CKEDITOR.config.toolbar_DefaultMonitor = [
 ];
 
 CKEDITOR.config.toolbar_DefaultMonitorInline = [
-  	['PasteFromWord'],
   	['Undo','Redo'],
   	['Bold','Italic','Underline', '-','Subscript','Superscript'],
   	['NumberedList','BulletedList','-','Outdent','Indent'],
@@ -67,7 +65,7 @@ CKEDITOR.config.toolbar_DefaultMonitorInline = [
 ];
 
 CKEDITOR.config.toolbar_CustomWiki = [
-	['Source','-','Preview','PasteFromWord'],
+	['Source','-','Preview'],
 	['Undo','Redo'],
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent'],
@@ -80,7 +78,7 @@ CKEDITOR.config.toolbar_CustomWiki = [
 ];
 
 CKEDITOR.config.toolbar_CustomWikiInline = [
-  	['Sourcedialog','-','PasteFromWord'],
+  	['Sourcedialog'],
   	['Undo','Redo'],
   	['Bold','Italic','Underline', '-','Subscript','Superscript'],
   	['NumberedList','BulletedList','-','Outdent','Indent'],
@@ -94,12 +92,12 @@ CKEDITOR.config.toolbar_CustomWikiInline = [
 
 
 CKEDITOR.config.toolbar_CustomPedplanner = [
-	['Source','-','Maximize','Preview','PasteFromWord','Bold','Italic','Underline', '-','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath'], 
+	['Source','-','Maximize','Preview','Bold','Italic','Underline', '-','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath'], 
 	['Image','Link','Iframe','Table','Emojione','Font','FontSize']
 ];
 
 CKEDITOR.config.toolbar_CustomPedplannerInline = [
-	['Sourcedialog','-','PasteFromWord','Bold','Italic','Underline', '-','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath'], 
+	['Sourcedialog','-','Bold','Italic','Underline', '-','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','Jlatexmath'], 
 	['Image','Link','Iframe','Table','Emojione','Font','FontSize']
 ];
 
