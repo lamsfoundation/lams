@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2018, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -13,10 +13,10 @@
  * (1) http://ckeditor.com/builder
  *     Visit online builder to build CKEditor from scratch.
  *
- * (2) http://ckeditor.com/builder/6c718a1aed05965d505a9b07cf98b070
+ * (2) http://ckeditor.com/builder/da259b618b74b16675ea8a4121ec1564
  *     Visit online builder to build CKEditor, starting with the same setup as before.
  *
- * (3) http://ckeditor.com/builder/download/6c718a1aed05965d505a9b07cf98b070
+ * (3) http://ckeditor.com/builder/download/da259b618b74b16675ea8a4121ec1564
  *     Straight download link to the latest version of CKEditor (Optimized) with the same setup as before.
  *
  * NOTE:
@@ -51,10 +51,10 @@ var CKBUILDER_CONFIG = {
 		'tests'
 	],
 	plugins : {
-		'about' : 1,
 		'autoembed' : 1,
 		'autogrow' : 1,
 		'basicstyles' : 1,
+		'bootstrapTabs' : 1,
 		'clipboard' : 1,
 		'colorbutton' : 1,
 		'colordialog' : 1,
@@ -75,10 +75,12 @@ var CKBUILDER_CONFIG = {
 		'format' : 1,
 		'forms' : 1,
 		'horizontalrule' : 1,
+		'html5audio' : 1,
 		'htmlwriter' : 1,
 		'iframe' : 1,
 		'iframedialog' : 1,
 		'image' : 1,
+		'image2' : 1,
 		'indentblock' : 1,
 		'indentlist' : 1,
 		'justify' : 1,
@@ -89,11 +91,9 @@ var CKBUILDER_CONFIG = {
 		'pastefromword' : 1,
 		'preview' : 1,
 		'resize' : 1,
-		'selectall' : 1,
 		'showborders' : 1,
 		'sourcearea' : 1,
 		'sourcedialog' : 1,
-		'specialchar' : 1,
 		'stylescombo' : 1,
 		'tab' : 1,
 		'table' : 1,
@@ -105,73 +105,33 @@ var CKBUILDER_CONFIG = {
 		'wysiwygarea' : 1
 	},
 	languages : {
-		'af' : 1,
 		'ar' : 1,
-		'az' : 1,
 		'bg' : 1,
-		'bn' : 1,
-		'bs' : 1,
 		'ca' : 1,
 		'cs' : 1,
 		'cy' : 1,
 		'da' : 1,
 		'de' : 1,
-		'de-ch' : 1,
 		'el' : 1,
 		'en' : 1,
 		'en-au' : 1,
-		'en-ca' : 1,
-		'en-gb' : 1,
-		'eo' : 1,
 		'es' : 1,
-		'es-mx' : 1,
-		'et' : 1,
-		'eu' : 1,
-		'fa' : 1,
-		'fi' : 1,
-		'fo' : 1,
 		'fr' : 1,
-		'fr-ca' : 1,
-		'gl' : 1,
-		'gu' : 1,
-		'he' : 1,
-		'hi' : 1,
-		'hr' : 1,
 		'hu' : 1,
 		'id' : 1,
-		'is' : 1,
 		'it' : 1,
 		'ja' : 1,
-		'ka' : 1,
-		'km' : 1,
 		'ko' : 1,
-		'ku' : 1,
-		'lt' : 1,
-		'lv' : 1,
-		'mk' : 1,
-		'mn' : 1,
 		'ms' : 1,
-		'nb' : 1,
 		'nl' : 1,
 		'no' : 1,
-		'oc' : 1,
 		'pl' : 1,
-		'pt' : 1,
 		'pt-br' : 1,
-		'ro' : 1,
 		'ru' : 1,
-		'si' : 1,
-		'sk' : 1,
 		'sl' : 1,
-		'sq' : 1,
-		'sr' : 1,
-		'sr-latn' : 1,
 		'sv' : 1,
 		'th' : 1,
 		'tr' : 1,
-		'tt' : 1,
-		'ug' : 1,
-		'uk' : 1,
 		'vi' : 1,
 		'zh' : 1,
 		'zh-cn' : 1
