@@ -205,6 +205,11 @@
         redirect="false"
       />
       <forward
+        name="peerreview"
+        path="/tblmonitor/peerreview.jsp"
+        redirect="false"
+      />
+      <forward
         name="sequence"
         path="/tblmonitor/sequence.jsp"
         redirect="false"

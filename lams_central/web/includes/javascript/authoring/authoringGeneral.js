@@ -132,7 +132,9 @@ var paper = null,
 			'optionalActivityBorder'    : '#00007f',
 			// dashed border around a selected activity 
 			'selectEffect'        : 'black',
-			'transition'   		  : 'rgb(119,126,157)'
+			'transition'   		  : 'rgb(119,126,157)',
+			// highlight TBL activities which should be grouped
+			'activityRequireGrouping' : 'red'
 		},
 	
 		'defaultTextAttributes' : {
@@ -724,7 +726,7 @@ GeneralInitLib = {
 				});
 				// limit size of the canvas so dialog does not resize after SVG loads
 				$('#ldStoreDialogCanvasDiv', dialog).css({
-					'max-width' : $(window).width() - 275 + 'px',
+					'max-width' : $(window).width() - 425 + 'px',
 					'max-height':  $(window).height() - 190 + 'px',
 				});
 				
@@ -743,11 +745,10 @@ GeneralInitLib = {
 			},
 			'close' : null,
 			'data' : {
-				'prepareForOpen' : function(dialogTitle, learningDesignTitle, shownElementIDs, highlightFirstTreeChild){
-					var tree = MenuLib.loadLearningDesignTree();
-					if (highlightFirstTreeChild) {
-						tree.getRoot().children[0].highlight();
-					}
+				'prepareForOpen' : function(dialogTitle, learningDesignTitle, shownElementIDs, highlightFolder){
+					// only Save As uses highlightFolder; otherwise the first folder in top level gets expanded and highlighted
+					layout.folderPathCurrent = highlightFolder && layout.ld.folderPath ? layout.ld.folderPath.slice() : [];
+					MenuLib.loadLearningDesignTree();
 					
 					$('#ldStoreDialogNameContainer input', layout.ldStoreDialog).val(learningDesignTitle);
 					$('.modal-title', layout.ldStoreDialog).text(dialogTitle);
@@ -933,6 +934,9 @@ GeneralInitLib = {
 						new YAHOO.widget.TextNode(this, node);
 					});
 			}
+			
+			// expand the folder where existing LD resides, if applicable
+			MenuLib.highlightFolder(node);
 			
 			// required by YUI
 			callback();
@@ -1528,45 +1532,85 @@ GeneralLib = {
 	 * there is a good chance this is a TBL sequence and all activities must be grouped.
 	 */
 	checkTBLGrouping : function(){
-		var firstGroupingActivity = null;
+		var firstActivity = null,
+			activities = [],
+			getNextActivity = function(activity) {
+				var nextActivity = activity;
+				do {
+					nextActivity = nextActivity.transitions.from.length > 0 ? nextActivity.transitions.from[0].toActivity : null;
+					// skip gates along the way
+				} while (nextActivity instanceof ActivityDefs.GateActivity);
+				return nextActivity;
+			};
+		// find first activity in the sequence
+		// it can be wrong if not all activities are connected
 		$.each(layout.activities, function(){
-			if (this instanceof ActivityDefs.GroupingActivity && this.transitions 
-					&& this.transitions.to.length === 0 && this.transitions.from.length > 0){
-				firstGroupingActivity = this;
+			if (this.transitions && this.transitions.to.length === 0 && this.transitions.from.length > 0){
+				firstActivity = this;
 				return false;
 			}
 		});
-		if (!firstGroupingActivity) {
-			return true;
+		if (!firstActivity) {
+			return null;
 		}
-		var secondActivity = firstGroupingActivity.transitions.from.length > 0 ? firstGroupingActivity.transitions.from[0].toActivity : null; 
-		var templateContainer = $('#templateContainerCell');
-		var isTBL = secondActivity instanceof ActivityDefs.ToolActivity
+		// the first activity can be grouping or the second one
+		var firstGroupingActivity = firstActivity instanceof ActivityDefs.GroupingActivity ? firstActivity : null;
+		if (!firstGroupingActivity) {
+			firstGroupingActivity = getNextActivity(firstActivity);
+			if (!(firstGroupingActivity instanceof ActivityDefs.GroupingActivity)){
+				return null;
+			}
+		}
+
+		// then it is Assessment or MCQ
+		var secondActivity = getNextActivity(firstGroupingActivity),
+			templateContainer = $('#templateContainerCell'),
+			isTBL = secondActivity instanceof ActivityDefs.ToolActivity
 			&& (secondActivity.learningLibraryID == $('.template[learningLibraryTitle="Assessment"]', templateContainer).attr('learningLibraryId')
 			    || secondActivity.learningLibraryID == $('.template[learningLibraryTitle="MCQ"]', templateContainer).attr('learningLibraryId'));
 		if (!isTBL){
-			return true;
+			return null;
 		}
-		var thirdActivity = secondActivity.transitions.from.length > 0 ? secondActivity.transitions.from[0].toActivity : null;
+		activities.push(secondActivity);
+		// then leader selection
+		var thirdActivity = getNextActivity(secondActivity);
 		isTBL = thirdActivity instanceof ActivityDefs.ToolActivity 
 				&& thirdActivity.learningLibraryID == $('.template[learningLibraryTitle="Leaderselection"]', templateContainer).attr('learningLibraryId');
 		if (!isTBL){
-			return true;
+			return null;
 		}
-		var fourthActivity = thirdActivity.transitions.from.length > 0 ? thirdActivity.transitions.from[0].toActivity : null;
+		activities.push(thirdActivity);
+		// then scratchie
+		var fourthActivity = getNextActivity(thirdActivity);
 		isTBL = fourthActivity instanceof ActivityDefs.ToolActivity 
 				&& fourthActivity.learningLibraryID == $('.template[learningLibraryTitle="Scratchie"]', templateContainer).attr('learningLibraryId');
 		if (!isTBL){
-			return true;
+			return null;
 		}
-		var result = true;
-		$.each(layout.activities, function(){
-			if (this != firstGroupingActivity && this instanceof ActivityDefs.ToolActivity && !this.grouping){
-				result = false;
-				return false;
+		activities.push(fourthActivity);
+		
+		// then optional assessments
+		var nextActivity = fourthActivity;
+		do {
+			nextActivity = getNextActivity(nextActivity);
+			if (nextActivity instanceof ActivityDefs.ToolActivity
+				&& nextActivity.learningLibraryID == $('.template[learningLibraryTitle="Assessment"]', templateContainer).attr('learningLibraryId')) {
+				activities.push(nextActivity);
+			} else {
+				nextActivity = null;
 			}
-		});
-		return result;
+		} while (nextActivity);
+		
+		// check which ones are not grouped
+		var activitiesToGroup = [];
+		for (var activity of activities) {
+			if (!activity.grouping){
+				activitiesToGroup.push(activity);
+				activity.requireGrouping = true;
+				activity.draw();
+			}
+		}
+		return activitiesToGroup.length === 0 ? null : activitiesToGroup;
 	},
 	
 	/**
@@ -1657,6 +1701,7 @@ GeneralLib = {
 				layout.ld = {
 					'learningDesignID' : ld.learningDesignID,
 					'folderID'		   : ld.workspaceFolderID,
+					'folderPath'	   : ld.folderPath,
 					'contentFolderID'  : ld.contentFolderID,
 					'title'			   : ld.title,
 					'maxUIID'		   : 0,
@@ -2780,13 +2825,19 @@ GeneralLib = {
 								GeneralLib.setModified(false);
 								
 								// close the Live Edit dialog
-								if (GeneralLib.checkTBLGrouping()) {
+								var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
+								if (missingGroupingOnActivities) {
+									var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
+									for (var activity of missingGroupingOnActivities){
+											info += '<br /> * ' + activity.title; 
+										}
+									layout.infoDialog.data('show')(info);
+
+								} else {
 									layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL, true);
 									setTimeout(function(){
 										window.parent.closeDialog('dialogAuthoring');
 									}, 5000);
-								} else {
-									layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
 								}
 							}
 						});
@@ -2801,10 +2852,16 @@ GeneralLib = {
 					}
 					
 					if (!layout.ld.invalid) {
-						if (GeneralLib.checkTBLGrouping()) {
-							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL, true);
+						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
+						if (missingGroupingOnActivities) {
+							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
+							for (var activity of missingGroupingOnActivities){
+									info += '<br /> * ' + activity.title; 
+								}
+							layout.infoDialog.data('show')(info);
+
 						} else {
-							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING);
+							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL, true);
 						}
 					}
 					

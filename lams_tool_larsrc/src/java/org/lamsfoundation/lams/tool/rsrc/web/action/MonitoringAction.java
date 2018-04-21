@@ -215,8 +215,9 @@ public class MonitoringAction extends Action {
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID);
 	boolean isHideItem = WebUtil.readBooleanParam(request, ResourceConstants.PARAM_IS_HIDE_ITEM);
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	IResourceService service = getResourceService();
-	service.setItemVisible(itemUid, sessionId, !isHideItem);
+	service.setItemVisible(itemUid, sessionId, contentId, !isHideItem);
 
 	return null;
     }

@@ -13,7 +13,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -29,6 +28,7 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
@@ -66,10 +66,11 @@ public class TblMonitoringAction extends LamsDispatchAction {
     private static ILamsToolService toolService;
     private static IActivityDAO activityDAO;
     private static IGradebookService gradebookService;
-    
+
     /**
-     * Displays addStudent page. 
+     * Displays addStudent page.
      */
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	initServices();
@@ -113,18 +114,18 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	List<GradebookUserActivity> traGradebookUserActivities = new LinkedList<>();
 	if (isIraMcqAvailable || isIraAssessmentAvailable) {
 	    iraGradebookUserActivities = gradebookService.getGradebookUserActivities(iraToolActivityId);
-	} 
+	}
 	if (isScratchieAvailable) {
 	    traGradebookUserActivities = gradebookService.getGradebookUserActivities(traToolActivityId);
 	}
-	
+
 	Set<Long> leaderUserIds = leaderselectionToolActivityId == null ? new HashSet<Long>()
 		: toolService.getLeaderUserId(leaderselectionToolActivityId);
 
 	GroupingActivity groupingActivity = getGroupingActivity(lesson);
 	Grouping grouping = groupingActivity == null ? null : groupingActivity.getCreateGrouping();
 	Set<Group> groups = grouping == null ? null : grouping.getGroups();
-	
+
 	Set<TblGroupDTO> groupDtos = new TreeSet<TblGroupDTO>();
 	if (groups != null) {
 	    for (Group group : groups) {
@@ -151,7 +152,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 				}
 			    }
 			}
-			
+
 			if (isScratchieAvailable) {
 			    //find according traGradebookUserActivity
 			    for (GradebookUserActivity traGradebookUserActivity : traGradebookUserActivities) {
@@ -160,7 +161,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 				    groupDto.setTraScore(traGradebookUserActivity.getMark());
 				    break;
 				}
-			    }			    
+			    }
 			}
 		    }
 		}
@@ -193,7 +194,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 
 			    Long activityId = contributeActivity.getActivityID();
 			    Activity activity = monitoringService.getActivityById(activityId);
-			    PermissionGateDTO gateDto = new PermissionGateDTO(activity);
+			    PermissionGateDTO gateDto = new PermissionGateDTO((PermissionGateActivity) activity);
 
 			    gateDto.setUrl(contributeEntry.getURL());
 			    gateDto.setComplete(contributeEntry.getIsComplete());
@@ -212,16 +213,16 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	request.setAttribute("permissionGates", permissionGates);
 	return mapping.findForward("gates");
     }
-    
+
     /**
      * Shows forum page
      */
     public ActionForward forum(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	
+
 	long forumActivityId = WebUtil.readLongParam(request, "activityId");
 	ToolActivity forumActivity = (ToolActivity) monitoringService.getActivityById(forumActivityId);
-	
+
 	int attemptedLearnersNumber = lessonService.getCountLearnersHaveAttemptedActivity(forumActivity);
 	request.setAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
@@ -229,6 +230,24 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	request.setAttribute("toolSessions", toolSessions);
 
 	return mapping.findForward("forum");
+    }
+
+    /**
+     * Shows peerreview page
+     */
+    public ActionForward peerreview(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+
+	long peerreviewActivityId = WebUtil.readLongParam(request, "activityId");
+	ToolActivity peerreviewActivity = (ToolActivity) monitoringService.getActivityById(peerreviewActivityId);
+
+	int attemptedLearnersNumber = lessonService.getCountLearnersHaveAttemptedActivity(peerreviewActivity);
+	request.setAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
+
+	Set<ToolSession> toolSessions = peerreviewActivity.getToolSessions();
+	request.setAttribute("toolSessions", toolSessions);
+
+	return mapping.findForward("peerreview");
     }
 
     /**
@@ -243,7 +262,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
     }
 
     /**
-     * Returns lesson activities sorted by the learning design order. 
+     * Returns lesson activities sorted by the learning design order.
      */
     @SuppressWarnings("unchecked")
     private List<Activity> getLessonActivities(Lesson lesson) {
@@ -262,10 +281,10 @@ public class TblMonitoringAction extends LamsDispatchAction {
 
 	return activities;
     }
-    
+
     /**
      * Sort all activities by the learning design order.
-     * 
+     *
      * @param activity
      * @param sortedActivities
      */
@@ -358,16 +377,16 @@ public class TblMonitoringAction extends LamsDispatchAction {
 		    iraPassed = true;
 		    if (CentralConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
 			request.setAttribute("isIraMcqAvailable", true);
-			
+
 		    } else {
 			request.setAttribute("isIraAssessmentAvailable", true);
 		    }
 		    request.setAttribute("iraToolContentId", toolContentId);
 		    request.setAttribute("iraToolActivityId", toolActivityId);
-		    
+
 		    continue;
 		}
-		
+
 		//aes are counted only after Scratchie activity
 		if (scratchiePassed && CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
 		    request.setAttribute("isAeAvailable", true);
@@ -379,15 +398,19 @@ public class TblMonitoringAction extends LamsDispatchAction {
 		    request.setAttribute("isForumAvailable", true);
 		    request.setAttribute("forumActivityId", toolActivityId);
 
-		//tRA is the first scratchie activity
+		} else if (CentralConstants.TOOL_SIGNATURE_PEER_REVIEW.equals(toolSignature)) {
+		    request.setAttribute("isPeerreviewAvailable", true);
+		    request.setAttribute("peerreviewToolContentId", toolContentId);
+
+		    //tRA is the first scratchie activity
 		} else if (!scratchiePassed && CentralConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
 		    scratchiePassed = true;
-			
+
 		    request.setAttribute("isScratchieAvailable", true);
 		    request.setAttribute("traToolContentId", toolContentId);
 		    request.setAttribute("traToolActivityId", toolActivityId);
 		}
-		
+
 		if (CentralConstants.TOOL_SIGNATURE_LEADERSELECTION.equals(toolSignature)) {
 		    request.setAttribute("leaderselectionToolActivityId", toolActivityId);
 		    request.setAttribute("leaderselectionToolContentId", toolContentId);
@@ -397,7 +420,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 		request.setAttribute("isGatesAvailable", true);
 	    }
 	}
-	
+
 	request.setAttribute("assessmentToolContentIds", assessmentToolContentIds);
 	request.setAttribute("assessmentActivityTitles", assessmentActivityTitles);
     }
@@ -416,7 +439,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	if (coreToolService == null) {
 	    coreToolService = (ILamsCoreToolService) ctx.getBean("lamsCoreToolService");
 	}
-	
+
 	if (toolService == null) {
 	    toolService = (ILamsToolService) ctx.getBean("lamsToolService");
 	}

@@ -246,7 +246,7 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	    + " FROM tl_lasbmt11_submission_details detail, tl_lasbmt11_report report "
 	    + " WHERE detail.session_id = :sessionId "
 	    + " AND detail.submission_id = report.report_id "
-    	    + " AND detail.filePath = (SELECT filePath from tl_lasbmt11_submission_details "
+    	    + " AND detail.uuid = (SELECT uuid from tl_lasbmt11_submission_details "
 	    + " WHERE submission_id = :reportId); ";
     
     @Override

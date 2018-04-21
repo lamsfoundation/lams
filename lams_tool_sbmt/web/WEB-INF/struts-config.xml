@@ -105,6 +105,11 @@
         redirect="false"
       />
       <forward
+        name="uploadredirect"
+        path="/learner/redirectAfterSubmit.jsp"
+        redirect="false"
+      />
+      <forward
         name="defineLater"
         path="/learner/definelater.jsp"
         redirect="false"

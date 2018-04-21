@@ -75,6 +75,10 @@
 				options = {
 					activityId: "${forumActivityId}"
 				};
+				
+			} else if (method == "peerreview") {
+				toolContentID = "${peerreviewToolContentId}";
+				url = "<lams:LAMSURL/>tool/laprev11/tblmonitoring.do";
 			}
 
 			// Merge additional options into existing options object
@@ -230,6 +234,17 @@
 							<a class="tab-link" href="#nogo" data-method="aes">
 								<i class="fa fa-dashboard"></i>
 								<fmt:message key="label.aes"/>
+							</a>
+						</td>
+					</tr>
+				</c:if>
+				
+				<c:if test="${not empty isPeerreviewAvailable}">
+					<tr>
+						<td id="menu-item-peerreview">
+							<a class="tab-link" href="#nogo" data-method="peerreview">
+								<i class="fa fa-users"></i>
+								<fmt:message key="label.peer.review"/>
 							</a>
 						</td>
 					</tr>

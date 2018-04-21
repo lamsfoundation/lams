@@ -158,8 +158,8 @@ function showDialog(id, initParams, extraButtons, recreate) {
 				modalDialog.on('drag', function(event, ui){
 					// pass the event to the dialog, not its internal element
 					dialog.offset({
-						'top'  : ui.offset.top + 5,
-						'left' : ui.offset.left + 5
+						'top'  : Math.min(window.innerHeight - 30, Math.max(0, ui.offset.top + 5)),
+						'left' : Math.min(window.innerWidth - 200, Math.max(0, ui.offset.left + 5))
 					});
 					modalDialog.css({
 						'position' : 'static'

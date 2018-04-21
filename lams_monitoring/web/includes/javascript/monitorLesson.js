@@ -106,7 +106,7 @@ function initLessonTab(){
 	// sets up dialog for editing class
 	var classDialog = showDialog('classDialog',{
 		'autoOpen'  : false,
-		'width'     : 510,
+		'width'     : 950,
 		'title' 	: LABELS.LESSON_EDIT_CLASS,
 		'resizable' : true,
 		'open'      : function(){

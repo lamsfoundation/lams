@@ -464,15 +464,24 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public int emailReportToUser(Long toolContentId, Long sessionId, Long userId) {
+    public String generateEmailReportToUser(Long toolContentId, Long sessionId, Long userId) {
 	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
 	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
-
-	String email = new EmailAnalysisBuilder(peerreview, session, ratingService, peerreviewSessionDao,
+	return new EmailAnalysisBuilder(peerreview, session, ratingService, peerreviewSessionDao,
 		peerreviewUserDao, this, messageService).generateHTMLEMailForLearner(userId);
-	eventNotificationService.sendMessage(null, userId.intValue(), IEventNotificationService.DELIVERY_METHOD_MAIL,
-		getResultsEmailSubject(peerreview), email, true);
-	return 1;
+    }
+
+    @Override
+    public int emailReportToUser(Long toolContentId, Long sessionId, Long userId, String email) {
+	PeerreviewUser user = peerreviewUserDao.getUserByUserIDAndSessionID(userId, sessionId);
+	if ( user != null ) {
+            eventNotificationService.sendMessage(null, userId.intValue(), IEventNotificationService.DELIVERY_METHOD_MAIL,
+            	getResultsEmailSubject(user.getSession().getPeerreview()), email, true);
+            return 1;
+	} else {
+	    log.error("Unable to send Peer Review email as user is not in session. SessionId="+sessionId+" userId="+userId);
+	    return 0;
+	}
     }
 
     @Override

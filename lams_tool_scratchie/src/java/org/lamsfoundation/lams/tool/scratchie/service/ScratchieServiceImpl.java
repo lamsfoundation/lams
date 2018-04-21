@@ -941,11 +941,11 @@ public class ScratchieServiceImpl
 
 	    //skip empty items if required
 	    if (!burningQuestionDtosOfSpecifiedItem.isEmpty() || includeEmptyItems) {
-	    BurningQuestionItemDTO burningQuestionItemDto = new BurningQuestionItemDTO();
-	    burningQuestionItemDto.setScratchieItem(item);
-	    burningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
-	    burningQuestionItemDtos.add(burningQuestionItemDto);
-	}
+		BurningQuestionItemDTO burningQuestionItemDto = new BurningQuestionItemDTO();
+		burningQuestionItemDto.setScratchieItem(item);
+		burningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
+		burningQuestionItemDtos.add(burningQuestionItemDto);
+	    }
 	}
 
 	// handle general burning question
@@ -966,7 +966,7 @@ public class ScratchieServiceImpl
 	generalBurningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
 	//skip empty item if required
 	if (!burningQuestionDtosOfSpecifiedItem.isEmpty() || includeEmptyItems) {
-	burningQuestionItemDtos.add(generalBurningQuestionItemDto);
+	    burningQuestionItemDtos.add(generalBurningQuestionItemDto);
 	}
 
 	//escape for Javascript
@@ -2251,12 +2251,13 @@ public class ScratchieServiceImpl
 	scratchie.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
 	scratchie.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 
-	scratchie.setBurningQuestionsEnabled(JsonUtil.optBoolean(toolContentJSON, "burningQuestionsEnabled", false));
+	scratchie.setBurningQuestionsEnabled(JsonUtil.optBoolean(toolContentJSON, "burningQuestionsEnabled", true));
 	scratchie.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
 	scratchie.setExtraPoint(JsonUtil.optBoolean(toolContentJSON, "extraPoint", false));
 	scratchie.setReflectOnActivity(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	scratchie.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	scratchie.setShowScrachiesInResults(JsonUtil.optBoolean(toolContentJSON, "showScrachiesInResults", true));
 
 	// Scratchie Items
 	Set<ScratchieItem> newItems = new LinkedHashSet<>();

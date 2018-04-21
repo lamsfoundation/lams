@@ -1,0 +1,27 @@
+@import "_lams_variables.scss";
+	
+.ui-jqgrid {
+	border-left-style: none !important;
+	border-right-style: none !important;
+	border-bottom-style: none !important;
+}
+
+.ui-jqgrid tr {
+	border-left-style: none !important;
+}
+
+.ui-jqgrid td {
+	border-style: none !important;
+}
+
+.ui-jqgrid a {
+    color: $a-link-default !important;
+}
+
+.ui-jqgrid a:hover {
+    color: $a-link-default-hover !important;
+}
+
+.ui-jqgrid a:focus {
+    color: $a-link-default-focus !important;
+}

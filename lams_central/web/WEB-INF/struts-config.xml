@@ -455,8 +455,11 @@
     <forward name="init" path="/authoring/template/tbl/tbl.jsp" />
     <forward name="question" path="/authoring/template/tool/mcquestion.jsp" />
     <forward name="questionoption" path="/authoring/template/tool/mcoption.jsp" />
-    <forward name="assess" path="/authoring/template/tool/assessment.jsp" />
     <forward name="redooption" path="/authoring/template/tool/mcredooption.jsp" />
+    <forward name="assess" path="/authoring/template/tool/assessment.jsp" />
+    <forward name="assessmcq" path="/authoring/template/tool/assessmcq.jsp" />
+    <forward name="assessredooption" path="/authoring/template/tool/assessredooption.jsp" />
+    <forward name="assessoption" path="/authoring/template/tool/assessoption.jsp" />
     <forward name="peerreviewstar" path="/authoring/template/tool/peerreviewstar.jsp" />
     </action>
 

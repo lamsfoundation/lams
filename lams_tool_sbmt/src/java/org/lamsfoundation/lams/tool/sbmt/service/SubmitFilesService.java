@@ -264,23 +264,57 @@ public class SubmitFilesService
     @Override
     public void copyLearnerContent(SubmitUser fromUser, SubmitUser toUser) throws ToolException {
 
-	List<SubmissionDetails> leadersubmissions = submissionDetailsDAO.getBySessionAndLearner(fromUser.getSessionID(),
+	if ((fromUser == null) || (toUser == null) || fromUser.getUid().equals(toUser.getUid())) {
+	    return;
+	}
+
+	List<SubmissionDetails> leaderSubmissions = submissionDetailsDAO.getBySessionAndLearner(fromUser.getSessionID(),
 		fromUser.getUserID());
-	for (SubmissionDetails leadersubmission : leadersubmissions) {
-	    if (leadersubmission.getSubmitFileSession().getSessionID().equals(toUser.getSessionID())) {
-		SubmissionDetails usersubmission = new SubmissionDetails();
-		usersubmission.setLearner(toUser);
-		usersubmission.setDateOfSubmission(new Date());
-		usersubmission.setFileDescription(leadersubmission.getFileDescription());
-		usersubmission.setFilePath(leadersubmission.getFilePath());
-		usersubmission.setSubmitFileSession(leadersubmission.getSubmitFileSession());
-		usersubmission.setVersionID(leadersubmission.getVersionID());
-		SubmitFilesReport report1 = new SubmitFilesReport();
-		usersubmission.setReport(report1);
-		usersubmission.setRemoved(leadersubmission.isRemoved());
-		usersubmission.setUuid(leadersubmission.getUuid());
-		submissionDetailsDAO.save(usersubmission);
+
+	List<SubmissionDetails> existingSubmissions = submissionDetailsDAO
+		.getBySessionAndLearner(toUser.getSessionID(), toUser.getUserID());
+
+	// Note: uuid never changes once a file is uploaded as this is the key from the content repository.
+	for (SubmissionDetails leadersubmission : leaderSubmissions) {
+	    SubmissionDetails usersubmission = null;
+	    for (SubmissionDetails exSubCheck : existingSubmissions) {
+		if (exSubCheck.getUuid().equals(leadersubmission.getUuid())) {
+		    usersubmission = exSubCheck;
+		    break;
+		}
 	    }
+	    if (usersubmission == null) {
+		usersubmission = new SubmissionDetails();
+	    }
+	    usersubmission.setLearner(toUser);
+	    usersubmission.setDateOfSubmission(leadersubmission.getDateOfSubmission());
+	    usersubmission.setFileDescription(leadersubmission.getFileDescription());
+	    usersubmission.setFilePath(leadersubmission.getFilePath());
+	    usersubmission.setSubmitFileSession(leadersubmission.getSubmitFileSession());
+	    usersubmission.setUuid(leadersubmission.getUuid());
+	    usersubmission.setVersionID(leadersubmission.getVersionID());
+	    usersubmission.setRemoved(leadersubmission.isRemoved());
+	    // submissionID is set by Hibernate
+
+	    if (leadersubmission.getReport() != null) {
+		SubmitFilesReport leaderReport = leadersubmission.getReport();
+		SubmitFilesReport userreport = usersubmission.getReport();
+		if (userreport == null) {
+		    userreport = new SubmitFilesReport();
+		    usersubmission.setReport(userreport);
+		}
+		userreport.setComments(leaderReport.getComments());
+		userreport.setDateMarksReleased(leaderReport.getDateMarksReleased());
+		userreport.setMarkFileName(leaderReport.getMarkFileName());
+		userreport.setMarkFileUUID(leaderReport.getMarkFileUUID());
+		userreport.setMarkFileVersionID(leaderReport.getMarkFileVersionID());
+		userreport.setMarks(leaderReport.getMarks());
+		// reportID is set by Hibernate to match submissionID
+	    } else {
+		usersubmission.setReport(null);
+	    }
+	    
+	    submissionDetailsDAO.save(usersubmission);
 	}
     }
 
@@ -665,6 +699,7 @@ public class SubmitFilesService
 	return new ArrayList(details);
     }
 
+    
     @Override
     public SubmissionDetails getSubmissionDetail(Long detailId) {
 	return submissionDetailsDAO.getSubmissionDetailsByID(detailId);
@@ -730,6 +765,13 @@ public class SubmitFilesService
 	SubmitFilesSession session = getSessionById(sessionID);
 	SubmitFilesContent content = session.getContent();
 	if (content.isUseSelectLeaderToolOuput()) {
+
+	    // can share the mark file across users
+	    NodeKey nodeKey = null;
+	    if ((markFile != null) && !StringUtils.isEmpty(markFile.getFileName())) {
+		nodeKey = this.processFile(markFile);
+	    }
+
 	    List<Long> reportIDs = submitUserDAO.getReportsForGroup(sessionID, reportID);
 	    for (Long reportIDGroup : reportIDs) {
 
@@ -740,7 +782,7 @@ public class SubmitFilesService
 		    report.setMarks(marks);
 
 		    // If there is a new file, delete the existing and add the mark file
-		    if ((markFile != null) && !StringUtils.isEmpty(markFile.getFileName())) {
+		    if ( nodeKey != null) {
 
 			// Delete the existing
 			if (report.getMarkFileUUID() != null) {
@@ -749,11 +791,6 @@ public class SubmitFilesService
 			    report.setMarkFileUUID(null);
 			    report.setMarkFileVersionID(null);
 			}
-
-			// Add the new file
-			NodeKey nodeKey = this.processFile(markFile);
-			// NodeKey nodeKey = toolContentHandler.uploadFile(marksFileInputStream, marksFileName, null,
-			// IToolContentHandler.TYPE_ONLINE);
 
 			report.setMarkFileName(markFile.getFileName());
 			report.setMarkFileUUID(nodeKey.getUuid());
@@ -800,15 +837,35 @@ public class SubmitFilesService
     }
 
     @Override
-    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID) {
-	SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
-	if (report != null) {
-	    deleteFromRepository(markFileUUID, markFileVersionID);
-	    report.setMarkFileName(null);
-	    report.setMarkFileUUID(null);
-	    report.setMarkFileVersionID(null);
-	    submitFilesReportDAO.update(report);
+    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID, Long sessionID) {
+
+	SubmitFilesSession session = getSessionById(sessionID);
+	SubmitFilesContent content = session.getContent();
+
+	if (content.isUseSelectLeaderToolOuput()) {
+	    List<Long> reportIDs = submitUserDAO.getReportsForGroup(sessionID, reportID);
+	    for (Long reportIDGroup : reportIDs) {
+		SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportIDGroup);
+		if (report != null) {
+		    report.setMarkFileName(null);
+		    report.setMarkFileUUID(null);
+		    report.setMarkFileVersionID(null);
+		    submitFilesReportDAO.update(report);
+		}
+	    }
+	    
+	} else {
+	    SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
+	    if (report != null) {
+		report.setMarkFileName(null);
+		report.setMarkFileUUID(null);
+		report.setMarkFileVersionID(null);
+		submitFilesReportDAO.update(report);
+	    }
 	}
+
+	deleteFromRepository(markFileUUID, markFileVersionID);
+
     }
 
     @Override

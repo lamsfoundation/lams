@@ -193,7 +193,7 @@ public class MarkAction extends LamsDispatchAction {
 	}
 
 	submitFilesService.removeMarkFile(markForm.getReportID(), markForm.getMarkFileUUID(),
-		markForm.getMarkFileVersionID());
+		markForm.getMarkFileVersionID(), markForm.getToolSessionID());
 
 	FileDetailsDTO fileDetailsDTO = submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale());
 	updateMarkForm(markForm, fileDetailsDTO);

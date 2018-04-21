@@ -361,7 +361,7 @@ var MenuLib = {
 								  	 'label'           : this.isRunSequencesFolder ?
 								  			 				LABELS.RUN_SEQUENCES_FOLDER : this.name,
 								  	 'folderID'		   : this.folderID,
-								  	 'canSave'		   : !this.isRunSequencesFolder,
+								  	 'canSave'		   : this.folderID > 0 && !this.isRunSequencesFolder,
 						  	         'canModify'	   : this.canModify
 									 });
 					});
@@ -381,7 +381,42 @@ var MenuLib = {
 		
 		return result;
 	},
-
+	
+	/**
+	 * Highlights the folder where existing LD already resides
+	 * or the user folder otherwise.
+	 */
+	highlightFolder : function(folder) {
+		// if there are no children or stop condition (no path) was reached
+		if (folder.children.length === 0 || layout.folderPathCurrent === null) {
+			return;
+		}
+		var chosenFolder = null;
+		// are there any steps left?
+		if (layout.folderPathCurrent.length > 0) {
+			// look for target folder in children
+			var folderID = layout.folderPathCurrent.shift();
+			$.each(folder.children, function(index, child){
+				if (folderID == child.data.folderID) {
+					chosenFolder = child;
+					return false;
+				}
+			});
+		}
+		// if last piece of folder path was consumed, set stop condition
+		if (layout.folderPathCurrent.length === 0) {
+			layout.folderPathCurrent = null;
+		}
+		// no folder found or path was empty from the beginning
+		if (!chosenFolder) {
+			chosenFolder = folder.children[0];
+		}
+		// if folder, highlight and expand
+		if (!chosenFolder.isLeaf) {
+			chosenFolder.expand();
+			chosenFolder.highlight();
+		}
+	},
 	
 	/**
 	 * Opens a pop up for importing LD. Loads the imported LD to canvas.
@@ -456,8 +491,8 @@ var MenuLib = {
 		tree.buildTreeFromObject(MenuLib.getFolderContents());
 		tree.render();
 		
-		// expand the first (user) folder
-		tree.getRoot().children[0].expand();
+		// expand the first folder or the one where existing LD resides
+		MenuLib.highlightFolder(tree.getRoot());
 		
 		return tree;
 	},
@@ -512,8 +547,11 @@ var MenuLib = {
 					dataType : 'text',
 					success : function() {
 						// open preview pop up window
+						var left = ((screen.width / 2) - (1280 / 2)),
+							// open the window a bit higher than center
+							top = ((screen.height / 2) - (720 / 2)) / 2;
 						window.open(LAMS_URL + 'home.do?method=learner&mode=preview&lessonID='+lessonID,'Preview',
-									'width=1280,height=720,resizable,scrollbars=yes,status=yes');
+									'width=1280,height=720,resizable,scrollbars=yes,status=yes,top=' + top + ',left=' + left);
 						previewButton.button('reset');
 					}
 				});

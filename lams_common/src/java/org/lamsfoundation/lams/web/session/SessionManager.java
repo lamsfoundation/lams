@@ -127,18 +127,31 @@ public class SessionManager {
     /**
      * Unregisteres the session by the given ID.
      */
-    public static void removeSessionByID(String sessionID, boolean invalidate) {
+    public static void removeSessionByID(String sessionID, boolean invalidate, boolean clearLoginMapping) {
 	HttpSession session = SessionManager.getSession(sessionID);
-	if (session == null) {
-	    return;
-	}
-	SessionManager.sessionIdMapping.remove(sessionID);
+	if (session != null) {
+	    SessionManager.sessionIdMapping.remove(sessionID);
 
-	if (invalidate) {
-	    // only mark for invalidation, not invalidate
-	    // otherwise on clustered environment we get problems with server-side invalidation of Infinispan distributed sessions
-	    // see WFLY-7281 and WFLY-7229; maybe it will work on WildFly 11
-	    session.setAttribute(LOG_OUT_FLAG, true);
+	    if (invalidate) {
+		// only mark for invalidation, not invalidate
+		// otherwise on clustered environment we get problems with server-side invalidation of Infinispan distributed sessions
+		// see WFLY-7281 and WFLY-7229; maybe it will work on WildFly 11
+		session.setAttribute(LOG_OUT_FLAG, true);
+	    }
+	}
+	if (clearLoginMapping) {
+	    // it seems that sometimes session does not contain userDTO, but login mapping exists
+	    // we need to try to clear it when destroying the session
+	    String login = null;
+	    for (Entry<String, HttpSession> sessionEntry : SessionManager.loginMapping.entrySet()) {
+		if (sessionID.equals(sessionEntry.getValue().getId())) {
+		    login = sessionEntry.getKey();
+		    break;
+		}
+	    }
+	    if (login != null) {
+		SessionManager.loginMapping.remove(login);
+	    }
 	}
     }
 

@@ -257,6 +257,7 @@ ActivityDefs = {
 		this.authorURL = authorURL;
 		this.title = title;
 		this.readOnly = readOnly;
+		this.requireGrouping = false;
 		if (evaluation) {
 			this.gradebookToolOutputDefinitionName = evaluation[0];
 			this.gradebookToolOutputWeight = evaluation.length > 1 ? evaluation[1] : null;
@@ -618,8 +619,10 @@ ActivityDraw = {
 										   }))
 						 // activity colour depends on its category ID
 						 .attr({
-							'stroke' : layout.colors.toolActivityBorder[layout.toolMetadata[this.learningLibraryID].activityCategoryID],
-							'stroke-width' : '0.5',
+							'stroke' : this.requireGrouping ?
+									   layout.colors.activityRequireGrouping 
+									   : layout.colors.toolActivityBorder[layout.toolMetadata[this.learningLibraryID].activityCategoryID],
+							'stroke-width' : this.requireGrouping ? '3' : '0.5',
 							'stroke-linejoin' : 'round',
 							'fill'   : layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
 						 }),

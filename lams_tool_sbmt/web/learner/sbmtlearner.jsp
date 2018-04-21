@@ -99,8 +99,9 @@
 			}
 		}
 		
-		function deleteLearnerFile(detailId) {
+		function deleteLearnerFile(detailId, filename) {
 			var msg = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
+			msg = msg.replace('{0}', filename);
 			var answer = confirm(msg);
 			if (answer) {	
 				 $.ajax({
@@ -202,7 +203,7 @@
 								</td>
 								<td>
 								<c:if test="${empty file.marks && hasEditRight}">
-								 <html:link href="javascript:deleteLearnerFile(${file.submissionID});" styleClass="btn btn-default btn-disable-on-submit pull-right">
+								 <html:link href="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" styleClass="btn btn-default btn-disable-on-submit pull-right">
 					                      <i class="fa fa-trash" title="<fmt:message key="label.monitoring.original.learner.file.delete" />"></i> <span class="hidden-xs"></span>
 				                 </html:link>
 				                 </c:if>

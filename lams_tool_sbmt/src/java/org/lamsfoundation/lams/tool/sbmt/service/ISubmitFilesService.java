@@ -144,7 +144,7 @@ public interface ISubmitFilesService {
      * @param markFileUUID
      * @param markFileVersionID
      */
-    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID);
+    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID, Long sessionID);
 
     /**
      * Mark the original file uploaded by a learner as deleted. Does not delete the file

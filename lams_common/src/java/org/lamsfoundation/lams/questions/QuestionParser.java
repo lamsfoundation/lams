@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.questions;
 
 import java.io.File;
@@ -50,7 +49,6 @@ import org.lamsfoundation.lams.util.UploadFileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
-import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -141,7 +139,8 @@ public class QuestionParser {
 	    Element questionItem = (Element) questionItems.item(questionItemIndex);
 	    NodeList questionItemTypes = questionItem.getElementsByTagName("qmd_itemtype");
 	    String questionItemType = questionItemTypes.getLength() > 0
-		    ? ((Text) questionItemTypes.item(0).getChildNodes().item(0)).getData() : null;
+		    ? ((Text) questionItemTypes.item(0).getChildNodes().item(0)).getData()
+		    : null;
 	    Question question = new Question();
 	    // check if it is "matching" question type
 	    if ("Matching".equalsIgnoreCase(questionItemType)
@@ -266,7 +265,8 @@ public class QuestionParser {
 		    NodeList scoreReference = answerMetadata.getElementsByTagName("varequal");
 		    // find where given metadata part references to
 		    String answerId = scoreReference.getLength() > 0
-			    ? ((Text) scoreReference.item(0).getChildNodes().item(0)).getData() : null;
+			    ? ((Text) scoreReference.item(0).getChildNodes().item(0)).getData()
+			    : null;
 		    if (answerId == null) {
 			// no answers at all, so it is Essay type
 			if ((question.getType() == null) && textBasedQuestion && !QuestionParser
@@ -569,8 +569,12 @@ public class QuestionParser {
 	    String elementName = questionElement.getNodeName();
 	    if ("mattext".equalsIgnoreCase(elementName) && questionElement.getChildNodes().getLength() > 0) {
 		// it is a HTML part
-		String questionTextPart = ((CDATASection) questionElement.getChildNodes().item(0)).getData();
-		result.append(questionTextPart);
+		NodeList questionTextChildrenList = questionElement.getChildNodes();
+		for (int questionTextIndex = 0; questionTextIndex < questionTextChildrenList
+			.getLength(); questionTextIndex++) {
+		    Node questionTextChildNode = questionElement.getChildNodes().item(questionTextIndex);
+		    result.append(((Text) questionTextChildNode).getData());
+		}
 	    } else if ("matimage".equalsIgnoreCase(elementName)) {
 		String fileName = ((Element) questionElement).getAttribute("uri");
 		if (resourcesFolderPath == null) {

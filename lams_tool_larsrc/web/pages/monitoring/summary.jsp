@@ -6,21 +6,7 @@
 <lams:css suffix="jquery.jRating"/>
 <link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet"/>
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
-<style media="screen,projection" type="text/css">
-	 .ui-jqgrid {
-		border-left-style: none !important;
-		border-right-style: none !important;
-		border-bottom-style: none !important;
-	}
-	
-	.ui-jqgrid tr {
-		border-left-style: none !important;
-	}
-	
-	.ui-jqgrid td {
-		border-style: none !important;
-	}
-</style>
+<link type="text/css" href="<lams:WebAppURL/>css/monitor.css" rel="stylesheet" />
 
 <script type="text/javascript">
 	var pathToImageFolder = "${lams}images/css/",
@@ -43,6 +29,9 @@
 		initializePortraitPopover("<lams:LAMSURL />");
 
 		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
+		
+			<%-- if no sessions exist the basic authored data is sent with a sessionId of 0. Do not use subgrid and modify how rating/comments are displayed. --%>
+			<c:set var="sessionsExist">${groupSummary.sessionId gt 0}</c:set>
 		
 			jQuery("#group${groupSummary.sessionId}").jqGrid({
 				datatype: "local",
@@ -79,6 +68,7 @@
 				   	</c:if>
 			   		{name:'actions', index:'actions', width:120, align:"center"}		
 			   	],
+			   	<c:if test="${sessionsExist}">
 			   	// caption: "${groupSummary.sessionName}",
 				subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -126,6 +116,7 @@
 					})
 					.navGrid("#pager-" + subgridTableId, {edit:false,add:false,del:false,search:false});
 				}
+			   	</c:if>
 			})
    	        <c:forEach var="item" items="${groupSummary.items}" varStatus="i">
 				<c:choose>
@@ -158,17 +149,27 @@
 				
 				<c:if test="${groupSummary.allowRating}">
 				<c:set var="ratingHTML"><div class="rating-stars-holder"></c:set>
-				<c:forEach var="criteriaDto" items="${item.ratingDTO.criteriaDtos}">
-					<c:set var="ratingHTML">${ratingHTML}<div class="rating-stars-new rating-stars-disabled" data-average="${criteriaDto.averageRating}" data-id="${criteriaDto.ratingCriteria.ratingCriteriaId}-${item.itemUid}"></div><div class="rating-stars-caption"><fmt:message key="label.average.rating"><fmt:param>${criteriaDto.averageRating}</fmt:param><fmt:param>${criteriaDto.numberOfVotes}</fmt:param></fmt:message></div></c:set>
-				</c:forEach>
+				<c:choose>
+				<c:when test="${sessionsExist}">
+					<c:forEach var="criteriaDto" items="${item.ratingDTO.criteriaDtos}">
+						<c:set var="ratingHTML">${ratingHTML}<div class="rating-stars-new rating-stars-disabled" data-average="${criteriaDto.averageRating}" data-id="${criteriaDto.ratingCriteria.ratingCriteriaId}-${item.itemUid}"></div><div class="rating-stars-caption"><fmt:message key="label.average.rating"><fmt:param>${criteriaDto.averageRating}</fmt:param><fmt:param>${criteriaDto.numberOfVotes}</fmt:param></fmt:message></div></c:set>
+					</c:forEach>
+				</c:when>
+				<c:when test="${not sessionsExist and item.allowRating}">
+					<c:set var="ratingHTML">${ratingHTML}<i class="fa fa-check"></i></c:set>
+				</c:when>
+				</c:choose>
 				<c:set var="ratingHTML">${ratingHTML}</div></c:set>
 				</c:if>
 				
 				<c:if test="${groupSummary.allowComments}">
 				<c:set var="commentButtonText"><fmt:message key="label.view.comments"/></c:set>
 				<c:choose>
-				<c:when test="${item.allowComments}">
+				<c:when test="${item.allowComments and sessionsExist}">
 					<c:set var="commentHTML"><a href="#nogo" onclick="javascript:viewComments(${item.itemUid}, ${groupSummary.sessionId}); return false;">${commentButtonText}</a></c:set>
+				</c:when>
+				<c:when test="${item.allowComments and not sessionsExist}">
+					<c:set var="commentHTML"><i class="fa fa-check"></i></c:set>
 				</c:when>
 				<c:otherwise>
 					<c:set var="commentHTML">&nbsp;</c:set>
@@ -216,10 +217,9 @@
 	}
 	
 	function changeItemVisibility(linkObject, itemUid, toolSessionId, isHideItem) {
-		<c:set var="hideShowLink"><a href='<c:url value='/monitoring/changeItemVisibility.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}' class='button'> <fmt:message key='monitoring.label.show' /> </a></c:set>
         $.ajax({
             url: '<c:url value="/monitoring/changeItemVisibility.do"/>',
-            data: 'sessionMapID=${sessionMapID}&toolSessionID='+toolSessionId+'&itemUid=' + itemUid + '&isHideItem=' + isHideItem,
+            data: 'sessionMapID=${sessionMapID}&toolSessionID='+toolSessionId+'&itemUid=' + itemUid + '&isHideItem=' + isHideItem + '&toolContentID=' + ${sessionMap.toolContentID},
             type: 'post',
             success: function () {
             	if (isHideItem) {
@@ -274,7 +274,11 @@
         	<span class="panel-title collapsable-icon-left">
         	<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
 					aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" >
-			<fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}</a>
+			<c:choose>
+			<c:when test="${sessionsExist}"><fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}</c:when>
+			<c:otherwise>&nbsp;</c:otherwise>
+			</c:choose>
+		</a>
 			</span>
         </div>
         

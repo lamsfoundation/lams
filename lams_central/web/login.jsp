@@ -33,6 +33,7 @@
 			<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
 			<script type="text/javascript">
 				function submitForm() {
+					$('#loginButton').addClass('disabled');
 					$('#loginForm').submit();
 				}
 

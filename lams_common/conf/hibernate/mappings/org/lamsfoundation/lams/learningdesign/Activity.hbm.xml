@@ -224,6 +224,8 @@
    			
 			<property name="gateActivityLevelId" type="java.lang.Integer" column="gate_activity_level_id" length="11" />
 			<property name="gateOpen" type="java.lang.Boolean" column="gate_open_flag" length="4" />
+			<property name="gateOpenTime" type="java.util.Date" column="gate_open_time" />
+			<many-to-one name="gateOpenUser" class="org.lamsfoundation.lams.usermanagement.User" column="gate_open_user" />
 			
 			<subclass name="org.lamsfoundation.lams.learningdesign.ScheduleGateActivity" discriminator-value="4">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>					

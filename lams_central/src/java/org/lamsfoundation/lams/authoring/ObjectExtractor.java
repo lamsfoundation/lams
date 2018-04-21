@@ -1219,8 +1219,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 	GateActivity gateActivity = (GateActivity) activity;
 	gateActivity.setGateActivityLevelId(JsonUtil.optInt(activityDetails, AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID));
-	gateActivity.setGateOpen(JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.GATE_OPEN));
-
     }
 
     private void buildSynchGateActivity(SynchGateActivity activity) {

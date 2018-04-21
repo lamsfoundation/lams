@@ -44,6 +44,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
+import org.lamsfoundation.lams.tool.peerreview.dto.EmailPreviewDTO;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
@@ -97,8 +98,11 @@ public class MonitoringAction extends Action {
 	if (param.equals("getReflections")) {
 	    return getReflections(mapping, form, request, response);
 	}
-	if (param.equals("sendResultsToUser")) {
-	    return sendResultsToUser(mapping, form, request, response);
+	if (param.equals("previewResultsToUser")) {
+	    return previewResultsToUser(mapping, form, request, response);
+	}
+	if (param.equals("sendPreviewedResultsToUser")) {
+	    return sendPreviewedResultsToUser(mapping, form, request, response);
 	}
 	if (param.equals("sendResultsToSessionUsers")) {
 	    return sendResultsToSessionUsers(mapping, form, request, response);
@@ -154,6 +158,7 @@ public class MonitoringAction extends Action {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	sessionMap.remove("emailPreviewDTO"); // clear any old cached emails
 
 	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
@@ -220,7 +225,7 @@ public class MonitoringAction extends Action {
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 
-	String emailResultsText = service.getLocalisedMessage("button.email.results", null);
+	String emailResultsText = service.getLocalisedMessage("button.preview.results", null);
 	if (criteria.isCommentRating()) {
 	    // special db lookup just for this - gets the user's & how many comments left for them
 	    List<Object[]> rawRows = service.getCommentsCounts(toolContentId, toolSessionId, criteria, page, size,
@@ -238,7 +243,7 @@ public class MonitoringAction extends Action {
 		if (numComments > 0) {
 		    cell.put("rating", service.getLocalisedMessage("label.monitoring.num.of.comments",
 			    new Object[] { numComments }));
-		    cell.put("email", generateResultsButton(toolSessionId, rawRow[0], emailResultsText));
+		    cell.put("email", generatePreviewButton(toolSessionId, rawRow[0], emailResultsText));
 		} else {
 		    cell.put("rating", "");
 		    cell.put("email", "");
@@ -271,11 +276,11 @@ public class MonitoringAction extends Action {
 			starString += msg;
 			starString += "</div>";
 			rawRow.put("rating", starString);
-			rawRow.put("email", generateResultsButton(toolSessionId, JsonUtil.optLong(rawRow, "itemId"),
+			rawRow.put("email", generatePreviewButton(toolSessionId, JsonUtil.optLong(rawRow, "itemId"),
 				emailResultsText));
 		    } else {
 			rawRow.put("rating", averageRating);
-			rawRow.put("email", generateResultsButton(toolSessionId, JsonUtil.optLong(rawRow, "itemId"),
+			rawRow.put("email", generatePreviewButton(toolSessionId, JsonUtil.optLong(rawRow, "itemId"),
 				emailResultsText));
 		    }
 		}
@@ -292,10 +297,11 @@ public class MonitoringAction extends Action {
 	return null;
     }
 
-    private String generateResultsButton(Object toolSessionId, Object userId, String emailResultsText) {
-	return new StringBuilder("<a href=\"javascript:sendResultsForLearner(").append(toolSessionId).append(", ")
-		.append(userId).append(")\" class=\"btn btn-default btn-xs email-button\">").append(emailResultsText)
-		.append("</a>").toString();
+    private String generatePreviewButton(Object toolSessionId, Object userId, String emailResultsText) {
+	return new StringBuilder("<button onclick=\"javascript:previewResultsForLearner(").append(toolSessionId)
+		.append(", ").append(userId)
+		.append(")\" class=\"btn btn-default btn-xs email-button btn-disable-on-submit\">")
+		.append(emailResultsText).append("</button>").toString();
     }
 
     private ActionForward getSubgridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -386,6 +392,7 @@ public class MonitoringAction extends Action {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	sessionMap.remove("emailPreviewDTO"); // clear any old cached emails
 
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 	request.setAttribute("toolSessionId", toolSessionId);
@@ -400,6 +407,7 @@ public class MonitoringAction extends Action {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	sessionMap.remove("emailPreviewDTO"); // clear any old cached emails
 
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 
@@ -478,36 +486,85 @@ public class MonitoringAction extends Action {
 	return null;
     }
 
-    private ActionForward sendResultsToUser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward previewResultsToUser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	return sendResults(mapping, request, response, true);
-    }
-
-    private ActionForward sendResultsToSessionUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	return sendResults(mapping, request, response, false);
-    }
-
-    private ActionForward sendResults(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
-	    boolean oneUserOnly) throws IOException {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	sessionMap.remove("emailPreviewDTO"); // clear any old cached emails
 
 	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 
 	IPeerreviewService service = getPeerreviewService();
-	int numEmailsSent = 0;
 
-	if (oneUserOnly) {
-	    Long userId = WebUtil.readLongParam(request, PeerreviewConstants.PARAM_USERID);
-	    numEmailsSent = service.emailReportToUser(contentId, toolSessionId, userId);
-	} else {
-	    numEmailsSent = service.emailReportToSessionUsers(contentId, toolSessionId);
+	// only supports single user
+	Long userId = WebUtil.readLongParam(request, PeerreviewConstants.PARAM_USERID);
+	String emailHTML = service.generateEmailReportToUser(contentId, toolSessionId, userId);
+	EmailPreviewDTO dto = new EmailPreviewDTO(emailHTML, toolSessionId, userId);
+	sessionMap.put("emailPreviewDTO", dto);
+	return mapping.findForward(PeerreviewConstants.SUCCESS);
+    }
+
+    private ActionForward sendPreviewedResultsToUser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	// if we regenerate the results, it is more work for the server and the results may change. if we want to
+	// just send what the monitor already sees, get it back from the sessionMap, check that it should be the
+	// same email (ie check the parameters) and if all good then send.
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+
+	EmailPreviewDTO previewDTO = (EmailPreviewDTO) sessionMap.get("emailPreviewDTO");
+	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
+	Long dateTimeStamp = WebUtil.readLongParam(request, "dateTimeStamp");
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
+	Long userId = WebUtil.readLongParam(request, "userID");
+
+	IPeerreviewService service = getPeerreviewService();
+
+	if (previewDTO == null || !dateTimeStamp.equals(previewDTO.getDateTimeStamp())
+		|| !toolSessionId.equals(previewDTO.getToolSessionId())
+		|| !userId.equals(previewDTO.getLearnerUserId())) {
+	    log.error(
+		    "Unable to send preview as requested parameters to not matched the catched parameters. Email text in session does not match the requested email. Cached preview: "
+			    + previewDTO);
+	    sessionMap.remove("emailPreviewDTO"); // Cached email removed so it can't be resent.
+	    response.setContentType("text/html;charset=utf-8");
+	    response.getWriter()
+		    .write(service.getLocalisedMessage("label.email.send.failed.preview.wrong", new Object[] {}));
+	    return null;
 	}
+
+	// Use the details from the DTO, so that if somehow something has got stuff up (and the above check has not picked
+	// up the issue, make sure you use the user id originally associated with this email.
+	int numEmailsSent = service.emailReportToUser(contentId, previewDTO.getToolSessionId(),
+		previewDTO.getLearnerUserId(), previewDTO.getEmailHTML());
+	sessionMap.remove("emailPreviewDTO"); // Cached email removed so it can't be resent.
+	response.setContentType("text/html;charset=utf-8");
+	response.getWriter().write(service.getLocalisedMessage("msg.results.sent", new Object[] { numEmailsSent }));
+	return null;
+
+    }
+
+    private ActionForward sendResultsToSessionUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	sessionMap.remove("emailPreviewDTO"); // clear any old cached emails
+
+	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
+
+	IPeerreviewService service = getPeerreviewService();
+
+	int numEmailsSent = service.emailReportToSessionUsers(contentId, toolSessionId);
 
 	response.setContentType("text/html;charset=utf-8");
 	response.getWriter().write(service.getLocalisedMessage("msg.results.sent", new Object[] { numEmailsSent }));
