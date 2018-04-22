@@ -137,7 +137,6 @@
     		}
     		
     		function userNameFormatter (cellvalue, options, rowObject) {
-    			debugger;
     			<c:choose><c:when test="${assessment.enableConfidenceLevels}">
     			var portraitId = rowObject[6];
     			</c:when><c:otherwise>

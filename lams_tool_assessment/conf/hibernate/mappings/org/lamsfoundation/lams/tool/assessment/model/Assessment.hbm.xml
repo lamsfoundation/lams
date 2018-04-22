@@ -183,7 +183,7 @@
             insert="true"
             column="allow_overall_feedback"
         />
-
+        
         <property
             name="allowRightAnswersAfterQuestion"
             type="boolean"
@@ -296,11 +296,13 @@
             column="reflect_on_activity"
         />
 
-        <!--
-            To add non XDoclet property mappings, create a file named
-                hibernate-properties-Assessment.xml
-            containing the additional properties and place it in your merge dir.
-        -->
+       <property
+            name="allowDiscloseAnswers"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_disclose_answers"
+        />
 
     </class>
 
