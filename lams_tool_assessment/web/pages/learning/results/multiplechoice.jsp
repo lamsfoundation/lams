@@ -17,11 +17,11 @@
 			<c:set var="isCorrect" 
 				   value="${(assessment.allowDiscloseAnswers 
 				   			 ? question.correctAnswersDisclosed : assessment.allowRightAnswersAfterQuestion)
-				    		 && (option.grade == 1)}" />
+				    		 && (option.grade > 0)}" />
 			<c:set var="isWrong"
 				   value="${(assessment.allowDiscloseAnswers 
 				   			 ? question.correctAnswersDisclosed : assessment.allowWrongAnswersAfterQuestion)
-				    		&& (option.grade < 1)}" />
+				    		&& (option.grade <= 0)}" />
 			<tr ${isCorrect ? 'class="bg-success"' : '' }>
 				<td class="complete-item-gif">
 				    <c:if test="${option.answerBoolean && isCorrect}">
@@ -64,12 +64,12 @@
 			
 			<c:if test="${assessment.allowDiscloseAnswers && question.groupsAnswersDisclosed && fn:length(sessions) > 1}">
 				<c:set var="teams" value="" />
-				<c:forEach var="session" items="${sessions}" varStatus="status">
+				<c:forEach var="session" items="${sessions}" varStatus="sessionStatus">
 					<%-- Now groups other than this one --%>
 					<c:if test="${sessionMap.toolSessionID != session.sessionId}">
 						<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
 						<c:set var="sessionResults" 
-							   value="${questionSummaries[question.uid].questionResultsPerSession[status.index]}" />
+							   value="${questionSummaries[question.uid].questionResultsPerSession[sessionStatus.index]}" />
 						<c:set var="sessionResults"
 						 	   value="${sessionResults[fn:length(sessionResults)-1]}" />
 						<c:forEach var="sessionOption" items="${sessionResults.optionAnswers}">
