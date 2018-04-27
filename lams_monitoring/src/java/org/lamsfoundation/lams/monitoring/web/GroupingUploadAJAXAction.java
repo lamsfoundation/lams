@@ -339,6 +339,14 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 		    log.warn("Unable to add learner " + login + " for group in related to grouping "
 			    + orgGroupingId + " as learner cannot be found.");
 		    totalUsersSkipped++;
+		
+		//Check user is a part of the organisation
+		} else if (!getSecurityService().hasOrgRole(organisation.getOrganisationId(), learner.getUserId(),
+			new String[] { Role.GROUP_MANAGER, Role.LEARNER, Role.MONITOR, Role.AUTHOR },
+			"be added to grouping", false)) {
+		    
+		    totalUsersSkipped++;
+
 		} else {
 		    totalUsersAdded++;
 		    learners.add(learner);
@@ -487,6 +495,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 			skipped++;
 			log.warn("Unable to add learner " + login + " for group in related to grouping " + groupingID
 				+ " as group name is missing.");
+			
 		    } else {
  			Set<String> users = groups.get(groupName);
  			if (users == null) {
