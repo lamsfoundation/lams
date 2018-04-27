@@ -122,8 +122,8 @@
 				   	colModel:[
 				   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 				   		{name:'isUserAuthor', width:0, hidden: true},
-				   		{name:'groupName', index:'groupName', width:200},
-				   		{name:'burningQuestion', index:'burningQuestion', width:401, edittype: 'textarea', editoptions:{rows:"5"},
+				   		{name:'groupName', index:'groupName', width:100},
+				   		{name:'burningQuestion', index:'burningQuestion', width:501, edittype: 'textarea', editoptions:{rows:"5"},
 				   			editable: function (options) {
 				   	            var item = $(this).jqGrid("getLocalRow", options.rowid);
 				   	            return ${isUserLeader} && eval(item.isUserAuthor);
@@ -136,7 +136,7 @@
 						},
 				   		{name:'count', index:'count', width:50, align:"right"}
 				   	],
-				   	caption: "${scratchieItem.title}",
+                    caption: "<a href='#${scratchieItem.title}'>${scratchieItem.title}</a>",
 					cellurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItem.uid}',
 	  				cellEdit: true,
 	  				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
@@ -259,19 +259,20 @@
 				<strong><fmt:param>${score}%</fmt:param></strong>
 			</fmt:message>
 		</lams:Alert>
-	
+<!--	
 		<div class="row voffset5" >
-			<html:button property="refreshButton" onclick="return refresh();" styleClass="btn btn-default voffset5 roffset10 pull-right">
-				<fmt:message key="label.refresh" />
-			</html:button>
+            <a class="btn btn-sm btn-default pull-right roffset10" href="#" onclick="return refresh();">
+                <i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="label.refresh" /></span></a>
 		</div>
-		
+-->		
 		<c:if test="${showResults}">
 			<%@ include file="scratchies.jsp"%>
 		</c:if>
 		
 		<!-- Display burningQuestionItemDtos -->
 		<c:if test="${sessionMap.isBurningQuestionsEnabled}">
+
+            <a class="btn btn-sm btn-default pull-right roffset10" href="#" onclick="return refresh();"><i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="label.refresh" /></span></a>
 			<div class="voffset5">
 				<div class="lead">
 					<fmt:message key="label.burning.questions" />

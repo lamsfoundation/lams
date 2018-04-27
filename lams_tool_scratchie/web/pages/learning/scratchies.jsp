@@ -1,6 +1,6 @@
 <c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 	<div class="lead">
-		<c:out value="${item.title}" escapeXml="true" />
+        <a name="${item.title}" style="text-decoration:none;color:black"><c:out value="${item.title}" escapeXml="true" /></a>
 	</div>
 	<div class="panel-body-sm">
 		<c:out value="${item.description}" escapeXml="false" />
