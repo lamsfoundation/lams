@@ -136,7 +136,7 @@
 						},
 				   		{name:'count', index:'count', width:50, align:"right"}
 				   	],
-                    caption: "<a href='#${scratchieItem.title}'>${scratchieItem.title}</a>",
+                    caption: "<a href='#${scratchieItem.title}' class='bq-title'>${scratchieItem.title}</a>",
 					cellurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItem.uid}',
 	  				cellEdit: true,
 	  				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
