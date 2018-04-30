@@ -7,7 +7,7 @@
 	
 	<lams:css/>
 	<lams:css suffix="main"/>
-    <link href="css/tblmonitor.css" rel="stylesheet">
+	<lams:css webapp="monitoring" suffix="tblmonitor"/>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
@@ -144,12 +144,10 @@
 	    <nav id="sidebar-wrapper" role="navigation">
 	        <div class="offcanvas-scroll-area">
 	        
-	        <!-- 
-				<div class="offcanvas-logo">
-					<div class="logo">
-					</div>
+			<div class="offcanvas-logo">
+				<div class="logo">
 				</div>
-			 -->
+			</div>
 				
 			<div class="offcanvas-header">
 				<span class="courses-title ">

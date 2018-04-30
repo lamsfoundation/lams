@@ -5,11 +5,6 @@
  * **LAMS** Heavily customized by LAMS.d
  */
 
-/* Toggle Styles */
-
-@import "_lams_variables.scss";
-@import "_monitorLesson_base.scss";
-
 #wrapper {
     padding-left: 0;
     -webkit-transition: all 0.5s ease;
@@ -30,7 +25,8 @@
     height: 100%;
     margin-left:-154px;
     overflow-y: auto;
-    background: $brand-primary-darker;
+    background: $main_offcanvas_background;
+    color: $main_offcanvas_color;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
@@ -78,6 +74,7 @@ table.tablesorter {
 
 .courses-title {
     padding-left: 0;
+    word-break: break-all;
 }
 
 .offcanvas-header {
