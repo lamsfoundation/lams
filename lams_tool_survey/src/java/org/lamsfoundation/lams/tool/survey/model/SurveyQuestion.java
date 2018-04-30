@@ -28,7 +28,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 
 /**
  * Survey
@@ -40,6 +42,7 @@ import org.apache.log4j.Logger;
  */
 public class SurveyQuestion implements Cloneable {
     private static final Logger log = Logger.getLogger(SurveyQuestion.class);
+    private static final int SHORT_TITLE_LENGTH = 60;
 
     private Long uid;
 
@@ -230,4 +233,11 @@ public class SurveyQuestion implements Cloneable {
 	this.shortTitle = shortTitle;
     }
 
+    /** Set the short title from the current description but strip HTML and shorten to SHORT_TITLE_LENGTH characters. */
+    public void updateShortTitleFromDescription() {
+	// strip all images first in case they are base64 otherwise the next step causes a stack overflow
+	// then strip out any other HTML tags
+	String newInput = SurveyWebUtils.removeHTMLTags(this.description);
+	this.shortTitle = StringUtils.abbreviate(newInput, SHORT_TITLE_LENGTH);
+    }
 }

@@ -370,12 +370,12 @@ public class MonitoringAction extends Action {
 		// survey title
 		row = sheet.createRow(idx++);
 		cell = row.createCell(0);
-		cell.setCellValue(removeHTMLTags(survey.getTitle()));
+		cell.setCellValue(SurveyWebUtils.removeHTMLTags(survey.getTitle()));
 
 		// survey instruction
 		row = sheet.createRow(idx++);
 		cell = row.createCell(0);
-		cell.setCellValue(removeHTMLTags(survey.getInstructions()));
+		cell.setCellValue(SurveyWebUtils.removeHTMLTags(survey.getInstructions()));
 
 		// display 2 empty row
 		row = sheet.createRow(idx++);
@@ -390,7 +390,7 @@ public class MonitoringAction extends Action {
 		cell = row.createCell(0);
 		cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_SESSION_NAME));
 		cell = row.createCell(1);
-		cell.setCellValue(removeHTMLTags(session.getSessionName()));
+		cell.setCellValue(SurveyWebUtils.removeHTMLTags(session.getSessionName()));
 
 		// begin to display question and its answers
 		Set<Entry<SurveyQuestion, List<AnswerDTO>>> questionEntries = map.entrySet();
@@ -410,7 +410,7 @@ public class MonitoringAction extends Action {
 		    cell = row.createCell(0);
 		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_QUESTION) + " " + questionIdx);
 		    cell = row.createCell(1);
-		    cell.setCellValue(removeHTMLTags(question.getDescription()));
+		    cell.setCellValue(SurveyWebUtils.removeHTMLTags(question.getDescription()));
 
 		    // display options content
 		    Set<SurveyOption> options = question.getOptions();
@@ -426,7 +426,7 @@ public class MonitoringAction extends Action {
 			cell = row.createCell(0);
 			cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
 			cell = row.createCell(1);
-			cell.setCellValue(removeHTMLTags(option.getDescription()));
+			cell.setCellValue(SurveyWebUtils.removeHTMLTags(option.getDescription()));
 		    }
 		    if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 			optionIdx++;
@@ -500,7 +500,7 @@ public class MonitoringAction extends Action {
 			if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 			    cell = row.createCell(++cellIdx);
 			    if (answer.getAnswer() != null) {
-				cell.setCellValue(removeHTMLTags(answer.getAnswer().getAnswerText()));
+				cell.setCellValue(SurveyWebUtils.removeHTMLTags(answer.getAnswer().getAnswerText()));
 			    }
 			}
 
@@ -572,16 +572,6 @@ public class MonitoringAction extends Action {
 	response.setContentType("text/plain;charset=utf-8");
 	response.getWriter().print(formattedDate);
 	return null;
-    }
-
-    /**
-     * Removes all the html tags from a string
-     * 
-     * @param string
-     * @return
-     */
-    private String removeHTMLTags(String string) {
-	return string.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
     }
 
     // *************************************************************************************
