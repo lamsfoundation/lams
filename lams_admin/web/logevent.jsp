@@ -236,7 +236,7 @@
 			<th><fmt:message key="label.event.type"/></th>
 			<th style="width:10%"><fmt:message key="audit.change.made.by"/></th>
 			<th style="width:10%"><fmt:message key="audit.change.made.to"/></th>
-			<th></th>
+			<th><fmt:message key="audit.remarks"/></th>
 	</lams:TSTable>
 	</div>
 </div>
