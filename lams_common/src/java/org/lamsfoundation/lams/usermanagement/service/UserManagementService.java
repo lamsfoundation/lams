@@ -377,6 +377,7 @@ public class UserManagementService implements IUserManagementService {
 	    String salt = HashUtil.salt();
 	    user.setSalt(salt);
 	    user.setPassword(HashUtil.sha256(password, salt));
+	    user.setModifiedDate(new Date());
 	    baseDAO.update(user);
 	} catch (Exception e) {
 	    log.debug(e);
