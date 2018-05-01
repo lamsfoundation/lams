@@ -44,10 +44,6 @@
 		vertical-align: top;
 	}
 	
-	.jqgh_cbox {
-		visibility: hidden;
-	}
-	
 	.ui-jqgrid-btable tr[role="row"] {
 		cursor: pointer;	
 	}
@@ -70,10 +66,8 @@
      var mustHaveUppercase = ${mustHaveUppercase},
 	     mustHaveNumerics  = ${mustHaveNumerics},
 	     mustHaveLowercase  = ${mustHaveLowercase},
-	     mustHaveSymbols   = ${mustHaveSymbols},
-	     excludedLearners = JSON.parse("<bean:write name='OrgPasswordChangeForm' property='excludedLearners' />"),
-	     excludedStaff = JSON.parse("<bean:write name='OrgPasswordChangeForm' property='excludedStaff' />");
-
+	     mustHaveSymbols   = ${mustHaveSymbols};
+	 
      $.validator.addMethod("pwcheck", function(value) {
 	      return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
 			     (!mustHaveNumerics || /\d/.test(value)) && // has a digit
@@ -171,8 +165,17 @@
 			},
 
 			submitHandler : function(form) {
-				$('#excludedLearners').val(JSON.stringify(excludedLearners));
-				$('#excludedStaff').val(JSON.stringify(excludedStaff));
+				// see which mode are we in (included/excluded) and serialize JSON arrays into strings
+				var learnerGrid = $('#learnerGrid'),
+					staffGrid = $('#staffGrid'),
+					includedLearners = learnerGrid.data('included'),
+					excludedLearners = learnerGrid.data('excluded'),
+					includedStaff = staffGrid.data('included'),
+					excludedStaff = staffGrid.data('excluded');
+				$('#includedLearners').val(includedLearners === null ? '' : JSON.stringify(includedLearners));
+				$('#excludedLearners').val(excludedLearners === null ? '' : JSON.stringify(excludedLearners));
+				$('#includedStaff').val(includedStaff === null ? '' : JSON.stringify(includedStaff));
+				$('#excludedStaff').val(excludedStaff === null ? '' : JSON.stringify(excludedStaff));
 				form.submit();
 			}
 		});
@@ -217,31 +220,84 @@
 			    ],
 			    onSelectRow : function(id, status, event) {
 				    var grid = $(this),
+				   		included = grid.data('included'),
 						excluded = grid.data('excluded'),
-						index = excluded.indexOf(+id);
-					// if row is deselected, add it to excluded array
-					if (index < 0) {
-						if (!status) {
-							excluded.push(+id);
+						selectAllChecked = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox .cbox').prop('checked');
+					if (selectAllChecked) {
+						var index = excluded.indexOf(+id);
+						// if row is deselected, add it to excluded array
+						if (index < 0) {
+							if (!status) {
+								excluded.push(+id);
+							}
+						} else if (status) {
+							excluded.splice(index, 1);
 						}
-					} else if (status) {
-						excluded.splice(index, 1);
+					} else {
+						var index = included.indexOf(+id);
+						// if row is selected, add it to included array
+						if (index < 0) {
+							if (status) {
+								included.push(+id);
+							}
+						} else if (!status) {
+							included.splice(index, 1);
+						}
 					}
 				},
 				gridComplete : function(){
 					var grid = $(this),
-						// get excludedLearners or excludedStaff
-						excluded = grid.data('excluded');
-					// go through each loaded row
-					$('[role="row"]', grid).each(function(){
-						var id = +$(this).attr('id'),
-							selected = $(this).hasClass('success');
-						// if row is not selected and is not excluded, select it
-						if (!selected && !excluded.includes(id)) {
-							// select without triggering onSelectRow
-							grid.jqGrid('setSelection', id, false);
-						}
-					});
+						included = grid.data('included'),
+						// cell containing "(de)select all" button
+						selectAllCell = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox > div');
+					// remove the default button provided by jqGrid
+					$('.cbox', selectAllCell).remove();
+					// create own button which follows own rules
+					var selectAllCheckbox = $('<input type="checkbox" class="cbox" />')
+											.prop('checked', included === null)
+											.prependTo(selectAllCell)
+											.change(function(){
+												// start with deselecting everyone on current page
+												grid.resetSelection();
+												if ($(this).prop('checked')){
+													// on select all change mode and select all on current page
+													grid.data('included', null);
+													grid.data('excluded', []);
+													$('[role="row"]', grid).each(function(){
+														grid.jqGrid('setSelection', +$(this).attr('id'), false);
+													});
+												} else {
+													// on deselect all just change mode
+													grid.data('excluded', null);
+													grid.data('included', []);
+												}
+											});
+					
+					grid.resetSelection();
+					if (selectAllCheckbox.prop('checked')) {
+						var excluded = grid.data('excluded');
+						// go through each loaded row
+						$('[role="row"]', grid).each(function(){
+							var id = +$(this).attr('id'),
+								selected = $(this).hasClass('success');
+							// if row is not selected and is not excluded, select it
+							if (!selected && !excluded.includes(id)) {
+								// select without triggering onSelectRow
+								grid.jqGrid('setSelection', id, false);
+							}
+						}); 
+					} else {
+						// go through each loaded row
+						$('[role="row"]', grid).each(function(){
+							var id = +$(this).attr('id'),
+								selected = $(this).hasClass('success');
+							// if row is not selected and is included, select it
+							if (!selected && included.includes(id)) {
+								// select without triggering onSelectRow
+								grid.jqGrid('setSelection', id, false);
+							}
+						});
+					}
 
 					changeCheckboxes.trigger('change');
 				},
@@ -251,11 +307,20 @@
 	    					'<fmt:message key="label.ok"/>');
 			    }
 		};
-		
+
+
+	    var includedLearners = "<bean:write name='OrgPasswordChangeForm' property='includedLearners' />",
+	    	excludedLearners = "<bean:write name='OrgPasswordChangeForm' property='excludedLearners' />",
+	    	includedStaff = "<bean:write name='OrgPasswordChangeForm' property='includedStaff' />",
+	    	excludedStaff = "<bean:write name='OrgPasswordChangeForm' property='excludedStaff' />";
 		jqGridSettings.url = jqGridURL + 'learner'
-		$("#learnerGrid").data('excluded', excludedLearners).jqGrid(jqGridSettings);
+		$("#learnerGrid").data('excluded', excludedLearners ? JSON.parse(excludedLearners) : null)
+						 .data('included', includedLearners ? JSON.parse(includedLearners) : null)
+						 .jqGrid(jqGridSettings);
 		jqGridSettings.url = jqGridURL + 'staff'
-		$("#staffGrid").data('excluded', excludedStaff).jqGrid(jqGridSettings);
+		$("#staffGrid").data('excluded', excludedStaff ? JSON.parse(excludedStaff) : null)
+					   .data('included', includedStaff ? JSON.parse(includedStaff) : null)
+					   .jqGrid(jqGridSettings);
 
 	});
 </script>
@@ -303,7 +368,9 @@
 		<input type="hidden" name="method" value="changePassword" />
 		<html:hidden property="organisationID" />
 		<html:hidden property="orgName" />
+		<html:hidden property="includedLearners" styleId="includedLearners" />
 		<html:hidden property="excludedLearners" styleId="excludedLearners" />
+		<html:hidden property="includedStaff" styleId="includedStaff" />
 		<html:hidden property="excludedStaff" styleId="excludedStaff" />
 		
 		<div class="form-group">
