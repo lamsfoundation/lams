@@ -62,6 +62,7 @@ public class LogEvent implements Serializable {
     public static final int TYPE_LEARNER_CONTENT_UPDATED = 19; // Audit Service
     public static final int TYPE_LEARNER_CONTENT_SHOW_HIDE = 20; // Audit Service
     public static final int TYPE_UNKNOWN = 21; // catch all for conversion
+    public static final int TYPE_LIVE_EDIT = 22; // Start or end Live Edit of a lesson
 
     /** *************************************************************** */
 
