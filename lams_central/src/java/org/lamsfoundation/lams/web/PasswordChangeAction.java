@@ -124,7 +124,7 @@ public class PasswordChangeAction extends Action {
 			ILogEventService logEventService = (ILogEventService) ctx.getBean("logEventService");
 			MessageService messageService = (MessageService) ctx.getBean("centralMessageService");
 			String[] args = new String[1];
-			args[0] = user.getLogin() + "(" + user.getUserId() + ")";
+			args[0] = user.getLogin() + " (" + user.getUserId() + ")";
 			String message = messageService.getMessage("audit.user.password.change", args);
 			logEventService.logEvent(LogEvent.TYPE_LOGIN_AS, user.getUserId(), user.getUserId(), null, null, message);
 		    }
