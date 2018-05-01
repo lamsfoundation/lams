@@ -216,6 +216,8 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	}
 	Set<Integer> changedUserIDs = new TreeSet<Integer>();
 	IUserManagementService userManagementService = AdminServiceProxy.getService(getServlet().getServletContext());
+	UserDTO currentUserDTO = getUserDTO();
+	User currentUser = (User) userManagementService.findById(User.class, currentUserDTO.getUserID());
 	for (User user : users) {
 	    boolean excluded = false;
 	    // skip excluded (unchecked on the page) users
@@ -237,6 +239,7 @@ public class OrgPasswordChangeAction extends DispatchAction {
 		user.setChangePassword(true);
 	    }
 	    userManagementService.saveUser(user);
+	    userManagementService.logPasswordChanged(user, currentUser);
 	    changedUserIDs.add(user.getUserId());
 	}
 	return changedUserIDs;
