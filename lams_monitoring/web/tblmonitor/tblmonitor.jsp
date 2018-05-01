@@ -13,7 +13,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 	<script>
-		var TOTAL_LESSON_LEARNERS_NUMBER = ${totalLearnersNumber};
+		var TOTAL_LESSON_LEARNERS_NUMBER = ${totalLearnersNumber},
+			LAMS_URL = '<lams:LAMSURL/>';
 	
 		$(document).ready(function(){
 			<!-- Menu Toggle Script -->
@@ -30,8 +31,9 @@
 				loadTab($(this).data("method"));
 			});
 
-			//open sequence tab by default
-			$("#tab-link-sequence").click();
+			//get #hash from URL and open according tab. Open sequence tab by default
+			var hash = window.location.hash ? window.location.hash.substring(1) : "sequence"; 
+			$("#tab-link-" + hash).click();
 
 			//hide burning-questions if it's disabled in a tool
 			if ("${traToolContentId}" != "") {
@@ -125,15 +127,14 @@
 		}
 
 		function refresh() {
-			$('.tab-link').parent().removeClass("active");
-			$("#tab-link-sequence").parent().addClass("active");
-
-			loadTab("sequence");
+			//get #hash from URL and open according tab. Open sequence tab by default
+			var hash = window.location.hash ? window.location.hash.substring(1) : "sequence"; 
+			$("#tab-link-" + hash).click();
 		}
 
         function switchToRegularMonitor() {
-        		location.href = "<lams:LAMSURL/>home.do?method=monitorLesson&lessonID=${lesson.lessonId}";
-    		}
+        	location.href = "<lams:LAMSURL/>home.do?method=monitorLesson&lessonID=${lesson.lessonId}";
+    	}
 	</script>
 </lams:head>
 
@@ -159,7 +160,7 @@
 				<c:set var="actionUrl"><c:url value='tblmonitor.do'/></c:set>
 				<tr>
 					<td id="menu-item-teams">
-						<a class="tab-link" href="#nogo" data-method="teams">
+						<a id="tab-link-teams" class="tab-link" href="#teams" data-method="teams">
 							<i class="fa fa-users"></i>
 							<fmt:message key="label.teams"/>
 						</a>
@@ -169,7 +170,7 @@
 				<c:if test="${not empty isGatesAvailable}">
 					<tr>
 						<td id="menu-item-gates">
-							<a class="tab-link" href="#nogo" data-method="gates">
+							<a id="tab-link-gates" class="tab-link" href="#gates" data-method="gates">
 								<i class="fa fa-sign-in"></i>
 								<fmt:message key="label.gates"/>
 							</a>
@@ -187,7 +188,7 @@
 				
 					<tr>
 						<td id="menu-item-ira">
-							<a class="tab-link" href="#nogo" data-method="${iraMethodName}">
+							<a id="tab-link-ira" class="tab-link" href="#ira" data-method="${iraMethodName}">
 								<i class="fa fa-user"></i>
 								<fmt:message key="label.ira"/>
 							</a>
@@ -198,7 +199,7 @@
 				<c:if test="${not empty isScratchieAvailable}">
 					<tr>
 						<td id="menu-item-tra">
-							<a class="tab-link" href="#nogo" data-method="tra">
+							<a id="tab-link-tra" class="tab-link" href="#tra" data-method="tra">
 								<i class="fa fa-users"></i>
 								<fmt:message key="label.tra"/>
 							</a>
@@ -207,7 +208,7 @@
 
 					<tr id="burning-questions-tr">
 						<td id="menu-item-burning-questions">
-							<a class="tab-link" href="#nogo" data-method="burningQuestions">
+							<a id="tab-link-burningQuestions" class="tab-link" href="#burningQuestions" data-method="burningQuestions">
 								<i class="fa fa-question-circle"></i>
 								<fmt:message key="label.burning.questions"/>
 							</a>
@@ -218,7 +219,7 @@
 				<c:if test="${not empty isForumAvailable}">
 					<tr>
 						<td id="menu-item-forum">
-							<a class="tab-link" href="#nogo" data-method="forum">
+							<a id="tab-link-forum" class="tab-link" href="#forum" data-method="forum">
 								<i class="fa fa-comments"></i>
 								<fmt:message key="label.forum"/>
 							</a>
@@ -229,7 +230,7 @@
 				<c:if test="${not empty isAeAvailable}">
 					<tr>
 						<td id="menu-item-aes">
-							<a class="tab-link" href="#nogo" data-method="aes">
+							<a id="tab-link-aes" class="tab-link" href="#aes" data-method="aes">
 								<i class="fa fa-dashboard"></i>
 								<fmt:message key="label.aes"/>
 							</a>
@@ -240,7 +241,7 @@
 				<c:if test="${not empty isPeerreviewAvailable}">
 					<tr>
 						<td id="menu-item-peerreview">
-							<a class="tab-link" href="#nogo" data-method="peerreview">
+							<a id="tab-link-peerreview" class="tab-link" href="#peerreview" data-method="peerreview">
 								<i class="fa fa-users"></i>
 								<fmt:message key="label.peer.review"/>
 							</a>
@@ -250,7 +251,7 @@
 				
 				<tr>
 					<td id="menu-item-sequence" class="active">
-						<a id="tab-link-sequence" class="tab-link" href="#nogo" data-method="sequence">
+						<a id="tab-link-sequence" class="tab-link" href="#sequence" data-method="sequence">
 							<i class="fa fa-cubes"></i>
 							<fmt:message key="label.sequence"/>
 						</a>
