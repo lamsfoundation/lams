@@ -28,13 +28,11 @@
 	</tr>
 </table>
 
-<c:if test='${!dto.contentInUse}'>
-	<c:url value="/authoring.do" var="authoringUrl">
-		<c:param name="toolContentID" value="${dto.toolContentId}" />
-		<c:param name="mode" value="teacher" />
-		<c:param name="contentFolderID" value="${contentFolderID}" />
-	</c:url>
-	<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
-		<fmt:message key="button.editActivity" />
-	</html:link>
-</c:if>
+<c:url value="/authoring.do" var="authoringUrl">
+	<c:param name="toolContentID" value="${dto.toolContentId}" />
+	<c:param name="mode" value="teacher" />
+	<c:param name="contentFolderID" value="${contentFolderID}" />
+</c:url>
+<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
+	<fmt:message key="button.editActivity" />
+</html:link>

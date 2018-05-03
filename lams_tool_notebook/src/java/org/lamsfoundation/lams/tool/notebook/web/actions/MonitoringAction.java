@@ -160,10 +160,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
 		responseRow.put(NotebookConstants.PARAM_ENTRY, HtmlUtils.htmlEscape((String) userAndReflection[1]));
 	    }
-//	    if (user.getTeachersComment() != null && user.getTeachersComment().length() > 0) {
-//		responseRow.put(NotebookConstants.PARAM_COMMENT,
-//			HtmlUtils.htmlEscape((String) user.getTeachersComment()));
-//	    }
+	    if (user.getTeachersComment() != null && user.getTeachersComment().length() > 0) {
+		responseRow.put(NotebookConstants.PARAM_COMMENT,
+			HtmlUtils.htmlEscape((String) user.getTeachersComment()));
+	    }
 
 	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
 		Date modifiedDate = (Date) userAndReflection[2];
