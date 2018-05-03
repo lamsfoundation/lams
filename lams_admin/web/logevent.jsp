@@ -3,8 +3,8 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
 <link rel="stylesheet" href="${lams}css/jquery-ui.timepicker.css" />
-<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css" >
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css"/>
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css" />
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
@@ -14,7 +14,6 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/portrait.js" ></script>
-
 
 <script type="text/javascript">
 
@@ -30,7 +29,6 @@
 		typeDescriptions = {};
 	
 	$(document).ready(function(){
-		debugger;
 		<c:forEach var="eventType" items="${eventLogTypes}">
 			addEventType("${eventType.id}","${eventType.description}","${eventType.areaCode}","${eventType.areaDescription}");
 		</c:forEach>		
@@ -46,7 +44,6 @@
 		var now = new Date();
 		$("#endDatePicker").datepicker( "setDate", now );
 		$("#startDatePicker").datepicker();
-		debugger;
 		var startDateParts = "${startDate}".split("-"); 	// YYYY-MM-DD
 		if ( startDateParts.length == 3 ) {
 			var startDate = new Date(startDateParts[0], startDateParts[1]-1, startDateParts[2]);
@@ -63,6 +60,7 @@
 		    widgets: [ "uitheme", "resizable", "filter" ],
 		    headers: { 0: { filter: false}, 1: { filter: false, sorter: false}, 2: { filter: false, sorter: false}, 3: { filter: false, sorter: false}, 4: { filter: false, sorter: false},  }, 
 		    sortList : [[0,1]],
+		    showProcessing: true,
 		    widgetOptions: {
 		    	resizable: true,
 		    	// include column filters 
@@ -167,7 +165,6 @@
 			    		}
 				},
 				customAjaxUrl: function(table, url) {
-					debugger;
 					var startDate = $("#startDatePicker").datepicker("getDate");
 					if ( startDate )
 						url += "&startDate="+startDate.getTime();
@@ -184,8 +181,12 @@
 			   	},
 			  })
 			  .bind('pagerInitialized pagerComplete', function(event, options){
+				  if ( options.totalRows == 0 ) {
+					  $.tablesorter.showError($(this), '<fmt:message key="label.no.data.found"/>');
+				  } else {
 					initializePortraitPopover('${lams}');
-				})
+				  }
+ 				})
 			 
 			});
 
@@ -233,10 +234,10 @@
 	<div class="voffset10">	
 	<lams:TSTable numColumns="5" dataId="data-session-id='1'">
 			<th style="width:20%"><fmt:message key="label.date"/></th>
-			<th><fmt:message key="label.event.type"/></th>
-			<th style="width:10%"><fmt:message key="audit.change.made.by"/></th>
-			<th style="width:10%"><fmt:message key="audit.change.made.to"/></th>
-			<th><fmt:message key="audit.remarks"/></th>
+			<th class="no-spinner"><fmt:message key="label.event.type"/></th>
+			<th class="no-spinner" style="width:12%"><fmt:message key="audit.change.made.by"/></th>
+			<th class="no-spinner" style="width:12%"><fmt:message key="audit.change.made.to"/></th>
+			<th class="no-spinner"><fmt:message key="audit.remarks"/></div></th>
 	</lams:TSTable>
 	</div>
 </div>
