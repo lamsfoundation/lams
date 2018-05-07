@@ -176,25 +176,27 @@
 					<div class="panel-heading">
 						<div class="panel-title">
 							<span class="float-left space-right">Q${i.index+1})</span> <c:out value="${question.title}" escapeXml="false"/>
-							<div class="btn-group-xs pull-right disclose-button-group" questionUid="${question.uid}">
-								<%-- Allow disclosing correct answers only for multiple choice questions --%>
-								<c:if test="${question.type == 1}">
-									<div class="btn btn-default disclose-correct-button"
-										<c:if test="${question.correctAnswersDisclosed}">
+							<c:if test="${assessmentDto.assessment.allowDiscloseAnswers}">
+								<div class="btn-group-xs pull-right disclose-button-group" questionUid="${question.uid}">
+									<%-- Allow disclosing correct answers only for multiple choice questions --%>
+									<c:if test="${question.type == 1}">
+										<div class="btn btn-default disclose-correct-button"
+											<c:if test="${question.correctAnswersDisclosed}">
+												disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
+											</c:if>
+											>
+											<fmt:message key="label.disclose.correct.answers"/>
+										</div>
+									</c:if>
+									<div class="btn btn-default disclose-groups-button"
+										<c:if test="${question.groupsAnswersDisclosed}">
 											disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
 										</c:if>
 										>
-										<fmt:message key="label.disclose.correct.answers"/>
+										<fmt:message key="label.disclose.groups.answers"/>
 									</div>
-								</c:if>
-								<div class="btn btn-default disclose-groups-button"
-									<c:if test="${question.groupsAnswersDisclosed}">
-										disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
-									</c:if>
-									>
-									<fmt:message key="label.disclose.groups.answers"/>
 								</div>
-							</div>
+							</c:if>
 						</div>
 					</div>
 					
