@@ -1776,15 +1776,16 @@ GeneralLib = {
 									// get groups names
 									$.each(groupingData.groups, function(){
 										groups.push({
-											'name' : this.groupName,
-											'id'   : this.groupID,
-											'uiid' : this.groupUIID
+											'name' 	  : this.groupName,
+											'id'   	  : this.groupID,
+											'uiid' 	  : this.groupUIID,
+											'orderID' : this.orderID
 											});
 									});
 									
-									// sort groups by asceding UIID
+									// sort groups by asceding order ID
 									groups.sort(function(a,b) {
-										return a.uiid - b.uiid;
+										return a.orderID - b.orderID;
 									});
 									
 									activity = new ActivityDefs.GroupingActivity(
