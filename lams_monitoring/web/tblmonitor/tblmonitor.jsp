@@ -129,7 +129,9 @@
 		function refresh() {
 			//get #hash from URL and open according tab. Open sequence tab by default
 			var hash = window.location.hash ? window.location.hash.substring(1) : "sequence"; 
-			$("#tab-link-" + hash).click();
+			//$("#tab-link-" + hash).trigger("click");
+			$("#tab-link-" + hash)[0].click();
+			//document.getElementById("tab-link-" + hash).onclick();
 		}
 
         function switchToRegularMonitor() {
