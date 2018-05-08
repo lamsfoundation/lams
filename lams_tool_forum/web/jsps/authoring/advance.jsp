@@ -25,6 +25,12 @@
 	</div>
 
 	<div class="checkbox">
+		<label for="allow-anon"><html:checkbox
+				property="forum.allowAnonym" styleId="allowAnonym" /> <fmt:message
+				key="label.authoring.advance.enable.anonymous.posts" /></label>
+	</div>
+
+	<div class="checkbox">
 		<label for="limited-min-characters"><html:checkbox
 				property="forum.limitedMinCharacters"
 				styleId="limited-min-characters" /> <fmt:message
