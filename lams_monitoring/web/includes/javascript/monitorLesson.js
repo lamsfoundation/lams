@@ -1814,7 +1814,7 @@ function openLiveEdit(){
 				if (response) {
 					alert(response);
 				} else {
-					window.parent.showAuthoringDialog(ldId, 'editonfly');
+					window.parent.showAuthoringDialog(ldId, lessonId);
 					closeMonitorLessonDialog();
 				}
 			}

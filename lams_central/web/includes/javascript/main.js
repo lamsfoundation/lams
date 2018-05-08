@@ -626,7 +626,11 @@ function closeDialog(id, refresh) {
 	if (refresh) {
 		loadOrganisation();
 	}
-	$("#" + id).modal('hide');
+	var dialog = $("#" + id).modal('hide'),
+		relaunchMonitorLessonID = dialog.data('relaunchMonitorLessonID');
+	if (relaunchMonitorLessonID) {
+		showMonitorLessonDialog(relaunchMonitorLessonID);
+	}
 }
 
 
