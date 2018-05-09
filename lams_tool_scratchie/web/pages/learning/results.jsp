@@ -40,6 +40,16 @@
 	        padding-top: 3px;
 	        padding-bottom: 3px
 	    }
+	    
+	    /* when item is editable - show pencil icon on hover */
+	    .burning-question-text:hover +span+ i, /* when link is hovered select i */
+		.burning-question-text + span:hover+ i, /* when space after link is hovered select i */
+		.burning-question-text + span + i:hover { /* when icon is hovered select i */
+		  visibility: visible;
+		}
+		.burning-question-text +span+ i { /* in all other case hide it */
+		  visibility: hidden;
+		}
 	</style>
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
@@ -124,6 +134,18 @@
 				   		{name:'isUserAuthor', width:0, hidden: true},
 				   		{name:'groupName', index:'groupName', width:100},
 				   		{name:'burningQuestion', index:'burningQuestion', width:501, edittype: 'textarea', editoptions:{rows:"5"},
+					   		formatter:function(cellvalue, options, rowObject) {
+					   			var item = $(this).jqGrid("getLocalRow", options.rowId);
+
+					   			//when item is editable - show pencil icon on hover
+								return ${isUserLeader} && eval(item.isUserAuthor) ? 
+								   		"<span class='burning-question-text'>" +cellvalue + "</span><span>&nbsp;</span><i class='fa fa-pencil'></i>" 
+								   		: cellvalue;
+			   				},
+			   				unformat:function(cellvalue, options, rowObject) {
+			   					var text = $('<div>' + cellvalue + '</div>').text();
+								return text.trim();
+			   				},
 				   			editable: function (options) {
 				   	            var item = $(this).jqGrid("getLocalRow", options.rowid);
 				   	            return ${isUserLeader} && eval(item.isUserAuthor);
@@ -136,7 +158,7 @@
 						},
 				   		{name:'count', index:'count', width:50, align:"right"}
 				   	],
-                    caption: "<a href='#${scratchieItem.title}' class='bq-title'>${scratchieItem.title}</a>",
+                    caption: <c:choose><c:when test="${scratchieItem.uid == 0}">"${scratchieItem.title}"</c:when><c:otherwise>"<a href='#${scratchieItem.title}' class='bq-title'>${scratchieItem.title}</a>"</c:otherwise></c:choose>,
 					cellurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItem.uid}',
 	  				cellEdit: true,
 	  				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
