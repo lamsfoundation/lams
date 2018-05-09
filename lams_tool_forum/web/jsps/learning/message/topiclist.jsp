@@ -55,11 +55,40 @@
 								</html:link> <c:if test="${topic.hasAttachment}">
 									<i class="fa fa-paperclip loffset5" title="<fmt:message key='message.label.attachment'/>"></i>
 								</c:if></td>
-							<td><c:set var="author" value="${topic.author}" /> <c:if test="${empty author}">
-									<c:set var="author">
-										<fmt:message key="label.default.user.name" />
-									</c:set>
-								</c:if> <c:out value="${author}" escapeXml="true" /></td>
+							<td><%-- Author Name --%>
+							<c:set var="msgAuthor" value="${topic.author}" />
+							<c:set var="anonymous" value="${topic.message.isAnonymous}" />
+							<c:set var="hidden" value="${topic.message.hideFlag}" />
+							<c:if test="${empty msgAuthor}">
+								<c:set var="msgAuthor"><fmt:message key="label.default.user.name" /></c:set>
+							</c:if>
+							<c:choose>
+							<c:when test='${sessionMap.mode == "teacher"}'>
+								<c:choose>
+								<c:when test="${anonymous}">
+									<c:set var="author">${msgAuthor} (<fmt:message key="label.anonymous" />)</c:set>
+								</c:when>
+								<c:otherwise>
+									<c:set var="author">${msgAuthor}</c:set>
+								</c:otherwise>
+								</c:choose>
+							</c:when>
+							<c:otherwise>
+								<c:choose>
+								<c:when test="${hidden}">
+									<c:set var="author"></c:set>
+								</c:when>
+								<c:when test="${not hidden and anonymous}">
+									<c:set var="author"><fmt:message key="label.anonymous" /></c:set>
+								</c:when>
+								<c:otherwise>
+									<c:set var="author">${msgAuthor}</c:set>
+								</c:otherwise>
+								</c:choose>
+							</c:otherwise>
+							</c:choose>
+							<c:out value="${author}" escapeXml="true" />
+							</td>
 
 							<td class="text-center hidden-xs"><c:out value="${topic.message.replyNumber}" /></td>
 

@@ -207,6 +207,17 @@ a:focus {
 .msg .panel-footer {
   font-size: $font-size-small;
 }
+
+.msg .checkbox {
+	margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.comment-entry .checkbox {
+	margin-top: 5px;
+    margin-bottom: 0px;
+}
+   
 .panel-heading-sm {
   padding: 3px 5px;
   font-size: smaller;
