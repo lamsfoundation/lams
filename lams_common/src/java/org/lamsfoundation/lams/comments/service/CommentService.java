@@ -155,13 +155,14 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public Comment createReply(Comment parent, String replyText, User user, boolean isMonitor) {
+    public Comment createReply(Comment parent, String replyText, User user, boolean isMonitor, boolean isAnonymous) {
 
 	Comment replyMessage = new Comment();
 	replyMessage.setBody(replyText);
 	replyMessage.setHideFlag(false);
 	replyMessage.updateModificationData(user);
 	replyMessage.setMonitor(isMonitor);
+	replyMessage.setAnonymous(isAnonymous);
 
 	replyMessage.setParent(parent);
 	replyMessage.setSession(parent.getSession());
@@ -221,15 +222,16 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public Comment createReply(Long parentId, String replyText, User user, boolean isMonitor) {
+    public Comment createReply(Long parentId, String replyText, User user, boolean isMonitor, boolean isAnonymous) {
 
 	Comment parent = commentDAO.getById(parentId);
-	return (createReply(parent, replyText, user, isMonitor));
+	return (createReply(parent, replyText, user, isMonitor, isAnonymous));
 
     }
 
     @Override
-    public Comment updateComment(Long commentUid, String newBody, User user, boolean makeAuditEntry) {
+    // if isAnonymous is null, do not update the field.
+    public Comment updateComment(Long commentUid, String newBody, User user, Boolean isAnonymous, boolean makeAuditEntry) {
 	Comment comment = commentDAO.getById(commentUid);
 
 	if (comment != null && user != null) {
@@ -247,6 +249,8 @@ public class CommentService implements ICommentService {
 
 	    comment.setBody(newBody);
 	    comment.updateModificationData(user);
+	    if ( isAnonymous != null )
+		comment.setAnonymous(isAnonymous);
 	    commentDAO.saveOrUpdate(comment);
 
 	    return comment;

@@ -143,6 +143,7 @@ public class CommentAction extends Action {
 	String externalSignature;
 	String mode;
 	boolean likeAndDislike;
+	boolean allowAnonymous;
 	boolean readOnly;
 	Integer pageSize;
 	Integer sortBy;
@@ -167,6 +168,7 @@ public class CommentAction extends Action {
 	    externalType = WebUtil.readIntParam(request, CommentConstants.ATTR_EXTERNAL_TYPE);
 	    externalSignature = WebUtil.readStrParam(request, CommentConstants.ATTR_EXTERNAL_SIG);
 	    likeAndDislike = WebUtil.readBooleanParam(request, CommentConstants.ATTR_LIKE_AND_DISLIKE);
+	    allowAnonymous = WebUtil.readBooleanParam(request, CommentConstants.ATTR_ANONYMOUS);
 	    readOnly = WebUtil.readBooleanParam(request, CommentConstants.ATTR_READ_ONLY);
 	    pageSize = WebUtil.readIntParam(request, CommentConstants.PAGE_SIZE, true);
 	    if (pageSize == null) {
@@ -184,6 +186,7 @@ public class CommentAction extends Action {
 	    }
 	    sessionMap.put(CommentConstants.ATTR_EXTERNAL_SIG, externalSignature);
 	    sessionMap.put(CommentConstants.ATTR_LIKE_AND_DISLIKE, likeAndDislike);
+	    sessionMap.put(CommentConstants.ATTR_ANONYMOUS, allowAnonymous);
 	    sessionMap.put(CommentConstants.ATTR_READ_ONLY, readOnly);
 	    sessionMap.put(CommentConstants.PAGE_SIZE, pageSize);
 	    sessionMap.put(CommentConstants.ATTR_SORT_BY, sortBy);
@@ -387,6 +390,8 @@ public class CommentAction extends Action {
 	    commentText = commentText.trim();
 	}
 
+	Boolean commentAnonymous = WebUtil.readBooleanParam(request, CommentConstants.ATTR_COMMENT_ANONYMOUS_NEW, false);
+
 	JSONObject JSONObject;
 
 	if (!validateText(commentText)) {
@@ -407,14 +412,13 @@ public class CommentAction extends Action {
 	    Comment rootSeq = commentService.getRoot(externalId, externalSecondaryId, externalType, externalSignature);
 
 	    // save message into database
-	    Comment newComment = commentService.createReply(rootSeq, commentText, user, isMonitor);
+	    Comment newComment = commentService.createReply(rootSeq, commentText, user, isMonitor, commentAnonymous);
 
 	    JSONObject = new JSONObject();
 	    JSONObject.put(CommentConstants.ATTR_COMMENT_ID, newComment.getUid());
 	    JSONObject.put(CommentConstants.ATTR_THREAD_ID, newComment.getThreadComment().getUid());
 	    JSONObject.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    JSONObject.put(CommentConstants.ATTR_PARENT_COMMENT_ID, newComment.getParent().getUid());
-
 	}
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(JSONObject);
@@ -458,6 +462,8 @@ public class CommentAction extends Action {
 	    commentText = commentText.trim();
 	}
 
+	Boolean commentAnonymous = WebUtil.readBooleanParam(request, CommentConstants.ATTR_COMMENT_ANONYMOUS_REPLY, false);
+
 	JSONObject JSONObject;
 
 	if (!validateText(commentText)) {
@@ -474,7 +480,7 @@ public class CommentAction extends Action {
 	    }
 
 	    // save message into database
-	    Comment newComment = commentService.createReply(parentId, commentText.trim(), user, isMonitor);
+	    Comment newComment = commentService.createReply(parentId, commentText.trim(), user, isMonitor, commentAnonymous);
 
 	    JSONObject = new JSONObject();
 	    JSONObject.put(CommentConstants.ATTR_COMMENT_ID, newComment.getUid());
@@ -546,6 +552,10 @@ public class CommentAction extends Action {
 	    commentText = commentText.trim();
 	}
 
+	// Don't update anonymous if it is monitoring
+	boolean isMonitoring = ToolAccessMode.TEACHER.equals(WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE)));
+	Boolean commentAnonymous = isMonitoring ? null : WebUtil.readBooleanParam(request, CommentConstants.ATTR_COMMENT_ANONYMOUS_EDIT, false);
+
 	JSONObject JSONObject;
 
 	if (!validateText(commentText)) {
@@ -563,8 +573,7 @@ public class CommentAction extends Action {
 			user.getLogin(), externalId, externalType, externalSignature);
 	    }
 
-	    Comment updatedComment = commentService.updateComment(commentId, commentText, user, ToolAccessMode.TEACHER
-		    .equals(WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE))));
+	    Comment updatedComment = commentService.updateComment(commentId, commentText, user, commentAnonymous, isMonitoring);
 
 	    JSONObject = new JSONObject();
 	    JSONObject.put(CommentConstants.ATTR_COMMENT_ID, commentId);

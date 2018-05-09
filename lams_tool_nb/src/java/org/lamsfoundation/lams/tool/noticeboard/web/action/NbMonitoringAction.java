@@ -156,8 +156,13 @@ public class NbMonitoringAction extends LamsDispatchAction {
 
     public ActionForward viewComments(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws NbApplicationException {
-	request.setAttribute(NoticeboardConstants.TOOL_SESSION_ID,
-		request.getParameter(NoticeboardConstants.TOOL_SESSION_ID));
+	
+	Long toolSessionID = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_SESSION_ID, false);
+	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+	NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
+
+	request.setAttribute(NoticeboardConstants.TOOL_SESSION_ID,toolSessionID);
+	request.setAttribute("anonymous", nbContent.isAllowAnonymous());
 	return mapping.findForward(NoticeboardConstants.MONITOR_COMMENTS_PAGE);
     }
 

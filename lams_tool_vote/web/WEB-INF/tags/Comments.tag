@@ -9,6 +9,7 @@
 <%@ attribute name="width" required="false" rtexprvalue="true"%>
 <%@ attribute name="mode" required="false" rtexprvalue="true"%>
 <%@ attribute name="likeAndDislike" required="false" rtexprvalue="true"%>
+<%@ attribute name="anonymous" required="false" rtexprvalue="true"%>
 <%@ attribute name="readOnly" required="false" rtexprvalue="true"%>
 <%@ attribute name="pageSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="sortBy" required="false" rtexprvalue="true"%>
@@ -31,6 +32,10 @@
 
 <c:if test="${empty likeAndDislike}">
 	<c:set var="likeAndDislike" value="false" />
+</c:if>
+
+<c:if test="${empty anonymous}">
+	<c:set var="anonymous" value="false" />
 </c:if>
 
 <c:if test="${empty readOnly}">
@@ -67,7 +72,7 @@
 
 <script>
 $(document).ready(function(){
-	var url='<lams:LAMSURL/>comments/comments.do?externalID=${toolSessionId}&externalSecondaryID=${toolItemId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}&pageSize=${pageSize}&sortBy=${sortBy}';
+	var url='<lams:LAMSURL/>comments/comments.do?externalID=${toolSessionId}&externalSecondaryID=${toolItemId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}&pageSize=${pageSize}&sortBy=${sortBy}&anonymous=${anonymous}';
 	$.ajaxSetup({ cache: true });
 	$('#commentFrame').load(url);
 });
