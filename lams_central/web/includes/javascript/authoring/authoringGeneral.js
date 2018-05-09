@@ -1553,12 +1553,15 @@ GeneralLib = {
 		if (!firstActivity) {
 			return null;
 		}
-		// the first activity can be grouping or the second one
+		// the first activity can be grouping or the second or third one (Live Edit gate and notebook can be in front)
 		var firstGroupingActivity = firstActivity instanceof ActivityDefs.GroupingActivity ? firstActivity : null;
 		if (!firstGroupingActivity) {
 			firstGroupingActivity = getNextActivity(firstActivity);
 			if (!(firstGroupingActivity instanceof ActivityDefs.GroupingActivity)){
-				return null;
+				firstGroupingActivity = getNextActivity(firstGroupingActivity);
+				if (!(firstGroupingActivity instanceof ActivityDefs.GroupingActivity)){
+					return null;
+				}
 			}
 		}
 
@@ -2780,6 +2783,16 @@ GeneralLib = {
 					layout.ld.learningDesignID = response.learningDesignID;
 					
 					if (layout.liveEdit) {
+						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
+						if (missingGroupingOnActivities) {
+							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
+							for (var activity of missingGroupingOnActivities){
+									info += '<br /> * ' + activity.title; 
+								}
+							layout.infoDialog.data('show')(info);
+							// do not close Live Edit if TBL errors appear
+							return;
+						}
 						// let backend know that system gate needs to be removed
 						$.ajax({
 							type  : 'POST',
@@ -2826,20 +2839,10 @@ GeneralLib = {
 								GeneralLib.setModified(false);
 								
 								// close the Live Edit dialog
-								var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
-								if (missingGroupingOnActivities) {
-									var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
-									for (var activity of missingGroupingOnActivities){
-											info += '<br /> * ' + activity.title; 
-										}
-									layout.infoDialog.data('show')(info);
-
-								} else {
-									layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL, true);
-									setTimeout(function(){
-										window.parent.closeDialog('dialogAuthoring');
-									}, 5000);
-								}
+								layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL, true);
+								setTimeout(function(){
+									window.parent.closeDialog('dialogAuthoring');
+								}, 5000);
 							}
 						});
 						
