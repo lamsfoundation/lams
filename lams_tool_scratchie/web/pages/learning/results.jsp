@@ -132,8 +132,8 @@
 				   	colModel:[
 				   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 				   		{name:'isUserAuthor', width:0, hidden: true},
-				   		{name:'groupName', index:'groupName', width:100},
-				   		{name:'burningQuestion', index:'burningQuestion', width:501, edittype: 'textarea', editoptions:{rows:"5"},
+				   		{name:'groupName', index:'groupName', width:100, title: false},
+				   		{name:'burningQuestion', index:'burningQuestion', width:501, edittype: 'textarea', title: false, editoptions:{rows:"8"},
 					   		formatter:function(cellvalue, options, rowObject) {
 					   			var item = $(this).jqGrid("getLocalRow", options.rowId);
 
@@ -156,7 +156,7 @@
 								return cellvalue;
 			   				}
 						},
-				   		{name:'count', index:'count', width:50, align:"right"}
+				   		{name:'count', index:'count', width:50, align:"right", title: false}
 				   	],
                     caption: <c:choose><c:when test="${scratchieItem.uid == 0}">"${scratchieItem.title}"</c:when><c:otherwise>"<a href='#${scratchieItem.title}' class='bq-title'>${scratchieItem.title}</a>"</c:otherwise></c:choose>,
 					cellurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItem.uid}',
