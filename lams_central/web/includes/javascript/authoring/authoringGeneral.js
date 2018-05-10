@@ -1606,13 +1606,13 @@ GeneralLib = {
 		
 		// check which ones are not grouped
 		var activitiesToGroup = [];
-		for (var activity of activities) {
-			if (!activity.grouping){
-				activitiesToGroup.push(activity);
-				activity.requireGrouping = true;
-				activity.draw();
+		$.each(activities, function(){
+			if (!this.grouping){
+				activitiesToGroup.push(this);
+				this.requireGrouping = true;
+				this.draw();
 			}
-		}
+		});
 		return activitiesToGroup.length === 0 ? null : activitiesToGroup;
 	},
 	
@@ -2786,9 +2786,9 @@ GeneralLib = {
 						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
 						if (missingGroupingOnActivities) {
 							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
-							for (var activity of missingGroupingOnActivities){
-									info += '<br /> * ' + activity.title; 
-								}
+							$.each(missingGroupingOnActivities, function(){
+									info += '<br /> * ' + this.title; 
+							});
 							layout.infoDialog.data('show')(info);
 							// do not close Live Edit if TBL errors appear
 							return;
@@ -2859,9 +2859,9 @@ GeneralLib = {
 						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
 						if (missingGroupingOnActivities) {
 							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
-							for (var activity of missingGroupingOnActivities){
-									info += '<br /> * ' + activity.title; 
-								}
+							$.each(missingGroupingOnActivities, function(){
+								info += '<br /> * ' + this.title; 
+							});
 							layout.infoDialog.data('show')(info);
 
 						} else {
