@@ -498,7 +498,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			+ ldDto.getContentFolderID() + ExportToolContentService.EXPORT_LDCONTENT_ZIP_SUFFIX;
 		String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
 			+ FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR;
-		String ldContentDir = FileUtil.getFullPath(secureDir, ldDto.getContentFolderID());
+
+		String ldContentDir = ExportToolContentService.getContentDirPath(ldDto.getContentFolderID());
+		ldContentDir = FileUtil.getFullPath(secureDir, ldContentDir);
 
 		if (!FileUtil.isEmptyDirectory(ldContentDir, true)) {
 		    log.debug("Create export Learning Design content target zip file. File name is "
@@ -767,13 +769,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		return -1L;
 	    }
 
-	    // begin fckeditor content folder import
+	    // begin ckeditor content folder import
 	    try {
 		String contentZipFileName = ExportToolContentService.EXPORT_LDCONTENT_ZIP_PREFIX
 			+ ldDto.getContentFolderID() + ExportToolContentService.EXPORT_LDCONTENT_ZIP_SUFFIX;
 		String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
 			+ FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR + File.separator
-			+ ldDto.getContentFolderID();
+			+ ExportToolContentService.getContentDirPath(ldDto.getContentFolderID());
 		File contentZipFile = new File(FileUtil.getFullPath(learningDesignPath, contentZipFileName));
 
 		// unzip file to target secure dir if exists
@@ -1956,6 +1958,18 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 
 	return newTitle;
+    }
+
+    /**
+     * Convert content folder ID to real path inside secure dir
+     */
+    private static String getContentDirPath(String contentFolderID) {
+	String contentFolderIDClean = contentFolderID.replaceAll("-", "");
+	String contentDir = "";
+	for (int charIndex = 0; charIndex < 6; charIndex++) {
+	    contentDir += contentFolderIDClean.substring(charIndex * 2, charIndex * 2 + 2) + File.separator;
+	}
+	return contentDir;
     }
 
     // ******************************************************************
