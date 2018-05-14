@@ -23,7 +23,7 @@
 				<h4 class="panel-title panel-collapse">
 					<c:choose>
 						<c:when test="${burningQsCount != 0}">
-							<a data-toggle="collapse" data-target="#collapse-${item.uid}" href="#collapse-${item.uid}" class="collapsed">
+							<a data-toggle="collapse" data-itemuid="${item.uid}" class="collapsed burning-question-title">
 								Q${i.index+1}) <c:out value="${item.title}" escapeXml="false"/>
 							</a>
 						</c:when>

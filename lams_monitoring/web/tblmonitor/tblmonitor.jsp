@@ -92,7 +92,16 @@
 
 			$("#tblmonitor-tab-content").load(
 				url,
-				options
+				options, 
+				//callback function fired on complete
+				function() { 
+					//use jqeury toggle instead of bootstrap collapse 
+					$(".burning-question-title").on('click', function () {
+						var div =  $("#collapse-" + $(this).data("itemuid"));
+						div.toggleClass("in");
+						$(this).toggleClass("collapsed");
+					});
+				}
 			);
 		}
 
