@@ -48,7 +48,11 @@
 		function turnOnDisplayAnswers() {
 			window.open("<c:url value='/monitoring.do'/>?dispatch=displayAnswers&toolContentID=${mcGeneralMonitoringDTO.toolContentID}&contentFolderID=${contentFolderID}","_self")
 		}
-	
+
+		function turnOnDisplayFeedbackOnly() {
+			window.open("<c:url value='/monitoring.do'/>?dispatch=displayFeedbackOnly&toolContentID=${mcGeneralMonitoringDTO.toolContentID}&contentFolderID=${contentFolderID}","_self")
+		}
+
 	</script>
 	
 </lams:head>

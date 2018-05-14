@@ -36,6 +36,7 @@ public class McGeneralMonitoringDTO {
     protected Integer countAllUsers;
     protected Integer countSessionComplete;
     protected String displayAnswers;
+    private String displayFeedbackOnly;
     protected String toolContentID;
 
     protected String contentFolderID;
@@ -113,6 +114,14 @@ public class McGeneralMonitoringDTO {
      */
     public void setDisplayAnswers(String displayAnswers) {
 	this.displayAnswers = displayAnswers;
+    }
+
+    public String getDisplayFeedbackOnly() {
+	return displayFeedbackOnly;
+    }
+
+    public void setDisplayFeedbackOnly(String displayFeedbackOnly) {
+	this.displayFeedbackOnly = displayFeedbackOnly;
     }
 
     /**

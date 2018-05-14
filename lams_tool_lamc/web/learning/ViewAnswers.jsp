@@ -189,7 +189,7 @@
 							</c:forEach>
 
 							<!-- answer feedback -->
-							<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
+							<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true' || mcGeneralLearnerFlowDTO.displayFeedbackOnly == 'true'}">
 								<c:forEach var="feedbackEntry" items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">
 									<c:if test="${(requestScope.mainQueIndex == feedbackEntry.key)
                                           && (feedbackEntry.value != null) && (feedbackEntry.value != '')}">

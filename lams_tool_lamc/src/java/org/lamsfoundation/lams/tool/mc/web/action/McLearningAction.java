@@ -491,6 +491,7 @@ public class McLearningAction extends LamsDispatchAction {
 	mcGeneralLearnerFlowDTO.setTotalMarksPossible(mcContent.getTotalMarksPossible());
 	mcGeneralLearnerFlowDTO.setShowMarks(new Boolean(mcContent.isShowMarks()).toString());
 	mcGeneralLearnerFlowDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
+	mcGeneralLearnerFlowDTO.setDisplayFeedbackOnly(((Boolean)mcContent.isDisplayFeedbackOnly()).toString());	
 	mcGeneralLearnerFlowDTO.setLearnerMark(user.getLastAttemptTotalMark());
 	
 	Object[] markStatistics = null;
