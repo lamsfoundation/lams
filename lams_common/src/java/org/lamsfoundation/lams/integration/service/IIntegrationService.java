@@ -147,6 +147,14 @@ public interface IIntegrationService {
     ExtUserUseridMap getImplicitExtUserUseridMap(ExtServer extServer, String extUsername, String firstName,
 	    String lastName, String language, String country, String email, boolean prefix, boolean isUpdateUserDetails)
 	    throws UserInfoValidationException;
+    
+    /**
+     * Checks whether user was created via integrations.
+     * 
+     * @param userId
+     * @return
+     */
+    boolean isIntegrationUser(Integer userId);
 
     ExtUserUseridMap getImplicitExtUserUseridMap(ExtServer extServer, String extUsername, String password, String salt,
 	    String firstName, String lastName, String email) throws UserInfoValidationException;
