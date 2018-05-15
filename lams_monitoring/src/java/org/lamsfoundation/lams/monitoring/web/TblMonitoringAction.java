@@ -358,6 +358,19 @@ public class TblMonitoringAction extends LamsDispatchAction {
     }
 
     private void setupAvailableActivityTypes(HttpServletRequest request, List<Activity> activities) {
+	
+	//check if there is Scratchie activity. It's used only in case of LKC TBL monitoring, when all assessment are treated as AEs
+	boolean isScratchieAvailable = false;
+	for (Activity activity : activities) {
+	    if (activity instanceof ToolActivity) {
+		ToolActivity toolActivity = (ToolActivity) activity;
+		String toolSignature = toolActivity.getTool().getToolSignature();
+		if (CentralConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
+		    isScratchieAvailable = true;
+		    break;
+		}
+	    }
+	}
 
 	boolean scratchiePassed = false;
 	boolean iraPassed = false;
@@ -373,7 +386,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 
 		//count only the first MCQ or Assessmnet as iRA
 		if (!iraPassed && (CentralConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
-			|| CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature))) {
+			|| isScratchieAvailable && CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature))) {
 		    iraPassed = true;
 		    if (CentralConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
 			request.setAttribute("isIraMcqAvailable", true);
@@ -387,8 +400,8 @@ public class TblMonitoringAction extends LamsDispatchAction {
 		    continue;
 		}
 
-		//aes are counted only after Scratchie activity
-		if (scratchiePassed && CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
+		//aes are counted only after Scratchie activity, or for LKC TBL monitoring
+		if ((scratchiePassed || !isScratchieAvailable) && CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
 		    request.setAttribute("isAeAvailable", true);
 		    //prepare assessment details to be passed to Assessment tool
 		    assessmentToolContentIds += toolContentId + ",";
