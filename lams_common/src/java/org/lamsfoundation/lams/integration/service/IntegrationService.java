@@ -515,6 +515,14 @@ public class IntegrationService implements IIntegrationService {
 	    throw new UserInfoFetchException(e);
 	}
     }
+    
+    @Override
+    public boolean isIntegrationUser(Integer userId) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("user.userId", userId);
+	List list = service.findByProperties(ExtUserUseridMap.class, properties);
+	return (list != null) && !list.isEmpty();
+    }
 
     @Override
     public String hash(ExtServer extServer, String extUsername, String timestamp) {
