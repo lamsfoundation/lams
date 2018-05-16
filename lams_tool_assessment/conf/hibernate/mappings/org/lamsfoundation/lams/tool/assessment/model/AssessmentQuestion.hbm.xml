@@ -258,6 +258,15 @@
             column="groups_answers_disclosed"
         />
 
+        <property
+            name="prefixAnswersWithLetters"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="prefix_answers_with_letters"
+        />
+
+
     </class>
 
 </hibernate-mapping>
