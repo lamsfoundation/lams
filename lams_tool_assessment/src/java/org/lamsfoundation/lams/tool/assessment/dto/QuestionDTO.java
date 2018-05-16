@@ -43,7 +43,9 @@ public class QuestionDTO {
 
     private String feedbackOnIncorrect;
 
+    // only one of shuffle and prefixAnswersWithLetters should be on. Both may be off
     private boolean shuffle;
+    private boolean prefixAnswersWithLetters;
 
     private boolean caseSensitive;
 
@@ -108,6 +110,7 @@ public class QuestionDTO {
 	this.feedbackOnPartiallyCorrect = question.getFeedbackOnPartiallyCorrect();
 	this.feedbackOnIncorrect = question.getFeedbackOnIncorrect();
 	this.shuffle = question.isShuffle();
+	this.prefixAnswersWithLetters = question.isPrefixAnswersWithLetters();
 	this.caseSensitive = question.isCaseSensitive();
 	this.correctAnswer = question.getCorrectAnswer();
 	this.allowRichEditor = question.isAllowRichEditor();
@@ -419,5 +422,13 @@ public class QuestionDTO {
 
     public void setOptionDtos(Set<OptionDTO> optionDtos) {
 	this.optionDtos = optionDtos;
+    }
+
+    public boolean isPrefixAnswersWithLetters() {
+	return prefixAnswersWithLetters;
+    }
+
+    public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
+	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
 }

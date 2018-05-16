@@ -126,4 +126,7 @@ public class OptionDTO implements Sequencable{
 	this.answerBoolean = answerBoolean;
     }
 
+    public String formatPrefixLetter(int index) {
+	return new String(Character.toChars(97 + index)) + ")";
+    }
 }

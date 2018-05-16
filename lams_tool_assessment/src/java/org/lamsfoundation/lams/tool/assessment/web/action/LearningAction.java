@@ -353,7 +353,7 @@ public class LearningAction extends Action {
 	    ArrayList<QuestionDTO> shuffledList = new ArrayList<QuestionDTO>(questionDtos);
 	    Collections.shuffle(shuffledList);
 	    questionDtos = new LinkedList<QuestionDTO>(shuffledList);
-	}
+	} 
 	for (QuestionDTO questionDto : questionDtos) {
 	    if (questionDto.isShuffle() || (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING)) {
 		ArrayList<OptionDTO> shuffledList = new ArrayList<OptionDTO>(questionDto.getOptionDtos());
@@ -374,7 +374,7 @@ public class LearningAction extends Action {
 		    }
 		});
 		questionDto.setMatchingPairOptions(new LinkedHashSet<OptionDTO>(optionsSortedByOptionString));
-	    }
+	    } 
 	}
 
 	//paging

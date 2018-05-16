@@ -81,7 +81,9 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     private String feedbackOnIncorrect;
 
+    // only one of shuffle and prefixAnswersWithLetters should be on. Both may be off
     private boolean shuffle;
+    private boolean prefixAnswersWithLetters;
 
     private boolean caseSensitive;
 
@@ -479,5 +481,13 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     public void setTitleEscaped(String titleEscaped) {
 	this.titleEscaped = titleEscaped;
+    }
+
+    public boolean isPrefixAnswersWithLetters() {
+        return prefixAnswersWithLetters;
+    }
+
+    public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
+        this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
 }
