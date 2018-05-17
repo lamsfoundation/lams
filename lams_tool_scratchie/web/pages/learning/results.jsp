@@ -50,6 +50,19 @@
 		.burning-question-text +span+ i { /* in all other case hide it */
 		  visibility: hidden;
 		}
+		
+		/* hide edit button background */
+		div.btn.ui-inline-edit {
+			background-color:rgba(0, 0, 0, 0) !important;
+		}
+		
+		/* make cell borders less prominent */
+		.ui-jqgrid .ui-jqgrid-bdiv tr.ui-row-ltr>td {
+    		border-right-style: dotted;
+		}
+		.ui-jqgrid tr.jqfoot>td, .ui-jqgrid tr.jqgroup>td, .ui-jqgrid tr.jqgrow>td, .ui-jqgrid tr.ui-subgrid>td, .ui-jqgrid tr.ui-subtblcell>td {
+	    	border-bottom-style: dotted;
+		}
 	</style>
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
@@ -126,6 +139,7 @@
 						'isUserAuthor',
 						"<fmt:message key='label.monitoring.summary.user.name' />",
 						"<fmt:message key='label.burning.questions' />",
+						"Edit",
 						"<fmt:message key='label.like' />",
 						"<fmt:message key='label.count' />"
 					],
@@ -151,6 +165,14 @@
 				   	            return ${isUserLeader} && eval(item.isUserAuthor);
 				   	        }
 						},
+						{ name: "act", template: "actions", width:50, formatoptions:{
+			            	keys: true, 
+			            	delbutton: false,
+			                isDisplayButtons: function (options, rowData) {
+			                	var isEditable = ${isUserLeader} && eval(rowData.isUserAuthor);
+				   	            return { edit: { hidden: !isEditable, noHovering: true } };
+			                }
+			            }},
 				   		{name:'like', index:'like', width:60, align: "center", 
 					   		formatter:function(cellvalue, options, rowObject) {
 								return cellvalue;
@@ -159,8 +181,27 @@
 				   		{name:'count', index:'count', width:50, align:"right", title: false}
 				   	],
                     caption: <c:choose><c:when test="${scratchieItem.uid == 0}">"${scratchieItem.title}"</c:when><c:otherwise>"<a href='#${scratchieItem.title}' class='bq-title'>${scratchieItem.title}</a>"</c:otherwise></c:choose>,
-					cellurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItem.uid}',
-	  				cellEdit: true,
+                    editurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItem.uid}',
+	  	          	beforeEditRow: function (options, rowid) {
+		  	          	alert("aaa");
+	  	          	},
+	  				inlineEditing: { keys: true, defaultFocusField: "burningQuestion", focusField: "burningQuestion" },
+	  				onSelectRow: function (rowid, status, e) {
+	  	                var $self = $(this), 
+	  	                	savedRow = $self.jqGrid("getGridParam", "savedRow");
+
+	  	                if (savedRow.length > 0 && savedRow[0].id !== rowid) {
+	  	                    $self.jqGrid("restoreRow", savedRow[0].id);
+	  	                }
+
+	  	                //edit row on its selection, unless "thumbs up" button is pressed
+	  	                if (e.target.classList.contains("fa") && e.target.classList.contains("fa-2x") 
+	  		  	                && (e.target.classList.contains("fa-thumbs-o-up") || e.target.classList.contains("fa-thumbs-up"))) { 
+	  	                	return;
+		  	            } else {
+		  	            	$self.jqGrid("editRow", rowid, { focusField: "burningQuestion" });
+			  	        }
+	  	            },
 	  				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
 	  					var itemUid = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
 	  					return {itemUid:itemUid};
