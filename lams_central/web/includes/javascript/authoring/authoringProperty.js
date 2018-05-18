@@ -1153,7 +1153,7 @@ PropertyLib = {
 								mappingEntry.condition = {
 									'name' 			  : this.name,
 								    'displayName' 	  : this.displayName,
-								    'type' 			  : 'OUTPUT_COMPLEX',
+								    'type' 			  : this.type,
 								    'conditionID'	  : this.conditionId,
 								    'toolActivityUIID' : output.toolActivityUIID
 								};

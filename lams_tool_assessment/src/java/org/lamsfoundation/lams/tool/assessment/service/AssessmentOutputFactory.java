@@ -23,12 +23,14 @@
 package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -36,15 +38,18 @@ import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
+import org.lamsfoundation.lams.util.WebUtil;
 
 public class AssessmentOutputFactory extends OutputFactory {
 
     /**
      * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
 	    int definitionType) {
@@ -95,9 +100,9 @@ public class AssessmentOutputFactory extends OutputFactory {
 		    markAvailable = new Long(questionReference.getDefaultGrade());
 		}
 
-		String description = getI18NText("output.user.score.for.question", false);
+		String description = getI18NText("output.user.score.for.question", false) + " ";
 		if (questionReference.isRandomQuestion()) {
-		    description += getI18NText("label.authoring.basic.type.random.question", false) + " "
+		    description += getI18NText("label.authoring.basic.type.random.question", false)
 			    + randomQuestionsCount++;
 		} else {
 		    description += questionReference.getQuestion().getTitle();
@@ -108,7 +113,25 @@ public class AssessmentOutputFactory extends OutputFactory {
 		definition.setDescription(description);
 		definitionMap.put(String.valueOf(questionReference.getSequenceId()), definition);
 	    }
-	    ;
+
+	    for (AssessmentQuestion question : assessment.getQuestions()) {
+		if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+		    String outputName = AssessmentConstants.OUTPUT_NAME_ORDERED_ANSWERS + "#" + question.getUid();
+		    ToolOutputDefinition orderedAnswersDefinition = buildLongOutputDefinition(outputName);
+		    orderedAnswersDefinition.setShowConditionNameOnly(true);
+		    orderedAnswersDefinition.setDescription(
+			    getI18NText("output.ordered.answers.for.question", false) + " " + question.getTitle());
+		    List<BranchCondition> conditions = new LinkedList<BranchCondition>();
+		    orderedAnswersDefinition.setConditions(conditions);
+		    int orderId = 1;
+		    for (AssessmentQuestionOption option : question.getOptions()) {
+			String value = WebUtil.removeHTMLtags(option.getOptionString());
+			conditions.add(new BranchCondition(null, null, orderId++, "ordered.answer#" + option.getUid(),
+				value, BranchCondition.OUTPUT_TYPE_LONG, null, null, value));
+		    }
+		    definitionMap.put(outputName, orderedAnswersDefinition);
+		}
+	    }
 	}
 
 	return definitionMap;

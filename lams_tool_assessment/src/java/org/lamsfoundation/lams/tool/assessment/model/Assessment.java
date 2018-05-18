@@ -103,7 +103,7 @@ public class Assessment implements Cloneable {
     private AssessmentUser createdBy;
 
     // Question bank questions
-    private Set questions;
+    private Set<AssessmentQuestion> questions;
 
     // assessment questions references that form question list
     private Set questionReferences;
@@ -407,11 +407,11 @@ public class Assessment implements Cloneable {
      *
      * @return
      */
-    public Set getQuestions() {
+    public Set<AssessmentQuestion> getQuestions() {
 	return questions;
     }
 
-    public void setQuestions(Set questions) {
+    public void setQuestions(Set<AssessmentQuestion> questions) {
 	this.questions = questions;
     }
 
