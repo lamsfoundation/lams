@@ -13,7 +13,7 @@
 
 <div class="table-responsive">
 	<table class="table table-hover table-condensed">
-		<c:forEach var="option" items="${question.optionDtos}">
+		<c:forEach var="option" items="${question.optionDtos}" varStatus="answerStatus">
 			<c:set var="isCorrect" 
 				   value="${(assessment.allowDiscloseAnswers 
 				   			 ? question.correctAnswersDisclosed : assessment.allowRightAnswersAfterQuestion)
@@ -31,7 +31,7 @@
 					    <i class="fa fa-times text-danger"></i>	
 				    </c:if>			
                 </td>
-				<td class="has-radio-button">
+				<td class="${question.prefixAnswersWithLetters?'has-radio-button-prefix':'has-radio-button'}">
 					<c:choose>
 						<c:when test="${question.multipleAnswersAllowed}">
 							<input type="checkbox" name="question${status.index}_${option.sequenceId}" value="${true}"
@@ -46,9 +46,12 @@
 							/>
 						</c:otherwise>
 					</c:choose>
+					<c:if test="${question.prefixAnswersWithLetters}">
+			 			&nbsp;${option.formatPrefixLetter(answerStatus.index)}
+ 	                </c:if>	
 				</td>
 				
-				<td>
+				<td ${question.prefixAnswersWithLetters?'class="has-radio-button-prefix-answer"':''}">
 					<c:out value="${option.optionString}" escapeXml="false" />
 				</td>
 				
