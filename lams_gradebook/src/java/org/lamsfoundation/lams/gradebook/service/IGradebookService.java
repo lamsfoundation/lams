@@ -45,12 +45,12 @@ public interface IGradebookService {
 
     /**
      * Gets all the activity rows for a lesson, with the mark for each activity being the average for all users in the
-     * lesson
+     * lesson. Only set escapeTitles to false if the output is *not* going to a webpage, but is instead going to a spreadsheet.
      *
      * @param lesson
      * @return
      */
-    List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId, TimeZone userTimezone);
+    List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId, TimeZone userTimezone, boolean escapeTitles);
 
     /**
      * Gets all the activity rows for a user, with the mark for the activity being the user's individual mark
