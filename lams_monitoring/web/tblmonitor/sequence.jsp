@@ -5,6 +5,9 @@
 	#content {
 		padding: 0 20px;
 	}
+	#sequenceCanvas {
+		height: auto !important;
+	}
 </style>
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>

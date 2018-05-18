@@ -118,6 +118,14 @@
         />
 
         <property
+            name="allowAnonymous"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_anonymous"
+        />
+
+        <property
             name="nbContentId"
             type="java.lang.Long"
             update="true"

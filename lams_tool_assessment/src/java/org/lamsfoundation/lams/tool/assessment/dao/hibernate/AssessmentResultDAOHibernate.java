@@ -30,7 +30,9 @@ import org.hibernate.SQLQuery;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
+import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.stereotype.Repository;
 
@@ -38,6 +40,9 @@ import org.springframework.stereotype.Repository;
 public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements AssessmentResultDAO {
 
     private static final String FIND_LAST_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
+	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND r.latest=1";
+    
+    private static final String FIND_WHETHER_LAST_RESULT_FINISHED = "SELECT (r.finishDate IS NOT NULL) FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND r.latest=1";
 
     private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
@@ -119,6 +124,16 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	q.setParameter(0, userId);
 	q.setParameter(1, assessmentUid);
 	return (AssessmentResult) q.uniqueResult();
+    }
+    
+    @Override
+    public Boolean isLastAttemptFinishedByUser(AssessmentUser user) {
+	Assessment assessment = user.getAssessment() == null ? user.getSession().getAssessment() : user.getAssessment();
+	
+	Query q = getSession().createQuery(FIND_WHETHER_LAST_RESULT_FINISHED);
+	q.setParameter(0, user.getUserId());
+	q.setParameter(1, assessment.getUid());
+	return (Boolean) q.uniqueResult();
     }
 
     @Override

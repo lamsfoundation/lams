@@ -153,6 +153,15 @@
             column="monitor"
         />
 
+        <property
+            name="anonymous"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="anonymous"
+        />
+
+
     </class>
 
 </hibernate-mapping>

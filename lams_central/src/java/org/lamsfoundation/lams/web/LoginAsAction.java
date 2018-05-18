@@ -69,7 +69,7 @@ public class LoginAsAction extends Action {
 		    // audit log when loginas
 		    UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 		    ILogEventService logEventService = (ILogEventService) ctx.getBean("logEventService");
-		    String[] args = new String[] { sysadmin.getLogin() + "(" + sysadmin.getUserID() + ")", login };
+		    String[] args = new String[] { sysadmin.getLogin() + " (" + sysadmin.getUserID() + ")", login };
 		    String message = messageService.getMessage("audit.admin.loginas", args);
 		    logEventService.logEvent(LogEvent.TYPE_LOGIN_AS, sysadmin.getUserID(), user.getUserId(), null, null, message);
 

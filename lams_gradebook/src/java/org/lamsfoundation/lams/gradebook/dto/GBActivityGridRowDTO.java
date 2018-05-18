@@ -56,19 +56,37 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	this.groupId = groupId;
     }
 
-    public GBActivityGridRowDTO(Activity activity, String groupName, Long groupId) {
+    /** The Spring htmlEscape method escapes Greek letters (https://jira.spring.io/browse/SPR-9293)
+     * so when the escaping is done for the Excel Exports, any Greek activity names are escaped. 
+     * So we default to escaping (works fine sent to the browser) and then we have XSS protection for the
+     * web pages. But do not escape when it will be saved in an Excel file. This issue will be resolved
+     * when we upgrade Spring to v4.1.2 and then we can go back to one single creator method.
+     */
+   public GBActivityGridRowDTO(Activity activity, String groupName, Long groupId) {
+	this(activity, groupName, groupId, true);
+    }
 
+   public GBActivityGridRowDTO(Activity activity, String groupName, Long groupId, boolean escapeTitles) {
+     
 	if (groupName != null && groupId != null) {
 	    // Need to make the id unique, so appending the group id for this row
 	    this.id = activity.getActivityId().toString() + "_" + groupId.toString();
 
 	    this.groupId = groupId;
 	    // If grouped acitivty, append group name
-	    this.rowName = HtmlUtils.htmlEscape(activity.getTitle()) + " (" + groupName + ")";
+	    if ( escapeTitles ) {
+		this.rowName = HtmlUtils.htmlEscape(activity.getTitle()) + " (" + groupName + ")";
+	    } else {
+		this.rowName = activity.getTitle() + " (" + groupName + ")"; 
+	    }
 	} else {
 	    this.id = activity.getActivityId().toString();
 
-	    this.rowName = HtmlUtils.htmlEscape(activity.getTitle());
+	    if ( escapeTitles ) {
+		this.rowName = HtmlUtils.htmlEscape(activity.getTitle());
+	    } else {
+		this.rowName = activity.getTitle();
+	    }
 	}
 
 	String competenceMappingsStr = "";

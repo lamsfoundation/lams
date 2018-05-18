@@ -583,16 +583,31 @@ public class MonitoringAction extends LamsDispatchAction {
 	jsonCommand.put("redirectURL", "/lams/learning/learner.do?method=joinLesson&lessonID=" + lessonId);
 	String command = jsonCommand.toString();
 
+	String activityDescription = null;
+	if (activityId != null) {
+	    Activity activity = getMonitoringService().getActivityById(activityId);
+	    activityDescription = new StringBuffer(activity.getTitle()).append(" (").append(activityId).append(")")
+		    .toString();
+	}
+
+	StringBuffer learnerIdNameBuf = new StringBuffer();
 	String message = null;
 	User learner = null;
+	boolean oneOrMoreProcessed = false;
 	try {
 	    for (String learnerIDString : learnerIDs.split(",")) {
+		if (oneOrMoreProcessed) {
+		    learnerIdNameBuf.append(", ");
+		} else {
+		    oneOrMoreProcessed = true;
+		}
 		Integer learnerID = Integer.valueOf(learnerIDString);
 		message = getMonitoringService().forceCompleteActivitiesByUser(learnerID, requesterId, lessonId,
 			activityId, removeLearnerContent);
 
 		learner = (User) getUserManagementService().findById(User.class, learnerID);
 		getLearnerService().createCommandForLearner(lessonId, learner.getLogin(), command);
+		learnerIdNameBuf.append(learner.getLogin()).append(" (").append(learnerID).append(")");
 	    }
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -600,15 +615,16 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	if (LamsDispatchAction.log.isDebugEnabled()) {
-	    LamsDispatchAction.log
-		    .debug("Force complete for learners " + learnerIDs + " lesson " + lessonId + ". " + message);
+	    LamsDispatchAction.log.debug("Force complete for learners " + learnerIdNameBuf.toString() + " lesson "
+		    + lessonId + ". " + message);
 	}
 
 	// audit log force completion attempt
 	String messageKey = (activityId == null) ? "audit.force.complete.end.lesson" : "audit.force.complete";
-	Object[] args = new Object[] { learnerIDs, activityId, lessonId };
+	
+	Object[] args = new Object[] { learnerIdNameBuf.toString(), activityDescription, lessonId };
 	String auditMessage = getMonitoringService().getMessageService().getMessage(messageKey, args);
-	getLogEventService().logEvent(LogEvent.TYPE_FORCE_COMPLETE, requesterId, null, lessonId, null,
+	getLogEventService().logEvent(LogEvent.TYPE_FORCE_COMPLETE, requesterId, null, lessonId, activityId,
 		auditMessage + " " + message);
 
 	PrintWriter writer = response.getWriter();

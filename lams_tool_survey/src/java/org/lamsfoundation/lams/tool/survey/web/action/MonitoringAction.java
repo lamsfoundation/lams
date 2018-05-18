@@ -260,7 +260,7 @@ public class MonitoringAction extends Action {
 		responseRow.put("answerText", answer);
 	    }
 	    if (userAndAnswers.length > 3 && userAndAnswers[3] != null) {
-		responseRow.put(SurveyConstants.ATTR_PORTRAIT_ID, ((Number)userAndAnswers[3]).longValue());
+		responseRow.put(SurveyConstants.ATTR_PORTRAIT_ID, ((Number) userAndAnswers[3]).longValue());
 	    }
 	    rows.add(responseRow);
 	}
@@ -321,7 +321,7 @@ public class MonitoringAction extends Action {
 	    }
 
 	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
-		responseRow.put(SurveyConstants.ATTR_PORTRAIT_ID, ((Number)userAndReflection[2]).longValue());
+		responseRow.put(SurveyConstants.ATTR_PORTRAIT_ID, ((Number) userAndReflection[2]).longValue());
 	    }
 
 	    rows.add(responseRow);
@@ -354,11 +354,11 @@ public class MonitoringAction extends Action {
 	try {
 	    // create an empty excel file
 	    Workbook workbook = new SXSSFWorkbook();
-	    
+
 	    // Date format for the timestamp field
 	    CellStyle dateStyle = workbook.createCellStyle();
-	    dateStyle.setDataFormat((short)0x16); // long date/time format e.g. DD/MM/YYYY MM:HH
-	    		
+	    dateStyle.setDataFormat((short) 0x16); // long date/time format e.g. DD/MM/YYYY MM:HH
+
 	    Sheet sheet = workbook.createSheet("Survey");
 	    sheet.setColumnWidth(0, 5000);
 	    Row row;
@@ -373,12 +373,12 @@ public class MonitoringAction extends Action {
 		// survey title
 		row = sheet.createRow(idx++);
 		cell = row.createCell(0);
-		cell.setCellValue(removeHTMLTags(survey.getTitle()));
+		cell.setCellValue(SurveyWebUtils.removeHTMLTags(survey.getTitle()));
 
 		// survey instruction
 		row = sheet.createRow(idx++);
 		cell = row.createCell(0);
-		cell.setCellValue(removeHTMLTags(survey.getInstructions()));
+		cell.setCellValue(SurveyWebUtils.removeHTMLTags(survey.getInstructions()));
 
 		// display 2 empty row
 		row = sheet.createRow(idx++);
@@ -393,7 +393,7 @@ public class MonitoringAction extends Action {
 		cell = row.createCell(0);
 		cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_SESSION_NAME));
 		cell = row.createCell(1);
-		cell.setCellValue(removeHTMLTags(session.getSessionName()));
+		cell.setCellValue(SurveyWebUtils.removeHTMLTags(session.getSessionName()));
 
 		// begin to display question and its answers
 		Set<Entry<SurveyQuestion, List<AnswerDTO>>> questionEntries = map.entrySet();
@@ -413,7 +413,7 @@ public class MonitoringAction extends Action {
 		    cell = row.createCell(0);
 		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_QUESTION) + " " + questionIdx);
 		    cell = row.createCell(1);
-		    cell.setCellValue(removeHTMLTags(question.getDescription()));
+		    cell.setCellValue(SurveyWebUtils.removeHTMLTags(question.getDescription()));
 
 		    // display options content
 		    Set<SurveyOption> options = question.getOptions();
@@ -429,7 +429,7 @@ public class MonitoringAction extends Action {
 			cell = row.createCell(0);
 			cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
 			cell = row.createCell(1);
-			cell.setCellValue(removeHTMLTags(option.getDescription()));
+			cell.setCellValue(SurveyWebUtils.removeHTMLTags(option.getDescription()));
 		    }
 		    if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 			optionIdx++;
@@ -484,7 +484,7 @@ public class MonitoringAction extends Action {
 			cellIdx++;
 			cell = row.createCell(cellIdx);
 			cell.setCellStyle(dateStyle);
-			cell.setCellValue(answer.getAnswer().getUpdateDate()); 
+			cell.setCellValue(answer.getAnswer().getUpdateDate());
 			// for answer's options
 			for (SurveyOption option : options) {
 			    cellIdx++;
@@ -503,7 +503,7 @@ public class MonitoringAction extends Action {
 			if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 			    cell = row.createCell(++cellIdx);
 			    if (answer.getAnswer() != null) {
-				cell.setCellValue(removeHTMLTags(answer.getAnswer().getAnswerText()));
+				cell.setCellValue(SurveyWebUtils.removeHTMLTags(answer.getAnswer().getAnswerText()));
 			    }
 			}
 
@@ -575,16 +575,6 @@ public class MonitoringAction extends Action {
 	response.setContentType("text/plain;charset=utf-8");
 	response.getWriter().print(formattedDate);
 	return null;
-    }
-
-    /**
-     * Removes all the html tags from a string
-     *
-     * @param string
-     * @return
-     */
-    private String removeHTMLTags(String string) {
-	return string.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
     }
 
     // *************************************************************************************

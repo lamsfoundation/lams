@@ -36,7 +36,7 @@ public class McAuthoringForm extends McLearningForm  {
     protected String useSelectLeaderToolOuput;
     protected String prefixAnswersWithLetters;
     protected String randomize;
-    protected String displayAnswers;
+    protected String displayAnswersFeedback;
 
     protected String submitAllContent;
 
@@ -371,16 +371,16 @@ public class McAuthoringForm extends McLearningForm  {
     /**
      * @return Returns the displayAnswers.
      */
-    public String getDisplayAnswers() {
-	return displayAnswers;
+    public String getDisplayAnswersFeedback() {
+	return displayAnswersFeedback;
     }
 
     /**
      * @param displayAnswers
      *            The displayAnswers to set.
      */
-    public void setDisplayAnswers(String displayAnswers) {
-	this.displayAnswers = displayAnswers;
+    public void setDisplayAnswersFeedback(String displayAnswersFeedback) {
+	this.displayAnswersFeedback = displayAnswersFeedback;
     }
 
 }

@@ -312,7 +312,7 @@ function moveDialogToTop(id) {
 
 
 //used by both /lams_central/web/main.jsp and /lams_central/web/lti/addlesson.jsp pages
-function showAuthoringDialog(learningDesignID){
+function showAuthoringDialog(learningDesignID, relaunchMonitorLessonID){
 	var dialog = showDialog('dialogAuthoring', {
 		'height' : Math.max(300, $(window).height() - 30),
 		'width' : Math.max(600, Math.min(1280, $(window).width() - 60)),
@@ -340,6 +340,10 @@ function showAuthoringDialog(learningDesignID){
 			$('iframe', this).attr('src', url);
 		}
 	}, true);
+	
+	if (relaunchMonitorLessonID) {
+		dialog.data('relaunchMonitorLessonID', relaunchMonitorLessonID);
+	}
 	
 	// resize the paper when dialog is resized
 	$('.modal-content', dialog).on('resizestop', function() {

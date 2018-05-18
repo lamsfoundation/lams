@@ -9,7 +9,7 @@
 <div class="row no-gutter">
 	<div class="col-xs-12 col-md-12 col-lg-8">
 		<h3>
-			<fmt:message key="label.ira.questions.marks"/>
+			<fmt:message key="label.ae.questions.marks"/>
 		</h3>
 	</div>
 </div>

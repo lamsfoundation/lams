@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -114,6 +115,7 @@ import org.lamsfoundation.lams.util.NumberUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -427,6 +429,16 @@ public class AssessmentServiceImpl
 
 	//store object in DB
 	assessmentDao.saveObject(assessment);
+    }
+
+    @Override
+    public void updateAssessmentQuestion(AssessmentQuestion question) {
+	//update question's hash in case question's title or description got changed
+	String newHash = question.getQuestion() == null ? null : HashUtil.sha1(question.getQuestion());
+	question.setQuestionHash(newHash);
+
+	//store object in DB
+	assessmentQuestionDao.update(question);
     }
 
     @Override
@@ -870,6 +882,11 @@ public class AssessmentServiceImpl
     @Override
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
+    }
+
+    @Override
+    public Boolean isLastAttemptFinishedByUser(AssessmentUser user) {
+	return assessmentResultDao.isLastAttemptFinishedByUser(user);
     }
 
     @Override
@@ -2824,7 +2841,7 @@ public class AssessmentServiceImpl
 	    AssessmentUser groupLeader = session.getGroupLeader();
 
 	    // check if leader has submitted answers
-	    if ((groupLeader != null) && groupLeader.isSessionFinished()) {
+	    if ((groupLeader != null) && isLastAttemptFinishedByUser(groupLeader)) {
 
 		// we need to make sure specified user has the same scratches as a leader
 		copyAnswersFromLeader(assessmentUser, groupLeader);
@@ -3116,5 +3133,25 @@ public class AssessmentServiceImpl
 	// public static final short QUESTION_TYPE_NUMERICAL = 4;
 	// public static final short QUESTION_TYPE_TRUE_FALSE = 5;
 	// public static final short QUESTION_TYPE_ORDERING = 7;
+    }
+
+    @Override
+    public AssessmentQuestion getAssessmentQuestionByUid(Long questionUid) {
+	return assessmentQuestionDao.getByUid(questionUid);
+    }
+
+    @Override
+    public void notifyLearnersOnAnswerDisclose(long toolContentId) {
+	List<AssessmentSession> sessions = assessmentSessionDao.getByContentId(toolContentId);
+	Set<Integer> userIds = new HashSet<Integer>();
+	for (AssessmentSession session : sessions) {
+	    for (AssessmentUser user : session.getAssessmentUsers()) {
+		userIds.add(user.getUserId().intValue());
+	    }
+	}
+
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	jsonCommand.put("hookTrigger", "assessment-results-refresh-" + toolContentId);
+	learnerService.createCommandForLearners(toolContentId, userIds, jsonCommand.toString());
     }
 }

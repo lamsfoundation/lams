@@ -1950,6 +1950,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	mcq.setRandomize(JsonUtil.optBoolean(toolContentJSON, "randomize", Boolean.FALSE));
 	mcq.setShowReport(JsonUtil.optBoolean(toolContentJSON, "showReport", Boolean.FALSE));
 	mcq.setDisplayAnswers(JsonUtil.optBoolean(toolContentJSON, "displayAnswers", Boolean.FALSE));
+	mcq.setDisplayFeedbackOnly(JsonUtil.optBoolean(toolContentJSON, "displayFeedbackOnly", Boolean.FALSE));
 	mcq.setShowMarks(JsonUtil.optBoolean(toolContentJSON, "showMarks", Boolean.FALSE));
 	mcq.setPrefixAnswersWithLetters(JsonUtil.optBoolean(toolContentJSON, "prefixAnswersWithLetters", Boolean.TRUE));
 	mcq.setPassMark(JsonUtil.optInt(toolContentJSON, "passMark", 0));

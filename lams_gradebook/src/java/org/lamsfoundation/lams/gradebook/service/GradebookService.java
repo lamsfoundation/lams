@@ -232,7 +232,7 @@ public class GradebookService implements IGradebookService {
     }
 
     @Override
-    public List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId, TimeZone userTimezone) {
+    public List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId, TimeZone userTimezone, boolean escapeTitles) {
 	GradebookService.logger.debug("Getting gradebook data for lesson: " + lessonId);
 
 	Lesson lesson = lessonService.getLesson(lessonId);
@@ -249,13 +249,13 @@ public class GradebookService implements IGradebookService {
 
 		    for (Group group : groups) {
 			GBActivityGridRowDTO activityDTO = getGradebookActivityDTO(activity, lesson,
-				group.getGroupName(), group.getGroupId());
+				group.getGroupName(), group.getGroupId(), escapeTitles);
 			gradebookActivityDTOs.add(activityDTO);
 		    }
 
 		}
 	    } else {
-		GBActivityGridRowDTO activityDTO = getGradebookActivityDTO(activity, lesson, null, null);
+		GBActivityGridRowDTO activityDTO = getGradebookActivityDTO(activity, lesson, null, null, escapeTitles);
 		gradebookActivityDTOs.add(activityDTO);
 	    }
 	}
@@ -996,7 +996,7 @@ public class GradebookService implements IGradebookService {
 	rowList.add(GradebookService.EMPTY_ROW);
 
 	// Adding the activity average data to the summary
-	List<GradebookGridRowDTO> activityRows = getGBActivityRowsForLesson(lesson.getLessonId(), null);
+	List<GradebookGridRowDTO> activityRows = getGBActivityRowsForLesson(lesson.getLessonId(), null, false);
 	ExcelCell[] activityAverageTitle = new ExcelCell[1];
 	activityAverageTitle[0] = new ExcelCell(getMessage("gradebook.export.activities"), true);
 	rowList.add(activityAverageTitle);
@@ -1016,7 +1016,7 @@ public class GradebookService implements IGradebookService {
 	    GBActivityGridRowDTO activityRow = (GBActivityGridRowDTO) it.next();
 	    // Add the activity average data
 	    ExcelCell[] activityDataRow = new ExcelCell[6];
-	    activityDataRow[0] = new ExcelCell(activityRow.getRowName(), false);
+	    activityDataRow[0] = new ExcelCell(activityRow.getRowName(), false); // this is the problem entry
 	    activityDataRow[1] = new ExcelCell(activityRow.getCompetences(), false);
 	    activityDataRow[2] = new ExcelCell(activityRow.getMedianTimeTakenSeconds(), false);
 	    activityDataRow[3] = new ExcelCell(activityRow.getAverageMark(), false);
@@ -1079,7 +1079,7 @@ public class GradebookService implements IGradebookService {
 	headerRow = new ExcelCell[3 + filteredActivityToUserDTOMap.keySet().size()];
 	int count = 3;
 	for (Activity activity : filteredActivityToUserDTOMap.keySet()) {
-	    headerRow[count++] = new ExcelCell(activity.getTitle(), true);
+	    headerRow[count++] = new ExcelCell(activity.getTitle(), true); // this one works
 	}
 	rowList.add(headerRow);
 	headerRow = new ExcelCell[4 + filteredActivityToUserDTOMap.keySet().size()];
@@ -1988,16 +1988,17 @@ public class GradebookService implements IGradebookService {
     }
 
     /**
-     * Gets the GBActivityGridRowDTO fro a given activity and lesson
+     * Gets the GBActivityGridRowDTO fro a given activity and lesson. Only set escapeTitles to false if the
+     * output is *not* going to a webpage, but is instead going to a spreadsheet.
      *
      * @param activity
      * @param lesson
      * @return
      */
     private GBActivityGridRowDTO getGradebookActivityDTO(ToolActivity activity, Lesson lesson, String groupName,
-	    Long groupId) {
+	    Long groupId, boolean escapeTitles) {
 
-	GBActivityGridRowDTO activityDTO = new GBActivityGridRowDTO(activity, groupName, groupId);
+	GBActivityGridRowDTO activityDTO = new GBActivityGridRowDTO(activity, groupName, groupId, escapeTitles);
 	if ((groupName != null) && (groupId != null)) {
 
 	    // Setting averages for group

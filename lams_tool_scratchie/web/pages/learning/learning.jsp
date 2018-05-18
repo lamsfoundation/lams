@@ -46,6 +46,12 @@
 		.lead {
 			margin-top: 30px;
 		}
+		[data-toggle="collapse"].collapsed .if-not-collapsed {
+		  display: none;
+		}
+		[data-toggle="collapse"]:not(.collapsed) .if-collapsed {
+		  display: none;
+		}
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>

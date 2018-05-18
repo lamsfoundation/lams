@@ -78,6 +78,7 @@ public class McContent implements Serializable {
     private boolean randomize;
 
     private boolean displayAnswers;
+    private boolean displayFeedbackOnly;
 
     private boolean showMarks;
 
@@ -105,8 +106,9 @@ public class McContent implements Serializable {
     public McContent(Long mcContentId, String title, String instructions, boolean defineLater, Date creationDate,
 	    Date updateDate, boolean questionsSequenced, long createdBy, Integer passMark,
 	    boolean enableConfidenceLevels, boolean showReport, boolean randomize, boolean displayAnswers,
-	    boolean showMarks, boolean useSelectLeaderToolOuput, boolean prefixAnswersWithLetters, boolean retries,
-	    boolean reflect, String reflectionSubject, Set mcQueContents, Set mcSessions) {
+	    boolean displayFeedbackOnly, boolean showMarks, boolean useSelectLeaderToolOuput, 
+	    boolean prefixAnswersWithLetters, boolean retries, boolean reflect, String reflectionSubject, 
+	    Set mcQueContents, Set mcSessions) {
 
 	this.mcContentId = mcContentId;
 	this.title = title;
@@ -124,6 +126,7 @@ public class McContent implements Serializable {
 	this.showReport = showReport;
 	this.randomize = randomize;
 	this.displayAnswers = displayAnswers;
+	this.displayFeedbackOnly = displayFeedbackOnly;
 	this.showMarks = showMarks;
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
 	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
@@ -158,7 +161,7 @@ public class McContent implements Serializable {
 	McContent newContent = new McContent(newContentId, mc.getTitle(), mc.getInstructions(), mc.isDefineLater(),
 		mc.getCreationDate(), mc.getUpdateDate(), mc.isQuestionsSequenced(), mc.getCreatedBy(),
 		mc.getPassMark(), mc.isEnableConfidenceLevels(), mc.isShowReport(), mc.isRandomize(),
-		mc.isDisplayAnswers(), mc.isShowMarks(), mc.isUseSelectLeaderToolOuput(),
+		mc.isDisplayAnswers(), mc.displayFeedbackOnly, mc.isShowMarks(), mc.isUseSelectLeaderToolOuput(),
 		mc.isPrefixAnswersWithLetters(), mc.isRetries(), mc.isReflect(), mc.getReflectionSubject(),
 		new TreeSet(), new TreeSet());
 	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
@@ -439,6 +442,14 @@ public class McContent implements Serializable {
      */
     public void setDisplayAnswers(boolean displayAnswers) {
 	this.displayAnswers = displayAnswers;
+    }
+
+    public boolean isDisplayFeedbackOnly() {
+	return displayFeedbackOnly;
+    }
+
+    public void setDisplayFeedbackOnly(boolean displayFeedbackOnly) {
+	this.displayFeedbackOnly = displayFeedbackOnly;
     }
 
     /**

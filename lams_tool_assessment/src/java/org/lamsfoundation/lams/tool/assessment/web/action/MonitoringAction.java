@@ -127,6 +127,12 @@ public class MonitoringAction extends Action {
 	if (param.equals("statistic")) {
 	    return statistic(mapping, form, request, response);
 	}
+	if (param.equals("discloseCorrectAnswers")) {
+	    return discloseCorrectAnswers(mapping, form, request, response);
+	}
+	if (param.equals("discloseGroupsAnswers")) {
+	    return discloseGroupsAnswers(mapping, form, request, response);
+	}
 
 	return mapping.findForward(AssessmentConstants.ERROR);
     }
@@ -665,6 +671,52 @@ public class MonitoringAction extends Action {
 	    }
 	}
 	return mapping.findForward(AssessmentConstants.SUCCESS);
+    }
+
+    /**
+     * Allows displaying correct answers to learners
+     */
+    private ActionForward discloseCorrectAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+
+	initAssessmentService();
+	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
+	question.setCorrectAnswersDisclosed(true);
+	service.updateAssessmentQuestion(question);
+
+	service.notifyLearnersOnAnswerDisclose(toolContentId);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Disclosed correct answers for Assessment tool content ID " + toolContentId + " and question ID "
+		    + questionUid);
+	}
+
+	return null;
+    }
+
+    /**
+     * Allows displaying other groups' answers to learners
+     */
+    private ActionForward discloseGroupsAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+
+	initAssessmentService();
+	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
+	question.setGroupsAnswersDisclosed(true);
+	service.updateAssessmentQuestion(question);
+
+	service.notifyLearnersOnAnswerDisclose(toolContentId);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Disclosed other groups' answers for Assessment tool content ID " + toolContentId
+		    + " and question ID " + questionUid);
+	}
+
+	return null;
     }
 
     // *************************************************************************************

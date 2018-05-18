@@ -4,6 +4,7 @@
 <%--  msgDto, messageUid, msgLevel needs to be in the session elsewhere --%>
 
 <c:set var="hidden" value="${msgDto.message.hideFlag}" />
+<c:set var="anonymous" value="${msgDto.message.isAnonymous}" />
 
 <c:choose>
 	<c:when test='${msgDto.message.uid == messageUid}'>
@@ -41,9 +42,12 @@
  	            </c:otherwise>
  	        </c:choose>
 
+			<c:if test='${(sessionMap.mode == "teacher") or not (anonymous or hidden)}'>
 			<div class="pull-right">
 			    <lams:Portrait userId="${msgDto.authorUserId}"/>
 			</div>
+			</c:if>
+			
 			<span class="${textClass} subject">
 			<c:choose>
 				<c:when test='${(sessionMap.mode == "teacher") || (not hidden)}'>
@@ -56,17 +60,38 @@
             </span><br/>
 
             <div class="${textClass} small">
-              <fmt:message key="lable.topic.subject.by" />:
-			  <c:if test='${(sessionMap.mode == "teacher") || (not hidden)}'>
-					<c:set var="author" value="${msgDto.author}" />
-					<c:if test="${empty author}">
-						<c:set var="author">
-							<fmt:message key="label.default.user.name" />
-						</c:set>
-					</c:if>
-                    <span id="author"><b><c:out value="${author}" escapeXml="true" /></b></span>
-				</c:if>
+			<c:set var="msgAuthor" value="${msgDto.author}" />
+			<c:if test="${empty msgAuthor}">
+				<c:set var="msgAuthor"><fmt:message key="label.default.user.name" /></c:set>
+			</c:if>
+			<fmt:message key="lable.topic.subject.by" />:
+				<c:choose>
+				<c:when test='${sessionMap.mode == "teacher"}'>
+					<c:choose>
+					<c:when test="${anonymous}">
+						<c:set var="author">${msgAuthor} (<fmt:message key="label.anonymous" />)</c:set>
+					</c:when>
+					<c:otherwise>
+						<c:set var="author">${msgAuthor}</c:set>
+					</c:otherwise>
+					</c:choose>
+				</c:when>
+				<c:otherwise>
+					<c:choose>
+					<c:when test="${hidden}">
+						<c:set var="author"></c:set>
+					</c:when>
+					<c:when test="${not hidden and anonymous}">
+						<c:set var="author"><fmt:message key="label.anonymous" /></c:set>
+					</c:when>
+					<c:otherwise>
+						<c:set var="author">${msgAuthor}</c:set>
+					</c:otherwise>
+					</c:choose>
+				</c:otherwise>
+				</c:choose>
 
+            <span id="author"><b><c:out value="${author}" escapeXml="true" /></b></span>
             - <lams:Date value="${msgDto.message.updated}" timeago="true"/>
 			</div>
 		</div>

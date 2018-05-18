@@ -112,6 +112,8 @@
 				commandWebsocketPingTimeout = null,
 				commandWebsocketPingFunc = null,
 				commandWebsocketReconnectAttempts = 0,
+				commandWebsocketHookTrigger = null,
+				commandWebsocketHook = null,
 				
 				bars = {
 					'learnerMainBar' : {
@@ -205,6 +207,12 @@
 					var command = JSON.parse(e.data);
 					if (command.message) {
 						alert(command.message);
+					}
+					// if learner's currently displayed page has hookTrigger same as in the JSON
+					// then a function also defined on that page will run
+					if (command.hookTrigger && command.hookTrigger == commandWebsocketHookTrigger 
+										    && typeof commandWebsocketHook === 'function') {
+					    commandWebsocketHook(command.hookParams);
 					}
 					if (command.redirectURL) {
 						window.location.href = command.redirectURL;

@@ -40,13 +40,6 @@
 	</div>
 	
 	<div class="checkbox">
-		<label for="displayAnswers">
-			<html:checkbox property="displayAnswers" value="1" styleId="displayAnswers"/>
-			<fmt:message key="label.displayAnswers" />
-		</label>
-	</div>
-	
-	<div class="checkbox">
 		<label for="retries">
 			<html:checkbox property="retries" value="1" styleId="retries"/>
 			<fmt:message key="radiobox.retries" />
@@ -73,6 +66,30 @@
 			<fmt:message key="label.enable.confidence.levels" />
 		</label>
 	</div>
+
+	<lams:SimplePanel panelBodyClass="panel-body-sm" titleKey="label.feedback.simple">
+	<div class="radio">
+		<label for="displayAnswers">
+			<html:radio property="displayAnswersFeedback" value="answers" styleId="displayAnswers"/>
+			<fmt:message key="label.displayAnswers" />		
+		</label>
+	</div>
+
+	<div class="radio form-inline">
+		<label for="displayFeedback">
+			<html:radio property="displayAnswersFeedback" value="feedback" styleId="displayFeedback"/>
+			<fmt:message key="label.displayFeedbackOnly" />
+		</label>
+	</div>
+
+	<div class="radio form-inline">
+		<label for="displayNoAnswersOrFeedback">
+			<html:radio property="displayAnswersFeedback" value="none" styleId="displayNoAnswersOrFeedback"/>
+			<fmt:message key="label.displayNoAnswersOrFeedback" />
+		</label>
+	</div>
+	</lams:SimplePanel>
+	
 </lams:SimplePanel>
 
 <lams:SimplePanel titleKey="label.activity.completion">

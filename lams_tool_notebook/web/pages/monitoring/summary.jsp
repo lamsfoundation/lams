@@ -114,13 +114,12 @@
  					$('<div/>', {
  						"class": "user-entry editable${sessionId}_" + rowId + "_t comment-area",
  						"data-type": "textarea",
- 						"data-checkbox-label": "<fmt:message key='label.notify.learner' />",
- 					    html: comment
- 					}).appendTo(subgrid);
- 					
+ 						"data-checkbox-label": "<fmt:message key='label.notify.learner' />"
+ 					}).text(comment).appendTo(subgrid); 
+  					
  					$(".editable${sessionId}_" + rowId + "_t").jinplace({
  					    url: "<c:url value='/monitoring.do'/>?dispatch=saveTeacherComment&userUid=" + userUid,
- 					    textOnly: false,
+ 					    textOnly: true,
  					    placeholder: '<fmt:message key="label.click.to.edit" />',
  					    okButton: "<fmt:message key='button.ok' />",
  					    cancelButton: "<fmt:message key='button.cancel' />"

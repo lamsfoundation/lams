@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -180,19 +181,30 @@ public class OrgPasswordChangeAction extends DispatchAction {
 	Boolean isLearnerChange = (Boolean) passForm.get("isLearnerChange");
 	// get data needed for each group
 	if (isStaffChange) {
-	    ArrayNode excludedStaff = JsonUtil.readArray((String) passForm.get("excludedStaff"));
+	    String staffString = (String) passForm.get("excludedStaff");
+	    ArrayNode excludedStaff = StringUtils.isBlank(staffString) ? null : JsonUtil.readArray(staffString);
+	    staffString = (String) passForm.get("includedStaff");
+	    ArrayNode includedStaff = StringUtils.isBlank(staffString) ? null : JsonUtil.readArray(staffString);
+
 	    String staffPass = (String) passForm.get("staffPass");
 	    Collection<User> users = getUsersByRole(organisationID, true);
-	    Collection<Integer> changedUserIDs = changePassword(staffPass, users, excludedStaff, force);
+	    Collection<Integer> changedUserIDs = changePassword(staffPass, users, includedStaff, excludedStaff, force);
 	    if (email && !changedUserIDs.isEmpty()) {
 		notifyOnPasswordChange(changedUserIDs, staffPass);
 	    }
 	}
 	if (isLearnerChange) {
-	    ArrayNode excludedLearners = JsonUtil.readArray((String) passForm.get("excludedLearners"));
+	    String learnersString = (String) passForm.get("excludedLearners");
+	    ArrayNode excludedLearners = StringUtils.isBlank(learnersString) ? null
+		    : JsonUtil.readArray(learnersString);
+	    learnersString = (String) passForm.get("includedLearners");
+	    ArrayNode includedLearners = StringUtils.isBlank(learnersString) ? null
+		    : JsonUtil.readArray(learnersString);
+
 	    String learnerPass = (String) passForm.get("learnerPass");
 	    Collection<User> users = getUsersByRole(organisationID, false);
-	    Collection<Integer> changedUserIDs = changePassword(learnerPass, users, excludedLearners, force);
+	    Collection<Integer> changedUserIDs = changePassword(learnerPass, users, includedLearners, excludedLearners,
+		    force);
 	    if (email && !changedUserIDs.isEmpty()) {
 		notifyOnPasswordChange(changedUserIDs, learnerPass);
 	    }
@@ -210,27 +222,48 @@ public class OrgPasswordChangeAction extends DispatchAction {
 		messageService.getMessage("admin.org.password.change.email.body", new String[] { password }), false);
     }
 
-    private Set<Integer> changePassword(String password, Collection<User> users, ArrayNode excludedUsers,
-	    boolean force) {
+    private Set<Integer> changePassword(String password, Collection<User> users, ArrayNode includedUsers,
+	    ArrayNode excludedUsers, boolean force) {
 	if (!ValidationUtil.isPasswordValueValid(password, password)) {
 	    // this should have been picked up by JS validator on the page!
 	    throw new InvalidParameterException("Password does not pass validation");
 	}
+	if (includedUsers != null && excludedUsers != null) {
+	    throw new IllegalArgumentException("Both included and excluded users arrays must not be passed together");
+	}
 	Set<Integer> changedUserIDs = new TreeSet<Integer>();
 	IUserManagementService userManagementService = AdminServiceProxy.getService(getServlet().getServletContext());
+	UserDTO currentUserDTO = getUserDTO();
+	User currentUser = (User) userManagementService.findById(User.class, currentUserDTO.getUserID());
 	for (User user : users) {
-	    boolean excluded = false;
-	    // skip excluded (unchecked on the page) users
-	    for (int index = 0; index < excludedUsers.size(); index++) {
-		Integer excludedUserID = excludedUsers.get(index).asInt();
-		if (user.getUserId().equals(excludedUserID)) {
-		    excluded = true;
-		    break;
+	    // either we work with white list or black list
+	    if (includedUsers == null) {
+		boolean excluded = false;
+		// skip excluded (unchecked on the page) users
+		for (int index = 0; index < excludedUsers.size(); index++) {
+		    Integer excludedUserID = excludedUsers.get(index).asInt();
+		    if (user.getUserId().equals(excludedUserID)) {
+			excluded = true;
+			break;
+		    }
+		}
+		if (excluded) {
+		    continue;
+		}
+	    } else {
+		boolean included = false;
+		for (int index = 0; index < includedUsers.size(); index++) {
+		    Integer includedUserID = includedUsers.get(index).asInt();
+		    if (user.getUserId().equals(includedUserID)) {
+			included = true;
+			break;
+		    }
+		}
+		if (!included) {
+		    continue;
 		}
 	    }
-	    if (excluded) {
-		continue;
-	    }
+
 	    // change password
 	    String salt = HashUtil.salt();
 	    user.setSalt(salt);
@@ -239,6 +272,8 @@ public class OrgPasswordChangeAction extends DispatchAction {
 		user.setChangePassword(true);
 	    }
 	    userManagementService.saveUser(user);
+	    log.info("Changed password for user ID " + user.getUserId());
+	    userManagementService.logPasswordChanged(user, currentUser);
 	    changedUserIDs.add(user.getUserId());
 	}
 	return changedUserIDs;

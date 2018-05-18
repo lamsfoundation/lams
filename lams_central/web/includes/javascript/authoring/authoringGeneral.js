@@ -1553,12 +1553,15 @@ GeneralLib = {
 		if (!firstActivity) {
 			return null;
 		}
-		// the first activity can be grouping or the second one
+		// the first activity can be grouping or the second or third one (Live Edit gate and notebook can be in front)
 		var firstGroupingActivity = firstActivity instanceof ActivityDefs.GroupingActivity ? firstActivity : null;
 		if (!firstGroupingActivity) {
 			firstGroupingActivity = getNextActivity(firstActivity);
 			if (!(firstGroupingActivity instanceof ActivityDefs.GroupingActivity)){
-				return null;
+				firstGroupingActivity = getNextActivity(firstGroupingActivity);
+				if (!(firstGroupingActivity instanceof ActivityDefs.GroupingActivity)){
+					return null;
+				}
 			}
 		}
 
@@ -1603,13 +1606,13 @@ GeneralLib = {
 		
 		// check which ones are not grouped
 		var activitiesToGroup = [];
-		for (var activity of activities) {
-			if (!activity.grouping){
-				activitiesToGroup.push(activity);
-				activity.requireGrouping = true;
-				activity.draw();
+		$.each(activities, function(){
+			if (!this.grouping){
+				activitiesToGroup.push(this);
+				this.requireGrouping = true;
+				this.draw();
 			}
-		}
+		});
 		return activitiesToGroup.length === 0 ? null : activitiesToGroup;
 	},
 	
@@ -1776,15 +1779,16 @@ GeneralLib = {
 									// get groups names
 									$.each(groupingData.groups, function(){
 										groups.push({
-											'name' : this.groupName,
-											'id'   : this.groupID,
-											'uiid' : this.groupUIID
+											'name' 	  : this.groupName,
+											'id'   	  : this.groupID,
+											'uiid' 	  : this.groupUIID,
+											'orderID' : this.orderID
 											});
 									});
 									
-									// sort groups by asceding UIID
+									// sort groups by asceding order ID
 									groups.sort(function(a,b) {
-										return a.uiid - b.uiid;
+										return a.orderID - b.orderID;
 									});
 									
 									activity = new ActivityDefs.GroupingActivity(
@@ -2779,6 +2783,16 @@ GeneralLib = {
 					layout.ld.learningDesignID = response.learningDesignID;
 					
 					if (layout.liveEdit) {
+						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
+						if (missingGroupingOnActivities) {
+							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
+							$.each(missingGroupingOnActivities, function(){
+									info += '<br /> * ' + this.title; 
+							});
+							layout.infoDialog.data('show')(info);
+							// do not close Live Edit if TBL errors appear
+							return;
+						}
 						// let backend know that system gate needs to be removed
 						$.ajax({
 							type  : 'POST',
@@ -2825,20 +2839,10 @@ GeneralLib = {
 								GeneralLib.setModified(false);
 								
 								// close the Live Edit dialog
-								var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
-								if (missingGroupingOnActivities) {
-									var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
-									for (var activity of missingGroupingOnActivities){
-											info += '<br /> * ' + activity.title; 
-										}
-									layout.infoDialog.data('show')(info);
-
-								} else {
-									layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL, true);
-									setTimeout(function(){
-										window.parent.closeDialog('dialogAuthoring');
-									}, 5000);
-								}
+								layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL, true);
+								setTimeout(function(){
+									window.parent.closeDialog('dialogAuthoring');
+								}, 5000);
 							}
 						});
 						
@@ -2855,9 +2859,9 @@ GeneralLib = {
 						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
 						if (missingGroupingOnActivities) {
 							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
-							for (var activity of missingGroupingOnActivities){
-									info += '<br /> * ' + activity.title; 
-								}
+							$.each(missingGroupingOnActivities, function(){
+								info += '<br /> * ' + this.title; 
+							});
 							layout.infoDialog.data('show')(info);
 
 						} else {

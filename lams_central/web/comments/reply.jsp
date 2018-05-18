@@ -85,14 +85,33 @@
 			value="${sessionMapID}" /> <input type="hidden" id="parentUid"
 			name="parentUid" value="${parentUid}" />
 
-		<div class="right-buttons voffset5">
-			<a href="#nogo" onclick="javascript:replyFormSubmit();"
-				class="btn btn-xs btn-primary pull-right" id="replyCommentSubmitButton"> <fmt:message
-					key="label.post" />
-			</a>&nbsp; <a href="#nogo" onclick="javascript:cancelReply();"
-				class="btn btn-xs btn-primary pull-right roffset5"> <fmt:message
-					key="label.cancel" />
-			</a>
+		<div class="row voffset5">
+		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+
+		<c:choose>
+	 	<c:when test="${sessionMap.anonymous}">
+	 	<%-- Post Anonymously? --%>
+		<div class="col-xs-12 col-sm-6">
+			<c:set var="anonymousCheckboxChecked" value=""/>
+			<c:set var="anonymousCheckboxName" value="commentAnonymousReply"/>
+			<%@include file="anonymouscheckbox.jsp" %>
+	 	</div>
+	
+		<%-- Cancel / Edit Buttons --%>
+		<div class="col-xs-12 col-sm-6">
+		</c:when>
+		<c:otherwise>
+		<div class="col-xs-12">
+		</c:otherwise>
+		</c:choose>
+		<a href="#nogo" onclick="javascript:replyFormSubmit();"
+			class="btn btn-xs btn-primary pull-right" id="replyCommentSubmitButton"> <fmt:message
+				key="label.post" />
+		</a>&nbsp; <a href="#nogo" onclick="javascript:cancelReply();"
+			class="btn btn-xs btn-primary pull-right roffset5"> <fmt:message
+				key="label.cancel" />
+		</a>
 		</div>
+	
 	</form>
 </div>

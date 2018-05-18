@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
  * @author Andrey Balan
  */
 public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
+    
     private static final Logger log = Logger.getLogger(AssessmentQuestion.class);
 
     private Long uid;
@@ -49,7 +50,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     private String title;
 
     private String question;
-    
+
     /**
      * It stores sha1(question) value that allows us to search for the AssessmentQuestions with the same question
      */
@@ -80,7 +81,9 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     private String feedbackOnIncorrect;
 
+    // only one of shuffle and prefixAnswersWithLetters should be on. Both may be off
     private boolean shuffle;
+    private boolean prefixAnswersWithLetters;
 
     private boolean caseSensitive;
 
@@ -100,8 +103,12 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     // only for hedging mark type of question
     private boolean hedgingJustificationEnabled;
 
+    private boolean correctAnswersDisclosed;
+
+    private boolean groupsAnswersDisclosed;
+
     // *************** NON Persist Fields used in monitoring ********************
-    
+
     private String titleEscaped;
 
     public AssessmentQuestion() {
@@ -181,7 +188,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public int hashCode() {
 	return new HashCodeBuilder().append(getUid()).append(getSequenceId()).toHashCode();
     }
-    
+
     public QuestionDTO getQuestionDTO() {
 	QuestionDTO questionDTO = new QuestionDTO(this);
 
@@ -210,6 +217,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public short getType() {
 	return type;
     }
+
     public void setType(short type) {
 	this.type = type;
     }
@@ -217,6 +225,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public String getTitle() {
 	return title;
     }
+
     public void setTitle(String title) {
 	this.title = title;
     }
@@ -224,16 +233,18 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public String getQuestion() {
 	return question;
     }
+
     public void setQuestion(String question) {
 	this.question = question;
     }
-    
+
     /**
      * Returns sha1(question) value that allows us to search for the AssessmentQuestions with the same question
      */
     public String getQuestionHash() {
 	return questionHash;
     }
+
     public void setQuestionHash(String questionHash) {
 	this.questionHash = questionHash;
     }
@@ -277,6 +288,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public float getPenaltyFactor() {
 	return penaltyFactor;
     }
+
     public void setPenaltyFactor(float penaltyFactor) {
 	this.penaltyFactor = penaltyFactor;
     }
@@ -284,6 +296,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public boolean isAnswerRequired() {
 	return answerRequired;
     }
+
     public void setAnswerRequired(boolean answerRequired) {
 	this.answerRequired = answerRequired;
     }
@@ -291,6 +304,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public String getGeneralFeedback() {
 	return generalFeedback;
     }
+
     public void setGeneralFeedback(String generalFeedback) {
 	this.generalFeedback = generalFeedback;
     }
@@ -298,6 +312,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public String getFeedback() {
 	return feedback;
     }
+
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
     }
@@ -305,6 +320,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public boolean isMultipleAnswersAllowed() {
 	return multipleAnswersAllowed;
     }
+
     public void setMultipleAnswersAllowed(boolean multipleAnswersAllowed) {
 	this.multipleAnswersAllowed = multipleAnswersAllowed;
     }
@@ -312,6 +328,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public boolean isIncorrectAnswerNullifiesMark() {
 	return incorrectAnswerNullifiesMark;
     }
+
     public void setIncorrectAnswerNullifiesMark(boolean incorrectAnswerNullifiesMark) {
 	this.incorrectAnswerNullifiesMark = incorrectAnswerNullifiesMark;
     }
@@ -319,6 +336,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public String getFeedbackOnCorrect() {
 	return feedbackOnCorrect;
     }
+
     public void setFeedbackOnCorrect(String feedbackOnCorrect) {
 	this.feedbackOnCorrect = feedbackOnCorrect;
     }
@@ -326,6 +344,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public String getFeedbackOnPartiallyCorrect() {
 	return feedbackOnPartiallyCorrect;
     }
+
     public void setFeedbackOnPartiallyCorrect(String feedbackOnPartiallyCorrect) {
 	this.feedbackOnPartiallyCorrect = feedbackOnPartiallyCorrect;
     }
@@ -333,6 +352,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public String getFeedbackOnIncorrect() {
 	return feedbackOnIncorrect;
     }
+
     public void setFeedbackOnIncorrect(String feedbackOnIncorrect) {
 	this.feedbackOnIncorrect = feedbackOnIncorrect;
     }
@@ -340,6 +360,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public boolean isShuffle() {
 	return shuffle;
     }
+
     public void setShuffle(boolean shuffle) {
 	this.shuffle = shuffle;
     }
@@ -347,6 +368,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public boolean isCaseSensitive() {
 	return caseSensitive;
     }
+
     public void setCaseSensitive(boolean caseSensitive) {
 	this.caseSensitive = caseSensitive;
     }
@@ -354,6 +376,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public boolean getCorrectAnswer() {
 	return correctAnswer;
     }
+
     public void setCorrectAnswer(boolean correctAnswer) {
 	this.correctAnswer = correctAnswer;
     }
@@ -361,6 +384,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public boolean isAllowRichEditor() {
 	return allowRichEditor;
     }
+
     public void setAllowRichEditor(boolean allowRichEditor) {
 	this.allowRichEditor = allowRichEditor;
     }
@@ -428,16 +452,42 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public boolean isHedgingJustificationEnabled() {
 	return hedgingJustificationEnabled;
     }
+
     public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
 	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
     }
-    
+
+    public boolean isCorrectAnswersDisclosed() {
+	return correctAnswersDisclosed;
+    }
+
+    public void setCorrectAnswersDisclosed(boolean correctAnswersDisclosed) {
+	this.correctAnswersDisclosed = correctAnswersDisclosed;
+    }
+
+    public boolean isGroupsAnswersDisclosed() {
+	return groupsAnswersDisclosed;
+    }
+
+    public void setGroupsAnswersDisclosed(boolean groupsAnswersDisclosed) {
+	this.groupsAnswersDisclosed = groupsAnswersDisclosed;
+    }
+
     // *************** NON Persist Fields used in monitoring ********************
 
     public String getTitleEscaped() {
 	return titleEscaped;
     }
+
     public void setTitleEscaped(String titleEscaped) {
 	this.titleEscaped = titleEscaped;
+    }
+
+    public boolean isPrefixAnswersWithLetters() {
+        return prefixAnswersWithLetters;
+    }
+
+    public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
+        this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
 }

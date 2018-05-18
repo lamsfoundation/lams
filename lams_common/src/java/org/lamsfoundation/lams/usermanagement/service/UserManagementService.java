@@ -377,6 +377,7 @@ public class UserManagementService implements IUserManagementService {
 	    String salt = HashUtil.salt();
 	    user.setSalt(salt);
 	    user.setPassword(HashUtil.sha256(password, salt));
+	    user.setModifiedDate(new Date());
 	    baseDAO.update(user);
 	} catch (Exception e) {
 	    log.debug(e);
@@ -896,7 +897,7 @@ public class UserManagementService implements IUserManagementService {
     @Override
     public void logPasswordChanged(User user, User modifiedBy) {
 	String[] args = new String[1];
-	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
+	args[0] = user.getLogin() + " (" + user.getUserId() + ")";
 	String message = messageService.getMessage("audit.user.password.change", args);
 	getLogEventService().logEvent(LogEvent.TYPE_PASSWORD_CHANGE, modifiedBy != null ? modifiedBy.getUserId() : null , user.getUserId(), null, null, message);
     }

@@ -15,13 +15,16 @@
 			<lams:STRUTS-textarea rows="10" styleClass="form-control" tabindex="2" property="message.body"/> 
 		</c:otherwise>
 	</c:choose>
-	<BR/>
-		
+ 
+	<c:if test="${sessionMap.allowAnonym || sessionMap.maxCharacters > 0 || sessionMap.minCharacters > 0}">
+	<div class="row voffset10">
+
+	<div class="col-xs-12 col-sm-6">
 	<%-- If limitChars == 0, then we don't want to limit the characters at all. --%>
 	<c:if test="${sessionMap.maxCharacters > 0}">
+
 		<fmt:message key="lable.char.left" />: <span id="char-left-div"></span>
 		<input type="hidden" name="limitCount" id="max-limit-count" />
-		<br>
 				
 		<script type="text/javascript">
 		$(document).ready(function() {
@@ -97,7 +100,7 @@
 		});
 		</script>
 	</c:if>
-			
+
 	<c:if test="${sessionMap.minCharacters > 0}">
 		<fmt:message key="label.char.required" />: <span id="char-required-div"></span>
 			
@@ -139,6 +142,30 @@
 		});
 		</script>			
 	</c:if>
+	</div>
+	
+	<div class="col-xs-12 col-sm-6 text-right ">
+	<c:if test="${sessionMap.allowAnonym}">
+		<div class="checkbox form-control-inline">
+		<label for="isAnonymous"><html:checkbox
+				property="message.isAnonymous" styleId="isAnonymous" /> <fmt:message
+				key="label.post.anonomously" /></label>
+		</div>&nbsp;<a tabindex="0" role="button" data-toggle="popover"><i class="fa fa-info-circle"></i></a>
+	
+		<%-- Use c:out to escape any quotes in the I18N string. Then use html: true converts any escaped quotes back --%>
+		<%-- into real quotes. Should be safe from XSS attack as the string is coming from a translation file. --%>	
+		<fmt:message key="label.anonymous.tooltip" var="ANONYMOUS_TOOLTIP_VAR"></fmt:message>		
+ 		<script type="text/javascript">
+		$(document).ready(function() {
+			var ANONYMOUS_TOOLTIP = '<c:out value="${ANONYMOUS_TOOLTIP_VAR}" />';
+	    		$('[data-toggle="popover"]').popover({title: "", content: ANONYMOUS_TOOLTIP, placement:"auto left", delay: 50, trigger:"hover focus", html: true});
+		});
+		</script>
+ 	</c:if>
+	</div>
 
+	</div> <!-- end row -->
+	</c:if>
+	
 	<html:errors property="message.body" />
 

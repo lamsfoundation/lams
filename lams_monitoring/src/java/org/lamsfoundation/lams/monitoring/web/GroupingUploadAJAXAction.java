@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -89,7 +90,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The action servlet that provides the support for the AJAX based Chosen Grouping upload from File
- * 
+ *
  * @author Fiona Malikoff
  */
 public class GroupingUploadAJAXAction extends DispatchAction {
@@ -105,7 +106,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
      * Get the spreadsheet file containing list of the current users, ready for uploading with groups. If lesson
      * supplied,
      * list lesson users, otherwise list organisation users (course grouping screen has just the organisation).
-     * 
+     *
      * @throws Exception
      */
     public ActionForward getGroupTemplateFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -160,17 +161,17 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	    dataToExport = exportLearnersForGrouping(learners, grouping.getGroups(), null);
 
 	} else {
-	    @SuppressWarnings("unchecked")
 	    Long groupingId = WebUtil.readLongParam(request, "groupingId", true);
 	    Set<OrganisationGroup> groups = null;
 	    if (groupingId != null) {
 		OrganisationGrouping orgGrouping = (OrganisationGrouping) getUserManagementService()
 			.findById(OrganisationGrouping.class, groupingId);
-		if (orgGrouping != null)
+		if (orgGrouping != null) {
 		    groups = orgGrouping.getGroups();
+		}
 	    }
-	    Vector<User> learners = (Vector<User>) getUserManagementService()
-		    .getUsersFromOrganisationByRole(organisationId, Role.LEARNER, true);
+	    Vector<User> learners = getUserManagementService().getUsersFromOrganisationByRole(organisationId,
+		    Role.LEARNER, true);
 	    dataToExport = exportLearnersForGrouping(learners, null, groups);
 	}
 
@@ -293,26 +294,21 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	if (fileElements.size() == 0) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "No file provided");
 	}
-	if (GroupingUploadAJAXAction.log.isDebugEnabled()) {
-	    GroupingUploadAJAXAction.log.debug("Saving course groups from spreadsheet for user " + userId
-		    + " and organisation " + organisationId + " filename " + fileElements);
+	if (log.isDebugEnabled()) {
+	    log.debug("Saving course groups from spreadsheet for user " + userId + " and organisation " + organisationId
+		    + " filename " + fileElements);
 	}
 
-	ObjectNode responseJSON = null;
-
-	if (isLessonMode) {
-	    responseJSON = saveLessonGrouping(response, activityId, fileElements);
-	} else {
-	    responseJSON = saveCourseGrouping(response, organisation, groupingId, name, fileElements);
-	}
+	ObjectNode responseJSON = isLessonMode ? saveLessonGrouping(lessonId, activityId, fileElements)
+		: saveCourseGrouping(organisation, groupingId, name, fileElements);
 
 	response.getWriter().write(responseJSON.toString());
 	return null;
     }
 
     /** Create the new course grouping */
-    private ObjectNode saveCourseGrouping(HttpServletResponse response, Organisation organisation, Long orgGroupingId,
-	    String name, Hashtable fileElements) throws IOException {
+    private ObjectNode saveCourseGrouping(Organisation organisation, Long orgGroupingId, String name,
+	    Hashtable fileElements) throws IOException {
 
 	OrganisationGrouping orgGrouping = null;
 	if (orgGroupingId != null) {
@@ -326,13 +322,13 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	}
 
 	Map<String, Long> existingGroupNameToId = new HashMap<String, Long>();
-	Map<String, Set<String>> groups = new HashMap<String, Set<String>>();
 	if (orgGrouping.getGroups() != null) {
 	    for (OrganisationGroup group : orgGrouping.getGroups()) {
 		existingGroupNameToId.put(group.getName(), group.getGroupId());
 	    }
 	}
 
+	Map<String, Set<String>> groups = new HashMap<String, Set<String>>();
 	int totalUsersSkipped = parseGroupSpreadsheet((FormFile) fileElements.elements().nextElement(), orgGroupingId,
 		groups);
 	int totalUsersAdded = 0;
@@ -343,11 +339,19 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	    // just overwrite existing groups; they will be updated if already exist
 	    Set<User> learners = new HashSet<>();
 	    for (String login : groupEntry.getValue()) {
-		User learner = (User) getUserManagementService().getUserByLogin(login);
+		User learner = getUserManagementService().getUserByLogin(login);
 		if (learner == null) {
 		    log.warn("Unable to add learner " + login + " for group in related to grouping " + orgGroupingId
 			    + " as learner cannot be found.");
 		    totalUsersSkipped++;
+
+		    //Check user is a part of the organisation
+		} else if (!getSecurityService().hasOrgRole(organisation.getOrganisationId(), learner.getUserId(),
+			new String[] { Role.GROUP_MANAGER, Role.LEARNER, Role.MONITOR, Role.AUTHOR },
+			"be added to grouping", false)) {
+
+		    totalUsersSkipped++;
+
 		} else {
 		    totalUsersAdded++;
 		    learners.add(learner);
@@ -365,19 +369,16 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	}
 
 	getUserManagementService().saveOrganisationGrouping(orgGrouping, orgGroups);
-	return createResponseJSON(response, false, null, true, orgGrouping.getGroupingId(), totalUsersAdded,
-		totalUsersSkipped);
+	return createResponseJSON(false, null, true, orgGrouping.getGroupingId(), totalUsersAdded, totalUsersSkipped);
 
     }
 
     /** Clean out and reuse any existing groups */
-    private ObjectNode saveLessonGrouping(HttpServletResponse response, Long activityId, Hashtable fileElements)
-	    throws IOException {
+    private ObjectNode saveLessonGrouping(Long lessonId, Long activityId, Hashtable fileElements) throws IOException {
 
 	IMonitoringService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 
-	Map<String, Set<String>> groups = new HashMap<String, Set<String>>();
 	int totalUsersSkipped = 0;
 	int totalUsersAdded = 0;
 
@@ -392,10 +393,11 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	    existingGroupNames.add(group.getGroupName());
 	    if (!group.mayBeDeleted()) {
 		String error = getCentralMessageService().getMessage("error.groups.upload.locked");
-		return createResponseJSON(response, true, error, true, grouping.getGroupingId(), 0, 0);
+		return createResponseJSON(true, error, true, grouping.getGroupingId(), 0, 0);
 	    }
 	}
 
+	Map<String, Set<String>> groups = new HashMap<String, Set<String>>();
 	totalUsersSkipped = parseGroupSpreadsheet((FormFile) fileElements.elements().nextElement(),
 		grouping.getGroupingId(), groups);
 
@@ -404,12 +406,35 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	    for (Map.Entry<String, Set<String>> groupEntry : groups.entrySet()) {
 		if (!existingGroupNames.contains(groupEntry.getKey())) {
 		    StringBuilder groupNamesStrBlder = new StringBuilder();
-		    for (String name : existingGroupNames)
+		    for (String name : existingGroupNames) {
 			groupNamesStrBlder.append("'").append(name).append("' ");
+		    }
 		    String error = getCentralMessageService().getMessage(
 			    "error.branching.upload.must.use.existing.groups",
 			    new String[] { groupNamesStrBlder.toString() });
-		    return createResponseJSON(response, true, error.toString(), false, grouping.getGroupingId(), 0, 0);
+		    return createResponseJSON(true, error.toString(), false, grouping.getGroupingId(), 0, 0);
+		}
+	    }
+	}
+
+	//check all users exist and are learners in the specified lesson
+	for (Map.Entry<String, Set<String>> groupEntry : groups.entrySet()) {
+	    Set<String> logins = groupEntry.getValue();
+
+	    Iterator<String> iter = logins.iterator();
+	    while (iter.hasNext()) {
+		String login = iter.next();
+		User learner = getUserManagementService().getUserByLogin(login);
+		if (learner == null) {
+		    log.warn("Unable to add learner " + login + " to lesson grouping as learner cannot be found.");
+		    totalUsersSkipped++;
+		    iter.remove();
+
+		} else if (!getSecurityService().isLessonLearner(lessonId, learner.getUserId(), "be added to grouping",
+			false)) {
+		    //log.warn("Unable to add learner " + login + " to lesson grouping as learner doesn't belong to the lesson.");
+		    totalUsersSkipped++;
+		    iter.remove();
 		}
 	    }
 	}
@@ -425,12 +450,11 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	    totalUsersSkipped += groupEntry.getValue().size() - added;
 	}
 
-	return createResponseJSON(response, false, null, true, grouping.getGroupingId(), totalUsersAdded,
-		totalUsersSkipped);
+	return createResponseJSON(false, null, true, grouping.getGroupingId(), totalUsersAdded, totalUsersSkipped);
     }
 
-    private ObjectNode createResponseJSON(HttpServletResponse response, boolean isError, String errorMessage,
-	    boolean reload, Long groupingId, int totalUsersAdded, int totalUsersSkipped) {
+    private ObjectNode createResponseJSON(boolean isError, String errorMessage, boolean reload, Long groupingId,
+	    int totalUsersAdded, int totalUsersSkipped) {
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	if (isError) {
 	    responseJSON.put("result", "FAIL");
@@ -509,40 +533,39 @@ public class GroupingUploadAJAXAction extends DispatchAction {
     }
 
     private IUserManagementService getUserManagementService() {
-	if (GroupingUploadAJAXAction.userManagementService == null) {
+	if (userManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GroupingUploadAJAXAction.userManagementService = (IUserManagementService) ctx
-		    .getBean("userManagementService");
+	    userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
-	return GroupingUploadAJAXAction.userManagementService;
+	return userManagementService;
     }
 
     private ILessonService getLessonService() {
-	if (GroupingUploadAJAXAction.lessonService == null) {
+	if (lessonService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GroupingUploadAJAXAction.lessonService = (ILessonService) ctx.getBean("lessonService");
+	    lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
-	return GroupingUploadAJAXAction.lessonService;
+	return lessonService;
     }
 
     private ISecurityService getSecurityService() {
-	if (GroupingUploadAJAXAction.securityService == null) {
+	if (securityService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GroupingUploadAJAXAction.securityService = (ISecurityService) ctx.getBean("securityService");
+	    securityService = (ISecurityService) ctx.getBean("securityService");
 	}
-	return GroupingUploadAJAXAction.securityService;
+	return securityService;
     }
 
     private MessageService getCentralMessageService() {
-	if (GroupingUploadAJAXAction.centralMessageService == null) {
+	if (centralMessageService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GroupingUploadAJAXAction.centralMessageService = (MessageService) ctx.getBean("centralMessageService");
+	    centralMessageService = (MessageService) ctx.getBean("centralMessageService");
 	}
-	return GroupingUploadAJAXAction.centralMessageService;
+	return centralMessageService;
     }
 
 }

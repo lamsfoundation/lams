@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learning.service;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1395,6 +1396,22 @@ public class LearnerService implements ICoreLearnerService {
     public void createCommandForLearner(Long lessonId, String userName, String jsonCommand) {
 	Command command = new Command(lessonId, userName, jsonCommand);
 	commandDAO.insert(command);
+    }
+
+    @Override
+    public void createCommandForLearners(Long toolContentId, Collection<Integer> userIds, String jsonCommand) {
+	// find lesson for given tool content ID
+	ToolActivity activity = activityDAO.getToolActivityByToolContentId(toolContentId);
+	LearningDesign learningDesign = activity.getLearningDesign();
+	Lesson lesson = (Lesson) learningDesign.getLessons().iterator().next();
+	Long lessonId = lesson.getLessonId();
+
+	// go through each user, find his user name and add a command for him
+	for (Integer userId : userIds) {
+	    User user = (User) activityDAO.find(User.class, userId);
+	    Command command = new Command(lessonId, user.getLogin(), jsonCommand);
+	    commandDAO.insert(command);
+	}
     }
 
     @Override

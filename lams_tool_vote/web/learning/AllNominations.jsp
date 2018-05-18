@@ -177,7 +177,7 @@
 							<i class="fa fa-xs fa-check text-success"></i>
 						</div>
 						<div class="media-body">
-							<c:out value="${entry}" escapeXml="true" />
+							<c:out value="${entry}" escapeXml="false" />
 						</div>
 					</div>
 				</c:forEach>

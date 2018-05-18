@@ -75,7 +75,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class McMonitoringAction extends LamsDispatchAction {
     /**
-     * displayAnswers
+     * Turn on displayAnswers
      */
     public ActionForward displayAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -85,6 +85,27 @@ public class McMonitoringAction extends LamsDispatchAction {
 
 	McContent mcContent = mcService.getMcContent(new Long(strToolContentID));
 	mcContent.setDisplayAnswers(new Boolean(true));
+	mcContent.setDisplayFeedbackOnly(new Boolean(false));
+	mcService.updateMc(mcContent);
+	
+	// use redirect to prevent resubmition of the same request
+	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("monitoringStarterRedirect"));
+	redirect.addParameter(McAppConstants.TOOL_CONTENT_ID, strToolContentID);
+	redirect.addParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+	return redirect;
+    }
+
+    /**
+     * Turn on displayFeedbackOnly
+     */
+    public ActionForward displayFeedbackOnly(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	
+	McContent mcContent = mcService.getMcContent(new Long(strToolContentID));
+	mcContent.setDisplayFeedbackOnly(new Boolean(true));
 	mcService.updateMc(mcContent);
 
 	// use redirect to prevent resubmition of the same request

@@ -449,8 +449,17 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	    for (Lesson lesson : (Set<Lesson>) design.getLessons()) {
 		lesson.setLockedForEdit(true);
+
+		if ( design.getEditOverrideUser() == null ||  design.getEditOverrideLock() == null || !design.getEditOverrideLock() ) {
+		    // create audit log entry only the first time - do not redo one if the monitor has restarted editing.
+		    String message = messageService.getMessage("audit.live.edit.start", new Object[] { design.getTitle(),
+			    design.getLearningDesignId(), lesson.getLessonId(), user.getLogin(), user.getUserId() });
+		    logEventService.logEvent(LogEvent.TYPE_LIVE_EDIT, user.getUserId(), null, lesson.getLessonId(), null,
+			    message);
+		}
 	    }
 
+	    
 	    // lock Learning Design
 	    design.setEditOverrideLock(true);
 	    design.setEditOverrideUser(user);
@@ -531,6 +540,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	    for (Lesson lesson : (Set<Lesson>) design.getLessons()) {
 		lesson.setLockedForEdit(false);
+
+		String message = messageService.getMessage("audit.live.edit.end", new Object[] { design.getTitle(),
+			design.getLearningDesignId(), lesson.getLessonId(), user.getLogin(), user.getUserId() });
+		logEventService.logEvent(LogEvent.TYPE_LIVE_EDIT, user.getUserId(), null, lesson.getLessonId(), null,
+			message);
 
 		// LDEV-1899 only mark learners uncompleted if a change was saved and an activity added
 		if (!cancelled && (firstAddedActivityId != null)) {

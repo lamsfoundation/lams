@@ -207,6 +207,17 @@ a:focus {
 .msg .panel-footer {
   font-size: $font-size-small;
 }
+
+.msg .checkbox {
+	margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.comment-entry .checkbox {
+	margin-top: 5px;
+    margin-bottom: 0px;
+}
+   
 .panel-heading-sm {
   padding: 3px 5px;
   font-size: smaller;
@@ -1122,3 +1133,42 @@ $portrait-size-image-xl: 400px;
 .radio-button-offset {
 	margin-left: -20px;
 }
+
+// Reformat the spinner used by Mottie tablesorter to use fa-refresh. The spinner appears on every column and if you only want one column
+// make the other columns <th class="no-spinner"
+.tablesorter-bootstrap .tablesorter-processing {
+	background-image: none !important;
+    content: none !important;
+}
+
+.tablesorter-bootstrap .tablesorter-processing .tablesorter-header-inner:before {
+  content: "\f021"; // fa-refresh
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  -webkit-animation: fa-spin 2s infinite linear;  // fa-spin
+  animation: fa-spin 2s infinite linear;  // fa-spin
+  text-decoration: inherit;
+  margin-right: 3px;
+  color: inherit;
+  float: left;
+  position: relative;
+  overflow: hidden;
+  left: calc(50% + 14px);
+  /* 14px = 1/2 of 18px padding for sort arrows + 1/2 of 10px width of this block */
+  display: inline-block;
+}
+
+.tablesorter-bootstrap .tablesorter-processing .tablesorter-header-inner {
+    margin-left: -15px; // the spinner moves the title slightly
+}
+    
+.tablesorter-bootstrap .tablesorter-processing.no-spinner .tablesorter-header-inner:before {
+	background-image: none !important;
+    content: none !important;
+}
+
+.tablesorter-bootstrap .tablesorter-processing.no-spinner  .tablesorter-header-inner {
+    margin-left: 0px; 
+}
+

@@ -5,11 +5,6 @@
  * **LAMS** Heavily customized by LAMS.d
  */
 
-/* Toggle Styles */
-
-@import "_lams_variables.scss";
-@import "_monitorLesson_base.scss";
-
 #wrapper {
     padding-left: 0;
     -webkit-transition: all 0.5s ease;
@@ -30,7 +25,8 @@
     height: 100%;
     margin-left:-154px;
     overflow-y: auto;
-    background: $brand-primary-darker;
+    background: $main_offcanvas_background;
+    color: $main_offcanvas_color;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
@@ -78,6 +74,9 @@ table.tablesorter {
 
 .courses-title {
     padding-left: 0;
+    word-break: break-all;
+    line-height: 10px;
+    font-size: 19px;
 }
 
 .offcanvas-header {
@@ -342,12 +341,16 @@ i.fa.fa-user{
 
 .panel-heading a:after {
     font-family: FontAwesome;
-    content:"\f13a";
+    content:"\f139";
     float: right;
     color: grey;
 }
 .panel-heading a.collapsed:after {
-    content:"\f139";
+    content:"\f13a";
+}
+
+.burning-question-title {
+   	cursor: pointer;
 }
 
 .table > tbody > tr > td.success,
@@ -396,4 +399,12 @@ div#sequenceCanvas svg {
 
 .burning-question-description div, .burning-question-count {
 	display: inline; 
+}
+
+.disclose-button-group {
+	margin-top: -2px;
+}
+
+.disclose-all-button-group {
+	margin-bottom: 10px;
 }

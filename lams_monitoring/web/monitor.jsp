@@ -276,7 +276,7 @@
 	<lams:Page type="navbar">
 		<c:if test="${isTBLSequence}">
 			<c:set var="tblMonitorButton">
-				<i class="fa fa fa-heartbeat" title="<fmt:message key="label.tblmonitor" />"
+				<i class="fa fa fa-heartbeat" title="<fmt:message key="label.tbl.monitor" />"
 			 		onclick="javascript:switchToTblMonitor();" id="tbl-monitor-control">  <fmt:message key="label.tbl.monitor"/></i>
 			</c:set>
 		</c:if>

@@ -146,7 +146,7 @@ public class GradebookAction extends LamsDispatchAction {
 		    currentUserDTO.getTimeZone());
 	} else if (view == GBGridView.MON_ACTIVITY) {
 	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLesson(lessonID,
-		    currentUserDTO.getTimeZone());
+		    currentUserDTO.getTimeZone(), true);
 	}
 
 	if ((sortBy == null) || sortBy.equals("")) {

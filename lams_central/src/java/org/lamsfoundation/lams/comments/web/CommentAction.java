@@ -144,6 +144,7 @@ public class CommentAction extends Action {
 	String externalSignature;
 	String mode;
 	boolean likeAndDislike;
+	boolean allowAnonymous;
 	boolean readOnly;
 	Integer pageSize;
 	Integer sortBy;
@@ -168,6 +169,7 @@ public class CommentAction extends Action {
 	    externalType = WebUtil.readIntParam(request, CommentConstants.ATTR_EXTERNAL_TYPE);
 	    externalSignature = WebUtil.readStrParam(request, CommentConstants.ATTR_EXTERNAL_SIG);
 	    likeAndDislike = WebUtil.readBooleanParam(request, CommentConstants.ATTR_LIKE_AND_DISLIKE);
+	    allowAnonymous = WebUtil.readBooleanParam(request, CommentConstants.ATTR_ANONYMOUS);
 	    readOnly = WebUtil.readBooleanParam(request, CommentConstants.ATTR_READ_ONLY);
 	    pageSize = WebUtil.readIntParam(request, CommentConstants.PAGE_SIZE, true);
 	    if (pageSize == null) {
@@ -180,11 +182,12 @@ public class CommentAction extends Action {
 
 	    sessionMap.put(CommentConstants.ATTR_EXTERNAL_ID, externalId);
 	    sessionMap.put(CommentConstants.ATTR_EXTERNAL_TYPE, externalType);
-	    if ( externalSecondaryId != null ) {
+	    if (externalSecondaryId != null) {
 		sessionMap.put(CommentConstants.ATTR_EXTERNAL_SECONDARY_ID, externalSecondaryId);
 	    }
 	    sessionMap.put(CommentConstants.ATTR_EXTERNAL_SIG, externalSignature);
 	    sessionMap.put(CommentConstants.ATTR_LIKE_AND_DISLIKE, likeAndDislike);
+	    sessionMap.put(CommentConstants.ATTR_ANONYMOUS, allowAnonymous);
 	    sessionMap.put(CommentConstants.ATTR_READ_ONLY, readOnly);
 	    sessionMap.put(CommentConstants.PAGE_SIZE, pageSize);
 	    sessionMap.put(CommentConstants.ATTR_SORT_BY, sortBy);
@@ -198,7 +201,8 @@ public class CommentAction extends Action {
 	    throwException("Unknown comment type ", user.getLogin(), externalId, externalType, externalSignature);
 	}
 
-	Comment rootComment = getCommentService().createOrGetRoot(externalId, externalSecondaryId, externalType, externalSignature, user);
+	Comment rootComment = getCommentService().createOrGetRoot(externalId, externalSecondaryId, externalType,
+		externalSignature, user);
 	sessionMap.put(CommentConstants.ATTR_ROOT_COMMENT_UID, rootComment.getUid());
 	return viewTopicImpl(mapping, form, request, response, sessionMap, pageSize, sortBy, true);
     }
@@ -388,6 +392,9 @@ public class CommentAction extends Action {
 	    commentText = commentText.trim();
 	}
 
+	Boolean commentAnonymous = WebUtil.readBooleanParam(request, CommentConstants.ATTR_COMMENT_ANONYMOUS_NEW,
+		false);
+
 	ObjectNode responseJSON;
 
 	if (!validateText(commentText)) {
@@ -408,7 +415,7 @@ public class CommentAction extends Action {
 	    Comment rootSeq = commentService.getRoot(externalId, externalSecondaryId, externalType, externalSignature);
 
 	    // save message into database
-	    Comment newComment = commentService.createReply(rootSeq, commentText, user, isMonitor);
+	    Comment newComment = commentService.createReply(rootSeq, commentText, user, isMonitor, commentAnonymous);
 
 	    responseJSON = JsonNodeFactory.instance.objectNode();
 	    responseJSON.put(CommentConstants.ATTR_COMMENT_ID, newComment.getUid());
@@ -459,6 +466,9 @@ public class CommentAction extends Action {
 	    commentText = commentText.trim();
 	}
 
+	Boolean commentAnonymous = WebUtil.readBooleanParam(request, CommentConstants.ATTR_COMMENT_ANONYMOUS_REPLY,
+		false);
+
 	ObjectNode responseJSON;
 
 	if (!validateText(commentText)) {
@@ -475,7 +485,8 @@ public class CommentAction extends Action {
 	    }
 
 	    // save message into database
-	    Comment newComment = commentService.createReply(parentId, commentText.trim(), user, isMonitor);
+	    Comment newComment = commentService.createReply(parentId, commentText.trim(), user, isMonitor,
+		    commentAnonymous);
 
 	    responseJSON = JsonNodeFactory.instance.objectNode();
 	    responseJSON.put(CommentConstants.ATTR_COMMENT_ID, newComment.getUid());
@@ -547,6 +558,12 @@ public class CommentAction extends Action {
 	    commentText = commentText.trim();
 	}
 
+	// Don't update anonymous if it is monitoring
+	boolean isMonitoring = ToolAccessMode.TEACHER
+		.equals(WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE)));
+	Boolean commentAnonymous = isMonitoring ? null
+		: WebUtil.readBooleanParam(request, CommentConstants.ATTR_COMMENT_ANONYMOUS_EDIT, false);
+
 	ObjectNode ObjectNode;
 
 	if (!validateText(commentText)) {
@@ -564,8 +581,8 @@ public class CommentAction extends Action {
 			user.getLogin(), externalId, externalType, externalSignature);
 	    }
 
-	    Comment updatedComment = commentService.updateComment(commentId, commentText, user, ToolAccessMode.TEACHER
-		    .equals(WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE))));
+	    Comment updatedComment = commentService.updateComment(commentId, commentText, user, commentAnonymous,
+		    isMonitoring);
 
 	    ObjectNode = JsonNodeFactory.instance.objectNode();
 	    ObjectNode.put(CommentConstants.ATTR_COMMENT_ID, commentId);

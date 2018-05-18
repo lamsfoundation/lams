@@ -382,7 +382,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	learningDesign.setTitle(JsonUtil.optString(ldJSON, AuthoringJsonTags.TITLE));
 	learningDesign.setMaxID(JsonUtil.optInt(ldJSON, AuthoringJsonTags.MAX_ID));
 	learningDesign.setReadOnly(JsonUtil.optBoolean(ldJSON, AuthoringJsonTags.READ_ONLY));
-	learningDesign.setEditOverrideLock(JsonUtil.optBoolean(ldJSON, AuthoringJsonTags.EDIT_OVERRIDE_LOCK));
 	learningDesign.setDateReadOnly(
 		DateUtil.convertFromString(JsonUtil.optString(ldJSON, AuthoringJsonTags.DATE_READ_ONLY)));
 	learningDesign.setHelpText(JsonUtil.optString(ldJSON, AuthoringJsonTags.HELP_TEXT));
