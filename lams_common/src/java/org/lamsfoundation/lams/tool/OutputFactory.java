@@ -160,12 +160,12 @@ public abstract class OutputFactory {
 	    try {
 		translatedText = tmpMsgSource.getMessage(key, null, locale);
 	    } catch (NoSuchMessageException e) {
-		log.warn("Unable to internationalise the text for key " + key
-			+ " as no matching key found in the msgSource");
+//		log.warn("Unable to internationalise the text for key " + key
+//			+ " as no matching key found in the msgSource");
 	    }
 	} else {
-	    log.warn("Unable to internationalise the text for key " + key
-		    + " as no matching key found in the msgSource. The tool's OutputDefinition factory needs to set either (a) messageSource or (b) loadedMessageSourceService and languageFilename.");
+//	    log.warn("Unable to internationalise the text for key " + key
+//		    + " as no matching key found in the msgSource. The tool's OutputDefinition factory needs to set either (a) messageSource or (b) loadedMessageSourceService and languageFilename.");
 	}
 
 	if (translatedText == null || translatedText.length() == 0) {
