@@ -27,6 +27,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -976,7 +977,6 @@ public class LearnerService implements ICoreLearnerService {
 	}
 
 	if (toolSession != null) {
-
 	    // Get all the conditions for this branching activity, ordered by order id.
 	    Map<BranchCondition, SequenceActivity> conditionsMap = new TreeMap<BranchCondition, SequenceActivity>();
 	    Iterator branchIterator = branchingActivity.getActivities().iterator();
@@ -997,6 +997,10 @@ public class LearnerService implements ICoreLearnerService {
 	    // Cache the tool output so that we aren't calling it over an over again.
 	    Map<String, ToolOutput> toolOutputMap = new HashMap<String, ToolOutput>();
 	    Iterator<BranchCondition> conditionIterator = conditionsMap.keySet().iterator();
+	    Boolean isOrderedAsc = false;
+	    // map of order chosen by learner -> condition with question and answer uid encoded
+	    Map<Long, BranchCondition> conditionOrder = isOrderedAsc == null ? null
+		    : isOrderedAsc ? new TreeMap<>() : new TreeMap<>(Collections.reverseOrder());
 
 	    while ((matchedBranch == null) && conditionIterator.hasNext()) {
 		BranchCondition condition = conditionIterator.next();
@@ -1011,9 +1015,25 @@ public class LearnerService implements ICoreLearnerService {
 			toolOutputMap.put(conditionName, toolOutput);
 		    }
 		}
+		if (toolOutput != null) {
+		    if (isOrderedAsc != null) {
+			// put this option's order ID chosen by the learner 
+			conditionOrder.put(toolOutput.getValue().getLong(), condition);
+		    } else if (condition.isMet(toolOutput)) {
+			matchedBranch = conditionsMap.get(condition);
+		    }
+		}
+	    }
 
-		if ((toolOutput != null) && condition.isMet(toolOutput)) {
-		    matchedBranch = conditionsMap.get(condition);
+	    // find first branch that has not been passed yet
+	    if (isOrderedAsc != null) {
+		LearnerProgress learnerProgress = getProgress(learner.getUserId(), lesson.getLessonId());
+		for (BranchCondition condition : conditionOrder.values()) {
+		    SequenceActivity sequenceActivity = conditionsMap.get(condition);
+		    if (!learnerProgress.getCompletedActivities().containsKey(sequenceActivity)) {
+			matchedBranch = sequenceActivity;
+			break;
+		    }
 		}
 	    }
 	}

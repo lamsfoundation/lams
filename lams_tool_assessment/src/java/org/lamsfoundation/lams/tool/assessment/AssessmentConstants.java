@@ -59,9 +59,9 @@ public class AssessmentConstants {
 
     // for action forward name
     public static final String SUCCESS = "success";
-    
+
     public static final String LEARNING = "learning";
-    
+
     public static final String SHOW_RESULTS = "showResults";
 
     public static final String ERROR = "error";
@@ -69,13 +69,13 @@ public class AssessmentConstants {
     public static final String DEFINE_LATER = "definelater";
 
     public static final String WAIT_FOR_LEADER = "waitForLeader";
-    
+
     public static final String WAIT_FOR_LEADER_TIME_LIMIT = "waitForLeaderTimeLimit";
 
     // for parameters' name
-    
+
     public static final String PARAM_WAITING_MESSAGE_KEY = "waitingMessageKey";
-    
+
     public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
 
     public static final String PARAM_TOOL_SESSION_ID = "toolSessionID";
@@ -134,7 +134,7 @@ public class AssessmentConstants {
     public static final String ATTR_OPTION_QUESTION_PREFIX = "optionQuestion";
 
     public static final String ATTR_QUESTION_PREFIX = "question";
-    
+
     public static final String ATTR_CONFIDENCE_LEVEL_PREFIX = "confidenceLevel";
 
     public static final String ATTR_QUESTION_TYPE = "questionType";
@@ -152,11 +152,11 @@ public class AssessmentConstants {
     public static final String ATTR_UNIT_LIST = "unitList";
 
     public static final String ATTR_QUESTION_REFERENCES_GRADES = "referenceGrades";
-    
+
     public static final String ATTR_HAS_EDIT_RIGHT = "hasEditRight";
-    
+
     public static final String ATTR_IS_TIME_LIMIT_NOT_LAUNCHED = "isTimeLimitNotLaunched";
-    
+
     public static final String ATTR_SECONDS_LEFT = "secondsLeft";
 
     public static final String ATTR_UNIT_COUNT = "unitCount";
@@ -228,7 +228,7 @@ public class AssessmentConstants {
     public static final String ATTR_QUESTION_NUMBERING_OFFSET = "questionNumberingOffset";
 
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
-    
+
     public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
 
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
@@ -257,9 +257,9 @@ public class AssessmentConstants {
     public static final String OUTPUT_NAME_BEST_SCORE = "best.score";
     public static final String OUTPUT_NAME_FIRST_SCORE = "first.score";
     public static final String OUTPUT_NAME_AVERAGE_SCORE = "average.score";
-    
-    public static final String OUTPUT_NAME_ORDERED_ANSWERS = "ordered.answers";
 
+    public static final String OUTPUT_NAME_ORDERED_ANSWERS = "ordered.answers";
+    public static final String OUTPUT_NAME_CONDITION_ORDERED_ANSWER = "ordered.answer";
     // error message keys
     public static final String ERROR_MSG_QUESTION_NAME_BLANK = "error.question.name.blank";
 

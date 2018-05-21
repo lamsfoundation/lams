@@ -29,6 +29,7 @@ import java.util.Iterator;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /**
@@ -40,6 +41,9 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
  * @version 1.1
  */
 public abstract class ComplexActivityStrategy implements Serializable, IContributionTypeStrategy {
+
+    protected static IActivityDAO activityDAO;
+
     /**
      * <p>
      * Check up all children completion status for a complex activity.
@@ -145,5 +149,14 @@ public abstract class ComplexActivityStrategy implements Serializable, IContribu
      */
     protected void setUpContributionType(ArrayList<Integer> contributionTypes) {
 
+    }
+
+    /**
+     * Ugly, but sometimes we need to get real child activity, not proxy
+     */
+    public void setActivityDAO(IActivityDAO activityDAO) {
+	if (ComplexActivityStrategy.activityDAO == null) {
+	    ComplexActivityStrategy.activityDAO = activityDAO;
+	}
     }
 }
