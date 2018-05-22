@@ -1079,19 +1079,21 @@ PropertyLib = {
 						// build output dropdown and bind data to each option
 						$.each(activity.input.outputDefinitions,function(){
 							var suffix = '';
-							switch(this.type) {
-								case 'OUTPUT_COMPLEX' :
-									suffix = LABELS.COMPLEX_OUTPUT_SUFFIX;
-									break;
-														
-								case 'OUTPUT_LONG' :
-									suffix = LABELS.RANGE_OUTPUT_SUFFIX;
-									break;
-									
-								case 'OUTPUT_BOOLEAN' :
-									suffix = LABELS.BOOLEAN_OUTPUT_SUFFIX;
-									break;
-							};
+							if (!this.showConditionNameOnly) {
+								switch(this.type) {
+									case 'OUTPUT_COMPLEX' :
+										suffix = LABELS.COMPLEX_OUTPUT_SUFFIX;
+										break;
+															
+									case 'OUTPUT_LONG' :
+										suffix = LABELS.RANGE_OUTPUT_SUFFIX;
+										break;
+										
+									case 'OUTPUT_BOOLEAN' :
+										suffix = LABELS.BOOLEAN_OUTPUT_SUFFIX;
+										break;
+								};
+							}
 			
 							this.toolActivityUIID = activity.input.uiid;
 							var option = $('<option />')
@@ -1730,6 +1732,11 @@ PropertyLib = {
 			return;
 		}
 
+		var conditionsLength = activity.input.outputDefinitions.length;
+		ActivityLib.getOutputDefinitions(activity.input);
+		if (conditionsLength != activity.input.outputDefinitions.length) {
+			PropertyLib.fillOutputDefinitionsDropdown(activity.input);
+		}
 		layout.outputConditionsDialog.data('parentObject', activity)
 			  						 .modal('show');
 	},
