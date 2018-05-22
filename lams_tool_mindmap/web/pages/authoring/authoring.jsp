@@ -1,50 +1,27 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.mindmap.util.MindmapConstants"%>
 
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
-<script type="text/javascript" src="includes/javascript/mindmap.resize.js"></script>
+<link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link>
+<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
+
+<script src="${tool}includes/javascript/mapjs/main.js"></script>
+<script src="${tool}includes/javascript/mapjs/underscore-min.js"></script>
+
 
 <script type="text/javascript">
-//<![CDATA[  
-           
-    <c:set var="MindmapUser">
-		<c:out value="${currentMindmapUser}" escapeXml="true"/>
-	</c:set>
-	
-	flashvars = { xml: "${mindmapContentPath}", user: "${MindmapUser}", dictionary: "${localizationPath}" }
-	
-	$(window).resize(makeNice);
-	
-	embedFlashObject(700, 525);
-	
+
+	var mode = "author";
+
 	function setMindmapContent() {
 		var mindmapContent = document.getElementById("mindmapContent");
-		var tag = document.getElementById("currentTab");
-		
-		if (tag.value == 1 || tag.value == "") {
-			mindmapContent.value = document['flashContent'].getMindmap();
-		}
-	}
-	
-	function flashLoaded() {
-		var mindmapContent = document.getElementById("mindmapContent");
-		document['flashContent'].setMindmap(mindmapContent.value);
-	}
-	
-	function embedFlashObject(x, y) {
-		swfobject.embedSWF("${mindmapType}", "flashContent", x, y, "9.0.0", false, flashvars);
+		mindmapContent.value = JSON.stringify(contentAggregate);
 	}
 
 	// set Mindmap content before submitting authoring form
 	$(document).ready(function() {
-		var hasFlash = ((typeof navigator.plugins != "undefined" && typeof navigator.plugins["Shockwave Flash"] == "object") || (window.ActiveXObject && (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) != false));
-		if(hasFlash != true){
-			 $("#saveButton").hide();
-			}
 		// selects "save" button in lams:AuthoringButton tag
 		$('a[href*="doSubmit_Form_Only()"]').click(setMindmapContent);
 	});	
-//]]>
 </script>
 
 <html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data">

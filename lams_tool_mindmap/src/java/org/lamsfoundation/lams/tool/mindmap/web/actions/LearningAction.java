@@ -38,6 +38,9 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -45,7 +48,11 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.mindmap.dto.IdeaJSON;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
+import org.lamsfoundation.lams.tool.mindmap.dto.NotifyActionJSON;
+import org.lamsfoundation.lams.tool.mindmap.dto.NotifyResponseJSON;
+import org.lamsfoundation.lams.tool.mindmap.dto.RootJSON;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapRequest;
@@ -85,6 +92,14 @@ public class LearningAction extends LamsDispatchAction {
     private static Logger log = Logger.getLogger(LearningAction.class);
     private static final boolean MODE_OPTIONAL = false;
     private IMindmapService mindmapService;
+    
+    private static final String REQUEST_JSON_TYPE = "type"; // Expected to be int: 0 - delete; 1 - create node; 2 - change color; 3 - change text
+    private static final String REQUEST_JSON_REQUEST_ID = "requestId"; // Expected to be long
+    private static final String REQUEST_JSON_PARENT_NODE_ID = "parentId"; // Expected to be long
+    
+    private static final String RESPONSE_JSON_ACTIONS = "actions";
+    
+
 
     /**
      * Default action on page load. Clones Mindmap Nodes for each Learner in single-user mode. Uses shared (runtime
@@ -149,15 +164,15 @@ public class LearningAction extends LamsDispatchAction {
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
 		getServlet().getServletContext());
 
+	HttpSession ss = SessionManager.getSession();
+	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+
 	// check if there is submission deadline
 	Date submissionDeadline = mindmap.getSubmissionDeadline();
 	if (submissionDeadline != null) {
 	    // store submission deadline to sessionMap
 	    request.setAttribute(MindmapConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
-
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    TimeZone learnerTimeZone = userDto.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 
@@ -169,8 +184,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	MindmapUser mindmapUser;
 	if (mode.equals(ToolAccessMode.TEACHER)) {
-	    Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
-	    mindmapUser = mindmapService.getUserByUserIdAndSessionId(userID, toolSessionID);
+	    mindmapUser = mindmapService.getUserByUserIdAndSessionId(userDto.getUserID().longValue(), toolSessionID);
 	} else {
 	    mindmapUser = getCurrentUser(toolSessionID);
 	}
@@ -192,19 +206,6 @@ public class LearningAction extends LamsDispatchAction {
 	// currentMindmapUser Parameter
 	String currentMindmapUser = mindmapUser.getFirstName() + " " + mindmapUser.getLastName();
 	request.setAttribute("currentMindmapUser", currentMindmapUser);
-
-	// mindmapType Parameter
-	String mindmapType = null;
-	if (mindmap.isLockOnFinished() && mindmapUser.isFinishedActivity()) {
-	    mindmapType = "images/mindmap_locked.swf";
-	} else {
-	    if (mindmap.isMultiUserMode() == true) {
-		mindmapType = "images/mindmap_multiuser.swf";
-	    } else {
-		mindmapType = "images/mindmap_singleuser.swf";
-	    }
-	}
-	request.setAttribute("mindmapType", mindmapType);
 
 	// pollServer Parameter
 	String pollServerParam = Configuration.get(ConfigurationKeys.SERVER_URL)
@@ -423,6 +424,149 @@ public class LearningAction extends LamsDispatchAction {
 	return null;
     }
 
+
+    /**
+     * Gets the Notify Requests (Actions) from Flash and returns proper Notify Responses
+     *
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return null
+     * @throws JSONException 
+     */
+    public ActionForward notifyServerActionJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException {
+
+	Long userId = WebUtil.readLongParam(request, "userId", false);
+	Long mindmapId = WebUtil.readLongParam(request, "mindmapId", false);
+	Long toolSessionId = WebUtil.readLongParam(request, "sessionId", false);
+	String requestAction = WebUtil.readStrParam(request, "actionJSON", false);
+
+	MindmapSession mindmapSession = mindmapService.getSessionBySessionId(toolSessionId);
+
+	JSONObject notifyRequest = new JSONObject(requestAction);
+	int requestType = notifyRequest.getInt(REQUEST_JSON_TYPE);
+	
+	MindmapRequest mindmapRequest = null;
+	if ( notifyRequest.has(REQUEST_JSON_REQUEST_ID)) {
+	    Long lastActionId = WebUtil.readLongParam(request, "lastActionId", false);
+	    mindmapRequest = mindmapService.getRequestByUniqueId(notifyRequest.getLong(REQUEST_JSON_REQUEST_ID), userId, mindmapId, lastActionId);
+	}
+
+	NotifyResponseJSON notifyResponse = null;
+	
+	MindmapUser currentUser = mindmapService.getUserByUID(userId);
+	if ( currentUser == null || ( mindmapSession.getMindmap().isLockOnFinished() && currentUser.isFinishedActivity() ) ) {
+	    notifyResponse = new NotifyResponseJSON(0, null, null);
+	} 
+	
+	// if request wasn't created before, create it
+	else if (mindmapRequest == null) {
+	    // getting node to which changes will be applied
+	    MindmapNode mindmapNode = null;
+	    if ( notifyRequest.has(IdeaJSON.MAPJS_JSON_ID_KEY) && requestType != 1 ) {
+		List mindmapNodeList = mindmapService.getMindmapNodeByUniqueIdSessionId(notifyRequest.getLong(IdeaJSON.MAPJS_JSON_ID_KEY),  mindmapId, toolSessionId);
+            	    if ((mindmapNodeList != null) && (mindmapNodeList.size() > 0)) {
+            		mindmapNode = (MindmapNode) mindmapNodeList.get(0);
+            	    } else {
+            		LearningAction.log.error("notifyServerAction(): Error finding node!");
+            		return null;
+            	    }
+	    }
+
+	    // delete node
+	    if (requestType == 0) {
+		// if node is created not by author or by other user... cannot delete
+		if (mindmapNode.getUser() == mindmapService.getUserByUID(userId)) {
+
+		    List childNodes = mindmapService.getMindmapNodeByParentIdMindmapIdSessionId(mindmapNode.getNodeId(),
+			    mindmapId, toolSessionId);
+
+		    if ((childNodes == null) || (childNodes.size() == 0)) // check if node has any children
+		    {
+			mindmapService.deleteNodeByUniqueMindmapUser(mindmapNode.getUniqueId(), mindmapId, userId, mindmapSession.getUid());
+			mindmapRequest = saveMindmapRequestJSON(mindmapRequest, requestType, null, mindmapNode.getUniqueId(), userId,
+				mindmapId, null, toolSessionId);
+			notifyResponse = new NotifyResponseJSON(1, mindmapRequest.getGlobalId(), null);
+		    } else {
+			notifyResponse = new NotifyResponseJSON(0, null, null);
+		    }
+		} else {
+		    notifyResponse = new NotifyResponseJSON(0, null, null);
+		}
+	    }
+	    // create node
+	    else if (requestType == 1) {
+		// no checking... users can create nodes everywhere. 
+		
+		// node unique ID - keep the biggest out of (next database value, client node). this ensures
+		// that deletions don't go back and fill holes with nodes that may conflict with something on a client.
+		Long uniqueId = 	mindmapService.getNodeLastUniqueIdByMindmapUidSessionId(mindmapId, toolSessionId) + 1;
+		Long childIdFromRequest = notifyRequest.getLong(IdeaJSON.MAPJS_JSON_ID_KEY);
+		if ( childIdFromRequest.longValue() > uniqueId.longValue() )
+		    uniqueId = childIdFromRequest;
+
+		Long parentNodeId = notifyRequest.getLong(REQUEST_JSON_PARENT_NODE_ID);
+		List parentNodes = mindmapService.getMindmapNodeByUniqueIdSessionId(parentNodeId, mindmapId, toolSessionId);
+		if (parentNodes == null || parentNodes.size() == 0 ) {
+		    LearningAction.log.error("notifyServerAction(): Unable to find parent node: "+parentNodeId+" toolSessionId "+toolSessionId);
+		}
+
+		MindmapNode newMindmapNode = mindmapService.saveMindmapNode(null, (MindmapNode) parentNodes.get(0), uniqueId, 
+			notifyRequest.optString(IdeaJSON.MAPJS_JSON_TITLE_KEY),
+			notifyRequest.optString(IdeaJSON.MAPJS_JSON_BACKGROUND_COLOR_KEY), mindmapService.getUserByUID(userId),
+			mindmapService.getMindmapByUid(mindmapId), mindmapSession);
+
+		mindmapRequest = saveMindmapRequestJSON(mindmapRequest, requestType, null, parentNodeId, userId, mindmapId,
+			uniqueId, toolSessionId);
+		notifyResponse = new NotifyResponseJSON(1, mindmapRequest.getGlobalId(), uniqueId);
+	    }
+	    // change color
+	    else if (requestType == 2) {
+		if (mindmapNode.getUser() == mindmapService.getUserByUID(userId)) {
+		    mindmapNode.setColor(notifyRequest.optString(IdeaJSON.MAPJS_JSON_BACKGROUND_COLOR_KEY));
+		    mindmapNode.setUser(mindmapService.getUserByUID(userId));
+		    mindmapService.saveOrUpdateMindmapNode(mindmapNode);
+		    mindmapRequest = saveMindmapRequestJSON(mindmapRequest, requestType, null, mindmapNode.getUniqueId(),  userId,
+			    mindmapId, null, toolSessionId);
+		    notifyResponse = new NotifyResponseJSON(1, mindmapRequest.getGlobalId(), null);
+		} else {
+		    notifyResponse = new NotifyResponseJSON(0, null, null);
+		}
+	    }
+	    // change text
+	    else if (requestType == 3) {
+		if (mindmapNode.getUser() == mindmapService.getUserByUID(userId)) {
+		    mindmapNode.setText(notifyRequest.optString(IdeaJSON.MAPJS_JSON_TITLE_KEY));
+		    mindmapNode.setUser(mindmapService.getUserByUID(userId));
+		    mindmapService.saveOrUpdateMindmapNode(mindmapNode);
+		    mindmapRequest = saveMindmapRequestJSON(mindmapRequest, requestType, null, mindmapNode.getUniqueId(),  userId,
+			    mindmapId, null, toolSessionId);
+		    notifyResponse = new NotifyResponseJSON(1, mindmapRequest.getGlobalId(), null);
+		} else {
+		    notifyResponse = new NotifyResponseJSON(0, null, null);
+		}
+	    }
+	} else {
+	    if (requestType == 1) {
+		notifyResponse = new NotifyResponseJSON(1, mindmapRequest.getGlobalId(),
+			mindmapRequest.getNodeChildId());
+	    } else {
+		notifyResponse = new NotifyResponseJSON(1, mindmapRequest.getGlobalId(), null);
+	    }
+	}
+
+	try {
+	    response.setContentType("application/x-json;charset=utf-8");
+	    response.getWriter().write(notifyResponse.toString());
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+
+	return null;
+    }
+
     /**
      * Saves Notify Requests to database
      *
@@ -449,6 +593,31 @@ public class LearningAction extends LamsDispatchAction {
     }
 
     /**
+     * Saves Notify Requests to database
+     *
+     * @param mindmapRequest
+     * @param requestType
+     * @param notifyRequestModel
+     * @param userId
+     * @param mindmapId
+     * @param nodeChildId
+     */
+    private MindmapRequest saveMindmapRequestJSON(MindmapRequest mindmapRequest, int requestType, Long requestId,
+	    Long nodeId, Long userId, Long mindmapId, Long nodeChildId, Long sessionId) {
+	mindmapRequest = new MindmapRequest();
+	mindmapRequest.setType(requestType);
+	mindmapRequest.setUniqueId(requestId);
+	// incrementing lastRequestId
+	mindmapRequest.setGlobalId(mindmapService.getLastGlobalIdByMindmapId(mindmapId, sessionId) + 1);
+	mindmapRequest.setUser(mindmapService.getUserByUID(userId));
+	mindmapRequest.setMindmap(mindmapService.getMindmapByUid(mindmapId));
+	mindmapRequest.setNodeId(nodeId);
+	mindmapRequest.setNodeChildId(nodeChildId); // nodeChildId
+	mindmapService.saveOrUpdateMindmapRequest(mindmapRequest);
+	return mindmapRequest;
+    }
+
+    /**
      * Generated Notify Responses
      *
      * @param ok
@@ -464,6 +633,100 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	return mindmapService.getXStream().toXML(nodeResponseModel);
+    }
+
+    /**
+     * Returns lists of Poll Requests (Actions) on Mindmap Nodes made by other learners
+     *
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return null
+     * @throws JSONException
+     */
+    public ActionForward pollServerActionJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException {
+
+	Long mindmapId = WebUtil.readLongParam(request, "mindmapId", false);
+	Long userId = WebUtil.readLongParam(request, "userId", false);
+	Long toolSessionId = WebUtil.readLongParam(request, "sessionId", false);
+	Long lastActionId = WebUtil.readLongParam(request, "lastActionID", false);
+
+	JSONObject pollResponseModel = new JSONObject();
+	JSONArray actions = new JSONArray();
+	pollResponseModel.put(RESPONSE_JSON_ACTIONS, actions);
+
+	List requestsList = mindmapService.getLastRequestsAfterGlobalId(lastActionId, mindmapId, userId, toolSessionId);
+	for (Iterator iterator = requestsList.iterator(); iterator.hasNext();) {
+	    MindmapRequest mindmapRequest = (MindmapRequest) iterator.next();
+	    int requestType = mindmapRequest.getType();
+
+	    JSONObject notifyRequestModel = null;
+	    MindmapNode rootMindmapNode = null;
+	    if ((requestType != 0) && (requestType != 1)) {
+		List nodesList = mindmapService.getMindmapNodeByUniqueIdSessionId(mindmapRequest.getNodeId(), mindmapId,
+			toolSessionId);
+
+		if ((nodesList != null) && (nodesList.size() > 0)) {
+		    rootMindmapNode = (MindmapNode) nodesList.get(0);
+		} else {
+		    LearningAction.log.error("pollServerAction(): Error finding node while changing text or color!");
+		}
+	    }
+
+	    MindmapNode mindmapNode = null;
+	    if (requestType == 1) {
+		List nodesList = mindmapService.getMindmapNodeByUniqueIdSessionId(mindmapRequest.getNodeChildId(),
+			mindmapId, toolSessionId);
+
+		if ((nodesList != null) && (nodesList.size() > 0)) {
+		    mindmapNode = (MindmapNode) nodesList.get(0);
+		} else {
+		    LearningAction.log.error("pollServerAction(): Error finding node while creating a node!");
+		}
+	    }
+
+	    // delete node
+	    if (requestType == 0) {
+		notifyRequestModel = new NotifyActionJSON(mindmapRequest.getGlobalId(), mindmapRequest.getNodeId(),
+			mindmapRequest.getType(), null, null, null, null);
+	    }
+	    // create node
+	    else if (requestType == 1) {
+		String creator = null;
+		MindmapUser mindmapUser = mindmapNode.getUser();
+		if (mindmapUser != null) {
+		    creator = mindmapUser.getFirstName() + " " + mindmapUser.getLastName();
+		} else {
+		    creator = "Student";
+		}
+		notifyRequestModel = new NotifyActionJSON(mindmapRequest.getGlobalId(), mindmapRequest.getNodeId(),
+			mindmapRequest.getType(), mindmapRequest.getNodeChildId(), mindmapNode.getText(),
+			mindmapNode.getColor(), creator);
+	    }
+	    // change color
+	    else if (requestType == 2) {
+		notifyRequestModel = new NotifyActionJSON(mindmapRequest.getGlobalId(), mindmapRequest.getNodeId(),
+			mindmapRequest.getType(), null, null, rootMindmapNode.getColor(), null);
+	    }
+	    // change text
+	    else if (requestType == 3) {
+		notifyRequestModel = new NotifyActionJSON(mindmapRequest.getGlobalId(), mindmapRequest.getNodeId(),
+			mindmapRequest.getType(), null, rootMindmapNode.getText(), null, null);
+	    }
+
+	    actions.put(notifyRequestModel);
+	}
+
+	try {
+	    response.setContentType("application/x-json;charset=utf-8");
+	    response.getWriter().write(pollResponseModel.toString());
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+
+	return null;
     }
 
     /**
@@ -569,22 +832,44 @@ public class LearningAction extends LamsDispatchAction {
     }
 
     /**
-     * Returns the serialized XML of the Mindmap Nodes from Database
+     * Returns the serialized JSON of the Mindmap Nodes from Database
      *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return null
+     * @throws JSONException 
+     * @throws IOException 
      */
-    public ActionForward setMindmapContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public ActionForward setMindmapContentJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+
+	// set up mindmapService
+	if (mindmapService == null) {
+	    mindmapService = MindmapServiceProxy.getMindmapService(this.getServlet().getServletContext());
+	}
 
 	Long mindmapId = WebUtil.readLongParam(request, "mindmapId", false);
-	Long userId = WebUtil.readLongParam(request, "userId", false);
 	Long toolSessionId = WebUtil.readLongParam(request, "sessionId", true);
 	Mindmap mindmap = mindmapService.getMindmapByUid(mindmapId);
-	MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
+
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,
+		LearningAction.MODE_OPTIONAL);
+	boolean monitoring = mode.equals(ToolAccessMode.TEACHER);
+
+	// In monitoring we do not need the user when accessing multi mode mindmap
+	Long userId = WebUtil.readLongParam(request, "userId", true);
+	if (userId == null && !(monitoring && mindmap.isMultiUserMode())) {
+	    log.error(
+		    "Unable to display mindmap as no user id is supplied. Can only skip user id if this is monitoring and multiuser mode.");
+	    return null;
+	}
+
+	MindmapUser mindmapUser = null;
+	if (userId != null) {
+	    mindmapUser = mindmapService.getUserByUID(userId);
+	}
 
 	List mindmapNodeList = null;
 	if (mindmap.isMultiUserMode()) {
@@ -604,74 +889,73 @@ public class LearningAction extends LamsDispatchAction {
 			+ rootMindmapNode.getUser().getLastName();
 	    }
 
-	    int edit = 1;
-	    if (rootMindmapNode.getUser() == mindmapUser) {
-		edit = 1;
-	    } else {
-		edit = 0;
-	    }
-
 	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(),
-		    rootMindmapNode.getText(), rootMindmapNode.getColor(), mindmapUserName, edit));
+		    rootMindmapNode.getText(), rootMindmapNode.getColor(), mindmapUserName, 0));
 
 	    NodeModel currentNodeModel = mindmapService.getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(),
-		    mindmapId, rootNodeModel, mindmapUser);
+		    mindmapId, rootNodeModel, mindmapUser, monitoring, false,
+		    mindmap.isLockOnFinished() && mindmapUser.isFinishedActivity());
 
-	    String mindmapContent = mindmapService.getXStream().toXML(currentNodeModel);
-
-	    // Saving lastActionID
-	    Long lastActionId = mindmapService.getLastGlobalIdByMindmapId(mindmap.getUid(), toolSessionId);
-	    //mindmap.setLastActionId(lastActionId);
-
+	    JSONObject jsonObject = new JSONObject();
+	    jsonObject.put("mindmap", new RootJSON(currentNodeModel));
 	    // adding lastActionId
 	    if (mindmap.isMultiUserMode()) {
-		if (mindmap.isLockOnFinished() && !mindmapUser.isFinishedActivity()) {
-		    mindmapContent = "<mindmap>\n" + mindmapContent + "\n<lastActionId>" + lastActionId
-			    + "</lastActionId>\n</mindmap>";
-		} else if (!mindmap.isLockOnFinished()) {
-		    mindmapContent = "<mindmap>\n" + mindmapContent + "\n<lastActionId>" + lastActionId
-			    + "</lastActionId>\n</mindmap>";
-		}
+		Long lastActionId = mindmapService.getLastGlobalIdByMindmapId(mindmap.getUid(), toolSessionId);
+		jsonObject.put("lastActionId", lastActionId);
 	    }
 
-	    try {
-		response.setContentType("text/xml");
-		response.setCharacterEncoding("utf-8");
-		response.getWriter().write(mindmapContent);
-	    } catch (IOException e) {
-		e.printStackTrace();
-	    }
-
+	    response.setContentType("application/x-json;charset=utf-8");
+	    response.getWriter().print(jsonObject.toString());
+	    return null;
 	}
 	return null;
     }
 
+	      
     public ActionForward saveLastMindmapChanges(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws JSONException, IOException {
 
 	Long userId = WebUtil.readLongParam(request, "userId", false);
 	Long toolContentId = WebUtil.readLongParam(request, "mindmapId", false);
-	Long toolSessionId = WebUtil.readLongParam(request, "sessionId", true);
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionID", true);
 	MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
 	Mindmap mindmap = mindmapService.getMindmapByUid(toolContentId);
 	MindmapSession mindmapSession = mindmapService.getSessionBySessionId(toolSessionId);
 
+	NotifyResponseJSON responseJSON = null;
 	// Saving Mindmap Nodes
 	if (!mindmap.isMultiUserMode()) {
-	    // getting xml data from SWF
+	    // getting JSON from Mindmup
 	    String mindmapContent = WebUtil.readStrParam(request, "content", false);
-	    // learningForm.getMindmapContent();
-
-	    saveMindmapXML(mindmap, mindmapUser, mindmapContent, mindmapSession);
+	    Long rootNodeId = saveMapJsJSON(mindmap, mindmapUser, mindmapContent, mindmapSession);
+	    responseJSON = new NotifyResponseJSON( rootNodeId != null ? 1 : 0, null, rootNodeId);
+	} else {
+	    responseJSON = new NotifyResponseJSON(0, null, 0L);
 	}
 
+	response.setContentType("application/x-json;charset=utf-8");
+	response.getWriter().print(responseJSON.toString());
 	return null;
     }
 
-    public void saveMindmapXML(Mindmap mindmap, MindmapUser mindmapUser, String mindmapContent,
-	    MindmapSession mindmapSession) {
-	// Saving Mindmap data to XML
-	NodeModel rootNodeModel = (NodeModel) mindmapService.getXStream().fromXML(mindmapContent);
+    private Long saveMapJsJSON(Mindmap mindmap, MindmapUser mindmapUser, String mindmapContent,
+	    MindmapSession mindmapSession) throws JSONException {
+	
+	NodeModel rootNodeModel = RootJSON.toNodeModel(mindmapContent);
+	if ( rootNodeModel == null ) {
+	    String error = new StringBuilder("Unable to save mindmap for session:")
+		    .append(mindmapSession.getSessionName())
+		    .append("(")
+		    .append(mindmapSession.getSessionId())
+		    .append(") user:")
+		    .append(mindmapUser.getLoginName())
+		    .append("("+mindmapUser.getUserId())
+		    .append("). No root node. JSON: ")
+		    .append(mindmapContent)
+		    .toString();
+	   throw new JSONException(error);
+	}
+	
 	NodeConceptModel nodeConceptModel = rootNodeModel.getConcept();
 	List<NodeModel> branches = rootNodeModel.getBranch();
 
@@ -693,29 +977,8 @@ public class LearningAction extends LamsDispatchAction {
 	nodesToDeleteCondition += mindmapService.getNodesToDeleteCondition() + " and mindmap_id = " + mindmap.getUid()
 		+ " and user_id = " + mindmapUser.getUid();
 	mindmapService.deleteNodes(nodesToDeleteCondition);
-    }
-
-    /**
-     * Returns the serialized XML of the Mindmap Nodes from Database
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return null
-     */
-    public ActionForward setLocale(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	try {
-	    response.setContentType("text/xml");
-	    response.setCharacterEncoding("utf-8");
-	    response.getWriter().write(mindmapService.getLanguageXML());
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-
-	return null;
+	
+	return rootMindmapNode.getNodeId();
     }
 
     /**
@@ -747,9 +1010,10 @@ public class LearningAction extends LamsDispatchAction {
      * @param request
      * @param response
      * @return
+     * @throws JSONException 
      */
     public ActionForward reflect(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws JSONException {
 
 	LearningForm learningForm = (LearningForm) form;
 
@@ -771,7 +1035,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	// Saving Mindmap Nodes
 	if (!mindmap.isMultiUserMode() && !StringUtils.isBlank(learningForm.getMindmapContent())) {
-	    saveMindmapXML(mindmap, mindmapUser, learningForm.getMindmapContent(), mindmapSession);
+	    saveMapJsJSON(mindmap, mindmapUser, learningForm.getMindmapContent(), mindmapSession);
 	}
 
 	// Reflection
@@ -794,47 +1058,52 @@ public class LearningAction extends LamsDispatchAction {
      * @param request
      * @param response
      * @return null
+     * @throws JSONException 
      */
     public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws JSONException {
 
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
 	MindmapUser mindmapUser = getCurrentUser(toolSessionID);
 
+	// Retrieve the session and content
+	MindmapSession mindmapSession = mindmapService.getSessionBySessionId(toolSessionID);
+	if (mindmapSession == null) {
+	    throw new MindmapException("Cannot retrieve session with toolSessionID" + toolSessionID);
+	}
+	Mindmap mindmap = mindmapSession.getMindmap();
+
+	// if locked do not update anything - do not want to risk having accidently changed the mindmap
+	boolean contentLocked = mindmap.isLockOnFinished() && mindmapUser.isFinishedActivity();
+
 	if (mindmapUser != null) {
-	    LearningForm learningForm = (LearningForm) form;
+	    if (!contentLocked) {
+		LearningForm learningForm = (LearningForm) form;
 
-	    mindmapUser.setFinishedActivity(true);
-	    mindmapService.saveOrUpdateMindmapUser(mindmapUser);
+		mindmapUser.setFinishedActivity(true);
+		mindmapService.saveOrUpdateMindmapUser(mindmapUser);
 
-	    // Retrieve the session and content
-	    MindmapSession mindmapSession = mindmapService.getSessionBySessionId(toolSessionID);
-	    if (mindmapSession == null) {
-		throw new MindmapException("Cannot retrieve session with toolSessionID" + toolSessionID);
-	    }
-
-	    Mindmap mindmap = mindmapSession.getMindmap();
-
-	    // save the reflection entry and call the notebook.
-	    if (mindmap.isReflectOnActivity()) {
-		// check for existing notebook entry
-		NotebookEntry entry = mindmapService.getEntry(mindmapUser.getEntryUID());
-		if (entry == null) {
-		    // create new entry
-		    Long entryUID = mindmapService.createNotebookEntry(toolSessionID,
-			    CoreNotebookConstants.NOTEBOOK_TOOL, MindmapConstants.TOOL_SIGNATURE,
-			    mindmapUser.getUserId().intValue(), learningForm.getEntryText());
-		    mindmapUser.setEntryUID(entryUID);
-		    mindmapService.saveOrUpdateMindmapUser(mindmapUser);
+		// save the reflection entry and call the notebook.
+		if (mindmap.isReflectOnActivity()) {
+		    // check for existing notebook entry
+		    NotebookEntry entry = mindmapService.getEntry(mindmapUser.getEntryUID());
+		    if (entry == null) {
+			// create new entry
+			Long entryUID = mindmapService.createNotebookEntry(toolSessionID,
+				CoreNotebookConstants.NOTEBOOK_TOOL, MindmapConstants.TOOL_SIGNATURE,
+				mindmapUser.getUserId().intValue(), learningForm.getEntryText());
+			mindmapUser.setEntryUID(entryUID);
+			mindmapService.saveOrUpdateMindmapUser(mindmapUser);
+		    } else {
+			// update existing entry
+			entry.setEntry(learningForm.getEntryText());
+			entry.setLastModified(new Date());
+			mindmapService.updateEntry(entry);
+		    }
 		} else {
-		    // update existing entry
-		    entry.setEntry(learningForm.getEntryText());
-		    entry.setLastModified(new Date());
-		    mindmapService.updateEntry(entry);
-		}
-	    } else {
-		if (!mindmap.isMultiUserMode() && !StringUtils.isBlank(learningForm.getMindmapContent())) {
-		    saveMindmapXML(mindmap, mindmapUser, learningForm.getMindmapContent(), mindmapSession);
+		    if (!mindmap.isMultiUserMode() && !StringUtils.isBlank(learningForm.getMindmapContent())) {
+			saveMapJsJSON(mindmap, mindmapUser, learningForm.getMindmapContent(), mindmapSession);
+		    }
 		}
 	    }
 

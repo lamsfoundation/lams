@@ -23,34 +23,26 @@
 
 
 
-package org.lamsfoundation.lams.tool.mindmap.util.xmlmodel;
+package org.lamsfoundation.lams.tool.mindmap.dto;
 
-import java.util.ArrayList;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 
 /**
- * XML Model Class for Poll Response in Mindmap.
- * Sends to Flash the list of Requests done by other users.
- *
- * @author Ruslan Kazakov
+ * JSON Class for returning responding to a multi user change sent from the client.
  */
-public class PollResponseModel {
-    // list of Requests (Actions)
-    ArrayList<NotifyRequestModel> actions = new ArrayList<NotifyRequestModel>();
+public class NotifyResponseJSON extends JSONObject {
+    
+    // Poll server response
+    public static final String REQUEST_ID_KEY = "requestId"; // Request ID
+    public static final String NODE_ID_KEY = "nodeId";  // Node ID
+    public static final String OK = "ok"; 
 
-    public ArrayList<NotifyRequestModel> getActions() {
-        return actions;
+    public NotifyResponseJSON(int ok, Long requestId, Long nodeId) throws JSONException {
+	super();
+	this.put(OK, ok);
+	this.put(REQUEST_ID_KEY, requestId);
+	this.putOpt(NODE_ID_KEY, nodeId);
     }
 
-    /** Default Constructor */
-    public PollResponseModel() {
-    }
-
-    /**
-     * Adds NotifyRequest to PollResponse
-     * 
-     * @param concept
-     */
-    public void addNotifyRequest(NotifyRequestModel notifyRequestModel) {
-	actions.add(notifyRequestModel);
-    }
 }

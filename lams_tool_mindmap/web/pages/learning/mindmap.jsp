@@ -1,63 +1,37 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
-<script type="text/javascript" src="includes/javascript/jquery.timer.js"></script>
-<script type="text/javascript" src="includes/javascript/mindmap.resize.js"></script>
+<link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link>
+<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
+
+<script src="${lams}includes/javascript/jquery.timer.js"></script>
+<script src="${tool}includes/javascript/mapjs/main.js"></script>
+<script src="${tool}includes/javascript/mapjs/underscore-min.js"></script>
 
 <script type="text/javascript">
-	var mode = "${mode}";
 
-	function disableFinishButton() {
-		document.getElementById("finishButton").disabled = true;
+	var mode = "${mode}";		// learner, teacher, ...
+	
+	function disableButtons() {
+		$("#finishButton").attr("disabled", true);
+		// show the waiting area during the upload
+		$("#spinnerArea_Busy").show();
+	}
+
+	function enableButtons() {
+		$("#spinnerArea_Busy").hide();
+		$("#finishButton").removeAttr("disabled");
 	}
 
 	function submitForm() {
-		var hasFlash = ((typeof navigator.plugins != "undefined" && typeof navigator.plugins["Shockwave Flash"] == "object") || (window.ActiveXObject && (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) != false));
-		if(hasFlash == true){
-			// Sets mindmap content in Flash
-			setMindmapContent();
-			}
+		var mindmapContent = document.getElementById("mindmapContent");
+		mindmapContent.value = JSON.stringify(contentAggregate);
  	 	var f = document.getElementById('submitForm');
  		f.submit();
 	}
+	
+	</script>
 
-	var multiMode = ${multiMode};
-	// saving Mindmap every one minute 
-	$.timer(60000, function (timer) {
-		if (!multiMode)
-			$.post("${get}", { dispatch: "${dispatch}", mindmapId: "${mindmapId}", userId: "${userId}", 
-				sessionId: "${sessionId}", content: document['flashContent'].getMindmap() } );
-	});
-
-	function validateForm() {
-		// Validates that there's input from the user. 
-		// disables the Finish button to avoid double submittion 
-		disableFinishButton();
-	}
-	
-	<c:set var="MindmapUser">
-		<c:out value="${currentMindmapUser}" escapeXml="true"/>
-	</c:set>
-	
-	flashvars = { xml: "${mindmapContentPath}", user: "${MindmapUser}", 
-				  pollServer: "${pollServerParam}", notifyServer: "${notifyServerParam}",
-				  dictionary: "${localizationPath}" }
-	
-	function setMindmapContent() {
-		var mindmapContent = document.getElementById("mindmapContent");
-		mindmapContent.value = document['flashContent'].getMindmap();
-	}
-	
-	function embedFlashObject(x, y)	{
-		swfobject.embedSWF("${mindmapType}", "flashContent", x, y, "9.0.0", false, flashvars);
-	}
-
-	$(window).resize(makeNice);
-	
-	embedFlashObject(540, 405);
-</script>
-
-<html:form action="/learning" method="post" onsubmit="return validateForm();" styleId="submitForm">
+<html:form action="/learning" method="post" onsubmit="return false;" styleId="submitForm">
 	<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<html:hidden property="userId" value="${userIdParam}" />
 	<html:hidden property="toolContentId" value="${toolContentIdParam}" />
@@ -104,16 +78,10 @@
 			</c:otherwise>
 		</c:choose>
 		
-		<%--MindMap Flash-----------------------------------%>
-
-		<center id="center12">
-			<div id="flashContent">
-				<lams:Alert type="warn" close="false">
-					<fmt:message key="message.enableFlash" />
-				</lams:Alert>
-			</div>
-		</center>
-
+		<%--MindMup -----------------------------------%>
+		<%@ include file="/common/mapjs.jsp"%>
+ 		<%-- End MindMup -----------------------------------%>
+ 		
 		<div class="voffset10 pull-right">
 			<c:choose>
 				<c:when test="${isMonitor}">

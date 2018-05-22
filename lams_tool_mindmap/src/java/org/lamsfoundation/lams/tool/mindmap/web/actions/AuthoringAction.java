@@ -31,13 +31,15 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.mindmap.dto.RootJSON;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
@@ -47,8 +49,6 @@ import org.lamsfoundation.lams.tool.mindmap.util.MindmapConstants;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
 import org.lamsfoundation.lams.tool.mindmap.web.forms.AuthoringForm;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -104,11 +104,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	    String childNodeName1 = mindmapService.getMindmapMessageService().getMessage("node.child1.defaultName");
 	    String childNodeName2 = mindmapService.getMindmapMessageService().getMessage("node.child2.defaultName");
 
-	    MindmapNode rootMindmapNode = mindmapService.saveMindmapNode(null, null, 1l, rootNodeName, "ffffff", null,
+	    MindmapNode rootMindmapNode = mindmapService.saveMindmapNode(null, null, 1l, rootNodeName, "#ffffff", null,
 		    mindmap, null);
 	    mindmapService.saveOrUpdateMindmapNode(rootMindmapNode);
-	    mindmapService.saveMindmapNode(null, rootMindmapNode, 2l, childNodeName1, "ffffff", null, mindmap, null);
-	    mindmapService.saveMindmapNode(null, rootMindmapNode, 3l, childNodeName2, "ffffff", null, mindmap, null);
+	    mindmapService.saveMindmapNode(null, rootMindmapNode, 2l, childNodeName1, "#ffffff", null, mindmap, null);
+	    mindmapService.saveMindmapNode(null, rootMindmapNode, 3l, childNodeName2, "#ffffff", null, mindmap, null);
 	}
 
 	if (mode.isTeacher()) {
@@ -122,21 +122,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 
 	/* Mindmap Attributes */
-
-	String mindmapContentPath = Configuration.get(ConfigurationKeys.SERVER_URL)
-		+ "tool/lamind10/authoring.do?dispatch=setMindmapContent%26mindmapId=" + mindmap.getUid();
-	request.setAttribute("mindmapContentPath", mindmapContentPath);
-
-	String localizationPath = Configuration.get(ConfigurationKeys.SERVER_URL)
-		+ "tool/lamind10/authoring.do?dispatch=setLocale";
-	request.setAttribute("localizationPath", localizationPath);
-
-	String currentMindmapUser = mindmapService.getMindmapMessageService().getMessage("node.instructor.label");
-	request.setAttribute("currentMindmapUser", currentMindmapUser);
-
-	String mindmapType = "images/mindmap_singleuser.swf";
-	request.setAttribute("mindmapType", mindmapType);
-
+	request.setAttribute("mindmapId", mindmap.getUid());
+	
 	// Set up the authForm.
 	AuthoringForm authForm = (AuthoringForm) form;
 	updateAuthForm(authForm, mindmap);
@@ -155,18 +142,16 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Returns the serialized XML of the Mindmap Nodes from Database
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return null
      */
-    public ActionForward setMindmapContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public ActionForward setMindmapContentJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+
+	// set up mindmapService
+	if (mindmapService == null) {
+	    mindmapService = MindmapServiceProxy.getMindmapService(this.getServlet().getServletContext());
+	}
 
 	Long mindmapId = WebUtil.readLongParam(request, "mindmapId", false);
-
 	List mindmapNodeList = mindmapService.getAuthorRootNodeByMindmapId(mindmapId);
 
 	if (mindmapNodeList != null && mindmapNodeList.size() > 0) {
@@ -177,40 +162,14 @@ public class AuthoringAction extends LamsDispatchAction {
 	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(),
 		    rootMindmapNode.getText(), rootMindmapNode.getColor(), rootMindmapUser, 1));
 	    NodeModel currentNodeModel = mindmapService.getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(),
-		    mindmapId, rootNodeModel, null);
+		    mindmapId, rootNodeModel, null, false, true, false);
 
-	    String mindmapContent = mindmapService.getXStream().toXML(currentNodeModel);
+	    JSONObject jsonObject = new JSONObject();
+	    jsonObject.put("mindmap", new RootJSON(currentNodeModel));
 
-	    try {
-		response.setContentType("text/xml");
-		response.setCharacterEncoding("utf-8");
-		response.getWriter().write(mindmapContent);
-	    } catch (IOException e) {
-		e.printStackTrace();
-	    }
-	}
-
-	return null;
-    }
-
-    /**
-     * Returns the serialized XML of the Mindmap Nodes from Database
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return null
-     */
-    public ActionForward setLocale(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	try {
-	    response.setContentType("text/xml");
-	    response.setCharacterEncoding("utf-8");
-	    response.getWriter().write(mindmapService.getLanguageXML());
-	} catch (IOException e) {
-	    e.printStackTrace();
+	    response.setContentType("application/x-json;charset=utf-8");
+	    response.getWriter().print(jsonObject.toString());
+	    return null;
 	}
 
 	return null;
@@ -218,15 +177,9 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Saves Mindmap Nodes to Database
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return null
      */
     public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws JSONException {
 	// get authForm and session map.
 	AuthoringForm authForm = (AuthoringForm) form;
 	SessionMap<String, Object> map = getSessionMap(request, authForm);
@@ -253,13 +206,20 @@ public class AuthoringAction extends LamsDispatchAction {
 	request.setAttribute(MindmapConstants.ATTR_SESSION_MAP, map);
 
 	/* Saving Minmdap Nodes */
-
-	// getting xml data from SWF
-	String mindmapContent = authForm.getMindmapContent();
 	MindmapUser mindmapUser = mindmapService.getUserByUID(mindmap.getCreateBy());
+	String mindmapContent = authForm.getMindmapContent();
 
-	// Saving Mindmap data to XML
-	NodeModel rootNodeModel = (NodeModel) mindmapService.getXStream().fromXML(mindmapContent);
+	NodeModel rootNodeModel = RootJSON.toNodeModel(mindmapContent);
+	if ( rootNodeModel == null ) {
+	    String error = new StringBuilder("Unable to save mindmap for authoring. User:")
+		    .append(mindmapUser.getLoginName())
+		    .append("("+mindmapUser.getUserId())
+		    .append("). No root node. JSON: ")
+		    .append(mindmapContent)
+		    .toString();
+	    throw new JSONException(error);
+	}
+
 	NodeConceptModel nodeConceptModel = rootNodeModel.getConcept();
 	List<NodeModel> branches = rootNodeModel.getBranch();
 
