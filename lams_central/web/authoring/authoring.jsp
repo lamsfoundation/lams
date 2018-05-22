@@ -458,7 +458,7 @@
 			</td>
 			<td id="canvasContainerCell">
 				<div id="ldDescriptionDiv">
-					<div id="ldDescriptionTitleContainer" title="Click to show the sequence description"
+					<div id="ldDescriptionTitleContainer" title='<fmt:message key="authoring.fla.page.ld.title.desc" /> '
 						 onClick="javascript:MenuLib.toggleDescriptionDiv()">
 						<span id="ldDescriptionFieldTitle"><fmt:message key="authoring.fla.page.ld.title" /></span>
 						<span id="ldDescriptionFieldModified"></span>
