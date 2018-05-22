@@ -77,11 +77,12 @@ ActivityDefs = {
 	/**
 	 * Represents a set of branches. It is not displayed on canvas, but holds all the vital data.
 	 */
-	BranchingActivity : function(id, uiid, branchingEdgeStart, readOnly) {
+	BranchingActivity : function(id, uiid, branchingEdgeStart, readOnly, orderedAsc) {
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.start = branchingEdgeStart;
 		this.readOnly = readOnly;
+		this.orderedAsc = orderedAsc;
 		this.branches = [];
 		// mapping between groups and branches, if applicable
 		this.groupsToBranches = [];

@@ -997,7 +997,7 @@ public class LearnerService implements ICoreLearnerService {
 	    // Cache the tool output so that we aren't calling it over an over again.
 	    Map<String, ToolOutput> toolOutputMap = new HashMap<String, ToolOutput>();
 	    Iterator<BranchCondition> conditionIterator = conditionsMap.keySet().iterator();
-	    Boolean isOrderedAsc = false;
+	    Boolean isOrderedAsc = branchingActivity.getBranchingOrderedAsc();
 	    // map of order chosen by learner -> condition with question and answer uid encoded
 	    Map<Long, BranchCondition> conditionOrder = isOrderedAsc == null ? null
 		    : isOrderedAsc ? new TreeMap<>() : new TreeMap<>(Collections.reverseOrder());
@@ -1017,7 +1017,7 @@ public class LearnerService implements ICoreLearnerService {
 		}
 		if (toolOutput != null) {
 		    if (isOrderedAsc != null) {
-			// put this option's order ID chosen by the learner 
+			// put this option's order ID chosen by the learner
 			conditionOrder.put(toolOutput.getValue().getLong(), condition);
 		    } else if (condition.isMet(toolOutput)) {
 			matchedBranch = conditionsMap.get(condition);

@@ -344,6 +344,11 @@ div.branchMappingDialog td.branchMappingListCell div {
 	cursor: pointer;
 }
 
+div.branchMappingDialog #branchMappingOrderedRow td {
+	text-align: left;
+	padding-top: 5px;
+}
+
 div#outputConditionsDialogContents div#complexConditions > div {
 	font-weight: bold;
 	margin: 10px 0 0 2px;

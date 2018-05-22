@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /**
@@ -82,12 +83,14 @@ public class BranchingActivityStrategy extends ComplexActivityStrategy {
      */
     @Override
     public boolean areChildrenCompleted(LearnerProgress learnerProgress) {
-	ComplexActivity complexActivity = getComplexActivity();
+	BranchingActivity branchingActivity = (BranchingActivity) getComplexActivity();
 	boolean isPreview = learnerProgress.getLesson().isPreviewLesson();
-	Boolean isOrderedAsc = false;
+	Boolean isOrderedAsc = branchingActivity.isToolBranchingActivity()
+		? ((ToolBranchingActivity) branchingActivity).getBranchingOrderedAsc()
+		: null;
 
-	if (complexActivity != null && complexActivity.getActivities().size() > 0) {
-	    for (Iterator i = complexActivity.getActivities().iterator(); i.hasNext();) {
+	if (branchingActivity != null && branchingActivity.getActivities().size() > 0) {
+	    for (Iterator i = branchingActivity.getActivities().iterator(); i.hasNext();) {
 		// we need the real activity, not proxy
 		SequenceActivity sequenceActivity = (SequenceActivity) activityDAO
 			.getActivityByActivityId(((Activity) i.next()).getActivityId());

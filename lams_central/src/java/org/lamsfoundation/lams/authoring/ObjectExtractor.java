@@ -69,6 +69,7 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.learningdesign.SystemGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IBranchActivityEntryDAO;
@@ -1151,6 +1152,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    branchingActivity.setSystemTool(getSystemTool(SystemTool.GROUP_BASED_BRANCHING));
 	} else if (branchingActivity.isToolBranchingActivity()) {
 	    branchingActivity.setSystemTool(getSystemTool(SystemTool.TOOL_BASED_BRANCHING));
+	    ((ToolBranchingActivity) branchingActivity).setBranchingOrderedAsc(
+		    (Boolean) JsonUtil.opt(activityDetails, AuthoringJsonTags.BRANCHING_ORDERED_ASC));
 	}
 
 	branchingActivity.setStartXcoord(getCoord(activityDetails, AuthoringJsonTags.START_XCOORD));

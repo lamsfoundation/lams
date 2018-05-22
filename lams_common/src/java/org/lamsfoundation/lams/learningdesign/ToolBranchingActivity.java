@@ -35,13 +35,13 @@ import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * @author Mitchell Seaton
- * @version 2.1
- *
  *
  */
 public class ToolBranchingActivity extends BranchingActivity implements Serializable {
 
     private static final long serialVersionUID = 8343443197068061495L;
+
+    private Boolean branchingOrderedAsc;
 
     /** full constructor */
     public ToolBranchingActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
@@ -49,12 +49,13 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
 	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
 	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
 	    String languageFile, Integer startXcoord, Integer startYcoord, Integer endXcoord, Integer endYcoord,
-	    Boolean stopAfterActivity, Set inputActivities, Set activities, Activity defaultActivity,
-	    SystemTool systemTool, Set branchActivityEntries) {
+	    Boolean stopAfterActivity, Boolean branchingOrderedAsc, Set inputActivities, Set activities,
+	    Activity defaultActivity, SystemTool systemTool, Set branchActivityEntries) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
 		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
 		transitionFrom, languageFile, startXcoord, startYcoord, endXcoord, endYcoord, stopAfterActivity,
 		inputActivities, activities, defaultActivity, systemTool, branchActivityEntries);
+	this.branchingOrderedAsc = branchingOrderedAsc;
     }
 
     /** default constructor */
@@ -83,6 +84,7 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
 
 	ToolBranchingActivity newBranchingActivity = new ToolBranchingActivity();
 	copyBranchingFields(newBranchingActivity);
+	newBranchingActivity.branchingOrderedAsc = this.branchingOrderedAsc;
 	copyToNewComplexActivity(newBranchingActivity, uiidOffset);
 
 	// Any grouping attached to a teacher chosen branching was either a runtime grouping
@@ -165,6 +167,14 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
 	}
 
 	return listOfValidationErrors;
+    }
+
+    public Boolean getBranchingOrderedAsc() {
+	return branchingOrderedAsc;
+    }
+
+    public void setBranchingOrderedAsc(Boolean branchingOrderedAsc) {
+	this.branchingOrderedAsc = branchingOrderedAsc;
     }
 
 }

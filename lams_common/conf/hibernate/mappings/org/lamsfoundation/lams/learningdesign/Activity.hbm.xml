@@ -365,6 +365,7 @@
 				</subclass>
 				<subclass name="org.lamsfoundation.lams.learningdesign.ToolBranchingActivity" discriminator-value="12">
 					<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+					<property name="branchingOrderedAsc" type="java.lang.Boolean" column="branching_ordered_asc" length="1"/>
 				</subclass>
 			</subclass>
 			
