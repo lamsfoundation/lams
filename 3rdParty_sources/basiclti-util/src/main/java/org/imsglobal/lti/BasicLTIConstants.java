@@ -410,6 +410,11 @@ public class BasicLTIConstants {
 	 * This parameter is optional and is unique to the Sakai Basic LTI provider.
 	 */
 	public static final String EXT_SAKAI_PROVIDER_DISPLAYID = "ext_sakai_provider_displayid";
+	
+	//**LAMS** added the next 3 lines
+	public static final String CONTENT_ITEMS = "content_items";
+	public static final String LTI_MESSAGE = "lti_msg";
+	public static final String LTI_ERROR_MESSAGE = "lti_errormsg";
 
 	/**
 	 * Utility array useful for validating property names when building launch
@@ -432,7 +437,7 @@ public class BasicLTIConstants {
 		TC_PROFILE_URL,
 		TOOL_CONSUMER_INSTANCE_CONTACT_EMAIL, TOOL_CONSUMER_INSTANCE_DESCRIPTION,
 		TOOL_CONSUMER_INSTANCE_GUID, TOOL_CONSUMER_INSTANCE_NAME,
-		TOOL_CONSUMER_INSTANCE_URL, USER_ID, USER_IMAGE };
+		TOOL_CONSUMER_INSTANCE_URL, USER_ID, USER_IMAGE, CONTENT_ITEMS, LTI_MESSAGE, LTI_ERROR_MESSAGE }; //**LAMS** added CONTENT_ITEMS, LTI_MESSAGE, LTI_ERROR_MESSAGE constants
 
 	/**
 	 * The default site type to use if a site needs to be created. Can be overriden in sakai.properties or as part of the launch.
