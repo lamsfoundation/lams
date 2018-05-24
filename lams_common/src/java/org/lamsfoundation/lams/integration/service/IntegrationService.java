@@ -861,7 +861,8 @@ public class IntegrationService implements IIntegrationService {
 	return (list == null || list.isEmpty()) ? null : list.get(0);
     }
 
-    private ExtServerLessonMap getExtServerLessonMap(Long lessonId) {
+    @Override
+    public ExtServerLessonMap getExtServerLessonMap(Long lessonId) {
 	List list = service.findByProperty(ExtServerLessonMap.class, "lessonId", lessonId);
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
