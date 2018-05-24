@@ -205,6 +205,11 @@
         <input type="hidden" name="context_id" value="${context_id}">
     	<input type="hidden" name="ldId" id="ldId" value="0">
     	
+    	<%-- ContentItemSelectionRequest items --%>
+    	<input type="hidden" name="lti_message_type" value="${lti_message_type}">
+    	<input type="hidden" name="content_item_return_url" value="${content_item_return_url}">
+    	<input type="hidden" name="data" value="${data}">
+    	
     	<table class="table  table-no-border">
 			<tr>
 				<td>
