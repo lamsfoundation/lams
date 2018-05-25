@@ -129,7 +129,7 @@ public class RatingServlet extends HttpServlet {
 
 		    NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
 		    numberFormat.setMaximumFractionDigits(1);
-		    JSONObject.put("userRating", numberFormat.format(rating));
+		    JSONObject.put("userRating", averageRatingDTO.getUserRating());
 		    JSONObject.put("averageRating", averageRatingDTO.getAverageRating());
 		    JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
 		}
