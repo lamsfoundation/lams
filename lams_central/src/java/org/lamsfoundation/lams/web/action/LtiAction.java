@@ -301,7 +301,7 @@ public class LtiAction extends LamsDispatchAction {
 	    properties.put("data", opaqueTCData);
 	}
 	
-	properties.put("lti_msg", "kkkkk lti_msg");
+	properties.put("lti_msg", "Information about LAMS lesson has been imported successfully.");
 	properties.put(OAuth.OAUTH_VERSION, OAuth.VERSION_1_0);
 	properties.put("oauth_callback", "about:blank");
 	properties.put(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.HMAC_SHA1);
