@@ -1,13 +1,13 @@
 @import "_lams_variables.scss";
 
 #mindmap-controls {
-	height: 50px;
+	height: auto;
 	padding: 5px;
 }
 
 #mindmap-container {
 	background-color: $body-bg;
-	height: calc(100vh - 300px);
+	height: calc(100vh - 400px);
 	width: 100%;
 	border: $border-thin-solid;
 }	

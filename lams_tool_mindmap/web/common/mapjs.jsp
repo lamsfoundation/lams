@@ -1,3 +1,13 @@
+<%-- LAMS code which wraps up the mapjs code into something usable on a page. All pages that want the mindmap should include this file. --%>
+<%-- They also need to include the following files:  --%>
+<%-- <link rel="stylesheet" type="text/css" href="${lams}css/jquery.minicolors.css"></link> --%>
+<%-- <link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link> --%>
+<%-- <link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link> --%>
+<%-- <script src="${lams}includes/javascript/jquery.minicolors.min.js"></script> --%>
+<%-- <script src="${tool}includes/javascript/jquery.timer.js"></script> --%>
+<%-- <script src="${tool}includes/javascript/mapjs/main.js"></script> --%>
+<%-- <script src="${tool}includes/javascript/mapjs/underscore-min.js"></script> --%>
+
 <script type="text/javascript">
 
 	var lastActionId = null, 	// multiuser request tracking
@@ -298,7 +308,7 @@
 </c:when>
 <c:otherwise>
 	
-	<c:if test="${contentEditable and not (mode == 'author')}">
+	<c:if test="${contentEditable and (mode == 'learner' || mode == 'author')}">
 
 		var savingNow = false;
 	
@@ -349,7 +359,7 @@
 	
 </script>	
 
-	<c:if test="${contentEditable and not (mode == 'author')}">
+	<c:if test="${contentEditable and (mode == 'learner' || mode == 'author')}">
 		<div>
 		<c:if test="${not multiMode}">
 			<div class="hint"><fmt:message key="label.your.mindmap.saved.every.minute"/><lams:WaitingSpinner id="spinnerArea_Busy" showInline="true"/></div>
@@ -357,29 +367,31 @@
 		</div>
 	</c:if>	
 
-	<!-- Color picker must be outside the div or it can't float on top of the mindmap. The float is done in javascript. -->
-	<input type="text" id="background-color" class='updateStyle form-control' data-mm-target-property='background' size="7" width="180px"></input>
- <!-- <input type="text" id="background-color" class='form-control' size="7" width="180px"></input>
- -->	
 	<div id="mindmap-controls">
-		<div class="btn-group btn-group-sm" role="group">
-		<a href="#" class="resetView btn btn-default btn-sm"><fmt:message key='label.zoom'/>:</a>
-		<a href="#" class="resetView btn btn-default btn-sm"><fmt:message key='label.zoom.reset'/></a>
-		<a href="#" class="scaleUp btn btn-default btn-sm" title="<fmt:message key='label.zoom.increase'/>"><i class="fa fa-lg fa-search-plus"></i></a>
-		<a href="#" class="scaleDown btn btn-default btn-sm" title="<fmt:message key='label.zoom.decrease'/>"><i class="fa fa-lg fa-search-minus"></i></a>
-		</div>
-		<div style="display:inline-block" role="group">
-	 	<a href="#" class="toggleCollapse btn btn-default btn-sm" title="<fmt:message key='label.expand.collapse.idea'/>"><i class="fa fa-lg fa-navicon"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.expand.collapse.idea'/></span></a>
-	<c:if test="${contentEditable}">
-		<a href="#" class="addSubIdea btn btn-default btn-sm" title="<fmt:message key='label.add.idea'/>"><i class="fa fa-lg fa-plus-square-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.add.idea'/></span></a>
-		<a href="#" class="editNode btn btn-default btn-sm" title="<fmt:message key='label.edit.idea.text'/>"><i class="fa fa-lg fa-pencil-square-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.edit.idea.text'/></span></a>		
-		<a href="#" class="removeSubIdea btn btn-default btn-sm" title="<fmt:message key='label.delete.idea'/>"><i class="fa fa-lg fa-trash-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.delete.idea'/></span></a>
-<!--   		(hide: <input type="text" class='updateStyle' data-mm-target-property='background'></input> )
- --> <%-- Not yet implemented in back end  --%> 
-<%-- 		<input type="button" data-mm-action="export-image" value="Export To Image"/>  --%> 
-<%--  		<input type="button" class="insertRoot" value="add root node"></input>  --%> 
-<%-- 		<input type="button" class="makeSelectedNodeRoot" value="make root"></input>  --%> 
- 	</c:if>
+	
+		<!-- Color picker must be outside the next div or it can't float on top of the mindmap. The float is done in javascript. -->
+		<input type="text" id="background-color" class='updateStyle form-control input-sm' data-mm-target-property='background' size="7" width="180px"></input>
+ 
+		<div>
+			<div class="btn-group btn-group-sm" role="group">
+			<a href="#" class="resetView btn btn-default btn-sm"><fmt:message key='label.zoom'/>:</a>
+			<a href="#" class="resetView btn btn-default btn-sm"><fmt:message key='label.zoom.reset'/></a>
+			<a href="#" class="scaleUp btn btn-default btn-sm" title="<fmt:message key='label.zoom.increase'/>"><i class="fa fa-lg fa-search-plus"></i></a>
+			<a href="#" class="scaleDown btn btn-default btn-sm" title="<fmt:message key='label.zoom.decrease'/>"><i class="fa fa-lg fa-search-minus"></i></a>
+			</div>
+			
+			<div style="display:inline-block" role="group">
+		 	<a href="#" class="toggleCollapse btn btn-default btn-sm" title="<fmt:message key='label.expand.collapse.idea'/>"><i class="fa fa-lg fa-navicon"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.expand.collapse.idea'/></span></a>
+		<c:if test="${contentEditable}">
+			<a href="#" class="addSubIdea btn btn-default btn-sm" title="<fmt:message key='label.add.idea'/>"><i class="fa fa-lg fa-plus-square-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.add.idea'/></span></a>
+			<a href="#" class="editNode btn btn-default btn-sm" title="<fmt:message key='label.edit.idea.text'/>"><i class="fa fa-lg fa-pencil-square-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.edit.idea.text'/></span></a>		
+			<a href="#" class="removeSubIdea btn btn-default btn-sm" title="<fmt:message key='label.delete.idea'/>"><i class="fa fa-lg fa-trash-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.delete.idea'/></span></a>
+	<%-- Not yet implemented in back end  --%> 
+	<%-- 		<input type="button" data-mm-action="export-image" value="Export To Image"/>  --%> 
+	<%--  		<input type="button" class="insertRoot" value="add root node"></input>  --%> 
+	<%-- 		<input type="button" class="makeSelectedNodeRoot" value="make root"></input>  --%> 
+	 	</c:if>
+	 		</div>
  		</div>
 	</div>
 
