@@ -66,7 +66,6 @@ import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NotifyRequestModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NotifyResponseModel;
-import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.PollResponseModel;
 import org.lamsfoundation.lams.tool.mindmap.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
@@ -722,108 +721,6 @@ public class LearningAction extends LamsDispatchAction {
 	try {
 	    response.setContentType("application/x-json;charset=utf-8");
 	    response.getWriter().write(pollResponseModel.toString());
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-
-	return null;
-    }
-
-    /**
-     * Returns lists of Poll Requests (Actions) on Mindmap Nodes made by other learners
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return null
-     */
-    public ActionForward pollServerAction(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	Long mindmapId = WebUtil.readLongParam(request, "mindmapId", false);
-	Long userId = WebUtil.readLongParam(request, "userId", false);
-	Long toolSessionId = WebUtil.readLongParam(request, "sessionId", false);
-	Long lastActionId = WebUtil.readLongParam(request, "lastActionID", false);
-
-	PollResponseModel pollResponseModel = new PollResponseModel();
-
-	List requestsList = mindmapService.getLastRequestsAfterGlobalId(lastActionId, mindmapId, userId, toolSessionId);
-	for (Iterator iterator = requestsList.iterator(); iterator.hasNext();) {
-	    MindmapRequest mindmapRequest = (MindmapRequest) iterator.next();
-	    int requestType = mindmapRequest.getType();
-
-	    NotifyRequestModel notifyRequestModel = null;
-	    NodeConceptModel nodeConceptModel = null;
-
-	    MindmapNode rootMindmapNode = null;
-	    if ((requestType != 0) && (requestType != 1)) {
-		//List nodesList = mindmapService.getMindmapNodeByUniqueId(mindmapRequest.getNodeId(), mindmapId);
-		List nodesList = mindmapService.getMindmapNodeByUniqueIdSessionId(mindmapRequest.getNodeId(), mindmapId,
-			toolSessionId);
-
-		if ((nodesList != null) && (nodesList.size() > 0)) {
-		    rootMindmapNode = (MindmapNode) nodesList.get(0);
-		} else {
-		    LearningAction.log.error("pollServerAction(): Error finding node while changing text or color!");
-		}
-	    }
-
-	    MindmapNode mindmapNode = null;
-	    if (requestType == 1) {
-		//List nodesList = mindmapService.getMindmapNodeByUniqueId(mindmapRequest.getNodeChildId(), mindmapId);
-		List nodesList = mindmapService.getMindmapNodeByUniqueIdSessionId(mindmapRequest.getNodeChildId(),
-			mindmapId, toolSessionId);
-
-		if ((nodesList != null) && (nodesList.size() > 0)) {
-		    mindmapNode = (MindmapNode) nodesList.get(0);
-		} else {
-		    LearningAction.log.error("pollServerAction(): Error finding node while creating a node!");
-		}
-	    }
-
-	    // delete node
-	    if (requestType == 0) {
-		notifyRequestModel = new NotifyRequestModel(mindmapRequest.getGlobalId(), mindmapRequest.getNodeId(),
-			mindmapRequest.getType(), null, null, null);
-	    }
-	    // create node
-	    else if (requestType == 1) {
-		nodeConceptModel = new NodeConceptModel();
-		nodeConceptModel.setId(mindmapNode.getUniqueId());
-		nodeConceptModel.setText(mindmapNode.getText());
-		nodeConceptModel.setColor(mindmapNode.getColor());
-
-		MindmapUser mindmapUser = mindmapNode.getUser();
-		if (mindmapUser != null) {
-		    nodeConceptModel.setCreator(mindmapUser.getFirstName() + " " + mindmapUser.getLastName());
-		} else {
-		    nodeConceptModel.setCreator("Student");
-		}
-
-		notifyRequestModel = new NotifyRequestModel(mindmapRequest.getGlobalId(), mindmapRequest.getNodeId(),
-			mindmapRequest.getType(), null, null, nodeConceptModel);
-	    }
-	    // change color
-	    else if (requestType == 2) {
-		notifyRequestModel = new NotifyRequestModel(mindmapRequest.getGlobalId(), mindmapRequest.getNodeId(),
-			mindmapRequest.getType(), null, rootMindmapNode.getColor(), null);
-	    }
-	    // change text
-	    else if (requestType == 3) {
-		notifyRequestModel = new NotifyRequestModel(mindmapRequest.getGlobalId(), mindmapRequest.getNodeId(),
-			mindmapRequest.getType(), rootMindmapNode.getText(), null, null);
-	    }
-
-	    pollResponseModel.addNotifyRequest(notifyRequestModel);
-	}
-
-	String pollResponse = mindmapService.getXStream().toXML(pollResponseModel);
-
-	try {
-	    response.setContentType("text/xml");
-	    response.setCharacterEncoding("utf-8");
-	    response.getWriter().write(pollResponse);
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}

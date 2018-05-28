@@ -12715,28 +12715,32 @@ const MAPJS = __webpack_require__(19),
 			imageInsertController = new MAPJS.ImageInsertController('http://localhost:4999?u='),
 			mapModel = new MAPJS.MapModel(MAPJS.DOMRender.layoutCalculator, []);
 
-		jQuery.fn.attachmentEditorWidget = function (mapModel) {
-			return this.each(function () {
-				mapModel.addEventListener('attachmentOpened', function (nodeId, attachment) {
-					mapModel.setAttachment(
-							'attachmentEditorWidget',
-							nodeId, {
-								contentType: 'text/html',
-								content: window.prompt('attachment', attachment && attachment.content)
-							}
-							);
-				});
-			});
-		};
+// LAMS Modification. Disable attachments, otherwise a popup dialog appears when you typed on a locked idea.
+// Re-enable when we support HTML attachments.
+//		jQuery.fn.attachmentEditorWidget = function (mapModel) {
+//			return this.each(function () {
+//				mapModel.addEventListener('attachmentOpened', function (nodeId, attachment) {
+//					mapModel.setAttachment(
+//							'attachmentEditorWidget',
+//							nodeId, {
+//								contentType: 'text/html',
+//								content: window.prompt('attachment', attachment && attachment.content)
+//							}
+//							);
+//				});
+//			});
+//		};
 		window.onerror = window.alert;
 
 
 		jQuery('#themecss').themeCssWidget(themeProvider, new ThemeProcessor(), mapModel);
 		container.domMapWidget(console, mapModel, false, imageInsertController);
 		jQuery('body').mapToolbarWidget(mapModel);
-		jQuery('body').attachmentEditorWidget(mapModel);
-		// mapModel.setIdea(idea);				// LAMS Modification
+		// LAMS Modification. Disable attachments, otherwise a popup dialog appears when you typed on a locked idea.
+		// Re-enable when we support HTML attachments.
+		// jQuery('body').attachmentEditorWidget(mapModel);
 
+		// mapModel.setIdea(idea);				// LAMS Modification
 
 		jQuery('#linkEditWidget').linkEditWidget(mapModel);
 		window.mapModel = mapModel;
@@ -19002,22 +19006,24 @@ jQuery.fn.updateNodeContent = function (nodeContent, resourceTranslator, forcedL
 			}
 			element.text(label).show();
 		},
-		applyAttachment = function () {
-			const attachment = nodeContent.attr && nodeContent.attr.attachment;
-			let element = self.find('a.mapjs-attachment');
-			if (!attachment) {
-				element.hide();
-				return;
-			}
-			if (element.length === 0) {
-				element = jQuery('<a href="#" class="mapjs-attachment icon-attachment"></a>').
-					appendTo(decorations()).click(function () {
-						self.trigger('attachment-click');
-						self.trigger('decoration-click', 'attachment');
-					});
-			}
-			element.show();
-		},
+// LAMS Modification. Disable attachments, otherwise a popup dialog appears when you typed on a locked idea.
+// Re-enable when we support HTML attachments.
+//		applyAttachment = function () {
+//			const attachment = nodeContent.attr && nodeContent.attr.attachment;
+//			let element = self.find('a.mapjs-attachment');
+//			if (!attachment) {
+//				element.hide();
+//				return;
+//			}
+//			if (element.length === 0) {
+//				element = jQuery('<a href="#" class="mapjs-attachment icon-attachment"></a>').
+//					appendTo(decorations()).click(function () {
+//						self.trigger('attachment-click');
+//						self.trigger('decoration-click', 'attachment');
+//					});
+//			}
+//			element.show();
+//		},
 		applyNote = function () {
 			const note = nodeContent.attr && nodeContent.attr.note;
 			let element = self.find('a.mapjs-note');
@@ -19202,7 +19208,9 @@ jQuery.fn.updateNodeContent = function (nodeContent, resourceTranslator, forcedL
 		applyLinkUrl(nodeContent.title);
 		applyLabel(nodeContent.label);
 		applyNote();
-		applyAttachment();
+		// LAMS Modification. Disable attachments, otherwise a popup dialog appears when you typed on a locked idea.
+		// Re-enable when we support HTML attachments.
+		// applyAttachment();
 		this.css({margin: '', width: '', height: ''});
 		if (decorationEdge === 'left') {
 			nodeCacheData.innerRect.dx = decorations().outerWidth();
@@ -19666,9 +19674,11 @@ DOMRender.viewController = function (mapModel, stageElement, touchEnabled, image
 				}
 				mapModel.editNode('mouse');
 			})
-			.on('attachment-click', function () {
-				mapModel.openAttachment('mouse', node.id);
-			})
+// LAMS Modification. Disable attachments, otherwise a popup dialog appears when you typed on a locked idea.
+// Re-enable when we support HTML attachments.
+//			.on('attachment-click', function () {
+//				mapModel.openAttachment('mouse', node.id);
+//			})
 			.on('decoration-click', function (evt, decorationType) {
 				mapModel.decorationAction('mouse', node.id, decorationType);
 			})
@@ -20036,7 +20046,9 @@ $.fn.domMapWidget = function (activityLog, mapModel, touchEnabled, imageInsertCo
 			'=': 'activateSiblingNodes',
 			'.': 'activateSelectedNode',
 			'/': 'toggleCollapse',
-			'a': 'openAttachment',
+			// LAMS Modification. Disable attachments, otherwise a popup dialog appears when you typed on a locked idea.
+			// Re-enable when we support HTML attachments.
+			// 'a': 'openAttachment',
 			'i': 'editIcon'
 		},
 		self = this;
@@ -21012,23 +21024,25 @@ module.exports = function MapModel(layoutCalculatorArg, selectAllTitles, clipboa
 		analytic('decorationAction', source);
 		self.dispatchEvent('decorationActionRequested', nodeId, decorationType);
 	};
-	this.openAttachment = function (source, nodeId) {
-		analytic('openAttachment', source);
-		nodeId = nodeId || currentlySelectedIdeaId;
-		const node = layoutModel.getNode(nodeId),
-			attachment = node && node.attr && node.attr.attachment;
-		if (node) {
-			self.dispatchEvent('attachmentOpened', nodeId, attachment);
-		}
-	};
-	this.setAttachment = function (source, nodeId, attachment) {
-		const hasAttachment = !!(attachment && attachment.content);
-		if (!isEditingEnabled) {
-			return false;
-		}
-		analytic('setAttachment', source);
-		idea.updateAttr(nodeId, 'attachment', hasAttachment && attachment);
-	};
+// LAMS Modification. Disable attachments, otherwise a popup dialog appears when you typed on a locked idea.
+// Re-enable when we support HTML attachments.
+//	this.openAttachment = function (source, nodeId) {
+//		analytic('openAttachment', source);
+//		nodeId = nodeId || currentlySelectedIdeaId;
+//		const node = layoutModel.getNode(nodeId),
+//			attachment = node && node.attr && node.attr.attachment;
+//		if (node) {
+//			self.dispatchEvent('attachmentOpened', nodeId, attachment);
+//		}
+//	};
+//	this.setAttachment = function (source, nodeId, attachment) {
+//		const hasAttachment = !!(attachment && attachment.content);
+//		if (!isEditingEnabled) {
+//			return false;
+//		}
+//		analytic('setAttachment', source);
+//		idea.updateAttr(nodeId, 'attachment', hasAttachment && attachment);
+//	};
 	this.toggleLink = function (source, nodeIdTo) {
 		const exists = _.find(idea.links, function (link) {
 			return (String(link.ideaIdFrom) === String(nodeIdTo) && String(link.ideaIdTo) === String(currentlySelectedIdeaId)) || (String(link.ideaIdTo) === String(nodeIdTo) && String(link.ideaIdFrom) === String(currentlySelectedIdeaId));
@@ -21843,12 +21857,23 @@ jQuery.fn.mapToolbarWidget = function (mapModel) {
 	return this.each(function () {
 		const element = jQuery(this);
 		let preventRoundtrip = false;
-		mapModel.addEventListener('nodeSelectionChanged', function () {
+		mapModel.addEventListener('nodeSelectionChanged', function (ideaId, isSelected) {
 			preventRoundtrip = true;
 			element.find('.updateStyle[data-mm-target-property]').val(function () {
 				return mapModel.getSelectedStyle(jQuery(this).data('mm-target-property'));
 			}).change();
 			preventRoundtrip = false;
+			// LAMS Modification - next 9 lines. Calls a LAMS methods to manage buttons and the color picker.
+			if ( isSelected ) {
+				updateColorPicker();
+				var attr = mapModel.findIdeaById(ideaId).attr;
+				if ( attr && attr.contentLocked ) {
+					disableEditButtons();
+				} else {
+					enableEditButtons();
+				}
+			}
+			// End LAMS Modification
 		});
 		mapModel.addEventListener('addLinkModeToggled', function () {
 			element.find('.toggleAddLinkMode').toggleClass('active');

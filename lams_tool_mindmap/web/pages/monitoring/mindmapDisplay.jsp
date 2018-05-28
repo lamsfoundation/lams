@@ -1,12 +1,13 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>css/jquery.minicolors.css"></link>
 <link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link>
 <link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
 
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="${tool}includes/javascript/mapjs/main.js"></script>
-<script type="text/javascript" src="${tool}includes/javascript/mapjs/underscore-min.js"></script>
-
+<script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+<script src="<lams:LAMSURL/>includes/javascript/jquery.minicolors.min.js"></script>
+<script src="${tool}includes/javascript/mapjs/main.js"></script>
+<script src="${tool}includes/javascript/mapjs/underscore-min.js"></script>
 
 <c:choose>
 <c:when test="${isMultiUserMode}">

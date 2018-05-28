@@ -43,8 +43,41 @@
 				alert('<fmt:message key="error.unable.to.load.mindmap"/>')
 			}
 		});
+		
+		// color picker
+   		$('#background-color').minicolors({
+			control: 'wheel',
+			theme: 'bootstrap',
+			swatches: ['#ff0000', '#ffff00', '#0000ff', '#008000', '#00ff00', '#800080', '#ff00ff', '#00ffff', '#87ceeb', '#ffd700', '#ffa500', '#ffffff', '#9e9e9e', '#000000'],
+  			change: function(value, opacity) {
+			    window.mapModel['updateStyle']('toolbar', 'background', value);
+			}
+ 			<c:if test="${multiMode}">
+			, changeDelay: 1500  			// Wait a bit before updating node sending to server.
+			</c:if>
+		});
+		$('.minicolors').css('float','right');
+		$('#background-color').minicolors({
+		});
+
 	}
 	
+	// Greys out the buttons to discourage people from using them. The mindmap javascript code won't let them update the values.
+	function disableEditButtons() {
+		$(".editNode").attr("disabled", true);
+		$(".removeSubIdea").attr("disabled", true);
+		$(".updateStyle").attr("disabled", true);		
+	}
+
+	function enableEditButtons() {
+		$(".editNode").attr("disabled", false);
+		$(".removeSubIdea").attr("disabled", false);
+		$(".updateStyle").attr("disabled", false);		
+	}
+
+	function updateColorPicker() {
+	    swatch = $('.minicolors').find('.minicolors-input-swatch').find('span').css("backgroundColor",$('#background-color').val());
+	}
 <c:choose> 
 <c:when test="${multiMode}">
 
@@ -60,7 +93,7 @@
 		}
 	 
 		function onIdeaChangedLAMS(action, args, sessionId) {
-			console.log("onIdeaChangedLAMS: action "+action+" args "+args);
+			// console.log("onIdeaChangedLAMS: action "+action+" args "+args);
 			var ideaToUpdate = null,
 				updateRequest = null;
 			
@@ -211,17 +244,21 @@
 					        		} else if ( action.type == 1 ) {
 	 								updateUnsavedNodeIds(action.childNodeId);
 					        			// add node response.nodeId, response.title, response.color
+					        			debugger;
 	 								contentAggregate.addSubIdea(action.nodeId, action.title, action.childNodeId);
+					        			var newChildNode = contentAggregate.findSubIdeaById(action.childNodeId);
+	 								newChildNode.attr = {};
+	 								newChildNode.attr.contentLocked = true;
 					        			if ( action.color ) {
-						        			var newChildNode = contentAggregate.findSubIdeaById(action.childNodeId);
-						        			newChildNode = action.color;
+		 								newChildNode.attr.style = {};
+						        			newChildNode.attr.style.background = action.color;
 					        			}
 					        		} else if ( action.type == 2 ) {
 					        			var ideaToUpdate = contentAggregate.findSubIdeaById(action.nodeId);
 					        			if ( ! ideaToUpdate.attr ) {
 					        				ideaToUpdate.attr = {};
 					        			}
-					        			if ( ! ideaToUpdate.style ) {
+					        			if ( ! ideaToUpdate.attr.style ) {
 					        				ideaToUpdate.attr.style = {};
 					        			}
 									ideaToUpdate.attr.style.background = action.color;
@@ -250,7 +287,6 @@
 	</c:when>
 	<c:otherwise>
 		function onIdeaChangedLAMS(action, args, sessionId) {
-			debugger;
 			if ( ! (action == 'updateAttr' && args[1] == 'collapsed') ) {
 				alert("label.no.changes.can.be.made.reloading.ideas");
 				loadRootIdea(mindMupContent);
@@ -262,7 +298,7 @@
 </c:when>
 <c:otherwise>
 	
-	<c:if test="${contentEditable and not mode eq 'author'}">
+	<c:if test="${contentEditable and not (mode == 'author')}">
 
 		var savingNow = false;
 	
@@ -300,8 +336,9 @@
 	
 		// saving Mindmap every one minute - do not bank up saves if server is taking too long.
 	 	$.timer(60000, function (timer) {
-	 		if ( !savingNow )
+	 		if ( !savingNow ) {
 				saveSingleUserMindmap();
+	 		}
 		});
 	
 	</c:if>
@@ -312,7 +349,7 @@
 	
 </script>	
 
-	<c:if test="${contentEditable and not mode eq 'author'}">
+	<c:if test="${contentEditable and not (mode == 'author')}">
 		<div>
 		<c:if test="${not multiMode}">
 			<div class="hint"><fmt:message key="label.your.mindmap.saved.every.minute"/><lams:WaitingSpinner id="spinnerArea_Busy" showInline="true"/></div>
@@ -320,26 +357,32 @@
 		</div>
 	</c:if>	
 
+	<!-- Color picker must be outside the div or it can't float on top of the mindmap. The float is done in javascript. -->
+	<input type="text" id="background-color" class='updateStyle form-control' data-mm-target-property='background' size="7" width="180px"></input>
+ <!-- <input type="text" id="background-color" class='form-control' size="7" width="180px"></input>
+ -->	
 	<div id="mindmap-controls">
 		<div class="btn-group btn-group-sm" role="group">
-		<input type="button" class="resetView btn btn-default btn-sm" value="<fmt:message key='label.zoom'/>:"></input>
-		<input type="button" class="resetView btn btn-default btn-sm" value="<fmt:message key='label.zoom.reset'/>"></input>
-		<input type="button" class="scaleUp btn btn-default btn-sm" value="<fmt:message key='label.zoom.increase'/>"></input>
-		<input type="button" class="scaleDown btn btn-default btn-sm" value="<fmt:message key='label.zoom.decrease'/>"></input>
+		<a href="#" class="resetView btn btn-default btn-sm"><fmt:message key='label.zoom'/>:</a>
+		<a href="#" class="resetView btn btn-default btn-sm"><fmt:message key='label.zoom.reset'/></a>
+		<a href="#" class="scaleUp btn btn-default btn-sm" title="<fmt:message key='label.zoom.increase'/>"><i class="fa fa-lg fa-search-plus"></i></a>
+		<a href="#" class="scaleDown btn btn-default btn-sm" title="<fmt:message key='label.zoom.decrease'/>"><i class="fa fa-lg fa-search-minus"></i></a>
 		</div>
-	 	<input type="button" class="toggleCollapse btn btn-default btn-sm" value="<fmt:message key='label.expand.collapse.idea'/>"></input>
+		<div style="display:inline-block" role="group">
+	 	<a href="#" class="toggleCollapse btn btn-default btn-sm" title="<fmt:message key='label.expand.collapse.idea'/>"><i class="fa fa-lg fa-navicon"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.expand.collapse.idea'/></span></a>
 	<c:if test="${contentEditable}">
-		<input type="button" class="addSubIdea btn btn-default btn-sm" value="<fmt:message key='label.add.idea'/>"></input>
-		<input type="button" class="editNode btn btn-default btn-sm" value="<fmt:message key='label.edit.idea.text'/>"></input> 
-		<input type="button" class="removeSubIdea btn-default btn btn-sm" value="<fmt:message key='label.delete.idea'/>"></input>
-<!-- Not yet implemented in back end
-		<input type="button" data-mm-action="export-image" value="Export To Image"/>
- 		<input type="button" class="insertRoot" value="add root node"></input>
-		<input type="button" class="makeSelectedNodeRoot" value="make root"></input>
- 	Background needs to be turned into a colour picker.
- -->		Background: <input type="text" class='updateStyle' data-mm-target-property='background'></input> 
+		<a href="#" class="addSubIdea btn btn-default btn-sm" title="<fmt:message key='label.add.idea'/>"><i class="fa fa-lg fa-plus-square-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.add.idea'/></span></a>
+		<a href="#" class="editNode btn btn-default btn-sm" title="<fmt:message key='label.edit.idea.text'/>"><i class="fa fa-lg fa-pencil-square-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.edit.idea.text'/></span></a>		
+		<a href="#" class="removeSubIdea btn btn-default btn-sm" title="<fmt:message key='label.delete.idea'/>"><i class="fa fa-lg fa-trash-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.delete.idea'/></span></a>
+<!--   		(hide: <input type="text" class='updateStyle' data-mm-target-property='background'></input> )
+ --> <%-- Not yet implemented in back end  --%> 
+<%-- 		<input type="button" data-mm-action="export-image" value="Export To Image"/>  --%> 
+<%--  		<input type="button" class="insertRoot" value="add root node"></input>  --%> 
+<%-- 		<input type="button" class="makeSelectedNodeRoot" value="make root"></input>  --%> 
  	</c:if>
+ 		</div>
 	</div>
+
  	<div id="mindmap-container"></div>
  	<style id="themecss">
 	</style>
