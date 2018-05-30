@@ -114,7 +114,7 @@ public interface IMindmapService {
 
     public List getMindmapNodeByUniqueId(Long uniqueId, Long mindmapId);
 
-    public List getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId);
+    public MindmapNode getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId);
 
     public List getMindmapNodeByUniqueIdMindmapIdUserId(Long uniqueId, Long mindmapId, Long userId);
 
@@ -131,7 +131,7 @@ public interface IMindmapService {
 
     public Long getNodeLastUniqueIdByMindmapUidSessionId(Long mindmapUid, Long sessionId);
 
-    public List getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long userId, Long sessionId);
+    public List<MindmapRequest> getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long sessionId);
 
     public MindmapRequest getRequestByUniqueId(Long uniqueId, Long userId, Long mindmapId, Long globalId);
 

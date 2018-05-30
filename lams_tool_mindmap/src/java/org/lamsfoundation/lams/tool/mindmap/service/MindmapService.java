@@ -899,8 +899,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     }
 
     @Override
-    public List getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId) {
+    public MindmapNode getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId) {
 	return mindmapNodeDAO.getMindmapNodeByUniqueIdSessionId(uniqueId, mindmapId, sessionId);
+	
     }
 
     @Override
@@ -937,8 +938,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     }
 
     @Override
-    public List getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long userId, Long sessionId) {
-	return mindmapRequestDAO.getLastRequestsAfterGlobalId(globalId, mindmapId, userId, sessionId);
+    public List<MindmapRequest> getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long sessionId) {
+	return mindmapRequestDAO.getLastRequestsAfterGlobalId(globalId, mindmapId, sessionId);
     }
 
     @Override
