@@ -216,19 +216,6 @@
       />
     </action>
     <action
-      path="/toolBranching"
-      type="org.lamsfoundation.lams.monitoring.web.ToolOutputBranchingAction"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="viewBranches"
-        path=".viewBranches"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/complexProgress"
       type="org.lamsfoundation.lams.monitoring.web.ComplexLearnerProgressAction"
       unknown="false"
