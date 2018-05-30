@@ -386,7 +386,7 @@ public class LearnerAction extends LamsDispatchAction {
 	String type = "a";
 	if (actType.contains("gate")) {
 	    type = "g";
-	} else if (actType.contains("options")) {
+	} else if (actType.contains("options") || actType.contains("ordered")) {
 	    type = "o";
 	} else if (actType.contains("branching")) {
 	    type = "b";

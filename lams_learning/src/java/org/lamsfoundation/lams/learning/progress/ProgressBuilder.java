@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.progress;
 
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesignProcessor;
 import org.lamsfoundation.lams.learningdesign.SimpleActivity;
+import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -125,7 +125,8 @@ public class ProgressBuilder extends LearningDesignProcessor {
 	// if a branch has been attempted, then we only want to show its children.
 	boolean branchStarted = false;
 	// always display all branches if in Preview mode
-	if (!previewMode && activity.isBranchingActivity()) {
+	if (!previewMode && activity.isBranchingActivity() && !(activity.isToolBranchingActivity()
+		&& ((ToolBranchingActivity) activity).getBranchingOrderedAsc() != null)) {
 	    Iterator iter = currentActivityList.iterator();
 	    while (!branchStarted && iter.hasNext()) {
 		ActivityURL sequenceURL = (ActivityURL) iter.next();
@@ -183,6 +184,9 @@ public class ProgressBuilder extends LearningDesignProcessor {
 	}
 	if (activity.isFloatingActivity()) {
 	    activityURL.setUrl(null);
+	}
+	if (activity.isToolBranchingActivity() && ((ToolBranchingActivity) activity).getBranchingOrderedAsc() != null) {
+	    activityURL.setType(activityURL.getType() + "Ordered");
 	}
 	return activityURL;
     }
