@@ -103,6 +103,11 @@ public class IndexAction extends LamsDispatchAction {
 		&& loggedInUser.getTwoFactorAuthenticationSecret() == null) {
 	    return mapping.findForward("twoFactorAuthentication");
 	}
+	
+	// check if user needs to get his shared two-factor authorization secret
+	if (false) {
+	    return mapping.findForward("policyConsents");
+	}
 
 	User user = getUserManagementService().getUserByLogin(userDTO.getLogin());
 	request.setAttribute("portraitUuid", user.getPortraitUuid());
