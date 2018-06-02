@@ -80,12 +80,6 @@ public class ConfigurationKeys {
     public static String ALLOW_MULTIPLE_LOGIN = "AllowMultipleLogin";
 
     /** Values for client updates */
-    public static String AUTHORING_CLIENT_VERSION = "AuthoringClientVersion";
-
-    public static String LEARNER_CLIENT_VERSION = "LearnerClientVersion";
-
-    public static String MONITOR_CLIENT_VERSION = "MonitorClientVersion";
-
     public static String SERVER_VERSION_NUMBER = "ServerVersionNumber";
 
     /** Default locale for the server. Originally en_AU */
