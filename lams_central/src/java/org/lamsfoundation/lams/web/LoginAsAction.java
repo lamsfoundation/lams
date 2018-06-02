@@ -23,6 +23,9 @@
 
 package org.lamsfoundation.lams.web;
 
+import java.util.Map;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,12 +34,16 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
+import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.security.UniversalLoginModule;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -60,12 +67,27 @@ public class LoginAsAction extends Action {
 		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	IUserManagementService service = (IUserManagementService) ctx.getBean("userManagementService");
 	MessageService messageService = (MessageService) ctx.getBean("centralMessageService");
+	IntegrationService integrationService = (IntegrationService) ctx.getBean("integrationService");
+
 	String login = WebUtil.readStrParam(request, "login", false);
 
 	if (service.isUserSysAdmin()) {
 	    if ((login != null) && (login.trim().length() > 0)) {
 		User user = service.getUserByLogin(login);
 		if (user != null) {
+		    
+		    // If the user is an integration learner and ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS if off do not let syadmin log in
+		    // as they will not be able to access the index page. This test should be the same test as found in IndexAction.
+		    Boolean allowDirectAccessIntegrationLearner = Configuration.getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS);
+		    if (!allowDirectAccessIntegrationLearner) {
+			boolean isIntegrationUser = integrationService.isIntegrationUser(user.getUserId());
+			if (isIntegrationUser && isOnlyLearner(service, user.getUserId())) {
+			    request.setAttribute("errorName", "Login As");
+			    request.setAttribute("errorMessage", messageService.getMessage("error.cannot.login.as.with.not.allow.direct.access"));
+			    return mapping.findForward("error");
+			}
+		    }
+		    
 		    // audit log when loginas
 		    UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 		    ILogEventService logEventService = (ILogEventService) ctx.getBean("logEventService");
@@ -84,12 +106,25 @@ public class LoginAsAction extends Action {
 		}
 	    }
 	} else {
-	    request.setAttribute("errorName", "LoginAsAction");
+	    request.setAttribute("errorName", "Login As");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return mapping.findForward("error");
 	}
 
 	return mapping.findForward("usersearch");
     }
+
+    private boolean isOnlyLearner(IUserManagementService service, Integer userId) {
+	Map<Integer, Set<Integer>> orgRoleSets = service.getRolesForUser(userId);
+	for (Set<Integer> orgRoleSet : orgRoleSets.values()) {
+	    for (Integer role : orgRoleSet) {
+		if (role.equals(Role.ROLE_AUTHOR) || role.equals(Role.ROLE_MONITOR)
+			|| role.equals(Role.ROLE_GROUP_MANAGER) || role.equals(Role.ROLE_GROUP_ADMIN)
+			|| role.equals(Role.ROLE_SYSADMIN))
+		    return false;
+	    }
+	}
+	return true;
+    }    
 
 }

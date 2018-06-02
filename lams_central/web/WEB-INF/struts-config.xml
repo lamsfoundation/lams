@@ -197,6 +197,12 @@
         path="/admin/usersearch.do"
         redirect="false"
       />
+      <forward
+        name="error"
+        path="/errorpages/errorWithMessage.jsp"
+        redirect="false"
+      />
+
     </action>
     <action
       path="/Paint"

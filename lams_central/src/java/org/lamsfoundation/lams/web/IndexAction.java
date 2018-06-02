@@ -120,14 +120,20 @@ public class IndexAction extends LamsDispatchAction {
 	    return mapping.findForward("lessons");
 	}
 
-	boolean isIntegrationUser = getIntegrationService().isIntegrationUser(userDTO.getUserID());
-	//prevent integration users with mere learner rights from accessing index.do
-	if (isIntegrationUser && !request.isUserInRole(Role.AUTHOR) && !request.isUserInRole(Role.MONITOR)
-		&& !request.isUserInRole(Role.GROUP_MANAGER) && !request.isUserInRole(Role.GROUP_ADMIN)
-		&& !request.isUserInRole(Role.SYSADMIN)) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN,
-		    "Integration users with learner right are not allowed to access this page");
-	    return null;
+	
+	// This test also appears in LoginAsAction
+	Boolean allowDirectAccessIntegrationLearner = Configuration
+		.getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS);
+	if (!allowDirectAccessIntegrationLearner) {
+	    boolean isIntegrationUser = getIntegrationService().isIntegrationUser(userDTO.getUserID());
+	    //prevent integration users with mere learner rights from accessing index.do
+	    if (isIntegrationUser && !request.isUserInRole(Role.AUTHOR) && !request.isUserInRole(Role.MONITOR)
+		    && !request.isUserInRole(Role.GROUP_MANAGER) && !request.isUserInRole(Role.GROUP_ADMIN)
+		    && !request.isUserInRole(Role.SYSADMIN)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN,
+			"Integration users with learner right are not allowed to access this page");
+		return null;
+	    }
 	}
 	
 	// only show the growl warning the first time after a user has logged in & if turned on in configuration
