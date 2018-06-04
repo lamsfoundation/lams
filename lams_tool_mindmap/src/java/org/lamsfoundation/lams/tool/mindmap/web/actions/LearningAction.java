@@ -200,22 +200,6 @@ public class LearningAction extends LamsDispatchAction {
 	String currentMindmapUser = mindmapUser.getFirstName() + " " + mindmapUser.getLastName();
 	request.setAttribute("currentMindmapUser", currentMindmapUser);
 
-	// pollServer Parameter
-	String pollServerParam = Configuration.get(ConfigurationKeys.SERVER_URL)
-		+ "tool/lamind10/learning.do?dispatch=pollServerAction%26mindmapId=" + mindmap.getUid() + "%26userId="
-		+ mindmapUser.getUid() + "%26sessionId=" + mindmapSession.getSessionId();
-	request.setAttribute("pollServerParam", pollServerParam);
-
-	// notifyServer Parameter
-	String notifyServerParam = Configuration.get(ConfigurationKeys.SERVER_URL)
-		+ "tool/lamind10/learning.do?dispatch=notifyServerAction%26mindmapId=" + mindmap.getUid() + "%26userId="
-		+ mindmapUser.getUid() + "%26sessionId=" + mindmapSession.getSessionId();
-	request.setAttribute("notifyServerParam", notifyServerParam);
-
-	String localizationPath = Configuration.get(ConfigurationKeys.SERVER_URL)
-		+ "tool/lamind10/learning.do?dispatch=setLocale";
-	request.setAttribute("localizationPath", localizationPath);
-
 	// setting userId for reflection
 	request.setAttribute("userIdParam", mindmapUser.getUid());
 	request.setAttribute("toolContentIdParam", mindmap.getUid());
@@ -517,7 +501,7 @@ public class LearningAction extends LamsDispatchAction {
 		    mindmap.isLockOnFinished() && mindmapUser.isFinishedActivity());
 
 	    JSONObject jsonObject = new JSONObject();
-	    jsonObject.put("mindmap", new RootJSON(currentNodeModel));
+	    jsonObject.put("mindmap", new RootJSON(currentNodeModel, mindmap.isMultiUserMode()));
 	    // adding lastActionId
 	    if (mindmap.isMultiUserMode()) {
 		Long lastActionId = mindmapService.getLastGlobalIdByMindmapId(mindmap.getUid(), toolSessionId);

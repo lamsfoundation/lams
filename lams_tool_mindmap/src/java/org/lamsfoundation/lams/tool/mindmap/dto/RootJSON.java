@@ -26,10 +26,8 @@ package org.lamsfoundation.lams.tool.mindmap.dto;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
 
 /** A JSONObject in the MapJs v3 format as per https://github.com/mindmup/mapjs/wiki/Data-Format.
@@ -56,7 +54,7 @@ public class RootJSON extends JSONObject {
     
     // TODO support more than one main node. mindmup does it, our database code does not
     /** Create JSON objects from the database model */
-    public RootJSON(NodeModel node) throws JSONException {
+    public RootJSON(NodeModel node, boolean includeCreator) throws JSONException {
 	super();
 	
 	// create special root level JSON object
@@ -69,7 +67,7 @@ public class RootJSON extends JSONObject {
 
 	// start the recursion to create the ideas objects
 	JSONObject ideas = new JSONObject();
-	ideas.put("1", new IdeaJSON(node, 0) );
+	ideas.put("1", new IdeaJSON(node, 0, includeCreator) );
 	this.put(IdeaJSON.MAPJS_JSON_IDEAS_KEY, ideas);
     }
 

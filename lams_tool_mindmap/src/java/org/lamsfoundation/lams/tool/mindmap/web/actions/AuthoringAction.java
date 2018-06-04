@@ -165,7 +165,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		    mindmapId, rootNodeModel, null, false, true, false);
 
 	    JSONObject jsonObject = new JSONObject();
-	    jsonObject.put("mindmap", new RootJSON(currentNodeModel));
+	    jsonObject.put("mindmap", new RootJSON(currentNodeModel, false));
 
 	    response.setContentType("application/x-json;charset=utf-8");
 	    response.getWriter().print(jsonObject.toString());

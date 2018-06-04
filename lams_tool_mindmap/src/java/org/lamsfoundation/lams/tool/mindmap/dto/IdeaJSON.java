@@ -63,12 +63,16 @@ public class IdeaJSON extends JSONObject {
 
     // TODO support more than one main node. mindmup does it, our database code does not
     /** Create JSON objects from the database model */
-    public IdeaJSON(NodeModel node, int level) throws JSONException {
+    public IdeaJSON(NodeModel node, int level, boolean includeCreator) throws JSONException {
 	super();
 
 	this.put(MAPJS_JSON_ID_KEY, node.getConcept().getId());
 	this.put(MAPJS_JSON_TITLE_KEY, node.getConcept().getText());
-	this.put("creator", node.getConcept().getCreator()); // LAMS custom value
+	
+	if ( includeCreator ) {
+	    // only needed for multi user maps
+	    this.put("creator", node.getConcept().getCreator()); // LAMS custom value
+	}
 
 	JSONObject attr = new JSONObject();
 	if ( node.getConcept().isEdit() == 0) {
@@ -82,7 +86,7 @@ public class IdeaJSON extends JSONObject {
 	    if (level == 0) {
 		int rank = 1;
 		for (NodeModel childNode : node.getBranch()) {
-		    ideasList.put(String.valueOf(rank), new IdeaJSON(childNode, nextLevel));
+		    ideasList.put(String.valueOf(rank), new IdeaJSON(childNode, nextLevel, includeCreator));
 		    rank = -rank;
 		    if (rank > 0)
 			rank++;
@@ -90,7 +94,7 @@ public class IdeaJSON extends JSONObject {
 	    } else {
 		int rank = 1;
 		for (NodeModel childNode : node.getBranch()) {
-		    ideasList.put(String.valueOf(rank++), new IdeaJSON(childNode, nextLevel));
+		    ideasList.put(String.valueOf(rank++), new IdeaJSON(childNode, nextLevel, includeCreator));
 		}
 	    }
 	    this.put(MAPJS_JSON_IDEAS_KEY, ideasList);

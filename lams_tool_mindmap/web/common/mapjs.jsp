@@ -19,6 +19,7 @@
 		requestsProcessed = new Array(), 
 		contentAggregate = null,	// mindmup variable - dummy root idea that has all visible ideas
 		mindMupContent = null; // mindmup content processor - used for reloading map.
+		
 
 	// *** getMindmapContainerId() and  loadRootIdea(content) called by customised mapjs code ***
 	// window.mapModel is set up by mapjs in main.js. 
@@ -40,7 +41,12 @@
 		        	initialActionId = response.lastActionId;
 		        lastActionId = initialActionId;
 		        var idea = content(response.mindmap);
-		        window.mapModel.setIdea(idea);
+
+		        <c:if  test="${multiMode}">
+    				window.mapModel.setLabelGenerator(labelGenerator, "CreatorNameLabels");
+    				</c:if>
+    				
+			    window.mapModel.setIdea(idea);
 		        <c:if test="${!contentEditable}">
 		    		    window.mapModel.setEditingEnabled(false);
     			    </c:if>
@@ -93,6 +99,21 @@
 	}
 <c:choose> 
 <c:when test="${multiMode}">
+
+	// set the creator labels for Multimode mindmaps
+	labelGenerator = function(idea) {
+		var 	labelMap = {};
+		addLabel = function(idea) {
+			if ( idea.creator ) {
+				labelMap[idea.id] = idea.creator;
+			}
+			if ( idea.ideas ) {
+				Object.values(idea.ideas).forEach(addLabel);
+	    		}
+		};
+		addLabel(idea);
+	    	return labelMap;
+	}
 
     <c:choose>
     <c:when test="${contentEditable}">
@@ -157,13 +178,14 @@
 		        				updateUnsavedNodeIds(response.nodeId);
 		        				ideaToUpdate.id = response.nodeId;    
 				        		contentAggregate.invalidateIdCache();
-				        		window.mapModel.rebuildRequired();
 				        		
 		        			} else if ( args[0] > response.nodeId ) {
 		        				// unexpected case - tell user to abort so we can't make anything worse.
 			        			abortSave();
 		        				return;
 		        			}
+		        			ideaToUpdate.creator = "${currentMindmapUser}";
+			        		window.mapModel.rebuildRequired();
 		        		}	        		
 				},
 				error: function (response) {
@@ -273,8 +295,9 @@
 		        			// add node response.nodeId, response.title, response.color
 						contentAggregate.addSubIdea(action.nodeId, action.title, action.childNodeId);
 		        			var newChildNode = contentAggregate.findSubIdeaById(action.childNodeId);
-							newChildNode.attr = {};
-							newChildNode.attr.contentLocked = true;
+						newChildNode.attr = {};
+						newChildNode.attr.contentLocked = true;
+						newChildNode.creator = action.creator;
 		        			if ( action.color ) {
 							newChildNode.attr.style = {};
 			        			newChildNode.attr.style.background = action.color;
