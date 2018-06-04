@@ -88,8 +88,6 @@ public interface IMindmapService {
 
     public MessageService getMindmapMessageService();
 
-    public String getLanguageXML();
-
     public void deleteNodeByUniqueMindmapUser(Long uniqueId, Long mindmapId, Long userId, Long sessionId);
 
     public void deleteNodes(String nodesToDeleteCondition);
@@ -116,7 +114,7 @@ public interface IMindmapService {
 
     public List getMindmapNodeByUniqueId(Long uniqueId, Long mindmapId);
 
-    public List getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId);
+    public MindmapNode getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId);
 
     public List getMindmapNodeByUniqueIdMindmapIdUserId(Long uniqueId, Long mindmapId, Long userId);
 
@@ -124,7 +122,7 @@ public interface IMindmapService {
 	    String text, String color, MindmapUser mindmapUser, Mindmap mindmap, MindmapSession session);
 
     public NodeModel getMindmapXMLFromDatabase(Long rootNodeId, Long mindmapId, NodeModel rootNodeModel,
-	    MindmapUser mindmapUser);
+	    MindmapUser mindmapUser, boolean isMonitor, boolean isAuthor, boolean isUserLocked);
 
     public void getChildMindmapNodes(List<NodeModel> branches, MindmapNode rootMindmapNode, MindmapUser mindmapUser,
 	    Mindmap mindmap, MindmapSession mindmapSession);
@@ -133,7 +131,7 @@ public interface IMindmapService {
 
     public Long getNodeLastUniqueIdByMindmapUidSessionId(Long mindmapUid, Long sessionId);
 
-    public List getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long userId, Long sessionId);
+    public List<MindmapRequest> getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long sessionId);
 
     public MindmapRequest getRequestByUniqueId(Long uniqueId, Long userId, Long mindmapId, Long globalId);
 
