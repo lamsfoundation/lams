@@ -1,0 +1,66 @@
+Mindmap uses two main files to handle the mindmap UI:
+
+(1) The file lams_tool_mindmap/web/includes/javascript/mapjs/main.js is a
+modified version of the mapjs Javascript library (from https://github.com/mindmup). 
+Modifications have been marked using "LAMS Modification"
+
+(2) The LAMS logic is in lams_tool_mindmap/web/common/mapjs.jsp. This logic is
+based on certain parts from the main.js file (look for the init function) and
+the HTML <div> is based on the index.html file supplied by the webpack (more on
+this later in this description). It contains the div in which the mindmap is
+rendered as well as handles the ajax and websocket calls to the LAMS server. The
+exact behaviour is dependent on the request attributes contentEditable, mode
+(learner, monitor, etc) and multiMode (single user vs multi user).
+
+If it is single user, the mindmap is saved once an minute in learning. If it is
+multi user then the changes are sent to the server immediately using ajax, and
+the updates sent to the other clients using websockets. In authoring the mindmap
+is only saved when the user presses the save button, and the mindmap cannot be
+altered in monitoring.
+
+The color picker used is not part of mapjs - it is using the jQuery MiniColors library
+https://labs.abeautifulsite.net/jquery-minicolors/. Mapjs.jsp also contains
+the code that controls updating mapjs with the user's selected colour (ie
+from the color picker to mapjs) and updating the color picker when a node
+is selected (ie from mapjs to the color picker). The two libraries are using the
+"background-color" input field so you have to be careful or one library will 
+block the other library's update.
+
+To change the swatch colours look for the entry:
+swatches: ['#ff0000', '#ffff00', '#0000ff', ... '#ffffff', '#9e9e9e', '#000000'],
+
+-------- mapjs library ---------------------------------------------------------------
+
+The Mindmap tool uses the mapjs javascript mindmap library. The code used is
+from https://github.com/mindmup. It comes as two parts - you need both "mapjs"
+and "mapjs-webpack-example".
+
+The mapjs directory contains all the source code for handling the mindmap, but
+it is seperated over many javascript files. The mapjs-webpack-example package
+will bundle the mapjs code into a single file, main.js, and create an index.html
+page that calls the mapjs code.
+
+To build a new copy:
+
+(1) Get a new copy of mapjs project from Github (the equivalent of the existing
+mapjs-3.3.5.zip file in this directory. I suggest running the npm test/npm run
+pretest to get the dependencies installed on your computer.
+
+(2) Depending on how much has changed, you may be able to use the existing
+mapjs-webpack-example-master directory or you may have to download a new one.
+Run "npm install" then "npm run pack-js" to package the mapjs code into the
+main.js and index.html.
+
+(3) Now the tricky bit - the mapjs-webpack-example-master/site/main.js file is
+the equivalent to the lams_tool_mindmap/web/includes/javascript/mapjs/main.js.
+You will need to compare the files, find out what has changed and reapply the
+changes made previously to the new version. You can search for our changes in
+main.js by looking for "LAMS Modification".
+
+Also look at index.html and compare it to lams_tool_mindmap/web/common/mapjs.jsp
+file.
+
+And then test like crazy to see what is broken.
+
+Fiona Malikoff
+4 Jun 2018

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+	 width="16px" height="32px" xml:space="preserve" style="transform:rotate(10)">
+ <g transform="translate(2,-2) rotate(10)" style="fill:none;stroke-width:2">
+   <path d="M4,16 L4,11 C4,1 15,1 15,11 L15,26 C15,31 8,31 8,25 L8,10"
+     style="stroke:black"/>
+   <path d="M3,16 L3,10 C3,0 14,0 14,10 L14,25 C14,30 7,30 7,25 L7,10"
+     style="stroke:#00BFFF"/>
+  </g>
+</svg>
+
