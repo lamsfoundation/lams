@@ -110,14 +110,9 @@
 		
 		<div class="row">
 			<div class="col-xs-12 ">
-				<c:choose>
-					<c:when test="${instructions.instruction == null}">
-						<fmt:message key="msg.no.instruction" />
-					</c:when>		
-					<c:otherwise>
-						<c:out value="${instructions.instruction.description}" escapeXml="false"/>
-					</c:otherwise>
-				</c:choose>
+				<c:if test="${instructions.instruction != null}">
+					<c:out value="${instructions.instruction.description}" escapeXml="false"/>
+				</c:if>
 			
 				<c:choose>
 					<c:when test="${instructions.current < instructions.total}">
