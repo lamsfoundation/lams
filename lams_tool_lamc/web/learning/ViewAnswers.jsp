@@ -123,7 +123,7 @@
 										<c:forEach var="subEntry" items="${mainEntry.value}">
 										<tr><td>${subEntry.key}
 										</td>
-										<td><c:out value="${subEntry.value}" escapeXml="false" /></td>
+										<td width="100%"><c:out value="${subEntry.value}" escapeXml="false" /></td>
 										</tr>
 										</c:forEach>
 										</tbody></table>
