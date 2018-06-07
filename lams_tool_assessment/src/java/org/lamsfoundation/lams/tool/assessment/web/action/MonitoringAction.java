@@ -506,13 +506,13 @@ public class MonitoringAction extends Action {
 		userData.put(questionResultUid);
 		userData.put(questionResult.getMaxMark());
 		userData.put(fullName);
-		userData.put(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
+	        //LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
+		userData.put(questionResult.getMark());
 		// show confidence levels if this feature is turned ON
 		if (assessment.isEnableConfidenceLevels()) {
 		    userData.put(questionResult.getConfidenceLevel());
 		}
-
-		userData.put(questionResult.getMark());
+		userData.put(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
 		if (userDto.getPortraitId() != null) {
 		    userData.put(userDto.getPortraitId());
 		}
