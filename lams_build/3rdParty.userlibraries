@@ -8,9 +8,9 @@
         <archive path="/lams_build/lib/autopatch/autopatch-1.4.2-lams.jar"/>
         <archive path="/lams_build/lib/basiclti-util/basiclti-util-1.2.0.jar"/>
         <archive path="/lams_build/lib/basiclti-util/oauth-20100527.jar"/>
- 	 	<archive path="/lams_build/lib/basiclti-util/oauth-provider-20100527.jar"/>
- 	 	<archive path="/lams_build/lib/basiclti-util/signpost-commonshttp4-1.2.1.2.jar"/>
- 	 	<archive path="/lams_build/lib/basiclti-util/signpost-core-1.2.1.2.jar"/>        
+        <archive path="/lams_build/lib/basiclti-util/oauth-provider-20100527.jar"/>
+        <archive path="/lams_build/lib/basiclti-util/signpost-commonshttp4-1.2.1.2.jar"/>
+        <archive path="/lams_build/lib/basiclti-util/signpost-core-1.2.1.2.jar"/>
         <archive path="/lams_build/lib/autopatch/discovery-1.0.5-lams.jar"/>
         <archive path="/lams_build/lib/googleauth/googleauth-1.1.1.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-fileupload.jar"/>
@@ -39,5 +39,6 @@
         <archive path="/lams_build/lib/lucene/lucene-analyzers-common-4.10.2.jar" source="/3rdParty_sources/lucene"/>
         <archive path="/lams_build/lib/lucene/lucene-queryparser-4.10.2.jar" source="/3rdParty_sources/lucene"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-5.1.38-bin.jar" source="/3rdParty_sources/mysql-connector"/>
+        <archive path="/lams_build/lib/jsonwebtoken/jjwt-0.9.0.jar" source="/3rdParty_sources/jsonwebtoken"/>
     </library>
 </eclipse-userlibraries>
