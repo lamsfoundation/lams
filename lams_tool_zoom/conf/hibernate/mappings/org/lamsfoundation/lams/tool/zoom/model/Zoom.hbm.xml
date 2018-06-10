@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+
+    <class
+        name="org.lamsfoundation.lams.tool.zoom.model.Zoom"
+        table="tl_lazoom10_zoom"
+    >
+
+        <id
+            name="uid"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-Zoom.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="createDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="create_date"
+        />
+
+        <property
+            name="updateDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="update_date"
+        />
+
+        <property
+            name="createBy"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="create_by"
+            length="20"
+        />
+
+        <property
+            name="title"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="title"
+            length="255"
+        />
+
+        <property
+            name="instructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="instructions"
+            length="65535"
+        />
+
+        <property
+            name="reflectOnActivity"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="reflect_on_activity"
+            length="1"
+        />
+
+        <property
+            name="reflectInstructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="reflect_instructions"
+            length="65535"
+        />
+
+        <property
+            name="contentInUse"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="content_in_use"
+            length="1"
+        />
+
+        <property
+            name="defineLater"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="define_later"
+            length="1"
+        />
+
+        <property
+            name="toolContentId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="tool_content_id"
+            length="20"
+        />
+        
+        <property
+            name="meetingId"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="meeting_id"
+            length="64"
+        />
+        
+        <property
+            name="meetingStartUrl"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="meeting_start_url"
+            length="1000"
+        />
+
+        <set
+            name="zoomSessions"
+            lazy="true"
+            inverse="true"
+            cascade="none"
+            sort="unsorted"
+        >
+
+            <key
+                column="zoom_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.zoom.model.ZoomSession"
+            />
+
+        </set>
+        
+       <many-to-one
+            name="api"
+            class="org.lamsfoundation.lams.tool.zoom.model.ZoomApi"
+            cascade="none"
+            foreign-key="fk_lazoom10_zoom_to_api"
+        >
+            <column
+                name="api_id" 
+            />
+        </many-to-one>
+    </class>
+
+</hibernate-mapping>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN"
+        "http://struts.apache.org/dtds/tiles-config_1_1.dtd">
+	<!--
+		Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) License
+		Information: http://lamsfoundation.org/licensing/lams/2.0/ This
+		program is free software; you can redistribute it and/or modify it
+		under the terms of the GNU General Public License version 2 as
+		published by the Free Software Foundation. This program is distributed
+		in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+		even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+		PARTICULAR PURPOSE. See the GNU General Public License for more
+		details. You should have received a copy of the GNU General Public
+		License along with this program; if not, write to the Free Software
+		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+		02110-1301 USA http://www.gnu.org/licenses/gpl.txt
+	-->
+
+<tiles-definitions>
+	<!--  Begin: Layouts -->
+	<definition name="tiles:/layout:tabbed" path="/layouts/tabbedLayout.jsp">
+		<put name="header" value="tiles:/header:tabbed" />
+		<put name="body" value="" />
+	</definition>
+
+	<definition name="tiles:/layout:simple" path="/layouts/simpleLayout.jsp">
+		<put name="header" value="tiles:/header:simple" />
+		<put name="body" value="" />
+	</definition>
+	<!--  End: Layouts -->
+
+
+	<!-- Begin: Headers -->
+	<definition name="tiles:/header:tabbed" path="/common/tabbedHeader.jsp">
+		<put name="headItems" value="/common/empty.jsp" type="page" />
+	</definition>
+
+	<definition name="tiles:/header:simple" path="/common/simpleHeader.jsp">
+		<put name="headItems" value="/common/empty.jsp" type="page" />
+	</definition>
+	<!-- End: Headers -->
+
+	<!-- Begin: Authoring -->
+	<definition name="tiles:/authoring/main" extends="tiles:/layout:tabbed">
+		<put name="pageTitleKey" value="pageTitle.authoring" />
+		<put name="header" value="tiles:/header:authoring" type="definition" />
+		<put name="body" value="/pages/authoring/authoring.jsp" />
+	</definition>
+
+	<definition name="tiles:/header:authoring" extends="tiles:/header:tabbed">
+		<put name="headItems" value="/pages/authoring/headItems.jsp" />
+	</definition>
+	<!-- End: Authoring -->
+
+
+	<!-- Begin: Learning -->
+	<definition name="tiles:/learning/main" extends="tiles:/layout:simple">
+		<put name="body" value="/pages/learning/learning.jsp" />
+	</definition>
+	<definition name="tiles:/learning/notebook" extends="tiles:/layout:simple">
+		<put name="body" value="/pages/learning/notebook.jsp" />
+	</definition>
+
+	<definition name="tiles:/learning/defineLater" extends="tiles:/layout:simple">
+		<put name="body" value="/pages/learning/defineLater.jsp" />
+	</definition>
+	<!-- End: Learning -->
+
+
+	<!-- Begin: Monitoring -->
+	<definition name="tiles:/monitoring/main" extends="tiles:/layout:tabbed">
+		<put name="pageTitleKey" value="pageTitle.monitoring" />
+		<put name="header" value="tiles:/header:monitoring/main" type="definition" />
+		<put name="body" value="/pages/monitoring/monitoring.jsp" />
+	</definition>
+
+	<definition name="tiles:/monitoring/zoom_display" extends="tiles:/layout:simple">
+		<put name="pageTitleKey" value="pageTitle.monitoring" />
+		<put name="header" value="tiles:/header:monitoring/notebook" type="definition" />
+		<put name="body" value="/pages/monitoring/notebook.jsp" />
+	</definition>
+
+	<definition name="tiles:/header:monitoring/main" extends="tiles:/header:tabbed">
+		<put name="headItems" value="/pages/monitoring/headItems.jsp" />
+	</definition>
+
+	<definition name="tiles:/header:monitoring/notebook"
+		extends="tiles:/header:simple">
+		<put name="headItems" value="/common/empty.jsp" />
+	</definition>
+	<!-- End: Monitoring -->
+
+
+	<!-- Begin Admin -->
+	<definition name="tiles:/admin/view" extends="tiles:/layout:simple">
+		<put name="body" value="/pages/admin/view.jsp" />
+	</definition>
+
+	<definition name="tiles:/admin/edit" extends="tiles:/layout:simple">
+		<put name="body" value="/pages/admin/edit.jsp" />
+	</definition>
+	<!-- End Admin -->
+
+	<!-- Begin Zoom -->
+	<definition name="tiles:/zoom/end_meeting" extends="tiles:/layout:simple">
+		<put name="body" value="/pages/zoom/end_meeting.jsp" />
+	</definition>
+	<!-- End Zoom -->
+
+	<!-- General Messsage -->
+	<definition name="tiles:/general/message" extends="tiles:/layout:simple">
+		<put name="body" value="/common/message.jsp" />
+	</definition>
+
+</tiles-definitions>

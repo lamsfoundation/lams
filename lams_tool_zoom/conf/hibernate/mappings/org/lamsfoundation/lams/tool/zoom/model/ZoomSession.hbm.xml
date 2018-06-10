@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+
+    <class
+        name="org.lamsfoundation.lams.tool.zoom.model.ZoomSession"
+        table="tl_lazoom10_session"
+    >
+
+        <id
+            name="uid"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-ZoomSession.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="sessionEndDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="session_end_date"
+        />
+
+        <property
+            name="sessionStartDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="session_start_date"
+        />
+
+        <property
+            name="status"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            column="status"
+            length="11"
+        />
+
+        <property
+            name="sessionId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="session_id"
+            length="20"
+        />
+
+        <property
+            name="sessionName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="session_name"
+            length="250"
+        />
+
+        <many-to-one
+            name="zoom"
+            class="org.lamsfoundation.lams.tool.zoom.model.Zoom"
+            cascade="none"
+            
+            update="true"
+            insert="true"
+            foreign-key="fk_lazoom10_zoom_session_to_zoom"
+        >
+            <column
+                name="zoom_uid" 
+            />
+        </many-to-one>
+
+        <set
+            name="zoomUsers"
+            lazy="true"
+            inverse="true"
+            cascade="none"
+            sort="unsorted"
+        >
+
+            <key
+                column="zoom_session_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.zoom.model.ZoomUser"
+            />
+
+        </set>
+
+    </class>
+
+</hibernate-mapping>

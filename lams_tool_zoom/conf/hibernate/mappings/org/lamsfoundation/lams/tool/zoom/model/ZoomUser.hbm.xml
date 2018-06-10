@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+
+    <class
+        name="org.lamsfoundation.lams.tool.zoom.model.ZoomUser"
+        table="tl_lazoom10_user"
+    >
+
+        <id
+            name="uid"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-ZoomUser.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="userId"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            column="user_id"
+            length="20"
+        />
+
+        <property
+            name="finishedActivity"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="finishedActivity"
+        />
+
+        <many-to-one
+            name="zoomSession"
+            class="org.lamsfoundation.lams.tool.zoom.model.ZoomSession"
+            cascade="none"
+            
+            update="true"
+            insert="true"
+            foreign-key="fk_lazoom10_zoom_user_to_zoom_session"
+        >
+            <column
+                name="zoom_session_uid" 
+            />
+        </many-to-one>
+
+        <property
+            name="notebookEntryUID"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="notebook_entry_uid"
+        />
+        
+        <property
+            name="meetingJoinUrl"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="meeting_join_url"
+            length="255"
+        />
+
+    </class>
+
+</hibernate-mapping>

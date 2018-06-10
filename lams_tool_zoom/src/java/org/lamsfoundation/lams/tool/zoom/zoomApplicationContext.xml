@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+	<bean id="zoomService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.tool.zoom.service.ZoomService">
+				<property name="zoomSessionDAO"><ref bean="zoomSessionDAO"/></property>
+				<property name="zoomUserDAO"><ref bean="zoomUserDAO"/></property>
+				<property name="zoomDAO"><ref bean="zoomDAO"/></property>
+				<property name="zoomConfigDAO"><ref bean="zoomConfigDAO"/></property>
+				<property name="toolService"><ref bean="lamsToolService"/></property>
+				<property name="learnerService"><ref bean="learnerService"/></property>	
+ 				<property name="zoomToolContentHandler"><ref bean="zoomToolContentHandler"/></property>
+		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
+		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+			</bean>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="register*">PROPAGATION_REQUIRED</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED</prop>
+				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
+                <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
+				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED</prop>				
+			</props>
+		</property>
+	</bean>
+	
+	<!--  DAO classes -->
+	<bean id="zoomDAO" class="org.lamsfoundation.lams.tool.zoom.dao.hibernate.ZoomDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>  
+
+	<bean id="zoomSessionDAO" class="org.lamsfoundation.lams.tool.zoom.dao.hibernate.ZoomSessionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="zoomUserDAO" class="org.lamsfoundation.lams.tool.zoom.dao.hibernate.ZoomUserDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="zoomConfigDAO" class="org.lamsfoundation.lams.tool.zoom.dao.hibernate.ZoomConfigDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+ 	<bean id="zoomToolContentHandler" class="org.lamsfoundation.lams.tool.zoom.util.ZoomToolContentHandler">
+ 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean>  
+
+</beans>
