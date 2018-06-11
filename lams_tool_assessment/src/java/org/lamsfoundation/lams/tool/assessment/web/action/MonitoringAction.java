@@ -185,6 +185,7 @@ public class MonitoringAction extends Action {
 
 	//prepare toolOutputDefinitions and activityEvaluation
 	List<String> toolOutputDefinitions = new ArrayList<String>();
+	toolOutputDefinitions.add(AssessmentConstants.OUTPUT_NAME_BLANK);
 	toolOutputDefinitions.add(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE);
 	toolOutputDefinitions.add(AssessmentConstants.OUTPUT_NAME_BEST_SCORE);
 	toolOutputDefinitions.add(AssessmentConstants.OUTPUT_NAME_FIRST_SCORE);

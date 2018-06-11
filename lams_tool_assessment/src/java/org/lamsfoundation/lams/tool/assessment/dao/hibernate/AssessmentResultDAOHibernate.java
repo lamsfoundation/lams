@@ -93,6 +93,14 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     private static final String AVERAGE_SCORES_BY_CONTENT_ID = "SELECT r.user.userId, AVG(r.grade) FROM "
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) GROUP BY r.user.userId";
+    
+    private static final String NO_SCORE_BY_SESSION_AND_USER = "SELECT '-' FROM "
+	    + AssessmentResult.class.getName()
+	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) AND r.latest=1";
+    
+    private static final String NO_SCORES_BY_CONTENT_ID = "SELECT r.user.userId, '-' FROM "
+	    + AssessmentResult.class.getName()
+	    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) GROUP BY r.user.userId";
 
     private static final String FIND_LAST_ASSESSMENT_RESULT_TIME_TAKEN = "select UNIX_TIMESTAMP(r.finishDate) - UNIX_TIMESTAMP(r.startDate) FROM "
 	    + AssessmentResult.class.getName()
@@ -169,6 +177,22 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	q.setParameter(0, userId);
 	q.setParameter(1, sessionId);
 	return ((Float) q.uniqueResult());
+    }
+    
+    @Override
+    public Float getNoScoreByUser(Long sessionId, Long userId){
+	Query q = getSession().createQuery(NO_SCORE_BY_SESSION_AND_USER);
+	q.setParameter(0, userId);
+	q.setParameter(1, sessionId);
+	Object result = q.uniqueResult();
+	return result == null ? null : 0f;
+    }
+
+    
+    @Override
+    public List<AssessmentUserDTO> getNoScoresByContentId(Long toolContentId) {	
+	List<Object[]> list = (List<Object[]>) doFind(NO_SCORES_BY_CONTENT_ID, new Object[] { toolContentId });
+	return convertBlankResultsToAssessmentUserDTOList(list);
     }
 
     @Override
@@ -309,6 +333,24 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setUserId(userId);
 		userDto.setGrade(grade);
+		lastTotalScores.add(userDto);
+	    }
+
+	}
+
+	return lastTotalScores;
+    }
+    
+    // LDEV_NTU-12 Need to be able to change tool output to blank
+    private List<AssessmentUserDTO> convertBlankResultsToAssessmentUserDTOList(List<Object[]> list) {
+
+	List<AssessmentUserDTO> lastTotalScores = new ArrayList<AssessmentUserDTO>();
+	if (list != null && list.size() > 0) {
+	    for (Object[] element : list) {
+
+		Long userId = ((Number) element[0]).longValue();
+		AssessmentUserDTO userDto = new AssessmentUserDTO();
+		userDto.setUserId(userId);
 		lastTotalScores.add(userDto);
 	    }
 
