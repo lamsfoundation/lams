@@ -57,7 +57,9 @@ public class AssessmentOutputFactory extends OutputFactory {
 
 	definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN, new Long(0), null);
 	definitionMap.put(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN, definition);
-
+	definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_NO_SCORE, new Long(0), null);
+	definitionMap.put(AssessmentConstants.OUTPUT_NAME_NO_SCORE, definition);
+	
 	if (toolContentObject != null) {
 	    Assessment assessment = (Assessment) toolContentObject;
 	    Set<QuestionReference> questionReferences = new TreeSet<QuestionReference>(new SequencableComparator());
@@ -185,7 +187,9 @@ public class AssessmentOutputFactory extends OutputFactory {
 		} else if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS)) {
 		    return getNumberAttempts(assessmentService, learnerId, assessment);
 
-		} else {
+		} else if (name.equals(AssessmentConstants.OUTPUT_NAME_NO_SCORE)) {
+		    return getNoScore(assessmentService, toolSessionId, learnerId);
+		}  else {
 		    Set<AssessmentQuestion> questions = assessment.getQuestions();
 		    for (AssessmentQuestion question : questions) {
 			if (name.equals(String.valueOf(question.getSequenceId()))) {
@@ -203,6 +207,10 @@ public class AssessmentOutputFactory extends OutputFactory {
 
 	    if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE)) {
 		List<AssessmentUserDTO> results = assessmentService.getLastTotalScoresByContentId(toolContentId);
+		return convertToToolOutputs(results);
+		
+	    }else if (name.equals(AssessmentConstants.OUTPUT_NAME_BLANK)) {
+		List<AssessmentUserDTO> results = assessmentService.getNoScoresByContentId(toolContentId);
 		return convertToToolOutputs(results);
 
 	    } else if (name.equals(AssessmentConstants.OUTPUT_NAME_BEST_SCORE)) {
@@ -299,6 +307,19 @@ public class AssessmentOutputFactory extends OutputFactory {
 
 	return new ToolOutput(AssessmentConstants.OUTPUT_NAME_AVERAGE_SCORE,
 		getI18NText(AssessmentConstants.OUTPUT_NAME_AVERAGE_SCORE, true), averageTotalScoreFloat);
+    }
+    
+    /**
+     * Get the average score for a user. Will always return a ToolOutput object.
+     * LDEV_NTU-12 Need to be able to change tool output to blank
+     * 
+     */
+    private ToolOutput getNoScore(IAssessmentService assessmentService, Long sessionId, Long userId) {
+	Float noScore = assessmentService.getNoScoreByUser(sessionId, userId);
+	float noScoreFloat = (noScore == null) ? 0 : noScore;
+
+	return new ToolOutput(AssessmentConstants.OUTPUT_NAME_BLANK,
+		getI18NText(AssessmentConstants.OUTPUT_NAME_BLANK, true), noScoreFloat);
     }
 
     /**
