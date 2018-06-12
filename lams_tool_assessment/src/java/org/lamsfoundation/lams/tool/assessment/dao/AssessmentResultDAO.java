@@ -52,10 +52,6 @@ public interface AssessmentResultDAO extends DAO {
     Float getLastTotalScoreByUser(Long assessmentUid, Long userId);
 
     List<AssessmentUserDTO> getLastTotalScoresByContentId(Long assessmentUid);
-    
-    Float getNoScoreByUser(Long sessionId, Long userId);
-    
-    List<AssessmentUserDTO> getNoScoresByContentId(Long assessmentUid);
 
     Float getBestTotalScoreByUser(Long sessionId, Long userId);
     

@@ -900,16 +900,6 @@ public class AssessmentServiceImpl
     public List<AssessmentUserDTO> getLastTotalScoresByContentId(Long toolContentId) {
 	return assessmentResultDao.getLastTotalScoresByContentId(toolContentId);
     }
-    
-    @Override
-    public Float getNoScoreByUser(Long sessionId, Long userId) {
-	return assessmentResultDao.getNoScoreByUser(sessionId, userId);
-    }
-    
-    @Override
-    public List<AssessmentUserDTO> getNoScoresByContentId(Long toolContentId) {
-	return assessmentResultDao.getNoScoresByContentId(toolContentId);
-    }
 
     @Override
     public Float getBestTotalScoreByUser(Long sessionId, Long userId) {

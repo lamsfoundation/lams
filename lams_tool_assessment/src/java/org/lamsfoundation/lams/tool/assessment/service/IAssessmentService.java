@@ -286,17 +286,6 @@ public interface IAssessmentService {
     Float getLastTotalScoreByUser(Long assessmentUid, Long userId);
 
     List<AssessmentUserDTO> getLastTotalScoresByContentId(Long toolContentId);
-    
-    /**
-     * Return the best *finished* result grade.
-     *
-     * @param sessionId
-     * @param userId
-     * @return
-     */
-    Float getNoScoreByUser(Long sessionId, Long userId);
-
-    List<AssessmentUserDTO> getNoScoresByContentId(Long toolContentId);
 
     /**
      * Return the best *finished* result grade.

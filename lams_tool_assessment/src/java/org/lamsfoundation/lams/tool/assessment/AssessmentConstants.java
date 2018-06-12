@@ -253,12 +253,11 @@ public class AssessmentConstants {
     public static final String OUTPUT_NAME_LEARNER_TOTAL_SCORE = "learner.total.score";
     public static final String OUTPUT_NAME_LEARNER_TIME_TAKEN = "learner.time.taken";
     public static final String OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS = "learner.number.of.attempts";
-    public static final String OUTPUT_NAME_NO_SCORE = "learner.no.score";
-    
+
     public static final String OUTPUT_NAME_BEST_SCORE = "best.score";
     public static final String OUTPUT_NAME_FIRST_SCORE = "first.score";
     public static final String OUTPUT_NAME_AVERAGE_SCORE = "average.score";
-    public static final String OUTPUT_NAME_BLANK = "no.score";
+
     // error message keys
     public static final String ERROR_MSG_QUESTION_NAME_BLANK = "error.question.name.blank";
 
