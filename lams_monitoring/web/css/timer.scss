@@ -1,0 +1,53 @@
+@import "_lams_variables.scss";
+
+@media (max-width: 500px) {
+* {
+	font-size: $font-size-base;
+}
+.fixed-button-width {
+	width: 80px;
+	font-size: $font-size-base;
+}	
+}
+
+#hours, #minutes, #seconds {
+	width:70px;
+}
+
+@media (min-width: 501px) {
+* {
+	font-size: x-large;
+}
+
+.fixed-button-width {
+	 width: 120px;
+	font-size: large;
+}	
+}
+
+.is-countdown {
+	border: none;
+    background-color: inherit;
+}
+
+.countdown-row-replacement-text, .countdown-row {
+    font-size: 15vmin;
+    display: block;
+    margin-left: 30px;
+}
+
+#mainDiv{
+    margin-bottom: 0px;
+}
+
+#buttonsDiv{
+    margin-top: 5px;
+}
+
+#progressBarDiv{
+	height:10px;
+}
+
+#progressBarDiv #nprogress .bar{
+	height:10px;
+}

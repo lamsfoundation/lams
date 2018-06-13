@@ -277,7 +277,7 @@
 
 			<!-- Top bar -->
 			<div class="top-nav">
-				<div class="col-xs-6 col-md-4 col-lg-4">
+				<div class="col-xs-5 col-md-3 col-lg-3">
 					<a href="#">
 						<i class="fa fa-bars fa-lg" id="menu-toggle-bars"></i>
 					</a>
@@ -285,12 +285,16 @@
 						
 				<div>
 					<button id="regular-monitor-button" type="button" class="btn btn-sm btn-default pull-right" onclick="return switchToRegularMonitor();" style="margin-right: 10px;">
-						<i class="fa fa-heartbeat" title="<fmt:message key="label.monitor" />"></i> <fmt:message key="label.switch.to.regular.monitor" />
+						<i class="fa fa-heartbeat" title="<fmt:message key="label.monitor" />"></i><span class="hidden-xs">  <fmt:message key="label.switch.to.regular.monitor" /></span>
 					</button>
 					
-					<button id="refresh-button" type="button" class="btn btn-sm btn-default pull-right" onclick="Javascript: refresh(); return false;">
-						<i class="fa fa-refresh"></i> <fmt:message key="button.refresh"/>
+					<button id="refresh-button" type="button" class="btn btn-sm btn-default pull-right" onclick="Javascript: refresh(); return false;" style="margin-right: 10px;">
+						<i class="fa fa-refresh"></i><span class="hidden-xs">  <fmt:message key="button.refresh"/></span>
 					</button>
+					
+					<button id="timer-button" type="button" class="btn btn-sm btn-default pull-right"  onclick="javascript:openPopUp('timer.jsp', '<fmt:message key="label.countdown.timer"/>', 648, 1152, true);return false;" style="margin-right: 10px;">
+							<i class="fa fa-hourglass-half"></i><span class="hidden-xs"> <fmt:message key="label.countdown.timer"/></span>
+					</button>		
 				</div>
 			</div>
 			<!-- End top bar -->
