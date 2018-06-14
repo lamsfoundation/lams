@@ -109,7 +109,7 @@
 			name="changePass">
 			<input type="hidden" name="method" id="method"
 				value="requestPasswordChange" /> <input type="hidden" name="key"
-				id="key" value="${param.key}" />
+				id="key" value="<c:out value='${param.key}' />" />
 
 			<h4>
 				<fmt:message key="label.forgot.password" />
