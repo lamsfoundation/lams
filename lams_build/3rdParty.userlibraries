@@ -39,6 +39,6 @@
         <archive path="/lams_build/lib/lucene/lucene-analyzers-common-4.10.2.jar" source="/3rdParty_sources/lucene"/>
         <archive path="/lams_build/lib/lucene/lucene-queryparser-4.10.2.jar" source="/3rdParty_sources/lucene"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-5.1.38-bin.jar" source="/3rdParty_sources/mysql-connector"/>
-        <archive path="/lams_build/lib/jsonwebtoken/jjwt-0.9.0.jar" source="/3rdParty_sources/jsonwebtoken"/>
+        <archive path="/lams_build/lib/json/jjwt-0.9.0.jar" source="/3rdParty_sources/jsonwebtoken"/>
     </library>
 </eclipse-userlibraries>
