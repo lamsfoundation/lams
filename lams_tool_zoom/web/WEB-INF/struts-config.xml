@@ -64,6 +64,11 @@
         path="tiles:/monitoring/zoom_display"
         redirect="false"
       />
+       <forward
+        name="learning"
+        path="tiles:/learning/main"
+        redirect="false"
+      />
     </action>
     <action
       path="/learning"

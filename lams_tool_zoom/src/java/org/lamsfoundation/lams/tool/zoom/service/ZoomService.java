@@ -365,6 +365,10 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	return false;
     }
 
+    public String getContributionURL(Long toolContentId) {
+	return ZoomConstants.TOOL_CONTRIBUTE_URL + toolContentId;
+    }
+
     /* IZoomService Methods */
 
     @Override
@@ -662,14 +666,8 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	    return zoom.getMeetingStartUrl();
 	}
 	if (zoom.getApi() == null) {
-	    throw new ZoomException("Can not create a meeting without chosen API keys");
+	    throw new ZoomException("Can not create a meeting without API keys chosen");
 	}
-	URL url = new URL("https://api.zoom.us/v2/users/" + zoom.getApi().getEmail() + "/meetings");
-	HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-	connection.setRequestMethod("POST");
-	connection.setRequestProperty("Content-Type", "application/json");
-	connection.setRequestProperty("Authorization", "Bearer " + ZoomService.generateJWT(zoom.getApi()));
-	connection.setDoOutput(true);
 	JSONObject bodyJSON = new JSONObject();
 	JSONObject settings = new JSONObject();
 	settings.put("approval_type", 0);
@@ -679,8 +677,9 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 	String startTime = sdf.format(currentTime);
 	bodyJSON.put("topic", zoom.getTitle()).put("type", 2).put("start_time", startTime).put("settings", settings);
-	ZoomService.writeRequestBody(connection, bodyJSON.toString());
 
+	HttpURLConnection connection = ZoomService.getZoomConnection("users/" + zoom.getApi().getEmail() + "/meetings",
+		"POST", bodyJSON.toString(), zoom.getApi());
 	JSONObject responseJSON = ZoomService.getReponse(connection);
 	String startURL = responseJSON.getString("start_url");
 	String meetingId = String.valueOf(responseJSON.getLong("id"));
@@ -690,6 +689,9 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	zoom.setMeetingStartUrl(startURL);
 	zoom.setMeetingId(meetingId);
 	zoomDAO.update(zoom);
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Created meeting: " + meetingId);
+	}
 	return startURL;
     }
 
@@ -701,54 +703,74 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	}
 	ZoomUserDTO userDTO = createUserDTO(user);
 	Zoom zoom = (Zoom) zoomDAO.find(Zoom.class, zoomUid);
-	URL url = new URL("https://api.zoom.us/v2/meetings/" + zoom.getMeetingId() + "/registrants");
-	HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-	con.setRequestMethod("POST");
-	con.setRequestProperty("Content-Type", "application/json");
-	con.setRequestProperty("Authorization", "Bearer " + ZoomService.generateJWT(zoom.getApi()));
-	con.setDoOutput(true);
+
 	JSONObject bodyJSON = new JSONObject();
 	String lastName = userDTO.getLastName();
 	if (!sessionName.endsWith(" learners")) {
 	    lastName += " (" + sessionName + ")";
 	}
 	bodyJSON.put("email", userDTO.getEmail()).put("first_name", userDTO.getFirstName()).put("last_name", lastName);
-	ZoomService.writeRequestBody(con, bodyJSON.toString());
-	JSONObject responseJSON = ZoomService.getReponse(con);
+	HttpURLConnection connection = ZoomService.getZoomConnection("meetings/" + zoom.getMeetingId() + "/registrants",
+		"POST", bodyJSON.toString(), zoom.getApi());
+	JSONObject responseJSON = ZoomService.getReponse(connection);
 	String meetingJoinURL = responseJSON.getString("join_url");
 	user.setMeetingJoinUrl(meetingJoinURL);
 	zoomUserDAO.update(user);
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Registerd user with UID: " + user.getUid() + " for meeting: " + zoom.getMeetingId());
+	}
 	return meetingJoinURL;
     }
 
     private static String generateJWT(ZoomApi api) {
-	Date expiration = new Date(System.currentTimeMillis() + 10000);
+	Date expiration = new Date(System.currentTimeMillis() + ZoomConstants.JWT_EXPIRATION_MILISECONDS);
 	return Jwts.builder().setHeaderParam("typ", "JWT").setIssuer(api.getKey()).setExpiration(expiration)
 		.signWith(SignatureAlgorithm.HS256, api.getSecret().getBytes()).compact();
     }
 
-    private static void writeRequestBody(HttpURLConnection connection, String body) throws IOException {
-	OutputStream os = connection.getOutputStream();
-	OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-	osw.write(body);
-	osw.flush();
-	osw.close();
-	os.close();
+    private static HttpURLConnection getZoomConnection(String urlSuffix, String method, String body, ZoomApi api)
+	    throws IOException {
+	URL url = new URL(ZoomConstants.ZOOM_API_URL + urlSuffix);
+	HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+	switch (method) {
+	    case "PATCH":
+		ZoomService.setRequestMethod(connection, method);
+		connection.setRequestProperty("Content-Type", "application/json");
+		connection.setRequestProperty("Authorization", "Bearer " + ZoomService.generateJWT(api));
+		connection.setDoOutput(true);
+		break;
+	    case "POST":
+		connection.setRequestProperty("Content-Type", "application/json");
+		connection.setRequestProperty("Authorization", "Bearer " + ZoomService.generateJWT(api));
+		connection.setDoOutput(true);
+		connection.setRequestMethod(method);
+		break;
+	    default:
+		connection.setRequestMethod(method);
+		break;
+	}
+	if (body != null) {
+	    OutputStream os = connection.getOutputStream();
+	    OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+	    osw.write(body);
+	    osw.flush();
+	    osw.close();
+	    os.close();
+	}
+	return connection;
     }
 
     private static void switchOffRegistrantEmails(ZoomApi api, String meetingId) throws IOException, JSONException {
-	URL url = new URL("https://api.zoom.us/v2/meetings/" + meetingId);
-	HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-	ZoomService.setRequestMethod(connection, "PATCH");
-	connection.setRequestProperty("Content-Type", "application/json");
-	connection.setRequestProperty("Authorization", "Bearer " + ZoomService.generateJWT(api));
-	connection.setDoOutput(true);
 	JSONObject bodyJSON = new JSONObject();
 	JSONObject settings = new JSONObject();
 	settings.put("registrants_confirmation_email", false);
 	bodyJSON.put("settings", settings);
-	ZoomService.writeRequestBody(connection, bodyJSON.toString());
+	HttpURLConnection connection = ZoomService.getZoomConnection("meetings/" + meetingId, "PATCH",
+		bodyJSON.toString(), api);
 	ZoomService.getReponse(connection);
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Switched off registrant emails for meeting: " + meetingId);
+	}
     }
 
     private static void setRequestMethod(HttpURLConnection connection, String method) {

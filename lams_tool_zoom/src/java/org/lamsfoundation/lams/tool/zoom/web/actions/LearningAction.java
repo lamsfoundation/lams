@@ -120,22 +120,6 @@ public class LearningAction extends DispatchAction {
 	return user;
     }
 
-    public ActionForward openLearnerMeeting(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	// get user uid parameter
-	Long uid = WebUtil.readLongParam(request, ZoomConstants.PARAM_USER_UID);
-	ZoomUser user = zoomService.getUserByUID(uid);
-
-	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
-		.getSession().getAttribute(AttributeNames.USER);
-
-	ZoomSession session = zoomService.getSessionBySessionId(user.getZoomSession().getSessionId());
-
-	return null;
-
-    }
-
     public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -268,6 +252,8 @@ public class LearningAction extends DispatchAction {
 	    userDTO.setNotebookEntryDTO(new NotebookEntryDTO(entry));
 	}
 	request.setAttribute(ZoomConstants.ATTR_USER_DTO, userDTO);
+	// set toolSessionID in request
+	request.setAttribute(ZoomConstants.ATTR_TOOL_SESSION_ID, session.getSessionId());
 
 //	String dispatchValue = new String();
 //	boolean meetingOpen = false;
@@ -277,24 +263,24 @@ public class LearningAction extends DispatchAction {
 //	} else {
 //	}
 
-	zoomService.chooseApiKeys(zoom.getUid());
-	String startURL = zoom.getMeetingStartUrl();
-	if (zoom.getMeetingId() == null) {
-	    startURL = zoomService.createMeeting(zoom.getUid());
-	}
+//	String startURL = zoom.getMeetingStartUrl();
+//
+//	if (zoom.getMeetingId() != null) {
+//	    zoomService.chooseApiKeys(zoom.getUid());
+//	    startURL = zoomService.createMeeting(zoom.getUid());
+//	}
 
-	String meetingURL = null;
-	if (startURL == null) {
+	String meetingURL = user.getMeetingJoinUrl();
+	if (meetingURL == null && zoom.getMeetingId() != null) {
 	    meetingURL = zoomService.registerUser(zoom.getUid(), user.getUid(), session.getSessionName());
-	} else {
-	    meetingURL = startURL;
-	    zoom.setMeetingStartUrl(null);
-	    zoomService.saveOrUpdateZoom(zoom);
 	}
-	request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
 
-	// set toolSessionID in request
-	request.setAttribute(ZoomConstants.ATTR_TOOL_SESSION_ID, session.getSessionId());
+//	else {
+//	    meetingURL = startURL;
+//	    zoom.setMeetingStartUrl(null);
+//	    zoomService.saveOrUpdateZoom(zoom);
+//	}
+	request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
 
 	return mapping.findForward("zoom");
     }

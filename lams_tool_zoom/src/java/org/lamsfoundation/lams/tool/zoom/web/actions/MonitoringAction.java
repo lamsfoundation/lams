@@ -104,22 +104,21 @@ public class MonitoringAction extends DispatchAction {
 
     public ActionForward startMeeting(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
+	Zoom zoom = zoomService.getZoomByContentId(toolContentID);
 
-	MonitoringForm monitoringForm = (MonitoringForm) form;
+	ContentDTO contentDTO = new ContentDTO();
+	contentDTO.setTitle(zoom.getTitle());
+	contentDTO.setInstructions(zoom.getInstructions());
+	request.setAttribute(ZoomConstants.ATTR_CONTENT_DTO, contentDTO);
 
-	// get zoom session
-	ZoomSession session = zoomService.getSessionBySessionId(monitoringForm.getToolSessionID());
+	String meetingURL = zoom.getMeetingStartUrl();
+	if (meetingURL == null) {
+	    zoomService.chooseApiKeys(zoom.getUid());
+	    meetingURL = zoomService.createMeeting(zoom.getUid());
+	}
+	request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
 
-	// Get LAMS userDTO
-	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
-		.getSession().getAttribute(AttributeNames.USER);
-
-	String meetingKey;
-
-	// if the meeting is already created, redirect the monitor to the meeting directly
-
-	zoomService.saveOrUpdateZoomSession(session);
-
-	return null;
+	return mapping.findForward("learning");
     }
 }

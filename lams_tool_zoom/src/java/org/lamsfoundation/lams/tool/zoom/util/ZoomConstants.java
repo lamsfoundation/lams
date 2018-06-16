@@ -50,6 +50,11 @@ public final class ZoomConstants {
 
     // Tool signature
     public static final String TOOL_SIGNATURE = "lazoom10";
+    public static final String TOOL_CONTRIBUTE_URL = "tool/" + TOOL_SIGNATURE
+	    + "/monitoring.do?dispatch=startMeeting&toolContentID=";
+
+    public static final long JWT_EXPIRATION_MILISECONDS = 5000;
+    public static final String ZOOM_API_URL = "https://api.zoom.us/v2/";
 
     private ZoomConstants() {
 	// prevent construction
