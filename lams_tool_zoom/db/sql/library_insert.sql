@@ -11,6 +11,6 @@ VALUES
 (
 'Zoom',
 'Zoom',
-1,
+0,
 NOW()
 )

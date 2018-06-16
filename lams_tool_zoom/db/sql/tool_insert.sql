@@ -29,7 +29,7 @@ VALUES
 'Web conferencing using Zoom',
 'zoom',
 '@tool_version@',
-1,
+0,
 2,
 'tool/lazoom10/learning.do?mode=learner',
 'tool/lazoom10/learning.do?mode=author',
