@@ -22,14 +22,6 @@
 				${session.numberOfLearners}
 			</td>
 		</tr>
-		<tr>
-			<td>
-				<fmt:message>heading.totalFinishedLearnersInGroup</fmt:message>
-			</td>
-			<td>
-				${session.numberOfFinishedLearners}
-			</td>
-		</tr>
 	</table>
 	
 	<c:if test="${dto.groupedActivity}">	

@@ -706,7 +706,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
 	JSONObject bodyJSON = new JSONObject();
 	String lastName = userDTO.getLastName();
-	if (!sessionName.endsWith(" learners")) {
+	if (isGroupedActivity(zoom.getToolContentId())) {
 	    lastName += " (" + sessionName + ")";
 	}
 	bodyJSON.put("email", userDTO.getEmail()).put("first_name", userDTO.getFirstName()).put("last_name", lastName);

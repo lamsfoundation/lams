@@ -27,18 +27,30 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.lamsfoundation.lams.tool.zoom.model.ZoomSession;
+import org.lamsfoundation.lams.tool.zoom.model.ZoomUser;
+import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
 
 public class SessionDTO implements Comparable<SessionDTO> {
+    private static IZoomService zoomService;
 
     Long sessionID;
 
     String sessionName;
+
+    int numberOfLearners;
 
     Set<ZoomUserDTO> userDTOs = new TreeSet<ZoomUserDTO>();
 
     public SessionDTO(ZoomSession session) {
 	this.sessionID = session.getSessionId();
 	this.sessionName = session.getSessionName();
+
+	for (ZoomUser zoomUser : session.getZoomUsers()) {
+	    ZoomUserDTO userDTO = zoomService.createUserDTO(zoomUser);
+	    userDTOs.add(userDTO);
+	}
+
+	numberOfLearners = userDTOs.size();
     }
 
     @Override
@@ -75,5 +87,17 @@ public class SessionDTO implements Comparable<SessionDTO> {
 
     public void setUserDTOs(Set<ZoomUserDTO> zoomUsers) {
 	this.userDTOs = zoomUsers;
+    }
+
+    public int getNumberOfLearners() {
+	return numberOfLearners;
+    }
+
+    public void setNumberOfLearners(int numberOfLearners) {
+	this.numberOfLearners = numberOfLearners;
+    }
+
+    public static void setZoomService(IZoomService zoomService) {
+	SessionDTO.zoomService = zoomService;
     }
 }

@@ -34,16 +34,14 @@ import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.zoom.dto.ContentDTO;
 import org.lamsfoundation.lams.tool.zoom.dto.NotebookEntryDTO;//import org.lamsfoundation.lams.tool.zoom.dto.UserDTO;
+import org.lamsfoundation.lams.tool.zoom.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.zoom.dto.ZoomUserDTO;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
-import org.lamsfoundation.lams.tool.zoom.model.ZoomSession;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomUser;
 import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
 import org.lamsfoundation.lams.tool.zoom.service.ZoomServiceProxy;
 import org.lamsfoundation.lams.tool.zoom.util.ZoomConstants;
-import org.lamsfoundation.lams.tool.zoom.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class MonitoringAction extends DispatchAction {
@@ -76,12 +74,14 @@ public class MonitoringAction extends DispatchAction {
 	    logger.error("Unable to find tool content with id :" + toolContentID);
 	}
 
-	ContentDTO contentDT0 = new ContentDTO(zoom);
+	SessionDTO.setZoomService(zoomService);
+	ContentDTO contentDTO = new ContentDTO(zoom);
 
 	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
-	contentDT0.setCurrentTab(currentTab);
+	contentDTO.setCurrentTab(currentTab);
+	contentDTO.setGroupedActivity(zoomService.isGroupedActivity(toolContentID));
 
-	request.setAttribute(ZoomConstants.ATTR_CONTENT_DTO, contentDT0);
+	request.setAttribute(ZoomConstants.ATTR_CONTENT_DTO, contentDTO);
 	request.setAttribute(ZoomConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
 
 	return mapping.findForward("success");

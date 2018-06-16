@@ -23,7 +23,11 @@
 
 package org.lamsfoundation.lams.tool.zoom.dto;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
+import org.lamsfoundation.lams.tool.zoom.model.ZoomSession;
 
 public class ContentDTO {
 
@@ -39,7 +43,11 @@ public class ContentDTO {
 
     Long currentTab;
 
+    boolean contentInUse;
+
     boolean isGroupedActivity; // set manually in MonitoringAction
+
+    Set<SessionDTO> sessionDTOs = new TreeSet<SessionDTO>();
 
     /* Constructors */
     public ContentDTO() {
@@ -49,8 +57,14 @@ public class ContentDTO {
 	this.toolContentId = zoom.getToolContentId();
 	this.title = zoom.getTitle();
 	this.instructions = zoom.getInstructions();
+	this.contentInUse = zoom.isContentInUse();
 	this.reflectInstructions = zoom.getReflectInstructions();
 	this.reflectOnActivity = zoom.isReflectOnActivity();
+	for (ZoomSession session : zoom.getZoomSessions()) {
+	    sessionDTOs.add(new SessionDTO(session));
+	}
+
+	isGroupedActivity = false;
     }
 
     public String getInstructions() {
@@ -93,6 +107,14 @@ public class ContentDTO {
 	this.toolContentId = toolContentID;
     }
 
+    public Boolean getContentInUse() {
+	return contentInUse;
+    }
+
+    public void setContentInUse(Boolean contentInUse) {
+	this.contentInUse = contentInUse;
+    }
+
     public Long getCurrentTab() {
 	return currentTab;
     }
@@ -107,5 +129,13 @@ public class ContentDTO {
 
     public void setGroupedActivity(boolean isGroupedActivity) {
 	this.isGroupedActivity = isGroupedActivity;
+    }
+
+    public Set<SessionDTO> getSessionDTOs() {
+	return sessionDTOs;
+    }
+
+    public void setSessionDTOs(Set<SessionDTO> sessionDTOs) {
+	this.sessionDTOs = sessionDTOs;
     }
 }
