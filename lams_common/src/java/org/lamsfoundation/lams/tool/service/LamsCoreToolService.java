@@ -532,10 +532,10 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    throw new ToolException(message, e);
 	}
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevelsByToolSession(ToolSession toolSession) {
-	
+
 	if (toolSession == null) {
 	    String error = "The toolSession is null. Unable to get confidence levels";
 	    LamsCoreToolService.log.error(error);
@@ -548,7 +548,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    LamsCoreToolService.log.error(error);
 	    throw new DataMissingException(error);
 	}
-	
+
 	try {
 	    ToolSessionManager sessionManager = (ToolSessionManager) findToolService(tool);
 	    return sessionManager.getConfidenceLevels(toolSession.getToolSessionId());
@@ -562,7 +562,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 		    + " doesn't support the getToolOutput(name, toolSessionId, learnerId) method so no output definitions can be accessed.";
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
-	}	
+	}
     }
 
     @Override
@@ -668,13 +668,13 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     @Override
     public Long getLessonMaxPossibleMark(Lesson lesson) {
 	Set<ToolActivity> activities = getLearningDesignActivities(lesson.getLearningDesign());
-	
+
 	// calculate lesson's MaxPossibleMark
 	Long lessonMaxPossibleMark = 0L;
 	//take into account whether learning design uses grade weight
 	if (isWeightedMarks(activities)) {
 	    lessonMaxPossibleMark = 100L;
-	    
+
 	} else {
 	    for (ToolActivity toolActivity : activities) {
 		Long activityMaxPossibleMark = getActivityMaxPossibleMark(toolActivity);
@@ -692,7 +692,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	Set<ToolActivity> activities = getLearningDesignActivities(design);
 	return isWeightedMarks(activities);
     }
-    
+
     private boolean isWeightedMarks(Set<ToolActivity> activities) {
 	for (ToolActivity toolActivity : activities) {
 	    ActivityEvaluation eval = toolActivity.getEvaluation();
@@ -843,6 +843,10 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    if (sysTool != null) {
 		return setupURLWithActivityLessonID(activity, lessonID, sysTool.getContributeUrl());
 	    }
+	} else if (activity.isToolActivity()) {
+	    ToolActivity toolActivity = (ToolActivity) activity;
+	    ToolContentManager toolContentManager = (ToolContentManager) findToolService(toolActivity.getTool());
+	    return toolContentManager.getContributionURL(toolActivity.getToolContentId());
 	}
 	return null;
     }

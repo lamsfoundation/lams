@@ -136,7 +136,8 @@ public class ContributeActivityDTO {
 	    boolean isReq = (contributionType != null) && (contributionType.equals(ContributionTypes.PERMISSION_GATE)
 		    || contributionType.equals(ContributionTypes.CHOSEN_GROUPING)
 		    || contributionType.equals(ContributionTypes.CHOSEN_BRANCHING)
-		    || contributionType.equals(ContributionTypes.CONTENT_EDITED));
+		    || contributionType.equals(ContributionTypes.CONTENT_EDITED)
+		    || contributionType.equals(ContributionTypes.CONTRIBUTION));
 
 	    this.isRequired = new Boolean(isReq);
 	}
