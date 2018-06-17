@@ -76,7 +76,7 @@
 		<put name="body" value="/pages/monitoring/monitoring.jsp" />
 	</definition>
 
-	<definition name="tiles:/monitoring/zoom_display" extends="tiles:/layout:simple">
+	<definition name="tiles:/monitoring/notebook" extends="tiles:/layout:simple">
 		<put name="pageTitleKey" value="pageTitle.monitoring" />
 		<put name="header" value="tiles:/header:monitoring/notebook" type="definition" />
 		<put name="body" value="/pages/monitoring/notebook.jsp" />
@@ -98,16 +98,7 @@
 		<put name="body" value="/pages/admin/view.jsp" />
 	</definition>
 
-	<definition name="tiles:/admin/edit" extends="tiles:/layout:simple">
-		<put name="body" value="/pages/admin/edit.jsp" />
-	</definition>
 	<!-- End Admin -->
-
-	<!-- Begin Zoom -->
-	<definition name="tiles:/zoom/end_meeting" extends="tiles:/layout:simple">
-		<put name="body" value="/pages/zoom/end_meeting.jsp" />
-	</definition>
-	<!-- End Zoom -->
 
 	<!-- General Messsage -->
 	<definition name="tiles:/general/message" extends="tiles:/layout:simple">

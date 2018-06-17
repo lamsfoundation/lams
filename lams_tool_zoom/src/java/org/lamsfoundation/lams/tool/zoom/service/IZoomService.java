@@ -24,10 +24,12 @@
 package org.lamsfoundation.lams.tool.zoom.service;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
+import org.lamsfoundation.lams.tool.zoom.model.ZoomApi;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomSession;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomUser;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -129,9 +131,34 @@ public interface IZoomService {
 
     void updateNotebookEntry(Long uid, String entry);
 
-    boolean chooseApiKeys(Long zoomUid);
+    /**
+     * Choose API keys for a new meeting.
+     * NULL means that there are none available.
+     * false means that keys have been chosen but they seem to be in use
+     * true means that keys have been chosen and they seem to be free
+     */
+    Boolean chooseApi(Long zoomUid) throws IOException, JSONException;
 
+    /**
+     * Create a new Zoom meeting using API
+     *
+     * @return start URL for browser to call and start the meeting
+     */
     String createMeeting(Long zoomUid) throws IOException, JSONException;
 
+    /**
+     * Register user for a meeting. Use session name in last name if the activity is grouped.
+     *
+     * @return personalised join link
+     */
     String registerUser(Long zoomUid, Long userUid, String sessionName) throws IOException, JSONException;
+
+    List<ZoomApi> getApis();
+
+    void saveApis(List<ZoomApi> apis);
+
+    /**
+     * Checks if given API responds correctly
+     */
+    boolean pingZoomApi(Long uid) throws IOException, JSONException;
 }

@@ -37,7 +37,7 @@ VALUES
 'tool/lazoom10/authoring.do',
 'tool/lazoom10/monitoring.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lazoom10',
-'tool/lazoom10/admin/view.do',
+'tool/lazoom10/admin.do',
 'org.lamsfoundation.lams.tool.zoom.ApplicationResources',
 NOW(),
 NOW()

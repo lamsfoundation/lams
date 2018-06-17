@@ -23,6 +23,9 @@
 
 package org.lamsfoundation.lams.tool.zoom.model;
 
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
+
 /**
  *
  */
@@ -44,6 +47,13 @@ public class ZoomApi {
 	this.email = email;
 	this.key = key;
 	this.secret = value;
+    }
+
+    public ZoomApi(JSONObject apiJSON) throws JSONException {
+	this.uid = apiJSON.optLong("uid");
+	this.email = apiJSON.getString("email");
+	this.key = apiJSON.getString("key");
+	this.secret = apiJSON.getString("secret");
     }
 
     /**
@@ -77,15 +87,20 @@ public class ZoomApi {
 	this.key = key;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getSecret() {
 	return secret;
     }
 
     public void setSecret(String value) {
 	this.secret = value;
+    }
+
+    public JSONObject toJSON() throws JSONException {
+	JSONObject result = new JSONObject();
+	result.put("uid", uid);
+	result.put("email", email);
+	result.put("key", key);
+	result.put("secret", secret);
+	return result;
     }
 }

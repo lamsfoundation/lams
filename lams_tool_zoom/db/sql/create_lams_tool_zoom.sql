@@ -37,6 +37,9 @@ CREATE TABLE tl_lazoom10_session (
 CREATE TABLE tl_lazoom10_user (
   uid bigint(20) NOT NULL AUTO_INCREMENT,
   user_id bigint(20),
+  email varchar(255),
+  first_name varchar(255),
+  last_name varchar(255),
   finishedActivity bit(1),
   zoom_session_uid bigint(20),
   notebook_entry_uid bigint(20),
@@ -70,19 +73,5 @@ VALUES(
 	0,
 	0
 );
-
--- hardcoded API keys
-INSERT INTO tl_lazoom10_api (
-	email,
-	api_key,
-	api_secret
-)
-VALUES (
-	'marcin@cieslak.mail.pl',
-	'6mJsv7muQaeimMr7t6NlhA',
-	'10oY1sViuELyZ7QutePK7pIs5acJ1C0zeDuI'
-);
-
--- default configuration values
 
 SET FOREIGN_KEY_CHECKS=1;

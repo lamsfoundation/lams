@@ -34,8 +34,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -64,11 +67,7 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.tool.zoom.dao.IZoomConfigDAO;
 import org.lamsfoundation.lams.tool.zoom.dao.IZoomDAO;
-import org.lamsfoundation.lams.tool.zoom.dao.IZoomSessionDAO;
-import org.lamsfoundation.lams.tool.zoom.dao.IZoomUserDAO;
-import org.lamsfoundation.lams.tool.zoom.dto.ZoomUserDTO;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomApi;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomSession;
@@ -94,12 +93,6 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     private IZoomDAO zoomDAO = null;
 
-    private IZoomSessionDAO zoomSessionDAO = null;
-
-    private IZoomUserDAO zoomUserDAO = null;
-
-    private IZoomConfigDAO zoomConfigDAO = null;
-
     private ILearnerService learnerService;
 
     private ILamsToolService toolService;
@@ -124,7 +117,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	// learner starts
 	Zoom zoom = getZoomByContentId(toolContentId);
 	session.setZoom(zoom);
-	zoomSessionDAO.insertOrUpdate(session);
+	zoomDAO.insertOrUpdate(session);
     }
 
     @Override
@@ -147,7 +140,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-	zoomSessionDAO.deleteByProperty(ZoomSession.class, "sessionId", toolSessionId);
+	zoomDAO.deleteByProperty(ZoomSession.class, "sessionId", toolSessionId);
     }
 
     @Override
@@ -248,7 +241,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 			user.setNotebookEntryUID(null);
 		    }
 		    user.setFinishedActivity(false);
-		    zoomUserDAO.update(user);
+		    zoomDAO.update(user);
 		}
 	    }
 	}
@@ -454,7 +447,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     @Override
     @SuppressWarnings("unchecked")
     public ZoomSession getSessionBySessionId(Long toolSessionId) {
-	List<ZoomSession> list = zoomSessionDAO.findByProperty(ZoomSession.class, "sessionId", toolSessionId);
+	List<ZoomSession> list = zoomDAO.findByProperty(ZoomSession.class, "sessionId", toolSessionId);
 	if (list.isEmpty()) {
 	    return null;
 	} else {
@@ -468,7 +461,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	Map<String, Object> map = new HashMap<String, Object>();
 	map.put("userId", userId);
 	map.put("zoomSession.sessionId", toolSessionId);
-	List<ZoomUser> list = zoomUserDAO.findByProperties(ZoomUser.class, map);
+	List<ZoomUser> list = zoomDAO.findByProperties(ZoomUser.class, map);
 	if (list.isEmpty()) {
 	    return null;
 	} else {
@@ -479,7 +472,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     @Override
     @SuppressWarnings("unchecked")
     public ZoomUser getUserByUID(Long uid) {
-	List<ZoomUser> list = zoomUserDAO.findByProperty(ZoomUser.class, "uid", uid);
+	List<ZoomUser> list = zoomDAO.findByProperty(ZoomUser.class, "uid", uid);
 	if (list.isEmpty()) {
 	    return null;
 	} else {
@@ -494,12 +487,12 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     @Override
     public void saveOrUpdateZoomSession(ZoomSession zoomSession) {
-	zoomSessionDAO.insertOrUpdate(zoomSession);
+	zoomDAO.insertOrUpdate(zoomSession);
     }
 
     @Override
     public void saveOrUpdateZoomUser(ZoomUser zoomUser) {
-	zoomUserDAO.insertOrUpdate(zoomUser);
+	zoomDAO.insertOrUpdate(zoomUser);
     }
 
     @Override
@@ -546,36 +539,12 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	this.zoomToolContentHandler = zoomToolContentHandler;
     }
 
-    public IZoomSessionDAO getZoomSessionDAO() {
-	return zoomSessionDAO;
-    }
-
-    public void setZoomSessionDAO(IZoomSessionDAO sessionDAO) {
-	this.zoomSessionDAO = sessionDAO;
-    }
-
-    public IZoomConfigDAO getZoomConfigDAO() {
-	return zoomConfigDAO;
-    }
-
-    public void setZoomConfigDAO(IZoomConfigDAO zoomConfigDAO) {
-	this.zoomConfigDAO = zoomConfigDAO;
-    }
-
     public ILamsToolService getToolService() {
 	return toolService;
     }
 
     public void setToolService(ILamsToolService toolService) {
 	this.toolService = toolService;
-    }
-
-    public IZoomUserDAO getZoomUserDAO() {
-	return zoomUserDAO;
-    }
-
-    public void setZoomUserDAO(IZoomUserDAO userDAO) {
-	this.zoomUserDAO = userDAO;
     }
 
     public ILearnerService getLearnerService() {
@@ -613,16 +582,31 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
 
-    @Override
-    public boolean chooseApiKeys(Long zoomUid) {
+    public Boolean chooseApi(Long zoomUid) throws IOException, JSONException {
 	Zoom zoom = (Zoom) zoomDAO.find(Zoom.class, zoomUid);
-	ZoomApi api = zoom.getApi();
-	if (zoom.getApi() == null) {
-	    api = (ZoomApi) zoomDAO.find(ZoomApi.class, 1L);
-	    zoom.setApi(api);
-	    zoomDAO.update(zoom);
+	List<ZoomApi> apis = getApis();
+	if (apis.isEmpty()) {
+	    return null;
 	}
-	return true;
+	ZoomApi chosenApi = null;
+	for (ZoomApi api : apis) {
+	    String meetingListURL = "users/" + api.getEmail() + "/meetings?type=live";
+	    HttpURLConnection connection = ZoomService.getZoomConnection(meetingListURL, "GET", null, api);
+	    JSONObject resultJSON = ZoomService.getReponse(connection);
+	    boolean noLiveMeetings = resultJSON != null && resultJSON.getInt("total_records") == 0;
+	    if (noLiveMeetings) {
+		chosenApi = api;
+		break;
+	    }
+	}
+	boolean result = chosenApi != null;
+	if (!result) {
+	    Random random = new Random();
+	    chosenApi = apis.get(random.nextInt(apis.size()));
+	}
+	zoom.setApi(chosenApi);
+	zoomDAO.update(zoom);
+	return result;
     }
 
     @Override
@@ -663,29 +647,75 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     @Override
     public String registerUser(Long zoomUid, Long userUid, String sessionName) throws IOException, JSONException {
-	ZoomUser user = (ZoomUser) zoomUserDAO.find(ZoomUser.class, userUid);
+	ZoomUser user = (ZoomUser) zoomDAO.find(ZoomUser.class, userUid);
 	if (user.getMeetingJoinUrl() != null) {
 	    return user.getMeetingJoinUrl();
 	}
-	ZoomUserDTO userDTO = new ZoomUserDTO(user);
 	Zoom zoom = (Zoom) zoomDAO.find(Zoom.class, zoomUid);
 
 	JSONObject bodyJSON = new JSONObject();
-	String lastName = userDTO.getLastName();
+	String lastName = user.getLastName();
 	if (isGroupedActivity(zoom.getToolContentId())) {
 	    lastName += " (" + sessionName + ")";
 	}
-	bodyJSON.put("email", userDTO.getEmail()).put("first_name", userDTO.getFirstName()).put("last_name", lastName);
+	bodyJSON.put("email", user.getEmail()).put("first_name", user.getFirstName()).put("last_name", lastName);
 	HttpURLConnection connection = ZoomService.getZoomConnection("meetings/" + zoom.getMeetingId() + "/registrants",
 		"POST", bodyJSON.toString(), zoom.getApi());
 	JSONObject responseJSON = ZoomService.getReponse(connection);
 	String meetingJoinURL = responseJSON.getString("join_url");
 	user.setMeetingJoinUrl(meetingJoinURL);
-	zoomUserDAO.update(user);
+	zoomDAO.update(user);
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Registerd user with UID: " + user.getUid() + " for meeting: " + zoom.getMeetingId());
 	}
 	return meetingJoinURL;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<ZoomApi> getApis() {
+	return zoomDAO.findAll(ZoomApi.class);
+    }
+
+    @Override
+    public void saveApis(List<ZoomApi> apis) {
+	List<ZoomApi> existingApis = getApis();
+	Set<Long> delete = new HashSet<Long>();
+	Set<String> saved = new HashSet<String>();
+	for (ZoomApi existingApi : existingApis) {
+	    boolean found = false;
+	    for (ZoomApi api : apis) {
+		if (existingApi.getEmail().equalsIgnoreCase(api.getEmail())) {
+		    found = true;
+		    saved.add(api.getEmail());
+		    if (!existingApi.getKey().equals(api.getKey())
+			    || !existingApi.getSecret().equals(api.getSecret())) {
+			existingApi.setKey(api.getKey());
+			existingApi.setSecret(api.getSecret());
+			zoomDAO.update(existingApi);
+		    }
+		    break;
+		}
+	    }
+	    if (!found) {
+		delete.add(existingApi.getUid());
+	    }
+	}
+	for (Long uidToDelete : delete) {
+	    zoomDAO.deleteById(ZoomApi.class, uidToDelete);
+	}
+	for (ZoomApi api : apis) {
+	    if (!saved.contains(api.getEmail())) {
+		zoomDAO.insert(api);
+	    }
+	}
+    }
+
+    public boolean pingZoomApi(Long uid) throws IOException, JSONException {
+	ZoomApi api = (ZoomApi) zoomDAO.find(ZoomApi.class, uid);
+	HttpURLConnection connection = ZoomService.getZoomConnection("users/" + api.getEmail() + "/meetings", "GET",
+		null, api);
+	return ZoomService.getReponse(connection) != null;
     }
 
     private static String generateJWT(ZoomApi api) {
@@ -698,18 +728,17 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	    throws IOException {
 	URL url = new URL(ZoomConstants.ZOOM_API_URL + urlSuffix);
 	HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+	connection.setRequestProperty("Authorization", "Bearer " + ZoomService.generateJWT(api));
 	switch (method) {
 	    case "PATCH":
 		ZoomService.setRequestMethod(connection, method);
 		connection.setRequestProperty("Content-Type", "application/json");
-		connection.setRequestProperty("Authorization", "Bearer " + ZoomService.generateJWT(api));
 		connection.setDoOutput(true);
 		break;
 	    case "POST":
-		connection.setRequestProperty("Content-Type", "application/json");
-		connection.setRequestProperty("Authorization", "Bearer " + ZoomService.generateJWT(api));
-		connection.setDoOutput(true);
 		connection.setRequestMethod(method);
+		connection.setRequestProperty("Content-Type", "application/json");
+		connection.setDoOutput(true);
 		break;
 	    default:
 		connection.setRequestMethod(method);
@@ -774,7 +803,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	    }
 
 	    if (logger.isDebugEnabled()) {
-		logger.info("Server response: " + code + " " + connection.getResponseMessage() + " " + response);
+		logger.debug("Server response: " + code + " " + connection.getResponseMessage() + " " + response);
 	    }
 	} finally {
 	    connection.disconnect();

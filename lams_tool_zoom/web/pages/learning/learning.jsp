@@ -14,7 +14,16 @@
 		<c:out value="${contentDTO.instructions}" escapeXml="false" />
 	</div>
 
-	<div class="buttons">
+	<logic:messagesPresent>
+		<lams:Alert type="danger" id="form-error" close="false">
+			<html:messages id="error">
+				<c:out value="${error}" escapeXml="false" />
+				<br />
+			</html:messages>
+		</lams:Alert>
+	</logic:messagesPresent>
+	
+	<c:if test="${not skipContent}">
 		<c:choose>
 			<c:when test="${empty meetingURL}">
 				<p>
@@ -28,7 +37,7 @@
 				<iframe id="zoomJoinFrame" style="width: 100%; height: 650px; border: none;" src="${meetingURL}"></iframe>
 			</c:otherwise>
 		</c:choose>
-	</div>
+	</c:if>
 
 	<hr class="msg-hr">
 

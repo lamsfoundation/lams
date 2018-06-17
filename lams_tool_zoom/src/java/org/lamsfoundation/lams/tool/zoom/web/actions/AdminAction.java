@@ -23,52 +23,79 @@
 
 package org.lamsfoundation.lams.tool.zoom.web.actions;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.MappingDispatchAction;
-import org.lamsfoundation.lams.tool.zoom.dto.ConfigDTO;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
+import org.apache.struts.actions.DispatchAction;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.tool.zoom.model.ZoomApi;
 import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
 import org.lamsfoundation.lams.tool.zoom.service.ZoomServiceProxy;
-import org.lamsfoundation.lams.tool.zoom.util.ZoomConstants;
-import org.lamsfoundation.lams.tool.zoom.web.forms.AdminForm;
 
-public class AdminAction extends MappingDispatchAction {
+public class AdminAction extends DispatchAction {
 
     private IZoomService zoomService;
 
-    // private static final Logger logger = Logger.getLogger(AdminAction.class);
+    private static final Logger logger = Logger.getLogger(AdminAction.class);
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
 	// set up zoomService
 	zoomService = ZoomServiceProxy.getZoomService(this.getServlet().getServletContext());
-
 	return super.execute(mapping, form, request, response);
     }
 
-    public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @Override
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
-	ConfigDTO configDTO = new ConfigDTO();
-
-	request.setAttribute(ZoomConstants.ATTR_CONFIG_DTO, configDTO);
-	return mapping.findForward("view-success");
+	List<ZoomApi> apis = zoomService.getApis();
+	JSONArray apisJSON = new JSONArray();
+	for (ZoomApi api : apis) {
+	    apisJSON.put(api.toJSON());
+	}
+	request.setAttribute("apis", apisJSON);
+	return mapping.findForward("success");
     }
 
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
-	if (!isCancelled(request)) {
-	    AdminForm adminForm = (AdminForm) form;
-
+	String apisJSONString = request.getParameter("apisJSON");
+	JSONArray apisJSON = new JSONArray(apisJSONString);
+	List<ZoomApi> apis = new LinkedList<ZoomApi>();
+	for (int index = 0; index < apisJSON.length(); index++) {
+	    JSONObject apiJSON = apisJSON.getJSONObject(index);
+	    ZoomApi api = new ZoomApi(apiJSON);
+	    apis.add(api);
+	}
+	zoomService.saveApis(apis);
+	request.setAttribute("saveOK", true);
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Saved " + apis.size() + " Zoom APIs");
 	}
 
-	return mapping.findForward("save-success");
+	ActionErrors errors = new ActionErrors();
+	apis = zoomService.getApis();
+	for (ZoomApi api : apis) {
+	    if (!zoomService.pingZoomApi(api.getUid())) {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.api.ping", api.getEmail()));
+	    }
+	}
+	if (!errors.isEmpty()) {
+	    this.addErrors(request, errors);
+	}
+
+	return unspecified(mapping, form, request, response);
     }
 }

@@ -263,23 +263,11 @@ public class LearningAction extends DispatchAction {
 //	} else {
 //	}
 
-//	String startURL = zoom.getMeetingStartUrl();
-//
-//	if (zoom.getMeetingId() != null) {
-//	    zoomService.chooseApiKeys(zoom.getUid());
-//	    startURL = zoomService.createMeeting(zoom.getUid());
-//	}
-
 	String meetingURL = user.getMeetingJoinUrl();
 	if (meetingURL == null && zoom.getMeetingId() != null) {
 	    meetingURL = zoomService.registerUser(zoom.getUid(), user.getUid(), session.getSessionName());
 	}
 
-//	else {
-//	    meetingURL = startURL;
-//	    zoom.setMeetingStartUrl(null);
-//	    zoomService.saveOrUpdateZoom(zoom);
-//	}
 	request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
 
 	return mapping.findForward("zoom");

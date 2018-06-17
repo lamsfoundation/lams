@@ -25,10 +25,6 @@
       name="authoringForm"
       type="org.lamsfoundation.lams.tool.zoom.web.forms.AuthoringForm"
     />
-    <form-bean
-      name="adminForm"
-      type="org.lamsfoundation.lams.tool.zoom.web.forms.AdminForm"
-    />
 
   </form-beans>
 
@@ -39,9 +35,6 @@
   -->
 
   <!-- ========== Global Forward Definitions =================================== -->
-  <global-forwards>
-	<forward name="test" path="/pages/test.html" />
-</global-forwards>
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
@@ -60,8 +53,8 @@
         redirect="false"
       />
       <forward
-        name="zoom_display"
-        path="tiles:/monitoring/zoom_display"
+        name="notebook"
+        path="tiles:/monitoring/notebook"
         redirect="false"
       />
        <forward
@@ -101,79 +94,17 @@
       />
     </action>
     <action
-      path="/admin/view"
+      path="/admin"
       type="org.lamsfoundation.lams.tool.zoom.web.actions.AdminAction"
-      name="adminForm"
       scope="request"
-      parameter="view"
+      parameter="dispatch"
       unknown="false"
       validate="false"
     >
       <forward
-        name="view-success"
+        name="success"
         path="tiles:/admin/view"
         redirect="false"
-      />
-      <forward
-        name="edit-success"
-        path="tiles:/admin/edit"
-        redirect="false"
-      />
-      <forward
-        name="save-success"
-        path="/admin/view.do"
-        redirect="true"
-      />
-    </action>
-    <action
-      path="/admin/edit"
-      type="org.lamsfoundation.lams.tool.zoom.web.actions.AdminAction"
-      name="adminForm"
-      scope="request"
-      parameter="edit"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="view-success"
-        path="tiles:/admin/view"
-        redirect="false"
-      />
-      <forward
-        name="edit-success"
-        path="tiles:/admin/edit"
-        redirect="false"
-      />
-      <forward
-        name="save-success"
-        path="/admin/view.do"
-        redirect="true"
-      />
-    </action>
-    <action
-      path="/admin/save"
-      type="org.lamsfoundation.lams.tool.zoom.web.actions.AdminAction"
-      name="adminForm"
-      scope="request"
-      input="tiles:/admin/edit"
-      parameter="save"
-      unknown="false"
-      validate="true"
-    >
-      <forward
-        name="view-success"
-        path="tiles:/admin/view"
-        redirect="false"
-      />
-      <forward
-        name="edit-success"
-        path="tiles:/admin/edit"
-        redirect="false"
-      />
-      <forward
-        name="save-success"
-        path="/admin/view.do"
-        redirect="true"
       />
     </action>
     <action
@@ -199,17 +130,14 @@
       />
     </action>
 
-   <action path="/endMeeting"
-	type="org.apache.struts.actions.ForwardAction"
-	parameter="tiles:/zoom/end_meeting" />
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
     <message-resources    parameter="org.lamsfoundation.lams.tool.zoom.ApplicationResources"/>
 
-<plug-in className="org.apache.struts.tiles.TilesPlugin">
-	<set-property property="definitions-config" value="/WEB-INF/tiles-defs.xml"/>
-</plug-in>
+	<plug-in className="org.apache.struts.tiles.TilesPlugin">
+		<set-property property="definitions-config" value="/WEB-INF/tiles-defs.xml"/>
+	</plug-in>
 
 </struts-config>
