@@ -489,12 +489,6 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     }
 
     @Override
-    public ZoomUserDTO createUserDTO(ZoomUser zoomUser) {
-	User user = (User) zoomUserDAO.find(User.class, zoomUser.getUserId().intValue());
-	return new ZoomUserDTO(zoomUser, user);
-    }
-
-    @Override
     public void saveOrUpdateZoom(Zoom zoom) {
 	zoomDAO.insertOrUpdate(zoom);
     }
@@ -511,7 +505,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     @Override
     public ZoomUser createZoomUser(UserDTO user, ZoomSession zoomSession) {
-	ZoomUser zoomUser = new ZoomUser(user.getUserID(), zoomSession);
+	ZoomUser zoomUser = new ZoomUser(user, zoomSession);
 	saveOrUpdateZoomUser(zoomUser);
 	return zoomUser;
     }
@@ -701,7 +695,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	if (user.getMeetingJoinUrl() != null) {
 	    return user.getMeetingJoinUrl();
 	}
-	ZoomUserDTO userDTO = createUserDTO(user);
+	ZoomUserDTO userDTO = new ZoomUserDTO(user);
 	Zoom zoom = (Zoom) zoomDAO.find(Zoom.class, zoomUid);
 
 	JSONObject bodyJSON = new JSONObject();

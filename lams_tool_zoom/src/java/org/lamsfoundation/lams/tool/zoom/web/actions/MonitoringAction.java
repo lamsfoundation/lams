@@ -34,7 +34,6 @@ import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.zoom.dto.ContentDTO;
 import org.lamsfoundation.lams.tool.zoom.dto.NotebookEntryDTO;//import org.lamsfoundation.lams.tool.zoom.dto.UserDTO;
-import org.lamsfoundation.lams.tool.zoom.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.zoom.dto.ZoomUserDTO;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomUser;
@@ -74,7 +73,6 @@ public class MonitoringAction extends DispatchAction {
 	    logger.error("Unable to find tool content with id :" + toolContentID);
 	}
 
-	SessionDTO.setZoomService(zoomService);
 	ContentDTO contentDTO = new ContentDTO(zoom);
 
 	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
@@ -94,7 +92,7 @@ public class MonitoringAction extends DispatchAction {
 	ZoomUser user = zoomService.getUserByUID(uid);
 	NotebookEntry entry = zoomService.getNotebookEntry(user.getNotebookEntryUID());
 
-	ZoomUserDTO userDTO = zoomService.createUserDTO(user);
+	ZoomUserDTO userDTO = new ZoomUserDTO(user);
 	userDTO.setNotebookEntryDTO(new NotebookEntryDTO(entry));
 
 	request.setAttribute(ZoomConstants.ATTR_USER_DTO, userDTO);

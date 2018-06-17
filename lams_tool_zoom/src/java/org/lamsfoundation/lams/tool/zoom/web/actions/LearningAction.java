@@ -247,7 +247,7 @@ public class LearningAction extends DispatchAction {
 
 	// get any existing notebook entries and create userDTO
 	NotebookEntry entry = zoomService.getNotebookEntry(user.getNotebookEntryUID());
-	ZoomUserDTO userDTO = zoomService.createUserDTO(user);
+	ZoomUserDTO userDTO = new ZoomUserDTO(user);
 	if (entry != null) {
 	    userDTO.setNotebookEntryDTO(new NotebookEntryDTO(entry));
 	}

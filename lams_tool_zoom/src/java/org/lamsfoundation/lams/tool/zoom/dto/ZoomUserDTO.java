@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.zoom.dto;
 
 import org.lamsfoundation.lams.tool.zoom.model.ZoomUser;
-import org.lamsfoundation.lams.usermanagement.User;
 
 public class ZoomUserDTO implements Comparable<ZoomUserDTO> {
     private Long uid;
@@ -43,12 +42,11 @@ public class ZoomUserDTO implements Comparable<ZoomUserDTO> {
 
     private Long notebookEntryUID;
 
-    public ZoomUserDTO(ZoomUser zoomUser, User user) {
+    public ZoomUserDTO(ZoomUser zoomUser) {
 	this.uid = zoomUser.getUid();
-	this.loginName = user.getLogin();
-	this.firstName = user.getFirstName();
-	this.lastName = user.getLastName();
-	this.email = user.getEmail();
+	this.firstName = zoomUser.getFirstName();
+	this.lastName = zoomUser.getLastName();
+	this.email = zoomUser.getEmail();
 	this.finishedActivity = zoomUser.isFinishedActivity();
 	this.notebookEntryUID = zoomUser.getNotebookEntryUID();
     }

@@ -28,11 +28,8 @@ import java.util.TreeSet;
 
 import org.lamsfoundation.lams.tool.zoom.model.ZoomSession;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomUser;
-import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
 
 public class SessionDTO implements Comparable<SessionDTO> {
-    private static IZoomService zoomService;
-
     Long sessionID;
 
     String sessionName;
@@ -46,7 +43,7 @@ public class SessionDTO implements Comparable<SessionDTO> {
 	this.sessionName = session.getSessionName();
 
 	for (ZoomUser zoomUser : session.getZoomUsers()) {
-	    ZoomUserDTO userDTO = zoomService.createUserDTO(zoomUser);
+	    ZoomUserDTO userDTO = new ZoomUserDTO(zoomUser);
 	    userDTOs.add(userDTO);
 	}
 
@@ -95,9 +92,5 @@ public class SessionDTO implements Comparable<SessionDTO> {
 
     public void setNumberOfLearners(int numberOfLearners) {
 	this.numberOfLearners = numberOfLearners;
-    }
-
-    public static void setZoomService(IZoomService zoomService) {
-	SessionDTO.zoomService = zoomService;
     }
 }

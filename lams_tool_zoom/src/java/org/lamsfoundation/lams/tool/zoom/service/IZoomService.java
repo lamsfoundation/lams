@@ -27,7 +27,6 @@ import java.io.IOException;
 
 import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.zoom.dto.ZoomUserDTO;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomConfig;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomSession;
@@ -73,7 +72,7 @@ public interface IZoomService {
 
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);
@@ -180,6 +179,4 @@ public interface IZoomService {
     String createMeeting(Long zoomUid) throws IOException, JSONException;
 
     String registerUser(Long zoomUid, Long userUid, String sessionName) throws IOException, JSONException;
-
-    ZoomUserDTO createUserDTO(ZoomUser zoomUser);
 }

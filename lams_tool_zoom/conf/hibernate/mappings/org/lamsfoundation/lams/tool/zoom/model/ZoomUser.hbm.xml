@@ -17,13 +17,7 @@
             column="uid"
             type="java.lang.Long"
         >
-            <generator class="native">
-              <!--  
-                  To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-ZoomUser.xml 
-                  containing the additional parameters and place it in your merge dir. 
-              --> 
-            </generator>
+            <generator class="native" />
         </id>
 
         <property
@@ -34,7 +28,34 @@
             column="user_id"
             length="20"
         />
+        
+        <property
+            name="lastName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="last_name"
+            length="255"
+        />
 
+        <property
+            name="firstName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="first_name"
+            length="255"
+        />
+        
+        <property
+            name="email"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="email"
+            length="255"
+        />
+        
         <property
             name="finishedActivity"
             type="boolean"
