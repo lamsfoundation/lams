@@ -28,7 +28,6 @@ import java.io.IOException;
 import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
-import org.lamsfoundation.lams.tool.zoom.model.ZoomConfig;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomSession;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomUser;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -122,57 +121,13 @@ public interface IZoomService {
      */
     public ZoomUser createZoomUser(UserDTO user, ZoomSession zoomSession);
 
-    /**
-     *
-     * @param id
-     * @param idType
-     * @param signature
-     * @param userID
-     * @param title
-     * @param entry
-     * @return
-     */
     Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
-    /**
-     *
-     * @param uid
-     * @return
-     */
     NotebookEntry getNotebookEntry(Long uid);
 
-    /**
-     *
-     * @param notebookEntry
-     */
     void updateNotebookEntry(NotebookEntry notebookEntry);
 
-    /**
-     *
-     * @param uid
-     * @param title
-     * @param entry
-     */
     void updateNotebookEntry(Long uid, String entry);
-
-    /**
-     *
-     * @param key
-     */
-    ZoomConfig getConfig(String key);
-
-    /**
-     *
-     * @param key
-     */
-    String getConfigValue(String key);
-
-    /**
-     *
-     * @param key
-     * @param value
-     */
-    void saveOrUpdateConfigEntry(ZoomConfig zoomConfig);
 
     boolean chooseApiKeys(Long zoomUid);
 

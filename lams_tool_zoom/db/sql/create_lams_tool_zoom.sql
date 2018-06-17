@@ -46,13 +46,6 @@ CREATE TABLE tl_lazoom10_user (
   	FOREIGN KEY (zoom_session_uid) REFERENCES tl_lazoom10_session (uid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE tl_lazoom10_config (
-  uid bigint(20) NOT NULL AUTO_INCREMENT,
-  config_key varchar(255),
-  config_value varchar(255),
-  PRIMARY KEY (uid)
-);
-
 CREATE TABLE tl_lazoom10_api (
   uid bigint(20) NOT NULL AUTO_INCREMENT,
   email varchar(64),

@@ -71,7 +71,6 @@ import org.lamsfoundation.lams.tool.zoom.dao.IZoomUserDAO;
 import org.lamsfoundation.lams.tool.zoom.dto.ZoomUserDTO;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomApi;
-import org.lamsfoundation.lams.tool.zoom.model.ZoomConfig;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomSession;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomUser;
 import org.lamsfoundation.lams.tool.zoom.util.ZoomConstants;
@@ -508,33 +507,6 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	ZoomUser zoomUser = new ZoomUser(user, zoomSession);
 	saveOrUpdateZoomUser(zoomUser);
 	return zoomUser;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public ZoomConfig getConfig(String key) {
-	List<ZoomConfig> list = zoomConfigDAO.findByProperty(ZoomConfig.class, "key", key);
-	if (list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public String getConfigValue(String key) {
-	List<ZoomConfig> list = zoomConfigDAO.findByProperty(ZoomConfig.class, "key", key);
-	if (list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0).getValue();
-	}
-    }
-
-    @Override
-    public void saveOrUpdateConfigEntry(ZoomConfig zoomConfig) {
-	zoomConfigDAO.insertOrUpdate(zoomConfig);
     }
 
     /**

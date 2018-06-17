@@ -31,26 +31,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.MappingDispatchAction;
 import org.lamsfoundation.lams.tool.zoom.dto.ConfigDTO;
-import org.lamsfoundation.lams.tool.zoom.model.ZoomConfig;
 import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
 import org.lamsfoundation.lams.tool.zoom.service.ZoomServiceProxy;
 import org.lamsfoundation.lams.tool.zoom.util.ZoomConstants;
 import org.lamsfoundation.lams.tool.zoom.web.forms.AdminForm;
 
-/**
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- * @author Ernie Ghiglione
- *
- */
 public class AdminAction extends MappingDispatchAction {
 
     private IZoomService zoomService;
@@ -76,37 +61,14 @@ public class AdminAction extends MappingDispatchAction {
 	return mapping.findForward("view-success");
     }
 
-    public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	AdminForm adminForm = (AdminForm) form;
-
-	return mapping.findForward("edit-success");
-    }
-
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	if (!isCancelled(request)) {
-
 	    AdminForm adminForm = (AdminForm) form;
 
 	}
 
 	return mapping.findForward("save-success");
     }
-
-    private void updateConfig(String key, String value) {
-
-	ZoomConfig config = zoomService.getConfig(key);
-
-	if (config == null) {
-	    config = new ZoomConfig(key, value);
-	} else {
-	    config.setValue(value);
-	}
-
-	zoomService.saveOrUpdateConfigEntry(config);
-    }
-
 }
