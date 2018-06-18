@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
+﻿﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null,
 // DIV container for lesson SVG
@@ -221,8 +221,11 @@ function lessonStateFieldChanged() {
 		case 4: 
 			$('#lessonScheduler').show();
 			$('#lessonStartApply').hide();
-			$('#lessonDisableApply').show();
 			$('#lessonStateApply').hide();
+			$("#scheduleDisableLessonButton").html(LABELS.SCHEDULE);
+			$("#scheduleDisableLessonButton").css('display', 'inline'); // must be inline or it will be wrong size
+			$("#disableLessonButton").show();
+			$('#lessonDisableApply').show();
 			break;
 		default:
 			$('#lessonDisableApply').hide();
@@ -315,9 +318,9 @@ function applyStateChange(state, method, newLessonEndDate) {
 			} else {
 				refreshMonitor('lesson');
 			}
-			if ( newLessonEndDate ) {
+			if ( state == 4 ) {
 				lessonEndDate = newLessonEndDate;
-			}
+			} 	
 		}
 	});
 }
@@ -398,7 +401,7 @@ function updateLessonTab(){
 			}
 			
 			// show/remove widgets for lesson scheduling
-			var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton, #lessonScheduler'),
+			var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton, #lessonScheduler, #scheduleDisableLessonButton, #disableLessonButton'),
 				startDateField = $('#lessonStartDateSpan'),
 				lessonFinishDateSpan = $('#lessonFinishDateSpan'),
 				disableDateSpan = $('#lessonDisableApply'),
@@ -432,13 +435,12 @@ function updateLessonTab(){
 					lessonStateChanger.hide();
 					break;
 				//started lesson
-				default: 			
+				default: 		
 				 	if ( response.finishDate ) {
 						scheduleControls.css('display','inline');
 						$("#lessonStartApply").css('display','none');
 				 		lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','inline');
 						$("#scheduleDisableLessonButton").html(LABELS.RESCHEDULE);
-						$("#disableLessonButton").css('display', 'none');
 				 	} else {
 						scheduleControls.css('display','none');
 						startDateField.text(response.startDate).hide();

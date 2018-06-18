@@ -335,7 +335,7 @@
 									<div class="collapse offset10" id="changeState">
 										<div id="lessonScheduler">
 											<form class="form-horizontal">
-												<div class="form-group" id="lessonStartApply" style="margin-bottom: 5px;">
+												<div class="form-group" id="lessonStartApply">
 													<label for="scheduleDatetimeField" class="col-sm-1"><fmt:message key="lesson.start"/></label>
 													<div class="col-sm-8">
 													<input class="lessonManageField input-sm" id="scheduleDatetimeField" type="text"/>
@@ -362,8 +362,7 @@
 													</a>
 													<a id="disableLessonButton" class="btn btn-xs btn-default" href="#"
 														   onClick="javascript:disableLesson()"
-														   title='<fmt:message key="button.disable.now.tooltip"/>'
-														   style="display:none">
+														   title='<fmt:message key="button.disable.now.tooltip"/>'>
 													   <fmt:message key="button.disable.now"/>
 													</a>
 													</div>
