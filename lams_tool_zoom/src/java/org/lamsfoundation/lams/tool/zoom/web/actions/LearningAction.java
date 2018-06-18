@@ -231,18 +231,20 @@ public class LearningAction extends DispatchAction {
 	// set toolSessionID in request
 	request.setAttribute(ZoomConstants.ATTR_TOOL_SESSION_ID, session.getSessionId());
 
-	if (mode.isAuthor()) {
+	if (mode.isAuthor() || !zoom.isStartInMonitor()) {
 	    // start a meeting just like a monitor would
 	    ActionErrors errors = ZoomUtil.startMeeting(zoomService, zoom, request);
 	    if (!errors.isEmpty()) {
 		this.addErrors(request, errors);
 	    }
-	} else {
+	}
+	if (!mode.isAuthor()) {
 	    // register a learner for the meeting
 	    String meetingURL = user.getMeetingJoinUrl();
 	    if (meetingURL == null && zoom.getMeetingId() != null) {
 		meetingURL = zoomService.registerUser(zoom.getUid(), user.getUid(), session.getSessionName());
 	    }
+	    // if start in monitor is not set, this overwrites the URL set in ZoomUtil.startMeeting() above
 	    request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
 	}
 

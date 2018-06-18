@@ -10,6 +10,8 @@ CREATE TABLE tl_lazoom10_zoom (
   instructions mediumtext,
   reflect_on_activity bit(1),
   reflect_instructions mediumtext,
+  start_in_monitor bit(1) DEFAULT 1,
+  duration smallint,
   content_in_use bit(1),
   define_later bit(1),
   api_id bigint(20),
@@ -61,6 +63,8 @@ INSERT INTO tl_lazoom10_zoom (
 	title,
 	instructions,
 	tool_content_id,
+	start_in_monitor,
+	duration,
 	content_in_use,
 	define_later,
 	reflect_on_activity
@@ -69,6 +73,8 @@ VALUES(
 	"Zoom",
 	"Instructions",
 	${default_content_id},
+	1,
+	120,
 	0,
 	0,
 	0

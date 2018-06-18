@@ -636,30 +636,24 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	    throw new ZoomException("Can not create a meeting without API keys chosen");
 	}
 	JSONObject bodyJSON = new JSONObject();
-	JSONObject settings = new JSONObject();
-	settings.put("approval_type", 0);
-	settings.put("join_before_host", true);
 	Date currentTime = new Date();
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 	String startTime = sdf.format(currentTime);
-	bodyJSON.put("topic", zoom.getTitle()).put("type", 2).put("start_time", startTime).put("settings", settings);
-
+	bodyJSON.put("topic", zoom.getTitle()).put("type", 2).put("start_time", startTime);
 	HttpURLConnection connection = ZoomService.getZoomConnection("users/" + zoom.getApi().getEmail() + "/meetings",
 		"POST", bodyJSON.toString(), zoom.getApi());
 	JSONObject responseJSON = ZoomService.getReponse(connection);
-	String startURL = responseJSON.getString("start_url");
 	String meetingId = String.valueOf(responseJSON.getLong("id"));
-
-	ZoomService.switchOffRegistrantEmails(zoom.getApi(), meetingId);
-
-	zoom.setMeetingStartUrl(startURL);
 	zoom.setMeetingId(meetingId);
+
+	ZoomService.configureMeeting(zoom);
+
 	zoomDAO.update(zoom);
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Created meeting: " + meetingId);
 	}
-	return startURL;
+	return zoom.getMeetingStartUrl();
     }
 
     @Override
@@ -730,7 +724,8 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     public boolean pingZoomApi(Long uid) throws IOException, JSONException {
 	ZoomApi api = (ZoomApi) zoomDAO.find(ZoomApi.class, uid);
-	HttpURLConnection connection = ZoomService.getZoomConnection("users/email?email=" + api.getEmail(), "GET", null, api);
+	HttpURLConnection connection = ZoomService.getZoomConnection("users/email?email=" + api.getEmail(), "GET", null,
+		api);
 	JSONObject resultJSON = ZoomService.getReponse(connection);
 	return resultJSON != null && resultJSON.getBoolean("existed_email");
     }
@@ -772,16 +767,32 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	return connection;
     }
 
-    private static void switchOffRegistrantEmails(ZoomApi api, String meetingId) throws IOException, JSONException {
+    /**
+     * Put extra options which can not be set when creating a meeting
+     */
+    private static void configureMeeting(Zoom zoom) throws IOException, JSONException {
 	JSONObject bodyJSON = new JSONObject();
 	JSONObject settings = new JSONObject();
+	// this setting can not be set during creation, thus we need another call
 	settings.put("registrants_confirmation_email", false);
+	// these settings could have been set during creation, but this call would have overwritten them, so we set them here
+	settings.put("approval_type", 0);
+	settings.put("join_before_host", !zoom.isStartInMonitor());
 	bodyJSON.put("settings", settings);
-	HttpURLConnection connection = ZoomService.getZoomConnection("meetings/" + meetingId, "PATCH",
-		bodyJSON.toString(), api);
+	if (zoom.getDuration() != null) {
+	    bodyJSON.put("duration", zoom.getDuration());
+	}
+	HttpURLConnection connection = ZoomService.getZoomConnection("meetings/" + zoom.getMeetingId(), "PATCH",
+		bodyJSON.toString(), zoom.getApi());
 	ZoomService.getReponse(connection);
+	// verify changes and get the new start URL
+	connection = ZoomService.getZoomConnection("meetings/" + zoom.getMeetingId(), "GET", null, zoom.getApi());
+	JSONObject responseJSON = ZoomService.getReponse(connection);
+	String startURL = responseJSON.getString("start_url");
+	zoom.setMeetingStartUrl(startURL);
+
 	if (logger.isDebugEnabled()) {
-	    logger.debug("Switched off registrant emails for meeting: " + meetingId);
+	    logger.debug("Configured meeting: " + zoom.getMeetingId());
 	}
     }
 

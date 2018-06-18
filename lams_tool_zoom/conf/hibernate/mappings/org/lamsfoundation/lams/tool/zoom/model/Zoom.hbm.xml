@@ -86,7 +86,24 @@
             column="reflect_instructions"
             length="65535"
         />
-
+        
+        <property
+            name="startInMonitor"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="start_in_monitor"
+            length="1"
+        />
+        
+        <property
+            name="duration"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            column="duration"
+        />
+        
         <property
             name="contentInUse"
             type="boolean"

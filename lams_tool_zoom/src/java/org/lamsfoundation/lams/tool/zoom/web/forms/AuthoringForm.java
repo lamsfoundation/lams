@@ -36,7 +36,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  *
  */
 public class AuthoringForm extends ActionForm {
-
     private static final long serialVersionUID = 3950453134542135495L;
 
     // Fields
@@ -48,6 +47,10 @@ public class AuthoringForm extends ActionForm {
     private boolean reflectOnActivity;
 
     private String reflectInstructions;
+
+    private boolean startInMonitor;
+
+    private Integer duration;
 
     private String currentTab;
 
@@ -111,6 +114,22 @@ public class AuthoringForm extends ActionForm {
 
     public void setReflectInstructions(String reflectInstructions) {
 	this.reflectInstructions = reflectInstructions;
+    }
+
+    public boolean isStartInMonitor() {
+	return startInMonitor;
+    }
+
+    public void setStartInMonitor(boolean startInMonitor) {
+	this.startInMonitor = startInMonitor;
+    }
+
+    public Integer getDuration() {
+	return duration;
+    }
+
+    public void setDuration(Integer duration) {
+	this.duration = duration;
     }
 
     public String getTitle() {

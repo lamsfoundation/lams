@@ -51,6 +51,10 @@ public class Zoom implements java.io.Serializable, Cloneable {
 
     private String instructions;
 
+    private boolean startInMonitor;
+
+    private Integer duration = 120;
+
     private boolean reflectOnActivity;
 
     private String reflectInstructions;
@@ -142,9 +146,6 @@ public class Zoom implements java.io.Serializable, Cloneable {
 	this.instructions = instructions;
     }
 
-    /**
-     *
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }
@@ -153,9 +154,6 @@ public class Zoom implements java.io.Serializable, Cloneable {
 	this.reflectOnActivity = reflectOnActivity;
     }
 
-    /**
-     *
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -164,10 +162,21 @@ public class Zoom implements java.io.Serializable, Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    /**
-     *
-     *
-     */
+    public boolean isStartInMonitor() {
+	return startInMonitor;
+    }
+
+    public void setStartInMonitor(boolean startInMonitor) {
+	this.startInMonitor = startInMonitor;
+    }
+
+    public Integer getDuration() {
+	return duration;
+    }
+
+    public void setDuration(Integer duration) {
+	this.duration = duration;
+    }
 
     public boolean isContentInUse() {
 	return this.contentInUse;
