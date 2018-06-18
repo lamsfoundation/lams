@@ -34,7 +34,7 @@
 				</html:link>
 			</c:when>
 			<c:otherwise>
-				<iframe id="zoomJoinFrame" style="width: 100%; height: 650px; border: none;" src="${meetingURL}"></iframe>
+				<iframe id="zoomJoinFrame" style="width: 100%; height: 680px; border: none;" src="${meetingURL}"></iframe>
 			</c:otherwise>
 		</c:choose>
 	</c:if>
