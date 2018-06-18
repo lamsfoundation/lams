@@ -249,7 +249,15 @@
 								<input id="schedulingEnableField" name="schedulingEnable" value="true" type="checkbox"/><fmt:message key="label.tab.advanced.field.scheduling" />
 							</label>
 						</div>		
-						<input id="schedulingDatetimeField" name="schedulingDatetime" type="text" /><br />
+						<div id="schedulingError" class="errorMessage"><fmt:message key="error.lesson.end.date.must.be.after.start.date"/></div>
+						<div id="scheduleStartTime" class="form-group">
+						<label for="schedulingDatetimeField"><fmt:message key="label.start"/></label>
+						<input id="schedulingDatetimeField" name="schedulingDatetime" type="text" />
+						</div>
+						<div id="scheduleEndTime" class="form-group">
+						<label for="schedulingEndDatetimeField"><fmt:message key="label.end"/></label>
+						<input id="schedulingEndDatetimeField" name="schedulingEndDatetime" type="text" />
+						</div>
 					</div>
 				</lams:TabBody>
 				<lams:TabBody id="4" titleKey="label.tab.conditions">
@@ -273,6 +281,7 @@
 					<div class="lead"><fmt:message key="label.tab.conditions.timelimit" /></div>
 					<div class="options">
 						<div class="fieldSectionDescription"><fmt:message key="label.tab.conditions.timelimit.desc" /></div>
+						<div id="timelimitError" class="errorMessage"><fmt:message key="error.lesson.with.scheduled.end.only.have.individual.limits"/></div>
 						
 						<div class="checkbox">
 							<label>
