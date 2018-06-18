@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TimeZone;
@@ -47,6 +46,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -589,20 +589,37 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	    return null;
 	}
 	ZoomApi chosenApi = null;
+	TreeMap<String, ZoomApi> liveApis = new TreeMap<String, ZoomApi>();
 	for (ZoomApi api : apis) {
 	    String meetingListURL = "users/" + api.getEmail() + "/meetings?type=live";
 	    HttpURLConnection connection = ZoomService.getZoomConnection(meetingListURL, "GET", null, api);
 	    JSONObject resultJSON = ZoomService.getReponse(connection);
 	    boolean noLiveMeetings = resultJSON != null && resultJSON.getInt("total_records") == 0;
 	    if (noLiveMeetings) {
+		// found a free API
 		chosenApi = api;
 		break;
 	    }
+	    // find the oldest live meeting
+	    // string comparing of dates works fine
+	    String oldestMeetingStartTime = null;
+	    JSONArray meetingsJSON = resultJSON.getJSONArray("meetings");
+	    for (int meetingIndex = 0; meetingIndex < meetingsJSON.length(); meetingIndex++) {
+		JSONObject meetingJSON = meetingsJSON.getJSONObject(meetingIndex);
+		String meetingStartTime = meetingJSON.optString("start_time");
+		if (meetingStartTime == null) {
+		    meetingStartTime = meetingJSON.getString("created_at");
+		}
+		if (oldestMeetingStartTime == null || meetingStartTime.compareTo(oldestMeetingStartTime) < 0) {
+		    oldestMeetingStartTime = meetingStartTime;
+		}
+	    }
+	    liveApis.put(oldestMeetingStartTime, api);
 	}
+
 	boolean result = chosenApi != null;
 	if (!result) {
-	    Random random = new Random();
-	    chosenApi = apis.get(random.nextInt(apis.size()));
+	    chosenApi = liveApis.firstEntry().getValue();
 	}
 	zoom.setApi(chosenApi);
 	zoomDAO.update(zoom);
