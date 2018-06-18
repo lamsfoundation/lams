@@ -30,12 +30,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.apache.struts.util.MessageResources;
-import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -50,6 +49,7 @@ import org.lamsfoundation.lams.tool.zoom.model.ZoomUser;
 import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
 import org.lamsfoundation.lams.tool.zoom.service.ZoomServiceProxy;
 import org.lamsfoundation.lams.tool.zoom.util.ZoomConstants;
+import org.lamsfoundation.lams.tool.zoom.util.ZoomUtil;
 import org.lamsfoundation.lams.tool.zoom.web.forms.LearningForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -144,30 +144,6 @@ public class LearningAction extends DispatchAction {
 
     }
 
-    public ActionForward openPreviewMeeting(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	// get user uid parameter
-	Long uid = WebUtil.readLongParam(request, ZoomConstants.PARAM_USER_UID);
-	ZoomUser user = zoomService.getUserByUID(uid);
-	ZoomSession session = user.getZoomSession();
-
-	// Get LAMS userDTO
-	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
-		.getSession().getAttribute(AttributeNames.USER);
-
-	// create random strings for attendee and moderator passwords
-	String attendeePassword = RandomPasswordGenerator.nextPassword(20);
-	String moderatorPassword = RandomPasswordGenerator.nextPassword(20);
-	MessageResources resources = MessageResources.getMessageResources(ZoomConstants.APP_RESOURCES);
-
-	// Get default localized welcome message
-
-	String welcomeMessage = resources.getMessage("activity.welcome.message");
-
-	return null;
-    }
-
     public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
@@ -255,20 +231,20 @@ public class LearningAction extends DispatchAction {
 	// set toolSessionID in request
 	request.setAttribute(ZoomConstants.ATTR_TOOL_SESSION_ID, session.getSessionId());
 
-//	String dispatchValue = new String();
-//	boolean meetingOpen = false;
-//	if (mode.isAuthor()) {
-//	    dispatchValue = "openPreviewMeeting";
-//	    meetingOpen = true;
-//	} else {
-//	}
-
-	String meetingURL = user.getMeetingJoinUrl();
-	if (meetingURL == null && zoom.getMeetingId() != null) {
-	    meetingURL = zoomService.registerUser(zoom.getUid(), user.getUid(), session.getSessionName());
+	if (mode.isAuthor()) {
+	    // start a meeting just like a monitor would
+	    ActionErrors errors = ZoomUtil.startMeeting(zoomService, zoom, request);
+	    if (!errors.isEmpty()) {
+		this.addErrors(request, errors);
+	    }
+	} else {
+	    // register a learner for the meeting
+	    String meetingURL = user.getMeetingJoinUrl();
+	    if (meetingURL == null && zoom.getMeetingId() != null) {
+		meetingURL = zoomService.registerUser(zoom.getUid(), user.getUid(), session.getSessionName());
+	    }
+	    request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
 	}
-
-	request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
 
 	return mapping.findForward("zoom");
     }

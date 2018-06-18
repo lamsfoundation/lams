@@ -23,6 +23,40 @@
 
 package org.lamsfoundation.lams.tool.zoom.util;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
+import org.apache.tomcat.util.json.JSONException;
+import org.lamsfoundation.lams.tool.zoom.model.Zoom;
+import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
+
 public class ZoomUtil {
 
+    /**
+     * Creates and starts a Zoom meeting
+     */
+    public static ActionErrors startMeeting(IZoomService zoomService, Zoom zoom, HttpServletRequest request)
+	    throws IOException, JSONException {
+	ActionErrors errors = new ActionErrors();
+	String meetingURL = zoom.getMeetingStartUrl();
+	if (meetingURL == null) {
+	    Boolean apiOK = zoomService.chooseApi(zoom.getUid());
+	    if (apiOK == null) {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.api.none.configured"));
+		request.setAttribute("skipContent", true);
+	    } else {
+		if (!apiOK) {
+		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.api.reuse"));
+		}
+		meetingURL = zoomService.createMeeting(zoom.getUid());
+	    }
+	}
+
+	request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
+	return errors;
+    }
 }

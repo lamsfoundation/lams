@@ -31,8 +31,6 @@ import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.zoom.dto.ContentDTO;
@@ -43,6 +41,7 @@ import org.lamsfoundation.lams.tool.zoom.model.ZoomUser;
 import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
 import org.lamsfoundation.lams.tool.zoom.service.ZoomServiceProxy;
 import org.lamsfoundation.lams.tool.zoom.util.ZoomConstants;
+import org.lamsfoundation.lams.tool.zoom.util.ZoomUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -113,27 +112,10 @@ public class MonitoringAction extends DispatchAction {
 	contentDTO.setInstructions(zoom.getInstructions());
 	request.setAttribute(ZoomConstants.ATTR_CONTENT_DTO, contentDTO);
 
-	String meetingURL = zoom.getMeetingStartUrl();
-
-	if (meetingURL == null) {
-	    ActionErrors errors = new ActionErrors();
-
-	    Boolean apiOK = zoomService.chooseApi(zoom.getUid());
-	    if (apiOK == null) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.api.none.configured"));
-		request.setAttribute("skipContent", true);
-	    } else {
-		if (!apiOK) {
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.api.reuse"));
-		}
-		meetingURL = zoomService.createMeeting(zoom.getUid());
-	    }
-	    if (!errors.isEmpty()) {
-		this.addErrors(request, errors);
-	    }
+	ActionErrors errors = ZoomUtil.startMeeting(zoomService, zoom, request);
+	if (!errors.isEmpty()) {
+	    this.addErrors(request, errors);
 	}
-
-	request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
 
 	return mapping.findForward("learning");
     }
