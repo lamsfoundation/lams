@@ -63,6 +63,12 @@
 		.ui-jqgrid tr.jqfoot>td, .ui-jqgrid tr.jqgroup>td, .ui-jqgrid tr.jqgrow>td, .ui-jqgrid tr.ui-subgrid>td, .ui-jqgrid tr.ui-subtblcell>td {
 	    	border-bottom-style: dotted;
 		}
+		
+		/* links to burning questions */
+		.scroll-down-to-bq {
+			overflow:auto; 
+			margin-top: -20px;
+		}
 	</style>
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
@@ -280,6 +286,14 @@
 			
 			// trigger the resize when the window first opens so that the grid uses all the space available.
 			setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+
+			//hide links to burning questions that were not created by the user
+			$(".scroll-down-to-bq a").each(function()  {
+				var itemUid = $(this).data("item-uid");
+				if ( $( "#burningQuestions" + itemUid ).length == 0) {
+					$(this).parent().hide();
+				}
+			});
 		    
 		})
 	
