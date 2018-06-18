@@ -730,9 +730,9 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     public boolean pingZoomApi(Long uid) throws IOException, JSONException {
 	ZoomApi api = (ZoomApi) zoomDAO.find(ZoomApi.class, uid);
-	HttpURLConnection connection = ZoomService.getZoomConnection("users/" + api.getEmail() + "/meetings", "GET",
-		null, api);
-	return ZoomService.getReponse(connection) != null;
+	HttpURLConnection connection = ZoomService.getZoomConnection("users/email?email=" + api.getEmail(), "GET", null, api);
+	JSONObject resultJSON = ZoomService.getReponse(connection);
+	return resultJSON != null && resultJSON.getBoolean("existed_email");
     }
 
     private static String generateJWT(ZoomApi api) {
