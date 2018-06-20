@@ -435,7 +435,8 @@ function updateLessonTab(){
 					lessonStateChanger.hide();
 					break;
 				//started lesson
-				default: 		
+				default: 	
+					startDateField.text("").css('display','none'); // we may have just started the lesson and needed to clear the scheduled date message
 				 	if ( response.finishDate ) {
 						scheduleControls.css('display','inline');
 						$("#lessonStartApply").css('display','none');
@@ -443,7 +444,6 @@ function updateLessonTab(){
 						$("#scheduleDisableLessonButton").html(LABELS.RESCHEDULE);
 				 	} else {
 						scheduleControls.css('display','none');
-						startDateField.text(response.startDate).hide();
 						$("#scheduleDisableLessonButton").html(LABELS.SCHEDULE);
 				 		lessonFinishDateSpan.text("").css('display','none');
 				 	}
@@ -469,7 +469,7 @@ function updateLessonTab(){
 function checkScheduleDate(startDateString, endDateString) {
 	var startDate = startDateString && startDateString > "" ? Date.parse(startDateString) : 0;
 	var endDate =  endDateString && endDateString > "" ? Date.parse(endDateString) : 0;
-	return ( endDate > startDate );
+	return ( endDate == 0 || startDate < endDate );
 }
 
 function scheduleLesson(){

@@ -275,7 +275,9 @@ function initAdvancedTab(){
 function checkScheduleDate() {
 	var startDate = $('#schedulingDatetimeField').val() > "" ? Date.parse($('#schedulingDatetimeField').val()) : 0;
 	var endDate = $('#schedulingEndDatetimeField').val() > "" ? Date.parse($('#schedulingEndDatetimeField').val()) : 0;
-	if ( endDate - startDate ) {
+	console.log("startDate"+startDate+"endDate"+endDate);
+	console.log(endDate - startDate);
+	if ( endDate > 0 && startDate >= endDate  ) {
 		$("#schedulingError").css("display","block");
 	} else {
 		$("#schedulingError").css("display","none");
