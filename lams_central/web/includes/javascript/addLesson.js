@@ -1,4 +1,4 @@
-﻿﻿// ********** MAIN FUNCTIONS **********
+﻿﻿﻿// ********** MAIN FUNCTIONS **********
 var tree,
 	lastSelectedUsers = {},
 	sortOrderAscending = {},
@@ -275,8 +275,6 @@ function initAdvancedTab(){
 function checkScheduleDate() {
 	var startDate = $('#schedulingDatetimeField').val() > "" ? Date.parse($('#schedulingDatetimeField').val()) : 0;
 	var endDate = $('#schedulingEndDatetimeField').val() > "" ? Date.parse($('#schedulingEndDatetimeField').val()) : 0;
-	console.log("startDate"+startDate+"endDate"+endDate);
-	console.log(endDate - startDate);
 	if ( endDate > 0 && startDate >= endDate  ) {
 		$("#schedulingError").css("display","block");
 	} else {
