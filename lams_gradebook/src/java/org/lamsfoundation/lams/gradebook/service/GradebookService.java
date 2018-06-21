@@ -1035,26 +1035,24 @@ public class GradebookService implements IGradebookService {
 	ArrayList<GBUserGridRowDTO> userRows = getGBUserRowsForLesson(lesson, null);
 
 	// Setting up the user marks table
-	ExcelCell[] userTitleRow = new ExcelCell[7];
+	ExcelCell[] userTitleRow = new ExcelCell[6];
 	userTitleRow[0] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
 	userTitleRow[1] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
 	userTitleRow[2] = new ExcelCell(getMessage("gradebook.export.login"), true);
-	userTitleRow[3] = new ExcelCell(getMessage("gradebook.export.groupName"), true);
-	userTitleRow[4] = new ExcelCell(getMessage("gradebook.exportcourse.progress"), true);
-	userTitleRow[5] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
-	userTitleRow[6] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
+	userTitleRow[3] = new ExcelCell(getMessage("gradebook.exportcourse.progress"), true);
+	userTitleRow[4] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
+	userTitleRow[5] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
 	rowList.add(userTitleRow);
 
 	for (GBUserGridRowDTO userRow : userRows) {
 	    // Adding the user data for the lesson
-	    ExcelCell[] userDataRow = new ExcelCell[7];
+	    ExcelCell[] userDataRow = new ExcelCell[6];
 	    userDataRow[0] = new ExcelCell(userRow.getLastName(), false);
 	    userDataRow[1] = new ExcelCell(userRow.getFirstName(), false);
 	    userDataRow[2] = new ExcelCell(userRow.getLogin(), false);
-	    userDataRow[3] = new ExcelCell(getGroupName(userRow, lesson), false);
-	    userDataRow[4] = new ExcelCell(getProgressMessage(userRow), false);
-	    userDataRow[5] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
-	    userDataRow[6] = isWeighted ? GradebookUtil.createPercentageCell(userRow.getMark(), true)
+	    userDataRow[3] = new ExcelCell(getProgressMessage(userRow), false);
+	    userDataRow[4] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
+	    userDataRow[5] = isWeighted ? GradebookUtil.createPercentageCell(userRow.getMark(), true)
 		    : new ExcelCell(userRow.getMark(), false);
 	    rowList.add(userDataRow);
 	}
@@ -1084,13 +1082,11 @@ public class GradebookService implements IGradebookService {
 	    headerRow[count++] = new ExcelCell(activity.getTitle(), true); // this one works
 	}
 	rowList.add(headerRow);
-	headerRow = new ExcelCell[5 + filteredActivityToUserDTOMap.keySet().size()];
+	headerRow = new ExcelCell[4 + filteredActivityToUserDTOMap.keySet().size()];
 	count = 0;
 	headerRow[count++] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
 	headerRow[count++] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
 	headerRow[count++] = new ExcelCell(getMessage("gradebook.export.login"), true);
-	headerRow[count++] = new ExcelCell(getMessage("gradebook.export.groupName"), true);
-	
 	for (Activity activity : filteredActivityToUserDTOMap.keySet()) {
 	    headerRow[count++] = new ExcelCell(getMessage("gradebook.columntitle.mark"), true);
 	}
@@ -1099,13 +1095,12 @@ public class GradebookService implements IGradebookService {
 
 	//iterating through all users in a lesson
 	for (GBUserGridRowDTO userRow : userRows) {
-	    ExcelCell[] userDataRow = new ExcelCell[5 + filteredActivityToUserDTOMap.keySet().size()];
+	    ExcelCell[] userDataRow = new ExcelCell[4 + filteredActivityToUserDTOMap.keySet().size()];
 	    count = 0;
 	    userDataRow[count++] = new ExcelCell(userRow.getLastName(), false);
 	    userDataRow[count++] = new ExcelCell(userRow.getFirstName(), false);
 	    userDataRow[count++] = new ExcelCell(userRow.getLogin(), false);
-	    userDataRow[count++] = new ExcelCell(getGroupName(userRow, lesson), false);
-	    
+
 	    for (Activity activity : filteredActivityToUserDTOMap.keySet()) {
 
 		//find according userActivityMark
@@ -1913,57 +1908,6 @@ public class GradebookService implements IGradebookService {
 	    status = originalStatus;
 	}
 	return status;
-    }
-
-    /**
-     * LDEV_NTU-10 Add a column "LAMS group" in exported summary
-     *
-     * Returns group name.
-     * @return
-     */
-    private String getGroupName(GBUserGridRowDTO userRow, Lesson lesson) {
-	Map<ToolActivity, List<GBUserGridRowDTO>> filteredActivityToUserDTOMap = new LinkedHashMap<ToolActivity, List<GBUserGridRowDTO>>();
-	Map<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = getDataForLessonGradebookExport(lesson);
-	ToolActivity activity = new ToolActivity(); 
-	    for (ToolActivity activityy : activityToUserDTOMap.keySet()) {
-		activity = activityy;
-	    }
-	
-	    filteredActivityToUserDTOMap.put(activity, activityToUserDTOMap.get(activity));
-
-
-
-	String groupName = null;
-	
-	   for (Activity acty : filteredActivityToUserDTOMap.keySet()) {
-
-			//find according userActivityMark
-			Double userActivityMark = null;
-			List<GBUserGridRowDTO> userDtos = filteredActivityToUserDTOMap.get(acty);
-			    
-			    Grouping grouping = acty.getGrouping();
-			    if (grouping != null) {
-				Set<Group> groups = grouping.getGroups();
-				if (groups != null) {
-
-				    for (Group group : groups) {
-					//userDataRow[count++] = new ExcelCell(group.getGroupName(), false);
-					Set<User> usrs = group.getUsers();
-					    for (User usr : usrs) {
-						if(usr.getUserDTO().getLogin().equals(userRow.getLogin())) {
-						    groupName = group.getGroupName();
-							break;
-						    }
-					    }
-				    }
-				}
-			    }
-			    
-			    
-			
-		    }
-	
-	return groupName;
     }
 
     /**
