@@ -5,7 +5,14 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		
-		$('#activity-evaluation').on('change', function() {
+		$('#activity-evaluation').on('focus', function(){
+			$(this).data('previousValue', this.value);
+		}).on('change', function() {
+			if (!this.value && !confirm("<fmt:message key='warn.tool.output.change.none'/>")) {
+				$(this).val($(this).data('previousValue'));
+				return;
+			}
+			$(this).data('previousValue', this.value);
 			$.ajax({
 				url: '<c:url value="/monitoring.do"/>',
 				data: {
