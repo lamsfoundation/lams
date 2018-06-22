@@ -13,7 +13,7 @@
 		<div aria-expanded="false" id="tool-output" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="heading-tool-output">
 		
 			<select name="activityEvaluation" id="activity-evaluation" autocomplete="off">
-				<option value="dummy"></option>
+				<option value=""><fmt:message key="output.desc.none" /></option>
 				
 				<c:forEach var="toolOutputDefinition" items="${sessionMap.toolOutputDefinitions}" varStatus="firstGroup">
 				

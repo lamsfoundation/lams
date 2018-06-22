@@ -7,11 +7,6 @@
 	$(document).ready(function(){
 		
 		$('#activity-evaluation').on('change', function() {
-
-			if (this.value == "dummy") {
-				return;
-			}
-
 			$.ajax({
 				url: '<c:url value="/monitoring/setActivityEvaluation.do?sessionMapID=${sessionMapID}"/>',
 				data: {

@@ -325,7 +325,7 @@ public class MonitoringAction extends Action {
 		.getAttribute(sessionMapID);
 
 	Long contentID = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
-	String activityEvaluation = WebUtil.readStrParam(request, AssessmentConstants.ATTR_ACTIVITY_EVALUATION);
+	String activityEvaluation = WebUtil.readStrParam(request, AssessmentConstants.ATTR_ACTIVITY_EVALUATION, true);
 	service.setActivityEvaluation(contentID, activityEvaluation);
 
 	// update the session ready for stats tab to be reloaded otherwise flicking between tabs
@@ -506,7 +506,7 @@ public class MonitoringAction extends Action {
 		userData.put(questionResultUid);
 		userData.put(questionResult.getMaxMark());
 		userData.put(fullName);
-	        //LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
+		//LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
 		userData.put(questionResult.getMark());
 		// show confidence levels if this feature is turned ON
 		if (assessment.isEnableConfidenceLevels()) {
