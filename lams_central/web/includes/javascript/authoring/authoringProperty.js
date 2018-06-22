@@ -1567,7 +1567,7 @@ PropertyLib = {
 	 */
 	fillOutputDefinitionsDropdown : function(activity) {
 		// find all tools that support input and fill dropdown menu with their titles
-		var emptyOption = $('<option />'),
+		var emptyOption = $('<option/>').text(LABELS.GRADEBOOK_OUTPUT_NONE),
 			gradebookDropdown = $('.propertiesContentFieldGradebook', activity.propertiesContent).empty().append(emptyOption);
 		// build output dropdown and bind data to each option
 		$.each(activity.outputDefinitions,function(){

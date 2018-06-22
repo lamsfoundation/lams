@@ -1745,19 +1745,32 @@ public class GradebookService implements IGradebookService {
 	    ToolActivity activity = toolSession.getToolActivity();
 	    GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(activity.getActivityId(), userID);
 	    if (gradebookUserActivity != null) {
-		// set mark to null so lesson mark recalculates correctly
-		Double oldActivityMark = gradebookUserActivity.getMark();
-		gradebookUserActivity.setMark(null);
-		Lesson lesson = (Lesson) activity.getLearningDesign().getLessons().iterator().next();
-		boolean isWeightedMarks = toolService.isWeightedMarks(lesson.getLearningDesign());
-		GradebookUserLesson gradebookUserLesson = getGradebookUserLesson(lesson.getLessonId(), userID);
-		aggregateTotalMarkForLesson(isWeightedMarks, gradebookUserLesson, gradebookUserActivity,
-			oldActivityMark);
-
-		// finally completely remove the activity mark
-		gradebookDAO.delete(gradebookUserActivity);
+		removeActivityMark(activity, gradebookUserActivity);
 	    }
 	}
+    }
+
+    @Override
+    public void removeActivityMark(Long toolContentID) {
+	Activity activity = activityDAO.getToolActivityByToolContentId(toolContentID);
+	List<GradebookUserActivity> userActivities = getGradebookUserActivities(activity.getActivityId());
+	for (GradebookUserActivity gradebookUserActivity : userActivities) {
+	    removeActivityMark(activity, gradebookUserActivity);
+	}
+    }
+
+    private void removeActivityMark(Activity activity, GradebookUserActivity gradebookUserActivity) {
+	// set mark to null so lesson mark recalculates correctly
+	Double oldActivityMark = gradebookUserActivity.getMark();
+	gradebookUserActivity.setMark(null);
+	Lesson lesson = (Lesson) activity.getLearningDesign().getLessons().iterator().next();
+	boolean isWeightedMarks = toolService.isWeightedMarks(lesson.getLearningDesign());
+	GradebookUserLesson gradebookUserLesson = getGradebookUserLesson(lesson.getLessonId(),
+		gradebookUserActivity.getLearner().getUserId());
+	aggregateTotalMarkForLesson(isWeightedMarks, gradebookUserLesson, gradebookUserActivity, oldActivityMark);
+
+	// finally completely remove the activity mark
+	gradebookDAO.delete(gradebookUserActivity);
     }
 
     @Override

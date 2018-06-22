@@ -257,6 +257,8 @@
 				ACTIVITY_BRANCHING_DESCRIPTION : decoderDiv.html('<c:out value="${ACTIVITY_BRANCHING_DESCRIPTION_VAR}" />').text(),
 				<fmt:message key="authoring.fla.default.range.condition.title.prefix" var="DEFAULT_RANGE_CONDITION_TITLE_PREFIX_VAR"/>
 				DEFAULT_RANGE_CONDITION_TITLE_PREFIX : '<c:out value="${DEFAULT_RANGE_CONDITION_TITLE_PREFIX_VAR}" />',
+				<fmt:message key="authoring.fla.page.prop.gradebook.none" var="GRADEBOOK_OUTPUT_NONE_VAR"/>
+				GRADEBOOK_OUTPUT_NONE : '<c:out value="${GRADEBOOK_OUTPUT_NONE_VAR}" />',
 				<fmt:message key="authoring.fla.clear.all.confirm" var="CLEAR_ALL_CONFIRM_VAR"/>
 				CLEAR_ALL_CONFIRM : decoderDiv.html('<c:out value="${CLEAR_ALL_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.remove.condition.confirm" var="REMOVE_CONDITION_CONFIRM_VAR"/>
