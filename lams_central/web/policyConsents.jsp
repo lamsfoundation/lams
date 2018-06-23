@@ -1,50 +1,135 @@
-<%@ include file="/taglibs.jsp"%>
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=utf-8" language="java"%>
+<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-bean" prefix="bean"%>
+<%@ taglib uri="tags-logic" prefix="logic"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
 
-<c:if test="${not empty error}">
-	<lams:Alert type="warn" id="errorMessage" close="false">	
-		<c:out value="${error}" />
+<lams:html>
+<lams:head>
+	<title><fmt:message key="label.policies.title" /></title>
+	<link rel="icon" href="/lams/favicon.ico" type="image/x-icon" />
+	<link rel="shortcut icon" href="/lams/favicon.ico" type="image/x-icon" />
+	<lams:css/>
+	<lams:css suffix="main"/>
+	<style>
+		.alert.alert-danger {
+			margin-right: 5px;
+		}
+		.full-policy, .policy-details {
+			padding-left: 15px;
+		}
+	</style>
+	
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
+    <script>
+		$(document).ready(function(){	
+		    $("#consents-form").validate({
+	    	    invalidHandler: function(form, validator) {
+	    		      var errors = validator.numberOfInvalids();
+	    		      if (errors) {
+		    		      $("#consent-all").removeClass("alert-info").addClass("alert-danger");
+	    		      } else {
+	    		    	  $("#consent-all").addClass("alert-info").removeClass("alert-danger");
+	    		      }
+	    		},
+	    		errorPlacement: function(error, element) {
+	    		    error.insertBefore( element.parent("label") );
+	    		},
+	    		errorClass: "alert alert-danger"
+		  	});
+
+		 	// the following method must come AFTER .validate()
+		    $('.required-field').each(function() {
+		        $(this).rules('add', {
+		            required: true,
+		            messages: {
+		                required: "<fmt:message key='label.consent.required' />"
+		            }
+		        });
+		    });
+		}); 
+	</script>
+</lams:head>
+<body class="offcanvas-hidden">
+<div id="page-wrapper">
+<div class="content">
+	
+	<h4>
+		<fmt:message key="label.policies.title" />
+	</h4>
+			
+	<lams:Alert close="false" id="consent-all" type="info">
+		<fmt:message key="label.agree.to.policies.before.proceeding" />
 	</lams:Alert>
-</c:if>
-
-<table class="table table-striped table-condensed" >
-	<c:forEach items="${policies}" var="policy">
-		<tr>
-			<td>
-				<b>
-					<c:out value="${policy.policyName}" />
-				</b>
-				<br>
-				
-				<fmt:message key="label.policy.type" />: 
-				<c:choose>
-					<c:when test="${policy.policyTypeId == 1}">
-						<fmt:message key="label.policy.type.site"/>
-					</c:when>
-					<c:when test="${policy.policyTypeId == 2}">
-						<fmt:message key="label.policy.type.privacy"/>
-					</c:when>
-					<c:when test="${policy.policyTypeId == 3}">
-						<fmt:message key="label.policy.type.third.party"/>
-					</c:when>
-					<c:when test="${policy.policyTypeId == 4}">
-						<fmt:message key="label.policy.type.other"/>
-					</c:when>
-				</c:choose>
-				<br>
-
-				<fmt:message key="label.version" />: <c:out value="${policy.version}" />
-				<br>
-				
-				<fmt:message key="label.summary" />: <c:out value="${policy.summary}" />
-				<br>
-				
-				<fmt:message key="label.full.policy" />: <c:out value="${policy.fullPolicy}" />
-				
-			</td>
-		</tr>
-	</c:forEach>
-</table>
-
-<html:link styleClass="btn btn-primary pull-right" page="/policyConsents.do?method=consent">
-	<fmt:message key="label.consent"/>
-</html:link>
+	
+	<form action="/lams/policyConsents.do?method=consent" method="post" id="consents-form">
+	<table class="table table-striped table-condensed" >
+		<c:forEach items="${policies}" var="policy">
+			<tr>
+				<td>
+					<h5>
+						<c:out value="${policy.policyName}" />
+					</h5>
+					
+					<div class="policy-details">
+					<fmt:message key="label.policy.type" />: 
+					<c:choose>
+						<c:when test="${policy.policyTypeId == 1}">
+							<fmt:message key="label.policy.type.site"/>
+						</c:when>
+						<c:when test="${policy.policyTypeId == 2}">
+							<fmt:message key="label.policy.type.privacy"/>
+						</c:when>
+						<c:when test="${policy.policyTypeId == 3}">
+							<fmt:message key="label.policy.type.third.party"/>
+						</c:when>
+						<c:when test="${policy.policyTypeId == 4}">
+							<fmt:message key="label.policy.type.other"/>
+						</c:when>
+					</c:choose>
+					<br>
+					
+					<c:out value="${policy.summary}" escapeXml="false"/>
+					
+					<div>
+						<a data-toggle="collapse" data-target="#full-policy-${policy.uid}" href="#nogo">
+							<i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i>
+							<fmt:message key="label.full.policy" />
+						</a>
+						<div id="full-policy-${policy.uid}"  class="voffset5 collapse form-group full-policy">
+							<c:out value="${policy.fullPolicy}" escapeXml="false"/>
+						</div>
+					</div>
+					</div>
+					
+					<div class="checkbox">
+						<label for="policy-${policy.uid}">
+							<input type="checkbox" name="policy${policy.uid}" value="${policy.uid}"
+									id="policy-${policy.uid}" class="required-field"
+									<c:if test="${policy.consentedByUser}">checked="checked"</c:if>>
+							<fmt:message key="label.agree.to.policy" />
+						</label>
+					</div>
+					
+				</td>
+			</tr>
+		</c:forEach>
+	</table>
+	
+		<div style="overflow:auto;">
+			<html:submit styleClass="btn btn-primary pull-right">
+				<fmt:message key="label.consent"/>
+			</html:submit>
+		</div>
+	</form>
+	
+</div>
+</div>
+</body>
+</lams:html>

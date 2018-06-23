@@ -26,17 +26,33 @@ package org.lamsfoundation.lams.policies.dao;
 import java.util.List;
 
 import org.lamsfoundation.lams.policies.Policy;
+import org.lamsfoundation.lams.policies.PolicyConsent;
+import org.lamsfoundation.lams.policies.PolicyDTO;
 
 public interface IPolicyDAO {
 
     Policy getPolicyByUid(Long uid);
 
-    List<Policy> getPolicies();
-    
-    List<Policy> getActivePolicies();
-    
-    List<Policy> getActivePoliciesWithConsents();
+    List<Policy> getAllPoliciesWithUserConsentsCount();
     
     List<Policy> getPreviousVersionsPolicies(Long policyId);
+    
+    boolean isPolicyConsentRequiredForUser(Integer userId);
+    
+    /**
+     * Return all active policies with indication which one of them has been consented by the user.
+     * 
+     * @param userId
+     * @return
+     */
+    List<PolicyDTO> getPolicyDtosByUser(Integer userId);
+    
+    /**
+     * Return all consents user has given.
+     * 
+     * @param userId
+     * @return
+     */
+    List<PolicyConsent> getConsentsByUserId(Integer userId);
 
 }

@@ -86,6 +86,13 @@
 							<i class="fa fa-fw fa-camera"></i> <span class="hidden-xs"><fmt:message
 									key="title.portrait.change.screen" /></span></i>
 						</a>&nbsp;&nbsp;
+						
+						<a class="btn btn-sm btn-default offset5" href="profile.do?method=policyConsents" role="button">
+							<i class="fa fa-fw fa-calendar-check-o"></i> 
+							<span class="hidden-xs">
+								<fmt:message key="label.policies.consents" />
+							</span>
+						</a>&nbsp;&nbsp;
 
 						<c:if test="${showAllMyLessonLink}">
 							<a class="btn btn-sm btn-default offset5"

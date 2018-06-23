@@ -48,7 +48,7 @@
 
 		$('#cancelButton').on('click', function (e) {
 			e.preventDefault();
-			window.location.href = "<lams:LAMSURL/>/admin/policyManagement.do";
+			window.location.href = "<lams:LAMSURL/>admin/policyManagement.do?method=list";
 	    });
 	});
 </script>
@@ -63,9 +63,11 @@
 </div>
 
 <html:form action="/policyManagement.do" styleId="policy-form" method="post">
+	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<html:hidden property="method" value="save" />
 	<html:hidden property="policyUid" />
 	<html:hidden property="policyId" />
+	<html:hidden property="editingPreviousVersion" />
 	
 	<table class="table table-condensed table-no-border">
 		<tr>
@@ -112,17 +114,19 @@
 			<td>
 				<html:radio property="policyStateId" value="1" />&nbsp;<fmt:message key="label.policy.status.active" />
 				<br>
-				<html:radio property="policyStateId" value="3" />&nbsp;<fmt:message key="label.policy.status.draft" /> 
+				<html:radio property="policyStateId" value="2" />&nbsp;<fmt:message key="label.policy.status.inactive" /> 
 				<div>
 					<fmt:message key="label.policy.status.hint" />
 				</div>
 			</td>
 		</tr>
 		
-		<tr>
-			<td><fmt:message key="label.minor.change" /></td>
-			<td><html:checkbox property="minorChange" /></td>
-		</tr>
+		<c:if test="${formBean.map.policyUid != null && !formBean.map.editingPreviousVersion}">
+			<tr>
+				<td><fmt:message key="label.minor.change" /></td>
+				<td><html:checkbox property="minorChange" /></td>
+			</tr>
+		</c:if>
 		
 	</table>
 	
@@ -130,6 +134,7 @@
 		<html:cancel styleId="cancelButton" styleClass="btn btn-default">
 			<fmt:message key="admin.cancel" />
 		</html:cancel>
+
 		<html:submit styleId="submitButton" styleClass="btn btn-primary loffset5">
 			<fmt:message key="admin.submit" />
 		</html:submit>

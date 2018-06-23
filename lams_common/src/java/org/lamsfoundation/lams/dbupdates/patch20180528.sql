@@ -55,7 +55,6 @@ CREATE TABLE lams_policy_consent (
 
 INSERT INTO lams_policy_state VALUES (1, 'ACTIVE');
 INSERT INTO lams_policy_state VALUES (2, 'INACTIVE');
-INSERT INTO lams_policy_state VALUES (3, 'DRAFT');
 
 INSERT INTO lams_policy_type VALUES (1, 'TYPE_SITE_POLICY');
 INSERT INTO lams_policy_type VALUES (2, 'TYPE_PRIVACY_POLICY');

@@ -551,6 +551,11 @@
         redirect="false"
       />
       <forward
+        name="profilePolicyConsents"
+        path="/profile/profilePolicyConsents.jsp"
+        redirect="false"
+      />
+      <forward
         name="edit"
         path="/editprofile.jsp"
         redirect="false"
@@ -666,6 +671,11 @@
         name="policyConsents"
         path="/policyConsents.jsp"
         redirect="false"
+      />
+      <forward
+        name="index"
+        path="/index.do"
+        redirect="true"
       />
     </action> 
      

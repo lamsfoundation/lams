@@ -50,7 +50,7 @@
             name="consents"
             lazy="true"
             inverse="false"
-            cascade="all"
+            cascade="none"
             sort="unsorted"
             order-by="date_agreed_on asc"
         >

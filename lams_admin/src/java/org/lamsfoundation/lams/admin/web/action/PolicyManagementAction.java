@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -21,7 +22,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.admin.web.dto.UserPolicyConsentDTO;
 import org.lamsfoundation.lams.policies.Policy;
+import org.lamsfoundation.lams.policies.PolicyConsent;
 import org.lamsfoundation.lams.policies.service.IPolicyService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -66,8 +69,8 @@ public class PolicyManagementAction extends Action {
 	    return edit(mapping, form, request, response);
 	} else if (StringUtils.equals(method, "save")) {
 	    return save(mapping, form, request, response);
-	} else if (StringUtils.equals(method, "delete")) {
-	    return delete(mapping, form, request, response);
+	} else if (StringUtils.equals(method, "displayUserConsents")) {
+	    return displayUserConsents(mapping, form, request, response);
 	} else if (StringUtils.equals(method, "viewPreviousVersions")) {
 	    return viewPreviousVersions(mapping, form, request, response);
 	} else if (StringUtils.equals(method, "changeStatus")) {
@@ -80,10 +83,10 @@ public class PolicyManagementAction extends Action {
     private ActionForward list(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	List<Policy> policies = policyService.getPolicies();
+	List<Policy> policies = policyService.getAllPoliciesWithUserConsentsCount();
 	
-	//calculate which policies have previous version instanses
-	HashMap<Long, Integer> policyCount = new HashMap<Long, Integer>();
+	//calculate which policies have previous version instances
+	HashMap<Long, Integer> policyCount = new LinkedHashMap<Long, Integer>();
 	for (Policy policy : policies) {
 	    Long policyId = policy.getPolicyId();
 	    int previousVersionsCount = policyCount.get(policyId) == null ? 0 : policyCount.get(policyId);
@@ -91,7 +94,7 @@ public class PolicyManagementAction extends Action {
 	}
 	
 	//filter out older versioned policies
-	HashMap<Long, Policy> filteredPolicies = new HashMap<Long, Policy>();
+	HashMap<Long, Policy> filteredPolicies = new LinkedHashMap<Long, Policy>();
 	for (Policy policy : policies) {
 	    Long policyId = policy.getPolicyId();
 	    boolean hasPreviousVersions = policyCount.get(policyId) != null && policyCount.get(policyId) > 1; 
@@ -105,9 +108,8 @@ public class PolicyManagementAction extends Action {
 		if (Policy.STATUS_ACTIVE.equals(policyStateId)) {
 		    filteredPolicies.put(policyId, policy);
 
-		    //if both are inactive - newer has priority
-		} else if (Policy.STATUS_INACTIVE.equals(policyStateId)
-			&& Policy.STATUS_INACTIVE.equals(alreadyAddedPolicy.getPolicyStateId())
+		    //if neither are active - newer has priority
+		} else if (!Policy.STATUS_ACTIVE.equals(alreadyAddedPolicy.getPolicyStateId())
 			&& policy.getLastModified().after(alreadyAddedPolicy.getLastModified())) {
 		    filteredPolicies.put(policyId, policy);
 		}
@@ -128,6 +130,7 @@ public class PolicyManagementAction extends Action {
 	    HttpServletResponse response) {
 
 	Long policyUid = WebUtil.readLongParam(request, "policyUid", true);
+	boolean isEditingPreviousVersion = WebUtil.readBooleanParam(request, "isEditingPreviousVersion", false);
 	if (policyUid != null && policyUid > 0) {
 	    Policy policy = policyService.getPolicyByUid(policyUid);
 	    if (policy != null) {
@@ -140,6 +143,7 @@ public class PolicyManagementAction extends Action {
 		policyForm.set("policyTypeId", policy.getPolicyTypeId());
 		policyForm.set("version", policy.getVersion());
 		policyForm.set("policyStateId", policy.getPolicyStateId());
+		policyForm.set("editingPreviousVersion", isEditingPreviousVersion);
 		request.setAttribute("policyForm", policyForm);
 	    }
 	}
@@ -152,61 +156,69 @@ public class PolicyManagementAction extends Action {
 	DynaActionForm policyForm = (DynaActionForm) form;
 	String currentDate = ZonedDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
 
-//	    ActionMessages errors = new ActionMessages();
-//
-//	    // validate
-//	    if (!StringUtils.equals(policyForm.getString("courseKey"), policyForm.getString("confirmCourseKey"))) {
-//		errors.add("courseKey", new ActionMessage("error.course.keys.unequal"));
-//	    }
-//	    if (policyService.contextExists((Integer) policyForm.get("signupOrganisationId"),
-//		    policyForm.getString("context"))) {
-//		errors.add("context", new ActionMessage("error.context.exists"));
-//	    }
-//
-//	    if (!errors.isEmpty()) {
-//		saveErrors(request, errors);
-//	    } else {
 	Object policyUid = policyForm.get("policyUid");
 	String version = policyForm.getString("version");
 	Integer policyStateId = (Integer) policyForm.get("policyStateId");
 	Boolean isMinorChange = (Boolean) policyForm.get("minorChange");
-	
-
+	Boolean isEditingPreviousVersion = (Boolean) policyForm.get("editingPreviousVersion");
 
 	Policy policy;
-	// edit existing policy
-	if (policyUid != null && (Long) policyUid > 0) {
-	    policy = policyService.getPolicyByUid((Long) policyUid);
+	// edit existing policy only in case of minor change
+	if (isMinorChange) {
+	    Policy oldPolicy = policyService.getPolicyByUid((Long) policyUid);
+	    policy = oldPolicy;
+
+	} else {
+	    //if it's not a minor change - then instantiate a new child policy
+	    policy = new Policy();
+
+	    //set policy's policyId
+	    Long policyId;
+	    if (policyUid != null && (Long) policyUid > 0) {
+		Policy oldPolicy = policyService.getPolicyByUid((Long) policyUid);
+		policyId = oldPolicy.getPolicyId();
+	    } else {
+		// generate Unique long ID
+		policyId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
+	    }
+	    policy.setPolicyId(policyId);
 	    
-	   //if it's not a minor change - then instantiate a new child policy
-	    if (!isMinorChange) {
-		Policy oldPolicy = policy;
-
-		//if the new policy has Active status then set the old one to Inactive
-		if (policyStateId.equals(Policy.STATUS_ACTIVE)) {
-		    oldPolicy.setPolicyStateId(Policy.STATUS_INACTIVE);
-		    oldPolicy.setLastModified(new Date());
-		    userManagementService.save(oldPolicy);
-		}
-
+	    //set policy's version
+	    if (policyUid != null && (Long) policyUid > 0) {
+		Policy oldPolicy = policyService.getPolicyByUid((Long) policyUid);
 		//if version was not changed by the user - append current date
 		if (oldPolicy.getVersion().equals(version)) {
 		    version += " " + currentDate;
 		}
-
-		policy = new Policy();
-		policy.setPolicyId(oldPolicy.getPolicyId());
 	    }
-	    
-	//create a new policy
-	} else {
-	    policy = new Policy();
-	    // generate Unique long ID
-	    Long policyId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
-	    policy.setPolicyId(policyId);
+
+	    //take care about old policy/policies: if the new policy has Active status then set the old one(s) to Inactive
+	    if (policyUid != null && (Long) policyUid > 0 && policyStateId.equals(Policy.STATUS_ACTIVE)) {
+
+		if (isEditingPreviousVersion) {
+		    List<Policy> policyFamily = policyService.getPreviousVersionsPolicies(policyId);
+		    for (Policy policyFromFamily : policyFamily) {
+			if (!policyFromFamily.getUid().equals(policyUid)
+				&& Policy.STATUS_ACTIVE.equals(policyFromFamily.getPolicyStateId())) {
+			    policyFromFamily.setPolicyStateId(Policy.STATUS_INACTIVE);
+			    policyFromFamily.setLastModified(new Date());
+			    userManagementService.save(policyFromFamily);
+			}
+		    }
+		    
+		} else {
+		    Policy oldPolicy = policyService.getPolicyByUid((Long) policyUid);
+		    if (Policy.STATUS_ACTIVE.equals(oldPolicy.getPolicyStateId())) {
+			oldPolicy.setPolicyStateId(Policy.STATUS_INACTIVE);
+			oldPolicy.setLastModified(new Date());
+			userManagementService.save(oldPolicy);
+		    }
+		}
+	    }
+
 	}
 
-	//set default version if it's empty
+	//set default version, if it's empty
 	if (StringUtils.isEmpty(version)) {
 	    version = currentDate;
 	}
@@ -224,28 +236,44 @@ public class PolicyManagementAction extends Action {
 	userManagementService.save(policy);
 
 	return mapping.findForward("policyListMethod");
-//	    }
-
-//	return mapping.findForward("editPolicy");
     }
 
-    private ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward displayUserConsents(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	Long policyUid = WebUtil.readLongParam(request, "policyUid");
-	if (policyUid != null && policyUid > 0) {
-	    userManagementService.deleteById(Policy.class, policyUid);
+	Policy policy = policyService.getPolicyByUid(policyUid);
+	Set<PolicyConsent> consents = policy.getConsents();
+	request.setAttribute("policy", policy);
+	
+	List<User> users = userManagementService.getAllUsers();
+	LinkedList<UserPolicyConsentDTO> userPolicyConsents = new LinkedList<UserPolicyConsentDTO>();
+	for (User user : users) {
+	    UserPolicyConsentDTO userPolicyConsent = new UserPolicyConsentDTO(user.getUserId(), user.getFirstName(), user.getLastName(), user.getLogin());
+	    
+	    for (PolicyConsent consent : consents) {
+		if (consent.getUser().getUserId().equals(user.getUserId())) {
+		    userPolicyConsent.setConsentGivenByUser(true);
+		    userPolicyConsent.setDateAgreedOn(consent.getDateAgreedOn());
+		}
+	    }
+	    userPolicyConsents.add(userPolicyConsent);
 	}
+	request.setAttribute("userPolicyConsents", userPolicyConsents);
 
-	return mapping.findForward("policyListMethod");
+	return mapping.findForward("userConsents");
     }
     
     private ActionForward viewPreviousVersions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	long policyId = WebUtil.readLongParam(request, "policyId");
-	List<Policy> policies = policyService.getPreviousVersionsPolicies(policyId);
-	request.setAttribute("policies", policies);
+	List<Policy> policyFamily = policyService.getPreviousVersionsPolicies(policyId);
+	//remove the first one from the list
+	if (policyFamily.size() > 1) {
+//	    policyFamily.remove(policyFamily.size() - 1);
+	}
+	request.setAttribute("policies", policyFamily);
 
 	int userCount = userManagementService.getCountUsers();
 	request.setAttribute("userCount", userCount);
@@ -260,6 +288,6 @@ public class PolicyManagementAction extends Action {
 	int newStatus = WebUtil.readIntParam(request, "newStatus");
 	policyService.changePolicyStatus(policyUid, newStatus);
 
-	return list(mapping, form, request, response);
+	return mapping.findForward("policyListMethod");
     }
 }

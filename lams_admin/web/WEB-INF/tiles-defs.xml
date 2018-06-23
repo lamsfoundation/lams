@@ -252,13 +252,13 @@
 	<definition name=".editPolicy" path="/template.jsp">
 		<put name="title" value="admin.policies.title" />
 		<put name="subtitle" value="admin.add.edit.policy" />
-		<put name="content" value="policies/edit.jsp" />
+		<put name="content" value="policies/editPolicy.jsp" />
 	</definition>
 
 	<definition name=".policyList" path="/template.jsp">
 		<put name="title" value="admin.policies.title" />
 		<put name="help" value="LAMS+Policies"/>
-		<put name="content" value="policies/list.jsp" />
+		<put name="content" value="policies/policies.jsp" />
 	</definition>
 	
 	<definition name=".orgPasswordChange" path="/template.jsp">

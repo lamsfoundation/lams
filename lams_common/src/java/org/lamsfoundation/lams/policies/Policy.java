@@ -11,16 +11,14 @@ public class Policy {
     public static final Integer STATUS_ACTIVE = new Integer(1);
     /** inactive policy */
     public static final Integer STATUS_INACTIVE = new Integer(2);
-    /** The state for draft policy */
-    public static final Integer STATUS_DRAFT = new Integer(3);
     
-    /** active policy */
+    /** site policy */
     public static final Integer TYPE_SITE_POLICY = new Integer(1);
-    /** inactive policy */
+    /** privacy policy */
     public static final Integer TYPE_PRIVACY_POLICY = new Integer(2);
-    /** The state for draft policy */
+    /** third party policy */
     public static final Integer TYPE_THIRD_PARTIES_POLICY = new Integer(3);
-    /** The state for draft policy */
+    /** other policy */
     public static final Integer TYPE_OTHER = new Integer(4);
     
     /** identifier field */
@@ -59,6 +57,7 @@ public class Policy {
     // *************** NON Persistent Fields ********************
     
     private boolean hasPreviousVersions;
+    private int userConsentsCount;
     
     /** default constructor */
     public Policy() {
@@ -161,4 +160,11 @@ public class Policy {
 	return hasPreviousVersions;
     }
 
+    public void setUserConsentsCount(int userConsentsCount) {
+	this.userConsentsCount = userConsentsCount;
+    }
+
+    public int getUserConsentsCount() {
+	return userConsentsCount;
+    }
 }

@@ -43,6 +43,7 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
+import org.lamsfoundation.lams.policies.service.IPolicyService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -71,6 +72,7 @@ public class IndexAction extends LamsDispatchAction {
     private static Logger log = Logger.getLogger(IndexAction.class);
     private static IUserManagementService userManagementService;
     private static IIntegrationService integrationService;
+    private static IPolicyService policyService;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -105,7 +107,7 @@ public class IndexAction extends LamsDispatchAction {
 	}
 	
 	// check if user needs to get his shared two-factor authorization secret
-	if (false) {
+	if (getPolicyService().isPolicyConsentRequiredForUser(loggedInUser.getUserId())) {
 	    return mapping.findForward("policyConsents");
 	}
 
@@ -299,6 +301,14 @@ public class IndexAction extends LamsDispatchAction {
 	    userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return userManagementService;
+    }
+    
+    private IPolicyService getPolicyService() {
+	if (policyService == null) {
+	    policyService = (IPolicyService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("policyService");
+	}
+	return policyService;
     }
 
     private static boolean isPedagogicalPlannerAvailable() {

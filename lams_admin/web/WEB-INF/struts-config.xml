@@ -170,6 +170,7 @@
 	<form-property name="version" type="java.lang.String" />
 	<form-property name="policyStateId" type="java.lang.Integer" initial="1"/>
 	<form-property name="minorChange" type="java.lang.Boolean" initial="0" />
+	<form-property name="editingPreviousVersion" type="java.lang.Boolean" initial="0" />
 </form-bean>
 
 <form-bean name="OrgPasswordChangeForm" type="org.apache.struts.action.DynaActionForm">
@@ -897,6 +898,11 @@
       <forward
         name="policyListMethod"
         path="/policyManagement.do?method=list"
+        redirect="true"
+      />
+      <forward
+        name="userConsents"
+        path="/policies/userConsents.jsp"
         redirect="false"
       />
     </action>
