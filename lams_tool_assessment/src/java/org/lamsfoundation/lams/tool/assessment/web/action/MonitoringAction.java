@@ -327,7 +327,7 @@ public class MonitoringAction extends Action {
 		.getAttribute(sessionMapID);
 
 	Long contentID = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
-	String activityEvaluation = WebUtil.readStrParam(request, AssessmentConstants.ATTR_ACTIVITY_EVALUATION);
+	String activityEvaluation = WebUtil.readStrParam(request, AssessmentConstants.ATTR_ACTIVITY_EVALUATION, true);
 	service.setActivityEvaluation(contentID, activityEvaluation);
 
 	// update the session ready for stats tab to be reloaded otherwise flicking between tabs
@@ -508,13 +508,14 @@ public class MonitoringAction extends Action {
 		userData.add(questionResultUid);
 		userData.add(questionResult.getMaxMark());
 		userData.add(fullName);
-		userData.add(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
+		//LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
+		userData.add(questionResult.getMark());
 		// show confidence levels if this feature is turned ON
 		if (assessment.isEnableConfidenceLevels()) {
 		    userData.add(questionResult.getConfidenceLevel());
 		}
 
-		userData.add(questionResult.getMark());
+		userData.add(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
 		if (userDto.getPortraitId() != null) {
 		    userData.add(userDto.getPortraitId());
 		}

@@ -45,7 +45,8 @@ public interface IGradebookService {
 
     /**
      * Gets all the activity rows for a lesson, with the mark for each activity being the average for all users in the
-     * lesson. Only set escapeTitles to false if the output is *not* going to a webpage, but is instead going to a spreadsheet.
+     * lesson. Only set escapeTitles to false if the output is *not* going to a webpage, but is instead going to a
+     * spreadsheet.
      *
      * @param lesson
      * @return
@@ -283,6 +284,8 @@ public interface IGradebookService {
      * Delete user activity mark and updates aggregates
      */
     void removeActivityMark(Integer userID, Long toolSessionID);
+
+    void removeActivityMark(Long toolContentID);
 
     /**
      * Get an activity from the db by id

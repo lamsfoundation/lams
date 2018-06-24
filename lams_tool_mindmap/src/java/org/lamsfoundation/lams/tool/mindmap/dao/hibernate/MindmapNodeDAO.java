@@ -149,9 +149,14 @@ public class MindmapNodeDAO extends LAMSBaseDAO implements IMindmapNodeDAO {
     }
 
     @Override
-    public List getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId) {
-	return this.doFind(SQL_QUERY_FIND_NODE_BY_UNIQUE_ID_SESSION_ID,
+    @SuppressWarnings("unchecked")
+    public MindmapNode getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId) {
+	List<MindmapNode> nodesList = (List<MindmapNode>) this.doFind(SQL_QUERY_FIND_NODE_BY_UNIQUE_ID_SESSION_ID,
 		new Object[] { uniqueId, mindmapId, sessionId });
+	if ((nodesList != null) && (nodesList.size() > 0)) {
+		return nodesList.get(0);
+	    }
+	return null;
     }
 
     @Override

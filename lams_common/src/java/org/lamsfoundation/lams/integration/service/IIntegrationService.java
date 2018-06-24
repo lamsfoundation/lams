@@ -119,6 +119,8 @@ public interface IIntegrationService {
      * @return
      */
     ExtServerLessonMap getLtiConsumerLesson(String serverId, String resourceLinkId);
+    
+    ExtServerLessonMap getExtServerLessonMap(Long lessonId);
 
     /**
      * Returns ExtCourseClassMap. If ExtCourseClassMap doesn't existent - returns null and does not create a new

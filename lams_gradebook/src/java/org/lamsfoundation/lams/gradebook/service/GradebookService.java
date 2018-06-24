@@ -232,7 +232,8 @@ public class GradebookService implements IGradebookService {
     }
 
     @Override
-    public List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId, TimeZone userTimezone, boolean escapeTitles) {
+    public List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId, TimeZone userTimezone,
+	    boolean escapeTitles) {
 	GradebookService.logger.debug("Getting gradebook data for lesson: " + lessonId);
 
 	Lesson lesson = lessonService.getLesson(lessonId);
@@ -1744,19 +1745,32 @@ public class GradebookService implements IGradebookService {
 	    ToolActivity activity = toolSession.getToolActivity();
 	    GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(activity.getActivityId(), userID);
 	    if (gradebookUserActivity != null) {
-		// act as if the mark was updated to 0 so lesson mark calculates correctly
-		Double oldActivityMark = gradebookUserActivity.getMark();
-		gradebookUserActivity.setMark(0D);
-		Lesson lesson = (Lesson) activity.getLearningDesign().getLessons().iterator().next();
-		boolean isWeightedMarks = toolService.isWeightedMarks(lesson.getLearningDesign());
-		GradebookUserLesson gradebookUserLesson = getGradebookUserLesson(lesson.getLessonId(), userID);
-		aggregateTotalMarkForLesson(isWeightedMarks, gradebookUserLesson, gradebookUserActivity,
-			oldActivityMark);
-
-		// finally completely remove the activity mark
-		gradebookDAO.delete(gradebookUserActivity);
+		removeActivityMark(activity, gradebookUserActivity);
 	    }
 	}
+    }
+
+    @Override
+    public void removeActivityMark(Long toolContentID) {
+	Activity activity = activityDAO.getToolActivityByToolContentId(toolContentID);
+	List<GradebookUserActivity> userActivities = getGradebookUserActivities(activity.getActivityId());
+	for (GradebookUserActivity gradebookUserActivity : userActivities) {
+	    removeActivityMark(activity, gradebookUserActivity);
+	}
+    }
+
+    private void removeActivityMark(Activity activity, GradebookUserActivity gradebookUserActivity) {
+	// set mark to null so lesson mark recalculates correctly
+	Double oldActivityMark = gradebookUserActivity.getMark();
+	gradebookUserActivity.setMark(null);
+	Lesson lesson = (Lesson) activity.getLearningDesign().getLessons().iterator().next();
+	boolean isWeightedMarks = toolService.isWeightedMarks(lesson.getLearningDesign());
+	GradebookUserLesson gradebookUserLesson = getGradebookUserLesson(lesson.getLessonId(),
+		gradebookUserActivity.getLearner().getUserId());
+	aggregateTotalMarkForLesson(isWeightedMarks, gradebookUserLesson, gradebookUserActivity, oldActivityMark);
+
+	// finally completely remove the activity mark
+	gradebookDAO.delete(gradebookUserActivity);
     }
 
     @Override
@@ -1917,11 +1931,16 @@ public class GradebookService implements IGradebookService {
      */
     private void aggregateTotalMarkForLesson(boolean useWeightings, GradebookUserLesson gradebookUserLesson,
 	    GradebookUserActivity markedActivity, Double oldActivityMark) {
-
 	List<GradebookUserActivity> userActivities = gradebookDAO.getGradebookUserActivitiesForLesson(
 		gradebookUserLesson.getLesson().getLessonId(), gradebookUserLesson.getLearner().getUserId());
+	// if there is only one marked activity and it is being deleted, remove whole lesson mark
+	if (markedActivity.getMark() == null && userActivities.size() == 1
+		&& userActivities.get(0).getUid() == markedActivity.getUid()) {
+	    gradebookDAO.delete(gradebookUserLesson);
+	    return;
+	}
 
-	Double totalMark;
+	Double totalMark = null;
 	if (oldActivityMark == null || gradebookUserLesson.getMark() == null) {
 	    totalMark = calculateLessonMark(useWeightings, userActivities, markedActivity);
 	} else if (!useWeightings) {
@@ -1931,7 +1950,8 @@ public class GradebookService implements IGradebookService {
 	    }
 	} else {
 	    Double oldWeightedMark = getWeightedMark(true, markedActivity, oldActivityMark);
-	    Double newWeighterMark = getWeightedMark(true, markedActivity, markedActivity.getMark());
+	    Double newWeighterMark = markedActivity.getMark() == null ? 0
+		    : getWeightedMark(true, markedActivity, markedActivity.getMark());
 	    totalMark = gradebookUserLesson.getMark() - oldWeightedMark + newWeighterMark;
 	}
 

@@ -144,11 +144,19 @@ public class RatingService implements IRatingService {
 	    rating.setToolSessionId(toolSessionId);
 	}
 
+	// LDEV-4590 Star Rating can never be more than 5 stars
+	if (ratingCriteria.isStarStyleRating()
+		&& Float.compare(ratingFloat, RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT) > 0) {
+	    ratingFloat = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT;
+	}
+	
 	rating.setRating(ratingFloat);
 	ratingDAO.saveOrUpdate(rating);
 
 	// to make available new changes be visible on a jsp page
-	return ratingDAO.getRatingAverageDTOByItem(ratingCriteriaId, toolSessionId, itemId);
+	ItemRatingCriteriaDTO averageDTO = ratingDAO.getRatingAverageDTOByItem(ratingCriteriaId, toolSessionId, itemId);
+	averageDTO.setUserRating(Float.toString(ratingFloat));
+	return averageDTO;
     }
 
     @Override
@@ -176,8 +184,16 @@ public class RatingService implements IRatingService {
 	    rating.setItemId(entry.getKey());
 	    rating.setLearner(learner);
 	    rating.setRatingCriteria(ratingCriteria);
-	    rating.setRating(entry.getValue());
 	    rating.setToolSessionId(toolSessionId);
+
+	    // LDEV-4590 Star Rating can never be more than 5 stars
+	    float rawRating = entry.getValue();
+	    if (ratingCriteria.isStarStyleRating()
+		    && Float.compare(rawRating, RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT) > 0) {
+		rawRating = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT;
+	    }
+	    rating.setRating(rawRating);
+		
 	    ratingDAO.saveOrUpdate(rating);
 	    numRatings++;
 	}

@@ -56,7 +56,7 @@ public interface IMindmapNodeDAO extends IBaseDAO {
 
     public List getMindmapNodeByUniqueId(Long uniqueId, Long mindmapId);
 
-    public List getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId);
+    public MindmapNode getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId);
 
     public List getMindmapNodeByUniqueIdMindmapIdUserId(Long uniqueId, Long mindmapId, Long userId);
 

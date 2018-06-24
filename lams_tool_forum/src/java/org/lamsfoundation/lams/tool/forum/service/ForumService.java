@@ -66,6 +66,7 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -676,6 +677,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    messageRating = new MessageRating();
 	    messageRating.setUser(imageGalleryUser);
 	    messageRating.setMessage(message);
+	}
+	
+	// LDEV-4590 Star Rating can never be more than 5 stars
+	if ( Float.compare(rating, RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT) > 0) {
+	    rating = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT;
 	}
 	messageRating.setRating(rating);
 	messageRatingDao.saveObject(messageRating);

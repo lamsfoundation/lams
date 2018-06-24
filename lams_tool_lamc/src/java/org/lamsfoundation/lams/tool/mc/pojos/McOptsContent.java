@@ -166,4 +166,8 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
     public void setEscapedOptionText(String escapedOptionText) {
 	this.escapedOptionText = escapedOptionText;
     }
+
+    public String formatPrefixLetter(int index) {
+ 	return new String(Character.toChars(97 + index)) + ")";
+     }
 }

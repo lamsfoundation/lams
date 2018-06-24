@@ -278,9 +278,18 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean imEnable = WebUtil.readBooleanParam(request, "imEnable", false);
 	Integer splitNumberLessons = WebUtil.readIntParam(request, "splitNumberLessons", true);
 	boolean schedulingEnable = WebUtil.readBooleanParam(request, "schedulingEnable", false);
-	Date schedulingDatetime = schedulingEnable
-		? MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(request.getParameter("schedulingDatetime"))
-		: null;
+	Date schedulingDatetime = null;
+	Date schedulingEndDatetime = null;
+	if ( schedulingEnable ) {
+	    String dateString = request.getParameter("schedulingDatetime");
+	    if ( dateString != null && dateString.length() > 0 ) {
+		schedulingDatetime = MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateString);
+	    }
+	    dateString = request.getParameter("schedulingEndDatetime");
+	    if ( dateString != null && dateString.length() > 0 ) {
+		schedulingEndDatetime = MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateString);
+	    }
+	}
 	boolean forceRestart = WebUtil.readBooleanParam(request, "forceRestart", false);
 	boolean allowRestart = WebUtil.readBooleanParam(request, "allowRestart", false);
 
@@ -368,10 +377,14 @@ public class MonitoringAction extends LamsDispatchAction {
 			getMonitoringService().startLessonOnSchedule(lesson.getLessonId(), schedulingDatetime, userId);
 		    }
 
+		    // monitor has given an end date/time for the lesson
+		    if (schedulingEndDatetime != null) {
+			getMonitoringService().finishLessonOnSchedule(lesson.getLessonId(), schedulingEndDatetime, userId);
 		    // if lesson should finish in few days, set it here
-		    if (timeLimitLesson != null) {
+		    } else if (timeLimitLesson != null) {
 			getMonitoringService().finishLessonOnSchedule(lesson.getLessonId(), timeLimitLesson, userId);
 		    }
+		    
 		} catch (SecurityException e) {
 		    try {
 			response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");

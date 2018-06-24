@@ -329,8 +329,7 @@ public class McMonitoringAction extends LamsDispatchAction {
 		countVisitLogs = 1;
 
 	} else {
-	    userDtos = mcService.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy,
-	    		sortOrder, searchString);
+	    userDtos = mcService.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy, sortOrder, searchString);
 	    countVisitLogs = mcService.getCountPagedUsersBySession(sessionId, searchString);
 	}
 

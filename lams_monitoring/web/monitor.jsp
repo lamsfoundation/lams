@@ -52,6 +52,8 @@
 			ldId = ${lesson.learningDesignID},
 			lessonStateId = ${lesson.lessonStateID},
 			createDateTimeStr = '${lesson.createDateTimeStr}',
+			lessonStartDate = '${lesson.scheduleStartDate}',
+			lessonEndDate = '${lesson.scheduleEndDate}',
 			// settings for progress bar
 			isHorizontalBar = true,
 			hasContentFrame = false,
@@ -205,9 +207,13 @@
 				<fmt:message key="lesson.display.activity.scores.alert" var="LESSON_ACTIVITY_SCORES_ENABLE_ALERT_VAR"/>
 				LESSON_ACTIVITY_SCORES_ENABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_ACTIVITY_SCORES_ENABLE_ALERT_VAR}" />').text(),
 				<fmt:message key="lesson.hide.activity.scores.alert" var="LESSON_ACTIVITY_SCORES_DISABLE_ALERT_VAR"/>
-				LESSON_ACTIVITY_SCORES_DISABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_ACTIVITY_SCORES_DISABLE_ALERT_VAR}" />').text()
+				LESSON_ACTIVITY_SCORES_DISABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_ACTIVITY_SCORES_DISABLE_ALERT_VAR}" />').text(),
+				<fmt:message key="label.reschedule" var="RESCHEDULE_VAR"/>
+				RESCHEDULE : decoderDiv.html('<c:out value="${RESCHEDULE_VAR}" />').text(),
+				<fmt:message key="error.lesson.end.date.must.be.after.start.date" var="LESSON_ERROR_START_END_DATE_VAR"/>
+				LESSON_ERROR_START_END_DATE : decoderDiv.html('<c:out value="${LESSON_ERROR_START_END_DATE_VAR}" />').text()
 		}
-	    
+				
 		$(document).ready(function(){
 			initLessonTab();
 			initSequenceTab();
@@ -322,28 +328,44 @@
 								</dt>
 								<dd>
 									<span data-toggle="collapse" data-target="#changeState" id="lessonStateLabel" class="lessonManageField"></span>
-								  	<span id="lessonStartDateSpan" class="lessonManageField loffset5"></span>
-								  	<span id="lessonFinishDateSpan" class="lessonManageField loffset5"></span>
+								  	<div style="display:inline-block;vertical-align: middle;"><span id="lessonStartDateSpan" class="lessonManageField loffset5"></span>
+								  	<span id="lessonFinishDateSpan" class="lessonManageField loffset5"></span></div>
 								  	 
 									<!--  Change lesson status or start/schedule start -->
 									<div class="collapse offset10" id="changeState">
 										<div id="lessonScheduler">
-											<form class="form-inline">
-												<div class="form-group">
-													<label for="scheduleDatetimeField"><fmt:message key="lesson.start"/></label>
+											<form class="form-horizontal">
+												<div class="form-group" id="lessonStartApply">
+													<label for="scheduleDatetimeField" class="col-sm-1"><fmt:message key="lesson.start"/></label>
+													<div class="col-sm-8">
 													<input class="lessonManageField input-sm" id="scheduleDatetimeField" type="text"/>
-													
 													<a id="scheduleLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
 														   onClick="javascript:scheduleLesson()"
 														   title='<fmt:message key="button.schedule.tooltip"/>'>
 													   <fmt:message key="button.schedule"/>
 													</a>
-													
 													<a id="startLessonButton" class="btn btn-xs btn-default" href="#"
 														   onClick="javascript:startLesson()"
 														   title='<fmt:message key="button.start.now.tooltip"/>'>
 													   <fmt:message key="button.start.now"/>
 													</a>
+													</div>
+												</div>
+												<div class="form-group" id="lessonDisableApply">
+													<label for="disableDatetimeField" class="col-sm-1"><fmt:message key="lesson.end"/></label>
+													<div class="col-sm-8">
+													<input class="lessonManageField input-sm" id="disableDatetimeField" type="text"/>
+													<a id="scheduleDisableLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
+														   onClick="javascript:scheduleDisableLesson()"
+														   title='<fmt:message key="button.schedule.disable.tooltip"/>'>
+												   	<fmt:message key="button.schedule"/>
+													</a>
+													<a id="disableLessonButton" class="btn btn-xs btn-default" href="#"
+														   onClick="javascript:disableLesson()"
+														   title='<fmt:message key="button.disable.now.tooltip"/>'>
+													   <fmt:message key="button.disable.now"/>
+													</a>
+													</div>
 												</div>
 											</form>
 										</div>
@@ -360,19 +382,6 @@
 										   		<span class="hidden-xs"><fmt:message key="button.apply"/></span>
 										    	</button>
 										    	</span>
-											<span id="lessonDisableApply">	
-												<input class="lessonManageField input-sm" id="disableDatetimeField" type="text"/>
-												<a id="scheduleDisableLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
-														   onClick="javascript:scheduleDisableLesson()"
-														   title='<fmt:message key="button.schedule.disable.tooltip"/>'>
-												   <fmt:message key="button.schedule"/>
-												</a>
-												<a id="disableLessonButton" class="btn btn-xs btn-default" href="#"
-														   onClick="javascript:disableLesson()"
-														   title='<fmt:message key="button.disable.now.tooltip"/>'>
-													   <fmt:message key="button.disable.now"/>
-												</a>
-											</span>
 								    		</div>					
 									</div>
 								</dd>

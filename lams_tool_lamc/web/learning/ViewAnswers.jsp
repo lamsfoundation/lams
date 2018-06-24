@@ -6,6 +6,8 @@
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" />
 <c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
+<c:set var="isPrefixAnswersWithLetters" value="${sessionMap.content.prefixAnswersWithLetters}" scope="request" />
+
 
 <lams:html>
 <lams:head>
@@ -22,6 +24,9 @@
 		}
 		table .bg-success, table .bg-danger {
 			width: 32px;
+		}
+		.table-top>tbody>tr>td {
+			vertical-align: top;
 		}
 	</style>	
 
@@ -112,11 +117,25 @@
 
 								<c:if test="${requestScope.mainQueIndex == requestScope.queIndex}">
 									<!-- list of candidate answers -->
+				                     <c:choose>
+				                     <c:when test="${isPrefixAnswersWithLetters}">
+										<table class="table table-hover table-condensed table-no-border table-top">
+										<c:forEach var="subEntry" items="${mainEntry.value}">
+										<tr><td>${subEntry.key}
+										</td>
+										<td width="100%"><c:out value="${subEntry.value}" escapeXml="false" /></td>
+										</tr>
+										</c:forEach>
+										</tbody></table>
+									</c:when>
+									<c:otherwise>
 									<ul>
 										<c:forEach var="subEntry" items="${mainEntry.value}">
 											<li><c:out value="${subEntry.value}" escapeXml="false" /></li>
 										</c:forEach>
 									</ul>
+									</c:otherwise>
+									</c:choose>
 									<!-- end list of candidate answers -->
 
 									<!-- display students answers -->

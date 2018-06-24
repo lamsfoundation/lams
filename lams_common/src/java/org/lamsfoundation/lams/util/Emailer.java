@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.util;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -39,11 +40,11 @@ public class Emailer {
      */
     public static void sendFromSupportEmail(String subject, String to, String body, boolean isHtmlFormat)
 	    throws AddressException, MessagingException, UnsupportedEncodingException {
-	sendFromSupportEmail(subject, to, body, isHtmlFormat, null);
+	Emailer.sendFromSupportEmail(subject, to, body, isHtmlFormat, null);
     }
 
-    public static void sendFromSupportEmail(String subject, String to, String body, boolean isHtmlFormat, String attachmentFilename)
-	    throws AddressException, MessagingException, UnsupportedEncodingException {
+    public static void sendFromSupportEmail(String subject, String to, String body, boolean isHtmlFormat,
+	    String attachmentFilename) throws AddressException, MessagingException, UnsupportedEncodingException {
 	String supportEmail = Configuration.get(ConfigurationKeys.LAMS_ADMIN_EMAIL);
 	Emailer.send(subject, to, "", supportEmail, "", body, isHtmlFormat, attachmentFilename);
     }
@@ -94,10 +95,10 @@ public class Emailer {
      */
     public static void send(String subject, String to, String toPerson, String from, String fromPerson, String body,
 	    boolean isHtmlFormat) throws AddressException, MessagingException, UnsupportedEncodingException {
-	
-	send(subject, to, toPerson, from, fromPerson, body, isHtmlFormat, null);
+
+	Emailer.send(subject, to, toPerson, from, fromPerson, body, isHtmlFormat, null);
     }
-    
+
     /**
      * Send email to recipients
      *
@@ -116,10 +117,11 @@ public class Emailer {
      * @param isHtmlFormat
      *            whether the message is of HTML content-type or plain text
      * @param file
-     * 		  file to attach
+     *            file to attach
      */
     public static void send(String subject, String to, String toPerson, String from, String fromPerson, String body,
-	    boolean isHtmlFormat, String filename) throws AddressException, MessagingException, UnsupportedEncodingException {
+	    boolean isHtmlFormat, String filename)
+	    throws AddressException, MessagingException, UnsupportedEncodingException {
 
 	Session session = Emailer.getMailSession();
 
@@ -127,6 +129,7 @@ public class Emailer {
 	message.setFrom(new InternetAddress(from, fromPerson));
 	message.addRecipient(RecipientType.TO, new InternetAddress(to, toPerson));
 	message.setSubject(subject, "UTF-8");
+	message.setSentDate(new Date());
 
 	if (filename == null) {
 	    message.setText(body, "UTF-8");

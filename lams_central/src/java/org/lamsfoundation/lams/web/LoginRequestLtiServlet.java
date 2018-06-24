@@ -125,6 +125,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	ExtServerLessonMap lesson = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
 
 	//Determine method based on role parameter. Monitor roles can be either LTI standard ones or tool consumer's custom ones set
+	//In case of ContentItemSelectionRequest user must still be a stuff member in order to create a lesson.
 	String method;
 	boolean isCustomMonitorRole = LtiUtils.isToolConsumerCustomRole(roles,
 		extServer.getLtiToolConsumerMonitorRoles());
@@ -153,6 +154,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 
 	    // constructing redirectUrl by getting request.getQueryString() for POST requests 
 	    URIBuilder redirectUrl = new URIBuilder("lti.do");
+	    redirectUrl.addParameter("_" + LoginRequestDispatcher.PARAM_METHOD, method);
 	    for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
 		String paramName = e.nextElement();
 
@@ -161,7 +163,6 @@ public class LoginRequestLtiServlet extends HttpServlet {
 			|| !paramName.startsWith(BasicLTIConstants.OAUTH_PREFIX)) {
 		    redirectUrl.addParameter(paramName, request.getParameter(paramName));
 		}
-		redirectUrl.addParameter("_" + LoginRequestDispatcher.PARAM_METHOD, method);
 	    }
 
 	    URIBuilder url = new URIBuilder("LoginRequest");

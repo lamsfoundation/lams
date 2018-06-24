@@ -96,5 +96,14 @@
 			</div>
 		</div>
 	</c:if>
+	
+	<%-- show link to burning questions (only for results page) --%>
+	<c:if test="${showResults && mode != 'teacher' && scratchie.burningQuestionsEnabled}">
+		<div class="scroll-down-to-bq">
+			<a href='#gbox_burningQuestions${item.uid}' data-item-uid="${item.uid}" class='pull-right' title="<fmt:message key="label.scroll.down.to.burning.question"/>">
+				<i class="fa fa-xs fa-angle-double-down roffset5"></i>
+			</a>
+		</div>
+	</c:if>
 
 </c:forEach>

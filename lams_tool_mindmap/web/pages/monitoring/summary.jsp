@@ -82,18 +82,20 @@
 		<fmt:message key="heading.totalLearners" />&nbsp;${session.numberOfLearners}
 	</div>
 
-	<table class="table table-centered voffset10">
+	<table class="table table-striped table-condensed voffset10">
 
 		<tr>
-			<th width="30%">
+			<th width="40%">
 				<fmt:message key="heading.learner" />
 			</th>
 			<th width="40%">
 				<fmt:message key="heading.mindmapEntry" />
 			</th>
-			<th width="40%">
+			<c:if test="${dto.reflectOnActivity == true}">
+			<th>
 				<fmt:message key="label.notebookEntry" />
 			</th>
+			</c:if>
 		</tr>
 
 		<c:choose>
@@ -108,13 +110,13 @@
 								</td>
 						
 								<td >
-									<a href="./learning.do?mode=learner&amp;toolSessionID=${session.sessionID}&amp;monitor=true">
+									<a href="./monitoring.do?dispatch=showMindmap&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
 										<fmt:message key="label.view" />
-									</a>
+									</a>		
 								</td>
 						
 								<td width="30%">
-									<a href="./monitoring.do?dispatch=reflect&amp;userUID=${user.uid}&amp;toolContentID=${dto.toolContentId}">
+									<a href="./monitoring.do?dispatch=reflect&userUID=${user.uid}&toolContentID=${dto.toolContentId}">
 										<fmt:message key="label.view" />
 									</a>
 								</td>
@@ -129,13 +131,9 @@
 							</td>
 					
 							<td>
-								<a href="./learning.do?mode=learner&amp;toolSessionID=${session.sessionID}&amp;monitor=true">
+								<a href="./monitoring.do?dispatch=showMindmap&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
 									<fmt:message key="label.view" />
-								</a>
-							</td>
-					
-							<td>
-								<fmt:message key="label.notAvailable" />
+								</a>		
 							</td>
 						</tr>
 					</c:otherwise>
@@ -157,25 +155,18 @@
 									<fmt:message key="label.notAvailable" />
 								</c:when>
 								<c:otherwise>
-									<a href="./monitoring.do?dispatch=showMindmap&amp;userUID=${user.uid}&amp;toolContentID=${dto.toolContentId}&amp;contentFolderID=${contentFolderID}">
+									<a href="./monitoring.do?dispatch=showMindmap&userUID=${user.uid}&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
 										<fmt:message key="label.view" />
 									</a>									
 								</c:otherwise>
 							</c:choose>
 						</td>
 						
+						<c:if test="${dto.reflectOnActivity}">
 						<td>
-							<c:choose>
-								<c:when test="${dto.reflectOnActivity != true}">
-									<fmt:message key="label.notAvailable" />
-								</c:when>
-								<c:otherwise>
-									<a href="./monitoring.do?dispatch=reflect&amp;userUID=${user.uid}&amp;toolContentID=${dto.toolContentId}">
-										<fmt:message key="label.view" />
-									</a>
-								</c:otherwise>
-							</c:choose>
+							<a href="./monitoring.do?dispatch=reflect&userUID=${user.uid}&toolContentID=${dto.toolContentId}"><fmt:message key="label.view" />	</a>
 						</td>
+						</c:if>
 						
 					</tr>
 				</c:forEach>

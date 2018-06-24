@@ -26,5 +26,6 @@
 			<attribute name="javadoc_location" value="http://commons.apache.org/proper/commons-lang/javadocs/api-2.6/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/websocket/api/main/jboss-websocket-api_1.1_spec-1.1.1.Final.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

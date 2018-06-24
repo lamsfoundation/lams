@@ -83,6 +83,20 @@
 			
 
 	</script>
+	<!-- LDEV_NTU-7 Page jumps to the top when clicking the link in Grouping -->		
+	<script type="text/javascript">
+		jQuery(document).ready(function(){
+		    jQuery('#noscrollinputid').on('click', function(event) {  
+		         jQuery('#collapseUploadGroupFile').toggle('show');
+		    });
+		});
+
+		jQuery(document).ready(function(){
+		    jQuery('#noscrolladvancedid').on('click', function(event) {  
+		         jQuery('#collapseAdvanced').toggle('show');
+		    });
+		});
+	</script>
 </lams:head>
 <body>
 
@@ -172,17 +186,32 @@
 
 <c:if test="${lessonMode}">
 	<c:set var="adTitle"><fmt:message key="label.advanced.settings" /></c:set>
-	<lams:AdvancedAccordian title="${adTitle}">
+	<!-- LDEV_NTU-7 Page jumps to the top when clicking the link in Grouping -->	
+	<!-- lams:AdvancedAccordian title="${adTitle}"-->
 	
-		<div id="course-grouping-advanced-settings">
-			<fmt:message key="label.save.as.course.grouping.hint" />
-			<button id="save-course-grouping-button" class="pull-right btn btn-sm btn-primary btn-disable-on-downupload" onClick="javascript:saveAsCourseGrouping();">
-				<i class="fa fa-save"></i>
-				<fmt:message key="label.save.as.course.grouping" />
-			</button>
+		<div class="panel-group" id="accordionAdvanced" role="tablist" aria-multiselectable="true"> 
+    <div class="panel panel-default" >
+		 <div class="panel-heading collapsable-icon-left" id="headingAdvanced">
+        	<span class="panel-title">
+	    	<a id="noscrolladvancedid" class="collapsed" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="collapseAdvanced" >
+          	${adTitle}
+        	</a>
+      		</span>
+        </div>
+        
+        <div id="collapseAdvanced" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingAdvanced">
+	        <div id="course-grouping-advanced-settings">
+				<fmt:message key="label.save.as.course.grouping.hint" />
+				<button id="save-course-grouping-button" class="pull-right btn btn-sm btn-primary btn-disable-on-downupload" onClick="javascript:saveAsCourseGrouping();">
+					<i class="fa fa-save"></i>
+					<fmt:message key="label.save.as.course.grouping" />
+				</button>
+			</div>
 		</div>
+	</div>
+	</div>
 		
-	</lams:AdvancedAccordian>
+	<!--  /lams:AdvancedAccordian-->
 </c:if>
 
 <c:if test="${canEdit}">
@@ -190,8 +219,8 @@
     <div class="panel panel-default" >
         <div class="panel-heading collapsable-icon-left" id="headingUploadGroupFile">
 	        	<span class="panel-title">
-			    	<a class="collapsed" role="button" data-toggle="collapse" href="#collapseUploadGroupFile" aria-expanded="false" aria-controls="collapseUploadGroupFile" >
-		          	<fmt:message key="label.import.groups.from.template" />
+	        		<a id="noscrollinputid" class="collapsed" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="collapseUploadGroupFile" >
+		          		<fmt:message key="label.import.groups.from.template" />
 		        	</a>
 		     </span>
         </div>

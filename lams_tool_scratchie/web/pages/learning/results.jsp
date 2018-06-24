@@ -63,6 +63,12 @@
 		.ui-jqgrid tr.jqfoot>td, .ui-jqgrid tr.jqgroup>td, .ui-jqgrid tr.jqgrow>td, .ui-jqgrid tr.ui-subgrid>td, .ui-jqgrid tr.ui-subtblcell>td {
 	    	border-bottom-style: dotted;
 		}
+		
+		/* links to burning questions */
+		.scroll-down-to-bq {
+			overflow:auto; 
+			margin-top: -20px;
+		}
 	</style>
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
@@ -139,7 +145,6 @@
 						'isUserAuthor',
 						"<fmt:message key='label.monitoring.summary.user.name' />",
 						"<fmt:message key='label.burning.questions' />",
-						"Edit",
 						"<fmt:message key='label.like' />",
 						"<fmt:message key='label.count' />"
 					],
@@ -165,14 +170,6 @@
 				   	            return ${isUserLeader} && eval(item.isUserAuthor);
 				   	        }
 						},
-						{ name: "act", template: "actions", width:50, formatoptions:{
-			            	keys: true, 
-			            	delbutton: false,
-			                isDisplayButtons: function (options, rowData) {
-			                	var isEditable = ${isUserLeader} && eval(rowData.isUserAuthor);
-				   	            return { edit: { hidden: !isEditable, noHovering: true } };
-			                }
-			            }},
 				   		{name:'like', index:'like', width:60, align: "center", 
 					   		formatter:function(cellvalue, options, rowObject) {
 								return cellvalue;
@@ -180,7 +177,7 @@
 						},
 				   		{name:'count', index:'count', width:50, align:"right", title: false}
 				   	],
-                    caption: <c:choose><c:when test="${scratchieItem.uid == 0}">"${scratchieItem.title}"</c:when><c:otherwise>"<a href='#${scratchieItem.title}' class='bq-title'>${scratchieItem.title}</a>"</c:otherwise></c:choose>,
+                    caption: <c:choose><c:when test="${scratchieItem.uid == 0}">"${scratchieItem.title}"</c:when><c:otherwise>"<a href='#${scratchieItem.title}' class='bq-title'>${scratchieItem.title}</a>"</c:otherwise></c:choose> + " <span class='small'>[${fn:length(burningQuestionItemDto.burningQuestionDtos)}]</span>",
                     editurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItem.uid}',
 	  	          	beforeEditRow: function (options, rowid) {
 		  	          	alert("aaa");
@@ -200,6 +197,12 @@
 	  	                	return;
 		  	            } else {
 		  	            	$self.jqGrid("editRow", rowid, { focusField: "burningQuestion" });
+
+		  	            	//Modify event handler to save on blur
+		  	            	var gridId = "#burningQuestions${scratchieItem.uid}";
+		  	              	$("textarea[id^='"+rowid+"_burningQuestion']", gridId).bind('blur',function(){
+		  	                	$(gridId).saveRow(rowid);
+		  	              	});
 			  	        }
 	  	            },
 	  				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
@@ -280,6 +283,34 @@
 			
 			// trigger the resize when the window first opens so that the grid uses all the space available.
 			setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+
+			//hide links to burning questions that were not created by the user
+			$(".scroll-down-to-bq a").each(function()  {
+				var itemUid = $(this).data("item-uid");
+				if ( $( "#burningQuestions" + itemUid ).length == 0) {
+					$(this).parent().hide();
+				}
+			});
+
+			//handler for expand/collapse all button
+			$("#toggle-burning-questions-button").click(function() {
+				$(".ui-jqgrid-titlebar-close").click();
+				var isExpanded = eval($(this).data("expanded"));
+
+				//change button label
+				var newButtonLabel = isExpanded ? "<fmt:message key='label.expand.all' />" : "<fmt:message key='label.collapse.all' />";
+				$(".hidden-xs", $(this)).text(newButtonLabel);
+
+				//change button icon
+				if (isExpanded) {
+					$(".fa", $(this)).removeClass("fa-minus-square").addClass("fa-plus-circle");
+				} else {
+					$(".fa", $(this)).removeClass("fa-plus-circle").addClass("fa-minus-square");
+				}
+
+				//change button's data-expanded attribute
+				$(this).data("expanded", !isExpanded);
+			});
 		    
 		})
 	
@@ -334,8 +365,21 @@
 		
 		<!-- Display burningQuestionItemDtos -->
 		<c:if test="${sessionMap.isBurningQuestionsEnabled}">
+            
+            <a class="btn btn-sm btn-default pull-right roffset10" href="#" onclick="return refresh();">
+            	<i class="fa fa-refresh"></i> 
+            	<span class="hidden-xs">
+            		<fmt:message key="label.refresh" />
+            	</span>
+            </a>
 
-            <a class="btn btn-sm btn-default pull-right roffset10" href="#" onclick="return refresh();"><i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="label.refresh" /></span></a>
+            <a id="toggle-burning-questions-button" class="btn btn-sm btn-default pull-right roffset10" data-expanded="true" href="#nogo">
+            	<i class="fa fa-minus-square"></i> 
+            	<span class="hidden-xs">
+            		<fmt:message key="label.collapse.all" />
+            	</span>
+            </a>
+            
 			<div class="voffset5">
 				<div class="lead">
 					<fmt:message key="label.burning.questions" />

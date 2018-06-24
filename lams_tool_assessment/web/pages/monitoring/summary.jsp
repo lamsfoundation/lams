@@ -91,21 +91,21 @@
 				   	'#',
 					'questionResultUid',
   					'Question',
-  					"<fmt:message key="label.monitoring.user.summary.response" />",
+  					"<fmt:message key="label.authoring.basic.list.header.mark" />",
   					<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
   						"<fmt:message key="label.confidence" />",
   					</c:if>
-  					"<fmt:message key="label.authoring.basic.list.header.mark" />"
+  					"<fmt:message key="label.monitoring.user.summary.response" />"
   				], 
 			   	colModel:[
 	  			   	{name:'id', index:'id', width:20, sorttype:"int"},
 	  			   	{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 	  			   	{name:'title', index:'title', width: 200},
-	  			   	{name:'response', index:'response', width:443, sortable:false},
+	  			    {name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
 	  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
 	  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 	  			  	</c:if>
-	  			   	{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' }
+	  			  	{name:'response', index:'response', width:443, sortable:false}
 			   	],
 			   	multiselect: false,
 

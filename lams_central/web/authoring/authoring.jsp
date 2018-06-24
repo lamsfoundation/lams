@@ -257,6 +257,8 @@
 				ACTIVITY_BRANCHING_DESCRIPTION : decoderDiv.html('<c:out value="${ACTIVITY_BRANCHING_DESCRIPTION_VAR}" />').text(),
 				<fmt:message key="authoring.fla.default.range.condition.title.prefix" var="DEFAULT_RANGE_CONDITION_TITLE_PREFIX_VAR"/>
 				DEFAULT_RANGE_CONDITION_TITLE_PREFIX : '<c:out value="${DEFAULT_RANGE_CONDITION_TITLE_PREFIX_VAR}" />',
+				<fmt:message key="authoring.fla.page.prop.gradebook.none" var="GRADEBOOK_OUTPUT_NONE_VAR"/>
+				GRADEBOOK_OUTPUT_NONE : '<c:out value="${GRADEBOOK_OUTPUT_NONE_VAR}" />',
 				<fmt:message key="authoring.fla.clear.all.confirm" var="CLEAR_ALL_CONFIRM_VAR"/>
 				CLEAR_ALL_CONFIRM : decoderDiv.html('<c:out value="${CLEAR_ALL_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.remove.condition.confirm" var="REMOVE_CONDITION_CONFIRM_VAR"/>
@@ -458,7 +460,7 @@
 			</td>
 			<td id="canvasContainerCell">
 				<div id="ldDescriptionDiv">
-					<div id="ldDescriptionTitleContainer" title="Click to show the sequence description"
+					<div id="ldDescriptionTitleContainer" title='<fmt:message key="authoring.fla.page.ld.title.desc" /> '
 						 onClick="javascript:MenuLib.toggleDescriptionDiv()">
 						<span id="ldDescriptionFieldTitle"><fmt:message key="authoring.fla.page.ld.title" /></span>
 						<span id="ldDescriptionFieldModified"></span>

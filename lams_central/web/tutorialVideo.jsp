@@ -68,30 +68,7 @@
 <body>
 	<h2 style="text-align: center">${param.title}</h2>
    <div style="text-align: center">
-    <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="${param.videoWidth}" height="${param.videoHeight}">
-       <param name="movie" value="${param.videoUrl}" />
-       <param name="quality" value="best" />
-       <param name="bgcolor" value="#1a1a1a" />
-       <param name="allowfullscreen" value="false" />
-       <param name="scale" value="showall" />
-       <param name="allowscriptaccess" value="always" />
-       <param name="flashvars" value="autostart=true&color=0x000000,0x000000" />
-       <!--[if !IE]>-->
-       <object type="application/x-shockwave-flash" data="${param.videoUrl}" width="${param.videoWidth}" height="${param.videoHeight}">
-           <param name="quality" value="best" />
-           <param name="bgcolor" value="#1a1a1a" />
-           <param name="allowfullscreen" value="false" />
-           <param name="scale" value="showall" />
-           <param name="allowscriptaccess" value="always" />
-           <param name="flashvars" value="autostart=true&color=0x000000,0x000000" />
-       <!--<![endif]-->
-           <div id="noUpdate">
-               <p>The Camtasia Studio video content presented here requires a more recent version of the Adobe Flash Player. If you are you using a browser with JavaScript disabled please enable it now. Otherwise, please update your version of the free Flash Player by <a href="http://www.adobe.com/go/getflashplayer">downloading here</a>.</p>
-           </div>
-       <!--[if !IE]>-->
-       </object>
-       <!--<![endif]-->
-    </object>
+<div style="position:relative;height:0;padding-bottom:75.0%"><iframe src="https://www.youtube.com/embed/5uUugBONK4k?rel=0&amp;showinfo=0&amp;ecver=2" width="480" height="360" frameborder="0" allow="autoplay; encrypted-media" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
    </div>
    <div style="float: left;">
 	   <input id="doNotShowAgain" style="margin: 12px 0px 0px 15px;" type="checkbox"><fmt:message key="label.tutorial.video.never.show.again" /></input>
