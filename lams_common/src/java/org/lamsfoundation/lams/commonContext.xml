@@ -52,6 +52,7 @@
 		<property name="userDAO"><ref bean="userDAO"/></property>
 		<property name="userOrganisationDAO"><ref bean="userOrganisationDAO"/></property>
 		<property name="messageService"><ref bean="commonMessageService"/></property>
+		<property name="centralToolContentHandler"><ref bean="centralToolContentHandler"/></property>
 	</bean>	
 	
 	<!-- Transactional proxy for the user management primary business object -->
@@ -78,6 +79,7 @@
 				<prop key="is*">PROPAGATION_REQUIRED</prop>
 				<prop key="toggleOrganisationFavorite">PROPAGATION_REQUIRED</prop>
 				<prop key="userHasData">PROPAGATION_REQUIRED</prop>
+				<prop key="upload*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
@@ -406,7 +408,9 @@
 		</property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.logevent.service.LogEventService">
+				<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 				<property name="logEventDAO"><ref bean="logEventDAO"/></property>
+				<property name="messageService"><ref bean="commonMessageService"/></property>
 				<property name="userManagementService"><ref bean="userManagementService"/></property>
 			</bean>	
 		</property>
@@ -443,17 +447,10 @@
 		</property>
 	</bean>
 
-	
-	<!-- auditing service -->
-	<bean id="auditService" class="org.lamsfoundation.lams.util.audit.AuditService" >
-		<property name="messageService"><ref bean="commonMessageService"/></property>
-		<property name="activityDao"><ref bean="activityDAO"/></property>
-    </bean>
-
 	<!-- Security service -->
 	<bean id="securityServiceTarget" class="org.lamsfoundation.lams.security.SecurityService">
 		<property name="securityDAO"><ref bean="securityDAO"/></property>
-		<property name="auditService"><ref bean="auditService"/></property>
+		<property name="logEventService"><ref bean="logEventService"/></property>
 	</bean>	
 	
 	<bean id="securityService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -581,7 +578,7 @@
 	</bean>	
 	<bean id="ratingCriteriaDAO" class="org.lamsfoundation.lams.rating.dao.hibernate.RatingCriteriaDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>	
+	</bean>
 	
 	<!--  Configuration related beans -->
 	<bean id="configurationDAO" class="org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO">

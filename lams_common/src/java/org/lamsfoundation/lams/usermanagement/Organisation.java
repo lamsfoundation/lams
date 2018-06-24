@@ -33,7 +33,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 
 public class Organisation implements Serializable, Comparable {
-
     private static final long serialVersionUID = -6742443056151585129L;
 
     /** identifier field */
@@ -101,6 +100,9 @@ public class Organisation implements Serializable, Comparable {
     private Boolean enableLiveEdit;
 
     /** persistent field */
+    private Boolean enableKumalive;
+
+    /** persistent field */
     private Date archivedDate;
 
     private String orderedLessonIds;
@@ -115,6 +117,7 @@ public class Organisation implements Serializable, Comparable {
 	this.enableGradebookForLearners = Boolean.FALSE;
 	this.enableSingleActivityLessons = Boolean.FALSE;
 	this.enableLiveEdit = Boolean.FALSE;
+	this.enableKumalive = Boolean.FALSE;
     }
 
     public Integer getOrganisationId() {
@@ -357,5 +360,13 @@ public class Organisation implements Serializable, Comparable {
 
     public void setEnableLiveEdit(Boolean enableLiveEdit) {
 	this.enableLiveEdit = enableLiveEdit;
+    }
+
+    public Boolean getEnableKumalive() {
+	return enableKumalive;
+    }
+
+    public void setEnableKumalive(Boolean enableKumalive) {
+	this.enableKumalive = enableKumalive;
     }
 }

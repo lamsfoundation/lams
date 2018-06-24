@@ -33,6 +33,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -50,6 +51,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.events.EmailNotificationArchive;
+import org.lamsfoundation.lams.events.dao.EventDAO;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -107,9 +110,10 @@ import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedExceptio
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.audit.AuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobBuilder;
@@ -167,6 +171,8 @@ public class MonitoringService implements IMonitoringService {
 
     private ILearnerProgressDAO learnerProgressDAO;
 
+    private EventDAO eventDAO;
+
     private IAuthoringService authoringService;
 
     private ICoreLearnerService learnerService;
@@ -183,8 +189,6 @@ public class MonitoringService implements IMonitoringService {
 
     private MessageService messageService;
 
-    private AuditService auditService;
-
     private ILogEventService logEventService;
 
     /** Message keys */
@@ -200,6 +204,8 @@ public class MonitoringService implements IMonitoringService {
     private static final String FORCE_COMPLETE_STOP_MESSAGE_COMPLETED_TO_END = "force.complete.stop.message.completed.to.end";
 
     private static final String FORCE_COMPLETE_STOP_MESSAGE_STOPPED_UNEXPECTEDLY = "force.complete.stop.message.stopped.unexpectedly";
+
+    private static final ExcelCell[] EMPTY_ROW = new ExcelCell[1];
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
@@ -313,6 +319,10 @@ public class MonitoringService implements IMonitoringService {
 	this.groupingDAO = groupingDAO;
     }
 
+    public void setEventDAO(EventDAO eventDAO) {
+	this.eventDAO = eventDAO;
+    }
+
     /**
      * @param lamsToolService
      *            The lamsToolService to set.
@@ -337,10 +347,6 @@ public class MonitoringService implements IMonitoringService {
 	this.scheduler = scheduler;
     }
 
-    public void setAuditService(AuditService auditService) {
-	this.auditService = auditService;
-    }
-
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
     }
@@ -354,7 +360,8 @@ public class MonitoringService implements IMonitoringService {
 	    Integer organisationId, Integer userID, String customCSV, Boolean enableLessonIntro,
 	    Boolean displayDesignImage, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
 	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean forceLearnerRestart,
-	    Boolean allowLearnerRestart, Integer scheduledNumberDaysToLessonFinish, Long precedingLessonId) {
+	    Boolean allowLearnerRestart, Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish,
+	    Long precedingLessonId) {
 
 	securityService.isGroupMonitor(organisationId, userID, "intializeLesson", true);
 
@@ -384,13 +391,11 @@ public class MonitoringService implements IMonitoringService {
 	Lesson initializedLesson = initializeLesson(lessonName, lessonDescription, originalLearningDesign, user,
 		runSeqFolder, LearningDesign.COPY_TYPE_LESSON, customCSV, enableLessonIntro, displayDesignImage,
 		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
-		forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish, precedingLesson);
+		forceLearnerRestart, allowLearnerRestart, gradebookOnComplete, scheduledNumberDaysToLessonFinish,
+		precedingLesson);
 
-	Long initializedLearningDesignId = initializedLesson.getLearningDesign().getLearningDesignId();
-	auditLogLessonStateChange(initializedLesson,null, initializedLesson.getLessonStateId()); 
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CREATE, userID, initializedLearningDesignId,
-		initializedLesson.getLessonId(), null);
-
+	logLessonStateChange(LogEvent.TYPE_TEACHER_LESSON_CREATE, initializedLesson, userID, null,
+		initializedLesson.getLessonStateId());
 	return initializedLesson;
     }
 
@@ -407,7 +412,7 @@ public class MonitoringService implements IMonitoringService {
 
 	return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, null,
 		LearningDesign.COPY_TYPE_PREVIEW, customCSV, false, false, learnerPresenceAvailable, learnerImAvailable,
-		liveEditEnabled, true, false, false, null, null);
+		liveEditEnabled, true, false, false, false, null, null);
     }
 
     @Override
@@ -415,7 +420,7 @@ public class MonitoringService implements IMonitoringService {
 	    User user, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
 	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
-	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
+	    Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
 	LearningDesign learningDesign = authoringService.getLearningDesign(learningDesignID);
 	if (learningDesign == null) {
 	    throw new MonitoringServiceException(
@@ -423,10 +428,11 @@ public class MonitoringService implements IMonitoringService {
 	}
 	Lesson lesson = createNewLesson(lessonName, lessonDescription, user, learningDesign, enableLessonIntro,
 		displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish,
-		precedingLesson);
-	writeAuditLog(MonitoringService.AUDIT_LESSON_CREATED_KEY,
-		new Object[] { lessonName, learningDesign.getTitle() });
+		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, gradebookOnComplete,
+		scheduledNumberDaysToLessonFinish, precedingLesson);
+	logLessonGeneralChange(LogEvent.TYPE_TEACHER_LESSON_CREATE, user != null ? user.getUserId() : null,
+		lesson != null ? lesson.getLessonId() : null, MonitoringService.AUDIT_LESSON_CREATED_KEY,
+		new Object[] { lessonName, learningDesign.getTitle(), learningDesign.getLearningDesignId() });
 	return lesson;
     }
 
@@ -434,7 +440,8 @@ public class MonitoringService implements IMonitoringService {
 	    User user, WorkspaceFolder workspaceFolder, int copyType, String customCSV, Boolean enableLessonIntro,
 	    Boolean displayDesignImage, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
 	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean forceLearnerRestart,
-	    Boolean allowLearnerRestart, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
+	    Boolean allowLearnerRestart, Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish,
+	    Lesson precedingLesson) {
 	// copy the current learning design
 	LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
 		new Integer(copyType), user, workspaceFolder, true, null, customCSV);
@@ -450,10 +457,11 @@ public class MonitoringService implements IMonitoringService {
 
 	Lesson lesson = createNewLesson(title, lessonDescription, user, copiedLearningDesign, enableLessonIntro,
 		displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish,
-		precedingLesson);
-	writeAuditLog(MonitoringService.AUDIT_LESSON_CREATED_KEY,
-		new Object[] { lessonName, copiedLearningDesign.getTitle() });
+		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, gradebookOnComplete,
+		scheduledNumberDaysToLessonFinish, precedingLesson);
+	logLessonGeneralChange(LogEvent.TYPE_TEACHER_LESSON_CREATE, user != null ? user.getUserId() : null,
+		lesson != null ? lesson.getLessonId() : null, MonitoringService.AUDIT_LESSON_CREATED_KEY, new Object[] {
+			lessonName, copiedLearningDesign.getTitle(), copiedLearningDesign.getLearningDesignId() });
 	return lesson;
     }
 
@@ -504,52 +512,86 @@ public class MonitoringService implements IMonitoringService {
 	    return;
 	}
 
-	if (requestedLesson.getScheduleStartDate() != null) {
-	    // can't reschedule!
-	    MonitoringService.log
-		    .error("Lesson for id=" + lessonId + " is already scheduled and cannot be rescheduled.");
-	    return;
-	}
-
 	// Change client/users schedule date to server's timezone.
 	User user = (User) baseDAO.find(User.class, userId);
 	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
 	Date tzStartLessonDate = DateUtil.convertFromTimeZoneToDefault(userTimeZone, startDate);
+	String triggerName = "startLessonOnScheduleTrigger:" + lessonId;
 
-	// setup the message for scheduling job
-	JobDetail startLessonJob = JobBuilder.newJob(StartScheduleLessonJob.class)
-		.withIdentity("startLessonOnSchedule:" + lessonId)
-		.withDescription(requestedLesson.getLessonName() + ":"
-			+ (requestedLesson.getUser() == null ? "" : requestedLesson.getUser().getFullName()))
-		.usingJobData(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId))
-		.usingJobData(MonitoringConstants.KEY_USER_ID, new Integer(userId)).build();
+	Trigger startLessonTrigger = null;
+	boolean alreadyScheduled = false;
 
-	// create customized triggers
-	Trigger startLessonTrigger = TriggerBuilder.newTrigger()
-		.withIdentity("startLessonOnScheduleTrigger:" + lessonId).startAt(tzStartLessonDate).build();
+	try {
+	    startLessonTrigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName));
+	    alreadyScheduled = startLessonTrigger != null;
+	} catch (SchedulerException e) {
+	    MonitoringService.log.error("Error while fetching Quartz trigger \"" + triggerName + "\"", e);
+	}
 
 	// start the scheduling job
 	try {
+
+	    if (!alreadyScheduled) {
+		// setup the message for scheduling job
+		JobDetail startLessonJob = JobBuilder.newJob(StartScheduleLessonJob.class)
+			.withIdentity("startLessonOnSchedule:" + lessonId)
+			.withDescription(requestedLesson.getLessonName() + ":"
+				+ (requestedLesson.getUser() == null ? "" : requestedLesson.getUser().getFullName()))
+			.usingJobData(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId))
+			.usingJobData(MonitoringConstants.KEY_USER_ID, new Integer(userId)).build();
+
+		// create customized triggers
+		startLessonTrigger = TriggerBuilder.newTrigger().withIdentity(triggerName).startAt(tzStartLessonDate)
+			.build();
+
+		scheduler.scheduleJob(startLessonJob, startLessonTrigger);
+
+	    } else {
+
+		startLessonTrigger = startLessonTrigger.getTriggerBuilder().startAt(tzStartLessonDate).build();
+		scheduler.rescheduleJob(startLessonTrigger.getKey(), startLessonTrigger);
+
+	    }
+
 	    requestedLesson.setScheduleStartDate(tzStartLessonDate);
-	    scheduler.scheduleJob(startLessonJob, startLessonTrigger);
-	    setLessonState(requestedLesson, Lesson.NOT_STARTED_STATE);
+	    setLessonState(requestedLesson, Lesson.NOT_STARTED_STATE, userId);
 	} catch (SchedulerException e) {
 	    throw new MonitoringServiceException(
 		    "Error occurred at " + "[startLessonOnSchedule]- fail to start scheduling", e);
 	}
 
 	if (MonitoringService.log.isDebugEnabled()) {
-	    MonitoringService.log.debug("Start lesson  [" + lessonId + "] on schedule is configured");
+	    MonitoringService.log.debug("Start lesson  [" + lessonId + "] on schedule is configured to start at "
+		    + DateUtil.convertToStringForTimeagoJSON(tzStartLessonDate));
 	}
     }
 
     @Override
-    public void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId) {
+    public void finishLessonOnSchedule(long lessonId, Date userEnteredEndDate, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "finish lesson on schedule", true);
+	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+	if (requestedLesson == null) {
+	    String error = "Unable to schedule lesson end as lesson is missing. Lesson Id " + lessonId;
+	    MonitoringService.log.error(error);
+	    throw new IllegalArgumentException("Error occurred at [finishLessonOnSchedule]- " + error);
+	}
+
+	// Change client/users schedule date to server's timezone.
+	User user = (User) baseDAO.find(User.class, userId);
+	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
+	Date tzEndLessonDate = DateUtil.convertFromTimeZoneToDefault(userTimeZone, userEnteredEndDate);
+	finishLessonOnScheduleAsServerDate(requestedLesson, tzEndLessonDate, userId);
+    }
+
+    /**
+     * Set up the job to end the lesson on endDate. EndDate is assumed to be converted to the LAMS's default
+     * timezone. If endDate == null then remove any existing scheduling.
+     */
+    private void finishLessonOnScheduleAsServerDate(Lesson requestedLesson, Date endDate, Integer userId) {
 
 	// we get the lesson want to finish
-	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	String triggerName = "finishLessonOnScheduleTrigger:" + lessonId;
+	long lessonId = requestedLesson.getLessonId();
+	String triggerName = getFinishLesssonTriggerName(lessonId);
 	Trigger finishLessonTrigger = null;
 	JobDetail finishLessonJob = null;
 	boolean alreadyScheduled = false;
@@ -558,6 +600,69 @@ public class MonitoringService implements IMonitoringService {
 	    alreadyScheduled = finishLessonTrigger != null;
 	} catch (SchedulerException e) {
 	    MonitoringService.log.error("Error while fetching Quartz trigger \"" + triggerName + "\"", e);
+	}
+
+	// start the scheduling job
+	try {
+	    if (endDate != null) {
+		if (alreadyScheduled) {
+		    finishLessonTrigger = finishLessonTrigger.getTriggerBuilder().startAt(endDate).build();
+		} else {
+		    // setup the message for scheduling job
+		    finishLessonJob = JobBuilder.newJob(FinishScheduleLessonJob.class)
+			    .withIdentity("finishLessonOnSchedule:" + lessonId)
+			    .withDescription(requestedLesson.getLessonName() + ":"
+				    + (requestedLesson.getUser() == null ? ""
+					    : requestedLesson.getUser().getFullName()))
+			    .usingJobData(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId))
+			    .usingJobData(MonitoringConstants.KEY_USER_ID, new Integer(userId)).build();
+
+		    finishLessonTrigger = TriggerBuilder.newTrigger().withIdentity(triggerName).startAt(endDate)
+			    .build();
+		}
+
+		requestedLesson.setScheduleEndDate(endDate);
+		lessonDAO.updateLesson(requestedLesson);
+		if (alreadyScheduled) {
+		    scheduler.rescheduleJob(finishLessonTrigger.getKey(), finishLessonTrigger);
+		    if (MonitoringService.log.isDebugEnabled()) {
+			MonitoringService.log
+				.debug("Finish lesson  [" + lessonId + "] job has been rescheduled to " + endDate);
+		    }
+		} else {
+		    scheduler.scheduleJob(finishLessonJob, finishLessonTrigger);
+		    if (MonitoringService.log.isDebugEnabled()) {
+			MonitoringService.log
+				.debug("Finish lesson  [" + lessonId + "] job has been scheduled to " + endDate);
+		    }
+		}
+	    } else {
+		if (alreadyScheduled) {
+		    scheduler.deleteJob(finishLessonTrigger.getJobKey());
+		    if (MonitoringService.log.isDebugEnabled()) {
+			MonitoringService.log.debug("Finish lesson  [" + lessonId + "] job has been removed");
+		    }
+		}
+	    }
+	} catch (SchedulerException e) {
+	    throw new MonitoringServiceException(
+		    "Error occurred at " + "[finishLessonOnSchedule]- fail to start scheduling", e);
+	}
+    }
+
+    private String getFinishLesssonTriggerName(long lessonId) {
+	return "finishLessonOnScheduleTrigger:" + lessonId;
+    }
+
+    @Override
+    public void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId) {
+	securityService.isLessonMonitor(lessonId, userId, "finish lesson on schedule", true);
+
+	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+	if (requestedLesson == null) {
+	    String error = "Unable to schedule lesson end as lesson is missing. Lesson Id " + lessonId;
+	    MonitoringService.log.error(error);
+	    throw new IllegalArgumentException("Error occurred at [finishLessonOnSchedule]- " + error);
 	}
 
 	Date endDate = null;
@@ -578,48 +683,10 @@ public class MonitoringService implements IMonitoringService {
 		throw new IllegalArgumentException("Lesson scheduled finish date is already in the past");
 	    }
 
-	    if (alreadyScheduled) {
-		finishLessonTrigger = finishLessonTrigger.getTriggerBuilder().startAt(endDate).build();
-	    } else {
-		// setup the message for scheduling job
-		finishLessonJob = JobBuilder.newJob(FinishScheduleLessonJob.class)
-			.withIdentity("finishLessonOnSchedule:" + lessonId)
-			.withDescription(requestedLesson.getLessonName() + ":"
-				+ (requestedLesson.getUser() == null ? "" : requestedLesson.getUser().getFullName()))
-			.usingJobData(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId))
-			.usingJobData(MonitoringConstants.KEY_USER_ID, new Integer(userId)).build();
-
-		finishLessonTrigger = TriggerBuilder.newTrigger().withIdentity(triggerName).startAt(endDate).build();
-	    }
-	}
-
-	// start the scheduling job
-	try {
-	    requestedLesson.setScheduleEndDate(endDate);
-	    lessonDAO.updateLesson(requestedLesson);
-	    if (alreadyScheduled) {
-		if (scheduledNumberDaysToLessonFinish > 0) {
-		    scheduler.rescheduleJob(finishLessonTrigger.getKey(), finishLessonTrigger);
-		    if (MonitoringService.log.isDebugEnabled()) {
-			MonitoringService.log
-				.debug("Finish lesson  [" + lessonId + "] job has been rescheduled to " + endDate);
-		    }
-		} else {
-		    scheduler.deleteJob(finishLessonTrigger.getJobKey());
-		    if (MonitoringService.log.isDebugEnabled()) {
-			MonitoringService.log.debug("Finish lesson  [" + lessonId + "] job has been removed");
-		    }
-		}
-	    } else if (scheduledNumberDaysToLessonFinish > 0) {
-		scheduler.scheduleJob(finishLessonJob, finishLessonTrigger);
-		if (MonitoringService.log.isDebugEnabled()) {
-		    MonitoringService.log
-			    .debug("Finish lesson  [" + lessonId + "] job has been scheduled to " + endDate);
-		}
-	    }
-	} catch (SchedulerException e) {
-	    throw new MonitoringServiceException(
-		    "Error occurred at " + "[finishLessonOnSchedule]- fail to start scheduling", e);
+	    finishLessonOnScheduleAsServerDate(requestedLesson, endDate, userId);
+	} else {
+	    // remove any existing schedule jobs
+	    finishLessonOnScheduleAsServerDate(requestedLesson, null, userId);
 	}
     }
 
@@ -669,8 +736,8 @@ public class MonitoringService implements IMonitoringService {
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("=============Lesson " + lessonId + " started===============");
 	}
-	auditLogLessonStateChange(requestedLesson,null, requestedLesson.getLessonStateId()); 
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_START, userId, null, lessonId, null);
+	logLessonStateChange(LogEvent.TYPE_TEACHER_LESSON_START, requestedLesson, userId, null,
+		requestedLesson.getLessonStateId());
     }
 
     @Override
@@ -759,10 +826,83 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
+    public GateActivity scheduleGate(Long gateId, Date schedulingDatetime, Integer userId) {
+	if (MonitoringService.log.isDebugEnabled()) {
+	    MonitoringService.log.debug("Setting gate schedule for gate " + gateId + "to " + schedulingDatetime);
+	}
+
+	User user = (User) baseDAO.find(User.class, userId);
+	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
+	Date tzSchedulingDatetime = DateUtil.convertFromTimeZoneToDefault(userTimeZone, schedulingDatetime);
+
+	GateActivity gateActivity = (GateActivity) activityDAO.getActivityByActivityId(gateId);
+	if (gateActivity != null && gateActivity.isScheduleGate()) {
+	    if (tzSchedulingDatetime.getTime() < System.currentTimeMillis()) {
+		// too late! Time already passed
+		openGate(gateId, userId);
+	    } else {
+
+		ScheduleGateActivity gate = (ScheduleGateActivity) activityDAO
+			.getActivityByActivityId(gateActivity.getActivityId());
+
+		// work out new offset in minutes from lesson start time to the given date
+		Lesson lesson = learnerService.getLessonByActivity(gate);
+		Date lessonStartingTime = lesson.getStartDateTime();
+		if (lessonStartingTime != null) {
+		    // Should never be null, so just skip that case. If it was null how did the initial trigger get set up?
+		    long offset = (tzSchedulingDatetime.getTime() - lessonStartingTime.getTime()) / 60000;
+		    if (offset > 0) {
+
+			String triggerName = "openGateTrigger:" + gate.getActivityId();
+			Trigger openGateTrigger = null;
+			boolean alreadyScheduled = false;
+
+			try {
+			    openGateTrigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName));
+			    alreadyScheduled = openGateTrigger != null;
+			} catch (SchedulerException e) {
+			    MonitoringService.log.error("Error while fetching Quartz trigger \"" + triggerName + "\"",
+				    e);
+			}
+
+			try {
+			    if (alreadyScheduled) {
+				openGateTrigger = openGateTrigger.getTriggerBuilder().startAt(tzSchedulingDatetime)
+					.build();
+				scheduler.rescheduleJob(openGateTrigger.getKey(), openGateTrigger);
+			    } else {
+				// setup the message for scheduling job
+				JobDetail openScheduleGateJob = JobBuilder.newJob(OpenScheduleGateJob.class)
+					.withIdentity("openGate:" + gate.getActivityId())
+					.withDescription(gate.getTitle() + ":" + lesson.getLessonName())
+					.usingJobData("gateId", gate.getActivityId()).usingJobData("openerId", userId)
+					.build();
+				openGateTrigger = TriggerBuilder.newTrigger()
+					.withIdentity("openGateTrigger:" + gate.getActivityId())
+					.startAt(tzSchedulingDatetime).build();
+				// start the scheduling job
+				scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
+			    }
+			} catch (SchedulerException e) {
+			    MonitoringService.log.error(
+				    "Error while setting up gate open trigger. Trigger name \"" + triggerName + "\"",
+				    e);
+			}
+
+			gate.setGateStartTimeOffset(offset);
+			activityDAO.update(gate);
+		    }
+		}
+	    }
+	}
+	return gateActivity;
+    }
+
+    @Override
     public void finishLesson(long lessonId, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "finish lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	setLessonState(requestedLesson, Lesson.FINISHED_STATE);
+	setLessonState(requestedLesson, Lesson.FINISHED_STATE, userId);
     }
 
     @Override
@@ -771,13 +911,16 @@ public class MonitoringService implements IMonitoringService {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	Integer lessonState = requestedLesson.getLessonStateId();
 
+	// remove any triggers waiting to suspend the lesson
+	removeScheduleDisableTrigger(requestedLesson);
+
 	// if lesson has 'suspended'('disabled') state - then unsuspend it first so its previous lesson state will be 'started'
 	if (Lesson.SUSPENDED_STATE.equals(lessonState)) {
 	    unsuspendLesson(lessonId, userId);
 	}
 
 	if (!Lesson.ARCHIVED_STATE.equals(lessonState) && !Lesson.REMOVED_STATE.equals(lessonState)) {
-	    setLessonState(requestedLesson, Lesson.ARCHIVED_STATE);
+	    setLessonState(requestedLesson, Lesson.ARCHIVED_STATE, userId);
 	}
     }
 
@@ -785,16 +928,31 @@ public class MonitoringService implements IMonitoringService {
     public void unarchiveLesson(long lessonId, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "unarchive lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	revertLessonState(requestedLesson);
+	// remove any triggers waiting to suspend the lesson
+	removeScheduleDisableTrigger(requestedLesson);
+	revertLessonState(requestedLesson, userId);
     }
 
     @Override
-    public void suspendLesson(long lessonId, Integer userId) {
+    public void suspendLesson(long lessonId, Integer userId, boolean clearScheduleDetails) {
 	securityService.isLessonMonitor(lessonId, userId, "suspend lesson", true);
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	if (!Lesson.SUSPENDED_STATE.equals(lesson.getLessonStateId())
 		&& !Lesson.REMOVED_STATE.equals(lesson.getLessonStateId())) {
-	    setLessonState(lesson, Lesson.SUSPENDED_STATE);
+	    setLessonState(lesson, Lesson.SUSPENDED_STATE, userId);
+	}
+	if (clearScheduleDetails) {
+	    removeScheduleDisableTrigger(lesson);
+	}
+    }
+
+    private void removeScheduleDisableTrigger(Lesson lesson) {
+	String triggerName = getFinishLesssonTriggerName(lesson.getLessonId());
+	try {
+	    scheduler.unscheduleJob(TriggerKey.triggerKey(triggerName));
+	    lesson.setScheduleEndDate(null);
+	} catch (SchedulerException e) {
+	    MonitoringService.log.error("Error while removing lesson suspend trigger \"" + triggerName + "\"", e);
 	}
     }
 
@@ -807,7 +965,9 @@ public class MonitoringService implements IMonitoringService {
 	if (!Lesson.SUSPENDED_STATE.equals(state)) {
 	    throw new MonitoringServiceException("Lesson is not suspended lesson. It can not be unsuspended.");
 	}
-	revertLessonState(lesson);
+	// remove any triggers waiting to suspend the lesson
+	removeScheduleDisableTrigger(lesson);
+	revertLessonState(lesson, userId);
     }
 
     /**
@@ -816,49 +976,64 @@ public class MonitoringService implements IMonitoringService {
      * @param requestedLesson
      * @param status
      */
-    private void setLessonState(Lesson requestedLesson, Integer status) {
-	auditLogLessonStateChange(requestedLesson, requestedLesson.getLessonStateId(), status); 
+    private void setLessonState(Lesson requestedLesson, Integer status, Integer userId) {
+	logLessonStateChange(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson, userId,
+		requestedLesson.getLessonStateId(), status);
 	requestedLesson.setPreviousLessonStateId(requestedLesson.getLessonStateId());
 	requestedLesson.setLessonStateId(status);
 	lessonDAO.updateLesson(requestedLesson);
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson.getUser().getUserId(), null,
-		requestedLesson.getLessonId(), null);
     }
 
-    private void auditLogLessonStateChange(Lesson lesson, Integer previousStatus, Integer newStatus) {
+    private void logLessonStateChange(Integer eventType, Lesson lesson, Integer userId, Integer previousStatus,
+	    Integer newStatus) {
 	String fromState = getStateDescription(previousStatus);
 	String toState = getStateDescription(newStatus);
-	writeAuditLog(MonitoringService.AUDIT_LESSON_STATUS_CHANGED,
-		new Object[] { lesson.getLessonName(),  lesson.getLessonId(), fromState, toState });
+	String message = messageService.getMessage(MonitoringService.AUDIT_LESSON_STATUS_CHANGED,
+		new Object[] { lesson.getLessonName(), lesson.getLessonId(), fromState, toState });
+	logEventService.logEvent(eventType != null ? eventType : LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, userId,
+		null, lesson.getLessonId(), null, message);
+    }
+
+    private void logLessonGeneralChange(int logEventType, Integer userId, Long lessonId, String messageKey,
+	    Object[] args) {
+	String message = messageService.getMessage(messageKey, args);
+	logEventService.logEvent(logEventType, userId, null, lessonId, null, message);
     }
 
     private String getStateDescription(Integer status) {
 	if (status != null) {
-	    if (status.equals(Lesson.CREATED))
+	    if (status.equals(Lesson.CREATED)) {
 		return messageService.getMessage("lesson.state.created");
-	    if (status.equals(Lesson.NOT_STARTED_STATE))
+	    }
+	    if (status.equals(Lesson.NOT_STARTED_STATE)) {
 		return messageService.getMessage("lesson.state.scheduled");
-	    if (status.equals(Lesson.STARTED_STATE))
+	    }
+	    if (status.equals(Lesson.STARTED_STATE)) {
 		return messageService.getMessage("lesson.state.started");
-	    if (status.equals(Lesson.SUSPENDED_STATE))
+	    }
+	    if (status.equals(Lesson.SUSPENDED_STATE)) {
 		return messageService.getMessage("lesson.state.suspended");
-	    if (status.equals(Lesson.FINISHED_STATE))
+	    }
+	    if (status.equals(Lesson.FINISHED_STATE)) {
 		return messageService.getMessage("lesson.state.finished");
-	    if (status.equals(Lesson.ARCHIVED_STATE))
+	    }
+	    if (status.equals(Lesson.ARCHIVED_STATE)) {
 		return messageService.getMessage("lesson.state.archived");
-	    if (status.equals(Lesson.REMOVED_STATE))
+	    }
+	    if (status.equals(Lesson.REMOVED_STATE)) {
 		return messageService.getMessage("lesson.state.removed");
+	    }
 	}
 	return "-";
     }
-    
+
     /**
      * Sets a lesson back to its previous state. Used when we "unsuspend" or "unarchive"
      *
      * @param requestedLesson
      * @param status
      */
-    private void revertLessonState(Lesson requestedLesson) {
+    private void revertLessonState(Lesson requestedLesson, Integer userId) {
 	Integer currentStatus = requestedLesson.getLessonStateId();
 	Integer newStatus;
 
@@ -899,16 +1074,17 @@ public class MonitoringService implements IMonitoringService {
 	}
 	lessonDAO.updateLesson(requestedLesson);
 
-	auditLogLessonStateChange(requestedLesson,currentStatus, newStatus); 
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson.getUser().getUserId(), null,
-		requestedLesson.getLessonId(), null);
+	logLessonStateChange(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson, userId, currentStatus,
+		newStatus);
     }
 
     @Override
     public void removeLesson(long lessonId, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "remove lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	setLessonState(requestedLesson, Lesson.REMOVED_STATE);
+	// remove any triggers waiting to suspend the lesson
+	removeScheduleDisableTrigger(requestedLesson);
+	setLessonState(requestedLesson, Lesson.REMOVED_STATE, userId);
     }
 
     @SuppressWarnings("unchecked")
@@ -979,9 +1155,10 @@ public class MonitoringService implements IMonitoringService {
 
 	// finally remove the learning design
 	lessonDAO.delete(learningDesign);
-	
-	writeAuditLog(MonitoringService.AUDIT_LESSON_REMOVED_PERMANENTLY_KEY,
-		new Object[] { lesson.getLessonName(),  lesson.getLessonId() });
+
+	logLessonGeneralChange(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, userId, lessonId,
+		MonitoringService.AUDIT_LESSON_REMOVED_PERMANENTLY_KEY,
+		new Object[] { lesson.getLessonName(), lesson.getLessonId() });
     }
 
     @Override
@@ -1012,10 +1189,23 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public GateActivity openGate(Long gateId) {
+    public Boolean toggleGradebookOnComplete(long lessonId, Integer userId, Boolean gradebookOnComplete) {
+	securityService.isLessonMonitor(lessonId, userId, "set gradebook on complete", true);
+	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+	requestedLesson.setGradebookOnComplete(gradebookOnComplete != null ? gradebookOnComplete : Boolean.FALSE);
+	lessonDAO.updateLesson(requestedLesson);
+	return requestedLesson.getGradebookOnComplete();
+    }
+
+    @Override
+    public GateActivity openGate(Long gateId, Integer openerId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
 	if (gate != null) {
 	    gate.setGateOpen(new Boolean(true));
+	    gate.setGateOpenTime(new Date());
+	    if (openerId != null) {
+		gate.setGateOpenUser((User) baseDAO.find(User.class, openerId));
+	    }
 
 	    // we un-schedule the gate from the scheduler if it's of a scheduled
 	    // gate (LDEV-1271)
@@ -1050,6 +1240,8 @@ public class MonitoringService implements IMonitoringService {
     public GateActivity closeGate(Long gateId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
 	gate.setGateOpen(new Boolean(false));
+	gate.setGateOpenUser(null);
+	gate.setGateOpenTime(null);
 	activityDAO.update(gate);
 	return gate;
     }
@@ -1651,6 +1843,80 @@ public class MonitoringService implements IMonitoringService {
 	return sortedUsers;
     }
 
+    @Override
+    public void archiveEmailNotification(Integer organisationId, Long lessonId, Integer searchType, String body,
+	    Set<Integer> recipients) {
+	if (organisationId == null && lessonId == null) {
+	    throw new MonitoringServiceException(
+		    "Missing both organisation ID and lesson ID when archiving an email notification");
+	}
+	baseDAO.insert(new EmailNotificationArchive(organisationId, lessonId, searchType, null, body, recipients));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<EmailNotificationArchive> getArchivedEmailNotifications(Integer organisationId) {
+	return baseDAO.findByProperty(EmailNotificationArchive.class, "organisationId", organisationId);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<EmailNotificationArchive> getArchivedEmailNotifications(Long lessonId) {
+	return baseDAO.findByProperty(EmailNotificationArchive.class, "lessonId", lessonId);
+    }
+
+    @Override
+    public List<User> getArchivedEmailNotificationRecipients(Long emailNotificationUid, Integer limit, Integer offset) {
+	return eventDAO.getArchivedEmailNotificationRecipients(emailNotificationUid, limit, offset);
+    }
+
+    @Override
+    public LinkedHashMap<String, ExcelCell[][]> exportArchivedEmailNotification(Long emailNotificationUid) {
+	EmailNotificationArchive notification = (EmailNotificationArchive) baseDAO.find(EmailNotificationArchive.class,
+		emailNotificationUid);
+
+	LinkedHashMap<String, ExcelCell[][]> sheets = new LinkedHashMap<String, ExcelCell[][]>();
+	List<ExcelCell[]> rows = new LinkedList<ExcelCell[]>();
+	ExcelCell[] row = new ExcelCell[3];
+	row[0] = new ExcelCell(messageService.getMessage("email.notifications.archived.messages.list.sent.date"), true);
+	row[1] = new ExcelCell(
+		messageService.getMessage("email.notifications.scheduled.messages.list.notify.sudents.that"), true);
+	row[2] = new ExcelCell(messageService.getMessage("email.notifications.scheduled.messages.list.email.body"),
+		true);
+	rows.add(row);
+
+	row = new ExcelCell[3];
+	row[0] = new ExcelCell(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(notification.getSentOn()),
+		false);
+	row[1] = new ExcelCell(
+		messageService.getMessage("email.notifications.user.search.property." + notification.getSearchType()),
+		false);
+	row[2] = new ExcelCell(notification.getBody(), false);
+	rows.add(row);
+	rows.add(EMPTY_ROW);
+
+	row = new ExcelCell[2];
+	row[0] = new ExcelCell(messageService.getMessage("email.notifications.archived.messages.list.sent.count"),
+		true);
+	row[1] = new ExcelCell(notification.getRecipients().size() + " "
+		+ messageService.getMessage("email.notifications.archived.messages.list.learners"), false);
+	rows.add(row);
+
+	// get all recipient objects, sorted by name
+	List<User> recipients = getArchivedEmailNotificationRecipients(emailNotificationUid, null, null);
+	for (User recipient : recipients) {
+	    row = new ExcelCell[1];
+	    String recipientName = new StringBuilder(recipient.getLastName()).append(", ")
+		    .append(recipient.getFirstName()).append(" [").append(recipient.getLogin()).append("]").toString();
+	    row[0] = new ExcelCell(recipientName, false);
+	    rows.add(row);
+	}
+
+	sheets.put(messageService.getMessage("email.notifications.archived.export.sheet.name"),
+		rows.toArray(new ExcelCell[][] {}));
+	return sheets;
+    }
+
     /**
      * Returns list of users who has already finished specified lesson.
      *
@@ -1808,10 +2074,11 @@ public class MonitoringService implements IMonitoringService {
 	    LearningDesign copiedLearningDesign, Boolean enableLessonIntro, Boolean displayDesignImage,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
 	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
-	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
+	    Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
 	Lesson newLesson = Lesson.createNewLessonWithoutClass(lessonName, lessonDescription, user, copiedLearningDesign,
 		enableLessonIntro, displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish);
+		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, gradebookOnComplete,
+		scheduledNumberDaysToLessonFinish);
 	if (precedingLesson != null) {
 	    HashSet precedingLessons = new HashSet();
 	    precedingLessons.add(precedingLesson);
@@ -1962,8 +2229,8 @@ public class MonitoringService implements IMonitoringService {
 		    // be lost via Live
 		    // Edit.
 		} else {
-		    MonitoringService.log
-			    .error("Request made to add a group which would be more than the max number of groups for the grouping "
+		    MonitoringService.log.error(
+			    "Request made to add a group which would be more than the max number of groups for the grouping "
 				    + grouping
 				    + ". This grouping is used for branching so we can't increase the max group number.");
 		    throw new MonitoringServiceException("Cannot increase the number of groups for the grouping "
@@ -2010,6 +2277,57 @@ public class MonitoringService implements IMonitoringService {
 	    }
 	}
 	return learners;
+    }
+
+    @Override
+    public int addUsersToGroupByLogins(Long activityID, String groupName, Set<String> logins)
+	    throws LessonServiceException {
+
+	ArrayList<User> learners = new ArrayList<User>();
+	for (String login : logins) {
+	    User learner = userManagementService.getUserByLogin(login);
+	    if (learner == null) {
+		MonitoringService.log.warn("Unable to add learner " + login + " for group in related to activity "
+			+ activityID + " as learner cannot be found.");
+	    } else {
+		learners.add(learner);
+	    }
+	}
+
+	Activity activity = getActivityById(activityID);
+	Grouping grouping = getGroupingForActivity(activity, !activity.isChosenBranchingActivity(),
+		"addUsersToGroupByLogins");
+
+	Group group = null;
+	Set<String> otherGroupNames = new HashSet<String>();
+	for (Group checkGroup : grouping.getGroups()) {
+	    if (checkGroup.getGroupName().equalsIgnoreCase(groupName)) {
+		group = checkGroup;
+		break;
+	    } else {
+		otherGroupNames.add(checkGroup.getGroupName());
+	    }
+	}
+
+	if (group == null) {
+	    // Leave performGrouping to create any new groups as addGroup returns a group without an id, so it could not be
+	    // used by performGrouping. Fix up name afterwards. Clumsy way to find to find the new group but how else?
+	    // It may not be the only new group and hence not the only group with no id.
+	    lessonService.performGrouping(grouping, (Long) null, learners);
+	    for (Group checkGroup : grouping.getGroups()) {
+		if (!otherGroupNames.contains(checkGroup.getGroupName())) {
+		    group = checkGroup;
+		    break;
+		}
+	    }
+	    if (group != null) {
+		group.setGroupName(groupName);
+	    }
+	} else {
+	    lessonService.performGrouping(grouping, group.getGroupId(), learners);
+	}
+
+	return learners.size();
     }
 
     @SuppressWarnings("unchecked")
@@ -2155,8 +2473,8 @@ public class MonitoringService implements IMonitoringService {
 	    // can't remove the group if someone has already started working on
 	    // the branch.
 	    if (isActivityAttempted(branch)) {
-		MonitoringService.log
-			.warn("removeGroupFromBranch: A group member has already started the branch. Unable to remove the group from the branch. Group ID was "
+		MonitoringService.log.warn(
+			"removeGroupFromBranch: A group member has already started the branch. Unable to remove the group from the branch. Group ID was "
 				+ groupIDString);
 	    } else {
 		branch.removeGroupFromBranch(group);
@@ -2305,21 +2623,22 @@ public class MonitoringService implements IMonitoringService {
 
     @SuppressWarnings("unchecked")
     private EmailProgressActivitiesProcessor getEmailProgressActivitiesProcessor(Long lessonId) {
-	
-	// TODO custom SQL to get the ids, number of users & marks in one go 
+
+	// TODO custom SQL to get the ids, number of users & marks in one go
 	Lesson lesson = lessonService.getLesson(lessonId);
 	LearningDesign ld = lesson.getLearningDesign();
 	Long[] activityIds = new Long[ld.getActivities().size()];
-	int i=0;
-	Iterator<Activity> activityIterator = (Iterator<Activity>) ld.getActivities().iterator();
-	while ( activityIterator.hasNext() ) {
+	int i = 0;
+	Iterator<Activity> activityIterator = ld.getActivities().iterator();
+	while (activityIterator.hasNext()) {
 	    Activity activity = activityIterator.next();
 	    activityIds[i] = activity.getActivityId();
 	    i++;
 	}
 	Map<Long, Integer> numberOfUsersInActivity = getCountLearnersCurrentActivities(activityIds);
 
-	EmailProgressActivitiesProcessor processor = new EmailProgressActivitiesProcessor(ld, activityDAO, numberOfUsersInActivity);
+	EmailProgressActivitiesProcessor processor = new EmailProgressActivitiesProcessor(ld, activityDAO,
+		numberOfUsersInActivity);
 	processor.parseLearningDesign();
 	return processor;
     }
@@ -2336,28 +2655,27 @@ public class MonitoringService implements IMonitoringService {
 
 	StringBuilder progress = new StringBuilder();
 	progress.append("<H3>Lesson ").append(lesson.getLessonName()).append("</H3><p>")
-		.append(getMessageService().getMessage("label.started")).append(" ")
-		.append(lesson.getStartDateTime()).append("</p><H3>")
-		.append(getMessageService().getMessage("label.grouping.learners")).append("</H3>")
-		.append("<table><tr><th width=\"50%\" align=\"left\">").append(getMessageService().getMessage("label.status")).append("</th><th>")
+		.append(getMessageService().getMessage("label.started")).append(" ").append(lesson.getStartDateTime())
+		.append("</p><H3>").append(getMessageService().getMessage("label.grouping.learners")).append("</H3>")
+		.append("<table><tr><th width=\"50%\" align=\"left\">")
+		.append(getMessageService().getMessage("label.status")).append("</th><th>")
 		.append(getMessageService().getMessage("progress.email.heading.number.learners"))
-		.append("</th><th>%</th></tr>")
-		.append("<tr><td width=\"50%\">").append(getMessageService().getMessage("label.not.started")).append("</td><td>")
-		.append(notStarted).append("</td><td>")
-		.append(asPercentage(notStarted, possibleLearnersCount)).append("%</td></tr>")
-		.append("<tr><td width=\"50%\">").append(getMessageService().getMessage("lesson.chart.started")).append("</td><td>")
-		.append(startedLearnersCount).append("</td><td>")
+		.append("</th><th>%</th></tr>").append("<tr><td width=\"50%\">")
+		.append(getMessageService().getMessage("label.not.started")).append("</td><td>").append(notStarted)
+		.append("</td><td>").append(asPercentage(notStarted, possibleLearnersCount)).append("%</td></tr>")
+		.append("<tr><td width=\"50%\">").append(getMessageService().getMessage("lesson.chart.started"))
+		.append("</td><td>").append(startedLearnersCount).append("</td><td>")
 		.append(asPercentage(startedLearnersCount, possibleLearnersCount)).append("%</td></tr>")
-		.append("<tr><td width=\"50%\">").append(getMessageService().getMessage("lesson.chart.completed")).append("</td><td>")
-		.append(completedLearnersCount).append("</td><td>")
+		.append("<tr><td width=\"50%\">").append(getMessageService().getMessage("lesson.chart.completed"))
+		.append("</td><td>").append(completedLearnersCount).append("</td><td>")
 		.append(asPercentage(completedLearnersCount, possibleLearnersCount)).append("%</td></tr>")
-		.append("<td width=\"50%\"></td><td><strong>").append(possibleLearnersCount).append("</strong></td><td><strong>")
-		.append("100%</strong></td></tr></table>")
-		.append("<H3>").append(getMessageService().getMessage("progress.email.heading.overall.progress")).append("</H3>")
-		.append("<table><tr><th width=\"50%\" align=\"left\">").append(getMessageService().getMessage("label.activity")).append("</th><th>")
+		.append("<td width=\"50%\"></td><td><strong>").append(possibleLearnersCount)
+		.append("</strong></td><td><strong>").append("100%</strong></td></tr></table>").append("<H3>")
+		.append(getMessageService().getMessage("progress.email.heading.overall.progress")).append("</H3>")
+		.append("<table><tr><th width=\"50%\" align=\"left\">")
+		.append(getMessageService().getMessage("label.activity")).append("</th><th>")
 		.append(getMessageService().getMessage("progress.email.heading.number.learners"))
-		.append("</th><th>%</th></tr>")
-		.append("<tr><td width=\"50%\"><i>")
+		.append("</th><th>%</th></tr>").append("<tr><td width=\"50%\"><i>")
 		.append(getMessageService().getMessage("label.not.started")).append("</i></td><td>").append(notStarted)
 		.append("</td>").append("<td>").append(asPercentage(notStarted, possibleLearnersCount))
 		.append("%</td></tr>");
@@ -2374,8 +2692,8 @@ public class MonitoringService implements IMonitoringService {
 		}
 		String title = activity.getTitle(); // null for gates
 		if (title == null) {
-		    title = activity.isGateActivity() ? getMessageService().getMessage("label.gate.title") : 
-			getMessageService().getMessage("label.unknown");
+		    title = activity.isGateActivity() ? getMessageService().getMessage("label.gate.title")
+			    : getMessageService().getMessage("label.unknown");
 		}
 
 		if (activity.isBranchingActivity() || activity.isOptionsActivity()) {
@@ -2401,8 +2719,7 @@ public class MonitoringService implements IMonitoringService {
 		.append("%</td></tr>").append("<tr><td width=\"60%\"><td><strong>").append(numLearnersProcessed)
 		.append("</strong></td><td><strong>").append(asPercentage(numLearnersProcessed, possibleLearnersCount))
 		.append("%</strong></td>").append("</table>").append("<p>&nbsp;</p>").append("<p>&nbsp;</p>")
-		.append("<p><i>")
-		.append(getMessageService().getMessage("progress.email.sent.automatically"))
+		.append("<p><i>").append(getMessageService().getMessage("progress.email.sent.automatically"))
 		.append("</i></p>");
 
 	String subject = getMessageService().getMessage("progress.email.subject",
@@ -2411,10 +2728,10 @@ public class MonitoringService implements IMonitoringService {
 	return new String[] { subject, progress.toString() };
 
     }
-    
-    private String asPercentage(Integer numerator, Integer denominator ) {
+
+    private String asPercentage(Integer numerator, Integer denominator) {
 	double raw = numerator.doubleValue() / denominator * 100;
-	return NumberUtil.formatLocalisedNumber(raw, (Locale)null, 2);  
+	return NumberUtil.formatLocalisedNumber(raw, (Locale) null, 2);
     }
 
     @Override
@@ -2443,7 +2760,8 @@ public class MonitoringService implements IMonitoringService {
 			    null, lesson.isEnableLessonIntro(), lesson.isDisplayDesignImage(),
 			    lesson.getLearnerPresenceAvailable(), lesson.getLearnerImAvailable(),
 			    lesson.getLiveEditEnabled(), lesson.getEnableLessonNotifications(),
-			    lesson.getForceLearnerRestart(), lesson.getAllowLearnerRestart(), null, null);
+			    lesson.getForceLearnerRestart(), lesson.getAllowLearnerRestart(),
+			    lesson.getGradebookOnComplete(), null, null);
 
 		    // save LessonClasses
 		    this.createLessonClassForLesson(newLesson.getLessonId(), group, learnerGroupName, learnerUsers,
@@ -2510,17 +2828,6 @@ public class MonitoringService implements IMonitoringService {
     }
 
     /**
-     * Write out audit log entry
-     *
-     * @param messageKey
-     * @param args
-     */
-    private void writeAuditLog(String messageKey, Object[] args) {
-	String message = messageService.getMessage(messageKey, args);
-	auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, message);
-    }
-
-    /**
      * Removes learner content from ToolActivities and resets read-only flag, if possible.
      */
     private boolean removeLearnerContent(Activity activity, User learner, boolean resetReadOnly) {
@@ -2540,5 +2847,4 @@ public class MonitoringService implements IMonitoringService {
 
 	return resetReadOnly;
     }
-    
 }

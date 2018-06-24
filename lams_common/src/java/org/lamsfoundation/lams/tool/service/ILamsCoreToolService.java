@@ -26,7 +26,9 @@ package org.lamsfoundation.lams.tool.service;
 import java.util.List;
 import java.util.SortedMap;
 
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.Tool;
@@ -270,6 +272,14 @@ public interface ILamsCoreToolService {
      */
     SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, ToolSession toolSession, Integer learnerId)
 	    throws ToolException;
+    
+    /**
+     * Returns confidence levels indicated by learners when answering questions. By now this feature is supported only by Assessment and MCQ tools.
+     * 
+     * @param toolSession
+     * @return
+     */
+    List<ConfidenceLevelDTO> getConfidenceLevelsByToolSession(ToolSession toolSession);
 
     /**
      * Notifies tool that the user is force completed. Currently it's been utilized only by leader aware tools, which
@@ -297,6 +307,9 @@ public interface ILamsCoreToolService {
      * @return
      */
     Long getLessonMaxPossibleMark(Lesson lesson);
+
+    /** Will the marks caculation take into account weighting? */
+    boolean isWeightedMarks(LearningDesign design);
 
     /**
      * Update the tool session data.

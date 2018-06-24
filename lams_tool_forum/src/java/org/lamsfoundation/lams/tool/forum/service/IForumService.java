@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
@@ -40,7 +41,6 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * User: conradb Date: 8/06/2005 Time: 14:49:59
@@ -359,7 +359,7 @@ public interface IForumService {
     void releaseMarksForSession(Long sessionID);
 
     /** The topic updates (for monitoring) are done in the web layer, so need the audit service to log the updates */
-    IAuditService getAuditService();
+    ILogEventService getLogEventService();
 
     /**
      * Mark user completing a session.

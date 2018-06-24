@@ -34,8 +34,10 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
@@ -60,6 +62,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
@@ -72,6 +75,7 @@ import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AnswerIntComparator;
+import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -202,11 +206,14 @@ public class LearningAction extends Action {
 		return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER);
 	    }
 
+	    AssessmentResult lastLeaderResult = service.getLastAssessmentResult(assessment.getUid(),
+		    groupLeader.getUserId());
+	    boolean isLastAttemptFinishedByLeader = lastLeaderResult != null
+		    && lastLeaderResult.getFinishDate() != null;
+
 	    // forwards to the waitForLeader pages
 	    boolean isNonLeader = !user.getUserId().equals(groupLeader.getUserId());
-	    if (assessment.getTimeLimit() != 0 && isNonLeader && !user.isSessionFinished()) {
-		AssessmentResult lastLeaderResult = service.getLastAssessmentResult(assessment.getUid(),
-			groupLeader.getUserId());
+	    if (assessment.getTimeLimit() != 0 && isNonLeader && !isLastAttemptFinishedByLeader) {
 
 		//show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK button to launch time limit
 		if (lastLeaderResult == null || lastLeaderResult.getTimeLimitLaunchedDate() == null) {
@@ -217,7 +224,7 @@ public class LearningAction extends Action {
 
 		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
 		boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(assessment, groupLeader);
-		if (isTimeLimitExceeded && !groupLeader.isSessionFinished()) {
+		if (isTimeLimitExceeded) {
 		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY,
 			    "label.waiting.for.leader.finish");
 		    return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER_TIME_LIMIT);
@@ -225,7 +232,7 @@ public class LearningAction extends Action {
 	    }
 
 	    // check if leader has submitted all answers
-	    if (groupLeader.isSessionFinished()) {
+	    if (isLastAttemptFinishedByLeader) {
 
 		// in case user joins the lesson after leader has answers some answers already - we need to make sure
 		// he has the same scratches as leader
@@ -266,11 +273,13 @@ public class LearningAction extends Action {
 	    }
 	}
 
-	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), user.getUserId());
+	//user is allowed to answer questions if assessment activity doesn't have leaders or he is the leader
 	boolean hasEditRight = !assessment.isUseSelectLeaderToolOuput()
 		|| assessment.isUseSelectLeaderToolOuput() && isUserLeader;
-	//showResults if either session or the last result is finished
-	boolean showResults = user.isSessionFinished() || (lastResult != null) && (lastResult.getFinishDate() != null);
+
+	//showResults if user has finished the last result
+	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), user.getUserId());
+	boolean showResults = (lastResult != null) && (lastResult.getFinishDate() != null);
 
 	// get notebook entry
 	String entryText = new String();
@@ -370,11 +379,11 @@ public class LearningAction extends Action {
 	}
 
 	//paging
-	List<Set<QuestionDTO>> pagedQuestionDtos = new ArrayList<>();
+	List<Set<QuestionDTO>> pagedQuestionDtos = new ArrayList<Set<QuestionDTO>>();
 	int maxQuestionsPerPage = ((assessment.getQuestionsPerPage() != 0) && hasEditRight)
 		? assessment.getQuestionsPerPage()
 		: questionDtos.size();
-	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<>();
+	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<QuestionDTO>();
 	pagedQuestionDtos.add(questionsForOnePage);
 	int count = 0;
 	for (QuestionDTO questionDto : questionDtos) {
@@ -397,7 +406,7 @@ public class LearningAction extends Action {
 	if (showResults) {
 
 	    // display results page
-	    showResults(mapping, sessionMap);
+	    showResults(request, mapping, sessionMap);
 	    return mapping.findForward(AssessmentConstants.SHOW_RESULTS);
 
 	} else {
@@ -419,12 +428,12 @@ public class LearningAction extends Action {
 	IAssessmentService service = getAssessmentService();
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	AssessmentSession session = service.getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentSession session = service.getSessionBySessionId(toolSessionId);
 	AssessmentUser leader = session.getGroupLeader();
 
 	//in case of time limit - prevent user from seeing questions page longer than time limit allows
 	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(session.getAssessment(), leader);
-	boolean isLeaderResponseFinalized = leader.isSessionFinished();
+	boolean isLeaderResponseFinalized = service.isLastAttemptFinishedByUser(leader);
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
 	ObjectNode.put("isPageRefreshRequested", isLeaderResponseFinalized || isTimeLimitExceeded);
@@ -449,7 +458,7 @@ public class LearningAction extends Action {
     /**
      * Auxiliary method to be called by nextPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
      * HttpServletResponse response) or submitAll.
-     * 
+     *
      * @param mapping
      * @param request
      * @param isAnswersValidationFailed
@@ -513,7 +522,7 @@ public class LearningAction extends Action {
      * Ajax call to get the remaining seconds. Needed when the page is reloaded in the browser to check with the server
      * what the current values should be! Otherwise the learner can keep hitting reload after a page change or submit
      * all (when questions are spread across pages) and increase their time!
-     * 
+     *
      * @return
      * @throws JSONException
      * @throws IOException
@@ -631,14 +640,13 @@ public class LearningAction extends Action {
 	    loadupLastAttempt(sessionMap);
 	}
 
-	sessionMap.put(AssessmentConstants.ATTR_SHOW_RESULTS, true);
-
-	// populate info for displaying results page
-	showResults(mapping, sessionMap);
-
-	//use redirect to prevent form resubmission
-	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(AssessmentConstants.SHOW_RESULTS));
-	redirect.addParameter(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	ActionRedirect redirect = new ActionRedirect("start.do");
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	if (mode != null) {
+	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
+	}
+	redirect.addParameter(AssessmentConstants.ATTR_TOOL_SESSION_ID,
+		sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
 	return redirect;
     }
 
@@ -895,6 +903,7 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
+	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Set<QuestionDTO> questionsForOnePage = pagedQuestionDtos.get(pageNumber - 1);
@@ -979,6 +988,13 @@ public class LearningAction extends Action {
 		    answerString = answerString.replaceAll("[\n\r\f]", "");
 		    questionDto.setAnswerString(answerString);
 		}
+	    }
+
+	    // store confidence level entered by the learner
+	    if (assessment.isEnableConfidenceLevels()) {
+		int confidenceLevel = WebUtil.readIntParam(request,
+			AssessmentConstants.ATTR_CONFIDENCE_LEVEL_PREFIX + i);
+		questionDto.setConfidenceLevel(confidenceLevel);
 	    }
 	}
     }
@@ -1089,7 +1105,7 @@ public class LearningAction extends Action {
     /**
      * Prepare data for displaying results page
      */
-    private void showResults(ActionMapping mapping, SessionMap<String, Object> sessionMap) {
+    private void showResults(HttpServletRequest request, ActionMapping mapping, SessionMap<String, Object> sessionMap) {
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
@@ -1142,7 +1158,8 @@ public class LearningAction extends Action {
 		}
 	    }
 
-	    Date timeTaken = new Date(result.getFinishDate().getTime() - result.getStartDate().getTime());
+	    Date timeTaken = result.getFinishDate() == null ? new Date(0)
+		    : new Date(result.getFinishDate().getTime() - result.getStartDate().getTime());
 	    result.setTimeTaken(timeTaken);
 	    if (assessment.isAllowOverallFeedbackAfterQuestion()) {
 		int percentageCorrectAnswers = (int) (result.getGrade() * 100 / result.getMaximumGrade());
@@ -1167,6 +1184,19 @@ public class LearningAction extends Action {
 	    sessionMap.put(AssessmentConstants.ATTR_IS_USER_FAILED, isUserFailed);
 
 	    sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
+
+	    // if answers are going to be disclosed, prepare data for the table in results page
+	    if (assessment.isAllowDiscloseAnswers()) {
+		// such entities should not go into session map, but as request attributes instead
+		SortedSet<AssessmentSession> sessions = new TreeSet<AssessmentSession>(
+			new AssessmentSessionComparator());
+		sessions.addAll(getAssessmentService().getSessionsByContentId(assessment.getContentId()));
+		request.setAttribute("sessions", sessions);
+
+		Map<Long, QuestionSummary> questionSummaries = getAssessmentService()
+			.getQuestionSummaryForExport(assessment);
+		request.setAttribute("questionSummaries", questionSummaries);
+	    }
 	}
 
 	//calculate whether isResubmitAllowed
@@ -1213,6 +1243,7 @@ public class LearningAction extends Action {
 			questionDto.setMark(questionResult.getMark());
 			questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
 			questionDto.setPenalty(questionResult.getPenalty());
+			questionDto.setConfidenceLevel(questionResult.getConfidenceLevel());
 
 			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 
@@ -1308,7 +1339,7 @@ public class LearningAction extends Action {
 	AssessmentUser assessmentUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()), sessionId);
 
 	if (assessmentUser == null) {
-	    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+	    AssessmentSession session = service.getSessionBySessionId(sessionId);
 	    assessmentUser = new AssessmentUser(user, session);
 	    service.createUser(assessmentUser);
 	}

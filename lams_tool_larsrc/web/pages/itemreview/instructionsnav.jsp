@@ -24,17 +24,13 @@
 <lams:html>
 	<lams:head>
 		<title><c:out value="${instructions.title}" escapeXml="true"/></title>
-
-		<%@ include file="/common/header.jsp"%>
 		
 		<%-- param has higher level for request attribute --%>
 		<c:if test="${not empty param.mode}">
 			<c:set var="mode" value="${param.mode}" />
 		</c:if>
 		<script type="text/JavaScript">
-				jQuery.noConflict();
-		
-				function finishIns(){
+ 				function finishIns(){
 				//learner and author(preview mode) will mark the finish
 					if(${mode == "learner"} || ${mode == "author"}){
 					   var reqIDVar = new Date();
@@ -43,7 +39,7 @@
 					        location.href='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${param.toolSessionID}&itemUid=${param.itemUid}"/>';
 					   }else{
 						    var url="<c:url value="/learning/completeItem"/>?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${param.itemUid}&reqID="+reqIDVar.getTime();
-							jQuery.ajax({
+							$.ajax({
 								type:   'GET',
 								dataType: 	'script',
 								url:    url,
@@ -51,9 +47,9 @@
 
 								beforeSend:  function() {
 									// disable button
-									jQuery("input#FinishInstruction").attr("disabled", true);
-									jQuery("input#FinishInstruction").removeClass("button");
-									jQuery("input#FinishInstruction").addClass("disabled");
+									$("input#FinishInstruction").attr("disabled", true);
+									$("input#FinishInstruction").removeClass("button");
+									$("input#FinishInstruction").addClass("disabled");
 								},
 
 								error: function(jqXHR, textStatus, errorThrown) {
@@ -73,9 +69,9 @@
 
 								complete:  function() {
 									//enable button
-									jQuery("input#FinishInstruction").attr("disabled", false);
-									jQuery("input#FinishInstruction").removeClass("disabled");
-									jQuery("input#FinishInstruction").addClass("button");
+									$("input#FinishInstruction").attr("disabled", false);
+									$("input#FinishInstruction").removeClass("disabled");
+									$("input#FinishInstruction").addClass("button");
 								}
 							});
 							
@@ -93,38 +89,30 @@
 					var nextUrl="<c:url value='/nextInstruction.do'/>?mode=${mode}&insIdx=" + currIns + "&sessionMapID=${sessionMapID}&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}";
 					$.ajaxSetup({ cache: true });
 					$('#headerFrame').load(nextUrl);
-				}
+				} 
 		</script>
 	</lams:head>
 	<body>
 
 		<div class="container-fluid" id="instructions">
-		  <div class="row">
+ 
+		<c:if test="${instructions.total > 0}" >
+		<div class="row">
 			<div class="col-xs-12 ">
-			<h4>
-				<c:if test="${instructions.total > 0}" >
-					<fmt:message key="message.step.of">
+			<h4><fmt:message key="message.step.of">
 						<fmt:param value="${instructions.current}" />
 						<fmt:param value="${instructions.total}" />
 					</fmt:message>
-				</c:if>
-				<c:if test="${instructions.total <= 0}" >
-					&nbsp;
-				</c:if>
 			</h4>
 			</div>
 		</div>
+		</c:if>
 		
 		<div class="row">
 			<div class="col-xs-12 ">
-				<c:choose>
-					<c:when test="${instructions.instruction == null}">
-						<fmt:message key="msg.no.instruction" />
-					</c:when>		
-					<c:otherwise>
-						<c:out value="${instructions.instruction.description}" escapeXml="false"/>
-					</c:otherwise>
-				</c:choose>
+				<c:if test="${instructions.instruction != null}">
+					<c:out value="${instructions.instruction.description}" escapeXml="false"/>
+				</c:if>
 			
 				<c:choose>
 					<c:when test="${instructions.current < instructions.total}">
@@ -152,7 +140,7 @@
 					</c:otherwise>
 				</c:choose>
 			</div>
-		</div>
+		</div> 
 	</div>
 	
 	</body>

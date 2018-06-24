@@ -48,7 +48,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -61,6 +60,7 @@ import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
@@ -71,6 +71,8 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
@@ -90,12 +92,12 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -125,7 +127,7 @@ public class MonitoringAction extends LamsDispatchAction {
     private static final int LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
     private static final int USER_PAGE_SIZE = 10;
 
-    private static IAuditService auditService;
+    private static ILogEventService logEventService;
 
     private static ILessonService lessonService;
 
@@ -184,6 +186,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
 	Boolean forceRestart = WebUtil.readBooleanParam(request, "forceRestart", false);
 	Boolean allowRestart = WebUtil.readBooleanParam(request, "allowRestart", false);
+	boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
 
 	Lesson newLesson = null;
 	if ((copyType != null) && copyType.equals(LearningDesign.COPY_TYPE_PREVIEW)) {
@@ -193,7 +196,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    try {
 		newLesson = getMonitoringService().initializeLesson(title, desc, ldId, organisationId, getUserId(),
 			customCSV, false, false, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, false,
-			forceRestart, allowRestart, null, null);
+			forceRestart, allowRestart, gradebookOnComplete, null, null);
 	    } catch (SecurityException e) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
@@ -275,9 +278,18 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean imEnable = WebUtil.readBooleanParam(request, "imEnable", false);
 	Integer splitNumberLessons = WebUtil.readIntParam(request, "splitNumberLessons", true);
 	boolean schedulingEnable = WebUtil.readBooleanParam(request, "schedulingEnable", false);
-	Date schedulingDatetime = schedulingEnable
-		? MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(request.getParameter("schedulingDatetime"))
-		: null;
+	Date schedulingDatetime = null;
+	Date schedulingEndDatetime = null;
+	if ( schedulingEnable ) {
+	    String dateString = request.getParameter("schedulingDatetime");
+	    if ( dateString != null && dateString.length() > 0 ) {
+		schedulingDatetime = MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateString);
+	    }
+	    dateString = request.getParameter("schedulingEndDatetime");
+	    if ( dateString != null && dateString.length() > 0 ) {
+		schedulingEndDatetime = MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateString);
+	    }
+	}
 	boolean forceRestart = WebUtil.readBooleanParam(request, "forceRestart", false);
 	boolean allowRestart = WebUtil.readBooleanParam(request, "allowRestart", false);
 
@@ -289,6 +301,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean timeLimitIndividualField = WebUtil.readBooleanParam(request, "timeLimitIndividual", false);
 	Integer timeLimitIndividual = timeLimitEnable && timeLimitIndividualField ? timeLimitDays : null;
 	Integer timeLimitLesson = timeLimitEnable && !timeLimitIndividualField ? timeLimitDays : null;
+	boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
 
 	IUserManagementService userManagementService = MonitoringServiceProxy
 		.getUserManagementService(getServlet().getServletContext());
@@ -338,7 +351,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    try {
 		lesson = getMonitoringService().initializeLesson(lessonInstanceName, introDescription, ldId,
 			organisationId, userId, null, introEnable, introImage, presenceEnable, imEnable, enableLiveEdit,
-			notificationsEnable, forceRestart, allowRestart, timeLimitIndividual, precedingLessonId);
+			notificationsEnable, forceRestart, allowRestart, gradebookOnComplete, timeLimitIndividual,
+			precedingLessonId);
 
 		getMonitoringService().createLessonClassForLesson(lesson.getLessonId(), organisation,
 			learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
@@ -363,10 +377,14 @@ public class MonitoringAction extends LamsDispatchAction {
 			getMonitoringService().startLessonOnSchedule(lesson.getLessonId(), schedulingDatetime, userId);
 		    }
 
+		    // monitor has given an end date/time for the lesson
+		    if (schedulingEndDatetime != null) {
+			getMonitoringService().finishLessonOnSchedule(lesson.getLessonId(), schedulingEndDatetime, userId);
 		    // if lesson should finish in few days, set it here
-		    if (timeLimitLesson != null) {
+		    } else if (timeLimitLesson != null) {
 			getMonitoringService().finishLessonOnSchedule(lesson.getLessonId(), timeLimitLesson, userId);
 		    }
+		    
 		} catch (SecurityException e) {
 		    try {
 			response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -454,20 +472,18 @@ public class MonitoringAction extends LamsDispatchAction {
      * The purpose of suspending is to hide the lesson from learners temporarily. It doesn't make any sense to suspend a
      * created or a not started (ie scheduled) lesson as they will not be shown on the learner interface anyway! If the
      * teacher tries to suspend a lesson that is not in the STARTED_STATE, then an error should be returned to UI.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward suspendLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException, ParseException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_END_DATE, true);
 	try {
-	    getMonitoringService().suspendLesson(lessonId, getUserId());
+	    if (dateStr == null || dateStr.length() == 0) {
+		getMonitoringService().suspendLesson(lessonId, getUserId(), true);
+	    } else {
+		getMonitoringService().finishLessonOnSchedule(lessonId,
+			MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateStr), getUserId());
+	    }
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -557,7 +573,7 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward forceComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	getAuditService();
+
 	// get parameters
 	Long activityId = null;
 	String actId = request.getParameter(AttributeNames.PARAM_ACTIVITY_ID);
@@ -580,16 +596,31 @@ public class MonitoringAction extends LamsDispatchAction {
 	jsonCommand.put("redirectURL", "/lams/learning/learner.do?method=joinLesson&lessonID=" + lessonId);
 	String command = jsonCommand.toString();
 
+	String activityDescription = null;
+	if (activityId != null) {
+	    Activity activity = getMonitoringService().getActivityById(activityId);
+	    activityDescription = new StringBuffer(activity.getTitle()).append(" (").append(activityId).append(")")
+		    .toString();
+	}
+
+	StringBuffer learnerIdNameBuf = new StringBuffer();
 	String message = null;
 	User learner = null;
+	boolean oneOrMoreProcessed = false;
 	try {
 	    for (String learnerIDString : learnerIDs.split(",")) {
+		if (oneOrMoreProcessed) {
+		    learnerIdNameBuf.append(", ");
+		} else {
+		    oneOrMoreProcessed = true;
+		}
 		Integer learnerID = Integer.valueOf(learnerIDString);
 		message = getMonitoringService().forceCompleteActivitiesByUser(learnerID, requesterId, lessonId,
 			activityId, removeLearnerContent);
 
 		learner = (User) getUserManagementService().findById(User.class, learnerID);
 		getLearnerService().createCommandForLearner(lessonId, learner.getLogin(), command);
+		learnerIdNameBuf.append(learner.getLogin()).append(" (").append(learnerID).append(")");
 	    }
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -597,15 +628,17 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	if (LamsDispatchAction.log.isDebugEnabled()) {
-	    LamsDispatchAction.log
-		    .debug("Force complete for learners " + learnerIDs + " lesson " + lessonId + ". " + message);
+	    LamsDispatchAction.log.debug("Force complete for learners " + learnerIdNameBuf.toString() + " lesson "
+		    + lessonId + ". " + message);
 	}
 
 	// audit log force completion attempt
 	String messageKey = (activityId == null) ? "audit.force.complete.end.lesson" : "audit.force.complete";
-	Object[] args = new Object[] { learnerIDs, activityId, lessonId };
+	
+	Object[] args = new Object[] { learnerIdNameBuf.toString(), activityDescription, lessonId };
 	String auditMessage = getMonitoringService().getMessageService().getMessage(messageKey, args);
-	MonitoringAction.auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, auditMessage + " " + message);
+	getLogEventService().logEvent(LogEvent.TYPE_FORCE_COMPLETE, requesterId, null, lessonId, activityId,
+		auditMessage + " " + message);
 
 	PrintWriter writer = response.getWriter();
 	writer.println(message);
@@ -930,8 +963,93 @@ public class MonitoringAction extends LamsDispatchAction {
 		.isUserInRole(user.getUserID(), organisation.getOrganisationId(), Role.AUTHOR);
 	request.setAttribute("enableLiveEdit", enableLiveEdit);
 	request.setAttribute("lesson", lessonDTO);
+	request.setAttribute("isTBLSequence", isTBLSequence(lessonId));
 
 	return mapping.findForward("monitorLesson");
+    }
+
+    /**
+     * If learning design contains the following activities Grouping->(MCQ or Assessment)->Leader Selection->Scratchie
+     * (potentially with some other gates or activities in the middle), there is a good chance this is a TBL sequence
+     * and all activities must be grouped.
+     */
+    private boolean isTBLSequence(Long lessonId) {
+
+	Lesson lesson = getLessonService().getLesson(lessonId);
+	Long firstActivityId = lesson.getLearningDesign().getFirstActivity().getActivityId();
+	//Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity
+	Activity firstActivity = getMonitoringService().getActivityById(firstActivityId);
+
+	return verifyNextActivityFitsTbl(firstActivity, "Grouping");
+    }
+
+    /**
+     * Traverses the learning design verifying it follows typical TBL structure
+     *
+     * @param activity
+     * @param anticipatedActivity
+     *            could be either "Grouping", "MCQ or Assessment", "Leaderselection" or "Scratchie"
+     */
+    private boolean verifyNextActivityFitsTbl(Activity activity, String anticipatedActivity) {
+
+	Transition transitionFromActivity = activity.getTransitionFrom();
+	//TBL can finish with the Scratchie
+	if (transitionFromActivity == null && !"Scratchie".equals(anticipatedActivity)) {
+	    return false;
+	}
+	// query activity from DB as transition holds only proxied activity object
+	Long nextActivityId = transitionFromActivity == null ? null
+		: transitionFromActivity.getToActivity().getActivityId();
+	Activity nextActivity = nextActivityId == null ? null : monitoringService.getActivityById(nextActivityId);
+
+	switch (anticipatedActivity) {
+	    case "Grouping":
+		//the first activity should be a grouping
+		if (activity instanceof GroupingActivity) {
+		    return verifyNextActivityFitsTbl(nextActivity, "MCQ or Assessment");
+
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "Grouping");
+		}
+
+	    case "MCQ or Assessment":
+		//the second activity shall be a MCQ or Assessment
+		if (activity.isToolActivity() && (CentralConstants.TOOL_SIGNATURE_ASSESSMENT
+			.equals(((ToolActivity) activity).getTool().getToolSignature())
+			|| CentralConstants.TOOL_SIGNATURE_MCQ
+				.equals(((ToolActivity) activity).getTool().getToolSignature()))) {
+		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection");
+
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "MCQ or Assessment");
+		}
+
+	    case "Leaderselection":
+		//the third activity shall be a Leader Selection
+		if (activity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_LEADERSELECTION
+			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
+		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie");
+
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection");
+		}
+
+	    case "Scratchie":
+		//the fourth activity shall be Scratchie
+		if (activity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_SCRATCHIE
+			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
+		    return true;
+
+		} else if (nextActivity == null) {
+		    return false;
+
+		} else {
+		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie");
+		}
+
+	    default:
+		return false;
+	}
     }
 
     /**
@@ -993,16 +1111,28 @@ public class MonitoringAction extends LamsDispatchAction {
 	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId, null));
 	responseJSON.put("lessonStateID", lesson.getLessonStateId());
 
-	responseJSON.put("lessonName", StringEscapeUtils.escapeHtml(lesson.getLessonName()));
+	responseJSON.put("lessonName", HtmlUtils.htmlEscape(lesson.getLessonName()));
 	responseJSON.put("lessonDescription", lesson.getLessonDescription());
 
 	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate()
 		: lesson.getStartDateTime();
+	Date finishDate = lesson.getScheduleEndDate();
+	DateFormat indfm = null;
+
+	if (startOrScheduleDate != null || finishDate != null) {
+	    indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
+	}
+
 	if (startOrScheduleDate != null) {
-	    DateFormat indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
 	    Date tzStartDate = DateUtil.convertToTimeZoneFromDefault(user.getTimeZone(), startOrScheduleDate);
 	    responseJSON.put("startDate",
 		    indfm.format(tzStartDate) + " " + user.getTimeZone().getDisplayName(userLocale));
+	}
+
+	if (finishDate != null) {
+	    Date tzFinishDate = DateUtil.convertToTimeZoneFromDefault(user.getTimeZone(), finishDate);
+	    responseJSON.put("finishDate",
+		    indfm.format(tzFinishDate) + " " + user.getTimeZone().getDisplayName(userLocale));
 	}
 
 	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, false);
@@ -1384,18 +1514,13 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
-    /**
-     * Get AuditService bean.
-     *
-     * @return
-     */
-    private IAuditService getAuditService() {
-	if (MonitoringAction.auditService == null) {
+    private ILogEventService getLogEventService() {
+	if (MonitoringAction.logEventService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    MonitoringAction.auditService = (IAuditService) ctx.getBean("auditService");
+	    MonitoringAction.logEventService = (ILogEventService) ctx.getBean("logEventService");
 	}
-	return MonitoringAction.auditService;
+	return MonitoringAction.logEventService;
     }
 
     private ILessonService getLessonService() {
@@ -1496,6 +1621,25 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	try {
 	    getMonitoringService().togglePresenceImAvailable(lessonID, userID, presenceImAvailable);
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	}
+	return null;
+    }
+
+    /**
+     * Set whether or not the activity scores / gradebook values are shown to the learner at the end of the lesson.
+     * Expects parameters lessonID and presenceAvailable.
+     */
+    public ActionForward gradebookOnComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+
+	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
+	Integer userID = getUserId();
+	Boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
+
+	try {
+	    getMonitoringService().toggleGradebookOnComplete(lessonID, userID, gradebookOnComplete);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}

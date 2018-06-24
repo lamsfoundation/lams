@@ -1,11 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
-
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
 <%-- param has higher level for request attribute --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 </c:if>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 <c:set var="scratchie" value="${sessionMap.scratchie}" />
@@ -58,14 +59,13 @@
 	
 	// set up timer for the first time
 	scratchieWebsocketPingFunc(true);
-
 	
 	// run when the server pushes new reports and vote statistics
 	scratchieWebsocket.onmessage = function(e) {
 		// create JSON object
 		var input = JSON.parse(e.data);
 
-		//time limit is expired but leader hasn't submitted required notebook/burning questions yet. Non-leaders
+		//time limit is expired but leader hasn't submitted required notebook yet. Non-leaders
         //will need to refresh the page in order to stop showing them questions page.
 		if (input.pageRefresh) {
 			location.reload();
@@ -92,88 +92,33 @@
 	</script>
 </c:if>
 
-<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
-	<div class="lead">
-		<c:out value="${item.title}" escapeXml="true" />
-	</div>
-	<div class="panel-body-sm">
-		<c:out value="${item.description}" escapeXml="false" />
-	</div>
+<form id="burning-questions" name="burning-questions" method="post" action="">
 
-	<table id="scratches" class="table table-hover">
-		<c:forEach var="answer" items="${item.answers}" varStatus="status">
-			<tr id="tr${answer.uid}">
-				<td style="width: 40px;"><c:choose>
-						<c:when test="${answer.scratched && answer.correct}">
-							<img src="<html:rewrite page='/includes/images/scratchie-correct.png'/>" class="scartchie-image"
-								 id="image-${item.uid}-${answer.uid}">
-						</c:when>
-						<c:when test="${answer.scratched && !answer.correct}">
-							<img src="<html:rewrite page='/includes/images/scratchie-wrong.png'/>" class="scartchie-image"
-								 id="image-${item.uid}-${answer.uid}">
-						</c:when>
-						<c:when test="${sessionMap.userFinished || item.unraveled || !isUserLeader || (mode == 'teacher')}">
-							<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image"
-								 id="image-${item.uid}-${answer.uid}">
-						</c:when>
-						<c:otherwise>
-							<a href="#nogo" onclick="scratchItem(${item.uid}, ${answer.uid}); return false;"
-								id="imageLink-${item.uid}-${answer.uid}"> <img
-								src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image"
-								id="image-${item.uid}-${answer.uid}" />
-							</a>
-						</c:otherwise>
-					</c:choose> <c:if test="${(mode == 'teacher') && (answer.attemptOrder != -1)}">
-						<div style="text-align: center; margin-top: 2px;">
-							<fmt:message key="label.choice.number">
-								<fmt:param>${answer.attemptOrder}</fmt:param>
-							</fmt:message>
-						</div>
-					</c:if></td>
+<%@ include file="scratchies.jsp"%>
 
-				<td style="vertical-align: middle;"><c:out value="${answer.description}" escapeXml="false" /></td>
-			</tr>
-		</c:forEach>
-	</table>
+<%-- show general burning question --%>
+<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">
+	<div class="form-group burning-question-container">
+		<a data-toggle="collapse" data-target="#burning-question-general" href="#bqg"
+				<c:if test="${empty sessionMap.generalBurningQuestion}">class="collapsed"</c:if>>
+			<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
+  			<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
+			<fmt:message key="label.general.burning.question" />
+		</a>
 
-</c:forEach>
-
-<%-- show reflection (only for teacher) --%>
-<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and (mode == 'teacher')}">
-	<div class="voffset5">
-		<div class="panel panel-default">
-			<div class="panel-heading-sm panel-title">
-				<fmt:message key="monitor.summary.td.notebookInstructions" />
-			</div>
-			<div class="panel-body-sm">
-				<div class="panel">
-					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
-				</div>
-				<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-							<fmt:message key="message.no.reflection.available" />
-					</c:when>
-					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
-					</c:otherwise>
-				</c:choose>
-			</div>
+		<div id="burning-question-general" class="collapse <c:if test="${not empty sessionMap.generalBurningQuestion}">in</c:if>">
+			<textarea rows="5" name="generalBurningQuestion" class="form-control"
+				<c:if test="${mode == 'teacher'}">disabled="disabled"</c:if>
+			>${sessionMap.generalBurningQuestion}</textarea>
 		</div>
 	</div>
 </c:if>
 
+</form>
+
 <c:if test="${mode != 'teacher'}">
 	<div class="voffset10 pull-right">
 		<c:choose>
-			<c:when test="${isUserLeader && sessionMap.isBurningQuestionsEnabled}">
-				<input type="hidden" name="method" id="method" value="showBurningQuestions">
-				<html:button property="finishButton" styleId="finishButton" onclick="return finish(false);"
-					styleClass="btn btn-sm btn-default">
-					<fmt:message key="label.continue.burning.questions" />
-				</html:button>
-			</c:when>
 			<c:when test="${isUserLeader && sessionMap.reflectOn}">
 				<input type="hidden" name="method" id="method" value="newReflection">
 				<html:button property="finishButton" styleId="finishButton" onclick="return finish(false);"

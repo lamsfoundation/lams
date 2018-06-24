@@ -6,10 +6,21 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
+	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
+	<style>
+		tr.selected-by-groups td {
+			border-top: none !important;
+		}
+		
+		tr.selected-by-groups span {
+			font-weight: bold;
+		}
+	</style>
 	
 	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script> 
 	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
 
 	<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 	<%-- param has higher level for request attribute --%>
@@ -26,12 +37,22 @@
 	<c:set var="result" value="${sessionMap.assessmentResult}" />
 	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
 	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
-	
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$("time.timeago").timeago();
+
+			//initialize bootstrap-sliders if "Enable confidence level" option is ON
+			$('.bootstrap-slider').bootstrapSlider();
+
+			// command websocket stuff for refreshing
+			// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+			commandWebsocketHookTrigger = 'assessment-results-refresh-${assessment.contentId}';
+			// if the trigger is recognised, the following action occurs
+			commandWebsocketHook = function() {
+				location.reload();
+			};
 		});
-	
+
 		function disableButtons() {
 			$('.btn').prop('disabled',true);
 		}

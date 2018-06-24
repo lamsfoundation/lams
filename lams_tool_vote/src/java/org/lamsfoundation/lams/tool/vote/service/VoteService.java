@@ -43,6 +43,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
@@ -50,6 +51,7 @@ import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -96,7 +98,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
@@ -122,7 +123,7 @@ public class VoteService
 
     private IUserManagementService userManagementService;
     private ILearnerService learnerService;
-    private IAuditService auditService;
+    private ILogEventService logEventService;
     private ILamsToolService toolService;
     private IExportToolContentService exportContentService;
 
@@ -1163,8 +1164,15 @@ public class VoteService
      */
     @Override
     public void hideOpenVote(VoteUsrAttempt voteUsrAttempt) {
-	auditService.logHideEntry(VoteAppConstants.MY_SIGNATURE, voteUsrAttempt.getQueUsrId(),
-		voteUsrAttempt.getVoteQueUsr().getUsername(), voteUsrAttempt.getUserEntry());
+	Long toolContentId = null;
+	if (voteUsrAttempt.getVoteQueContent() != null && voteUsrAttempt.getVoteQueContent().getMcContent() != null) {
+	    toolContentId = voteUsrAttempt.getVoteQueContent().getMcContent().getVoteContentId();
+	}
+
+	logEventService.logHideLearnerContent(voteUsrAttempt.getVoteQueUsr().getQueUsrId(),
+		voteUsrAttempt.getVoteQueUsr().getUsername(), toolContentId,
+		voteUsrAttempt.getUserEntry());
+
     }
 
     /**
@@ -1172,8 +1180,14 @@ public class VoteService
      */
     @Override
     public void showOpenVote(VoteUsrAttempt voteUsrAttempt) {
-	auditService.logShowEntry(VoteAppConstants.MY_SIGNATURE, voteUsrAttempt.getQueUsrId(),
-		voteUsrAttempt.getVoteQueUsr().getUsername(), voteUsrAttempt.getUserEntry());
+	Long toolContentId = null;
+	if (voteUsrAttempt.getVoteQueContent() != null && voteUsrAttempt.getVoteQueContent().getMcContent() != null) {
+	    toolContentId = voteUsrAttempt.getVoteQueContent().getMcContent().getVoteContentId();
+	}
+
+	logEventService.logShowLearnerContent(voteUsrAttempt.getVoteQueUsr().getQueUsrId(),
+		voteUsrAttempt.getVoteQueUsr().getUsername(), toolContentId,
+		voteUsrAttempt.getUserEntry());
     }
 
     @Override
@@ -1611,6 +1625,11 @@ public class VoteService
     }
 
     @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
+	return null;
+    }
+
+    @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	Long userId = user.getUserId().longValue();
 
@@ -1660,6 +1679,11 @@ public class VoteService
 	} else {
 	    return list.get(0);
 	}
+    }
+
+    @Override
+    public void updateEntry(NotebookEntry notebookEntry) {
+	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -1848,18 +1872,18 @@ public class VoteService
     }
 
     /**
-     * @return Returns the auditService.
+     * @return Returns the logEventService.
      */
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
     /**
-     * @param auditService
-     *            The auditService to set.
+     * @param logEventService
+     *            The logEventService to set.
      */
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public IExportToolContentService getExportContentService() {

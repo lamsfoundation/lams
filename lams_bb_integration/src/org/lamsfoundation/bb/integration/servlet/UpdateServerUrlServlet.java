@@ -91,7 +91,7 @@ public class UpdateServerUrlServlet extends HttpServlet {
 	    PkId courseId = new PkId(bbContainer, Course.DATA_TYPE, courseIdParam);
 	    
 	    //find all lessons that should be updated
-	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
+	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId, true);
 	    for (Content content : lamsContents) {
 		String oldUrl = content.getUrl();
 		String newUrl = oldUrl.replaceFirst(oldUrlHost, newUrlHost);

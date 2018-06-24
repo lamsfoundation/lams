@@ -100,6 +100,22 @@
 			</c:choose>
 		</td>
 	</tr>
+
+	<tr>
+		<td>
+			<fmt:message key="label.displayFeedbackOnly" />
+		</td>	
+		<td>
+			<c:choose>
+				<c:when test="${displayFeedbackOnly}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 	 		
 	<tr>
 	 	<td>
@@ -159,17 +175,31 @@
 			<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'true'}">
 				<fmt:message key="label.monitoring.yesDisplayAnswers"/>
 			</c:when>
-			<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'false'}">
+			<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'false' && mcGeneralMonitoringDTO.displayFeedbackOnly == 'true'}">
+				<fmt:message key="label.monitoring.yesDisplayFeedbackOnly"/><br/>
+				<quote>
+					<fmt:message key="label.monitoring.noDisplayAnswers2"/>&nbsp;
+					<input onclick="javascript:turnOnDisplayAnswers();" name="displayAnswers" 
+							class="btn btn-default btn-xs" value="<fmt:message key='button.monitoring.yes'/>" type="button">	
+				</quote>
+			</c:when>
+			<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'false' && mcGeneralMonitoringDTO.displayFeedbackOnly == 'false'}">
 				<fmt:message key="label.monitoring.noDisplayAnswers1"/><br/>
 				<quote>
 					<fmt:message key="label.monitoring.noDisplayAnswers2"/>&nbsp;
 					<input onclick="javascript:turnOnDisplayAnswers();" name="displayAnswers" 
-							class="btn btn-default btn-xs" value="<fmt:message key='button.monitoring.noDisplayAnswers'/>" type="button">	
+							class="btn btn-default btn-xs" value="<fmt:message key='button.monitoring.yes'/>" type="button">	
+				</quote><br/>
+				<quote>
+					<fmt:message key="label.monitoring.noDisplayFeedbackOnly2"/>&nbsp;
+					<input onclick="javascript:turnOnDisplayFeedbackOnly();" name="displayFeedbackOnly" 
+							class="btn btn-default btn-xs" value="<fmt:message key='button.monitoring.yes'/>" type="button">	
 				</quote>
 			</c:when>
 		</c:choose>
 		</td>
 	</tr>
+
 </table>
 
 </lams:AdvancedAccordian>

@@ -123,6 +123,8 @@ public class ResourceConstants {
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
     public static final String ATTR_IS_URL_ITEM_TYPE = "isUrlItemType";
+    
+    public static final String ATTR_ALLOW_COMMENTS = "allowComments";
 
     // error message keys
     public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
@@ -150,10 +152,6 @@ public class ResourceConstants {
     public static final String ATTR_REFLECT_LIST = "reflectList";
 
     public static final String ATTR_USER_UID = "userUid";
-
-    public static final String DEFUALT_PROTOCOL_REFIX = "http://";
-
-    public static final String ALLOW_PROTOCOL_REFIX = new String("[http://|https://|ftp://|nntp://]");
 
     public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT = "notify_teachers_on_assigment_submit";
 

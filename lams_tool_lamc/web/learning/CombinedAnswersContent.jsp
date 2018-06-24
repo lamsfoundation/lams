@@ -32,41 +32,53 @@
             <div class="table-responsive">
               <table class="table table-hover table-condensed">
                 <tbody>
+                
                   <c:forEach var="option" items="${dto.options}" varStatus="status">
                     <tr>
+                    
                       <td class="text-nowrap" style="vertical-align: top;">
-                          <c:choose>
-                            <c:when test="${hasEditRight}">		
-                              <input type="radio" id="${dto.questionUid}-${option.uid}" name="checkedCa${dto.questionUid}" class="noBorder" value="${dto.questionUid}-${option.uid}"
-                                     <c:if test="${option.selected}">checked="checked"</c:if>/>
-                            
-                            </c:when>
-                          <c:otherwise>
-                            <input type="radio" id="${dto.questionUid}-${option.uid}" name="checkedCa${dto.questionUid}" class="noBorder" value="${dto.questionUid}-${option.uid}" <c:if test="${option.selected}">checked="checked"</c:if> disabled="disabled">
-                          </c:otherwise>
-                    </c:choose>
-                    <c:if test="${isPrefixAnswersWithLetters}">
-                      <c:set var="seqLetter" value="${status.index}"/>
-                      <%=Character.toChars(97 + (Integer)pageContext.getAttribute("seqLetter"))%>)
-                    </c:if>
-                      
-                    </td>
-                  <td width="100%">
-                    <label for="${dto.questionUid}-${option.uid}">
-                      <c:out value="${option.mcQueOptionText}" escapeXml="false" />
-                    </label>
-                  </td>
-                </tr>
-              </c:forEach>
-            </tbody>
-          </table>            
-      </div>
-      <!-- End answer options -->            
+                      	<input type="radio" id="${dto.questionUid}-${option.uid}" name="checkedCa${dto.questionUid}" class="noBorder" 
+                         		value="${dto.questionUid}-${option.uid}" 
+                           		<c:if test="${option.selected}">checked="checked"</c:if>
+                            		<c:if test="${!hasEditRight}">disabled="disabled"</c:if> 
+                      	>
+                              
+	                     <c:if test="${isPrefixAnswersWithLetters}">
+	                     	<c:set var="seqLetter" value="${status.index}"/>
+	                     	<%=Character.toChars(97 + (Integer)pageContext.getAttribute("seqLetter"))%>)
+	                     </c:if>
+                       </td>
+                       
+	                   <td width="100%">
+	                       <label for="${dto.questionUid}-${option.uid}">
+	                           <c:out value="${option.mcQueOptionText}" escapeXml="false" />
+	                       </label>
+	                    </td>
+                    </tr>
+                  </c:forEach>
+              </tbody>
+            </table>            
+          </div>
+          <!-- End answer options --> 
+                
+			<c:if test="${sessionMap.content.enableConfidenceLevels}">
+				<div class="question-type">
+					<fmt:message key="label.what.is.your.confidence.level" />
+				</div>
+	
+				<div>
+					<input name="confidenceLevel${dto.questionUid}" class="bootstrap-slider" type="text" 
+						data-slider-ticks="[0, 5, 10]" data-slider-ticks-labels='["0", "50", "100%"]' 
+						data-slider-enabled="${hasEditRight}" data-slider-tooltip="hide"
+						<c:if test="${dto.confidenceLevel != -1}">data-slider-value="${dto.confidenceLevel}"</c:if>
+					/>
+				</div>
+            </c:if>           
 
-    </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 </c:forEach>
 
 <html:hidden property="continueOptionsCombined" value="Continue" />

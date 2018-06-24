@@ -313,7 +313,7 @@ public class LearningAction extends Action {
 	boolean isRedo = WebUtil.readBooleanParam(request, "isRedo", false);
 	if (!mode.isTeacher() && !peerreview.getLockWhenFinished() && isRedo && user.isSessionFinished()) {
 	    user.setSessionFinished(false);
-	    service.createUser(user);
+	    service.updateUser(user);
 	}
 
 	RatingCriteria newCriteria = null;
@@ -353,7 +353,7 @@ public class LearningAction extends Action {
 
 	    if (newCriteria == null) {
 		user.setSessionFinished(true);
-		service.createUser(user);
+		service.updateUser(user);
 	    } else {
 		// work out the step details.
 		int numCriteria = criterias.size();

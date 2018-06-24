@@ -4,5 +4,6 @@
 @import url("/lams/includes/font-awesome/css/font-awesome.min.css");
 @import url("/lams/css/bootstrap.min.css");
 // LAMS Classes and overrides
+@import "_dialogs.scss";
 @import "_inlineeditor.scss";
 @import "_learner_base.scss";

@@ -7,7 +7,9 @@
 <c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
 <c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
+<c:set var="isLeadershipEnabled" value="${sessionMap.useSelectLeaderToolOuput}"/>
+<c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
 <lams:html>
 <lams:head>
 	<title><fmt:message key="tool.display.name" /></title>
@@ -97,8 +99,9 @@
 			}
 		}
 		
-		function deleteLearnerFile(detailId) {
+		function deleteLearnerFile(detailId, filename) {
 			var msg = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
+			msg = msg.replace('{0}', filename);
 			var answer = confirm(msg);
 			if (answer) {	
 				 $.ajax({
@@ -126,7 +129,7 @@
 		</div>
 
 		<!-- notices and announcements -->
-		<c:if test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
+		<c:if test="${(sessionMap.mode == 'author' || sessionMap.mode == 'learner') && hasEditRight}">
 			<c:if test="${sessionMap.lockOnFinish}">
 				<!--  Lock when finished -->
 				<lams:Alert id="lockWhenFinished" type="info" close="true">
@@ -171,8 +174,7 @@
 
 		<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->
 		<c:choose>
-
-			<c:when test="${empty learner.filesUploaded}">
+			<c:when test="${empty learner.filesUploaded && hasEditRight}">
 				<div class="alert">
 					<fmt:message key="label.learner.noUpload" />
 				</div>
@@ -200,8 +202,8 @@
 								</c:set>
 								</td>
 								<td>
-								<c:if test="${empty file.marks}">
-								 <html:link href="javascript:deleteLearnerFile(${file.submissionID});" styleClass="btn btn-default btn-disable-on-submit pull-right">
+								<c:if test="${empty file.marks && hasEditRight}">
+								 <html:link href="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" styleClass="btn btn-default btn-disable-on-submit pull-right">
 					                      <i class="fa fa-trash" title="<fmt:message key="label.monitoring.original.learner.file.delete" />"></i> <span class="hidden-xs"></span>
 				                 </html:link>
 				                 </c:if>
@@ -282,7 +284,7 @@
 			<!-- now check if the user is (finished + lockedWhenFinished) or no more files allowed -->
 			<c:set var="displayForm" value="${sessionMap.finishLock || sessionMap.arriveLimit}" />
 
-			<c:if test="${!displayForm}">
+			<c:if test="${!displayForm && hasEditRight}">
 
 				<html:form action="/learner?method=uploadFile" method="post" enctype="multipart/form-data" onsubmit="return validate();" >
 					<html:hidden property="sessionMapID" />
@@ -311,10 +313,12 @@
 							</div>
 							<p class="help-block"><small><fmt:message key="errors.required"><fmt:param>*</fmt:param></fmt:message></small></p>
 							<div class="form-group">
-								<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.arriveLimit}">disabled="disabled"</c:if>
-									class="btn btn-sm btn-default btn-primary btn-disable-on-submit">
-									<i class="fa fa-xs fa-plus"></i> <fmt:message key="label.add" />
-								</button>
+								<c:if test="${hasEditRight}">											
+									<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.arriveLimit}">disabled="disabled"</c:if>
+										class="btn btn-sm btn-default btn-primary btn-disable-on-submit">
+										<i class="fa fa-xs fa-plus"></i> <fmt:message key="label.add" />
+									</button>
+								</c:if>
 							</div>
 						</div>
 					</div>

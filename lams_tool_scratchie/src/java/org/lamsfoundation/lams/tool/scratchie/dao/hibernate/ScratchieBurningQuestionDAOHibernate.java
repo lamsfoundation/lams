@@ -45,9 +45,6 @@ public class ScratchieBurningQuestionDAOHibernate extends LAMSBaseDAO implements
     private static final String FIND_BY_SESSION = "from " + ScratchieBurningQuestion.class.getName()
 	    + " as r where r.sessionId=?";
 
-    private static final String FIND_BY_ITEM_UID = "from " + ScratchieBurningQuestion.class.getName()
-	    + " as r where r.scratchieItem.uid=? order by r.sessionId asc";
-
     @Override
     @SuppressWarnings("unchecked")
     public List<BurningQuestionDTO> getBurningQuestionsByContentId(Long scratchieUid, Long sessionId) {
@@ -90,6 +87,9 @@ public class ScratchieBurningQuestionDAOHibernate extends LAMSBaseDAO implements
 	    if (sessionId != null) {
 		boolean userLiked = (Integer) rawObject[3] == 1;
 		burningQuestionDTO.setUserLiked(userLiked);
+		
+		//sets whether the leader of specified group created this burningQuestion
+		burningQuestionDTO.setUserAuthor(sessionId.equals(burningQuestion.getSessionId()));
 	    }
 	    burningQuestionDTO.setSessionName(sessionName);
 	    results.add(burningQuestionDTO);

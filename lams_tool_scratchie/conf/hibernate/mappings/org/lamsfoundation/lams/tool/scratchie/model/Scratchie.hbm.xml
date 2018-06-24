@@ -150,12 +150,31 @@
             insert="true"
             column="time_limit"
         />
-
-        <!--
-            To add non XDoclet property mappings, create a file named
-                hibernate-properties-Scratchie.xml
-            containing the additional properties and place it in your merge dir.
-        -->
+        
+        <property
+            name="confidenceLevelsActivityUiid"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            column="confidence_levels_activity_uiid"
+            unique="true"
+        />
+        
+        <property
+            name="presetMarks"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="preset_marks"
+        />
+        
+       <property
+            name="showScrachiesInResults"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="show_scratchies_in_results"
+        />
 
     </class>
 

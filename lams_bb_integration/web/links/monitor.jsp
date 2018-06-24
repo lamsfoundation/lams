@@ -36,6 +36,12 @@
 
 	<%-- Monitor Button --%>
 	<div id="buttons">
+		<div id="course-gradebook-button" class="yui-button yui-link-button">
+			<button id="course-gradebook-button-but" onclick="openCourseGradebook('${param.course_id}'); return false;">
+				Open course gradebook
+			</button>
+		</div>
+		
 		<span id="monitor-button" class="yui-button yui-link-button">
 			<button onclick="openMonitor('${param.course_id}', sequenceId); return false;">
 				Monitor this lesson
@@ -81,6 +87,7 @@
 		
         var sequenceId = null;
         var monitorWin = null;
+        var courseGradebookWin = null;
         
 		function seqSelected(seqId, seqName) {
 			sequenceId = seqId;

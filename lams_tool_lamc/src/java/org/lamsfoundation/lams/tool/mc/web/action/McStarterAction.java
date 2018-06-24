@@ -100,7 +100,7 @@ public class McStarterAction extends Action {
 	mcAuthoringForm.setSln(mcContent.isShowReport() ? "1" : "0");
 	mcAuthoringForm.setQuestionsSequenced(mcContent.isQuestionsSequenced() ? "1" : "0");
 	mcAuthoringForm.setRandomize(mcContent.isRandomize() ? "1" : "0");
-	mcAuthoringForm.setDisplayAnswers(mcContent.isDisplayAnswers() ? "1" : "0");
+	mcAuthoringForm.setDisplayAnswersFeedback(mcContent.isDisplayAnswers() ? "answers" : mcContent.isDisplayFeedbackOnly() ? "feedback" : "none");
 	mcAuthoringForm.setShowMarks(mcContent.isShowMarks() ? "1" : "0");
 	mcAuthoringForm.setUseSelectLeaderToolOuput(mcContent.isUseSelectLeaderToolOuput() ? "1" : "0");
 	mcAuthoringForm.setPrefixAnswersWithLetters(mcContent.isPrefixAnswersWithLetters() ? "1" : "0");
@@ -110,6 +110,7 @@ public class McStarterAction extends Action {
 	mcAuthoringForm.setReflectionSubject(mcContent.getReflectionSubject());
 	mcAuthoringForm.setTitle(mcContent.getTitle());
 	mcAuthoringForm.setInstructions(mcContent.getInstructions());
+	mcAuthoringForm.setEnableConfidenceLevels(mcContent.isEnableConfidenceLevels());
 
 	List<McQuestionDTO> questionDtos = AuthoringUtil.buildDefaultQuestions(mcContent);
 	sessionMap.put(McAppConstants.QUESTION_DTOS, questionDtos);

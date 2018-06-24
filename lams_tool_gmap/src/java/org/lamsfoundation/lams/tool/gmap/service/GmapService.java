@@ -39,6 +39,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -70,6 +71,7 @@ import org.lamsfoundation.lams.tool.gmap.util.GmapException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.w3c.dom.Document;
@@ -98,6 +100,8 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
     private ILearnerService learnerService;
 
     private ILamsToolService toolService;
+
+    private IUserManagementService userManagementService;
 
     private IToolContentHandler gmapToolContentHandler = null;
 
@@ -177,6 +181,11 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();
+    }
+    
+    @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
+	return null;
     }
 
     @Override
@@ -599,6 +608,19 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
     	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
+    @Override
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
+	    String searchString, boolean getNotebookEntries) {
+	return gmapUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries,
+		coreNotebookService, userManagementService);
+    }
+
+
+    @Override
+    public int getCountUsersBySession(Long sessionId, String searchString) {
+	return gmapUserDAO.getCountUsersBySession(sessionId, searchString);
+    }
+
     // =========================================================================================
     /* ********** Used by Spring to "inject" the linked objects ************* */
 
@@ -664,6 +686,14 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
+    }
+
+    public IUserManagementService getUserManagementService() {
+   	return userManagementService;
+    }
+
+    public void setUserManagementService(IUserManagementService userManagementService) {
+	this.userManagementService = userManagementService;
     }
 
     public IGmapMarkerDAO getGmapMarkerDAO() {

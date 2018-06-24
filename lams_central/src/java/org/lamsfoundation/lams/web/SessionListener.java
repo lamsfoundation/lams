@@ -94,7 +94,7 @@ public class SessionListener implements HttpSessionListener {
 	// clear the authentication cache when the session is invalidated
 	HttpSession session = sessionEvent.getSession();
 	if (session != null) {
-	    SessionManager.removeSessionByID(session.getId(), false);
+	    SessionManager.removeSessionByID(session.getId(), false, true);
 
 	    UserDTO userDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
 	    if (userDTO != null) {

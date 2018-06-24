@@ -46,7 +46,6 @@ public class ScratchieUser implements Cloneable, Comparable {
     private Long portraitId;
 
     private ScratchieSession session;
-    private Scratchie scratchie;
 
     public ScratchieUser() {
     }
@@ -58,7 +57,6 @@ public class ScratchieUser implements Cloneable, Comparable {
 	this.loginName = user.getLogin();
 	this.portraitId = user.getPortraitUuid();
 	this.session = session;
-	this.scratchie = null;
 	this.sessionFinished = false;
     }
 
@@ -168,18 +166,6 @@ public class ScratchieUser implements Cloneable, Comparable {
 
     public void setSession(ScratchieSession session) {
 	this.session = session;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Scratchie getScratchie() {
-	return scratchie;
-    }
-
-    public void setScratchie(Scratchie content) {
-	this.scratchie = content;
     }
 
     /**

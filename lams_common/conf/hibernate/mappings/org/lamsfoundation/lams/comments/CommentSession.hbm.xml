@@ -44,6 +44,15 @@
             column="external_signature"
         />
 
+        <property
+            name="externalSecondaryId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="external_secondary_id"
+        />
+
+
     </class>
 
 </hibernate-mapping>

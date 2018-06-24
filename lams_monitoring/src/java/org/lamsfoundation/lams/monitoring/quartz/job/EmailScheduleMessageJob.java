@@ -23,7 +23,9 @@
 package org.lamsfoundation.lams.monitoring.quartz.job;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -66,15 +68,20 @@ public class EmailScheduleMessageJob extends MonitoringJob {
 	    HibernateSessionManager.openSession();
 	    Collection<User> users = getMonitoringService(context).getUsersByEmailNotificationSearchType(searchType,
 		    lessonId, lessonIds, activityId, xDaystoFinish, orgId);
+	    Set<Integer> recipients = new HashSet<Integer>();
 	    for (User user : users) {
 		boolean isHtmlFormat = false;
 		int userId = user.getUserId();
+		recipients.add(userId);
 		log.debug("Sending scheduled email to user [" + userId + "].");
-		eventNotificationService.sendMessage(null, userId,
-			IEventNotificationService.DELIVERY_METHOD_MAIL, monitoringService.getMessageService()
-				.getMessage("event.emailnotifications.email.subject", new Object[] {}),
-			emailBody, isHtmlFormat);
+		eventNotificationService
+			.sendMessage(null, userId, IEventNotificationService.DELIVERY_METHOD_MAIL,
+				monitoringService.getMessageService()
+					.getMessage("event.emailnotifications.email.subject", new Object[] {}),
+				emailBody, isHtmlFormat);
 	    }
+
+	    monitoringService.archiveEmailNotification(orgId, lessonId, searchType, emailBody, recipients);
 	} finally {
 	    HibernateSessionManager.closeSession();
 	}

@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -68,6 +67,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -250,7 +250,7 @@ public class MonitoringAction extends Action {
 	    DacoUser user = (DacoUser) userAndReflection[0];
 
 	    responseRow.put(DacoConstants.USER_ID, user.getUserId());
-	    responseRow.put(DacoConstants.USER_FULL_NAME, StringEscapeUtils.escapeHtml(user.getFullName()));
+	    responseRow.put(DacoConstants.USER_FULL_NAME, HtmlUtils.htmlEscape(user.getFullName()));
 
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
 		responseRow.put(DacoConstants.RECORD_COUNT, (Integer) userAndReflection[1]);
@@ -260,7 +260,7 @@ public class MonitoringAction extends Action {
 
 	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
 		responseRow.put(DacoConstants.NOTEBOOK_ENTRY,
-			StringEscapeUtils.escapeHtml((String) userAndReflection[2]));
+			HtmlUtils.htmlEscape((String) userAndReflection[2]));
 	    }
 	    if (userAndReflection.length > 3 && userAndReflection[3] != null) {
 		responseRow.put(DacoConstants.PORTRAIT_ID, (String) userAndReflection[3]);

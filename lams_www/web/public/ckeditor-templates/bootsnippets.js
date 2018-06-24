@@ -11,7 +11,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 	// The templates definitions.
 	snippets: [
 	{
-		title: 'Paragraph (full width)',
+		title: 'textParagraphFullWidth',
 		image: 'paragraph.png',
 		description: '',
 		css: '',
@@ -21,7 +21,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'</div>'
 	},
 	{
-		title: 'Paragraph and heading',
+		title: 'textParagraphAndHeading',
 		image: 'paragraph_with_heading.png',
 		description: '',
 		css: '',
@@ -32,7 +32,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'</div>'
 	},
 	{
-		title: 'Two columns',
+		title: 'textTwoColumns',
 		image: 'two_columns.png',
 		description: '',
 		css: '',
@@ -50,7 +50,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'</div>'
 	},
 	{
-		title: 'Three columns',
+		title: 'textThreeColumns',
 		image: 'three_columns.png',
 		description: '',
 		css: '',
@@ -73,7 +73,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'</div>'
 	},
 	{
-		title: 'Statement',
+		title: 'textStatement',
 		image: 'statement.png',
 		description: '',
 		css: '',
@@ -87,7 +87,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'</div>'
 	},
 	{
-		title: 'Note',
+		title: 'textNote',
 		image: 'note.png',
 		description: '',
 		css: '',
@@ -109,7 +109,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'</div>'
 	},
 	{
-		title: 'Quote (center picture) paragraph above',
+		title: 'textQuote',
 		image: 'quote_paragraph_below.png',
 		description: '',
 		css: '',
@@ -124,7 +124,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'</div>'
 	},
 	{
-		title: 'Table',
+		title: 'textTable',
 		image: 'panel_table.png',
 		description: '',
 		css: 'panel_table.css',
@@ -156,7 +156,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'</div></div></div>'
 	},
 	{
-		title: 'Panel (heading and body)',
+		title: 'textPanel',
 		image: 'panel.png',
 		html: 
 		'<script type="text/javascript" src="/lams/includes/javascript/clickable.js"></script>' +
@@ -175,7 +175,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'</div>'
 	},
 	{
-		title: 'Panel (heading, body and footer)',
+		title: 'textPanelFooter',
 		image: 'panel_footer.png',
 		html: 
 			'<script type="text/javascript" src="/lams/includes/javascript/clickable.js"></script>' +
@@ -195,7 +195,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 			'</div>'
 	},
 	{
-		title: 'Jumbotron with text',
+		title: 'textJumbotron',
 		image: 'jumbotron_with_text.png',
 		html: 
 		'	<div class="jumbotron">' +
@@ -215,7 +215,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 	// The templates definitions.
 	snippets: [ 
 	{
-		title: 'Centered image',
+		title: 'imageCenteredImage',
 		image: 'centered_image.png',
 		description: '',
 		css: '',
@@ -225,7 +225,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'</div>'
 	},
 	{
-		title: 'Image full width',
+		title: 'imageImageFullWidth',
 		image: 'image_full_width.png',
 		description: '',
 		css: '',
@@ -237,7 +237,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 	    '</div>'
 	},
 	{
-		title: 'Image and text',
+		title: 'imageImageAndText',
 		image: 'image_and_text.png',
 		description: '',
 		css: '',
@@ -254,7 +254,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'</div>'
 	},
 	{
-		title: 'Text on image',
+		title: 'imageTextOnImage',
 		image: 'text_on_image.png',
 		description: '',
 		css: '',
@@ -269,7 +269,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'</div>'
 	},
 	{
-		title: 'Image within a panel',
+		title: 'imageImageWithinPanel',
 		image: 'image_within_a_panel.png',
 		description: '',
 		css: '',
@@ -288,7 +288,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	</div>'
 	},
 	{
-		title: 'Carousel',
+		title: 'imageCarousel',
 		image: 'carousel.png',
 		description: '',
 		html: 
@@ -341,7 +341,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'</div>'
 	},
 	{
-		title: 'Two column images',
+		title: 'imageTwoColumnImages',
 		image: 'two_column_images.png',
 		description: '',
 		html: 
@@ -366,7 +366,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'</div>'
 	},
 	{
-		title: 'Three column images',
+		title: 'imageThreeColumnImages',
 		image: 'three_column_images.png',
 		description: '',
 		html: 
@@ -409,7 +409,7 @@ CKEDITOR.addSnippets( 'bootsnippets-multimedia', {
 
 	// The templates definitions.
 	snippets: [ {
-		title: 'Video',
+		title: 'multimediaVideo',
 		image: 'video.png',
 		description: '',
 		html:
@@ -423,7 +423,7 @@ CKEDITOR.addSnippets( 'bootsnippets-multimedia', {
 		'</div>'
 	},
 	{
-		title: 'Video with the side text',
+		title: 'multimediaVideoWithSideText',
 		image: 'video_side_text.png',
 		description: '',
 		css: '',
@@ -441,7 +441,7 @@ CKEDITOR.addSnippets( 'bootsnippets-multimedia', {
 		'            </div>' +
 		'        </div>'
 	},{
-		title: 'Audio',
+		title: 'multimediaAudio',
 		image: 'audio.png',
 		description: '',
 		html:
@@ -460,7 +460,7 @@ CKEDITOR.addSnippets( 'bootsnippets-advanced-layout', {
 	// The templates definitions.
 	snippets: [
 		{
-			title: 'Screen header',
+			title: 'advancedScreenHeader',
 			image: 'screen_header.png',
 			html: 
 			'<div>' +
@@ -484,7 +484,7 @@ CKEDITOR.addSnippets( 'bootsnippets-advanced-layout', {
 			'</div>'
 		},
 		{
-		title: 'Tabs',
+		title: 'advancedTabs',
 		image: 'tabs.png',
 		description: '',
 		html: 

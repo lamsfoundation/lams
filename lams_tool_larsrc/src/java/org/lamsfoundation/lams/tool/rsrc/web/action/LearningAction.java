@@ -708,11 +708,17 @@ public class LearningAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID);
+	
+	// get back sessionMap
+	String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	Long sessionId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
+	Long contentId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_CONTENT_ID);
 	IResourceService service = getResourceService();
 	ResourceItem resourceItem = service.getResourceItemByUid(itemUid);
 	if (!resourceItem.isCreateByAuthor()
 		&& user.getUserID().longValue() == resourceItem.getCreateBy().getUserId()) {
-	    service.setItemVisible(itemUid, false);
+	    service.setItemVisible(itemUid, sessionId, contentId, false);
 	    //open session Map
 	} else {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not allowed to hide this item");

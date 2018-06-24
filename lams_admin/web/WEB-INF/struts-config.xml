@@ -47,6 +47,7 @@
 	<form-property name="enableGradebookForLearners" type="java.lang.Boolean" initial="false"/>
 	<form-property name="enableSingleActivityLessons" type="java.lang.Boolean" initial="false"/>
 	<form-property name="enableLiveEdit" type="java.lang.Boolean" initial="true"/>
+	<form-property name="enableKumalive" type="java.lang.Boolean" initial="false"/>
 </form-bean>
 
 <form-bean name="UserRolesForm" type="org.apache.struts.action.DynaActionForm">
@@ -157,6 +158,21 @@
 	<form-property name="disabled" type="java.lang.Boolean" initial="0" />
 	<form-property name="loginTabActive" type="java.lang.Boolean" initial="0" />
 	<form-property name="context" type="java.lang.String" />
+</form-bean>
+
+<form-bean name="OrgPasswordChangeForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="organisationID" type="java.lang.Integer" />
+	<form-property name="orgName" type="java.lang.String" />
+	<form-property name="isStaffChange" type="java.lang.Boolean" initial="false" />
+	<form-property name="isLearnerChange" type="java.lang.Boolean" initial="false" />
+	<form-property name="includedLearners" type="java.lang.String" initial=""/>
+	<form-property name="excludedLearners" type="java.lang.String" initial="[]"/>
+	<form-property name="includedStaff" type="java.lang.String" initial=""/>
+	<form-property name="excludedStaff" type="java.lang.String" initial="[]"/>
+	<form-property name="learnerPass" type="java.lang.String" />
+	<form-property name="staffPass" type="java.lang.String" />
+	<form-property name="email" type="java.lang.Boolean" initial="false" />
+	<form-property name="force" type="java.lang.Boolean" initial="false" />
 </form-bean>
   </form-beans>
 
@@ -304,6 +320,11 @@
       <forward
         name="orglist"
         path="/orgmanage.do"
+        redirect="false"
+      />
+      <forward
+        name="deleteAllLessons"
+        path=".deleteAllLessons"
         redirect="false"
       />
     </action>
@@ -869,6 +890,27 @@
       />
     </action>
     <action
+      path="/logevent"
+      type="org.lamsfoundation.lams.admin.web.action.LogEventAction"
+      name="logevent"
+      scope="request"
+      input=".logevent"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path=".logevent"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/disabledmanage"
       type="org.lamsfoundation.lams.admin.web.action.DisabledUserManageAction"
       unknown="false"
@@ -944,7 +986,23 @@
         redirect="false"
       />
     </action>
-
+    <action
+      path="/uploadPortraits"
+      type="org.lamsfoundation.lams.admin.web.action.PortraitBatchUploadAction"
+    />
+    <action
+      path="/orgPasswordChange"
+      type="org.lamsfoundation.lams.admin.web.action.OrgPasswordChangeAction"
+      name="OrgPasswordChangeForm"
+      parameter="method"
+      scope="request"
+    >
+      <forward
+        name="display"
+        path=".orgPasswordChange"
+        redirect="false"
+      />
+    </action>
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

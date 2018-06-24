@@ -26,10 +26,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -44,6 +41,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -73,7 +71,7 @@ public class AuthoringUtil {
     }
 
     /**
-     * persisting content
+     * persisting content. 
      */
     public static McContent saveOrUpdateMcContent(IMcService mcService, HttpServletRequest request, McContent mcContent,
 	    String strToolContentID, List<McQuestionDTO> questionDTOs) {
@@ -86,7 +84,7 @@ public class AuthoringUtil {
 	String prefixAnswersWithLetters = request.getParameter("prefixAnswersWithLetters");
 	String questionsSequenced = request.getParameter("questionsSequenced");
 	String randomize = request.getParameter("randomize");
-	String displayAnswers = request.getParameter("displayAnswers");
+	String displayAnswersFeedback = request.getParameter("displayAnswersFeedback");
 	String showMarks = request.getParameter("showMarks");
 	String retries = request.getParameter("retries");
 	String reflect = request.getParameter(McAppConstants.REFLECT);
@@ -95,12 +93,14 @@ public class AuthoringUtil {
 	boolean questionsSequencedBoolean = false;
 	boolean randomizeBoolean = false;
 	boolean displayAnswersBoolean = false;
+	boolean displayFeedbackOnlyBoolean = false;
 	boolean showMarksBoolean = false;
 	boolean slnBoolean = false;
 	boolean useSelectLeaderToolOuputBoolean = false;
 	boolean prefixAnswersWithLettersBoolean = false;
 	boolean retriesBoolean = false;
 	boolean reflectBoolean = false;
+	boolean enableConfidenceLevels = WebUtil.readBooleanParam(request, "enableConfidenceLevels", false);
 
 	if ((questionsSequenced != null) && (questionsSequenced.equalsIgnoreCase("1"))) {
 	    questionsSequencedBoolean = true;
@@ -110,8 +110,14 @@ public class AuthoringUtil {
 	    randomizeBoolean = true;
 	}
 
-	if ((displayAnswers != null) && (displayAnswers.equalsIgnoreCase("1"))) {
-	    displayAnswersBoolean = true;
+	if ( displayAnswersFeedback != null) {
+	    if ( displayAnswersFeedback.equalsIgnoreCase("answers")) {
+		displayAnswersBoolean = true;
+		displayFeedbackOnlyBoolean = false;
+	    } else if ( displayAnswersFeedback.equalsIgnoreCase("feedback")) {
+		displayAnswersBoolean = false;
+		displayFeedbackOnlyBoolean = true;
+	    }
 	}
 
 	if ((showMarks != null) && (showMarks.equalsIgnoreCase("1"))) {
@@ -169,11 +175,13 @@ public class AuthoringUtil {
 	mcContent.setQuestionsSequenced(questionsSequencedBoolean);
 	mcContent.setRandomize(randomizeBoolean);
 	mcContent.setDisplayAnswers(displayAnswersBoolean);
+	mcContent.setDisplayFeedbackOnly(displayFeedbackOnlyBoolean);
 	mcContent.setShowMarks(showMarksBoolean);
 	mcContent.setRetries(retriesBoolean);
 	mcContent.setShowReport(slnBoolean);
 	mcContent.setUseSelectLeaderToolOuput(useSelectLeaderToolOuputBoolean);
 	mcContent.setPrefixAnswersWithLetters(prefixAnswersWithLettersBoolean);
+	mcContent.setEnableConfidenceLevels(enableConfidenceLevels);
 
 	mcContent.setReflect(reflectBoolean);
 	mcContent.setReflectionSubject(reflectionSubject);

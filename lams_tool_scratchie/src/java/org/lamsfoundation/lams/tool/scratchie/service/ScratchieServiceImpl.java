@@ -46,12 +46,15 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -98,9 +101,6 @@ import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -147,15 +147,13 @@ public class ScratchieServiceImpl
 
     private IGradebookService gradebookService;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
 
     private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
 
     private ScratchieOutputFactory scratchieOutputFactory;
-
-    private Scheduler scheduler;
 
     // *******************************************************************************
     // Service method
@@ -203,8 +201,12 @@ public class ScratchieServiceImpl
 
     @Override
     public ScratchieUser getUserByIDAndSession(Long userId, Long sessionId) {
-
 	return scratchieUserDao.getUserByUserIDAndSessionID(userId, sessionId);
+    }
+
+    @Override
+    public int countUsersByContentId(Long contentId) {
+	return scratchieUserDao.countUsersByContentId(contentId);
     }
 
     @Override
@@ -230,8 +232,80 @@ public class ScratchieServiceImpl
     }
 
     @Override
+    public String[] getPresetMarks(Scratchie scratchie) {
+	String presetMarks = "";
+	if (StringUtils.isNotEmpty(scratchie.getPresetMarks())) {
+	    presetMarks = scratchie.getPresetMarks();
+	} else {
+	    ScratchieConfigItem defaultPresetMarks = getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS);
+	    if (defaultPresetMarks != null) {
+		presetMarks = defaultPresetMarks.getConfigValue();
+	    }
+	}
+
+	return presetMarks.split(",");
+    }
+
+    @Override
+    public int getMaxPossibleScore(Scratchie scratchie) {
+	int itemsNumber = scratchie.getScratchieItems().size();
+
+	// calculate totalMarksPossible
+	String[] presetMarks = getPresetMarks(scratchie);
+	int maxPossibleScore = (presetMarks.length > 0) ? itemsNumber * Integer.parseInt(presetMarks[0]) : 0;
+
+	// count an extra point if such option is ON
+	if (scratchie.isExtraPoint()) {
+	    maxPossibleScore += itemsNumber;
+	}
+
+	return maxPossibleScore;
+    }
+
+    @Override
     public void deleteScratchieItem(Long uid) {
 	scratchieItemDao.removeObject(ScratchieItem.class, uid);
+    }
+
+    @Override
+    public void populateItemsWithConfidenceLevels(Long userId, Long toolSessionId, Integer confidenceLevelsActivityUiid,
+	    Collection<ScratchieItem> items) {
+	List<ConfidenceLevelDTO> confidenceLevelDtos = toolService
+		.getConfidenceLevelsByActivity(confidenceLevelsActivityUiid, userId.intValue(), toolSessionId);
+
+	//populate Scratchie items with confidence levels
+	for (ScratchieItem item : items) {
+
+	    //init answers' confidenceLevelDtos list
+	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+		LinkedList<ConfidenceLevelDTO> confidenceLevelDtosTemp = new LinkedList<ConfidenceLevelDTO>();
+		answer.setConfidenceLevelDtos(confidenceLevelDtosTemp);
+	    }
+
+	    //Assessment (similar with Scratchie) adds '\n' at the end of question, MCQ - '\r\n'
+	    String question = item.getDescription() == null ? "" : item.getDescription().replaceAll("(\\r|\\n)", "");
+
+	    //find according confidenceLevelDto
+	    for (ConfidenceLevelDTO confidenceLevelDto : confidenceLevelDtos) {
+		if (question.equals(confidenceLevelDto.getQuestion().replaceAll("(\\r|\\n)", ""))) {
+
+		    //find according answer
+		    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+			String answerText = answer.getDescription().replaceAll("(\\r|\\n)", "");
+			if (answerText.equals(confidenceLevelDto.getAnswer().replaceAll("(\\r|\\n)", ""))) {
+			    answer.getConfidenceLevelDtos().add(confidenceLevelDto);
+			}
+		    }
+
+		}
+	    }
+
+	}
+    }
+
+    @Override
+    public Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId) {
+	return toolService.getPrecedingConfidenceLevelsActivities(toolContentId);
     }
 
     @Override
@@ -265,7 +339,7 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public void launchTimeLimit(Long sessionId) throws SchedulerException {
+    public void launchTimeLimit(Long sessionId) {
 	ScratchieSession session = getScratchieSessionBySessionId(sessionId);
 	int timeLimit = session.getScratchie().getTimeLimit();
 	if (timeLimit == 0) {
@@ -279,7 +353,7 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public boolean isWaitingForLeaderToSubmit(ScratchieSession toolSession) {
+    public boolean isWaitingForLeaderToSubmitNotebook(ScratchieSession toolSession) {
 	Long toolSessionId = toolSession.getSessionId();
 	Scratchie scratchie = toolSession.getScratchie();
 	ScratchieUser groupLeader = toolSession.getGroupLeader();
@@ -291,15 +365,9 @@ public class ScratchieServiceImpl
 	    notebookEntry = getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		    ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId().intValue());
 	}
-	List<ScratchieBurningQuestion> burningQuestions = null;
-	if (scratchie.isBurningQuestionsEnabled()) {
-	    burningQuestions = getBurningQuestionsBySession(toolSessionId);
-	}
-	boolean isWaitingForLeaderToSubmitNotebook = isReflectOnActivity && (notebookEntry == null);
-	boolean isWaitingForLeaderToSubmitBurningQuestions = scratchie.isBurningQuestionsEnabled()
-		&& ((burningQuestions == null) || burningQuestions.isEmpty()) && !toolSession.isSessionFinished();
 
-	return isWaitingForLeaderToSubmitNotebook || isWaitingForLeaderToSubmitBurningQuestions;
+	// return whether it's waiting for the leader to submit notebook
+	return isReflectOnActivity && (notebookEntry == null);
     }
 
     @Override
@@ -322,8 +390,13 @@ public class ScratchieServiceImpl
 		    user.getSession().getSessionId(), false);
 
 	    // record mark change with audit service
-	    auditService.logMarkChange(ScratchieConstants.TOOL_SIGNATURE, user.getUserId(), user.getLoginName(),
-		    "" + oldMark, "" + newMark);
+	    Long toolContentId = null;
+	    if (session.getScratchie() != null) {
+		toolContentId = session.getScratchie().getContentId();
+	    }
+
+	    logEventService.logMarkChange(user.getUserId(), user.getLoginName(), toolContentId, "" + oldMark,
+		    "" + newMark);
 	}
 
     }
@@ -339,6 +412,11 @@ public class ScratchieServiceImpl
     @Override
     public ScratchieSession getScratchieSessionBySessionId(Long sessionId) {
 	return scratchieSessionDao.getSessionBySessionId(sessionId);
+    }
+
+    @Override
+    public int countSessionsByContentId(Long toolContentId) {
+	return scratchieSessionDao.getByContentId(toolContentId).size();
     }
 
     @Override
@@ -377,7 +455,7 @@ public class ScratchieServiceImpl
 	ScratchieSession session = this.getScratchieSessionBySessionId(sessionId);
 	Scratchie scratchie = session.getScratchie();
 	Set<ScratchieItem> items = scratchie.getScratchieItems();
-	String presetMarks = getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS).getConfigValue();
+	String[] presetMarks = getPresetMarks(scratchie);
 
 	// calculate mark
 	int mark = 0;
@@ -565,12 +643,18 @@ public class ScratchieServiceImpl
     }
 
     @Override
+    public ScratchieUser getUserByUserIDAndContentID(Long userId, Long contentId) {
+	return scratchieUserDao.getUserByUserIDAndContentID(userId, contentId);
+    }
+
+    @Override
     public void saveUser(ScratchieUser user) {
 	scratchieUserDao.saveObject(user);
     }
 
     @Override
-    /* If isIncludeOnlyLeaders then include the portrait ids needed for monitoring. If false then it
+    /*
+     * If isIncludeOnlyLeaders then include the portrait ids needed for monitoring. If false then it
      * is probably the export and that doesn't need portraits.
      */
     public List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders) {
@@ -712,17 +796,15 @@ public class ScratchieServiceImpl
      * @return
      */
     private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs,
-	    String presetMarks) {
-
-	String[] marksArray = presetMarks.split(",");
+	    String[] presetMarks) {
 
 	int mark = 0;
 	// add mark only if an item was unraveled
 	if (isItemUnraveled(item, userLogs)) {
 
 	    int itemAttempts = calculateItemAttempts(userLogs, item);
-	    String markStr = (itemAttempts <= marksArray.length) ? marksArray[itemAttempts - 1]
-		    : marksArray[marksArray.length - 1];
+	    String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
+		    : presetMarks[presetMarks.length - 1];
 	    mark = Integer.parseInt(markStr);
 
 	    // add extra point if needed
@@ -832,7 +914,8 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId) {
+    public List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId,
+	    boolean includeEmptyItems) {
 
 	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
@@ -856,10 +939,13 @@ public class ScratchieServiceImpl
 		}
 	    }
 
-	    BurningQuestionItemDTO burningQuestionItemDto = new BurningQuestionItemDTO();
-	    burningQuestionItemDto.setScratchieItem(item);
-	    burningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
-	    burningQuestionItemDtos.add(burningQuestionItemDto);
+	    //skip empty items if required
+	    if (!burningQuestionDtosOfSpecifiedItem.isEmpty() || includeEmptyItems) {
+		BurningQuestionItemDTO burningQuestionItemDto = new BurningQuestionItemDTO();
+		burningQuestionItemDto.setScratchieItem(item);
+		burningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
+		burningQuestionItemDtos.add(burningQuestionItemDto);
+	    }
 	}
 
 	// handle general burning question
@@ -878,7 +964,10 @@ public class ScratchieServiceImpl
 	    }
 	}
 	generalBurningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
-	burningQuestionItemDtos.add(generalBurningQuestionItemDto);
+	//skip empty item if required
+	if (!burningQuestionDtosOfSpecifiedItem.isEmpty() || includeEmptyItems) {
+	    burningQuestionItemDtos.add(generalBurningQuestionItemDto);
+	}
 
 	//escape for Javascript
 	for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
@@ -886,8 +975,8 @@ public class ScratchieServiceImpl
 		String escapedSessionName = StringEscapeUtils.escapeJavaScript(burningQuestionDto.getSessionName());
 		burningQuestionDto.setSessionName(escapedSessionName);
 
-		String escapedBurningQuestion = StringEscapeUtils.escapeJavaScript(
-			burningQuestionDto.getBurningQuestion().getQuestion().replaceAll("\\n", "<br>"));
+		String escapedBurningQuestion = StringEscapeUtils
+			.escapeJavaScript(burningQuestionDto.getBurningQuestion().getQuestion());
 		burningQuestionDto.setEscapedBurningQuestion(escapedBurningQuestion);
 	    }
 	}
@@ -1542,7 +1631,7 @@ public class ScratchieServiceImpl
 	    row[2] = new ExcelCell(getMessage("label.count"), IndexedColors.BLUE);
 	    rowList.add(row);
 
-	    List<BurningQuestionItemDTO> burningQuestionItemDtos = getBurningQuestionDtos(scratchie, null);
+	    List<BurningQuestionItemDTO> burningQuestionItemDtos = getBurningQuestionDtos(scratchie, null, true);
 	    for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
 		ScratchieItem item = burningQuestionItemDto.getScratchieItem();
 		row = new ExcelCell[1];
@@ -1609,7 +1698,7 @@ public class ScratchieServiceImpl
     private List<GroupSummary> getSummaryByTeam(Scratchie scratchie, Collection<ScratchieItem> sortedItems) {
 	List<GroupSummary> groupSummaries = new ArrayList<>();
 
-	String presetMarks = getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS).getConfigValue();
+	String[] presetMarks = getPresetMarks(scratchie);
 
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
 	for (ScratchieSession session : sessionList) {
@@ -1824,7 +1913,6 @@ public class ScratchieServiceImpl
 		user.setLastName(sysUser.getLastName());
 		user.setLoginName(sysUser.getLogin());
 		user.setUserId(new Long(newUserUid.longValue()));
-		user.setScratchie(toolContentObj);
 	    }
 
 	    scratchieDao.saveObject(toolContentObj);
@@ -1963,7 +2051,7 @@ public class ScratchieServiceImpl
 
 		scratchieUserDao.removeObject(ScratchieUser.class, user.getUid());
 
-		gradebookService.updateActivityMark(null, null, userId, session.getSessionId(), false);
+		gradebookService.removeActivityMark(userId, session.getSessionId());
 	    }
 	}
     }
@@ -2034,6 +2122,11 @@ public class ScratchieServiceImpl
     }
 
     @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
+	return null;
+    }
+
+    @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	Long userId = user.getUserId().longValue();
 
@@ -2070,8 +2163,8 @@ public class ScratchieServiceImpl
 	this.gradebookService = gradebookService;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public IUserManagementService getUserManagementService() {
@@ -2124,14 +2217,6 @@ public class ScratchieServiceImpl
 	this.scratchieOutputFactory = scratchieOutputFactory;
     }
 
-    /**
-     * @param scheduler
-     *            The scheduler to set.
-     */
-    public void setScheduler(Scheduler scheduler) {
-	this.scheduler = scheduler;
-    }
-
     @Override
     public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
 	// db doesn't have a start/finish date for learner, and session start/finish is null
@@ -2166,12 +2251,13 @@ public class ScratchieServiceImpl
 	scratchie.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
 	scratchie.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 
-	scratchie.setBurningQuestionsEnabled(JsonUtil.optBoolean(toolContentJSON, "burningQuestionsEnabled", false));
+	scratchie.setBurningQuestionsEnabled(JsonUtil.optBoolean(toolContentJSON, "burningQuestionsEnabled", true));
 	scratchie.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
 	scratchie.setExtraPoint(JsonUtil.optBoolean(toolContentJSON, "extraPoint", false));
 	scratchie.setReflectOnActivity(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	scratchie.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
+	scratchie.setShowScrachiesInResults(JsonUtil.optBoolean(toolContentJSON, "showScrachiesInResults", true));
 
 	// Scratchie Items
 	Set<ScratchieItem> newItems = new LinkedHashSet<>();

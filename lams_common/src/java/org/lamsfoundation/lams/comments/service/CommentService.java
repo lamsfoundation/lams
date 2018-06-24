@@ -35,10 +35,12 @@ import org.lamsfoundation.lams.comments.dao.ICommentDAO;
 import org.lamsfoundation.lams.comments.dao.ICommentLikeDAO;
 import org.lamsfoundation.lams.comments.dao.ICommentSessionDAO;
 import org.lamsfoundation.lams.comments.dto.CommentDTO;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  *
@@ -56,19 +58,21 @@ public class CommentService implements ICommentService {
     // Services
     private IUserManagementService userService;
     private MessageService messageService;
-    private IAuditService auditService;
+    private ILogEventService logEventService;
+    private ILamsToolService toolService;
     private ICommentSessionDAO commentSessionDAO;
     private ICommentDAO commentDAO;
     private ICommentLikeDAO commentLikeDAO;
 
     @Override
-    public List<CommentDTO> getTopicThread(Long externalId, Integer externalType, String externalSignature,
-	    Long lastCommentSeqId, Integer pageSize, Integer sortBy, String extraSortParam, Integer userId) {
+    public List<CommentDTO> getTopicThread(Long externalId, Long externalSecondaryId, Integer externalType,
+	    String externalSignature, Long lastCommentSeqId, Integer pageSize, Integer sortBy, String extraSortParam,
+	    Integer userId) {
 
 	long lastThreadMessageUid = lastCommentSeqId != null ? lastCommentSeqId.longValue() : 0L;
 
 	// hidden root of all the threads!
-	Comment rootTopic = commentDAO.getRootTopic(externalId, externalType, externalSignature);
+	Comment rootTopic = commentDAO.getRootTopic(externalId, externalSecondaryId, externalType, externalSignature);
 
 	// first time through - no root topic.
 	if (rootTopic == null) {
@@ -81,11 +85,11 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public List<CommentDTO> getTopicStickyThread(Long externalId, Integer externalType, String externalSignature,
+    public List<CommentDTO> getTopicStickyThread(Long externalId, Long externalSecondaryId, Integer externalType, String externalSignature,
 	    Integer sortBy, String extraSortParam, Integer userId) {
 
 	// hidden root of all the threads!
-	Comment rootTopic = commentDAO.getRootTopic(externalId, externalType, externalSignature);
+	Comment rootTopic = commentDAO.getRootTopic(externalId, externalSecondaryId, externalType, externalSignature);
 
 	// first time through - no root topic.
 	if (rootTopic == null) {
@@ -117,20 +121,21 @@ public class CommentService implements ICommentService {
     // Do we need to synchronize this method? Would be nice but it is the equivalent of tool session creation
     // and we don't synchonize them!
     @Override
-    public Comment createOrGetRoot(Long externalId, Integer externalIdType, String externalSignature, User user) {
-	Comment rootComment = commentDAO.getRootTopic(externalId, externalIdType, externalSignature);
-	return (rootComment != null ? rootComment : createRoot(externalId, externalIdType, externalSignature, user));
+    public Comment createOrGetRoot(Long externalId, Long externalSecondaryId, Integer externalIdType, String externalSignature, User user) {
+	Comment rootComment = commentDAO.getRootTopic(externalId, externalSecondaryId, externalIdType, externalSignature);
+	return (rootComment != null ? rootComment : createRoot(externalId, externalSecondaryId, externalIdType, externalSignature, user));
     }
 
     @Override
-    public Comment getRoot(Long externalId, Integer externalIdType, String externalSignature) {
-	return commentDAO.getRootTopic(externalId, externalIdType, externalSignature);
+    public Comment getRoot(Long externalId, Long externalSecondaryId, Integer externalIdType, String externalSignature) {
+	return commentDAO.getRootTopic(externalId, externalSecondaryId, externalIdType, externalSignature);
     }
 
-    private Comment createRoot(Long externalId, Integer externalIdType, String externalSignature, User user) {
+    private Comment createRoot(Long externalId, Long externalSecondaryId, Integer externalIdType, String externalSignature, User user) {
 
 	CommentSession session = new CommentSession();
 	session.setExternalId(externalId);
+	session.setExternalSecondaryId(externalSecondaryId);
 	session.setExternalIdType(externalIdType);
 	session.setExternalSignature(externalSignature);
 
@@ -150,13 +155,14 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public Comment createReply(Comment parent, String replyText, User user, boolean isMonitor) {
+    public Comment createReply(Comment parent, String replyText, User user, boolean isMonitor, boolean isAnonymous) {
 
 	Comment replyMessage = new Comment();
 	replyMessage.setBody(replyText);
 	replyMessage.setHideFlag(false);
 	replyMessage.updateModificationData(user);
 	replyMessage.setMonitor(isMonitor);
+	replyMessage.setAnonymous(isAnonymous);
 
 	replyMessage.setParent(parent);
 	replyMessage.setSession(parent.getSession());
@@ -199,34 +205,52 @@ public class CommentService implements ICommentService {
 	Comment comment = commentDAO.getById(commentUid);
 	comment.setHideFlag(status);
 	commentDAO.saveOrUpdate(comment);
+
+	Long learnerUserId = 0L;
+	String loginName = "Default";
+	if (comment.getCreatedBy() != null) {
+	    learnerUserId = comment.getCreatedBy().getUserId().longValue();
+	    loginName = comment.getCreatedBy().getLogin();
+	}
+	Long toolContentId = getToolContentIdForAuditing(commentUid, comment);
+	if ( status )
+	    getLogEventService().logHideLearnerContent(learnerUserId, loginName, toolContentId, comment.toString());
+	else
+	    getLogEventService().logShowLearnerContent(learnerUserId, loginName, toolContentId, comment.toString());
+	    
 	return comment;
     }
 
     @Override
-    public Comment createReply(Long parentId, String replyText, User user, boolean isMonitor) {
+    public Comment createReply(Long parentId, String replyText, User user, boolean isMonitor, boolean isAnonymous) {
 
 	Comment parent = commentDAO.getById(parentId);
-	return (createReply(parent, replyText, user, isMonitor));
+	return (createReply(parent, replyText, user, isMonitor, isAnonymous));
 
     }
 
     @Override
-    public Comment updateComment(Long commentUid, String newBody, User user, boolean makeAuditEntry) {
+    // if isAnonymous is null, do not update the field.
+    public Comment updateComment(Long commentUid, String newBody, User user, Boolean isAnonymous, boolean makeAuditEntry) {
 	Comment comment = commentDAO.getById(commentUid);
 
 	if (comment != null && user != null) {
 	    if (makeAuditEntry) {
-		Long userId = 0L;
+		Long learnerUserId = 0L;
 		String loginName = "Default";
 		if (comment.getCreatedBy() != null) {
-		    userId = comment.getCreatedBy().getUserId().longValue();
+		    learnerUserId = comment.getCreatedBy().getUserId().longValue();
 		    loginName = comment.getCreatedBy().getLogin();
 		}
-		getAuditService().logChange(MODULE_NAME, userId, loginName, comment.getBody(), newBody);
+		Long toolContentId = getToolContentIdForAuditing(commentUid, comment);
+		getLogEventService().logChangeLearnerContent(learnerUserId, loginName, toolContentId, comment.getBody(),
+			newBody);
 	    }
 
 	    comment.setBody(newBody);
 	    comment.updateModificationData(user);
+	    if ( isAnonymous != null )
+		comment.setAnonymous(isAnonymous);
 	    commentDAO.saveOrUpdate(comment);
 
 	    return comment;
@@ -235,6 +259,27 @@ public class CommentService implements ICommentService {
 		    + " new body " + newBody + " user " + (user != null ? user.getLogin() : " missing"));
 	    return null;
 	}
+    }
+
+    private Long getToolContentIdForAuditing(Long commentUid, Comment comment) {
+	Long toolContentId = null;
+	String externalSignature = comment.getSession().getExternalSignature();
+	if (externalSignature != null) {
+	    Long externalId = comment.getSession().getExternalId(); // current this is toolSessionId
+	    ToolSession session = getToolService().getToolSession(externalId);
+	    if (session != null
+		    && externalSignature.equals(session.getToolActivity().getTool().getToolSignature())) {
+		// consistent session id and tool signature so we should be safe. If this fails we have something
+		// else but a tool using the comment module
+		toolContentId = session.getToolActivity().getToolContentId();
+	    }
+	}
+	if (toolContentId == null) {
+	    log.error(
+		    "Unexpected data for comment. Will create incomplete audit entry - cannot determine toolContentId. CommentUid="
+			    + commentUid);
+	}
+	return toolContentId;
     }
 
     @Override
@@ -275,12 +320,20 @@ public class CommentService implements ICommentService {
 	this.messageService = messageService;
     }
 
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
+    }
+
+    public ILamsToolService getToolService() {
+        return toolService;
+    }
+
+    public void setToolService(ILamsToolService toolService) {
+        this.toolService = toolService;
     }
 
     public ICommentSessionDAO getCommentSessionDAO() {

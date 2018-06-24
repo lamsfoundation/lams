@@ -35,12 +35,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:choose>
 	<c:when test="${not empty GateForm.map.reachDate}">
 		<p>
-			<fmt:message key="label.schedule.gate.reach" />
+			<fmt:message key="label.schedule.gate.reach" />&nbsp;
 			<strong><lams:Date value="${GateForm.map.reachDate}" /></strong>
-			<br />
-			<fmt:message key="label.schedule.gate.offset.1" />
-			<span id="offset"></span>
-			<fmt:message key="label.schedule.gate.offset.2" />
 		</p>
 	</c:when>
 	<c:otherwise>
@@ -61,6 +57,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   <script type="text/javascript">
     jQuery(document).ready(function() {
     	jQuery.timeago.settings.allowFuture = true;
-      jQuery("time.timeago").timeago();
+    	jQuery("time.timeago").timeago();
     });
   </script>

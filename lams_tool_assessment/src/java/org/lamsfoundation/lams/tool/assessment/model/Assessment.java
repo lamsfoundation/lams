@@ -71,11 +71,15 @@ public class Assessment implements Cloneable {
 
     private boolean allowOverallFeedbackAfterQuestion;
 
+    private boolean allowDiscloseAnswers;
+
     private boolean allowRightAnswersAfterQuestion;
 
     private boolean allowWrongAnswersAfterQuestion;
 
     private boolean allowGradesAfterAttempt;
+
+    private boolean enableConfidenceLevels;
 
     private boolean allowHistoryResponses;
 
@@ -232,17 +236,18 @@ public class Assessment implements Cloneable {
 	}
 	this.setUpdated(new Date(now));
     }
-    
+
     /**
-     * Checks whether content was modified in monitor and this has happened after attempt was started (and thus this modification can potentially affect attempt results).
-     * 
+     * Checks whether content was modified in monitor and this has happened after attempt was started (and thus this
+     * modification can potentially affect attempt results).
+     *
      * @param attemptStartingDate
      * @return
      */
     public boolean isContentModifiedInMonitor(Date attemptStartingDate) {
 	return (updated != null) && updated.after(attemptStartingDate);
     }
-    
+
     /**
      * @return true if there is at least one random question reference, false otherwise
      */
@@ -490,6 +495,14 @@ public class Assessment implements Cloneable {
 	this.allowOverallFeedbackAfterQuestion = allowOverallFeedbackAfterQuestion;
     }
 
+    public boolean isAllowDiscloseAnswers() {
+	return allowDiscloseAnswers;
+    }
+
+    public void setAllowDiscloseAnswers(boolean tblReleaseAnswers) {
+	this.allowDiscloseAnswers = tblReleaseAnswers;
+    }
+
     /**
      *
      * @return
@@ -524,6 +537,18 @@ public class Assessment implements Cloneable {
 
     public void setAllowGradesAfterAttempt(boolean allowGradesAfterAttempt) {
 	this.allowGradesAfterAttempt = allowGradesAfterAttempt;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isEnableConfidenceLevels() {
+	return enableConfidenceLevels;
+    }
+
+    public void setEnableConfidenceLevels(boolean enableConfidenceLevels) {
+	this.enableConfidenceLevels = enableConfidenceLevels;
     }
 
     /**

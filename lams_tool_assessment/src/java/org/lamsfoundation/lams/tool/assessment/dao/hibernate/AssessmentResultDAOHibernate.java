@@ -26,16 +26,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
+import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements AssessmentResultDAO {
 
     private static final String FIND_LAST_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
+	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND r.latest=1";
+    
+    private static final String FIND_WHETHER_LAST_RESULT_FINISHED = "SELECT (r.finishDate IS NOT NULL) FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND r.latest=1";
 
     private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
@@ -118,6 +125,16 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	q.setParameter(1, assessmentUid);
 	return (AssessmentResult) q.uniqueResult();
     }
+    
+    @Override
+    public Boolean isLastAttemptFinishedByUser(AssessmentUser user) {
+	Assessment assessment = user.getAssessment() == null ? user.getSession().getAssessment() : user.getAssessment();
+	
+	Query q = getSession().createQuery(FIND_WHETHER_LAST_RESULT_FINISHED);
+	q.setParameter(0, user.getUserId());
+	q.setParameter(1, assessment.getUid());
+	return (Boolean) q.uniqueResult();
+    }
 
     @Override
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
@@ -171,12 +188,16 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     @Override
     public List<AssessmentUserDTO> getFirstTotalScoresByContentId(Long toolContentId) {
-	final String FIRST_SCORES_BY_CONTENT_ID = "SELECT res.user.userId, res.grade FROM " + AssessmentResult.class.getName()
-		+ " AS res WHERE res.startDate = ( SELECT MIN(resMax.startDate) FROM "
-		+ AssessmentResult.class.getName()
-		+ " AS resMax WHERE resMax.user.userId = res.user.userId AND resMax.assessment.contentId=? AND (resMax.finishDate != null) )";
+	final String FIRST_SCORES_BY_CONTENT_ID = "SELECT user.user_id, res.grade "
+		+ "FROM tl_laasse10_assessment_result AS res "
+		+ "JOIN tl_laasse10_user AS user ON res.user_uid = user.uid "
+		+ "JOIN tl_laasse10_assessment AS assess ON res.assessment_uid = assess.uid AND assess.content_id = :contentId "
+		+ "INNER JOIN (SELECT user_uid, MIN(start_date) AS startDate FROM tl_laasse10_assessment_result WHERE finish_date IS NOT NULL GROUP BY user_uid) firstRes "
+		+ "ON (res.user_uid = firstRes.user_uid AND res.start_date = firstRes.startDate) GROUP BY res.user_uid";
 
-	List<Object[]> list = (List<Object[]>) doFind(FIRST_SCORES_BY_CONTENT_ID, new Object[] { toolContentId });
+	SQLQuery query = getSession().createSQLQuery(FIRST_SCORES_BY_CONTENT_ID);
+	query.setLong("contentId", toolContentId);
+	List<Object[]> list = query.list();
 	return convertResultsToAssessmentUserDTOList(list);
     }
 
@@ -218,6 +239,22 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     public List<AssessmentResult> getLastFinishedAssessmentResults(Long contentId) {
 	return (List<AssessmentResult>) doFind(FIND_LAST_FINISHED_RESULTS_BY_CONTENT_ID, new Object[] { contentId });
     }
+    
+    @Override
+    public List<Object[]> getLastFinishedAssessmentResultsBySession(Long sessionId) {
+	final String FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID = "SELECT r, u.portraitUuid FROM " + AssessmentResult.class.getName()
+		+ " AS r, " + User.class.getName() + " as u WHERE r.sessionId=? AND (r.finishDate != null) AND r.latest=1 AND u.userId=r.user.userId";
+	
+	return (List<Object[]>) doFind(FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID, new Object[] { sessionId });
+    }
+    
+    @Override
+    public List<Object[]> getLeadersLastFinishedAssessmentResults(Long contentId) {
+	final String FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID = "SELECT r, u.portraitUuid FROM " + AssessmentResult.class.getName()
+		+ " AS r, " + User.class.getName() + " as u WHERE r.user=r.user.session.groupLeader AND r.assessment.contentId=? AND (r.finishDate != null) AND r.latest=1 AND u.userId=r.user.userId";
+	
+	return (List<Object[]>) doFind(FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID, new Object[] { contentId });
+    }
 
     @Override
     public int getAssessmentResultCount(Long assessmentUid, Long userId) {
@@ -236,6 +273,23 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	    return null;
 	}
 	return (AssessmentResult) list.get(0);
+    }
+    
+    @Override
+    public int countAttemptsPerOption(Long optionUid) {
+	String COUNT_ATTEMPTS_BY_OPTION_UID = "SELECT count(*) "
+		+ "FROM tl_laasse10_assessment_result AS result "
+		+ "JOIN tl_laasse10_question_result AS questionResult ON result.uid = questionResult.result_uid "
+		+ "JOIN tl_laasse10_option_answer AS optionAnswer ON questionResult.uid = optionAnswer.question_result_uid AND optionAnswer.answer_boolean=1 AND optionAnswer.question_option_uid = :optionUid "
+		+ "WHERE (result.finish_date IS NOT NULL) AND result.latest=1";
+
+	SQLQuery query = getSession().createSQLQuery(COUNT_ATTEMPTS_BY_OPTION_UID);
+	query.setLong("optionUid", optionUid);
+	List list = query.list();
+	if (list == null || list.size() == 0) {
+	    return 0;
+	}
+	return ((Number) list.get(0)).intValue();
     }
 
     private List<AssessmentUserDTO> convertResultsToAssessmentUserDTOList(List<Object[]> list) {

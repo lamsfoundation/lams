@@ -21,10 +21,11 @@
 	</lams:CKEditor>
 </div>
 
-<center id="center12">
-<div id="flashContent">
-	<lams:Alert type="warn" close="false">
-				<fmt:message>message.enableFlashAuthorMonitor</fmt:message>
-	</lams:Alert>
-</div>
-</center>
+<%-- Page is reloaded after save and then disappears. Do not want to try to render the mindmap. --%>
+<c:if test="${not empty mindmapId}">
+	<c:set var="multiMode">false</c:set>
+	<c:set var="contentEditable">true</c:set>
+	<c:set var="url">author</c:set>			
+	<c:set var="mindmapId">${mindmapId}</c:set>
+	<%@ include file="/common/mapjs.jsp"%>
+</c:if>

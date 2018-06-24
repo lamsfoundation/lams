@@ -36,7 +36,7 @@ public class McAuthoringForm extends McLearningForm  {
     protected String useSelectLeaderToolOuput;
     protected String prefixAnswersWithLetters;
     protected String randomize;
-    protected String displayAnswers;
+    protected String displayAnswersFeedback;
 
     protected String submitAllContent;
 
@@ -55,6 +55,8 @@ public class McAuthoringForm extends McLearningForm  {
     protected String sln;
 
     protected String passmark;
+    
+    protected boolean enableConfidenceLevels;
 
     protected String questionsSequenced;
 
@@ -198,6 +200,14 @@ public class McAuthoringForm extends McLearningForm  {
      */
     public void setPassmark(String passmark) {
 	this.passmark = passmark;
+    }
+    
+    public boolean isEnableConfidenceLevels() {
+ 	return enableConfidenceLevels;
+    }
+
+    public void setEnableConfidenceLevels(boolean enableConfidenceLevels) {
+ 	this.enableConfidenceLevels = enableConfidenceLevels;
     }
 
     /**
@@ -361,16 +371,16 @@ public class McAuthoringForm extends McLearningForm  {
     /**
      * @return Returns the displayAnswers.
      */
-    public String getDisplayAnswers() {
-	return displayAnswers;
+    public String getDisplayAnswersFeedback() {
+	return displayAnswersFeedback;
     }
 
     /**
      * @param displayAnswers
      *            The displayAnswers to set.
      */
-    public void setDisplayAnswers(String displayAnswers) {
-	this.displayAnswers = displayAnswers;
+    public void setDisplayAnswersFeedback(String displayAnswersFeedback) {
+	this.displayAnswersFeedback = displayAnswersFeedback;
     }
 
 }

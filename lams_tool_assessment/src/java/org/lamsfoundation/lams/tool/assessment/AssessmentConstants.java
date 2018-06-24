@@ -134,6 +134,8 @@ public class AssessmentConstants {
     public static final String ATTR_OPTION_QUESTION_PREFIX = "optionQuestion";
 
     public static final String ATTR_QUESTION_PREFIX = "question";
+    
+    public static final String ATTR_CONFIDENCE_LEVEL_PREFIX = "confidenceLevel";
 
     public static final String ATTR_QUESTION_TYPE = "questionType";
 

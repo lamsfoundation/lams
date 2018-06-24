@@ -73,14 +73,33 @@
 	<input type="hidden" id="sessionMapID" name="sessionMapID" value="${sessionMapID}"/>
 	<input type="hidden" id="commentUid" name="commentUid" value="${commentUid}"/>
 	
-	<div class="right-buttons voffset5">
-		<a href="#nogo" onclick="javascript:editCommentSubmit();" class="btn btn-xs btn-primary pull-right" id="editCommentSubmitButton">
-			<fmt:message key="label.post" />
-		</a>&nbsp;
-		<a href="#nogo" onclick="javascript:cancelEdit();" class="btn btn-xs btn-primary pull-right roffset5">
-			<fmt:message key="label.cancel" />
-		</a>
+	<div class="row voffset5">
+	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+
+ 	<c:choose>
+ 	<c:when test="${sessionMap.anonymous}">
+ 	<%-- Post Anonymously? --%>
+	<div class="col-xs-12 col-sm-6">
+		<c:set var="anonymousCheckboxChecked" value="${comment.comment.anonymous}"/>
+		<c:set var="anonymousCheckboxName" value="commentAnonymousEdit"/>
+		<%@include file="anonymouscheckbox.jsp" %>
+ 	</div>
+
+	<%-- Cancel / Edit Buttons --%>
+	<div class="col-xs-12 col-sm-6">
+	</c:when>
+	<c:otherwise>
+	<div class="col-xs-12">
+	</c:otherwise>
+	</c:choose>
+	<a href="#nogo" onclick="javascript:editCommentSubmit();" class="btn btn-xs btn-primary pull-right" id="editCommentSubmitButton">
+		<fmt:message key="label.post" />
+	</a>&nbsp;
+	<a href="#nogo" onclick="javascript:cancelEdit();" class="btn btn-xs btn-primary pull-right roffset5">
+		<fmt:message key="label.cancel" />
+	</a>
 	</div>
+
 </form>
 </div>
 

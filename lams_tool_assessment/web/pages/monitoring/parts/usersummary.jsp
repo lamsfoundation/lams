@@ -8,18 +8,13 @@
 		<%@ include file="/common/header.jsp"%>		
 		
 		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
-		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
-		<style media="screen,projection" type="text/css">
-			.ui-jqgrid tr.jqgrow td {
-			    white-space: normal !important;
-			    height:auto;
-			    vertical-align:text-top;
-			    padding-top:2px;
-			}
-		</style>
+		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet">
+		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
+		<link type="text/css" href="<html:rewrite page='/includes/css/monitoring.css'/>" rel="stylesheet">	
 
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
   	    <script>
 	    	var isEdited = false;
   	    	var previousCellValue = "";  	    	
@@ -34,18 +29,26 @@
 	  					autowidth: true,
 	  					shrinkToFit: false,
 	  					
-	  				   	colNames:["<fmt:message key="label.monitoring.user.summary.attempt" />",
-	  							'questionResultUid',
-	  							"<fmt:message key="label.monitoring.user.summary.time" />",
-	  							"<fmt:message key="label.monitoring.user.summary.response" />",
-	  						    "<fmt:message key="label.monitoring.user.summary.grade" />"],
+	  				   	colNames:[
+		  				   	"<fmt:message key="label.monitoring.user.summary.attempt" />",
+	  						'questionResultUid',
+	  						"<fmt:message key="label.monitoring.user.summary.time" />",
+	  						"<fmt:message key="label.monitoring.user.summary.response" />",
+	  						<c:if test="${assessment.enableConfidenceLevels}">
+	  							"<fmt:message key="label.confidence" />",
+	  						</c:if>
+	  						"<fmt:message key="label.monitoring.user.summary.grade" />"
+	  					],
 	  						    
 	  				   	colModel:[
 	  				   		{name:'id', index:'id', width:52, sorttype:"int"},
 	  				   		{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 	  				   		{name:'time', index:'time', width:150, sorttype:'date', datefmt:'Y-m-d'},
 	  				   		{name:'response', index:'response', width:341, sortable:false},
-	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }		
+	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
+			  			  	</c:if>
+	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' }		
 	  				   	],
 	  				   	
 	  				   	multiselect: false,
@@ -104,6 +107,9 @@
 	  	   	   	   			questionResultUid:"${questionResult.uid}",
 	  	   	   	   			time:"${questionResult.finishDate}",
 	  	   	   	   			response:responseStr,
+		  	   	   	   		<c:if test="${assessment.enableConfidenceLevels}">
+		  	 	   	   			confidence:"${questionResult.confidenceLevel}",
+		  	 	   	   		</c:if>
 	  	   	   	   			grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
 	  	   	   	   	    });
 	  	   	     		

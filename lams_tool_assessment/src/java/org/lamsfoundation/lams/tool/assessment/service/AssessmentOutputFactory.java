@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.util.ArrayList;
@@ -71,16 +70,22 @@ public class AssessmentOutputFactory extends OutputFactory {
 	    ;
 	    definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE, new Long(0),
 		    totalMarksPossible, true);
+	    definition.setWeightable(true);
 	    definitionMap.put(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE, definition);
 
 	    definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_BEST_SCORE, new Long(0),
 		    totalMarksPossible, false);
+	    definition.setWeightable(true);
 	    definitionMap.put(AssessmentConstants.OUTPUT_NAME_BEST_SCORE, definition);
+
 	    definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_FIRST_SCORE, new Long(0),
 		    totalMarksPossible, false);
+	    definition.setWeightable(true);
 	    definitionMap.put(AssessmentConstants.OUTPUT_NAME_FIRST_SCORE, definition);
+
 	    definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_AVERAGE_SCORE, new Long(0),
 		    totalMarksPossible, false);
+	    definition.setWeightable(true);
 	    definitionMap.put(AssessmentConstants.OUTPUT_NAME_AVERAGE_SCORE, definition);
 
 	    int randomQuestionsCount = 1;
@@ -114,7 +119,7 @@ public class AssessmentOutputFactory extends OutputFactory {
 
 	TreeMap<String, ToolOutput> output = new TreeMap<String, ToolOutput>();
 
-	AssessmentSession session = assessmentService.getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentSession session = assessmentService.getSessionBySessionId(toolSessionId);
 	if ((session != null) && (session.getAssessment() != null)) {
 	    Assessment assessment = session.getAssessment();
 
@@ -157,29 +162,29 @@ public class AssessmentOutputFactory extends OutputFactory {
     public ToolOutput getToolOutput(String name, IAssessmentService assessmentService, Long toolSessionId,
 	    Long learnerId) {
 	if (name != null) {
-	    AssessmentSession session = assessmentService.getAssessmentSessionBySessionId(toolSessionId);
+	    AssessmentSession session = assessmentService.getSessionBySessionId(toolSessionId);
 
 	    if ((session != null) && (session.getAssessment() != null)) {
 		Assessment assessment = session.getAssessment();
 
 		if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE)) {
 		    return getLastTotalScore(assessmentService, learnerId, assessment);
-		    
+
 		} else if (name.equals(AssessmentConstants.OUTPUT_NAME_BEST_SCORE)) {
 		    return getBestTotalScore(assessmentService, toolSessionId, learnerId);
-		    
+
 		} else if (name.equals(AssessmentConstants.OUTPUT_NAME_FIRST_SCORE)) {
 		    return getFirstTotalScore(assessmentService, toolSessionId, learnerId);
-		    
+
 		} else if (name.equals(AssessmentConstants.OUTPUT_NAME_AVERAGE_SCORE)) {
 		    return getAverageTotalScore(assessmentService, toolSessionId, learnerId);
-		    
+
 		} else if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN)) {
 		    return getTimeTaken(assessmentService, learnerId, assessment);
-		    
+
 		} else if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS)) {
 		    return getNumberAttempts(assessmentService, learnerId, assessment);
-		    
+
 		} else {
 		    Set<AssessmentQuestion> questions = assessment.getQuestions();
 		    for (AssessmentQuestion question : questions) {
@@ -192,32 +197,32 @@ public class AssessmentOutputFactory extends OutputFactory {
 	}
 	return null;
     }
-    
+
     public List<ToolOutput> getToolOutputs(String name, IAssessmentService assessmentService, Long toolContentId) {
 	if ((name != null) && (toolContentId != null)) {
 
 	    if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE)) {
 		List<AssessmentUserDTO> results = assessmentService.getLastTotalScoresByContentId(toolContentId);
 		return convertToToolOutputs(results);
-		
+
 	    } else if (name.equals(AssessmentConstants.OUTPUT_NAME_BEST_SCORE)) {
 		List<AssessmentUserDTO> results = assessmentService.getBestTotalScoresByContentId(toolContentId);
 		return convertToToolOutputs(results);
-		
+
 	    } else if (name.equals(AssessmentConstants.OUTPUT_NAME_FIRST_SCORE)) {
 		List<AssessmentUserDTO> results = assessmentService.getFirstTotalScoresByContentId(toolContentId);
 		return convertToToolOutputs(results);
-		
+
 	    } else if (name.equals(AssessmentConstants.OUTPUT_NAME_AVERAGE_SCORE)) {
 		List<AssessmentUserDTO> results = assessmentService.getAverageTotalScoresByContentId(toolContentId);
 		return convertToToolOutputs(results);
-		
+
 	    } else if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN)) {
 		return null;
-		
+
 	    } else if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS)) {
 		return null;
-		
+
 	    } else {
 		Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 		Set<AssessmentQuestion> questions = assessment.getQuestions();
@@ -230,7 +235,7 @@ public class AssessmentOutputFactory extends OutputFactory {
 	}
 	return null;
     }
-    
+
     /**
      * Simply converts List<AssessmentUserDTO> to List<ToolOutput>.
      * 
@@ -241,7 +246,7 @@ public class AssessmentOutputFactory extends OutputFactory {
 	List<ToolOutput> toolOutputs = new ArrayList<ToolOutput>();
 	for (AssessmentUserDTO result : results) {
 	    float totalScore = result.getGrade();
-	    
+
 	    ToolOutput toolOutput = new ToolOutput(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE,
 		    getI18NText(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE, true), totalScore);
 	    toolOutput.setUserId(result.getUserId().intValue());

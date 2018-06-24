@@ -44,7 +44,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -83,6 +82,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -310,7 +310,7 @@ public class MonitoringAction extends Action {
 
 	    responseRow.put(ForumConstants.ATTR_USER_UID, user.getUid());
 	    responseRow.put(ForumConstants.ATTR_USER_ID, user.getUserId());
-	    responseRow.put("userName", StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+	    responseRow.put("userName", HtmlUtils.htmlEscape(user.getLastName() + " " + user.getFirstName()));
 
 	    int numberOfPosts = 0;
 	    boolean isAnyPostsMarked = false;
@@ -339,7 +339,7 @@ public class MonitoringAction extends Action {
 	    responseRow.put("numberOfPosts", numberOfPosts);
 
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
-		responseRow.put("notebookEntry", StringEscapeUtils.escapeHtml((String) userAndReflection[1]));
+		responseRow.put("notebookEntry", HtmlUtils.htmlEscape((String) userAndReflection[1]));
 	    }
 
 	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {

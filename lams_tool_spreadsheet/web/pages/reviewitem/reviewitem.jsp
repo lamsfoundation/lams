@@ -14,7 +14,7 @@
 		<c:set var="title"><fmt:message key="label.reviewitem.title" /></c:set>
 		<lams:Page type="learner" title="${title}">
 			
-			<p><fmt:message key="label.reviewitem.spreadsheet.sent.by" />&nbsp;<strong>${userName}</strong></p>
+			<p><fmt:message key="label.reviewitem.spreadsheet.sent.by" />&nbsp;<strong><c:out value="${userName}" escapeXml="true"/></strong></p>
 			<c:choose>
 				<c:when test="${code == null}">
 					<lams:Alert type="info" id="no-spreadsheet" close="false">

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
+﻿﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null,
 // DIV container for lesson SVG
@@ -34,6 +34,7 @@ var originalSequenceCanvas = null,
 // popup window size
 	popupWidth = 1280,
 	popupHeight = 720;
+
 
 
 //********** LESSON TAB FUNCTIONS **********
@@ -97,11 +98,15 @@ function initLessonTab(){
 	$('#scheduleDatetimeField').datetimepicker({
 		'minDate' : 0
 	});
+	// sets up calendar for schedule date choice
+	$('#disableDatetimeField').datetimepicker({
+		'minDate' : 0
+	});
 	
 	// sets up dialog for editing class
 	var classDialog = showDialog('classDialog',{
 		'autoOpen'  : false,
-		'width'     : 510,
+		'width'     : 950,
 		'title' 	: LABELS.LESSON_EDIT_CLASS,
 		'resizable' : true,
 		'open'      : function(){
@@ -165,6 +170,28 @@ function initLessonTab(){
 	//initialize datetimepicker
 	$("#emaildatePicker").datetimepicker();
 
+	// sets gradebook on complete functionality
+	$('#gradebookOnCompleteButton').click(function(){
+		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
+		$.ajax({
+			url : LAMS_URL + 'monitoring/monitoring.do',
+			cache : false,
+			data : {
+				'method'    : 'gradebookOnComplete',
+				'gradebookOnComplete' : checked,
+				'lessonID'      : lessonId
+			},
+			success : function() {
+				if (checked) {
+					alert(LABELS.LESSON_ACTIVITY_SCORES_ENABLE_ALERT);
+				} else {
+					alert(LABELS.LESSON_ACTIVITY_SCORES_DISABLE_ALERT);
+				}
+			}
+		});
+	});
+	
+
 }
 
 /**
@@ -182,10 +209,36 @@ function showLessonLearnersDialog() {
 	showLearnerGroupDialog(ajaxProperties, LABELS.LESSON_GROUP_DIALOG_CLASS, true, false, false, true);
 }
 
+/** 
+ * Lesson state field changed but the apply button not yet pressed
+ */
+function lessonStateFieldChanged() {
+
+	//state chosen in the dropdown menu
+	var state = +$('#lessonStateField').val();
+	switch (state) {
+		//'disable' is chosen
+		case 4: 
+			$('#lessonScheduler').show();
+			$('#lessonStartApply').hide();
+			$('#lessonStateApply').hide();
+			$("#scheduleDisableLessonButton").html(LABELS.SCHEDULE);
+			$("#scheduleDisableLessonButton").css('display', 'inline'); // must be inline or it will be wrong size
+			$("#disableLessonButton").show();
+			$('#lessonDisableApply').show();
+			break;
+		default:
+			$('#lessonDisableApply').hide();
+			$('#lessonStateApply').show();		
+			break;
+	}
+}
+
 /**
- * Changes lesson state and updates widgets.
+ * Apply the lesson state change and update widgets.
  */
 function changeLessonState(){
+	
 	var method = null;
 	
 	//state chosen in the dropdown menu
@@ -204,11 +257,10 @@ function changeLessonState(){
 			}
 			break;
 			
-		//'disable' is chosen
-		case 4: 
-			method = "suspendLesson";
-			break;
 			
+		//'disable' is handled by scheduleDisableLesson, disableLesson
+		// case 4:
+
 		//'archive' is chosen
 		case 6: 
 			method = "archiveLesson";
@@ -225,25 +277,53 @@ function changeLessonState(){
 	}
 	
 	if (method) {
-		$.ajax({
-			url : LAMS_URL + 'monitoring/monitoring.do',
-			cache : false,
-			data : {
-				'method'    : method,
-				'lessonID'  : lessonId
-			},
-			success : function() {
-				if (state == 7) {
-					// user chose to finish the lesson, close monitoring and refresh the lesson list
-					closeMonitorLessonDialog(true);
-				} else {
-					refreshMonitor('lesson');
-				}
-			}
-		});
+		applyStateChange(state, method)
 	}
 }
 
+function scheduleDisableLesson() {
+	var date = $('#disableDatetimeField').val();
+	if (date) {
+		if ( checkScheduleDate(lessonStartDate, date) ) {
+			applyStateChange(4, "suspendLesson", date);
+		} else {
+			alert(LABELS.LESSON_ERROR_START_END_DATE);
+		}
+	} else {
+		alert(LABELS.LESSON_ERROR_SCHEDULE_DATE);
+	}
+}			
+
+function disableLesson() {
+	applyStateChange(4, "suspendLesson");
+}			
+
+function applyStateChange(state, method, newLessonEndDate) {
+	var params = {
+			'method'    : method,
+			'lessonID'  : lessonId,
+		};
+	if ( newLessonEndDate ) {
+		params.lessonEndDate = newLessonEndDate;
+	}
+	
+	$.ajax({
+		url : LAMS_URL + 'monitoring/monitoring.do',
+		cache : false,
+		data : params,
+		success : function() {
+			if (state == 7) {
+				// user chose to finish the lesson, close monitoring and refresh the lesson list
+				closeMonitorLessonDialog(true);
+			} else {
+				refreshMonitor('lesson');
+			}
+			if ( state == 4 ) {
+				lessonEndDate = newLessonEndDate;
+			} 	
+		}
+	});
+}
 
 /**
  * Updates widgets in lesson tab according to response sent to refreshMonitor()
@@ -301,7 +381,9 @@ function updateLessonTab(){
 			selectField.children('option:not([value="-1"])').remove();
 			switch (lessonStateId) {
 				case 3:
-					$('<option />').attr('value', 4).text(LABELS.LESSON_STATE_ACTION_DISABLE).appendTo(selectField);
+					if ( ! ( lessonEndDate && lessonEndDate > "") ) {
+						$('<option />').attr('value', 4).text(LABELS.LESSON_STATE_ACTION_DISABLE).appendTo(selectField);
+					}
 					$('<option />').attr('value', 6).text(LABELS.LESSON_STATE_ACTION_ARCHIVE).appendTo(selectField);
 					$('<option />').attr('value', 7).text(LABELS.LESSON_STATE_ACTION_REMOVE).appendTo(selectField);
 					break;
@@ -319,29 +401,53 @@ function updateLessonTab(){
 			}
 			
 			// show/remove widgets for lesson scheduling
-			var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton, #lessonScheduler'),
+			var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton, #lessonScheduler, #scheduleDisableLessonButton, #disableLessonButton'),
 				startDateField = $('#lessonStartDateSpan'),
+				lessonFinishDateSpan = $('#lessonFinishDateSpan'),
+				disableDateSpan = $('#lessonDisableApply'),
 				lessonStateChanger = $('#lessonStateChanger'),
 				stateLabel = $('#lessonStateLabel');
 			switch (lessonStateId) {
 				//created but not started lesson
 				case 1:
 					scheduleControls.css('display','inline');
+				 	if ( response.finishDate ) {
+				 		lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','inline');
+						$("#scheduleDisableLessonButton").html(LABELS.RESCHEDULE);
+						$("#disableLessonButton").css('display', 'none');
+				 	}
 					startDateField.hide();
+					lessonFinishDateSpan.hide();
 					lessonStateChanger.hide();
 					break;
-				//schedules lesson
+				//scheduled lesson
 				case 2:
 					scheduleControls.css('display','inline');
-					$("#scheduleDatetimeField").hide();
-					$("#scheduleLessonButton").hide();
-					startDateField.text(response.startDate).add('#startLessonButton').css('display','inline');
+					startDateField.text(LABELS.LESSON_START.replace("%0",response.startDate)).add('#startLessonButton').css('display','inline');
+					$("#scheduleLessonButton").html(LABELS.RESCHEDULE);
+				 	if ( response.finishDate ) {
+				 		lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','block');
+						$("#scheduleDisableLessonButton").html(LABELS.RESCHEDULE);
+						$("#disableLessonButton").css('display', 'none');
+				 	} else {
+				 		lessonFinishDateSpan.css('display','none');
+				 	}
 					lessonStateChanger.hide();
 					break;
 				//started lesson
-				default: 			
-					scheduleControls.hide();
-				 	startDateField.text(response.startDate).hide();
+				default: 	
+					startDateField.text("").css('display','none'); // we may have just started the lesson and needed to clear the scheduled date message
+				 	if ( response.finishDate ) {
+						scheduleControls.css('display','inline');
+						$("#lessonStartApply").css('display','none');
+				 		lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','inline');
+						$("#scheduleDisableLessonButton").html(LABELS.RESCHEDULE);
+				 	} else {
+						scheduleControls.css('display','none');
+						$("#scheduleDisableLessonButton").html(LABELS.SCHEDULE);
+				 		lessonFinishDateSpan.text("").css('display','none');
+				 	}
+
 				 	lessonStateChanger.css('display','inline');
 				 	stateLabel.attr('title',response.startDate);
 				 	break;
@@ -360,22 +466,33 @@ function updateLessonTab(){
 	updatePresenceAvailableCount();
 }
 
+function checkScheduleDate(startDateString, endDateString) {
+	var startDate = startDateString && startDateString > "" ? Date.parse(startDateString) : 0;
+	var endDate =  endDateString && endDateString > "" ? Date.parse(endDateString) : 0;
+	return ( endDate == 0 || startDate < endDate );
+}
 
 function scheduleLesson(){
+	
 	var date = $('#scheduleDatetimeField').val();
 	if (date) {
-		$.ajax({
-			url : LAMS_URL + 'monitoring/monitoring.do',
-			cache : false,
-			data : {
-				'method'          : 'startOnScheduleLesson',
-				'lessonID'        : lessonId,
-				'lessonStartDate' : date
-			},
-			success : function() {
-				refreshMonitor('lesson');
-			}
-		});
+		if ( checkScheduleDate (date, lessonEndDate) ) {
+			$.ajax({
+				url : LAMS_URL + 'monitoring/monitoring.do',
+				cache : false,
+				data : {
+					'method'          : 'startOnScheduleLesson',
+					'lessonID'        : lessonId,
+					'lessonStartDate' : date
+				},
+				success : function() {
+					lessonStartDate = date;
+					refreshMonitor('lesson');
+				}
+			});
+		} else {
+			alert(LABELS.LESSON_ERROR_START_END_DATE);
+		}
 	} else {
 		alert(LABELS.LESSON_ERROR_SCHEDULE_DATE);
 	}
@@ -860,7 +977,7 @@ function initSequenceTab(){
 	});
 
 	// small info box on Sequence tab, activated when the tab is showed
-	showDialog('sequenceInfoDialog', {
+	var sequenceInfoDialog = showDialog('sequenceInfoDialog', {
 		'autoOpen'   : false,
 		'width'      : 300,
 		'modal'      : false, 
@@ -881,7 +998,8 @@ function initSequenceTab(){
 				'of' : '#sequenceCanvas'
 			}
 		}
-	}, false).click(function(){
+	}, false);
+	$(sequenceInfoDialog).click(function(){
 		$('#sequenceInfoDialog').modal('hide');
 	}).find('.modal-header').remove();
 	
@@ -1028,6 +1146,7 @@ function updateSequenceTab() {
 					});
 				}
 			});	
+			initializePortraitPopover(LAMS_URL, 'large', 'top');
 			
 			sequenceRefreshInProgress = false;
 		}
@@ -1273,20 +1392,29 @@ function addActivityIcons(activity) {
 			if ([3,4,5,7,13,14].indexOf(activity.type) == -1) {
 				$.each(activity.learners, function(learnerIndex, learner){
 					var learnerDisplayName = getLearnerDisplayName(learner);
-						element = appendXMLElement('image', {
-							'id'         : 'act' + activity.id + 'learner' + learner.id,
-							'x'          : coord.x + learnerIndex*15 + 1,
-							// a bit lower for Optional Activity
-							'y'          : coord.y,
-							'height'     : 16,
-							'width'      : 16,
-							'xlink:href' : LAMS_URL + 'images/icons/' 
-											   + (learner.id == sequenceSearchedLearner ? 'user_red.png'
-											      : (learner.leader ? 'user_online.png' : 'user.png')),
-							'style'		 : 'cursor : pointer'
-						}, null, appendTarget);
-						appendXMLElement('title', null, learnerDisplayName, element);
-					});
+						activityLearnerId = 'act' + activity.id + 'learner' + learner.id,
+						elementAttributes = {
+									'id'			 : activityLearnerId,
+									'x'          : coord.x + learnerIndex*15 + 1,
+									// a bit lower for Optional Activity
+									'y'          : coord.y,
+									'height'     : 16,
+									'width'      : 16,
+									'xlink:href' : LAMS_URL + 'images/icons/' 
+													   + (learner.id == sequenceSearchedLearner ? 'user_red.png'
+													      : (learner.leader ? 'user_online.png' : 'user.png')),
+									'style'		 : 'cursor : pointer',
+									'class'		 : 'popover-link new-popover',
+									'data-toggle': 'popover',
+									'data-id'	 : 'popover-'+activityLearnerId,
+									'data-fullname': learnerDisplayName},
+						element;
+
+					if ( learner.portraitId ) {
+						elementAttributes['data-portrait'] = learner.portraitId;
+					} 
+					element = appendXMLElement('image', elementAttributes, null, appendTarget);
+				});
 			}
 		}
 	}
@@ -1403,13 +1531,18 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 	if (learners) {
 		// create learner icons, along with handlers
 		$.each(learners, function(learnerIndex, learner){
-				// make an icon for each learner
+			// make an icon for each learner			
+			var activityLearnerId = 'completedlearner'+learner.id;
 			var icon = $('<img />').attr({
+				'id'	   : activityLearnerId,
 				'src' : LAMS_URL + 'images/icons/' 
 				   		+ (learner.id == sequenceSearchedLearner ? 'user_red.png' : 'user.png'),
 				'style'		 : 'cursor : pointer',
-				'title'      : getLearnerDisplayName(learner)
-			})
+				'class'		 : 'popover-link new-popover',
+				'data-toggle': 'popover',
+				'data-id'	 : 'popover-'+activityLearnerId,
+				'data-fullname': getLearnerDisplayName(learner)
+				})
 				// drag learners to force complete activities
 				  .draggable({
 					'appendTo'    : '#t2',
@@ -1434,6 +1567,9 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 					}
 				})
 				.appendTo(iconsContainer);
+			if ( learner.portraitId ) {
+				icon.attr('data-portrait', learner.portraitId);
+			} 
 			
 			if (learner.id == sequenceSearchedLearner){
 				highlightSearchedLearner(icon);
@@ -1720,7 +1856,7 @@ function openLiveEdit(){
 				if (response) {
 					alert(response);
 				} else {
-					window.parent.showAuthoringDialog(ldId, 'editonfly');
+					window.parent.showAuthoringDialog(ldId, lessonId);
 					closeMonitorLessonDialog();
 				}
 			}
@@ -2213,8 +2349,8 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
  * Formats learner name.
  */
 function getLearnerDisplayName(learner, raw) {
-	return raw ? learner.firstName + ' ' + learner.lastName + ' (' + learner.login + ')'
-			   : escapeHtml(learner.firstName) + ' ' + escapeHtml(learner.lastName) + ' (' + escapeHtml(learner.login) + ')';
+	return raw ? learner.lastName + ', ' + learner.firstName + ' (' + learner.login + ')'
+			   : escapeHtml(learner.lastName) + ', ' + escapeHtml(learner.firstName) + ' (' + escapeHtml(learner.login) + ')';
 }
 
 

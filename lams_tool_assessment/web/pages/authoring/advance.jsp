@@ -3,39 +3,52 @@
 
 <script lang="javascript">
 	$(document).ready(function(){
-		$("#attemptsAllowedRadio").click(function() {
+		$("#attemptsAllowedRadio").change(function() {
 			$("#passingMark").val("0");
 			$("#passingMark").prop("disabled", true);
 			$("#attemptsAllowed").prop("disabled", false);
 		});
 		
-		$("#passingMarkRadio").click(function() {
+		$("#passingMarkRadio").change(function() {
 			$("#attemptsAllowed").val("0");
 			$("#attemptsAllowed").prop("disabled", true);
 			$("#passingMark").prop("disabled", false);
 		});
 		
-		$("#display-summary").click(function(){
+		$("#display-summary").change(function(){
 			$('#display-summary-area').toggle('slow');
 			$('#allowQuestionFeedback').prop("checked", false);
-			$('#allowRightAnswersAfterQuestion').prop("checked", false);
-			$('#allowWrongAnswersAfterQuestion').prop("checked", false);
+			$('#allowDiscloseAnswers').prop("checked", false);
+			$('#allowRightAnswersAfterQuestion').prop("checked", false).prop('disabled', false);
+			$('#allowWrongAnswersAfterQuestion').prop("checked", false).prop('disabled', false);
 			$('#allowHistoryResponsesAfterAttempt').prop("checked", false);
 		});
+
+		$('#allowDiscloseAnswers').change(function(){
+			if ($(this).prop('checked')) {
+				$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('checked', false).prop('disabled', true);
+			} else {
+				$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('disabled', false);
+			}
+		});
 		
-		$("#useSelectLeaderToolOuput").click(function() {
-			if ($("#useSelectLeaderToolOuput").is(':checked')) {
+		$("#useSelectLeaderToolOuput").change(function() {
+			if ($(this).prop('checked')) {
 				$("#display-summary").prop("checked", true).prop("disabled", true);
 				$('#display-summary-area').show('slow');
-				
+				$('#allowDiscloseAnswers').prop('disabled', false);
 			} else {
 				$("#display-summary").prop("disabled", false);
+				$('#allowDiscloseAnswers').prop("checked", false).prop('disabled', true).change();
 			}		
 		});
 		
 		<c:if test="${formBean.assessment.passingMark == 0}">$("#passingMark").prop("disabled", true);</c:if>
 		<c:if test="${formBean.assessment.passingMark > 0}">$("#attemptsAllowed").prop("disabled", true);</c:if>
 		<c:if test="${formBean.assessment.useSelectLeaderToolOuput}">$("#display-summary").prop("disabled", true);</c:if>
+		<c:if test="${formBean.assessment.allowDiscloseAnswers}">
+			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('disabled', true)
+		;</c:if>
 	});
 </script>
 
@@ -153,6 +166,13 @@
 			<fmt:message key="label.authoring.advance.allow.students.question.feedback" />
 		</label>
 	</div>
+	
+	<div class="checkbox">
+		<label for="allowDiscloseAnswers">
+			<html:checkbox property="assessment.allowDiscloseAnswers" styleId="allowDiscloseAnswers"/>
+			<fmt:message key="label.authoring.advance.disclose.answers" />
+		</label>
+	</div>
 
 	<div class="checkbox">
 		<label for="allowRightAnswersAfterQuestion">
@@ -187,6 +207,13 @@
 	<label for="allowGradesAfterAttempt">
 		<html:checkbox property="assessment.allowGradesAfterAttempt" styleId="allowGradesAfterAttempt"/>
 		<fmt:message key="label.authoring.advance.allow.students.grades" />
+	</label>
+</div>
+
+<div class="checkbox">
+	<label for="enable-confidence-levels">
+		<html:checkbox property="assessment.enableConfidenceLevels" styleId="enable-confidence-levels"/>
+		<fmt:message key="label.enable.confidence.levels" />
 	</label>
 </div>
 </lams:SimplePanel>

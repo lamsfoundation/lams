@@ -37,16 +37,16 @@
 		
 		var url = "<c:url value="/authoring/addQuestionReference.do"/>";
 		$(questionListTargetDiv).load(
-				url,
-				{
-					questionIndex: idx, 
-					sessionMapID: "${sessionMapID}",
-					referenceGrades: serializeReferenceGrades()
-				},
-				function(){
-					reinitializePassingMarkSelect(false);
-					refreshThickbox();
-				}
+			url,
+			{
+				questionIndex: idx, 
+				sessionMapID: "${sessionMapID}",
+				referenceGrades: serializeReferenceGrades()
+			},
+			function(){
+				reinitializePassingMarkSelect(false);
+				refreshThickbox();
+			}
 		);
 	}
 	function deleteQuestionReference(idx){
@@ -67,29 +67,29 @@
 	function upQuestionReference(idx){
 		var url = "<c:url value="/authoring/upQuestionReference.do"/>";
 		$(questionListTargetDiv).load(
-				url,
-				{
-					questionReferenceIndex: idx, 
-					sessionMapID: "${sessionMapID}",
-					referenceGrades: serializeReferenceGrades()
-				},
-				function(){
-					refreshThickbox();
-				}
+			url,
+			{
+				questionReferenceIndex: idx, 
+				sessionMapID: "${sessionMapID}",
+				referenceGrades: serializeReferenceGrades()
+			},
+			function(){
+				refreshThickbox();
+			}
 		);
 	}
 	function downQuestionReference(idx){
 		var url = "<c:url value="/authoring/downQuestionReference.do"/>";
 		$(questionListTargetDiv).load(
-				url,
-				{
-					questionReferenceIndex: idx, 
-					sessionMapID: "${sessionMapID}",
-					referenceGrades: serializeReferenceGrades()
-				},
-				function(){
-					refreshThickbox();
-				}
+			url,
+			{
+				questionReferenceIndex: idx, 
+				sessionMapID: "${sessionMapID}",
+				referenceGrades: serializeReferenceGrades()
+			},
+			function(){
+				refreshThickbox();
+			}
 		);
 	}
 	function serializeReferenceGrades(){
@@ -132,12 +132,12 @@
 	};	
 	
     function importQTI(){
-    	window.open('<lams:LAMSURL/>questions/questionFile.jsp',
+    		window.open('<lams:LAMSURL/>questions/questionFile.jsp',
     			    'QuestionFile','width=500,height=240,scrollbars=yes');
     }
 	
     function saveQTI(formHTML, formName) {
-    	var form = $($.parseHTML(formHTML));
+    		var form = $($.parseHTML(formHTML));
 		$.ajax({
 			type: "POST",
 			url: '<c:url value="/authoring/saveQTI.do?sessionMapID=${sessionMapID}" />',
@@ -150,24 +150,24 @@
     }
 
     function exportQTI(){
-    	var frame = document.getElementById("downloadFileDummyIframe"),
-    		title = encodeURIComponent(document.getElementsByName("assessment.title")[0].value);
-    	frame.src = '<c:url value="/authoring/exportQTI.do?sessionMapID=${sessionMapID}" />'
-    			+ '&title=' + title;
+    		var frame = document.getElementById("downloadFileDummyIframe"),
+    			title = encodeURIComponent(document.getElementsByName("assessment.title")[0].value);
+		
+    		frame.src = '<c:url value="/authoring/exportQTI.do?sessionMapID=${sessionMapID}" />&title=' + title;
     }
 </script>
 
 <!-- Basic Tab Content -->
 <div class="form-group">
     <label for="assessment.title">
-    	<fmt:message key="label.authoring.basic.title"/>
+    		<fmt:message key="label.authoring.basic.title"/>
     </label>
     <html:text property="assessment.title" styleClass="form-control" maxlength="255"/>
 </div>
 
 <div class="form-group">
     <label for="assessment.instructions">
-    	<fmt:message key="label.authoring.basic.instruction"/>
+    		<fmt:message key="label.authoring.basic.instruction"/>
     </label>
 	<lams:CKEditor id="assessment.instructions" value="${formBean.assessment.instructions}"
 			contentFolderID="${formBean.contentFolderID}">

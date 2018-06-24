@@ -357,7 +357,44 @@
 			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
 			parameter="statistic" >
 			<forward name="success" path="/pages/monitoring/statisticpart.jsp" />
-		</action>			
+		</action>
+		<action path="/monitoring/discloseCorrectAnswers"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
+			parameter="discloseCorrectAnswers" >
+		</action>
+		<action path="/monitoring/discloseGroupsAnswers"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
+			parameter="discloseGroupsAnswers" >
+		</action>
+		
+		<!--TBL Monitoring Action -->
+   		<action 	path="/tblmonitoring" 
+   			type="org.lamsfoundation.lams.tool.assessment.web.action.TblMonitoringAction"
+	      	scope="request"
+      		parameter="method"
+      		unknown="false"
+      		validate="false"> 
+		  	<forward
+				name="assessment"
+				path="/pages/tblmonitoring/assessment.jsp"
+				redirect="false"
+		  	/>
+		  	<forward
+			    name="assessmentStudentChoices"
+			    path="/pages/tblmonitoring/assessmentStudentChoices.jsp"
+			    redirect="false"
+		  	/>
+		  	<forward
+			    name="teams"
+			    path="/pages/tblmonitoring/teams.jsp"
+			    redirect="false"
+		  	/>
+		  	<forward
+			    name="iraAssessmentStudentChoices"
+			    path="/pages/tblmonitoring/iraAssessmentStudentChoices.jsp"
+			    redirect="false"
+		  	/>
+		</action>
 		<!-- ========== Common Definitions ============================== -->
 		<action path="/clearsession"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.ClearSessionAction">

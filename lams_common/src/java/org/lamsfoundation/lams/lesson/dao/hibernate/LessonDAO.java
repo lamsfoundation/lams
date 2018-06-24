@@ -36,6 +36,7 @@ import org.hibernate.criterion.Restrictions;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
@@ -63,6 +64,10 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     private final static String FIND_LESSON_FOR_ACTIVITY = "select lesson from " + Lesson.class.getName() + " lesson, "
 	    + Activity.class.getName() + " activity "
 	    + " where activity.activityId=:activityId and activity.learningDesign=lesson.learningDesign";
+    private final static String FIND_LESSON_ACTIVITY_IDS_BY_TOOL_CONTENT_ID = "SELECT lesson.lessonId, toolActivity.activityId FROM "
+	    + Lesson.class.getName() + " lesson, " + ToolActivity.class.getName() + " toolActivity "
+	    + " WHERE toolActivity.learningDesign = lesson.learningDesign "
+	    + " AND toolActivity.toolContentId = :toolContentId";
     private final static String LESSONS_WITH_ORIGINAL_LEARNING_DESIGN = "select l from " + Lesson.class.getName()
 	    + " l " + "where l.learningDesign.originalLearningDesign.learningDesignId = ? "
 	    + "and l.learningDesign.copyTypeID != " + LearningDesign.COPY_TYPE_PREVIEW + " " + "and l.lessonStateId = "
@@ -257,6 +262,18 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	Query query = getSession().createQuery(LessonDAO.FIND_LESSON_FOR_ACTIVITY);
 	query.setLong("activityId", activityId);
 	return (Lesson) query.uniqueResult();
+    }
+
+    /**
+     * Get the lesson and activity ids that apply to the tool activity associated with this tool content id. 
+     * Returns an array of two longs.
+     */
+    @Override
+    public Object[] getLessonActivityIdsForToolContentId(long toolContentId) {
+	Query query = getSession().createQuery(LessonDAO.FIND_LESSON_ACTIVITY_IDS_BY_TOOL_CONTENT_ID);
+	query.setLong("toolContentId", toolContentId);
+	List list = query.list();
+	return list.size() > 0 ? (Object[]) list.get(0) : null;
     }
 
     /**

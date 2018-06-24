@@ -34,7 +34,6 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
@@ -61,6 +60,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -173,7 +173,7 @@ public class MonitoringController implements VoteAppConstants {
 
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 	    responseRow.put(VoteAppConstants.ATTR_USER_ID, (Integer) userAndAnswers[0]);
-	    responseRow.put(VoteAppConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml((String) userAndAnswers[2]));
+	    responseRow.put(VoteAppConstants.ATTR_USER_NAME, HtmlUtils.htmlEscape((String) userAndAnswers[2]));
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME,
 		    DateUtil.convertToStringForJSON((Date) userAndAnswers[3], request.getLocale()));
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME_TIMEAGO,
@@ -213,10 +213,9 @@ public class MonitoringController implements VoteAppConstants {
 	for (Object[] userAndReflection : users) {
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 	    responseRow.put(VoteAppConstants.ATTR_USER_ID, (Integer) userAndReflection[0]);
-	    responseRow.put(VoteAppConstants.ATTR_USER_NAME,
-		    StringEscapeUtils.escapeHtml((String) userAndReflection[2]));
+	    responseRow.put(VoteAppConstants.ATTR_USER_NAME, HtmlUtils.htmlEscape((String) userAndReflection[2]));
 	    if (userAndReflection.length > 3 && userAndReflection[3] != null) {
-		String reflection = StringEscapeUtils.escapeHtml((String) userAndReflection[3]);
+		String reflection = HtmlUtils.htmlEscape((String) userAndReflection[3]);
 		responseRow.put(VoteAppConstants.NOTEBOOK, reflection.replaceAll("\n", "<br>"));
 	    }
 	    if (userAndReflection.length > 4) {
@@ -285,11 +284,10 @@ public class MonitoringController implements VoteAppConstants {
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
 	    responseRow.put("uid", userAndAttempt.getUserUid());
-	    responseRow.put(VoteAppConstants.ATTR_USER_NAME,
-		    StringEscapeUtils.escapeHtml(userAndAttempt.getFullName()));
+	    responseRow.put(VoteAppConstants.ATTR_USER_NAME, HtmlUtils.htmlEscape(userAndAttempt.getFullName()));
 
 	    responseRow.put("userEntryUid", userAndAttempt.getUserEntryUid());
-	    responseRow.put("userEntry", StringEscapeUtils.escapeHtml(userAndAttempt.getUserEntry()));
+	    responseRow.put("userEntry", HtmlUtils.htmlEscape(userAndAttempt.getUserEntry()));
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME,
 		    DateUtil.convertToStringForJSON(userAndAttempt.getAttemptTime(), request.getLocale()));
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME_TIMEAGO,

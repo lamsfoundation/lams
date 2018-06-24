@@ -132,7 +132,7 @@ public class AddCustomWebXmlContexts {
 	System.out.println("Pass: " + dbPass);
 	System.out.println("Url: " + dbUrl);
 
-	Class.forName("com.mysql.jdbc.Driver");
+	Class.forName("com.mysql.cj.jdbc.Driver");
 	Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
 	conn.setAutoCommit(false);
 

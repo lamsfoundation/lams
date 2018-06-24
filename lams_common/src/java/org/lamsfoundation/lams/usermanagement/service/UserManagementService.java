@@ -23,6 +23,10 @@
 
 package org.lamsfoundation.lams.usermanagement.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +34,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -39,10 +44,12 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.hibernate.type.IntegerType;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.FavoriteOrganisation;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
@@ -68,7 +75,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -107,7 +114,9 @@ public class UserManagementService implements IUserManagementService {
 
     protected MessageService messageService;
 
-    private static IAuditService auditService;
+    private static ILogEventService logEventService;
+
+    private IToolContentHandler centralToolContentHandler;
 
     // ---------------------------------------------------------------------
     // Service Methods
@@ -368,6 +377,7 @@ public class UserManagementService implements IUserManagementService {
 	    String salt = HashUtil.salt();
 	    user.setSalt(salt);
 	    user.setPassword(HashUtil.sha256(password, salt));
+	    user.setModifiedDate(new Date());
 	    baseDAO.update(user);
 	} catch (Exception e) {
 	    log.debug(e);
@@ -863,13 +873,18 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public Integer getCountRoleForOrg(Integer orgId, Integer roleId, String searchPhrase) {
-	Integer count = roleDAO.getCountRoleForOrg(roleId, orgId, searchPhrase);
+    public Integer getCountRoleForOrg(Integer orgId, Integer[] roleIds, String searchPhrase) {
+	Integer count = roleDAO.getCountRoleForOrg(roleIds, orgId, searchPhrase);
 	if (count != null) {
 	    return count;
 	} else {
 	    return new Integer(0);
 	}
+    }
+
+    @Override
+    public Integer getCountRoleForOrg(Integer orgId, Integer roleId, String searchPhrase) {
+	return getCountRoleForOrg(orgId, new Integer[] { roleId }, searchPhrase);
     }
 
     @Override
@@ -880,20 +895,29 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public void auditPasswordChanged(User user, String moduleName) {
+    public void logPasswordChanged(User user, User modifiedBy) {
 	String[] args = new String[1];
-	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
+	args[0] = user.getLogin() + " (" + user.getUserId() + ")";
 	String message = messageService.getMessage("audit.user.password.change", args);
-	getAuditService().log(moduleName, message);
+	getLogEventService().logEvent(LogEvent.TYPE_PASSWORD_CHANGE, modifiedBy != null ? modifiedBy.getUserId() : null , user.getUserId(), null, null, message);
     }
 
     @Override
-    public void auditUserCreated(User user, String moduleName) {
+    public void logUserCreated(User user, User createdBy) {
 	String[] args = new String[2];
 	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
 	args[1] = user.getFullName();
 	String message = messageService.getMessage("audit.user.create", args);
-	getAuditService().log(moduleName, message);
+	getLogEventService().logEvent(LogEvent.TYPE_USER_ORG_ADMIN, createdBy != null ? createdBy.getUserId() : null, user.getUserId(), null, null, message);
+    }
+
+    @Override
+    public void logUserCreated(User user, UserDTO createdBy) {
+	String[] args = new String[2];
+	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
+	args[1] = user.getFullName();
+	String message = messageService.getMessage("audit.user.create", args);
+	getLogEventService().logEvent(LogEvent.TYPE_USER_ORG_ADMIN, createdBy != null ? createdBy.getUserID() : null, user.getUserId(), null, null, message);
     }
 
     @Override
@@ -959,8 +983,14 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString) {
+    public List<UserDTO> getAllUsers(Integer page, Integer size, String sortBy, String sortOrder, String searchString) {
 	return userDAO.getAllUsersPaged(page, size, sortBy, sortOrder, searchString);
+    }
+
+    @Override
+    public List<UserDTO> getAllUsers(Integer organisationID, String[] roleNames, Integer page, Integer size,
+	    String sortBy, String sortOrder, String searchString) {
+	return userDAO.getAllUsersPaged(organisationID, roleNames, page, size, sortBy, sortOrder, searchString);
     }
 
     @Override
@@ -1008,15 +1038,16 @@ public class UserManagementService implements IUserManagementService {
 	List<User> results = baseDAO.findByProperty(User.class, "openidURL", openidURL);
 	return results.isEmpty() ? null : (User) results.get(0);
     }
-    
+
     /**
-     * Returns the SQL needed to look up portrait details for a given user. This is an efficient way to get the entries 
-     * at the same time as retrieving the tool data, rather than making a separate lookup. 
+     * Returns the SQL needed to look up portrait details for a given user. This is an efficient way to get the entries
+     * at the same time as retrieving the tool data, rather than making a separate lookup.
      *
-     * The return values are the entry for the select clause (will always have a leading space but no trailing comma and an
+     * The return values are the entry for the select clause (will always have a leading space but no trailing comma and
+     * an
      * alias of luser) and the sql join clause, which should go with any other join clauses.
      *
-     * To convert the portrait id set up the sql -> java object translation using 
+     * To convert the portrait id set up the sql -> java object translation using
      * addScalar("portraitId", IntegerType.INSTANCE)
      *
      * @param userIdString
@@ -1032,6 +1063,110 @@ public class UserManagementService implements IUserManagementService {
 	return retValue;
     }
 
+    /**
+     * Looks for [login].jpg images in /tmp/portraits of user IDs within given range and starting with the given prefix
+     */
+    @Override
+    public List<String> uploadPortraits(Integer minUserId, Integer maxUserId, String prefix) throws IOException {
+	File tmpDir = new File("/tmp/portraits");
+	if (!tmpDir.canRead()) {
+	    throw new IOException("/tmp/portraits is not readable");
+	}
+
+	List<String> uploadedPortraits = new LinkedList<String>();
+	Integer prefixLength = StringUtils.isBlank(prefix) ? null : prefix.length() + 1;
+
+	for (int userId = minUserId; userId <= maxUserId; userId++) {
+	    try {
+		User user = (User) baseDAO.find(User.class, userId);
+		if (user == null) {
+		    if (log.isDebugEnabled()) {
+			log.debug("User " + userId + " not found when batch uploading portraits, skipping");
+		    }
+		    continue;
+		}
+		String login = user.getLogin();
+		if (prefixLength != null) {
+		    if (!login.startsWith(prefix)) {
+			if (log.isDebugEnabled()) {
+			    log.debug("User " + userId + " login \"" + login
+				    + "\" does not start with the required prefix \"" + prefix
+				    + "\" when batch uploading portraits");
+			}
+			continue;
+		    }
+		    login = login.substring(prefixLength);
+		}
+		File portraitFile = new File(tmpDir, login + ".jpg");
+		if (!portraitFile.canRead()) {
+		    if (log.isDebugEnabled()) {
+			log.debug("Portrait for user " + userId + " with login \"" + login
+				+ "\" was not found or can not be read when batch uploading portraits");
+			continue;
+		    }
+		}
+
+		// upload to the content repository
+		FileInputStream is = new FileInputStream(portraitFile);
+		String fileNameWithoutExt = login;
+		NodeKey originalFileNode = centralToolContentHandler.uploadFile(is,
+			fileNameWithoutExt + "_original.jpg", "image/jpeg");
+		is.close();
+		log.debug("Saved original portrait with uuid: " + originalFileNode.getUuid() + " and version: "
+			+ originalFileNode.getVersion());
+
+		//resize to the large size
+		is = new FileInputStream(portraitFile);
+		InputStream modifiedPortraitInputStream = ResizePictureUtil.resize(is,
+			PORTRAIT_LARGEST_DIMENSION_LARGE);
+		NodeKey node = centralToolContentHandler.updateFile(originalFileNode.getUuid(),
+			modifiedPortraitInputStream, fileNameWithoutExt + "_large.jpg", "image/jpeg");
+		modifiedPortraitInputStream.close();
+		is.close();
+		if (log.isDebugEnabled()) {
+		    log.debug(
+			    "Saved large portrait with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+		}
+
+		//resize to the medium size
+		is = new FileInputStream(portraitFile);
+		modifiedPortraitInputStream = ResizePictureUtil.resize(is, PORTRAIT_LARGEST_DIMENSION_MEDIUM);
+		node = centralToolContentHandler.updateFile(node.getUuid(), modifiedPortraitInputStream,
+			fileNameWithoutExt + "_medium.jpg", "image/jpeg");
+		modifiedPortraitInputStream.close();
+		is.close();
+		if (log.isDebugEnabled()) {
+		    log.debug("Saved medium portrait with uuid: " + node.getUuid() + " and version: "
+			    + node.getVersion());
+		}
+
+		//resize to the small size
+		is = new FileInputStream(portraitFile);
+		modifiedPortraitInputStream = ResizePictureUtil.resize(is, PORTRAIT_LARGEST_DIMENSION_SMALL);
+		node = centralToolContentHandler.updateFile(node.getUuid(), modifiedPortraitInputStream,
+			fileNameWithoutExt + "_small.jpg", "image/jpeg");
+		modifiedPortraitInputStream.close();
+		is.close();
+		if (log.isDebugEnabled()) {
+		    log.debug(
+			    "Saved small portrait with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+		}
+		// delete old portrait file (we only want to keep the user's current portrait)
+		if (user.getPortraitUuid() != null) {
+		    centralToolContentHandler.deleteFile(user.getPortraitUuid());
+		}
+		user.setPortraitUuid(originalFileNode.getUuid());
+		saveUser(user);
+
+		log.info("Uploaded portrait for user " + userId + " with login \"" + login + "\"");
+		uploadedPortraits.add(login);
+	    } catch (Exception e) {
+		log.error("Error while batch uploading portraits", e);
+	    }
+	}
+
+	return uploadedPortraits;
+    }
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
@@ -1072,12 +1207,16 @@ public class UserManagementService implements IUserManagementService {
 	this.favoriteOrganisationDAO = favoriteOrganisationDAO;
     }
 
-    private IAuditService getAuditService() {
-	if (UserManagementService.auditService == null) {
+    private ILogEventService getLogEventService() {
+	if (UserManagementService.logEventService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getWebApplicationContext(SessionManager.getServletContext());
-	    UserManagementService.auditService = (IAuditService) ctx.getBean("auditService");
+	    UserManagementService.logEventService = (ILogEventService) ctx.getBean("logEventService");
 	}
-	return UserManagementService.auditService;
+	return UserManagementService.logEventService;
+    }
+
+    public void setCentralToolContentHandler(IToolContentHandler centralToolContentHandler) {
+	this.centralToolContentHandler = centralToolContentHandler;
     }
 }

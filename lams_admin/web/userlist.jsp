@@ -3,6 +3,16 @@
 
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+<style type="text/css">
+	#courseHeading {
+		height: 45px;
+	}
+	
+	#courseHeading .panel-title {
+		display: inline-block;
+		margin-top: 5px;
+	}
+</style>
 
 <script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 <script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
@@ -44,7 +54,7 @@
 </p>
 
 <div class="panel panel-default voffset5" >
-	<div class="panel-heading">
+	<div id="courseHeading" class="panel-heading">
 		<span class="panel-title">
 			<logic:equal name="orgType" value="1">
 				<fmt:message key="admin.global.roles.manage" />
@@ -55,6 +65,9 @@
 		</span>
 		<div class="pull-right btn-group btn-group-sm">
 			<input id="addRemoveUsers" class="btn btn-default" type="button" value="<fmt:message key="admin.user.add"/>" onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' />
+			<logic:equal name="UserManageForm" property="canResetOrgPassword" value="true">
+				<a class="btn btn-default" href="orgPasswordChange.do?organisationID=<bean:write name='UserManageForm' property='orgId'/>"><fmt:message key='admin.org.password.change.button'/></a>
+			</logic:equal>
 			<logic:equal name="UserManageForm" property="courseAdminCanAddNewUsers" value="true">
 				<input class="btn btn-default" type="button" value="<fmt:message key="admin.user.create"/>" onclick=javascript:document.location='user.do?method=edit&orgId=<bean:write name="UserManageForm" property="orgId"/>' />
 			</logic:equal>

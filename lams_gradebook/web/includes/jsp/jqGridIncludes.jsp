@@ -2,22 +2,15 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-core" prefix="c"%>
 
-<!-- 
-Include this jsp in your jqGrid page head to get some jqGrid functionaility
- -->
+<%-- 
+Include this jsp in your jqGrid page head to get some jqGrid functionality
+ --%>
  
-<!-- Do not include these if used within tabs such as monitoring as redeclaring the jquery and jqgrid breaks the tabs.  -->
-<!-- Need both stylesheets or we lose the grey headers on the grids. -->
-<c:if test="${!isInTabs}"> 
-<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
-<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
-<link type="text/css" href="<lams:LAMSURL />css/jquery.jqGrid.css" rel="stylesheet" />
+<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.locale-en.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
-</c:if>
 
 <script type="text/javascript">
 		
@@ -112,7 +105,7 @@ Include this jsp in your jqGrid page head to get some jqGrid functionaility
 		var cell = $(kmouse.target).html();
 		my_tooltip.html(cell);
               my_tooltip.css({ 
-              	opacity: 0.85, 
+              	opacity: 0.75, 
               	display: "none" 
           	}).stop().fadeIn(400);
 	}
@@ -123,7 +116,7 @@ Include this jsp in your jqGrid page head to get some jqGrid functionaility
         var border_right = $(window).width(); 
         var left_pos; 
         var top_pos; 
-        var offset = 15;  
+        var offset = 20;  
         if (border_right - (offset * 2) >= my_tooltip.width() + kmouse.pageX)  
         { 
         	left_pos = kmouse.pageX + offset;  
@@ -168,4 +161,45 @@ Include this jsp in your jqGrid page head to get some jqGrid functionaility
 		return str;
 	}
 		
+	function fixPagerInCenter(pagername, numcolshift) {
+		$('#'+pagername+'_right').css('display','inline');
+		if ( numcolshift > 0 ) {
+			var marginshift = - numcolshift * 12;
+			$('#'+pagername+'_center table').css('margin-left', marginshift+'px');
+		}
+	}
+
+	<%--  gradebook dialog windows	on the ipad do not update the grid width properly using setGridWidth. Calling this is 
+	-- setting the grid to parentWidth-1 and the width of the parent to parentWidth+1, leading to growing width window
+	-- that overflows the dialog window. Keep the main grids slightly smaller than their containers and all is well. 
+	--%>
+    function resizeJqgrid(jqgrids) {
+        jqgrids.each(function(index) {
+            var gridId = $(this).attr('id');
+            var parent = jQuery('#gbox_' + gridId).parent();
+            var gridParentWidth = parent.width();
+            if ( parent.hasClass('grid-holder') ) {
+                	gridParentWidth = gridParentWidth - 2;
+            }
+            jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+        });
+    };
+
+
+    <%-- Based on jqgrid internal functions --%>
+    function displayCellErrorMessage(table, iRow, iCol, errorLabel, errorMessage, buttonText ) {
+    		setTimeout(function () {
+			try {
+			    	var frozenRows = table.grid.fbRows,
+					tr = table.rows[iRow];
+			    	tr = frozenRows != null && frozenRows[0].cells.length > iCol ? frozenRows[tr.rowIndex] : tr;
+			    var td = tr != null && tr.cells != null ? $(tr.cells[iCol]) : $(),
+			    		rect = td[0].getBoundingClientRect();
+			    $.jgrid.info_dialog.call(table, errorLabel, errorMessage, buttonText, {left:rect.left-200, top:rect.top});
+			} catch (e) {
+				alert(errorMessage);
+			}
+		}, 50);
+	}
+	
 </script>

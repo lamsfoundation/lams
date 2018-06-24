@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.usermanagement.service;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -51,6 +52,9 @@ import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public interface IUserManagementService {
+    static int PORTRAIT_LARGEST_DIMENSION_LARGE = 200;
+    static int PORTRAIT_LARGEST_DIMENSION_MEDIUM = 80;
+    static int PORTRAIT_LARGEST_DIMENSION_SMALL = 35;
 
     /**
      * save(insert or update)
@@ -373,6 +377,8 @@ public interface IUserManagementService {
      */
     Integer getCountRoleForOrg(Integer orgId, Integer roleId, String searchPhrase);
 
+    Integer getCountRoleForOrg(Integer orgId, Integer[] roleIds, String searchPhrase);
+
     /**
      * Get default html theme of server.
      *
@@ -380,9 +386,10 @@ public interface IUserManagementService {
      */
     Theme getDefaultTheme();
 
-    void auditPasswordChanged(User user, String moduleName);
+    void logPasswordChanged(User user, User modifiedBy);
 
-    void auditUserCreated(User user, String moduleName);
+    void logUserCreated(User user, User createdBy);
+    void logUserCreated(User user, UserDTO createdBy);
 
     Integer getCountUsers();
 
@@ -460,7 +467,10 @@ public interface IUserManagementService {
      *            filters results by course name. It can be null and then doesn't affect results
      * @return paged list of users
      */
-    List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString);
+    List<UserDTO> getAllUsers(Integer page, Integer size, String sortBy, String sortOrder, String searchString);
+
+    List<UserDTO> getAllUsers(Integer organisationID, String[] roleNames, Integer page, Integer size, String sortBy,
+	    String sortOrder, String searchString);
 
     /**
      * Get all users, except for disabled users and users that are members of filteredOrg.
@@ -518,10 +528,15 @@ public interface IUserManagementService {
      * Stores organisation (course) groups and removes the unnecessary ones.
      */
     void saveOrganisationGrouping(OrganisationGrouping grouping, Collection<OrganisationGroup> newGroups);
-    
+
     /**
-     * Returns the SQL needed to look up portrait details for a given user. This is an efficient way to get the entries 
-     * at the same time as retrieving the tool data, rather than making a separate lookup. 
+     * Returns the SQL needed to look up portrait details for a given user. This is an efficient way to get the entries
+     * at the same time as retrieving the tool data, rather than making a separate lookup.
      */
     String[] getPortraitSQL(String userIdString);
+
+    /**
+     * Looks for [login].png images in /tmp/portraits of user IDs within given range and starting with the given prefix
+     */
+    List<String> uploadPortraits(Integer minUserId, Integer maxUserId, String prefix) throws IOException;
 }

@@ -52,6 +52,8 @@ public class ResourceItemForm extends ActionForm {
     private String fileName;
     private FormFile file;
     private boolean allowRating;
+    private boolean allowComments;
+    
 
     public String getDescription() {
 	return description;
@@ -163,5 +165,13 @@ public class ResourceItemForm extends ActionForm {
 
     public void setAllowRating(boolean allowRating) {
 	this.allowRating = allowRating;
+    }
+
+    public boolean isAllowComments() {
+        return allowComments;
+    }
+
+    public void setAllowComments(boolean allowComments) {
+        this.allowComments = allowComments;
     }
 }

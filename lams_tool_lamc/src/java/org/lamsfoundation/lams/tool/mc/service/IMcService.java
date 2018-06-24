@@ -72,28 +72,35 @@ public interface IMcService {
      */
     void copyAnswersFromLeader(McQueUsr user, McQueUsr leader);
 
-    void createMc(McContent mcContent) throws McApplicationException;
+    void createMc(McContent mcContent);
 
-    McContent getMcContent(Long toolContentId) throws McApplicationException;
+    McContent getMcContent(Long toolContentId);
 
     void setDefineLater(String strToolContentID, boolean value);
 
-    void updateQuestion(McQueContent mcQueContent) throws McApplicationException;
-
-    McQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long mcContentUid)
-	    throws McApplicationException;
+    McQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long mcContentUid);
 
     McQueUsr createMcUser(Long toolSessionId) throws McApplicationException;
 
     McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) throws McApplicationException;
 
+    Long getPortraitId(Long userId);
+
     void saveUserAttempt(McQueUsr user, List<AnswerDTO> answerDtos);
 
     void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;
+    
+    /**
+     * Count how many attempts done to this option
+     *
+     * @param optionUid
+     * @return
+     */
+    int getAttemptsCountPerOption(Long optionUid);
 
     void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException;
 
-    void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException;
+    void saveOrUpdateMcQueContent(McQueContent mcQueContent);
 
     /**
      * persists the questions
@@ -104,11 +111,13 @@ public interface IMcService {
 
     List refreshQuestionContent(final Long mcContentId) throws McApplicationException;
 
-    List getAllQuestionsSorted(final long mcContentId) throws McApplicationException;
+    List getAllQuestionsSorted(final long mcContentId);
 
     McQueContent getQuestionByUid(Long uid);
 
     McQueUsr getMcUserByUID(Long uid) throws McApplicationException;
+    
+    McQueUsr getMcUserByContentId(Long userId, Long contentId);
 
     List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
 	    String searchString);
@@ -117,7 +126,7 @@ public interface IMcService {
 
     String getLocalizedMessage(String key);
 
-    List<McQueContent> getQuestionsByContentUid(final Long mcContentId) throws McApplicationException;
+    List<McQueContent> getQuestionsByContentUid(final Long mcContentId);
 
     McSession getMcSessionById(Long mcSessionId) throws McApplicationException;
 
@@ -127,13 +136,13 @@ public interface IMcService {
 
     List<McOptionDTO> getOptionDtos(Long mcQueContentId) throws McApplicationException;
 
-    List<McUsrAttempt> getFinalizedUserAttempts(final McQueUsr user) throws McApplicationException;
+    List<McUsrAttempt> getFinalizedUserAttempts(final McQueUsr user);
 
     List findOptionsByQuestionUid(Long mcQueContentId) throws McApplicationException;
 
     void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
 
-    McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId) throws McApplicationException;
+    McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId);
     
     List<ToolOutputDTO> getLearnerMarksByContentId(Long toolContentId);
 

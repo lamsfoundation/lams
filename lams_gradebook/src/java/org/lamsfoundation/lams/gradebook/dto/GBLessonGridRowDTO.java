@@ -25,9 +25,9 @@ package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
+import org.springframework.web.util.HtmlUtils;
 
 public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 
@@ -53,7 +53,7 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 
 	ret.add(id.toString());
 
-	rowName = StringEscapeUtils.escapeHtml(rowName);
+	rowName = HtmlUtils.htmlEscape(rowName);
 
 	if (view == GBGridView.MON_COURSE) {
 	    if (gradebookMonitorURL != null && gradebookMonitorURL.length() != 0) {

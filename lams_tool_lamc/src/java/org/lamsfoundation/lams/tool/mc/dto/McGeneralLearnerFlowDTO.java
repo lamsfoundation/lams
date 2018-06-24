@@ -78,6 +78,7 @@ public class McGeneralLearnerFlowDTO implements Comparable {
     protected String showMarks;
 
     protected String displayAnswers;
+    protected String displayFeedbackOnly;
 
     protected Map mapGeneralOptionsContent;
 
@@ -354,9 +355,10 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 		.append("passMarkApplicable: ", passMarkApplicable).append("userPassed: ", userPassed)
 		.append("userOverPassMark: ", userOverPassMark).append("reportTitleLearner: ", reportTitleLearner)
 		.append("activityInstructions: ", activityInstructions).append("activityTitle: ", activityTitle)
-		.append("displayAnswers: ", displayAnswers).append("reflection: ", reflection)
-		.append("reflectionSubject: ", reflectionSubject).append("notebookEntry: ", notebookEntry)
-		.append("notebookEntriesVisible: ", notebookEntriesVisible).toString();
+		.append("displayAnswers: ", displayAnswers).append("displayFeedbackOnly: ", displayFeedbackOnly)
+		.append("reflection: ", reflection).append("reflectionSubject: ", reflectionSubject)
+		.append("notebookEntry: ", notebookEntry).append("notebookEntriesVisible: ", notebookEntriesVisible)
+		.toString();
     }
 
     /**
@@ -562,6 +564,14 @@ public class McGeneralLearnerFlowDTO implements Comparable {
      */
     public void setDisplayAnswers(String displayAnswers) {
 	this.displayAnswers = displayAnswers;
+    }
+
+    public String getDisplayFeedbackOnly() {
+	return displayFeedbackOnly;
+    }
+
+    public void setDisplayFeedbackOnly(String displayFeedbackOnly) {
+	this.displayFeedbackOnly = displayFeedbackOnly;
     }
 
     /**

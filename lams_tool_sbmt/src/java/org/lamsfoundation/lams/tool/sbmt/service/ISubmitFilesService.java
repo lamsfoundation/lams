@@ -134,7 +134,7 @@ public interface ISubmitFilesService {
      * @param marksFileInputStream
      * @param marksFileName
      */
-    public void updateMarks(Long reportID, Float marks, String comments, FormFile file)
+    public void updateMarks(Long reportID, Float marks, String comments, FormFile file, Long SessionID)	    
 	    throws InvalidParameterException, RepositoryCheckedException;
 
     /**
@@ -144,7 +144,7 @@ public interface ISubmitFilesService {
      * @param markFileUUID
      * @param markFileVersionID
      */
-    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID);
+    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID, Long sessionID);
 
     /**
      * Mark the original file uploaded by a learner as deleted. Does not delete the file
@@ -320,7 +320,15 @@ public interface ISubmitFilesService {
      * @param contentId
      * @return
      */
-    List<StatisticDTO> getStatisticsBySession(final Long contentId);
+    List<StatisticDTO> getStatisticsBySession(final Long contentId);   
+    
+    /**
+     * Get the leader statistics for all the sessions for one activity.
+     * 
+     * @param contentId
+     * @return
+     */
+    List<StatisticDTO> getLeaderStatisticsBySession(final Long contentId);
 
     public IEventNotificationService getEventNotificationService();
 
@@ -349,4 +357,28 @@ public interface ISubmitFilesService {
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);
+    
+    /**
+     * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
+     *
+     * @param userId
+     * @param toolSessionID
+     */
+    SubmitUser checkLeaderSelectToolForSessionLeader(SubmitUser user, Long toolSessionID);
+    
+    /**
+     * Create a new user in database.
+     */
+    void createUser(SubmitUser submitUser);
+    
+    /**
+     * @param user
+     * @param toolSessionId
+     * @return
+     */
+    boolean isUserGroupLeader(SubmitUser user, Long toolSessionId);
+    
+
+    void copyLearnerContent(SubmitUser fromUser, SubmitUser toUser);
+    
 }

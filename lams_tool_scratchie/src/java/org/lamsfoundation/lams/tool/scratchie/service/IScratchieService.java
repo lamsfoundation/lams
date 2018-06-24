@@ -31,6 +31,7 @@ import java.util.Set;
 
 
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
@@ -60,6 +61,25 @@ public interface IScratchieService {
      * @return
      */
     Scratchie getScratchieByContentId(Long contentId);
+    
+    /**
+     * Populate scratchie items with the confidence levels from the activity specified in author
+     * 
+     * @param userId
+     * @param toolSessionId
+     * @param confidenceLevelsActivityUiid
+     * @param items
+     */
+    void populateItemsWithConfidenceLevels(Long userId, Long toolSessionId, Integer confidenceLevelsActivityUiid,
+	    Collection<ScratchieItem> items);
+    
+    /**
+     * Returns all activities that precede specified activity and produce confidence levels.
+     * 
+     * @param toolContentId toolContentId of the specified activity 
+     * @return
+     */
+    Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId);
 
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
@@ -78,12 +98,12 @@ public interface IScratchieService {
     void launchTimeLimit(Long sessionId) throws SchedulerException;
     
     /**
-     * Checks if non-leaders should still wait for leader to submit either notebook or burning questions.
+     * Checks if non-leaders should still wait for leader to submit notebook.
      * 
      * @param toolSession
      * @return
      */
-    boolean isWaitingForLeaderToSubmit(ScratchieSession toolSession);
+    boolean isWaitingForLeaderToSubmitNotebook(ScratchieSession toolSession);
 
     List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId);
 
@@ -135,10 +155,14 @@ public interface IScratchieService {
     /**
      * Get users by given toolSessionId.
      *
-     * @param long1
+     * @param toolSessionId
      * @return
      */
     List<ScratchieUser> getUsersBySession(Long toolSessionId);
+    
+    ScratchieUser getUserByUserIDAndContentID(Long userId, Long contentId);
+    
+    int countUsersByContentId(Long contentId);
 
     /**
      * Save specified user.
@@ -177,6 +201,14 @@ public interface IScratchieService {
      * @return
      */
     ScratchieSession getScratchieSessionBySessionId(Long sessionId);
+    
+    /**
+     * Return all sessions realted to the specified toolContentId.
+     * 
+     * @param toolContentId
+     * @return
+     */
+    int countSessionsByContentId(Long toolContentId);
 
     /**
      * Save or update scratchie session.
@@ -259,9 +291,10 @@ public interface IScratchieService {
      * @param sessionId
      *            optional parameter, if it's specified, BurningQuestionDTOs will also contain information what leader
      *            of this group has liked
+     * @param includeEmptyItems whether it should include questions that don't have any burning questions
      * @return
      */
-    List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId);
+    List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId, boolean includeEmptyItems);
 
     boolean addLike(Long burningQuestionUid, Long sessionId);
 
@@ -370,6 +403,23 @@ public interface IScratchieService {
     ScratchieConfigItem getConfigItem(String key);
 
     void saveOrUpdateScratchieConfigItem(ScratchieConfigItem item);
+    
+    /**
+     * Return preset marks that is going to be used for calculating learners' marks. Return scratchie.presetMarks if
+     * it's not null, otherwise returns default setting stored as admin config setting.
+     * 
+     * @param scratchie
+     * @return
+     */
+    String[] getPresetMarks(Scratchie scratchie);
+    
+    /**
+     * Return a maximum possible mark that user can get on answering all questions.
+     * 
+     * @param scratchie
+     * @return
+     */
+    int getMaxPossibleScore(Scratchie scratchie);
     
     /** Get the raw marks for display in a graph in monitoring */
     List<Number> getMarksArray(Long contentId);

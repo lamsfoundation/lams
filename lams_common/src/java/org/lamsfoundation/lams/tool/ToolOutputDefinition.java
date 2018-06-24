@@ -56,6 +56,7 @@ public class ToolOutputDefinition implements Comparable<ToolOutputDefinition> {
     private String name;
     private String description;
     private OutputType type;
+    private Boolean weightable = false;
     private Object startValue;
     private Object endValue;
     private Object complexDefinition;
@@ -104,6 +105,17 @@ public class ToolOutputDefinition implements Comparable<ToolOutputDefinition> {
 
     public void setType(OutputType type) {
 	this.type = type;
+    }
+
+    /**
+     * Can this output be used in weighting, i.e. does it have "max score" and % of this score can be calculated
+     */
+    public Boolean getWeightable() {
+	return weightable;
+    }
+
+    public void setWeightable(Boolean weightable) {
+	this.weightable = weightable;
     }
 
     /**

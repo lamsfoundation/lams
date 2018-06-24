@@ -75,10 +75,14 @@
 	function submitTask(){
 		refreshCKEditors();
 		var form = $('#taskListItemForm');
-		$('#resourceInputArea').load(
-			form.attr('action'), 
-			form.serialize()
-		);
+		$.ajax({
+			data: form.serialize(),
+	       	type: form.attr('method'),
+			url: form.attr('action'),
+			success: function(data) {
+	           $('#resourceInputArea').html(data);
+			}
+		});
 	} 
 	
 </script>

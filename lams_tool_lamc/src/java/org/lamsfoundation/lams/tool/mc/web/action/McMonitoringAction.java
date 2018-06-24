@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -74,7 +75,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class McMonitoringAction extends LamsDispatchAction {
     /**
-     * displayAnswers
+     * Turn on displayAnswers
      */
     public ActionForward displayAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -84,6 +85,27 @@ public class McMonitoringAction extends LamsDispatchAction {
 
 	McContent mcContent = mcService.getMcContent(new Long(strToolContentID));
 	mcContent.setDisplayAnswers(new Boolean(true));
+	mcContent.setDisplayFeedbackOnly(new Boolean(false));
+	mcService.updateMc(mcContent);
+	
+	// use redirect to prevent resubmition of the same request
+	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("monitoringStarterRedirect"));
+	redirect.addParameter(McAppConstants.TOOL_CONTENT_ID, strToolContentID);
+	redirect.addParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+	return redirect;
+    }
+
+    /**
+     * Turn on displayFeedbackOnly
+     */
+    public ActionForward displayFeedbackOnly(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	
+	McContent mcContent = mcService.getMcContent(new Long(strToolContentID));
+	mcContent.setDisplayFeedbackOnly(new Boolean(true));
 	mcService.updateMc(mcContent);
 
 	// use redirect to prevent resubmition of the same request
@@ -260,6 +282,7 @@ public class McMonitoringAction extends LamsDispatchAction {
 	    }
 	}
 
+	request.setAttribute(McAppConstants.ATTR_CONTENT, user.getMcSession().getMcContent());
 	request.setAttribute(McAppConstants.USER_ATTEMPTS, userAttempts);
 	request.setAttribute(McAppConstants.TOOL_SESSION_ID, user.getMcSession().getMcSessionId());
 	return (userAttempts == null || userAttempts.isEmpty()) ? null
@@ -288,9 +311,27 @@ public class McMonitoringAction extends LamsDispatchAction {
 	}
 	String searchString = WebUtil.readStrParam(request, "userName", true);
 
-	List<McUserMarkDTO> userDtos = mcService.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy,
-		sortOrder, searchString);
-	int countVisitLogs = mcService.getCountPagedUsersBySession(sessionId, searchString);
+	List<McUserMarkDTO> userDtos = new ArrayList<McUserMarkDTO>();
+	int countVisitLogs = 0;
+	//in case of UseSelectLeaderToolOuput - display only one user
+	if (groupLeader != null) {
+	    
+		Integer totalMark = groupLeader.getLastAttemptTotalMark();
+		Long portraitId = mcService.getPortraitId(groupLeader.getQueUsrId());
+		
+		McUserMarkDTO userDto = new McUserMarkDTO();
+		userDto.setQueUsrId(groupLeader.getUid().toString());
+		userDto.setUserId(groupLeader.getQueUsrId().toString());
+		userDto.setFullName(groupLeader.getFullname());
+		userDto.setTotalMark(totalMark != null ? totalMark.longValue() : null);
+		userDto.setPortraitId(portraitId==null ? null : portraitId.toString());
+		userDtos.add(userDto);
+		countVisitLogs = 1;
+
+	} else {
+	    userDtos = mcService.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy, sortOrder, searchString);
+	    countVisitLogs = mcService.getCountPagedUsersBySession(sessionId, searchString);
+	}
 
 	int totalPages = new Double(
 		Math.ceil(new Integer(countVisitLogs).doubleValue() / new Integer(rowLimit).doubleValue())).intValue();
@@ -304,7 +345,7 @@ public class McMonitoringAction extends LamsDispatchAction {
 	    visitLogData.add(userUid);
 	    visitLogData.add(userDto.getUserId());
 
-	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFullName());
 	    if (groupLeader != null && groupLeader.getUid().equals(userUid)) {
 		fullName += " (" + mcService.getLocalizedMessage("label.monitoring.group.leader") + ")";
 	    }

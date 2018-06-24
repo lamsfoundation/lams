@@ -102,6 +102,10 @@ public class LinkToolsServlet extends HttpServlet {
 
 	} else if (method.equals("openMonitorLinkTool")) {
 	    openMonitorLinkTool(request, response);
+	
+	//open LAMS course gradebook page
+	} else if (method.equals("openCourseGradebook")) {
+	    openCourseGradebook(request, response);
 
 	//Admin on BB side calls this servlet to clone old lesson that were copied to the new course.
 	} else if (method.equals("cloneLessons")) {
@@ -262,6 +266,40 @@ public class LinkToolsServlet extends HttpServlet {
 	    return sb.toString();
 	}
     }
+    
+    private void openCourseGradebook(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
+	
+//	BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
+//	Container bbContainer = bbPm.getContainer();
+//	PkId courseId = new PkId(bbContainer, Course.DATA_TYPE, request.getParameter("course_id"));
+//	
+//	    // find a teacher that will be assigned as lesson's author on LAMS side
+//	    User teacher = BlackboardUtil.getCourseTeacher(courseId);
+	
+	Context ctx = null;
+	try {
+	    // get Blackboard context
+	    ContextManager ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
+	    ctx = ctxMgr.getContext();
+
+	    // construct Login Request URL for author LAMS Lessons (as it's the only possible method value to successfully pass authentication)
+	    String courseGradebookUrl = LamsSecurityUtil.generateRequestURL(ctx, "author", null);
+	    courseGradebookUrl += "&mode=gradebook";
+//		courseGradebookUrl += "&courseid=" + cour;
+//		courseGradebookUrl += "&redirectUrl=/gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=4";
+//			https://translations.lamsinternational.com/lams/gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=4
+	    response.sendRedirect(courseGradebookUrl);
+	} catch (InitializationException e) {
+	    throw new ServletException(e);
+	} catch (BbServiceException e) {
+	    throw new ServletException(e);
+	} catch (PersistenceException e) {
+	    throw new ServletException(e);
+	}
+
+
+    }
 
     /**
      * Admin on BB side calls this servlet to clone old lesson that were copied to the new course.
@@ -342,7 +380,7 @@ public class LinkToolsServlet extends HttpServlet {
 	User teacher = BlackboardUtil.getCourseTeacher(courseId);
 
 	//find all lessons that should be updated
-	List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
+	List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId, false);
 	for (Content content : lamsContents) {
 
 	    String _content_id = content.getId().toExternalString();
@@ -408,7 +446,7 @@ public class LinkToolsServlet extends HttpServlet {
 	    User teacher = BlackboardUtil.getCourseTeacher(courseId);
 
 	    //find all lessons that should be updated
-	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
+	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId, false);
 	    for (Content content : lamsContents) {
 
 		String _content_id = content.getId().toExternalString();
@@ -520,7 +558,7 @@ public class LinkToolsServlet extends HttpServlet {
 	    User teacher = BlackboardUtil.getCourseTeacher(courseId);
 
 	    //find all lessons that should be updated
-	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
+	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId, false);
 	    for (Content content : lamsContents) {
 
 		// update lesson id

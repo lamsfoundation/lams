@@ -25,9 +25,10 @@ package org.lamsfoundation.lams.tool.peerreview.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 
-public interface PeerreviewSessionDAO extends DAO {
+public interface PeerreviewSessionDAO extends IBaseDAO {
 
     PeerreviewSession getSessionBySessionId(Long sessionId);
 

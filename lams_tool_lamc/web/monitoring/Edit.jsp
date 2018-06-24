@@ -1,5 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<lams:Alert id="editWarning" type="warning" close="false">
+    <fmt:message key="message.monitoring.edit.activity.warning" />
+</lams:Alert>
+
 <table class="table table-condensed">
 	<tr>
 		<td width="10%" ><fmt:message key="label.authoring.title.col"></fmt:message></td>

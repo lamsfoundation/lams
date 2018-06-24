@@ -21,8 +21,13 @@
 				<tr>					
 					<td>  <b> <fmt:message key="label.mc.options.col"/>  </b> 
 						<table class="table table-condensed" style="margin-bottom:0px">
-							<c:forEach var="option" items="${question.mcOptionsContents}">
+							<c:forEach var="option" items="${question.mcOptionsContents}" varStatus="optionStatus">
 								<tr>			
+									<c:if test="${prefixAnswersWithLetters}">
+									<td style="vertical-align:top">
+										${option.formatPrefixLetter(optionStatus.index)}	
+									</td>
+									</c:if>	
 									<td>
 										<c:if test="${option.correctOption}"> 		
 											(<fmt:message key="label.correct"/>)

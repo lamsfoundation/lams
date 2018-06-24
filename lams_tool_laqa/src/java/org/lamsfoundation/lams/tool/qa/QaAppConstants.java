@@ -44,7 +44,9 @@ public interface QaAppConstants {
     public static final String ACTIVITY_INSTRUCTIONS_KEY = "activityInstructionsKey";
     public static final String LIST_QUESTION_DTOS = "questionDTOs";
     public static final String LIST_DELETED_QUESTION_DTOS = "deletedQuestionDTOs";
-
+    public static final String QUESTION_DTO = "questionDTO";
+    public static final String RESPONSES = "responses";
+    
     public static final String TOOL_SERVICE = "toolService";
     public static final String AUTHORING_STARTER = "starter";
     public static final String TITLE = "title";

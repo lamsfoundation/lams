@@ -59,7 +59,7 @@ import org.w3c.dom.Element;
 public class QuestionExporter {
     private static final Logger log = Logger.getLogger(QuestionExporter.class);
 
-    private static final Pattern IMAGE_PATTERN = Pattern.compile("<img.*?src=['\"]/+lams/+www/+([\\w\\.\\/]+).+?>",
+    private static final Pattern IMAGE_PATTERN = Pattern.compile("<img.*?src=['\"]/+lams/+www/+([\\w\\.\\/\\-\\s]+).+?>",
 	    Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
     private static final String IMAGE_MARKER = "[matimage]";
 

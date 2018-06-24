@@ -70,6 +70,7 @@ import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -122,7 +123,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static IMonitoringService monitoringService;
     private static MessageService messageService;
     private static PedagogicalPlannerDAO pedagogicalPlannerDAO;
-    private static ActivityDAO activityDAO;
+    private static IActivityDAO activityDAO;
 
     private static final String FILE_EXTENSION_ZIP = ".zip";
     private static final String FILE_EXTENSION_LAS = ".las";
@@ -1811,71 +1812,67 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     }
 
     private IExportToolContentService getExportService() {
-	if (PedagogicalPlannerAction.exportService == null) {
+	if (exportService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    PedagogicalPlannerAction.exportService = (IExportToolContentService) ctx
+	    exportService = (IExportToolContentService) ctx
 		    .getBean(CentralConstants.EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);
 	}
-	return PedagogicalPlannerAction.exportService;
+	return exportService;
     }
 
     private IAuthoringService getAuthoringService() {
-	if (PedagogicalPlannerAction.authoringService == null) {
+	if (authoringService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    PedagogicalPlannerAction.authoringService = (IAuthoringService) ctx
-		    .getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);
+	    authoringService = (IAuthoringService) ctx.getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);
 	}
-	return PedagogicalPlannerAction.authoringService;
+	return authoringService;
     }
 
     private IMonitoringService getMonitoringService() {
-	if (PedagogicalPlannerAction.monitoringService == null) {
+	if (monitoringService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    PedagogicalPlannerAction.monitoringService = (IMonitoringService) ctx
-		    .getBean(CentralConstants.MONITORING_SERVICE_BEAN_NAME);
+	    monitoringService = (IMonitoringService) ctx.getBean(CentralConstants.MONITORING_SERVICE_BEAN_NAME);
 	}
-	return PedagogicalPlannerAction.monitoringService;
+	return monitoringService;
     }
 
     private IUserManagementService getUserManagementService() {
-	if (PedagogicalPlannerAction.userManagementService == null) {
+	if (userManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    PedagogicalPlannerAction.userManagementService = (IUserManagementService) ctx
+	    userManagementService = (IUserManagementService) ctx
 		    .getBean(CentralConstants.USER_MANAGEMENT_SERVICE_BEAN_NAME);
 	}
-	return PedagogicalPlannerAction.userManagementService;
+	return userManagementService;
     }
 
     private MessageService getMessageService() {
-	if (PedagogicalPlannerAction.messageService == null) {
+	if (messageService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    PedagogicalPlannerAction.messageService = (MessageService) ctx
-		    .getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
+	    messageService = (MessageService) ctx.getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
 	}
-	return PedagogicalPlannerAction.messageService;
+	return messageService;
     }
 
     private PedagogicalPlannerDAO getPedagogicalPlannerDAO() {
-	if (PedagogicalPlannerAction.pedagogicalPlannerDAO == null) {
+	if (pedagogicalPlannerDAO == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    PedagogicalPlannerAction.pedagogicalPlannerDAO = (PedagogicalPlannerDAO) wac
-		    .getBean("pedagogicalPlannerDAO");
+	    pedagogicalPlannerDAO = (PedagogicalPlannerDAO) wac.getBean("pedagogicalPlannerDAO");
 	}
-	return PedagogicalPlannerAction.pedagogicalPlannerDAO;
+	return pedagogicalPlannerDAO;
     }
 
-    private ActivityDAO getActivityDAO() {
-	if (PedagogicalPlannerAction.activityDAO == null) {
+    private IActivityDAO getActivityDAO() {
+	if (activityDAO == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    PedagogicalPlannerAction.activityDAO = (ActivityDAO) wac.getBean("activityDAO");
+	    activityDAO = (IActivityDAO) wac.getBean("activityDAO");
 	}
-	return PedagogicalPlannerAction.activityDAO;
+	return activityDAO;
     }
 }

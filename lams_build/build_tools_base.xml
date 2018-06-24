@@ -123,7 +123,7 @@
 			dbPassword="${db.password}" 
 			dbUsername="${db.username}" 
 			dbDriverUrl="${db.url.build}" 
-			dbDriverClass="com.mysql.jdbc.Driver" 
+			dbDriverClass="com.mysql.cj.jdbc.Driver" 
 			deployFiles="${basedir}/build/deploy/${product}.war,${basedir}/build/deploy/${product}.jar" 
 			toolJarFileName="${product}.jar"
 			toolSignature="${signature}"

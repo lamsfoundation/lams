@@ -233,6 +233,7 @@ public class LearningAction extends Action {
 	sessionMap.put(ForumConstants.ATTR_LOCK_WHEN_FINISHED, forum.getLockWhenFinished());
 	sessionMap.put(ForumConstants.ATTR_USER_FINISHED, forumUser.isSessionFinished());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_EDIT, forum.isAllowEdit());
+	sessionMap.put(ForumConstants.ATTR_ALLOW_ANONYMOUS, forum.getAllowAnonym());
 
 	sessionMap.put(ForumConstants.ATTR_ALLOW_UPLOAD, forum.isAllowUpload());
 	int uploadMaxFileSize = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
@@ -985,17 +986,22 @@ public class LearningAction extends Action {
 	messagePO.setBody(message.getBody());
 	messagePO.setUpdated(new Date());
 	messagePO.setModifiedBy(getCurrentUser(request, (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID)));
+	messagePO.setIsAnonymous(message.getIsAnonymous());
 	setAttachment(messageForm, messagePO);
 
 	if (makeAuditEntry) {
 	    Long userId = 0L;
 	    String loginName = "Default";
-	    if (message.getCreatedBy() != null) {
-		userId = message.getCreatedBy().getUserId();
-		loginName = message.getCreatedBy().getLoginName();
+	    Long toolContentId = null;
+	    if (messagePO.getCreatedBy() != null) {
+		userId = messagePO.getCreatedBy().getUserId();
+		loginName = messagePO.getCreatedBy().getLoginName();
 	    }
-	    forumService.getAuditService().logChange(ForumConstants.TOOL_SIGNATURE, userId, loginName, oldMessageString,
-		    messagePO.toString());
+	    if (messagePO.getToolSession() != null && messagePO.getToolSession().getForum() != null) {
+		toolContentId = messagePO.getToolSession().getForum().getContentId();
+	    }
+	    forumService.getLogEventService().logChangeLearnerContent(userId, loginName, toolContentId,
+		    oldMessageString, messagePO.toString());
 	}
 
 	// save message into database

@@ -17,12 +17,12 @@
 	<lams:css/>
  	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
  	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" rel="stylesheet">
- 	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>/css/jquery.jqGrid.css" />	
+ 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
+
 	<style type="text/css">
 		#additionalParameters {min-height: 50px;}
 		#lessonsDiv {display: none;}
 		#lessonDiv { padding-bottom: 20px;}
-		#pager3_right table{float:right !important; }
 		#datePickerDiv {margin: 10px 0 10px;}
 		
 		/* Accordion */
@@ -30,7 +30,7 @@
 		    background-image: none;
 		    background-color: transparent ;
 		}
-		#nowDiv{padding-left: 10px;}
+		#nowDiv{padding:0px;}
 		.ui-jqgrid-hbox {padding-left: 0;}
 		#accordion h3 a {border-bottom: 0;}
 		#accordion p {text-align: center; padding-bottom: 0px; margin-bottom: 0xp; font-size:12px;}
@@ -40,34 +40,37 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/monitorToolSummaryAdvanced.js "></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jqGrid.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jstepper.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript">
 		jQuery(document).ready(function() {
 
 			//initialize user list 
 			jQuery("#list3").jqGrid({
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
 			   	url: "<c:url value='/emailNotifications.do'/>?method=getUsers" + getSearchParams(),
 				datatype: "json",
 			   	colNames:['<fmt:message key="email.notifications.user.name"/>'],
 			   	colModel:[
 			   		{name:'name',index:'name', width:260, firstsortorder:'desc', sorttype: 'text'}
 			   	],
-			   	rowNum:50,
-			   	rowList:[50,75,100,150,200],
+			    rowList:[10,20,30,40,50,100],
+			   	rowNum:10,
 			   	pager: '#pager3',
 			   	sortname: 'name',
 			   	multiselect: true,
+				multiPageSelection : true,
 			    sortorder: "asc",
 			    loadonce: true,
-			    height:'auto',
-			    pagerpos:'left',
+			    height:'100%',
+				autowidth:true,
 			    ignoreCase: true
 			});
-			jQuery("#list3").jqGrid('navGrid','#pager3',{add:false,del:false,edit:false,position:'right'});
-			$("#list3").parents('div.ui-jqgrid-bdiv').css("max-height","1000px");
+			jQuery("#list3").jqGrid('navGrid','#pager3',{add:false,del:false,edit:false,search:false});
 			jQuery("#list3").jqGrid('filterToolbar',{stringResult: true, searchOnEnter: true, defaultSearch: 'cn'});
+			$("#list3").parents('div.ui-jqgrid-bdiv').css("max-height","1000px");
+			$('#pager3_right').css('display','inline');
 			
 			//initialize datetimepicker
     		$("#datePicker").datetimepicker();
@@ -105,7 +108,7 @@
 			jQuery("#lessonsTable").jqGrid('filterToolbar',{stringResult: true, searchOnEnter: true, defaultSearch: 'cn'});
 			
 			<c:forEach var="lesson" items="${lessons}" varStatus="i">
-				jQuery("#lessonsTable").jqGrid('addRowData',${lesson.lessonId}, {id2:'${lesson.lessonId}',name:'${fn:escapeXml(lesson.lessonName)}'});
+				jQuery("#lessonsTable").jqGrid('addRowData',${lesson.id}, {id2:'${lesson.id}',name:'${fn:escapeXml(lesson.name)}'});
 			</c:forEach>
 			
 			$("#lessonsTable").parents('div.ui-jqgrid-bdiv').css("max-height","10000px");
@@ -117,11 +120,15 @@
     			
     			var isInstantEmailing = ($('#accordion').accordion('option', 'active') == 0);
     			var ids = jQuery("#list3").getGridParam('selarrrow');
-    			var params = "";
+
+    			var searchType = document.getElementById("searchType").value;
+    			var params =  "&searchType=" + searchType;
+    			
     			if(isInstantEmailing && ids.length) {
     			    for (var i=0;i<ids.length;i++) {
     			    	params += "&userId=" + ids[i];
     			    }
+    			    params += "&organisationID=${org.organisationId}";
     			} else if (isInstantEmailing && !ids.length) {
     				return;
 
@@ -133,8 +140,8 @@
     					return;
     				}
         			       			
-    				var searchType = document.getElementById("searchType").value;
-    				params = "&searchType=" + searchType + "&scheduleDate=" + scheduleDate.getTime() + getSearchParams(); 
+    				
+    				params += "&scheduleDate=" + scheduleDate.getTime() + getSearchParams(); 
     			}
     			
     			var emailBody = encodeURIComponent(document.getElementById("emailBody").value);
@@ -214,6 +221,20 @@
 
 	<lams:Page title="${title}" type="admin">
 		<div class="row">
+			<div class="col-sm-12">
+				<div class="btn-group pull-right">
+					<a href="<c:url value='/emailNotifications.do'/>?method=showScheduledEmails&organisationID=${org.organisationId}"
+					   id="listEmailsHref" class="btn btn-default btn-sm">
+						<i class="fa fa-calendar"></i> <fmt:message key="email.notifications.scheduled.messages.button" />
+					</a>
+					<a href="<c:url value='/emailNotifications.do'/>?method=showArchivedEmails&organisationID=${org.organisationId}"
+					   id="archiveHref" class="btn btn-default btn-sm">
+						<i class="fa fa-archive"></i> <fmt:message key="email.notifications.archived.messages.button" />
+					</a>		
+				</div>
+			</div>
+		</div>
+		<div class="row">
 			<div class="col-sm-6">
 				<h4><fmt:message key="email.notifications.notify.sudents.that"/></h4>
 				
@@ -221,6 +242,14 @@
 				
 				<!-- Dropdown menu for choosing a user search type -->
 				<div>
+					<c:choose>
+					<c:when test="${empty lessons}">
+						<!--  only valid type is not started lessons -->
+						<select id="searchType" onchange="getUsers();">
+							<option selected="selected" value="9"><fmt:message key="email.notifications.user.search.property.9" /></option>
+						</select>
+					</c:when>
+					<c:otherwise>
 					<select id="searchType" onchange="getUsers();">
 						<option selected="selected" value="7"><fmt:message key="email.notifications.user.search.property.7" /></option>
 						<option value="8"><fmt:message key="email.notifications.user.search.property.8" /></option>
@@ -228,6 +257,8 @@
 						<option value="10"><fmt:message key="email.notifications.user.search.property.10" /></option>
 						<option value="11"><fmt:message key="email.notifications.user.search.property.11" /></option>
 					</select>
+					</c:otherwise>
+					</c:choose>
 				</div>
 				
 				<div id="additionalParameters">
@@ -237,7 +268,7 @@
 						</h4>
 						<select id="lessonId" onchange="getUsers();">
 							<c:forEach var="lesson" items="${lessons}">
-								<option <c:if test="${lesson.lessonId==firstLesson.lessonId}">selected="selected"</c:if> value="${lesson.lessonId}">${fn:escapeXml(lesson.lessonName)}</option>
+								<option <c:if test="${lesson.id==firstLesson.id}">selected="selected"</c:if> value="${lesson.id}">${fn:escapeXml(lesson.name)}</option>
 							</c:forEach>
 						</select>				
 					</div>
@@ -259,7 +290,7 @@
 			</div>
 			<div class="col-sm-6">
 				<div id="emailTextareaDiv">
-				
+					<h4><fmt:message key="email.notifications.message.header"/></h4>
 					<c:set var="emailBody"><fmt:message key="email.notifications.course.email.body.header"/><br/><br/><fmt:message key="email.notifications.course.email.body.msg"/><br/><br/><br/>
 					</c:set>
 					<textarea rows="8" name="emailBody" id="emailBody" width="100%"  class="form-control" >${fn:replace(emailBody, '<br/>', newLineChar)}</textarea>

@@ -79,12 +79,13 @@
 
 	function clearNewForm() {
 		$('#newFormBody').val('');
+		$('#commentAnonymousNew').prop('checked',false);
 		enableButton(btnName);
 		return false;
 	}
 </script>
 
-<div class="row no-gutter">
+<%-- <div class="row no-gutter">
 	<div class="col-xs-12">
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -94,36 +95,44 @@
 			</div>
 			<div class="panel-body">
 
-				<div class="form-group">
+ --%>				<div class="form-group">
 					<div class="comment-entry">
-						<form id="newForm" method="GET"
-							action="<lams:LAMSURL />comments/newComment.do">
+						<form id="newForm" method="GET"	action="<lams:LAMSURL />comments/newComment.do">
+							<a href="javascript:refreshComments();" style="margin: 5px" class="btn btn-primary btn-xs"> <fmt:message key="label.refresh" /> </a>
+
 							<textarea class="form-control" placeholder="..." id="newFormBody"
 								maxlength="<%=CommentConstants.MAX_BODY_LENGTH + 2%>" name="body"
 								class="comment"></textarea>
-							<input type="hidden" id="sessionMapID" name="sessionMapID"
-								value="${sessionMapID}" /> <a
-								href="javascript:refreshComments();" style="margin: 5px"
-								class="btn btn-primary btn-xs"> <fmt:message
-									key="label.refresh" />
-							</a> <span onclick="javascript:newCommentSubmit();"
+
+							<input type="hidden" id="sessionMapID" name="sessionMapID" value="${sessionMapID}" />  
+
+							<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+							<c:if test="${sessionMap.anonymous}">
+							<div class="inline-block pull-left">
+								<c:set var="anonymousCheckboxChecked" value=""/>
+								<c:set var="anonymousCheckboxName" value="commentAnonymousNew"/>
+								<%@include file="anonymouscheckbox.jsp" %>
+							</div>
+							</c:if>
+
+							<span onclick="javascript:newCommentSubmit();"
 								style="margin: 5px" class="btn btn-primary btn-xs pull-right" id="newCommentSubmitButton">
 								<fmt:message key="label.post" /></span>
-							</a> <a href="#nogo" onclick="javascript:clearNewForm();"
+							<a href="#nogo" onclick="javascript:clearNewForm();"
 								style="margin: 5px" class="btn btn-primary btn-xs pull-right">
 								<fmt:message key="label.cancel" />
 							</a>&nbsp;
 						</form>
 					</div>
 				</div>
-
+<!-- 
 			</div>
-			<!-- end panel body -->
+			end panel body
 		</div>
-		<!-- end comment panel -->
+		end comment panel
 	</div>
-	<!-- end col-*-12 -->
+	end col-*-12
 </div>
-<!-- end row no-gutter -->
-
+end row no-gutter
+ -->
 

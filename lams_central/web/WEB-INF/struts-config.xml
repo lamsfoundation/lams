@@ -29,7 +29,10 @@
       name="emailForm"
       type="org.lamsfoundation.lams.web.EmailForm"
     />
-
+   <form-bean
+      name="uploadForm"
+      type="org.lamsfoundation.lams.monitoring.web.FileUploadForm"
+    />
    <form-bean
   name="PedagogicalPlannerGroupingForm"
   type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerGroupingForm"
@@ -194,6 +197,12 @@
         path="/admin/usersearch.do"
         redirect="false"
       />
+      <forward
+        name="error"
+        path="/errorpages/errorWithMessage.jsp"
+        redirect="false"
+      />
+
     </action>
     <action
       path="/Paint"
@@ -438,6 +447,29 @@
         redirect="false"
       />
     </action>
+    
+	<!--
+		Learning Design Sequence Templates
+  		-->
+    <action
+      path="/authoring/template/tbl"
+      type="org.lamsfoundation.lams.authoring.template.web.TBLTemplateAction"
+      parameter="method"
+      validate="false"
+      scope="request"
+    >
+    <forward name="init" path="/authoring/template/tbl/tbl.jsp" />
+    <forward name="question" path="/authoring/template/tool/mcquestion.jsp" />
+    <forward name="questionoption" path="/authoring/template/tool/mcoption.jsp" />
+    <forward name="redooption" path="/authoring/template/tool/mcredooption.jsp" />
+    <forward name="assess" path="/authoring/template/tool/assessment.jsp" />
+    <forward name="assessmcq" path="/authoring/template/tool/assessmcq.jsp" />
+    <forward name="assessredooption" path="/authoring/template/tool/assessredooption.jsp" />
+    <forward name="assessoption" path="/authoring/template/tool/assessoption.jsp" />
+    <forward name="peerreviewstar" path="/authoring/template/tool/peerreviewstar.jsp" />
+    </action>
+
+
     <action
       path="/portrait"
       type="org.lamsfoundation.lams.web.PortraitAction"
@@ -787,6 +819,19 @@
 		scope="request">
 		<!--  JSON response on success -->
 	</action>
+	<action
+      path="/groupingUpload"
+      type="org.lamsfoundation.lams.monitoring.web.GroupingUploadAJAXAction"
+      name="uploadForm"
+      parameter="method"
+	  scope="request"
+      validate="false"
+    >
+		<!--  text response on success -->
+    </action>
+
+
+
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

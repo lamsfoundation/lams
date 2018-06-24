@@ -40,8 +40,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements AssessmentUserDAO {
 
-    private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + AssessmentUser.class.getName()
-	    + " as u where u.userId =? and u.assessment.contentId=?";
     private static final String FIND_BY_USER_ID_SESSION_ID = "from " + AssessmentUser.class.getName()
 	    + " as u where u.userId =? and u.session.sessionId=?";
     private static final String FIND_BY_SESSION_ID = "from " + AssessmentUser.class.getName()
@@ -62,8 +60,6 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	    + " JOIN tl_laasse10_assessment a ON s.assessment_uid = a.uid "
 	    + " WHERE r.finish_date IS NOT NULL AND r.latest = 1 AND a.content_id = :toolContentId";
 
-    
-
     @SuppressWarnings("rawtypes")
     @Override
     public AssessmentUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
@@ -76,7 +72,22 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 
     @SuppressWarnings("rawtypes")
     @Override
-    public AssessmentUser getUserByUserIDAndContentID(Long userId, Long contentId) {
+    public AssessmentUser getUserCreatedAssessment(Long userId, Long contentId) {
+	final String FIND_BY_USER_ID_CONTENT_ID = "from " + AssessmentUser.class.getName()
+		+ " as u where u.userId =? and u.assessment.contentId=?";
+
+	List list = doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	if (list == null || list.size() == 0) {
+	    return null;
+	}
+	return (AssessmentUser) list.get(0);
+    }
+
+    @Override
+    public AssessmentUser getUserByIdAndContent(Long userId, Long contentId) {
+	final String FIND_BY_USER_ID_CONTENT_ID = "from " + AssessmentUser.class.getName()
+		+ " as u where u.userId =? and u.session.assessment.contentId=?";
+
 	List list = doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0) {
 	    return null;
@@ -174,6 +185,23 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	    return ((Number) list.get(0)).intValue();
 	}
     }
+    
+    @Override
+    public int getCountUsersByContentId(Long contentId) {
+
+	String LOAD_USERS_ORDERED_BY_NAME = "SELECT COUNT(*) FROM " + AssessmentUser.class.getName() + " user"
+		+ " WHERE user.session.assessment.contentId = :contentId ";
+
+	Query query = getSession().createQuery(LOAD_USERS_ORDERED_BY_NAME);
+	query.setLong("contentId", contentId);
+	List list = query.list();
+
+	if ((list == null) || (list.size() == 0)) {
+	    return 0;
+	} else {
+	    return ((Number) list.get(0)).intValue();
+	}
+    }
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -211,8 +239,9 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     }
 
 
-    private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION = "SELECT DISTINCT question_result.uid, user.last_name, user.first_name, user.login_name, question_result.mark"
-		+ " FROM tl_laasse10_user user" + " INNER JOIN tl_laasse10_session session"
+    private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_SELECT = "SELECT DISTINCT question_result.uid, user.last_name, user.first_name, user.login_name, question_result.mark";
+    private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_FROM = " FROM tl_laasse10_user user";
+    private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_JOIN = " INNER JOIN tl_laasse10_session session"
 		+ " ON user.session_uid=session.uid" +
 
 		" LEFT OUTER JOIN tl_laasse10_assessment_result result " + " ON result.user_uid = user.uid"
@@ -228,9 +257,15 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     @SuppressWarnings("unchecked")
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page,
-	    int size, String sortBy, String sortOrder, String searchString) {
+	    int size, String sortBy, String sortOrder, String searchString, IUserManagementService userManagementService) {
 
-	StringBuilder bldr = new StringBuilder(LOAD_USERS_ORDERED_BY_SESSION_QUESTION);
+	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
+
+	StringBuilder bldr = new StringBuilder(LOAD_USERS_ORDERED_BY_SESSION_QUESTION_SELECT)
+		.append(portraitStrings[0])
+		.append(LOAD_USERS_ORDERED_BY_SESSION_QUESTION_FROM)
+		.append(portraitStrings[1])
+		.append(LOAD_USERS_ORDERED_BY_SESSION_QUESTION_JOIN);
 	if ( "grade".equalsIgnoreCase(sortBy) )
 	    bldr.append(LOAD_USERS_ORDERED_ORDER_BY_RESULT);
 	else
@@ -256,6 +291,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		String lastName = (String) element[2];
 		String login = (String) element[3];
 		float grade = element[4] == null ? 0 : ((Number) element[4]).floatValue();
+		Long portraitId  = element[5] == null ? null : ((Number) element[5]).longValue();
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setQuestionResultUid(questionResultUid);
@@ -264,6 +300,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		userDto.setLastName(lastName);
 		userDto.setLogin(login);
 		userDto.setGrade(grade);
+		userDto.setPortraitId(portraitId);
 		userDtos.add(userDto);
 	    }
 

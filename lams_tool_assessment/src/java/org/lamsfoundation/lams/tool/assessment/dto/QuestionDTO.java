@@ -43,7 +43,9 @@ public class QuestionDTO {
 
     private String feedbackOnIncorrect;
 
+    // only one of shuffle and prefixAnswersWithLetters should be on. Both may be off
     private boolean shuffle;
+    private boolean prefixAnswersWithLetters;
 
     private boolean caseSensitive;
 
@@ -54,10 +56,14 @@ public class QuestionDTO {
     private Set<AssessmentUnit> units;
 
     private int maxWordsLimit;
-    
+
     private int minWordsLimit;
 
     private boolean hedgingJustificationEnabled;
+
+    private boolean correctAnswersDisclosed;
+
+    private boolean groupsAnswersDisclosed;
 
     // ============= variable properties =============
 
@@ -85,6 +91,8 @@ public class QuestionDTO {
 
     private List<Object[]> questionResults;
 
+    private int confidenceLevel;
+
     public QuestionDTO(AssessmentQuestion question) {
 	this.uid = question.getUid();
 	this.type = question.getType();
@@ -102,6 +110,7 @@ public class QuestionDTO {
 	this.feedbackOnPartiallyCorrect = question.getFeedbackOnPartiallyCorrect();
 	this.feedbackOnIncorrect = question.getFeedbackOnIncorrect();
 	this.shuffle = question.isShuffle();
+	this.prefixAnswersWithLetters = question.isPrefixAnswersWithLetters();
 	this.caseSensitive = question.isCaseSensitive();
 	this.correctAnswer = question.getCorrectAnswer();
 	this.allowRichEditor = question.isAllowRichEditor();
@@ -109,16 +118,19 @@ public class QuestionDTO {
 	this.maxWordsLimit = question.getMaxWordsLimit();
 	this.minWordsLimit = question.getMinWordsLimit();
 	this.hedgingJustificationEnabled = question.isHedgingJustificationEnabled();
+	this.correctAnswersDisclosed = question.isCorrectAnswersDisclosed();
+	this.groupsAnswersDisclosed = question.isGroupsAnswersDisclosed();
 
 	optionDtos = new TreeSet<OptionDTO>(new SequencableComparator());
-	for (AssessmentQuestionOption option: question.getOptions()) {
-	    optionDtos.add(new OptionDTO(option)); 
+	for (AssessmentQuestionOption option : question.getOptions()) {
+	    optionDtos.add(new OptionDTO(option));
 	}
     }
 
     public Long getUid() {
 	return uid;
     }
+
     public void setUid(Long userID) {
 	this.uid = userID;
     }
@@ -126,13 +138,15 @@ public class QuestionDTO {
     public short getType() {
 	return type;
     }
+
     public void setType(short type) {
 	this.type = type;
     }
-    
+
     public String getTitle() {
 	return title;
     }
+
     public void setTitle(String title) {
 	this.title = title;
     }
@@ -140,6 +154,7 @@ public class QuestionDTO {
     public String getQuestion() {
 	return question;
     }
+
     public void setQuestion(String question) {
 	this.question = question;
     }
@@ -147,6 +162,7 @@ public class QuestionDTO {
     public int getSequenceId() {
 	return sequenceId;
     }
+
     public void setSequenceId(int sequenceId) {
 	this.sequenceId = sequenceId;
     }
@@ -154,6 +170,7 @@ public class QuestionDTO {
     public int getDefaultGrade() {
 	return defaultGrade;
     }
+
     public void setDefaultGrade(int defaultGrade) {
 	this.defaultGrade = defaultGrade;
     }
@@ -161,6 +178,7 @@ public class QuestionDTO {
     public float getPenaltyFactor() {
 	return penaltyFactor;
     }
+
     public void setPenaltyFactor(float penaltyFactor) {
 	this.penaltyFactor = penaltyFactor;
     }
@@ -168,6 +186,7 @@ public class QuestionDTO {
     public boolean isAnswerRequired() {
 	return answerRequired;
     }
+
     public void setAnswerRequired(boolean answerRequired) {
 	this.answerRequired = answerRequired;
     }
@@ -175,6 +194,7 @@ public class QuestionDTO {
     public String getGeneralFeedback() {
 	return generalFeedback;
     }
+
     public void setGeneralFeedback(String generalFeedback) {
 	this.generalFeedback = generalFeedback;
     }
@@ -182,6 +202,7 @@ public class QuestionDTO {
     public String getFeedback() {
 	return feedback;
     }
+
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
     }
@@ -189,6 +210,7 @@ public class QuestionDTO {
     public boolean isMultipleAnswersAllowed() {
 	return multipleAnswersAllowed;
     }
+
     public void setMultipleAnswersAllowed(boolean multipleAnswersAllowed) {
 	this.multipleAnswersAllowed = multipleAnswersAllowed;
     }
@@ -196,6 +218,7 @@ public class QuestionDTO {
     public boolean isIncorrectAnswerNullifiesMark() {
 	return incorrectAnswerNullifiesMark;
     }
+
     public void setIncorrectAnswerNullifiesMark(boolean incorrectAnswerNullifiesMark) {
 	this.incorrectAnswerNullifiesMark = incorrectAnswerNullifiesMark;
     }
@@ -203,6 +226,7 @@ public class QuestionDTO {
     public String getFeedbackOnCorrect() {
 	return feedbackOnCorrect;
     }
+
     public void setFeedbackOnCorrect(String feedbackOnCorrect) {
 	this.feedbackOnCorrect = feedbackOnCorrect;
     }
@@ -210,6 +234,7 @@ public class QuestionDTO {
     public String getFeedbackOnPartiallyCorrect() {
 	return feedbackOnPartiallyCorrect;
     }
+
     public void setFeedbackOnPartiallyCorrect(String feedbackOnPartiallyCorrect) {
 	this.feedbackOnPartiallyCorrect = feedbackOnPartiallyCorrect;
     }
@@ -217,6 +242,7 @@ public class QuestionDTO {
     public String getFeedbackOnIncorrect() {
 	return feedbackOnIncorrect;
     }
+
     public void setFeedbackOnIncorrect(String feedbackOnIncorrect) {
 	this.feedbackOnIncorrect = feedbackOnIncorrect;
     }
@@ -224,6 +250,7 @@ public class QuestionDTO {
     public boolean isShuffle() {
 	return shuffle;
     }
+
     public void setShuffle(boolean shuffle) {
 	this.shuffle = shuffle;
     }
@@ -231,6 +258,7 @@ public class QuestionDTO {
     public boolean isCaseSensitive() {
 	return caseSensitive;
     }
+
     public void setCaseSensitive(boolean caseSensitive) {
 	this.caseSensitive = caseSensitive;
     }
@@ -238,6 +266,7 @@ public class QuestionDTO {
     public boolean getCorrectAnswer() {
 	return correctAnswer;
     }
+
     public void setCorrectAnswer(boolean correctAnswer) {
 	this.correctAnswer = correctAnswer;
     }
@@ -245,6 +274,7 @@ public class QuestionDTO {
     public boolean isAllowRichEditor() {
 	return allowRichEditor;
     }
+
     public void setAllowRichEditor(boolean allowRichEditor) {
 	this.allowRichEditor = allowRichEditor;
     }
@@ -252,6 +282,7 @@ public class QuestionDTO {
     public Set<AssessmentUnit> getUnits() {
 	return units;
     }
+
     public void setUnits(Set<AssessmentUnit> units) {
 	this.units = units;
     }
@@ -259,6 +290,7 @@ public class QuestionDTO {
     public int getMaxWordsLimit() {
 	return maxWordsLimit;
     }
+
     public void setMaxWordsLimit(int maxWordsLimit) {
 	this.maxWordsLimit = maxWordsLimit;
     }
@@ -266,6 +298,7 @@ public class QuestionDTO {
     public int getMinWordsLimit() {
 	return minWordsLimit;
     }
+
     public void setMinWordsLimit(int minWordsLimit) {
 	this.minWordsLimit = minWordsLimit;
     }
@@ -273,15 +306,24 @@ public class QuestionDTO {
     public boolean isHedgingJustificationEnabled() {
 	return hedgingJustificationEnabled;
     }
+
     public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
 	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
     }
-    
+
+    public boolean isCorrectAnswersDisclosed() {
+	return correctAnswersDisclosed;
+    }
+
+    public boolean isGroupsAnswersDisclosed() {
+	return groupsAnswersDisclosed;
+    }
     // ============= variable properties =============
-    
+
     public String getAnswerString() {
 	return answerString;
     }
+
     public void setAnswerString(String answerString) {
 	this.answerString = answerString;
     }
@@ -289,6 +331,7 @@ public class QuestionDTO {
     public float getAnswerFloat() {
 	return answerFloat;
     }
+
     public void setAnswerFloat(float answerFloat) {
 	this.answerFloat = answerFloat;
     }
@@ -296,13 +339,15 @@ public class QuestionDTO {
     public boolean getAnswerBoolean() {
 	return answerBoolean;
     }
+
     public void setAnswerBoolean(boolean answerBoolean) {
 	this.answerBoolean = answerBoolean;
     }
-    
+
     public void setQuestionFeedback(String questionFeedback) {
 	this.questionFeedback = questionFeedback;
     }
+
     public String getQuestionFeedback() {
 	return questionFeedback;
     }
@@ -310,6 +355,7 @@ public class QuestionDTO {
     public int getGrade() {
 	return grade;
     }
+
     public void setGrade(int grade) {
 	this.grade = grade;
     }
@@ -317,6 +363,7 @@ public class QuestionDTO {
     public Float getMark() {
 	return mark;
     }
+
     public void setMark(Float mark) {
 	this.mark = mark;
     }
@@ -324,6 +371,7 @@ public class QuestionDTO {
     public Float getPenalty() {
 	return penalty;
     }
+
     public void setPenalty(Float penalty) {
 	this.penalty = penalty;
     }
@@ -331,6 +379,7 @@ public class QuestionDTO {
     public Set<OptionDTO> getMatchingPairOptions() {
 	return matchingPairOptions;
     }
+
     public void setMatchingPairOptions(Set<OptionDTO> matchingPairOptions) {
 	this.matchingPairOptions = matchingPairOptions;
     }
@@ -338,13 +387,23 @@ public class QuestionDTO {
     public List<Object[]> getQuestionResults() {
 	return questionResults;
     }
+
     public void setQuestionResults(List<Object[]> questionResults2) {
 	this.questionResults = questionResults2;
+    }
+
+    public int getConfidenceLevel() {
+	return confidenceLevel;
+    }
+
+    public void setConfidenceLevel(int confidenceLevel) {
+	this.confidenceLevel = confidenceLevel;
     }
 
     public boolean isResponseSubmitted() {
 	return responseSubmitted;
     }
+
     public void setResponseSubmitted(boolean responseSubmitted) {
 	this.responseSubmitted = responseSubmitted;
     }
@@ -352,14 +411,24 @@ public class QuestionDTO {
     public float getAnswerTotalGrade() {
 	return answerTotalGrade;
     }
+
     public void setAnswerTotalGrade(float answerTotalGrade) {
 	this.answerTotalGrade = answerTotalGrade;
     }
-    
+
     public Set<OptionDTO> getOptionDtos() {
 	return optionDtos;
     }
+
     public void setOptionDtos(Set<OptionDTO> optionDtos) {
 	this.optionDtos = optionDtos;
+    }
+
+    public boolean isPrefixAnswersWithLetters() {
+	return prefixAnswersWithLetters;
+    }
+
+    public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
+	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
 }

@@ -38,12 +38,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -86,7 +88,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
@@ -115,7 +116,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     private IUserManagementService userManagementService;
     private ILamsToolService toolService;
     private ILearnerService learnerService;
-    private IAuditService auditService;
+    private ILogEventService logEventService;
     private IExportToolContentService exportContentService;
     private QaOutputFactory qaOutputFactory;
     private IQaConfigItemDAO qaConfigItemDAO;
@@ -381,8 +382,12 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
     @Override
     public void removeUserResponse(QaUsrResp resp) {
-	auditService.logChange(QaAppConstants.MY_SIGNATURE, resp.getQaQueUser().getQueUsrId(),
-		resp.getQaQueUser().getUsername(), resp.getAnswer(), null);
+	Long toolContentId = null;
+	if (resp.getQaQuestion() != null && resp.getQaQuestion().getQaContent() != null) {
+	    toolContentId = resp.getQaQuestion().getQaContent().getQaContentId();
+	}
+	logEventService.logChangeLearnerContent(resp.getQaQueUser().getQueUsrId(), resp.getQaQueUser().getUsername(),
+		toolContentId, resp.getAnswer(), null);
 	qaUsrRespDAO.removeUserResponse(resp);
     }
 
@@ -398,10 +403,14 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 		userId = response.getQaQueUser().getQueUsrId();
 		loginName = response.getQaQueUser().getUsername();
 	    }
+	    Long toolContentId = null;
+	    if (response.getQaQuestion() != null && response.getQaQuestion().getQaContent() != null) {
+		toolContentId = response.getQaQuestion().getQaContent().getQaContentId();
+	    }
 	    if (isHideItem) {
-		auditService.logHideEntry(QaAppConstants.MY_SIGNATURE, userId, loginName, response.getAnswer());
+		logEventService.logHideLearnerContent(userId, loginName, toolContentId, response.getAnswer());
 	    } else {
-		auditService.logShowEntry(QaAppConstants.MY_SIGNATURE, userId, loginName, response.getAnswer());
+		logEventService.logShowLearnerContent(userId, loginName, toolContentId, response.getAnswer());
 	    }
 	    response.setVisible(!isHideItem);
 	    updateUserResponse(response);
@@ -906,6 +915,11 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
+	return null;
+    }
+
+    @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	Long userId = user.getUserId().longValue();
 
@@ -1040,12 +1054,12 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public IExportToolContentService getExportContentService() {

@@ -50,6 +50,15 @@
             insert="true"
             column="question"
         />
+        
+       	<property 
+       		name="questionHash" 
+       		type="java.lang.String" 
+            update="true"
+            insert="true"
+       		column="question_hash"
+			length="64"
+		/>
 
         <property
             name="sequenceId"
@@ -232,12 +241,31 @@
             insert="true"
             column="hedging_justification_enabled"
         />
+        
+        <property
+            name="correctAnswersDisclosed"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="correct_answers_disclosed"
+        />
 
-        <!--
-            To add non XDoclet property mappings, create a file named
-                hibernate-properties-AssessmentQuestion.xml
-            containing the additional properties and place it in your merge dir.
-        -->
+        <property
+            name="groupsAnswersDisclosed"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="groups_answers_disclosed"
+        />
+
+        <property
+            name="prefixAnswersWithLetters"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="prefix_answers_with_letters"
+        />
+
 
     </class>
 

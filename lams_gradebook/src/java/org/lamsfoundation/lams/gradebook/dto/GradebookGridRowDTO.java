@@ -20,11 +20,9 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook.dto;
 
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -57,6 +55,12 @@ public abstract class GradebookGridRowDTO {
 
     // Another unit of time that represents average time taken for a corresponding task
     protected Long medianTimeTaken;
+    
+    // Another unit of time that represents minimum time taken for a corresponding task
+    protected Long minTimeTaken;
+    
+    // Another unit of time that represents maximum time taken for a corresponding task
+    protected Long maxTimeTaken;
 
     // The mark for the corresponding gradebook grid row task
     protected Double mark;
@@ -69,9 +73,8 @@ public abstract class GradebookGridRowDTO {
 
     protected String status;
     protected String feedback;
-    
+
     protected boolean displayMarkAsPercent = false;
-   
 
     /**
      * A shared function to convert milliseconds into a readable string
@@ -125,38 +128,6 @@ public abstract class GradebookGridRowDTO {
 	    return usedFormat.format(date);
 	}
 	return null;
-    }
-
-    protected String markToString() {
-	if (mark != null) {
-	    String markStr = new DecimalFormat("##0.00").format(mark);
-	    if (marksAvailable != null) {
-		return "<font color='green'>" + markStr + "/" + marksAvailable.toString() + "</font>";
-	    } else {
-		return markStr;
-	    }
-	} else {
-	    if (marksAvailable != null) {
-		return "<font color='red'>" + CELL_EMPTY + "/" + marksAvailable.toString() + "</font>";
-	    } else {
-
-	    }
-	    return CELL_EMPTY;
-
-	}
-    }
-
-    protected String averageMarkToString() {
-	if (averageMark != null) {
-	    String avgStr = new DecimalFormat("##0.00").format(averageMark);
-	    if (marksAvailable != null) {
-		return avgStr + "/" + marksAvailable.toString();
-	    } else {
-		return avgStr;
-	    }
-	} else {
-	    return CELL_EMPTY;
-	}
     }
 
     protected String toItalic(String string) {
@@ -218,6 +189,39 @@ public abstract class GradebookGridRowDTO {
     public void setMedianTimeTaken(Long medianTimeTaken) {
 	this.medianTimeTaken = medianTimeTaken;
     }
+    
+    
+    public Long getMinTimeTaken() {
+        return minTimeTaken;
+    }
+    
+    public Long getMinTimeTakenSeconds() {
+	if (minTimeTaken != null) {
+	    return minTimeTaken / 1000;
+	} else {
+	    return null;
+	}
+    }
+
+    public void setMinTimeTaken(Long minTimeTaken) {
+        this.minTimeTaken = minTimeTaken;
+    }
+
+    public Long getMaxTimeTaken() {
+        return maxTimeTaken;
+    }
+    
+    public Long getMaxTimeTakenSeconds() {
+	if (maxTimeTaken != null) {
+	    return maxTimeTaken / 1000;
+	} else {
+	    return null;
+	}
+    }
+
+    public void setMaxTimeTaken(Long maxTimeTaken) {
+        this.maxTimeTaken = maxTimeTaken;
+    }
 
     public Double getAverageMark() {
 	return averageMark;
@@ -250,7 +254,7 @@ public abstract class GradebookGridRowDTO {
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
     }
-    
+
     public Date getStartDate() {
 	return startDate;
     }
@@ -268,12 +272,11 @@ public abstract class GradebookGridRowDTO {
     }
 
     public boolean getDisplayMarkAsPercent() {
- 	return displayMarkAsPercent;
-     }
+	return displayMarkAsPercent;
+    }
 
-     public void setDisplayMarkAsPercent(boolean displayMarkAsPercent) {
- 	this.displayMarkAsPercent = displayMarkAsPercent;
-     }
+    public void setDisplayMarkAsPercent(boolean displayMarkAsPercent) {
+	this.displayMarkAsPercent = displayMarkAsPercent;
+    }
 
-    
 }

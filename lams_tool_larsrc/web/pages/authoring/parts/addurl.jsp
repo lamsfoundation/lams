@@ -65,8 +65,7 @@
 					&nbsp;<label for="openUrlNewWindow"><fmt:message key="open.in.new.window" /></label>
 					<br/>
 					
-					<html:checkbox property="allowRating" styleId="allowRating" styleClass="loffset5"/>
-					&nbsp;<label for="allowRating"><fmt:message key="label.enable.rating" /></label>
+					<%@ include file="ratings.jsp"%>	
 				</div>
 
 			</html:form>

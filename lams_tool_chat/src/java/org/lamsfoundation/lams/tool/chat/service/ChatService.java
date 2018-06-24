@@ -36,11 +36,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -70,7 +72,6 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -98,7 +99,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 
     private IToolContentHandler chatToolContentHandler = null;
 
-    private IAuditService auditService = null;
+    private ILogEventService logEventService = null;
 
     private IExportToolContentService exportContentService;
 
@@ -203,6 +204,11 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<>();
+    }
+
+    @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
+	return null;
     }
 
     @Override
@@ -626,28 +632,37 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 	return chatMessageDAO.getLatest(chatSession, max, orderAsc);
     }
 
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     @Override
     public void auditEditMessage(ChatMessage chatMessage, String messageBody) {
-	auditService.logChange(ChatConstants.TOOL_SIGNATURE, chatMessage.getFromUser().getUserId(),
-		chatMessage.getFromUser().getLoginName(), chatMessage.getBody(), messageBody);
+	Long toolContentId = null;
+	if (chatMessage.getChatSession() != null && chatMessage.getChatSession().getChat() != null) {
+	    toolContentId = chatMessage.getChatSession().getChat().getToolContentId();
+	}
+
+	logEventService.logChangeLearnerContent(chatMessage.getFromUser().getUserId(),
+		chatMessage.getFromUser().getLoginName(), toolContentId, chatMessage.getBody(), messageBody);
     }
 
     @Override
     public void auditHideShowMessage(ChatMessage chatMessage, boolean messageHidden) {
+	Long toolContentId = null;
+	if (chatMessage.getChatSession() != null && chatMessage.getChatSession().getChat() != null) {
+	    toolContentId = chatMessage.getChatSession().getChat().getToolContentId();
+	}
 	if (messageHidden) {
-	    auditService.logHideEntry(ChatConstants.TOOL_SIGNATURE, chatMessage.getFromUser().getUserId(),
-		    chatMessage.getFromUser().getLoginName(), chatMessage.toString());
+	    logEventService.logHideLearnerContent(chatMessage.getFromUser().getUserId(),
+		    chatMessage.getFromUser().getLoginName(), toolContentId, chatMessage.toString());
 	} else {
-	    auditService.logShowEntry(ChatConstants.TOOL_SIGNATURE, chatMessage.getFromUser().getUserId(),
-		    chatMessage.getFromUser().getLoginName(), chatMessage.toString());
+	    logEventService.logShowLearnerContent(chatMessage.getFromUser().getUserId(),
+		    chatMessage.getFromUser().getLoginName(), toolContentId, chatMessage.toString());
 	}
     }
 

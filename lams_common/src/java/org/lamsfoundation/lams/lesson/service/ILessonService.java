@@ -183,6 +183,14 @@ public interface ILessonService {
     void removeLearnersFromGroup(Grouping grouping, Long groupId, List<User> learners) throws LessonServiceException;
 
     /**
+     * Remove all the learners from the given grouping but leave the groups.
+     *
+     * @param grouping
+     *            the grouping from which to remove the learners (mandatory)
+     */
+    void removeAllLearnersFromGrouping(Grouping grouping) throws LessonServiceException;
+
+    /**
      * Create an empty group for the given grouping. If the group name already exists then it will force the name to be
      * unique.
      *
@@ -332,6 +340,9 @@ public interface ILessonService {
      */
     Integer getCountLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
 
+    /** Gets the count of the users who are currently in an activity */
+    Integer getCountLearnersInCurrentActivity(Activity activity);
+    
     /**
      * Returns map of lessons in an organisation for a particular learner or staff user.
      *

@@ -16,6 +16,9 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
+
 <script type="text/javascript">
   	$(document).ready(function(){
   	
@@ -58,11 +61,11 @@
 							rows += '<tr>';
 							
 							rows += '<td>';
-							rows += 	orgData["userId"];
+							rows += 	definePortraitPopover(orgData["portraitId"], orgData["userId"], orgData["userId"], orgData["userId"]);
 							rows += '</td>';
 
 							rows += '<td>';
-							rows += 	orgData["login"];
+							rows += 	definePortraitPopover(orgData["portraitId"], orgData["userId"], orgData["login"], orgData["login"]);
 							rows += '</td>';
 
 							rows += '<td>';
@@ -109,6 +112,10 @@
 			    	}
 				}
             })
+            .bind('pagerInitialized pagerComplete', function(event, options){
+				initializePortraitPopover('${lams}');
+			})
+
 		});
 		
 		// make demo search buttons work

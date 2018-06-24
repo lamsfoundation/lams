@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.comments;
 public class CommentConstants {
 
     public static final String ATTR_EXTERNAL_ID = "externalID";
+    public static final String ATTR_EXTERNAL_SECONDARY_ID = "externalSecondaryID";
     public static final String ATTR_EXTERNAL_SIG = "externalSig";
     public static final String ATTR_EXTERNAL_TYPE = "externalType";
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
@@ -41,6 +42,11 @@ public class CommentConstants {
     public static final String ATTR_HIDE_FLAG = "hideFlag";
     public static final String ATTR_STATUS = "status";
     public static final String ATTR_LIKE_AND_DISLIKE = "likeAndDislike";
+    public static final String ATTR_ANONYMOUS = "anonymous"; // do we allow anonymous comments?
+    public static final String ATTR_COMMENT_ANONYMOUS_NEW = "commentAnonymousNew"; // is this new comment anonymous?
+    public static final String ATTR_COMMENT_ANONYMOUS_EDIT_ALLOW_UPDATE = "commentAnonymousAllowUpdate"; // is this new comment anonymous?
+    public static final String ATTR_COMMENT_ANONYMOUS_EDIT = "commentAnonymousEdit"; // is this edited comment anonymous?
+    public static final String ATTR_COMMENT_ANONYMOUS_REPLY = "commentAnonymousReply"; // is this edited comment anonymous?
     public static final String ATTR_READ_ONLY = "readOnly";
     public static final String ATTR_SORT_BY = "sortBy"; // 0 date, 1 likes
     public static final String ATTR_STICKY = "sticky"; // 0 date, 1 likes

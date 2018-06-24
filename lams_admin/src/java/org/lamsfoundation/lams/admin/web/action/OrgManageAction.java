@@ -29,7 +29,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -43,6 +42,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -190,7 +191,7 @@ public class OrgManageAction extends LamsDispatchAction {
 	    sortOrder = isSort3.equals(0) ? "ASC" : "DESC";
 
 	} else if (isSort4 != null) {
-	    sortBy = "description";
+	    sortBy = "createDate";
 	    sortOrder = isSort4.equals(0) ? "ASC" : "DESC";
 
 	}
@@ -207,11 +208,12 @@ public class OrgManageAction extends LamsDispatchAction {
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 	    responseRow.put("id", organisation.getOrganisationId());
 	    String orgName = organisation.getName() == null ? "" : organisation.getName();
-	    responseRow.put("name", StringEscapeUtils.escapeHtml(orgName));
+	    responseRow.put("name", HtmlUtils.htmlEscape(orgName));
 	    String orgCode = organisation.getCode() == null ? "" : organisation.getCode();
-	    responseRow.put("code", StringEscapeUtils.escapeHtml(orgCode));
-	    String orgDescription = organisation.getDescription() == null ? "" : organisation.getDescription();
-	    responseRow.put("description", StringEscapeUtils.escapeHtml(orgDescription));
+	    responseRow.put("code", HtmlUtils.htmlEscape(orgCode));
+	    String orgCreateDate = organisation.getCreateDate() == null ? ""
+		    : FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(organisation.getCreateDate());
+	    responseRow.put("createDate", orgCreateDate);
 
 	    rows.add(responseRow);
 	}

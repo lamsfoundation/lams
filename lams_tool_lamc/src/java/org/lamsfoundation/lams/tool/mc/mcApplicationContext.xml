@@ -80,7 +80,7 @@
 					<property name="toolService"><ref bean="lamsToolService"/></property>
 			 		<property name="learnerService"><ref bean="learnerService"/></property>		
 					<property name="mcToolContentHandler"><ref bean="mcToolContentHandler"/></property>		
-					<property name="auditService"><ref bean="auditService"/></property>					
+					<property name="logEventService"><ref bean="logEventService"/></property>					
 					<property name="exportContentService"><ref bean="exportToolContentService"/></property>
 					<property name="gradebookService"><ref bean="gradebookService" /></property>
 			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>										
@@ -106,6 +106,7 @@
 					<prop key="setReflectiveData">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="setDefineLater">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="changeUserAttemptMark">PROPAGATION_REQUIRED,-McApplicationException</prop>
 				</props>
 			</property>
 	</bean>  

@@ -105,6 +105,11 @@
         redirect="false"
       />
       <forward
+        name="uploadredirect"
+        path="/learner/redirectAfterSubmit.jsp"
+        redirect="false"
+      />
+      <forward
         name="defineLater"
         path="/learner/definelater.jsp"
         redirect="false"
@@ -112,6 +117,11 @@
       <forward
         name="submissionDeadline"
         path="/learner/submissionDeadline.jsp"
+        redirect="false"
+      />
+      <forward
+        name="waitForLeaderTimeLimit"
+        path="/learner/waitForLeaderTimeLimit.jsp"
         redirect="false"
       />
     </action>

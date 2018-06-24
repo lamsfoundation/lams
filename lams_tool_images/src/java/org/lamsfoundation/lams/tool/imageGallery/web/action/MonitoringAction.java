@@ -212,8 +212,11 @@ public class MonitoringAction extends Action {
 	    HttpServletResponse response) {
 
 	Long itemUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_IMAGE_UID);
+	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	Long contentId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_CONTENT_ID);
 	IImageGalleryService service = getImageGalleryService();
-	service.toggleImageVisibility(itemUid);
+	service.toggleImageVisibility(itemUid, contentId);
 
 	return null;
     }

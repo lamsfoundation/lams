@@ -9,14 +9,10 @@ var MenuLib = {
 	addAnnotationLabel : function() {
 		HandlerLib.resetCanvasMode();
 		
-		$('.modal-body', layout.infoDialog).text(LABELS.ANNOTATION_LABEL_PLACE_PROMPT);
-		layout.infoDialog.modal('show');
+		layout.infoDialog.data('show')(LABELS.ANNOTATION_LABEL_PLACE_PROMPT, true);
 
 		canvas.css('cursor', 'pointer').click(function(event){
-			$('.modal-body', layout.infoDialog).empty();
 			layout.infoDialog.modal('hide');
-
-
 			var translatedEvent = GeneralLib.translateEventOnCanvas(event),
 				x = translatedEvent[0],
 				y = translatedEvent[1];
@@ -34,13 +30,10 @@ var MenuLib = {
 	addAnnotationRegion : function() {
 		HandlerLib.resetCanvasMode();
 		
-		$('.modal-body', layout.infoDialog).text(LABELS.ANNOTATION_REGION_PLACE_PROMPT);
-		layout.infoDialog.modal('show');
+		layout.infoDialog.data('show')(LABELS.ANNOTATION_REGION_PLACE_PROMPT, true);
 	
 		canvas.css('cursor', 'crosshair').mousedown(function(event){
-			$('.modal-body', layout.infoDialog).empty();
 			layout.infoDialog.modal('hide');
-			
 			var	targetElement = Snap.getElementByPoint(event.pageX, event.pageY);
 			
 			if (targetElement.type == 'svg') {
@@ -59,8 +52,7 @@ var MenuLib = {
 	addBranching : function(){
 		HandlerLib.resetCanvasMode();
 		
-		$('.modal-body', layout.infoDialog).text(LABELS.BRANCHING_START_PLACE_PROMPT);
-		layout.infoDialog.modal('show');
+		layout.infoDialog.data('show')(LABELS.BRANCHING_START_PLACE_PROMPT, true);
 		
 		layout.addBranchingStart = true;
 		
@@ -81,7 +73,6 @@ var MenuLib = {
 				layout.addBranchingStart = null;
 				HandlerLib.resetCanvasMode(true);
 				
-				$('.modal-body', layout.infoDialog).empty();
 				layout.infoDialog.modal('hide');
 				
 				GeneralLib.setModified(true);
@@ -89,7 +80,7 @@ var MenuLib = {
 				// extract main branchingActivity structure from created start point
 				branchingActivity = branchingEdge.branchingActivity;
 				layout.addBranchingStart = branchingEdge;
-				$('.modal-body', layout.infoDialog).text(LABELS.BRANCHING_END_PLACE_PROMPT);
+				layout.infoDialog.data('show')(LABELS.BRANCHING_END_PLACE_PROMPT, true);
 			}
 		});
 	},
@@ -105,13 +96,10 @@ var MenuLib = {
 		}
 		HandlerLib.resetCanvasMode();
 		
-		$('.modal-body', layout.infoDialog).text(LABELS.SUPPORT_ACTIVITY_PLACE_PROMPT);
-		layout.infoDialog.modal('show');
+		layout.infoDialog.data('show')(LABELS.SUPPORT_ACTIVITY_PLACE_PROMPT, true);
 	
 		canvas.css('cursor', 'pointer').click(function(event){
-			$('.modal-body', layout.infoDialog).empty();
 			layout.infoDialog.modal('hide');
-
 			var translatedEvent = GeneralLib.translateEventOnCanvas(event),
 				x = translatedEvent[0],
 				y = translatedEvent[1];
@@ -186,13 +174,10 @@ var MenuLib = {
 	addOptionalActivity : function() {
 			HandlerLib.resetCanvasMode();
 			
-			$('.modal-body', layout.infoDialog).text(LABELS.OPTIONAL_ACTIVITY_PLACE_PROMPT);
-			layout.infoDialog.modal('show');
+			layout.infoDialog.data('show')(LABELS.OPTIONAL_ACTIVITY_PLACE_PROMPT, true);
 		
 			canvas.css('cursor', 'pointer').click(function(event){
-				$('.modal-body', layout.infoDialog).empty();
 				layout.infoDialog.modal('hide');
-	
 				var translatedEvent = GeneralLib.translateEventOnCanvas(event),
 					x = translatedEvent[0],
 					y = translatedEvent[1];
@@ -212,20 +197,17 @@ var MenuLib = {
 		if (layout.isTransitionStarted) {
 			layout.isTransitionStarted = false;
 			HandlerLib.resetCanvasMode(true);
-			$('.modal-body', layout.infoDialog).empty();
 			layout.infoDialog.modal('hide');
 			$('#transitionButton').blur();
 		} else {
 			layout.isTransitionStarted = true;
 			HandlerLib.resetCanvasMode();
 			
-			$('.modal-body', layout.infoDialog).text(LABELS.TRANSITION_PLACE_PROMPT);
-			layout.infoDialog.modal('show');
+			layout.infoDialog.data('show')(LABELS.TRANSITION_PLACE_PROMPT, true);
 			
 			canvas.css('cursor', 'pointer').click(function(event){
 				layout.isTransitionStarted = false;
 				
-				$('.modal-body', layout.infoDialog).empty();
 				layout.infoDialog.modal('hide');
 				
 				var startActivity = null,
@@ -379,7 +361,7 @@ var MenuLib = {
 								  	 'label'           : this.isRunSequencesFolder ?
 								  			 				LABELS.RUN_SEQUENCES_FOLDER : this.name,
 								  	 'folderID'		   : this.folderID,
-								  	 'canSave'		   : !this.isRunSequencesFolder,
+								  	 'canSave'		   : this.folderID > 0 && !this.isRunSequencesFolder,
 						  	         'canModify'	   : this.canModify
 									 });
 					});
@@ -399,12 +381,50 @@ var MenuLib = {
 		
 		return result;
 	},
-
+	
+	/**
+	 * Highlights the folder where existing LD already resides
+	 * or the user folder otherwise.
+	 */
+	highlightFolder : function(folder) {
+		// if there are no children or stop condition (no path) was reached
+		if (folder.children.length === 0 || layout.folderPathCurrent === null) {
+			return;
+		}
+		var chosenFolder = null;
+		// are there any steps left?
+		if (layout.folderPathCurrent.length > 0) {
+			// look for target folder in children
+			var folderID = layout.folderPathCurrent.shift();
+			$.each(folder.children, function(index, child){
+				if (folderID == child.data.folderID) {
+					chosenFolder = child;
+					return false;
+				}
+			});
+		}
+		// if last piece of folder path was consumed, set stop condition
+		if (layout.folderPathCurrent.length === 0) {
+			layout.folderPathCurrent = null;
+		}
+		// no folder found or path was empty from the beginning
+		if (!chosenFolder) {
+			chosenFolder = folder.children[0];
+		}
+		// if folder, highlight and expand
+		if (!chosenFolder.isLeaf) {
+			chosenFolder.expand();
+			chosenFolder.highlight();
+		}
+	},
 	
 	/**
 	 * Opens a pop up for importing LD. Loads the imported LD to canvas.
 	 */
 	importLearningDesign : function(){
+		if (layout.modified && !confirm(LABELS.CLEAR_CANVAS_CONFIRM)) {
+			return;
+		}
 		var dialog = showDialog("dialogImportLearningDesign", {
 						'modal' : true,
 						'height' : 350,
@@ -471,8 +491,8 @@ var MenuLib = {
 		tree.buildTreeFromObject(MenuLib.getFolderContents());
 		tree.render();
 		
-		// expand the first (user) folder
-		tree.getRoot().children[0].expand();
+		// expand the first folder or the one where existing LD resides
+		MenuLib.highlightFolder(tree.getRoot());
 		
 		return tree;
 	},
@@ -482,6 +502,9 @@ var MenuLib = {
 	 * Opens "Open sequence" dialog where an user can choose a Learning Design to load.
 	 */
 	openLearningDesign : function(){
+		if (layout.modified && !confirm(LABELS.CLEAR_CANVAS_CONFIRM)) {
+			return;
+		}
 		layout.ldStoreDialog.data('prepareForOpen')(LABELS.OPEN_DIALOG_TITLE, null,
 				'#ldStoreDialogOpenButton, #ldStoreDialogCancelButton', false);
 		layout.ldStoreDialog.modal('show');
@@ -509,7 +532,7 @@ var MenuLib = {
 			dataType : 'text',
 			success : function(lessonID) {
 				if (!lessonID) {
-					alert(LABELS.PREVIEW_ERROR);
+					layout.infoDialog.data('show')(LABELS.PREVIEW_ERROR);
 					previewButton.button('reset');
 					return;
 				}
@@ -524,8 +547,11 @@ var MenuLib = {
 					dataType : 'text',
 					success : function() {
 						// open preview pop up window
+						var left = ((screen.width / 2) - (1280 / 2)),
+							// open the window a bit higher than center
+							top = ((screen.height / 2) - (720 / 2)) / 2;
 						window.open(LAMS_URL + 'home.do?method=learner&mode=preview&lessonID='+lessonID,'Preview',
-									'width=1280,height=720,resizable,scrollbars=yes,status=yes');
+									'width=1280,height=720,resizable,scrollbars=yes,status=yes,top=' + top + ',left=' + left);
 						previewButton.button('reset');
 					}
 				});
@@ -557,7 +583,7 @@ var MenuLib = {
 		}
 		// only tool activities can be copied (todo?)
 		if (!(activity instanceof ActivityDefs.ToolActivity)) {
-			alert(LABELS.PASTE_ERROR);
+			layout.infoDialog.data('show')(LABELS.PASTE_ERROR);
 			return;
 		}
 		
@@ -644,5 +670,66 @@ var MenuLib = {
 			$('#ldDescriptionHideTip').text($(this).is(':visible') ? '▲' : '▼');
 			$('.templateContainer').height($('#ldDescriptionDiv').height() + $('#canvas').height() - 10);
 		});
-	}
+	},
+	
+	
+	/**
+	 * Opens a pop up for template window that generates a learning design
+	 */
+	useTemplateToCreateLearningDesign : function(){
+		if (layout.modified && !confirm(LABELS.CLEAR_CANVAS_CONFIRM)) {
+			return;
+		}
+
+		var dialog = showDialog("ldTemplate", {
+				'height' : Math.max(300, $(window).height() - 30),
+				'width' :  Math.max(380, Math.min(1024, $(window).width() - 60)),
+				'draggable' : true,
+				'resizable' : true,
+				'title' : LABELS.TEMPLATES,
+				'beforeClose' : function(event){
+					// ask the user if he really wants to exit before saving his work
+					var iframe = $('iframe', this);
+					if (iframe[0].contentWindow.doCancel) {
+						iframe[0].contentWindow.doCancel();
+						return false;
+					}
+				},
+				'close' : function(){
+					// stop checking in LD was 
+					clearInterval(loadCheckInterval);
+					$(this).remove();
+				},
+				'open' : function() {
+					var dialog = $(this);
+					// load contents after opening the dialog
+					$('iframe', dialog).attr('src', LAMS_URL + '/authoring/template/list.jsp').load(function(){
+						// override the close function so it works with the dialog, not window
+						this.contentWindow.closeWindow = function(){
+							// detach the 'beforeClose' handler above, attach the standard one and close the dialog
+							dialog.off('hide.bs.modal').on('hide.bs.modal', function(){
+								$('iframe', this).attr('src', null);
+							}).modal('hide');
+						}
+					});
+				},
+			}, true),
+			currentLearningDesignID = null,
+			regEx = /learningDesignID=(\d+)/g,
+			// since window.onload does not really work after submitting a form inside the window,
+			// this trick checks periodically for changes
+			loadCheckInterval = setInterval(function(){
+				var body = $('body', $('iframe', dialog).contents()).html(),
+					match = regEx.exec(body);
+				// check if ID was found and it's not the same as previously set
+				if (match && match[1] != currentLearningDesignID) {
+					currentLearningDesignID = match[1];
+					// load the imported LD
+					GeneralLib.openLearningDesign(currentLearningDesignID);
+					
+					// generate images of the imported LD
+					GeneralLib.saveLearningDesignImage();
+				}
+			}, 1000);
+	},
 };

@@ -1,11 +1,23 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
 
+<link type="text/css" href="${lams}/css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery.tablesorter.pager.css" rel="stylesheet">
+
+
 <script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/portrait.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
+
 <!-- Include the gmap API header -->
 <c:choose>
 	<c:when test="${gmapKey != null}">

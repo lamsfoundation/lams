@@ -226,6 +226,54 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	    return ((Number) result.get(0)).intValue() * 1000;
 	}
     }
+    
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public long getMinTimeTakenForActivity(Long activityID) {
+	
+	final String GET_MIN_TIME_TAKEN_FOR_ACTIVITY = "SELECT MIN(t1.timeTaken) AS minVal FROM ("
+		+ " SELECT @rownum\\:=@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(progress.completed_date_time, progress.start_date_time)) AS timeTaken"
+		+ "  FROM lams_progress_completed progress,  (SELECT @rownum\\:=0) r"
+		+ "  WHERE progress.activity_id=:activityID AND TIMEDIFF(progress.completed_date_time, progress.start_date_time) IS NOT NULL"
+		+ "  ORDER BY TIMEDIFF(progress.completed_date_time, progress.start_date_time)"
+		+ " ) AS t1 ";
+		
+
+	List result = getSession().createSQLQuery(GET_MIN_TIME_TAKEN_FOR_ACTIVITY)
+		.setLong("activityID", activityID.longValue()).list();
+	
+	if (result == null || result.size() == 0 || result.get(0) == null) {
+	    return 0;
+	} else {
+	    //converting into milliseconds
+	    return ((Number) result.get(0)).intValue() * 1000;
+	}
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public long getMaxTimeTakenForActivity(Long activityID) {
+	
+	final String GET_MAX_TIME_TAKEN_FOR_ACTIVITY = "SELECT MAX(t1.timeTaken) AS maxVal FROM ("
+		+ " SELECT @rownum\\:=@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(progress.completed_date_time, progress.start_date_time)) AS timeTaken"
+		+ "  FROM lams_progress_completed progress,  (SELECT @rownum\\:=0) r"
+		+ "  WHERE progress.activity_id=:activityID AND TIMEDIFF(progress.completed_date_time, progress.start_date_time) IS NOT NULL"
+		+ "  ORDER BY TIMEDIFF(progress.completed_date_time, progress.start_date_time)"
+		+ " ) AS t1 ";
+		
+
+	List result = getSession().createSQLQuery(GET_MAX_TIME_TAKEN_FOR_ACTIVITY)
+		.setLong("activityID", activityID.longValue()).list();
+	
+	if (result == null || result.size() == 0 || result.get(0) == null) {
+	    return 0;
+	} else {
+	    //converting into milliseconds
+	    return ((Number) result.get(0)).intValue() * 1000;
+	}
+    }
+    
 
     @Override
     @SuppressWarnings("unchecked")
@@ -287,6 +335,53 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	    return ((Number) result.get(0)).intValue() * 1000;
 	}
     }
+    
+    
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public long getMinTimeTakenForGroupedActivity(Long activityID, Long groupID) {
+	
+	final String GET_MIN_TIME_TAKEN_FOR_GROUPED_ACTIVITY = "SELECT MIN(t1.timeTaken) AS minVal FROM ("
+		+ " SELECT @rownum\\:=@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)) AS timeTaken"
+		+ "  FROM lams_progress_completed compProgress,  (SELECT @rownum\\:=0) r, lams_learner_progress progr, lams_user_group ug "
+		+ "  WHERE compProgress.activity_id=:activityID AND TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time) IS NOT NULL"
+		+ "  AND ug.group_id=:groupID AND compProgress.learner_progress_id = progr.learner_progress_id AND progr.user_id=ug.user_id "
+		+ "  ORDER BY TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)"
+		+ " ) AS t1";
+	List result = getSession().createSQLQuery(GET_MIN_TIME_TAKEN_FOR_GROUPED_ACTIVITY)
+		.setLong("activityID", activityID.longValue()).setLong("groupID", groupID.longValue()).list();
+
+	if (result == null || result.size() == 0 || result.get(0) == null) {
+	    return 0;
+	} else {
+	    //converting into milliseconds
+	    return ((Number) result.get(0)).intValue() * 1000;
+	}
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public long getMaxTimeTakenForGroupedActivity(Long activityID, Long groupID) {
+	
+	final String GET_MAX_TIME_TAKEN_FOR_GROUPED_ACTIVITY = "SELECT MAX(t1.timeTaken) AS maxVal FROM ("
+		+ " SELECT @rownum\\:=@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)) AS timeTaken"
+		+ "  FROM lams_progress_completed compProgress,  (SELECT @rownum\\:=0) r, lams_learner_progress progr, lams_user_group ug "
+		+ "  WHERE compProgress.activity_id=:activityID AND TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time) IS NOT NULL"
+		+ "  AND ug.group_id=:groupID AND compProgress.learner_progress_id = progr.learner_progress_id AND progr.user_id=ug.user_id "
+		+ "  ORDER BY TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)"
+		+ " ) AS t1";
+	List result = getSession().createSQLQuery(GET_MAX_TIME_TAKEN_FOR_GROUPED_ACTIVITY)
+		.setLong("activityID", activityID.longValue()).setLong("groupID", groupID.longValue()).list();
+
+	if (result == null || result.size() == 0 || result.get(0) == null) {
+	    return 0;
+	} else {
+	    //converting into milliseconds
+	    return ((Number) result.get(0)).intValue() * 1000;
+	}
+    }  
+    
 
     @Override
     public List<Lesson> getLessonsByGroupAndUser(final Integer userId, final Integer orgId, int page, int size,

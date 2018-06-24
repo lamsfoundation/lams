@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -75,6 +74,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -126,6 +126,12 @@ public class MonitoringAction extends Action {
 	}
 	if (param.equals("statistic")) {
 	    return statistic(mapping, form, request, response);
+	}
+	if (param.equals("discloseCorrectAnswers")) {
+	    return discloseCorrectAnswers(mapping, form, request, response);
+	}
+	if (param.equals("discloseGroupsAnswers")) {
+	    return discloseGroupsAnswers(mapping, form, request, response);
 	}
 
 	return mapping.findForward(AssessmentConstants.ERROR);
@@ -206,9 +212,11 @@ public class MonitoringAction extends Action {
 	initAssessmentService();
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_SESSION_ID);
+	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	AssessmentResultDTO result = service.getUserMasterDetail(sessionId, userId);
 
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return (result == null) ? null : mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
@@ -319,7 +327,7 @@ public class MonitoringAction extends Action {
 		.getAttribute(sessionMapID);
 
 	Long contentID = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
-	String activityEvaluation = WebUtil.readStrParam(request, AssessmentConstants.ATTR_ACTIVITY_EVALUATION);
+	String activityEvaluation = WebUtil.readStrParam(request, AssessmentConstants.ATTR_ACTIVITY_EVALUATION, true);
 	service.setActivityEvaluation(contentID, activityEvaluation);
 
 	// update the session ready for stats tab to be reloaded otherwise flicking between tabs
@@ -361,7 +369,7 @@ public class MonitoringAction extends Action {
 	//in case of UseSelectLeaderToolOuput - display only one user
 	if (assessment.isUseSelectLeaderToolOuput()) {
 
-	    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+	    AssessmentSession session = service.getSessionBySessionId(sessionId);
 	    AssessmentUser groupLeader = session.getGroupLeader();
 
 	    if (groupLeader != null) {
@@ -396,11 +404,12 @@ public class MonitoringAction extends Action {
 	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 	    userData.add(userDto.getUserId());
 	    userData.add(sessionId);
-	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " " + userDto.getLastName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFirstName() + " " + userDto.getLastName());
 	    userData.add(fullName);
 	    userData.add(userDto.getGrade());
-	    if (userDto.getPortraitId() != null ) 
+	    if (userDto.getPortraitId() != null) {
 		userData.add(userDto.getPortraitId());
+	    }
 
 	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);
@@ -449,7 +458,7 @@ public class MonitoringAction extends Action {
 	//in case of UseSelectLeaderToolOuput - display only one user
 	if (assessment.isUseSelectLeaderToolOuput()) {
 
-	    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+	    AssessmentSession session = service.getSessionBySessionId(sessionId);
 	    AssessmentUser groupLeader = session.getGroupLeader();
 
 	    if (groupLeader != null) {
@@ -490,7 +499,7 @@ public class MonitoringAction extends Action {
 	for (AssessmentUserDTO userDto : userDtos) {
 
 	    Long questionResultUid = userDto.getQuestionResultUid();
-	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " " + userDto.getLastName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFirstName() + " " + userDto.getLastName());
 
 	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 	    if (questionResultUid != null) {
@@ -499,14 +508,26 @@ public class MonitoringAction extends Action {
 		userData.add(questionResultUid);
 		userData.add(questionResult.getMaxMark());
 		userData.add(fullName);
-		userData.add(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
+		//LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
 		userData.add(questionResult.getMark());
+		// show confidence levels if this feature is turned ON
+		if (assessment.isEnableConfidenceLevels()) {
+		    userData.add(questionResult.getConfidenceLevel());
+		}
+
+		userData.add(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
+		if (userDto.getPortraitId() != null) {
+		    userData.add(userDto.getPortraitId());
+		}
 
 	    } else {
 		userData.add("");
 		userData.add("");
 		userData.add(fullName);
 		userData.add("-");
+		if (assessment.isEnableConfidenceLevels()) {
+		    userData.add(-1);
+		}
 		userData.add("-");
 	    }
 
@@ -581,14 +602,14 @@ public class MonitoringAction extends Action {
 	    HttpServletResponse response) throws IOException {
 	initAssessmentService();
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
 	String fileName = null;
 	boolean showUserNames = true;
 
 	Long contentId = null;
 	List<SessionDTO> sessionDtos;
-	if (sessionMap != null) {
+	if (sessionMapID != null) {
+	    SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		    .getAttribute(sessionMapID);
 	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
 	    showUserNames = true;
@@ -651,6 +672,52 @@ public class MonitoringAction extends Action {
 	    }
 	}
 	return mapping.findForward(AssessmentConstants.SUCCESS);
+    }
+
+    /**
+     * Allows displaying correct answers to learners
+     */
+    private ActionForward discloseCorrectAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+
+	initAssessmentService();
+	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
+	question.setCorrectAnswersDisclosed(true);
+	service.updateAssessmentQuestion(question);
+
+	service.notifyLearnersOnAnswerDisclose(toolContentId);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Disclosed correct answers for Assessment tool content ID " + toolContentId + " and question ID "
+		    + questionUid);
+	}
+
+	return null;
+    }
+
+    /**
+     * Allows displaying other groups' answers to learners
+     */
+    private ActionForward discloseGroupsAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+
+	initAssessmentService();
+	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
+	question.setGroupsAnswersDisclosed(true);
+	service.updateAssessmentQuestion(question);
+
+	service.notifyLearnersOnAnswerDisclose(toolContentId);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Disclosed other groups' answers for Assessment tool content ID " + toolContentId
+		    + " and question ID " + questionUid);
+	}
+
+	return null;
     }
 
     // *************************************************************************************

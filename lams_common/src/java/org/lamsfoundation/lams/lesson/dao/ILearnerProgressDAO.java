@@ -201,4 +201,7 @@ public interface ILearnerProgressDAO {
      * Get the last attempt ID for the given learner and lesson.
      */
     Integer getLearnerProgressArchiveMaxAttemptID(Integer userId, Long lessonId);
+
+    /** Get the number of learners who are in a particular activity at the moment */
+    Integer getNumUsersCurrentActivity(Activity activity);
 }

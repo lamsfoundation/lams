@@ -28,8 +28,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
@@ -46,7 +46,6 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
 
 /**
@@ -84,9 +83,11 @@ public interface IAssessmentService {
     void copyAnswersFromLeader(AssessmentUser user, AssessmentUser leader)
 	    throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException;
 
+    List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId);
+
     /**
      * Stores date when user has started activity with time limit.
-     * 
+     *
      * @param assessmentUid
      * @param userId
      */
@@ -95,7 +96,7 @@ public interface IAssessmentService {
     /**
      * Calculates how many seconds left till the time limit will expire. If it's expired already - returns 1 in order to
      * show learning.jsp and autosubmit results.
-     * 
+     *
      * @param assessment
      * @param user
      * @return
@@ -121,6 +122,8 @@ public interface IAssessmentService {
 	    String searchString);
 
     int getCountUsersBySession(Long sessionId, String searchString);
+
+    int getCountUsersByContentId(Long contentId);
 
     List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page, int size,
 	    String sortBy, String sortOrder, String searchString);
@@ -150,12 +153,20 @@ public interface IAssessmentService {
     void createUser(AssessmentUser assessmentUser);
 
     /**
+     * Get user created current Assessment.
+     *
+     * @param long1
+     * @return
+     */
+    AssessmentUser getUserCreatedAssessment(Long userID, Long contentId);
+
+    /**
      * Get user by given userID and toolContentID.
      *
      * @param long1
      * @return
      */
-    AssessmentUser getUserByIDAndContent(Long userID, Long contentId);
+    AssessmentUser getUserByIdAndContent(Long userID, Long contentId);
 
     /**
      * Get user by sessionID and UserID
@@ -172,6 +183,11 @@ public interface IAssessmentService {
      * @param Assessment
      */
     void saveOrUpdateAssessment(Assessment Assessment);
+
+    /**
+     * Update assessment question into database.
+     */
+    void updateAssessmentQuestion(AssessmentQuestion question);
 
     /**
      * Delete resoruce question from database.
@@ -196,7 +212,15 @@ public interface IAssessmentService {
      * @param sessionId
      * @return
      */
-    AssessmentSession getAssessmentSessionBySessionId(Long sessionId);
+    AssessmentSession getSessionBySessionId(Long sessionId);
+
+    /**
+     * Get all assessment toolSessions by toolContentId
+     *
+     * @param toolContentId
+     * @return
+     */
+    List<AssessmentSession> getSessionsByContentId(Long toolContentId);
 
     /**
      * Save or update assessment result.
@@ -233,6 +257,14 @@ public interface IAssessmentService {
      * @return
      */
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
+
+    /**
+     * Checks whether the last attempt started by user is finished.
+     *
+     * @param user
+     * @return true if user has finished it, false otherwise
+     */
+    Boolean isLastAttemptFinishedByUser(AssessmentUser user);
 
     /**
      * Return the latest *finished* result.
@@ -297,6 +329,11 @@ public interface IAssessmentService {
     Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId);
 
     /**
+     * Count how many last finished attempts selected specified option.
+     */
+    int countAttemptsPerOption(Long optionUid);
+
+    /**
      * Return the latest *finished* result (the same as the method above). But previously evicting it from the cache. It
      * might be useful in cases when we modify result and the use it during one request.
      *
@@ -348,7 +385,7 @@ public interface IAssessmentService {
 
     /**
      * Set userFinished to false
-     * 
+     *
      * @param toolSessionId
      * @param userId
      */
@@ -406,25 +443,28 @@ public interface IAssessmentService {
     LinkedHashMap<String, ExcelCell[][]> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos,
 	    boolean showUserNames);
 
-    /** 
+    /**
      * Gets the basic statistics for the grades for the Leaders when an Assessment is done using
      * Group Leaders. So the averages, etc are for the whole Assessment, not for a Group.
+     *
      * @param contentId
      * @return
      */
     LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
-    
-    /** 
+
+    /**
      * Prepares data for the marks summary graph on the statistics page
+     *
      * @param assessment
      * @param sessionDtos
      * @return
      */
     List<Number> getMarksArray(Long sessionId);
 
-    /** 
-     * Prepares data for the marks summary graph on the statistics page, using the grades for the Leaders 
+    /**
+     * Prepares data for the marks summary graph on the statistics page, using the grades for the Leaders
      * when an Assessment is done using Group Leaders. So the grades are for the whole Assessment, not for a Group.
+     *
      * @param assessment
      * @param sessionDtos
      * @return
@@ -437,7 +477,7 @@ public interface IAssessmentService {
 
     /**
      * Get a message from the language files with the given key
-     * 
+     *
      * @param key
      * @return
      */
@@ -450,10 +490,10 @@ public interface IAssessmentService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);
@@ -497,6 +537,14 @@ public interface IAssessmentService {
 	    List<QuestionReference> deletedReferences);
 
     void releaseFromCache(Object object);
-    
+
     Long getPortraitId(Long userId);
+
+    AssessmentQuestion getAssessmentQuestionByUid(Long questionUid);
+
+    /**
+     * Sends a websocket command to learners who have assessment results open
+     * to refresh page because new data is available
+     */
+    void notifyLearnersOnAnswerDisclose(long toolContentId);
 }

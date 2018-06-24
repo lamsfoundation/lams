@@ -1,0 +1,320 @@
+@import "_lams_variables.scss"; 
+
+button {
+	width: 70%;
+	margin-top: 10px;
+}
+
+#initDiv {
+	padding-top: 35vh;
+	text-align: center;
+}
+
+#createKumaliveDiv, #closedDiv {
+	display: none;
+	padding-top: 35vh;
+	text-align: center;
+}
+
+#closedDiv {
+	font-weight: bold;
+}
+
+#createKumaliveDiv input[type="text"] {
+	width: 60%;
+	display: inline;
+}
+
+#createKumaliveDiv #rubrics {
+	display: inline-block;
+	text-align: left;
+	margin: 10px auto;
+}
+
+#mainDiv {
+	display: none;
+}
+
+#mainDiv > .row > div {
+	background-color: white;
+}
+
+#actionCell {
+	padding-bottom: 10px;
+	border-bottom: $border-thin-black;
+	vertical-align: top;
+}
+
+#pollCell {
+	display: none;
+	padding-bottom: 10px;
+	border-bottom: $border-thin-black;
+}
+
+#pollSetupAnswer {
+	width: initial;
+}
+
+#pollSetupAnswerCustom, #pollSetupAnswerCustomParseError, #pollSetupAnswerCustomCountError {
+	display: none;
+}
+
+#pollSetup {
+	display: none;
+	padding: 0 10px;
+}
+
+#pollSetupButtons, #pollSetup h3 {
+	text-align: center;
+}
+
+#pollSetupButtons button {
+	width: 70%;
+	margin-top: 10px;
+}
+
+#pollRun, #pollRunAnswerRadioTemplate, #pollRunFinishButton {
+	display: none;
+}
+
+#pollRun {
+	text-align: center;
+}
+
+#pollRunQuestion {
+	margin-top: 20px;
+}
+
+#pollRunAnswerRadios {
+	display: inline-block;
+	text-align: left;
+	margin: 0 auto;
+}
+
+#pollRunAnswerList {
+	margin-bottom: 0;
+}
+
+#pollRunVoteButton {
+	margin-top: 20px;
+}
+
+#pollRunAnswerList .list-group-item {
+	margin: 5px 20px;
+	text-align: left;
+}
+
+#pollRunAnswerList .list-group-item.voted {
+	border: $border-thin-primary;
+	border-width: thick;
+	padding-right: 10px;
+}
+
+#pollRunAnswerList .list-group-item .badge {
+	margin-left: 5px;
+}
+
+#pollRunChart {
+	display: none;
+	border-top: $border-thin-black;
+	margin-top: 10px;
+}
+
+#pollRunChartPie, #pollRunChartBar {
+	height: 340px;
+}
+
+#pollRun .pollVoters {
+	margin-top: 10px;
+	text-align: left;
+	border-top: $border-thin-default-light;
+}
+
+#pollRun .pollVoters .badge {
+	float: right;
+	margin: 8px 0 0 5px;
+}
+
+#learnersCell {
+	width: 100%;
+	padding: 0;
+}
+
+#learnersCell h3 {
+	text-align: center;
+}
+
+#learnersContainer {
+	padding-left: 10px;
+}
+
+#raiseHandContainer {
+	display: none;
+	margin-bottom : 10px;
+	padding-left: 15px;
+	border-bottom: $border-thin-black;
+}
+
+.learner {
+	display: inline-block;
+	width: 80px;
+	height: 80px;
+	margin: 5px 5px 0 0;
+	text-align: center;
+	display: none;
+}
+
+.profilePicture {
+	width: 35px;
+	height: 35px;
+}
+
+.profilePicture:before {
+	font-size: 35px;
+	line-height: 26px;	
+}
+
+.profilePictureHidden {
+	opacity: 0;
+}
+
+.profilePictureShown {
+	opacity: 1;
+}
+
+.name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#learnersCell .learner .badge {
+	float: right;
+	position: relative;
+	right: 15px;
+	top: -10px;
+}
+
+.speaker {
+	text-align: center;
+}
+
+.speaker .profilePicture {
+	width: 80px;
+	height: 80px;
+	margin: auto;
+}
+
+.speaker .profilePicture:before {
+	font-size: 70px;
+	line-height: 80px;
+}
+
+#teacher {
+	display: none;
+}
+
+#raiseHandPrompt {
+	display: none;
+	text-align: center;
+	padding-top: 20px;
+	margin-bottom: 20px;
+}
+
+#raiseHandPrompt i {
+	font-size: 80px;
+}
+
+.score {
+	display: none;
+	margin-top: 10px;
+}
+
+.score span {
+	font-weight: bold;
+}
+
+.score i {
+	font-size: 40px;
+	margin-right: 15px;
+	cursor: pointer;
+}
+
+.scoreButtons {
+	text-align: center;
+}
+
+.scoreGood {
+	color: green;
+}
+
+.scoreNeutral {
+	color: darkOrange;
+}
+
+.scoreBad {
+	color: red;
+}
+
+.score:last-child hr {
+	display: none;
+}
+
+@media (min-width : $screen-md-min) {
+	#actionCell {
+		width: 350px;
+		height: 100vh;
+		border-bottom: none;
+		border-right: $border-thin-black;
+	}
+	
+	#pollCell {
+		width: 500px;
+		height: 100vh;
+		padding: 0;
+		border-bottom: none;
+		border-right: $border-thin-black;
+	}
+	
+	.learner {
+		height: 120px;
+		margin-left: 20px;
+	}
+	
+	.profilePicture {
+		width: 80px;
+		height: 80px;
+	}
+	
+	.profilePicture:before {
+		line-height: 70px;	
+		font-size: 80px;
+	}
+	
+	#learnersCell .learner .badge {
+		top: 3px;
+		right: 2px;
+	}
+	
+	.speaker .profilePicture {
+		width: 200px;
+		height: 200px;
+	}
+	
+	.speaker .profilePicture:before {
+		font-size: 200px;
+		line-height: 200px;
+	}
+	
+	.speaker .name {
+		font-size: 18px;
+		margin-top: 10px;
+	}
+	
+	#raiseHandPrompt i {
+		font-size: 140px;
+	}
+	
+	.score i {
+		font-size: 70px;
+	}
+}

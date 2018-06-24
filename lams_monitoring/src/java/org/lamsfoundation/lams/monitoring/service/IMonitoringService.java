@@ -26,10 +26,13 @@ package org.lamsfoundation.lams.monitoring.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 
+import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -43,6 +46,7 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -61,8 +65,8 @@ public interface IMonitoringService {
     Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID, User user,
 	    String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerPresenceAvailable,
 	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
-	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Integer scheduledNumberDaysToLessonFinish,
-	    Lesson precedingLesson);
+	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Boolean gradebookOnComplete,
+	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson);
 
     /**
      * <p>
@@ -109,7 +113,7 @@ public interface IMonitoringService {
 	    Integer userID, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
 	    Boolean enableNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
-	    Integer numberDaysToLessonFinish, Long precedingLessonId);
+	    Boolean gradebookOnComplete, Integer numberDaysToLessonFinish, Long precedingLessonId);
 
     /**
      * Create new lesson according to the learning design specified by the user, but for a preview session rather than a
@@ -200,7 +204,7 @@ public interface IMonitoringService {
     void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) throws UserAccessDeniedException;
 
     /**
-     * Finish a lesson on scheduled datetime.
+     * Finish a lesson on scheduled datetime based on days in the lesson runs for
      *
      * @param lessonId
      * @param endDate
@@ -209,6 +213,18 @@ public interface IMonitoringService {
      *            checks that the user is a staff member for this lesson
      */
     void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId)
+	    throws UserAccessDeniedException;
+
+    /**
+     * Finish a lesson on scheduled datetime.
+     *
+     * @param lessonId
+     * @param endDate
+     *            number of days since lesson start when the lesson should be closed.
+     * @param userId
+     *            checks that the user is a staff member for this lesson
+     */
+    void finishLessonOnSchedule(long lessonId, Date endDate, Integer userId)
 	    throws UserAccessDeniedException;
 
     /**
@@ -260,6 +276,9 @@ public interface IMonitoringService {
      */
     Boolean toggleLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled);
 
+    /** Set whether or not to display the gradebook activity scores at the end of a lesson */
+    Boolean toggleGradebookOnComplete(long lessonId, Integer userId, Boolean gradebookOnComplete);
+    
     String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId,
 	    boolean removeLearnerContent);
 
@@ -282,16 +301,20 @@ public interface IMonitoringService {
     void unarchiveLesson(long lessonId, Integer userId);
 
     /**
-     * A lesson can only be suspended if it is started. The purpose of suspending is to hide the lesson from learners
+     * Suspend lesson now! A lesson can only be suspended if it is started. The purpose of suspending is to hide the lesson from learners
      * temporarily.
      *
      * @param lessonId
      *            the lesson ID which will be suspended.
      * @param userId
      *            checks that the user is a staff member for this lesson
+     * @param clearScheduleDetails
+     * 		  should it remove any triggers set up to suspend the lesson and clear the schedule date field. true if user suspending right now,
+     * 		  false if this is being called by the trigger
      */
-    void suspendLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+    void suspendLesson(long lessonId, Integer userId, boolean removeTriggers) throws UserAccessDeniedException;
 
+    
     /**
      * Unsuspend a lesson, which state must be Lesson.SUSPEND_STATE. Returns the lesson back to its previous state.
      * Otherwise an exception will be thrown.
@@ -328,7 +351,7 @@ public interface IMonitoringService {
      * @param gate
      *            the id of the gate we need to open.
      */
-    GateActivity openGate(Long gateId);
+    GateActivity openGate(Long gateId, Integer openerId);
 
     /**
      * Allows a single learner to pass the gate.
@@ -347,6 +370,9 @@ public interface IMonitoringService {
      */
     GateActivity closeGate(Long gateId);
 
+    /** Update the schedule gate date/time */
+    GateActivity scheduleGate(Long gateId, Date schedulingDatetime, Integer userId);
+    
     /**
      * Returns users by search type criteria. It's sorted by first and last user names.
      *
@@ -416,6 +442,7 @@ public interface IMonitoringService {
      *            id of the activity.
      * @return the requested activity object.
      */
+    @SuppressWarnings("rawtypes")
     Activity getActivityById(Long activityId, Class clasz);
 
     /**
@@ -497,6 +524,11 @@ public interface IMonitoringService {
      */
     abstract void addUsersToGroup(Long activityID, Long groupID, String learnerIDs[]) throws LessonServiceException;
 
+    /**
+     * Add learners to a group based on their logins. Doesn't necessarily check if the user is already in another group.
+     */
+    abstract int addUsersToGroupByLogins(Long activityID, String groupName, Set<String> logins) throws LessonServiceException;
+    
     /**
      * Remove a user to a group. If the user is not in the group, then nothing is changed.
      *
@@ -649,15 +681,43 @@ public interface IMonitoringService {
     Long cloneLesson(Long lessonId, Integer creatorId, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException;
 
-
     void removeLearnerContent(Long lessonId, Integer learnerId);
 
-    /** Generate an email containing the progress details for individual activities in a lesson. 
-     * @return String[] {subject, email body} */
+    /**
+     * Generate an email containing the progress details for individual activities in a lesson.
+     *
+     * @return String[] {subject, email body}
+     */
     String[] generateLessonProgressEmail(Long lessonId, Integer userId);
-    
+
     /**
      * Get list of users who completed the given lesson.
      */
     List<User> getUsersCompletedLesson(Long lessonId, Integer limit, Integer offset, boolean orderAscending);
+
+    /**
+     * Save information about an email notification sent to learners.
+     */
+    void archiveEmailNotification(Integer organisationId, Long lessonId, Integer searchType, String body,
+	    Set<Integer> recipients);
+
+    /**
+     * Gets archived notifications for the given organisation.
+     */
+    List<EmailNotificationArchive> getArchivedEmailNotifications(Integer organisationId);
+
+    /**
+     * Gets archived notifications for the given lesson.
+     */
+    List<EmailNotificationArchive> getArchivedEmailNotifications(Long lessonId);
+
+    /**
+     * Gets pages recipients of the given archived email notification.
+     */
+    List<User> getArchivedEmailNotificationRecipients(Long emailNotificationUid, Integer limit, Integer offset);
+
+    /**
+     * Exports the given email notification to Excel sheet
+     */
+    LinkedHashMap<String, ExcelCell[][]> exportArchivedEmailNotification(Long emailNotificationUid);
 }

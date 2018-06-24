@@ -80,12 +80,6 @@ public class ConfigurationKeys {
     public static String ALLOW_MULTIPLE_LOGIN = "AllowMultipleLogin";
 
     /** Values for client updates */
-    public static String AUTHORING_CLIENT_VERSION = "AuthoringClientVersion";
-
-    public static String LEARNER_CLIENT_VERSION = "LearnerClientVersion";
-
-    public static String MONITOR_CLIENT_VERSION = "MonitorClientVersion";
-
     public static String SERVER_VERSION_NUMBER = "ServerVersionNumber";
 
     /** Default locale for the server. Originally en_AU */
@@ -114,6 +108,10 @@ public class ConfigurationKeys {
     public static String ALLOW_DIRECT_LESSON_LAUNCH = "AllowDirectLessonLaunch";
 
     public static String ALLOW_EDIT_ON_FLY = "AllowLiveEdit";
+    
+    public static String ALLOW_KUMALIVE = "AllowKumalive";
+    
+    public static String DISPLAY_PORTRAIT = "DisplayPortrait";
 
     public static String SHOW_ALL_MY_LESSON_LINK = "ShowAllMyLessonLink";
 
@@ -271,5 +269,8 @@ public class ConfigurationKeys {
 
     // LDEV-4144
     public static String SHOW_TIMEZONE_WARNING = "ShowTimezoneWarning";
+
+    // LDEV-4594 / LDEV-4583 Allow/Block access to index.do for integration learners. Default to false - do not allow direct access.
+    public static String ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS = "AllowDirectAccessIntgrtnLrnr";
 
 }

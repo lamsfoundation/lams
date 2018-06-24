@@ -84,7 +84,7 @@ public class BlackboardUtil {
      * @return list of LAMS lessons
      * @throws PersistenceException
      */
-    public static List<Content> getLamsLessonsByCourse(PkId courseId) throws PersistenceException {
+    public static List<Content> getLamsLessonsByCourse(PkId courseId, boolean includeLessonsCreatedByOldNtuPlugin) throws PersistenceException {
 
 	ContentDbLoader contentLoader = ContentDbLoader.Default.getInstance();
 	CourseTocDbLoader cTocDbLoader = CourseTocDbLoader.Default.getInstance();
@@ -107,7 +107,7 @@ public class BlackboardUtil {
 		for (Content content : contents) {
 		    // only LAMS content
 		    if ("resource/x-lams-lamscontent".equals(content.getContentHandler())
-			    || content.getContentHandler().equals("resource/x-ntu-hdllams")) {
+			    || includeLessonsCreatedByOldNtuPlugin && content.getContentHandler().equals("resource/x-ntu-hdllams")) {
 			lamsContents.add(content);
 		    }
 		}

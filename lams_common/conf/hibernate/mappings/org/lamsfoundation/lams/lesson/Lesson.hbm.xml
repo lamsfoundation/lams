@@ -74,6 +74,9 @@
     	<property name="allowLearnerRestart" type="java.lang.Boolean"
         	column="allow_restart" length="1">
     	</property>
+    	<property name="gradebookOnComplete" type="java.lang.Boolean"
+        	column="gradebook_on_complete" length="1">
+    	</property>
 		
 		<!-- Associations -->
 		

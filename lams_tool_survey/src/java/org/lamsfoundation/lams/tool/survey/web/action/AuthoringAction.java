@@ -801,7 +801,7 @@ public class AuthoringAction extends Action {
 	    item.setAllowMultipleAnswer(itemForm.getQuestion().isAllowMultipleAnswer());
 
 	}
-	AuthoringAction.retriveQuestionForDisplay(item);
+	item.updateShortTitleFromDescription();
 	short type = getQuestionType(itemForm);
 	item.setType(type);
 
@@ -833,14 +833,8 @@ public class AuthoringAction extends Action {
 
     private void retriveQuestionListForDisplay(List<SurveyQuestion> list) {
 	for (SurveyQuestion item : list) {
-	    AuthoringAction.retriveQuestionForDisplay(item);
+	    item.updateShortTitleFromDescription();
 	}
-    }
-
-    public static void retriveQuestionForDisplay(SurveyQuestion item) {
-	String desc = item.getDescription();
-	desc = desc.replaceAll("<(.|\n)*?>", "");
-	item.setShortTitle(StringUtils.abbreviate(desc, AuthoringAction.SHORT_TITLE_LENGTH));
     }
 
     /**

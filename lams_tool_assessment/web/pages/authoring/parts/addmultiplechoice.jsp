@@ -101,6 +101,33 @@
 					$("#incorrect-answer-nullifies-mark-area").toggle(eval($(this).val()));
 				}).trigger("change");
 
+				// Only one of prefixAnswersWithLetters or shuffle at a time
+ 				$("#prefixAnswersWithLetters").on('change', function() {
+					if ( this.checked ) {
+						if ($("#shuffle").prop('checked')) {
+							$("#shuffle").prop('checked', false);
+						}
+						$("#shuffle").prop('disabled', true);
+						$("#shuffleText").addClass('text-muted');
+					} else {
+						$("#shuffle").prop('disabled', false);
+						$("#shuffleText").removeClass('text-muted');
+					}
+				}).trigger("change");
+
+				$("#shuffle").on('change', function() {
+					if ( this.checked ) {
+						if ($("#prefixAnswersWithLetters").prop('checked')) {
+							$("#prefixAnswersWithLetters").prop('checked', false);
+						}
+						$("#prefixAnswersWithLetters").prop('disabled', true);
+						$("#prefixAnswersWithLettersText").addClass('text-muted');
+					} else {
+						$("#prefixAnswersWithLetters").prop('disabled', false);
+						$("#prefixAnswersWithLettersText").removeClass('text-muted');
+					}
+				}).trigger("change"); 
+
 		});
    		// post-submit callback 
    		function afterRatingSubmit(responseText, statusText)  { 
@@ -191,12 +218,19 @@
 				<div class="checkbox">
 					<label for="shuffle">
 						<html:checkbox property="shuffle" styleId="shuffle"/>
-						<fmt:message key="label.authoring.basic.shuffle.the.choices" />
+						<span id="shuffleText"><fmt:message key="label.authoring.basic.shuffle.the.choices" /></span>
 					</label>
 				</div>
 				
+				<div class="checkbox" id="prefixAnswersWithLettersDiv">
+					<label for="prefixAnswersWithLetters">
+						<html:checkbox property="prefixAnswersWithLetters" styleId="prefixAnswersWithLetters"/>
+						<span id="prefixAnswersWithLettersText"><fmt:message key="label.prefix.sequential.letters.for.each.answer" /></span>
+					</label>
+				</div>
+
 				<div class="generalFeedback">
-				  <a data-toggle="collapse" data-target="#general-feedback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.general.feedback" /></a>
+				  <a data-toggle="collapse" data-target="#general-feedback" href="#general-fdback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.general.feedback" /></a>
 					<div id="general-feedback"  class="voffset5 collapse <c:if test="${not empty formBean.generalFeedback}">in</c:if> form-group">
 						<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}" contentFolderID="${formBean.contentFolderID}" />
 					</div>
@@ -221,7 +255,7 @@
 			
 			<!-- Overall feedback -->
 			<div class="overallFeedback">
-			  <a data-toggle="collapse" data-target="#overall-feedback"><i class="fa fa-xs a-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.choice.overall.feedback" /></a>
+			  <a data-toggle="collapse" data-target="#overall-feedback" href="#overall-fdback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.choice.overall.feedback" /></a>
 
 				<div id="overall-feedback" class="collapse <c:if test="${(not empty formBean.feedbackOnCorrect) || (not empty formBean.feedbackOnPartiallyCorrect) || (not empty formBean.feedbackOnIncorrect) }">in</c:if>">				
 				<div class="form-group">

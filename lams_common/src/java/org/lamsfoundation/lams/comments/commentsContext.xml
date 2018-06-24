@@ -24,10 +24,11 @@
 	<bean id="commentServiceTarget" class="org.lamsfoundation.lams.comments.service.CommentService" >
 		<property name="userService"><ref bean="userManagementService"/></property>	
 		<property name="messageService"><ref bean="commonMessageService"/></property>
-		<property name="auditService"><ref bean="auditService"/></property>
+		<property name="logEventService"><ref bean="logEventService"/></property>
 		<property name="commentSessionDAO"><ref bean="commentSessionDAO"/></property> 
 		<property name="commentDAO"><ref bean="commentDAO"/></property> 
 		<property name="commentLikeDAO"><ref bean="commentLikeDAO"/></property> 
+		<property name="toolService"><ref bean="lamsToolService"/></property>
 	</bean>
 	
 	<bean id="commentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" >

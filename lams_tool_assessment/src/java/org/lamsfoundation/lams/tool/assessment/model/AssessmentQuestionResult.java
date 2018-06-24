@@ -50,6 +50,7 @@ public class AssessmentQuestionResult {
     private float penalty;
     private Set<AssessmentOptionAnswer> optionAnswers;
     private Date finishDate;
+    private int confidenceLevel;
 
     // DTO fields:
     private AssessmentUser user;
@@ -238,6 +239,14 @@ public class AssessmentQuestionResult {
 
     public void setFinishDate(Date finishDate) {
 	this.finishDate = finishDate;
+    }
+    
+    public int getConfidenceLevel() {
+	return confidenceLevel;
+    }
+
+    public void setConfidenceLevel(int confidenceLevel) {
+	this.confidenceLevel = confidenceLevel;
     }
 
     public AssessmentUser getUser() {

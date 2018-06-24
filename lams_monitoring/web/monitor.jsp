@@ -16,10 +16,7 @@
 <lams:head>
 
 	<lams:css/>
-	<!-- Need both ui stylesheets or we lose the grey headers on the grids. -->
-	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery.jqGrid.css" type="text/css" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-tour.min.css"> 
 	<lams:css suffix="progressBar"/>
@@ -35,8 +32,6 @@
 		});
 	</script>
 	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
@@ -57,6 +52,8 @@
 			ldId = ${lesson.learningDesignID},
 			lessonStateId = ${lesson.lessonStateID},
 			createDateTimeStr = '${lesson.createDateTimeStr}',
+			lessonStartDate = '${lesson.scheduleStartDate}',
+			lessonEndDate = '${lesson.scheduleEndDate}',
 			// settings for progress bar
 			isHorizontalBar = true,
 			hasContentFrame = false,
@@ -202,9 +199,21 @@
 				<fmt:message key="progress.email.title" var="PROGRESS_EMAIL_TITLE_VAR"/>
 				PROGRESS_EMAIL_TITLE : '<c:out value="${PROGRESS_EMAIL_TITLE_VAR}" />',
 				<fmt:message key="error.date.in.past" var="ERROR_DATE_IN_PAST_VAR"/>
-				ERROR_DATE_IN_PAST : '<c:out value="${ERROR_DATE_IN_PAST_VAR}" />'
+				ERROR_DATE_IN_PAST : '<c:out value="${ERROR_DATE_IN_PAST_VAR}" />',
+				<fmt:message key="label.lesson.starts" var="LESSON_START_VAR"><fmt:param value="%0"/></fmt:message>
+				LESSON_START : '<c:out value="${LESSON_START_VAR}"/>',
+				<fmt:message key="label.lesson.finishes" var="LESSON_FINISH_VAR"><fmt:param value="%0"/></fmt:message>
+				LESSON_FINISH : '<c:out value="${LESSON_FINISH_VAR}" />',
+				<fmt:message key="lesson.display.activity.scores.alert" var="LESSON_ACTIVITY_SCORES_ENABLE_ALERT_VAR"/>
+				LESSON_ACTIVITY_SCORES_ENABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_ACTIVITY_SCORES_ENABLE_ALERT_VAR}" />').text(),
+				<fmt:message key="lesson.hide.activity.scores.alert" var="LESSON_ACTIVITY_SCORES_DISABLE_ALERT_VAR"/>
+				LESSON_ACTIVITY_SCORES_DISABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_ACTIVITY_SCORES_DISABLE_ALERT_VAR}" />').text(),
+				<fmt:message key="label.reschedule" var="RESCHEDULE_VAR"/>
+				RESCHEDULE : decoderDiv.html('<c:out value="${RESCHEDULE_VAR}" />').text(),
+				<fmt:message key="error.lesson.end.date.must.be.after.start.date" var="LESSON_ERROR_START_END_DATE_VAR"/>
+				LESSON_ERROR_START_END_DATE : decoderDiv.html('<c:out value="${LESSON_ERROR_START_END_DATE_VAR}" />').text()
 		}
-	    
+				
 		$(document).ready(function(){
 			initLessonTab();
 			initSequenceTab();
@@ -213,8 +222,8 @@
 			refreshMonitor();
 			<c:if test="${not empty lesson.lessonDescription}">
 				$('#description').readmore({
-						  speed: 500,
-						  collapsedHeight: 85
+					speed: 500,
+					collapsedHeight: 85
 				});
 			</c:if>
 			
@@ -223,17 +232,17 @@
 		});
 			
         function doSelectTab(tabId) {
-        	if ( tourInProgress )  {
-        		alert(LABELS.TOUR_DISABLED_ELEMENT);
-        		return;
-        	}
-        	actualDoSelectTab(tabId);
+	        	if ( tourInProgress )  {
+	        		alert(LABELS.TOUR_DISABLED_ELEMENT);
+	        		return;
+	        	}
+	        	actualDoSelectTab(tabId);
         }
 
         function actualDoSelectTab(tabId) {
-	    	selectTab(tabId);
+	    		selectTab(tabId);
 			var sequenceInfoDialog = $('#sequenceInfoDialog');
-	    	if ( tabId == '2' ) {
+	    		if ( tabId == '2' ) {
 				if (sequenceTabShowInfo) {
 					sequenceInfoDialog.modal("show");
 					sequenceTabShowInfo = false; // only show it once
@@ -241,11 +250,19 @@
 			} else {
 				sequenceInfoDialog.modal("hide");
             }
-	    	if ( tabId == '4' ) {
-	    		updateGradebookTab();
-	    	}
+	    		if ( tabId == '4' ) {
+	    			updateGradebookTab();
+	    		}
         }
-        
+
+        function switchToTblMonitor() {
+			$("#content").load(
+				"<c:url value='tblmonitor.do'/>",
+				{
+					lessonID: ${lesson.lessonID}
+				}
+			);
+    		}
 
     	<%@ include file="monitorTour.jsp" %> 
 
@@ -263,7 +280,14 @@
 	</div>
 	
 	<lams:Page type="navbar">
-		<lams:Tabs control="true">
+		<c:if test="${isTBLSequence}">
+			<c:set var="tblMonitorButton">
+				<i class="fa fa fa-heartbeat" title="<fmt:message key="label.tbl.monitor" />"
+			 		onclick="javascript:switchToTblMonitor();" id="tbl-monitor-control">  <fmt:message key="label.tbl.monitor"/></i>
+			</c:set>
+		</c:if>
+	
+		<lams:Tabs control="true" extraControl="${tblMonitorButton}">
 			<lams:Tab id="1" key="tab.lesson" />
 			<lams:Tab id="2" key="tab.sequence" />
 			<lams:Tab id="3" key="tab.learners" />
@@ -288,7 +312,7 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-sm-9 col-xs-6">
+						<div class="col-sm-9 col-xs-7">
 						
 							<!-- Lesson details -->
 							<dl id="lessonDetails" class="dl-horizontal">
@@ -300,45 +324,65 @@
 										</div>
 									</dd>
 								</c:if>
-								<dt><fmt:message key="lesson.state"/></dt>
+								<dt><fmt:message key="lesson.state"/>
+								</dt>
 								<dd>
-									<span data-toggle="collapse" data-target="#changeState" id="lessonStateLabel"></span>
-								  
+									<span data-toggle="collapse" data-target="#changeState" id="lessonStateLabel" class="lessonManageField"></span>
+								  	<div style="display:inline-block;vertical-align: middle;"><span id="lessonStartDateSpan" class="lessonManageField loffset5"></span>
+								  	<span id="lessonFinishDateSpan" class="lessonManageField loffset5"></span></div>
+								  	 
 									<!--  Change lesson status or start/schedule start -->
 									<div class="collapse offset10" id="changeState">
 										<div id="lessonScheduler">
-											<form class="form-inline">
-												<div class="form-group">
-													<label for="scheduleDatetimeField"><fmt:message key="lesson.start"/></label>
+											<form class="form-horizontal">
+												<div class="form-group" id="lessonStartApply">
+													<label for="scheduleDatetimeField" class="col-sm-1"><fmt:message key="lesson.start"/></label>
+													<div class="col-sm-8">
 													<input class="lessonManageField input-sm" id="scheduleDatetimeField" type="text"/>
-													
-													<span id="lessonStartDateSpan" class="lessonManageField"></span>
 													<a id="scheduleLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
 														   onClick="javascript:scheduleLesson()"
 														   title='<fmt:message key="button.schedule.tooltip"/>'>
 													   <fmt:message key="button.schedule"/>
 													</a>
-													
 													<a id="startLessonButton" class="btn btn-xs btn-default" href="#"
 														   onClick="javascript:startLesson()"
 														   title='<fmt:message key="button.start.now.tooltip"/>'>
 													   <fmt:message key="button.start.now"/>
 													</a>
+													</div>
+												</div>
+												<div class="form-group" id="lessonDisableApply">
+													<label for="disableDatetimeField" class="col-sm-1"><fmt:message key="lesson.end"/></label>
+													<div class="col-sm-8">
+													<input class="lessonManageField input-sm" id="disableDatetimeField" type="text"/>
+													<a id="scheduleDisableLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
+														   onClick="javascript:scheduleDisableLesson()"
+														   title='<fmt:message key="button.schedule.disable.tooltip"/>'>
+												   	<fmt:message key="button.schedule"/>
+													</a>
+													<a id="disableLessonButton" class="btn btn-xs btn-default" href="#"
+														   onClick="javascript:disableLesson()"
+														   title='<fmt:message key="button.disable.now.tooltip"/>'>
+													   <fmt:message key="button.disable.now"/>
+													</a>
+													</div>
 												</div>
 											</form>
 										</div>
 										
 										<div id="lessonStateChanger">
-											<select id="lessonStateField" class="btn btn-xs">
+											<select id="lessonStateField" class="btn btn-xs" onchange="lessonStateFieldChanged()">
 												<option value="-1"><fmt:message key="lesson.select.state"/></option>
 											</select>
-											<button type="button" class="btn btn-xs btn-primary"
+											<span id="lessonStateApply">
+											<button type="button" class="lessonManageField btn btn-xs btn-primary"
 													onClick="javascript:changeLessonState()"
 													title='<fmt:message key="lesson.change.state.tooltip"/>'>
 										   		<i class="fa fa-check"></i> 
 										   		<span class="hidden-xs"><fmt:message key="button.apply"/></span>
-									    	</button>
-								    	</div>					
+										    	</button>
+										    	</span>
+								    		</div>					
 									</div>
 								</dd>
 								
@@ -370,15 +414,26 @@
 												<span class="hidden-xs"><fmt:message key="email.notifications"/></span>
 											</button>
 										</c:if>
-										
+									</div>
+									
+									<div class="btn-group btn-group-xs" role="group" id="lessonActions2">
 										<c:if test="${lesson.enableLessonIntro}">
-											<button id="editIntroButton" class="btn btn-default"
+											<button id="editIntroButton" class="btn btn-default roffset10"
 													type="button" onClick="javascript:showIntroductionDialog(${lesson.lessonID})">
 												<i class="fa fa-sm fa-info"></i>
 												<span class="hidden-xs"><fmt:message key="label.lesson.introduction"/></span>
 											</button>
 										</c:if>							  
+
+										<button id="gradebookOnCompleteButton" class="btn btn-default
+											<c:if test="${lesson.gradebookOnComplete}">
+												btn-success
+											</c:if>
+											">
+											<i class="fa fa-sm fa-list-ol"></i><span class="hidden-xs">&nbsp;<fmt:message key="label.display.activity.scores"/></span> 
+ 										</button>
 									</div>
+										
 								</dd>
 		
 								<!-- IM & Presence -->
@@ -432,7 +487,7 @@
 										</button>
 									</div>
 								</dd>
-								
+
 								<!--  encodedLessonID -->
 								<c:if test="${ALLOW_DIRECT_LESSON_LAUNCH}">
                                     <dt class="text-muted"><small><fmt:message key="lesson.learner.url"/></small></dt>
@@ -679,7 +734,7 @@
 		
 	<div id="classDialogContents" class="dialogContainer">
 		<div id="classDialogTable">
-			<div class="row">
+			<div class="row no-margin">
 				<div id="leftLearnerTable" class="col-xs-6">
 					<table id="classLearnerTable" class="table table-condensed">
 						<tr class="active">

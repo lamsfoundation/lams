@@ -177,6 +177,22 @@ td.sectionHeader {
 	margin-right: 5px;
 }
 
+#disableLessonButton {
+	display: none;
+}
+
+#lessonScheduler label {
+	margin-top: 5px;
+}
+
+#lessonStartApply {
+	margin-bottom: 5px;
+}
+
+#lessonStateLabel, #lessonScheduler input {
+	font-size:13px; // Larger than buttons but smaller than the date text next to it.
+}
+
 #lessonStateField {
 	width: 114px;
 }
@@ -263,6 +279,24 @@ td.contributeEntryCell a {
 
 #emailProgressTable input[type="checkbox"] {
 	@include checkboxInTable;
+}
+
+
+@media (min-width: 768px) {
+#lessonActions {
+	display: inline-block;
+}
+
+#lessonActions2 {
+	display: block;
+	margin-top: 5px;
+	}
+}
+
+@media (max-width: 767px) {
+#lessonActions {
+	display: inline;
+}
 }
 
 /********** SEQUENCE TAB STYLES **********/
@@ -386,4 +420,12 @@ td.progressBarLabel {
 	height: 25px;
 	margin-left: 25px;
 	
+}
+
+/***** Group View Page **/
+.group-table>tbody>tr:nth-of-type(odd){
+   background-color:$brand-primary-light;
+}
+.group-table>tbody>tr>td, .table>tfoot>tr>td {
+    border-top: none;
 }

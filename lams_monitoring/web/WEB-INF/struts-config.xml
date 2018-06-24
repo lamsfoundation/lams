@@ -25,6 +25,7 @@
 	<form-property name="forbiddenLearnerList" type="java.util.Collection" />
 	<form-property name="allowedToPassLearnerList" type="java.util.Collection" />
 	<form-property name="userId" type="java.lang.String" />
+	<form-property name="scheduleDate" type="java.lang.String" />
 </form-bean>
 
   </form-beans>
@@ -134,6 +135,11 @@
         path="/emailnotifications/scheduledEmailList.jsp"
         redirect="false"
       />
+     <forward
+        name="archivedEmailList"
+        path="/emailnotifications/archivedEmailList.jsp"
+        redirect="false"
+      />
     </action>
     <action
       path="/groupedBranching"
@@ -168,6 +174,44 @@
       <forward
         name="chosenGrouping"
         path="/grouping/chosenGrouping.jsp"
+        redirect="false"
+      />
+    </action>
+	<action
+      path="/tblmonitor"
+      type="org.lamsfoundation.lams.monitoring.web.TblMonitoringAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="tblmonitor"
+        path="/tblmonitor/tblmonitor.jsp"
+        redirect="false"
+      />
+      <forward
+        name="teams"
+        path="/tblmonitor/teams.jsp"
+        redirect="false"
+      />
+      <forward
+        name="gates"
+        path="/tblmonitor/gates.jsp"
+        redirect="false"
+      />
+      <forward
+        name="forum"
+        path="/tblmonitor/forum.jsp"
+        redirect="false"
+      />
+      <forward
+        name="peerreview"
+        path="/tblmonitor/peerreview.jsp"
+        redirect="false"
+      />
+      <forward
+        name="sequence"
+        path="/tblmonitor/sequence.jsp"
         redirect="false"
       />
     </action>

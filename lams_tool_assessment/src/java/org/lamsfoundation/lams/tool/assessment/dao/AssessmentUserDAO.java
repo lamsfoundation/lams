@@ -33,7 +33,9 @@ public interface AssessmentUserDAO extends DAO {
 
     AssessmentUser getUserByUserIDAndSessionID(Long userID, Long sessionId);
 
-    AssessmentUser getUserByUserIDAndContentID(Long userId, Long contentId);
+    AssessmentUser getUserCreatedAssessment(Long userId, Long contentId);
+    
+    AssessmentUser getUserByIdAndContent(Long userId, Long contentId);
 
     List<AssessmentUser> getBySessionID(Long sessionId);
 
@@ -41,14 +43,17 @@ public interface AssessmentUserDAO extends DAO {
 	    String searchString, IUserManagementService userManagementService);
 
     int getCountUsersBySession(Long sessionId, String searchString);
+    
+    int getCountUsersByContentId(Long contentId);
 
     List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page, int size,
-	    String sortBy, String sortOrder, String searchString);
+	    String sortBy, String sortOrder, String searchString, IUserManagementService userManagementService);
     
     List<Number> getRawUserMarksBySession(Long sessionId);
+    
     Object[] getStatsMarksBySession(Long sessionId);
+    
     List<Number> getRawLeaderMarksByToolContentId(Long toolContentId);
+    
     Object[] getStatsMarksForLeaders(Long toolContentId);
-
-
 }

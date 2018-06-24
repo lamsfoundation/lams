@@ -43,9 +43,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -63,9 +60,6 @@ public interface IAuthoringService {
     public static final String START_EDIT_ON_FLY_MESSAGE_KEY = "startEditOnFly";
 
     public static final String COPY_TOOL_CONTENT_MESSAGE_KEY = "copyMultipleToolContent";
-
-    public static final String LEARNING_DESIGN_IMAGES_FOLDER = FileUtil.getFullPath(
-	    Configuration.get(ConfigurationKeys.LAMS_EAR_DIR), "lams-www.war\\secure\\learning-design-images");
 
     /**
      * Returns a populated LearningDesign object corresponding to the given learningDesignID
@@ -239,7 +233,7 @@ public interface IAuthoringService {
      * @param cancelled
      *            flag specifying whether user cancelled or saved the edit
      * @throws IOException
-     * @throws Exception 
+     * @throws Exception
      */
     void finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws Exception;
 

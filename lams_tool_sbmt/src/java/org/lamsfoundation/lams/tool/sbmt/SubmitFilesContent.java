@@ -62,6 +62,8 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     private boolean defineLater;
 
     private boolean contentInUse;
+    
+    private boolean useSelectLeaderToolOuput;
 
     private boolean limitUpload;
 
@@ -339,5 +341,13 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 
     public void setNotifyTeachersOnFileSubmit(boolean notifyTeachersOnFileSubmit) {
 	this.notifyTeachersOnFileSubmit = notifyTeachersOnFileSubmit;
+    }
+    
+    public boolean isUseSelectLeaderToolOuput() {
+   	return useSelectLeaderToolOuput;
+    }
+
+    public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
+   	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 }

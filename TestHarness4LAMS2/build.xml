@@ -40,8 +40,7 @@
 				<path refid="project.classpath"/>
 			</classpath>
 			<arg value="test.properties"/>
-			<jvmarg value="-XX:MaxPermSize=256m"/>
-			<jvmarg value="-Xmx512M"/>
+			<jvmarg value="-Xmx1024"/>
 		</java>
 	</target>
 

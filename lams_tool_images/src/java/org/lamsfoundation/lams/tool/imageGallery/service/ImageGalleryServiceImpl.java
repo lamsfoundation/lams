@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
@@ -54,6 +55,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -96,7 +98,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
 
 /**
@@ -137,7 +138,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     private ILearnerService learnerService;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
 
     private IUserManagementService userManagementService;
 
@@ -303,7 +304,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     }
 
     @Override
-    public void toggleImageVisibility(Long itemUid) {
+    public void toggleImageVisibility(Long itemUid, Long toolContentId) {
 	ImageGalleryItem image = imageGalleryItemDao.getByUid(itemUid);
 	if (image != null) {
 	    boolean isHidden = image.isHide();
@@ -314,9 +315,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    Long userId = image.getCreateBy() == null ? 0L : image.getCreateBy().getUserId();
 	    String loginName = image.getCreateBy() == null ? "No user" : image.getCreateBy().getLoginName();
 	    if (isHidden) {
-		auditService.logShowEntry(ImageGalleryConstants.TOOL_SIGNATURE, userId, loginName, image.toString());
+		logEventService.logShowLearnerContent(userId, loginName, toolContentId, image.toString());
 	    } else {
-		auditService.logHideEntry(ImageGalleryConstants.TOOL_SIGNATURE, userId, loginName, image.toString());
+		logEventService.logHideLearnerContent(userId, loginName, toolContentId, image.toString());
 	    }
 	}
     }
@@ -572,9 +573,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    // prepare medium image
 	    InputStream mediumIS = ResizePictureUtil.resize(originalImage, mediumImageDimensions);
 	    String mediumFileName = ImageGalleryServiceImpl.MEDIUM_FILENAME_PREFIX
-		    + fileName.substring(0, fileName.indexOf('.')) + ".png";
+		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 	    NodeKey mediumNodeKey = imageGalleryToolContentHandler.uploadFile(mediumIS, mediumFileName,
-		    "image/png");
+		    "image/jpeg");
 	    image.setMediumFileUuid(mediumNodeKey.getUuid());
 	    //store MediumImageWidth and MediumImageHeight
 	    InputStream mediumIS2 = imageGalleryToolContentHandler.getFileNode(mediumNodeKey.getUuid()).getFile();
@@ -587,23 +588,17 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    InputStream originalIS2 = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
 	    InputStream thumbnailIS = ResizePictureUtil.resize(originalIS2, thumbnailImageDimensions);
 	    String thumbnailFileName = ImageGalleryServiceImpl.THUMBNAIL_FILENAME_PREFIX
-		    + fileName.substring(0, fileName.indexOf('.')) + ".png";
+		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 	    NodeKey thumbnailNodeKey = imageGalleryToolContentHandler.uploadFile(thumbnailIS, thumbnailFileName,
-		    "image/png");
+		    "image/jpeg");
 	    image.setThumbnailFileUuid(thumbnailNodeKey.getUuid());
 
 	} catch (RepositoryCheckedException e) {
-	    ImageGalleryServiceImpl.log
-		    .error(messageService.getMessage("error.msg.repository.checked.exception") + ":" + e.toString());
 	    throw new UploadImageGalleryFileException(
 		    messageService.getMessage("error.msg.repository.checked.exception"));
 	} catch (NumberFormatException e) {
-	    ImageGalleryServiceImpl.log
-		    .error(messageService.getMessage("error.msg.number.format.exception") + ":" + e.toString());
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.number.format.exception"));
 	} catch (IOException e) {
-	    ImageGalleryServiceImpl.log
-		    .error(messageService.getMessage("error.msg.io.exception.resizing") + ":" + e.toString());
 	    throw new ImageGalleryException(messageService.getMessage("error.msg.io.exception.resizing"));
 	}
     }
@@ -659,8 +654,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public void setLearnerService(ILearnerService learnerService) {
@@ -1064,6 +1059,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();
+    }
+    
+    @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
+	return null;
     }
 
     @Override

@@ -32,13 +32,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.index.IndexLinkBean;
+import org.lamsfoundation.lams.integration.service.IIntegrationService;
+import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -53,6 +54,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -69,6 +71,7 @@ public class IndexAction extends LamsDispatchAction {
 
     private static Logger log = Logger.getLogger(IndexAction.class);
     private static IUserManagementService userManagementService;
+    private static IIntegrationService integrationService;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -118,6 +121,22 @@ public class IndexAction extends LamsDispatchAction {
 	    return mapping.findForward("lessons");
 	}
 
+	
+	// This test also appears in LoginAsAction
+	Boolean allowDirectAccessIntegrationLearner = Configuration
+		.getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS);
+	if (!allowDirectAccessIntegrationLearner) {
+	    boolean isIntegrationUser = getIntegrationService().isIntegrationUser(userDTO.getUserID());
+	    //prevent integration users with mere learner rights from accessing index.do
+	    if (isIntegrationUser && !request.isUserInRole(Role.AUTHOR) && !request.isUserInRole(Role.MONITOR)
+		    && !request.isUserInRole(Role.GROUP_MANAGER) && !request.isUserInRole(Role.GROUP_ADMIN)
+		    && !request.isUserInRole(Role.SYSADMIN)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN,
+			"Integration users with learner right are not allowed to access this page");
+		return null;
+	    }
+	}
+
 	// only show the growl warning the first time after a user has logged in & if turned on in configuration
 	Boolean tzWarning = Configuration.getAsBoolean(ConfigurationKeys.SHOW_TIMEZONE_WARNING);
 	request.setAttribute("showTimezoneWarning", tzWarning);
@@ -134,7 +153,7 @@ public class IndexAction extends LamsDispatchAction {
 		.getFavoriteOrganisationsByUser(userDTO.getUserID());
 	request.setAttribute("favoriteOrganisations", favoriteOrganisations);
 	request.setAttribute("activeOrgId", user.getLastVisitedOrganisationId());
-	
+
 	boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
 	int userCoursesCount = userManagementService.getCountActiveCoursesByUser(userDTO.getUserID(), isSysadmin, null);
 	request.setAttribute("isCourseSearchOn", userCoursesCount > 10);
@@ -213,7 +232,7 @@ public class IndexAction extends LamsDispatchAction {
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 	    responseRow.put("id", orgDto.getOrganisationID());
 	    String orgName = orgDto.getName() == null ? "" : orgDto.getName();
-	    responseRow.put("name", StringEscapeUtils.escapeHtml(orgName));
+	    responseRow.put("name", HtmlUtils.htmlEscape(orgName));
 
 	    rows.add(responseRow);
 	}
@@ -267,6 +286,14 @@ public class IndexAction extends LamsDispatchAction {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return learner != null ? learner.getUserID() : null;
+    }
+
+    private IIntegrationService getIntegrationService() {
+	if (integrationService == null) {
+	    integrationService = (IntegrationService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("integrationService");
+	}
+	return integrationService;
     }
 
     private IUserManagementService getUserManagementService() {

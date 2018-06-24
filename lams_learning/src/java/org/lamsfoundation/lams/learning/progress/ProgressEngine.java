@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * The Progress Engine controls how a learner progresses through a sequence.
@@ -53,9 +54,14 @@ import org.lamsfoundation.lams.usermanagement.User;
 public class ProgressEngine {
     protected Logger log = Logger.getLogger(ProgressEngine.class);
 
+    public static final String AUDIT_ACTIVITY_START_KEY = "audit.activity.started";
+    public static final String AUDIT_ACTIVITY_STOP_KEY = "audit.activity.stopped";
+    public static final String AUDIT_LESSON_COMPLETE_KEY = "audit.learner.lesson.complete";
+	    
     private IActivityDAO activityDAO;
     private ILogEventService logEventService;
-
+    private MessageService messageService;
+    
     /**
      * Method determines next step for a learner based on the activity they have
      * just completed. Will clear the Parallel Waiting Complete value if it is
@@ -208,6 +214,7 @@ public class ProgressEngine {
      * Set the current activity as attempted. If it is a parallel activity, mark
      * its children as attempted too.
      */
+    @SuppressWarnings("rawtypes")
     public void setActivityAttempted(LearnerProgress progress, Activity activity) {
 	progress.setProgressState(activity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
 	activity.setReadOnly(true);
@@ -223,8 +230,9 @@ public class ProgressEngine {
 	}
 
 	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_START, progress.getUser().getUserId(),
-		activity.getLearningDesign().getLearningDesignId(), progress.getLesson().getLessonId(),
-		activity.getActivityId());
+		progress.getUser().getUserId(), progress.getLesson().getLessonId(), activity.getActivityId(),
+		messageService.getMessage(AUDIT_ACTIVITY_START_KEY, new Object[] { progress.getUser().getLogin(),
+			progress.getUser().getUserId(), activity.getTitle(), activity.getActivityId() }));
 
 	// update activity
 	activityDAO.insertOrUpdate(activity);
@@ -372,8 +380,12 @@ public class ProgressEngine {
 	learnerProgress.setLessonComplete(completionStatus);
 
 	// log learner has completed the current lesson event
-	logEventService.logEvent(LogEvent.TYPE_LEARNER_LESSON_COMPLETE, learnerProgress.getUser().getUserId(), null,
-		learnerProgress.getLesson().getLessonId(), null);
+	logEventService.logEvent(LogEvent.TYPE_LEARNER_LESSON_COMPLETE, learnerProgress.getUser().getUserId(),
+		learnerProgress.getUser().getUserId(), learnerProgress.getLesson().getLessonId(), null,
+		messageService.getMessage(AUDIT_LESSON_COMPLETE_KEY,
+			new Object[] { learnerProgress.getUser().getLogin(), learnerProgress.getUser().getUserId(),
+				learnerProgress.getLesson().getLessonName(),
+				learnerProgress.getLesson().getLessonId() }));
 
 	return learnerProgress;
     }
@@ -422,5 +434,9 @@ public class ProgressEngine {
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
     }
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
+    }
+
 
 }

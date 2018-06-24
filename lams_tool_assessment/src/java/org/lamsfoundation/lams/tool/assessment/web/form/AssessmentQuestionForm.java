@@ -54,7 +54,9 @@ public class AssessmentQuestionForm extends ActionForm {
     private String feedbackOnCorrect;
     private String feedbackOnPartiallyCorrect;
     private String feedbackOnIncorrect;
+    // only one of shuffle and prefixAnswersWithLetters should be on. Both may be off
     private boolean shuffle;
+    private boolean prefixAnswersWithLetters;
     private boolean caseSensitive;
     private boolean correctAnswer;
     private boolean allowRichEditor;
@@ -252,5 +254,13 @@ public class AssessmentQuestionForm extends ActionForm {
 
     public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
 	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
+    }
+
+    public boolean isPrefixAnswersWithLetters() {
+	return prefixAnswersWithLetters;
+    }
+
+    public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
+	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
 }

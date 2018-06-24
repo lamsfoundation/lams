@@ -17,6 +17,15 @@
 	});
 </script>
 
+<lams:SimplePanel titleKey="label.select.leader">
+<div class="checkbox">
+	<label for="useSelectLeaderToolOuput">
+		<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput"/>
+		<fmt:message key="label.use.select.leader.tool.output" />
+	</label>
+</div>
+</lams:SimplePanel>
+
 <lams:SimplePanel titleKey="label.file.options">
 <div class="checkbox">
 	<label for="limitUpload">

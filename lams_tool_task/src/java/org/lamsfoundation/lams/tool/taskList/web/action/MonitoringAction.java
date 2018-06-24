@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -67,6 +66,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -234,7 +234,7 @@ public class MonitoringAction extends Action {
 
 	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 	    userData.add(userDto.getUserId());
-	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFullName());
 	    userData.add(fullName);
 
 	    Set<Long> completedTaskUids = userDto.getCompletedTaskUids();
@@ -245,7 +245,7 @@ public class MonitoringAction extends Action {
 	    }
 
 	    if (tasklist.isMonitorVerificationRequired()) {
-		String label = StringEscapeUtils.escapeHtml(service.getMessage("label.confirm"));
+		String label = HtmlUtils.htmlEscape(service.getMessage("label.confirm"));
 
 		String verificationStatus = userDto.isVerifiedByMonitor() ? "<i class=\"fa fa-check\"></i>"
 			: "<a id='verif-" + userDto.getUserId()
@@ -255,7 +255,7 @@ public class MonitoringAction extends Action {
 	    }
 
 	    userData.add(userDto.getPortraitId());
-	    
+
 	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);
 	    userRow.put("cell", userData);
@@ -313,14 +313,14 @@ public class MonitoringAction extends Action {
 	TaskListItem item = service.getTaskListItemByUid(itemUid);
 	Set<TaskListItemComment> itemComments = item.getComments();
 	Set<TaskListItemAttachment> itemAttachments = item.getAttachments();
-	String label = StringEscapeUtils.escapeHtml(service.getMessage("label.download"));
+	String label = HtmlUtils.htmlEscape(service.getMessage("label.download"));
 
 	int i = 0;
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	for (TaskListUserDTO userDto : userDtos) {
 
 	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
-	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFullName());
 	    userData.add(fullName);
 
 	    String completionImage = userDto.isCompleted() ? "<i class=\"fa fa-check\"></i>"
@@ -345,7 +345,7 @@ public class MonitoringAction extends Action {
 		if (!userComments.isEmpty()) {
 		    commentsFiles += "<li>";
 		    for (String userComment : userComments) {
-			commentsFiles += StringEscapeUtils.escapeHtml(userComment);
+			commentsFiles += HtmlUtils.htmlEscape(userComment);
 		    }
 		    commentsFiles += "</li>";
 		}
@@ -359,7 +359,7 @@ public class MonitoringAction extends Action {
 		if (!userAttachments.isEmpty()) {
 		    commentsFiles += "<li>";
 		    for (TaskListItemAttachment userAttachment : userAttachments) {
-			commentsFiles += StringEscapeUtils.escapeHtml(userAttachment.getFileName()) + " ";
+			commentsFiles += HtmlUtils.htmlEscape(userAttachment.getFileName()) + " ";
 			commentsFiles += "<a href='" + TOOL_URL + "/download/?uuid=" + userAttachment.getFileUuid()
 				+ "&versionID=" + userAttachment.getFileVersionId() + "&preferDownload=true'>" + label
 				+ "</a>";

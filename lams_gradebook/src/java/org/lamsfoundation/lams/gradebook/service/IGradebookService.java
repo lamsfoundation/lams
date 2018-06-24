@@ -45,12 +45,13 @@ public interface IGradebookService {
 
     /**
      * Gets all the activity rows for a lesson, with the mark for each activity being the average for all users in the
-     * lesson
+     * lesson. Only set escapeTitles to false if the output is *not* going to a webpage, but is instead going to a
+     * spreadsheet.
      *
      * @param lesson
      * @return
      */
-    List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId, TimeZone userTimezone);
+    List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId, TimeZone userTimezone, boolean escapeTitles);
 
     /**
      * Gets all the activity rows for a user, with the mark for the activity being the user's individual mark
@@ -92,6 +93,11 @@ public interface IGradebookService {
      */
     List<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson, int page, int size, String sortBy, String sortOrder,
 	    String searchString, TimeZone userTimezone);
+
+    /**
+     * Returns output for gradebook on lesson complete.
+     */
+    List<GradebookGridRowDTO> getGBLessonComplete(Long lessonId, Integer userId);
 
 //    /**
 //     * Gets the user rows containing only users' names. Do proper paging on DB side.
@@ -235,6 +241,15 @@ public interface IGradebookService {
     GradebookUserActivity getGradebookUserActivity(Long activityID, Integer userID);
 
     /**
+     * Gets all available gradebookUserActivity objects for the specified activity
+     *
+     * @param activityID
+     * @param userID
+     * @return
+     */
+    List<GradebookUserActivity> getGradebookUserActivities(Long activityId);
+
+    /**
      * Returns the average mark for a given activity. Activity can be grouped - then supply according groupId to receive
      * AverageMarkForGroupedActivity.
      *
@@ -264,6 +279,13 @@ public interface IGradebookService {
      */
     void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
 	    Boolean markedInGradebook);
+
+    /**
+     * Delete user activity mark and updates aggregates
+     */
+    void removeActivityMark(Integer userID, Long toolSessionID);
+
+    void removeActivityMark(Long toolContentID);
 
     /**
      * Get an activity from the db by id
@@ -311,18 +333,18 @@ public interface IGradebookService {
      */
     LinkedHashMap<String, ExcelCell[][]> exportSelectedLessonsGradebook(Integer userId, Integer organisationId,
 	    String[] lessonIds, boolean simplified);
-    
+
     /**
      * Get the raw overall marks for a lesson for charting purposes
+     * 
      * @param lessonId
      * @return
      */
     List<Number> getMarksArray(Long lessonId);
 
     /** Will the marks caculation take into account weighting? */
-    boolean isWeightedMarks(LearningDesign design);
-    
+    boolean isWeightedMarks(Long lessonId);
+
     /** Get a summary of the weightings */
     List<String[]> getWeights(LearningDesign design);
-
 }

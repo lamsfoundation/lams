@@ -80,7 +80,7 @@
 					<property name="qaWizardDAO"><ref bean="qaWizardDAO"/></property>								
 					<property name="toolService"><ref bean="lamsToolService"/></property>
 					<property name="learnerService"><ref bean="learnerService"/></property>			
-					<property name="auditService"><ref bean="auditService"/></property>
+					<property name="logEventService"><ref bean="logEventService"/></property>
 					<property name="qaOutputFactory"><ref bean="qaOutputFactory"/></property>
 					<property name="qaToolContentHandler"><ref bean="qaToolContentHandler"/></property>								
 					<property name="exportContentService"><ref bean="exportToolContentService"/></property>											

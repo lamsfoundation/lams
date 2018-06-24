@@ -257,6 +257,7 @@ ActivityDefs = {
 		this.authorURL = authorURL;
 		this.title = title;
 		this.readOnly = readOnly;
+		this.requireGrouping = false;
 		if (evaluation) {
 			this.gradebookToolOutputDefinitionName = evaluation[0];
 			this.gradebookToolOutputWeight = evaluation.length > 1 ? evaluation[1] : null;
@@ -618,8 +619,10 @@ ActivityDraw = {
 										   }))
 						 // activity colour depends on its category ID
 						 .attr({
-							'stroke' : layout.colors.toolActivityBorder[layout.toolMetadata[this.learningLibraryID].activityCategoryID],
-							'stroke-width' : '0.5',
+							'stroke' : this.requireGrouping ?
+									   layout.colors.activityRequireGrouping 
+									   : layout.colors.toolActivityBorder[layout.toolMetadata[this.learningLibraryID].activityCategoryID],
+							'stroke-width' : this.requireGrouping ? '3' : '0.5',
 							'stroke-linejoin' : 'round',
 							'fill'   : layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
 						 }),
@@ -957,7 +960,7 @@ ActivityLib = {
 				&& toActivity instanceof ActivityDefs.BranchingEdgeActivity
 				&& fromActivity.isStart && !toActivity.isStart
 				&& fromActivity.branchingActivity != toActivity.branchingActivity) {
-			alert(LABELS.CROSS_BRANCHING_ERROR);
+			layout.infoDialog.data('show')(LABELS.CROSS_BRANCHING_ERROR);
 			return;
 		}
 		
@@ -971,7 +974,7 @@ ActivityLib = {
 		// no transitions to/from support activities
 		if (toActivity instanceof ActivityDefs.FloatingActivity
 			|| fromActivity instanceof ActivityDefs.FloatingActivity){
-			alert(LABELS.SUPPORT_TRANSITION_ERROR);
+			layout.infoDialog.data('show')(LABELS.SUPPORT_TRANSITION_ERROR);
 			return;
 		}
 		
@@ -979,7 +982,7 @@ ActivityLib = {
 		if (!redraw
 				&& toActivity.transitions.to.length > 0
 				&& !(toActivity instanceof ActivityDefs.BranchingEdgeActivity && !toActivity.isStart)) {
-			alert(LABELS.TRANSITION_TO_EXISTS_ERROR);
+			layout.infoDialog.data('show')(LABELS.TRANSITION_TO_EXISTS_ERROR);
 			return;
 		}
 
@@ -995,7 +998,7 @@ ActivityLib = {
 			}
 			
 			if (toActivity == activity) {
-				alert(LABELS.CIRCULAR_SEQUENCE_ERROR);
+				layout.infoDialog.data('show')(LABELS.CIRCULAR_SEQUENCE_ERROR);
 				return;
 			}
 		} while (activity);
@@ -1103,7 +1106,7 @@ ActivityLib = {
 									break;
 								}
 								// this branching's end does not match with own start, error
-								alert(LABELS.CROSS_BRANCHING_ERROR);
+								layout.infoDialog.data('show')(LABELS.CROSS_BRANCHING_ERROR);
 								// remove the just added transition
 								ActivityLib.removeTransition(transition);
 								// tell the outer iteration loop to quit
@@ -1148,7 +1151,7 @@ ActivityLib = {
 						// put the activity back
 						activity.parentActivity.childActivities = existingChildActivities;
 						
-						alert(LABELS.LIVEEDIT_READONLY_MOVE_PARENT_ERROR);
+						layout.infoDialog.data('show')(LABELS.LIVEEDIT_READONLY_MOVE_PARENT_ERROR);
 						return false;
 					}
 					
@@ -1176,11 +1179,11 @@ ActivityLib = {
 				if (activity instanceof ActivityDefs.GateActivity
 					|| activity instanceof ActivityDefs.GroupingActivity
 					|| activity instanceof ActivityDefs.BranchingEdgeActivity){
-					alert(LABELS.ACTIVITY_IN_CONTAINER_ERROR);
+					layout.infoDialog.data('show')(LABELS.ACTIVITY_IN_CONTAINER_ERROR);
 					return false;
 				}
 				if (activity.readOnly || container.readOnly) {
-					alert(LABELS.LIVEEDIT_READONLY_ACTIVITY_ERROR);
+					layout.infoDialog.data('show')(LABELS.LIVEEDIT_READONLY_ACTIVITY_ERROR);
 					return false;
 				}
 				
@@ -1322,12 +1325,14 @@ ActivityLib = {
 					if (activity.gradebookToolOutputDefinitionName) {
 						if (this.name == activity.gradebookToolOutputDefinitionName) {
 							activity.gradebookToolOutputDefinitionDescription = this.description;
+							activity.gradebookToolOutputDefinitionWeightable = this.weightable;
 							return false;
 						}
 					} else {
 						if (this.isDefaultGradebookMark){
 							activity.gradebookToolOutputDefinitionName = this.name;
 							activity.gradebookToolOutputDefinitionDescription = this.description;
+							activity.gradebookToolOutputDefinitionWeightable = this.weightable;
 							return false;
 						}
 					}

@@ -29,16 +29,14 @@
 	
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
-	<style media="screen,projection" type="text/css">
-
-	</style>
+	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
-	
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			
@@ -53,7 +51,6 @@
 					var grade = selects.length == 0 ? 0 : eval(selects.first().find('option:last-child').val())
 					var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
 					
-
 					var isButtonEnabled = (totalSelected == grade);
 					
 					//check if hedging justification is enabled
@@ -69,9 +66,10 @@
 						$("[type=button][name=submit-hedging-question" + questionIndex + "]").prop("disabled", "true").addClass("button-disabled");
 					}
 				}).trigger("change");
-				
 			}
 
+			//initialize bootstrap-sliders if "Enable confidence level" option is ON
+			$('.bootstrap-slider').bootstrapSlider();
 		});
 		
 		function countHedgeQuestionSelectTotal(questionIndex) {
@@ -190,13 +188,14 @@
 					$('#answers').ajaxSubmit({
 						url: "<c:url value='/learning/autoSaveAnswers.do'/>?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
 		                success: function() {
-		                	$.jGrowl(
-		                		"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.learning.draft.autosaved" />",
-		                		{ life: 2000, closeTemplate: '' }
-		                	);
+			                	$.jGrowl(
+			                		"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.learning.draft.autosaved" />",
+			                		{ life: 2000, closeTemplate: '' }
+			                	);
 		                }
 					});
-	        	}, autosaveInterval
+	        		}, 
+	        		autosaveInterval
 	        );
 		</c:if>
 		
@@ -216,13 +215,12 @@
 				return;
 			}
 			disableButtons();
-        	var myForm = $("#answers");
-        	myForm.attr("action", "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber);
-        	myForm.submit();
+	        	var myForm = $("#answers");
+	        	myForm.attr("action", "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber);
+	        	myForm.submit();
 		}
 		
 		function submitAll(isTimelimitExpired){
-			
 			//only if time limit is not expired
 			if (!isTimelimitExpired) {
 				if (!validateAnswers()) {
@@ -230,9 +228,9 @@
 				}
 			}
 			disableButtons();
-        	var myForm = $("#answers");
-        	myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>&isTimelimitExpired=" + isTimelimitExpired);
-        	myForm.submit();
+	        	var myForm = $("#answers");
+	        	myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>&isTimelimitExpired=" + isTimelimitExpired);
+	        	myForm.submit();
 		}
 		
 		function submitSingleMarkHedgingQuestion(singleMarkHedgingQuestionUid, questionIndex){
@@ -246,8 +244,8 @@
 			$('#answers').ajaxSubmit({
 				url: "<c:url value='/learning/submitSingleMarkHedgingQuestion.do'/>?sessionMapID=${sessionMapID}&singleMarkHedgingQuestionUid=" + singleMarkHedgingQuestionUid +"&questionIndex="+ questionIndex +"&date=" + new Date().getTime(),
 				target: '#mark-hedging-question-' + singleMarkHedgingQuestionUid,
-                success: function() {
-                	$('#question-area-' + questionIndex).removeClass('bg-warning');
+            		success: function() {
+                		$('#question-area-' + questionIndex).removeClass('bg-warning');
                 }
 			});
 		}

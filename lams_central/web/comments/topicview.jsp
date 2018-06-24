@@ -162,7 +162,7 @@
 			</table>
 			<script> 
 				$("#${messageTablename}").treetable({${isSticky?tableCommandSticky:tableCommand}});
-			</script>	
+ 			</script>	
 			</div>
 		</c:if>
 		<c:set var="messageTablename" value="tree${commentDto.comment.uid}"/>

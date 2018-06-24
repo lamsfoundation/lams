@@ -217,5 +217,49 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	}
 	return list;
     }
+    
+    
+    private static final String GET_LEADER_STATISTICS = "SELECT session.session_id sessionId, session.session_name sessionName, "
+	    + " COUNT(detail.submission_id) totalUploadedFiles, COUNT(report.marks) markedCount"
+	    + " FROM tl_lasbmt11_session session, tl_lasbmt11_submission_details detail, tl_lasbmt11_report report "
+	    + " WHERE session.content_id = :contentId and detail.session_id = session.session_id "
+	    + " AND detail.submission_id = report.report_id AND session.group_leader_uid= detail.learner_id" + " GROUP BY session.session_id";
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<StatisticDTO> getLeaderStatisticsBySession(final Long contentId) {
+
+	SQLQuery query = getSession().createSQLQuery(GET_LEADER_STATISTICS);
+	query.addScalar("sessionId", LongType.INSTANCE).addScalar("sessionName", StringType.INSTANCE)
+		.addScalar("totalUploadedFiles", IntegerType.INSTANCE).addScalar("markedCount", IntegerType.INSTANCE)
+		.setLong("contentId", contentId).setResultTransformer(Transformers.aliasToBean(StatisticDTO.class));
+
+	List<StatisticDTO> list = query.list();
+	for (StatisticDTO dto : list) {
+	    dto.setNotMarkedCount(dto.getTotalUploadedFiles() - dto.getMarkedCount());
+	}
+	return list;
+    }
+    
+    
+    private static final String GET_GROUP_REPORTS = "SELECT report.report_id reportId "
+	    + " FROM tl_lasbmt11_submission_details detail, tl_lasbmt11_report report "
+	    + " WHERE detail.session_id = :sessionId "
+	    + " AND detail.submission_id = report.report_id "
+    	    + " AND detail.uuid = (SELECT uuid from tl_lasbmt11_submission_details "
+	    + " WHERE submission_id = :reportId); ";
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Long> getReportsForGroup(final Long sessionId, final Long reportId) {
+
+	SQLQuery query = getSession().createSQLQuery(GET_GROUP_REPORTS);
+	query.addScalar("reportId", LongType.INSTANCE)
+		.setLong("sessionId", sessionId)
+		.setLong("reportId", reportId);
+
+	return query.list();
+	
+    }
 
 }

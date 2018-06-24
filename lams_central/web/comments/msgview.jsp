@@ -1,6 +1,7 @@
 <%--  commentDto, commentUid, msgLevel needs to be in the session elsewhere --%>
 
   <c:set var="hidden" value="${commentDto.comment.hideFlag}" />
+  <c:set var="anonymous" value="${commentDto.comment.anonymous}" />
 
   <c:choose>
     <c:when test='${(commentDto.level <= 1)}'>
@@ -26,12 +27,37 @@
       <div class="panel panel-default ${highlightClass} msg" id="msg${commentDto.comment.uid}">
         <div class="panel-heading">
           <h4 class="panel-title">
-            <c:if test='${(sessionMap.mode == "teacher") || (not hidden)}'>
-              <c:set var="author" value="${commentDto.authorname}" />
-            </c:if>
-            <c:if test="${empty author}">
-              <c:set var="author">&nbsp;</c:set>
-            </c:if>
+          
+          	<%-- authors name --%>
+			<c:set var="msgAuthor" value="${commentDto.authorname}" />
+			<c:if test="${empty msgAuthor}">
+				<c:set var="msgAuthor">&nbsp;</c:set>
+			</c:if>
+			<c:choose>
+			<c:when test='${sessionMap.mode == "teacher"}'>
+				<c:choose>
+				<c:when test="${anonymous}">
+					<c:set var="author">${msgAuthor} (<fmt:message key="label.anonymous" />)</c:set>
+				</c:when>
+				<c:otherwise>
+					<c:set var="author">${msgAuthor}</c:set>
+				</c:otherwise>
+				</c:choose>
+			</c:when>
+			<c:otherwise>
+				<c:choose>
+				<c:when test="${hidden}">
+					<c:set var="author"></c:set>
+				</c:when>
+				<c:when test="${not hidden and anonymous}">
+					<c:set var="author"><fmt:message key="label.anonymous" /></c:set>
+				</c:when>
+				<c:otherwise>
+					<c:set var="author">${msgAuthor}</c:set>
+				</c:otherwise>
+				</c:choose>
+			</c:otherwise>
+			</c:choose>
 
           	<c:choose>
             <c:when test="${isMonitor and isSticky}">
@@ -65,9 +91,12 @@
           </h4>
         </div>
         <div class="panel-body ${bgClass}" id="pb-msg${commentDto.comment.uid}">
+        
+        	  <c:if test='${(sessionMap.mode == "teacher") or not (anonymous or hidden)}'>
 	      <div class="pull-left roffset10"><lams:Portrait userId="${commentDto.authorUserId}"/></div>
-          <c:if
-                test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
+	      </c:if>
+	      
+          <c:if test='${(sessionMap.mode == "teacher") or (not hidden)}'>
             <lams:out value="${commentDto.comment.body}" escapeHtml="true" />
           </c:if>
           <c:if test='${hidden}'>

@@ -40,8 +40,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class MindmapRequestDAO extends LAMSBaseDAO implements IMindmapRequestDAO {
     private static final String SQL_QUERY_FIND_REQUESTS_AFTER_GLOBAL_ID = " from " + MindmapRequest.class.getName()
-	    + " mr where mr.globalId > ? and "
-	    + " mr.mindmap.uid = ? and mr.user.uid <> ? and mr.user.mindmapSession.sessionId = ? order by mr.globalId ";
+	    + " mr where mr.mindmap.uid = ?  and mr.globalId > ? and mr.user.mindmapSession.sessionId = ? "
+	    + " order by mr.globalId ";
 
     private static final String SQL_QUERY_FIND_REQUEST_BY_UNIQUE_ID = " from " + MindmapRequest.class.getName()
 	    + " mr where mr.uniqueId = ? and mr.user.uid = ? and " + " mr.mindmap.uid = ? and mr.globalId > ? ";
@@ -58,10 +58,11 @@ public class MindmapRequestDAO extends LAMSBaseDAO implements IMindmapRequestDAO
 	getSession().saveOrUpdate(mindmapRequest);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long userId, Long sessionId) {
-	return this.doFind(SQL_QUERY_FIND_REQUESTS_AFTER_GLOBAL_ID,
-		new Object[] { globalId, mindmapId, userId, sessionId });
+    public List<MindmapRequest> getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long sessionId) {
+	return (List<MindmapRequest>) this.doFind(SQL_QUERY_FIND_REQUESTS_AFTER_GLOBAL_ID,
+		new Object[] { mindmapId, globalId, sessionId });
     }
 
     @Override

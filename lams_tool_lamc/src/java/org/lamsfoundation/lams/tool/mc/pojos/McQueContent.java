@@ -43,11 +43,16 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
     /** identifier field */
     private Long uid;
 
-    /** persistent field */
+    /** Stores mcQueContent.uid, despite of what the name says */
     private Long mcQueContentId;
 
     /** nullable persistent field */
     private String question;
+    
+    /**
+     * It stores sha1(question) value that allows us to search for the McQueContentc with the same question
+     */
+    private String questionHash;
 
     /** nullable persistent field */
     private Integer displayOrder;
@@ -69,9 +74,10 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
 
     private String escapedQuestion;
 
-    public McQueContent(String question, Integer displayOrder, Integer mark, String feedback, McContent mcContent,
+    public McQueContent(String question, String questionHash, Integer displayOrder, Integer mark, String feedback, McContent mcContent,
 	    Set mcUsrAttempts, Set mcOptionsContents) {
 	this.question = question;
+	this.questionHash = questionHash;
 	this.displayOrder = displayOrder;
 	this.mark = mark;
 	this.feedback = feedback;
@@ -93,7 +99,7 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
      * @return the new qa question content object
      */
     public static McQueContent newInstance(McQueContent queContent, McContent newMcContent) {
-	McQueContent newQueContent = new McQueContent(queContent.getQuestion(), queContent.getDisplayOrder(),
+	McQueContent newQueContent = new McQueContent(queContent.getQuestion(), queContent.getQuestionHash(), queContent.getDisplayOrder(),
 		queContent.getMark(), queContent.getFeedback(), newMcContent, new TreeSet(), new TreeSet());
 
 	newQueContent.setMcOptionsContents(queContent.deepCopyMcOptionsContent(newQueContent));
@@ -132,6 +138,16 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
 
     public void setQuestion(String question) {
 	this.question = question;
+    }
+    
+    /**
+     * Returns sha1(question) value that allows us to search for the McQueContent with the same question
+     */
+    public String getQuestionHash() {
+	return questionHash;
+    }
+    public void setQuestionHash(String questionHash) {
+	this.questionHash = questionHash;
     }
 
     public Integer getDisplayOrder() {

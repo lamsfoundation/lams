@@ -24,7 +24,7 @@
 
 <module xmlns="urn:jboss:module:1.5" name="com.mysql">
   <resources>
-    <resource-root path="mysql-connector-java-5.1.43-bin.jar"/>
+    <resource-root path="mysql-connector-java-8.0.11.jar"/>
   </resources>
   <dependencies>
     <module name="javax.api"/>

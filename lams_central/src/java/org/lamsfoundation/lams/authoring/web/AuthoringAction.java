@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -70,6 +71,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
@@ -81,6 +83,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -186,7 +189,25 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	response.setContentType("application/json;charset=utf-8");
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.set("ld", JsonUtil.readObject(learningDesignDTO));
+	ObjectNode ldJSON = JsonUtil.readObject(learningDesignDTO);
+	// get all parent folders of the LD
+	List<Integer> folderPath = new LinkedList<Integer>();
+	WorkspaceFolder folder = (WorkspaceFolder) getUserManagementService().findById(WorkspaceFolder.class,
+		learningDesignDTO.getWorkspaceFolderID());
+	while (folder != null) {
+	    Integer folderID = folder.getWorkspaceFolderId();
+	    if (folderID.equals(WorkspaceAction.ROOT_ORG_FOLDER_ID)) {
+		// we reached the top folder, finish
+		folder = null;
+	    } else {
+		folderPath.add(folderID);
+		folder = folder.getParentWorkspaceFolder();
+	    }
+	}
+	// we'll go from top to bottom
+	Collections.reverse(folderPath);
+	ldJSON.set("folderPath", JsonUtil.readArray(folderPath));
+	responseJSON.set("ld", ldJSON);
 
 	List<LearningDesignAccess> accessList = getAuthoringService().updateLearningDesignAccessByUser(userId);
 	accessList = accessList.subList(0,
@@ -206,7 +227,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	try {
 	    authoringService.finishEditOnFly(learningDesignID, getUserId(), cancelled);
 	} catch (Exception e) {
-	    String errorMsg = "Error occured ending EditOnFly" + e.getMessage()+" learning design id "+learningDesignID;
+	    String errorMsg = "Error occured ending EditOnFly" + e.getMessage() + " learning design id "
+		    + learningDesignID;
 	    log.error(errorMsg, e);
 	    throw new IOException(e);
 	}
@@ -304,13 +326,16 @@ public class AuthoringAction extends LamsDispatchAction {
 		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	ToolContentManager toolManager = (ToolContentManager) wac.getBean(tool.getServiceName());
 	String title = toolManager.getToolContentTitle(toolContentID);
+	if (title == null || title.trim().length() == 0) {
+	    title = getLearningDesignService().internationaliseActivityTitle(learningLibraryID);
+	}
 	// create the LD and put it in Run Sequences folder in the given organisation
 	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(title, toolID, toolContentID,
 		learningLibraryID, contentFolderID, organisationID);
 	if (learningDesignID != null) {
 	    User user = (User) getUserManagementService().findById(User.class, userID);
 	    Lesson lesson = getMonitoringService().initializeLessonWithoutLDcopy(title, "", learningDesignID, user,
-		    null, false, false, false, false, true, true, false, false, null, null);
+		    null, false, false, false, false, true, true, false, false, true, null, null);
 	    Organisation organisation = getMonitoringService().getOrganisation(organisationID);
 
 	    List<User> staffList = new LinkedList<>();
@@ -434,13 +459,18 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 
 	// prepare the dir and the file
-	File thumbnailDirectory = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER);
-	if (!thumbnailDirectory.exists()) {
-	    thumbnailDirectory.mkdirs();
+	File thumbnailDir = new File(ILearningDesignService.LD_SVG_TOP_DIR);
+	String thumbnailSubdir = String.valueOf(learningDesignID);
+	if (thumbnailSubdir.length() % 2 == 1) {
+	    thumbnailSubdir = "0" + thumbnailSubdir;
 	}
+	for (int charIndex = 0; charIndex < thumbnailSubdir.length(); charIndex += 2) {
+	    thumbnailDir = new File(thumbnailDir,
+		    "" + thumbnailSubdir.charAt(charIndex) + thumbnailSubdir.charAt(charIndex + 1));
+	}
+	thumbnailDir.mkdirs();
 
-	String absoluteFilePath = FileUtil.getFullPath(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER,
-		learningDesignID + ".svg");
+	String absoluteFilePath = FileUtil.getFullPath(thumbnailDir.getAbsolutePath(), learningDesignID + ".svg");
 
 	// write out the content
 	try (FileOutputStream fos = new FileOutputStream(absoluteFilePath);

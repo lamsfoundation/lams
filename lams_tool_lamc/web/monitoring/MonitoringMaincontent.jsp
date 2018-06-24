@@ -17,10 +17,11 @@
         }     
         
         function doSelectTab(tabId) {
-	    	// end optional tab controller stuff
-	    	if ( tabId == 3 )
-	    		doStatistic();
-	    	selectTab(tabId);
+		    	// end optional tab controller stuff
+		    	if ( tabId == 3 ) {
+		    		doStatistic();
+		    	}
+		    	selectTab(tabId);
         }
 
 		function doStatistic(){
@@ -47,7 +48,11 @@
 		function turnOnDisplayAnswers() {
 			window.open("<c:url value='/monitoring.do'/>?dispatch=displayAnswers&toolContentID=${mcGeneralMonitoringDTO.toolContentID}&contentFolderID=${contentFolderID}","_self")
 		}
-	
+
+		function turnOnDisplayFeedbackOnly() {
+			window.open("<c:url value='/monitoring.do'/>?dispatch=displayFeedbackOnly&toolContentID=${mcGeneralMonitoringDTO.toolContentID}&contentFolderID=${contentFolderID}","_self")
+		}
+
 	</script>
 	
 </lams:head>

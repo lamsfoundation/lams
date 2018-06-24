@@ -8,6 +8,8 @@
 <%@ attribute name="likeDislikeVariableName" required="false" rtexprvalue="true"%>
 <%@ attribute name="likeOnlyCommentLabelKey" required="false" rtexprvalue="true"%>
 <%@ attribute name="likeDislikeLabelKey" required="false" rtexprvalue="true"%>
+<%@ attribute name="allowAnonymousVariableName" required="false" rtexprvalue="true"%>
+<%@ attribute name="allowAnonymousLabelKey" required="false" rtexprvalue="true"%>
 <%@ attribute name="commentPanelHeaderKey" required="false" rtexprvalue="true"%>
 
 
@@ -26,6 +28,12 @@
 <c:if test="${empty likeDislikeLabelKey}">
 	<c:set var="likeDislikeLabelKey" value="advanced.comments.like.and.dislike" />
 </c:if>
+<c:if test="${empty allowAnonymousVariableName}">
+	<c:set var="allowAnonymousVariableName" value="allowAnonymous" />
+</c:if>
+<c:if test="${empty allowAnonymousLabelKey}">
+	<c:set var="allowAnonymousLabelKey" value="advanced.enable.anonymous.posts" />
+</c:if>
 <c:if test="${empty commentPanelHeaderKey}">
 	<c:set var="commentPanelHeaderKey" value="advanced.comment.header" />
 </c:if>
@@ -39,10 +47,21 @@
 	<fmt:message key="${allowCommentLabelKey}"/>
 	</label>
 </div>
-<div class="loffset20" id="likedislike">
+<div id="likedislike">
+<div class="loffset20">
 		<form:radio path="${likeDislikeVariableName}" value="false" />&nbsp;<fmt:message key="${likeOnlyCommentLabelKey}" /> &nbsp;
 		<form:radio path="${likeDislikeVariableName}" value="true" />&nbsp;<fmt:message key="${likeDislikeLabelKey}" /> 
 </div>
+<div class="checkbox">
+	<label>
+	<html:checkbox property="${allowAnonymousVariableName}" 
+		styleId="${allowAnonymousVariableName}">
+	</html:checkbox>
+	<fmt:message key="${allowAnonymousLabelKey}"/>
+	</label>
+</div>
+</div>
+
 </lams:SimplePanel>
 
 <script>

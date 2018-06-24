@@ -154,6 +154,15 @@ public class MockLearner extends MockUser implements Runnable {
     private static final Set<Long> SCRIBE_FINISHED_TOOL_CONTENT = new TreeSet<>();
     private static final short SCRIBE_SUBMIT_REPORT_ATTEMPTS = 3;
 
+    private static final String NB_SUBSTRING = "/lams/tool/lanb11/";
+    
+    private static final String GMAP_SUBSTRING = "map.closeInfoWindow()";
+    private static final String GMAP_CONTINUE_BUTTON = "continueButton";
+    private static final String GMAP_CONTINUE_METHOD = "openNotebook";
+    private static final String GMAP_FINISH_METHOD = "finishActivity";
+    private static final String GMAP_DISPATCH = "dispatch";
+    
+    
     private static int joinLessonUserCount = 0;
     private static int topJoinLessonUserCount = 0;
     private boolean finished = false;
@@ -219,7 +228,7 @@ public class MockLearner extends MockUser implements Runnable {
 	// an example of matched string:
 	// location.href ='http://localhost/lams/mylinksubstring/learner.do'
 	Pattern linkPattern = Pattern
-		.compile("location\\.href\\s*=\\s*['\"](.*" + Pattern.quote(linkSubstring) + ".*)['\"]");
+		.compile("location\\.href\\s*=\\s*['\"](.*" + Pattern.quote(linkSubstring) + ".*?)['\"]");
 	Matcher m = linkPattern.matcher(resp.getText());
 	if (m.find()) {
 	    String url = m.group(1);
@@ -395,6 +404,7 @@ public class MockLearner extends MockUser implements Runnable {
 	boolean isActivityFinished = (asText != null) && (asText.contains(MockLearner.ACTIVITY_FINISHED_FLAG)
 		|| asText.contains(MockLearner.LESSON_FINISHED_FLAG)
 		|| asText.contains(MockLearner.LOAD_TOOL_ACTIVITY_FLAG));
+	
 	return isActivityFinished ? nextResp : handleActivity(nextResp);
     }
 
@@ -407,7 +417,7 @@ public class MockLearner extends MockUser implements Runnable {
 	return null;
     }
 
-    private WebResponse handlePageWithForms(WebResponse resp) throws IOException, SAXException {
+    private WebResponse handlePageWithForms(WebResponse resp) throws IOException, SAXException, InterruptedException {
 	int index = -1;
 	WebForm[] forms = resp.getForms();
 	WebForm form = null;
@@ -461,6 +471,11 @@ public class MockLearner extends MockUser implements Runnable {
 		return handleToolAssessment(resp, form);
 	    } else if (asText.contains(SCRIBE_TOOL_SUBSTRING)) {
 		return handleToolScribe(resp, form);
+	    } else if (asText.contains(NB_SUBSTRING)) {
+		handleToolNb(resp, form);
+	    } else if (asText.contains(GMAP_SUBSTRING)) {
+		// GMAP has two forms so force it to use the right one
+		return handleToolGMAP(resp, forms, asText);
 	    }
 	}
 	log.debug("Filling form fillFormArbitrarily");
@@ -574,7 +589,7 @@ public class MockLearner extends MockUser implements Runnable {
 	websocketClient.close();
     }
 
-    private WebResponse handleToolForum(WebResponse resp) throws SAXException, IOException {
+    private WebResponse handleToolForum(WebResponse resp) throws SAXException, IOException, InterruptedException {
 	WebResponse replyResponse = null;
 
 	String replyURL = MockLearner.findURLInAHREF(resp, MockLearner.FORUM_VIEW_TOPIC_SUBSTRING);
@@ -598,7 +613,7 @@ public class MockLearner extends MockUser implements Runnable {
 	return (WebResponse) new Call(wc, test, "Finish Forum", finishURL).execute();
     }
 
-    private WebResponse handleToolForumReply(String url) throws SAXException, IOException {
+    private WebResponse handleToolForumReply(String url) throws SAXException, IOException, InterruptedException {
 	WebResponse resp = (WebResponse) new Call(wc, test, username + " views Forum topic", url).execute();
 	// store link for later
 	String returnToForumURL = MockLearner.findURLInLocationHref(resp, MockLearner.FORUM_VIEW_FORUM_SUBSTRING);
@@ -659,7 +674,7 @@ public class MockLearner extends MockUser implements Runnable {
     }
 
     @SuppressWarnings("deprecation")
-    private WebResponse handleToolScratchie(WebResponse resp) throws SAXException, IOException {
+    private WebResponse handleToolScratchie(WebResponse resp) throws SAXException, IOException, InterruptedException {
 	String asText = resp.getText();
 	String finishURL = null;
 	// check if scratchie is not finished already
@@ -886,6 +901,15 @@ public class MockLearner extends MockUser implements Runnable {
 	}
     }
 
+    private void handleToolNb(WebResponse resp, WebForm form) throws IOException {
+	String asText = resp.getText();
+	if (asText.contains("submitForm('reflect')")) {
+	    form.setAttribute("action", form.getAction() + "?method=reflect");
+	} else {
+	    form.setAttribute("action", form.getAction() + "?method=finish");
+	}
+    }
+
     private WebResponse handleToolAssessment(WebResponse resp, WebForm form) throws SAXException, IOException {
 	String asText = resp.getText();
 	// check if current user is the leader
@@ -1001,6 +1025,36 @@ public class MockLearner extends MockUser implements Runnable {
 //	return form;
 //    }
 
+    // has more than two forms - need to find the one with continue/next. It should be the last one on the page
+    private WebResponse handleToolGMAP(WebResponse resp, WebForm[] forms, String asText)
+	    throws IOException, SAXException, InterruptedException {
+
+	WebForm wantedForm = null;
+	Button continueButton = null;
+	for ( WebForm form: forms) {
+	    continueButton = form.getSubmitButtonWithID(GMAP_CONTINUE_BUTTON);
+	    if (continueButton != null) {
+		// log.debug("Found a continue button");
+		wantedForm = form;
+		wantedForm.setAttribute(GMAP_DISPATCH, GMAP_CONTINUE_METHOD);
+		break;
+	    }
+	}
+
+	if ( continueButton == null ) {
+	    wantedForm = forms[forms.length-1];
+	    wantedForm.setAttribute(GMAP_DISPATCH, GMAP_FINISH_METHOD);
+	}
+	
+	// MockLearner.log.debug(GMAP_DISPATCH + wantedForm.getAttribute(GMAP_DISPATCH));
+	if ( continueButton != null ) {
+	    // MockLearner.log.debug("handling reflection");
+	    WebResponse nextResp = (WebResponse) new Call(wc, test, username + " submits gmap form", wantedForm).execute();
+	    return handleActivity(nextResp);
+	}
+	return (WebResponse) new Call(wc, test, username + " submits gmap form", wantedForm).execute();
+    }
+    
     private WebResponse handleToolPeerReview(WebResponse resp, String asText) throws SAXException, IOException {
 	WebResponse replyResponse = null;
 

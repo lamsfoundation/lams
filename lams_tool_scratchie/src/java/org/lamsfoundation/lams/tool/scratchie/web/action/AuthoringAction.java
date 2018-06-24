@@ -54,6 +54,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionExporter;
@@ -192,10 +193,6 @@ public class AuthoringAction extends Action {
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	scratchieForm.setSessionMapID(sessionMap.getSessionID());
 
-	ScratchieConfigItem isEnabledExtraPointOption = service
-		.getConfigItem(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION);
-	sessionMap.put(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION,
-		new Boolean(isEnabledExtraPointOption.getConfigValue()));
 
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
@@ -222,6 +219,18 @@ public class AuthoringAction extends Action {
 	    throw new ServletException(e);
 	}
 
+	ScratchieConfigItem isEnabledExtraPointOption = service
+		.getConfigItem(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION);
+	sessionMap.put(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION,
+		new Boolean(isEnabledExtraPointOption.getConfigValue()));
+	
+	//prepare advanced option allowing to overwrite default preset marks
+	ScratchieConfigItem defaultPresetMarksConfigItem = service.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS);
+	String defaultPresetMarks = defaultPresetMarksConfigItem == null ? "" : defaultPresetMarksConfigItem.getConfigValue();
+	boolean presetMarksOverwritten = scratchie.getPresetMarks() != null && !scratchie.getPresetMarks().equals(defaultPresetMarks);
+	sessionMap.put(ScratchieConstants.ATTR_IS_PRESET_MARKS_OVERWRITTEN, presetMarksOverwritten);
+	sessionMap.put(ScratchieConstants.ATTR_DEFAULT_PRESET_MARKS, defaultPresetMarks);
+
 	// init it to avoid null exception in following handling
 	if (items == null) {
 	    items = new ArrayList<ScratchieItem>();
@@ -247,6 +256,10 @@ public class AuthoringAction extends Action {
 	    }
 	    i++;
 	}
+	
+	//display confidence providing activities
+	Set<ToolActivity> confidenceLevelsActivities = service.getPrecedingConfidenceLevelsActivities(contentId);
+	sessionMap.put(ScratchieConstants.ATTR_CONFIDENCE_LEVELS_ACTIVITIES, confidenceLevelsActivities);
 
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_FORM, scratchieForm);
 	return mapping.findForward(ScratchieConstants.SUCCESS);

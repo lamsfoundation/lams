@@ -86,8 +86,8 @@
    		<property name="learnerService">
    			<ref bean="learnerService"/>
    		</property>
-   		<property name="auditService">
-   			<ref bean="auditService"/>
+   		<property name="logEventService">
+   			<ref bean="logEventService"/>
    		</property>
    		<property name="userManagementService">
    			<ref bean="userManagementService"/>
@@ -131,6 +131,7 @@
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="store*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="set*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="unset*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
@@ -138,7 +139,7 @@
                 <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="processUserAnswers">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="changeQuestionResultMark">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="notifyTeachersOnAttemptCompletion">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="notify*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

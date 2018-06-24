@@ -46,13 +46,14 @@
 			   		var userSummaryUrl = "<c:url value='/learning/start.do'/>?userID=" + userId + "&toolSessionID=" + toolSessionId + "&mode=teacher&reqId=" + (new Date()).getTime();
 					launchPopup(userSummaryUrl, "MonitoringReview");		
 			  	},
-			   	colNames:['#',
-						'userId',
-						'sessionId',
-						"<fmt:message key="label.monitoring.summary.user.name" />",
-						"<fmt:message key="label.monitoring.summary.attempts" />",
-					    "<fmt:message key="label.monitoring.summary.mark" />",
-					    'portraitId'
+			   	colNames:[
+				   	'#',
+					'userId',
+					'sessionId',
+					"<fmt:message key="label.monitoring.summary.user.name" />",
+					"<fmt:message key="label.monitoring.summary.attempts" />",
+					"<fmt:message key="label.monitoring.summary.mark" />",
+					'portraitId'
 				],
 			   	colModel:[
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},

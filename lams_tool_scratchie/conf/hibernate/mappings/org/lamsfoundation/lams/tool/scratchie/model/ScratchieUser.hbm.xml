@@ -71,16 +71,6 @@
             column="session_uid"
         />
 
-        <many-to-one
-            name="scratchie"
-            class="org.lamsfoundation.lams.tool.scratchie.model.Scratchie"
-            cascade="none"
-            
-            update="true"
-            insert="true"
-            column="scratchie_uid"
-        />
-
         <property
             name="sessionFinished"
             type="boolean"

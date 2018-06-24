@@ -27,7 +27,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
@@ -37,8 +36,7 @@ import org.lamsfoundation.lams.tool.survey.util.SurveyOptionComparator;
 
 public class AnswerDTO extends SurveyQuestion {
 
-    private static final int SHORT_TITLE_LENGTH = 60;
-
+    
     // ***********************************************
     // DTO fields:
     // this is DTO field. For answer, which is user and session level. For question, which is content level.
@@ -73,9 +71,7 @@ public class AnswerDTO extends SurveyQuestion {
 	    this.setOptions(newOptions);
 	}
 
-	String desc = this.getDescription();
-	desc = desc.replaceAll("<(.|\n)*?>", "");
-	this.setShortTitle(StringUtils.abbreviate(desc, SHORT_TITLE_LENGTH));
+	this.updateShortTitleFromDescription();
 
     }
 

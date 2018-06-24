@@ -517,6 +517,14 @@ public class IntegrationService implements IIntegrationService {
 	    throw new UserInfoFetchException(e);
 	}
     }
+    
+    @Override
+    public boolean isIntegrationUser(Integer userId) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("user.userId", userId);
+	List list = service.findByProperties(ExtUserUseridMap.class, properties);
+	return (list != null) && !list.isEmpty();
+    }
 
     @Override
     public String hash(ExtServer extServer, String extUsername, String timestamp) {
@@ -852,7 +860,8 @@ public class IntegrationService implements IIntegrationService {
 	return (list == null || list.isEmpty()) ? null : list.get(0);
     }
 
-    private ExtServerLessonMap getExtServerLessonMap(Long lessonId) {
+    @Override
+    public ExtServerLessonMap getExtServerLessonMap(Long lessonId) {
 	List list = service.findByProperty(ExtServerLessonMap.class, "lessonId", lessonId);
 	if ((list == null) || (list.size() == 0)) {
 	    return null;

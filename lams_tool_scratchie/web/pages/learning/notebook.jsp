@@ -28,8 +28,6 @@
 
 		<lams:Page type="learner" title="${sessionMap.title}">
 
-
-
 			<%@ include file="/common/messages.jsp"%>
 
 			<div class="panel">
@@ -45,9 +43,7 @@
 				</html:button>
 			</div>
 
-
 			<div id="footer"></div>
-			<!--closes footer-->
 		</lams:Page>
 	</html:form>
 	<script type="text/javascript">

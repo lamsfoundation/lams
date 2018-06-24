@@ -46,9 +46,10 @@ import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorE
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -59,14 +60,14 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 
     private static Logger log = Logger.getLogger(RepopulateProgressMarksServlet.class);
 
-    private static IAuditService auditService;
+    private static ILogEventService logEventService;
     private static ILessonService lessonService;
     private static ICoreLearnerService learnerService;
 
     @Override
     public void init() throws ServletException {
 	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-	RepopulateProgressMarksServlet.auditService = (IAuditService) ctx.getBean("auditService");
+	RepopulateProgressMarksServlet.logEventService = (ILogEventService) ctx.getBean("logEventService");
 	RepopulateProgressMarksServlet.lessonService = (ILessonService) ctx.getBean("lessonService");
 	RepopulateProgressMarksServlet.learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
     }
@@ -82,9 +83,10 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 	UserDTO userDTO = null;
 
 	PrintWriter out = response.getWriter();
+	Long lessonId = null;
 	try {
 
-	    Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	    lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	    Integer restrictToLearnerId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, true);
 	    Boolean gradebookAll = WebUtil.readBooleanParam(request, "gradebookAll", false);
 	    HttpSession ss = SessionManager.getSession();
@@ -144,7 +146,7 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 	    msg = new StringBuilder(header).append("Successful run, no errors\n").append(auditLogBuilder.toString())
 		    .toString();
 	}
-	auditService.log(userDTO, "RepopulateProgressMarksServlet", msg);
+	logEventService.logEvent(LogEvent.TYPE_MARK_UPDATED, userDTO != null ? userDTO.getUserID() : null, null, lessonId, null, msg);
 	out.println(msg);
 	return;
     }

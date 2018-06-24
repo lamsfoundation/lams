@@ -2,7 +2,7 @@
 
 <html:errors />
 
-<c:if test="${!isPageEditable}">
+<c:if test="${isContentInUse}">
 	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.alertContentEdit" />
 	</lams:Alert>
@@ -29,13 +29,11 @@
 	</tr>
 </table>
 
-<c:if test='${isPageEditable}'>
-	<c:url value="/authoring.do" var="authoringUrl">
-		<c:param name="mode" value="teacher" />
-		<c:param name="contentFolderID" value="${contentFolderID}" />
-		<c:param name="toolContentID" value="${toolContentID}" />
-	</c:url>
-	<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
-		<fmt:message key="label.monitoring.edit.activity.edit" />
-	</html:link>
-</c:if>
+<c:url value="/authoring.do" var="authoringUrl">
+	<c:param name="mode" value="teacher" />
+	<c:param name="contentFolderID" value="${contentFolderID}" />
+	<c:param name="toolContentID" value="${toolContentID}" />
+</c:url>
+<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
+	<fmt:message key="label.monitoring.edit.activity.edit" />
+</html:link>

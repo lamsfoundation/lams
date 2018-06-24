@@ -32,6 +32,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -39,7 +40,6 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
@@ -66,7 +66,7 @@ public abstract class LamsAuthoringFinishController {
 
     private static final String RE_EDIT_URL = "reEditUrl";
 
-    private static IAuditService auditService;
+    private static ILogEventService logEventService;
 
     /**
      * Action method, will handle save/cancel action.
@@ -112,7 +112,7 @@ public abstract class LamsAuthoringFinishController {
 
 	//audit log content has been finished being edited
 	if (StringUtils.equals(action, DEFINE_LATER_ACTION)) {
-	    getAuditService(applicationContext).logFinishEditingActivityInMonitor(toolContentId);
+	    getLogEventService(applicationContext).logFinishEditingActivityInMonitor(toolContentId);
 	}
 
 	//reset defineLater task
@@ -122,7 +122,7 @@ public abstract class LamsAuthoringFinishController {
 	    ToolContentManager contentManager = (ToolContentManager) findToolService(applicationContext, signature);
 	    contentManager.resetDefineLater(toolContentId);
 
-	    getAuditService(applicationContext).logCancelEditingActivityInMonitor(toolContentId);
+	    getLogEventService(applicationContext).logCancelEditingActivityInMonitor(toolContentId);
 	}
     }
 
@@ -157,13 +157,13 @@ public abstract class LamsAuthoringFinishController {
     }
 
     /**
-     * Get AuditService bean
+     * Get LogEventService bean
      */
-    private IAuditService getAuditService(ApplicationContext applicationContext) {
-	if (auditService == null) {
-	    auditService = (IAuditService) applicationContext.getBean("auditService");
+    private ILogEventService getLogEventService(ApplicationContext applicationContext) {
+	if (logEventService == null) {
+	    logEventService = (ILogEventService) applicationContext.getBean("logEventService");
 	}
-	return auditService;
+	return logEventService;
     }
 
     /**

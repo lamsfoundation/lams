@@ -33,5 +33,5 @@ import org.lamsfoundation.lams.usermanagement.User;
 public interface IRoleDAO extends IBaseDAO {
     User getUserByOrganisationAndRole(Integer userId, Integer roleId, Organisation organisation);
 
-    Integer getCountRoleForOrg(Integer roleId, Integer orgId, String searchPhrase);
+    Integer getCountRoleForOrg(Integer[] roleIds, Integer orgId, String searchPhrase);
 }

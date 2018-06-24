@@ -53,6 +53,7 @@ public class AttributeNames {
     public static final String PARAM_ACTIVITY_ID = "activityID";
     public static final String PARAM_CONTENT_FOLDER_ID = "contentFolderID";
     public static final String PARAM_TITLE = "title";
+    public static final String PARAM_PRINT_VIEW = "printView";
 
     public static final String PARAM_COURSE_ID = "courseID";
     public static final String PARAM_CLASS_ID = "classID";

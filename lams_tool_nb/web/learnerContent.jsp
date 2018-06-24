@@ -11,8 +11,7 @@
 	}
 	function submitForm(methodName) {
 		var f = document.getElementById('learnerForm');
-		var m = document.getElementById('methodVar');
-		m.value = methodName;
+		f.action += "?method=" + methodName;
 		f.submit();
 	}
 </script>
@@ -25,7 +24,6 @@
 	<html:form action="/learner" target="_self" onsubmit="disableFinishButton();" styleId="learnerForm">
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="mode" />
-		<input type="hidden" id="methodVar" name="method" />
 
 		<c:if test="${userFinished and reflectOnActivity}">
 			<div class="panel">
@@ -47,7 +45,7 @@
 		<c:if test="${allowComments}">
 			<hr/>
 			<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}" 
-				toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" />
+				toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" anonymous="${anonymous}" />
 		</c:if>
 
 
@@ -82,8 +80,3 @@
 	</html:form>
 
 </lams:Page>
-
-
-
-
-

@@ -25,16 +25,13 @@
 
 package org.lamsfoundation.lams.rating.dao.hibernate;
 
-import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingDAO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
@@ -58,6 +55,9 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 
     private static final String FIND_RATINGS_BY_USER_CRITERIA = "FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=?";
+
+    private static final String FIND_RATINGS_BY_ITEM_CRITERIA = "FROM " + Rating.class.getName()
+	    + " AS r where r.ratingCriteria.ratingCriteriaId IN (:ratingCriteriaIds) AND r.itemId IN (:itemIds)";
 
     private static final String FIND_RATING_AVERAGE_BY_ITEM = "SELECT AVG(r.rating), COUNT(*) FROM "
 	    + Rating.class.getName() + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.toolSessionId=? AND r.itemId=?";
@@ -363,5 +363,17 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 	else 
 	    return getByUser ? TOOL_SELECT_LEFT_JOIN_BY_USER_STANDARD : TOOL_SELECT_LEFT_JOIN_FOR_USER_STANDARD;
     }
+    
+    /** 
+     * Get all the raw ratings for a combination of criteria and item ids. Used by Peer Review to do SPA analysis.
+     */
+    @SuppressWarnings("unchecked")
+    public List getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds) {
+	return getSession().createQuery(FIND_RATINGS_BY_ITEM_CRITERIA)
+		.setParameterList("ratingCriteriaIds", ratingCriteriaIds)
+		.setParameterList("itemIds", itemIds)
+		.list();
+    }
+    
 	    
 }

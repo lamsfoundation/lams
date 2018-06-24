@@ -72,6 +72,10 @@
 				AUTHORING_TITLE : '<c:out value="${AUTHORING_TITLE_VAR}" />',
 				<fmt:message key="index.monitoring.title" var="MONITORING_TITLE_VAR"/>
 				MONITORING_TITLE : '<c:out value="${MONITORING_TITLE_VAR}" />',
+				<fmt:message key="index.kumalive.rubric" var="KUMALIVE_RUBRICS_TITLE_VAR"/>
+				KUMALIVE_RUBRICS_TITLE : '<c:out value="${KUMALIVE_RUBRICS_TITLE_VAR}" />',
+				<fmt:message key="index.kumalive.report" var="KUMALIVE_REPORT_TITLE_VAR"/>
+				KUMALIVE_REPORT_TITLE : '<c:out value="${KUMALIVE_REPORT_TITLE_VAR}" />',
 				<fmt:message key="label.private.notifications.title" var="PRIVATE_NOTIFICATIONS_TITLE_VAR"/>
 				PRIVATE_NOTIFICATIONS_TITLE : '<c:out value="${PRIVATE_NOTIFICATIONS_TITLE_VAR}" />',
 				<fmt:message key="label.private.notifications.messages" var="PRIVATE_NOTIFICATIONS_MESSAGES_VAR"/>
@@ -87,7 +91,9 @@
 				<fmt:message key="label.remove.org.favorite" var="REMOVE_ORG_FAVORITE_VAR"/>
 				REMOVE_ORG_FAVORITE : '<c:out value="${REMOVE_ORG_FAVORITE_VAR}" />',
 				<fmt:message key="label.mark.org.favorite" var="MARK_ORG_FAVORITE_VAR"/>
-				MARK_ORG_FAVORITE : '<c:out value="${MARK_ORG_FAVORITE_VAR}" />'
+				MARK_ORG_FAVORITE : '<c:out value="${MARK_ORG_FAVORITE_VAR}" />',
+				<fmt:message key="index.kumalive" var="KUMALIVE_TITLE_VAR"/>
+				KUMALIVE_TITLE : '<c:out value="${KUMALIVE_TITLE_VAR}" />',
 			},
 			activeOrgId = <c:choose><c:when test="${empty activeOrgId}">null</c:when><c:otherwise>${activeOrgId}</c:otherwise></c:choose>;
 

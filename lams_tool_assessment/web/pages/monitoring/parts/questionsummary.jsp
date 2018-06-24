@@ -10,18 +10,14 @@
 		<c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 		
 		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
-		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
-		<style media="screen,projection" type="text/css">
-			.ui-jqgrid tr.jqgrow td {
-			    white-space: normal !important;
-			    height:auto;
-			    vertical-align:text-top;
-			    padding-top:2px;
-			}
-		</style>
+		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet">
+		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
+		<link type="text/css" href="<html:rewrite page='/includes/css/monitoring.css'/>" rel="stylesheet">	
 		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
   	    <script>
   	    	var isEdited = false;
   	    	var previousCellValue = "";
@@ -38,18 +34,28 @@
 	  				  	rowList:[10,20,30,40,50,100],
 	  				    rowNum:10,
 	  				    viewrecords:true,
-	  				   	colNames:['questionResultUid',
-	  				   	     	'maxMark',
-	  		  				   	"<fmt:message key="label.monitoring.summary.user.name" />",
-	  							"<fmt:message key="label.monitoring.user.summary.response" />",
-	  						    "<fmt:message key="label.monitoring.user.summary.grade" />"],
+	  				   	colNames:[
+		  				   	'questionResultUid',
+	  				   	    	'maxMark',
+	  		  				"<fmt:message key="label.monitoring.summary.user.name" />",
+	  		  			    "<fmt:message key="label.monitoring.user.summary.grade" />",
+		  			   		<c:if test="${assessment.enableConfidenceLevels}">
+		  			   			"<fmt:message key="label.confidence" />",
+		  			  		</c:if>
+		  			   		"<fmt:message key="label.monitoring.user.summary.response" />",
+	  						'portraitId'
+	  					],
 	  						    
 	  				   	colModel:[
 							{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 							{name:'maxMark', index:'maxMark', width:0, hidden: true},
-							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }},
-	  				   		{name:'response', index:'response', width:427, sortable:false, search:false},
-	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }		
+							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
+							{name:'grade', index:'grade', width:80, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
+	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
+			  			  	</c:if>
+			  			   	{name:'response', index:'response', width:427, sortable:false, search:false},
+		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}
 	  				   	],
 	  				   	multiselect: false,
 	  				   	caption: "${sessionDto.sessionName}",
@@ -84,7 +90,10 @@
 	  							var questionResultUid = jQuery("#session${sessionDto.sessionId}").getCell(rowid, 'questionResultUid');
 	  							return {questionResultUid:questionResultUid};		  				  		
 	  				  		}
-	  					}
+	  					},
+  						loadComplete: function () {
+  					   	 	initializePortraitPopover('<lams:LAMSURL/>');
+  					    	}
   						/*  resetSelection() doesn't work in this version
 						    hope it'll be fixed in the next one
 						    
@@ -126,6 +135,16 @@
         			self.parent.tb_remove();
         		}
     		}
+    		
+    		function userNameFormatter (cellvalue, options, rowObject) {
+    			<c:choose><c:when test="${assessment.enableConfidenceLevels}">
+    			var portraitId = rowObject[6];
+    			</c:when><c:otherwise>
+    			var portraitId = rowObject[5];
+    			</c:otherwise></c:choose>
+    			return definePortraitPopover(portraitId, rowObject[0], rowObject[2]);
+    		}
+
   		</script>
 	</lams:head>
 	

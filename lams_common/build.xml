@@ -7,7 +7,7 @@
 	<target name="build-db" depends="_clean-dirs"
 		description="Rebuilds LAMS database.">
 		
-		<echo>Rebuilding LAMS database</echo>
+		<echo>Rebuilding LAMS database ${db.url.init.build} ${db.username} ${db.password}</echo>
 		<tstamp/>
 		<copy todir="${basedir}/build/sql" overwrite="true" verbose="true">
 			<fileset dir="${db.scripts}/">
@@ -24,7 +24,7 @@
 		</copy>
 		
 		<echo>Executing SQL scripts</echo>
-		<sql driver="com.mysql.jdbc.Driver"
+		<sql driver="com.mysql.cj.jdbc.Driver"
 		     url="${db.url.init.build}"
 			 userid="${db.username}"
 			 password="${db.password}"

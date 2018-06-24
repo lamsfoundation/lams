@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -69,6 +68,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -131,7 +131,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	AuthoringDTO authorDto = new AuthoringDTO(persistContent);
 	request.setAttribute(SbmtConstants.AUTHORING_DTO, authorDto);
-	request.setAttribute(SbmtConstants.PAGE_EDITABLE, !persistContent.isContentInUse());
+	request.setAttribute(SbmtConstants.CONTENT_IN_USE, persistContent.isContentInUse());
 	request.setAttribute(SbmtConstants.ATTR_IS_GROUPED_ACTIVITY, submitFilesService.isGroupedActivity(contentID));
 	request.setAttribute(SbmtConstants.ATTR_REFLECTION_ON, persistContent.isReflectOnActivity());
 
@@ -187,7 +187,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
 	responsedata.put("total_rows", service.getCountUsersBySession(sessionID, searchString));
-
+	SubmitUser groupLeader = new SubmitUser();
+	 if (spreadsheet.isUseSelectLeaderToolOuput()) {
+		SubmitFilesSession session = service.getSessionById(sessionID);
+		groupLeader = session.getGroupLeader();
+	 }
 	for (Object[] userAndReflection : users) {
 
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
@@ -195,7 +199,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    SubmitUser user = (SubmitUser) userAndReflection[0];
 	    responseRow.put(SbmtConstants.ATTR_USER_UID, user.getUid());
 	    responseRow.put(SbmtConstants.USER_ID, user.getUserID());
-	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, StringEscapeUtils.escapeHtml(user.getFullName()));
+	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, HtmlUtils.htmlEscape(user.getFullName()));
 
 
     	    if (userAndReflection.length > 2) {
@@ -214,8 +218,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	    if (userAndReflection.length > 5) {
 		responseRow.put(SbmtConstants.ATTR_USER_REFLECTION, (String) userAndReflection[5]);
 	    }
-
+	    if(!spreadsheet.isUseSelectLeaderToolOuput()|| (spreadsheet.isUseSelectLeaderToolOuput() && groupLeader==user)){
 	    rows.add(responseRow);
+	}
 	}
 
 	responsedata.set("rows", rows);
@@ -246,8 +251,16 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private void statistic(HttpServletRequest request, Long contentID) {
 	SortedSet<StatisticDTO> statistics = new TreeSet<StatisticDTO>(new StatisticComparator());
+	ISubmitFilesService service = getSubmitFilesService();
+	SubmitFilesContent spreadsheet = service.getSubmitFilesContent(contentID);
+	if (spreadsheet.isUseSelectLeaderToolOuput()) {
+	    statistics.addAll(submitFilesService.getLeaderStatisticsBySession(contentID));
+	    request.setAttribute("statisticList", statistics);
+	}
+	else{
 	statistics.addAll(submitFilesService.getStatisticsBySession(contentID));
 	request.setAttribute("statisticList", statistics);
+    }
     }
 
     /**

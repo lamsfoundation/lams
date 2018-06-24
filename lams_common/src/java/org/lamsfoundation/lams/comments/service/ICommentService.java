@@ -39,23 +39,25 @@ public interface ICommentService {
      * Gets the comments for a tool, based on the tool session and the tool's id. Allows for paging.
      * Will not include the sticky - get them using getTopicStickyThread()
      */
-    List<CommentDTO> getTopicThread(Long externalId, Integer externalType, String externalSignature, Long lastMsgSeqId,
-	    Integer pageSize, Integer sortBy, String extraSortParam, Integer userId);
+    List<CommentDTO> getTopicThread(Long externalId, Long externalSecondaryId, Integer externalType,
+	    String externalSignature, Long lastMsgSeqId, Integer pageSize, Integer sortBy, String extraSortParam,
+	    Integer userId);
 
     /** Gets all the sticky comments for a tool, based on the tool session and the tool's id */
-    List<CommentDTO> getTopicStickyThread(Long externalId, Integer externalType, String externalSignature,
-	    Integer sortBy, String extraSortParam, Integer userId);
+    List<CommentDTO> getTopicStickyThread(Long externalId, Long externalSecondaryId, Integer externalType,
+	    String externalSignature, Integer sortBy, String extraSortParam, Integer userId);
 
     /** Saves a comment - either creating a whole tree one if there is no parent or saving under the given parent. */
-    Comment createReply(Long parentId, String replyText, User user, boolean isMonitor);
+    Comment createReply(Long parentId, String replyText, User user, boolean isMonitor, boolean isAnonymous);
 
-    Comment createReply(Comment parent, String replyText, User user, boolean isMonitor);
+    Comment createReply(Comment parent, String replyText, User user, boolean isMonitor, boolean isAnonymous);
 
     /** Gets the dummy root for the comment system and if one doesn't exist for this session then set it up! */
-    Comment createOrGetRoot(Long externalId, Integer externalIdType, String externalSignature, User user);
+    Comment createOrGetRoot(Long externalId, Long externalSecondaryId, Integer externalIdType, String externalSignature,
+	    User user);
 
     /** Gets the dummy root. If it doesn't exist, returns null. */
-    Comment getRoot(Long externalId, Integer externalIdType, String externalSignature);
+    Comment getRoot(Long externalId, Long externalSecondaryId, Integer externalIdType, String externalSignature);
 
     /**
      * Get one complete thread within a topic Note that the return type is DTO.
@@ -65,8 +67,9 @@ public interface ICommentService {
     /** Get a single comment. Note that the return type is DTO */
     CommentDTO getComment(Long commentUid);
 
-    /** Update the body in a comment, and update the modified time, who by, etc, etc */
-    Comment updateComment(Long commentUid, String newBody, User user, boolean makeAuditEntry);
+    /** Update the body in a comment, and update the modified time, who by, etc, etc.
+     * If isAnonymous is null, do not update. Used to ensure monitoring changes do not accidently change the value. */
+    Comment updateComment(Long commentUid, String newBody, User user, Boolean isAnonymous, boolean makeAuditEntry);
 
     /** Update the sticky flag for a comment */
     Comment updateSticky(Long commentUid, Boolean newSticky);

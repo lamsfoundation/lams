@@ -17,10 +17,13 @@
 
 	<script type="text/javascript">
 		
-		jQuery(document).ready(function(){
+		$(document).ready(function(){
   
 			// for the ipad, we seem to need to force the grid to a sensible size to start
-			jQuery("#organisationGrid").jqGrid({
+			$("#organisationGrid").jqGrid({
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
+				autoencode:false,
 				caption: "${organisationName}",
 			    datatype: "xml",
 			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&view=lrnCourse&organisationID=${organisationID}",
@@ -30,7 +33,7 @@
 			    sortorder: "asc", 
 			    sortname: "id", 
 			    pager: 'organisationGridPager',
-			    rowList:[5,10,20,30],
+			    rowList:[10,20,30,40,50,100],
 			    rowNum:10,
 			    colNames:[
 			    	'', 
@@ -57,23 +60,26 @@
 			      {name:'averageMark',index:'averageMark', sortable:true, editable:false, search:false, width:50, align:"center"},
 			      {name:'mark',index:'mark', sortable:true, editable:false, search:false, width:50, align:"center"}
 			    ],
-			    loadError: function(xhr,st,err) {
-			    	jQuery("#organisationGrid").clearGridData();
-			    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+ 			    loadError: function(xhr,st,err) {
+			    		$("#organisationGrid").jqGrid('clearGridData');
+			    		alert('<fmt:message key="label.error"/>\n\n<fmt:message key="gradebook.error.loaderror"/>');
 			    },
-			    subGrid: true,
+ 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
 				   var subgrid_table_id;
-				   var lessonID = jQuery("#organisationGrid").getRowData(row_id)["id"];
+				   var lessonID = $("#organisationGrid").getRowData(row_id)["id"];
 				   subgrid_table_id = subgrid_id+"_t";
-					 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
-					   	jQuery("#"+subgrid_table_id).jqGrid({
+					 $("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
+					   	$("#"+subgrid_table_id).jqGrid({
+							 guiStyle: "bootstrap",
+							 iconSet: 'fontAwesome',
+							 autoencode:false,
 						     datatype: "xml",
 						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&view=lrnActivity&lessonID=" + lessonID,
 						     height: "100%",
 						     autowidth:true,
 						     pager: subgrid_table_id + "_pager",
-							 rowList:[5,10,20,30],
+						     rowList:[10,20,30,40,50,100],
 							 rowNum:10,
 						     colNames: [
 						     	'',
@@ -95,66 +101,34 @@
 			      				{name:'averageMark',index:'averageMark', sortable:true, editable:false, search:false, width:50, align:"center"},
 								{name:'mark', width:100, index:'mark', sortable:true, editable: false, width:50, align:"center"}
 						     ],
-						     loadError: function(xhr,st,err) {
-						    	jQuery("#"+subgrid_table_id).clearGridData();
-						    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+ 						     loadError: function(xhr,st,err) {
+						    		$("#"+subgrid_table_id).jqGrid('clearGridData');
+						    		alert('<fmt:message key="label.error"/>\n\n<fmt:message key="gradebook.error.loaderror"/>');
 						     },
-							 gridComplete: function(){
+ 							 gridComplete: function(){
 							 	toolTip($(".jqgrow"));
+							 	fixPagerInCenter(subgrid_table_id+"_pager", 1);
 							 }
 					  	}).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}); // applying refresh button
-					  
-					  	// Adding button for show/hiding collumn
-					  	jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
-							caption: "",
-							buttonimg:"<lams:LAMSURL />images/table_edit.png", 
-							onClickButton: function(){
-								jQuery("#"+subgrid_table_id).setColumns();
-							}
-						});
 					},
 					gridComplete: function(){
 						toolTip($(".jqgrow"));	// enable tooltips for grid
+						fixPagerInCenter('organisationGridPager', 0);
 					}	
-				}).navGrid("#organisationGridPager", {edit:false,add:false,del:false,search:false})
-				
-			jQuery("#organisationGrid").navButtonAdd("#organisationGridPager",{
-				caption: "",
-				buttonimg:"<lams:LAMSURL />images/find.png", 
-				onClickButton: function(){
-					jQuery("#organisationGrid").searchGrid({
-						top:10, 
-						left:10,
-						sopt:['cn','bw','eq','ne','ew']
-					});
-				}
-			});
+				}).navGrid("#organisationGridPager", {edit:false,add:false,del:false,search:false});
 
-			jQuery("#organisationGrid").navButtonAdd('#organisationGridPager',{
-				caption: "",
-				buttonimg:"<lams:LAMSURL />images/table_edit.png", 
-				onClickButton: function(){
-					jQuery("#organisationGrid").setColumns();
-				}
-			});
-			
+			jQuery("#organisationGrid").jqGrid('filterToolbar');	
+
 	        //jqgrid autowidth (http://stackoverflow.com/a/1610197)
 	        $(window).bind('resize', function() {
-	            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
+	            resizeJqgrid($(".ui-jqgrid-btable:visible"));
 	        });
 
 	        //resize jqGrid on openning of bootstrap collapsible
 	        $('div[id^="collapse"]').on('shown.bs.collapse', function () {
-	            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
+	            resizeJqgrid($(".ui-jqgrid-btable:visible", this));
 	        })
 
-	        function resizeJqgrid(jqgrids) {
-	            jqgrids.each(function(index) {
-	                var gridId = $(this).attr('id');
-	                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-	                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-	            });
-	        };
 	        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
 		});
@@ -177,7 +151,7 @@
 			</fmt:message>
 		</h4>
 
- 		<div>
+ 		<div class="grid-holder">
  			<table id="organisationGrid" class="scroll"></table>
 			<div id="organisationGridPager" class="scroll"></div>
  			<div class="tooltip-lg" id="tooltip"></div>

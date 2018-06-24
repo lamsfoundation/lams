@@ -79,20 +79,6 @@ a:focus {
     color: $a-link-default-focus;
 }
 
-// popover links forced to be the usual link color or jqgrid interferes
-.popover-link {
-    color: $a-link-default !important;
-}
-
-.popover-link:hover {
-    color: $a-link-default-hover !important;
-}
-
-.popover-link:focus {
-    color: $a-link-default-focus !important;
-}
-
-
 @if variable-exists(panel-default-heading-background) {
     .panel-default>.panel-heading {
 	    background-color: $panel-default-heading-background;
@@ -221,6 +207,17 @@ a:focus {
 .msg .panel-footer {
   font-size: $font-size-small;
 }
+
+.msg .checkbox {
+	margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.comment-entry .checkbox {
+	margin-top: 5px;
+    margin-bottom: 0px;
+}
+   
 .panel-heading-sm {
   padding: 3px 5px;
   font-size: smaller;
@@ -230,11 +227,11 @@ a:focus {
   padding: 3px 5px;
 }
 .panel-learner-page {
-  border-radius: 6px;
+  border-radius: $border-radius-large;
   box-shadow: $panel-box-shadow;
 }
 .panel-monitor-page {
-  border-radius: 6px;
+  border-radius: $border-radius-large;
   box-shadow: $panel-box-shadow;
 }
 // .panel-learner-page-title,
@@ -252,7 +249,7 @@ a:focus {
 //   min-height: 48px;
 // }
 .panel-admin-page {
-  border-radius: 6px;
+  border-radius: $border-radius-large;
   box-shadow: $panel-box-shadow;
   margin-top: 20px;
 }
@@ -289,8 +286,8 @@ body.stripes {
 .sbox-heading {
   padding: 3px 5px;
   border-bottom: 1px solid $gray-lighter;
-  border-top-right-radius: 3px;
-  border-top-left-radius: 3px;
+  border-top-right-radius: $border-radius-small;
+  border-top-left-radius: $border-radius-small;
 }
 .user {
   display: inline-block;
@@ -513,6 +510,11 @@ ul.dropdown-menu {
 	right: 0;
 }
 
+ul.dropdown-menu-right {
+	left: 0;
+	right: auto;
+}    
+
 /** Authoring */
 /*layout of adding a topic button */
 a.button-add-item:before {
@@ -530,7 +532,7 @@ a.button-add-item:before {
 }
 
 .modal .ui-resizable-handle.ui-resizable-s {
-	border-radius: 6px;
+	border-radius: $border-radius-large;
     border-bottom: 1px solid white;
 }
 
@@ -601,9 +603,8 @@ a.button-add-item:before {
 	
 	/* darker outline than usual */
 	nav.sidebar{
-		  border-radius: 6px;
+		  border-radius: $border-radius-large;
 		  box-shadow: $panel-box-shadow;
-		  min-height:300px;
 	}
  
 	/*Center Brand*/
@@ -625,11 +626,6 @@ a.button-add-item:before {
 	nav.sidebar.slidesidemenu{
 		padding:10px 10px 10px 12px;
 	}
-	/*Hide text when compressed*/
-	nav.sidebar p{
-		padding-right: 35px;
-		text-align: center;
-	}
  
 	/* colour in top box to match panel heading */
 	nav.sidebar .navbar-nav > li:first-child{
@@ -650,7 +646,6 @@ a.button-add-item:before {
 	nav.sidebar .navbar-collapse, nav.sidebar .container-fluid{
 		padding: 0 0px 0 0px;
 		border:2px solid transparent;
-		box-shadow: $panel-box-shadow;
 	}
 
 	/*gives sidebar width/height*/
@@ -659,7 +654,7 @@ a.button-add-item:before {
 		height: 100%;
 		margin-left: -135px;
 		float: left;
-		z-index: 8000;
+		z-index: 1000;
 		margin-top: 0px;
 		margin-bottom: 0px;
 	}
@@ -691,6 +686,33 @@ a.button-add-item:before {
 	
 }
 
+/*alter portrait for displaying it in collapsed pregress bar*/
+@media (min-width: 768px) and (max-width: 1329px) {
+	
+	nav.sidebar:not(.expandmenu) #navbar-portrait {
+		float: right;
+    		padding: 5px 0 0;
+	}
+
+	nav.sidebar:not(.expandmenu) #navbar-portrait img{
+		border: 4px solid whitesmoke;
+	}
+
+	nav.sidebar:not(.expandmenu) .portrait-generic-sm::before{
+		font-size: 30px;
+		margin-right: 3px;
+	}
+
+	nav.sidebar:not(.expandmenu) p{
+		padding-right: 35px;
+	}
+}
+
+/*in case when portrait is not shown in a progress bar - give extra space to hamburger button*/
+nav.sidebar p.no-portrait{
+	padding-right: 35px;
+}
+
 /* .....NavBar: Fully showing nav bar..... */
 
 @media (min-width: 1330px) {
@@ -712,6 +734,11 @@ a.button-add-item:before {
 	nav.sidebar .forAnimate{
 		opacity: 1;
 	}
+}
+
+/* center portrait */
+nav.sidebar .navbar-nav > li:first-child{
+	text-align: center;
 }
 
 nav.sidebar .navbar-nav .open .dropdown-menu>li>a:hover, nav.sidebar .navbar-nav .open .dropdown-menu>li>a:focus {
@@ -787,6 +814,8 @@ div.growlUI h1,div.growlUI h2 {
 	width: 150px;
 	font-size: 0.9em;
 	word-wrap: break-word;
+    border-radius: $border-radius-large;
+    @include box-shadow(0 5px 10px rgba(0,0,0,.2));
 }
 
 .tooltip-lg{
@@ -797,8 +826,12 @@ div.growlUI h1,div.growlUI h2 {
     padding:5px;
     width:250px;
     font-size: 1.1em;
+	font-weight: bold;
 	word-wrap: break-word;
+    border-radius: $border-radius-large;
+    @include box-shadow(0 5px 10px rgba(0,0,0,.2));
 }
+
 
 // clickable panel created in CKEditor
 .lams-bootpanel .clickable {
@@ -1018,7 +1051,7 @@ $portrait-size-image-xl: 400px;
 
 .portrait-container-sm {
 	height: $portrait-size-image-sm + 3;
-	margin-top: 3px;
+	margin-top: $border-radius-small;
 }
 
 // Used in PortraitTag.java when user does not have a portrait
@@ -1072,3 +1105,70 @@ $portrait-size-image-xl: 400px;
 	    margin-bottom: 0px;
 	}
 }
+
+// Popovers used in Gradebook to display portraits
+// popover links forced to be the usual link color or jqgrid can interfere
+.popover-link {
+    color: $a-link-default !important;
+}
+
+.popover-link:hover {
+    color: $a-link-default-hover !important;
+}
+
+.popover-link:focus {
+    color: $a-link-default-focus !important;
+}
+
+.popover-title {
+	background-color: $gray-light-mid;
+}
+
+.popover-content-with-portrait {
+	min-height: $portrait-size-image-lg + 20;
+	min-width:  $portrait-size-image-lg + 20;
+}
+
+// Use the same offset as the radio buttons in Bootstrap so that ticks line up with radio buttons on pages like Optional Activities
+.radio-button-offset {
+	margin-left: -20px;
+}
+
+// Reformat the spinner used by Mottie tablesorter to use fa-refresh. The spinner appears on every column and if you only want one column
+// make the other columns <th class="no-spinner"
+.tablesorter-bootstrap .tablesorter-processing {
+	background-image: none !important;
+    content: none !important;
+}
+
+.tablesorter-bootstrap .tablesorter-processing .tablesorter-header-inner:before {
+  content: "\f021"; // fa-refresh
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  -webkit-animation: fa-spin 2s infinite linear;  // fa-spin
+  animation: fa-spin 2s infinite linear;  // fa-spin
+  text-decoration: inherit;
+  margin-right: 3px;
+  color: inherit;
+  float: left;
+  position: relative;
+  overflow: hidden;
+  left: calc(50% + 14px);
+  /* 14px = 1/2 of 18px padding for sort arrows + 1/2 of 10px width of this block */
+  display: inline-block;
+}
+
+.tablesorter-bootstrap .tablesorter-processing .tablesorter-header-inner {
+    margin-left: -15px; // the spinner moves the title slightly
+}
+    
+.tablesorter-bootstrap .tablesorter-processing.no-spinner .tablesorter-header-inner:before {
+	background-image: none !important;
+    content: none !important;
+}
+
+.tablesorter-bootstrap .tablesorter-processing.no-spinner  .tablesorter-header-inner {
+    margin-left: 0px; 
+}
+

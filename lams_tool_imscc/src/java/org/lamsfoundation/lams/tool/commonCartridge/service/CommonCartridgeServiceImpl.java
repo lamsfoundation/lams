@@ -41,6 +41,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
@@ -55,6 +56,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -89,7 +91,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
@@ -125,7 +126,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     private ILearnerService learnerService;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
 
     private IUserManagementService userManagementService;
 
@@ -475,7 +476,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     }
 
     @Override
-    public void setItemVisible(Long itemUid, boolean visible) {
+    public void setItemVisible(Long itemUid, Long toolContentId, boolean visible) {
 	CommonCartridgeItem item = commonCartridgeItemDao.getByUid(itemUid);
 	if (item != null) {
 	    // createBy should be null for system default value.
@@ -486,9 +487,9 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 		loginName = item.getCreateBy().getLoginName();
 	    }
 	    if (visible) {
-		auditService.logShowEntry(CommonCartridgeConstants.TOOL_SIGNATURE, userId, loginName, item.toString());
+		logEventService.logShowLearnerContent(userId, loginName, toolContentId, item.toString());
 	    } else {
-		auditService.logHideEntry(CommonCartridgeConstants.TOOL_SIGNATURE, userId, loginName, item.toString());
+		logEventService.logHideLearnerContent(userId, loginName, toolContentId, item.toString());
 	    }
 	    item.setHide(!visible);
 	    commonCartridgeItemDao.saveObject(item);
@@ -603,8 +604,8 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public void setLearnerService(ILearnerService learnerService) {
@@ -958,6 +959,11 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();
+    }
+    
+    @Override
+    public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
+	return null;
     }
 
     @Override

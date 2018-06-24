@@ -94,7 +94,9 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
     public static final int RATING_STYLE_RANKING = 2;
     public static final int RATING_STYLE_HEDGING = 3;
 
-    public static final int RATING_STYLE_STAR_DEFAULT_MAX = 5;
+    // The star rating can never be higher than RATING_STYLE_STAR_DEFAULT_MAX - it is capped in RatingService.rateItem, RatingService.rateItems
+    public static final int RATING_STYLE_STAR_DEFAULT_MAX = 5; 
+    public static final float RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT = 5f; 
     public static final int RATING_STYLE_RANKING_DEFAULT_MAX = 5;
     public static final int RATING_RANK_ALL = -1;
     
@@ -270,6 +272,21 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
     // Service Methods
     // ---------------------------------------------------------------------
 
+    // RatingStyle must be set before calling this method
+    public static Integer getDefaultMaxRating(int ratingStyle) {
+	switch (ratingStyle) {
+	    case RatingCriteria.RATING_STYLE_STAR:
+		return RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX;
+	    case RatingCriteria.RATING_STYLE_RANKING:
+		return RatingCriteria.RATING_STYLE_RANKING_DEFAULT_MAX;
+	    case RatingCriteria.RATING_STYLE_HEDGING:
+	    case RatingCriteria.RATING_STYLE_COMMENT:
+		return 0;
+	    default:
+		return null;
+	}
+    }
+    
     // ---------------------------------------------------------------------
     // RatingCriteria Type checking methods
     // ---------------------------------------------------------------------

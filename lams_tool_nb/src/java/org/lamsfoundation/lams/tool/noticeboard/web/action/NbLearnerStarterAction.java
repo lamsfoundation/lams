@@ -183,6 +183,7 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 	request.setAttribute("reflectOnActivity", nbContent.getReflectOnActivity());
 	request.setAttribute("allowComments", nbContent.isAllowComments());
 	request.setAttribute("likeAndDislike", nbContent.isCommentsLikeAndDislike());
+	request.setAttribute("anonymous", nbContent.isAllowAnonymous());
 
 	Boolean userFinished = (nbUser != null && NoticeboardUser.COMPLETED.equals(nbUser.getUserStatus()));
 	request.setAttribute("userFinished", userFinished);
