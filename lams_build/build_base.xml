@@ -140,7 +140,7 @@
 	
 	<target name="_db-script">
 		<!-- Internal target: Runs SQL script given by call parameter. -->
-		<sql driver="com.mysql.jdbc.Driver"
+		<sql driver="com.mysql.cj.jdbc.Driver"
 		     url="${db.url.build}"
 			 userid="${db.username}"
 			 password="${db.password}"

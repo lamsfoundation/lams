@@ -380,7 +380,7 @@
 			dbPassword="${db.password}"
 			dbUsername="${db.username}"
 			dbDriverUrl="${db.url.build}"
-			dbDriverClass="com.mysql.jdbc.Driver"	
+			dbDriverClass="com.mysql.cj.jdbc.Driver"	
 		/>
 	
 		<echo>Deploying language files</echo>
@@ -675,6 +675,7 @@
 	        	<filter token="db.location" value="${db.location}"/>
                 <filter token="db.username" value="${db.username}"/>
                 <filter token="db.password" value="${db.password}"/>
+	        	<filter token="db.timezone" value="${db.timezone}"/>
 	        </filterset>
 		</copy>
 	</target>
@@ -688,6 +689,7 @@
 	        	<filter token="db.location" value="${db.location}"/>
                 <filter token="db.username" value="${db.username}"/>
                 <filter token="db.password" value="${db.password}"/>
+	        	<filter token="db.timezone" value="${db.timezone}"/>
 	        </filterset>
 		</copy>
 	</target>
@@ -761,6 +763,7 @@
 	        	<filter token="db.location" value="${db.location}"/>
                 <filter token="db.username" value="${db.username}"/>
                 <filter token="db.password" value="${db.password}"/>
+	        	<filter token="db.timezone" value="${db.timezone}"/>
 	        </filterset>
 		</copy>
 		

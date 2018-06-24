@@ -264,9 +264,11 @@
 				    <driver>MySQL</driver>
 				    <connection-property name="characterEncoding">utf8</connection-property>
 				    <connection-property name="useUnicode">true</connection-property>
-				    <connection-property name="zeroDateTimeBehavior">convertToNull</connection-property>
+				    <connection-property name="zeroDateTimeBehavior">CONVERT_TO_NULL</connection-property>
 				    <connection-property name="useSSL">false</connection-property>
 				    <connection-property name="autoReconnect">true</connection-property>
+				    <connection-property name="useLegacyDatetimeCode">false</connection-property>
+				    <connection-property name="serverTimezone">@db.timezone@</connection-property>
 				    
 				    <!-- Properties below are used only for embedded MySQL server -->
 				    <connection-property name="server.basedir">@db.location@</connection-property>

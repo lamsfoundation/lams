@@ -1,8 +1,8 @@
 <Deploy>
 	<dbUsername></dbUsername>
 	<dbPassword></dbPassword>
-	<dbDriverClass>com.mysql.jdbc.Driver</dbDriverClass>
-	<dbDriverUrl>jdbc:mysql://localhost/lams?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;autoReconnect=true</dbDriverUrl>
+	<dbDriverClass>com.mysql.cj.jdbc.Driver</dbDriverClass>
+	<dbDriverUrl>jdbc:mysql://localhost/lams?characterEncoding=utf8&amp;zeroDateTimeBehavior=CONVERT_TO_NULL&amp;autoReconnect=true&amp;useUnicode=true&amp;useSSL=false</dbDriverUrl>
 	<toolSignature>lasbmt11</toolSignature>
 	<toolWebUri>test-dummy.war</toolWebUri>
 	<toolContext>/lams/tool/test</toolContext>
