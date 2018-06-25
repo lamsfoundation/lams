@@ -316,6 +316,7 @@
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
 				<prop key="rateItem">PROPAGATION_REQUIRED</prop>
 				<prop key="commentItem">PROPAGATION_REQUIRED</prop>
 			</props>
