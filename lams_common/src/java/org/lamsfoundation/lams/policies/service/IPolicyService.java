@@ -23,11 +23,13 @@
 
 package org.lamsfoundation.lams.policies.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.lamsfoundation.lams.policies.Policy;
 import org.lamsfoundation.lams.policies.PolicyConsent;
 import org.lamsfoundation.lams.policies.PolicyDTO;
+import org.lamsfoundation.lams.policies.dto.UserPolicyConsentDTO;
 
 public interface IPolicyService {
     
@@ -36,11 +38,12 @@ public interface IPolicyService {
     Policy getPolicyByUid(Long uid);
 
     /**
-     * Return all active policies together with how many users have consented to each of them  
+     * Return distinct versions policies (i.e. one policy per policyId). Also return number of users that have consented
+     * to each policy.
      * 
      * @return
      */
-    List<Policy> getAllPoliciesWithUserConsentsCount();
+    Collection<Policy> getPoliciesOfDistinctVersions();
     
     List<Policy> getPreviousVersionsPolicies(Long policyId);
     
@@ -61,13 +64,14 @@ public interface IPolicyService {
      * @return
      */
     List<PolicyConsent> getConsentsByUserId(Integer userId);
-    
+
+    List<UserPolicyConsentDTO> getConsentDtosByPolicy(Long policyUid, int page, int size, String sortBy,
+	    String sortOrder, String searchString);
+
     /**
-     * Changes policy status as set by the admin. In case of deactivating policy, it also removes all associated
-     * consents.
+     * Toggles policy status as requested by admin
      * 
      * @param policyUid
-     * @param newPolicyStatus
      */
-    void changePolicyStatus(Long policyUid, Integer newPolicyStatus);
+    void togglePolicyStatus(Long policyUid);
 }

@@ -896,9 +896,14 @@
         redirect="false"
       />
       <forward
-        name="policyListMethod"
+        name="policyListRedirect"
         path="/policyManagement.do?method=list"
         redirect="true"
+      />
+      <forward
+        name="policyTable"
+        path="/policies/policyTable.jsp"
+        redirect="false"
       />
       <forward
         name="userConsents"

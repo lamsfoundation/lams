@@ -18,8 +18,11 @@
 		.alert.alert-danger {
 			margin-right: 5px;
 		}
-		.full-policy, .policy-details {
-			padding-left: 15px;
+		.policy-details {
+			padding-left: 10px;
+		}
+		h5 {
+		    margin-bottom: 5px;
 		}
 	</style>
 	
@@ -73,48 +76,45 @@
 		<c:forEach items="${policies}" var="policy">
 			<tr>
 				<td>
-					<h5>
+					<h4>
 						<c:out value="${policy.policyName}" />
-					</h5>
+					</h4>
 					
 					<div class="policy-details">
-					<fmt:message key="label.policy.type" />: 
-					<c:choose>
-						<c:when test="${policy.policyTypeId == 1}">
-							<fmt:message key="label.policy.type.site"/>
-						</c:when>
-						<c:when test="${policy.policyTypeId == 2}">
-							<fmt:message key="label.policy.type.privacy"/>
-						</c:when>
-						<c:when test="${policy.policyTypeId == 3}">
-							<fmt:message key="label.policy.type.third.party"/>
-						</c:when>
-						<c:when test="${policy.policyTypeId == 4}">
-							<fmt:message key="label.policy.type.other"/>
-						</c:when>
-					</c:choose>
-					<br>
-					
-					<c:out value="${policy.summary}" escapeXml="false"/>
-					
-					<div>
-						<a data-toggle="collapse" data-target="#full-policy-${policy.uid}" href="#nogo">
-							<i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i>
+						<fmt:message key="label.policy.type" />: 
+						<c:choose>
+							<c:when test="${policy.policyTypeId == 1}">
+								<fmt:message key="label.policy.type.site"/>
+							</c:when>
+							<c:when test="${policy.policyTypeId == 2}">
+								<fmt:message key="label.policy.type.privacy"/>
+							</c:when>
+							<c:when test="${policy.policyTypeId == 3}">
+								<fmt:message key="label.policy.type.third.party"/>
+							</c:when>
+							<c:when test="${policy.policyTypeId == 4}">
+								<fmt:message key="label.policy.type.other"/>
+							</c:when>
+						</c:choose>
+						
+						<h5>
+							<fmt:message key="label.summary" />
+						</h5>
+						<c:out value="${policy.summary}" escapeXml="false"/>
+						
+						<h5>
 							<fmt:message key="label.full.policy" />
-						</a>
-						<div id="full-policy-${policy.uid}"  class="voffset5 collapse form-group full-policy">
-							<c:out value="${policy.fullPolicy}" escapeXml="false"/>
-						</div>
-					</div>
-					</div>
+						</h5>
+						<c:out value="${policy.fullPolicy}" escapeXml="false"/>
 					
-					<div class="checkbox">
-						<label for="policy-${policy.uid}">
-							<input type="checkbox" name="policy${policy.uid}" value="${policy.uid}"
-									id="policy-${policy.uid}" class="required-field"
-									<c:if test="${policy.consentedByUser}">checked="checked"</c:if>>
-							<fmt:message key="label.agree.to.policy" />
-						</label>
+						<div class="checkbox">
+							<label for="policy-${policy.uid}">
+								<input type="checkbox" name="policy${policy.uid}" value="${policy.uid}"
+										id="policy-${policy.uid}" class="required-field"
+										<c:if test="${policy.consentedByUser}">checked="checked"</c:if>>
+								<fmt:message key="label.agree.to.policy" />
+							</label>
+						</div>
 					</div>
 					
 				</td>

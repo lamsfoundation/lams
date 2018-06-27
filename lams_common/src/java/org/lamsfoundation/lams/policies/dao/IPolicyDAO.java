@@ -28,6 +28,7 @@ import java.util.List;
 import org.lamsfoundation.lams.policies.Policy;
 import org.lamsfoundation.lams.policies.PolicyConsent;
 import org.lamsfoundation.lams.policies.PolicyDTO;
+import org.lamsfoundation.lams.policies.dto.UserPolicyConsentDTO;
 
 public interface IPolicyDAO {
 
@@ -54,5 +55,8 @@ public interface IPolicyDAO {
      * @return
      */
     List<PolicyConsent> getConsentsByUserId(Integer userId);
+    
+    List<UserPolicyConsentDTO> getConsentDtosByPolicy(Long policyUid, int page, int size, String sortBy,
+	    String sortOrder, String searchString);
 
 }

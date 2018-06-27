@@ -1,15 +1,12 @@
 package org.lamsfoundation.lams.admin.web.action;
 
+import java.io.IOException;
+import java.text.DateFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,19 +19,22 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.admin.web.dto.UserPolicyConsentDTO;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.policies.Policy;
-import org.lamsfoundation.lams.policies.PolicyConsent;
+import org.lamsfoundation.lams.policies.dto.UserPolicyConsentDTO;
 import org.lamsfoundation.lams.policies.service.IPolicyService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * Handles Policy management requests.
@@ -49,7 +49,7 @@ public class PolicyManagementAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws JSONException, IOException {
 
 	if (policyService == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
@@ -64,66 +64,35 @@ public class PolicyManagementAction extends Action {
 
 	String method = WebUtil.readStrParam(request, "method", true);
 	if (StringUtils.equals(method, "list") || isCancelled(request)) {
-	    return list(mapping, form, request, response);
+	    handleListPage(request);
+	    return mapping.findForward("policyList");
 	} else if (StringUtils.equals(method, "edit")) {
 	    return edit(mapping, form, request, response);
 	} else if (StringUtils.equals(method, "save")) {
 	    return save(mapping, form, request, response);
 	} else if (StringUtils.equals(method, "displayUserConsents")) {
 	    return displayUserConsents(mapping, form, request, response);
+	} else if (StringUtils.equals(method, "getConsentsGridData")) {
+	    return getConsentsGridData(mapping, form, request, response);
 	} else if (StringUtils.equals(method, "viewPreviousVersions")) {
-	    return viewPreviousVersions(mapping, form, request, response);
-	} else if (StringUtils.equals(method, "changeStatus")) {
-	    return changeStatus(mapping, form, request, response);
-	}
+	    handleViewPreviousVersionsPage(request);
+	    return mapping.findForward("policyList");
+	} else if (StringUtils.equals(method, "togglePolicyStatus")) {
+	    return togglePolicyStatus(mapping, form, request, response);
+	} 
 
 	return mapping.findForward("error");
     }
     
-    private ActionForward list(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	List<Policy> policies = policyService.getAllPoliciesWithUserConsentsCount();
-	
-	//calculate which policies have previous version instances
-	HashMap<Long, Integer> policyCount = new LinkedHashMap<Long, Integer>();
-	for (Policy policy : policies) {
-	    Long policyId = policy.getPolicyId();
-	    int previousVersionsCount = policyCount.get(policyId) == null ? 0 : policyCount.get(policyId);
-	    policyCount.put(policy.getPolicyId(), previousVersionsCount + 1);
-	}
-	
-	//filter out older versioned policies
-	HashMap<Long, Policy> filteredPolicies = new LinkedHashMap<Long, Policy>();
-	for (Policy policy : policies) {
-	    Long policyId = policy.getPolicyId();
-	    boolean hasPreviousVersions = policyCount.get(policyId) != null && policyCount.get(policyId) > 1; 
-	    policy.setPreviousVersions(hasPreviousVersions);
-	    
-	    if (filteredPolicies.containsKey(policyId)) {
-		Policy alreadyAddedPolicy = filteredPolicies.get(policyId);
-		Integer policyStateId = policy.getPolicyStateId();
-
-		//active policy has priority
-		if (Policy.STATUS_ACTIVE.equals(policyStateId)) {
-		    filteredPolicies.put(policyId, policy);
-
-		    //if neither are active - newer has priority
-		} else if (!Policy.STATUS_ACTIVE.equals(alreadyAddedPolicy.getPolicyStateId())
-			&& policy.getLastModified().after(alreadyAddedPolicy.getLastModified())) {
-		    filteredPolicies.put(policyId, policy);
-		}
-
-	    } else {
-		filteredPolicies.put(policyId, policy);
-	    }
-	    
-	}
-	request.setAttribute("policies", filteredPolicies.values());
+    /**
+     * Prepare all data for the "list" page.
+     */
+    private void handleListPage(HttpServletRequest request) {
+	Collection<Policy> policies = policyService.getPoliciesOfDistinctVersions();
+	request.setAttribute("policies", policies);
 
 	int userCount = userManagementService.getCountUsers();
 	request.setAttribute("userCount", userCount);
-	return mapping.findForward("policyList");
     }
 
     private ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -201,7 +170,6 @@ public class PolicyManagementAction extends Action {
 			if (!policyFromFamily.getUid().equals(policyUid)
 				&& Policy.STATUS_ACTIVE.equals(policyFromFamily.getPolicyStateId())) {
 			    policyFromFamily.setPolicyStateId(Policy.STATUS_INACTIVE);
-			    policyFromFamily.setLastModified(new Date());
 			    userManagementService.save(policyFromFamily);
 			}
 		    }
@@ -210,7 +178,6 @@ public class PolicyManagementAction extends Action {
 		    Policy oldPolicy = policyService.getPolicyByUid((Long) policyUid);
 		    if (Policy.STATUS_ACTIVE.equals(oldPolicy.getPolicyStateId())) {
 			oldPolicy.setPolicyStateId(Policy.STATUS_INACTIVE);
-			oldPolicy.setLastModified(new Date());
 			userManagementService.save(oldPolicy);
 		    }
 		}
@@ -235,7 +202,7 @@ public class PolicyManagementAction extends Action {
 	policy.setLastModified(new Date());
 	userManagementService.save(policy);
 
-	return mapping.findForward("policyListMethod");
+	return mapping.findForward("policyListRedirect");
     }
 
     private ActionForward displayUserConsents(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -243,51 +210,97 @@ public class PolicyManagementAction extends Action {
 
 	Long policyUid = WebUtil.readLongParam(request, "policyUid");
 	Policy policy = policyService.getPolicyByUid(policyUid);
-	Set<PolicyConsent> consents = policy.getConsents();
 	request.setAttribute("policy", policy);
-	
-	List<User> users = userManagementService.getAllUsers();
-	LinkedList<UserPolicyConsentDTO> userPolicyConsents = new LinkedList<UserPolicyConsentDTO>();
-	for (User user : users) {
-	    UserPolicyConsentDTO userPolicyConsent = new UserPolicyConsentDTO(user.getUserId(), user.getFirstName(), user.getLastName(), user.getLogin());
-	    
-	    for (PolicyConsent consent : consents) {
-		if (consent.getUser().getUserId().equals(user.getUserId())) {
-		    userPolicyConsent.setConsentGivenByUser(true);
-		    userPolicyConsent.setDateAgreedOn(consent.getDateAgreedOn());
-		}
-	    }
-	    userPolicyConsents.add(userPolicyConsent);
-	}
-	request.setAttribute("userPolicyConsents", userPolicyConsents);
 
 	return mapping.findForward("userConsents");
     }
     
-    private ActionForward viewPreviousVersions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
+    /**
+     * Prepares all data for "vewPreviousVersions" page.
+     */
+    private void handleViewPreviousVersionsPage(HttpServletRequest request) {
 	long policyId = WebUtil.readLongParam(request, "policyId");
-	List<Policy> policyFamily = policyService.getPreviousVersionsPolicies(policyId);
-	//remove the first one from the list
-	if (policyFamily.size() > 1) {
+	List<Policy> previousVersions = policyService.getPreviousVersionsPolicies(policyId);
+//	remove the first one from the list
+//	if (previousVersion.size() > 1) {
 //	    policyFamily.remove(policyFamily.size() - 1);
-	}
-	request.setAttribute("policies", policyFamily);
+//	}
+	request.setAttribute("policies", previousVersions);
 
 	int userCount = userManagementService.getCountUsers();
 	request.setAttribute("userCount", userCount);
-	request.setAttribute("viewPreviousVersions", "true");
-	return mapping.findForward("policyList");
+	
+	request.setAttribute("viewPreviousVersions", true);
     }
     
-    private ActionForward changeStatus(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward togglePolicyStatus(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	long policyUid = WebUtil.readLongParam(request, "policyUid");
-	int newStatus = WebUtil.readIntParam(request, "newStatus");
-	policyService.changePolicyStatus(policyUid, newStatus);
+	policyService.togglePolicyStatus(policyUid);
 
-	return mapping.findForward("policyListMethod");
+	Boolean isViewPreviousVersions = (Boolean) WebUtil.readBooleanParam(request, "viewPreviousVersions", false);
+	if (isViewPreviousVersions) {
+	    handleViewPreviousVersionsPage(request);
+	} else {
+	    handleListPage(request);
+	}
+	return mapping.findForward("policyTable");
+    }
+    
+    /**
+     */
+    @SuppressWarnings("unchecked")
+    public ActionForward getConsentsGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	Long policyUid = WebUtil.readLongParam(request, "policyUid");
+	Policy policy = policyService.getPolicyByUid(policyUid);
+	
+	// Getting the params passed in from the jqGrid
+	int page = WebUtil.readIntParam(request, "page");
+	int rowLimit = WebUtil.readIntParam(request, "rows");
+	String sortOrder = WebUtil.readStrParam(request, "sord");
+	String sortBy = WebUtil.readStrParam(request, "sidx", true);
+	if (StringUtils.isEmpty(sortBy)) {
+	    sortBy = "fullName";
+	}
+	String searchString = WebUtil.readStrParam(request, "fullName", true);
+	
+	List<UserPolicyConsentDTO> consentDtos = policyService.getConsentDtosByPolicy(policyUid, page-1, rowLimit, sortBy, sortOrder, searchString);
+	int countUsers = userManagementService.getCountUsers(searchString);
+	int totalPages = new Double(
+		Math.ceil(new Integer(countUsers).doubleValue() / new Integer(rowLimit).doubleValue()))
+			.intValue();
+	
+	JSONObject responcedata = new JSONObject();
+	responcedata.put("total", "" + totalPages);
+	responcedata.put("page", "" + page);
+	responcedata.put("records", "" + countUsers);
+
+	JSONArray rows = new JSONArray();
+	for (UserPolicyConsentDTO consentDto : consentDtos) {
+	    JSONArray userData = new JSONArray();
+	    userData.put(consentDto.getUserID());
+	    String firstName = consentDto.getFirstName() == null ? "" : consentDto.getFirstName();
+	    String lastName = consentDto.getLastName() == null ? "" : consentDto.getLastName();
+	    String fullName = HtmlUtils.htmlEscape(lastName) + " " + HtmlUtils.htmlEscape(firstName);
+	    userData.put(fullName);
+	    String consentedIcon = consentDto.isConsentGivenByUser()
+		    ? "<i class=\"icon fa fa-check-circle text-success fa-fw\" title=\"Consent given\"></i>"
+		    : "-";
+	    userData.put(consentedIcon);
+	    String dateAgreedOn = consentDto.getDateAgreedOn() == null ? ""
+		    : DateUtil.convertToStringForJSON(consentDto.getDateAgreedOn(), request.getLocale());
+	    userData.put(HtmlUtils.htmlEscape(dateAgreedOn));
+	    
+	    JSONObject cellobj = new JSONObject();
+	    cellobj.put("id", "" + consentDto.getUserID());
+	    cellobj.put("cell", userData);
+	    rows.put(cellobj);
+	}
+	responcedata.put("rows", rows);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responcedata.toString()));
+	return null;
     }
 }

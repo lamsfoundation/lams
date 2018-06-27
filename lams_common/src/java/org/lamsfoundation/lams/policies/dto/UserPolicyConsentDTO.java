@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.admin.web.dto;
+package org.lamsfoundation.lams.policies.dto;
 
 import java.util.Date;
 

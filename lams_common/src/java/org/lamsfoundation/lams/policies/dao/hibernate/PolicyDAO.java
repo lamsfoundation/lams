@@ -1,9 +1,12 @@
 package org.lamsfoundation.lams.policies.dao.hibernate;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -11,6 +14,9 @@ import org.lamsfoundation.lams.policies.Policy;
 import org.lamsfoundation.lams.policies.PolicyConsent;
 import org.lamsfoundation.lams.policies.PolicyDTO;
 import org.lamsfoundation.lams.policies.dao.IPolicyDAO;
+import org.lamsfoundation.lams.policies.dto.UserPolicyConsentDTO;
+import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.springframework.stereotype.Repository;
 
 import com.sun.webkit.PolicyClient;
@@ -106,6 +112,77 @@ public class PolicyDAO extends LAMSBaseDAO implements IPolicyDAO {
     public List<PolicyConsent> getConsentsByUserId(Integer userId) {
 	String query = "from PolicyConsent consent where consent.user.userId=? ORDER BY consent.dateAgreedOn ASC";
 	return (List<PolicyConsent>) doFind(query, userId);
+    }
+    
+    @Override
+    public List<UserPolicyConsentDTO> getConsentDtosByPolicy(Long policyUid, int page, int size, String sortBy,
+	    String sortOrder, String searchString) {
+	
+	String queryText = "SELECT user.user_id, user.login, user.first_name, user.last_name, policyConsent.uid IS NOT NULL as consented, policyConsent.date_agreed_on "
+		+ " FROM lams_user AS user"
+		+ " LEFT JOIN lams_policy_consent AS policyConsent ON policyConsent.user_id = user.user_id AND policyConsent.policy_uid = :policyUid "
+		+ " WHERE user.disabled_flag=0";
+
+	switch (sortBy) {
+	    case "userId":
+		sortBy = "user.userId + 0 ";
+		break;
+	    case "login":
+		sortBy = "user.login ";
+		break;
+	    case "fullName":
+		sortBy = "(CONCAT(user.last_name, ' ', user.first_name)) ";
+		break;
+	    case "consented":
+		sortBy = "consented ";
+		break;
+	    case "consentedOn":
+		sortBy = "policyConsent.date_agreed_on ";
+		break;
+	}
+
+	StringBuilder queryBuilder = new StringBuilder(queryText);
+
+	// support for custom search from a toolbar
+	if (StringUtils.isNotBlank(searchString)) {
+	    String[] tokens = searchString.trim().split("\\s+");
+	    for (String token : tokens) {
+		String escToken = StringEscapeUtils.escapeSql(token).replace("\\", "\\\\");
+		queryBuilder.append(" AND (user.first_name LIKE '%").append(escToken)
+			.append("%' OR user.last_name LIKE '%").append(escToken).append("%' OR user.login LIKE '%")
+			.append(escToken).append("%')");
+	    }
+	}
+
+	//order by
+	queryBuilder.append(" ORDER BY ").append(sortBy).append(sortOrder);
+
+	Query query = getSession().createSQLQuery(queryBuilder.toString());
+	query.setLong("policyUid", policyUid);
+	query.setMaxResults(size);
+	query.setFirstResult(page * size);
+	List<Object[]> list = query.list();
+
+	//group by userId as long as it returns all completed visitLogs for each user
+	List<UserPolicyConsentDTO> policyConsentDtos = new ArrayList<UserPolicyConsentDTO>();
+	for (Object[] element : list) {
+	    Integer userId = ((Number) element[0]).intValue();
+	    String login = (String) element[1];
+	    String firstName = (String) element[2];
+	    String lastName = (String) element[3];
+
+	    UserPolicyConsentDTO policyConsentDto = new UserPolicyConsentDTO(userId, firstName, lastName, login);
+	    
+	    boolean isConsentGivenByUser = ((Number) element[4]).intValue() == 1;
+	    policyConsentDto.setConsentGivenByUser(isConsentGivenByUser);
+
+	    Date dateAgreedOn = (Date) element[5];
+	    policyConsentDto.setDateAgreedOn(dateAgreedOn);
+
+	    policyConsentDtos.add(policyConsentDto);
+	}
+
+	return policyConsentDtos;
     }
     
 }
