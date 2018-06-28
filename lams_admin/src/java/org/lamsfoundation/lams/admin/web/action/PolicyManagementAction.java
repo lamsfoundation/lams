@@ -99,7 +99,6 @@ public class PolicyManagementAction extends Action {
 	    HttpServletResponse response) {
 
 	Long policyUid = WebUtil.readLongParam(request, "policyUid", true);
-	boolean isEditingPreviousVersion = WebUtil.readBooleanParam(request, "isEditingPreviousVersion", false);
 	if (policyUid != null && policyUid > 0) {
 	    Policy policy = policyService.getPolicyByUid(policyUid);
 	    if (policy != null) {
@@ -112,7 +111,6 @@ public class PolicyManagementAction extends Action {
 		policyForm.set("policyTypeId", policy.getPolicyTypeId());
 		policyForm.set("version", policy.getVersion());
 		policyForm.set("policyStateId", policy.getPolicyStateId());
-		policyForm.set("editingPreviousVersion", isEditingPreviousVersion);
 		request.setAttribute("policyForm", policyForm);
 	    }
 	}
@@ -129,66 +127,57 @@ public class PolicyManagementAction extends Action {
 	String version = policyForm.getString("version");
 	Integer policyStateId = (Integer) policyForm.get("policyStateId");
 	Boolean isMinorChange = (Boolean) policyForm.get("minorChange");
-	Boolean isEditingPreviousVersion = (Boolean) policyForm.get("editingPreviousVersion");
+
+	Policy oldPolicy = (policyUid != null) && ((Long) policyUid > 0)
+		? policyService.getPolicyByUid((Long) policyUid)
+		: null;
+
+	// set policyId: generate Unique long ID in case of new policy and reuse existing one otherwise
+	Long policyId = oldPolicy == null ? policyId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE
+		: oldPolicy.getPolicyId();
 
 	Policy policy;
 	// edit existing policy only in case of minor change
-	if (isMinorChange) {
-	    Policy oldPolicy = policyService.getPolicyByUid((Long) policyUid);
-	    policy = oldPolicy;
+	if (isMinorChange) { 
+	    policy = policyService.getPolicyByUid((Long) policyUid);
 
 	} else {
 	    //if it's not a minor change - then instantiate a new child policy
 	    policy = new Policy();
-
-	    //set policy's policyId
-	    Long policyId;
-	    if (policyUid != null && (Long) policyUid > 0) {
-		Policy oldPolicy = policyService.getPolicyByUid((Long) policyUid);
-		policyId = oldPolicy.getPolicyId();
-	    } else {
-		// generate Unique long ID
-		policyId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
-	    }
-	    policy.setPolicyId(policyId);
 	    
-	    //set policy's version
-	    if (policyUid != null && (Long) policyUid > 0) {
-		Policy oldPolicy = policyService.getPolicyByUid((Long) policyUid);
-		//if version was not changed by the user - append current date
-		if (oldPolicy.getVersion().equals(version)) {
-		    version += " " + currentDate;
-		}
+	    //set policy's version: if version was not changed by the user - append current date
+	    if (oldPolicy != null && oldPolicy.getVersion().equals(version)) {
+		version += " " + currentDate;
 	    }
-
-	    //take care about old policy/policies: if the new policy has Active status then set the old one(s) to Inactive
-	    if (policyUid != null && (Long) policyUid > 0 && policyStateId.equals(Policy.STATUS_ACTIVE)) {
-
-		if (isEditingPreviousVersion) {
-		    List<Policy> policyFamily = policyService.getPreviousVersionsPolicies(policyId);
-		    for (Policy policyFromFamily : policyFamily) {
-			if (!policyFromFamily.getUid().equals(policyUid)
-				&& Policy.STATUS_ACTIVE.equals(policyFromFamily.getPolicyStateId())) {
-			    policyFromFamily.setPolicyStateId(Policy.STATUS_INACTIVE);
-			    userManagementService.save(policyFromFamily);
-			}
-		    }
-		    
-		} else {
-		    Policy oldPolicy = policyService.getPolicyByUid((Long) policyUid);
-		    if (Policy.STATUS_ACTIVE.equals(oldPolicy.getPolicyStateId())) {
-			oldPolicy.setPolicyStateId(Policy.STATUS_INACTIVE);
-			userManagementService.save(oldPolicy);
-		    }
-		}
-	    }
-
 	}
 
 	//set default version, if it's empty
 	if (StringUtils.isEmpty(version)) {
 	    version = currentDate;
 	}
+
+	//in case we edit existing policy and the new policy is Active - set all other policy versions to Inactive
+	if (oldPolicy != null && Policy.STATUS_ACTIVE.equals(policyStateId)) {
+
+	    //in case old policy was active - we only need to deactivate it, otherwise we need to find an active one from the policy family
+	    if (Policy.STATUS_ACTIVE.equals(oldPolicy.getPolicyStateId())) {
+		oldPolicy.setPolicyStateId(Policy.STATUS_INACTIVE);
+		userManagementService.save(oldPolicy);
+
+	    } else {
+		List<Policy> policyFamily = policyService.getPreviousVersionsPolicies(policyId);
+		for (Policy policyFromFamily : policyFamily) {
+		    if (!policyFromFamily.getUid().equals(policyUid)
+			    && Policy.STATUS_ACTIVE.equals(policyFromFamily.getPolicyStateId())) {
+			policyFromFamily.setPolicyStateId(Policy.STATUS_INACTIVE);
+			userManagementService.save(policyFromFamily);
+		    }
+		}
+
+	    }
+	}
+
+	policy.setPolicyId(policyId);
 	policy.setVersion(version);
 	policy.setSummary(policyForm.getString("summary"));
 	policy.setFullPolicy(policyForm.getString("fullPolicy"));

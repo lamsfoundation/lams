@@ -59,18 +59,9 @@
 			
 			<!-- Actions columns -->
 			<td>
-				<c:choose>
-					<c:when test="${policy.policyStateId == 2}">
-						<html:link page="/policyManagement.do?method=edit&policyUid=${policy.uid}&isEditingPreviousVersion=true">
-							<fmt:message key="label.create.new.draft"/>
-						</html:link>
-					</c:when>
-					<c:otherwise>
-						<html:link page="/policyManagement.do?method=edit&policyUid=${policy.uid}">
-							<fmt:message key="admin.edit"/>
-						</html:link>	
-					</c:otherwise>
-				</c:choose>
+				<html:link page="/policyManagement.do?method=edit&policyUid=${policy.uid}">
+					<fmt:message key="admin.edit"/>
+				</html:link>
 			</td>
 						
 			<td>

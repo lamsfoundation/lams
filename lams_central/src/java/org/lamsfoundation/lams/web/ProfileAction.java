@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
+import org.lamsfoundation.lams.policies.Policy;
 import org.lamsfoundation.lams.policies.PolicyDTO;
 import org.lamsfoundation.lams.policies.service.IPolicyService;
 import org.lamsfoundation.lams.themes.Theme;
@@ -64,6 +65,7 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
 import org.lamsfoundation.lams.util.LanguageUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -199,6 +201,16 @@ public class ProfileAction extends LamsDispatchAction {
 	request.setAttribute("policyDtos", policyDtos);
 
 	return mapping.findForward("profilePolicyConsents");
+    }
+    
+    public ActionForward displayPolicyDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	long policyUid = WebUtil.readLongParam(request, "policyUid");
+	Policy policy = policyService.getPolicyByUid(policyUid);
+	request.setAttribute("policy", policy);
+
+	return mapping.findForward("policyDetails");
     }
 
     public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,

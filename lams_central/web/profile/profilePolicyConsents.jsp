@@ -39,7 +39,7 @@
 			<div class="panel">
 				<div class="panel-body">
 
-					<table class="table table-striped table-condensed" >
+					<table class="table table-condensed table-striped" >
 						<tr>
 							<th><fmt:message key="label.policy.name" /></th>
 							<th><fmt:message key="label.policy.type" /></th>
@@ -49,9 +49,12 @@
 						</tr>
 					
 						<c:forEach items="${policyDtos}" var="policyDto">
-							<tr title="<c:out value="${policyDto.summary}" />">
+							<tr>
 								<td>
-									<c:out value="${policyDto.policyName}" />
+									<a href="profile.do?method=displayPolicyDetails&policyUid=${policyDto.uid}" target="_new"
+											title="<fmt:message key="label.policy.details"/>">
+										<c:out value="${policyDto.policyName}" />
+									</a>
 								</td>
 								<td>
 									<c:choose>
@@ -89,7 +92,7 @@
 						</c:forEach>
 					</table>
 					
-					<div align="center">
+					<div class="pull-right">
 						<input class="btn btn-sm btn-default offset5" type="button"
 							value="<fmt:message key="label.return.to.myprofile" />"
 							onclick="javascript:document.location='index.do?method=profile'" />

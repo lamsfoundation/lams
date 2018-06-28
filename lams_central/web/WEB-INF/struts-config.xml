@@ -556,6 +556,11 @@
         redirect="false"
       />
       <forward
+        name="policyDetails"
+        path="/profile/policyDetails.jsp"
+        redirect="false"
+      />
+      <forward
         name="edit"
         path="/editprofile.jsp"
         redirect="false"

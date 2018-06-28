@@ -67,7 +67,6 @@
 	<html:hidden property="method" value="save" />
 	<html:hidden property="policyUid" />
 	<html:hidden property="policyId" />
-	<html:hidden property="editingPreviousVersion" />
 	
 	<table class="table table-condensed table-no-border">
 		<tr>
@@ -121,7 +120,7 @@
 			</td>
 		</tr>
 		
-		<c:if test="${formBean.map.policyUid != null && !formBean.map.editingPreviousVersion}">
+		<c:if test="${formBean.map.policyUid != null}">
 			<tr>
 				<td><fmt:message key="label.minor.change" /></td>
 				<td><html:checkbox property="minorChange" /></td>
