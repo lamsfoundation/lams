@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.survey.web.action;
+package org.lamsfoundation.lams.tool.survey.web.controller;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -61,7 +61,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <code>AuthoringAction</code> action.
  *
  * @author Marcin Cieslak
- * @see org.lamsfoundation.lams.tool.survey.web.action.AuthoringAction
+ * @see org.lamsfoundation.lams.tool.survey.web.controller.AuthoringAction
  */
 public class AuthoringConditionAction extends Action {
 

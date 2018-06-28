@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.survey.web.action;
+package org.lamsfoundation.lams.tool.survey.web.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -46,11 +46,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
@@ -73,92 +69,29 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Steve.Ni
  */
-public class AuthoringAction extends Action {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
     private static final int INIT_INSTRUCTION_COUNT = 2;
     private static final String INSTRUCTION_ITEM_DESC_PREFIX = "instructionItemDesc";
     private static final String INSTRUCTION_ITEM_COUNT = "instructionCount";
     private static final int SHORT_TITLE_LENGTH = 60;
 
-    private static Logger log = Logger.getLogger(AuthoringAction.class);
+    private static Logger log = Logger.getLogger(AuthoringController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	String param = mapping.getParameter();
-	// -----------------------Survey Author function ---------------------------
-	if (param.equals("start")) {
-	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("definelater")) {
-	    // update define later flag to true
-	    Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	    ISurveyService service = getSurveyService();
-	    Survey survey = service.getSurveyByContentId(contentId);
-
-	    boolean isEditable = SurveyWebUtils.isSurveyEditable(survey);
-	    if (!isEditable) {
-		request.setAttribute(SurveyConstants.PAGE_EDITABLE, new Boolean(isEditable));
-		return mapping.findForward("forbidden");
-	    }
-
-	    if (!survey.isContentInUse()) {
-		survey.setDefineLater(true);
-		service.saveOrUpdateSurvey(survey);
-
-		// audit log the teacher has started editing activity in monitor
-		service.auditLogStartEditingActivityInMonitor(contentId);
-	    }
-
-	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("initPage")) {
-	    return initPage(mapping, form, request, response);
-	}
-
-	if (param.equals("updateContent")) {
-	    return updateContent(mapping, form, request, response);
-	}
-	// ----------------------- Add survey item function ---------------------------
-	if (param.equals("newItemInit")) {
-	    return newItemlInit(mapping, form, request, response);
-	}
-	if (param.equals("copyItemInit")) {
-	    return copyItemlInit(mapping, form, request, response);
-	}
-	if (param.equals("editItemInit")) {
-	    return editItemInit(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdateItem")) {
-	    return saveOrUpdateItem(mapping, form, request, response);
-	}
-	if (param.equals("removeItem")) {
-	    return removeItem(mapping, form, request, response);
-	}
-	if (param.equals("upItem")) {
-	    return upItem(mapping, form, request, response);
-	}
-	if (param.equals("downItem")) {
-	    return downItem(mapping, form, request, response);
-	}
-	// -----------------------Survey Item Instruction function ---------------------------
-	if (param.equals("newInstruction")) {
-	    return newInstruction(mapping, form, request, response);
-	}
-	if (param.equals("removeInstruction")) {
-	    return removeInstruction(mapping, form, request, response);
-	}
-	return mapping.findForward(SurveyConstants.ERROR);
-    }
+    @Autowired
+    @Qualifier("lasurvSurveyService")
+    private ISurveyService surveyService;
 
     /**
      * Remove survey item from HttpSession list and update page display. As authoring rule, all persist only happen when
@@ -170,17 +103,18 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeItem")
+    public String removeItem(HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(SurveyConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
 	    SortedSet<SurveyQuestion> surveyList = getSurveyItemList(sessionMap);
-	    List<SurveyQuestion> rList = new ArrayList<SurveyQuestion>(surveyList);
+	    List<SurveyQuestion> rList = new ArrayList<>(surveyList);
 	    SurveyQuestion item = rList.remove(itemIdx);
 	    surveyList.clear();
 	    surveyList.addAll(rList);
@@ -201,7 +135,7 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(SurveyConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
     }
 
     /**
@@ -213,10 +147,10 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward upItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/upItem")
+    public String upItem(HttpServletRequest request) {
 
-	return switchItem(mapping, request, true);
+	return switchItem(request, true);
     }
 
     /**
@@ -228,21 +162,23 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward downItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping(path = "/downItem")
+    public String downItem(HttpServletRequest request) {
 
-	return switchItem(mapping, request, false);
+	return switchItem(request, false);
     }
 
-    private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
+    @RequestMapping("/switchItem")
+    public String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(SurveyConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
 	    SortedSet<SurveyQuestion> surveyList = getSurveyItemList(sessionMap);
-	    List<SurveyQuestion> rList = new ArrayList<SurveyQuestion>(surveyList);
+	    List<SurveyQuestion> rList = new ArrayList<>(surveyList);
 	    // get current and the target item, and switch their sequnece
 	    SurveyQuestion item = rList.get(itemIdx);
 	    SurveyQuestion repItem;
@@ -261,7 +197,7 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(SurveyConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
     }
 
     /**
@@ -273,28 +209,29 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/editItemInit")
+    public String editItemInit(QuestionForm surveyItemForm, HttpServletRequest request) {
 
-	QuestionForm itemForm = (QuestionForm) form;
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(SurveyConstants.PARAM_ITEM_INDEX), -1);
 	SurveyQuestion item = null;
 	if (itemIdx != -1) {
 	    SortedSet<SurveyQuestion> surveyList = getSurveyItemList(sessionMap);
-	    List<SurveyQuestion> rList = new ArrayList<SurveyQuestion>(surveyList);
+	    List<SurveyQuestion> rList = new ArrayList<>(surveyList);
 	    item = rList.get(itemIdx);
 	    if (item != null) {
-		populateItemToForm(itemIdx, item, itemForm, request);
+		populateItemToForm(itemIdx, item, surveyItemForm, request);
 	    }
 	}
-	if (itemForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-	    return mapping.findForward(SurveyConstants.FORWARD_OPEN_QUESTION);
+	request.setAttribute("surveyItemForm", surveyItemForm);
+	if (surveyItemForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
+	    return "pages/authoring/parts/addopenquestion";
 	} else {
-	    return mapping.findForward(SurveyConstants.FORWARD_CHOICE_QUESTION);
+	    return "pages/authoring/parts/addchoicequestion";
 	}
     }
 
@@ -307,44 +244,43 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	QuestionForm questionForm = (QuestionForm) form;
+    @RequestMapping("/newItemInit")
+    public String newItemlInit(QuestionForm questionForm, HttpServletRequest request) {
 
-	List instructionList = new ArrayList(AuthoringAction.INIT_INSTRUCTION_COUNT);
-	for (int idx = 0; idx < AuthoringAction.INIT_INSTRUCTION_COUNT; idx++) {
+	List instructionList = new ArrayList(AuthoringController.INIT_INSTRUCTION_COUNT);
+	for (int idx = 0; idx < AuthoringController.INIT_INSTRUCTION_COUNT; idx++) {
 	    instructionList.add("");
 	}
 	request.setAttribute("instructionList", instructionList);
 	if (questionForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-	    return mapping.findForward(SurveyConstants.FORWARD_OPEN_QUESTION);
+	    return "pages/authoring/parts/addopenquestion";
 	} else {
-	    return mapping.findForward(SurveyConstants.FORWARD_CHOICE_QUESTION);
+	    return "pages/authoring/parts/addchoicequestion";
 	}
     }
 
     /**
      * Create a new question based on existing one.
      */
-    private ActionForward copyItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	QuestionForm itemForm = (QuestionForm) form;
+    @RequestMapping("/copyItemInit")
+    public String copyItemlInit(QuestionForm surveyItemForm, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(SurveyConstants.PARAM_ITEM_INDEX), -1);
 	SortedSet<SurveyQuestion> surveyList = getSurveyItemList(sessionMap);
-	List<SurveyQuestion> rList = new ArrayList<SurveyQuestion>(surveyList);
+	List<SurveyQuestion> rList = new ArrayList<>(surveyList);
 	SurveyQuestion item = rList.get(itemIdx);
 	if (item != null) {
-	    populateItemToForm(-1, item, itemForm, request);
-	    itemForm.setItemIndex(null);
+	    populateItemToForm(-1, item, surveyItemForm, request);
+	    surveyItemForm.setItemIndex(null);
 	}
-
-	if (itemForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-	    return mapping.findForward(SurveyConstants.FORWARD_OPEN_QUESTION);
+	request.setAttribute("surveyItemForm", surveyItemForm);
+	if (surveyItemForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
+	    return "pages/authoring/parts/addopenquestion";
 	} else {
-	    return mapping.findForward(SurveyConstants.FORWARD_CHOICE_QUESTION);
+	    return "pages/authoring/parts/addchoicequestion";
 	}
     }
 
@@ -360,39 +296,38 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/saveOrUpdateItem")
+    public String saveOrUpdateItem(@ModelAttribute("surveyItemForm") QuestionForm surveyItemForm, Errors errors, HttpServletRequest request)
+	    throws Exception {
 	// get instructions:
 	List<String> instructionList = getInstructionsFromRequest(request);
 
-	QuestionForm itemForm = (QuestionForm) form;
-	ActionErrors errors = validateSurveyItem(itemForm, instructionList);
+	validateSurveyItem(surveyItemForm, instructionList, errors);
 
-	if (!errors.isEmpty()) {
-	    this.addErrors(request, errors);
+	if (errors.hasErrors()) {
 	    // add at least 2 instruction list
 	    for (int idx = instructionList.size(); idx < 2; idx++) {
 		instructionList.add("");
 	    }
 	    request.setAttribute(SurveyConstants.ATTR_INSTRUCTION_LIST, instructionList);
-	    if (itemForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-		return mapping.findForward(SurveyConstants.FORWARD_OPEN_QUESTION);
+	    if (surveyItemForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
+		return "pages/authoring/parts/addopenquestion";
 	    } else {
-		return mapping.findForward(SurveyConstants.FORWARD_CHOICE_QUESTION);
+		return "pages/authoring/parts/addchoicequestion";
 	    }
 	}
 
 	try {
-	    extractFormToSurveyItem(request, instructionList, itemForm);
+	    extractFormToSurveyItem(request, instructionList, surveyItemForm);
 	} catch (Exception e) {
-	    AuthoringAction.log.error("Uploading failed. The exception is " + e.toString());
+	    AuthoringController.log.error("Uploading failed. The exception is " + e.toString());
 	    throw e;
 	}
 	// set session map ID so that itemlist.jsp can get sessionMAP
-	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, itemForm.getContentFolderID());
+	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, surveyItemForm.getSessionMapID());
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, surveyItemForm.getContentFolderID());
 	// return null to close this window
-	return mapping.findForward(SurveyConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
     }
 
     /**
@@ -404,25 +339,121 @@ public class AuthoringAction extends Action {
      * @throws ServletException
      *
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/start")
+    public String start(SurveyForm startForm, HttpServletRequest request) throws Exception {
+
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	// get back the survey and item list and display them on page
-	ISurveyService service = getSurveyService();
+	ISurveyService service = surveyService;
 
 	List<SurveyQuestion> questions = null;
 	Survey survey = null;
-	SurveyForm surveyForm = (SurveyForm) form;
+
+	// Get contentFolderID and save to form.
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	startForm.setContentFolderID(contentFolderID);
+
+	// initial Session Map
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	startForm.setSessionMapID(sessionMap.getSessionID());
+
+	survey = service.getSurveyByContentId(contentId);
+	// if survey does not exist, try to use default content instead.
+	if (survey == null) {
+	    survey = service.getDefaultContent(contentId);
+	    if (survey.getQuestions() != null) {
+		questions = new ArrayList<>(survey.getQuestions());
+	    } else {
+		questions = null;
+	    }
+	} else {
+	    questions = new ArrayList<>(survey.getQuestions());
+	}
+
+	startForm.setSurvey(survey);
+
+	// init it to avoid null exception in following handling
+	if (questions == null) {
+	    questions = new ArrayList();
+	} else {
+	    SurveyUser surveyUser = null;
+	    // handle system default question: createBy is null, now set it to current user
+	    for (SurveyQuestion question : questions) {
+		if (question.getCreateBy() == null) {
+		    if (surveyUser == null) {
+			// get back login user DTO
+			HttpSession ss = SessionManager.getSession();
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			surveyUser = new SurveyUser(user, survey);
+		    }
+		    question.setCreateBy(surveyUser);
+		}
+	    }
+	}
+	// init survey item list
+	SortedSet<SurveyQuestion> surveyItemList = getSurveyItemList(sessionMap);
+	surveyItemList.clear();
+	retriveQuestionListForDisplay(questions);
+	surveyItemList.addAll(questions);
+
+	// init condition set
+	SortedSet<SurveyCondition> conditionSet = getSurveyConditionSet(sessionMap);
+	conditionSet.clear();
+	conditionSet.addAll(survey.getConditions());
+
+	sessionMap.put(SurveyConstants.ATTR_SURVEY_FORM, startForm);
+	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
+	request.setAttribute("startForm", startForm);
+	return "pages/authoring/start";
+    }
+
+    @RequestMapping("/definelater")
+    public String definelater(SurveyForm surveyForm, HttpServletRequest request, HttpServletResponse response)
+	    throws Exception {
+
+	// update define later flag to true
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	ISurveyService service = surveyService;
+	Survey survey = service.getSurveyByContentId(contentId);
+
+	boolean isEditable = SurveyWebUtils.isSurveyEditable(survey);
+	if (!isEditable) {
+	    request.setAttribute(SurveyConstants.PAGE_EDITABLE, new Boolean(isEditable));
+	    return "error";
+	}
+
+	if (!survey.isContentInUse()) {
+	    survey.setDefineLater(true);
+	    service.saveOrUpdateSurvey(survey);
+
+	    // audit log the teacher has started editing activity in monitor
+	    service.auditLogStartEditingActivityInMonitor(contentId);
+	}
+
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+
+	// save toolContentID into HTTPSession
+	contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+
+	// get back the survey and item list and display them on page
+	service = surveyService;
+
+	List<SurveyQuestion> questions = null;
+	survey = null;
 
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	surveyForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	surveyForm.setSessionMapID(sessionMap.getSessionID());
 
@@ -431,12 +462,12 @@ public class AuthoringAction extends Action {
 	if (survey == null) {
 	    survey = service.getDefaultContent(contentId);
 	    if (survey.getQuestions() != null) {
-		questions = new ArrayList<SurveyQuestion>(survey.getQuestions());
+		questions = new ArrayList<>(survey.getQuestions());
 	    } else {
 		questions = null;
 	    }
 	} else {
-	    questions = new ArrayList<SurveyQuestion>(survey.getQuestions());
+	    questions = new ArrayList<>(survey.getQuestions());
 	}
 
 	surveyForm.setSurvey(survey);
@@ -473,36 +504,36 @@ public class AuthoringAction extends Action {
 	sessionMap.put(SurveyConstants.ATTR_SURVEY_FORM, surveyForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-	return mapping.findForward(SurveyConstants.SUCCESS);
+	return "pages/authoring/start";
     }
 
     /**
      * Display same entire authoring page content from HttpSession variable.
      *
      * @param mapping
-     * @param form
+     * @param authoringForm
      * @param request
      * @param response
      * @return
      * @throws ServletException
      */
-    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/init")
+    public String initPage(SurveyForm startForm, HttpServletRequest request) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	SurveyForm existForm = (SurveyForm) sessionMap.get(SurveyConstants.ATTR_SURVEY_FORM);
 
-	SurveyForm surveyForm = (SurveyForm) form;
 	try {
-	    PropertyUtils.copyProperties(surveyForm, existForm);
+	    PropertyUtils.copyProperties(startForm, existForm);
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-
-	return mapping.findForward(SurveyConstants.SUCCESS);
+	request.setAttribute("authoringForm", startForm);
+	return "pages/authoring/authoring";
     }
 
     /**
@@ -515,27 +546,27 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	SurveyForm surveyForm = (SurveyForm) form;
+    @RequestMapping("/update")
+    public String updateContent(SurveyForm authoringForm, HttpServletRequest request) throws Exception {
 
 	// get back sessionMAP
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(surveyForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(authoringForm.getSessionMapID());
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	Survey survey = surveyForm.getSurvey();
-	ISurveyService service = getSurveyService();
+	Survey survey = authoringForm.getSurvey();
+	ISurveyService service = surveyService;
 
 	// **********************************Get Survey PO*********************
-	Survey surveyPO = service.getSurveyByContentId(surveyForm.getSurvey().getContentId());
+	Survey surveyPO = service.getSurveyByContentId(authoringForm.getSurvey().getContentId());
 	if (surveyPO == null) {
 	    // new Survey, create it.
 	    surveyPO = survey;
 	    surveyPO.setCreated(new Timestamp(new Date().getTime()));
 	    surveyPO.setUpdated(new Timestamp(new Date().getTime()));
-	    
+
 	} else {
 	    Long uid = surveyPO.getUid();
 	    PropertyUtils.copyProperties(surveyPO, survey);
@@ -546,7 +577,7 @@ public class AuthoringAction extends Action {
 	    if (mode.isTeacher()) {
 		surveyPO.setDefineLater(false);
 	    }
-		
+
 	    surveyPO.setUpdated(new Timestamp(new Date().getTime()));
 	}
 
@@ -556,7 +587,7 @@ public class AuthoringAction extends Action {
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	SurveyUser surveyUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
-		surveyForm.getSurvey().getContentId());
+		authoringForm.getSurvey().getContentId());
 	if (surveyUser == null) {
 	    surveyUser = new SurveyUser(user, surveyPO);
 	}
@@ -620,23 +651,15 @@ public class AuthoringAction extends Action {
 	// finally persist surveyPO again
 	service.saveOrUpdateSurvey(surveyPO);
 
-	surveyForm.setSurvey(surveyPO);
+	authoringForm.setSurvey(surveyPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	return mapping.findForward(SurveyConstants.SUCCESS);
+	return "pages/authoring/authoring";
     }
 
     // *************************************************************************************
     // Private method
     // *************************************************************************************
-    /**
-     * Return SurveyService bean.
-     */
-    private ISurveyService getSurveyService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (ISurveyService) wac.getBean(SurveyConstants.SURVEY_SERVICE);
-    }
 
     /**
      * List save current survey items.
@@ -647,7 +670,7 @@ public class AuthoringAction extends Action {
     private SortedSet<SurveyQuestion> getSurveyItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<SurveyQuestion> list = (SortedSet<SurveyQuestion>) sessionMap.get(SurveyConstants.ATTR_QUESTION_LIST);
 	if (list == null) {
-	    list = new TreeSet<SurveyQuestion>(new QuestionsComparator());
+	    list = new TreeSet<>(new QuestionsComparator());
 	    sessionMap.put(SurveyConstants.ATTR_QUESTION_LIST, list);
 	}
 	return list;
@@ -663,7 +686,7 @@ public class AuthoringAction extends Action {
 	SortedSet<SurveyCondition> set = (SortedSet<SurveyCondition>) sessionMap
 		.get(SurveyConstants.ATTR_CONDITION_SET);
 	if (set == null) {
-	    set = new TreeSet<SurveyCondition>(new TextSearchConditionComparator());
+	    set = new TreeSet<>(new TextSearchConditionComparator());
 	    sessionMap.put(SurveyConstants.ATTR_CONDITION_SET, set);
 	}
 	return set;
@@ -702,14 +725,14 @@ public class AuthoringAction extends Action {
      */
     private List<String> getInstructionsFromRequest(HttpServletRequest request) {
 	String list = request.getParameter("instructionList");
-	List<String> instructionList = new ArrayList<String>();
+	List<String> instructionList = new ArrayList<>();
 	// for open text entry question
 	if (list == null) {
 	    return instructionList;
 	}
 
 	String[] params = list.split("&");
-	Map<String, String> paramMap = new HashMap<String, String>();
+	Map<String, String> paramMap = new HashMap<>();
 	String[] pair;
 	for (String item : params) {
 	    pair = item.split("=");
@@ -719,13 +742,13 @@ public class AuthoringAction extends Action {
 	    try {
 		paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
 	    } catch (UnsupportedEncodingException e) {
-		AuthoringAction.log.error("Error occurs when decode instruction string:" + e.toString());
+		AuthoringController.log.error("Error occurs when decode instruction string:" + e.toString());
 	    }
 	}
 
-	int count = NumberUtils.stringToInt(paramMap.get(AuthoringAction.INSTRUCTION_ITEM_COUNT));
+	int count = NumberUtils.stringToInt(paramMap.get(AuthoringController.INSTRUCTION_ITEM_COUNT));
 	for (int idx = 0; idx < count; idx++) {
-	    String item = paramMap.get(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
+	    String item = paramMap.get(AuthoringController.INSTRUCTION_ITEM_DESC_PREFIX + idx);
 	    if (item == null) {
 		continue;
 	    }
@@ -777,7 +800,8 @@ public class AuthoringAction extends Action {
 	 * item.
 	 */
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(itemForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(itemForm.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<SurveyQuestion> surveyList = getSurveyItemList(sessionMap);
 	int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(), -1);
@@ -793,7 +817,7 @@ public class AuthoringAction extends Action {
 	    item.setSequenceId(maxSeq);
 	    surveyList.add(item);
 	} else { // edit
-	    List<SurveyQuestion> rList = new ArrayList<SurveyQuestion>(surveyList);
+	    List<SurveyQuestion> rList = new ArrayList<>(surveyList);
 	    item = rList.get(itemIdx);
 	    item.setDescription(itemForm.getQuestion().getDescription());
 	    item.setOptional(itemForm.getQuestion().isOptional());
@@ -869,12 +893,12 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward newInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	int count = NumberUtils.stringToInt(request.getParameter(AuthoringAction.INSTRUCTION_ITEM_COUNT), 0);
+    @RequestMapping("/newInstruction")
+    public String newInstruction(HttpServletRequest request) {
+	int count = NumberUtils.stringToInt(request.getParameter(AuthoringController.INSTRUCTION_ITEM_COUNT), 0);
 	List instructionList = new ArrayList(++count);
 	for (int idx = 0; idx < count; idx++) {
-	    String item = request.getParameter(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
+	    String item = request.getParameter(AuthoringController.INSTRUCTION_ITEM_DESC_PREFIX + idx);
 	    if (item == null) {
 		instructionList.add("");
 	    } else {
@@ -882,7 +906,7 @@ public class AuthoringAction extends Action {
 	    }
 	}
 	request.setAttribute(SurveyConstants.ATTR_INSTRUCTION_LIST, instructionList);
-	return mapping.findForward(SurveyConstants.SUCCESS);
+	return "pages/authoring/parts/instructions";
     }
 
     /**
@@ -894,13 +918,13 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward removeInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	int count = NumberUtils.stringToInt(request.getParameter(AuthoringAction.INSTRUCTION_ITEM_COUNT), 0);
+    @RequestMapping("/removeInstruction")
+    public String removeInstruction(HttpServletRequest request) {
+	int count = NumberUtils.stringToInt(request.getParameter(AuthoringController.INSTRUCTION_ITEM_COUNT), 0);
 	int removeIdx = NumberUtils.stringToInt(request.getParameter("removeIdx"), -1);
 	List instructionList = new ArrayList(count - 1);
 	for (int idx = 0; idx < count; idx++) {
-	    String item = request.getParameter(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
+	    String item = request.getParameter(AuthoringController.INSTRUCTION_ITEM_DESC_PREFIX + idx);
 	    if (idx == removeIdx) {
 		continue;
 	    }
@@ -911,7 +935,7 @@ public class AuthoringAction extends Action {
 	    }
 	}
 	request.setAttribute(SurveyConstants.ATTR_INSTRUCTION_LIST, instructionList);
-	return mapping.findForward(SurveyConstants.SUCCESS);
+	return "pages/authoring/parts/instructions";
     }
 
     /**
@@ -922,5 +946,18 @@ public class AuthoringAction extends Action {
      */
     private List getDeletedSurveyConditionList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, SurveyConstants.ATTR_DELETED_CONDITION_LIST);
+    }
+
+    private void validateSurveyItem(QuestionForm itemForm, List<String> instructionList, Errors errors) {
+	if (StringUtils.isBlank(itemForm.getQuestion().getDescription())) {
+	    errors.reject(SurveyConstants.ERROR_MSG_DESC_BLANK);
+	}
+
+	short type = getQuestionType(itemForm);
+	if (type != SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
+	    if (instructionList == null || instructionList.size() < 2) {
+		errors.reject(SurveyConstants.ERROR_MSG_LESS_OPTIONS);
+	    }
+	}
     }
 }

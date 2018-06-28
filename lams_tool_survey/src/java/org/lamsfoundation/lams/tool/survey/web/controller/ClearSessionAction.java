@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.survey.web.action;
+package org.lamsfoundation.lams.tool.survey.web.controller;
 
 import javax.servlet.http.HttpSession;
 

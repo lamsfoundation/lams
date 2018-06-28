@@ -6,7 +6,7 @@
        var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
 	</script>
 	<script type="text/javascript"
-		src="<html:rewrite page='/includes/javascript/surveyitem.js'/>"></script>
+		src="<lams:WebAppURL/>includes/javascript/surveyitem.js"></script>
 
 		<!-- Basic Info Form-->
 		<div class="panel panel-default add-file">
@@ -17,28 +17,25 @@
 
 			<%@ include file="/common/messages.jsp"%>
 	
-			<html:form action="/authoring/saveOrUpdateItem" method="post"
-				styleId="surveyItemForm">
-				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<form:form action="saveOrUpdateItem.do" modelAttribute="surveyItemForm" id="surveyItemForm" method="post">
 				<%-- This field is not belong STRUTS form --%>
 				<input type="hidden" name="instructionList" id="instructionList" />
-				<html:hidden property="sessionMapID" />
-				<html:hidden property="itemIndex" />
-				<html:hidden property="contentFolderID" />
+				<form:hidden path="sessionMapID" />
+				<form:hidden path="itemIndex" />
+				<form:hidden path="contentFolderID" />
 				<%-- This value should be 1 or 2 --%>
-				<html:hidden property="itemType" value="1" />
+				<form:hidden path="itemType" value="1" />
 
 				<div class="form-group">
 					<label for="question.description"><fmt:message key="label.question" /></label>
-					<lams:CKEditor id="question.description" value="${formBean.question.description}"
-						contentFolderID="${formBean.contentFolderID}">	
+					<lams:CKEditor id="question.description" value="${surveyItemForm.question.description}"
+						contentFolderID="${surveyItemForm.contentFolderID}">	
 					</lams:CKEditor>
 				</div>
 
 				<div class="checkbox">
 					<label for="questionOptional">
-					<html:checkbox property="question.optional" styleId="questionOptional">
-					</html:checkbox>
+					<form:checkbox path="question.optional" id="questionOptional"/>
 					<fmt:message key="label.authoring.basic.question.optional" />
 					</label>
 				</div>
@@ -50,22 +47,20 @@
 
 					<div class="checkbox loffset5"> 
 						<label for="question.allowMultipleAnswer">
-						<html:checkbox	property="question.allowMultipleAnswer" styleId="questionAllowMultipleAnswer">
-						</html:checkbox> 
+						<form:checkbox	path="question.allowMultipleAnswer" id="questionAllowMultipleAnswer"/>
 						<fmt:message key="label.authoring.basic.question.allow.muli.answer" />
 						</label> 
 					</div>
 					
 					<div class="checkbox loffset5"> 
 						<label for="question.appendText">
-						<html:checkbox property="question.appendText" styleId="questionAppendText">
-						</html:checkbox> 
+						<form:checkbox path="question.appendText" id="questionAppendText"/>
 						<fmt:message key="label.authoring.basic.question.append.text" />
 						</label>
 					</div>
 				</div>
 
-			</html:form>
+			</form:form>
 		<!-- Instructions -->
 
 		<%@ include file="instructions.jsp"%>

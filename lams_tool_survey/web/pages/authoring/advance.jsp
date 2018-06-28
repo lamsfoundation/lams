@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <!-- Advance Tab Content -->
 
@@ -7,14 +6,14 @@
 	
 	<div class="checkbox">
 		<label for="showOnePage">
-		<html:checkbox property="survey.showOnePage" styleId="showOnePage"/>
+		<form:checkbox path="survey.showOnePage" id="showOnePage"/>
 			<fmt:message key="label.authoring.advance.show.on.one.page" />
 		</label>
 	</div>
 	
 	<div class="checkbox">
 		<label for="showOtherUsersAnswers">
-		<html:checkbox property="survey.showOtherUsersAnswers" styleId="showOtherUsersAnswers"/>
+		<form:checkbox path="survey.showOtherUsersAnswers" id="showOtherUsersAnswers"/>
 			<fmt:message key="label.show.answers.from.other.users" />
 		</label>
 	</div>
@@ -25,7 +24,7 @@
 
 	<div class="checkbox">
 		<label for="notifyTeachersOnAnswerSumbit">
-		<html:checkbox property="survey.notifyTeachersOnAnswerSumbit" styleId="notifyTeachersOnAnswerSumbit"/>
+		<form:checkbox path="survey.notifyTeachersOnAnswerSumbit" id="notifyTeachersOnAnswerSumbit"/>
 			<fmt:message key="label.authoring.advanced.notify.onanswersubmit" />
 		</label>
 	</div>
@@ -36,20 +35,20 @@
 
 	<div class="checkbox">
 		<label for="lockWhenFinished">
-		<html:checkbox property="survey.lockWhenFinished" styleId="lockWhenFinished"/>
+		<form:checkbox path="survey.lockWhenFinished" id="lockWhenFinished"/>
 			<fmt:message key="label.authoring.advance.lock.on.finished" />
 		</label>
 	</div>
 	
 	<div class="checkbox">
 		<label for="reflectOn">
-		<html:checkbox property="survey.reflectOnActivity" styleId="reflectOn"/>
+		<form:checkbox path="survey.reflectOnActivity" id="reflectOn"/>
 			<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 		</label>
 	</div>
 	
 	<div class="form-group">
-		<html:textarea property="survey.reflectInstructions" styleId="reflectInstructions" rows="3" styleClass="form-control"/>
+		<form:textarea path="survey.reflectInstructions" id="reflectInstructions" rows="3" cssClass="form-control"/>
 	</div>
 
 </lams:SimplePanel>

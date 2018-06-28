@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.survey.web.action;
+package org.lamsfoundation.lams.tool.survey.web.controller;
 
 import java.io.IOException;
 import java.util.Set;

@@ -10,29 +10,27 @@
 <div class="panel-body">	
 
 	<%@ include file="/common/messages.jsp"%>
-	<html:form action="/authoring/saveOrUpdateCondition" method="post" styleId="surveyConditionForm" focus="displayName" >
-		<html:hidden property="orderId" />
+	<form:form action="saveOrUpdateCondition.do" method="post" modelAttribute="surveyConditionForm" id="surveyConditionForm" focus="displayName" >
+		<form:hidden path="orderId" />
 		
 		<div class="form-group">
 		    <label for="displayName"><fmt:message key="label.authoring.conditions.condition.name" /></label>
-       		<html:text property="displayName" size="51"  styleClass="form-control"/>
+       		<form:input path="displayName" size="51"  cssClass="form-control"/>
 		</div>
 
 		<%-- Text search form fields are being included --%>
 		<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}"  />
 		<h4><fmt:message key="textsearch.questions" /></h4>
-		<logic:iterate name="surveyConditionForm" id="itemE" property="possibleItems">
+		<c:forEach var="itemE" items="possibleItems">
 			<div class="checkbox">
 			<label>
-		  	<html:multibox property="selectedItems">
-		    	<bean:write name="itemE" property="value" />
-		  	</html:multibox>
-		    <bean:write name="itemE" property="label" />
+		  	<form:checkbox path="selectedItems" value="${itemE.value }"/>
+		    <c:out value="${itemE.label}" />
 		    </label>
 		    </div>
-		</logic:iterate>
+		</c:forEach>
 	
-	</html:form>
+	</form:form>
 
 	<div class="voffset5 pull-right">
 	    <a href="#" onclick="hideConditionMessage();" class="btn btn-default btn-xs"><fmt:message key="button.cancel" /> </a>

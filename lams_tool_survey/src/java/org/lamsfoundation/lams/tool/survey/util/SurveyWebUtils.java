@@ -25,7 +25,7 @@
 package org.lamsfoundation.lams.tool.survey.util;
 
 import org.lamsfoundation.lams.tool.survey.model.Survey;
-import org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction;
+import org.lamsfoundation.lams.tool.survey.web.controller.MonitoringAction;
 
 /**
  * Contains helper methods used by the Action Servlets
