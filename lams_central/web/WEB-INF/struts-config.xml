@@ -485,7 +485,7 @@
     >
       <forward
         name="portrait"
-        path="/portrait.jsp"
+        path="/profile/portrait.jsp"
         redirect="false"
       />
     </action>
@@ -522,7 +522,7 @@
       type="org.lamsfoundation.lams.web.ProfileSaveAction"
       name="UserForm"
       scope="request"
-      input="/editprofile.jsp"
+      input="/profile/editprofile.jsp"
       unknown="false"
       validate="false"
     >
@@ -548,12 +548,12 @@
     >
       <forward
         name="view"
-        path="/profile.jsp"
+        path="/profile/profile.jsp"
         redirect="false"
       />
       <forward
         name="lessons"
-        path="/lessons.jsp"
+        path="/profile/lessons.jsp"
         redirect="false"
       />
       <forward
@@ -568,7 +568,7 @@
       />
       <forward
         name="edit"
-        path="/editprofile.jsp"
+        path="/profile/editprofile.jsp"
         redirect="false"
       />
     </action>
@@ -590,7 +590,7 @@
       type="org.lamsfoundation.lams.web.PortraitSaveAction"
       name="PortraitActionForm"
       scope="request"
-      input="/portrait.jsp"
+      input="/profile/portrait.jsp"
       parameter="method"
       unknown="false"
       validate="false"
