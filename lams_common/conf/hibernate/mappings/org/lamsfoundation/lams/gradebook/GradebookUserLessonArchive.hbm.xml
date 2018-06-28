@@ -60,5 +60,13 @@
             column="feedback"
             length="65535"
         />
+        
+        <property
+            name="archiveDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="archive_date"
+        />
     </class>
 </hibernate-mapping>

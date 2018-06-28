@@ -1800,21 +1800,22 @@ public class GradebookService implements IGradebookService {
 
     @Override
     public void archiveLearnerMarks(Long lessonId, Integer learnerId) {
+	Date archiveDate = new Date();
 	if (logger.isDebugEnabled()) {
-	    logger.debug(
-		    "Archiving activity and lesson entries for learner ID " + learnerId + " and lesson ID " + lessonId);
+	    logger.debug("Archiving activity and lesson entries for learner ID " + learnerId + " and lesson ID "
+		    + lessonId + " with archive date " + archiveDate);
 	}
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	List<ToolActivity> activities = getLessonActivitiesForLearner(lesson, learnerId);
 	for (ToolActivity activity : activities) {
 	    GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(activity.getActivityId(), learnerId);
 	    if (gradebookUserActivity != null) {
-		gradebookDAO.insert(new GradebookUserActivityArchive(gradebookUserActivity));
+		gradebookDAO.insert(new GradebookUserActivityArchive(gradebookUserActivity, archiveDate));
 	    }
 	}
 	GradebookUserLesson gradebookUserLesson = getGradebookUserLesson(lesson.getLessonId(), learnerId);
 	if (gradebookUserLesson != null) {
-	    gradebookDAO.insert(new GradebookUserLessonArchive(gradebookUserLesson));
+	    gradebookDAO.insert(new GradebookUserLessonArchive(gradebookUserLesson, archiveDate));
 	}
     }
 
