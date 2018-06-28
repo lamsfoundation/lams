@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.taskList.web.form;
 
 import java.util.ArrayList;
@@ -28,11 +27,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.springframework.validation.Errors;
 
 /**
  *
@@ -40,9 +38,7 @@ import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 public class TaskListPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private List<String> taskListItem;
 
-    @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
+    public void validate(Errors errors) {
 	boolean valid = true;
 	boolean allEmpty = true;
 	if (taskListItem != null && !taskListItem.isEmpty()) {
@@ -54,21 +50,19 @@ public class TaskListPedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 	    }
 	}
 	if (allEmpty) {
-	    ActionMessage error = new ActionMessage("authoring.msg.no.tasks.save");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    errors.reject("authoring.msg.no.tasks.save");
 	    valid = false;
 	    taskListItem = null;
 	}
 
 	setValid(valid);
-	return errors;
     }
 
     public void fillForm(TaskList taskList) {
 	if (taskList != null) {
 	    setToolContentID(taskList.getContentId());
 
-	    taskListItem = new ArrayList<String>();
+	    taskListItem = new ArrayList<>();
 	    Set<TaskListItem> items = taskList.getTaskListItems();
 	    if (items != null) {
 		int topicIndex = 0;
@@ -81,7 +75,7 @@ public class TaskListPedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 
     public void setTaskListItem(int number, String TaskListItems) {
 	if (taskListItem == null) {
-	    taskListItem = new ArrayList<String>();
+	    taskListItem = new ArrayList<>();
 	}
 	while (number >= taskListItem.size()) {
 	    taskListItem.add(null);

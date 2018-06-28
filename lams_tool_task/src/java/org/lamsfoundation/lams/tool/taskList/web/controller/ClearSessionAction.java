@@ -22,12 +22,13 @@
  */
 
 
-package org.lamsfoundation.lams.tool.taskList.web.action;
+package org.lamsfoundation.lams.tool.taskList.web.controller;
 
 import javax.servlet.http.HttpSession;
 
 import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.springframework.stereotype.Controller;
 
 /**
  * This class give a chance to clear HttpSession when user save/close authoring page.
@@ -36,6 +37,8 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
  *
  * @version $Revision$
  */
+
+
 public class ClearSessionAction extends LamsAuthoringFinishAction {
 
     @Override

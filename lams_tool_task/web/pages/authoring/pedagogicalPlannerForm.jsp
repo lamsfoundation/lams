@@ -54,18 +54,17 @@
 <body id="body">
 	<%@ include file="/common/messages.jsp"%>
 	<h4 class="space-left"><fmt:message key="planner.item.title"/></h4>
-	<html:form action="/authoring/saveOrUpdatePedagogicalPlannerForm.do" styleId="pedagogicalPlannerForm" method="post">
-		<html:hidden property="toolContentID" styleId="toolContentID" />
-		<html:hidden property="valid" styleId="valid" />
-		<html:hidden property="callID" styleId="callID" />
-		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
-		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	<form:form  action="saveOrUpdatePedagogicalPlannerForm.do"  modelAttribute="plannerForm" id="pedagogicalPlannerForm" method="post">
+		<form:hidden path="toolContentID" id="toolContentID" />
+		<form:hidden path="valid" id="valid" />
+		<form:hidden path="callID" idd="callID" />
+		<form:hidden path="activityOrderNumber" id="activityOrderNumber" />
 		
 		<table id="taskTable" cellpadding="0" cellspacing="0">
-			<c:forEach var="itemIndex"  begin="1" end="${formBean.taskListItemCount}" >
+			<c:forEach var="itemIndex"  begin="1" end="${plannerForm.taskListItemCount}" >
 				<tr>
 					<td>
-						<html:text styleId="item${itemIndex-1}" styleClass="item" size="100" property="taskListItem[${itemIndex-1}]"></html:text>
+						<form:input id="item${itemIndex-1}" cssClass="item" size="100" path="taskListItem[${itemIndex-1}]"/>
 					</td>
 					<td>
 						<img class="clearEntry" src="<lams:LAMSURL/>images/icons/cross.png"
@@ -75,7 +74,7 @@
 				</tr>
 			</c:forEach>
 		</table>
-	</html:form>
+	</form:form>
 	<a class="button" href="javascript:createItem();"><fmt:message key="label.authoring.basic.add.task" /></a>
 </body>
 </lams:html>

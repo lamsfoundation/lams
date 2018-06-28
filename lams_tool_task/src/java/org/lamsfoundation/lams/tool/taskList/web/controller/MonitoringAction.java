@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.taskList.web.action;
+package org.lamsfoundation.lams.tool.taskList.web.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.util.HtmlUtils;
@@ -72,7 +73,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+
 public class MonitoringAction extends Action {
+	
+	
     public static Logger log = Logger.getLogger(MonitoringAction.class);
     private static String TOOL_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
 	    + TaskListConstants.TOOL_SIGNATURE + "/";

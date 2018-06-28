@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.taskList.web.action;
+package org.lamsfoundation.lams.tool.taskList.web.controller;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -77,6 +77,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -84,9 +85,11 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  * @author Steve.Ni
  */
-public class LearningAction extends Action {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
+
+public class LearningController extends Action {
+
+    private static Logger log = Logger.getLogger(LearningController.class);
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,

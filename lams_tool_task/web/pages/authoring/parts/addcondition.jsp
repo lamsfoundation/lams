@@ -21,27 +21,26 @@
 	
 			<!-- Basic Info Form-->
 			<%@ include file="/common/messages.jsp"%>
-			<html:form action="/authoring/saveOrUpdateCondition" method="post" styleId="taskListConditionForm" focus="name" >
-				<html:hidden property="sessionMapID" />
-				<html:hidden property="sequenceId" />
+			<form:form action="saveOrUpdateCondition.do" method="post" modelAttribute="taskListConditionForm" id="taskListConditionForm" focus="name" >
+				<form:hidden path="sessionMapID" />
+				<form:hidden path="sequenceId" />
 	
 				<div class="form-group">
 	            	<label for="name"><fmt:message key="label.authoring.conditions.condition.name" /></label>
-	         		<html:text property="name" styleClass="form-control"/>
+	         		<form:input path="name" cssClass="form-control"/>
 				</div>
-	
-				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />					
-	        	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />				
+				
+	        	<c:set var="sessionMapID" value="${taskListConditionForm.sessionMapID}" />				
 		    	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 		    
 		    	<div class="form-group form-inline">
-			    <logic:iterate name="taskListConditionForm" id="itemE" property="possibleItems">
-				  	<html:multibox property="selectedItems" styleClass="form-control">
-				    	<bean:write name="itemE" property="value" />
-				  	</html:multibox>
-				    &nbsp;<bean:write name="itemE" property="label" />
+		    	<c:forEach var="itemE" items="${taskListConditionForm.possibleItems}">
+				  	<form:checkbox path="selectedItems" cssClass="form-control">
+				    	<c:out value="${itemE.value}" />
+				  	</form:checkbox>
+				    &nbsp;<c:out value="${itemE.lbael}" />
 				    <br />
-				</logic:iterate>
+				</c:forEach>
 				</div>
 				
 			<div class="voffset5 pull-right">
@@ -53,7 +52,7 @@
 				</a> 
 			</div>
 			
-			</html:form>
+			</form:form>
 	
 			
 		</div>

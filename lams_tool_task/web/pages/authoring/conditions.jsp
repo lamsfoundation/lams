@@ -1,6 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean"
-	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+
 <script lang="javascript">
 <!-- Common Javascript functions for LAMS -->
 
@@ -50,13 +49,13 @@ function submitCondition(){
 <!-- Conditions Tab Content -->
 
 <div id="conditionsArea">
-	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+	<c:set var="sessionMapID" value="${taskListForm.sessionMapID}" />
 	<%@ include file="/pages/authoring/parts/conditionlist.jsp"%>
 </div>
 
  <div class="form-inline">
-	<a href="javascript:showConditionMessage('<html:rewrite page="/authoring/newConditionInit.do?sessionMapID=${formBean.sessionMapID}"/>');"
-		 class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.conditions.add.condition" /></a> 
+	<a href="javascript:showConditionMessage('<lams:WebAppURL/>authoring/newConditionInit.do?sessionMapID=${taskListForm.sessionMapID}');"
+   class="btn btn-default btn-sm"><i class="fa fa-plus"></i> <fmt:message key="label.authoring.conditions.add.condition" /></a>
 </div>
 
 <div id="conditionInputArea" name="conditionInputArea" class="voffset10"></div>

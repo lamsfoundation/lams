@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.taskList.web.action;
+package org.lamsfoundation.lams.tool.taskList.web.controller;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -37,20 +37,13 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
@@ -70,138 +63,87 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * The main action in author mode. All the authoring operations are located in here. Except for operations dealing with
- * TaskListCondition that are located in <code>AuthoringTaskListConditionAction</code> action.
+ * The main action in author mode. All the authoring operations are located in
+ * here. Except for operations dealing with TaskListCondition that are located
+ * in <code>AuthoringTaskListConditionAction</code> action.
  *
  * @author Steve.Ni
  * @author Andrey Balan
- * @see org.lamsfoundation.lams.tool.taskList.web.action.AuthoringTaskListConditionAction
+ * @see org.lamsfoundation.lams.tool.taskList.web.controller.AuthoringTaskListConditionController
  */
-public class AuthoringAction extends Action {
 
-    private static Logger log = Logger.getLogger(AuthoringAction.class);
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    private static Logger log = Logger.getLogger(AuthoringController.class);
 
-	String param = mapping.getParameter();
-
-	// ----------------------- solid taskList methods ---------------------------
-	if (param.equals("start")) {
-	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("definelater")) {
-	    // update define later flag to true
-	    Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	    ITaskListService service = getTaskListService();
-	    TaskList taskList = service.getTaskListByContentId(contentId);
-
-	    taskList.setDefineLater(true);
-	    service.saveOrUpdateTaskList(taskList);
-	    
-	    //audit log the teacher has started editing activity in monitor
-	    service.auditLogStartEditingActivityInMonitor(contentId);
-
-	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("initPage")) {
-	    return initPage(mapping, form, request, response);
-	}
-	if (param.equals("updateContent")) {
-	    return updateContent(mapping, form, request, response);
-	}
-
-	// ----------------------- Add taskListItem methods ---------------------------
-	if (param.equals("newItemInit")) {
-	    return newItemlInit(mapping, form, request, response);
-	}
-	if (param.equals("editItemInit")) {
-	    return editItemInit(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdateItem")) {
-	    return saveOrUpdateItem(mapping, form, request, response);
-	}
-	if (param.equals("removeItem")) {
-	    return removeItem(mapping, form, request, response);
-	}
-	if (param.equals("upItem")) {
-	    return upItem(mapping, form, request, response);
-	}
-	if (param.equals("downItem")) {
-	    return downItem(mapping, form, request, response);
-	}
-	if (param.equals("initPedagogicalPlannerForm")) {
-	    return initPedagogicalPlannerForm(mapping, form, request, response);
-	}
-	if (param.equals("createPedagogicalPlannerItem")) {
-	    return createPedagogicalPlannerItem(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdatePedagogicalPlannerForm")) {
-	    return saveOrUpdatePedagogicalPlannerForm(mapping, form, request, response);
-	}
-
-	return mapping.findForward(TaskListConstants.ERROR);
-    }
+    @Autowired
+    @Qualifier("lataskTaskListService")
+    private ITaskListService taskListService;
 
     // **********************************************************
     // Solid taskList methods
     // **********************************************************
 
     /**
-     * Read taskList data from database and put them into HttpSession. It will redirect to init.do directly after this
-     * method run successfully.
+     * Read taskList data from database and put them into HttpSession. It will
+     * redirect to init.do directly after this method run successfully.
      *
-     * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
+     * This method will avoid read database again and lost un-saved resouce item
+     * lost when user "refresh page",
      *
      * @throws ServletException
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+
+    @RequestMapping("/start")
+    public String start(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request) throws ServletException {
+
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, TaskListConstants.PARAM_TOOL_CONTENT_ID));
 
-	// get back the taskList and item list and display them on page
-	ITaskListService service = getTaskListService();
-
 	List<TaskListItem> items = null;
 	TaskList taskList = null;
-	TaskListForm taskListForm = (TaskListForm) form;
 
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	taskListForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	taskListForm.setSessionMapID(sessionMap.getSessionID());
 
 	try {
-	    taskList = service.getTaskListByContentId(contentId);
+	    taskList = taskListService.getTaskListByContentId(contentId);
 	    // if taskList does not exist, try to use default content instead.
 	    if (taskList == null) {
-		taskList = service.getDefaultContent(contentId);
+		taskList = taskListService.getDefaultContent(contentId);
 		if (taskList.getTaskListItems() != null) {
 		    items = new ArrayList<TaskListItem>(taskList.getTaskListItems());
 		} else {
 		    items = null;
 		}
 	    } else {
-		items = service.getAuthoredItems(taskList.getUid());
+		items = taskListService.getAuthoredItems(taskList.getUid());
 	    }
 
 	    taskListForm.setTaskList(taskList);
 	} catch (Exception e) {
-	    AuthoringAction.log.error(e);
+	    AuthoringController.log.error(e);
 	    throw new ServletException(e);
 	}
 
@@ -212,7 +154,7 @@ public class AuthoringAction extends Action {
 
 	// init it to avoid null exception in following handling
 	if (items == null) {
-	    items = new ArrayList<TaskListItem>();
+	    items = new ArrayList<>();
 	} else {
 	    TaskListUser taskListUser = null;
 	    // handle system default question: createBy is null, now set it to current user
@@ -236,69 +178,153 @@ public class AuthoringAction extends Action {
 	sessionMap.put(TaskListConstants.ATTR_TASKLIST_FORM, taskListForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-	return mapping.findForward(TaskListConstants.SUCCESS);
+	request.setAttribute("startForm", taskListForm);
+	return "pages/authoring/start";
+    }
+
+    @RequestMapping("/definelater")
+    public String defineLater(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request)
+	    throws ServletException {
+
+	// update define later flag to true
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	TaskList taskList = taskListService.getTaskListByContentId(contentId);
+
+	taskList.setDefineLater(true);
+	taskListService.saveOrUpdateTaskList(taskList);
+
+	// audit log the teacher has started editing activity in monitor
+	taskListService.auditLogStartEditingActivityInMonitor(contentId);
+
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+
+	// save toolContentID into HTTPSession
+
+	List<TaskListItem> items = null;
+
+	// Get contentFolderID and save to form.
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	taskListForm.setContentFolderID(contentFolderID);
+
+	// initial Session Map
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	taskListForm.setSessionMapID(sessionMap.getSessionID());
+
+	try {
+	    taskList = taskListService.getTaskListByContentId(contentId);
+	    // if taskList does not exist, try to use default content instead.
+	    if (taskList == null) {
+		taskList = taskListService.getDefaultContent(contentId);
+		if (taskList.getTaskListItems() != null) {
+		    items = new ArrayList<TaskListItem>(taskList.getTaskListItems());
+		} else {
+		    items = null;
+		}
+	    } else {
+		items = taskListService.getAuthoredItems(taskList.getUid());
+	    }
+
+	    taskListForm.setTaskList(taskList);
+	} catch (Exception e) {
+	    AuthoringController.log.error(e);
+	    throw new ServletException(e);
+	}
+
+	// initialize conditions list
+	SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
+	conditionList.clear();
+	conditionList.addAll(taskList.getConditions());
+
+	// init it to avoid null exception in following handling
+	if (items == null) {
+	    items = new ArrayList<>();
+	} else {
+	    TaskListUser taskListUser = null;
+	    // handle system default question: createBy is null, now set it to current user
+	    for (TaskListItem item : items) {
+		if (item.getCreateBy() == null) {
+		    if (taskListUser == null) {
+			// get back login user DTO
+			HttpSession ss = SessionManager.getSession();
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			taskListUser = new TaskListUser(user, taskList);
+		    }
+		    item.setCreateBy(taskListUser);
+		}
+	    }
+	}
+	// init taskList item list
+	SortedSet<TaskListItem> taskListItemList = getTaskListItemList(sessionMap);
+	taskListItemList.clear();
+	taskListItemList.addAll(items);
+
+	sessionMap.put(TaskListConstants.ATTR_TASKLIST_FORM, taskListForm);
+	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
+	return "pages/authoring/start";
+
     }
 
     /**
      * Display same entire authoring page content from HttpSession variable.
      *
-     * @param mapping
-     * @param form
+     * @param taskListForm
      * @param request
-     * @param response
      * @return
      * @throws ServletException
      */
-    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/init")
+    public String initPage(@ModelAttribute TaskListForm startForm, HttpServletRequest request)
+	    throws ServletException {
+
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	TaskListForm existForm = (TaskListForm) sessionMap.get(TaskListConstants.ATTR_TASKLIST_FORM);
 
-	TaskListForm taskListForm = (TaskListForm) form;
 	try {
-	    PropertyUtils.copyProperties(taskListForm, existForm);
+	    PropertyUtils.copyProperties(startForm, existForm);
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	
-	return mapping.findForward(TaskListConstants.SUCCESS);
+	request.setAttribute("taskListForm", startForm);
+	return "pages/authoring/authoring";
     }
 
     /**
-     * This method will persist all inforamtion in this authoring page, include all taskList item, information etc.
+     * This method will persist all inforamtion in this authoring page, include all
+     * taskList item, information etc.
      *
-     * @param mapping
-     * @param form
+     * @param taskListForm
      * @param request
-     * @param response
      * @return
      * @throws ServletException
      */
-    private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	TaskListForm taskListForm = (TaskListForm) form;
+    @RequestMapping("/update")
+    public String updateContent(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request)
+	    throws Exception {
 
 	// get back sessionMAP
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(taskListForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(taskListForm.getSessionMapID());
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	TaskList taskList = taskListForm.getTaskList();
-	ITaskListService service = getTaskListService();
 
 	// **********************************Get TaskList PO*********************
-	TaskList taskListPO = service.getTaskListByContentId(taskListForm.getTaskList().getContentId());
+	TaskList taskListPO = taskListService.getTaskListByContentId(taskListForm.getTaskList().getContentId());
 	if (taskListPO == null) {
 	    // new TaskList, create it
 	    taskListPO = taskList;
 	    taskListPO.setCreated(new Timestamp(new Date().getTime()));
 	    taskListPO.setUpdated(new Timestamp(new Date().getTime()));
-	    
+
 	} else {
 	    Long uid = taskListPO.getUid();
 	    PropertyUtils.copyProperties(taskListPO, taskList);
@@ -318,7 +344,7 @@ public class AuthoringAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	TaskListUser taskListUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
+	TaskListUser taskListUser = taskListService.getUserByIDAndContent(new Long(user.getUserID().intValue()),
 		taskListForm.getTaskList().getContentId());
 	if (taskListUser == null) {
 	    taskListUser = new TaskListUser(user, taskListPO);
@@ -331,19 +357,22 @@ public class AuthoringAction extends Action {
 	SortedSet<TaskListItem> items = getTaskListItemList(sessionMap);
 	for (TaskListItem item : items) {
 	    if (item != null) {
-		if ( item.getUid() == null ) {
+		if (item.getUid() == null) {
 		    // This flushs user UID info to message if this user is a new user.
 		    item.setCreateBy(taskListUser);
 		    itemList.add(item);
 		} else {
-		    // Do not update if it is not null otherwise Edit Activity will overwrite the learner id for learner entered tasks
-		    // But taskListUser & .getCreatedBy() are a stale lazy loaded object so need to the real things from the session
-		    TaskListItem itemPO = service.getTaskListItemByUid(item.getUid());
-		    if ( itemPO != null ) {
+		    // Do not update if it is not null otherwise Edit Activity will overwrite the
+		    // learner id for learner entered tasks
+		    // But taskListUser & .getCreatedBy() are a stale lazy loaded object so need to
+		    // the real things from the session
+		    TaskListItem itemPO = taskListService.getTaskListItemByUid(item.getUid());
+		    if (itemPO != null) {
 			updateTaskListItemFromSession(itemPO, item);
 			itemList.add(itemPO);
 		    } else {
-			// something weird happened. Uid exists but can't find the task. Make it an authored task
+			// something weird happened. Uid exists but can't find the task. Make it an
+			// authored task
 			item.setCreateBy(taskListUser);
 			item.setCreateByAuthor(true);
 			itemList.add(item);
@@ -355,7 +384,7 @@ public class AuthoringAction extends Action {
 
 	// ************************* Handle taskList conditions *******************
 	SortedSet<TaskListCondition> conditions = getTaskListConditionList(sessionMap);
-	SortedSet<TaskListCondition> conditionListWithoutEmptyElements = new TreeSet<TaskListCondition>(conditions);
+	SortedSet<TaskListCondition> conditionListWithoutEmptyElements = new TreeSet<>(conditions);
 	List delConditions = getDeletedTaskListConditionList(sessionMap);
 
 	for (TaskListCondition condition : conditions) {
@@ -363,7 +392,7 @@ public class AuthoringAction extends Action {
 		conditionListWithoutEmptyElements.remove(condition);
 		delConditions.add(condition);
 
-		//reorder remaining conditions
+		// reorder remaining conditions
 		for (TaskListCondition otherCondition : conditionListWithoutEmptyElements) {
 		    if (otherCondition.getSequenceId() > condition.getSequenceId()) {
 			otherCondition.setSequenceId(otherCondition.getSequenceId() - 1);
@@ -382,7 +411,7 @@ public class AuthoringAction extends Action {
 	    iter.remove();
 
 	    if (condition.getUid() != null) {
-		service.deleteTaskListCondition(condition.getUid());
+		taskListService.deleteTaskListCondition(condition.getUid());
 	    }
 	}
 
@@ -395,25 +424,26 @@ public class AuthoringAction extends Action {
 	    TaskListItem item = (TaskListItem) iter.next();
 	    iter.remove();
 	    if (item.getUid() != null) {
-		service.deleteTaskListItem(item.getUid());
+		taskListService.deleteTaskListItem(item.getUid());
 	    }
 	}
 
-	// if MinimumNumberTasksComplete is bigger than available items, then set it topics size
+	// if MinimumNumberTasksComplete is bigger than available items, then set it
+	// topics size
 	if (taskListPO.getMinimumNumberTasks() > items.size()) {
 	    taskListPO.setMinimumNumberTasks(items.size());
 	}
 
 	// **********************************************
 	// finally persist taskListPO again
-	service.saveOrUpdateTaskList(taskListPO);
+	taskListService.saveOrUpdateTaskList(taskListPO);
 
-	service.getTaskListByContentId(taskListPO.getContentId());
+	taskListService.getTaskListByContentId(taskListPO.getContentId());
 
 	taskListForm.setTaskList(taskListPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	return mapping.findForward(TaskListConstants.SUCCESS);
+	return "pages/authoring/authoring";
     }
 
     // **********************************************************
@@ -423,111 +453,106 @@ public class AuthoringAction extends Action {
     /**
      * Display empty page for new taskList item.
      *
-     * @param mapping
-     * @param form
+     * @param taskListForm
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	((TaskListItemForm) form).setSessionMapID(sessionMapID);
+    @RequestMapping("/newItemInit")
+    public String newItemlInit(@ModelAttribute TaskListItemForm taskListItemForm, HttpServletRequest request) {
 
-	return mapping.findForward("task");
+	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
+	taskListItemForm.setSessionMapID(sessionMapID);
+
+	return "pages/authoring/parts/addtask";
     }
 
     /**
      * Display edit page for existed taskList item.
      *
-     * @param mapping
-     * @param form
+     * @param taskListForm
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("editItemInit")
+    public String editItemInit(@ModelAttribute TaskListItemForm taskListItemForm, HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX), -1);
 	TaskListItem item = null;
 	if (itemIdx != -1) {
 	    SortedSet<TaskListItem> taskListList = getTaskListItemList(sessionMap);
-	    List<TaskListItem> rList = new ArrayList<TaskListItem>(taskListList);
+	    List<TaskListItem> rList = new ArrayList<>(taskListList);
 	    item = rList.get(itemIdx);
 	    if (item != null) {
-		populateItemToForm(itemIdx, item, (TaskListItemForm) form, request);
+		populateItemToForm(itemIdx, item, taskListItemForm, request);
 	    }
 	}
 
-	return item == null ? null : mapping.findForward("task");
+	return item == null ? null : "pages/authoring/parts/addtask";
     }
 
     /**
-     * This method will get necessary information from taskList item form and save or update into
-     * <code>HttpSession</code> TaskListItemList. Notice, this save is not persist them into database, just save
-     * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
-     * persisted.
+     * This method will get necessary information from taskList item form and save
+     * or update into <code>HttpSession</code> TaskListItemList. Notice, this save
+     * is not persist them into database, just save <code>HttpSession</code>
+     * temporarily. Only they will be persist when the entire authoring page is
+     * being persisted.
      *
-     * @param mapping
      * @param form
      * @param request
-     * @param response
      * @return
      * @throws ServletException
      */
-    private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	TaskListItemForm itemForm = (TaskListItemForm) form;
-	ActionErrors errors = validateTaskListItem(itemForm);
+    @RequestMapping("/saveOrUpdateItem")
+    public String saveOrUpdateItem(@ModelAttribute TaskListItemForm taskListItemForm, Errors errors,
+	    HttpServletRequest request) {
 
-	if (!errors.isEmpty()) {
-	    this.addErrors(request, errors);
-	    return mapping.findForward("task");
+	validateTaskListItem(taskListItemForm, errors);
+
+	if (errors.hasErrors()) {
+	    return "pages/authoring/parts/addtask";
 	}
-
+//
 	try {
-	    extractFormToTaskListItem(request, itemForm);
+	    extractFormToTaskListItem(request, taskListItemForm);
 	} catch (Exception e) {
-	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-		    new ActionMessage(TaskListConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
-	    if (!errors.isEmpty()) {
-		this.addErrors(request, errors);
-		return mapping.findForward("task");
-	    }
+	    // any upload exception will display as normal error message rather then throw
+	    // exception directly
+	    errors.reject(TaskListConstants.ERROR_MSG_UPLOAD_FAILED);
+	    return "pages/authoring/parts/addtask";
 	}
 	// set session map ID so that itemlist.jsp can get sessionMAP
-	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
+	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, taskListItemForm.getSessionMapID());
 	// return null to close this window
-	return mapping.findForward(TaskListConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
     }
 
     /**
-     * Remove taskList item from HttpSession list and update page display. As authoring rule, all persist only happen
-     * when user submit whole page. So this remove is just impact HttpSession values.
+     * Remove taskList item from HttpSession list and update page display. As
+     * authoring rule, all persist only happen when user submit whole page. So this
+     * remove is just impact HttpSession values.
      *
-     * @param mapping
-     * @param form
+     * @param taskListForm
      * @param request
      * @param response
      * @return
      */
-    private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeItem")
+    public String removeItem(HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
 	    SortedSet<TaskListItem> taskListList = getTaskListItemList(sessionMap);
-	    List<TaskListItem> rList = new ArrayList<TaskListItem>(taskListList);
+	    List<TaskListItem> rList = new ArrayList<>(taskListList);
 	    TaskListItem item = rList.remove(itemIdx);
 	    taskListList.clear();
 	    taskListList.addAll(rList);
@@ -547,46 +572,41 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(TaskListConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
     }
 
     /**
      * Move up current item.
      *
-     * @param mapping
-     * @param form
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward upItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, true);
+    @RequestMapping("/upItem")
+    public String upItem(HttpServletRequest request) {
+	return switchItem(request, true);
     }
 
     /**
      * Move down current item.
      *
-     * @param mapping
-     * @param form
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward downItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, false);
+    @RequestMapping("/downItem")
+    public String downItem(HttpServletRequest request) {
+	return switchItem(request, false);
     }
 
-    private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
+    public String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
 	    SortedSet<TaskListItem> taskListList = getTaskListItemList(sessionMap);
-	    List<TaskListItem> rList = new ArrayList<TaskListItem>(taskListList);
+	    List<TaskListItem> rList = new ArrayList<>(taskListList);
 	    // get current and the target item, and switch their sequnece
 	    TaskListItem item = rList.get(itemIdx);
 	    TaskListItem repItem;
@@ -605,20 +625,12 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(TaskListConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
     }
 
     // *************************************************************************************
     // Private methods for internal needs
     // *************************************************************************************
-    /**
-     * Return TaskListService bean.
-     */
-    private ITaskListService getTaskListService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (ITaskListService) wac.getBean(TaskListConstants.TASKLIST_SERVICE);
-    }
 
     /**
      * List save current taskList items.
@@ -630,7 +642,7 @@ public class AuthoringAction extends Action {
 	SortedSet<TaskListItem> list = (SortedSet<TaskListItem>) sessionMap
 		.get(TaskListConstants.ATTR_TASKLIST_ITEM_LIST);
 	if (list == null) {
-	    list = new TreeSet<TaskListItem>(new TaskListItemComparator());
+	    list = new TreeSet<>(new TaskListItemComparator());
 	    sessionMap.put(TaskListConstants.ATTR_TASKLIST_ITEM_LIST, list);
 	}
 	return list;
@@ -646,14 +658,15 @@ public class AuthoringAction extends Action {
 	SortedSet<TaskListCondition> list = (SortedSet<TaskListCondition>) sessionMap
 		.get(TaskListConstants.ATTR_CONDITION_LIST);
 	if (list == null) {
-	    list = new TreeSet<TaskListCondition>(new TaskListConditionComparator());
+	    list = new TreeSet<>(new TaskListConditionComparator());
 	    sessionMap.put(TaskListConstants.ATTR_CONDITION_LIST, list);
 	}
 	return list;
     }
 
     /**
-     * List save deleted taskList items, which could be persisted or non-persisted items.
+     * List save deleted taskList items, which could be persisted or non-persisted
+     * items.
      *
      * @param request
      * @return
@@ -663,7 +676,8 @@ public class AuthoringAction extends Action {
     }
 
     /**
-     * List save deleted taskList items, which could be persisted or non-persisted items.
+     * List save deleted taskList items, which could be persisted or non-persisted
+     * items.
      *
      * @param request
      * @return
@@ -724,12 +738,14 @@ public class AuthoringAction extends Action {
      */
     private void extractFormToTaskListItem(HttpServletRequest request, TaskListItemForm itemForm) throws Exception {
 	/*
-	 * BE CAREFUL: This method will copy necessary info from request form to a old or new TaskListItem instance. It
-	 * gets all info EXCEPT TaskListItem.createDate and TaskListItem.createBy, which need be set when persisting
-	 * this taskList item.
+	 * BE CAREFUL: This method will copy necessary info from request form to a old
+	 * or new TaskListItem instance. It gets all info EXCEPT TaskListItem.createDate
+	 * and TaskListItem.createBy, which need be set when persisting this taskList
+	 * item.
 	 */
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(itemForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(itemForm.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<TaskListItem> taskListList = getTaskListItemList(sessionMap);
 	int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(), -1);
@@ -746,7 +762,7 @@ public class AuthoringAction extends Action {
 	    item.setSequenceId(maxSeq);
 	    taskListList.add(item);
 	} else { // edit
-	    List<TaskListItem> rList = new ArrayList<TaskListItem>(taskListList);
+	    List<TaskListItem> rList = new ArrayList<>(taskListList);
 	    item = rList.get(itemIdx);
 	}
 
@@ -768,14 +784,18 @@ public class AuthoringAction extends Action {
     }
 
     /**
-     * Extract session request version of a taskListItem update the DB version of the taskListItem.
+     * Extract session request version of a taskListItem update the DB version of
+     * the taskListItem.
+     *
      * @throws TaskListException
      */
     private void updateTaskListItemFromSession(TaskListItem itemPO, TaskListItem itemFromSession) throws Exception {
 	/*
-	 * BE CAREFUL: This method will copy necessary info from session to an existing TaskListItem instance. It
-	 * gets all info EXCEPT uid, createDate, createBy, createByAuthor, attachments and comments which need be left the same
-	 * as they were previously. If you change them then LiveEdit will change Learner created items.
+	 * BE CAREFUL: This method will copy necessary info from session to an existing
+	 * TaskListItem instance. It gets all info EXCEPT uid, createDate, createBy,
+	 * createByAuthor, attachments and comments which need be left the same as they
+	 * were previously. If you change them then LiveEdit will change Learner created
+	 * items.
 	 */
 
 	itemPO.setTitle(itemFromSession.getTitle());
@@ -791,41 +811,41 @@ public class AuthoringAction extends Action {
 	itemPO.setChildTask(itemFromSession.isChildTask());
 	itemPO.setParentTaskName(itemFromSession.getParentTaskName());
     }
+
     /**
-     * Vaidate taskList item regards to their type (url/file/learning object/website zip file)
+     * Vaidate taskList item regards to their type (url/file/learning object/website
+     * zip file)
      *
      * @param itemForm
+     * @param errors
      * @return
      */
-    private ActionErrors validateTaskListItem(TaskListItemForm itemForm) {
-	ActionErrors errors = new ActionErrors();
+    private void validateTaskListItem(TaskListItemForm itemForm, Errors errors) {
 	if (StringUtils.isBlank(itemForm.getTitle())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(TaskListConstants.ERROR_MSG_TITLE_BLANK));
+	    errors.reject(TaskListConstants.ERROR_MSG_TITLE_BLANK);
 	}
-
-	return errors;
     }
 
-    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/initPedagogicalPlannerForm")
+    public String initPedagogicalPlannerForm(ActionForm form, HttpServletRequest request) {
 	TaskListPedagogicalPlannerForm plannerForm = (TaskListPedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	TaskList taskList = getTaskListService().getTaskListByContentId(toolContentID);
+	TaskList taskList = taskListService.getTaskListByContentId(toolContentID);
 	plannerForm.fillForm(taskList);
-	return mapping.findForward("success");
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException {
-	TaskListPedagogicalPlannerForm plannerForm = (TaskListPedagogicalPlannerForm) form;
-	ActionMessages errors = plannerForm.validate();
-	if (errors.isEmpty()) {
-	    TaskList taskList = getTaskListService().getTaskListByContentId(plannerForm.getToolContentID());
+    @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
+    public String saveOrUpdatePedagogicalPlannerForm(TaskListPedagogicalPlannerForm plannerForm, Errors errors,
+	    HttpServletRequest request) throws IOException {
+	plannerForm.validate(errors);
+	if (!errors.hasErrors()) {
+	    TaskList taskList = taskListService.getTaskListByContentId(plannerForm.getToolContentID());
 
 	    int itemIndex = 0;
 	    String item = null;
 	    TaskListItem taskListItem = null;
-	    List<TaskListItem> newItems = new LinkedList<TaskListItem>();
+	    List<TaskListItem> newItems = new LinkedList<>();
 	    Iterator<TaskListItem> taskListTopicIterator = taskList.getTaskListItems().iterator();
 	    do {
 		item = plannerForm.getTaskListItem(itemIndex);
@@ -843,7 +863,7 @@ public class AuthoringAction extends Action {
 
 			HttpSession session = SessionManager.getSession();
 			UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
-			TaskListUser taskListUser = getTaskListService().getUserByIDAndContent(
+			TaskListUser taskListUser = taskListService.getUserByIDAndContent(
 				new Long(user.getUserID().intValue()), plannerForm.getToolContentID());
 			taskListItem.setCreateBy(taskListUser);
 
@@ -858,20 +878,20 @@ public class AuthoringAction extends Action {
 	    while (taskListTopicIterator.hasNext()) {
 		taskListItem = taskListTopicIterator.next();
 		taskListTopicIterator.remove();
-		getTaskListService().deleteTaskListItem(taskListItem.getUid());
+		taskListService.deleteTaskListItem(taskListItem.getUid());
 	    }
 	    taskList.getTaskListItems().addAll(newItems);
-	    getTaskListService().saveOrUpdateTaskList(taskList);
-	} else {
-	    saveErrors(request, errors);
+	    taskListService.saveOrUpdateTaskList(taskList);
 	}
-	return mapping.findForward("success");
+
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward createPedagogicalPlannerItem(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/createPedagogicalPlannerItem")
+    public String createPedagogicalPlannerItem(ActionForm form, HttpServletRequest request)
+	    throws IOException, ServletException {
 	TaskListPedagogicalPlannerForm plannerForm = (TaskListPedagogicalPlannerForm) form;
 	plannerForm.setTaskListItem(plannerForm.getTaskListItemCount().intValue(), "");
-	return mapping.findForward("success");
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 }

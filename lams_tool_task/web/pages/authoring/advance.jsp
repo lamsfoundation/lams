@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+
 
 <!-- Advance Tab Content -->
 
@@ -7,7 +7,7 @@
 	
 	<div class="checkbox">
 		<label for="sequentialOrder">
-		<html:checkbox property="taskList.sequentialOrder" styleId="sequentialOrder"/>
+		<form:checkbox path="taskList.sequentialOrder" id="sequentialOrder"/>
 		<fmt:message key="label.authoring.advance.run.content.sequentialOrder" />
 		</label>
 	</div>
@@ -16,7 +16,7 @@
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 	
-		<html:select property="taskList.minimumNumberTasks"	styleId="minimumNumberTasks" styleClass="form-control form-control-inline input-sm">
+		<form:select path="taskList.minimumNumberTasks"	id="minimumNumberTasks" cssClass="form-control form-control-inline input-sm">
 	<!-- 		<c:forEach begin="1" end="${fn:length(sessionMap.taskListList)}" varStatus="status">
 				<c:choose>
 					<c:when	test="${formBean.taskList.minimumNumberTasks == status.index}">
@@ -32,7 +32,7 @@
 				</c:choose>
 			</c:forEach>
 	 -->		
-		</html:select>
+		</form:select>
 	
 		<label for="minimumNumberTasks">
 			<fmt:message key="label.authoring.advance.minimum.number.tasks" />
@@ -41,14 +41,14 @@
 	
 	<div class="checkbox">
 		<label for="allowContributeTasks">
-		<html:checkbox property="taskList.allowContributeTasks" styleId="allowContributeTasks" />
+		<form:checkbox path="taskList.allowContributeTasks" id="allowContributeTasks" />
 		<fmt:message key="label.authoring.advance.allow.contribute.tasks" />
 		</label>
 	</div>
 		
 	<div class="checkbox">
 		<label for="monitorVerificationRequired">
-		<html:checkbox property="taskList.monitorVerificationRequired" styleId="monitorVerificationRequired" />
+		<form:checkbox path="taskList.monitorVerificationRequired" id="monitorVerificationRequired" />
 		<fmt:message key="label.authoring.advance.monitor.verification.required" />
 		</label>
 	</div>
@@ -59,20 +59,20 @@
 
 	<div class="checkbox">
 		<label for="lockWhenFinished">
-		<html:checkbox property="taskList.lockWhenFinished"	styleId="lockWhenFinished" />
+		<form:checkbox path="taskList.lockWhenFinished"	id="lockWhenFinished" />
 		<fmt:message key="label.authoring.advance.lock.on.finished" />
 		</label>
 	</div>
 
 	<div class="checkbox">
 		<label for="reflectOn">
-		<html:checkbox property="taskList.reflectOnActivity" styleId="reflectOn" />
+		<form:checkbox path="taskList.reflectOnActivity" id="reflectOn" />
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 		</label>
 	</div>
 	
 	<div class="form-group">
-		<html:textarea property="taskList.reflectInstructions"	styleId="reflectInstructions" styleClass="form-control" rows="3" />
+		<form:input path="taskList.reflectInstructions"	id="reflectInstructions" cssClass="form-control" rows="3" />
 	</div>
 
 </lams:SimplePanel>

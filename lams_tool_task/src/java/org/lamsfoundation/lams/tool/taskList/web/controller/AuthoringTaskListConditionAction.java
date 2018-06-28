@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.taskList.web.action;
+package org.lamsfoundation.lams.tool.taskList.web.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.tool.taskList.web.form.TaskListForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -65,8 +66,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <code>AuthoringAction</code> action.
  *
  * @author Andrey Balan
- * @see org.lamsfoundation.lams.tool.taskList.web.action.AuthoringAction
+ * @see org.lamsfoundation.lams.tool.taskList.web.controller.AuthoringController
  */
+
 public class AuthoringTaskListConditionAction extends Action {
 
     @Override
