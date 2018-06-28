@@ -141,6 +141,11 @@
         redirect="false"
       />
       <forward
+        name="policyConsents"
+        path="/policyConsents.do"
+        redirect="false"
+      />
+      <forward
         name="portrait"
         path="/portrait.do"
         redirect="false"
@@ -552,6 +557,16 @@
         redirect="false"
       />
       <forward
+        name="profilePolicyConsents"
+        path="/profile/profilePolicyConsents.jsp"
+        redirect="false"
+      />
+      <forward
+        name="policyDetails"
+        path="/profile/policyDetails.jsp"
+        redirect="false"
+      />
+      <forward
         name="edit"
         path="/editprofile.jsp"
         redirect="false"
@@ -654,7 +669,27 @@
         path="/twoFactorAuthSecret.jsp"
         redirect="false"
       />
-    </action>    
+    </action>   
+
+    <action
+      path="/policyConsents"
+      type="org.lamsfoundation.lams.web.action.PolicyConsentsAction"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="policyConsents"
+        path="/policyConsents.jsp"
+        redirect="false"
+      />
+      <forward
+        name="index"
+        path="/index.do"
+        redirect="true"
+      />
+    </action> 
+     
     <action
       path="/passwordChanged"
       type="org.lamsfoundation.lams.web.PasswordChangeAction"

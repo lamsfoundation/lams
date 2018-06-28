@@ -160,6 +160,18 @@
 	<form-property name="context" type="java.lang.String" />
 </form-bean>
 
+<form-bean name="PolicyForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="policyUid" type="java.lang.Long" />
+	<form-property name="policyId" type="java.lang.Long" />
+	<form-property name="policyName" type="java.lang.String" />
+	<form-property name="summary" type="java.lang.String" />
+	<form-property name="fullPolicy" type="java.lang.String" />
+	<form-property name="policyTypeId" type="java.lang.Integer" />
+	<form-property name="version" type="java.lang.String" />
+	<form-property name="policyStateId" type="java.lang.Integer" initial="1"/>
+	<form-property name="minorChange" type="java.lang.Boolean" initial="0" />
+</form-bean>
+
 <form-bean name="OrgPasswordChangeForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="organisationID" type="java.lang.Integer" />
 	<form-property name="orgName" type="java.lang.String" />
@@ -860,6 +872,41 @@
       <forward
         name="signupPageListMethod"
         path="/signupManagement.do?method=list"
+        redirect="false"
+      />
+    </action>
+     <action
+      path="/policyManagement"
+      type="org.lamsfoundation.lams.admin.web.action.PolicyManagementAction"
+      name="PolicyForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="policyList"
+        path=".policyList"
+        redirect="false"
+      />
+      <forward
+        name="editPolicy"
+        path=".editPolicy"
+        redirect="false"
+      />
+      <forward
+        name="policyListRedirect"
+        path="/policyManagement.do?method=list"
+        redirect="true"
+      />
+      <forward
+        name="policyTable"
+        path="/policies/policyTable.jsp"
+        redirect="false"
+      />
+      <forward
+        name="userConsents"
+        path="/policies/userConsents.jsp"
         redirect="false"
       />
     </action>
