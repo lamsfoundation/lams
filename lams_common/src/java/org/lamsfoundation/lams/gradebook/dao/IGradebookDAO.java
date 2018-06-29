@@ -20,14 +20,15 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook.dao;
 
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
+import org.lamsfoundation.lams.gradebook.GradebookUserActivityArchive;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
+import org.lamsfoundation.lams.gradebook.GradebookUserLessonArchive;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -40,7 +41,7 @@ public interface IGradebookDAO extends IBaseDAO {
     GradebookUserActivity getGradebookUserDataForActivity(Long activityID, Integer userID);
 
     List<GradebookUserActivity> getGradebookUserActivitiesForLesson(Long lessonID, Integer userID);
-    
+
 //    Double getGradebookUserActivityMarkSum(Long lessonID, Integer userID);
 
     List<GradebookUserActivity> getAllGradebookUserActivitiesForActivity(Long activityID);
@@ -60,7 +61,7 @@ public interface IGradebookDAO extends IBaseDAO {
     long getMedianTimeTakenLesson(Long lessonID);
 
     long getMedianTimeTakenForActivity(Long activityID);
-    
+
     long getMinTimeTakenForActivity(Long activityID);
 
     long getMaxTimeTakenForActivity(Long activityID);
@@ -70,11 +71,10 @@ public interface IGradebookDAO extends IBaseDAO {
     Double getAverageMarkForGroupedActivity(Long activityID, Long groupID);
 
     long getMedianTimeTakenForGroupedActivity(Long activityID, Long groupID);
-    
-    long getMinTimeTakenForGroupedActivity(Long activityID, Long groupID);
-    
-    long getMaxTimeTakenForGroupedActivity(Long activityID, Long groupID);
 
+    long getMinTimeTakenForGroupedActivity(Long activityID, Long groupID);
+
+    long getMaxTimeTakenForGroupedActivity(Long activityID, Long groupID);
 
     List<Lesson> getLessonsByGroupAndUser(final Integer userId, final Integer orgId, int page, int size, String sortBy,
 	    String sortOrder, String searchString);
@@ -112,6 +112,12 @@ public interface IGradebookDAO extends IBaseDAO {
     List<GradebookUserLesson> getGradebookUserLessons(Lesson lesson, List<Integer> userIds);
 
     List<GradebookUserLesson> getGradebookUserLessons(List<Long> lessonIds);
-    
+
     List<Number> getAllMarksForLesson(Long lessonID);
+
+    boolean hasArchivedMarks(Long lessonId, Integer userId);
+
+    List<GradebookUserLessonArchive> getArchivedLessonMarks(Long lessonId, Integer userId);
+
+    List<GradebookUserActivityArchive> getArchivedActivityMarks(Long activityId, Integer userId);
 }

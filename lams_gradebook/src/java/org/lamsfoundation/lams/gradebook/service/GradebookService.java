@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.gradebook.GradebookUserActivityArchive;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.GradebookUserLessonArchive;
 import org.lamsfoundation.lams.gradebook.dao.IGradebookDAO;
+import org.lamsfoundation.lams.gradebook.dto.GBActivityArchiveGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBActivityGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
@@ -187,6 +188,36 @@ public class GradebookService implements IGradebookService {
 	    }
 
 	    gradebookActivityDTOs.add(activityDTO);
+	}
+
+	return gradebookActivityDTOs;
+    }
+
+    @Override
+    public List<GradebookGridRowDTO> getGBActivityArchiveRowsForLearner(Long activityId, Integer userId,
+	    TimeZone userTimezone) {
+	GradebookService.logger
+		.debug("Getting archive gradebook user data for activity: " + activityId + ". For user: " + userId);
+
+	Lesson lesson = (Lesson) getActivityById(activityId).getLearningDesign().getLessons().iterator().next();
+
+	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
+	List<GradebookUserLessonArchive> lessonArchives = gradebookDAO.getArchivedLessonMarks(lesson.getLessonId(),
+		userId);
+	int attemptOrder = lessonArchives.size();
+	List<GradebookUserActivityArchive> activityArchives = gradebookDAO.getArchivedActivityMarks(activityId, userId);
+	for (GradebookUserLessonArchive lessonArchive : lessonArchives) {
+	    GBActivityArchiveGridRowDTO activityDTO = new GBActivityArchiveGridRowDTO(attemptOrder,
+		    lessonArchive.getArchiveDate(), lessonArchive.getMark());
+	    for (GradebookUserActivityArchive activityArchive : activityArchives) {
+		if (lessonArchive.getArchiveDate().equals(activityArchive.getArchiveDate())) {
+		    activityDTO.setMark(activityArchive.getMark());
+		    activityDTO.setFeedback(activityArchive.getFeedback());
+		    break;
+		}
+	    }
+	    gradebookActivityDTOs.add(activityDTO);
+	    attemptOrder--;
 	}
 
 	return gradebookActivityDTOs;
@@ -420,6 +451,9 @@ public class GradebookService implements IGradebookService {
 		    gradebookUserDTO.setFeedback(gradebookUserLesson.getFeedback());
 		    gradebookUserDTO.setDisplayMarkAsPercent(isWeighted);
 		}
+
+		boolean hasArchivedMarks = gradebookDAO.hasArchivedMarks(lesson.getLessonId(), learner.getUserId());
+		gradebookUserDTO.setHasArchivedMarks(hasArchivedMarks);
 
 	    }
 	}
