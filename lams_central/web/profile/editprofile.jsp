@@ -80,9 +80,10 @@
 							<c:if test="${authenticationMethodId eq dbId}">
 
 								<div class="form-group">
-									<span class="lead"><label><fmt:message
-												key="label.username" /></label>: <bean:write name="UserForm"
-											property="login" /></span>
+									<span class="lead">
+										<label><fmt:message key="label.username" /></label>: 
+										<bean:write name="UserForm" property="login" />
+									</span>
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.title" />:</label>
@@ -145,9 +146,18 @@
 										disabled="${!profileEditEnabled}" styleClass="form-control" />
 								</div>
 								<div class="form-group">
-									<label><fmt:message key="label.country" />:</label>
-									<html:text property="country" size="50" maxlength="64"
-										disabled="${!profileEditEnabled}" styleClass="form-control" />
+									<label><fmt:message key="label.country" /> *:</label>
+
+									<html:select property="country" disabled="${!profileEditEnabled}" styleClass="form-control">
+										<html:option value="0">
+											<fmt:message key="label.select.country" />
+										</html:option>
+										<c:forEach items="${countryCodes}" var="countryCode">
+											<html:option value="${countryCode}">
+												<fmt:message key="country.${countryCode}" />
+											</html:option>
+										</c:forEach>
+									</html:select>
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.day_phone" />:</label>

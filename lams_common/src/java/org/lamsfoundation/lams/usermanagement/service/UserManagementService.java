@@ -70,6 +70,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
@@ -1118,7 +1119,7 @@ public class UserManagementService implements IUserManagementService {
 		//resize to the large size
 		is = new FileInputStream(portraitFile);
 		InputStream modifiedPortraitInputStream = ResizePictureUtil.resize(is,
-			PORTRAIT_LARGEST_DIMENSION_LARGE);
+			CommonConstants.PORTRAIT_LARGEST_DIMENSION_LARGE);
 		NodeKey node = centralToolContentHandler.updateFile(originalFileNode.getUuid(),
 			modifiedPortraitInputStream, fileNameWithoutExt + "_large.jpg", "image/jpeg");
 		modifiedPortraitInputStream.close();
@@ -1130,7 +1131,7 @@ public class UserManagementService implements IUserManagementService {
 
 		//resize to the medium size
 		is = new FileInputStream(portraitFile);
-		modifiedPortraitInputStream = ResizePictureUtil.resize(is, PORTRAIT_LARGEST_DIMENSION_MEDIUM);
+		modifiedPortraitInputStream = ResizePictureUtil.resize(is, CommonConstants.PORTRAIT_LARGEST_DIMENSION_MEDIUM);
 		node = centralToolContentHandler.updateFile(node.getUuid(), modifiedPortraitInputStream,
 			fileNameWithoutExt + "_medium.jpg", "image/jpeg");
 		modifiedPortraitInputStream.close();
@@ -1142,7 +1143,7 @@ public class UserManagementService implements IUserManagementService {
 
 		//resize to the small size
 		is = new FileInputStream(portraitFile);
-		modifiedPortraitInputStream = ResizePictureUtil.resize(is, PORTRAIT_LARGEST_DIMENSION_SMALL);
+		modifiedPortraitInputStream = ResizePictureUtil.resize(is, CommonConstants.PORTRAIT_LARGEST_DIMENSION_SMALL);
 		node = centralToolContentHandler.updateFile(node.getUuid(), modifiedPortraitInputStream,
 			fileNameWithoutExt + "_small.jpg", "image/jpeg");
 		modifiedPortraitInputStream.close();

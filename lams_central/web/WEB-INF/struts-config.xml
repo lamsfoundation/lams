@@ -74,6 +74,7 @@
 	<form-property name="firstName" type="java.lang.String" />
 	<form-property name="lastName" type="java.lang.String" />
 	<form-property name="email" type="java.lang.String" />
+	<form-property name="country" type="java.lang.String" />
 	<form-property name="confirmEmail" type="java.lang.String" />
 	<form-property name="courseKey" type="java.lang.String" />
 	<form-property name="submitted" type="java.lang.Boolean" />
@@ -485,7 +486,7 @@
     >
       <forward
         name="portrait"
-        path="/portrait.jsp"
+        path="/profile/portrait.jsp"
         redirect="false"
       />
     </action>
@@ -522,7 +523,7 @@
       type="org.lamsfoundation.lams.web.ProfileSaveAction"
       name="UserForm"
       scope="request"
-      input="/editprofile.jsp"
+      input="/profile/editprofile.jsp"
       unknown="false"
       validate="false"
     >
@@ -548,12 +549,12 @@
     >
       <forward
         name="view"
-        path="/profile.jsp"
+        path="/profile/profile.jsp"
         redirect="false"
       />
       <forward
         name="lessons"
-        path="/lessons.jsp"
+        path="/profile/lessons.jsp"
         redirect="false"
       />
       <forward
@@ -568,7 +569,7 @@
       />
       <forward
         name="edit"
-        path="/editprofile.jsp"
+        path="/profile/editprofile.jsp"
         redirect="false"
       />
     </action>
@@ -590,7 +591,7 @@
       type="org.lamsfoundation.lams.web.PortraitSaveAction"
       name="PortraitActionForm"
       scope="request"
-      input="/portrait.jsp"
+      input="/profile/portrait.jsp"
       parameter="method"
       unknown="false"
       validate="false"
