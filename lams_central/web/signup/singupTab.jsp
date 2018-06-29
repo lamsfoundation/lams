@@ -26,41 +26,32 @@
 	mustHaveSymbols   = ${mustHaveSymbols};
 
 	$.validator.addMethod("pwcheck", function(value) {
-	 return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
-	(!mustHaveNumerics || /\d/.test(value)) && // has a digit
-	(!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
-	(!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
+		 return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
+			(!mustHaveNumerics || /\d/.test(value)) && // has a digit
+			(!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
+			(!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
 	});
-
 	$.validator.addMethod("charactersAllowed", function(value) {
 		return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/
 				.test(value)
-
 	});
 	$.validator.addMethod("charactersNotAllowed", function(value) {
 		return /^[^<>^!#&()/\\|\"?,:{}= ~`*%$]*$/.test(value)
-
 	});
-
 	$.validator.addMethod("charactersNotAllowedName", function(value) {
 		return /^[^<>^*@%$]*$/.test(value)
-
 	});
-	$.validator
-			.addMethod(
-					"emailCheck",
-					function(value) {
-						return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-								.test(value)
-
-					});
+	$.validator.addMethod("emailCheck", function(value) {
+		return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+			.test(value)
+	});
+	$.validator.addMethod("notEqualTo", function(value, element, param) {
+		return this.optional(element) || value != param;
+	}, "Please specify a different (non-default) value");
 
 	$(function() {
 		// Setup form validation 
-
-		$("#SignupForm")
-				.validate(
-						{
+		$("#SignupForm").validate({
 							debug : true,
 							errorClass : 'help-block',
 							//  validation rules
@@ -101,6 +92,10 @@
 									maxlength : 255,
 									equalTo : $('form input[name="email"]')
 								},
+								country : {
+									required: true,
+									notEqualTo: "0"
+								}
 
 							},
 
@@ -131,12 +126,15 @@
 								confirmEmail : {
 									equalTo : "<fmt:message key='error.emails.unequal'/>"
 								},
+								country: {
+									required: "<fmt:message key='error.country.required'/>",
+									notEqualTo: "<fmt:message key='error.country.required'/>"
+								}
 							},
 							submitHandler : function(form) {
 								form.submit();
 							}
-						});
-
+		});
 	});
 </script>
 <div>
@@ -245,6 +243,25 @@
 									styleClass="form-control" />
 								<span style="display: none;'" class="confirmEmail error"><fmt:message
 										key="error.emails.unequal" /></span>
+							</div>
+							
+							<div class="form-group">
+								<label for="country">
+									<fmt:message key="label.country" />
+								</label>:
+
+								<html:select property="country" styleClass="form-control">
+									<html:option value="0">
+										<fmt:message key="label.select.country" />
+									</html:option>
+									
+									<c:forEach items="${countryCodes}" var="countryCode">
+										<html:option value="${countryCode}">
+											<fmt:message key="country.${countryCode}" />
+										</html:option>
+									</c:forEach>
+								</html:select>
+								<html:errors property="country" />
 							</div>
 
 

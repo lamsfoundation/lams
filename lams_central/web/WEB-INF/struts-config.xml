@@ -74,6 +74,7 @@
 	<form-property name="firstName" type="java.lang.String" />
 	<form-property name="lastName" type="java.lang.String" />
 	<form-property name="email" type="java.lang.String" />
+	<form-property name="country" type="java.lang.String" />
 	<form-property name="confirmEmail" type="java.lang.String" />
 	<form-property name="courseKey" type="java.lang.String" />
 	<form-property name="submitted" type="java.lang.Boolean" />

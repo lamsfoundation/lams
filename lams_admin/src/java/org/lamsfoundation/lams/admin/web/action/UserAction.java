@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -86,11 +87,11 @@ public class UserAction extends LamsDispatchAction {
 	if (messageService == null) {
 	    messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
 	}
-	if (UserAction.themeService == null) {
-	    UserAction.themeService = AdminServiceProxy.getThemeService(getServlet().getServletContext());
+	if (themeService == null) {
+	    themeService = AdminServiceProxy.getThemeService(getServlet().getServletContext());
 	}
-	if (UserAction.timezoneService == null) {
-	    UserAction.timezoneService = AdminServiceProxy.getTimezoneService(getServlet().getServletContext());
+	if (timezoneService == null) {
+	    timezoneService = AdminServiceProxy.getTimezoneService(getServlet().getServletContext());
 	}
     }
 
@@ -99,12 +100,12 @@ public class UserAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws Exception {
 
 	initServices();
-	if (UserAction.locales == null) {
-	    UserAction.locales = service.findAll(SupportedLocale.class);
-	    Collections.sort(UserAction.locales);
+	if (locales == null) {
+	    locales = service.findAll(SupportedLocale.class);
+	    Collections.sort(locales);
 	}
-	if (UserAction.authenticationMethods == null) {
-	    UserAction.authenticationMethods = service.findAll(AuthenticationMethod.class);
+	if (authenticationMethods == null) {
+	    authenticationMethods = service.findAll(AuthenticationMethod.class);
 	}
 
 	DynaActionForm userForm = (DynaActionForm) form;
@@ -112,11 +113,11 @@ public class UserAction extends LamsDispatchAction {
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
 
 	// Get all the css themess
-	List<Theme> themes = UserAction.themeService.getAllThemes();
+	List<Theme> themes = themeService.getAllThemes();
 	request.setAttribute("themes", themes);
 
 	// Select the default themes by default
-	Theme defaultTheme = UserAction.themeService.getDefaultTheme();
+	Theme defaultTheme = themeService.getDefaultTheme();
 	for (Theme theme : themes) {
 	    if (theme.getThemeId().equals(defaultTheme.getThemeId())) {
 		userForm.set("userTheme", theme.getThemeId());
@@ -152,7 +153,7 @@ public class UserAction extends LamsDispatchAction {
 	// editing a user
 	if ((userId != null) && (userId != 0)) {
 	    User user = (User) service.findById(User.class, userId);
-	    UserAction.log.debug("got userid to edit: " + userId);
+	    log.debug("got userid to edit: " + userId);
 	    BeanUtils.copyProperties(userForm, user);
 	    userForm.set("password", null);
 	    SupportedLocale locale = user.getLocale();
@@ -176,7 +177,7 @@ public class UserAction extends LamsDispatchAction {
 	    }
 	    // if still null, use the default
 	    if (userSelectedTheme == null) {
-		userSelectedTheme = UserAction.themeService.getDefaultTheme().getThemeId();
+		userSelectedTheme = themeService.getDefaultTheme().getThemeId();
 	    }
 	    userForm.set("userTheme", userSelectedTheme);
 	    userForm.set("initialPortraitId", user.getPortraitUuid());
@@ -188,7 +189,7 @@ public class UserAction extends LamsDispatchAction {
 		SupportedLocale locale = LanguageUtil.getDefaultLocale();
 		userForm.set("localeId", locale.getLocaleId());
 	    } catch (Exception e) {
-		UserAction.log.debug(e);
+		log.debug(e);
 	    }
 	}
 	userForm.set("orgId", (org == null ? null : org.getOrganisationId()));
@@ -199,7 +200,7 @@ public class UserAction extends LamsDispatchAction {
 	}
 
 	// Get all available time zones
-	List<Timezone> availableTimeZones = UserAction.timezoneService.getDefaultTimezones();
+	List<Timezone> availableTimeZones = timezoneService.getDefaultTimezones();
 	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<TimezoneDTO>(new TimezoneDTOComparator());
 	for (Timezone availableTimeZone : availableTimeZones) {
 	    String timezoneId = availableTimeZone.getTimezoneId();
@@ -220,8 +221,9 @@ public class UserAction extends LamsDispatchAction {
 	    }
 	}
 
-	request.setAttribute("locales", UserAction.locales);
-	request.setAttribute("authenticationMethods", UserAction.authenticationMethods);
+	request.setAttribute("locales", locales);
+	request.setAttribute("countryCodes", CommonConstants.COUNTRY_CODES);
+	request.setAttribute("authenticationMethods", authenticationMethods);
 
 	return mapping.findForward("user");
     }
@@ -387,7 +389,7 @@ public class UserAction extends LamsDispatchAction {
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
 	User user = (User) service.findById(User.class, userId);
 
-	UserAction.log.debug("enabling user: " + userId);
+	log.debug("enabling user: " + userId);
 	user.setDisabledFlag(false);
 	service.saveUser(user);
 

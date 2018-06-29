@@ -16,6 +16,7 @@ import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.signup.model.SignupOrganisation;
 import org.lamsfoundation.lams.signup.service.ISignupService;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.Emailer;
@@ -34,18 +35,20 @@ public class SignupAction extends Action {
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	if (SignupAction.signupService == null) {
+	if (signupService == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    SignupAction.signupService = (ISignupService) wac.getBean("signupService");
+	    signupService = (ISignupService) wac.getBean("signupService");
 	}
+	
+	request.setAttribute("countryCodes", CommonConstants.COUNTRY_CODES);
 
 	DynaActionForm signupForm = (DynaActionForm) form;
 	String method = WebUtil.readStrParam(request, "method", true);
 	String context = WebUtil.readStrParam(request, "context", true);
 	SignupOrganisation signupOrganisation = null;
 	if (StringUtils.isNotBlank(context)) {
-	    signupOrganisation = SignupAction.signupService.getSignupOrganisation(context);
+	    signupOrganisation = signupService.getSignupOrganisation(context);
 	    request.setAttribute("signupOrganisation", signupOrganisation);
 	}
 	if ((signupForm.get("submitted") == null) || !((Boolean) signupForm.get("submitted"))) {
@@ -82,10 +85,11 @@ public class SignupAction extends Action {
 		user.setFirstName(signupForm.getString("firstName"));
 		user.setLastName(signupForm.getString("lastName"));
 		user.setEmail(signupForm.getString("email"));
+		user.setCountry(signupForm.getString("country"));
 		String salt = HashUtil.salt();
 		user.setSalt(salt);
 		user.setPassword(HashUtil.sha256(signupForm.getString("password"), salt));
-		SignupAction.signupService.signupUser(user, signupForm.getString("context"));
+		signupService.signupUser(user, signupForm.getString("context"));
 
 		// send email
 		try {
@@ -102,14 +106,14 @@ public class SignupAction extends Action {
 
 		    Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
 		} catch (Exception e) {
-		    SignupAction.log.error(e.getMessage(), e);
+		    log.error(e.getMessage(), e);
 		    request.setAttribute("error", e.getMessage());
 		}
 
 		return mapping.findForward("success");
 	    }
 	} catch (Exception e) {
-	    SignupAction.log.error(e.getMessage(), e);
+	    log.error(e.getMessage(), e);
 	    request.setAttribute("error", e.getMessage());
 	}
 
@@ -130,7 +134,7 @@ public class SignupAction extends Action {
 		String login = signupForm.getString("usernameTab2");
 		String password = signupForm.getString("passwordTab2");
 		String context = signupForm.getString("context");
-		SignupAction.signupService.signinUser(login, context);
+		signupService.signinUser(login, context);
 
 		HttpSession hses = request.getSession();
 		hses.setAttribute("login", login);
@@ -139,7 +143,7 @@ public class SignupAction extends Action {
 		return null;
 	    }
 	} catch (Exception e) {
-	    SignupAction.log.error(e.getMessage(), e);
+	    log.error(e.getMessage(), e);
 	    request.setAttribute("error", e.getMessage());
 	}
 
@@ -155,8 +159,8 @@ public class SignupAction extends Action {
 	    errors.add("username", new ActionMessage("error.username.blank"));
 	} else if (!ValidationUtil.isUserNameValid(userName)) {
 	    errors.add("username", new ActionMessage("error.username.invalid.characters"));
-	    SignupAction.log.info("username has invalid characters: " + userName);
-	} else if (SignupAction.signupService.usernameExists(userName)) {
+	    log.info("username has invalid characters: " + userName);
+	} else if (signupService.usernameExists(userName)) {
 	    errors.add("username", new ActionMessage("error.username.exists"));
 	}
 
@@ -166,7 +170,7 @@ public class SignupAction extends Action {
 	    errors.add("firstName", new ActionMessage("error.first.name.blank"));
 	} else if (!ValidationUtil.isFirstLastNameValid(firstName)) {
 	    errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
-	    SignupAction.log.info("firstname has invalid characters: " + firstName);
+	    log.info("firstname has invalid characters: " + firstName);
 	}
 
 	//last name validation
@@ -175,7 +179,7 @@ public class SignupAction extends Action {
 	    errors.add("lastName", new ActionMessage("error.last.name.blank"));
 	} else if (!ValidationUtil.isFirstLastNameValid(lastName)) {
 	    errors.add("lastName", new ActionMessage("error.lastname.invalid.characters"));
-	    SignupAction.log.info("lastName has invalid characters: " + lastName);
+	    log.info("lastName has invalid characters: " + lastName);
 	}
 
 	//password validation
@@ -197,9 +201,15 @@ public class SignupAction extends Action {
 	} else if (!StringUtils.equals(userEmail, signupForm.getString("confirmEmail"))) {
 	    errors.add("email", new ActionMessage("error.emails.unequal"));
 	}
+	
+	//country validation
+	String country = (signupForm.get("country") == null) ? null : (String) signupForm.get("country");
+	if (StringUtils.isBlank(country) || "0".equals(country)) {
+	    errors.add("email", new ActionMessage("error.country.required"));
+	}
 
 	// courseKey validation
-	if (!SignupAction.signupService.courseKeyIsValid(signupForm.getString("context"),
+	if (!signupService.courseKeyIsValid(signupForm.getString("context"),
 		signupForm.getString("courseKey"))) {
 	    errors.add("courseKey", new ActionMessage("error.course.key.invalid"));
 	}
@@ -214,7 +224,7 @@ public class SignupAction extends Action {
 	if (StringUtils.isBlank(signupForm.getString("passwordTab2"))) {
 	    errors.add("passwordTab2", new ActionMessage("error.password.blank"));
 	}
-	if (!SignupAction.signupService.courseKeyIsValid(signupForm.getString("context"),
+	if (!signupService.courseKeyIsValid(signupForm.getString("context"),
 		signupForm.getString("courseKeyTab2"))) {
 	    errors.add("courseKeyTab2", new ActionMessage("error.course.key.invalid"));
 	}
@@ -222,7 +232,7 @@ public class SignupAction extends Action {
 	if (errors.isEmpty()) {
 	    String login = signupForm.getString("usernameTab2");
 	    String password = signupForm.getString("passwordTab2");
-	    User user = SignupAction.signupService.getUserByLogin(login);
+	    User user = signupService.getUserByLogin(login);
 	    if (user == null) {
 		errors.add("usernameTab2", new ActionMessage("error.login.or.password.incorrect",
 			"<a onclick='selectSignupTab();' id='selectLoginTabA'>", "</a>"));

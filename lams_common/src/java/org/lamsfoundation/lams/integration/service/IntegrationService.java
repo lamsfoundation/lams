@@ -36,6 +36,7 @@ import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +73,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CSVUtil;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
@@ -433,6 +435,15 @@ public class IntegrationService implements IIntegrationService {
 		    + "Email format is invalid. External server:" + extServer.getServerid() + ", Username:" + login
 		    + ", firstName:" + firstName + ", lastName:" + lastName);
 	}
+	
+	//set user's country to default value if it wasn't provided or has a wrong value
+	String country = userData[7];
+	if (StringUtils.isBlank(country) || !Arrays.asList(CommonConstants.COUNTRY_CODES).contains(country)) {
+	    country = userData[13];
+	    if (StringUtils.isBlank(country) || !Arrays.asList(CommonConstants.COUNTRY_CODES).contains(country)) {
+		country = LanguageUtil.getDefaultLangCountry()[1];
+	    }
+	}
 
 	User user = new User();
 	user.setLogin(login);
@@ -445,7 +456,7 @@ public class IntegrationService implements IIntegrationService {
 	user.setCity(userData[4]);
 	user.setState(userData[5]);
 	user.setPostcode(userData[6]);
-	user.setCountry(userData[7]);
+	user.setCountry(country);
 	user.setDayPhone(userData[8]);
 	user.setMobilePhone(userData[9]);
 	user.setFax(userData[10]);

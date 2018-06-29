@@ -61,6 +61,7 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
@@ -240,6 +241,8 @@ public class ProfileAction extends LamsDispatchAction {
 	}
 	userForm.set("localeId", locale.getLocaleId());
 	request.setAttribute("locales", locales);
+	
+	request.setAttribute("countryCodes", CommonConstants.COUNTRY_CODES);
 
 	themeService = getThemeService();
 
