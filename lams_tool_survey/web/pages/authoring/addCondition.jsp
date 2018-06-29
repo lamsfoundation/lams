@@ -10,7 +10,7 @@
 <div class="panel-body">	
 
 	<%@ include file="/common/messages.jsp"%>
-	<form:form action="saveOrUpdateCondition.do" method="post" modelAttribute="surveyConditionForm" id="surveyConditionForm" focus="displayName" >
+	<form:form action="../authoringCondition/saveOrUpdateCondition.do" method="post" modelAttribute="surveyConditionForm" id="surveyConditionForm" focus="displayName" >
 		<form:hidden path="orderId" />
 		
 		<div class="form-group">
@@ -21,7 +21,7 @@
 		<%-- Text search form fields are being included --%>
 		<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}"  />
 		<h4><fmt:message key="textsearch.questions" /></h4>
-		<c:forEach var="itemE" items="possibleItems">
+		<c:forEach var="itemE" items="${surveyConditionForm.possibleItems}">
 			<div class="checkbox">
 			<label>
 		  	<form:checkbox path="selectedItems" value="${itemE.value }"/>

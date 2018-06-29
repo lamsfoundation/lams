@@ -20,13 +20,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.survey.web.form;
 
 import org.apache.struts.util.LabelValueBean;
 import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
-import org.lamsfoundation.lams.web.TextSearchActionForm;
+import org.lamsfoundation.lams.web.TextSearchForm;
 
 /**
  * A text search form with additional parameters for Survey needs.
@@ -35,7 +34,7 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
  * @author Marcin Cieslak
  *
  */
-public class SurveyConditionForm extends TextSearchActionForm {
+public class SurveyConditionForm extends TextSearchForm {
     /**
      * Names of the questions that could be selected by a user.
      */

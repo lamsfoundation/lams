@@ -53,10 +53,10 @@
 
 <%-- Default value for message key --%>
 <c:if test="${empty action}">
-	<c:set var="action" value="authoring/textsearch.do" scope="request"/>
+	<c:set var="action" value="textsearch.do" scope="request"/>
 </c:if>
 <c:if test="${empty cancelAction}">
-	<c:set var="cancelAction" value="authoring/textsearchCancel.do" scope="request"/>
+	<c:set var="cancelAction" value="textsearchCancel.do" scope="request"/>
 </c:if>
 <c:if test="${empty formID}">
 	<c:set var="formID" value="textSearchForm" scope="request"/>
@@ -86,9 +86,9 @@
 <!-- begin text search form content -->
 	
 <c:if test="${wrapInFormTag}">
-	<form action="${action}" id="${formID}" name="${formID}">
+	<form:form action="${action}" id="${formID}">
 </c:if>
-		<html:hidden property="sessionMapID" />
+		<form:hidden path="sessionMapID" />
 		<h4><fmt:message key="${headingLabelKey}" /></h4>
 		<table>
 			<tr>
@@ -96,7 +96,7 @@
 					<fmt:message key="${allWordsLabelKey}" />
 				</td>
 				<td>
-					<html:text size="40" property="allWords" />
+					<form:input size="40" path="allWords" />
 				</td>
 			</tr>
 			<tr>
@@ -104,7 +104,7 @@
 					<fmt:message key="${phraseLabelKey}" />
 				</td>
 				<td>
-					<html:text size="40" property="phrase" />
+					<form:input size="40" path="phrase" />
 				</td>
 			</tr>
 			<tr>
@@ -112,7 +112,7 @@
 					<fmt:message key="${anyWordsLabelKey}" />
 				</td>
 				<td>
-					<html:text size="40" property="anyWords" /> 
+					<form:input size="40" path="anyWords" /> 
 				</td>
 			</tr>
 			<tr>
@@ -120,7 +120,7 @@
 					<fmt:message key="${excludedWordsLabelKey}" />
 				</td>
 				<td>
-					<html:text size="40" property="excludedWords" /> 
+					<form:input size="40" path="excludedWords" /> 
 				</td>
 			</tr>
 		</table>

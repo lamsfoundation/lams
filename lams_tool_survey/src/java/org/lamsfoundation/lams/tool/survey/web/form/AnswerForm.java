@@ -23,8 +23,6 @@
 
 package org.lamsfoundation.lams.tool.survey.web.form;
 
-import org.apache.struts.action.ActionForm;
-
 /**
  * Survey Item Form.
  *
@@ -32,7 +30,7 @@ import org.apache.struts.action.ActionForm;
  *
  * @version $Revision$
  */
-public class AnswerForm extends ActionForm {
+public class AnswerForm {
     private String sessionMapID;
     private Integer questionSeqID;
     private int position;

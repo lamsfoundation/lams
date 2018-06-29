@@ -31,19 +31,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.util.MessageResources;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -53,26 +51,31 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @author Steve.Ni
  */
-public class ChartAction extends Action {
+@Controller
+public class ChartAction {
 
     private static Logger logger = Logger.getLogger(ChartAction.class);
 
-    private static ISurveyService surveyService;
-    private MessageResources resource;
+    @Autowired
+    @Qualifier("lasurvSurveyService")
+    private ISurveyService surveyService;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	resource = getResources(request);
+    @Autowired
+    @Qualifier("lasurvMessageSource")
+    private MessageSource resource;
+
+    @RequestMapping("/showChart")
+    public String execute(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long questionUid = WebUtil.readLongParam(request, SurveyConstants.ATTR_QUESTION_UID);
 
 	// if excludeUserId received exclude this user's answers
-	AnswerDTO answer = getSurveyService().getQuestionResponse(sessionId, questionUid);
+	AnswerDTO answer = surveyService.getQuestionResponse(sessionId, questionUid);
 	if (answer.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 	    ChartAction.logger.error("Error question type : Text entry can not generate chart.");
-	    response.getWriter().print(resource.getMessage(SurveyConstants.ERROR_MSG_CHART_ERROR));
+	    response.getWriter().print(resource.getMessage(SurveyConstants.ERROR_MSG_CHART_ERROR, null, null));
 	    return null;
 	}
 
@@ -88,7 +91,7 @@ public class ChartAction extends Action {
 
 	if (answer.isAppendText()) {
 	    ObjectNode nomination = JsonNodeFactory.instance.objectNode();
-	    nomination.put("name", resource.getMessage(SurveyConstants.MSG_OPEN_RESPONSE));
+	    nomination.put("name", resource.getMessage(SurveyConstants.MSG_OPEN_RESPONSE, null, null));
 	    nomination.put("value", (Double) answer.getOpenResponse());
 	    responseJSON.withArray("data").add(nomination);
 	}
@@ -98,12 +101,4 @@ public class ChartAction extends Action {
 	return null;
     }
 
-    private ISurveyService getSurveyService() {
-	if (ChartAction.surveyService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    ChartAction.surveyService = (ISurveyService) wac.getBean(SurveyConstants.SURVEY_SERVICE);
-	}
-	return ChartAction.surveyService;
-    }
 }

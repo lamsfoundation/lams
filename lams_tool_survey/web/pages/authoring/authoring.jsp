@@ -30,7 +30,7 @@
 </lams:head>
 <body class="stripes" onLoad="init()">
 
-	<form:form action="update.do" method="post" modelAttribute="authoringForm" id="authoringForm" enctype="multipart/form-data">
+	<form:form action="update.do" method="post" modelAttribute="authoringForm" id="authoringForm">
 		<form:hidden path="survey.contentId" />
 		<input type="hidden" name="mode" value="${mode}"/>
 		<form:hidden path="sessionMapID" />

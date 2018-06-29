@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.survey.web.controller;
 
 import java.util.ArrayList;
@@ -32,16 +31,10 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.util.LabelValueBean;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
@@ -53,8 +46,11 @@ import org.lamsfoundation.lams.tool.survey.util.QuestionsComparator;
 import org.lamsfoundation.lams.tool.survey.web.form.SurveyConditionForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Auxiliary action in author mode. It contains operations with SurveyCondition. The rest of operations are located in
@@ -63,65 +59,44 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Marcin Cieslak
  * @see org.lamsfoundation.lams.tool.survey.web.controller.AuthoringAction
  */
-public class AuthoringConditionAction extends Action {
+@Controller
+@RequestMapping("/authoringCondition")
+public class AuthoringConditionController {
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	String param = mapping.getParameter();
-
-	if (param.equals("newConditionInit")) {
-	    return newConditionInit(mapping, form, request, response);
-	}
-	if (param.equals("editCondition")) {
-	    return editCondition(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdateCondition")) {
-	    return saveOrUpdateCondition(mapping, form, request, response);
-	}
-	if (param.equals("removeCondition")) {
-	    return removeCondition(mapping, form, request, response);
-	}
-	if (param.equals("upCondition")) {
-	    return upCondition(mapping, form, request, response);
-	}
-	if (param.equals("downCondition")) {
-	    return downCondition(mapping, form, request, response);
-	}
-	return null;
-    }
+    @Autowired
+    @Qualifier("lasurvSurveyService")
+    private ISurveyService surveyService;
 
     /**
      * Display empty page for a new condition.
      *
-     * @param mapping
-     * @param form
+     * @param surveyConditionForm
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward newConditionInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
 
-	populateFormWithPossibleItems(form, request);
-	((SurveyConditionForm) form).setOrderId(-1);
-	return mapping.findForward("addcondition");
+    @RequestMapping("/newConditionInit")
+    public String newConditionInit(HttpServletRequest request) {
+
+	SurveyConditionForm surveyConditionForm = new SurveyConditionForm();
+	String sessionMapId = request.getParameter(SurveyConstants.ATTR_SESSION_MAP_ID);
+	surveyConditionForm.setSessionMapID(sessionMapId);
+	populateFormWithPossibleItems(surveyConditionForm, request);
+	surveyConditionForm.setOrderId(-1);
+	request.setAttribute("surveyConditionForm", surveyConditionForm);
+	return "pages/authoring/addCondition";
     }
 
     /**
      * Display edit page for an existing condition.
      *
-     * @param mapping
-     * @param form
+     * @param SurveyConditionForm
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward editCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/editCondition")
+    public String editCondition(SurveyConditionForm SurveyConditionForm, HttpServletRequest request) {
 
-	SurveyConditionForm SurveyConditionForm = (SurveyConditionForm) form;
 	String sessionMapID = SurveyConditionForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
@@ -129,15 +104,15 @@ public class AuthoringConditionAction extends Action {
 	SurveyCondition condition = null;
 	if (orderId != -1) {
 	    SortedSet<SurveyCondition> conditionSet = getSurveyConditionSet(sessionMap);
-	    List<SurveyCondition> conditionList = new ArrayList<SurveyCondition>(conditionSet);
+	    List<SurveyCondition> conditionList = new ArrayList<>(conditionSet);
 	    condition = conditionList.get(orderId);
 	    if (condition != null) {
 		populateConditionToForm(orderId, condition, SurveyConditionForm, request);
 	    }
 	}
 
-	populateFormWithPossibleItems(form, request);
-	return condition == null ? null : mapping.findForward("addcondition");
+	populateFormWithPossibleItems(SurveyConditionForm, request);
+	return condition == null ? null : "/pages/authoring/addCondition";
     }
 
     /**
@@ -152,33 +127,32 @@ public class AuthoringConditionAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward saveOrUpdateCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/saveOrUpdateCondition")
+    public String saveOrUpdateCondition(SurveyConditionForm surveyConditionForm, Errors errors,
+	    HttpServletRequest request) {
 
-	SurveyConditionForm conditionForm = (SurveyConditionForm) form;
-	ActionErrors errors = validateSurveyCondition(conditionForm, request);
+//	ActionErrors errors = validateSurveyCondition(conditionForm, request);
 
-	if (!errors.isEmpty()) {
-	    populateFormWithPossibleItems(form, request);
-	    this.addErrors(request, errors);
-	    return mapping.findForward("addcondition");
+	validateSurveyCondition(surveyConditionForm, request, errors);
+	if (errors.hasErrors()) {
+	    populateFormWithPossibleItems(surveyConditionForm, request);
+	    return "pages/authoring/addCondition";
 	}
 
 	try {
-	    extractFormToSurveyCondition(request, conditionForm);
+	    extractFormToSurveyCondition(request, surveyConditionForm);
 	} catch (Exception e) {
 
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.condition", e.getMessage()));
-	    if (!errors.isEmpty()) {
-		populateFormWithPossibleItems(form, request);
-		this.addErrors(request, errors);
-		return mapping.findForward("addcondition");
+	    errors.reject("error.condition");
+	    if (errors.hasErrors()) {
+		populateFormWithPossibleItems(surveyConditionForm, request);
+		return "pages/authoring/addCondition";
 	    }
 	}
 
-	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, conditionForm.getSessionMapID());
+	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, surveyConditionForm.getSessionMapID());
 
-	return mapping.findForward(SurveyConstants.SUCCESS);
+	return "pages/authoring/conditionList";
     }
 
     /**
@@ -186,13 +160,13 @@ public class AuthoringConditionAction extends Action {
      * user submit whole page. So this remove is just impact HttpSession values.
      *
      * @param mapping
-     * @param form
+     * @param surveyConditionForm
      * @param request
      * @param response
      * @return
      */
-    private ActionForward removeCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeCondition")
+    public String removeCondition(ActionForm surveyConditionForm, HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
@@ -201,7 +175,7 @@ public class AuthoringConditionAction extends Action {
 	int orderId = NumberUtils.stringToInt(request.getParameter(SurveyConstants.PARAM_ORDER_ID), -1);
 	if (orderId != -1) {
 	    SortedSet<SurveyCondition> conditionSet = getSurveyConditionSet(sessionMap);
-	    List<SurveyCondition> conditionList = new ArrayList<SurveyCondition>(conditionSet);
+	    List<SurveyCondition> conditionList = new ArrayList<>(conditionSet);
 	    SurveyCondition condition = conditionList.remove(orderId);
 	    for (SurveyCondition otherCondition : conditionSet) {
 		if (otherCondition.getOrderId() > orderId) {
@@ -216,7 +190,7 @@ public class AuthoringConditionAction extends Action {
 	}
 
 	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(SurveyConstants.SUCCESS);
+	return "pages/authoring/conditionList";
     }
 
     /**
@@ -228,9 +202,9 @@ public class AuthoringConditionAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward upCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, true);
+    @RequestMapping("/upCondition")
+    private String upCondition(HttpServletRequest request) {
+	return switchItem(request, true);
     }
 
     /**
@@ -242,12 +216,13 @@ public class AuthoringConditionAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward downCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, false);
+    @RequestMapping("/downCondition")
+    private String downCondition(HttpServletRequest request) {
+	return switchItem(request, false);
     }
 
-    private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
+    @RequestMapping("/switchItem")
+    public String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -255,7 +230,7 @@ public class AuthoringConditionAction extends Action {
 	int orderId = NumberUtils.stringToInt(request.getParameter(SurveyConstants.PARAM_ORDER_ID), -1);
 	if (orderId != -1) {
 	    SortedSet<SurveyCondition> conditionSet = getSurveyConditionSet(sessionMap);
-	    List<SurveyCondition> conditionList = new ArrayList<SurveyCondition>(conditionSet);
+	    List<SurveyCondition> conditionList = new ArrayList<>(conditionSet);
 	    // get current and the target item, and switch their sequnece
 	    SurveyCondition condition = conditionList.get(orderId);
 	    SurveyCondition repCondition;
@@ -274,20 +249,12 @@ public class AuthoringConditionAction extends Action {
 	}
 
 	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(SurveyConstants.SUCCESS);
+	return "pages/authoring/conditionList";
     }
 
     // *************************************************************************************
     // Private methods for internal needs
     // *************************************************************************************
-    /**
-     * Return SurveyService bean.
-     */
-    private ISurveyService getSurveyService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (ISurveyService) wac.getBean(SurveyConstants.SURVEY_SERVICE);
-    }
 
     /**
      * List containing survey conditions.
@@ -299,7 +266,7 @@ public class AuthoringConditionAction extends Action {
 	SortedSet<SurveyCondition> list = (SortedSet<SurveyCondition>) sessionMap
 		.get(SurveyConstants.ATTR_CONDITION_SET);
 	if (list == null) {
-	    list = new TreeSet<SurveyCondition>(new TextSearchConditionComparator());
+	    list = new TreeSet<>(new TextSearchConditionComparator());
 	    sessionMap.put(SurveyConstants.ATTR_CONDITION_SET, list);
 	}
 	return list;
@@ -308,7 +275,7 @@ public class AuthoringConditionAction extends Action {
     private SortedSet<SurveyQuestion> getSurveyQuestionSet(SessionMap sessionMap) {
 	SortedSet<SurveyQuestion> list = (SortedSet<SurveyQuestion>) sessionMap.get(SurveyConstants.ATTR_QUESTION_LIST);
 	if (list == null) {
-	    list = new TreeSet<SurveyQuestion>(new QuestionsComparator());
+	    list = new TreeSet<>(new QuestionsComparator());
 	    sessionMap.put(SurveyConstants.ATTR_QUESTION_LIST, list);
 	}
 	return list;
@@ -364,8 +331,7 @@ public class AuthoringConditionAction extends Action {
      * @param form
      * @param request
      */
-    private void populateFormWithPossibleItems(ActionForm form, HttpServletRequest request) {
-	SurveyConditionForm conditionForm = (SurveyConditionForm) form;
+    private void populateFormWithPossibleItems(SurveyConditionForm conditionForm, HttpServletRequest request) {
 	// get back sessionMAP
 	String sessionMapID = conditionForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -374,7 +340,7 @@ public class AuthoringConditionAction extends Action {
 
 	// Initialise the LabelValueBeans in the possibleOptions array.
 
-	List<LabelValueBean> lvBeans = new LinkedList<LabelValueBean>();
+	List<LabelValueBean> lvBeans = new LinkedList<>();
 	int i = 0;
 	for (SurveyQuestion question : questions) {
 	    if (question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
@@ -401,7 +367,7 @@ public class AuthoringConditionAction extends Action {
 	SurveyCondition condition = null;
 
 	if (orderId == -1) { // add
-	    String properConditionName = getSurveyService().createConditionName(conditionSet);
+	    String properConditionName = surveyService.createConditionName(conditionSet);
 	    condition = form.extractCondition();
 	    condition.setName(properConditionName);
 	    int maxOrderId = 1;
@@ -412,13 +378,13 @@ public class AuthoringConditionAction extends Action {
 	    condition.setOrderId(maxOrderId);
 	    conditionSet.add(condition);
 	} else { // edit
-	    List<SurveyCondition> conditionList = new ArrayList<SurveyCondition>(conditionSet);
+	    List<SurveyCondition> conditionList = new ArrayList<>(conditionSet);
 	    condition = conditionList.get(orderId - 1);
 	    form.extractCondition(condition);
 	}
 
 	Integer[] selectedItems = form.getSelectedItems();
-	Set<SurveyQuestion> conditionQuestions = new TreeSet<SurveyQuestion>(new QuestionsComparator());
+	Set<SurveyQuestion> conditionQuestions = new TreeSet<>(new QuestionsComparator());
 	Set<SurveyQuestion> questions = getSurveyQuestionSet(sessionMap);
 
 	for (Integer selectedItem : selectedItems) {
@@ -437,13 +403,12 @@ public class AuthoringConditionAction extends Action {
      * @param conditionForm
      * @return
      */
-    private ActionErrors validateSurveyCondition(SurveyConditionForm conditionForm, HttpServletRequest request) {
-	ActionErrors errors = new ActionErrors();
+    private void validateSurveyCondition(SurveyConditionForm conditionForm, HttpServletRequest request, Errors errors) {
 
 	String formConditionName = conditionForm.getDisplayName();
 	if (StringUtils.isBlank(formConditionName)) {
 
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.condition.name.blank"));
+	    errors.reject("error.condition.name.blank");
 	} else {
 
 	    Integer formConditionOrderId = conditionForm.getOrderId();
@@ -455,7 +420,7 @@ public class AuthoringConditionAction extends Action {
 		if (formConditionName.equals(condition.getDisplayName())
 			&& !formConditionOrderId.equals(condition.getOrderId())) {
 
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.condition.duplicated.name"));
+		    errors.reject("error.condition.duplicated.name");
 		    break;
 		}
 	    }
@@ -464,13 +429,12 @@ public class AuthoringConditionAction extends Action {
 	// should be selected at least one question
 	Integer[] selectedItems = conditionForm.getSelectedItems();
 	if (selectedItems == null || selectedItems.length == 0) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.condition.no.questions.selected"));
+	    errors.reject("error.condition.no.questions.selected");
 	}
 
-	return errors;
     }
 
-    private ActionMessages validate(SurveyConditionForm form, ActionMapping mapping, HttpServletRequest request) {
+    private ActionMessages validate(SurveyConditionForm form, HttpServletRequest request) {
 	return new ActionMessages();
     }
 }

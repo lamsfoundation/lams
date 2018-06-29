@@ -39,7 +39,6 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -245,14 +244,15 @@ public class AuthoringController {
      * @return
      */
     @RequestMapping("/newItemInit")
-    public String newItemlInit(QuestionForm questionForm, HttpServletRequest request) {
+    public String newItemlInit(@ModelAttribute("surveyItemForm") QuestionForm surveyItemForm,
+	    HttpServletRequest request) {
 
 	List instructionList = new ArrayList(AuthoringController.INIT_INSTRUCTION_COUNT);
 	for (int idx = 0; idx < AuthoringController.INIT_INSTRUCTION_COUNT; idx++) {
 	    instructionList.add("");
 	}
 	request.setAttribute("instructionList", instructionList);
-	if (questionForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
+	if (surveyItemForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 	    return "pages/authoring/parts/addopenquestion";
 	} else {
 	    return "pages/authoring/parts/addchoicequestion";
@@ -297,8 +297,8 @@ public class AuthoringController {
      * @throws ServletException
      */
     @RequestMapping("/saveOrUpdateItem")
-    public String saveOrUpdateItem(@ModelAttribute("surveyItemForm") QuestionForm surveyItemForm, Errors errors, HttpServletRequest request)
-	    throws Exception {
+    public String saveOrUpdateItem(@ModelAttribute("surveyItemForm") QuestionForm surveyItemForm, Errors errors,
+	    HttpServletRequest request) throws Exception {
 	// get instructions:
 	List<String> instructionList = getInstructionsFromRequest(request);
 
@@ -415,8 +415,7 @@ public class AuthoringController {
     }
 
     @RequestMapping("/definelater")
-    public String definelater(SurveyForm surveyForm, HttpServletRequest request, HttpServletResponse response)
-	    throws Exception {
+    public String definelater(SurveyForm startForm, HttpServletRequest request) throws Exception {
 
 	// update define later flag to true
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -450,12 +449,12 @@ public class AuthoringController {
 
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	surveyForm.setContentFolderID(contentFolderID);
+	startForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	surveyForm.setSessionMapID(sessionMap.getSessionID());
+	startForm.setSessionMapID(sessionMap.getSessionID());
 
 	survey = service.getSurveyByContentId(contentId);
 	// if survey does not exist, try to use default content instead.
@@ -470,7 +469,7 @@ public class AuthoringController {
 	    questions = new ArrayList<>(survey.getQuestions());
 	}
 
-	surveyForm.setSurvey(survey);
+	startForm.setSurvey(survey);
 
 	// init it to avoid null exception in following handling
 	if (questions == null) {
@@ -501,9 +500,10 @@ public class AuthoringController {
 	conditionSet.clear();
 	conditionSet.addAll(survey.getConditions());
 
-	sessionMap.put(SurveyConstants.ATTR_SURVEY_FORM, surveyForm);
+	sessionMap.put(SurveyConstants.ATTR_SURVEY_FORM, startForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
+	request.setAttribute("startForm", startForm);
 	return "pages/authoring/start";
     }
 
@@ -547,7 +547,8 @@ public class AuthoringController {
      * @throws ServletException
      */
     @RequestMapping("/update")
-    public String updateContent(SurveyForm authoringForm, HttpServletRequest request) throws Exception {
+    public String updateContent(@ModelAttribute("authoringForm") SurveyForm authoringForm, HttpServletRequest request)
+	    throws Exception {
 
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -654,6 +655,7 @@ public class AuthoringController {
 	authoringForm.setSurvey(surveyPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute("authoringForm", authoringForm);
 	return "pages/authoring/authoring";
     }
 

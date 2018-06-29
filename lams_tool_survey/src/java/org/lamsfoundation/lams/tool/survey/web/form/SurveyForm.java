@@ -27,8 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 
@@ -39,7 +37,7 @@ import org.lamsfoundation.lams.tool.survey.model.Survey;
  *
  * User: Dapeng.Ni
  */
-public class SurveyForm extends ActionForm {
+public class SurveyForm {
     private static final long serialVersionUID = 3599879328307492312L;
 
     private static Logger logger = Logger.getLogger(SurveyForm.class.getName());
@@ -67,9 +65,8 @@ public class SurveyForm extends ActionForm {
 	}
     }
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
-	String param = mapping.getParameter();
+    public void reset(HttpServletRequest request, String param) {
+
 	// if it is start page, all data read out from database or current session
 	// so need not reset checkbox to refresh value!
 	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
