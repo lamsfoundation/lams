@@ -62,12 +62,11 @@
 	</a>
 </div>
 
-<html:form action="/policyManagement.do" styleId="policy-form" method="post">
+<html:form action="/policyManagement.do" styleId="policy-form" styleClass="voffset20" method="post">
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<html:hidden property="method" value="save" />
 	<html:hidden property="policyUid" />
 	<html:hidden property="policyId" />
-	
 	<table class="table table-condensed table-no-border">
 		<tr>
 			<td><fmt:message key="label.name" />&nbsp;&nbsp;*</td>
@@ -111,19 +110,29 @@
 		<tr>
 			<td><fmt:message key="label.policy.status" /></td>
 			<td>
-				<html:radio property="policyStateId" value="1" />&nbsp;<fmt:message key="label.policy.status.active" />
-				<br>
-				<html:radio property="policyStateId" value="2" />&nbsp;<fmt:message key="label.policy.status.inactive" /> 
-				<div>
-					<fmt:message key="label.policy.status.hint" />
-				</div>
+                <div class="radio">
+                    <label><html:radio property="policyStateId" value="1" />
+                            <fmt:message key="label.policy.status.active" />
+                    </label>
+                </div>
+                <div class="radio">
+                    <label><html:radio property="policyStateId" value="2" />
+                            <fmt:message key="label.policy.status.inactive" />
+                    </label>
+                    <span id="helpBlock" class="help-block"><fmt:message key="label.policy.status.hint" /></span>
+                </div>
 			</td>
 		</tr>
 		
 		<c:if test="${formBean.map.policyUid != null}">
 			<tr>
 				<td><fmt:message key="label.minor.change" /></td>
-				<td><html:checkbox property="minorChange" /></td>
+				<td>
+                    <div class="radio">
+                        <html:checkbox property="minorChange" />
+                        <span id="helpBlock" class="help-block"><fmt:message key="label.policy.minor.change.hint" /></span>
+                    </div>
+                </td>
 			</tr>
 		</c:if>
 		
