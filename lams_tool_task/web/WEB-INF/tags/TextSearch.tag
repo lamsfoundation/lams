@@ -32,8 +32,8 @@
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
 <%-- Required attributes --%>
 <%@ attribute name="sessionMapID" required="true" rtexprvalue="true" %>
@@ -88,7 +88,7 @@
 <c:if test="${wrapInFormTag}">
 	<form action="${action}" id="${formID}" name="${formID}">
 </c:if>
-		<html:hidden property="sessionMapID" />
+		<form:hidden path="sessionMapID" />
 		<h4><fmt:message key="${headingLabelKey}" /></h4>
 		<table>
 			<tr>
@@ -96,7 +96,7 @@
 					<fmt:message key="${allWordsLabelKey}" />
 				</td>
 				<td>
-					<html:text size="40" property="allWords" />
+					<form:input size="40" path="allWords" />
 				</td>
 			</tr>
 			<tr>
@@ -104,7 +104,7 @@
 					<fmt:message key="${phraseLabelKey}" />
 				</td>
 				<td>
-					<html:text size="40" property="phrase" />
+					<form:input size="40" path="phrase" />
 				</td>
 			</tr>
 			<tr>
@@ -112,7 +112,7 @@
 					<fmt:message key="${anyWordsLabelKey}" />
 				</td>
 				<td>
-					<html:text size="40" property="anyWords" /> 
+					<form:input size="40" path="anyWords" /> 
 				</td>
 			</tr>
 			<tr>
@@ -120,7 +120,7 @@
 					<fmt:message key="${excludedWordsLabelKey}" />
 				</td>
 				<td>
-					<html:text size="40" property="excludedWords" /> 
+					<form:input size="40" path="excludedWords" /> 
 				</td>
 			</tr>
 		</table>

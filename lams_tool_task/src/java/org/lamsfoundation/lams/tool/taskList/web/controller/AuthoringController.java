@@ -710,23 +710,23 @@ public class AuthoringController {
      * @param form
      * @param request
      */
-    private void populateItemToForm(int itemIdx, TaskListItem item, TaskListItemForm form, HttpServletRequest request) {
-	form.setDescription(item.getDescription());
-	form.setTitle(item.getTitle());
+    private void populateItemToForm(int itemIdx, TaskListItem item, TaskListItemForm taskListItemForm, HttpServletRequest request) {
+	taskListItemForm.setDescription(item.getDescription());
+	taskListItemForm.setTitle(item.getTitle());
 	if (itemIdx >= 0) {
-	    form.setItemIndex(new Integer(itemIdx).toString());
+	    taskListItemForm.setItemIndex(new Integer(itemIdx).toString());
 	}
-	form.setRequired(item.isRequired());
-	form.setCommentsAllowed(item.isCommentsAllowed());
-	form.setCommentsRequired(item.isCommentsRequired());
-	form.setFilesAllowed(item.isFilesAllowed());
-	form.setFilesRequired(item.isFilesRequired());
+	taskListItemForm.setRequired(item.isRequired());
+	taskListItemForm.setCommentsAllowed(item.isCommentsAllowed());
+	taskListItemForm.setCommentsRequired(item.isCommentsRequired());
+	taskListItemForm.setFilesAllowed(item.isFilesAllowed());
+	taskListItemForm.setFilesRequired(item.isFilesRequired());
 	// The next 2 options always will be true (as it set in jsp). Waiting
 	// for the final decision -- if this options will be needed later.
-	form.setCommentsFilesAllowed(item.isCommentsFilesAllowed());
-	form.setShowCommentsToAll(item.getShowCommentsToAll());
-	form.setChildTask(item.isChildTask());
-	form.setParentTaskName(item.getParentTaskName());
+	taskListItemForm.setCommentsFilesAllowed(item.isCommentsFilesAllowed());
+	taskListItemForm.setShowCommentsToAll(item.getShowCommentsToAll());
+	taskListItemForm.setChildTask(item.isChildTask());
+	taskListItemForm.setParentTaskName(item.getParentTaskName());
     }
 
     /**

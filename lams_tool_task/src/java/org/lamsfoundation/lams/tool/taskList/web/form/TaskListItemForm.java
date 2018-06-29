@@ -34,7 +34,7 @@ import org.apache.struts.upload.FormFile;
  *
  *
  */
-public class TaskListItemForm extends ActionForm {
+public class TaskListItemForm {
     private String itemIndex;
     private String sessionMapID;
 

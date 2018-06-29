@@ -23,8 +23,11 @@
 
 package org.lamsfoundation.lams.tool.taskList.web.form;
 
-import org.apache.struts.action.ActionForm;
+
+import java.util.Map;
+
 import org.apache.struts.util.LabelValueBean;
+import org.lamsfoundation.lams.web.TextSearchForm;
 
 /**
  * Form responsible for representing <code>TaskListCondition</code> objects on a view layer.
@@ -33,7 +36,7 @@ import org.apache.struts.util.LabelValueBean;
  *
  *
  */
-public class TaskListConditionForm extends ActionForm {
+public class TaskListConditionForm extends TextSearchForm {
 
     //tool access mode;
     private String mode;
@@ -42,7 +45,7 @@ public class TaskListConditionForm extends ActionForm {
     private String sequenceId;
     private String name;
 //    private String taskListItemName;
-    private LabelValueBean[] possibleItems;
+    private Map<String, String> possibleItems;
     private String[] selectedItems;
 
     public TaskListConditionForm() {
@@ -142,11 +145,11 @@ public class TaskListConditionForm extends ActionForm {
 //		this.taskListItemName = taskListItemName;
 //	}
 
-    public LabelValueBean[] getPossibleItems() {
+    public Map<String, String> getPossibleItems() {
 	return possibleItems;
     }
 
-    public void setPossibleItems(LabelValueBean[] lvBeans) {
+    public void setPossibleItems(Map<String, String> lvBeans) {
 	this.possibleItems = lvBeans;
     }
 

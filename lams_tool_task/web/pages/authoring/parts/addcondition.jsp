@@ -21,7 +21,7 @@
 	
 			<!-- Basic Info Form-->
 			<%@ include file="/common/messages.jsp"%>
-			<form:form action="saveOrUpdateCondition.do" method="post" modelAttribute="taskListConditionForm" id="taskListConditionForm" focus="name" >
+			<form:form action="../authoringCondition/saveOrUpdateCondition.do" method="post" modelAttribute="taskListConditionForm" id="taskListConditionForm" focus="name" >
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="sequenceId" />
 	
@@ -34,13 +34,7 @@
 		    	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 		    
 		    	<div class="form-group form-inline">
-		    	<c:forEach var="itemE" items="${taskListConditionForm.possibleItems}">
-				  	<form:checkbox path="selectedItems" cssClass="form-control">
-				    	<c:out value="${itemE.value}" />
-				  	</form:checkbox>
-				    &nbsp;<c:out value="${itemE.lbael}" />
-				    <br />
-				</c:forEach>
+		    	<form:checkboxes path="selectedItems" items="${taskListConditionForm.possibleItems}"/>
 				</div>
 				
 			<div class="voffset5 pull-right">

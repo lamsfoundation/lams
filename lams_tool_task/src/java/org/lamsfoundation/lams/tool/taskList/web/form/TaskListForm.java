@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskList;
  *
  * User: Dapeng.Ni
  */
-public class TaskListForm extends ActionForm {
+public class TaskListForm {
     private static final long serialVersionUID = 3599879328307492312L;
 
     private static Logger logger = Logger.getLogger(TaskListForm.class.getName());
@@ -67,22 +67,7 @@ public class TaskListForm extends ActionForm {
 	}
     }
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
-	String param = mapping.getParameter();
-	//if it is start page, all data read out from database or current session
-	//so need not reset checkbox to refresh value!
-	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
-	    taskList.setLockWhenFinished(false);
-	    taskList.setSequentialOrder(false);
-	    taskList.setMinimumNumberTasks(0);
-	    taskList.setAllowContributeTasks(false);
-	    taskList.setMonitorVerificationRequired(false);
-	    taskList.setDefineLater(false);
-	    taskList.setReflectOnActivity(false);
-	}
-    }
-
+ 
     public int getCurrentTab() {
 	return currentTab;
     }

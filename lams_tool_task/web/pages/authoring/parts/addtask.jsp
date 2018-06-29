@@ -28,13 +28,12 @@
 
 			<%@ include file="/common/messages.jsp"%>
 
-			<form:form action="saveOrUpdateItem.do" modelAttribute="taskListItemForm" method="post" styleId="taskListItemForm" focus="title" >
+			<form:form action="saveOrUpdateItem.do" modelAttribute="taskListItemForm" method="post" id="taskListItemForm" focus="title" >
 	
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="itemIndex" />
-				
-				<form:hidden path="commentsFilesAllowed" value="${true}"/>
-				<form:hidden path="showCommentsToAll" value="${true}" />
+				<form:hidden path="commentsFilesAllowed" value="true"/>
+				<form:hidden path="showCommentsToAll" value="true" />
 				
 				<div class="form-group">
 	            	<label for="title">

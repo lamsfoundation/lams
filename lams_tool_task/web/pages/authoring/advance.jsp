@@ -17,9 +17,9 @@
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 	
 		<form:select path="taskList.minimumNumberTasks"	id="minimumNumberTasks" cssClass="form-control form-control-inline input-sm">
-	<!-- 		<c:forEach begin="1" end="${fn:length(sessionMap.taskListList)}" varStatus="status">
+			<c:forEach begin="1" end="${fn:length(sessionMap.taskListList)}" varStatus="status">
 				<c:choose>
-					<c:when	test="${formBean.taskList.minimumNumberTasks == status.index}">
+					<c:when	test="${taskListForm.taskList.minimumNumberTasks == status.index}">
 						<option value="${status.index}" selected="true">
 							${status.index}
 						</option>
@@ -30,8 +30,7 @@
 						</option>
 					</c:otherwise>
 				</c:choose>
-			</c:forEach>
-	 -->		
+			</c:forEach>	
 		</form:select>
 	
 		<label for="minimumNumberTasks">

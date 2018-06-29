@@ -20,11 +20,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.taskList.web.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -36,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -57,7 +57,12 @@ import org.lamsfoundation.lams.tool.taskList.web.form.TaskListForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -69,112 +74,85 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @see org.lamsfoundation.lams.tool.taskList.web.controller.AuthoringController
  */
 
-public class AuthoringTaskListConditionAction extends Action {
+@Controller
+@RequestMapping("/authoringCondition")
+public class AuthoringTaskListConditionController {
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	String param = mapping.getParameter();
-
-	if (param.equals("showConditions")) {
-	    return showConditions(mapping, form, request, response);
-	}
-	if (param.equals("newConditionInit")) {
-	    return newConditionInit(mapping, form, request, response);
-	}
-	if (param.equals("editCondition")) {
-	    return editCondition(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdateCondition")) {
-	    return saveOrUpdateCondition(mapping, form, request, response);
-	}
-	if (param.equals("removeCondition")) {
-	    return removeCondition(mapping, form, request, response);
-	}
-	if (param.equals("upCondition")) {
-	    return upCondition(mapping, form, request, response);
-	}
-	if (param.equals("downCondition")) {
-	    return downCondition(mapping, form, request, response);
-	}
-
-	return mapping.findForward(TaskListConstants.ERROR);
-    }
-
+    
     /**
      * Display same entire authoring page content from HttpSession variable.
      *
-     * @param mapping
-     * @param form
+     * @param taskListForm
      * @param request
-     * @param response
      * @return
      * @throws ServletException
      */
-    private ActionForward showConditions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/showConditions")
+    public String showConditions(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request) throws ServletException {
+	
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	TaskListForm existForm = (TaskListForm) sessionMap.get(TaskListConstants.ATTR_TASKLIST_FORM);
-
-	TaskListForm taskListForm = (TaskListForm) form;
+	
 	try {
 	    PropertyUtils.copyProperties(taskListForm, existForm);
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
 
-	return mapping.findForward(TaskListConstants.SUCCESS);
+	return "pages/authoring/conditions";
     }
 
     /**
      * Display empty page for new taskList item.
      *
-     * @param mapping
-     * @param form
+     * @param taskListConditionForm
      * @param request
      * @param response
      * @return
      */
-    private ActionForward newConditionInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	((TaskListConditionForm) form).setSessionMapID(sessionMapID);
-
-	populateFormWithPossibleItems(form, request);
-	return mapping.findForward("addcondition");
+    @RequestMapping("/newConditionInit")
+    public String newConditionInit(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request) {
+	
+	TaskListConditionForm taskListConditionForm = new TaskListConditionForm();
+	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
+	taskListConditionForm.setSessionMapID(sessionMapID);
+	populateFormWithPossibleItems(taskListConditionForm, request);
+	request.setAttribute("taskListConditionForm", taskListConditionForm);
+	return "pages/authoring/parts/addcondition";
     }
 
+    
     /**
      * Display edit page for existed taskList item.
      *
-     * @param mapping
-     * @param form
+     * @param taskListConditionForm
      * @param request
      * @param response
      * @return
      */
-    private ActionForward editCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/editCondition")
+    public String editCondition(@ModelAttribute TaskListConditionForm taskListConditionForm, HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int sequenceId = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_SEQUENCE_ID), -1);
 	TaskListCondition item = null;
 	if (sequenceId != -1) {
 	    SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
-	    List<TaskListCondition> rList = new ArrayList<TaskListCondition>(conditionList);
+	    List<TaskListCondition> rList = new ArrayList<>(conditionList);
 	    item = rList.get(sequenceId);
 	    if (item != null) {
-		populateConditionToForm(sequenceId, item, (TaskListConditionForm) form, request);
+		populateConditionToForm(sequenceId, item, taskListConditionForm, request);
 	    }
 	}
 
-	populateFormWithPossibleItems(form, request);
-	return item == null ? null : mapping.findForward("addcondition");
+	populateFormWithPossibleItems(taskListConditionForm, request);
+	return item == null ? null : "pages/authoring/parts/addcondition";
     }
 
     /**
@@ -183,64 +161,60 @@ public class AuthoringTaskListConditionAction extends Action {
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
      *
-     * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
      * @throws ServletException
      */
-    private ActionForward saveOrUpdateCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/saveOrUpdateCondition")
+    public String saveOrUpdateCondition(@ModelAttribute TaskListConditionForm taskListConditionForm,  Errors errors, HttpServletRequest request) {
 
-	TaskListConditionForm conditionForm = (TaskListConditionForm) form;
-	ActionErrors errors = validateTaskListCondition(conditionForm, request);
-
-	if (!errors.isEmpty()) {
-	    populateFormWithPossibleItems(form, request);
-	    this.addErrors(request, errors);
-	    return mapping.findForward("addcondition");
+	validateTaskListCondition(taskListConditionForm, errors, request);
+	if (errors.hasErrors()) {
+	    populateFormWithPossibleItems(taskListConditionForm, request);
+	    return "pages/authoring/parts/addcondition";
 	}
 
 	try {
-	    extractFormToTaskListCondition(request, conditionForm);
+	    extractFormToTaskListCondition(request, taskListConditionForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-		    new ActionMessage(TaskListConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
-	    if (!errors.isEmpty()) {
-		populateFormWithPossibleItems(form, request);
-		this.addErrors(request, errors);
-		return mapping.findForward("addcondition");
+	    errors.reject("error.condition.name.blank");
+	    if (errors.hasErrors()) {
+		populateFormWithPossibleItems(taskListConditionForm, request);
+		return "pages/authoring/parts/addcondition";
 	    }
+		
 	}
 	// set session map ID so that itemlist.jsp can get sessionMAP
-	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, conditionForm.getSessionMapID());
+	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, taskListConditionForm.getSessionMapID());
 	// return null to close this window
-	return mapping.findForward(TaskListConstants.SUCCESS);
+	return "pages/authoring/parts/conditionlist";
     }
+
 
     /**
      * Remove taskList item from HttpSession list and update page display. As authoring rule, all persist only happen
      * when user submit whole page. So this remove is just impact HttpSession values.
      *
-     * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
      */
-    private ActionForward removeCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeCondition")
+    public String removeCondition(@ModelAttribute TaskListConditionForm taskListConditionForm, HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int sequenceId = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_SEQUENCE_ID), -1);
 	if (sequenceId != -1) {
 	    SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
-	    List<TaskListCondition> rList = new ArrayList<TaskListCondition>(conditionList);
+	    List<TaskListCondition> rList = new ArrayList<>(conditionList);
 	    TaskListCondition condition = rList.remove(sequenceId);
 	    for (TaskListCondition otherCondition : conditionList) {
 		if (otherCondition.getSequenceId() > sequenceId) {
@@ -255,46 +229,41 @@ public class AuthoringTaskListConditionAction extends Action {
 	}
 
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(TaskListConstants.SUCCESS);
+	return "pages/authoring/parts/conditionlist";
     }
 
     /**
      * Move up current item.
      *
-     * @param mapping
-     * @param form
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward upCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, true);
+    @RequestMapping("/upCondition")
+    public String upCondition(HttpServletRequest request) {
+	return switchItem(request, true);
     }
 
     /**
      * Move down current item.
      *
-     * @param mapping
-     * @param form
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward downCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, false);
+    @RequestMapping("/downCondition")
+    public String downCondition(HttpServletRequest request) {
+	return switchItem(request, false);
     }
 
-    private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
+    public String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int sequenceId = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_SEQUENCE_ID), -1);
 	if (sequenceId != -1) {
 	    SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
-	    List<TaskListCondition> rList = new ArrayList<TaskListCondition>(conditionList);
+	    List<TaskListCondition> rList = new ArrayList<>(conditionList);
 	    // get current and the target item, and switch their sequnece
 	    TaskListCondition condition = rList.get(sequenceId);
 	    TaskListCondition repCondition;
@@ -313,20 +282,12 @@ public class AuthoringTaskListConditionAction extends Action {
 	}
 
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(TaskListConstants.SUCCESS);
+	return "pages/authoring/parts/conditionlist";
     }
 
     // *************************************************************************************
     // Private methods for internal needs
     // *************************************************************************************
-    /**
-     * Return TaskListService bean.
-     */
-    private ITaskListService getTaskListService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (ITaskListService) wac.getBean(TaskListConstants.TASKLIST_SERVICE);
-    }
 
     /**
      * List save current taskList items.
@@ -338,7 +299,7 @@ public class AuthoringTaskListConditionAction extends Action {
 	SortedSet<TaskListCondition> list = (SortedSet<TaskListCondition>) sessionMap
 		.get(TaskListConstants.ATTR_CONDITION_LIST);
 	if (list == null) {
-	    list = new TreeSet<TaskListCondition>(new TaskListConditionComparator());
+	    list = new TreeSet<>(new TaskListConditionComparator());
 	    sessionMap.put(TaskListConstants.ATTR_CONDITION_LIST, list);
 	}
 	return list;
@@ -354,7 +315,7 @@ public class AuthoringTaskListConditionAction extends Action {
 	SortedSet<TaskListItem> list = (SortedSet<TaskListItem>) sessionMap
 		.get(TaskListConstants.ATTR_TASKLIST_ITEM_LIST);
 	if (list == null) {
-	    list = new TreeSet<TaskListItem>(new TaskListItemComparator());
+	    list = new TreeSet<>(new TaskListItemComparator());
 	    sessionMap.put(TaskListConstants.ATTR_TASKLIST_ITEM_LIST, list);
 	}
 	return list;
@@ -394,12 +355,12 @@ public class AuthoringTaskListConditionAction extends Action {
      * @param form
      * @param request
      */
-    private void populateConditionToForm(int sequenceId, TaskListCondition condition, TaskListConditionForm form,
+    private void populateConditionToForm(int sequenceId, TaskListCondition condition, TaskListConditionForm taskListConditionForm,
 	    HttpServletRequest request) {
 	if (sequenceId >= 0) {
-	    form.setSequenceId(new Integer(sequenceId).toString());
+	    taskListConditionForm.setSequenceId(new Integer(sequenceId).toString());
 	}
-	form.setName(condition.getName());
+	taskListConditionForm.setName(condition.getName());
 
 	Set<TaskListItem> itemList = condition.getTaskListItems();
 	String[] selectedItems = new String[itemList.size()];
@@ -407,7 +368,7 @@ public class AuthoringTaskListConditionAction extends Action {
 	for (TaskListItem item : itemList) {
 	    selectedItems[i++] = (new Integer(item.getSequenceId())).toString();
 	}
-	form.setSelectedItems(selectedItems);
+	taskListConditionForm.setSelectedItems(selectedItems);
     }
 
     /**
@@ -418,22 +379,23 @@ public class AuthoringTaskListConditionAction extends Action {
      * @param form
      * @param request
      */
-    private void populateFormWithPossibleItems(ActionForm form, HttpServletRequest request) {
+    private void populateFormWithPossibleItems(TaskListConditionForm taskListConditionForm, HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	SortedSet<TaskListItem> itemList = getTaskListItemList(sessionMap);
 
 	// Initialise the LabelValueBeans in the possibleOptions array.
-	LabelValueBean[] lvBeans = new LabelValueBean[itemList.size()];
+	Map<String, String> possibleItems = new HashMap<String, String>(itemList.size());
 
-	int i = 0;
 	for (TaskListItem item : itemList) {
-	    lvBeans[i++] = new LabelValueBean(item.getTitle(), (new Integer(item.getSequenceId())).toString());
+	    possibleItems.put(String.valueOf(item.getSequenceId()), item.getTitle());
 	}
-	((TaskListConditionForm) form).setPossibleItems(lvBeans);
+	taskListConditionForm.setPossibleItems(possibleItems);
+	
     }
 
     /**
@@ -451,7 +413,8 @@ public class AuthoringTaskListConditionAction extends Action {
 	 * this taskList item.
 	 */
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(form.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(form.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
 	int sequenceId = NumberUtils.stringToInt(form.getSequenceId(), -1);
@@ -467,7 +430,7 @@ public class AuthoringTaskListConditionAction extends Action {
 	    condition.setSequenceId(maxSeq);
 	    conditionList.add(condition);
 	} else { // edit
-	    List<TaskListCondition> rList = new ArrayList<TaskListCondition>(conditionList);
+	    List<TaskListCondition> rList = new ArrayList<>(conditionList);
 	    condition = rList.get(sequenceId);
 	}
 
@@ -475,7 +438,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
 	String[] selectedItems = form.getSelectedItems();
 	SortedSet<TaskListItem> itemList = getTaskListItemList(sessionMap);
-	SortedSet<TaskListItem> conditionItemList = new TreeSet<TaskListItem>(new TaskListItemComparator());
+	SortedSet<TaskListItem> conditionItemList = new TreeSet<>(new TaskListItemComparator());
 
 	for (String selectedItem : selectedItems) {
 	    for (TaskListItem item : itemList) {
@@ -494,58 +457,37 @@ public class AuthoringTaskListConditionAction extends Action {
      * @param conditionForm
      * @return
      */
-    private ActionErrors validateTaskListCondition(TaskListConditionForm conditionForm, HttpServletRequest request) {
-	ActionErrors errors = new ActionErrors();
+    private void validateTaskListCondition(TaskListConditionForm taskListConditionForm, Errors errors, HttpServletRequest request) {
+	
 
-	String formConditionName = conditionForm.getName();
+	String formConditionName = taskListConditionForm.getName();
 	if (StringUtils.isBlank(formConditionName)) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(TaskListConstants.ERROR_MSG_NAME_BLANK));
+	    errors.reject(TaskListConstants.ERROR_MSG_NAME_BLANK);
 	} else if (StringUtils.contains(formConditionName, '#')) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-		    new ActionMessage(TaskListConstants.ERROR_MSG_NAME_CONTAINS_WRONG_SYMBOL));
+	    errors.reject(TaskListConstants.ERROR_MSG_NAME_CONTAINS_WRONG_SYMBOL);
 	} else {
 
-	    String formConditionSequenceId = conditionForm.getSequenceId();
+	    String formConditionSequenceId = taskListConditionForm.getSequenceId();
 
-	    String sessionMapID = conditionForm.getSessionMapID();
-	    SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	    String sessionMapID = taskListConditionForm.getSessionMapID();
+	    SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		    .getAttribute(sessionMapID);
 	    SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
 	    for (TaskListCondition condition : conditionList) {
 		if (formConditionName.equals(condition.getName())
 			&& !formConditionSequenceId.equals((new Integer(condition.getSequenceId() - 1)).toString())) {
-		    errors.add(ActionMessages.GLOBAL_MESSAGE,
-			    new ActionMessage(TaskListConstants.ERROR_MSG_NAME_DUPLICATED));
+		    errors.reject(TaskListConstants.ERROR_MSG_NAME_DUPLICATED);
 		    break;
 		}
 	    }
 	}
 
 	// should be selected at least one TaskListItem
-	String[] selectedItems = conditionForm.getSelectedItems();
+	String[] selectedItems = taskListConditionForm.getSelectedItems();
 	if (selectedItems == null || selectedItems.length == 0) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-		    new ActionMessage(TaskListConstants.ERROR_MSG_NO_TASK_LIST_ITEMS));
+	    errors.reject(TaskListConstants.ERROR_MSG_NO_TASK_LIST_ITEMS);
 	}
 
-	return errors;
-    }
-
-    private ActionMessages validate(TaskListForm taskListForm, ActionMapping mapping, HttpServletRequest request) {
-	ActionMessages errors = new ActionMessages();
-	// if (StringUtils.isBlank(taskListForm.getTaskList().getTitle())) {
-	// ActionMessage error = new ActionMessage("error.resource.item.title.blank");
-	// errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	// }
-
-	// define it later mode(TEACHER) skip below validation.
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    return errors;
-	}
-
-	// Some other validation outside basic Tab.
-
-	return errors;
     }
 
 }
