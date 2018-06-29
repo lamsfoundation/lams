@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralToolContentHandler;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
@@ -128,7 +129,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 
 	    //resize to the large size
 	    is = ResizePictureUtil.resize(file.getInputStream(),
-		    IUserManagementService.PORTRAIT_LARGEST_DIMENSION_LARGE);
+		    CommonConstants.PORTRAIT_LARGEST_DIMENSION_LARGE);
 	    NodeKey node = getCentralToolContentHandler().updateFile(originalFileNode.getUuid(), is,
 		    fileNameWithoutExt + "_large.jpg", "image/jpeg");
 	    is.close();
@@ -136,7 +137,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 
 	    //resize to the medium size
 	    is = ResizePictureUtil.resize(file.getInputStream(),
-		    IUserManagementService.PORTRAIT_LARGEST_DIMENSION_MEDIUM);
+		    CommonConstants.PORTRAIT_LARGEST_DIMENSION_MEDIUM);
 	    node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_medium.jpg",
 		    "image/jpeg");
 	    is.close();
@@ -144,7 +145,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 
 	    //resize to the small size
 	    is = ResizePictureUtil.resize(file.getInputStream(),
-		    IUserManagementService.PORTRAIT_LARGEST_DIMENSION_SMALL);
+		    CommonConstants.PORTRAIT_LARGEST_DIMENSION_SMALL);
 	    node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_small.jpg",
 		    "image/jpeg");
 	    is.close();
