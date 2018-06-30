@@ -23,11 +23,13 @@
 
 package org.lamsfoundation.lams.lesson.dao;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.LearnerProgressArchive;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -204,4 +206,6 @@ public interface ILearnerProgressDAO {
 
     /** Get the number of learners who are in a particular activity at the moment */
     Integer getNumUsersCurrentActivity(Activity activity);
+
+    LearnerProgressArchive getLearnerProgressArchive(Long lessonId, Integer userId, Date archiveDate);
 }

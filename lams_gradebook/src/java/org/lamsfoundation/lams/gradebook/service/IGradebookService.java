@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.gradebook.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
@@ -300,7 +301,7 @@ public interface IGradebookService {
 
     void removeLearnerFromLesson(Long lessonId, Integer learnerId);
 
-    void archiveLearnerMarks(Long lessonId, Integer learnerId);
+    void archiveLearnerMarks(Long lessonId, Integer learnerId, Date archiveDate);
 
     /**
      * Get a language label

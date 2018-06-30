@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,6 +34,7 @@ import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.LearnerProgressArchive;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.stereotype.Repository;
@@ -118,6 +120,9 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     private final static String FIND_PROGRESS_ARCHIVE_MAX_ATTEMPT = "SELECT MAX(p.attemptId) FROM LearnerProgressArchive p "
 	    + "WHERE p.user.id = :learnerId AND p.lesson.id = :lessonId";
+
+    private final static String FIND_PROGRESS_ARCHIVE_BY_DATE = "FROM LearnerProgressArchive a "
+	    + "WHERE a.lesson.lessonId = :lessonId AND a.user.userId = :learnerId AND a.archiveDate = :archiveDate";
 
     @Override
     public LearnerProgress getLearnerProgress(Long learnerProgressId) {
@@ -348,7 +353,6 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	return result;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Integer getNumUsersCurrentActivity(Activity activity) {
 	Object value = getSession().createQuery(LearnerProgressDAO.COUNT_SINGLE_CURRENT_ACTIVITY)
@@ -356,11 +360,17 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	return new Integer(((Number) value).intValue());
     }
 
-
     @Override
     public Integer getLearnerProgressArchiveMaxAttemptID(Integer userId, Long lessonId) {
 	Object value = getSession().createQuery(LearnerProgressDAO.FIND_PROGRESS_ARCHIVE_MAX_ATTEMPT)
 		.setInteger("learnerId", userId).setLong("lessonId", lessonId).uniqueResult();
 	return value == null ? null : ((Number) value).intValue();
+    }
+
+    @Override
+    public LearnerProgressArchive getLearnerProgressArchive(Long lessonId, Integer userId, Date archiveDate) {
+	return (LearnerProgressArchive) getSession().createQuery(LearnerProgressDAO.FIND_PROGRESS_ARCHIVE_BY_DATE)
+		.setInteger("learnerId", userId).setLong("lessonId", lessonId).setTimestamp("archiveDate", archiveDate)
+		.uniqueResult();
     }
 }

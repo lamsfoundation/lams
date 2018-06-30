@@ -10,6 +10,12 @@ DELETE FROM lams_gradebook_user_lesson_archive;
 ALTER TABLE lams_gradebook_user_lesson_archive ADD COLUMN archive_date DATETIME;
 ALTER TABLE lams_gradebook_user_activity_archive ADD COLUMN archive_date DATETIME;
 
+DELETE FROM lams_progress_attempted_archive;
+DELETE FROM lams_progress_completed_archive;
+DELETE FROM lams_learner_progress_archive;
+
+ALTER TABLE lams_learner_progress_archive ADD COLUMN archive_date DATETIME;
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on
