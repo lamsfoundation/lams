@@ -28,6 +28,12 @@
 <c:set var="title"><fmt:message key="label.monitoring.heading.marking" /></c:set>
 <lams:Page title="${title}" type="monitor">
 
+	<c:if test="${isMarksReleased}">
+		<div class="alert alert-success">
+			<fmt:message key="label.marks.released" />
+		</div>
+	</c:if>
+
 	<c:forEach var="user" items="${reports}">
 		<c:forEach items="${user.value}" var="fileInfo" varStatus="status">
 			<%@include file="fileinfo.jsp"%>

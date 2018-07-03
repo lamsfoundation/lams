@@ -53,7 +53,6 @@ public class SubmitUserDTO implements Serializable {
     private String comments;
     private Float marks;
     private Date dateOfSubmission;
-    private Date dateMarksReleased;
     private boolean anyFilesMarked;
 
     //submit file list
@@ -93,21 +92,6 @@ public class SubmitUserDTO implements Serializable {
      */
     public void setComments(String comments) {
 	this.comments = comments;
-    }
-
-    /**
-     * @return Returns the dateMarksReleased.
-     */
-    public Date getDateMarksReleased() {
-	return dateMarksReleased;
-    }
-
-    /**
-     * @param dateMarksReleased
-     *            The dateMarksReleased to set.
-     */
-    public void setDateMarksReleased(Date dateMarksReleased) {
-	this.dateMarksReleased = dateMarksReleased;
     }
 
     /**

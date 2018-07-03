@@ -8,6 +8,12 @@
 	<lams:LAMSURL />
 </c:set>
 
+<style>
+	.group-mark-release-label {
+		font-size: medium; vertical-align: -webkit-baseline-middle;
+	}
+</style>
+
 <script type="text/javascript">
 	// pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
@@ -136,6 +142,8 @@
 			},
 			function() {
 				$("#messageArea_Busy").hide();
+				$("#release-marks-" + sessionId).hide();
+				$("#release-marks-info-" + sessionId).show();
 			}
 		);
 	}
@@ -162,8 +170,6 @@
 
 </div>
 
-
-
 <c:forEach var="sessionDto" items="${sessions}" varStatus="status">
 		
 	<c:if test="${isGroupedActivity}">	
@@ -188,15 +194,23 @@
 			</c:if>
 	</lams:TSTable>
 	
-	<P style="display: inline"> 
+	<P style="display: inline">
+		
+		<div class="label label-success loffset5 group-mark-release-label" id="release-marks-info-${sessionDto.sessionID}"
+				<c:if test="${!sessionDto.marksReleased}">style="display:none;"</c:if>>
+			<fmt:message key="label.marks.released" />
+		</div>
+	
 		<html:button property="viewAllMarks" onclick="javascript:viewAllMarks(${sessionDto.sessionID})"
 					 styleClass="btn btn-default loffset5 voffset10" >
 			<fmt:message key="label.monitoring.viewAllMarks.button" />
 		</html:button>
-		<html:button property="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})"
-					 styleClass="btn btn-default loffset5 voffset10" >
-			<fmt:message key="label.monitoring.releaseMarks.button" />
-		</html:button>
+		<c:if test="${!sessionDto.marksReleased}">
+			<html:button property="releaseMarks" styleId="release-marks-${sessionDto.sessionID}" onclick="releaseMarks(${sessionDto.sessionID})"
+						 styleClass="btn btn-default loffset5 voffset10" >
+				<fmt:message key="label.monitoring.releaseMarks.button" />
+			</html:button>
+		</c:if>
 		<html:form action="/monitoring" style="display:inline">
 			<html:hidden property="method" value="downloadMarks" />
 			<html:hidden property="toolSessionID" value="${sessionDto.sessionID}" />

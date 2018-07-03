@@ -41,22 +41,26 @@
 		}
 
 	</script>
-
-	</script>
 </lams:head>
 
 <body class="stripes">
 <c:set var="title"><fmt:message key="label.monitoring.heading.marking" /></c:set>
 <lams:Page title="${title}" type="monitor">
 
-		<c:forEach var="fileInfo" items="${report}" varStatus="status">
-			<%@include file="fileinfo.jsp"%>
-			<hr width="100%">
-		</c:forEach>
+	<c:if test="${isMarksReleased}">
+		<div class="alert alert-success">
+			<fmt:message key="label.marks.released" />
+		</div>
+	</c:if>
+
+	<c:forEach var="fileInfo" items="${report}" varStatus="status">
+		<%@include file="fileinfo.jsp"%>
+		<hr width="100%">
+	</c:forEach>
 	
-		<html:link href="javascript:window.close();" property="submit" styleClass="btn btn-primary pull-right">
-			<fmt:message key="label.monitoring.done.button" />
-		</html:link>
+	<html:link href="javascript:window.close();" property="submit" styleClass="btn btn-primary pull-right">
+		<fmt:message key="label.monitoring.done.button" />
+	</html:link>
 	
 	<div id="footer"></div>
 	
