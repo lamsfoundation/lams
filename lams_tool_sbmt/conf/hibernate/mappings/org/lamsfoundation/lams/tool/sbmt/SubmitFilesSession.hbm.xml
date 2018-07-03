@@ -83,6 +83,14 @@
             insert="true"
             column="group_leader_uid"
         />
+        
+       <property
+            name="marksReleased"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="marks_released"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

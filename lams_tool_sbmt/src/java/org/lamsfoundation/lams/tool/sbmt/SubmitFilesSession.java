@@ -64,6 +64,8 @@ public class SubmitFilesSession implements Serializable, Cloneable {
 
     private SubmitUser groupLeader;
     
+    private boolean marksReleased;
+    
     /** full constructor */
     public SubmitFilesSession(Long sessionID, int status) {
 	this.sessionID = sessionID;
@@ -207,5 +209,13 @@ public class SubmitFilesSession implements Serializable, Cloneable {
 
     public void setGroupLeader(SubmitUser groupLeader) {
    	this.groupLeader = groupLeader;
+    }
+    
+    public boolean isMarksReleased() {
+	return marksReleased;
+    }
+
+    public void setMarksReleased(boolean marksReleased) {
+	this.marksReleased = marksReleased;
     }
 }

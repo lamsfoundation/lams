@@ -57,7 +57,6 @@ public class FileDetailsDTO implements Serializable {
     private String comments;
     private String marks;
     private Date dateOfSubmission;
-    private Date dateMarksReleased;
     private String markFileName;
     private Long markFileUUID;
     private Long markFileVersionID;
@@ -100,7 +99,6 @@ public class FileDetailsDTO implements Serializable {
 	SubmitFilesReport report = details.getReport();
 	if (report != null) {
 	    this.reportID = report.getReportID();
-	    this.dateMarksReleased = report.getDateMarksReleased();
 	    this.comments = report.getComments();
 	    this.marks = report.getMarks() != null
 		    ? NumberUtil.formatLocalisedNumber(report.getMarks(), numberFormat, 2) : "";
@@ -198,21 +196,6 @@ public class FileDetailsDTO implements Serializable {
      */
     public void setMarks(String marks) {
 	this.marks = marks;
-    }
-
-    /**
-     * @return Returns the dateMarksReleased.
-     */
-    public Date getDateMarksReleased() {
-	return dateMarksReleased;
-    }
-
-    /**
-     * @param dateMarksReleased
-     *            The dateMarksReleased to set.
-     */
-    public void setDateMarksReleased(Date dateMarksReleased) {
-	this.dateMarksReleased = dateMarksReleased;
     }
 
     /**

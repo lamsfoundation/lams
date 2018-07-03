@@ -21,20 +21,19 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.sbmt.dto;
 
 /**
  *
  * @author Anthony Sukkar
- *
  */
 public class SessionDTO {
 
     private Long sessionID;
 
     private String sessionName;
+    
+    private boolean marksReleased;
 
     public Long getSessionID() {
 	return sessionID;
@@ -50,6 +49,14 @@ public class SessionDTO {
 
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
+    }
+    
+    public boolean isMarksReleased() {
+	return marksReleased;
+    }
+
+    public void setMarksReleased(boolean marksReleased) {
+	this.marksReleased = marksReleased;
     }
 
 }

@@ -102,11 +102,10 @@ public class LearnerAction extends DispatchAction {
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// initial session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	
-
 	((LearnerForm) form).setSessionMapID(sessionMap.getSessionID());
 
 	// get parameters from Request
@@ -134,14 +133,13 @@ public class LearnerAction extends DispatchAction {
 	}
 
 	ISubmitFilesService submitFilesService = getService();
-	ToolContentManager contentManager = getContentManager();
 	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 	SubmitFilesContent content = session.getContent();
 
 	// this must before getFileUploadByUser() method becuase getCurrentLearner()
 	// will create session user if it does not exist.
 	SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
-	List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(), false);
+	List<FileDetailsDTO> filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(), false);
 
 	// check whehter finish lock is on/off
 	boolean lock = content.isLockOnFinished() && learner.isFinished();
@@ -158,6 +156,7 @@ public class LearnerAction extends DispatchAction {
 	sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD, content.isLimitUpload());
 	sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER, content.getLimitUploadNumber());
 	sessionMap.put(SbmtConstants.ATTR_USER_FINISHED, learner.isFinished());
+	sessionMap.put(SbmtConstants.ATTR_IS_MARKS_RELEASED, session.isMarksReleased());
 
 	sessionMap.put(SbmtConstants.ATTR_UPLOAD_MAX_FILE_SIZE,
 		FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)));
@@ -205,8 +204,8 @@ public class LearnerAction extends DispatchAction {
 		    IEventNotificationService.DELIVERY_METHOD_MAIL);
 	}
 
-	
-	SortedMap submittedFilesMap = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
+	SortedMap<SubmitUserDTO, List<FileDetailsDTO>> submittedFilesMap = submitFilesService
+		.getFilesUploadedBySession(sessionID, request.getLocale());
 	// support for leader select feature  
 	SubmitUser groupLeader = content.isUseSelectLeaderToolOuput()
 		? submitFilesService.checkLeaderSelectToolForSessionLeader(learner, new Long(sessionID).longValue())
@@ -274,7 +273,7 @@ public class LearnerAction extends DispatchAction {
     public ActionForward refresh(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	((LearnerForm) form).setSessionMapID(sessionMap.getSessionID());
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	
@@ -286,10 +285,13 @@ public class LearnerAction extends DispatchAction {
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	
 	ISubmitFilesService submitFilesService = getService();
-	List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(), false);
+	List<FileDetailsDTO> filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(), false);
 	SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
+	
+	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
+	sessionMap.put(SbmtConstants.ATTR_IS_MARKS_RELEASED, session.isMarksReleased());
 
 	return mapping.findForward(SbmtConstants.SUCCESS);
     }
@@ -309,7 +311,7 @@ public class LearnerAction extends DispatchAction {
 
 	LearnerForm learnerForm = (LearnerForm) form;
 	String sessionMapID = learnerForm.getSessionMapID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	// set the mode into http session
@@ -326,8 +328,8 @@ public class LearnerAction extends DispatchAction {
 	    Integer userID = user.getUserID();
 
 	    ISubmitFilesService submitFilesService = getService();
-	    List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(),
-		    false);
+	    List<FileDetailsDTO> filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID,
+		    request.getLocale(), false);
 
 	    SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 	    ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -378,7 +380,7 @@ public class LearnerAction extends DispatchAction {
 	    HttpServletResponse response) {
 
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -416,8 +418,10 @@ public class LearnerAction extends DispatchAction {
     // Private mehtods
     // **********************************************************************************************
     private ISubmitFilesService getService() {
-	ISubmitFilesService submitFilesService = SubmitFilesServiceProxy
-		.getSubmitFilesService(this.getServlet().getServletContext());
+	if (submitFilesService == null) {
+	    submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
+	}
+
 	return submitFilesService;
     }
     
@@ -463,16 +467,8 @@ public class LearnerAction extends DispatchAction {
     }
 
     /**
-     *
      * Set information into learner DTO object for page display. Fill file list uploaded by the special user into web
      * form. Remove the unauthorized mark and comments.
-     *
-     * @param request
-     * @param sessionMap
-     * @param sessionID
-     * @param userID
-     * @param content
-     * @param filesUploaded
      */
     private void setLearnerDTO(HttpServletRequest request, SessionMap sessionMap, SubmitUser currUser,
 	    List filesUploaded, ToolAccessMode mode) {
@@ -489,10 +485,6 @@ public class LearnerAction extends DispatchAction {
 		    } else {
 			filedto.setCurrentLearner(false);
 		    }
-//		    if (filedto.getDateMarksReleased() == null) {
-//			filedto.setComments(null);
-//			filedto.setMarks(null);
-//		    }
 		}
 	    }
 	    dto.setFilesUploaded(filesUploaded);
@@ -542,25 +534,13 @@ public class LearnerAction extends DispatchAction {
 	return learner;
     }
 
-    private ISubmitFilesService getSubmitFilesService() {
-	return SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
-    }
-
     public ActionForward deleteLearnerFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException, IOException {
-	HttpSession ss = SessionManager.getSession();
-	
-
 	UserDTO currentUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	Long detailID = WebUtil.readLongParam(request, "detailId");
-
-	if (submitFilesService == null) {
-	    submitFilesService = getSubmitFilesService();
-	}
-	FileDetailsDTO fileDetail = submitFilesService.getFileDetails(detailID, request.getLocale());
+	FileDetailsDTO fileDetail = getService().getFileDetails(detailID, request.getLocale());
 	
 	if (fileDetail.getOwner().getUserID().equals(currentUser.getUserID()) && (StringUtils.isBlank(fileDetail.getMarks()))) {
-
 	    submitFilesService.removeLearnerFile(detailID,null);
 
 	} else {
