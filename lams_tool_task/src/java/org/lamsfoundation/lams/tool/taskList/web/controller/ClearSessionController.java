@@ -29,6 +29,8 @@ import javax.servlet.http.HttpSession;
 import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * This class give a chance to clear HttpSession when user save/close authoring page.
@@ -38,10 +40,10 @@ import org.springframework.stereotype.Controller;
  * @version $Revision$
  */
 
+@Controller
+public class ClearSessionController {
 
-public class ClearSessionAction extends LamsAuthoringFinishAction {
-
-    @Override
+    @RequestMapping("/clearsession")
     public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {
 	if (mode.isAuthor()) {
 	    session.removeAttribute(customiseSessionID);

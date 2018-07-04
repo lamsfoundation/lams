@@ -64,7 +64,7 @@
 </lams:head>
 
 <body class="stripes" onLoad="init()">
-<form:form action="update.do" method="post" modelAttribute="taskListForm" id="authoringForm">
+<form:form action="update.do" method="post" modelAttribute="taskListForm" id="taskListForm">
 	<form:hidden path="taskList.contentId" />
 	<input type="hidden" name="mode" value="${mode}"/>
 	<form:hidden path="sessionMapID" />
@@ -108,7 +108,7 @@
 		
 					<lams:AuthoringButton formID="taskListForm" clearSessionActionUrl="/clearsession.do" 
 						toolSignature="<%=TaskListConstants.TOOL_SIGNATURE%>" toolContentID="${taskListForm.taskList.contentId}" 
-						 customiseSessionID="${taskListForm.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
+						 customiseSessionID="${taskListItemForm.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
 						 contentFolderID="${taskListForm.contentFolderID}" />
 			</lams:TabBodyArea>
 	

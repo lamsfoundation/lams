@@ -42,7 +42,7 @@
 	       			<form:input path="title" size="55" cssClass="form-control"/>
 				</div>
 	
-				<c:set var="sessionMap"	value="${sessionScope[taskListForm.sessionMapID]}" />
+				<c:set var="sessionMap" value="${sessionScope[taskListItemForm.sessionMapID]}" />
 	
 				<div class="form-group">
 					<label for="description"><fmt:message key="label.authoring.basic.resource.description.input" /></label>

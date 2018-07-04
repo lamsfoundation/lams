@@ -15,10 +15,10 @@
 					<li><c:out value="${file.fileName}" escapeXml="true" /> <c:if test="${file.createBy != null}">
 						[<c:out value="${file.createBy.firstName} ${file.createBy.lastName}" escapeXml="true" />]
 					</c:if> <c:set var="downloadURL">
-							<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
-						</c:set> <html:link href="${downloadURL}">
+							"<lams:WebAppURL/>download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true"
+						</c:set> <a href="${downloadURL}">
 							<fmt:message key="label.download" />
-						</html:link></li>
+						</a></li>
 				</c:if>
 			</c:forEach>
 		</ul>
