@@ -41,8 +41,8 @@
 				document.getElementById("datesShown").style.display="none";
 				document.getElementById("datesNotShown").style.display="inline";
 	        } else { 
-		        	grid.jqGrid('showCol','startDate');
-		        	grid.jqGrid('showCol','finishDate');
+		        grid.jqGrid('showCol','startDate');
+		       	grid.jqGrid('showCol','finishDate');
 				document.getElementById("datesShown").style.display="inline";
 				document.getElementById("datesNotShown").style.display="none";
 	        }
@@ -64,6 +64,7 @@
 			    height: "100%",
 			    width: jqgridWidth,
 				shrinkToFit: false,
+				cmTemplate: { title: false },
 			    sortorder: "asc", 
 			    sortname: "id", 
 			    pager: 'organisationGridPager',
@@ -88,7 +89,7 @@
 			      {name:'avgMark',index:'avgMark', sortable:true, editable:false, search:false, width:50, align:"center"}
 			    ],
 			    loadError: function(xhr,st,err) {
-			    		jQuery("#organisationGrid").clearGridData();
+			    	jQuery("#organisationGrid").clearGridData();
 			   	 	alert("<fmt:message key="gradebook.error.loaderror"/>");
 			    },
 			    subGrid: true,
@@ -105,6 +106,7 @@
 					     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monCourse&lessonID=" + lessonID,
 					     height: "100%",
 					     autowidth:true,
+					     cmTemplate: { title: false },
 					     cellEdit:true,
 					     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradebookData&lessonID=" + lessonID,
 					     sortorder: "asc", 
@@ -117,11 +119,11 @@
 					     	"<fmt:message key="gradebook.columntitle.learnerName"/>",
 					     	"<fmt:message key="gradebook.columntitle.progress"/>", 
 					     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
-					    		"<fmt:message key="gradebook.columntitle.startDate"/>", 
-					    		"<fmt:message key="gradebook.columntitle.completeDate"/>", 
+					    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
+					    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 					     	"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
-			    				"<fmt:message key="gradebook.columntitle.mark"/>",
-			    				'portraitId'
+			    			"<fmt:message key="gradebook.columntitle.mark"/>",
+			    			'portraitId'
 					     ],
 					     colModel:[
 					     	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
@@ -169,7 +171,6 @@
 							fixArrowColumn(subgrid_id);
 							processLessonDateFields( lessonDatesHidden, jQuery("#"+subgrid_table_id) );
 							fixPagerInCenter(subgrid_table_id+"_pager",2);
-						 	toolTip($(".jqgrow"));	// enable tooltips for grid
 							initializePortraitPopover('<lams:LAMSURL/>');
 						 }	
 					 }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false})
@@ -177,7 +178,6 @@
 
 					},
 					gridComplete: function(){
-						toolTip($(".jqgrow"));	// enable tooltips for grid
 						fixPagerInCenter('organisationGridPager', 0);
 						processLessonDateFields( lessonDatesHidden, jQuery("#organisationGrid") ); // LDEV-4289 hide dates to start
 						hideShowLessonCheckboxes(); 
@@ -196,6 +196,7 @@
 			    height: "100%",
 			    width: jqgridWidth,
 			    shrinkToFit: false,
+			    cmTemplate: { title: false },
 			    sortorder: "asc", 
 			    sortname: "rowName", 
 			    pager: 'userViewPager',
@@ -217,11 +218,11 @@
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
-				   var subgrid_table_id;
-				   var userID = jQuery("#userView").getRowData(row_id)["id"];
-				   subgrid_table_id = subgrid_id+"_t";
-					 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
-					   	jQuery("#"+subgrid_table_id).jqGrid({
+					var subgrid_table_id;
+					var userID = jQuery("#userView").getRowData(row_id)["id"];
+					subgrid_table_id = subgrid_id+"_t";
+					jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
+					jQuery("#"+subgrid_table_id).jqGrid({
 							 guiStyle: "bootstrap",
 							 iconSet: 'fontAwesome',
 							 autoencode:false,
@@ -229,6 +230,7 @@
 						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&view=monUserView&organisationID=${organisationID}&userID=" + userID,
 						     height: "100%",
 						     autowidth:true,
+						     cmTemplate: { title: false },
 						     cellEdit:true,
 						     pager: subgrid_table_id + "_pager",
 						     rowList:[10,20,30,40,50,100],
@@ -333,16 +335,14 @@
 							 gridComplete: function(){
 								processLessonDateFields( lessonDatesHidden, jQuery("#"+subgrid_table_id) );
 								fixPagerInCenter(subgrid_table_id+"_pager",1);
-							 	toolTip($(".jqgrow"));
 							 }
-					  	}).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}); // applying refresh button
+					}).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}); // applying refresh button
 					  
-					},
-					gridComplete: function(){
-						toolTip($(".jqgrow"));  // allowing tooltips for this grid	
-						fixPagerInCenter('userViewPager',0);
-						initializePortraitPopover('<lams:LAMSURL/>');
-					}
+				},
+				gridComplete: function(){
+					fixPagerInCenter('userViewPager',0);
+					initializePortraitPopover('<lams:LAMSURL/>');
+				}
 			}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false}); // applying refresh button
 			jQuery("#userView").jqGrid('filterToolbar');
 			
