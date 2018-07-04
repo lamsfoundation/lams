@@ -10,7 +10,10 @@
 
 <style>
 	.group-mark-release-label {
-		font-size: medium; vertical-align: -webkit-baseline-middle;
+		margin-top: 8px;
+	}
+	.group-mark-release-label span{
+		font-size: medium;
 	}
 </style>
 
@@ -130,22 +133,21 @@
 	}
 
 	function releaseMarks(sessionId) {
-		var url = "<c:url value="/monitoring.do"/>";
-		
 		$("#messageArea_Busy").show();
-		$("#messageArea").load(
-			url,
-			{
+		
+		$.ajax({
+			url: "<c:url value="/monitoring.do"/>",
+			data: {
 				method: "releaseMarks",
 				toolSessionID: sessionId, 
 				reqID: (new Date()).getTime()
 			},
-			function() {
+			success: function() {
 				$("#messageArea_Busy").hide();
 				$("#release-marks-" + sessionId).hide();
 				$("#release-marks-info-" + sessionId).show();
 			}
-		);
+		});
 	}
 
 </script>
@@ -166,7 +168,6 @@
 	
 	<!--For release marks feature-->
 	<lams:WaitingSpinner id="messageArea_Busy"/>
-	<div id="messageArea"></div>
 
 </div>
 
@@ -196,9 +197,11 @@
 	
 	<P style="display: inline">
 		
-		<div class="label label-success loffset5 group-mark-release-label" id="release-marks-info-${sessionDto.sessionID}"
+		<div id="release-marks-info-${sessionDto.sessionID}" class="loffset5 group-mark-release-label"
 				<c:if test="${!sessionDto.marksReleased}">style="display:none;"</c:if>>
-			<fmt:message key="label.marks.released" />
+			<span class="label label-success">
+				<fmt:message key="label.marks.released" />
+			</span>
 		</div>
 	
 		<html:button property="viewAllMarks" onclick="javascript:viewAllMarks(${sessionDto.sessionID})"
