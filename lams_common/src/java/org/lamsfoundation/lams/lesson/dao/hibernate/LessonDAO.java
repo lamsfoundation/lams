@@ -272,7 +272,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     @Override
     public Long[] getLessonActivityIdsForToolContentId(long toolContentId) {
 	Query query = getSession().createQuery(LessonDAO.FIND_LESSON_ACTIVITY_IDS_BY_TOOL_CONTENT_ID);
-	query.setLong("toolContentId", 33333);
+	query.setLong("toolContentId", toolContentId);
 	List list = query.list();
 	
 	Long[] longArray = {null, null};

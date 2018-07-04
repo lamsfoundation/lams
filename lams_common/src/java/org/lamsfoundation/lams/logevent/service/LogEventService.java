@@ -207,18 +207,23 @@ public class LogEventService implements ILogEventService {
 	logLearnerChange(LogEvent.TYPE_LEARNER_CONTENT_SHOW_HIDE, learnerUserId, toolContentId, AUDIT_SHOW_I18N_KEY,
 		args);
     }
+    
+    @Override
+    public void logToolEvent(int eventType, Long toolContentId, Long learnerUserId, String message) {
+	Long[] ids = lessonDAO.getLessonActivityIdsForToolContentId(toolContentId);
+	Long lessonId = ids[0];
+	Long activityId = ids[1];
+	Integer currentUserId = getCurrentUserId();
+	
+	logEvent(eventType, currentUserId, learnerUserId != null ? learnerUserId.intValue() : null, lessonId,
+		activityId, message);
+    }
 
     private void logLearnerChange(int eventType, Long learnerUserId, Long toolContentId, String messageKey,
 	    Object[] args) {
-	Long lessonId = null;
-	Long activityId = null;
-	if (toolContentId != null) {
-	    Object[] ids = lessonDAO.getLessonActivityIdsForToolContentId(toolContentId);
-	    if (ids != null) {
-		lessonId = (Long) ids[0];
-		activityId = (Long) ids[1];
-	    }
-	}
+	Long[] ids = lessonDAO.getLessonActivityIdsForToolContentId(toolContentId);
+	Long lessonId = ids[0];
+	Long activityId = ids[1];
 	UserDTO currentUser = getCurrentUser();
 	
 	args[args.length - 1] = currentUser.getUserID();
@@ -230,16 +235,9 @@ public class LogEventService implements ILogEventService {
     @Override
     // Use for unusual changes such as adding/removing file
     public void logChangeLearnerArbitraryChange(Long learnerUserId, String learnerUserLogin, Long toolContentId, String message) {
-	Long lessonId = null;
-	Long activityId = null;
-	if (toolContentId != null) {
-	    // ToolActivity toolActivity = 
-	    Object[] ids = lessonDAO.getLessonActivityIdsForToolContentId(toolContentId);
-	    if (ids != null) {
-		lessonId = (Long) ids[0];
-		activityId = (Long) ids[1];
-	    }
-	}
+	Long[] ids = lessonDAO.getLessonActivityIdsForToolContentId(toolContentId);
+	Long lessonId = ids[0];
+	Long activityId = ids[1];
 	
 	logEvent(LogEvent.TYPE_LEARNER_CONTENT_UPDATED, getCurrentUserId(), learnerUserId != null ? learnerUserId.intValue() : null, lessonId,
 		activityId, message);
@@ -262,16 +260,9 @@ public class LogEventService implements ILogEventService {
 
     private void logEditActivityInMonitor(Long toolContentId, String messageKey) {
 
-	Number lessonId = null;
-	Number activityId = null;
-	if (toolContentId != null) {
-	    // ToolActivity toolActivity = 
-	    Object[] ids = lessonDAO.getLessonActivityIdsForToolContentId(toolContentId);
-	    if (ids != null) {
-		lessonId = (Number) ids[0];
-		activityId = (Number) ids[1];
-	    }
-	}
+	Long[] ids = lessonDAO.getLessonActivityIdsForToolContentId(toolContentId);
+	Long lessonId = ids[0];
+	Long activityId = ids[1];
 
 	UserDTO user = getCurrentUser();
 	String userString = user != null

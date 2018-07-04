@@ -1033,20 +1033,9 @@ public class SubmitFilesService
 	}
 	
 	//audit log event
-//	UserDTO currentUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-//	StringBuilder instructorTxt = new StringBuilder(monitor.getLogin()).append(" (").append(monitor.getUserID())
-//		.append(") ");
-//	StringBuilder learnerTxt = new StringBuilder(learner.getLogin()).append("  (").append(learner.getUserID())
-//		.append(") ");
-//
-//	String auditMsg = getLocalisedMessage(i18nKey,
-//		new Object[] { instructorTxt.toString(), detail.getFilePath(), learnerTxt.toString() });
-//	Long toolContentId = null;
-//	if (detail.getSubmitFileSession() != null && detail.getSubmitFileSession().getContent() != null) {
-//	    toolContentId = detail.getSubmitFileSession().getContent().getContentID();
-//	}
-//	logEventService.logEvent(LogEvent.TYPE_MARK_RELEASED, monitor.getUserID(), null, lessonId, null, message);
-//	logEventService.logEvent(logEventTypeId, currentUser.getUserID(), null, lessonId, activityId, description);
+	String sessionName = session.getSessionName() + " (toolSessionId=" + session.getSessionID() + ")"; 
+	String message = messageService.getMessage("msg.mark.released", new String[] { sessionName });
+	logEventService.logToolEvent(LogEvent.TYPE_TOOL_MARK_RELEASED, content.getContentID(), null, message);
     }
 
     @Override
