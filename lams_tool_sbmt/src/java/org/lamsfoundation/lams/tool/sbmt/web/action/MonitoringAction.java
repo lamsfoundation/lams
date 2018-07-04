@@ -279,18 +279,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	submitFilesService.releaseMarksForSession(sessionID);
 
-	try {
-	    response.setContentType("text/html;charset=utf-8");
-	    PrintWriter out = response.getWriter();
-	    SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
-	    String sessionName = "";
-	    if (session != null) {
-		sessionName = session.getSessionName();
-	    }
-	    out.write(getMessageService().getMessage("msg.mark.released", new String[] { sessionName }));
-	    out.flush();
-	} catch (IOException e) {
-	}
 	return null;
     }
 
