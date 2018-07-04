@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -269,11 +270,17 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * Returns an array of two longs.
      */
     @Override
-    public Object[] getLessonActivityIdsForToolContentId(long toolContentId) {
+    public Long[] getLessonActivityIdsForToolContentId(long toolContentId) {
 	Query query = getSession().createQuery(LessonDAO.FIND_LESSON_ACTIVITY_IDS_BY_TOOL_CONTENT_ID);
-	query.setLong("toolContentId", toolContentId);
+	query.setLong("toolContentId", 33333);
 	List list = query.list();
-	return list.size() > 0 ? (Object[]) list.get(0) : null;
+	
+	Long[] longArray = {null, null};
+	if (list.size() > 0) {
+	    Object[] objectArray = (Object[]) list.get(0);
+	    longArray = Arrays.copyOf(objectArray, objectArray.length, Long[].class);
+	}
+	return longArray;
     }
 
     /**
