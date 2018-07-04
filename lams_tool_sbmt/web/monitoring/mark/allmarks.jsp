@@ -30,6 +30,7 @@
 
 	<c:if test="${isMarksReleased}">
 		<div class="alert alert-success">
+            <i class="fa fa-check-circle"></i>
 			<fmt:message key="label.marks.released" />
 		</div>
 	</c:if>

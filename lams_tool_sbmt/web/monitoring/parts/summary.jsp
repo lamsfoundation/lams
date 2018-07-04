@@ -13,7 +13,7 @@
 		margin-top: 8px;
 	}
 	.group-mark-release-label span{
-		font-size: medium;
+		font-size: small;
 	}
 </style>
 
@@ -200,6 +200,7 @@
 		<div id="release-marks-info-${sessionDto.sessionID}" class="loffset5 group-mark-release-label"
 				<c:if test="${!sessionDto.marksReleased}">style="display:none;"</c:if>>
 			<span class="label label-success">
+                <i class="fa fa-check-circle"></i>
 				<fmt:message key="label.marks.released" />
 			</span>
 		</div>
