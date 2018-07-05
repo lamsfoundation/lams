@@ -16,30 +16,17 @@
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/readmore.min.js"></script>	
+	<script type="text/javascript" src="${lams}includes/javascript/readmore.min.js"></script>
+	<script type="text/javascript" src="<c:url value="/"/>/includes/javascript/marks.js"></script>
 	<script type="text/javascript">
+		//constants for marks.js
+		var LABEL_DELETE = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
+		var LABEL_RESTORE = '<fmt:message key="message.monitor.confirm.original.learner.file.restore"/>';
+		var MONITOR_URL = "<c:url value="/monitoring.do"/>";
+		
 		function updateMark(detailId,reportId,sessionId,userId){
 			location.href="<lams:WebAppURL/>mark.do?method=newMark&updateMode=listMark&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
 		}
-
-		function removeLearnerFile(detailId,sessionId,userId,filename) {
-			var msg = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
-			msg = msg.replace('{0}', filename)
-			var answer = confirm(msg);
-			if (answer) {	
-				location.href="<c:url value="/monitoring.do"/>?method=removeLearnerFile&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId;
-			}
-		}
-
-		function restoreLearnerFile(detailId,sessionId,userId,filename) {
-			var msg = '<fmt:message key="message.monitor.confirm.original.learner.file.restore"/>';
-			msg = msg.replace('{0}', filename)
-			var answer = confirm(msg);
-			if (answer) {	
-				location.href="<c:url value="/monitoring.do"/>?method=restoreLearnerFile&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId;
-			}
-		}
-
 	</script>
 </lams:head>
 
