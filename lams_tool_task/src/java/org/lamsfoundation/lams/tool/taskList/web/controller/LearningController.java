@@ -37,9 +37,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -75,6 +72,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  *
@@ -83,9 +81,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/learning")
-public class LearningController {
+public class LearningController implements TaskListConstants{
 
     private static Logger log = Logger.getLogger(LearningController.class);
+
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     @Autowired
     @Qualifier("lataskTaskListService")
@@ -108,7 +109,7 @@ public class LearningController {
 	// save toolContentID into HTTPSession
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 
-	Long sessionId = new Long(request.getParameter(TaskListConstants.PARAM_TOOL_SESSION_ID));
+	Long sessionId = Long.valueOf(request.getParameter(TaskListConstants.PARAM_TOOL_SESSION_ID));
 
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
@@ -296,9 +297,9 @@ public class LearningController {
 	taskList.setDefineLater(false);
 	taskListService.saveOrUpdateTaskList(taskList);
 
-//	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
-//		request, getServlet().getServletContext());
-//	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
+		request, applicationContext.getServletContext());
+	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	// check if there is submission deadline
 	Date submissionDeadline = taskList.getSubmissionDeadline();
@@ -357,7 +358,7 @@ public class LearningController {
      * @return
      */
     @RequestMapping("/finish")
-    public String finish(HttpServletRequest request, HttpServletResponse response) {
+    public String finish(@ModelAttribute ReflectionForm reflectionForm, Errors errors, HttpServletRequest request, HttpServletResponse response) {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
@@ -378,8 +379,8 @@ public class LearningController {
 	    request.setAttribute(TaskListConstants.ATTR_RUN_AUTO, false);
 	}
 
-	if (!validateBeforeFinish(request, sessionMapID)) {
-	    return "forward:/";
+	if (!validateBeforeFinish(request, sessionMapID, errors)) {
+	    return "redirect:/";
 	    // getInputForward
 	}
 
@@ -532,8 +533,8 @@ public class LearningController {
      * @throws UploadTaskListFileException
      */
     @RequestMapping("/uploadFile")
-    public String uploadFile(@ModelAttribute TaskListItemForm taskListItemForm, Errors errors, HttpServletRequest request)
-	    throws UploadTaskListFileException {
+    public String uploadFile(@ModelAttribute TaskListItemForm taskListItemForm, Errors errors,
+	    HttpServletRequest request) throws UploadTaskListFileException {
 
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -548,14 +549,15 @@ public class LearningController {
 	}
 
 	// validate file size
-//	FileValidatorUtil.validateFileSize(file, false);
-//	if (errors.hasErrors()) {
-//	    return "pages/learning/learning";
-//	}
+	FileValidatorUtil.validateFileSize(file, false, errors);
+	if (errors.hasErrors()) {
+	    return "pages/learning/learning";
+	}
 
 	// upload to repository
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	TaskListUser taskListUser = taskListService.getUserByIDAndSession(new Long(user.getUserID().intValue()), sessionId);
+	TaskListUser taskListUser = taskListService.getUserByIDAndSession(new Long(user.getUserID().intValue()),
+		sessionId);
 	TaskListItemAttachment att = taskListService.uploadTaskListItemFile(file, taskListUser);
 
 	// persist TaskListItem changes in DB
@@ -587,12 +589,12 @@ public class LearningController {
      */
     @RequestMapping("/newReflection")
     public String newReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    Errors errors, HttpServletResponse response) {
 
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
 
-	if (!validateBeforeFinish(request, sessionMapID)) {
+	if (!validateBeforeFinish(request, sessionMapID, errors)) {
 	    return "pages/learning/learning";
 	}
 
@@ -626,8 +628,8 @@ public class LearningController {
      * @return
      */
     @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, Errors errors,
+	    HttpServletRequest request, HttpServletResponse response) {
 
 	Integer userId = reflectionForm.getUserID();
 
@@ -651,7 +653,7 @@ public class LearningController {
 	    taskListService.updateEntry(entry);
 	}
 
-	return finish(request, response);
+	return finish(reflectionForm, errors, request, response);
     }
 
     // *************************************************************************************
@@ -692,7 +694,7 @@ public class LearningController {
 	}
     }
 
-    private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
+    private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID, Errors errors) {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -705,10 +707,8 @@ public class LearningController {
 	int minimumNumberTasks = taskListService.getTaskListBySessionId(sessionId).getMinimumNumberTasks();
 	// if current user view less than reqired view count number, then just return error message.
 	if ((minimumNumberTasks - numberCompletedTasks) > 0) {
-//	    ActionErrors errors = new ActionErrors();
-//	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-//		    new ActionMessage("lable.learning.minimum.view.number", minimumNumberTasks, numberCompletedTasks));
-//	    this.addErrors(request, errors);
+	    errors.reject("lable.learning.minimum.view.number",
+		    new Object[] { minimumNumberTasks, numberCompletedTasks }, null);
 	    return false;
 	}
 

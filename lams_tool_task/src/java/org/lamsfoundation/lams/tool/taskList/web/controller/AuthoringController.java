@@ -67,9 +67,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -275,8 +273,7 @@ public class AuthoringController {
      * @throws ServletException
      */
     @RequestMapping("/init")
-    public String initPage(@ModelAttribute TaskListForm startForm, HttpServletRequest request)
-	    throws ServletException {
+    public String initPage(@ModelAttribute TaskListForm startForm, HttpServletRequest request) throws ServletException {
 
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -516,7 +513,7 @@ public class AuthoringController {
 	if (errors.hasErrors()) {
 	    return "pages/authoring/parts/addtask";
 	}
-//
+
 	try {
 	    extractFormToTaskListItem(request, taskListItemForm);
 	} catch (Exception e) {
@@ -710,7 +707,8 @@ public class AuthoringController {
      * @param form
      * @param request
      */
-    private void populateItemToForm(int itemIdx, TaskListItem item, TaskListItemForm taskListItemForm, HttpServletRequest request) {
+    private void populateItemToForm(int itemIdx, TaskListItem item, TaskListItemForm taskListItemForm,
+	    HttpServletRequest request) {
 	taskListItemForm.setDescription(item.getDescription());
 	taskListItemForm.setTitle(item.getTitle());
 	if (itemIdx >= 0) {

@@ -108,7 +108,7 @@
 		
 					<lams:AuthoringButton formID="taskListForm" clearSessionActionUrl="/clearsession.do" 
 						toolSignature="<%=TaskListConstants.TOOL_SIGNATURE%>" toolContentID="${taskListForm.taskList.contentId}" 
-						 customiseSessionID="${taskListItemForm.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
+						 customiseSessionID="${taskListForm.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
 						 contentFolderID="${taskListForm.contentFolderID}" />
 			</lams:TabBodyArea>
 	

@@ -15,7 +15,7 @@
 
 						<div class="form-group voffset5">
 							<label for="comment"><fmt:message key="label.preview.add.comment" /></label>
-							<lams:STRUTS-textarea path="comment" rows="2" id="comment" cssClass="form-control" index="${item.uid}" />
+							<textarea name="comment" rows="2" id="comment" cssClass="form-control" index="${item.uid}"></textarea>
 							<c:if test="${(mode != 'teacher') && !itemDTO.commentRequirementsMet}">
 								<div class="help-block">
 									<fmt:message key="label.learning.info.add.comment.required" />

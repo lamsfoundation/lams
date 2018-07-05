@@ -19,8 +19,8 @@
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 	<form:form action="/learning/submitReflection" modelAttribute="reflectionForm" method="post" onsubmit="disableFinishButton();" id="messageForm">
-		<form:hidden property="userID" />
-		<form:hidden property="sessionMapID" />
+		<form:hidden path="userID" />
+		<form:hidden path="sessionMapID" />
 
 		<lams:Page type="learner" title="${sessionMap.title}">
 
@@ -30,7 +30,7 @@
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 			</p>
 
-			<form:input cols="60" id="notebookEntry" path="entryText" cssClass="form-control" rows="5" />
+			<input type="text" cols="60" id="notebookEntry" name="entryText" class="form-control" rows="5" />
 
 			<div class="voffset10">
 				<button type="submit" class="btn btn-primary pull-right na" id="finishButton">

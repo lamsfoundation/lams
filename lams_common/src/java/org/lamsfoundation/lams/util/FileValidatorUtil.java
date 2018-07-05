@@ -103,8 +103,30 @@ public class FileValidatorUtil {
      * @param errors
      * @return Be careful, if the file size is under maximum size, return TRUE. Otherwise, return false.
      */
+    public static boolean validateFileSize(FormFile file, boolean largeFile, ActionMessages errors) {
+	return FileValidatorUtil.validateFileSize(file, largeFile, ActionMessages.GLOBAL_MESSAGE, errors);
+
+    }
+
     public static boolean validateFileSize(FormFile file, boolean largeFile, Errors errors) {
-	return FileValidatorUtil.validateFileSize(file, largeFile, errors);
+	int fileSize = 0;
+	try {
+	    fileSize = file.getFileSize();
+	} catch (Exception e) {
+	    //skip, do nothing
+	    return true;
+	}
+	float maxFileSize = largeFile ? Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)
+		: Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
+
+	if (fileSize > maxFileSize) {
+	    String maxSize = FileValidatorUtil.formatSize(maxFileSize);
+
+	    // set error message
+	    errors.reject(MSG_KEY, new Object[] { maxSize }, null);
+	    return false;
+	}
+	return true;
 
     }
 

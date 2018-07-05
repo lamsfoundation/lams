@@ -41,20 +41,21 @@
 			<label for="taskTitle">
 			<fmt:message key="label.authoring.basic.resource.title.input" />
 			</label>
-			<form:input id="taskTitle" path="title" cssClass="form-control" tabindex="1" />
+			<input id="taskTitle" name="title" cssClass="form-control" tabindex="1" />
 		</div>
 		<div class="form-group">
 			<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>
-			<lams:STRUTS-textarea rows="5" tabindex="2" id="description" cssClass="form-control" path="description" />
+			<textarea rows="5" tabindex="2" id="description" class="form-control" name="description"></textarea>
 		</div>
 	</form:form>
 
 	<div class="form-group">
 		<lams:ImgButtonWrapper>
-			<button onclick="cancel();" class="btn btn-sm btn-default btn-disable-on-submit"> <fmt:message
-					key="label.cancel" />
+			<button onclick="cancel();" class="btn btn-sm btn-default btn-disable-on-submit"> 
+				<fmt:message key="label.cancel" />
 			</button>
-			<button onclick="saveTask()" class="btn btn-sm btn-default btn-disable-on-submit"> <fmt:message key="button.add" />
+			<button onclick="saveTask()" class="btn btn-sm btn-default btn-disable-on-submit"> 
+				<fmt:message key="button.add" />
 			</button>
 		</lams:ImgButtonWrapper>
 	</div>

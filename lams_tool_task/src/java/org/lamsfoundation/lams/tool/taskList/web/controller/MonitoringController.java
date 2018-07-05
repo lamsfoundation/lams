@@ -41,10 +41,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.SessionDTO;
@@ -64,52 +60,32 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
 
-public class MonitoringAction extends Action {
-	
-	
-    public static Logger log = Logger.getLogger(MonitoringAction.class);
+    public static Logger log = Logger.getLogger(MonitoringController.class);
     private static String TOOL_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
 	    + TaskListConstants.TOOL_SIGNATURE + "/";
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	String param = mapping.getParameter();
+    @Autowired
+    @Qualifier("lataskTaskListService")
+    private ITaskListService taskListService;
 
-	if (param.equals("summary")) {
-	    return summary(mapping, form, request, response);
-	}
-	if (param.equals("itemSummary")) {
-	    return itemSummary(mapping, form, request, response);
-	}
-	if (param.equals("getPagedUsers")) {
-	    return getPagedUsers(mapping, form, request, response);
-	}
-	if (param.equals("getPagedUsersByItem")) {
-	    return getPagedUsersByItem(mapping, form, request, response);
-	}
-	if (param.equals("setVerifiedByMonitor")) {
-	    return setVerifiedByMonitor(mapping, form, request, response);
-	}
-	if (param.equals("setSubmissionDeadline")) {
-	    return setSubmissionDeadline(mapping, form, request, response);
-	}
-
-	return mapping.findForward(TaskListConstants.ERROR);
-    }
-
-    private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/summary")
+    public String summary(HttpServletRequest request) {
 
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
@@ -120,10 +96,9 @@ public class MonitoringAction extends Action {
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
 
-	ITaskListService service = getTaskListService();
-	TaskList taskList = service.getTaskListByContentId(contentId);
+	TaskList taskList = taskListService.getTaskListByContentId(contentId);
 
-	List<SessionDTO> sessionDtos = service.getSummary(contentId);
+	List<SessionDTO> sessionDtos = taskListService.getSummary(contentId);
 
 	// cache into sessionMap
 	sessionMap.put(TaskListConstants.ATTR_SESSION_DTOS, sessionDtos);
@@ -133,7 +108,7 @@ public class MonitoringAction extends Action {
 	sessionMap.put(TaskListConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	sessionMap.put(TaskListConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
+	sessionMap.put(TaskListConstants.ATTR_IS_GROUPED_ACTIVITY, taskListService.isGroupedActivity(contentId));
 
 	if (taskList.getSubmissionDeadline() != null) {
 	    Date submissionDeadline = taskList.getSubmissionDeadline();
@@ -148,17 +123,17 @@ public class MonitoringAction extends Action {
 
 	// Create reflectList if reflection is enabled.
 	if (taskList.isReflectOnActivity()) {
-	    List<ReflectDTO> reflectList = service.getReflectList(taskList.getContentId());
+	    List<ReflectDTO> reflectList = taskListService.getReflectList(taskList.getContentId());
 	    // Add reflectList to sessionMap
 	    sessionMap.put(TaskListConstants.ATTR_REFLECT_LIST, reflectList);
 	}
 
-	return mapping.findForward(TaskListConstants.SUCCESS);
+	return "pages/monitoring/monitoring";
     }
 
-    private ActionForward itemSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ITaskListService service = getTaskListService();
+    @RequestMapping("/itemSummary")
+    public String itemSummary(HttpServletRequest request) {
+	
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -167,12 +142,12 @@ public class MonitoringAction extends Action {
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Long itemUid = WebUtil.readLongParam(request, TaskListConstants.PARAM_ITEM_UID);
 
-	TaskListItem item = service.getTaskListItemByUid(itemUid);
+	TaskListItem item = taskListService.getTaskListItemByUid(itemUid);
 
 	// create sessionList depending on whether the item was created by author or by learner
 	List<SessionDTO> sessionDtos = new ArrayList<>();
 	if (item.isCreateByAuthor()) {
-	    List<TaskListSession> sessionList = service.getSessionsByContentId(contentId);
+	    List<TaskListSession> sessionList = taskListService.getSessionsByContentId(contentId);
 	    for (TaskListSession session : sessionList) {
 		SessionDTO sessionDto = new SessionDTO(session);
 		sessionDtos.add(sessionDto);
@@ -187,15 +162,15 @@ public class MonitoringAction extends Action {
 	request.setAttribute(TaskListConstants.ATTR_SESSION_DTOS, sessionDtos);
 	request.setAttribute(TaskListConstants.ATTR_TASK_LIST_ITEM, item);
 
-	return mapping.findForward(TaskListConstants.SUCCESS);
+	return "pages/monitoring/itemsummary";
     }
 
     /**
      * Refreshes user list.
      */
-    public ActionForward getPagedUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException {
-	ITaskListService service = getTaskListService();
+    @RequestMapping(path = "/getPagedUsers", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getPagedUsers(HttpServletRequest request, HttpServletResponse res) {
 
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -224,9 +199,9 @@ public class MonitoringAction extends Action {
 	String searchString = WebUtil.readStrParam(request, "userName", true);
 
 	// Get the user list from the db
-	Collection<TaskListUserDTO> userDtos = service.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy,
-		sortOrder, searchString);
-	int countSessionUsers = service.getCountPagedUsersBySession(sessionId, searchString);
+	Collection<TaskListUserDTO> userDtos = taskListService.getPagedUsersBySession(sessionId, page - 1, rowLimit,
+		sortBy, sortOrder, searchString);
+	int countSessionUsers = taskListService.getCountPagedUsersBySession(sessionId, searchString);
 
 	int totalPages = new Double(
 		Math.ceil(new Integer(countSessionUsers).doubleValue() / new Integer(rowLimit).doubleValue()))
@@ -249,7 +224,7 @@ public class MonitoringAction extends Action {
 	    }
 
 	    if (tasklist.isMonitorVerificationRequired()) {
-		String label = HtmlUtils.htmlEscape(service.getMessage("label.confirm"));
+		String label = HtmlUtils.htmlEscape(taskListService.getMessage("label.confirm"));
 
 		String verificationStatus = userDto.isVerifiedByMonitor() ? "<i class=\"fa fa-check\"></i>"
 			: "<a id='verif-" + userDto.getUserId()
@@ -273,17 +248,15 @@ public class MonitoringAction extends Action {
 	responseJSON.put("records", countSessionUsers);
 	responseJSON.set("rows", rows);
 
-	res.setContentType("application/json;charset=utf-8");
-	res.getWriter().print(new String(responseJSON.toString()));
-	return null;
+	return responseJSON.toString();
     }
 
     /**
      * Refreshes user list.
      */
-    public ActionForward getPagedUsersByItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException {
-	ITaskListService service = getTaskListService();
+    @RequestMapping(path = "/getPagedUsersByItem", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getPagedUsersByItem(HttpServletRequest request) {
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long itemUid = WebUtil.readLongParam(request, TaskListConstants.PARAM_ITEM_UID);
@@ -299,9 +272,9 @@ public class MonitoringAction extends Action {
 	String searchString = WebUtil.readStrParam(request, "userName", true);
 
 	// Get the user list from the db
-	Collection<TaskListUserDTO> userDtos = service.getPagedUsersBySessionAndItem(sessionId, itemUid, page - 1,
-		rowLimit, sortBy, sortOrder, searchString);
-	int countSessionUsers = service.getCountPagedUsersBySession(sessionId, searchString);
+	Collection<TaskListUserDTO> userDtos = taskListService.getPagedUsersBySessionAndItem(sessionId, itemUid,
+		page - 1, rowLimit, sortBy, sortOrder, searchString);
+	int countSessionUsers = taskListService.getCountPagedUsersBySession(sessionId, searchString);
 
 	int totalPages = new Double(
 		Math.ceil(new Integer(countSessionUsers).doubleValue() / new Integer(rowLimit).doubleValue()))
@@ -314,10 +287,10 @@ public class MonitoringAction extends Action {
 	TimeZone monitorTimeZone = monitorDto.getTimeZone();
 
 	//get all comments and attachments
-	TaskListItem item = service.getTaskListItemByUid(itemUid);
+	TaskListItem item = taskListService.getTaskListItemByUid(itemUid);
 	Set<TaskListItemComment> itemComments = item.getComments();
 	Set<TaskListItemAttachment> itemAttachments = item.getAttachments();
-	String label = HtmlUtils.htmlEscape(service.getMessage("label.download"));
+	String label = HtmlUtils.htmlEscape(taskListService.getMessage("label.download"));
 
 	int i = 0;
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
@@ -403,9 +376,7 @@ public class MonitoringAction extends Action {
 	responseJSON.put("records", countSessionUsers);
 	responseJSON.set("rows", rows);
 
-	res.setContentType("application/json;charset=utf-8");
-	res.getWriter().print(new String(responseJSON.toString()));
-	return null;
+	return responseJSON.toString();
     }
 
     /**
@@ -418,21 +389,20 @@ public class MonitoringAction extends Action {
      * @return
      * @throws IOException
      */
-    private ActionForward setVerifiedByMonitor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/setVerifiedByMonitor")
+    public String setVerifiedByMonitor(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long userUid = WebUtil.readLongParam(request, TaskListConstants.ATTR_USER_UID);
-	ITaskListService service = getTaskListService();
-	TaskListUser user = service.getUser(userUid);
+	TaskListUser user = taskListService.getUser(userUid);
 	user.setVerifiedByMonitor(true);
-	service.createUser(user);
+	taskListService.createUser(user);
 
 	response.setContentType("text/html");
 	PrintWriter out = response.getWriter();
 	out.write(userUid.toString());
 	out.flush();
 	out.close();
-	return null;
+	return "redirect:/monitoring/summary.do";
     }
 
     /**
@@ -444,12 +414,12 @@ public class MonitoringAction extends Action {
      * @param response
      * @return
      */
-    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseBody
+    public String setSubmissionDeadline(HttpServletRequest request) {
 
-	ITaskListService service = getTaskListService();
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	TaskList taskList = service.getTaskListByContentId(contentID);
+	TaskList taskList = taskListService.getTaskListByContentId(contentID);
 
 	Long dateParameter = WebUtil.readLongParam(request, TaskListConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
@@ -464,19 +434,8 @@ public class MonitoringAction extends Action {
 	    formattedDate = DateUtil.convertToStringForJSON(tzSubmissionDeadline, request.getLocale());
 	}
 	taskList.setSubmissionDeadline(tzSubmissionDeadline);
-	service.saveOrUpdateTaskList(taskList);
-	response.setContentType("text/plain;charset=utf-8");
-	response.getWriter().print(formattedDate);
-	return null;
-    }
-
-    // *************************************************************************************
-    // Private method
-    // *************************************************************************************
-    private ITaskListService getTaskListService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (ITaskListService) wac.getBean(TaskListConstants.TASKLIST_SERVICE);
+	taskListService.saveOrUpdateTaskList(taskList);
+	return formattedDate;
     }
 
 }
