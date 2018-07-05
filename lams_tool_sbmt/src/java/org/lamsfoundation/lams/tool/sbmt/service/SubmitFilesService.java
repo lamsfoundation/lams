@@ -1034,7 +1034,7 @@ public class SubmitFilesService
 	
 	//audit log event
 	String sessionName = session.getSessionName() + " (toolSessionId=" + session.getSessionID() + ")"; 
-	String message = messageService.getMessage("msg.mark.released", new String[] { sessionName });
+	String message = messageService.getMessage("tool.display.name") + ". " + messageService.getMessage("msg.mark.released", new String[] { sessionName });
 	logEventService.logToolEvent(LogEvent.TYPE_TOOL_MARK_RELEASED, content.getContentID(), null, message);
     }
 
