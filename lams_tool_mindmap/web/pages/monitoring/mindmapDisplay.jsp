@@ -6,6 +6,7 @@
 
 <script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script src="<lams:LAMSURL/>includes/javascript/jquery.minicolors.min.js"></script>
+<script src="<lams:LAMSURL/>includes/javascript/fullscreen.js"></script>
 <script src="${tool}includes/javascript/mapjs/main.js"></script>
 <script src="${tool}includes/javascript/mapjs/underscore-min.js"></script>
 
