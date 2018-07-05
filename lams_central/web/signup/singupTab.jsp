@@ -256,8 +256,8 @@
 									</html:option>
 									
 									<c:forEach items="${countryCodes}" var="countryCode">
-										<html:option value="${countryCode}">
-											<fmt:message key="country.${countryCode}" />
+										<html:option value="${countryCode.key}">
+											${countryCode.value}
 										</html:option>
 									</c:forEach>
 								</html:select>

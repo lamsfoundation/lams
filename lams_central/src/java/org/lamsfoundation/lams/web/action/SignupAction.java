@@ -21,6 +21,7 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
@@ -41,7 +42,7 @@ public class SignupAction extends Action {
 	    signupService = (ISignupService) wac.getBean("signupService");
 	}
 	
-	request.setAttribute("countryCodes", CommonConstants.COUNTRY_CODES);
+	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes());
 
 	DynaActionForm signupForm = (DynaActionForm) form;
 	String method = WebUtil.readStrParam(request, "method", true);

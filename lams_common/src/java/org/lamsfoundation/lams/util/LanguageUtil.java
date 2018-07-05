@@ -24,10 +24,13 @@
 package org.lamsfoundation.lams.util;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
@@ -40,7 +43,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * Various internationalisation (internationalization) utilities.
  *
  * @author Fiona Malikoff
- *
  */
 public class LanguageUtil {
 
@@ -51,19 +53,7 @@ public class LanguageUtil {
     public static final String DEFAULT_DIRECTION = "LTR";
 
     private static IUserManagementService service;
-
-    private static IUserManagementService getService() {
-	if (LanguageUtil.service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getWebApplicationContext(SessionManager.getServletContext());
-	    LanguageUtil.service = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return LanguageUtil.service;
-    }
-
-    public static void setService(IUserManagementService service) {
-	LanguageUtil.service = service;
-    }
+    private static MessageService messageService;
 
     /**
      * Get the default language, country, based on entries in the server configuration file.
@@ -133,9 +123,9 @@ public class LanguageUtil {
 	}
 
 	SupportedLocale locale = null;
-	locale = LanguageUtil.getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
+	locale = getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
 	if (locale == null) {
-	    locale = LanguageUtil.getSupportedLocaleOrNull(LanguageUtil.DEFAULT_LANGUAGE, LanguageUtil.DEFAULT_COUNTRY);
+	    locale = getSupportedLocaleOrNull(LanguageUtil.DEFAULT_LANGUAGE, LanguageUtil.DEFAULT_COUNTRY);
 	}
 
 	return locale;
@@ -146,16 +136,16 @@ public class LanguageUtil {
      * default locale.
      */
     public static SupportedLocale getSupportedLocale(String input) {
-	List list = LanguageUtil.getService().findByProperty(SupportedLocale.class, "languageIsoCode", input);
+	List list = getService().findByProperty(SupportedLocale.class, "languageIsoCode", input);
 	if ((list != null) && (list.size() > 0)) {
 	    return (SupportedLocale) list.get(0);
 	} else {
-	    list = LanguageUtil.getService().findByProperty(SupportedLocale.class, "countryIsoCode", input);
+	    list = getService().findByProperty(SupportedLocale.class, "countryIsoCode", input);
 	    if ((list != null) && (list.size() > 0)) {
 		return (SupportedLocale) list.get(0);
 	    }
 	}
-	return LanguageUtil.getDefaultLocale();
+	return getDefaultLocale();
     }
 
     /**
@@ -164,9 +154,9 @@ public class LanguageUtil {
     public static SupportedLocale getSupportedLocale(String langIsoCode, String countryIsoCode) {
 	SupportedLocale locale = null;
 
-	locale = LanguageUtil.getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
+	locale = getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
 	if (locale == null) {
-	    locale = LanguageUtil.getDefaultLocale();
+	    locale = getDefaultLocale();
 	}
 
 	return locale;
@@ -190,7 +180,7 @@ public class LanguageUtil {
 	    return null;
 	}
 
-	List list = LanguageUtil.getService().findByProperties(SupportedLocale.class, properties);
+	List list = getService().findByProperties(SupportedLocale.class, properties);
 	if ((list != null) && (list.size() > 0)) {
 	    Collections.sort(list);
 	    locale = (SupportedLocale) list.get(0);
@@ -198,6 +188,42 @@ public class LanguageUtil {
 	    locale = null;
 	}
 	return locale;
+    }
+    
+    /**
+     * Get list of all available country names sorted alphabetically.
+     */
+    public static Map<String, String> getCountryCodes() {
+	getMessageService();
+	
+	Map<String, String> countryCodesMap = new HashMap<String, String>();
+	for (String countryCode : CommonConstants.COUNTRY_CODES) {
+	    String countryName = messageService.getMessage("country." + countryCode);
+	    countryCodesMap.put(countryCode, countryName);
+	}
+	
+	//sort alphabetically
+	return countryCodesMap.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.naturalOrder()))
+		.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue,
+			LinkedHashMap::new));
+    }
+
+    private static IUserManagementService getService() {
+	if (service == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(SessionManager.getServletContext());
+	    service = (IUserManagementService) ctx.getBean("userManagementService");
+	}
+	return service;
+    }
+    
+    private static MessageService getMessageService() {
+	if (messageService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(SessionManager.getServletContext());
+	    messageService = (MessageService) ctx.getBean("commonMessageService");
+	}
+	return messageService;
     }
 
 }
