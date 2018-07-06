@@ -81,7 +81,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @RequestMapping("/learning")
-public class LearningController implements TaskListConstants{
+public class LearningController implements TaskListConstants {
 
     private static Logger log = Logger.getLogger(LearningController.class);
 
@@ -342,10 +342,11 @@ public class LearningController implements TaskListConstants{
 
 	doComplete(request);
 
-//	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(TaskListConstants.SUCCESS));
-//	redirect.addParameter(AttributeNames.ATTR_MODE, mode);
-//	redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
-	return "redirect:/learning/start.do";
+	String redirectURL = "redirect:/learning/start.do";
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.ATTR_MODE, mode);
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.PARAM_TOOL_SESSION_ID,
+		sessionId.toString());
+	return redirectURL;
     }
 
     /**
@@ -358,7 +359,8 @@ public class LearningController implements TaskListConstants{
      * @return
      */
     @RequestMapping("/finish")
-    public String finish(@ModelAttribute ReflectionForm reflectionForm, Errors errors, HttpServletRequest request, HttpServletResponse response) {
+    public String finish(@ModelAttribute ReflectionForm reflectionForm, Errors errors, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
