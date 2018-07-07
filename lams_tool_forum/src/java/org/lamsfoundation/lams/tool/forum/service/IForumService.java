@@ -179,7 +179,7 @@ public interface IForumService {
      * @param rootTopicId
      * @return List of MessageDTO
      */
-    List getTopicThread(Long rootTopicId);
+    List<MessageDTO> getTopicThread(Long rootTopicId);
 
     /**
      * Get topic and its children list by given root topic ID, starting from after the sequence number specified.
@@ -342,12 +342,12 @@ public interface IForumService {
     ForumUser getUserByID(Long userId);
 
     /**
-     * Update report contained inside specified message.
+     * Update mark and mark comment. Send marks to gradebook, if marks are released for that session
      *
      * @param message
      *            specified message
      */
-    void updateContainedReport(Message message);
+    void updateMark(Message message);
 
     // ************************************************************************************
     // Report Method
