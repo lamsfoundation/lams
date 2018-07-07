@@ -42,7 +42,7 @@ public class SignupAction extends Action {
 	    signupService = (ISignupService) wac.getBean("signupService");
 	}
 	
-	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes());
+	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(true));
 
 	DynaActionForm signupForm = (DynaActionForm) form;
 	String method = WebUtil.readStrParam(request, "method", true);

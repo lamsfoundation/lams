@@ -242,7 +242,7 @@ public class ProfileAction extends LamsDispatchAction {
 	userForm.set("localeId", locale.getLocaleId());
 	request.setAttribute("locales", locales);
 	
-	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes());
+	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
 
 	themeService = getThemeService();
 

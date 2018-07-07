@@ -23,6 +23,9 @@
 
 package org.lamsfoundation.lams.util;
 
+import java.util.Locale;
+
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -66,6 +69,25 @@ public class MessageService {
 	String message;
 	try {
 	    message = messageSource.getMessage(key, null, LocaleContextHolder.getLocale());
+	} catch (NoSuchMessageException e) {
+	    message = "??" + key + "??";
+	}
+	return message;
+    }
+    
+    /**
+     * The same as getMessage(String key) but allows specifying locale in which to do a loockup.
+     * 
+     * @param key
+     * @param supportedLocale
+     * @return
+     */
+    public String getMessage(String key, SupportedLocale supportedLocale) {
+	Locale locale = new Locale(supportedLocale.getLanguageIsoCode(), supportedLocale.getCountryIsoCode());
+
+	String message;
+	try {
+	    message = messageSource.getMessage(key, null, locale);
 	} catch (NoSuchMessageException e) {
 	    message = "??" + key + "??";
 	}

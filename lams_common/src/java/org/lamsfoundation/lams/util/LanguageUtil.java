@@ -192,13 +192,19 @@ public class LanguageUtil {
     
     /**
      * Get list of all available country names sorted alphabetically.
+     * 
+     * @parama enforceUsingDefaultLocale in some rare cases (like with SignupAction) it's useful to enforce using LAMS
+     *         server's default locale, instead of the system default one
      */
-    public static Map<String, String> getCountryCodes() {
+    public static Map<String, String> getCountryCodes(boolean enforceUsingDefaultLocale) {
 	getMessageService();
+	SupportedLocale lamsDefaultLocale = enforceUsingDefaultLocale ? LanguageUtil.getDefaultLocale() : null;
 	
 	Map<String, String> countryCodesMap = new HashMap<String, String>();
 	for (String countryCode : CommonConstants.COUNTRY_CODES) {
-	    String countryName = messageService.getMessage("country." + countryCode);
+	    String countryName = enforceUsingDefaultLocale
+		    ? messageService.getMessage("country." + countryCode, lamsDefaultLocale)
+		    : messageService.getMessage("country." + countryCode);
 	    countryCodesMap.put(countryCode, countryName);
 	}
 	

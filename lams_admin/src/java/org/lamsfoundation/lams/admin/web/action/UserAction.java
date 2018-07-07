@@ -224,7 +224,7 @@ public class UserAction extends LamsDispatchAction {
 	}
 
 	request.setAttribute("locales", locales);
-	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes());
+	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
 	request.setAttribute("authenticationMethods", authenticationMethods);
 
 	return mapping.findForward("user");
