@@ -461,6 +461,18 @@
 					</tr>
 				</c:if>
 				
+				<c:if test="${not empty createDate}">
+					<tr>
+						<td class="align-right">
+							<fmt:message key="admin.user.create.date" />:
+						</td>
+						<td>
+							<lams:Date value="${createDate}"/>
+						</td>
+					</tr>
+				</c:if>
+				
+				
 			</table>
 		</div>
 		</div>
