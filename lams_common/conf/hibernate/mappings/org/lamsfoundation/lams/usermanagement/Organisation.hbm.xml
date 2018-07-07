@@ -240,17 +240,6 @@
 			</key>
 			<one-to-many class="org.lamsfoundation.lams.usermanagement.WorkspaceFolder" />
 		</set>
-		<!-- bi-directional many-to-one association to SupportedLocale -->
-		<many-to-one name="locale"
-			class="org.lamsfoundation.lams.usermanagement.SupportedLocale"
-			not-null="true">
-			<meta attribute="field-description">
-				@hibernate.many-to-one not-null="true"
-				@hibernate.column
-				name="locale_id"
-			</meta>
-			<column name="locale_id" />
-		</many-to-one>
 
 		<property name="archivedDate" type="java.util.Date" update="true"
 			insert="true" column="archived_date" length="19" not-null="false" />

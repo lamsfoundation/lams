@@ -126,11 +126,10 @@ public class ImportService implements IImportService {
     private static final short NAME = 0;
     private static final short CODE = 1;
     private static final short DESCRIPTION = 2;
-    private static final short LOCALE_ID = 3;
-    private static final short ORGANISATION_STATE = 4;
-    private static final short ADMIN_ADD_NEW_USERS = 5;
-    private static final short ADMIN_BROWSE_ALL_USERS = 6;
-    private static final short ADMIN_CHANGE_STATUS = 7;
+    private static final short ORGANISATION_STATE = 3;
+    private static final short ADMIN_ADD_NEW_USERS = 4;
+    private static final short ADMIN_BROWSE_ALL_USERS = 5;
+    private static final short ADMIN_CHANGE_STATUS = 6;
 
     // class-wide variables
     ArrayList<ArrayList> results = new ArrayList<ArrayList>();
@@ -258,16 +257,6 @@ public class ImportService implements IImportService {
 	org.setName(name);
 	org.setCode(parseStringCell(row.getCell(ImportService.CODE)));
 	org.setDescription(parseStringCell(row.getCell(ImportService.DESCRIPTION)));
-
-	String localeId = parseStringCell(row.getCell(ImportService.LOCALE_ID));
-	SupportedLocale locale = getLocale(localeId);
-	if (locale == null) {
-	    args[0] = "(" + localeId + ")";
-	    rowResult.add(messageService.getMessage("error.locale.invalid", args));
-	    hasError = true;
-	} else {
-	    org.setLocale(locale);
-	}
 
 	String orgStateText = parseStringCell(row.getCell(ImportService.ORGANISATION_STATE));
 	OrganisationState orgState = getOrganisationState(orgStateText);
