@@ -59,7 +59,6 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -184,6 +183,9 @@ public class UserAction extends LamsDispatchAction {
 
 	    //property available for modification only to sysadmins
 	    userForm.set("twoFactorAuthenticationEnabled", user.isTwoFactorAuthenticationEnabled());
+	    // can not make a part of form as in JSP it can only be accessed by <bean:write>
+	    // and we need the Date object to put into <lams:Date>
+	    request.setAttribute("createDate", user.getCreateDate());
 	} else { // create a user
 	    try {
 		SupportedLocale locale = LanguageUtil.getDefaultLocale();
