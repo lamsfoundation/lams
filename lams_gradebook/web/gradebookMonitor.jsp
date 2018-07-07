@@ -165,7 +165,7 @@
 			    rowNum:10,
 				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradebookData&lessonID=${lessonDetails.lessonID}",
 			    colNames:["", 
-			    	"<fmt:message key="gradebook.columntitle.name"/>AAAAAAAAAAA", 
+			    	"<fmt:message key="gradebook.columntitle.name"/>", 
 			    	"<fmt:message key="gradebook.columntitle.progress"/>", 
 			    	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
 			    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
