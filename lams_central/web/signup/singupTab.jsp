@@ -133,6 +133,9 @@
 							},
 							submitHandler : function(form) {
 								form.submit();
+							},
+							invalidHandler : function(){
+								$('#submitButton').button('reset');
 							}
 		});
 	});
@@ -274,9 +277,13 @@
 							</div>
 
 							<div class="form-group" align="right">
-								<html:submit styleClass="btn btn-sm btn-default voffset5">
+								<button id="submitButton"
+										class="btn btn-sm btn-default voffset5"
+									    data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='login.submit' /></span>"
+									    onClick="javascript:$(this).button('loading');$('#SignupForm').submit()"
+								>
 									<fmt:message key="login.submit" />
-								</html:submit>
+								</button>
 							</div>
 						</div>
 					</div>
