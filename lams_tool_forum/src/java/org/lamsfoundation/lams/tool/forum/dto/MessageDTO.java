@@ -82,7 +82,7 @@ public class MessageDTO {
 	if ((report != null) && (report.getMark() != null)) {
 	    dto.mark = report.getMark();
 	    dto.comment = report.getComment();
-	    dto.released = report.getDateMarksReleased() == null ? false : true;
+	    dto.released = msg.getToolSession().isMarkReleased();
 	}
 
 	return dto;
@@ -119,7 +119,7 @@ public class MessageDTO {
 	    if ((report != null) && (report.getMark() != null)) {
 		msgDto.mark = report.getMark();
 		msgDto.comment = report.getComment();
-		msgDto.released = report.getDateMarksReleased() == null ? false : true;
+		msgDto.released = msg.getToolSession().isMarkReleased();
 	    }
 
 	    retSet.add(msgDto);

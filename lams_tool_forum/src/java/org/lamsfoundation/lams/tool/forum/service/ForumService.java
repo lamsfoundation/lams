@@ -65,6 +65,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -290,8 +291,15 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public void updateContainedReport(Message message) {
+    public void updateMark(Message message) {
 	messageDao.saveOrUpdate(message);
+	
+	// send marks to gradebook, if marks are released for that session
+	ForumUser user = message.getCreatedBy();
+	ForumToolSession session = user.getSession();
+	if (session.isMarkReleased()) {
+	    sendMarksToGradebook(user, session.getSessionId());
+	}
     }
 
     @Override
@@ -420,7 +428,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public List getTopicThread(Long rootTopicId) {
+    public List<MessageDTO> getTopicThread(Long rootTopicId) {
 	List unsortedThread = messageSeqDao.getCompleteTopic(rootTopicId);
 	Iterator iter = unsortedThread.iterator();
 	MessageSeq msgSeq;
@@ -600,51 +608,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     @Override
     public void releaseMarksForSession(Long sessionID) {
 	// udate release mark date for each message.
-	List<Message> list = messageDao.getBySession(sessionID);
-	Iterator<Message> iter = list.iterator();
+	List<Message> messages = messageDao.getBySession(sessionID);
 	ForumToolSession session = forumToolSessionDao.getBySessionId(sessionID);
 	Forum forum = session.getForum();
 	boolean notifyLearnersOnMarkRelease = getEventNotificationService().eventExists(ForumConstants.TOOL_SIGNATURE,
 		ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId());
-	Map<Integer, StringBuilder> notificationMessages = null;
-	Object[] notificationMessageParameters = null;
-	if (notifyLearnersOnMarkRelease) {
-	    notificationMessages = new TreeMap<>();
-	    notificationMessageParameters = new Object[3];
-	}
-
-	while (iter.hasNext()) {
-	    Message msg = iter.next();
-	    ForumReport report = msg.getReport();
-	    if (report != null) {
-		report.setDateMarksReleased(new Date());
-		if (notifyLearnersOnMarkRelease) {
-		    ForumUser user = msg.getCreatedBy();
-		    StringBuilder notificationMessage = notificationMessages.get(user.getUserId().intValue());
-		    if (notificationMessage == null) {
-			notificationMessage = new StringBuilder();
-		    }
-		    notificationMessageParameters[0] = msg.getSubject();
-		    notificationMessageParameters[1] = msg.getUpdated();
-		    notificationMessageParameters[2] = report.getMark();
-		    notificationMessage
-			    .append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
-		    notificationMessages.put(user.getUserId().intValue(), notificationMessage);
-		}
-	    }
-	    messageDao.saveOrUpdate(msg);
-
-	}
-	if (notifyLearnersOnMarkRelease) {
-	    notificationMessageParameters = new Object[1];
-	    for (Integer userID : notificationMessages.keySet()) {
-		notificationMessageParameters[0] = notificationMessages.get(userID).toString();
-		getEventNotificationService().triggerForSingleUser(ForumConstants.TOOL_SIGNATURE,
-			ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(), userID,
-			notificationMessageParameters);
-
-	    }
-	}
 
 	List<ForumUser> users = getUsersBySessionId(sessionID);
 	if (users != null) {
@@ -654,9 +622,46 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    }
 	}
 
-	// update session to set MarkRelease flag.
+	// update session to set MarkRelease flag
 	session.setMarkReleased(true);
 	forumToolSessionDao.saveOrUpdate(session);
+	
+	// notify learners on mark release
+	if (notifyLearnersOnMarkRelease) {
+	    Map<Integer, StringBuilder> notificationMessages = new TreeMap<>();
+
+	    for (Message message : messages) {
+		ForumReport report = message.getReport();
+		if (report != null) {
+		    ForumUser user = message.getCreatedBy();
+		    StringBuilder notificationMessage = notificationMessages.get(user.getUserId().intValue());
+		    if (notificationMessage == null) {
+			notificationMessage = new StringBuilder();
+		    }
+		    Object[] notificationMessageParameters = new Object[3];
+		    notificationMessageParameters[0] = message.getSubject();
+		    notificationMessageParameters[1] = message.getUpdated();
+		    notificationMessageParameters[2] = report.getMark();
+		    notificationMessage
+			    .append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
+		    notificationMessages.put(user.getUserId().intValue(), notificationMessage);
+		}
+	    }
+
+	    for (Integer userID : notificationMessages.keySet()) {
+		Object[] notificationMessageParameters = new Object[1];
+		notificationMessageParameters[0] = notificationMessages.get(userID).toString();
+		getEventNotificationService().triggerForSingleUser(ForumConstants.TOOL_SIGNATURE,
+			ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(), userID,
+			notificationMessageParameters);
+
+	    }
+	}
+	
+	//audit log event
+	String sessionName = session.getSessionName() + " (toolSessionId=" + session.getSessionId() + ")"; 
+	String message = messageService.getMessage("tool.display.name") + ". " + messageService.getMessage("msg.mark.released", new String[] { sessionName });
+	logEventService.logToolEvent(LogEvent.TYPE_TOOL_MARK_RELEASED, forum.getContentId(), null, message);
 
     }
 
@@ -706,7 +711,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
      * @param map
      * @return
      */
-    private List getSortedMessageDTO(SortedMap<MessageSeq, Message> map) {
+    private List<MessageDTO> getSortedMessageDTO(SortedMap<MessageSeq, Message> map) {
 	Iterator iter;
 	MessageSeq msgSeq;
 	Message message;

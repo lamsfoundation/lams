@@ -25,20 +25,11 @@
 
 package org.lamsfoundation.lams.tool.forum.persistence;
 
-import java.util.Date;
-
-/**
- *
- *
- *
- *
- */
 public class ForumReport {
 
     private Long uid;
     private Float mark;
     private String comment;
-    private Date dateMarksReleased;
 
     /**
      *
@@ -61,18 +52,6 @@ public class ForumReport {
 
     public void setComment(String comment) {
 	this.comment = comment;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Date getDateMarksReleased() {
-	return dateMarksReleased;
-    }
-
-    public void setDateMarksReleased(Date dateMarksReleased) {
-	this.dateMarksReleased = dateMarksReleased;
     }
 
     /**
