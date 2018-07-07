@@ -35,18 +35,6 @@
 		<td><fmt:message key="admin.organisation.description"/>:</td>
 		<td><html-el:textarea property="description" cols="50" rows="3"  styleClass="form-control"/></td>
 	</tr>
-	<tr>
-		<td><fmt:message key="admin.organisation.locale"/>:</td>
-		<td>
-			<html-el:select property="localeId"  styleClass="form-control">
-				<c:forEach items="${locales}" var="locale">
-					<html-el:option value="${locale.localeId}">
-						<c:out value="${locale.description}" />
-					</html-el:option>
-				</c:forEach>	
-			</html-el:select>
-		</td>
-	</tr>
 	<logic:equal name="OrganisationForm" property="courseAdminCanChangeStatusOfCourse" value="true">
 	<tr>
 		<td><fmt:message key="admin.organisation.status"/>:</td>

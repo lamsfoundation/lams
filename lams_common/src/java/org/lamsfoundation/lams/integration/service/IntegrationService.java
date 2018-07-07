@@ -371,7 +371,6 @@ public class IntegrationService implements IIntegrationService {
 	org.setDescription(extCourseId);
 	org.setOrganisationState(
 		(OrganisationState) service.findById(OrganisationState.class, OrganisationState.ACTIVE));
-	org.setLocale(LanguageUtil.getSupportedLocale(langIsoCode, countryIsoCode));
 
 	org.setEnableCourseNotifications(true);
 
@@ -435,7 +434,7 @@ public class IntegrationService implements IIntegrationService {
 		    + "Email format is invalid. External server:" + extServer.getServerid() + ", Username:" + login
 		    + ", firstName:" + firstName + ", lastName:" + lastName);
 	}
-	
+
 	//set user's country to default value if it wasn't provided or has a wrong value
 	String country = userData[7];
 	if (StringUtils.isBlank(country) || !Arrays.asList(CommonConstants.COUNTRY_CODES).contains(country)) {
@@ -526,7 +525,7 @@ public class IntegrationService implements IIntegrationService {
 	    throw new UserInfoFetchException(e);
 	}
     }
-    
+
     @Override
     public boolean isIntegrationUser(Integer userId) {
 	Map<String, Object> properties = new HashMap<>();

@@ -153,9 +153,7 @@ public class OrgSaveAction extends Action {
 			(Organisation) service.findById(Organisation.class, (Integer) orgForm.get("parentId")));
 		org.setOrganisationType(
 			(OrganisationType) service.findById(OrganisationType.class, (Integer) orgForm.get("typeId")));
-		writeAuditLog(user, org, orgForm, org.getOrganisationState(), org.getLocale());
 	    }
-	    org.setLocale(locale);
 	    org.setOrganisationState(state);
 	    if (log.isDebugEnabled()) {
 		log.debug("orgId: " + org.getOrganisationId() + " create date: " + org.getCreateDate());
@@ -238,25 +236,6 @@ public class OrgSaveAction extends Action {
 		args[0] = "courseAdminCanChangeStatusOfCourse";
 		args[2] = org.getCourseAdminCanChangeStatusOfCourse() ? "true" : "false";
 		args[3] = (Boolean) orgForm.get("courseAdminCanChangeStatusOfCourse") ? "true" : "false";
-		message = messageService.getMessage(key, args);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null,
-			null, null, null, message);
-	    }
-	    /*
-	     * this field not set yet
-	     * if(!org.getCourseAdminCanCreateGuestAccounts().equals((Boolean)orgForm.get(
-	     * "courseAdminCanCreateGuestAccounts"))) {
-	     * args[0] = "courseAdminCanCreateGuestAccounts";
-	     * args[2] = org.getCourseAdminCanCreateGuestAccounts() ? "true" : "false";
-	     * args[3] = (Boolean)orgForm.get("courseAdminCanCreateGuestAccounts") ? "true" : "false";
-	     * message = messageService.getMessage(key, args);
-	     * auditService.log(AdminConstants.MODULE_NAME, message);
-	     * }
-	     */
-	    if (!org.getLocale().getLocaleId().equals(orgForm.get("localeId"))) {
-		args[0] = "locale";
-		args[2] = org.getLocale().getDescription();
-		args[3] = newLocale.getDescription();
 		message = messageService.getMessage(key, args);
 		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null,
 			null, null, null, message);
