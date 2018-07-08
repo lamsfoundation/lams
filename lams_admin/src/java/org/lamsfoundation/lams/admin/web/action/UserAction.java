@@ -190,6 +190,8 @@ public class UserAction extends LamsDispatchAction {
 	    try {
 		SupportedLocale locale = LanguageUtil.getDefaultLocale();
 		userForm.set("localeId", locale.getLocaleId());
+		String country = LanguageUtil.getDefaultCountry();
+		userForm.set("country", country);
 	    } catch (Exception e) {
 		log.debug(e);
 	    }
