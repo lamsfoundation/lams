@@ -601,7 +601,11 @@ public class ImportService implements IImportService {
 	user.setCity(parseStringCell(row.getCell(ImportService.CITY)));
 	user.setState(parseStringCell(row.getCell(ImportService.STATE)));
 	user.setPostcode(parseStringCell(row.getCell(ImportService.POSTCODE)));
-	user.setCountry(parseStringCell(row.getCell(ImportService.COUNTRY)));
+	String country = parseStringCell(row.getCell(ImportService.COUNTRY));
+	if (StringUtils.isBlank(country)) {
+	    country = LanguageUtil.DEFAULT_COUNTRY;
+	}
+	user.setCountry(country);
 	user.setDayPhone(parseStringCell(row.getCell(ImportService.DAY_PHONE)));
 	user.setEveningPhone(parseStringCell(row.getCell(ImportService.EVE_PHONE)));
 	user.setMobilePhone(parseStringCell(row.getCell(ImportService.MOB_PHONE)));
