@@ -111,6 +111,17 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 	}
 
+	String[] localeParts = langIsoCode.split("_");
+	// if langIsoCode is just 2 letters, then countryIsoCode stays the same and country will fall back to default
+	// if langIsoCode is en_AU, then it gets split to langIsoCode and countryIsoCode
+	// and the old value of countryIsoCode is considered country
+	String country = null;
+	if (localeParts.length == 2 && localeParts[0].length() == 2 && localeParts[1].length() == 2) {
+	    country = countryIsoCode;
+	    langIsoCode = localeParts[0];
+	    countryIsoCode = localeParts[1];
+	}
+
 	ExtServer extServer = getIntegrationService().getExtServer(serverId);
 	boolean prefix = (usePrefix == null) ? true : Boolean.parseBoolean(usePrefix);
 	try {
@@ -119,7 +130,7 @@ public class LoginRequestServlet extends HttpServlet {
 		userMap = getIntegrationService().getExtUserUseridMap(extServer, extUsername, prefix);
 	    } else {
 		userMap = getIntegrationService().getImplicitExtUserUseridMap(extServer, extUsername, firstName,
-			lastName, langIsoCode, countryIsoCode, email, prefix, isUpdateUserDetails);
+			lastName, langIsoCode, countryIsoCode, country, email, prefix, isUpdateUserDetails);
 	    }
 
 	    // in case of request for learner with strict authentication check cache should also contain lsid
@@ -154,7 +165,8 @@ public class LoginRequestServlet extends HttpServlet {
 	    String loggedInLogin = loggedInUserDTO == null ? null : loggedInUserDTO.getLogin();
 	    // for checking if requested role is the same as already assigned
 	    String role = method.equals(LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION)
-		    ? LoginRequestDispatcher.METHOD_LEARNER : method;
+		    ? LoginRequestDispatcher.METHOD_LEARNER
+		    : method;
 	    if ((loggedInLogin != null) && loggedInLogin.equals(login) && request.isUserInRole(role)) {
 		String url = LoginRequestDispatcher.getRequestURL(request);
 		response.sendRedirect(response.encodeRedirectURL(url));

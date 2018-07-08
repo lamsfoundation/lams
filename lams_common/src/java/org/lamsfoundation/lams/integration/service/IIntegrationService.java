@@ -137,8 +137,8 @@ public interface IIntegrationService {
      * @param extUsername
      * @param firstName
      * @param lastName
-     * @param language
-     * @param country
+     * @param langIsoCode
+     * @param countryIsoCode
      * @param email
      * @param prefix
      * @param isUpdateUserDetails
@@ -147,7 +147,7 @@ public interface IIntegrationService {
      * @throws UserInfoValidationException
      */
     ExtUserUseridMap getImplicitExtUserUseridMap(ExtServer extServer, String extUsername, String firstName,
-	    String lastName, String language, String country, String email, boolean prefix, boolean isUpdateUserDetails)
+	    String lastName, String langIsoCode, String countryIsoCode, String country, String email, boolean prefix, boolean isUpdateUserDetails)
 	    throws UserInfoValidationException;
     
     /**

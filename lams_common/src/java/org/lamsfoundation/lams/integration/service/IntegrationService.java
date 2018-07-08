@@ -292,8 +292,9 @@ public class IntegrationService implements IIntegrationService {
 
 	if (extUserUseridMap == null) {
 	    String[] defaultLangCountry = LanguageUtil.getDefaultLangCountry();
-	    String[] userData = { "", firstName, lastName, "", "", "", "", "", "", "", "", email, defaultLangCountry[1],
-		    defaultLangCountry[0] };
+	    String country = LanguageUtil.getDefaultCountry();
+	    String[] userData = { "", firstName, lastName, "", "", "", "", country, "", "", "", email,
+		    defaultLangCountry[1], defaultLangCountry[0] };
 	    return createExtUserUseridMap(extServer, extUsername, password, salt, userData, false);
 	} else {
 	    return extUserUseridMap;
@@ -302,14 +303,15 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public ExtUserUseridMap getImplicitExtUserUseridMap(ExtServer extServer, String extUsername, String firstName,
-	    String lastName, String language, String country, String email, boolean prefix, boolean isUpdateUserDetails)
-	    throws UserInfoValidationException {
+	    String lastName, String langIsoCode, String countryIsoCode, String country, String email, boolean prefix,
+	    boolean isUpdateUserDetails) throws UserInfoValidationException {
 
 	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(extServer, extUsername);
 
 	//create new one if it doesn't exist yet
 	if (extUserUseridMap == null) {
-	    String[] userData = { "", firstName, lastName, "", "", "", "", "", "", "", "", email, country, language };
+	    String[] userData = { "", firstName, lastName, "", "", "", "", country, "", "", "", email, countryIsoCode,
+		    langIsoCode };
 	    String salt = HashUtil.salt();
 	    String password = HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt);
 	    return createExtUserUseridMap(extServer, extUsername, password, salt, userData, prefix);
@@ -342,7 +344,11 @@ public class IntegrationService implements IIntegrationService {
 	    user.setLastName(lastName);
 	    user.setEmail(email);
 	    user.setModifiedDate(new Date());
-	    user.setLocale(LanguageUtil.getSupportedLocale(language, country));
+	    user.setLocale(LanguageUtil.getSupportedLocale(langIsoCode, countryIsoCode));
+	    if (StringUtils.isBlank(country)) {
+		country = LanguageUtil.getDefaultCountry();
+	    }
+	    user.setCountry(country);
 	    service.saveUser(user);
 
 	    return extUserUseridMap;
@@ -438,10 +444,7 @@ public class IntegrationService implements IIntegrationService {
 	//set user's country to default value if it wasn't provided or has a wrong value
 	String country = userData[7];
 	if (StringUtils.isBlank(country) || !Arrays.asList(CommonConstants.COUNTRY_CODES).contains(country)) {
-	    country = userData[13];
-	    if (StringUtils.isBlank(country) || !Arrays.asList(CommonConstants.COUNTRY_CODES).contains(country)) {
-		country = LanguageUtil.getDefaultLangCountry()[1];
-	    }
+	    country = LanguageUtil.getDefaultCountry();
 	}
 
 	User user = new User();

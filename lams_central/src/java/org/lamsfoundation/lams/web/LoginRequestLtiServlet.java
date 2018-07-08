@@ -81,8 +81,8 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	String email = request.getParameter(BasicLTIConstants.LIS_PERSON_CONTACT_EMAIL_PRIMARY);
 
 	String locale = request.getParameter(BasicLTIConstants.LAUNCH_PRESENTATION_LOCALE);
-	String country = LoginRequestLtiServlet.getCountry(locale);
-	String lang = LoginRequestLtiServlet.getLanguage(locale);
+	String countryIsoCode = LoginRequestLtiServlet.getCountry(locale);
+	String langIsoCode = LoginRequestLtiServlet.getLanguage(locale);
 
 	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
@@ -173,8 +173,8 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	    url.addParameter(LoginRequestDispatcher.PARAM_HASH, hash);
 	    url.addParameter(LoginRequestDispatcher.PARAM_COURSE_ID, contextId);
 	    url.addParameter(CentralConstants.PARAM_COURSE_NAME, contextLabel);
-	    url.addParameter(LoginRequestDispatcher.PARAM_COUNTRY, country);
-	    url.addParameter(LoginRequestDispatcher.PARAM_LANGUAGE, lang);
+	    url.addParameter(LoginRequestDispatcher.PARAM_COUNTRY, countryIsoCode);
+	    url.addParameter(LoginRequestDispatcher.PARAM_LANGUAGE, langIsoCode);
 	    url.addParameter(LoginRequestDispatcher.PARAM_FIRST_NAME, firstName);//TODO ?? URLEncoder.encode(queryString, "UTF-8");
 	    url.addParameter(LoginRequestDispatcher.PARAM_LAST_NAME, lastName);//TODO ?? URLEncoder.encode(queryString, "UTF-8");
 	    url.addParameter(LoginRequestDispatcher.PARAM_LESSON_ID, lessonId);

@@ -33,6 +33,7 @@ import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
@@ -73,6 +74,7 @@ public class ConfigAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws Exception {
 
 	request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
+	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
 
 	return mapping.findForward("config");
     }
@@ -120,7 +122,7 @@ public class ConfigAction extends LamsDispatchAction {
 	    }
 	}
 	getConfiguration().persistUpdate();
-	
+
 	Configuration.refreshCache();
 
 	return mapping.findForward("sysadmin");
