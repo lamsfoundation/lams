@@ -84,6 +84,11 @@ public class ConfigurationKeys {
 
     /** Default locale for the server. Originally en_AU */
     public static String SERVER_LANGUAGE = "ServerLanguage";
+    
+    /**
+     * Default country for the server. Originally AU
+     */
+    public static String SERVER_COUNTRY = "ServerCountry";
 
     /**
      * Direction (left to right, right to left) for writing on HTML pages. Originally LTR

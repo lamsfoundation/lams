@@ -81,7 +81,7 @@ public class LanguageUtil {
 	    languageIsoCode = LanguageUtil.DEFAULT_LANGUAGE;
 	}
 	if (countryIsoCode == null) {
-	    languageIsoCode = LanguageUtil.DEFAULT_COUNTRY;
+	    languageIsoCode = LanguageUtil.getDefaultCountry();
 	}
 
 	return new String[] { languageIsoCode, countryIsoCode };
@@ -116,19 +116,26 @@ public class LanguageUtil {
     public static SupportedLocale getDefaultLocale() {
 	String localeName = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 	String langIsoCode = LanguageUtil.DEFAULT_LANGUAGE;
-	String countryIsoCode = LanguageUtil.DEFAULT_COUNTRY;
+	// try to use the server's country first
+	String countryIsoCode = LanguageUtil.getDefaultCountry();
 	if (StringUtils.isNotBlank(localeName) && (localeName.length() > 2)) {
 	    langIsoCode = localeName.substring(0, 2);
 	    countryIsoCode = localeName.substring(3);
 	}
 
 	SupportedLocale locale = null;
-	locale = getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
+	locale = LanguageUtil.getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
 	if (locale == null) {
-	    locale = getSupportedLocaleOrNull(LanguageUtil.DEFAULT_LANGUAGE, LanguageUtil.DEFAULT_COUNTRY);
+	    // if default language and server do not yield result, default to en_AU
+	    locale = LanguageUtil.getSupportedLocaleOrNull(LanguageUtil.DEFAULT_LANGUAGE, LanguageUtil.DEFAULT_COUNTRY);
 	}
 
 	return locale;
+    }
+
+    public static String getDefaultCountry() {
+	String serverCountry = Configuration.get(ConfigurationKeys.SERVER_COUNTRY);
+	return StringUtils.isBlank(serverCountry) ? LanguageUtil.DEFAULT_COUNTRY : serverCountry;
     }
 
     /**
@@ -136,16 +143,16 @@ public class LanguageUtil {
      * default locale.
      */
     public static SupportedLocale getSupportedLocale(String input) {
-	List list = getService().findByProperty(SupportedLocale.class, "languageIsoCode", input);
+	List list = LanguageUtil.getService().findByProperty(SupportedLocale.class, "languageIsoCode", input);
 	if ((list != null) && (list.size() > 0)) {
 	    return (SupportedLocale) list.get(0);
 	} else {
-	    list = getService().findByProperty(SupportedLocale.class, "countryIsoCode", input);
+	    list = LanguageUtil.getService().findByProperty(SupportedLocale.class, "countryIsoCode", input);
 	    if ((list != null) && (list.size() > 0)) {
 		return (SupportedLocale) list.get(0);
 	    }
 	}
-	return getDefaultLocale();
+	return LanguageUtil.getDefaultLocale();
     }
 
     /**
@@ -154,9 +161,9 @@ public class LanguageUtil {
     public static SupportedLocale getSupportedLocale(String langIsoCode, String countryIsoCode) {
 	SupportedLocale locale = null;
 
-	locale = getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
+	locale = LanguageUtil.getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
 	if (locale == null) {
-	    locale = getDefaultLocale();
+	    locale = LanguageUtil.getDefaultLocale();
 	}
 
 	return locale;
@@ -180,7 +187,7 @@ public class LanguageUtil {
 	    return null;
 	}
 
-	List list = getService().findByProperties(SupportedLocale.class, properties);
+	List list = LanguageUtil.getService().findByProperties(SupportedLocale.class, properties);
 	if ((list != null) && (list.size() > 0)) {
 	    Collections.sort(list);
 	    locale = (SupportedLocale) list.get(0);
@@ -189,17 +196,17 @@ public class LanguageUtil {
 	}
 	return locale;
     }
-    
+
     /**
      * Get list of all available country names sorted alphabetically.
-     * 
+     *
      * @parama enforceUsingDefaultLocale in some rare cases (like with SignupAction) it's useful to enforce using LAMS
      *         server's default locale, instead of the system default one
      */
     public static Map<String, String> getCountryCodes(boolean enforceUsingDefaultLocale) {
-	getMessageService();
+	LanguageUtil.getMessageService();
 	SupportedLocale lamsDefaultLocale = enforceUsingDefaultLocale ? LanguageUtil.getDefaultLocale() : null;
-	
+
 	Map<String, String> countryCodesMap = new HashMap<String, String>();
 	for (String countryCode : CommonConstants.COUNTRY_CODES) {
 	    String countryName = enforceUsingDefaultLocale
@@ -207,7 +214,7 @@ public class LanguageUtil {
 		    : messageService.getMessage("country." + countryCode);
 	    countryCodesMap.put(countryCode, countryName);
 	}
-	
+
 	//sort alphabetically
 	return countryCodesMap.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.naturalOrder()))
 		.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue,
@@ -222,7 +229,7 @@ public class LanguageUtil {
 	}
 	return service;
     }
-    
+
     private static MessageService getMessageService() {
 	if (messageService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils

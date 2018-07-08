@@ -163,7 +163,7 @@ public class SignupService implements ISignupService {
     private SupportedLocale getDefaultLocale() {
 	String localeName = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 	String langIsoCode = LanguageUtil.DEFAULT_LANGUAGE;
-	String countryIsoCode = LanguageUtil.DEFAULT_COUNTRY;
+	String countryIsoCode = LanguageUtil.getDefaultCountry();
 	if (StringUtils.isNotBlank(localeName) && localeName.length() > 2) {
 	    langIsoCode = localeName.substring(0, 2);
 	    countryIsoCode = localeName.substring(3);

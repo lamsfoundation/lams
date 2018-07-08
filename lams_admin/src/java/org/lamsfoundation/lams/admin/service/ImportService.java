@@ -603,7 +603,7 @@ public class ImportService implements IImportService {
 	user.setPostcode(parseStringCell(row.getCell(ImportService.POSTCODE)));
 	String country = parseStringCell(row.getCell(ImportService.COUNTRY));
 	if (StringUtils.isBlank(country)) {
-	    country = LanguageUtil.DEFAULT_COUNTRY;
+	    country = LanguageUtil.getDefaultCountry();
 	}
 	user.setCountry(country);
 	user.setDayPhone(parseStringCell(row.getCell(ImportService.DAY_PHONE)));
