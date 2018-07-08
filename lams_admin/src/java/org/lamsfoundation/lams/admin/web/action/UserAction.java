@@ -186,13 +186,18 @@ public class UserAction extends LamsDispatchAction {
 	    // can not make a part of form as in JSP it can only be accessed by <bean:write>
 	    // and we need the Date object to put into <lams:Date>
 	    request.setAttribute("createDate", user.getCreateDate());
-	} else { // create a user
+	    
+	// create a user
+	} else { 
 	    try {
 		SupportedLocale locale = LanguageUtil.getDefaultLocale();
 		userForm.set("localeId", locale.getLocaleId());
 	    } catch (Exception e) {
 		log.debug(e);
 	    }
+
+	    Timezone serverTimezone = timezoneService.getServerTimezone();
+	    userForm.set("timeZone", serverTimezone.getTimezoneId());
 	}
 	userForm.set("orgId", (org == null ? null : org.getOrganisationId()));
 
