@@ -292,8 +292,8 @@ public class IntegrationService implements IIntegrationService {
 
 	if (extUserUseridMap == null) {
 	    String[] defaultLangCountry = LanguageUtil.getDefaultLangCountry();
-	    String[] userData = { "", firstName, lastName, "", "", "", "", "", "", "", "", email, defaultLangCountry[1],
-		    defaultLangCountry[0] };
+	    String[] userData = { "", firstName, lastName, "", "", "", "", LanguageUtil.getDefaultCountry(), "", "", "",
+		    email, defaultLangCountry[1], defaultLangCountry[0] };
 	    return createExtUserUseridMap(extServer, extUsername, password, salt, userData, false);
 	} else {
 	    return extUserUseridMap;
@@ -438,10 +438,7 @@ public class IntegrationService implements IIntegrationService {
 	//set user's country to default value if it wasn't provided or has a wrong value
 	String country = userData[7];
 	if (StringUtils.isBlank(country) || !Arrays.asList(CommonConstants.COUNTRY_CODES).contains(country)) {
-	    country = userData[13];
-	    if (StringUtils.isBlank(country) || !Arrays.asList(CommonConstants.COUNTRY_CODES).contains(country)) {
-		country = LanguageUtil.getDefaultLangCountry()[1];
-	    }
+	    country = LanguageUtil.getDefaultCountry();
 	}
 
 	User user = new User();

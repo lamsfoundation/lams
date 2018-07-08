@@ -81,7 +81,7 @@ public class LanguageUtil {
 	    languageIsoCode = LanguageUtil.DEFAULT_LANGUAGE;
 	}
 	if (countryIsoCode == null) {
-	    languageIsoCode = LanguageUtil.getDefaultCountry();
+	    languageIsoCode = LanguageUtil.DEFAULT_COUNTRY;
 	}
 
 	return new String[] { languageIsoCode, countryIsoCode };
@@ -117,7 +117,7 @@ public class LanguageUtil {
 	String localeName = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 	String langIsoCode = LanguageUtil.DEFAULT_LANGUAGE;
 	// try to use the server's country first
-	String countryIsoCode = LanguageUtil.getDefaultCountry();
+	String countryIsoCode = LanguageUtil.DEFAULT_COUNTRY;
 	if (StringUtils.isNotBlank(localeName) && (localeName.length() > 2)) {
 	    langIsoCode = localeName.substring(0, 2);
 	    countryIsoCode = localeName.substring(3);
