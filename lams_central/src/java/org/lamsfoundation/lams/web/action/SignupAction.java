@@ -15,8 +15,8 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.signup.model.SignupOrganisation;
 import org.lamsfoundation.lams.signup.service.ISignupService;
+import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.Emailer;
@@ -31,15 +31,17 @@ public class SignupAction extends Action {
 
     private static Logger log = Logger.getLogger(SignupAction.class);
     private static ISignupService signupService = null;
+    private static ITimezoneService timezoneService = null;
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	if (signupService == null) {
+	if (signupService == null || timezoneService == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    signupService = (ISignupService) wac.getBean("signupService");
+	    timezoneService = (ITimezoneService) wac.getBean("timezoneService");
 	}
 	
 	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(true));
@@ -71,7 +73,6 @@ public class SignupAction extends Action {
 	    HttpServletResponse response) {
 
 	try {
-
 	    DynaActionForm signupForm = (DynaActionForm) form;
 
 	    // validation
@@ -87,6 +88,7 @@ public class SignupAction extends Action {
 		user.setLastName(signupForm.getString("lastName"));
 		user.setEmail(signupForm.getString("email"));
 		user.setCountry(signupForm.getString("country"));
+		user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
 		String salt = HashUtil.salt();
 		user.setSalt(salt);
 		user.setPassword(HashUtil.sha256(signupForm.getString("password"), salt));

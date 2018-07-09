@@ -9,7 +9,8 @@
 		<property name="gradebookService"><ref bean="gradebookService"/></property>
 		<property name="lessonService"><ref bean="lessonService"/></property>
 		<property name="service"><ref bean="userManagementService"/></property>
-		<property name="toolService"><ref bean="lamsCoreToolServiceTarget"/></property>		
+		<property name="toolService"><ref bean="lamsCoreToolServiceTarget"/></property>
+		<property name="timezoneService"><ref bean="timezoneService"/></property>
 	</bean>
 	
 	<bean id="integrationService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
