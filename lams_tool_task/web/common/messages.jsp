@@ -1,4 +1,7 @@
 <%-- Error Messages --%>
+<form:errors path="*" />
+
+<%-- Success Messages -
 <logic:messagesPresent>
 	<lams:Alert id="error" type="danger" close="false">
 	        <html:messages id="error">
@@ -6,3 +9,4 @@
 	        </html:messages>
 	</lams:Alert>
 </logic:messagesPresent>
+--%>

@@ -4,7 +4,7 @@
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 
  <!-- ********************  CSS ********************** -->
-<link href="<html:rewrite page='/includes/css/taskList.css'/>" rel="stylesheet" type="text/css">
+<link href="<lams:WebAppURL/>includes/css/taskList.css" rel="stylesheet" type="text/css">
 <lams:css/>
 <link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">

@@ -6,7 +6,7 @@
 			<hr class="msg-hr">
 			<!-- Comments Part -->
 			<c:if test="${item.commentsAllowed}">
-				<form:form action="/learning/addNewComment.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${item.uid}"
+				<form:form action="addNewComment.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${item.uid}"
 					modelAttribute="taskListItemForm" method="post" enctype="multipart/form-data" onsubmit="disableButtons()">
 
 					<%@ include file="commentlist.jsp"%>
@@ -15,7 +15,7 @@
 
 						<div class="form-group voffset5">
 							<label for="comment"><fmt:message key="label.preview.add.comment" /></label>
-							<textarea name="comment" rows="2" id="comment" cssClass="form-control" index="${item.uid}"></textarea>
+							<textarea name="comment" rows="2" id="comment" class="form-control" index="${item.uid}"></textarea>
 							<c:if test="${(mode != 'teacher') && !itemDTO.commentRequirementsMet}">
 								<div class="help-block">
 									<fmt:message key="label.learning.info.add.comment.required" />
@@ -33,7 +33,7 @@
 			<!-- Uploaded Attachments -->
 			<c:if test="${item.filesAllowed}">
 				<hr class="msg-hr">				
-				<form:form action="/learning/uploadFile.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${item.uid}"
+				<form:form action="uploadFile.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${item.uid}"
 					modelAttribute="taskListItemForm" method="post" enctype="multipart/form-data" onsubmit="return validateFiles();">
 					<c:choose>
 						<c:when test="${(mode != 'teacher') && !itemDTO.attachmentRequirementsMet}">

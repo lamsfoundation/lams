@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -133,7 +132,7 @@ public class MonitoringController {
 
     @RequestMapping("/itemSummary")
     public String itemSummary(HttpServletRequest request) {
-	
+
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -402,7 +401,7 @@ public class MonitoringController {
 	out.write(userUid.toString());
 	out.flush();
 	out.close();
-	return "redirect:/monitoring/summary.do";
+	return "pages/monitoring/monitoring";
     }
 
     /**

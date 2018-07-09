@@ -28,7 +28,7 @@
 <body>
 
 
-	<form:form action="/learning/saveNewTask" modelAttribute="taskListItemForm" method="post" id="taskListItemForm">
+	<form:form action="saveNewTask.do" modelAttribute="taskListItemForm" method="post" id="taskListItemForm">
 		<form:hidden path="mode" />
 		<form:hidden path="sessionMapID" />
 
@@ -41,7 +41,7 @@
 			<label for="taskTitle">
 			<fmt:message key="label.authoring.basic.resource.title.input" />
 			</label>
-			<input id="taskTitle" name="title" cssClass="form-control" tabindex="1" />
+			<form:input id="taskTitle" path="title" cssClass="form-control" tabindex="1" />
 		</div>
 		<div class="form-group">
 			<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>

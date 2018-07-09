@@ -43,7 +43,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
@@ -69,6 +68,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * The main action in author mode. All the authoring operations are located in
@@ -301,7 +301,7 @@ public class AuthoringController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping("/update")
+    @RequestMapping(path = "/update", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request)
 	    throws Exception {
 
@@ -504,7 +504,7 @@ public class AuthoringController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping("/saveOrUpdateItem")
+    @RequestMapping(path = "/saveOrUpdateItem", method = RequestMethod.POST)
     public String saveOrUpdateItem(@ModelAttribute TaskListItemForm taskListItemForm, Errors errors,
 	    HttpServletRequest request) {
 
@@ -825,17 +825,17 @@ public class AuthoringController {
     }
 
     @RequestMapping("/initPedagogicalPlannerForm")
-    public String initPedagogicalPlannerForm(ActionForm form, HttpServletRequest request) {
-	TaskListPedagogicalPlannerForm plannerForm = (TaskListPedagogicalPlannerForm) form;
+    public String initPedagogicalPlannerForm(@ModelAttribute TaskListPedagogicalPlannerForm plannerForm,
+	    HttpServletRequest request) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	TaskList taskList = taskListService.getTaskListByContentId(toolContentID);
 	plannerForm.fillForm(taskList);
 	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
-    public String saveOrUpdatePedagogicalPlannerForm(TaskListPedagogicalPlannerForm plannerForm, Errors errors,
-	    HttpServletRequest request) throws IOException {
+    @RequestMapping(path = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
+    public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute TaskListPedagogicalPlannerForm plannerForm,
+	    Errors errors, HttpServletRequest request) throws IOException {
 	plannerForm.validate(errors);
 	if (!errors.hasErrors()) {
 	    TaskList taskList = taskListService.getTaskListByContentId(plannerForm.getToolContentID());
@@ -886,9 +886,8 @@ public class AuthoringController {
     }
 
     @RequestMapping("/createPedagogicalPlannerItem")
-    public String createPedagogicalPlannerItem(ActionForm form, HttpServletRequest request)
-	    throws IOException, ServletException {
-	TaskListPedagogicalPlannerForm plannerForm = (TaskListPedagogicalPlannerForm) form;
+    public String createPedagogicalPlannerItem(@ModelAttribute TaskListPedagogicalPlannerForm plannerForm,
+	    HttpServletRequest request) {
 	plannerForm.setTaskListItem(plannerForm.getTaskListItemCount().intValue(), "");
 	return "pages/authoring/pedagogicalPlannerForm";
     }

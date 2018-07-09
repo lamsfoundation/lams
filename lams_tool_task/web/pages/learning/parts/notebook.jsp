@@ -18,7 +18,7 @@
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-	<form:form action="/learning/submitReflection" modelAttribute="reflectionForm" method="post" onsubmit="disableFinishButton();" id="messageForm">
+	<form:form action="submitReflection.do" modelAttribute="reflectionForm" method="post" onsubmit="disableFinishButton();" id="messageForm">
 		<form:hidden path="userID" />
 		<form:hidden path="sessionMapID" />
 

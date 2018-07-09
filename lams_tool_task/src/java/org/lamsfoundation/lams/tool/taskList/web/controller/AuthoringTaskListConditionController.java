@@ -32,39 +32,25 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.util.LabelValueBean;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
-import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
 import org.lamsfoundation.lams.tool.taskList.service.TaskListException;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListConditionComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListConditionForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListForm;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Auxiliary action in author mode. It contains operations with TaskListCondition. The rest of operations are located in
@@ -78,7 +64,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @RequestMapping("/authoringCondition")
 public class AuthoringTaskListConditionController {
 
-    
     /**
      * Display same entire authoring page content from HttpSession variable.
      *
@@ -88,13 +73,14 @@ public class AuthoringTaskListConditionController {
      * @throws ServletException
      */
     @RequestMapping("/showConditions")
-    public String showConditions(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request) throws ServletException {
-	
+    public String showConditions(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request)
+	    throws ServletException {
+
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	TaskListForm existForm = (TaskListForm) sessionMap.get(TaskListConstants.ATTR_TASKLIST_FORM);
-	
+
 	try {
 	    PropertyUtils.copyProperties(taskListForm, existForm);
 	} catch (Exception e) {
@@ -114,7 +100,7 @@ public class AuthoringTaskListConditionController {
      */
     @RequestMapping("/newConditionInit")
     public String newConditionInit(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request) {
-	
+
 	TaskListConditionForm taskListConditionForm = new TaskListConditionForm();
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
 	taskListConditionForm.setSessionMapID(sessionMapID);
@@ -123,7 +109,6 @@ public class AuthoringTaskListConditionController {
 	return "pages/authoring/parts/addcondition";
     }
 
-    
     /**
      * Display edit page for existed taskList item.
      *
@@ -133,7 +118,8 @@ public class AuthoringTaskListConditionController {
      * @return
      */
     @RequestMapping("/editCondition")
-    public String editCondition(@ModelAttribute TaskListConditionForm taskListConditionForm, HttpServletRequest request) {
+    public String editCondition(@ModelAttribute TaskListConditionForm taskListConditionForm,
+	    HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
@@ -167,8 +153,9 @@ public class AuthoringTaskListConditionController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping("/saveOrUpdateCondition")
-    public String saveOrUpdateCondition(@ModelAttribute TaskListConditionForm taskListConditionForm,  Errors errors, HttpServletRequest request) {
+    @RequestMapping(path = "/saveOrUpdateCondition", method = RequestMethod.POST)
+    public String saveOrUpdateCondition(@ModelAttribute TaskListConditionForm taskListConditionForm, Errors errors,
+	    HttpServletRequest request) {
 
 	validateTaskListCondition(taskListConditionForm, errors, request);
 	if (errors.hasErrors()) {
@@ -185,14 +172,13 @@ public class AuthoringTaskListConditionController {
 		populateFormWithPossibleItems(taskListConditionForm, request);
 		return "pages/authoring/parts/addcondition";
 	    }
-		
+
 	}
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, taskListConditionForm.getSessionMapID());
 	// return null to close this window
 	return "pages/authoring/parts/conditionlist";
     }
-
 
     /**
      * Remove taskList item from HttpSession list and update page display. As authoring rule, all persist only happen
@@ -204,7 +190,8 @@ public class AuthoringTaskListConditionController {
      * @return
      */
     @RequestMapping("/removeCondition")
-    public String removeCondition(@ModelAttribute TaskListConditionForm taskListConditionForm, HttpServletRequest request) {
+    public String removeCondition(@ModelAttribute TaskListConditionForm taskListConditionForm,
+	    HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
@@ -355,8 +342,8 @@ public class AuthoringTaskListConditionController {
      * @param form
      * @param request
      */
-    private void populateConditionToForm(int sequenceId, TaskListCondition condition, TaskListConditionForm taskListConditionForm,
-	    HttpServletRequest request) {
+    private void populateConditionToForm(int sequenceId, TaskListCondition condition,
+	    TaskListConditionForm taskListConditionForm, HttpServletRequest request) {
 	if (sequenceId >= 0) {
 	    taskListConditionForm.setSequenceId(new Integer(sequenceId).toString());
 	}
@@ -379,7 +366,8 @@ public class AuthoringTaskListConditionController {
      * @param form
      * @param request
      */
-    private void populateFormWithPossibleItems(TaskListConditionForm taskListConditionForm, HttpServletRequest request) {
+    private void populateFormWithPossibleItems(TaskListConditionForm taskListConditionForm,
+	    HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
@@ -389,13 +377,13 @@ public class AuthoringTaskListConditionController {
 	SortedSet<TaskListItem> itemList = getTaskListItemList(sessionMap);
 
 	// Initialise the LabelValueBeans in the possibleOptions array.
-	Map<String, String> possibleItems = new HashMap<String, String>(itemList.size());
+	Map<String, String> possibleItems = new HashMap<>(itemList.size());
 
 	for (TaskListItem item : itemList) {
 	    possibleItems.put(String.valueOf(item.getSequenceId()), item.getTitle());
 	}
 	taskListConditionForm.setPossibleItems(possibleItems);
-	
+
     }
 
     /**
@@ -457,8 +445,8 @@ public class AuthoringTaskListConditionController {
      * @param conditionForm
      * @return
      */
-    private void validateTaskListCondition(TaskListConditionForm taskListConditionForm, Errors errors, HttpServletRequest request) {
-	
+    private void validateTaskListCondition(TaskListConditionForm taskListConditionForm, Errors errors,
+	    HttpServletRequest request) {
 
 	String formConditionName = taskListConditionForm.getName();
 	if (StringUtils.isBlank(formConditionName)) {

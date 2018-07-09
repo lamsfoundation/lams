@@ -1,4 +1,4 @@
-/****************************************************************
+/* ***************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -37,7 +37,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
+
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -72,6 +72,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -428,7 +429,8 @@ public class LearningController implements TaskListConstants {
      * @param response
      * @return
      */
-    @RequestMapping("/saveNewTask")
+
+    @RequestMapping(path = "/saveNewTask", method = RequestMethod.POST)
     public String saveNewTask(@ModelAttribute TaskListItemForm taskListItemForm, Errors errors,
 	    HttpServletRequest request) {
 	// get back SessionMap
@@ -482,7 +484,7 @@ public class LearningController implements TaskListConstants {
      * @param response
      * @return
      */
-    @RequestMapping("/addNewComment")
+    @RequestMapping(path = "/addNewComment", method = RequestMethod.POST)
     public String addNewComment(@ModelAttribute TaskListItemForm taskListItemForm, HttpServletRequest request) {
 
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
@@ -629,7 +631,7 @@ public class LearningController implements TaskListConstants {
      * @param response
      * @return
      */
-    @RequestMapping("/submitReflection")
+    @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
     public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, Errors errors,
 	    HttpServletRequest request, HttpServletResponse response) {
 

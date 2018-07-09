@@ -86,7 +86,7 @@
 <!-- begin text search form content -->
 	
 <c:if test="${wrapInFormTag}">
-	<form action="${action}" id="${formID}" name="${formID}">
+	<form:form action="${action}" id="${formID}" name="${formID}">
 </c:if>
 		<form:hidden path="sessionMapID" />
 		<h4><fmt:message key="${headingLabelKey}" /></h4>
@@ -131,6 +131,6 @@
 		<a href="#" onclick="location.href='${cancelAction}'" class="button space-left"><fmt:message key="${cancelButtonLabelKey}" />
 		</a>
 	</lams:ImgButtonWrapper>
-	</form>
+	</form:form>
 </c:if>
 <!-- end text search form content -->
