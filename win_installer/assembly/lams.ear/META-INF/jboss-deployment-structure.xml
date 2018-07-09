@@ -1,0 +1,107 @@
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.3">
+  <!-- Make sub deployments not isolated, so they can see each others classes without a Class-Path entry -->
+  <ear-subdeployments-isolated>false</ear-subdeployments-isolated>
+  <deployment>
+    <!-- exclude-subsystem prevents a subsystems deployment unit processors running on a deployment -->
+    <!-- which gives basically the same effect as removing the subsystem, but it only affects single deployment 
+    <exclude-subsystems>
+        <subsystem name="resteasy" />
+    </exclude-subsystems>
+    -->
+    
+    <!-- Exclusions allow you to prevent the server from automatically adding some dependencies     
+    <exclusions>
+        <module name="org.javassist" />
+    </exclusions>
+    -->
+    
+    <!-- This allows you to define additional dependencies, it is the same as using the Dependencies: manifest attribute -->
+    <dependencies>
+      <module name="org.javassist" export="true" />
+      <module name="org.apache.poi" export="true" />
+      <module name="net.fckeditor" export="true" />
+      <module name="org.apache.commons.beanutils" export="true" />
+      <module name="org.apache.commons.collections" export="true" />
+      <module name="org.apache.commons.io" export="true" />
+      <module name="org.apache.commons.lang" export="true" />
+      <module name="org.apache.commons.codec" export="true" />
+      <module name="org.apache.commons.pool" export="true" />
+      <module name="org.apache.commons.fileupload" export="true" />
+      <module name="org.apache.commons.validator" export="true" />
+      <module name="org.apache.httpcomponents" export="true" />
+      <module name="org.apache.xmlcommons" export="true" />
+      <module name="org.infinispan" export="true" />
+      <module name="org.imsglobal" export="true" />
+      <module name="oauth.signpost" export="true" />
+      <module name="org.hibernate" export="true" />
+      <module name="org.jboss.as.controller-client" export="true" />
+      <module name="org.jboss.dmr" export="true" />
+      <module name="org.scilab.forge.jlatexmath" export="true" />
+      <module name="org.json.simple" export="true" />
+      <module name="org.quartz" export="true" />
+      <module name="org.springframework" export="true" meta-inf="export" />
+      <module name="org.apache.struts" export="true" />
+      <module name="org.apache.strutsel" export="true" />
+      <module name="org.tuckey.urlrewritefilter" export="true" />
+      <module name="com.thoughtworks.xstream" export="true" />
+      <module name="com.warrenstrange.googleauth" export="true" />
+      <module name="io.undertow.core" export="true" />
+  	  <module name="io.undertow.servlet" export="true" />
+  	  <module name="org.joda.time" export="true" />
+  	  <module name="javax.mail.api" export="true" />
+  	  <module name="com.fasterxml.jackson.core.jackson-core" export="true" />
+      <module name="com.fasterxml.jackson.core.jackson-databind" export="true" />
+      
+      <!-- Import META-INF/services for ServiceLoader impls as well
+      <module name="myservicemodule" services="import"/>
+       -->
+    </dependencies>
+    
+    <!-- These add additional classes to the module. In this case it is the same as including the jar in the EAR's lib directory
+    <resources>
+    </resources>-->
+    
+  </deployment>
+  
+  
+  <!--
+  <sub-deployment name="myapp.war">
+    This corresponds to the module for a web deployment 
+    it can use all the same tags as the <deployment> entry above 
+    <dependencies>
+       Adds a dependency on a ejb jar. This could also be done with a Class-Path entry 
+      <module name="deployment.myear.ear.myejbjar.jar" />
+    </dependencies>
+   	Set's local resources to have the lowest priority 
+    If the same class is both in the sub deployment and in another sub deployment that 
+    is visible to the war, then the Class from the other deployment will be loaded,  
+    rather than the class actually packaged in the war.
+    This can be used to resolve ClassCastExceptions  if the same class is in multiple sub deployments
+    <local-last value="true" />
+  </sub-deployment>
+  Now we are going to define two additional modules
+  This one is a different version of javassist that we have packaged 
+  <module name="deployment.myjavassist" >
+    <resources>
+     <resource-root path="javassist.jar" >
+       We want to use the servers version of javassist.util.proxy.* so we filter it out
+       <filter>
+         <exclude path="javassist/util/proxy" />
+       </filter>
+     </resource-root>
+    </resources>
+  </module>
+  This is a module that re-exports the containers version of javassist.util.proxy
+  This means that there is only one version of the Proxy classes defined          
+  <module name="deployment.javassist.proxy" >
+    <dependencies>
+      <module name="org.javassist" >
+        <imports>
+          <include path="javassist/util/proxy" />
+          <exclude path="/**" />
+        </imports>
+      </module>
+    </dependencies>
+  </module>
+  -->
+</jboss-deployment-structure>

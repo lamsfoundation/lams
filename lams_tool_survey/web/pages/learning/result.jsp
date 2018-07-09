@@ -146,9 +146,9 @@
 
 		<c:if test="${not sessionMap.finishedLock}">
 			<div class="voffset5">
-				<html:button property="RetakeButton" onclick="return retakeSurvey(-1)" styleClass="btn btn-sm btn-default pull-left">
+				<button property="RetakeButton" onclick="return retakeSurvey(-1)" styleClass="btn btn-sm btn-default pull-left">
 					<fmt:message key="label.retake.survey" />
-				</html:button>
+				</button>
 			</div>
 		</c:if>
 
@@ -177,10 +177,10 @@
 						</c:otherwise>
 					</c:choose>
 
-					<html:button property="ContinueButton" onclick="return continueReflect()"
+					<button property="ContinueButton" onclick="return continueReflect()"
 						styleClass="btn voffset5 btn-sm btn-default pull-left">
 						<fmt:message key="label.edit" />
-					</html:button>
+					</button>
 				</div>
 			</div>
 		</c:if>
@@ -189,17 +189,17 @@
 			<div class="pull-right voffset10">
 				<c:choose>
 					<c:when test="${sessionMap.showOtherUsersAnswers}">
-						<html:button property="otherUsersAnswersButton" onclick="return showOtherUsersAnswers()"
+						<button property="otherUsersAnswersButton" onclick="return showOtherUsersAnswers()"
 							styleClass="btn btn-sm btn-default">
 							<fmt:message key="label.view.all.responses" />
-						</html:button>
+						</button>
 					</c:when>
 
 					<c:when test="${sessionMap.reflectOn}">
-						<html:button property="ContinueButton" onclick="return continueReflect()"
+						<button property="ContinueButton" onclick="return continueReflect()"
 							styleClass="btn btn-sm btn-primary pull-right">
 							<fmt:message key="label.continue" />
-						</html:button>
+						</button>
 					</c:when>
 
 					<c:otherwise>

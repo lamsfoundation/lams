@@ -170,9 +170,10 @@ table.alternative-color td:first-child {
 		</c:forEach>
 
 		<c:if test="${not sessionMap.lockOnFinish}">
-			<div class="voffset5"><html:button property="RetakeButton" onclick="return retakeSurvey()" styleClass="btn btn-default">
+			<div class="voffset5">
+			<button property="RetakeButton" onclick="return retakeSurvey()" styleClass="btn btn-default">
 				<fmt:message key="label.retake.survey" />
-			</html:button></div>
+			</button></div>
 		</c:if>
 		</div>
 
@@ -199,9 +200,9 @@ table.alternative-color td:first-child {
 						</c:otherwise>
 					</c:choose>
 
-					<html:button property="ContinueButton" onclick="return continueReflect()" styleClass="btn btn-default btn-primary pull-right">
+					<button property="ContinueButton" onclick="return continueReflect()" styleClass="btn btn-default btn-primary pull-right">
 						<fmt:message key="label.edit" />
-					</html:button>
+					</button>
 				</div>
 			</div>
 		</c:if>
@@ -284,9 +285,9 @@ table.alternative-color td:first-child {
 				<c:choose>
 
 					<c:when test="${sessionMap.reflectOn}">
-						<html:button property="ContinueButton" onclick="return continueReflect()" styleClass="btn btn-default btn-primary pull-right">
+						<button property="ContinueButton" onclick="return continueReflect()" styleClass="btn btn-default btn-primary pull-right">
 							<fmt:message key="label.continue" />
-						</html:button>
+						</button>
 					</c:when>
 
 					<c:otherwise>

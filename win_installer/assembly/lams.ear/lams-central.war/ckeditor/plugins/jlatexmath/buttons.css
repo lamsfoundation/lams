@@ -1,0 +1,65 @@
+#formulaTabs {
+	height: 270px;
+}
+
+#formulaTabs > div.ui-tabs-panel {
+	padding-left: 5px;
+}
+
+#formulaTabs > ul a {
+	font-size: 12px;
+}
+
+#formulaTabs button {
+	width: 30px;
+	height: 25px;
+	margin: 0 0 4px 0;
+	background: none;
+	background-color: #EEEEEE;
+	color: black;
+	font-size : 14px;
+	font-weight: normal;
+}
+
+
+#formulaTabs button:hover {
+	background-color: #DDDDDD;
+}
+
+#formulaTabs #formulaTabMath button {
+	width: 50px;
+	height: 70px;
+}
+
+#formulaTabs #formulaTabFunctions button, #formulaTabs #formulaTabFormatting button {
+	width: auto;
+}
+
+#formulaTabs #formulaTabMatrix button {
+	width: 120px;
+	height: 60px;
+}
+
+#formulaTabs #formulaTabAccents button {
+	height: 30px;
+}
+
+#formulaTabs button span {
+	padding: 2px 3px 0 3px !important;
+}
+
+#formulaTabs #formulaTabFunctions button span {
+	padding: 0 7px 0 7px !important;
+}
+
+#formulaTabs button.formulaButtonShifted span {
+	padding-top: 0 !important;
+}
+
+#formulaTabs button.formulaButtonLowered span {
+	padding-top: 3px !important;
+}
+
+img#preview {
+	margin-top: 20px;
+}

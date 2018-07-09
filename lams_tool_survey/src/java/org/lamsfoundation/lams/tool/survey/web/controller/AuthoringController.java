@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.tool.survey.web.form.QuestionForm;
 import org.lamsfoundation.lams.tool.survey.web.form.SurveyForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -91,6 +92,10 @@ public class AuthoringController {
     @Autowired
     @Qualifier("lasurvSurveyService")
     private ISurveyService surveyService;
+    
+    @Autowired
+    @Qualifier("lasurvMessageService")
+    private MessageService messageService;
 
     /**
      * Remove survey item from HttpSession list and update page display. As authoring rule, all persist only happen when
@@ -952,13 +957,13 @@ public class AuthoringController {
 
     private void validateSurveyItem(QuestionForm itemForm, List<String> instructionList, Errors errors) {
 	if (StringUtils.isBlank(itemForm.getQuestion().getDescription())) {
-	    errors.reject(SurveyConstants.ERROR_MSG_DESC_BLANK);
+	    errors.reject(null,null,messageService.getMessage(SurveyConstants.ERROR_MSG_DESC_BLANK));
 	}
 
 	short type = getQuestionType(itemForm);
 	if (type != SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 	    if (instructionList == null || instructionList.size() < 2) {
-		errors.reject(SurveyConstants.ERROR_MSG_LESS_OPTIONS);
+		errors.reject(null,null,messageService.getMessage(SurveyConstants.ERROR_MSG_LESS_OPTIONS));
 	    }
 	}
     }

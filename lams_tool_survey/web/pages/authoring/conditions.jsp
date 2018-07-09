@@ -40,6 +40,7 @@
 	
 	//Packs additional elements and submits the question form
 	function submitCondition(){
+		debugger;
 		var form = $('#surveyConditionForm');
 		$('#conditionInputArea').load(form.attr('action'), form.serialize());
 	} 

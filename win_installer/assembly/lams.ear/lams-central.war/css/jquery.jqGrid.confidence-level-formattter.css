@@ -1,0 +1,39 @@
+.vertical-align {
+  vertical-align: middle !important; }
+
+.filled-bar {
+  left: 0px;
+  top: 0px;
+  height: 22px;
+  position: relative;
+  padding: 0px 0px 0px 0px;
+  margin-right: -2px;
+  margin-left: -2px;
+  border: 0; }
+
+.gradient {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  height: 22px;
+  float: left; }
+
+.gradient-green {
+  background: LimeGreen;
+  background: linear-gradient(to right, LimeGreen, LightGreen); }
+
+.gradient-orange {
+  background: orange;
+  background: linear-gradient(to right, orange, #ffe1b4); }
+
+.gradient-red {
+  background: OrangeRed;
+  background: linear-gradient(to right, OrangeRed, #f18f8f); }
+
+.filled-bar-text {
+  position: relative;
+  margin-top: 4px;
+  margin-right: 4px;
+  text-align: right;
+  float: right; }

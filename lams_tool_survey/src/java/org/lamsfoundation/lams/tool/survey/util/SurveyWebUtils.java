@@ -21,11 +21,10 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.survey.util;
 
 import org.lamsfoundation.lams.tool.survey.model.Survey;
-import org.lamsfoundation.lams.tool.survey.web.controller.MonitoringAction;
+import org.lamsfoundation.lams.tool.survey.web.controller.MonitoringController;
 
 /**
  * Contains helper methods used by the Action Servlets
@@ -38,7 +37,7 @@ public class SurveyWebUtils {
 	if ((survey.isDefineLater() == true) && (survey.isContentInUse() == true)) {
 	    // throw new
 	    // SurveyApplicationException("An exception has occurred: There is a bug in this tool, conflicting flags are set");
-	    MonitoringAction.log
+	    MonitoringController.log
 		    .error("An exception has occurred: There is a bug in this tool, conflicting flags are set");
 	    return false;
 	} else if ((survey.isDefineLater() == true) && (survey.isContentInUse() == false)) {
@@ -70,14 +69,12 @@ public class SurveyWebUtils {
 
 	return choiceList.split("&");
     }
-    
+
     /** Remove the html tags from the input string. Used for authoring, learning, monitoring and export! */
     public static String removeHTMLTags(String input) {
 	// strip all images first in case they are base64 otherwise the next step causes a stack overflow
 	// then strip out any other HTML tags
-	return input.replaceAll("<img.*>","")
-		.replaceAll("<(.|\n)*?>", "")
-		.replaceAll("&nbsp;", " ")
+	return input.replaceAll("<img.*>", "").replaceAll("<(.|\n)*?>", "").replaceAll("&nbsp;", " ")
 		.replaceAll("[\r\n][\r\n]+", "\n");
     }
 }

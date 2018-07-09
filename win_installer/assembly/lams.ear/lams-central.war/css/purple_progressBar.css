@@ -1,0 +1,60 @@
+.progressBarContainer {
+  overflow: auto; }
+
+div.optionalActivity {
+  display: none;
+  position: absolute;
+  z-index: 6; }
+
+div.optionalActivity table {
+  border: thin solid black;
+  background-color: #faebf8;
+  width: 145px; }
+
+div.optionalActivity table tr:first-child td {
+  border-top: none;
+  background-color: #eaaee5; }
+
+div.optionalActivity td {
+  border-top: thin solid black;
+  cursor: pointer;
+  padding: 0px; }
+
+div.optionalActivity td:hover {
+  background-color: #F6EEBF; }
+
+div#progressBarDialog {
+  display: none; }
+
+div#progressBarDialog iframe {
+  width: 100%;
+  height: 100%;
+  border: none; }
+
+.activityCurrent {
+  fill: #BB0000;
+  stroke: #000; }
+
+.activityNotStarted {
+  fill: #009900;
+  stroke: #000; }
+
+.activityCompleted {
+  fill: #85237d;
+  stroke: #000; }
+
+.activityComplex {
+  fill: #999999;
+  stroke: #000; }
+
+.gate {
+  fill: #FF0000; }
+
+.gateCurrent {
+  stroke: #BB0000; }
+
+.gateText {
+  stroke: #fff; }
+
+.transitionLine {
+  stroke: #000; }

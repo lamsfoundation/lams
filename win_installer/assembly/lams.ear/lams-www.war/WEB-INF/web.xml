@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_1.xsd"
+	version="3.1">
+
+	<context-param>
+		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+		<param-value>org.lamsfoundation.lams.central.ApplicationResources</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath:/org/lamsfoundation/lams/applicationContext.xml
+			classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
+			classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
+			classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml
+			classpath:/org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml
+		</param-value>
+	</context-param>
+
+	<filter>
+		<filter-name>SystemSessionFilter</filter-name>
+		<filter-class>org.lamsfoundation.lams.web.session.SystemSessionFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>SystemSessionFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>LocaleFilter</filter-name>
+		<filter-class>
+			org.lamsfoundation.lams.web.filter.LocaleFilter
+		</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>LocaleFilter</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+	</filter-mapping>
+
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/403.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/404.jsp</location>
+	</error-page>
+
+	<jsp-config>
+		<!-- ======================================================== -->
+		<!-- JSTL 1.2 Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-fmt</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fmt.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-core</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/c.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-function</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fn.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-xml</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
+		<!-- Customized Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-lams</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
+		</taglib>
+
+	</jsp-config>
+
+		<!-- ======================================================== -->
+		<!-- Struts Tag Library Descriptors -->
+		<!-- ======================================================== -->
+
+	<!-- Security Constraint -->
+	<deny-uncovered-http-methods />
+	
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Public Content</web-resource-name>
+			<url-pattern>/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+	</security-constraint>
+	
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Secure Content</web-resource-name>
+			<url-pattern>/secure/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>LEARNER</role-name>
+			<role-name>MONITOR</role-name>
+			<role-name>AUTHOR</role-name>
+			<role-name>GROUP MANAGER</role-name>
+			<role-name>GROUP ADMIN</role-name>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<!-- Login Configuration -->
+	<login-config>
+		<auth-method>FORM</auth-method>
+		<realm-name>LAMS</realm-name>
+		<form-login-config>
+			<form-login-page>/login.jsp</form-login-page>
+			<form-error-page>/login.jsp?failed=y</form-error-page>
+		</form-login-config>
+	</login-config>
+
+	<!-- Security Roles -->
+	<security-role>
+		<description>Student</description>
+		<role-name>LEARNER</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Authors Learning Designs</description>
+		<role-name>AUTHOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Member of Staff</description>
+		<role-name>MONITOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Group Manager</description>
+		<role-name>GROUP MANAGER</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Group Administrator</description>
+		<role-name>GROUP ADMIN</role-name>
+	</security-role>
+
+	<security-role>
+		<description>LAMS System Adminstrator</description>
+		<role-name>SYSADMIN</role-name>
+	</security-role>
+</web-app>

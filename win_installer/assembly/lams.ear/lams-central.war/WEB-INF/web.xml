@@ -1,0 +1,777 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_1.xsd"
+	version="3.1">
+	<context-param>
+		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext
+		</param-name>
+		<param-value>org.lamsfoundation.lams.central.ApplicationResources
+		</param-value>
+	</context-param>
+
+	<!-- In LAMS 2.3 there was a change in this section in all tools and core 
+		parts (central, learning, monitoring etc.) All LAMS web application now use 
+		shared application context. See refBeanContext.xml file in lams_common for 
+		its description. This refBeanContext.xml contains definition of the shared 
+		context. It is located by this entry: <context-param> <param-name>locatorFactorySelector</param-name> 
+		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value> 
+		</context-param> telling to look for refBeanContext.xml files in selected 
+		part of the classpath. Currently LAMS has only one refBeanContext.xml with 
+		one shared context definition. Lams_central uses only beans from the shared 
+		context "context.central". That is why there is no value in contextConfigLocation. 
+		Even so, this parameter needs to be declared with empty value for locatorFactorySelector 
+		to work properly. Also, if no local application context file is declare, 
+		there MUST be a file named "applicationContext.xml" in web/WEB-INF containing 
+		empty bean list, otherwise there will be errors during start up. If there 
+		are local (private for web application; see tools and admin for example) 
+		bean definitions, path to application context XML file can still be added 
+		to contextConfigLocation. -->
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value></param-value>
+	</context-param>
+	<context-param>
+		<param-name>locatorFactorySelector</param-name>
+		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml
+		</param-value>
+	</context-param>
+	<context-param>
+		<param-name>parentContextKey</param-name>
+		<param-value>context.central</param-value>
+	</context-param>
+
+	<filter>
+		<filter-name>UrlRewriteFilter</filter-name>
+		<filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter
+		</filter-class>
+	</filter>
+
+	<filter>
+		<filter-name>SystemSessionFilter</filter-name>
+		<filter-class>
+			org.lamsfoundation.lams.web.session.SystemSessionFilter
+		</filter-class>
+	</filter>
+
+	<filter>
+		<filter-name>hibernateFilter</filter-name>
+		<filter-class>
+			org.springframework.orm.hibernate5.support.OpenSessionInViewFilter
+		</filter-class>
+		<init-param>
+			<param-name>sessionFactoryBeanName</param-name>
+			<param-value>coreSessionFactory</param-value>
+		</init-param>
+	</filter>
+
+	<filter>
+		<filter-name>LocaleFilter</filter-name>
+		<filter-class>
+			org.lamsfoundation.lams.web.filter.LocaleFilter
+		</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>UrlRewriteFilter</filter-name>
+		<url-pattern>/signup/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>SystemSessionFilter</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>SystemSessionFilter</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>SystemSessionFilter</filter-name>
+		<url-pattern>*.xml</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>SystemSessionFilter</filter-name>
+		<url-pattern>/servlet/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>SystemSessionFilter</filter-name>
+		<url-pattern>/ckeditor/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>hibernateFilter</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>hibernateFilter</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>hibernateFilter</filter-name>
+		<url-pattern>*.xml</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>hibernateFilter</filter-name>
+		<url-pattern>/servlet/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>hibernateFilter</filter-name>
+		<url-pattern>/services/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>hibernateFilter</filter-name>
+		<url-pattern>/ckeditor/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>hibernateFilter</filter-name>
+		<url-pattern>/LoginRequest</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>hibernateFilter</filter-name>
+		<url-pattern>/ForgotPasswordRequest</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>LocaleFilter</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>LocaleFilter</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>LocaleFilter</filter-name>
+		<url-pattern>*.xml</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>LocaleFilter</filter-name>
+		<url-pattern>/servlet/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>LocaleFilter</filter-name>
+		<url-pattern>/ckeditor/*</url-pattern>
+	</filter-mapping>
+
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+
+	<listener>
+		<listener-class>
+			org.lamsfoundation.lams.web.SessionListener
+		</listener-class>
+	</listener>
+
+	<servlet>
+		<servlet-name>GetRecordingServlet</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.webservice.GetRecordingServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>Connector</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.web.LAMSConnectorServlet
+		</servlet-class>
+
+		<init-param>
+			<param-name>baseDir</param-name>
+			<param-value>secure</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>true</param-value>
+		</init-param>
+
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<servlet-name>RegisterServlet</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.webservice.RegisterAction
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>LaunchLearnerUrlServlet</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.web.LaunchLearnerUrlServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>jlatexmath</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.web.JlatexmathServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>saveLessonOrder</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.web.LessonOrderServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>lamsStartupServlet</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.web.LamsStartupServlet
+		</servlet-class>
+
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<servlet-name>forgotPasswordServlet</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.web.ForgotPasswordServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>SimpleUploader</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.web.LAMSUploadServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>action</servlet-name>
+		<servlet-class>
+			org.apache.struts.action.ActionServlet
+		</servlet-class>
+		<init-param>
+			<param-name>config</param-name>
+			<param-value>/WEB-INF/struts-config.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>999</param-value>
+		</init-param>
+		<init-param>
+			<param-name>detail</param-name>
+			<param-value>2</param-value>
+		</init-param>
+		<init-param>
+			<param-name>validate</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<description>Instructions Download</description>
+		<servlet-name>download</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.contentrepository.client.ToolDownload
+		</servlet-class>
+		<init-param>
+			<param-name>toolContentHandlerBeanName</param-name>
+			<param-value>centralToolContentHandler</param-value>
+		</init-param>
+		<load-on-startup>3</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<servlet-name>LoginRequest</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.web.LoginRequestServlet
+		</servlet-class>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>LoginRequestLti</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.web.LoginRequestLtiServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>LearningDesignRepository</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.webservice.xml.LearningDesignRepositoryServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>LearningDesignSVG</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.webservice.LearningDesignSVGServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>LessonManager</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.webservice.xml.LessonManagerServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>GradebookServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.web.GradebookServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>CourseGroupManager</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.web.OrganisationGroupServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>RatingServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.web.RatingServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>GetServerTimeServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.webservice.GetServerTimeServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>LearningDesignRestServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.rest.LearningDesignRestServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>ToolContentRestServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.rest.ToolContentRestServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>RuntimeStatsServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.web.RuntimeStatsServlet
+		</servlet-class>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>NotificationServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.webservice.xml.NotificationServlet
+		</servlet-class>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>UserRoleServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.webservice.UserRoleServlet
+		</servlet-class>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>OrganisationGroupServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.webservice.xml.OrganisationGroupServlet
+		</servlet-class>
+	</servlet>
+	
+	
+	<servlet-mapping>
+		<servlet-name>LearningDesignRestServlet</servlet-name>
+		<url-pattern>/rest/LearningDesign</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ToolContentRestServlet</servlet-name>
+		<url-pattern>/rest/ToolContent</url-pattern>
+	</servlet-mapping>
+	<!-- Optional Module Placeholder - do not remove -->
+
+	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>download</servlet-name>
+		<url-pattern>/download/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>LoginRequest</servlet-name>
+		<url-pattern>/LoginRequest</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>LoginRequestLti</servlet-name>
+		<url-pattern>/LoginRequestLti</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>LearningDesignRepository</servlet-name>
+		<url-pattern>/services/xml/LearningDesignRepository/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>LearningDesignSVG</servlet-name>
+		<url-pattern>/services/LearningDesignSVG/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>LessonManager</servlet-name>
+		<url-pattern>/services/xml/LessonManager/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>GradebookServlet</servlet-name>
+		<url-pattern>/services/Gradebook</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>CourseGroupManager</servlet-name>
+		<url-pattern>/services/CourseGroupManager</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>RatingServlet</servlet-name>
+		<url-pattern>/servlet/rateItem</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>GetServerTimeServlet</servlet-name>
+		<url-pattern>/services/getServerTime</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>GetRecordingServlet</servlet-name>
+		<url-pattern>/GetRecording</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Connector</servlet-name>
+		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector
+		</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>RegisterServlet</servlet-name>
+		<url-pattern>/services/Register/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>LaunchLearnerUrlServlet</servlet-name>
+		<url-pattern>/r/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>jlatexmath</servlet-name>
+		<url-pattern>/servlet/jlatexmath</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>saveLessonOrder</servlet-name>
+		<url-pattern>/servlet/saveLessonOrder</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>lamsStartupServlet</servlet-name>
+		<url-pattern>/lamsstartupservlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>forgotPasswordServlet</servlet-name>
+		<url-pattern>/ForgotPasswordRequest</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>SimpleUploader</servlet-name>
+		<url-pattern>/ckeditor/filemanager/upload/simpleuploader</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>RuntimeStatsServlet</servlet-name>
+		<url-pattern>/runtimeStats</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>NotificationServlet</servlet-name>
+		<url-pattern>/services/xml/NotificationManager</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>UserRoleServlet</servlet-name>
+		<url-pattern>/services/UserRoleManager</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>OrganisationGroupServlet</servlet-name>
+		<url-pattern>/services/xml/CourseGroupManager</url-pattern>
+	</servlet-mapping>
+	
+	
+	<mime-mapping>
+		<extension>csv</extension>
+		<mime-type>text/plain</mime-type>
+	</mime-mapping>
+
+	<mime-mapping>
+		<extension>xsd</extension>
+		<mime-type>text/xml</mime-type>
+	</mime-mapping>
+
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/errorpages/403.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/errorpages/404.jsp</location>
+	</error-page>
+
+	<jsp-config>
+
+		<!-- ======================================================== -->
+		<!-- Struts Tag Library Descriptors -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-bean</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-bean.tld
+			</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-html</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-html.tld
+			</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-logic</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-logic.tld
+			</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-tiles</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-tiles.tld
+			</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-bean-el</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-bean-el.tld
+			</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-html-el</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-html-el.tld
+			</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-logic-el</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-logic-el.tld
+			</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-tiles-el</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-tiles-el.tld
+			</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
+		<!-- JSTL 1.2 Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-fmt</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fmt.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-core</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/c.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-function</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fn.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-xml</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
+		<!-- JSTL 1.2 Tag Library: Apache implementation of TLV -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-permittedTaglibs</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/permittedTaglibs.tld
+			</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-scriptfree</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/scriptfree.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
+		<!-- Customized Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-lams</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
+		</taglib>
+
+	</jsp-config>
+
+	<!-- Security Constraint -->
+	<deny-uncovered-http-methods />
+	
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>General secure content</web-resource-name>
+			<url-pattern>/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>LEARNER</role-name>
+			<role-name>MONITOR</role-name>
+			<role-name>AUTHOR</role-name>
+			<role-name>GROUP MANAGER</role-name>
+			<role-name>GROUP ADMIN</role-name>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Public content</web-resource-name>
+			<!-- Integrations -->
+			<url-pattern>/LoginRequest</url-pattern>
+			<url-pattern>/LoginRequestLti</url-pattern>
+			<url-pattern>/services/xml/LessonManager/*</url-pattern>
+			<url-pattern>/services/xml/LearningDesignRepository/*</url-pattern>
+			<url-pattern>/services/LearningDesignSVG/*</url-pattern>
+			<url-pattern>/services/Gradebook</url-pattern>
+			<url-pattern>/services/xml/LessonJoin/*</url-pattern>
+			<url-pattern>/services/CourseGroupManager</url-pattern>
+			<url-pattern>/services/getServerTime</url-pattern>
+			<url-pattern>/services/Register/*</url-pattern>
+			<url-pattern>/services/xml/NotificationManager</url-pattern>
+			<url-pattern>/services/UserRoleManager</url-pattern>
+			<url-pattern>/services/xml/CourseGroupManager</url-pattern>
+			<url-pattern>/ForgotPasswordRequest</url-pattern>
+			<url-pattern>/forgotPassword.jsp</url-pattern>
+			<url-pattern>/forgotPasswordChange.jsp</url-pattern>
+			<url-pattern>/forgotPasswordProc.jsp</url-pattern>
+			<url-pattern>/loginTwoFactorAuth.jsp</url-pattern>
+			<url-pattern>/signup/*</url-pattern>
+			<url-pattern>/rest/*</url-pattern>
+			<url-pattern>/runtimeStats</url-pattern>
+			<!-- Static resources -->
+			<url-pattern>/css/*</url-pattern>
+			<url-pattern>/errorpages/*</url-pattern>
+			<url-pattern>/images/*</url-pattern>
+			<url-pattern>/includes/javascript/*</url-pattern>
+			<url-pattern>/includes/font-awesome/*</url-pattern>
+			<url-pattern>/ckeditor/*</url-pattern>
+			<url-pattern>/favicon.ico</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+	</security-constraint>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Authoring content</web-resource-name>
+			<url-pattern>/authoring/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>AUTHOR</role-name>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<!-- Some constraints are based on DisplayGroupAction class -->
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Organisation grouping</web-resource-name>
+			<url-pattern>/orgGroup.jsp</url-pattern>
+			<url-pattern>/orgGrouping.jsp</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>AUTHOR</role-name>
+			<role-name>MONITOR</role-name>
+			<role-name>GROUP MANAGER</role-name>
+			<role-name>GROUP ADMIN</role-name>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Add lesson</web-resource-name>
+			<url-pattern>/addLesson.jsp</url-pattern>
+			<url-pattern>/lti/addLesson.jsp</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>MONITOR</role-name>
+			<role-name>GROUP MANAGER</role-name>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Sysadmin content</web-resource-name>
+			<url-pattern>/admin.jsp</url-pattern>
+			<url-pattern>/sysadmin.jsp</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<!-- Login Configuration -->
+	<login-config>
+		<auth-method>FORM</auth-method>
+		<realm-name>LAMS</realm-name>
+		<form-login-config>
+			<form-login-page>/login.jsp</form-login-page>
+			<form-error-page>/login.jsp?failed=y</form-error-page>
+		</form-login-config>
+	</login-config>
+
+	<!-- Security Roles -->
+	<security-role>
+		<description>Student</description>
+		<role-name>LEARNER</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Authors Learning Designs</description>
+		<role-name>AUTHOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Member of Staff</description>
+		<role-name>MONITOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Group Manager</description>
+		<role-name>GROUP MANAGER</role-name>
+	</security-role>
+	<security-role>
+		<description>Group Administrator</description>
+		<role-name>GROUP ADMIN</role-name>
+	</security-role>
+	<security-role>
+		<description>LAMS System Adminstrator</description>
+		<role-name>SYSADMIN</role-name>
+	</security-role>
+</web-app>

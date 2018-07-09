@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<application xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+			 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			 version="7"
+			 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/application_7.xsd">
+    <display-name>LAMS</display-name>
+  
+	    
+    <!-- ======================================================== -->
+	<!--  Modules 						-->
+    <!-- ======================================================== -->
+    <module>
+        <web>
+            <web-uri>lams-central.war</web-uri>
+            <context-root>/lams</context-root>
+	</web>
+    </module>
+    <module>
+        <web>
+            <web-uri>lams-admin.war</web-uri>
+            <context-root>/lams/admin</context-root>
+	</web>
+    </module>
+    <module>
+        <web>
+            <web-uri>lams-monitoring.war</web-uri>
+            <context-root>/lams/monitoring</context-root>
+	</web>
+    </module>
+    <module>
+        <web>
+            <web-uri>lams-learning.war</web-uri>
+            <context-root>/lams/learning</context-root>
+	</web>
+    </module> 
+	<module>
+		<java>lams-dictionary.jar</java>
+	</module>
+    <module>
+        <web>
+            <web-uri>lams-www.war</web-uri>
+            <context-root>/lams/www</context-root>
+		</web>
+    </module>
+    <module>
+        <web>
+            <web-uri>lams-gradebook.war</web-uri>
+            <context-root>/lams/gradebook</context-root>
+		</web>
+    </module>
+    
+	<!-- Optional Module Placeholder - do not remove -->
+	
+    <!-- 
+    	======================================================== 
+	 	  Tool modules and Security Roles 
+	 	
+		  (tools will be added just below this comment)
+  		========================================================
+  	-->
+  	
+	<security-role>
+		<description>Student</description>
+		<role-name>LEARNER</role-name>
+	</security-role>
+	<security-role>
+		<description>Student</description>
+		<role-name>TEACHER</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can create/modify a learning design</description>
+		<role-name>AUTHOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can running and monitoring a learning session</description>
+		<role-name>MONITOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can add/remove users to the system, set up classes of users for sessions</description>
+		<role-name>ADMIN</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can add/remove users to the system, set up classes of users for sessions</description>
+		<role-name>SYSADMIN</role-name>
+	</security-role>
+	
+	<!-- All LAMS JARs go to this directory.
+		 3rd party libraries get installed as WildFly modules.
+	-->
+	<library-directory>lib</library-directory>
+	
+ </application>

@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Implementation-Title: LAMS
+Implementation-Version: 3.1
+Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)

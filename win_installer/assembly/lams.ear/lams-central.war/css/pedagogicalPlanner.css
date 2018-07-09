@@ -1,0 +1,193 @@
+/*
+*************************************************
+LAMS 2.2
+Date modified:  24/01/2009
+
+*************************************************
+CSS for PedagogicalPlanner
+********************************************** */
+
+.toolFrame {
+    width: 780px;
+    height: 220px;
+    border: 1px lightgrey solid;
+   }
+   
+.pedagogicalPlannerButtons {
+     margin-right: 10px;
+     float: right;
+   }
+   
+.pedagogicalPlannerTable{
+     table-layout: fixed;
+   }
+   
+.titleCell {
+   	padding: 0px 0px 0px 5px;
+   	width: 45px;
+   	text-align: center;
+   }
+   
+.titleCell .toolIcon {
+	margin-bottom: 20px;
+	}
+   
+.formCell {
+   	width: 780px;
+   }
+   
+#pedagogicalPlannerInfoArea {
+	color: #000000;
+	padding:8px 10px 10px 40px;
+	margin-top: 25px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 20px;
+	text-align: left;
+	font-weight: normal;
+	background: url('../images/css/edit.gif') no-repeat #d8e4f1 10px 8px;
+	width: 60%;
+	border: 1px solid #3c78b5;
+	float: none;
+}
+
+div#buttonArea{
+	padding: 10px 10px 40px 0px;
+}
+div#pedagogicalPlannerBusy{
+	margin: 0px 0px 20px 40%;
+}
+div#pedagogicalPlannerErrorArea{
+	margin-bottom: 20px;
+	width: 60%;
+}
+
+td.branchFirstActivity {
+	border-bottom: thick blue solid;
+	text-align: center;
+	color: blue;
+}
+
+td.optionFirstActivity {
+	border-bottom: thick lightgreen solid;
+	text-align: center;
+	color: lightgreen;
+}
+
+td.parallelFirstActivity {
+	border-bottom: thick orange solid;
+	text-align: center;
+	color: orange;
+}
+
+td.branchLastActivity {
+	border-bottom: thick blue solid;
+}
+
+td.optionLastActivity {
+	border-bottom: thick lightgreen solid;
+}
+
+td.parallelLastActivity {
+	border-bottom: thick orange solid;
+}
+
+td.branch {
+	border-left: thick blue solid;
+}
+
+td.option {
+	border-left: thick lightgreen solid;
+}
+
+td.parallel {
+	border-left: thick orange solid;
+}
+
+td.group1{
+	border-right: thick yellow solid;
+}
+
+td.group2{
+	border-right: thick orange solid;
+}
+
+td.group3{
+	border-right: thick red solid;
+}
+
+td.group4{
+	border-right: thick purple solid;
+}
+
+h3.group1{
+	color: #F1CD03;
+	text-decoration: underline;
+}
+
+h3.group2{
+	color: orange;
+	text-decoration: underline;
+}
+
+h3.group3{
+	color: red;
+	text-decoration: underline;
+}
+
+h3.group4{
+	color: purple;
+	text-decoration: underline;
+}
+
+.sequenceActionImage {
+	height: 16px;
+	width: 16px;
+	cursor: pointer;
+	float: left;
+	margin-left: 5px;
+}
+
+.align-center {
+	text-align: center;
+}
+
+.dummyLink {
+	color: #47bc23;
+}
+
+#content a.editing-advice-button {
+	font-size: smaller;
+	margin: 0px 0px 0px 663px;
+	background: url('../images/css/editing_advice.png') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+	line-height: 20px;
+	cursor: pointer;
+}
+
+a#tutorialVideoHref {
+	margin: 5px;
+	border: none;
+	color: inherit;
+	float: right;
+}
+
+a#tutorialVideoHref:hover {
+	border: none;
+	color: inherit;
+	cursor: pointer;
+}
+
+#content a.activityButton {
+	border: none;
+	text-decoration: none;
+}
+
+#content a.activityButton img{
+	border: none;
+	margin: 5px;
+}

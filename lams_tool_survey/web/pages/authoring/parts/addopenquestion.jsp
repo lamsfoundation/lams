@@ -12,13 +12,14 @@
 		</div>
 		<div class="panel-body">
 
-		<%@ include file="/common/messages.jsp"%>
+		
 
 		<form:form action="saveOrUpdateItem.do" method="post" modelAttribute="surveyItemForm" id="surveyItemForm">
 			<form:hidden path="sessionMapID" />
 			<form:hidden path="contentFolderID" />
 			<form:hidden path="itemIndex" />
 			<form:hidden path="itemType" value="3" />
+			<%@ include file="/common/messages.jsp"%>
 
 			<div class="form-group">
 				<label for="question.description"><fmt:message key="label.question" /></label>

@@ -8,13 +8,14 @@
 
 		<c:out value="${question.description}" escapeXml="false" />
 
-		<logic:messagesPresent property="questionError${question.uid}">
+		<c:set var="hasErrors"><form:errors path="*"/></c:set>
+		<c:if test="${not empty hasErrors}">
 			<lams:Alert id="error" type="danger" close="false">
-				<html:messages id="error" property="questionError${question.uid}">
-					<c:out value="${error}" escapeXml="false" />
-				</html:messages>
+				<form:errors path="questionError${question.uid}"/>
 			</lams:Alert>
-		</logic:messagesPresent>
+		</c:if>
+
+		
 
 
 	</div>

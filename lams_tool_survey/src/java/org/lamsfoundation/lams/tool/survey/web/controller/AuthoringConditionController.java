@@ -23,8 +23,9 @@
 package org.lamsfoundation.lams.tool.survey.web.controller;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -36,7 +37,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.util.LabelValueBean;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
 import org.lamsfoundation.lams.tool.survey.util.QuestionsComparator;
 import org.lamsfoundation.lams.tool.survey.web.form.SurveyConditionForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,10 @@ public class AuthoringConditionController {
     @Autowired
     @Qualifier("lasurvSurveyService")
     private ISurveyService surveyService;
+    
+    @Autowired
+    @Qualifier("lasurvMessageService")
+    private MessageService messageService;
 
     /**
      * Display empty page for a new condition.
@@ -95,9 +100,9 @@ public class AuthoringConditionController {
      * @return
      */
     @RequestMapping("/editCondition")
-    public String editCondition(SurveyConditionForm SurveyConditionForm, HttpServletRequest request) {
+    public String editCondition(SurveyConditionForm surveyConditionForm, HttpServletRequest request) {
 
-	String sessionMapID = SurveyConditionForm.getSessionMapID();
+	String sessionMapID = surveyConditionForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
 	int orderId = NumberUtils.stringToInt(request.getParameter(SurveyConstants.PARAM_ORDER_ID), -1);
@@ -107,12 +112,13 @@ public class AuthoringConditionController {
 	    List<SurveyCondition> conditionList = new ArrayList<>(conditionSet);
 	    condition = conditionList.get(orderId);
 	    if (condition != null) {
-		populateConditionToForm(orderId, condition, SurveyConditionForm, request);
+		populateConditionToForm(orderId, condition, surveyConditionForm, request);
 	    }
 	}
 
-	populateFormWithPossibleItems(SurveyConditionForm, request);
-	return condition == null ? null : "/pages/authoring/addCondition";
+	populateFormWithPossibleItems(surveyConditionForm, request);
+	request.setAttribute("surveyConditionForm", surveyConditionForm);
+	return condition == null ? null : "pages/authoring/addCondition";
     }
 
     /**
@@ -143,7 +149,7 @@ public class AuthoringConditionController {
 	    extractFormToSurveyCondition(request, surveyConditionForm);
 	} catch (Exception e) {
 
-	    errors.reject("error.condition");
+	    errors.reject(null,null,messageService.getMessage("error.condition"));
 	    if (errors.hasErrors()) {
 		populateFormWithPossibleItems(surveyConditionForm, request);
 		return "pages/authoring/addCondition";
@@ -151,7 +157,7 @@ public class AuthoringConditionController {
 	}
 
 	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, surveyConditionForm.getSessionMapID());
-
+	request.setAttribute("surveyConditionForm", surveyConditionForm);
 	return "pages/authoring/conditionList";
     }
 
@@ -340,15 +346,14 @@ public class AuthoringConditionController {
 
 	// Initialise the LabelValueBeans in the possibleOptions array.
 
-	List<LabelValueBean> lvBeans = new LinkedList<>();
-	int i = 0;
+//	List<LabelValueBean> lvBeans = new LinkedList<>();
+	Map<String, String> possibleItems = new HashMap<>(questions.size());
 	for (SurveyQuestion question : questions) {
 	    if (question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-		lvBeans.add(
-			new LabelValueBean(question.getShortTitle(), new Integer(question.getSequenceId()).toString()));
+		possibleItems.put(question.getShortTitle(), new Integer(question.getSequenceId()).toString());
 	    }
 	}
-	conditionForm.setPossibleItems(lvBeans.toArray(new LabelValueBean[] {}));
+	conditionForm.setPossibleItems(possibleItems);
     }
 
     /**
@@ -408,7 +413,7 @@ public class AuthoringConditionController {
 	String formConditionName = conditionForm.getDisplayName();
 	if (StringUtils.isBlank(formConditionName)) {
 
-	    errors.reject("error.condition.name.blank");
+	    errors.reject(null,null,messageService.getMessage("error.condition.name.blank"));
 	} else {
 
 	    Integer formConditionOrderId = conditionForm.getOrderId();
@@ -420,7 +425,7 @@ public class AuthoringConditionController {
 		if (formConditionName.equals(condition.getDisplayName())
 			&& !formConditionOrderId.equals(condition.getOrderId())) {
 
-		    errors.reject("error.condition.duplicated.name");
+		    errors.reject(null,null,messageService.getMessage("error.condition.duplicated.name"));
 		    break;
 		}
 	    }
@@ -429,7 +434,7 @@ public class AuthoringConditionController {
 	// should be selected at least one question
 	Integer[] selectedItems = conditionForm.getSelectedItems();
 	if (selectedItems == null || selectedItems.length == 0) {
-	    errors.reject("error.condition.no.questions.selected");
+	    errors.reject(null,null,messageService.getMessage("error.condition.no.questions.selected"));
 	}
 
     }

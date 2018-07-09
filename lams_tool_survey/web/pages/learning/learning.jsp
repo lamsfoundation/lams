@@ -30,18 +30,16 @@
 	</script>
 </lams:head>
 <body class="stripes">
-	<html:form action="/learning/doSurvey" method="post" styleId="surveyForm" onsubmit="disableButtons();">
-		<c:set var="formBean" value="<%=request
-							.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-		<html:hidden property="questionSeqID" />
-		<html:hidden property="sessionMapID" />
-		<html:hidden property="position" />
-		<html:hidden property="currentIdx" />
-		<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+	<form:form action="doSurvey.do" method="post" modelAttribute="surveyForm" id="surveyForm" onsubmit="disableButtons();">
+		<form:hidden path="questionSeqID" />
+		<form:hidden path="sessionMapID" />
+		<form:hidden path="position" />
+		<form:hidden path="currentIdx" />
+		<c:set var="sessionMapID" value="${surveyForm.sessionMapID}" />
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-		<c:set var="position" value="${formBean.position}" />
-		<c:set var="questionSeqID" value="${formBean.questionSeqID}" />
-		<c:set var="currentIdx" value="${formBean.currentIdx}" />
+		<c:set var="position" value="${surveyForm.position}" />
+		<c:set var="questionSeqID" value="${surveyForm.questionSeqID}" />
+		<c:set var="currentIdx" value="${surveyForm.currentIdx}" />
 
 		<lams:Page type="learner" title="${sessionMap.title}">
 
@@ -77,10 +75,11 @@
 			<c:choose>
 				<c:when test="${(sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)) or position == 3}">
 					<div class="right-buttons voffset10">
-						<html:submit property="doSurvey" disabled="${sessionMap.finishedLock}"
-							styleClass="btn btn-sm btn-primary pull-right">
+						<form:button onclick="submit" path="doSurvey" value="Done" disabled="${sessionMap.finishedLock}"
+							class="btn btn-sm btn-primary pull-right">
 							<fmt:message key="label.submit.survey" />
-						</html:submit>
+						</form:button>
+						
 					</div>
 				</c:when>
 				<c:otherwise>
@@ -92,26 +91,29 @@
 					<c:if test="${position == 1 || position == 0}">
 						<c:set var="nextChecked" value="false" />
 					</c:if>
-					<div class="pull-left voffset10"> <html:button property="PreviousButton" onclick="previousQuestion()"
-							styleClass="btn btn-sm btn-default" disabled="${preChecked}">
+					<div class="pull-left voffset10"> 
+						<form:button path="PreviousButton" onclick="previousQuestion()"
+							class="btn btn-sm btn-default" disabled="${preChecked}">
 							<fmt:message key="label.previous" />
-						</html:button>
+						</form:button>
 					</div>
-					<div class="pull-right voffset10"> <c:if test="${position != 2}">
-							<html:button property="NextButton" onclick="nextQuestion()" styleClass="btn btn-sm btn-default" disabled="${nextChecked}">
-								<fmt:message key="label.next" />
-							</html:button>
-						</c:if> <c:if test="${position == 2}">
-							<html:submit property="doSurvey" disabled="${sessionMap.finishedLock}" styleClass="btn btn-sm btn-primary">
-								<fmt:message key="label.submit.survey" />
-							</html:submit>
-						</c:if>
+					<div class="pull-right voffset10"> 
+					<c:if test="${position != 2}">
+						<form:button path="NextButton" onclick="nextQuestion()" class="btn btn-sm btn-default" disabled="${nextChecked}">
+							<fmt:message key="label.next" />
+						</form:button>
+					</c:if>
+					 <c:if test="${position == 2}">
+						<form:button onclick="submit" path="doSurvey" disabled="${sessionMap.finishedLock}" class="btn btn-sm btn-primary">
+							<fmt:message key="label.submit.survey" />
+						</form:button>
+					</c:if>
 					</div>
 				</c:otherwise>
 			</c:choose>
 			<div id="footer"></div>
 			<!--closes footer-->
 		</lams:Page>
-	</html:form>
+	</form:form>
 </body>
 </lams:html>

@@ -15,9 +15,11 @@
 			</div>
 			<div class="panel-body">
 
-			<%@ include file="/common/messages.jsp"%>
+			
 	
 			<form:form action="saveOrUpdateItem.do" modelAttribute="surveyItemForm" id="surveyItemForm" method="post">
+			
+			<%@ include file="/common/messages.jsp"%>
 				<%-- This field is not belong STRUTS form --%>
 				<input type="hidden" name="instructionList" id="instructionList" />
 				<form:hidden path="sessionMapID" />
