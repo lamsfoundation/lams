@@ -62,6 +62,7 @@ import org.lamsfoundation.lams.integration.util.GroupInfoFetchException;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -96,6 +97,7 @@ public class IntegrationService implements IIntegrationService {
     private IUserManagementService service;
     private ILessonService lessonService;
     private ILamsCoreToolService toolService;
+    private ITimezoneService timezoneService;
 
     /**
      * Returns integration server or LTI tool consumer by its human-entered server key/server id.
@@ -468,6 +470,7 @@ public class IntegrationService implements IIntegrationService {
 	user.setCreateDate(new Date());
 	user.setDisabledFlag(false);
 	user.setLocale(LanguageUtil.getSupportedLocale(userData[13], userData[12]));
+	user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
 	user.setTheme(service.getDefaultTheme());
 	service.saveUser(user);
 	ExtUserUseridMap extUserUseridMap = new ExtUserUseridMap();
@@ -904,6 +907,10 @@ public class IntegrationService implements IIntegrationService {
 	    return (ExtCourseClassMap) list.get(0);
 	}
     }
+    
+    // ---------------------------------------------------------------------
+    // Inversion of Control Methods - Method injection
+    // ---------------------------------------------------------------------
 
     public void setService(IUserManagementService service) {
 	this.service = service;
@@ -913,16 +920,16 @@ public class IntegrationService implements IIntegrationService {
 	this.lessonService = lessonService;
     }
 
-    public ILessonService getLessonService() {
-	return lessonService;
-    }
-
     public void setGradebookService(IGradebookService gradebookService) {
 	this.gradebookService = gradebookService;
     }
 
     public void setToolService(ILamsCoreToolService toolService) {
 	this.toolService = toolService;
+    }
+    
+    public void setTimezoneService(ITimezoneService timezoneService) {
+	this.timezoneService = timezoneService;
     }
 
 }
