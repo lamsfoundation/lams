@@ -44,7 +44,7 @@
         header('HTTP/1.1 401 Unauthenticated');
         exit(1);
     }
-    $array = array('',$user->firstname,$user->lastname,$user->address,$user->city,'','',$user->country,$user->phone1,'','',$user->email,$user->country,substr($user->lang,0,2));
+    $array = array('',$user->firstname,$user->lastname,$user->address,$user->city,'','',$user->country,$user->phone1,'','',$user->email,$user->country,$USER->lang);
     $comma_separated = implode(",", $array);//need more sophiscated algorithm to generate CSV formatted string
     echo $comma_separated;
 
