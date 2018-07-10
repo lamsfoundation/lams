@@ -33,12 +33,11 @@ package org.lamsfoundation.lams.tool.noticeboard;
  *
  * @author mtruong
  */
-public class NoticeboardConstants {
+public interface NoticeboardConstants {
     /**
      * Private Construtor to avoid instantiation.
      */
-    private NoticeboardConstants() {
-    }
+    
 
     public final static String TOOL_SIGNATURE = "lanb11";
 

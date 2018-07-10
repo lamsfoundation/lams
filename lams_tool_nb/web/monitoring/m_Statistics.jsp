@@ -17,7 +17,7 @@
 					<c:param name="method" value="viewComments" />
 					<c:param name="toolSessionID" value="${formBean.sessionIdMap[group.key]}" />
 				</c:url>
-				<html:link href="javascript:launchPopup('${commentURL}')"  styleClass="btn btn-default btn-sm pull-right"><fmt:message key="label.view.comments" /></html:link></td>
+				<a href="javascript:launchPopup('${commentURL}')" class="btn btn-default btn-sm pull-right"><fmt:message key="label.view.comments" /></a></td>
 				</c:if>
 			</tr>
 		</c:forEach>

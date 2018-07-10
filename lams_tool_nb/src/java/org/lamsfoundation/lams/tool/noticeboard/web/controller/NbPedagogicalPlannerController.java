@@ -1,0 +1,90 @@
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+
+package org.lamsfoundation.lams.tool.noticeboard.web.controller;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
+import org.lamsfoundation.lams.tool.noticeboard.web.form.NbPedagogicalPlannerForm;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/**
+ * @author
+ * @version
+ *
+ *
+ *
+ *
+ *
+ */
+@Controller
+@RequestMapping("/pedagogicalPlanner")
+public class NbPedagogicalPlannerController {
+
+    private static Logger logger = Logger.getLogger(NbPedagogicalPlannerController.class);
+
+    @Autowired
+    @Qualifier("nbService")
+    private INoticeboardService nbService;
+
+    protected String unspecified(@ModelAttribute NbPedagogicalPlannerForm plannerForm, HttpServletRequest request) {
+	return initPedagogicalPlannerForm(plannerForm, request);
+    }
+
+    public String initPedagogicalPlannerForm(@ModelAttribute NbPedagogicalPlannerForm plannerForm,
+	    HttpServletRequest request) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	NoticeboardContent noticeboard = nbService.retrieveNoticeboard(toolContentID);
+	plannerForm.fillForm(noticeboard);
+	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	plannerForm.setContentFolderID(contentFolderId);
+	return "authoring/pedagogicalPlannerForm";
+
+    }
+
+    public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute NbPedagogicalPlannerForm plannerForm,
+	    Errors errors, HttpServletRequest request) {
+
+	plannerForm.validate(errors);
+	if (!errors.hasErrors()) {
+	    String content = plannerForm.getBasicContent();
+	    Long toolContentID = plannerForm.getToolContentID();
+	    NoticeboardContent noticeboard = nbService.retrieveNoticeboard(toolContentID);
+	    noticeboard.setContent(content);
+	    nbService.saveNoticeboard(noticeboard);
+	}
+
+	return "authoring/pedagogicalPlannerForm";
+    }
+
+}

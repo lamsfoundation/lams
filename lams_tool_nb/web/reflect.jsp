@@ -13,20 +13,20 @@
 
 <lams:Page type="learner" title="${title}">
 
-	<html:form action="/learner" method="post" onsubmit="disableFinishButton();" styleId="learnerForm">
+	<form:form action="/learner" method="post" onsubmit="disableFinishButton();" modelAttribute="learnerForm" id="learnerForm">
 		<div class="form-group">
 			<div class="panel">
 				<lams:out value="${reflectInstructions}" escapeHtml="true" />
 			</div>
 
-			<html:textarea rows="4" property="reflectionText" value="${reflectEntry}" styleClass="form-control"
-				styleId="focusedInput"></html:textarea>
+			<textarea rows="4" name="reflectionText" value="${reflectEntry}" class="form-control"
+				id="focusedInput"></textarea>
 
-			<html:hidden property="toolSessionID" />
-			<html:hidden property="mode" />
-			<html:hidden property="method" value="finish" />
+			<form:hidden path="toolSessionID" />
+			<form:hidden path="mode" />
+			<form:hidden path="method" value="finish" />
 
-			<html:link href="#nogo" styleClass="btn btn-primary pull-right voffset10" onclick="submitForm('finish')">
+			<a href="#nogo" class="btn btn-primary pull-right voffset10" onclick="submitForm('finish')">
 				<c:choose>
 					<c:when test="${activityPosition.last}">
 						<fmt:message key="button.submit" />
@@ -35,10 +35,10 @@
 						<fmt:message key="button.finish" />
 					</c:otherwise>
 				</c:choose>
-			</html:link>
+			</a>
 		</div>
 
-	</html:form>
+	</form:form>
 
 	<!-- Comments: the extra div counteracts the float -->
 	<c:if test="${allowComments}">

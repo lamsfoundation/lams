@@ -37,9 +37,9 @@
 					<c:param name="toolSessionID" value="${reflection.externalId}" />
 				</c:url>
 				<td>
-				<html:link href="javascript:launchPopup('${viewReflection}')" styleClass="btn btn-default btn-sm ${allowComments ? 'pull-right' : ''}">
+				<a href="javascript:launchPopup('${viewReflection}')" class="btn btn-default btn-sm ${allowComments ? 'pull-right' : ''}">
 							<fmt:message key="link.view" />
-					</html:link>
+					</a>
 				</td>
 			</tr>
 		</c:forEach>

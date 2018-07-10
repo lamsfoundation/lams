@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.taskList.web.form;
 
 import java.util.Map;
 
-import org.apache.struts.util.LabelValueBean;
 import org.lamsfoundation.lams.web.TextSearchForm;
 
 /**

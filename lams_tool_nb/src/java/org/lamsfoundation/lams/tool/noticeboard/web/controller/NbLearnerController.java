@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.noticeboard.web.action;
+package org.lamsfoundation.lams.tool.noticeboard.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
@@ -33,10 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.util.MessageResources;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -54,14 +49,20 @@ import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.tool.noticeboard.web.form.NbLearnerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Creation Date: 29-06-05
- * 
+ *
  * This class has been created so that when a learner finishes an activity,
  * leaveToolSession() will be called to inform the progress engine
  * that the user has completed this activity.
@@ -78,9 +79,22 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class NbLearnerAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/learner")
+public class NbLearnerController implements NoticeboardConstants {
 
-    static Logger logger = Logger.getLogger(NbLearnerAction.class.getName());
+    static Logger logger = Logger.getLogger(NbLearnerController.class.getName());
+
+    @Autowired
+    @Qualifier("nbService")
+    private INoticeboardService nbService;
+
+    @Autowired
+    @Qualifier("nbMessageService")
+    private MessageService messageService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /** Get the user id from the shared session */
     public Long getUserID(HttpServletRequest request) {
@@ -88,8 +102,7 @@ public class NbLearnerAction extends LamsDispatchAction {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	if (user == null) {
-	    MessageResources resources = getResources(request);
-	    String error = resources.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "User");
+	    String error = messageService.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "User");
 	    logger.error(error);
 	    throw new NbApplicationException(error);
 	}
@@ -99,18 +112,17 @@ public class NbLearnerAction extends LamsDispatchAction {
     /**
      * Indicates that the user has finished viewing the noticeboard.
      * The session is set to complete and leaveToolSession is called.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
      */
-    public ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public String finish(@ModelAttribute NbLearnerForm learnerForm, HttpServletRequest request,
 	    HttpServletResponse response)
 	    throws NbApplicationException, ToolException, DataMissingException, ServletException, IOException {
 
-	NbLearnerForm learnerForm = (NbLearnerForm) form;
 	Long userID = getUserID(request);
 
 	Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
@@ -120,9 +132,8 @@ public class NbLearnerAction extends LamsDispatchAction {
 	    throw new NbApplicationException(error);
 	}
 
-	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 	ToolSessionManager sessionMgrService = NoticeboardServiceProxy
-		.getNbSessionManager(getServlet().getServletContext());
+		.getNbSessionManager(applicationContext.getServletContext());
 
 	ToolAccessMode mode = WebUtil.getToolAccessMode(learnerForm.getMode());
 	if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR) {
@@ -170,26 +181,22 @@ public class NbLearnerAction extends LamsDispatchAction {
 	}
 	request.setAttribute(NoticeboardConstants.READ_ONLY_MODE, "true");
 
-	return mapping.findForward(NoticeboardConstants.DISPLAY_LEARNER_CONTENT);
+	return ".learnerContent";
 
     }
 
     /**
      * Indicates that the user has finished viewing the noticeboard, and will be
      * passed onto the Notebook reflection screen.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
      */
-    public ActionForward reflect(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws NbApplicationException {
+    public String reflect(@ModelAttribute NbLearnerForm learnerForm, HttpServletRequest request) {
 
-	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-
-	NbLearnerForm learnerForm = (NbLearnerForm) form;
 	Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
 	NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
 	request.setAttribute("reflectInstructions", nbContent.getReflectInstructions());
@@ -206,8 +213,8 @@ public class NbLearnerAction extends LamsDispatchAction {
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
-	return mapping.findForward(NoticeboardConstants.REFLECT_ON_ACTIVITY);
+	return ".reflectOnActivity";
     }
 }

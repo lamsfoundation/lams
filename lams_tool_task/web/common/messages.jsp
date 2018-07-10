@@ -1,12 +1,17 @@
-<%-- Error Messages --%>
-<form:errors path="*" />
+<c:set var="hasErrors">
+<form:errors path='*'/>
+</c:set>
+<c:if test="${not empty hasErrors}">
+	<lams:Alert id="error" type="danger" close="false">
+		<form:errors path="*"/>
+	</lams:Alert>
+</c:if>
 
 <%-- Success Messages -
 <logic:messagesPresent>
 	<lams:Alert id="error" type="danger" close="false">
-	        <html:messages id="error">
-	            <c:out value="${error}" escapeXml="false"/><br/>
-	        </html:messages>
+	        <form:errors path="*"/>
 	</lams:Alert>
 </logic:messagesPresent>
 --%>
+

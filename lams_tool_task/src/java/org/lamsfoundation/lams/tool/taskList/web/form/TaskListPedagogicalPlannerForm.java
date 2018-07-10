@@ -30,12 +30,13 @@ import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
 import org.springframework.validation.Errors;
 
 /**
  *
  */
-public class TaskListPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class TaskListPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     private List<String> taskListItem;
 
     public void validate(Errors errors) {

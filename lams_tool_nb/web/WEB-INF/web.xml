@@ -90,6 +90,29 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>spring</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<servlet-name>Connector</servlet-name>
+		<servlet-class>net.fckeditor.connector.ConnectorServlet</servlet-class>
+		<init-param>
+			<param-name>baseDir</param-name>
+			<param-value>/UserFiles/</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
 	<!-- The download servlet, reused from the content repository jar -->
 	<servlet>
 		<servlet-name>download</servlet-name>
@@ -102,8 +125,13 @@
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>action</servlet-name>
+		<servlet-name>spring</servlet-name>
 		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>Connector</servlet-name>
+		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>

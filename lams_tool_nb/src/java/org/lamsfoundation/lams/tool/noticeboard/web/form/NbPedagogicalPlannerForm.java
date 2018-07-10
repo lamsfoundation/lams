@@ -20,11 +20,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.noticeboard.web.form;
 
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.Errors;
 
 /**
  *
@@ -56,5 +57,22 @@ public class NbPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	    setBasicContent(content);
 	    setToolContentID(noticeboard.getNbContentId());
 	}
+    }
+
+    public void validate(Errors errors) {
+	boolean valid = true;
+	boolean allEmpty = true;
+	if (basicContent != null && !basicContent.isEmpty()) {
+	    if (!StringUtils.isEmpty(basicContent)) {
+		allEmpty = false;
+	    }
+	}
+	if (allEmpty) {
+	    errors.reject("authoring.msg.no.tasks.save");
+	    valid = false;
+	    basicContent = null;
+	}
+
+	setValid(valid);
     }
 }

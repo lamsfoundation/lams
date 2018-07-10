@@ -21,20 +21,13 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.noticeboard.web.action;
+package org.lamsfoundation.lams.tool.noticeboard.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.util.MessageResources;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -43,15 +36,21 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
-import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.tool.noticeboard.web.form.NbLearnerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Creation Date: 27-06-05
@@ -75,18 +74,29 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
+@Controller
+@RequestMapping("/starter/learner")
+public class NbLearnerStarterController {
 
-public class NbLearnerStarterAction extends LamsDispatchAction {
+    static Logger logger = Logger.getLogger(NbLearnerStarterController.class.getName());
 
-    static Logger logger = Logger.getLogger(NbLearnerStarterAction.class.getName());
+    @Autowired
+    @Qualifier("nbService")
+    private INoticeboardService nbService;
+
+    @Autowired
+    @Qualifier("nbMessageService")
+    private MessageService messageService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     private UserDTO getUserDTO(HttpServletRequest request) {
 	// set up the user details
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	if (user == null) {
-	    MessageResources resources = getResources(request);
-	    String error = resources.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "User");
+	    String error = messageService.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "User");
 	    logger.error(error);
 	    throw new NbApplicationException(error);
 	}
@@ -104,24 +114,19 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 	return WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
     }
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public String unspecified(@ModelAttribute NbLearnerForm learnerForm, Errors errors, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	return learner(mapping, form, request, response);
+	return learner(learnerForm, errors, request, response);
     }
 
-    public ActionForward learner(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws NbApplicationException {
+    @RequestMapping("/learner")
+    public String learner(@ModelAttribute NbLearnerForm learnerForm, Errors errors, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	NoticeboardContent nbContent = null;
 	NoticeboardUser nbUser = null;
 	saveMessages(request, null);
-
-	NbLearnerForm learnerForm = (NbLearnerForm) form;
-
-	ActionMessages message = new ActionMessages();
-	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 
 	Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
 
@@ -141,7 +146,7 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 	}
 
 	if (isFlagSet(nbContent, NoticeboardConstants.FLAG_DEFINE_LATER)) {
-	    return mapping.findForward(NoticeboardConstants.DEFINE_LATER);
+	    return "defineLater";
 	}
 
 	boolean readOnly = false;
@@ -189,31 +194,32 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 	request.setAttribute("userFinished", userFinished);
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
 	/*
 	 * Checks to see if the runOffline flag is set.
 	 * If the particular flag is set, control is forwarded to jsp page
 	 * displaying to the user the message according to what flag is set.
 	 */
-	if (displayMessageToUser(nbContent, message)) {
+	if (displayMessageToUser(nbContent, errors)) {
 	    saveMessages(request, message);
-	    return mapping.findForward(NoticeboardConstants.DISPLAY_MESSAGE);
+	    return ("displayMessage");
 	}
 
-	return mapping.findForward(NoticeboardConstants.DISPLAY_LEARNER_CONTENT);
+	return "learnerContent";
 
     }
 
-    public ActionForward teacher(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/teacher")
+    public String teacher(@ModelAttribute NbLearnerForm learnerForm, Errors errors, HttpServletRequest request,
 	    HttpServletResponse response) throws NbApplicationException {
-	return learner(mapping, form, request, response);
+	return learner(learnerForm, errors, request, response);
     }
 
-    public ActionForward author(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public String author(@ModelAttribute NbLearnerForm learnerForm, Errors errors, HttpServletRequest request,
 	    HttpServletResponse response) throws NbApplicationException {
 
-	return learner(mapping, form, request, response);
+	return learner(learnerForm, errors, request, response);
 
     }
 
@@ -257,18 +263,18 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
      * This method will return true if any one of the defineLater or runOffline flag is set.
      * Otherwise false will be returned.
      * </p>
-     * 
+     *
      * @param content
      *            The instance of NoticeboardContent
      * @param message
      *            the instance of ActtionMessages
      * @return true if any of the flags are set, false otherwise
      */
-    private boolean displayMessageToUser(NoticeboardContent content, ActionMessages message) {
+    private boolean displayMessageToUser(NoticeboardContent content, Errors errors) {
 	boolean isDefineLaterSet = isFlagSet(content, NoticeboardConstants.FLAG_DEFINE_LATER);
 	if (isDefineLaterSet) {
 	    if (isDefineLaterSet) {
-		message.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.defineLaterSet"));
+		errors.reject("message.defineLaterSet");
 	    }
 	    return true;
 	} else {

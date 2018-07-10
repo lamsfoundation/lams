@@ -61,7 +61,7 @@ import org.lamsfoundation.lams.tool.taskList.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -73,7 +73,9 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -537,7 +539,7 @@ public class LearningController implements TaskListConstants {
      * @throws UploadTaskListFileException
      */
     @RequestMapping("/uploadFile")
-    public String uploadFile(@ModelAttribute TaskListItemForm taskListItemForm, Errors errors,
+    public String uploadFile(@ModelAttribute TaskListItemForm taskListItemForm, @RequestParam("file") MultipartFile file, Errors errors,
 	    HttpServletRequest request) throws UploadTaskListFileException {
 
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
@@ -546,14 +548,12 @@ public class LearningController implements TaskListConstants {
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
 
-	FormFile file = taskListItemForm.getUploadedFile();
-
-	if (file == null || StringUtils.isBlank(file.getFileName())) {
+	if (file == null || StringUtils.isBlank(file.getName())) {
 	    return "pages/learning/learning";
 	}
 
 	// validate file size
-	FileValidatorUtil.validateFileSize(file, false, errors);
+	FileValidatorSpringUtil.validateFileSize(file, false, errors);
 	if (errors.hasErrors()) {
 	    return "pages/learning/learning";
 	}

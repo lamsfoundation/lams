@@ -53,7 +53,9 @@
 		</property>
 	</bean> 
 
-
+	<bean id="nbMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource"><ref bean="nbMessageSource"/></property>										
+	</bean>
 
 	<!--  DAO classes -->
 	<bean id="nbContentDAO" class="org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardContentDAO">
