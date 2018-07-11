@@ -21,7 +21,7 @@
 	<script type="text/javascript">
 		$(document).ready(function () {
 			//update dialog's height and title
-			updateMyProfileDialogSettings('<fmt:message key="index.myprofile" />', '430');
+			updateMyProfileDialogSettings('<fmt:message key="index.myprofile" />', '480');
 		});
 	</script>
 </lams:head>
