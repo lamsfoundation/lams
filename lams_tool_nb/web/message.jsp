@@ -31,7 +31,7 @@
 	</c:if>
 	
 	<div class="align-right space-bottom-top">
-		<form:form modelAttribute="messageForm" action="/learner" target="_self" onsubmit="disableFinishButton();" id="messageForm">
+		<form:form modelAttribute="messageForm" action="/learner.do" target="_self" onsubmit="disableFinishButton();" id="messageForm">
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="mode" />
 			<form:hidden path="method" value="finish"/>

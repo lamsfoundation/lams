@@ -34,9 +34,9 @@
 		<c:out value="${NbLearnerForm.basicContent}" escapeXml="false" />
 	</div>
 
-	<form:form action="/learner.do" modelAttribute="learnerForm" target="_self" onsubmit="disableFinishButton();" id="learnerForm">
-		<form:hidden property="toolSessionID" />
-		<form:hidden property="mode" />
+	<form:form action="starter/learner.do" modelAttribute="nbLearnerForm" target="_self" onsubmit="disableFinishButton();" id="nbLearnerForm">
+		<form:hidden path="toolSessionID" />
+		<form:hidden path="mode" />
 
 		<c:if test="${userFinished and reflectOnActivity}">
 			<div class="panel">

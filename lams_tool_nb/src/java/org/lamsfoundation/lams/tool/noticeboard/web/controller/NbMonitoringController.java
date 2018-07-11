@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -60,7 +59,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author mtruong
  */
 @Controller
-@RequestMapping("/monitoring")
 public class NbMonitoringController {
 
     static Logger logger = Logger.getLogger(NbMonitoringController.class.getName());
@@ -71,8 +69,8 @@ public class NbMonitoringController {
 
     public final static String FORM = "NbMonitoringForm";
 
-    public String unspecified(@ModelAttribute NbMonitoringForm monitorForm, HttpServletRequest request,
-	    HttpServletResponse response) throws NbApplicationException {
+    @RequestMapping("/monitoring")
+    public String unspecified(@ModelAttribute NbMonitoringForm nbMonitoringForm, HttpServletRequest request) {
 
 	Long toolContentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
@@ -84,14 +82,14 @@ public class NbMonitoringController {
 
 	NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
 
-	monitorForm.setTitle(content.getTitle());
-	monitorForm.setBasicContent(content.getContent());
+	nbMonitoringForm.setTitle(content.getTitle());
+	nbMonitoringForm.setBasicContent(content.getContent());
 
 	request.setAttribute(NoticeboardConstants.TOOL_CONTENT_ID, toolContentId);
 	request.setAttribute(NoticeboardConstants.CONTENT_FOLDER_ID, contentFolderID);
 
 	//Get the total number of learners that have participated in this tool activity
-	monitorForm.setTotalLearners(nbService.calculateTotalNumberOfUsers(toolContentId));
+	nbMonitoringForm.setTotalLearners(nbService.calculateTotalNumberOfUsers(toolContentId));
 
 	Set sessions = content.getNbSessions();
 	Iterator i = sessions.iterator();
@@ -121,8 +119,8 @@ public class NbMonitoringController {
 		}
 	    }
 	}
-	monitorForm.setGroupStatsMap(numUsersMap);
-	monitorForm.setSessionIdMap(sessionIdMap);
+	nbMonitoringForm.setGroupStatsMap(numUsersMap);
+	nbMonitoringForm.setSessionIdMap(sessionIdMap);
 
 	boolean isGroupedActivity = nbService.isGroupedActivity(toolContentId);
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
@@ -135,11 +133,12 @@ public class NbMonitoringController {
 	request.setAttribute("allowComments", content.isAllowComments());
 
 	String currentTab = WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
-	monitorForm.setCurrentTab(currentTab != null ? currentTab : "1");
-	request.setAttribute(FORM, monitorForm);
-	return "monitorPage";
+	nbMonitoringForm.setCurrentTab(currentTab != null ? currentTab : "1");
+	request.setAttribute(FORM, nbMonitoringForm);
+	return "/monitoring/monitoring";
     }
 
+    @RequestMapping("/reflection")
     public String viewReflection(HttpServletRequest request) {
 	Long userId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.USER_ID));
 	Long toolSessionId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_SESSION_ID));
@@ -151,9 +150,10 @@ public class NbMonitoringController {
 	    request.setAttribute("name", nbUser.getFullname());
 	}
 
-	return "monitorReflectionPage";
+	return "/monitoring/reflection";
     }
 
+    @RequestMapping("/comments")
     public String viewComments(HttpServletRequest request) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_SESSION_ID, false);
@@ -161,7 +161,7 @@ public class NbMonitoringController {
 
 	request.setAttribute(NoticeboardConstants.TOOL_SESSION_ID, toolSessionID);
 	request.setAttribute("anonymous", nbContent.isAllowAnonymous());
-	return "monitorCommentsPage";
+	return "monitoring/comments";
     }
 
 }

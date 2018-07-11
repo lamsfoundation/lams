@@ -1,8 +1,6 @@
 <!DOCTYPE html>
-            
-
+           
 <%@ include file="/includes/taglibs.jsp"%>
-
 <%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
 <c:set var="lams">
 	<lams:LAMSURL />
@@ -55,15 +53,15 @@
 
 <body class="stripes" onLoad="init()">
 
-<form:form modelAttribute="authoringForm" action="authoring.do" id="authoringForm" target="_self" enctype="multipart/form-data">
+<form:form modelAttribute="nbAuthoringForm" action="authoring.do" id="nbAuthoringForm" enctype="multipart/form-data">
 
 <c:set var="title"><fmt:message key="activity.title" /></c:set>
 <lams:Page title="${title}" type="navbar">
 
-			<form:hidden property="toolContentID" />
-			<form:hidden property="contentFolderID" />
-			<form:hidden property="currentTab" styleId="currentTab" />
-			<form:hidden property="defineLater" />
+			<form:hidden path="toolContentID" />
+			<form:hidden path="contentFolderID" />
+			<form:hidden path="currentTab" id="currentTab" />
+			<form:hidden path="defineLater" />
 		
 		 	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 				<lams:Tab id="1" key="label.authoring.heading.basic" />
@@ -87,7 +85,7 @@
   				</lams:TabBodys>
 		
 				<!-- Button Row -->
-				<form:hidden property="method" value="save" />
+				<form:hidden path="method" value="save" />
 				<c:set var="accessMode">
 					<c:choose>
 						<c:when test="${NbAuthoringForm.defineLater == 'true'}">
@@ -98,7 +96,7 @@
 						</c:otherwise>
 					</c:choose>
 				</c:set>
-				<lams:AuthoringButton formID="authoringForm"
+				<lams:AuthoringButton formID="nbAuthoringForm"
 					clearSessionActionUrl="/clearsession.do" toolSignature="lanb11"
 					toolContentID="${NbAuthoringForm.toolContentID}"
 					cancelButtonLabelKey="button.cancel"

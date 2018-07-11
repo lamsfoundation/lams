@@ -1,5 +1,19 @@
-<%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
+<!DOCTYPE html>
 <%@ include file="/includes/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+
+<lams:html>
+<lams:head>
+	<lams:css />
+	<title><fmt:message key="activity.title"/></title>
+	<script src="${lams}includes/javascript/jquery.js"></script>
+	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
+</lams:head>
+
+<body class="stripes">
 
 <script type="text/javascript">
 	function disableFinishButton() {
@@ -13,7 +27,7 @@
 
 <lams:Page type="learner" title="${title}">
 
-	<form:form action="/learner" method="post" onsubmit="disableFinishButton();" modelAttribute="learnerForm" id="learnerForm">
+	<form:form action="/reflect.do" method="post" onsubmit="disableFinishButton();" modelAttribute="nbLearnerForm" id="nbLearnerForm">
 		<div class="form-group">
 			<div class="panel">
 				<lams:out value="${reflectInstructions}" escapeHtml="true" />
@@ -56,4 +70,5 @@
 		document.getElementById("focusedInput").focus();
 	}
 </script>
-
+	
+</lams:html>

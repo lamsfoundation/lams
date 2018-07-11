@@ -8,13 +8,11 @@
 
 <div class="checkbox">
 	<label for="reflectOnActivity">
-    <form:checkbox path="reflectOnActivity" value="1"
-		cssClass="noBorder" id="reflectOnActivity"/>
-		<fmt:message key="advanced.reflectOnActivity" />
+    <form:checkbox path="reflectOnActivity" value="1" cssClass="noBorder" id="ReflectOnActivity"/><fmt:message key="advanced.reflectOnActivity" />
 	</label>
 </div>
 <div class="form-group">
-	<textarea name="reflectInstructions" cols="60" rows="3"  id="reflectInstructions" class="form-control"/>
+	<form:textarea path="reflectInstructions" cols="60" rows="3"  id="reflectInstructions" cssClass="form-control"></form:textarea>
 </div>
 </lams:SimplePanel>
 

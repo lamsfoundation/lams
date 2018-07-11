@@ -119,13 +119,14 @@ public class NbLearnerController implements NoticeboardConstants {
      * @param response
      * @return
      */
-    public String finish(@ModelAttribute NbLearnerForm learnerForm, HttpServletRequest request,
+    @RequestMapping("/finish")
+    public String finish(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request,
 	    HttpServletResponse response)
 	    throws NbApplicationException, ToolException, DataMissingException, ServletException, IOException {
 
 	Long userID = getUserID(request);
 
-	Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
+	Long toolSessionID = NbWebUtil.convertToLong(nbLearnerForm.getToolSessionID());
 	if (toolSessionID == null) {
 	    String error = "Unable to continue. The parameters tool session id is missing";
 	    logger.error(error);
@@ -135,7 +136,7 @@ public class NbLearnerController implements NoticeboardConstants {
 	ToolSessionManager sessionMgrService = NoticeboardServiceProxy
 		.getNbSessionManager(applicationContext.getServletContext());
 
-	ToolAccessMode mode = WebUtil.getToolAccessMode(learnerForm.getMode());
+	ToolAccessMode mode = WebUtil.getToolAccessMode(nbLearnerForm.getMode());
 	if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR) {
 	    NoticeboardSession nbSession = nbService.retrieveNoticeboardSession(toolSessionID);
 	    NoticeboardUser nbUser = nbService.retrieveNbUserBySession(userID, toolSessionID);
@@ -154,10 +155,10 @@ public class NbLearnerController implements NoticeboardConstants {
 		if (entry == null) {
 		    // create new entry
 		    nbService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-			    NoticeboardConstants.TOOL_SIGNATURE, userID.intValue(), learnerForm.getReflectionText());
+			    NoticeboardConstants.TOOL_SIGNATURE, userID.intValue(), nbLearnerForm.getReflectionText());
 		} else {
 		    // update existing entry
-		    entry.setEntry(learnerForm.getReflectionText());
+		    entry.setEntry(nbLearnerForm.getReflectionText());
 		    entry.setLastModified(new Date());
 		    nbService.updateEntry(entry);
 		}
@@ -167,10 +168,10 @@ public class NbLearnerController implements NoticeboardConstants {
 	    try {
 		nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, getUserID(request));
 	    } catch (DataMissingException e) {
-		log.error(e);
+		logger.error(e);
 		throw new ServletException(e);
 	    } catch (ToolException e) {
-		log.error(e);
+		logger.error(e);
 		throw new ServletException(e);
 	    }
 
@@ -181,7 +182,7 @@ public class NbLearnerController implements NoticeboardConstants {
 	}
 	request.setAttribute(NoticeboardConstants.READ_ONLY_MODE, "true");
 
-	return ".learnerContent";
+	return "learnerContent";
 
     }
 
@@ -195,9 +196,10 @@ public class NbLearnerController implements NoticeboardConstants {
      * @param response
      * @return
      */
-    public String reflect(@ModelAttribute NbLearnerForm learnerForm, HttpServletRequest request) {
+    @RequestMapping("/reflect")
+    public String reflect(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request) {
 
-	Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
+	Long toolSessionID = NbWebUtil.convertToLong(nbLearnerForm.getToolSessionID());
 	NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
 	request.setAttribute("reflectInstructions", nbContent.getReflectInstructions());
 	request.setAttribute("title", nbContent.getTitle());
@@ -215,6 +217,6 @@ public class NbLearnerController implements NoticeboardConstants {
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
 		applicationContext.getServletContext());
 
-	return ".reflectOnActivity";
+	return "reflect";
     }
 }

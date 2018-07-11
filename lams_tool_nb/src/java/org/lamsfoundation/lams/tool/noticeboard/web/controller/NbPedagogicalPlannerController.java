@@ -61,6 +61,7 @@ public class NbPedagogicalPlannerController {
 	return initPedagogicalPlannerForm(plannerForm, request);
     }
 
+    @RequestMapping("/init")
     public String initPedagogicalPlannerForm(@ModelAttribute NbPedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -72,6 +73,7 @@ public class NbPedagogicalPlannerController {
 
     }
 
+    @RequestMapping("/saveorupdate")
     public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute NbPedagogicalPlannerForm plannerForm,
 	    Errors errors, HttpServletRequest request) {
 

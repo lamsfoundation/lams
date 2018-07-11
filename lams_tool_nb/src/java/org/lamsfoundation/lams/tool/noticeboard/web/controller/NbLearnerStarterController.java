@@ -75,7 +75,7 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
-@RequestMapping("/starter/learner")
+@RequestMapping("/starter")
 public class NbLearnerStarterController {
 
     static Logger logger = Logger.getLogger(NbLearnerStarterController.class.getName());
@@ -114,21 +114,21 @@ public class NbLearnerStarterController {
 	return WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
     }
 
-    public String unspecified(@ModelAttribute NbLearnerForm learnerForm, Errors errors, HttpServletRequest request,
+    public String unspecified(@ModelAttribute NbLearnerForm NbLearnerForm, Errors errors, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	return learner(learnerForm, errors, request, response);
+	return learner(NbLearnerForm, errors, request, response);
     }
 
     @RequestMapping("/learner")
-    public String learner(@ModelAttribute NbLearnerForm learnerForm, Errors errors, HttpServletRequest request,
+    public String learner(@ModelAttribute NbLearnerForm NbLearnerForm, Errors errors, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	NoticeboardContent nbContent = null;
 	NoticeboardUser nbUser = null;
-	saveMessages(request, null);
+//	saveMessages(request, null);
 
-	Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
+	Long toolSessionID = NbWebUtil.convertToLong(NbLearnerForm.getToolSessionID());
 
 	if (toolSessionID == null) {
 	    String error = "Unable to continue. The parameters tool session id is missing";
@@ -177,7 +177,7 @@ public class NbLearnerStarterController {
 	    readOnly = true;
 	}
 
-	learnerForm.copyValuesIntoForm(nbContent, readOnly, mode.toString());
+	NbLearnerForm.copyValuesIntoForm(nbContent, readOnly, mode.toString());
 
 	NotebookEntry notebookEntry = nbService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		NoticeboardConstants.TOOL_SIGNATURE, userID.intValue());
@@ -201,25 +201,27 @@ public class NbLearnerStarterController {
 	 * If the particular flag is set, control is forwarded to jsp page
 	 * displaying to the user the message according to what flag is set.
 	 */
-	if (displayMessageToUser(nbContent, errors)) {
-	    saveMessages(request, message);
-	    return ("displayMessage");
-	}
+//	if (displayMessageToUser(nbContent, errors)) {
+//	    saveMessages(request, message);
+//A	    request.setAttribute("messageForm", );	
+//A	    return ("message");
+//	}
 
 	return "learnerContent";
 
     }
 
     @RequestMapping("/teacher")
-    public String teacher(@ModelAttribute NbLearnerForm learnerForm, Errors errors, HttpServletRequest request,
+    public String teacher(@ModelAttribute NbLearnerForm NbLearnerForm, Errors errors, HttpServletRequest request,
 	    HttpServletResponse response) throws NbApplicationException {
-	return learner(learnerForm, errors, request, response);
+	return learner(NbLearnerForm, errors, request, response);
     }
 
-    public String author(@ModelAttribute NbLearnerForm learnerForm, Errors errors, HttpServletRequest request,
+    @RequestMapping("/author")
+    public String author(@ModelAttribute NbLearnerForm NbLearnerForm, Errors errors, HttpServletRequest request,
 	    HttpServletResponse response) throws NbApplicationException {
 
-	return learner(learnerForm, errors, request, response);
+	return learner(NbLearnerForm, errors, request, response);
 
     }
 

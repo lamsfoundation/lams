@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.noticeboard.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -65,7 +66,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author mtruong
  */
 @Controller
-@RequestMapping("/authoring")
 public class NbAuthoringController {
 
     private static Logger logger = Logger.getLogger(NbAuthoringController.class.getName());
@@ -92,15 +92,24 @@ public class NbAuthoringController {
 	return user;
     }
 
-    public String unspecified(@ModelAttribute NbAuthoringForm nbAuthoringForm, HttpServletRequest request) {
+    @RequestMapping("/authoring")
+    public String unspecified(@ModelAttribute NbAuthoringForm nbAuthoringForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 	/*
 	 * Retrieve the Service
 	 */
+	String contentIdString = nbAuthoringForm.getToolContentID();
+	Long contentId = NbWebUtil.convertToLong(nbAuthoringForm.getToolContentID());
+	String contentFolderId = nbAuthoringForm.getContentFolderID();
+	
+	
+	//throws exception if the content id does not exist
+	checkContentId(contentId);
+	
+//	Long contentId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_CONTENT_ID);
+//	String contentFolderId = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
 
-	Long contentId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_CONTENT_ID);
-	String contentFolderId = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
-
-	nbAuthoringForm.setToolContentID(contentId.toString());
+	nbAuthoringForm.setToolContentID(contentIdString);
 
 	/*
 	 * DefineLater is used in the basic screen. If defineLater is set, then in the authoring page,
@@ -157,6 +166,7 @@ public class NbAuthoringController {
 	}
 
 	request.setAttribute(FORM, nbAuthoringForm);
+	
 	return "authoring/authoring";
     }
 
@@ -177,6 +187,7 @@ public class NbAuthoringController {
 
     }
 
+    @RequestMapping("/save")
     public String save(@ModelAttribute NbAuthoringForm nbAuthoringForm, HttpServletRequest request) {
 
 	//copyAuthoringFormValuesIntoFormBean(request, nbForm);

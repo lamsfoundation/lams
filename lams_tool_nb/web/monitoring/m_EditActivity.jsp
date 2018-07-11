@@ -2,7 +2,7 @@
 
 <div class="voffset10">
 
-<c:if test="${formBean.totalLearners >= 1}">
+<c:if test="${NbMonitoringForm.totalLearners >= 1}">
 	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.alertContentEdit" />
 	</lams:Alert>
@@ -14,7 +14,7 @@
 			<fmt:message key="basic.title" />
 		</td>
 		<td>
-			<c:out value="${formBean.title}" escapeXml="true" />
+			<c:out value="${NbMonitoringForm.title}" escapeXml="true" />
 		</td>
 	</tr>
 	<tr>
@@ -22,7 +22,7 @@
 			<fmt:message key="basic.content" />
 		</td>
 		<td>
-			<c:out value="${formBean.basicContent}" escapeXml="false" />
+			<c:out value="${NbMonitoringForm.basicContent}" escapeXml="false" />
 		</td>
 	</tr>
 </table>
