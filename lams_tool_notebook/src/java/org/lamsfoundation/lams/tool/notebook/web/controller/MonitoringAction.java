@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.notebook.web.actions;
+package org.lamsfoundation.lams.tool.notebook.web.controller;
 
 import java.io.IOException;
 import java.util.Date;

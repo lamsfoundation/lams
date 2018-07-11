@@ -61,13 +61,7 @@ public class AuthoringForm extends ActionForm {
 
     SessionMap sessionMap;
 
-    @Override
-    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-	ActionErrors ac = new ActionErrors();
-	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
 
-	return ac;
-    }
 
     public String getSessionMapID() {
 	return sessionMapID;

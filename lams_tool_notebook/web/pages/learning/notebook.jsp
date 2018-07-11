@@ -1,6 +1,12 @@
+<!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-
-<script type="text/javascript">
+<%@ taglib uri="tags-lams" prefix="lams"%>
+<lams:html>
+	<lams:head>
+		<lams:headItems/>
+	</lams:head>
+	<body class="stripes">
+		<script type="text/javascript">
 	var mode = "${mode}";
 	var forceResponse = "${notebookDTO.forceResponse}";
 
@@ -67,13 +73,10 @@
 	
 </script>
 
-<html:form action="/learning" method="post" styleId="messageForm">
-	<html:hidden property="dispatch" value="finishActivity" />
-	<html:hidden property="toolSessionID" />
-	<html:hidden property="contentEditable" value="${contentEditable}" />
-	<c:set var="lrnForm" value="<%=request
-						.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-
+<form:form action="/learning" method="post" modelAttribute="messageForm" id="messageForm">
+	<form:hidden path="dispatch" value="finishActivity" />
+	<form:hidden path="toolSessionID" />
+	<form:hidden path="contentEditable" value="${contentEditable}" />
 
 	<lams:Page type="learner" title="${notebookDTO.title}">
 		<div class="panel">
@@ -124,7 +127,7 @@
 						</c:when>
 
 						<c:otherwise>
-							<html:textarea rows="8" property="entryText" styleClass="form-control" styleId="focusedInput"/>
+							<form:textarea rows="8" path="entryText" cssClass="form-control" id="focusedInput"/>
 						</c:otherwise>
 					</c:choose>
 				</c:when>
@@ -149,7 +152,7 @@
 
 			<c:if test="${mode != 'teacher'}">
 				<div class="right-buttons voffset5">
-					<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton"
+					<button href="#nogo" style="btn btn-primary pull-right na" styleId="finishButton"
 						onclick="submitForm('finish')">
 						<c:choose>
 							<c:when test="${activityPosition.last}">
@@ -159,17 +162,13 @@
 								<fmt:message key="button.finish" />
 							</c:otherwise>
 						</c:choose>
-					</html:link>
+					</button>
 				</div>
 			</c:if>
 		</div>
 	</lams:Page>
-</html:form>
+</form:form>
 <!-- end form -->
-
-
-
-
 
 <script type="text/javascript">
 	window.onload = function() {
@@ -181,3 +180,7 @@
 		</c:if>
 	}
 </script>
+		<div class="footer"></div>					
+	</body>
+</lams:html>
+

@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.notebook.web.actions;
+package org.lamsfoundation.lams.tool.notebook.web.controller;
 
 import java.util.ArrayList;
 import java.util.List;

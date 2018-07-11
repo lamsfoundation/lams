@@ -33,7 +33,7 @@ import org.apache.struts.action.ActionForm;
  *
  *
  */
-public class LearningForm extends ActionForm {
+public class LearningForm{
 
     private static final long serialVersionUID = -4728946254882237144L;
 

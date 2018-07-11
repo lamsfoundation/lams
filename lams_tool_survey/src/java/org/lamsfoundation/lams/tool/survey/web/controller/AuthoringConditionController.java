@@ -51,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -134,7 +135,7 @@ public class AuthoringConditionController {
      * @throws ServletException
      */
     @RequestMapping("/saveOrUpdateCondition")
-    public String saveOrUpdateCondition(SurveyConditionForm surveyConditionForm, Errors errors,
+    public String saveOrUpdateCondition(@ModelAttribute("surveyConditionForm")SurveyConditionForm surveyConditionForm, Errors errors,
 	    HttpServletRequest request) {
 
 //	ActionErrors errors = validateSurveyCondition(conditionForm, request);

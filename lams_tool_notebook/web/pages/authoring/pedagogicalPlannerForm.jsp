@@ -16,20 +16,19 @@
 <body style="width: 550px">
 	<%@ include file="/common/messages.jsp"%>
 	<h4 class="space-left" style="float:left"><fmt:message key="label.authoring.basic.instructions" /></h4>
-	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
-		<html:hidden property="toolContentID" styleId="toolContentID" />
-		<html:hidden property="valid" styleId="valid" />
-		<html:hidden property="callID" styleId="callID" />
-		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
+	<form:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" modelAttribute="pedagogicalPlannerForm" id="pedagogicalPlannerForm" method="post">
+		<form:hidden path="toolContentID" id="toolContentID" />
+		<form:hidden path="valid" i="vdalid" />
+		<form:hidden path="callID" id="callID" />
+		<form:hidden path="activityOrderNumber" id="activityOrderNumber" />
 		<br />
 		
-		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		<lams:CKEditor id="instructions"
-			value="${formBean.instructions}"
-			contentFolderID="${formBean.contentFolderID}"
+			value="${authoringForm.instructions}"
+			contentFolderID="${authoringForm.contentFolderID}"
 			toolbarSet="CustomPedplanner" height="190px"
 			width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 		</lams:CKEditor>
-	</html:form>
+	</form:form>
 </body>
 </lams:html>

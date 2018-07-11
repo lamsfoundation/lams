@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.notebook.web.actions;
+package org.lamsfoundation.lams.tool.notebook.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author
@@ -68,24 +69,22 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class LearningAction extends LamsDispatchAction {
+public class LearningController extends LamsDispatchAction {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningController.class);
 
     private static final boolean MODE_OPTIONAL = false;
 
     private INotebookService notebookService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("unspecified")
+    public String unspecified(LearningForm learningForm, HttpServletRequest request) throws Exception {
 
-	LearningForm learningForm = (LearningForm) form;
 
 	// 'toolSessionID' and 'mode' paramters are expected to be present.
 	// TODO need to catch exceptions and handle errors.
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,
-		LearningAction.MODE_OPTIONAL);
+		LearningController.MODE_OPTIONAL);
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -104,7 +103,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	// check defineLater
 	if (notebook.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "pages/learning/notebook";
 	}
 
 	// set mode, toolSessionID and NotebookDTO
@@ -175,11 +174,11 @@ public class LearningAction extends LamsDispatchAction {
 
 	    // calculate whether deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("submissionDeadline");
+		return "pages/learning/submissionDeadline";
 	    }
 	}
 
-	return mapping.findForward("notebook");
+	return ""; //mapping.findForward("notebook");
     }
 
     private NotebookUser getCurrentUser(Long toolSessionId) {

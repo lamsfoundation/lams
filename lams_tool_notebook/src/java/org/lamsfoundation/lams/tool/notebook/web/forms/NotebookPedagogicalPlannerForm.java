@@ -29,7 +29,7 @@ import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 /**
  *
  */
-public class NotebookPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class NotebookPedagogicalPlannerForm extends PedagogicalPlannerSpringForm {
     String instructions;
     String contentFolderID;
 

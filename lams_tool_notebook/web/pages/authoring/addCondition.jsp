@@ -11,20 +11,20 @@
 
 		<!-- Basic Info Form-->
 		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/saveOrUpdateCondition" method="post"
-			styleId="notebookConditionForm" focus="displayName">
-			<html:hidden property="orderId" />
+		<form:form action="saveOrUpdateCondition.do" method="post"
+			modelAttribute="notebookConditionForm" id="notebookConditionForm" focus="displayName">
+			<form:hidden path="orderId" />
 
 			<div class="form-group">
 				<label for="displayName"><fmt:message
 						key="label.authoring.conditions.condition.name" /> *</label>
-				<html:text tabindex="1" property="displayName" size="51"
-					styleClass="form-control" />
+				<form:input tabindex="1" property="displayName" size="51"
+					cssClass="form-control" />
 			</div>
 
 			<%-- Text search form fields are being included --%>
 			<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}" />
-		</html:form>
+		</form:form>
 
 		<div class="voffset5 pull-right">
 		    <a href="#" onclick="hideConditionMessage()"
