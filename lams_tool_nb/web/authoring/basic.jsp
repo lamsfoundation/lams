@@ -2,7 +2,7 @@
 <!-- Basic Tab Content  -->
 <div class="form-group">
     <label for="title"><fmt:message key="basic.title"/></label>
-    <input type="text" name="title" class="form-control"/>
+    <form:input type="text" path="title" cssClass="form-control"/>
 </div>
 
 <div class="form-group">

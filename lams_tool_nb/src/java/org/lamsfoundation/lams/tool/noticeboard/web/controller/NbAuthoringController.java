@@ -46,6 +46,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * <p>
@@ -99,15 +100,11 @@ public class NbAuthoringController {
 	 * Retrieve the Service
 	 */
 	String contentIdString = nbAuthoringForm.getToolContentID();
-	Long contentId = NbWebUtil.convertToLong(nbAuthoringForm.getToolContentID());
-	String contentFolderId = nbAuthoringForm.getContentFolderID();
+//	Long contentId = NbWebUtil.convertToLong(nbAuthoringForm.getToolContentID());
+//	String contentFolderId = nbAuthoringForm.getContentFolderID();
 	
-	
-	//throws exception if the content id does not exist
-	checkContentId(contentId);
-	
-//	Long contentId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_CONTENT_ID);
-//	String contentFolderId = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
+	Long contentId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_CONTENT_ID);
+	String contentFolderId = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
 
 	nbAuthoringForm.setToolContentID(contentIdString);
 
@@ -187,18 +184,18 @@ public class NbAuthoringController {
 
     }
 
-    @RequestMapping("/save")
+    @RequestMapping(value = "/authoring/save", method = RequestMethod.POST)
     public String save(@ModelAttribute NbAuthoringForm nbAuthoringForm, HttpServletRequest request) {
 
 	//copyAuthoringFormValuesIntoFormBean(request, nbForm);
+	String contentId = WebUtil.readStrParam(request, NoticeboardConstants.TOOL_CONTENT_ID);
+	Long content_id = WebUtil.readLongParam(request,NoticeboardConstants.TOOL_CONTENT_ID);
 
-	String idAsString = nbAuthoringForm.getToolContentID();
-	if (idAsString == null) {
+	if (contentId == null) {
 	    String error = messageService.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "Tool Content Id");
 	    logger.error(error);
 	    throw new NbApplicationException(error);
 	}
-	Long content_id = NbWebUtil.convertToLong(nbAuthoringForm.getToolContentID());
 
 	//throws exception if the content id does not exist
 	checkContentId(content_id);
