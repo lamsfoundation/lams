@@ -36,7 +36,7 @@ public class ContributionTypes {
     public static final Integer SYNC_GATE = new Integer(4);
     public static final Integer SCHEDULE_GATE = new Integer(5);
     public static final Integer CHOSEN_GROUPING = new Integer(6);
-    // public static final Integer CONTRIBUTION = new Integer(7);
+    public static final Integer CONTRIBUTION = new Integer(7);
     public static final Integer SYSTEM_GATE = new Integer(8);
     public static final Integer CHOSEN_BRANCHING = new Integer(9);
     public static final Integer CONDITION_GATE = new Integer(10);

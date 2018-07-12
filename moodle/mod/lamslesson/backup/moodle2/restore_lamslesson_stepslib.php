@@ -82,10 +82,8 @@ class restore_lamslesson_activity_structure_step extends restore_activity_struct
 	    $username = $USER->username;
 	  	$plaintext = $datetime.$username.$CFG->lamslesson_serverid.$CFG->lamslesson_serverkey;
 	  	$hashvalue = sha1(strtolower($plaintext));
-	  	
-	  	$locale = lamslesson_get_locale($form->course);
-	  	$country = $locale['country'];
-	  	$lang = $locale['lang'];
+	  	$country = $USER->country;
+	  	$lang = $USER->lang;
 	
 	  	$request = "$CFG->lamslesson_serverurl" . "/services/xml/LessonManager";
 	

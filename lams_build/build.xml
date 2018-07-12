@@ -547,8 +547,6 @@
 		<copy tofile="${server.home}/modules/system/layers/base/com/google/gson/main/module.xml"
 			  file="lib/json/gson.module.xml" overwrite="true" verbose="true" />
 
-		
-		
 		<copy todir="${server.home}/modules/system/layers/base/org/json/simple/main" overwrite="true" verbose="true">
 			<fileset dir="lib/json">
 				<include name="json-simple-*.jar" />
@@ -556,6 +554,14 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/json/simple/main/module.xml"
 			  file="lib/json/json-simple.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/io/jsonwebtoken/main" overwrite="true" verbose="true">
+			<fileset dir="lib/json">
+				<include name="jjwt-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/io/jsonwebtoken/main/module.xml"
+			  file="lib/json/jjwt.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
@@ -859,7 +865,6 @@
 			</fileset>
 			<!-- Libraries -->
 			<fileset dir="${server.home}/modules/system/layers/base/">
-				<include name="com/fasterxml/jackson/"/>
 				<include name="com/h2database/"/>
 				<include name="gnu/"/>
 				<include name="org/apache/avro/"/>

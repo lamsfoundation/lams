@@ -41,6 +41,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
+import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -68,33 +69,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class ImportService implements IImportService {
 
     private static Logger log = Logger.getLogger(ImportService.class);
-    public IUserManagementService service;
-    public MessageService messageService;
-    public ILogEventService logEventService;
-
-    public IUserManagementService getService() {
-	return service;
-    }
-
-    public void setService(IUserManagementService service) {
-	this.service = service;
-    }
-
-    public MessageService getMessageService() {
-	return messageService;
-    }
-
-    public void setMessageService(MessageService messageService) {
-	this.messageService = messageService;
-    }
-
-    public ILogEventService getLogEventService() {
-	return logEventService;
-    }
-
-    public void setLogEventService(ILogEventService logEventService) {
-	this.logEventService = logEventService;
-    }
+    private IUserManagementService service;
+    private MessageService messageService;
+    private ILogEventService logEventService;
+    private ITimezoneService timezoneService;
 
     // spreadsheet column indexes for user spreadsheet
     private static final short LOGIN = 0;
@@ -612,7 +590,7 @@ public class ImportService implements IImportService {
 	user.setFax(parseStringCell(row.getCell(ImportService.FAX)));
 	user.setDisabledFlag(false);
 	user.setCreateDate(new Date());
-	user.setTimeZone(user.getTimeZone());
+	user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
 	user.setTutorialsDisabled(false);
 	user.setFirstLogin(true);
 
@@ -838,5 +816,25 @@ public class ImportService implements IImportService {
 	String message = messageService.getMessage(key, args);
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, userDTO != null ? userDTO.getUserID() : null, null, null,
 		null, message);
+    }
+    
+    // ---------------------------------------------------------------------
+    // Inversion of Control Methods - Method injection
+    // ---------------------------------------------------------------------
+
+    public void setService(IUserManagementService service) {
+	this.service = service;
+    }
+
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
+
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
+    }
+    
+    public void setTimezoneService(ITimezoneService timezoneService) {
+	this.timezoneService = timezoneService;
     }
 }

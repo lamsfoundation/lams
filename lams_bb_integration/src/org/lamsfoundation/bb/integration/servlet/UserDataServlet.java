@@ -105,21 +105,18 @@ public class UserDataServlet extends HttpServlet {
 	address += user.getZipCode();
 	// String username = u.getUserName().replaceAll();
 
-	PrintWriter out = response.getWriter();
-
-	String locale = user.getLocale();
-	String loc_lang = LamsSecurityUtil.getLanguage(locale);
-	String loc_cntry = LamsSecurityUtil.getCountry(locale);
+	String countryCode = LamsSecurityUtil.getCountryCode(user.getCountry());
 
 	// The CSV list should be the format below
 	// <Title>,<First name>,<Last name>,<Address>,<City>,<State>,
-	// <Postcode>,<Country>,<Day time number>,<Mobile number>,
-	// <Fax number>,<Email>,<Locale language>,<Locale country>
+	// <Postcode>,<Country ISO code>,<Day time number>,<Mobile number>,
+	// <Fax number>,<Email>,<Locale>
 	String[] valList = { user.getTitle(), user.getGivenName(), user.getFamilyName(),
 		user.getStreet1() + user.getStreet2(), user.getCity(), user.getState(), user.getZipCode(),
-		user.getCountry(), user.getHomePhone1(), user.getMobilePhone(), user.getBusinessFax(),
-		user.getEmailAddress(), loc_lang, loc_cntry };
-
+		countryCode, user.getHomePhone1(), user.getMobilePhone(), user.getBusinessFax(),
+		user.getEmailAddress(), user.getLocale() };
+	
+	PrintWriter out = response.getWriter();
 	out.println(CSVUtil.write(valList));
     }
 

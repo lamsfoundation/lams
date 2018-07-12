@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.service;
 
 import java.util.Collections;
@@ -85,6 +84,9 @@ public class ContributeDTOFactory {
 	    dto = new ContributeActivityDTO(activity);
 	    for (Integer contributionTypeEntry : contributionType) {
 		String url = ContributeDTOFactory.getURL(lessonID, activity, contributionTypeEntry, toolService);
+		if (ContributionTypes.CONTRIBUTION.equals(contributionTypeEntry) && url == null) {
+		    continue;
+		}
 		ContributeEntry entry = dto.addContribution(contributionTypeEntry, url);
 
 		// once a gate was opened, it does not require attention
@@ -109,7 +111,7 @@ public class ContributeDTOFactory {
 			    GroupingActivity groupingActivity = (GroupingActivity) activity;
 			    Grouping grouping = groupingActivity.getCreateGrouping();
 			    if ((grouping != null) && (grouping.getGroups() != null)) {
-				for (Group group : (Set<Group>) grouping.getGroups()) {
+				for (Group group : grouping.getGroups()) {
 				    if (!group.mayBeDeleted()) {
 					learners.removeAll(group.getUsers());
 				    }

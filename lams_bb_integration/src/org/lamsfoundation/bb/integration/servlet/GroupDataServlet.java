@@ -129,8 +129,8 @@ public class GroupDataServlet extends HttpServlet {
 
 			    // The CSV list should be the format below
 			    // <Title>,<First name>,<Last name>,<Address>,<City>,<State>,
-			    // <Postcode>,<Country>,<Day time number>,<Mobile number>,
-			    // <Fax number>,<Email>,<Locale language>,<Locale country>
+			    // <Postcode>,<Country ISO code>,<Day time number>,<Mobile number>,
+			    // <Fax number>,<Email>,<Locale>
 			    jsonUser.addProperty("1", user.getTitle());
 			    jsonUser.addProperty("2", user.getGivenName());
 			    jsonUser.addProperty("3", user.getFamilyName());
@@ -138,16 +138,12 @@ public class GroupDataServlet extends HttpServlet {
 			    jsonUser.addProperty("5", user.getCity());
 			    jsonUser.addProperty("6", user.getState());
 			    jsonUser.addProperty("7", user.getZipCode());
-			    jsonUser.addProperty("8", user.getCountry());
+			    jsonUser.addProperty("8", LamsSecurityUtil.getCountryCode(user.getCountry()));
 			    jsonUser.addProperty("9", user.getHomePhone1());
 			    jsonUser.addProperty("10", user.getMobilePhone());
 			    jsonUser.addProperty("11", user.getBusinessFax());
 			    jsonUser.addProperty("12", user.getEmailAddress());
-			    String locale = user.getLocale();
-			    String localeLang = LamsSecurityUtil.getLanguage(locale);
-			    String localeCountry = LamsSecurityUtil.getCountry(locale);
-			    jsonUser.addProperty("13", localeLang);
-			    jsonUser.addProperty("14", localeCountry);
+			    jsonUser.addProperty("13", user.getLocale());
 			}
 		    }
 		}

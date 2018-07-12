@@ -606,6 +606,7 @@ function updateContributeActivities(contributeActivities) {
 				switch(this.contributionType) {
 					case 3  : entryContent = LABELS.CONTRIBUTE_GATE; break;
 					case 6  : entryContent = LABELS.CONTRIBUTE_GROUPING; break;
+					case 7  : entryContent = LABELS.CONTRIBUTE_TOOL; break;
 					case 9  : entryContent = LABELS.CONTRIBUTE_BRANCHING; break;
 					case 11 : entryContent = LABELS.CONTRIBUTE_CONTENT_EDITED; break; 
 				}

@@ -503,7 +503,6 @@ public class User implements Serializable, Comparable {
 
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
 		theme != null ? new ThemeDTO(theme) : null,
-		// TimeZone.getTimeZone("Australia/Sydney"),
 		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping,
 		(tutorialsDisabled == null ? false : true), // assume tutorials enabled if not set
 		tutorialPages, 
@@ -596,7 +595,7 @@ public class User implements Serializable, Comparable {
 
     public String getTimeZone() {
 	if (timeZone == null) {
-	    timeZone = TimeZone.getDefault().getID();
+	    return TimeZone.getDefault().getID();
 	}
 	return timeZone;
     }
