@@ -9,16 +9,19 @@
 
 	<div class="panel-body">
 
-		<!-- Basic Info Form-->
-		<%@ include file="/common/messages.jsp"%>
+		<!-- Basic Info Form-->		 <%-- For some reason Spring MVC consumes this first form and only renders the second one.
+		  If this redundant form is removed, the other one would be consumed, so this one needs to stay --%>
+		 <form:form modelAttribute="notebookConditionForm">
+		 </form:form>		
 		<form:form action="saveOrUpdateCondition.do" method="post"
 			modelAttribute="notebookConditionForm" id="notebookConditionForm" focus="displayName">
+			<%@ include file="/common/messages.jsp"%>
 			<form:hidden path="orderId" />
 
 			<div class="form-group">
 				<label for="displayName"><fmt:message
 						key="label.authoring.conditions.condition.name" /> *</label>
-				<form:input tabindex="1" property="displayName" size="51"
+				<form:input tabindex="1" path="displayName" size="51"
 					cssClass="form-control" />
 			</div>
 

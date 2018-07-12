@@ -52,7 +52,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Auxiliary action in author mode. It contains operations with SurveyCondition. The rest of operations are located in
@@ -172,8 +174,8 @@ public class AuthoringConditionController {
      * @param response
      * @return
      */
-    @RequestMapping("/removeCondition")
-    public String removeCondition(ActionForm surveyConditionForm, HttpServletRequest request) {
+    @RequestMapping(value="/removeCondition", method = RequestMethod.POST)
+    public String removeCondition(@ModelAttribute("surveyConditionForm")ActionForm surveyConditionForm, HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
@@ -197,6 +199,7 @@ public class AuthoringConditionController {
 	}
 
 	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	request.setAttribute("surveyConditionForm", surveyConditionForm);
 	return "pages/authoring/conditionList";
     }
 

@@ -21,16 +21,12 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.notebook.web.forms;
-
-import org.apache.struts.action.ActionForm;
 
 /**
  *
  */
-public class MonitoringForm{
+public class MonitoringForm {
 
     private static final long serialVersionUID = 9096908688391850595L;
 

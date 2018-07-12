@@ -20,16 +20,15 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.notebook.web.forms;
 
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
 
 /**
  *
  */
-public class NotebookPedagogicalPlannerForm extends PedagogicalPlannerSpringForm {
+public class NotebookPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     String instructions;
     String contentFolderID;
 

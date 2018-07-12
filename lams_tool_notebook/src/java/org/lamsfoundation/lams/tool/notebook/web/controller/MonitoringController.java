@@ -33,40 +33,44 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.notebook.dto.NotebookSessionsDTO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
-import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class MonitoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
     private static String noEntryText = null; // access via getNoEntryText()
 
-    public INotebookService notebookService;
+    @Autowired
+    @Qualifier("notebookService")
+    private INotebookService notebookService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @Autowired
+    @Qualifier("notebookMessageService")
+    private MessageService messageService;
 
-	setupService();
+    @RequestMapping("/")
+    public String unspecified(HttpServletRequest request) {
+
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	request.setAttribute("contentFolderID", contentFolderID);
@@ -96,13 +100,12 @@ public class MonitoringAction extends LamsDispatchAction {
 		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
-	return mapping.findForward("success");
+	return "pages/monitoring/monitoring";
     }
 
-    public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/getUsers")
+    public ActionForward getUsers(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-	setupService();
 	Long toolSessionId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 
 	boolean hasSearch = WebUtil.readBooleanParam(request, "_search", false);
@@ -152,8 +155,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		responseRow.put(NotebookConstants.PARAM_ENTRY, HtmlUtils.htmlEscape((String) userAndReflection[1]));
 	    }
 	    if (user.getTeachersComment() != null && user.getTeachersComment().length() > 0) {
-		responseRow.put(NotebookConstants.PARAM_COMMENT,
-			HtmlUtils.htmlEscape((String) user.getTeachersComment()));
+		responseRow.put(NotebookConstants.PARAM_COMMENT, HtmlUtils.htmlEscape(user.getTeachersComment()));
 	    }
 
 	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
@@ -189,9 +191,9 @@ public class MonitoringAction extends LamsDispatchAction {
      * @return
      * @throws Exception
      */
-    public ActionForward saveTeacherComment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	setupService();
+
+    @RequestMapping("/saveTeacherComment")
+    public String saveTeacherComment(HttpServletRequest request) throws Exception {
 
 	String teachersComment = WebUtil.readStrParam(request, "value", true);
 	Long userUid = WebUtil.readLongParam(request, NotebookConstants.PARAM_USER_UID);
@@ -223,10 +225,9 @@ public class MonitoringAction extends LamsDispatchAction {
      * @return
      * @throws IOException
      */
-    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
 
-	setupService();
+    @RequestMapping("/setSubmissionDeadline")
+    public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 
@@ -252,10 +253,10 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /** Get the statistics for monitoring */
-    public ActionForward getStatistics(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
 
-	setupService();
+    @RequestMapping("/getStatistics")
+    public String getStatistics(HttpServletRequest request) {
+
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	boolean isGroupedActivity = notebookService.isGroupedActivity(contentID);
@@ -263,24 +264,18 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	request.setAttribute("statisticList", notebookService.getStatisticsBySession(contentID));
 
-	return mapping.findForward("statistic");
+	return "pages/monitoring/statisticpart";
     }
 
     /**
      * set up notebookService
      */
-    private void setupService() {
-	if (notebookService == null) {
-	    notebookService = NotebookServiceProxy.getNotebookService(this.getServlet().getServletContext());
-	}
-    }
 
     private String getNoEntryText() {
 	if (noEntryText == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    noEntryText = ((MessageService) wac.getBean("notebookMessageService")).getMessage("label.no.entry");
+	    noEntryText = messageService.getMessage("label.no.entry");
 	}
 	return noEntryText;
     }
+
 }

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.notebook.web.controller;
 
 import java.io.IOException;
@@ -33,9 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -78,8 +74,7 @@ public class LearningController extends LamsDispatchAction {
     private INotebookService notebookService;
 
     @RequestMapping("unspecified")
-    public String unspecified(LearningForm learningForm, HttpServletRequest request) throws Exception {
-
+    public String unspecified(LearningForm messageForm, HttpServletRequest request) throws Exception {
 
 	// 'toolSessionID' and 'mode' paramters are expected to be present.
 	// TODO need to catch exceptions and handle errors.
@@ -103,12 +98,12 @@ public class LearningController extends LamsDispatchAction {
 
 	// check defineLater
 	if (notebook.isDefineLater()) {
-	    return "pages/learning/notebook";
+	    return "pages/learning/defineLater";
 	}
 
 	// set mode, toolSessionID and NotebookDTO
 	request.setAttribute("mode", mode.toString());
-	learningForm.setToolSessionID(toolSessionID);
+	messageForm.setToolSessionID(toolSessionID);
 
 	NotebookDTO notebookDTO = new NotebookDTO();
 	notebookDTO.title = notebook.getTitle();
@@ -116,7 +111,6 @@ public class LearningController extends LamsDispatchAction {
 	notebookDTO.allowRichEditor = notebook.isAllowRichEditor();
 	notebookDTO.lockOnFinish = notebook.isLockOnFinished();
 	notebookDTO.forceResponse = notebook.isForceResponse();
-	
 
 	request.setAttribute("notebookDTO", notebookDTO);
 
@@ -143,7 +137,7 @@ public class LearningController extends LamsDispatchAction {
 	    nbEntry = notebookService.getEntry(notebookUser.getEntryUID());
 	}
 	if (nbEntry != null) {
-	    learningForm.setEntryText(nbEntry.getEntry());
+	    messageForm.setEntryText(nbEntry.getEntry());
 	}
 
 	// set readOnly flag.
@@ -178,7 +172,7 @@ public class LearningController extends LamsDispatchAction {
 	    }
 	}
 
-	return ""; //mapping.findForward("notebook");
+	return "pages/learning/notebook";
     }
 
     private NotebookUser getCurrentUser(Long toolSessionId) {
@@ -196,23 +190,22 @@ public class LearningController extends LamsDispatchAction {
 	return notebookUser;
     }
 
-    public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/finishActivity")
+    public String finishActivity(LearningForm messageForm, HttpServletRequest request, HttpServletResponse response) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
-	LearningForm learningForm = (LearningForm) form;
 	NotebookUser notebookUser = getCurrentUser(toolSessionID);
 
 	// learningForm.getContentEditable() will be null if the deadline has passed
-	if (learningForm.getContentEditable() != null && learningForm.getContentEditable()) {
+	if (messageForm.getContentEditable() != null && messageForm.getContentEditable()) {
 	    // TODO fix idType to use real value not 999
 	    if (notebookUser.getEntryUID() == null) {
 		notebookUser.setEntryUID(notebookService.createNotebookEntry(toolSessionID,
 			CoreNotebookConstants.NOTEBOOK_TOOL, NotebookConstants.TOOL_SIGNATURE,
-			notebookUser.getUserId().intValue(), learningForm.getEntryText()));
+			notebookUser.getUserId().intValue(), messageForm.getEntryText()));
 	    } else {
 		// update existing entry.
-		notebookService.updateEntry(notebookUser.getEntryUID(), learningForm.getEntryText());
+		notebookService.updateEntry(notebookUser.getEntryUID(), messageForm.getEntryText());
 	    }
 
 	    notebookUser.setFinishedActivity(true);

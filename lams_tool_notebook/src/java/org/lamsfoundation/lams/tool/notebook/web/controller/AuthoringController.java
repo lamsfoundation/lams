@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.notebook.web.controller;
 
 import java.util.ArrayList;
@@ -32,13 +31,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -49,12 +43,12 @@ import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -67,15 +61,14 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
-@RequestMapping("/authoring")
-public class AuthoringController{ //extends LamsDispatchAction {
+public class AuthoringController {
 
     private static Logger logger = Logger.getLogger(AuthoringController.class);
-    
+
     @Autowired
     @Qualifier("notebookService")
     private INotebookService notebookService;
-    
+
     @Autowired
     private WebApplicationContext applicationContext;
 
@@ -89,8 +82,8 @@ public class AuthoringController{ //extends LamsDispatchAction {
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
      *
      */
-//    @RequestMapping("/")
-    protected String unspecified(AuthoringForm authForm, HttpServletRequest request) {
+    @RequestMapping("/authoring")
+    protected String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
 
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -98,11 +91,6 @@ public class AuthoringController{ //extends LamsDispatchAction {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-
-	// set up notebookService
-	if (notebookService == null) {
-	    notebookService = NotebookServiceProxy.getNotebookService(this.applicationContext.getServletContext());
-	}
 
 	// retrieving Notebook with given toolContentID
 	Notebook notebook = notebookService.getNotebookByContentId(toolContentID);
@@ -118,44 +106,45 @@ public class AuthoringController{ //extends LamsDispatchAction {
 	    // when updateContent is called.
 	    notebook.setDefineLater(true);
 	    notebookService.saveOrUpdateNotebook(notebook);
-	    
+
 	    //audit log the teacher has started editing activity in monitor
 	    notebookService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	// Set up the authForm.
-	updateAuthForm(authForm, notebook);
+	updateAuthForm(authoringForm, notebook);
 
 	// Set up sessionMap
-	SessionMap<String, Object> map = createSessionMap(notebook, mode, contentFolderID,
-		toolContentID);
-	authForm.setSessionMapID(map.getSessionID());
+	SessionMap<String, Object> map = createSessionMap(notebook, mode, contentFolderID, toolContentID);
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
 	request.getSession().setAttribute(map.getSessionID(), map);
 	request.setAttribute(NotebookConstants.ATTR_SESSION_MAP, map);
+	request.setAttribute("authoringForm", authoringForm);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
     @RequestMapping("/updateContent")
-    public String updateContent(AuthoringForm authForm, HttpServletRequest request) {
+    public String updateContent(@ModelAttribute("authoringForm") AuthoringForm authoringForm, HttpServletRequest request) {
 	// TODO need error checking.
 
 	// get authForm and session map.
-	SessionMap<String, Object> map = getSessionMap(request, authForm);
+	SessionMap<String, Object> map = getSessionMap(request, authoringForm);
 
 	// get notebook content.
-	Notebook notebook = notebookService.getNotebookByContentId((Long) map.get(AuthoringController.KEY_TOOL_CONTENT_ID));
+	Notebook notebook = notebookService
+		.getNotebookByContentId((Long) map.get(AuthoringController.KEY_TOOL_CONTENT_ID));
 
 	// update notebook content using form inputs
-	updateNotebook(notebook, authForm);
+	updateNotebook(notebook, authoringForm);
 
 	notebookService.releaseConditionsFromCache(notebook);
 
 	Set<NotebookCondition> conditions = notebook.getConditions();
 	if (conditions == null) {
-	    conditions = new TreeSet<NotebookCondition>(new TextSearchConditionComparator());
+	    conditions = new TreeSet<>(new TextSearchConditionComparator());
 	}
 	SortedSet<NotebookCondition> conditionSet = (SortedSet<NotebookCondition>) map
 		.get(NotebookConstants.ATTR_CONDITION_SET);
@@ -185,11 +174,12 @@ public class AuthoringController{ //extends LamsDispatchAction {
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
-	authForm.setSessionMapID(map.getSessionID());
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	request.setAttribute(NotebookConstants.ATTR_SESSION_MAP, map);
+	request.setAttribute("authoringForm", authoringForm);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
     /* ========== Private Methods ********** */
@@ -234,14 +224,14 @@ public class AuthoringController{ //extends LamsDispatchAction {
     private SessionMap<String, Object> createSessionMap(Notebook notebook, ToolAccessMode mode, String contentFolderID,
 	    Long toolContentID) {
 
-	SessionMap<String, Object> map = new SessionMap<String, Object>();
+	SessionMap<String, Object> map = new SessionMap<>();
 
 	map.put(AuthoringController.KEY_MODE, mode);
 	map.put(AuthoringController.KEY_CONTENT_FOLDER_ID, contentFolderID);
 	map.put(AuthoringController.KEY_TOOL_CONTENT_ID, toolContentID);
 	map.put(NotebookConstants.ATTR_DELETED_CONDITION_LIST, new ArrayList<NotebookCondition>());
 
-	SortedSet<NotebookCondition> set = new TreeSet<NotebookCondition>(new TextSearchConditionComparator());
+	SortedSet<NotebookCondition> set = new TreeSet<>(new TextSearchConditionComparator());
 
 	if (notebook.getConditions() != null) {
 	    set.addAll(notebook.getConditions());

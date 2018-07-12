@@ -29,24 +29,14 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookCondition;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
-import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
-import org.lamsfoundation.lams.tool.notebook.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.tool.notebook.web.forms.NotebookConditionForm;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -55,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -66,16 +57,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
  *
  */
 @Controller
-@RequestMapping("/authoring")
-public class AuthoringNotebookConditionController{
-    
-   @Autowired
-   @Qualifier("notebookService")
+@RequestMapping("/authoringCondition")
+public class AuthoringNotebookConditionController {
+
+    @Autowired
+    @Qualifier("notebookService")
     private INotebookService notebookService;
-   
-   @Autowired
-   @Qualifier("notebookMessageService")
-   private MessageService messageService;
+
+    @Autowired
+    @Qualifier("notebookMessageService")
+    private MessageService messageService;
 
     /**
      * Display empty page for new taskList item.
@@ -84,7 +75,7 @@ public class AuthoringNotebookConditionController{
      * @param request
      * @return
      */
-   @RequestMapping("newConditionInit")
+    @RequestMapping("newConditionInit")
     private String newConditionInit(NotebookConditionForm notebookConditionForm, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, NotebookConstants.ATTR_SESSION_MAP_ID);
 	notebookConditionForm.setSessionMapID(sessionMapID);
@@ -100,7 +91,7 @@ public class AuthoringNotebookConditionController{
      * @param response
      * @return
      */
-   @RequestMapping("/editCondition")
+    @RequestMapping("/editCondition")
     private String editCondition(NotebookConditionForm notebookConditionForm, HttpServletRequest request) {
 
 	String sessionMapID = notebookConditionForm.getSessionMapID();
@@ -110,7 +101,7 @@ public class AuthoringNotebookConditionController{
 	NotebookCondition condition = null;
 	if (orderId != -1) {
 	    SortedSet<NotebookCondition> conditionSet = getNotebookConditionSet(sessionMap);
-	    List<NotebookCondition> conditionList = new ArrayList<NotebookCondition>(conditionSet);
+	    List<NotebookCondition> conditionList = new ArrayList<>(conditionSet);
 	    condition = conditionList.get(orderId);
 	    if (condition != null) {
 		populateConditionToForm(orderId, condition, notebookConditionForm, request);
@@ -133,8 +124,9 @@ public class AuthoringNotebookConditionController{
      * @throws ServletException
      */
     @RequestMapping("/saveOrUpdateCondition")
-    private String saveOrUpdateCondition(NotebookConditionForm notebookConditionForm, Errors errors, HttpServletRequest request,
-	    HttpServletResponse response) {
+    private String saveOrUpdateCondition(
+	    @ModelAttribute("notebookConditionForm") NotebookConditionForm notebookConditionForm, Errors errors,
+	    HttpServletRequest request) {
 
 	validateNotebookCondition(notebookConditionForm, errors, request);
 
@@ -153,6 +145,7 @@ public class AuthoringNotebookConditionController{
 	}
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(NotebookConstants.ATTR_SESSION_MAP_ID, notebookConditionForm.getSessionMapID());
+	request.setAttribute("notebookConditionForm", notebookConditionForm);
 	// return null to close this window
 	return "pages/authoring/conditionList";
     }
@@ -177,7 +170,7 @@ public class AuthoringNotebookConditionController{
 	int orderId = NumberUtils.stringToInt(request.getParameter(NotebookConstants.PARAM_ORDER_ID), -1);
 	if (orderId != -1) {
 	    SortedSet<NotebookCondition> conditionSet = getNotebookConditionSet(sessionMap);
-	    List<NotebookCondition> conditionList = new ArrayList<NotebookCondition>(conditionSet);
+	    List<NotebookCondition> conditionList = new ArrayList<>(conditionSet);
 	    NotebookCondition condition = conditionList.remove(orderId);
 	    for (NotebookCondition otherCondition : conditionSet) {
 		if (otherCondition.getOrderId() > orderId) {
@@ -222,7 +215,7 @@ public class AuthoringNotebookConditionController{
     private String downCondition(HttpServletRequest request) {
 	return switchItem(request, false);
     }
-    
+
     @RequestMapping("/switchItem")
     private String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
@@ -232,7 +225,7 @@ public class AuthoringNotebookConditionController{
 	int orderId = NumberUtils.stringToInt(request.getParameter(NotebookConstants.PARAM_ORDER_ID), -1);
 	if (orderId != -1) {
 	    SortedSet<NotebookCondition> conditionSet = getNotebookConditionSet(sessionMap);
-	    List<NotebookCondition> conditionList = new ArrayList<NotebookCondition>(conditionSet);
+	    List<NotebookCondition> conditionList = new ArrayList<>(conditionSet);
 	    // get current and the target item, and switch their sequnece
 	    NotebookCondition condition = conditionList.get(orderId);
 	    NotebookCondition repCondition;
@@ -268,7 +261,7 @@ public class AuthoringNotebookConditionController{
 	SortedSet<NotebookCondition> set = (SortedSet<NotebookCondition>) sessionMap
 		.get(NotebookConstants.ATTR_CONDITION_SET);
 	if (set == null) {
-	    set = new TreeSet<NotebookCondition>(new TextSearchConditionComparator());
+	    set = new TreeSet<>(new TextSearchConditionComparator());
 	    sessionMap.put(NotebookConstants.ATTR_CONDITION_SET, set);
 	}
 	return set;
@@ -349,7 +342,7 @@ public class AuthoringNotebookConditionController{
 	    condition.setOrderId(maxSeq);
 	    conditionSet.add(condition);
 	} else { // edit
-	    List<NotebookCondition> conditionList = new ArrayList<NotebookCondition>(conditionSet);
+	    List<NotebookCondition> conditionList = new ArrayList<>(conditionSet);
 	    condition = conditionList.get(orderId - 1);
 	    form.extractCondition(condition);
 	}
@@ -361,7 +354,8 @@ public class AuthoringNotebookConditionController{
      * @param notebookConditionForm
      * @return
      */
-    private void validateNotebookCondition(NotebookConditionForm notebookConditionForm, Errors errors, HttpServletRequest request) {
+    private void validateNotebookCondition(NotebookConditionForm notebookConditionForm, Errors errors,
+	    HttpServletRequest request) {
 
 	String formConditionName = notebookConditionForm.getDisplayName();
 	if (StringUtils.isBlank(formConditionName)) {

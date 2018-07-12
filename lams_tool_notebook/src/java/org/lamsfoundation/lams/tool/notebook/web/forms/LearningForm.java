@@ -21,11 +21,7 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.notebook.web.forms;
-
-import org.apache.struts.action.ActionForm;
 
 /**
  *
@@ -33,7 +29,7 @@ import org.apache.struts.action.ActionForm;
  *
  *
  */
-public class LearningForm{
+public class LearningForm {
 
     private static final long serialVersionUID = -4728946254882237144L;
 

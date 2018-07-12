@@ -9,7 +9,10 @@
 
 <div class="panel-body">	
 
-
+	 <%-- For some reason Spring MVC consumes this first form and only renders the second one.
+	   If this redundant form is removed, the other one would be consumed, so this one needs to stay --%>
+	 <form:form modelAttribute="surveyConditionForm">
+	 </form:form>
 	<form:form action="../authoringCondition/saveOrUpdateCondition.do" method="post" modelAttribute="surveyConditionForm" id="surveyConditionForm" focus="displayName" >
 		<%@ include file="/common/messages.jsp"%>
 		<form:hidden path="orderId" />
