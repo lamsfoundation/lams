@@ -73,8 +73,7 @@
 	
 </script>
 
-<form:form action="/learning" method="post" modelAttribute="messageForm" id="messageForm">
-	<form:hidden path="dispatch" value="finishActivity" />
+<form:form action="learning/finishActivity.do" method="post" modelAttribute="messageForm" id="messageForm">
 	<form:hidden path="toolSessionID" />
 	<form:hidden path="contentEditable" value="${contentEditable}" />
 
@@ -152,7 +151,7 @@
 
 			<c:if test="${mode != 'teacher'}">
 				<div class="right-buttons voffset5">
-					<button href="#nogo" style="btn btn-primary pull-right na" styleId="finishButton"
+					<button href="#nogo" style="btn btn-primary pull-right na" id="finishButton"
 						onclick="submitForm('finish')">
 						<c:choose>
 							<c:when test="${activityPosition.last}">

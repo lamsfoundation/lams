@@ -8,11 +8,10 @@
 		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/authoring.js"></script>
 	</lams:head>
 	<body class="stripes">
-		<form:form action="updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post">
+		<form:form action="authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post">
 			<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 			<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
-			<form:hidden path="dispatch" value="updateContent" />
 			<form:hidden path="sessionMapID" />
 	
 		<lams:Page title="${title}" type="navbar">

@@ -29,8 +29,7 @@
 			<!-- End announcements and advanced settings -->
 		
 			<c:if test="${mode == 'learner' || mode == 'author'}">
-				<form:form action="/learning" method="post" onsubmit="disableFinishButton();" modelAttribute="messageForm" id="messageForm">
-					<form:hidden path="dispatch" value="finishActivity" />
+				<form:form action="learning/finishActivity.do" method="post" onsubmit="disableFinishButton();" modelAttribute="messageForm" id="messageForm">
 					<form:hidden path="toolSessionID" />
 		
 					<button href="#nogo" style="btn btn-primary pull-right voffset10 na" styleId="finishButton"

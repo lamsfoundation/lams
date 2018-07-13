@@ -175,7 +175,7 @@ public class AuthoringConditionController {
      * @return
      */
     @RequestMapping(value="/removeCondition", method = RequestMethod.POST)
-    public String removeCondition(@ModelAttribute("surveyConditionForm")ActionForm surveyConditionForm, HttpServletRequest request) {
+    public String removeCondition(HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
@@ -199,7 +199,6 @@ public class AuthoringConditionController {
 	}
 
 	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	request.setAttribute("surveyConditionForm", surveyConditionForm);
 	return "pages/authoring/conditionList";
     }
 

@@ -61,7 +61,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AuthoringNotebookConditionController {
 
     @Autowired
-    @Qualifier("notebookService")
     private INotebookService notebookService;
 
     @Autowired
@@ -76,10 +75,11 @@ public class AuthoringNotebookConditionController {
      * @return
      */
     @RequestMapping("newConditionInit")
-    private String newConditionInit(NotebookConditionForm notebookConditionForm, HttpServletRequest request) {
+    private String newConditionInit(@ModelAttribute NotebookConditionForm notebookConditionForm, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, NotebookConstants.ATTR_SESSION_MAP_ID);
 	notebookConditionForm.setSessionMapID(sessionMapID);
 	notebookConditionForm.setOrderId(-1);
+	request.setAttribute("notebookConditionForm", notebookConditionForm);
 	return "pages/authoring/addCondition";
     }
 
@@ -298,14 +298,14 @@ public class AuthoringNotebookConditionController {
      *
      * @param orderId
      * @param condition
-     * @param form
+     * @param notebookConditionForm
      * @param request
      */
-    private void populateConditionToForm(int orderId, NotebookCondition condition, NotebookConditionForm form,
+    private void populateConditionToForm(int orderId, NotebookCondition condition, NotebookConditionForm notebookConditionForm,
 	    HttpServletRequest request) {
-	form.populateForm(condition);
+	notebookConditionForm.populateForm(condition);
 	if (orderId >= 0) {
-	    form.setOrderId(orderId + 1);
+	    notebookConditionForm.setOrderId(orderId + 1);
 	}
     }
 
@@ -313,10 +313,10 @@ public class AuthoringNotebookConditionController {
      * Extract form content to taskListContent.
      *
      * @param request
-     * @param form
+     * @param notebookConditionForm
      * @throws NotebookException
      */
-    private void extractFormToNotebookCondition(HttpServletRequest request, NotebookConditionForm form)
+    private void extractFormToNotebookCondition(HttpServletRequest request, NotebookConditionForm notebookConditionForm)
 	    throws Exception {
 	/*
 	 * BE CAREFUL: This method will copy necessary info from request form to a old or new NotebookItem instance. It
@@ -324,15 +324,15 @@ public class AuthoringNotebookConditionController {
 	 * this taskList item.
 	 */
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(form.getSessionMapID());
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(notebookConditionForm.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<NotebookCondition> conditionSet = getNotebookConditionSet(sessionMap);
-	int orderId = form.getOrderId();
+	int orderId = notebookConditionForm.getOrderId();
 	NotebookCondition condition = null;
 
 	if (orderId == -1) { // add
 	    String properConditionName = notebookService.createConditionName(conditionSet);
-	    condition = form.extractCondition();
+	    condition = notebookConditionForm.extractCondition();
 	    condition.setName(properConditionName);
 	    int maxSeq = 1;
 	    if (conditionSet != null && conditionSet.size() > 0) {
@@ -344,7 +344,7 @@ public class AuthoringNotebookConditionController {
 	} else { // edit
 	    List<NotebookCondition> conditionList = new ArrayList<>(conditionSet);
 	    condition = conditionList.get(orderId - 1);
-	    form.extractCondition(condition);
+	    notebookConditionForm.extractCondition(condition);
 	}
     }
 
@@ -354,7 +354,7 @@ public class AuthoringNotebookConditionController {
      * @param notebookConditionForm
      * @return
      */
-    private void validateNotebookCondition(NotebookConditionForm notebookConditionForm, Errors errors,
+    private void validateNotebookCondition( NotebookConditionForm notebookConditionForm, Errors errors,
 	    HttpServletRequest request) {
 
 	String formConditionName = notebookConditionForm.getDisplayName();

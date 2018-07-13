@@ -61,6 +61,7 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
+@RequestMapping("/authoring")
 public class AuthoringController {
 
     private static Logger logger = Logger.getLogger(AuthoringController.class);
@@ -82,7 +83,7 @@ public class AuthoringController {
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
      *
      */
-    @RequestMapping("/authoring")
+    @RequestMapping("")
     protected String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
 
 	// Extract toolContentID from parameters.

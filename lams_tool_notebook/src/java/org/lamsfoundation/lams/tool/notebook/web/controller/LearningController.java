@@ -51,10 +51,14 @@ import org.lamsfoundation.lams.tool.notebook.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author
@@ -65,16 +69,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
  *
  *
  */
-public class LearningController extends LamsDispatchAction {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
 
     private static Logger log = Logger.getLogger(LearningController.class);
 
     private static final boolean MODE_OPTIONAL = false;
 
+    @Autowired
+    @Qualifier("notebookService")
     private INotebookService notebookService;
 
-    @RequestMapping("unspecified")
-    public String unspecified(LearningForm messageForm, HttpServletRequest request) throws Exception {
+    @Autowired
+    private WebApplicationContext applicationContext;
+
+    @RequestMapping("")
+    public String unspecified(@ModelAttribute("messageForm") LearningForm messageForm, HttpServletRequest request)
+	    throws Exception {
 
 	// 'toolSessionID' and 'mode' paramters are expected to be present.
 	// TODO need to catch exceptions and handle errors.
@@ -82,11 +94,6 @@ public class LearningController extends LamsDispatchAction {
 		LearningController.MODE_OPTIONAL);
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// set up notebookService
-	if (notebookService == null) {
-	    notebookService = NotebookServiceProxy.getNotebookService(this.getServlet().getServletContext());
-	}
 
 	// Retrieve the session and content.
 	NotebookSession notebookSession = notebookService.getSessionBySessionId(toolSessionID);
@@ -121,7 +128,7 @@ public class LearningController extends LamsDispatchAction {
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
 	NotebookUser notebookUser;
 	if (mode.equals(ToolAccessMode.TEACHER)) {
@@ -171,6 +178,7 @@ public class LearningController extends LamsDispatchAction {
 		return "pages/learning/submissionDeadline";
 	    }
 	}
+	request.setAttribute("messageForm", messageForm);
 
 	return "pages/learning/notebook";
     }
@@ -191,7 +199,8 @@ public class LearningController extends LamsDispatchAction {
     }
 
     @RequestMapping("/finishActivity")
-    public String finishActivity(LearningForm messageForm, HttpServletRequest request, HttpServletResponse response) {
+    public String finishActivity(@ModelAttribute("messageForm") LearningForm messageForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
 	NotebookUser notebookUser = getCurrentUser(toolSessionID);
@@ -213,7 +222,7 @@ public class LearningController extends LamsDispatchAction {
 	}
 
 	ToolSessionManager sessionMgrService = NotebookServiceProxy
-		.getNotebookSessionManager(getServlet().getServletContext());
+		.getNotebookSessionManager(applicationContext.getServletContext());
 
 	try {
 	    String nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, notebookUser.getUserId());

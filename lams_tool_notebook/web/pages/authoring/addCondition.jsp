@@ -13,7 +13,7 @@
 		  If this redundant form is removed, the other one would be consumed, so this one needs to stay --%>
 		 <form:form modelAttribute="notebookConditionForm">
 		 </form:form>		
-		<form:form action="saveOrUpdateCondition.do" method="post"
+		<form:form action="authoringCondition/saveOrUpdateCondition.do" method="post"
 			modelAttribute="notebookConditionForm" id="notebookConditionForm" focus="displayName">
 			<%@ include file="/common/messages.jsp"%>
 			<form:hidden path="orderId" />
