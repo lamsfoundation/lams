@@ -32,12 +32,11 @@
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 <%-- Required attributes --%>
 <%@ attribute name="sessionMapID" required="true" rtexprvalue="true" %>
-<%@ attribute name="wrapInFormTag" required="true" rtexprvalue="true" %>
 
 <%-- Optional attributes --%>
 <%@ attribute name="action" required="false" rtexprvalue="true" %>
@@ -53,10 +52,10 @@
 
 <%-- Default value for message key --%>
 <c:if test="${empty action}">
-	<c:set var="action" value="authoring/textsearch.do" scope="request"/>
+	<c:set var="action" value="textsearch.do" scope="request"/>
 </c:if>
 <c:if test="${empty cancelAction}">
-	<c:set var="cancelAction" value="authoring/textsearchCancel.do" scope="request"/>
+	<c:set var="cancelAction" value="textsearchCancel.do" scope="request"/>
 </c:if>
 <c:if test="${empty formID}">
 	<c:set var="formID" value="textSearchForm" scope="request"/>
@@ -85,52 +84,40 @@
 
 <!-- begin text search form content -->
 	
-<c:if test="${wrapInFormTag}">
-	<form action="${action}" id="${formID}" name="${formID}">
-</c:if>
-		<form:hidden path="sessionMapID" />
-		<h4><fmt:message key="${headingLabelKey}" /></h4>
-		<table>
-			<tr>
-				<td>
-					<fmt:message key="${allWordsLabelKey}" />
-				</td>
-				<td>
-					<form:input size="40" path="allWords" />
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<fmt:message key="${phraseLabelKey}" />
-				</td>
-				<td>
-					<form:input size="40" path="phrase" />
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<fmt:message key="${anyWordsLabelKey}" />
-				</td>
-				<td>
-					<form:input size="40" path="anyWords" /> 
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<fmt:message key="${excludedWordsLabelKey}" />
-				</td>
-				<td>
-					<form:input size="40" path="excludedWords" /> 
-				</td>
-			</tr>
-		</table>
-<c:if test="${wrapInFormTag}">
-	<lams:ImgButtonWrapper>
-		<a href="#" onclick="${formID}.submit();" class="button-add-item"><fmt:message key="${saveButtonLabelKey}" />
-		</a>
-		<a href="#" onclick="location.href='${cancelAction}'" class="button space-left"><fmt:message key="${cancelButtonLabelKey}" />
-		</a>
-	</lams:ImgButtonWrapper>
-	</form>
-</c:if>
+	<form:hidden path="sessionMapID" />
+	<h4><fmt:message key="${headingLabelKey}" /></h4>
+	<table>
+		<tr>
+			<td>
+				<fmt:message key="${allWordsLabelKey}" />
+			</td>
+			<td>
+				<form:input size="40" path="allWords" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<fmt:message key="${phraseLabelKey}" />
+			</td>
+			<td>
+				<form:input size="40" path="phrase" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<fmt:message key="${anyWordsLabelKey}" />
+			</td>
+			<td>
+				<form:input size="40" path="anyWords" /> 
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<fmt:message key="${excludedWordsLabelKey}" />
+			</td>
+			<td>
+				<form:input size="40" path="excludedWords" /> 
+			</td>
+		</tr>
+	</table>
 <!-- end text search form content -->

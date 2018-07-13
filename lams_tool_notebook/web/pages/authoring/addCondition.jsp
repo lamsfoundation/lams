@@ -26,7 +26,7 @@
 			</div>
 
 			<%-- Text search form fields are being included --%>
-			<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}" />
+			<lams:TextSearch  sessionMapID="${sessionMapID}" />
 		</form:form>
 
 		<div class="voffset5 pull-right">
