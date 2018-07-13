@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.tool.sbmt.web.action;
+package org.lamsfoundation.lams.tool.sbmt.web.controller;
 
 import java.util.Date;
 import java.util.List;
@@ -7,58 +7,41 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.sbmt.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
-import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  *
  * @author steven
  *
  */
-public class ReflectAction extends Action {
+@Controller
+@RequestMapping("/learning")
+public class ReflectController {
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	String param = mapping.getParameter();
-	//================ Reflection =======================
-	if (param.equals("newReflection")) {
-	    return newReflection(mapping, form, request, response);
-	}
-	if (param.equals("submitReflection")) {
-	    return submitReflection(mapping, form, request, response);
-	}
-
-	return mapping.findForward(SbmtConstants.SUCCESS);
-    }
+    @Autowired
+    @Qualifier("submitFilesService")
+    private ISubmitFilesService submitFilesService;
 
     /**
      * Display empty reflection form.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/newReflection")
+    public String newReflection(@ModelAttribute ReflectionForm refForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 //		ISubmitFilesService submitFilesService = getService();
@@ -72,7 +55,6 @@ public class ReflectAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
-	ReflectionForm refForm = (ReflectionForm) form;
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
@@ -80,7 +62,6 @@ public class ReflectAction extends Action {
 	refForm.setSessionMapID(sessionMapID);
 
 	// get the existing reflection entry
-	ISubmitFilesService submitFilesService = getService();
 
 	SessionMap map = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -91,21 +72,14 @@ public class ReflectAction extends Action {
 	    refForm.setEntryText(entry.getEntry());
 	}
 
-	return mapping.findForward(SbmtConstants.SUCCESS);
+	return "learner/notebook";
     }
 
     /**
      * Submit reflection form input database.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ReflectionForm refForm = (ReflectionForm) form;
+    @RequestMapping("/submitReflection")
+    public String submitReflection(@ModelAttribute ReflectionForm refForm, HttpServletRequest request) {
 	Integer userId = refForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
@@ -113,8 +87,6 @@ public class ReflectAction extends Action {
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	ISubmitFilesService submitFilesService = getService();
 
 	// check for existing notebook entry
 	NotebookEntry entry = submitFilesService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -131,21 +103,15 @@ public class ReflectAction extends Action {
 	    submitFilesService.updateEntry(entry);
 	}
 
-	return mapping.findForward(SbmtConstants.SUCCESS);
+	return "redirect:/learner.do?method=finish";
     }
 
     //**********************************************************************************************
     //		Private mehtods
     //**********************************************************************************************
-    private ISubmitFilesService getService() {
-	ISubmitFilesService submitFilesService = SubmitFilesServiceProxy
-		.getSubmitFilesService(this.getServlet().getServletContext());
-	return submitFilesService;
-    }
 
-    public static ActionErrors validateBeforeFinish(HttpServletRequest request,
+    public static void validateBeforeFinish(Errors errors, HttpServletRequest request,
 	    ISubmitFilesService submitFilesService) {
-	ActionErrors errors = new ActionErrors();
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -157,9 +123,7 @@ public class ReflectAction extends Action {
 	List list = submitFilesService.getFilesUploadedByUser(userID, sessionId, request.getLocale(), false);
 	int minUpload = (Integer) sessionMap.get(SbmtConstants.PARAM_MIN_UPLOAD);
 	if (minUpload > 0) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.learning.minimum.upload.number.less"));
+	    errors.reject("error.learning.minimum.upload.number.less");
 	}
-
-	return errors;
     }
 }

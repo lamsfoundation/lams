@@ -58,16 +58,16 @@
 
 
 		<c:forEach var="fileInfo" items="${report}" varStatus="status">
-			<html:form action="/mark.do" method="post" styleId="updateMarkForm" enctype="multipart/form-data" onsubmit="return validate();">
+			<form:form action="/mark.do" method="post" modelAttribute="markForm" id="updateMarkForm" enctype="multipart/form-data" onsubmit="return validate();">
 			
-				<html:hidden property="method" value="updateMark" styleId="method" />
-				<html:hidden property="toolSessionID" />
-				<html:hidden property="reportID" />
-				<html:hidden property="detailID"  />
-				<html:hidden property="userID"  />
-				<html:hidden property="updateMode" />
-				<html:hidden property="markFileUUID" />
-				<html:hidden property="markFileVersionID" />
+				<form:hidden path="method" value="updateMark" id="method" />
+				<form:hidden path="toolSessionID" />
+				<form:hidden path="reportID" />
+				<form:hidden path="detailID"  />
+				<form:hidden path="userID"  />
+				<form:hidden path="updateMode" />
+				<form:hidden path="markFileUUID" />
+				<form:hidden path="markFileVersionID" />
 				
 				<%@include file="fileinfo.jsp"%>
 				
@@ -80,7 +80,7 @@
 						<fmt:message key="label.learner.marks" />:
 				</dt>
 				<dd>
-						<html:text property="marks" />
+						<input type="text" name="marks" />
 				</dd>
 				
 				</dl>
@@ -102,22 +102,22 @@
 
 								<div id="actionButtons" class="pull-right">						
 								<c:set var="viewMarkFileURL">
-									<html:rewrite page="/download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=false" />
+									<lams:WebAppURL />download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=false
 								</c:set>
-								<html:link href="javascript:launchInstructionsPopup('${viewMarkFileURL}')" styleClass="btn btn-xs btn-default">
+								<a href="javascript:launchInstructionsPopup('${viewMarkFileURL}')" class="btn btn-xs btn-default">
 									<i class="fa fa-eye" title="<fmt:message key="label.view" />"></i>
-								</html:link>
+								</a>
 								
 								<c:set var="downloadMarkFileURL">
-									<html:rewrite page="/download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=true" />
+									<lams:WebAppURL />download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=true
 								</c:set>
-								<html:link href="${downloadMarkFileURL}" styleClass="btn btn-xs btn-default loffset10">
+								<a href="${downloadMarkFileURL}" class="btn btn-xs btn-default loffset10">
 									<i class="fa fa-download" title="<fmt:message key="label.download" />"></i>
-								</html:link>
+								</a>
 								
-								<html:link href="javascript:removeMarkFile()" styleClass="btn btn-xs btn-danger loffset10">
+								<a href="javascript:removeMarkFile()" class="btn btn-xs btn-danger loffset10">
 									<i class="fa fa-trash" title="<fmt:message key="label.monitoring.file.delete" />"></i>
-								</html:link>
+								</a>
 								</div>
 								
 								<div class="offset5">
@@ -149,14 +149,14 @@
 							<c:url value="/monitoring.do"/>?method=listAllMarks&toolSessionID=${toolSessionID}
 						</c:set>
 					</c:if>
-					<html:link href="${cancelUrl}" styleClass="btn btn-default">
+					<a href="${cancelUrl}" class="btn btn-default">
 						<fmt:message key="label.cancel" />
-					</html:link>
+					</a>
 					<button type="submit" class="btn  btn-primary loffset10">
 						<fmt:message key="label.monitoring.saveMarks.button" />
 					</button>
 				</div>
-			</html:form>
+			</form:form>
 		</c:forEach>
 
 

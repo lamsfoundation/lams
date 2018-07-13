@@ -21,46 +21,47 @@
  * ****************************************************************
  */
 
-
-
-package org.lamsfoundation.lams.tool.sbmt.web.action;
+package org.lamsfoundation.lams.tool.sbmt.web.controller;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
-import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.web.form.AuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Manpreet Minhas
  * @author Steve Ni
  */
-public class AuthoringAction extends LamsDispatchAction {
-    private Logger log = Logger.getLogger(AuthoringAction.class);
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
+    private Logger log = Logger.getLogger(AuthoringController.class);
 
-    public ISubmitFilesService submitFilesService;
+    @Autowired
+    @Qualifier("submitFilesService")
+    private ISubmitFilesService submitFilesService;
 
     /**
      * This page will display initial submit tool content. Or just a blank page if the toolContentID does not exist
@@ -73,27 +74,26 @@ public class AuthoringAction extends LamsDispatchAction {
      *      org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+
+    @RequestMapping("/authoring")
+    public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	sessionMap.put(AttributeNames.PARAM_MODE, mode);
 
 	Long contentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	// get back the upload file list and display them on page
-	submitFilesService = getService();
 
 	SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
 
 	if (mode.isTeacher()) {
 	    persistContent.setDefineLater(true);
 	    submitFilesService.saveOrUpdateContent(persistContent);
-	    
+
 	    //audit log the teacher has started editing activity in monitor
 	    submitFilesService.auditLogStartEditingActivityInMonitor(contentID);
 	}
@@ -104,43 +104,40 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 
 	// set back STRUTS component value
-	AuthoringForm authForm = (AuthoringForm) form;
-	authForm.initContentValue(persistContent);
+	authoringForm.initContentValue(persistContent);
 	// session map
-	authForm.setSessionMapID(sessionMap.getSessionID());
-	authForm.setContentFolderID(contentFolderID);
+	authoringForm.setSessionMapID(sessionMap.getSessionID());
+	authoringForm.setContentFolderID(contentFolderID);
 
-	return mapping.findForward("success");
+	return "authoring/authoring";
     }
 
     /**
      * Update all content for submit tool except online/offline instruction files list.
      *
-     * @param mapping
-     * @param form
      * @param request
      * @param response
      * @return
+     * @throws IllegalAccessException
      * @throws NoSuchMethodException
      * @throws InvocationTargetException
      * @throws Exception
      */
-    public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/updateContent")
+    public String updateContent(@ModelAttribute AuthoringForm authoringForm, Errors errors, HttpServletRequest request)
+	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
-	AuthoringForm authForm = (AuthoringForm) form;
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(authForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(authoringForm.getSessionMapID());
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.PARAM_MODE);
 
-	ActionMessages errors = validate(authForm, mapping, request);
-	if (!errors.isEmpty()) {
-	    saveErrors(request, errors);
-	    return mapping.getInputForward();
+	validate(authoringForm, errors, request);
+	if (errors.hasErrors()) {
+	    return "redirect:/";
 	}
 
-	SubmitFilesContent content = getContent(form);
+	SubmitFilesContent content = getContent(authoringForm);
 
-	submitFilesService = getService();
 	SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(content.getContentID());
 
 	if (persistContent == null) {
@@ -164,7 +161,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	// get back login user DTO
 	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
-	Long contentId = authForm.getToolContentID();
+	Long contentId = authoringForm.getToolContentID();
 	SubmitUser user = submitFilesService.getContentUser(contentId, userDto.getUserID());
 	if (user == null) {
 	    user = submitFilesService.createContentUser(userDto, contentId);
@@ -175,7 +172,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	// to jump to common success page in lams_central
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	return mapping.findForward("success");
+	return "authoring/authoring";
     }
 
     // ***********************************************************
@@ -187,40 +184,26 @@ public class AuthoringAction extends LamsDispatchAction {
      * @param form
      * @return
      */
-    private SubmitFilesContent getContent(ActionForm form) {
-	AuthoringForm authForm = (AuthoringForm) form;
-	Long contentId = authForm.getToolContentID();
+    private SubmitFilesContent getContent(AuthoringForm authoringForm) {
+	Long contentId = authoringForm.getToolContentID();
 
 	SubmitFilesContent content = new SubmitFilesContent();
 	content.setContentID(contentId);
-	content.setInstruction(authForm.getInstructions());
-	content.setTitle(authForm.getTitle());
-	content.setLockOnFinished(authForm.isLockOnFinished());
-	content.setReflectInstructions(authForm.getReflectInstructions());
-	content.setReflectOnActivity(authForm.isReflectOnActivity());
-	content.setLimitUpload(authForm.isLimitUpload());
-	content.setUseSelectLeaderToolOuput(authForm.isUseSelectLeaderToolOuput());
-	content.setLimitUploadNumber(authForm.getLimitUploadNumber());
-	content.setNotifyLearnersOnMarkRelease(authForm.isNotifyLearnersOnMarkRelease());
-	content.setNotifyTeachersOnFileSubmit(authForm.isNotifyTeachersOnFileSubmit());
+	content.setInstruction(authoringForm.getInstructions());
+	content.setTitle(authoringForm.getTitle());
+	content.setLockOnFinished(authoringForm.isLockOnFinished());
+	content.setReflectInstructions(authoringForm.getReflectInstructions());
+	content.setReflectOnActivity(authoringForm.isReflectOnActivity());
+	content.setLimitUpload(authoringForm.isLimitUpload());
+	content.setUseSelectLeaderToolOuput(authoringForm.isUseSelectLeaderToolOuput());
+	content.setLimitUploadNumber(authoringForm.getLimitUploadNumber());
+	content.setNotifyLearnersOnMarkRelease(authoringForm.isNotifyLearnersOnMarkRelease());
+	content.setNotifyTeachersOnFileSubmit(authoringForm.isNotifyTeachersOnFileSubmit());
 	return content;
     }
 
-    /**
-     * Get submit file service bean.
-     *
-     * @return
-     */
-    private ISubmitFilesService getService() {
-	if (submitFilesService == null) {
-	    return SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
-	} else {
-	    return submitFilesService;
-	}
-    }
+    private void validate(AuthoringForm authoringForm, Errors errors, HttpServletRequest request) {
 
-    private ActionMessages validate(AuthoringForm sbmtForm, ActionMapping mapping, HttpServletRequest request) {
-	ActionMessages errors = new ActionMessages();
 	// if (StringUtils.isBlank(sbmtForm.getTitle())) {
 	// ActionMessage error = new ActionMessage("error.title.blank");
 	// errors.add(ActionMessages.GLOBAL_MESSAGE, error);
@@ -228,12 +211,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	// define it later mode(TEACHER) skip below validation.
 	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    return errors;
+	    errors.reject("error.title.blank");
 	}
 
-	// Some other validation outside basic Tab.
-
-	return errors;
     }
 
 }

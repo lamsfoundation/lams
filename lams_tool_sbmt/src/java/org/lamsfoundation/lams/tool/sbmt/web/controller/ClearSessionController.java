@@ -21,28 +21,49 @@
  * ****************************************************************
  */
 
+package org.lamsfoundation.lams.tool.sbmt.web.controller;
 
-package org.lamsfoundation.lams.tool.sbmt.web.action;
+import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
+import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishController;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.sbmt.SbmtConstants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * This class give a chance to clear HttpSession when user save/close authoring page.
- * 
+ *
  * @author Steve.Ni
  *
  * @version $Revision$
  */
-public class ClearSessionAction extends LamsAuthoringFinishAction {
+@Controller
+public class ClearSessionController extends LamsAuthoringFinishController implements SbmtConstants {
+    private static Logger logger = Logger.getLogger(ClearSessionController.class.getName());
+
+    @Autowired
+    private WebApplicationContext applicationContext;
+
+    @RequestMapping("/clearsession")
+    public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	super.execute(request, response, applicationContext);
+    }
 
     @Override
     public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {
+	session.removeAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG);
 	if (mode.isAuthor()) {
+	    ClearSessionController.logger.debug("In Author mode");
 	    session.removeAttribute(customiseSessionID);
 	}
     }
-
 }

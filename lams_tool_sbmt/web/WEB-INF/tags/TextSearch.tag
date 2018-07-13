@@ -88,7 +88,7 @@
 <c:if test="${wrapInFormTag}">
 	<form action="${action}" id="${formID}" name="${formID}">
 </c:if>
-		<html:hidden property="sessionMapID" />
+		<input type="hidden" name="sessionMapID" />
 		<h4><fmt:message key="${headingLabelKey}" /></h4>
 		<table>
 			<tr>
@@ -96,7 +96,7 @@
 					<fmt:message key="${allWordsLabelKey}" />
 				</td>
 				<td>
-					<html:text size="40" property="allWords" />
+					<input type="text" size="40" name="allWords" />
 				</td>
 			</tr>
 			<tr>
@@ -104,7 +104,7 @@
 					<fmt:message key="${phraseLabelKey}" />
 				</td>
 				<td>
-					<html:text size="40" property="phrase" />
+					<input type="text" size="40" name="phrase" />
 				</td>
 			</tr>
 			<tr>
@@ -112,7 +112,7 @@
 					<fmt:message key="${anyWordsLabelKey}" />
 				</td>
 				<td>
-					<html:text size="40" property="anyWords" /> 
+					<input type="text" size="40" name="anyWords" /> 
 				</td>
 			</tr>
 			<tr>
@@ -120,7 +120,7 @@
 					<fmt:message key="${excludedWordsLabelKey}" />
 				</td>
 				<td>
-					<html:text size="40" property="excludedWords" /> 
+					<input type="text" size="40" name="excludedWords" /> 
 				</td>
 			</tr>
 		</table>

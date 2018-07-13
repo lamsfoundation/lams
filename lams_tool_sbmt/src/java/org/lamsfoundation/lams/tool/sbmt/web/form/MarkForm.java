@@ -31,7 +31,7 @@ import org.apache.struts.upload.FormFile;
  *
  *
  */
-public class MarkForm extends ActionForm {
+public class MarkForm {
 
     private static final long serialVersionUID = -8680214759155659983L;
 

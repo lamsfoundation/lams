@@ -203,9 +203,9 @@
 								</td>
 								<td>
 								<c:if test="${empty file.marks && hasEditRight}">
-								 <html:link href="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" styleClass="btn btn-default btn-disable-on-submit pull-right">
+								 <a href="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" class="btn btn-default btn-disable-on-submit pull-right">
 					                      <i class="fa fa-trash" title="<fmt:message key="label.monitoring.original.learner.file.delete" />"></i> <span class="hidden-xs"></span>
-				                 </html:link>
+				                 </a>
 				                 </c:if>
 									<a href="${downloadURL}" title="<fmt:message key="label.download" />" class="btn btn-default btn-disable-on-submit pull-right">
 										<i class="fa fa-download" ></i>
@@ -286,11 +286,11 @@
 
 			<c:if test="${!displayForm && hasEditRight}">
 
-				<html:form action="/learner?method=uploadFile" method="post" enctype="multipart/form-data" onsubmit="return validate();" >
-					<html:hidden property="sessionMapID" />
+				<form:form action="/learner?method=uploadFile" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validate();" >
+					<form:hidden path="sessionMapID" />
 
 					<!-- Hidden fields -->
-					<html:hidden property="toolSessionID" value="${sessionMap.toolSessionID}" />
+					<form:hidden path="toolSessionID" value="${sessionMap.toolSessionID}" />
 
 					<!--File path row -->
 					<div class="panel panel-default">
@@ -308,7 +308,7 @@
 								<!--File Description row -->
 								<label for="description"><fmt:message key="label.learner.fileDescription" />&nbsp;<span
 									style="color: red">*</span></label>
-								<html:textarea styleId="description" styleClass="form-control" property="description"/>
+								<html:textarea id="description" cssClass="form-control" path="description"/>
 								<div id="desc-error-msg" class="text-danger" style="display: none;"></div>
 							</div>
 							<p class="help-block"><small><fmt:message key="errors.required"><fmt:param>*</fmt:param></fmt:message></small></p>
@@ -322,7 +322,7 @@
 							</div>
 						</div>
 					</div>
-				</html:form>
+				</form:form>
 				
 				<lams:WaitingSpinner id="attachmentArea_Busy"/>
 			</c:if>
@@ -359,10 +359,10 @@
 					</div>
 
 					<c:if test="${sessionMap.mode != 'teacher'}">
-					<html:button property="notebookButton" style="margin-top: 10px" onclick="javascript:notebook();"
-						styleClass="btn btn-sm btn-primary btn-disable-on-submit pull-left" >
+					<button name="notebookButton" style="margin-top: 10px" onclick="javascript:notebook();"
+						class="btn btn-sm btn-primary btn-disable-on-submit pull-left" >
 						<fmt:message key="label.edit" />
-					</html:button>
+					</button>
 					</c:if>
 				</div>
 			</div>
@@ -372,9 +372,9 @@
 		<c:if test="${sessionMap.mode != 'teacher'}">
 		<c:choose>
 			<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
-				<html:button property="notebookButton" onclick="javascript:notebook();" styleClass="btn btn-primary btn-disable-on-submit pull-right">
+				<button name="notebookButton" onclick="javascript:notebook();" class="btn btn-primary btn-disable-on-submit pull-right">
 					<fmt:message key="label.continue" />
-				</html:button>
+				</button>
 			</c:when>
 			<c:otherwise>
 				<button type="submit"  onclick="javascript:finish();" class="btn btn-primary btn-disable-on-submit pull-right na" id="finishButton">

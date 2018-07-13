@@ -21,11 +21,10 @@
  * ****************************************************************
  */
 
-
-
-package org.lamsfoundation.lams.tool.sbmt.web.action;
+package org.lamsfoundation.lams.tool.sbmt.web.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -40,13 +39,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.actions.DispatchAction;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -71,48 +63,63 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.filter.LocaleFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Manpreet Minhas
  * @author Steve.Ni
  */
-public class LearnerAction extends DispatchAction {
+@Controller
+@RequestMapping("/learner")
+public class LearnerController implements SbmtConstants {
 
     private static final boolean MODE_OPTIONAL = false;
 
-    public static Logger logger = Logger.getLogger(LearnerAction.class);
-    public ISubmitFilesService submitFilesService;
+    public static Logger logger = Logger.getLogger(LearnerController.class);
+
+    @Autowired
+    @Qualifier("submitFilesService")
+    private ISubmitFilesService submitFilesService;
+
+    @Autowired
+    @Qualifier("sbmtMessageService")
+    private MessageService messageService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /**
      * The initial page of learner in Submission tool. This page will list all uploaded files and learn
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/learner")
+    public String unspecified(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	// initial session Map
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	
 
-	((LearnerForm) form).setSessionMapID(sessionMap.getSessionID());
+	learnerForm.setSessionMapID(sessionMap.getSessionID());
 
 	// get parameters from Request
 	ToolAccessMode mode = null;
 	try {
-	    mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, LearnerAction.MODE_OPTIONAL);
+	    mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, LearnerController.MODE_OPTIONAL);
 	} catch (Exception e) {
 	}
 	if (mode == null) {
@@ -133,7 +140,6 @@ public class LearnerAction extends DispatchAction {
 	    userID = user.getUserID();
 	}
 
-	ISubmitFilesService submitFilesService = getService();
 	ToolContentManager contentManager = getContentManager();
 	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 	SubmitFilesContent content = session.getContent();
@@ -165,7 +171,7 @@ public class LearnerAction extends DispatchAction {
 
 	// if content in use, return special page.
 	if (content.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "learner/definelater";
 	}
 
 	// set contentInUse flag to true!
@@ -174,7 +180,7 @@ public class LearnerAction extends DispatchAction {
 	submitFilesService.saveOrUpdateContent(content);
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
 	// check if there is submission deadline
 	Date submissionDeadline = content.getSubmissionDeadline();
@@ -189,7 +195,7 @@ public class LearnerAction extends DispatchAction {
 
 	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("submissionDeadline");
+		return "learner/submissionDeadline";
 	    }
 	}
 
@@ -205,9 +211,8 @@ public class LearnerAction extends DispatchAction {
 		    IEventNotificationService.DELIVERY_METHOD_MAIL);
 	}
 
-	
 	SortedMap submittedFilesMap = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
-	// support for leader select feature  
+	// support for leader select feature
 	SubmitUser groupLeader = content.isUseSelectLeaderToolOuput()
 		? submitFilesService.checkLeaderSelectToolForSessionLeader(learner, new Long(sessionID).longValue())
 		: null;
@@ -219,7 +224,7 @@ public class LearnerAction extends DispatchAction {
 		List<SubmitUser> groupUsers = submitFilesService.getUsersBySession(new Long(sessionID).longValue());
 		request.setAttribute(SbmtConstants.ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(SbmtConstants.ATTR_SUBMIT_FILES, submittedFilesMap);
-		return mapping.findForward(SbmtConstants.WAIT_FOR_LEADER);
+		return "learner/waitForLeaderTimeLimit";
 	    }
 
 	    // forwards to the waitForLeader pages
@@ -232,13 +237,13 @@ public class LearnerAction extends DispatchAction {
 		if (filesUploadedByLeader == null) {
 		    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY,
 			    "label.waiting.for.leader.launch.time.limit");
-		    return mapping.findForward(SbmtConstants.WAIT_FOR_LEADER_TIME_LIMIT);
+		    return "learner/waitForLeaderTimeLimit";
 		}
 
 		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
 		if (!groupLeader.isFinished()) {
 		    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader.finish");
-		    return mapping.findForward(SbmtConstants.WAIT_FOR_LEADER_TIME_LIMIT);
+		    return "learner/waitForLeaderTimeLimit";
 		}
 	    }
 
@@ -259,55 +264,41 @@ public class LearnerAction extends DispatchAction {
 		|| content.isUseSelectLeaderToolOuput() && isUserLeader;
 	sessionMap.put(SbmtConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
 
-	return mapping.findForward(SbmtConstants.SUCCESS);
+	return "learner/sbmtlearner";
     }
 
     /**
      * Loads the main learner page with the details currently in the session map
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward refresh(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/refresh")
+    public String refresh(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	((LearnerForm) form).setSessionMapID(sessionMap.getSessionID());
+	learnerForm.setSessionMapID(sessionMap.getSessionID());
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	
+
 	// get session from shared session.
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Integer userID = user.getUserID();
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	
-	ISubmitFilesService submitFilesService = getService();
+
 	List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(), false);
 	SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
 
-	return mapping.findForward(SbmtConstants.SUCCESS);
+	return "learner/sbmtlearner";
     }
 
     /**
      * Implements learner upload submission function. This function also display the page again for learner uploading
      * more submission use.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward uploadFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String uploadFile(@ModelAttribute LearnerForm learnerForm, @RequestParam("file") MultipartFile file,
+	    Errors errors, HttpServletRequest request) {
 
-	LearnerForm learnerForm = (LearnerForm) form;
 	String sessionMapID = learnerForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -316,16 +307,15 @@ public class LearnerAction extends DispatchAction {
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
-	if (validateUploadForm(learnerForm, request)) {
+	if (validateUploadForm(learnerForm, errors, request)) {
 	    // get session from shared session.
 	    HttpSession ss = SessionManager.getSession();
 	    // get back login user DTO
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    Integer userID = user.getUserID();
 
-	    ISubmitFilesService submitFilesService = getService();
 	    List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(),
 		    false);
 
@@ -333,7 +323,7 @@ public class LearnerAction extends DispatchAction {
 	    ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	    setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
 
-	    return mapping.getInputForward();
+	    return "redirect:/";
 	}
 
 	// get session from shared session.
@@ -342,14 +332,12 @@ public class LearnerAction extends DispatchAction {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Integer userID = user.getUserID();
 
-	FormFile uploadedFile = learnerForm.getFile();
+	file = learnerForm.getFile();
 	String fileDescription = learnerForm.getDescription();
 	// reset fields and display a new form for next new file upload
 	learnerForm.setDescription("");
 
-	ISubmitFilesService submitFilesService = getService();
-
-	submitFilesService.uploadFileToSession(sessionID, uploadedFile, fileDescription, userID);
+	submitFilesService.uploadFileToSession(sessionID, file, fileDescription, userID);
 	SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 
 	SubmitFilesContent content = submitFilesService.getSessionById(sessionID).getContent();
@@ -359,23 +347,16 @@ public class LearnerAction extends DispatchAction {
 		    new Object[] { learner.getFullName() });
 	    submitFilesService.getEventNotificationService().notifyLessonMonitors(sessionID, message, false);
 	}
-	
+
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward("uploadredirect");
+	return "learner/redirectAfterSubmit";
     }
 
     /**
      * Learner choose finish upload button, will invoke this function. This function will mark the <code>finished</code>
      * field by special toolSessionID and userID.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public void finish(HttpServletRequest request, HttpServletResponse response) {
 
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -386,8 +367,7 @@ public class LearnerAction extends DispatchAction {
 
 	if (mode == ToolAccessMode.LEARNER || mode.equals(ToolAccessMode.AUTHOR)) {
 	    ToolSessionManager sessionMgrService = SubmitFilesServiceProxy
-		    .getToolSessionManager(getServlet().getServletContext());
-	    ISubmitFilesService submitFilesService = getService();
+		    .getToolSessionManager(applicationContext.getServletContext());
 
 	    // get back login user DTO
 	    // get session from shared session.
@@ -408,55 +388,44 @@ public class LearnerAction extends DispatchAction {
 		throw new SubmitFilesException(e);
 	    }
 	}
-	return null;
-
     }
 
     // **********************************************************************************************
     // Private mehtods
     // **********************************************************************************************
-    private ISubmitFilesService getService() {
-	ISubmitFilesService submitFilesService = SubmitFilesServiceProxy
-		.getSubmitFilesService(this.getServlet().getServletContext());
-	return submitFilesService;
-    }
-    
+
     private ToolContentManager getContentManager() {
-	ToolContentManager contentManager = SubmitFilesServiceProxy.
-		getSubmitFilesContentManager(this.getServlet().getServletContext());
+	ToolContentManager contentManager = SubmitFilesServiceProxy
+		.getSubmitFilesContentManager(this.applicationContext.getServletContext());
 	return contentManager;
     }
 
     // validate uploaded form
-    private boolean validateUploadForm(LearnerForm learnerForm, HttpServletRequest request) {
-	ActionMessages errors = new ActionMessages();
+    private boolean validateUploadForm(LearnerForm learnerForm, Errors errors, HttpServletRequest request) {
 	Locale preferredLocale = (Locale) request.getSession().getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
-	if (learnerForm.getFile() == null || StringUtils.isBlank(learnerForm.getFile().getFileName())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required",
-		    this.getResources(request).getMessage(preferredLocale, "learner.form.filepath.displayname")));
+	List<String> messages = new ArrayList<>();
+	if (learnerForm.getFile() == null || StringUtils.isBlank(learnerForm.getFile().getName())) {
+	    messages.add(this.messageService.getMessage("learner.form.filepath.displayname"));
 	}
 	if (StringUtils.isBlank(learnerForm.getDescription())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required",
-		    this.getResources(request).getMessage(preferredLocale, "label.learner.fileDescription")));
+	    messages.add(this.messageService.getMessage("label.learner.fileDescription"));
 	} else if (learnerForm.getDescription().length() > LearnerForm.DESCRIPTION_LENGTH) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-		    new ActionMessage("errors.maxdescsize", LearnerForm.DESCRIPTION_LENGTH));
+	    messages.add("errors.maxdescsize");
 	}
 
-	FileValidatorUtil.validateFileSize(learnerForm.getFile(), false, errors);
+	FileValidatorSpringUtil.validateFileSize(learnerForm.getFile(), false, errors);
 
 	if (learnerForm.getFile() != null) {
-	    LearnerAction.logger.debug("Learner submit file : " + learnerForm.getFile().getFileName());
+	    LearnerController.logger.debug("Learner submit file : " + learnerForm.getFile().getName());
 	}
 
-	if (learnerForm.getFile() != null && FileUtil.isExecutableFile(learnerForm.getFile().getFileName())) {
-	    LearnerAction.logger.debug("File is executatable : " + learnerForm.getFile().getFileName());
-	    ActionMessage msg = new ActionMessage("error.attachment.executable");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
+	if (learnerForm.getFile() != null && FileUtil.isExecutableFile(learnerForm.getFile().getName())) {
+	    LearnerController.logger.debug("File is executatable : " + learnerForm.getFile().getName());
+	    messages.add("error.attachment.executable");
 	}
-
-	if (!errors.isEmpty()) {
-	    this.addErrors(request, errors);
+	
+	if (messages != null && !messages.isEmpty()) {
+	    request.setAttribute("messages", messages);
 	    return true;
 	}
 	return false;
@@ -466,13 +435,6 @@ public class LearnerAction extends DispatchAction {
      *
      * Set information into learner DTO object for page display. Fill file list uploaded by the special user into web
      * form. Remove the unauthorized mark and comments.
-     *
-     * @param request
-     * @param sessionMap
-     * @param sessionID
-     * @param userID
-     * @param content
-     * @param filesUploaded
      */
     private void setLearnerDTO(HttpServletRequest request, SessionMap sessionMap, SubmitUser currUser,
 	    List filesUploaded, ToolAccessMode mode) {
@@ -514,7 +476,6 @@ public class LearnerAction extends DispatchAction {
 	}
 
 	// retrieve notebook reflection entry.
-	ISubmitFilesService submitFilesService = getService();
 
 	NotebookEntry notebookEntry = submitFilesService.getEntry(
 		(Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID), CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -542,31 +503,23 @@ public class LearnerAction extends DispatchAction {
 	return learner;
     }
 
-    private ISubmitFilesService getSubmitFilesService() {
-	return SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
-    }
-
-    public ActionForward deleteLearnerFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException, IOException {
+    public void deleteLearnerFile(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	HttpSession ss = SessionManager.getSession();
-	
 
 	UserDTO currentUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	Long detailID = WebUtil.readLongParam(request, "detailId");
 
-	if (submitFilesService == null) {
-	    submitFilesService = getSubmitFilesService();
-	}
 	FileDetailsDTO fileDetail = submitFilesService.getFileDetails(detailID, request.getLocale());
-	
-	if (fileDetail.getOwner().getUserID().equals(currentUser.getUserID()) && (StringUtils.isBlank(fileDetail.getMarks()))) {
 
-	    submitFilesService.removeLearnerFile(detailID,null);
+	if (fileDetail.getOwner().getUserID().equals(currentUser.getUserID())
+		&& (StringUtils.isBlank(fileDetail.getMarks()))) {
+
+	    submitFilesService.removeLearnerFile(detailID, null);
 
 	} else {
-	  response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not allowed to delete this item");
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not allowed to delete this item");
 	}
-	return null;
     }
 
 }

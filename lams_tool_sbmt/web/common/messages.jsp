@@ -1,10 +1,11 @@
 <%@include file="/common/taglibs.jsp"%>
 
 <%-- Error Messages --%>
-<logic:messagesPresent>
-	<lams:Alert id="errors" type="danger" close="true">
-	        <html:messages id="error">
-	            <c:out value="${error}" escapeXml="false"/><br/>
-	        </html:messages>
+<c:set var="hasErrors">
+<form:errors path='*'/>
+</c:set>
+<c:if test="${not empty hasErrors}">
+	<lams:Alert id="error" type="danger" close="false">
+		<form:errors path="*"/>
 	</lams:Alert>
-</logic:messagesPresent>
+</c:if>

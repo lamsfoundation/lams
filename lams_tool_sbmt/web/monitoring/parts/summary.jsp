@@ -189,21 +189,21 @@
 	</lams:TSTable>
 	
 	<P style="display: inline"> 
-		<html:button property="viewAllMarks" onclick="javascript:viewAllMarks(${sessionDto.sessionID})"
-					 styleClass="btn btn-default loffset5 voffset10" >
+		<button name="viewAllMarks" onclick="javascript:viewAllMarks(${sessionDto.sessionID})"
+					class="btn btn-default loffset5 voffset10" >
 			<fmt:message key="label.monitoring.viewAllMarks.button" />
-		</html:button>
-		<html:button property="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})"
-					 styleClass="btn btn-default loffset5 voffset10" >
+		</button>
+		<button name="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})"
+					 class="btn btn-default loffset5 voffset10" >
 			<fmt:message key="label.monitoring.releaseMarks.button" />
-		</html:button>
-		<html:form action="/monitoring" style="display:inline">
-			<html:hidden property="method" value="downloadMarks" />
-			<html:hidden property="toolSessionID" value="${sessionDto.sessionID}" />
-			<html:submit property="downloadMarks" styleClass="btn btn-default loffset5 voffset10" >
+		</button>
+		<form:form action="monitoring.do" style="display:inline">
+			<form:hidden path="method" value="downloadMarks" />
+			<form:hidden path="toolSessionID" value="${sessionDto.sessionID}" />
+			<input type="submit" name="downloadMarks" class="btn btn-default loffset5 voffset10" >
 				<fmt:message key="label.monitoring.downloadMarks.button" />
-			</html:submit>
-		</html:form>
+			</input>
+		</form:form>
 	</P>
 		
 	<c:if test="${isGroupedActivity}">

@@ -101,6 +101,7 @@ import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.dao.DataAccessException;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -607,11 +608,11 @@ public class SubmitFilesService
     }
 
     @Override
-    public void uploadFileToSession(Long sessionID, FormFile uploadFile, String fileDescription, Integer userID)
+    public void uploadFileToSession(Long sessionID, MultipartFile file, String fileDescription, Integer userID)
 	    throws SubmitFilesException {
 
-	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new SubmitFilesException("Could not find upload file: " + uploadFile);
+	if ((file == null) || StringUtils.isEmpty(file.getName())) {
+	    throw new SubmitFilesException("Could not find upload file: " + file);
 	}
 
 	SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(sessionID);
@@ -619,17 +620,17 @@ public class SubmitFilesService
 	    throw new SubmitFilesException("No such session with a sessionID of: " + sessionID + " found.");
 	}
 
-	NodeKey nodeKey = processFile(uploadFile);
+//	NodeKey nodeKey = processFile(file);
 
 	SubmissionDetails details = new SubmissionDetails();
 	details.setFileDescription(fileDescription);
-	details.setFilePath(uploadFile.getFileName());
+	details.setFilePath(file.getName());
 	details.setDateOfSubmission(new Date());
 
 	SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);
 	details.setLearner(learner);
-	details.setUuid(nodeKey.getUuid());
-	details.setVersionID(nodeKey.getVersion());
+//	details.setUuid(nodeKey.getUuid());
+//	details.setVersionID(nodeKey.getVersion());
 	SubmitFilesReport report = new SubmitFilesReport();
 	details.setReport(report);
 	details.setSubmitFileSession(session);
@@ -1503,5 +1504,6 @@ public class SubmitFilesService
 
 	return (groupLeader != null) && user.getUserID().equals(groupLeader.getUserID());
     }
+
 
 }

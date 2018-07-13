@@ -23,16 +23,15 @@
 
 </lams:head>
 <body class="stripes">
-<html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data">
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
+<form:form action="authoring.do" id="authoringForm" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">
+	<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
-	<html:hidden property="mode" value="${sessionMap.mode}" />
-	<html:hidden property="dispatch" value="updateContent" />
-	<html:hidden property="sessionMapID" />
-	<html:hidden property="toolContentID" />
-	<html:hidden property="contentFolderID" />
+	<form:hidden path="mode" value="${sessionMap.mode}" />
+	<form:hidden path="dispatch" value="updateContent" />
+	<form:hidden path="sessionMapID" />
+	<form:hidden path="toolContentID" />
+	<form:hidden path="contentFolderID" />
 	
 	<lams:Page title="${title}" type="navbar">
 		
@@ -54,14 +53,14 @@
 				toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>"
 				accessMode="${sessionMap.mode}"
 				defineLater="${sessionMap.mode == 'teacher'}"
-				toolContentID="${formBean.toolContentID}"
-				customiseSessionID="${formBean.sessionMapID}" 
-				contentFolderID="${formBean.contentFolderID}" />
+				toolContentID="${authoringForm.toolContentID}"
+				customiseSessionID="${authoringForm.sessionMapID}" 
+				contentFolderID="${authoringForm.contentFolderID}" />
 		</lams:TabBodyArea>
 		
 		<div id="footer"></div>
 		
 	</lams:Page>
-</html:form>
+</form:form>
 </body>
 </lams:html>

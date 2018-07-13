@@ -1,7 +1,6 @@
 package org.lamsfoundation.lams.tool.sbmt.web.form;
 
-import org.apache.struts.upload.FormFile;
-import org.apache.struts.validator.ValidatorForm;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -9,12 +8,12 @@ import org.apache.struts.validator.ValidatorForm;
  *
  *
  */
-public class LearnerForm extends ValidatorForm {
+public class LearnerForm {
 
     public static int DESCRIPTION_LENGTH = 5000;
 
     private String description;
-    private FormFile file;
+    private MultipartFile file;
 
     private String sessionMapID;
 
@@ -26,11 +25,11 @@ public class LearnerForm extends ValidatorForm {
 	this.description = description;
     }
 
-    public FormFile getFile() {
+    public MultipartFile getFile() {
 	return file;
     }
 
-    public void setFile(FormFile file) {
+    public void setFile(MultipartFile file) {
 	this.file = file;
     }
 

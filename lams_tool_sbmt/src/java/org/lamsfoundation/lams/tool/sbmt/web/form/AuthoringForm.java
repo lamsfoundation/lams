@@ -11,7 +11,7 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
  * @author Dapeng.Ni
  *
  */
-public class AuthoringForm extends ValidatorForm {
+public class AuthoringForm {
 
     private Long toolContentID;
 
@@ -45,13 +45,11 @@ public class AuthoringForm extends ValidatorForm {
 
     private boolean notifyTeachersOnFileSubmit;
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
+    public void reset(HttpServletRequest request) {
 	lockOnFinished = false;
 	useSelectLeaderToolOuput = false;
 	limitUpload = false;
 	reflectOnActivity = false;
-
     }
 
     public void initContentValue(SubmitFilesContent content) {

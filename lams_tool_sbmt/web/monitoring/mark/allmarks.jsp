@@ -36,9 +36,9 @@
 		<hr width="100%" style="border-top: 2px solid #ddd;"/>
 	</c:forEach>
 
-	<html:link href="javascript:window.close();" property="submit" styleClass="btn btn-primary pull-right">
+	<a href="javascript:window.close();" name="submit" class="btn btn-primary pull-right">
 		<fmt:message key="label.monitoring.done.button" />
-	</html:link>
+	</a>
 	
 <div id="footer"></div>
 	

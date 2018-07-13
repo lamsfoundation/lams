@@ -20,8 +20,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.sbmt.web.action;
+package org.lamsfoundation.lams.tool.sbmt.web.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,21 +30,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
-import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.web.form.MarkForm;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author lfoxton
@@ -59,39 +56,32 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class MarkAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/mark")
+public class MarkController {
 
+    @Autowired
+    @Qualifier("submitFilesService")
     private ISubmitFilesService submitFilesService;
 
     /**
      * Update mark.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws RepositoryCheckedException
-     * @throws InvalidParameterException
      */
-    public ActionForward updateMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws InvalidParameterException, RepositoryCheckedException {
+    public String updateMark(@ModelAttribute MarkForm markForm, HttpServletRequest request)
+	    throws InvalidParameterException, RepositoryCheckedException {
 
-	MarkForm markForm = (MarkForm) form;
-
-	ActionMessages errors = new ActionMessages();
 	// Check whether the mark is valid.
 	Float marks = null;
 	String markStr = markForm.getMarks();
+	List<String> messages = new ArrayList<>();
 	try {
 	    marks = NumberUtil.getLocalisedFloat(markStr, request.getLocale());
 	} catch (Exception e) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.mark.invalid.number"));
+	    messages.add("errors.mark.invalid.number");
 	}
 
 	String comments = WebUtil.readStrParam(request, "comments", true);
-	if (!errors.isEmpty()) {
-	    submitFilesService = getSubmitFilesService();
+	if (messages != null && !messages.isEmpty()) {
 	    List report = new ArrayList<FileDetailsDTO>();
 	    FileDetailsDTO fileDetail = submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale());
 	    // echo back the input, even they are wrong.
@@ -102,48 +92,32 @@ public class MarkAction extends LamsDispatchAction {
 	    request.setAttribute("report", report);
 	    request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, markForm.getToolSessionID());
 
-	    saveErrors(request, errors);
-	    return mapping.findForward("updateMark");
-	}
-
-	if (submitFilesService == null) {
-	    submitFilesService = getSubmitFilesService();
+	    request.setAttribute("messages", messages);
+	    return "monitoring/mark/updatemark";
 	}
 
 	// Update the mark based on the form
-	submitFilesService.updateMarks(markForm.getReportID(), marks, comments, markForm.getMarkFile(),markForm.getToolSessionID());
-	
+	submitFilesService.updateMarks(markForm.getReportID(), marks, comments, markForm.getMarkFile(),
+		markForm.getToolSessionID());
+
 	// Return to the appropriate screen based upon the updateMode
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, markForm.getToolSessionID());
 	if (StringUtils.equals(markForm.getUpdateMode(), "listMark")) {
 	    List report = submitFilesService.getFilesUploadedByUser(markForm.getUserID(), markForm.getToolSessionID(),
 		    request.getLocale(), true);
 	    request.setAttribute("report", report);
-	    return mapping.findForward("listMark");
+	    return "monitoring/mark/mark";
 	} else {
 	    Map report = submitFilesService.getFilesUploadedBySession(markForm.getToolSessionID(), request.getLocale());
 	    request.setAttribute("reports", report);
-	    return mapping.findForward("listAllMarks");
+	    return "monitoring/mark/allmarks";
 	}
     }
 
     /**
      * Display update mark initial page.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward newMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	MarkForm markForm = (MarkForm) form;
-
-	if (submitFilesService == null) {
-	    submitFilesService = getSubmitFilesService();
-	}
+    public String newMark(@ModelAttribute MarkForm markForm, HttpServletRequest request) {
 
 	FileDetailsDTO fileDetailsDTO = submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale());
 	updateMarkForm(markForm, fileDetailsDTO);
@@ -155,14 +129,11 @@ public class MarkAction extends LamsDispatchAction {
 	request.setAttribute("toolSessionID", markForm.getToolSessionID());
 	request.setAttribute("report", report);
 
-	return mapping.findForward("updateMark");
+	return "monitoring/mark/updatemark";
     }
 
     /**
      * Update the form
-     * 
-     * @param markForm
-     * @param fileDetailsDTO
      */
     private void updateMarkForm(MarkForm markForm, FileDetailsDTO fileDetailsDTO) {
 
@@ -177,20 +148,9 @@ public class MarkAction extends LamsDispatchAction {
 
     /**
      * Remove a mark file
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward removeMarkFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public String removeMarkFile(@ModelAttribute MarkForm markForm, HttpServletRequest request,
 	    HttpServletResponse response) {
-	MarkForm markForm = (MarkForm) form;
-
-	if (submitFilesService == null) {
-	    submitFilesService = getSubmitFilesService();
-	}
 
 	submitFilesService.removeMarkFile(markForm.getReportID(), markForm.getMarkFileUUID(),
 		markForm.getMarkFileVersionID(), markForm.getToolSessionID());
@@ -205,10 +165,7 @@ public class MarkAction extends LamsDispatchAction {
 	request.setAttribute("toolSessionID", markForm.getToolSessionID());
 	request.setAttribute("report", report);
 
-	return mapping.findForward("updateMark");
+	return "monitoring/mark/updatemark";
     }
 
-    private ISubmitFilesService getSubmitFilesService() {
-	return SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
-    }
 }

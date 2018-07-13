@@ -39,13 +39,13 @@
 
 		<c:choose>
 			<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
-				<html:button property="continueButton" onclick="javascript:notebook();" styleClass="btn btn-primary pull-right">
+				<button name="continueButton" onclick="javascript:notebook();" class="btn btn-primary pull-right">
 					<fmt:message key="label.continue" />
-				</html:button>
+				</button>
 			</c:when>
 			<c:otherwise>
-				<html:link href="#nogo" property="finishButton" onclick="javascript:finish();"
-					styleClass="btn btn-primary pull-right na" styleId="finishButton">
+				<a href="#nogo" name="finishButton" onclick="javascript:finish();"
+					class="btn btn-primary pull-right na" id="finishButton">
 					<span class="nextActivity"> <c:choose>
 							<c:when test="${activityPosition.last}">
 								<fmt:message key="button.submit" />
@@ -55,7 +55,7 @@
 							</c:otherwise>
 						</c:choose>
 					</span>
-				</html:link>
+				</a>
 			</c:otherwise>
 		</c:choose>
 
