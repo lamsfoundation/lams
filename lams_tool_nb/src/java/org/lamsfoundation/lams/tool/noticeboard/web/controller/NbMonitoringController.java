@@ -41,7 +41,6 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.tool.noticeboard.web.form.NbMonitoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -70,14 +69,15 @@ public class NbMonitoringController {
     public final static String FORM = "NbMonitoringForm";
 
     @RequestMapping("/monitoring")
-    public String unspecified(@ModelAttribute NbMonitoringForm nbMonitoringForm, HttpServletRequest request) {
+    public String unspecified(@ModelAttribute NbMonitoringForm nbMonitoringForm, List<String> messages,
+	    HttpServletRequest request) {
 
 	Long toolContentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
 	if (toolContentId == null) {
 	    String error = "Unable to continue. Tool content id missing";
-	    logger.error(error);
-	    throw new NbApplicationException(error);
+	    messages.add(error);
+	    request.setAttribute("messages", messages);
 	}
 
 	NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);

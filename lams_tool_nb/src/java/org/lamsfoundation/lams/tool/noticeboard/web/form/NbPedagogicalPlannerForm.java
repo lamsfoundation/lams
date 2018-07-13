@@ -22,6 +22,8 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.web.form;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 import org.springframework.util.StringUtils;
@@ -59,7 +61,7 @@ public class NbPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	}
     }
 
-    public void validate(Errors errors) {
+    public void validate(List<String> messages) {
 	boolean valid = true;
 	boolean allEmpty = true;
 	if (basicContent != null && !basicContent.isEmpty()) {
@@ -68,7 +70,7 @@ public class NbPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	    }
 	}
 	if (allEmpty) {
-	    errors.reject("authoring.msg.no.tasks.save");
+	    messages.add("authoring.msg.no.tasks.save");
 	    valid = false;
 	    basicContent = null;
 	}

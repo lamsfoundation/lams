@@ -112,12 +112,6 @@ public class NbLearnerController implements NoticeboardConstants {
     /**
      * Indicates that the user has finished viewing the noticeboard.
      * The session is set to complete and leaveToolSession is called.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/finish")
     public String finish(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request,
@@ -189,12 +183,6 @@ public class NbLearnerController implements NoticeboardConstants {
     /**
      * Indicates that the user has finished viewing the noticeboard, and will be
      * passed onto the Notebook reflection screen.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/reflect")
     public String reflect(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request) {

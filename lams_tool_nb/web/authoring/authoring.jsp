@@ -53,7 +53,7 @@
 
 <body class="stripes" onLoad="init()">
 
-<form:form modelAttribute="nbAuthoringForm" action="authoring/save.do" id="nbAuthoringForm" enctype="multipart/form-data">
+<form:form modelAttribute="nbAuthoringForm" action="save.do" id="nbAuthoringForm" enctype="multipart/form-data">
 
 <c:set var="title"><fmt:message key="activity.title" /></c:set>
 <lams:Page title="${title}" type="navbar">
@@ -62,7 +62,7 @@
 			<form:hidden path="contentFolderID" />
 			<form:hidden path="currentTab" id="currentTab" />
 			<form:hidden path="defineLater" />
-		
+		 <c:out value="${nbAuthoringForm.toolContentID}"/>
 		 	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 				<lams:Tab id="1" key="label.authoring.heading.basic" />
 				<lams:Tab id="2" key="label.authoring.heading.advanced" />
@@ -88,7 +88,7 @@
 				<form:hidden path="method" value="save" />
 				<c:set var="accessMode">
 					<c:choose>
-						<c:when test="${NbAuthoringForm.defineLater == 'true'}">
+						<c:when test="${nbAuthoringForm.defineLater == 'true'}">
 							teacher
 						</c:when>
 						<c:otherwise>
@@ -98,11 +98,11 @@
 				</c:set>
 				<lams:AuthoringButton formID="nbAuthoringForm"
 					clearSessionActionUrl="/clearsession.do" toolSignature="lanb11"
-					toolContentID="${NbAuthoringForm.toolContentID}"
+					toolContentID="${nbAuthoringForm.toolContentID}"
 					cancelButtonLabelKey="button.cancel"
 					saveButtonLabelKey="button.save"
 					accessMode="${accessMode}"
-					defineLater="${NbAuthoringForm.defineLater}"
+					defineLater="${nbAuthoringForm.defineLater}"
 					contentFolderID="${NbAuthoringForm.contentFolderID}" />
 			</lams:TabBodyArea>
 

@@ -25,6 +25,8 @@
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
 	</bean>
 	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+	
 	<bean id="transactionRetryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target">
@@ -627,5 +629,4 @@
    			<ref bean="userManagementService"/>
    		</property>
     </bean>
-	
 </beans>

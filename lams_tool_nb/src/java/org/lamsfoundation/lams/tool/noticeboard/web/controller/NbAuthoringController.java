@@ -102,7 +102,7 @@ public class NbAuthoringController {
 	String contentIdString = nbAuthoringForm.getToolContentID();
 //	Long contentId = NbWebUtil.convertToLong(nbAuthoringForm.getToolContentID());
 //	String contentFolderId = nbAuthoringForm.getContentFolderID();
-	
+
 	Long contentId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_CONTENT_ID);
 	String contentFolderId = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
 
@@ -163,16 +163,12 @@ public class NbAuthoringController {
 	}
 
 	request.setAttribute(FORM, nbAuthoringForm);
-	
+
 	return "authoring/authoring";
     }
 
     /**
      * Checks the session to see if the title and content session variables exist or not.
-     *
-     * @param session
-     *            The HttpSession to check.
-     * @return true if the parameters title and content exists in the session, false otherwise
      */
     private boolean contentExists(INoticeboardService service, Long id) {
 	NoticeboardContent nb = service.retrieveNoticeboard(id);
@@ -184,18 +180,19 @@ public class NbAuthoringController {
 
     }
 
-    @RequestMapping(value = "/authoring/save", method = RequestMethod.POST)
+    @RequestMapping(value = "/save", method = RequestMethod.POST)
     public String save(@ModelAttribute NbAuthoringForm nbAuthoringForm, HttpServletRequest request) {
 
 	//copyAuthoringFormValuesIntoFormBean(request, nbForm);
-	String contentId = WebUtil.readStrParam(request, NoticeboardConstants.TOOL_CONTENT_ID);
-	Long content_id = WebUtil.readLongParam(request,NoticeboardConstants.TOOL_CONTENT_ID);
+	String idAsString = nbAuthoringForm.getToolContentID();
 
-	if (contentId == null) {
+	if (idAsString == null) {
 	    String error = messageService.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "Tool Content Id");
 	    logger.error(error);
 	    throw new NbApplicationException(error);
 	}
+
+	Long content_id = NbWebUtil.convertToLong(nbAuthoringForm.getToolContentID());
 
 	//throws exception if the content id does not exist
 	checkContentId(content_id);
@@ -226,9 +223,6 @@ public class NbAuthoringController {
     /**
      * It is assumed that the contentId is passed as a http parameter
      * if the contentId is null, an exception is thrown, otherwise proceed as normal
-     *
-     * @param contentId
-     *            the <code>toolContentId</code> to check
      */
     private void checkContentId(Long contentId) {
 	if (contentId == null) {

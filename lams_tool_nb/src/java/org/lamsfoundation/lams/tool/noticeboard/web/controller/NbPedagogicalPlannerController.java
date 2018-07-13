@@ -23,6 +23,9 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.web.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -34,7 +37,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -75,10 +77,10 @@ public class NbPedagogicalPlannerController {
 
     @RequestMapping("/saveorupdate")
     public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute NbPedagogicalPlannerForm plannerForm,
-	    Errors errors, HttpServletRequest request) {
+	    List<String> messages, HttpServletRequest request) {
 
-	plannerForm.validate(errors);
-	if (!errors.hasErrors()) {
+	plannerForm.validate(messages);
+	if (messages != null && !messages.isEmpty()) {
 	    String content = plannerForm.getBasicContent();
 	    Long toolContentID = plannerForm.getToolContentID();
 	    NoticeboardContent noticeboard = nbService.retrieveNoticeboard(toolContentID);

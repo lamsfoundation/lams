@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.web.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -47,7 +49,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
@@ -114,26 +115,24 @@ public class NbLearnerStarterController {
 	return WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
     }
 
-    public String unspecified(@ModelAttribute NbLearnerForm NbLearnerForm, Errors errors, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String unspecified(@ModelAttribute NbLearnerForm NbLearnerForm, List<String> messages,
+	    HttpServletRequest request, HttpServletResponse response) {
 
-	return learner(NbLearnerForm, errors, request, response);
+	return learner(NbLearnerForm, messages, request, response);
     }
 
     @RequestMapping("/learner")
-    public String learner(@ModelAttribute NbLearnerForm NbLearnerForm, Errors errors, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String learner(@ModelAttribute NbLearnerForm NbLearnerForm, List<String> messages,
+	    HttpServletRequest request, HttpServletResponse response) {
 
 	NoticeboardContent nbContent = null;
 	NoticeboardUser nbUser = null;
-//	saveMessages(request, null);
 
 	Long toolSessionID = NbWebUtil.convertToLong(NbLearnerForm.getToolSessionID());
 
 	if (toolSessionID == null) {
 	    String error = "Unable to continue. The parameters tool session id is missing";
-	    logger.error(error);
-	    throw new NbApplicationException(error);
+	    messages.add(error);
 	}
 
 	nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
@@ -141,8 +140,7 @@ public class NbLearnerStarterController {
 
 	if (nbContent == null) {
 	    String error = "An Internal error has occurred. Please exit and retry this sequence";
-	    logger.error(error);
-	    throw new NbApplicationException(error);
+	    messages.add(error);
 	}
 
 	if (isFlagSet(nbContent, NoticeboardConstants.FLAG_DEFINE_LATER)) {
@@ -201,27 +199,26 @@ public class NbLearnerStarterController {
 	 * If the particular flag is set, control is forwarded to jsp page
 	 * displaying to the user the message according to what flag is set.
 	 */
-//	if (displayMessageToUser(nbContent, errors)) {
-//	    saveMessages(request, message);
-//A	    request.setAttribute("messageForm", );	
-//A	    return ("message");
-//	}
+	if (displayMessageToUser(nbContent, messages)) {
+	    request.setAttribute("messages", messages);
+//	    return ("message");
+	}
 
 	return "learnerContent";
 
     }
 
     @RequestMapping("/teacher")
-    public String teacher(@ModelAttribute NbLearnerForm NbLearnerForm, Errors errors, HttpServletRequest request,
-	    HttpServletResponse response) throws NbApplicationException {
-	return learner(NbLearnerForm, errors, request, response);
+    public String teacher(@ModelAttribute NbLearnerForm NbLearnerForm, List<String> messages,
+	    HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
+	return learner(NbLearnerForm, messages, request, response);
     }
 
     @RequestMapping("/author")
-    public String author(@ModelAttribute NbLearnerForm NbLearnerForm, Errors errors, HttpServletRequest request,
+    public String author(@ModelAttribute NbLearnerForm NbLearnerForm, List<String> messages, HttpServletRequest request,
 	    HttpServletResponse response) throws NbApplicationException {
 
-	return learner(NbLearnerForm, errors, request, response);
+	return learner(NbLearnerForm, messages, request, response);
 
     }
 
@@ -272,11 +269,11 @@ public class NbLearnerStarterController {
      *            the instance of ActtionMessages
      * @return true if any of the flags are set, false otherwise
      */
-    private boolean displayMessageToUser(NoticeboardContent content, Errors errors) {
+    private boolean displayMessageToUser(NoticeboardContent content, List<String> messages) {
 	boolean isDefineLaterSet = isFlagSet(content, NoticeboardConstants.FLAG_DEFINE_LATER);
 	if (isDefineLaterSet) {
 	    if (isDefineLaterSet) {
-		errors.reject("message.defineLaterSet");
+		messages.add("message.defineLaterSet");
 	    }
 	    return true;
 	} else {
