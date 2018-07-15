@@ -50,7 +50,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Auxiliary action in author mode. It contains operations with TaskListCondition. The rest of operations are located in
@@ -153,7 +152,7 @@ public class AuthoringTaskListConditionController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping(path = "/saveOrUpdateCondition", method = RequestMethod.POST)
+    @RequestMapping("/saveOrUpdateCondition")
     public String saveOrUpdateCondition(@ModelAttribute TaskListConditionForm taskListConditionForm, Errors errors,
 	    HttpServletRequest request) {
 
@@ -167,7 +166,7 @@ public class AuthoringTaskListConditionController {
 	    extractFormToTaskListCondition(request, taskListConditionForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.reject("error.condition.name.blank");
+	    errors.reject(e.getMessage());
 	    if (errors.hasErrors()) {
 		populateFormWithPossibleItems(taskListConditionForm, request);
 		return "pages/authoring/parts/addcondition";

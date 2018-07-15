@@ -301,7 +301,7 @@ public class AuthoringController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping(path = "/update", method = RequestMethod.POST)
+    @RequestMapping("/update")
     public String updateContent(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request)
 	    throws Exception {
 
