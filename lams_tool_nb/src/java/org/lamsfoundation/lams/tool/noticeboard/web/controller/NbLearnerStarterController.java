@@ -23,8 +23,12 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.web.controller;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -34,10 +38,15 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
+import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.tool.noticeboard.web.form.NbLearnerForm;
@@ -115,20 +124,23 @@ public class NbLearnerStarterController {
 	return WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
     }
 
-    public String unspecified(@ModelAttribute NbLearnerForm NbLearnerForm, List<String> messages,
-	    HttpServletRequest request, HttpServletResponse response) {
+    public String unspecified(@ModelAttribute NbLearnerForm NbLearnerForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
-	return learner(NbLearnerForm, messages, request, response);
+	return learner(NbLearnerForm, request, response);
     }
 
     @RequestMapping("/learner")
-    public String learner(@ModelAttribute NbLearnerForm NbLearnerForm, List<String> messages,
-	    HttpServletRequest request, HttpServletResponse response) {
+    public String learner(@ModelAttribute NbLearnerForm NbLearnerForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	NoticeboardContent nbContent = null;
 	NoticeboardUser nbUser = null;
 
-	Long toolSessionID = NbWebUtil.convertToLong(NbLearnerForm.getToolSessionID());
+//	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID)
+	Long toolSessionID = Long.valueOf(NbLearnerForm.getToolSessionID());
+
+	List<String> messages = new ArrayList<>();
 
 	if (toolSessionID == null) {
 	    String error = "Unable to continue. The parameters tool session id is missing";
@@ -199,7 +211,7 @@ public class NbLearnerStarterController {
 	 * If the particular flag is set, control is forwarded to jsp page
 	 * displaying to the user the message according to what flag is set.
 	 */
-	if (displayMessageToUser(nbContent, messages)) {
+	if (displayMessageToUser(nbContent)) {
 	    request.setAttribute("messages", messages);
 //	    return ("message");
 	}
@@ -208,17 +220,15 @@ public class NbLearnerStarterController {
 
     }
 
-    @RequestMapping("/teacher")
-    public String teacher(@ModelAttribute NbLearnerForm NbLearnerForm, List<String> messages,
-	    HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
-	return learner(NbLearnerForm, messages, request, response);
+    public String teacher(@ModelAttribute NbLearnerForm NbLearnerForm, HttpServletRequest request,
+	    HttpServletResponse response) throws NbApplicationException {
+	return learner(NbLearnerForm, request, response);
     }
 
-    @RequestMapping("/author")
-    public String author(@ModelAttribute NbLearnerForm NbLearnerForm, List<String> messages, HttpServletRequest request,
+    public String author(@ModelAttribute NbLearnerForm NbLearnerForm, HttpServletRequest request,
 	    HttpServletResponse response) throws NbApplicationException {
 
-	return learner(NbLearnerForm, messages, request, response);
+	return learner(NbLearnerForm, request, response);
 
     }
 
@@ -262,15 +272,10 @@ public class NbLearnerStarterController {
      * This method will return true if any one of the defineLater or runOffline flag is set.
      * Otherwise false will be returned.
      * </p>
-     *
-     * @param content
-     *            The instance of NoticeboardContent
-     * @param message
-     *            the instance of ActtionMessages
-     * @return true if any of the flags are set, false otherwise
      */
-    private boolean displayMessageToUser(NoticeboardContent content, List<String> messages) {
+    private boolean displayMessageToUser(NoticeboardContent content) {
 	boolean isDefineLaterSet = isFlagSet(content, NoticeboardConstants.FLAG_DEFINE_LATER);
+	List<String> messages = new ArrayList<>();
 	if (isDefineLaterSet) {
 	    if (isDefineLaterSet) {
 		messages.add("message.defineLaterSet");
@@ -279,6 +284,102 @@ public class NbLearnerStarterController {
 	} else {
 	    return false;
 	}
+    }
+
+    /**
+     * Indicates that the user has finished viewing the noticeboard.
+     * The session is set to complete and leaveToolSession is called.
+     */
+    public String finish(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException, IOException {
+
+	Long userID = getUserID(request);
+
+	Long toolSessionID = NbWebUtil.convertToLong(nbLearnerForm.getToolSessionID());
+	if (toolSessionID == null) {
+	    String error = "Unable to continue. The parameters tool session id is missing";
+	    logger.error(error);
+	    throw new NbApplicationException(error);
+	}
+
+	ToolSessionManager sessionMgrService = NoticeboardServiceProxy
+		.getNbSessionManager(applicationContext.getServletContext());
+
+	ToolAccessMode mode = WebUtil.getToolAccessMode(nbLearnerForm.getMode());
+	if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR) {
+	    NoticeboardSession nbSession = nbService.retrieveNoticeboardSession(toolSessionID);
+	    NoticeboardUser nbUser = nbService.retrieveNbUserBySession(userID, toolSessionID);
+
+	    nbUser.setUserStatus(NoticeboardUser.COMPLETED);
+	    nbService.updateNoticeboardSession(nbSession);
+	    nbService.updateNoticeboardUser(nbUser);
+
+	    // Create the notebook entry if reflection is set.
+	    NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
+	    if (nbContent.getReflectOnActivity()) {
+		// check for existing notebook entry
+		NotebookEntry entry = nbService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+			NoticeboardConstants.TOOL_SIGNATURE, userID.intValue());
+
+		if (entry == null) {
+		    // create new entry
+		    nbService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+			    NoticeboardConstants.TOOL_SIGNATURE, userID.intValue(), nbLearnerForm.getReflectionText());
+		} else {
+		    // update existing entry
+		    entry.setEntry(nbLearnerForm.getReflectionText());
+		    entry.setLastModified(new Date());
+		    nbService.updateEntry(entry);
+		}
+	    }
+
+	    String nextActivityUrl;
+	    try {
+		nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, getUserID(request));
+	    } catch (DataMissingException e) {
+		logger.error(e);
+		throw new ServletException(e);
+	    } catch (ToolException e) {
+		logger.error(e);
+		throw new ServletException(e);
+	    }
+
+	    response.sendRedirect(nextActivityUrl);
+
+	    return null;
+
+	}
+	request.setAttribute(NoticeboardConstants.READ_ONLY_MODE, "true");
+
+	return "learnerContent";
+
+    }
+
+    /**
+     * Indicates that the user has finished viewing the noticeboard, and will be
+     * passed onto the Notebook reflection screen.
+     */
+    public String reflect(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request) {
+
+	Long toolSessionID = NbWebUtil.convertToLong(nbLearnerForm.getToolSessionID());
+	NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
+	request.setAttribute("reflectInstructions", nbContent.getReflectInstructions());
+	request.setAttribute("title", nbContent.getTitle());
+	request.setAttribute("allowComments", nbContent.isAllowComments());
+	request.setAttribute("likeAndDislike", nbContent.isCommentsLikeAndDislike());
+	request.setAttribute("anonymous", nbContent.isAllowAnonymous());
+
+	// get the existing reflection entry
+	NotebookEntry entry = nbService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		NoticeboardConstants.TOOL_SIGNATURE, getUserID(request).intValue());
+	if (entry != null) {
+	    request.setAttribute("reflectEntry", entry.getEntry());
+	}
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+		applicationContext.getServletContext());
+
+	return "reflect";
     }
 
 }

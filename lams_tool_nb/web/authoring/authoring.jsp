@@ -62,7 +62,6 @@
 			<form:hidden path="contentFolderID" />
 			<form:hidden path="currentTab" id="currentTab" />
 			<form:hidden path="defineLater" />
-		 <c:out value="${nbAuthoringForm.toolContentID}"/>
 		 	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 				<lams:Tab id="1" key="label.authoring.heading.basic" />
 				<lams:Tab id="2" key="label.authoring.heading.advanced" />

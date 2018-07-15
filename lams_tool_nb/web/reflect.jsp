@@ -20,7 +20,7 @@
 		document.getElementById("finishButton").disabled = true;
 	}
 	function submitForm(methodName) {
-		var f = document.getElementById('learnerForm');
+		var f = document.getElementById('nbLearnerForm');
 		f.submit();
 	}
 </script>

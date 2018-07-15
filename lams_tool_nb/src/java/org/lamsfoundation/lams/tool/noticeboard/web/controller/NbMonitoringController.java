@@ -69,11 +69,11 @@ public class NbMonitoringController {
     public final static String FORM = "NbMonitoringForm";
 
     @RequestMapping("/monitoring")
-    public String unspecified(@ModelAttribute NbMonitoringForm nbMonitoringForm, List<String> messages,
-	    HttpServletRequest request) {
+    public String unspecified(@ModelAttribute NbMonitoringForm nbMonitoringForm, HttpServletRequest request) {
 
 	Long toolContentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
+	List<String> messages = new ArrayList<>();
 	if (toolContentId == null) {
 	    String error = "Unable to continue. Tool content id missing";
 	    messages.add(error);
@@ -138,8 +138,7 @@ public class NbMonitoringController {
 	return "/monitoring/monitoring";
     }
 
-    @RequestMapping("/reflection")
-    public String viewReflection(HttpServletRequest request) {
+    public String viewReflection(@ModelAttribute NbMonitoringForm nbMonitoringForm, HttpServletRequest request) {
 	Long userId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.USER_ID));
 	Long toolSessionId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_SESSION_ID));
 	NoticeboardUser nbUser = nbService.retrieveNoticeboardUser(userId, toolSessionId);
@@ -153,8 +152,7 @@ public class NbMonitoringController {
 	return "/monitoring/reflection";
     }
 
-    @RequestMapping("/comments")
-    public String viewComments(HttpServletRequest request) {
+    public String viewComments(@ModelAttribute NbMonitoringForm nbMonitoringForm, HttpServletRequest request) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_SESSION_ID, false);
 	NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);

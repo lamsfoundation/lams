@@ -23,18 +23,18 @@
 		}
 	}
 	function submitForm(methodName) {
-		var f = document.getElementById('learnerForm');
+		var f = document.getElementById('nbLearnerForm');
 		f.action += "?method=" + methodName;
 		f.submit();
 	}
 </script>
 
-<lams:Page type="learner" title="${NbLearnerForm.title}">
+<lams:Page type="learner" title="${nbLearnerForm.title}">
 	<div class="panel">
-		<c:out value="${NbLearnerForm.basicContent}" escapeXml="false" />
+		<c:out value="${nbLearnerForm.basicContent}" escapeXml="false" />
 	</div>
 
-	<form:form action="starter/learner.do" modelAttribute="nbLearnerForm" target="_self" onsubmit="disableFinishButton();" id="nbLearnerForm">
+	<form:form action="../starter/learner.do" modelAttribute="nbLearnerForm" target="_self" onsubmit="disableFinishButton();" id="nbLearnerForm">
 		<form:hidden path="toolSessionID" />
 		<form:hidden path="mode" />
 
@@ -57,12 +57,12 @@
 
 		<c:if test="${allowComments}">
 			<hr/>
-			<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}" 
+			<lams:Comments toolSessionId="${nbLearnerForm.toolSessionID}" 
 				toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" anonymous="${anonymous}" />
 		</c:if>
 
 
-		<c:if test="${not NbLearnerForm.readOnly}">
+		<c:if test="${not nbLearnerForm.readOnly}">
 			<c:choose>
 				<c:when test="${reflectOnActivity}">
 
