@@ -48,11 +48,11 @@
 			}
 		}
 		function finish() {
-			var finishUrl = "<html:rewrite page='/learner.do?method=finish&sessionMapID=${sessionMapID}'/>";
+			var finishUrl = "<lams:WebAppURL />learner.do?method=finish&sessionMapID=${sessionMapID}";
 			return submitCount(finishUrl);
 		}
 		function notebook() {
-			var continueUrl = "<html:rewrite page='/learning/newReflection.do?sessionMapID=${sessionMapID}'/>";
+			var continueUrl = "<lams:WebAppURL />learning/newReflection.do?sessionMapID=${sessionMapID}";
 			return submitCount(continueUrl);
 		}
 		function validate() {
@@ -286,11 +286,11 @@
 
 			<c:if test="${!displayForm && hasEditRight}">
 
-				<form:form action="/learner?method=uploadFile" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validate();" >
+				<form:form action="learner/uploadFile.do" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validate();" >
 					<form:hidden path="sessionMapID" />
 
 					<!-- Hidden fields -->
-					<form:hidden path="toolSessionID" value="${sessionMap.toolSessionID}" />
+					<input type="hidden" name="toolSessionID" value="${toolSessionID}" />
 
 					<!--File path row -->
 					<div class="panel panel-default">
@@ -308,7 +308,7 @@
 								<!--File Description row -->
 								<label for="description"><fmt:message key="label.learner.fileDescription" />&nbsp;<span
 									style="color: red">*</span></label>
-								<html:textarea id="description" cssClass="form-control" path="description"/>
+								<form:textarea id="description" cssClass="form-control" path="description"></form:textarea>
 								<div id="desc-error-msg" class="text-danger" style="display: none;"></div>
 							</div>
 							<p class="help-block"><small><fmt:message key="errors.required"><fmt:param>*</fmt:param></fmt:message></small></p>

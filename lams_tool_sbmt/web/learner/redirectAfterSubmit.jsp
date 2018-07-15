@@ -8,7 +8,7 @@
 <%@ include file="/common/header.jsp"%>
 <script language="JavaScript" type="text/JavaScript">
 	$(document).ready(function(){
-		window.location.href = '<lams:WebAppURL />/learner.do?method=refresh&sessionMapID=${sessionMapID}';
+		window.location.href = '<lams:WebAppURL />learner.do?method=refresh&sessionMapID=${sessionMapID}';
 	});
 </script>
 </lams:head>

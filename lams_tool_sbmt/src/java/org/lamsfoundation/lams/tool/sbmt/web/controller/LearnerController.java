@@ -63,7 +63,6 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -74,7 +73,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -107,7 +105,7 @@ public class LearnerController implements SbmtConstants {
     /**
      * The initial page of learner in Submission tool. This page will list all uploaded files and learn
      */
-    @RequestMapping("/learner")
+    @RequestMapping("")
     public String unspecified(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	// initial session Map
 	SessionMap sessionMap = new SessionMap();
@@ -126,7 +124,9 @@ public class LearnerController implements SbmtConstants {
 	    mode = ToolAccessMode.LEARNER;
 	}
 
-	Long sessionID = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
+	String sessionIDStr = WebUtil.readStrParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	Long sessionID = Long.valueOf(sessionIDStr);
+	request.setAttribute("toolSessionID", sessionID);
 
 	// get session from shared session.
 	HttpSession ss = SessionManager.getSession();
@@ -270,7 +270,6 @@ public class LearnerController implements SbmtConstants {
     /**
      * Loads the main learner page with the details currently in the session map
      */
-    @RequestMapping("/refresh")
     public String refresh(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -296,8 +295,9 @@ public class LearnerController implements SbmtConstants {
      * Implements learner upload submission function. This function also display the page again for learner uploading
      * more submission use.
      */
+    @RequestMapping("/uploadFile")
     public String uploadFile(@ModelAttribute LearnerForm learnerForm, @RequestParam("file") MultipartFile file,
-	    Errors errors, HttpServletRequest request) {
+	    HttpServletRequest request) {
 
 	String sessionMapID = learnerForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -309,7 +309,7 @@ public class LearnerController implements SbmtConstants {
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request,
 		applicationContext.getServletContext());
 
-	if (validateUploadForm(learnerForm, errors, request)) {
+	if (validateUploadForm(learnerForm, request)) {
 	    // get session from shared session.
 	    HttpSession ss = SessionManager.getSession();
 	    // get back login user DTO
@@ -401,7 +401,7 @@ public class LearnerController implements SbmtConstants {
     }
 
     // validate uploaded form
-    private boolean validateUploadForm(LearnerForm learnerForm, Errors errors, HttpServletRequest request) {
+    private boolean validateUploadForm(LearnerForm learnerForm, HttpServletRequest request) {
 	Locale preferredLocale = (Locale) request.getSession().getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
 	List<String> messages = new ArrayList<>();
 	if (learnerForm.getFile() == null || StringUtils.isBlank(learnerForm.getFile().getName())) {
@@ -413,7 +413,7 @@ public class LearnerController implements SbmtConstants {
 	    messages.add("errors.maxdescsize");
 	}
 
-	FileValidatorSpringUtil.validateFileSize(learnerForm.getFile(), false, errors);
+//	FileValidatorSpringUtil.validateFileSize(learnerForm.getFile(), false, errors);
 
 	if (learnerForm.getFile() != null) {
 	    LearnerController.logger.debug("Learner submit file : " + learnerForm.getFile().getName());
@@ -423,7 +423,7 @@ public class LearnerController implements SbmtConstants {
 	    LearnerController.logger.debug("File is executatable : " + learnerForm.getFile().getName());
 	    messages.add("error.attachment.executable");
 	}
-	
+
 	if (messages != null && !messages.isEmpty()) {
 	    request.setAttribute("messages", messages);
 	    return true;

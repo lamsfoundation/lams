@@ -27,8 +27,8 @@
 	<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
-	<form:hidden path="mode" value="${sessionMap.mode}" />
-	<form:hidden path="dispatch" value="updateContent" />
+	<input type="hidden" name="mode" value="${mode}" />
+	<input type="hidden" name="dispatch" value="updateContent" />
 	<form:hidden path="sessionMapID" />
 	<form:hidden path="toolContentID" />
 	<form:hidden path="contentFolderID" />

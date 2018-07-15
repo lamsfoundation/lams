@@ -11,11 +11,11 @@
 	<script type="text/javascript">
 		function finish() {
 			document.getElementById("finishButton").disabled = true;
-			var finishUrl = "<html:rewrite page='/learner.do?method=finish&sessionMapID=${sessionMapID}'/>";
+			var finishUrl = "<lams:WebAppURL />learner.do?method=finish&sessionMapID=${sessionMapID}";
 			location.href = finishUrl;
 		}
 		function notebook() {
-			var finishUrl = "<html:rewrite page='/learning/newReflection.do?sessionMapID=${sessionMapID}'/>";
+			var finishUrl = "<lams:WebAppURL />learning/newReflection.do?sessionMapID=${sessionMapID}";
 			location.href = finishUrl;
 		}
 	</script>

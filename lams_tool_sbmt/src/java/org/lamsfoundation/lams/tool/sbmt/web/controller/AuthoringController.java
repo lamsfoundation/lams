@@ -55,7 +55,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author Steve Ni
  */
 @Controller
-@RequestMapping("/authoring")
 public class AuthoringController {
     private Logger log = Logger.getLogger(AuthoringController.class);
 
@@ -123,7 +122,6 @@ public class AuthoringController {
      * @throws InvocationTargetException
      * @throws Exception
      */
-    @RequestMapping("/updateContent")
     public String updateContent(@ModelAttribute AuthoringForm authoringForm, Errors errors, HttpServletRequest request)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 

@@ -197,13 +197,13 @@
 					 class="btn btn-default loffset5 voffset10" >
 			<fmt:message key="label.monitoring.releaseMarks.button" />
 		</button>
-		<form:form action="monitoring.do" style="display:inline">
-			<form:hidden path="method" value="downloadMarks" />
-			<form:hidden path="toolSessionID" value="${sessionDto.sessionID}" />
+		<form action="monitoring.do" method="post" style="display:inline">
+			<input type="hidden" name="method" value="downloadMarks" />
+			<input type="hidden" name="toolSessionID" value="${sessionDto.sessionID}" />
 			<input type="submit" name="downloadMarks" class="btn btn-default loffset5 voffset10" >
 				<fmt:message key="label.monitoring.downloadMarks.button" />
 			</input>
-		</form:form>
+		</form>
 	</P>
 		
 	<c:if test="${isGroupedActivity}">
