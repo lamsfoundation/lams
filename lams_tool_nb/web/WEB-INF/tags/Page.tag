@@ -89,7 +89,6 @@
 				</c:if>
 			</c:if>
 			<c:if test="${empty toolSessionId}">
-				<c:set var="toolForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 				<c:if test="${not empty toolForm}"> 
 				    <c:set var="toolSessionId"><c:catch var="exception">${toolForm.toolSessionID}</c:catch></c:set>
 				</c:if>

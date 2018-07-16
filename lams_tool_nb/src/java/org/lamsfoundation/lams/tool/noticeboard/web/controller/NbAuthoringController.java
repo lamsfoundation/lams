@@ -67,6 +67,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author mtruong
  */
 @Controller
+@RequestMapping("/authoring")
 public class NbAuthoringController {
 
     private static Logger logger = Logger.getLogger(NbAuthoringController.class.getName());

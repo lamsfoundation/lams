@@ -23,9 +23,6 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.web.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -37,6 +34,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -75,17 +74,20 @@ public class NbPedagogicalPlannerController {
 
     }
 
-    @RequestMapping("/saveorupdate")
+    @RequestMapping("/saveOrUpdate")
     public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute NbPedagogicalPlannerForm plannerForm,
-	    List<String> messages, HttpServletRequest request) {
+	    HttpServletRequest request) {
 
-	plannerForm.validate(messages);
-	if (messages != null && !messages.isEmpty()) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	errorMap = plannerForm.validate();
+	if (errorMap.isEmpty()) {
 	    String content = plannerForm.getBasicContent();
 	    Long toolContentID = plannerForm.getToolContentID();
 	    NoticeboardContent noticeboard = nbService.retrieveNoticeboard(toolContentID);
 	    noticeboard.setContent(content);
 	    nbService.saveNoticeboard(noticeboard);
+	} else {
+	    request.setAttribute("errorMap", errorMap);
 	}
 
 	return "authoring/pedagogicalPlannerForm";

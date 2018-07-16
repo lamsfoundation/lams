@@ -21,14 +21,14 @@
 		<fmt:message key="activity.title" />
 	</h1>
 	
-	<c:set var="hasErrors">
-		<form:errors path='*'/>
-	</c:set>
-	<c:if test="${not empty hasErrors}">
-		<lams:Alert id="error" type="danger" close="false">
-		<form:errors path="*"/>
-		</lams:Alert>
-	</c:if>
+	<c:set var="errorKey" value="GLOBAL" />
+        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
+            <lams:Alert id="error" type="danger" close="false">
+                <c:forEach var="error" items="${errorMap[errorKey]}">
+                    <c:out value="${error}" />
+                </c:forEach>
+            </lams:Alert>
+        </c:if>
 	
 	<div class="align-right space-bottom-top">
 		<form:form modelAttribute="messageForm" action="/learner.do" target="_self" onsubmit="disableFinishButton();" id="messageForm">

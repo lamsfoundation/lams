@@ -13,8 +13,7 @@
 				<td><c:out value="${group.value}" /></td>
 				<c:if test="${allowComments}">
 				<td width="20%">
-				<c:url value="monitoring.do" var="commentURL">
-					<c:param name="method" value="viewComments" />
+				<c:url value="/monitoring/viewComments.do" var="commentURL">
 					<c:param name="toolSessionID" value="${nbMonitoringForm.sessionIdMap[group.key]}" />
 				</c:url>
 				<a href="javascript:launchPopup('${commentURL}')" class="btn btn-default btn-sm pull-right"><fmt:message key="label.view.comments" /></a></td>
@@ -30,8 +29,7 @@
 		<td><c:out value="${nbMonitoringForm.totalLearners}" /></td>
 		<c:if test="${allowComments && !isGroupedActivity}">
 			<c:forEach var="group" items="${nbMonitoringForm.sessionIdMap}">
-			<c:url value="monitoring.do" var="commentURL">
-					<c:param name="method" value="viewComments" />
+			<c:url value="/monitoring/viewComments.do" var="commentURL">
 					<c:param name="toolSessionID" value="${group.value}" />
 			</c:url>
 			<td width="20%"><a href="javascript:launchPopup('${commentURL}')" cssClass="btn btn-default btn-sm pull-right"><fmt:message key="label.view.comments" /></a></td>
