@@ -380,13 +380,6 @@ public class MonitoringController {
 
     /**
      * Mark taskList user as verified.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
      */
     @RequestMapping("/setVerifiedByMonitor")
     public String setVerifiedByMonitor(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -406,12 +399,6 @@ public class MonitoringController {
 
     /**
      * Set Submission Deadline
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody

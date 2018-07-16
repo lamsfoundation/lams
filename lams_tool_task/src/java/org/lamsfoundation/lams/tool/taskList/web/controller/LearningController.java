@@ -37,7 +37,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -60,8 +59,11 @@ import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -69,7 +71,8 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -94,6 +97,10 @@ public class LearningController implements TaskListConstants {
     @Autowired
     @Qualifier("lataskTaskListService")
     private ITaskListService taskListService;
+
+    @Autowired
+    @Qualifier("lataskMessageService")
+    private MessageService messageService;
 
     /**
      * Read taskList data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -328,12 +335,6 @@ public class LearningController implements TaskListConstants {
 
     /**
      * Mark taskList item as complete status.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/completeItem")
     public String complete(HttpServletRequest request, HttpServletResponse response) {
@@ -354,15 +355,9 @@ public class LearningController implements TaskListConstants {
 
     /**
      * Finish learning session.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/finish")
-    public String finish(@ModelAttribute ReflectionForm reflectionForm, Errors errors, HttpServletRequest request,
+    public String finish(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	// get back SessionMap
@@ -384,7 +379,7 @@ public class LearningController implements TaskListConstants {
 	    request.setAttribute(TaskListConstants.ATTR_RUN_AUTO, false);
 	}
 
-	if (!validateBeforeFinish(request, sessionMapID, errors)) {
+	if (!validateBeforeFinish(request, sessionMapID)) {
 	    return "redirect:/";
 	    // getInputForward
 	}
@@ -407,12 +402,6 @@ public class LearningController implements TaskListConstants {
 
     /**
      * Initial page for add taskList item (single file or URL).
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/addtask")
     public String addTask(@ModelAttribute TaskListItemForm taskListItemForm, HttpServletRequest request) {
@@ -424,25 +413,21 @@ public class LearningController implements TaskListConstants {
 
     /**
      * Save new user task into database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
 
     @RequestMapping(path = "/saveNewTask", method = RequestMethod.POST)
-    public String saveNewTask(@ModelAttribute TaskListItemForm taskListItemForm, Errors errors,
-	    HttpServletRequest request) {
+    public String saveNewTask(@ModelAttribute TaskListItemForm taskListItemForm, HttpServletRequest request) {
 	// get back SessionMap
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 
-	validateTaskListItem(taskListItemForm, errors);
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	errorMap = validateTaskListItem(taskListItemForm);
 
-	if (errors.hasErrors()) {
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	    return "pages/learning/parts/addtask";
 	}
 
@@ -479,12 +464,6 @@ public class LearningController implements TaskListConstants {
 
     /**
      * Adds new user commment.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping(path = "/addNewComment", method = RequestMethod.POST)
     public String addNewComment(@ModelAttribute TaskListItemForm taskListItemForm, HttpServletRequest request) {
@@ -522,25 +501,15 @@ public class LearningController implements TaskListConstants {
 
 	// form.reset(mapping, request);
 
-//	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(TaskListConstants.SUCCESS));
-//	redirect.addParameter(AttributeNames.ATTR_MODE, mode);
-//	redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	return "redirect:/learning/start.do";
     }
 
     /**
      * Uploads specified file to repository and associates it with current TaskListItem.
-     *
-     * @param mapping
-     * @param form
-     * @param type
-     * @param request
-     * @return
-     * @throws UploadTaskListFileException
      */
-    @RequestMapping("/uploadFile")
-    public String uploadFile(@ModelAttribute TaskListItemForm taskListItemForm, @RequestParam("file") MultipartFile file, Errors errors,
-	    HttpServletRequest request) throws UploadTaskListFileException {
+    @RequestMapping(path = "/uploadFile", method = RequestMethod.POST)
+    public String uploadFile(@ModelAttribute TaskListItemForm taskListItemForm,
+	    @RequestParam("file") MultipartFile file, HttpServletRequest request) throws UploadTaskListFileException {
 
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -548,13 +517,19 @@ public class LearningController implements TaskListConstants {
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
 
+	file = taskListItemForm.getUploadedFile();
+
 	if (file == null || StringUtils.isBlank(file.getName())) {
 	    return "pages/learning/learning";
 	}
 
 	// validate file size
-	FileValidatorSpringUtil.validateFileSize(file, false, errors);
-	if (errors.hasErrors()) {
+	boolean fileSizeCorrect = FileValidatorSpringUtil.validateFileSize(file, false);
+	if (!fileSizeCorrect) {
+	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	    errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
+		    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
+	    request.setAttribute("errorMap", errorMap);
 	    return "pages/learning/learning";
 	}
 
@@ -576,30 +551,21 @@ public class LearningController implements TaskListConstants {
 
 	// form.reset(mapping, request);
 
-//	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(TaskListConstants.SUCCESS));
-//	redirect.addParameter(AttributeNames.ATTR_MODE, mode);
-//	redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	return "redirect:/learning/start.do";
     }
 
     /**
      * Display empty reflection form.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/newReflection")
     public String newReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    Errors errors, HttpServletResponse response) {
+	    HttpServletResponse response) {
 
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
 
-	if (!validateBeforeFinish(request, sessionMapID, errors)) {
-	    return "pages/learning/learning";
+	if (!validateBeforeFinish(request, sessionMapID)) {
+	    return "redirect:/";
 	}
 
 	HttpSession ss = SessionManager.getSession();
@@ -624,16 +590,10 @@ public class LearningController implements TaskListConstants {
 
     /**
      * Submit reflection form input database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
-    public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, Errors errors,
-	    HttpServletRequest request, HttpServletResponse response) {
+    public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	Integer userId = reflectionForm.getUserID();
 
@@ -657,7 +617,7 @@ public class LearningController implements TaskListConstants {
 	    taskListService.updateEntry(entry);
 	}
 
-	return finish(reflectionForm, errors, request, response);
+	return finish(reflectionForm, request, response);
     }
 
     // *************************************************************************************
@@ -688,17 +648,16 @@ public class LearningController implements TaskListConstants {
 	return taskListUser;
     }
 
-    /**
-     * @param itemForm
-     * @return
-     */
-    private void validateTaskListItem(TaskListItemForm itemForm, Errors errors) {
+    private MultiValueMap validateTaskListItem(TaskListItemForm itemForm) {
+
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (StringUtils.isBlank(itemForm.getTitle())) {
-	    errors.reject(TaskListConstants.ERROR_MSG_TITLE_BLANK);
+	    errorMap.add("GLOBAL", TaskListConstants.ERROR_MSG_TITLE_BLANK);
 	}
+	return errorMap;
     }
 
-    private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID, Errors errors) {
+    private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -711,8 +670,9 @@ public class LearningController implements TaskListConstants {
 	int minimumNumberTasks = taskListService.getTaskListBySessionId(sessionId).getMinimumNumberTasks();
 	// if current user view less than reqired view count number, then just return error message.
 	if ((minimumNumberTasks - numberCompletedTasks) > 0) {
-	    errors.reject("lable.learning.minimum.view.number",
-		    new Object[] { minimumNumberTasks, numberCompletedTasks }, null);
+	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	    errorMap.add("GLOBAL", "lable.learning.minimum.view.number");
+	    request.setAttribute("errorMap", errorMap);
 	    return false;
 	}
 
@@ -721,9 +681,6 @@ public class LearningController implements TaskListConstants {
 
     /**
      * Set complete flag for given taskList item.
-     *
-     * @param request
-     * @param sessionId
      */
     private void doComplete(HttpServletRequest request) {
 	// get back sessionMap

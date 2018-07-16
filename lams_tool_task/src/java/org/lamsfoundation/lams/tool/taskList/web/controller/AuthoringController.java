@@ -51,13 +51,13 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
-import org.lamsfoundation.lams.tool.taskList.service.TaskListException;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListConditionComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListPedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -65,7 +65,8 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -90,6 +91,10 @@ public class AuthoringController {
     @Qualifier("lataskTaskListService")
     private ITaskListService taskListService;
 
+    @Autowired
+    @Qualifier("lataskMessageService")
+    private MessageService messageService;
+
     // **********************************************************
     // Solid taskList methods
     // **********************************************************
@@ -100,8 +105,6 @@ public class AuthoringController {
      *
      * This method will avoid read database again and lost un-saved resouce item
      * lost when user "refresh page",
-     *
-     * @throws ServletException
      */
 
     @RequestMapping("/start")
@@ -266,13 +269,8 @@ public class AuthoringController {
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     *
-     * @param taskListForm
-     * @param request
-     * @return
-     * @throws ServletException
      */
-    @RequestMapping("/init")
+    @RequestMapping(path = "/init", method = RequestMethod.POST)
     public String initPage(@ModelAttribute TaskListForm startForm, HttpServletRequest request) throws ServletException {
 
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
@@ -295,13 +293,8 @@ public class AuthoringController {
     /**
      * This method will persist all inforamtion in this authoring page, include all
      * taskList item, information etc.
-     *
-     * @param taskListForm
-     * @param request
-     * @return
-     * @throws ServletException
      */
-    @RequestMapping("/update")
+    @RequestMapping(path = "/update", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request)
 	    throws Exception {
 
@@ -449,10 +442,6 @@ public class AuthoringController {
 
     /**
      * Display empty page for new taskList item.
-     *
-     * @param taskListForm
-     * @param request
-     * @return
      */
     @RequestMapping("/newItemInit")
     public String newItemlInit(@ModelAttribute TaskListItemForm taskListItemForm, HttpServletRequest request) {
@@ -505,12 +494,13 @@ public class AuthoringController {
      * @throws ServletException
      */
     @RequestMapping(path = "/saveOrUpdateItem", method = RequestMethod.POST)
-    public String saveOrUpdateItem(@ModelAttribute TaskListItemForm taskListItemForm, Errors errors,
-	    HttpServletRequest request) {
+    public String saveOrUpdateItem(@ModelAttribute TaskListItemForm taskListItemForm, HttpServletRequest request) {
 
-	validateTaskListItem(taskListItemForm, errors);
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	errorMap = validateTaskListItem(taskListItemForm);
 
-	if (errors.hasErrors()) {
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
 	    return "pages/authoring/parts/addtask";
 	}
 
@@ -519,8 +509,11 @@ public class AuthoringController {
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw
 	    // exception directly
-	    errors.reject(TaskListConstants.ERROR_MSG_UPLOAD_FAILED);
-	    return "pages/authoring/parts/addtask";
+	    errorMap.add("GLOBAL", messageService.getMessage(e.getMessage()));
+	    if (!errorMap.isEmpty()) {
+		request.setAttribute("errorMap", errorMap);
+		return "pages/authoring/parts/addtask";
+	    }
 	}
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, taskListItemForm.getSessionMapID());
@@ -532,11 +525,6 @@ public class AuthoringController {
      * Remove taskList item from HttpSession list and update page display. As
      * authoring rule, all persist only happen when user submit whole page. So this
      * remove is just impact HttpSession values.
-     *
-     * @param taskListForm
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/removeItem")
     public String removeItem(HttpServletRequest request) {
@@ -574,9 +562,6 @@ public class AuthoringController {
 
     /**
      * Move up current item.
-     *
-     * @param request
-     * @return
      */
     @RequestMapping("/upItem")
     public String upItem(HttpServletRequest request) {
@@ -585,9 +570,6 @@ public class AuthoringController {
 
     /**
      * Move down current item.
-     *
-     * @param request
-     * @return
      */
     @RequestMapping("/downItem")
     public String downItem(HttpServletRequest request) {
@@ -631,9 +613,6 @@ public class AuthoringController {
 
     /**
      * List save current taskList items.
-     *
-     * @param request
-     * @return
      */
     private SortedSet<TaskListItem> getTaskListItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<TaskListItem> list = (SortedSet<TaskListItem>) sessionMap
@@ -647,9 +626,6 @@ public class AuthoringController {
 
     /**
      * List save current taskList items.
-     *
-     * @param request
-     * @return
      */
     private SortedSet<TaskListCondition> getTaskListConditionList(SessionMap<String, Object> sessionMap) {
 	SortedSet<TaskListCondition> list = (SortedSet<TaskListCondition>) sessionMap
@@ -664,9 +640,6 @@ public class AuthoringController {
     /**
      * List save deleted taskList items, which could be persisted or non-persisted
      * items.
-     *
-     * @param request
-     * @return
      */
     private List getDeletedTaskListConditionList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, TaskListConstants.ATTR_DELETED_CONDITION_LIST);
@@ -675,9 +648,6 @@ public class AuthoringController {
     /**
      * List save deleted taskList items, which could be persisted or non-persisted
      * items.
-     *
-     * @param request
-     * @return
      */
     private List getDeletedTaskListItemList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, TaskListConstants.ATTR_DELETED_TASKLIST_ITEM_LIST);
@@ -685,10 +655,6 @@ public class AuthoringController {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     *
-     * @param request
-     * @param name
-     * @return
      */
     private List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
@@ -701,11 +667,6 @@ public class AuthoringController {
 
     /**
      * This method will populate taskList item information to its form for edit use.
-     *
-     * @param itemIdx
-     * @param item
-     * @param form
-     * @param request
      */
     private void populateItemToForm(int itemIdx, TaskListItem item, TaskListItemForm taskListItemForm,
 	    HttpServletRequest request) {
@@ -729,10 +690,6 @@ public class AuthoringController {
 
     /**
      * Extract web from content to taskList item.
-     *
-     * @param request
-     * @param itemForm
-     * @throws TaskListException
      */
     private void extractFormToTaskListItem(HttpServletRequest request, TaskListItemForm itemForm) throws Exception {
 	/*
@@ -784,8 +741,6 @@ public class AuthoringController {
     /**
      * Extract session request version of a taskListItem update the DB version of
      * the taskListItem.
-     *
-     * @throws TaskListException
      */
     private void updateTaskListItemFromSession(TaskListItem itemPO, TaskListItem itemFromSession) throws Exception {
 	/*
@@ -813,15 +768,14 @@ public class AuthoringController {
     /**
      * Vaidate taskList item regards to their type (url/file/learning object/website
      * zip file)
-     *
-     * @param itemForm
-     * @param errors
-     * @return
      */
-    private void validateTaskListItem(TaskListItemForm itemForm, Errors errors) {
+    private MultiValueMap validateTaskListItem(TaskListItemForm itemForm) {
+
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (StringUtils.isBlank(itemForm.getTitle())) {
-	    errors.reject(TaskListConstants.ERROR_MSG_TITLE_BLANK);
+	    errorMap.add("GLOBAL", TaskListConstants.ERROR_MSG_TITLE_BLANK);
 	}
+	return errorMap;
     }
 
     @RequestMapping("/initPedagogicalPlannerForm")
@@ -835,9 +789,11 @@ public class AuthoringController {
 
     @RequestMapping(path = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
     public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute TaskListPedagogicalPlannerForm plannerForm,
-	    Errors errors, HttpServletRequest request) throws IOException {
-	plannerForm.validate(errors);
-	if (!errors.hasErrors()) {
+	    HttpServletRequest request) throws IOException {
+	
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	errorMap = plannerForm.validate();
+	if (!errorMap.isEmpty()) {
 	    TaskList taskList = taskListService.getTaskListByContentId(plannerForm.getToolContentID());
 
 	    int itemIndex = 0;
@@ -880,6 +836,8 @@ public class AuthoringController {
 	    }
 	    taskList.getTaskListItems().addAll(newItems);
 	    taskListService.saveOrUpdateTaskList(taskList);
+	} else {
+	    request.setAttribute("errorMap", errorMap);
 	}
 
 	return "pages/authoring/pedagogicalPlannerForm";

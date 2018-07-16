@@ -29,9 +29,9 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  *
@@ -39,9 +39,11 @@ import org.springframework.validation.Errors;
 public class TaskListPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     private List<String> taskListItem;
 
-    public void validate(Errors errors) {
+    @Override
+    public LinkedMultiValueMap<String, String> validate() {
 	boolean valid = true;
 	boolean allEmpty = true;
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (taskListItem != null && !taskListItem.isEmpty()) {
 	    for (String item : taskListItem) {
 		if (!StringUtils.isEmpty(item)) {
@@ -51,12 +53,13 @@ public class TaskListPedagogicalPlannerForm extends PedagogicalPlannerActivitySp
 	    }
 	}
 	if (allEmpty) {
-	    errors.reject("authoring.msg.no.tasks.save");
+	    errorMap.add("GLOBAL", "authoring.msg.no.tasks.save");
 	    valid = false;
 	    taskListItem = null;
 	}
 
 	setValid(valid);
+	return (LinkedMultiValueMap<String, String>) errorMap;
     }
 
     public void fillForm(TaskList taskList) {

@@ -39,7 +39,6 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
-import org.lamsfoundation.lams.tool.taskList.service.TaskListException;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListConditionComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListConditionForm;
@@ -65,11 +64,6 @@ public class AuthoringTaskListConditionController {
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     *
-     * @param taskListForm
-     * @param request
-     * @return
-     * @throws ServletException
      */
     @RequestMapping("/showConditions")
     public String showConditions(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request)
@@ -91,11 +85,6 @@ public class AuthoringTaskListConditionController {
 
     /**
      * Display empty page for new taskList item.
-     *
-     * @param taskListConditionForm
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/newConditionInit")
     public String newConditionInit(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request) {
@@ -110,11 +99,6 @@ public class AuthoringTaskListConditionController {
 
     /**
      * Display edit page for existed taskList item.
-     *
-     * @param taskListConditionForm
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/editCondition")
     public String editCondition(@ModelAttribute TaskListConditionForm taskListConditionForm,
@@ -145,12 +129,6 @@ public class AuthoringTaskListConditionController {
      * <code>HttpSession</code> TaskListItemList. Notice, this save is not persist them into database, just save
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
-     *
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
     @RequestMapping("/saveOrUpdateCondition")
     public String saveOrUpdateCondition(@ModelAttribute TaskListConditionForm taskListConditionForm, Errors errors,
@@ -182,11 +160,6 @@ public class AuthoringTaskListConditionController {
     /**
      * Remove taskList item from HttpSession list and update page display. As authoring rule, all persist only happen
      * when user submit whole page. So this remove is just impact HttpSession values.
-     *
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/removeCondition")
     public String removeCondition(@ModelAttribute TaskListConditionForm taskListConditionForm,
@@ -220,9 +193,6 @@ public class AuthoringTaskListConditionController {
 
     /**
      * Move up current item.
-     *
-     * @param request
-     * @return
      */
     @RequestMapping("/upCondition")
     public String upCondition(HttpServletRequest request) {
@@ -231,9 +201,6 @@ public class AuthoringTaskListConditionController {
 
     /**
      * Move down current item.
-     *
-     * @param request
-     * @return
      */
     @RequestMapping("/downCondition")
     public String downCondition(HttpServletRequest request) {
@@ -277,9 +244,6 @@ public class AuthoringTaskListConditionController {
 
     /**
      * List save current taskList items.
-     *
-     * @param request
-     * @return
      */
     private SortedSet<TaskListCondition> getTaskListConditionList(SessionMap<String, Object> sessionMap) {
 	SortedSet<TaskListCondition> list = (SortedSet<TaskListCondition>) sessionMap
@@ -293,9 +257,6 @@ public class AuthoringTaskListConditionController {
 
     /**
      * List save current taskList items.
-     *
-     * @param request
-     * @return
      */
     private SortedSet<TaskListItem> getTaskListItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<TaskListItem> list = (SortedSet<TaskListItem>) sessionMap
@@ -309,9 +270,6 @@ public class AuthoringTaskListConditionController {
 
     /**
      * List save deleted taskList items, which could be persisted or non-persisted items.
-     *
-     * @param request
-     * @return
      */
     private List getDeletedTaskListConditionList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, TaskListConstants.ATTR_DELETED_CONDITION_LIST);
@@ -319,10 +277,6 @@ public class AuthoringTaskListConditionController {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     *
-     * @param request
-     * @param name
-     * @return
      */
     private List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
@@ -335,11 +289,6 @@ public class AuthoringTaskListConditionController {
 
     /**
      * This method will populate taskList item information to its form for edit use.
-     *
-     * @param sequenceId
-     * @param condition
-     * @param form
-     * @param request
      */
     private void populateConditionToForm(int sequenceId, TaskListCondition condition,
 	    TaskListConditionForm taskListConditionForm, HttpServletRequest request) {
@@ -359,11 +308,6 @@ public class AuthoringTaskListConditionController {
 
     /**
      * This method will populate taskList item information to its form for edit use.
-     *
-     * @param sequenceId
-     * @param condition
-     * @param form
-     * @param request
      */
     private void populateFormWithPossibleItems(TaskListConditionForm taskListConditionForm,
 	    HttpServletRequest request) {
@@ -387,10 +331,6 @@ public class AuthoringTaskListConditionController {
 
     /**
      * Extract form content to taskListContent.
-     *
-     * @param request
-     * @param form
-     * @throws TaskListException
      */
     private void extractFormToTaskListCondition(HttpServletRequest request, TaskListConditionForm form)
 	    throws Exception {
@@ -440,9 +380,6 @@ public class AuthoringTaskListConditionController {
 
     /**
      * Validate taskListCondition
-     *
-     * @param conditionForm
-     * @return
      */
     private void validateTaskListCondition(TaskListConditionForm taskListConditionForm, Errors errors,
 	    HttpServletRequest request) {

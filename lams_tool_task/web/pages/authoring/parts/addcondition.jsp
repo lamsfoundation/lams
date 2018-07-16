@@ -21,7 +21,8 @@
 	
 			<!-- Basic Info Form-->
 			<%@ include file="/common/messages.jsp"%>
-			<form:form action="../authoringCondition/saveOrUpdateCondition.do" method="post" modelAttribute="taskListConditionForm" id="taskListConditionForm" focus="name" >
+			<form:form action="../authoringCondition/saveOrUpdateCondition.do" method="post" modelAttribute="taskListConditionForm" id="taskListConditionForm" focus="name"
+			 onSubmit="javascript:return false;" >
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="sequenceId" />
 	
