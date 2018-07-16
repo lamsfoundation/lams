@@ -81,16 +81,16 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException {
 	NotebookPedagogicalPlannerForm plannerForm = (NotebookPedagogicalPlannerForm) form;
-	ActionMessages errors = plannerForm.validate();
-	if (errors.isEmpty()) {
-	    String instructions = plannerForm.getInstructions();
-	    Long toolContentID = plannerForm.getToolContentID();
-	    Notebook notebook = getNotebookService().getNotebookByContentId(toolContentID);
-	    notebook.setInstructions(instructions);
-	    getNotebookService().saveOrUpdateNotebook(notebook);
-	} else {
-	    saveErrors(request, errors);
-	}
+//	ActionMessages errors = plannerForm.validate();
+//	if (errors.isEmpty()) {
+//	    String instructions = plannerForm.getInstructions();
+//	    Long toolContentID = plannerForm.getToolContentID();
+//	    Notebook notebook = getNotebookService().getNotebookByContentId(toolContentID);
+//	    notebook.setInstructions(instructions);
+//	    getNotebookService().saveOrUpdateNotebook(notebook);
+//	} else {
+//	    saveErrors(request, errors);
+//	}
 	return mapping.findForward(NotebookConstants.SUCCESS);
     }
 

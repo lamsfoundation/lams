@@ -29,6 +29,8 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  * Form for grouping activities in Pedagogical Planner.
@@ -101,8 +103,8 @@ public class PedagogicalPlannerGroupingForm extends PedagogicalPlannerActivityFo
      * Checks if the provided group/learner number is a nonnegative integer.
      */
     @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
+    public LinkedMultiValueMap<String, String> validate() {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	boolean valid = true;
 	boolean numberValid = true;
 
@@ -116,11 +118,11 @@ public class PedagogicalPlannerGroupingForm extends PedagogicalPlannerActivityFo
 	    numberValid = false;
 	}
 	if (!numberValid) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.planner.grouping.number.integer"));
+	    errorMap.add("GLOBAL", "error.planner.grouping.number.integer");
 	    valid = false;
 	}
 	setValid(valid);
-	return errors;
+	return (LinkedMultiValueMap<String, String>) errorMap;
     }
 
     public String getLearnersPerGroup() {

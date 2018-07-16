@@ -71,7 +71,6 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -101,6 +100,8 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -1436,8 +1437,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 	PedagogicalPlannerAction.log.debug("Saving grouping activity");
 	PedagogicalPlannerGroupingForm plannerForm = (PedagogicalPlannerGroupingForm) form;
-	ActionMessages errors = plannerForm.validate();
-	if (errors.isEmpty()) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	errorMap = plannerForm.validate();
+	if (errorMap.isEmpty()) {
 	    Grouping grouping = getAuthoringService().getGroupingById(plannerForm.getToolContentID());
 	    if (grouping.isRandomGrouping()) {
 		RandomGrouping randomGrouping = (RandomGrouping) grouping;
@@ -1465,7 +1467,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		grouping.setMaxNumberOfGroups(number);
 	    }
 	} else {
-	    saveMessages(request, errors);
+	    request.setAttribute("errorMap", errorMap);
+	    ;
 	}
 	return mapping.findForward(PedagogicalPlannerAction.FORWARD_GROUPING);
     }

@@ -104,7 +104,7 @@ public class FileValidatorSpringUtil {
      * @return Be careful, if the file size is under maximum size, return TRUE. Otherwise, return false.
      */
 
-    public static boolean validateFileSize(MultipartFile file, boolean largeFile, Errors errors) {
+    public static boolean validateFileSize(MultipartFile file, boolean largeFile) {
 	long fileSize = 0;
 	try {
 	    fileSize = file.getSize();
@@ -119,7 +119,6 @@ public class FileValidatorSpringUtil {
 	    String maxSize = FileValidatorSpringUtil.formatSize(maxFileSize);
 
 	    // set error message
-	    errors.reject(MSG_KEY, new Object[] { maxSize }, null);
 	    return false;
 	}
 	return true;
@@ -153,12 +152,12 @@ public class FileValidatorSpringUtil {
      * @param largeFile
      * @return return null if file size is below max filesize, otherwise, return error message
      */
-    public static Errors validateFileSize(MultipartFile file, Long fileSize, boolean largeFile, Errors errors) {
+    public static Errors validateFileSize(MultipartFile file, Long fileSize, boolean largeFile) {
 	fileSize = file.getSize();
 	Errors errorMessage = null;
-	boolean isMaxFilesizeExceeded = !FileValidatorSpringUtil.validateFileSize(file, largeFile, errors);
+	boolean isMaxFilesizeExceeded = !FileValidatorSpringUtil.validateFileSize(file, largeFile);
 	if (isMaxFilesizeExceeded) {
-	    errorMessage = (Errors) errors.getAllErrors();
+//	    errorMessage = (Errors) errors.getAllErrors();
 	}
 
 	return errorMessage;

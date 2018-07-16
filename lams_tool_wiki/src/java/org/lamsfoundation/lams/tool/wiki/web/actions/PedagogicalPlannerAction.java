@@ -80,18 +80,18 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException {
 	WikiPedagogicalPlannerForm plannerForm = (WikiPedagogicalPlannerForm) form;
-	ActionMessages errors = plannerForm.validate();
-	if (errors.isEmpty()) {
-	    String instructions = plannerForm.getWikiBody();
-	    Long toolContentID = plannerForm.getToolContentID();
-	    Wiki wiki = getWikiService().getWikiByContentId(toolContentID);
-	    WikiPage wikiPage = wiki.getWikiPages().iterator().next();
-	    wikiPage.setTitle(plannerForm.getTitle());
-	    wikiPage.getCurrentWikiContent().setBody(plannerForm.getWikiBody());
-	    getWikiService().saveOrUpdateWikiPage(wikiPage);
-	} else {
-	    saveErrors(request, errors);
-	}
+//	ActionMessages errors = plannerForm.validate();
+//	if (errors.isEmpty()) {
+//	    String instructions = plannerForm.getWikiBody();
+//	    Long toolContentID = plannerForm.getToolContentID();
+//	    Wiki wiki = getWikiService().getWikiByContentId(toolContentID);
+//	    WikiPage wikiPage = wiki.getWikiPages().iterator().next();
+//	    wikiPage.setTitle(plannerForm.getTitle());
+//	    wikiPage.getCurrentWikiContent().setBody(plannerForm.getWikiBody());
+//	    getWikiService().saveOrUpdateWikiPage(wikiPage);
+//	} else {
+//	    saveErrors(request, errors);
+//	}
 	return mapping.findForward("success");
     }
 

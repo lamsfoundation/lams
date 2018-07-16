@@ -20,14 +20,10 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web.planner;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
+import org.springframework.util.LinkedMultiValueMap;
 
 /**
  * The base for any Pedagogical Planner Action Forms that other activities. All Java forms need to inherit from this
@@ -80,11 +76,11 @@ public abstract class PedagogicalPlannerActivityForm extends ActionForm {
 	this.callID = callID;
     }
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
-	super.reset(mapping, request);
-	setValid(true);
-    }
+//    @Override
+//    public void reset(ActionMapping mapping, HttpServletRequest request) {
+//	super.reset(mapping, request);
+//	setValid(true);
+//    }
 
     /**
      * Validates form. Must set {@link #valid} property. Can be overriden by inheriting classes, although call to this
@@ -92,9 +88,9 @@ public abstract class PedagogicalPlannerActivityForm extends ActionForm {
      *
      * @return
      */
-    public ActionMessages validate() {
+    public LinkedMultiValueMap<String, String> validate() {
 	setValid(true);
-	return new ActionMessages();
+	return new LinkedMultiValueMap<>();
     }
 
     public Integer getActivityOrderNumber() {
