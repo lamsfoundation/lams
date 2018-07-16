@@ -54,7 +54,7 @@
 </div>
  
  <div class="form-inline">
-	<a href="javascript:showConditionMessage('<lams:WebAppURL/>authoringCondition/newConditionInit.do?sessionMapID=${authoringForm.sessionMapID}/>');" 
+	<a href="javascript:showConditionMessage('<lams:WebAppURL/>authoringCondition/newConditionInit.do?sessionMapID=${authoringForm.sessionMapID}');" 
 		class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.conditions.add.condition" /></a> 
 </div>
 

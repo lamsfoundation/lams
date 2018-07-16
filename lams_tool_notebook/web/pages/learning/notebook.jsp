@@ -151,7 +151,7 @@
 
 			<c:if test="${mode != 'teacher'}">
 				<div class="right-buttons voffset5">
-					<button href="#nogo" style="btn btn-primary pull-right na" id="finishButton"
+					<button href="#nogo" class="btn btn-primary pull-right na" id="finishButton"
 						onclick="submitForm('finish')">
 						<c:choose>
 							<c:when test="${activityPosition.last}">

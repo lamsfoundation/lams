@@ -29,7 +29,7 @@
 
 			<%@ include file="/common/messages.jsp"%>
 
-			<form:textarea rows="5" styleId="focused" property="entryText" styleClass="form-control" />
+			<form:textarea rows="5" id="focused" path="entryText" cssClass="form-control" />
 
 			<div class="voffset10">
 				<button class="btn btn-primary pull-right na" id="finishButton" type="submit">

@@ -7,11 +7,13 @@
 		</c:if>
 
 		<c:out value="${question.description}" escapeXml="false" />
-
-		<c:set var="hasErrors"><form:errors path="*"/></c:set>
-		<c:if test="${not empty hasErrors}">
+		<c:set var="errorKey" value="questionError${question.uid}" />
+		<c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
 			<lams:Alert id="error" type="danger" close="false">
-				<form:errors path="questionError${question.uid}"/>
+                <c:forEach var="error" items="${errorMap[errorKey]}"> 
+                    <c:out value="${error}" />
+                </c:forEach>
+					
 			</lams:Alert>
 		</c:if>
 
@@ -78,6 +80,5 @@
 	</div>
 
 </div>
-
 
 

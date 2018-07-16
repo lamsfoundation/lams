@@ -1,11 +1,35 @@
-<%@ include file="/common/taglibs.jsp"%>
+<!DOCTYPE html>
 
+<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstants"%>
 
-<html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data">
+<lams:html>
+	<c:set var="lams">
+		<lams:LAMSURL />
+	</c:set>
+	<c:set var="tool">
+		<lams:WebAppURL />
+	</c:set>
+	
+	<lams:head>
+		<title>
+		<fmt:message key="activity.title" />
+	</title>
+	<lams:headItems />
+	<c:set var="lams">
+	<lams:LAMSURL />
+	</c:set>
+	<c:set var="tool">
+		<lams:WebAppURL />
+	</c:set>
+	
+	<lams:headItems/>
+	<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
+	</lams:head>
+	<body class="stripes" onload="init();">
+			<form:form action="authoring/updateContent.do"  modelAttribute="authoringForm" id="authoringForm" method="post" >
 
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
+	<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	<lams:Page title="${title}" type="navbar">		
@@ -14,9 +38,8 @@
 			<lams:Tab id="1" key="button.basic" />
 		</lams:Tabs>   
 		
-		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="dispatch" value="updateContent" />
-		<html:hidden property="sessionMapID" />
+		<form:hidden path="currentTab" id="currentTab" />
+		<form:hidden path="sessionMapID" />
 		
 		<lams:TabBodyArea>
 			<div id="message" style="text-align: center;">
@@ -44,7 +67,13 @@
 		</lams:TabBodyArea>
 	</lams:Page>
 	
-</html:form>
+</form:form>
 
 <div id="footer"></div>
+
+	</body>
+</lams:html>
+
+
+
 

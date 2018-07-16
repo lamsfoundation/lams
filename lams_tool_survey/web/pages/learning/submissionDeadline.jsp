@@ -52,7 +52,7 @@
 						</c:otherwise>
 					</c:choose>
 
-					<button property="ContinueButton" onclick="return continueReflect()" styleClass="voffset5 btn btn-sm btn-default">
+					<button property="ContinueButton" onclick="return continueReflect()" class="voffset5 btn btn-sm btn-default">
 						<fmt:message key="label.edit" />
 					</button>
 				</div>
@@ -64,13 +64,13 @@
 			<c:choose>
 				<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 					<a href="#nogo" property="FinishButton" onclick="return continueReflect()"
-						styleClass="btn btn-primary pull-right">
+						class="btn btn-primary pull-right">
 						<fmt:message key="label.continue" />
 					</a>
 				</c:when>
 				<c:otherwise>
 					<a href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()"
-						styleClass="btn btn-primary pull-right na">
+						class="btn btn-primary pull-right na">
 						<span class="nextActivity"> <c:choose>
 								<c:when test="${sessionMap.activityPosition.last}">
 									<fmt:message key="label.submit" />

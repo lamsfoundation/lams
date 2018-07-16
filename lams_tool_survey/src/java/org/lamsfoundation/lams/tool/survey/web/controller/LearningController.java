@@ -70,7 +70,8 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
@@ -242,7 +243,8 @@ public class LearningController {
     }
 
     @RequestMapping("/nextQuestion")
-    private String nextQuestion(AnswerForm surveyForm, Errors errors, HttpServletRequest request) {
+    private String nextQuestion(AnswerForm surveyForm, MultiValueMap<String, String> errorMap,
+	    HttpServletRequest request) {
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
 	String sessionMapID = surveyForm.getSessionMapID();
 
@@ -250,8 +252,9 @@ public class LearningController {
 		.getAttribute(sessionMapID);
 	SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
 
-	if (errors.hasErrors()) {
-	    return "redirect:/";
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    return "pages/learning/learning";
 	}
 
 	// go to next question
@@ -283,7 +286,8 @@ public class LearningController {
     }
 
     @RequestMapping("/previousQuestion")
-    private String previousQuestion(AnswerForm surveyForm, Errors errors, HttpServletRequest request) {
+    private String previousQuestion(AnswerForm surveyForm, MultiValueMap<String, String> errorMap,
+	    HttpServletRequest request) {
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
 	String sessionMapID = surveyForm.getSessionMapID();
 
@@ -291,8 +295,9 @@ public class LearningController {
 		.getAttribute(sessionMapID);
 	SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
 
-	if (errors.hasErrors()) {
-	    return "redirect:/";
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    return "pages/learning/learning";
 	}
 
 	SortedMap<Integer, AnswerDTO> subMap = surveyItemMap.headMap(questionSeqID);
@@ -317,8 +322,7 @@ public class LearningController {
     }
 
     @RequestMapping("/retake")
-    private String retake(AnswerForm surveyForm, Errors errors, HttpServletRequest request,
-	    HttpServletResponse response) {
+    private String retake(AnswerForm surveyForm, HttpServletRequest request, HttpServletResponse response) {
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
 
 	String sessionMapID = surveyForm.getSessionMapID();
@@ -345,7 +349,7 @@ public class LearningController {
 	int currIdx = new ArrayList<>(surveyItemMap.keySet()).indexOf(questionSeqID) + 1;
 	surveyForm.setCurrentIdx(currIdx);
 	request.setAttribute("surveyForm", surveyForm);
-	
+
 	return "pages/learning/learning";
     }
 
@@ -423,7 +427,7 @@ public class LearningController {
     }
 
     @RequestMapping("/doSurvey")
-    private String doSurvey(@ModelAttribute("surveyForm") AnswerForm surveyForm, Errors errors, HttpServletRequest request) {
+    private String doSurvey(@ModelAttribute("surveyForm") AnswerForm surveyForm, HttpServletRequest request) {
 
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
 	String sessionMapID = surveyForm.getSessionMapID();
@@ -437,13 +441,16 @@ public class LearningController {
 	SurveyUser surveyLearner = (SurveyUser) sessionMap.get(SurveyConstants.ATTR_USER);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+
 	if ((questionSeqID == null) || questionSeqID.equals(0)) {
-	   getAnswers(request,errors);
+	    getAnswers(request, errorMap);
 	} else {
-	   getAnswer(request, errors, surveyItemMap.get(questionSeqID));
+	    getAnswer(request, surveyItemMap.get(questionSeqID), errorMap);
 	}
-	if (errors.hasErrors()) {
-	    return "redirect:/";
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    return "pages/learning/learning";
 	}
 
 	List<SurveyAnswer> answerList = new ArrayList<>();
@@ -463,6 +470,7 @@ public class LearningController {
 	    surveyService.notifyTeachersOnAnswerSumbit(sessionId, surveyLearner);
 	}
 
+	request.setAttribute("errorMap", errorMap);
 	return "pages/learning/result";
     }
 
@@ -579,7 +587,7 @@ public class LearningController {
     /**
      * Get answer by special question.
      */
-    private void getAnswer(HttpServletRequest request,Errors errors, AnswerDTO answerDto) {
+    private void getAnswer(HttpServletRequest request, AnswerDTO answerDto, MultiValueMap<String, String> errorMap) {
 	// get sessionMap
 	String sessionMapID = request.getParameter(SurveyConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -588,8 +596,8 @@ public class LearningController {
 
 	SurveyAnswer answer = getAnswerFromPage(request, answerDto, sessionID);
 	answerDto.setAnswer(answer);
-	validateAnswers(request, answerDto, errors, answer);
-	
+	validateAnswers(request, answerDto, errorMap, answer);
+
     }
 
     /**
@@ -598,7 +606,7 @@ public class LearningController {
      * @param request
      * @return
      */
-    private void getAnswers(HttpServletRequest request, Errors errors) {
+    private void getAnswers(HttpServletRequest request, MultiValueMap<String, String> errorMap) {
 	// get sessionMap
 	String sessionMapID = request.getParameter(SurveyConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -609,25 +617,30 @@ public class LearningController {
 	for (AnswerDTO answerDto : answerDtoList) {
 	    SurveyAnswer answer = getAnswerFromPage(request, answerDto, sessionID);
 	    answerDto.setAnswer(answer);
-	    validateAnswers(request, answerDto, errors, answer);
+	    validateAnswers(request, answerDto, errorMap, answer);
 	}
 
     }
 
-    private void validateAnswers(HttpServletRequest request, AnswerDTO question, Errors errors, SurveyAnswer answer) {
+    private void validateAnswers(HttpServletRequest request, AnswerDTO question, MultiValueMap<String, String> errorMap,
+	    SurveyAnswer answer) {
 	boolean isAnswerEmpty = ((answer.getChoices() == null) && StringUtils.isBlank(answer.getAnswerText()));
 
 	// for mandatory questions, answer can not be null.
+
 	if (!question.isOptional() && isAnswerEmpty) {
-	    errors.rejectValue(SurveyConstants.ERROR_MSG_KEY + question.getUid(), null, null, messageService.getMessage(SurveyConstants.ERROR_MSG_MANDATORY_QUESTION));
+	    errorMap.add(SurveyConstants.ERROR_MSG_KEY + question.getUid(),
+		    messageService.getMessage(SurveyConstants.ERROR_MSG_MANDATORY_QUESTION));
 	}
 	if ((question.getType() == SurveyConstants.QUESTION_TYPE_SINGLE_CHOICE) && question.isAppendText()
 		&& !isAnswerEmpty) {
 	    // for single choice, user only can choose one option or open text (if it has)
 	    if (!StringUtils.isBlank(answer.getAnswerChoices()) && !StringUtils.isBlank(answer.getAnswerText())) {
-		errors.rejectValue(SurveyConstants.ERROR_MSG_KEY + question.getUid(),null, null, messageService.getMessage(SurveyConstants.ERROR_MSG_SINGLE_CHOICE));
+		errorMap.add(SurveyConstants.ERROR_MSG_KEY + question.getUid(),
+			messageService.getMessage(SurveyConstants.ERROR_MSG_SINGLE_CHOICE));
 	    }
 	}
+
     }
 
     private SurveyAnswer getAnswerFromPage(HttpServletRequest request, AnswerDTO question, Long sessionID) {

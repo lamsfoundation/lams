@@ -72,6 +72,8 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -302,19 +304,21 @@ public class AuthoringController {
      * @throws ServletException
      */
     @RequestMapping("/saveOrUpdateItem")
-    public String saveOrUpdateItem(@ModelAttribute("surveyItemForm") QuestionForm surveyItemForm, Errors errors,
+    public String saveOrUpdateItem(@ModelAttribute("surveyItemForm") QuestionForm surveyItemForm,
 	    HttpServletRequest request) throws Exception {
 	// get instructions:
 	List<String> instructionList = getInstructionsFromRequest(request);
+	
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	validateSurveyItem(surveyItemForm, instructionList, errorMap);
 
-	validateSurveyItem(surveyItemForm, instructionList, errors);
-
-	if (errors.hasErrors()) {
+	if (!errorMap.isEmpty()) {
 	    // add at least 2 instruction list
 	    for (int idx = instructionList.size(); idx < 2; idx++) {
 		instructionList.add("");
 	    }
 	    request.setAttribute(SurveyConstants.ATTR_INSTRUCTION_LIST, instructionList);
+	    request.setAttribute("errorMap", errorMap);
 	    if (surveyItemForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 		return "pages/authoring/parts/addopenquestion";
 	    } else {
@@ -955,15 +959,15 @@ public class AuthoringController {
 	return getListFromSession(sessionMap, SurveyConstants.ATTR_DELETED_CONDITION_LIST);
     }
 
-    private void validateSurveyItem(QuestionForm itemForm, List<String> instructionList, Errors errors) {
+    private void validateSurveyItem(QuestionForm itemForm, List<String> instructionList, MultiValueMap<String, String> errorMap) {
 	if (StringUtils.isBlank(itemForm.getQuestion().getDescription())) {
-	    errors.reject(null,null,messageService.getMessage(SurveyConstants.ERROR_MSG_DESC_BLANK));
+	    errorMap.add("GLOBAL", messageService.getMessage(SurveyConstants.ERROR_MSG_DESC_BLANK));
 	}
 
 	short type = getQuestionType(itemForm);
 	if (type != SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 	    if (instructionList == null || instructionList.size() < 2) {
-		errors.reject(null,null,messageService.getMessage(SurveyConstants.ERROR_MSG_LESS_OPTIONS));
+		 errorMap.add("GLOBAL", messageService.getMessage(SurveyConstants.ERROR_MSG_LESS_OPTIONS));
 	    }
 	}
     }

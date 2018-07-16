@@ -35,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
@@ -50,9 +49,9 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -70,7 +69,7 @@ public class AuthoringConditionController {
     @Autowired
     @Qualifier("lasurvSurveyService")
     private ISurveyService surveyService;
-    
+
     @Autowired
     @Qualifier("lasurvMessageService")
     private MessageService messageService;
@@ -137,14 +136,16 @@ public class AuthoringConditionController {
      * @throws ServletException
      */
     @RequestMapping("/saveOrUpdateCondition")
-    public String saveOrUpdateCondition(@ModelAttribute("surveyConditionForm")SurveyConditionForm surveyConditionForm, Errors errors,
+    public String saveOrUpdateCondition(@ModelAttribute("surveyConditionForm") SurveyConditionForm surveyConditionForm,
 	    HttpServletRequest request) {
 
 //	ActionErrors errors = validateSurveyCondition(conditionForm, request);
 
-	validateSurveyCondition(surveyConditionForm, request, errors);
-	if (errors.hasErrors()) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	validateSurveyCondition(surveyConditionForm, request, errorMap);
+	if (!errorMap.isEmpty()) {
 	    populateFormWithPossibleItems(surveyConditionForm, request);
+	    request.setAttribute("errorMap", errorMap);
 	    return "pages/authoring/addCondition";
 	}
 
@@ -152,9 +153,10 @@ public class AuthoringConditionController {
 	    extractFormToSurveyCondition(request, surveyConditionForm);
 	} catch (Exception e) {
 
-	    errors.reject(null,null,messageService.getMessage("error.condition"));
-	    if (errors.hasErrors()) {
+	    errorMap.add("GLOBAL", messageService.getMessage("error.condition"));
+	    if (!errorMap.isEmpty()) {
 		populateFormWithPossibleItems(surveyConditionForm, request);
+		request.setAttribute("errorMap", errorMap);
 		return "pages/authoring/addCondition";
 	    }
 	}
@@ -174,7 +176,7 @@ public class AuthoringConditionController {
      * @param response
      * @return
      */
-    @RequestMapping(value="/removeCondition", method = RequestMethod.POST)
+    @RequestMapping(value = "/removeCondition", method = RequestMethod.POST)
     public String removeCondition(HttpServletRequest request) {
 
 	// get back sessionMAP
@@ -411,12 +413,13 @@ public class AuthoringConditionController {
      * @param conditionForm
      * @return
      */
-    private void validateSurveyCondition(SurveyConditionForm conditionForm, HttpServletRequest request, Errors errors) {
+    private void validateSurveyCondition(SurveyConditionForm conditionForm, HttpServletRequest request,
+	    MultiValueMap<String, String> errorMap) {
 
 	String formConditionName = conditionForm.getDisplayName();
 	if (StringUtils.isBlank(formConditionName)) {
 
-	    errors.reject(null,null,messageService.getMessage("error.condition.name.blank"));
+	    errorMap.add("GLOBAL", messageService.getMessage("error.condition.name.blank"));
 	} else {
 
 	    Integer formConditionOrderId = conditionForm.getOrderId();
@@ -428,7 +431,7 @@ public class AuthoringConditionController {
 		if (formConditionName.equals(condition.getDisplayName())
 			&& !formConditionOrderId.equals(condition.getOrderId())) {
 
-		    errors.reject(null,null,messageService.getMessage("error.condition.duplicated.name"));
+		    errorMap.add("GLOBAL", messageService.getMessage("error.condition.duplicated.name"));
 		    break;
 		}
 	    }
@@ -437,7 +440,7 @@ public class AuthoringConditionController {
 	// should be selected at least one question
 	Integer[] selectedItems = conditionForm.getSelectedItems();
 	if (selectedItems == null || selectedItems.length == 0) {
-	    errors.reject(null,null,messageService.getMessage("error.condition.no.questions.selected"));
+	    errorMap.add("GLOBAL", messageService.getMessage("error.condition.no.questions.selected"));
 	}
 
     }

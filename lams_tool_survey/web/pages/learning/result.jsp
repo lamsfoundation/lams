@@ -146,7 +146,7 @@
 
 		<c:if test="${not sessionMap.finishedLock}">
 			<div class="voffset5">
-				<button property="RetakeButton" onclick="return retakeSurvey(-1)" styleClass="btn btn-sm btn-default pull-left">
+				<button property="RetakeButton" onclick="return retakeSurvey(-1)" class="btn btn-sm btn-default pull-left">
 					<fmt:message key="label.retake.survey" />
 				</button>
 			</div>
@@ -178,7 +178,7 @@
 					</c:choose>
 
 					<button property="ContinueButton" onclick="return continueReflect()"
-						styleClass="btn voffset5 btn-sm btn-default pull-left">
+						class="btn voffset5 btn-sm btn-default pull-left">
 						<fmt:message key="label.edit" />
 					</button>
 				</div>
@@ -190,14 +190,14 @@
 				<c:choose>
 					<c:when test="${sessionMap.showOtherUsersAnswers}">
 						<button property="otherUsersAnswersButton" onclick="return showOtherUsersAnswers()"
-							styleClass="btn btn-sm btn-default">
+							class="btn btn-sm btn-default">
 							<fmt:message key="label.view.all.responses" />
 						</button>
 					</c:when>
 
 					<c:when test="${sessionMap.reflectOn}">
 						<button property="ContinueButton" onclick="return continueReflect()"
-							styleClass="btn btn-sm btn-primary pull-right">
+							class="btn btn-sm btn-primary pull-right">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>

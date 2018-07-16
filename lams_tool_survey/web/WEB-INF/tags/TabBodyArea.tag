@@ -30,7 +30,7 @@
 
 %>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
+
 
 <div class="panel-body panel-monitor-body">
 	 <jsp:doBody />
