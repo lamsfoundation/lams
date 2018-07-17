@@ -21,41 +21,43 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.leaderselection.web.actions;
+package org.lamsfoundation.lams.tool.leaderselection.web.controller;
 
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
-import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionServiceProxy;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstants;
 import org.lamsfoundation.lams.tool.leaderselection.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  *
  *
  *
  */
-public class AuthoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
 
-    private static Logger logger = Logger.getLogger(AuthoringAction.class);
+    private static Logger logger = Logger.getLogger(AuthoringController.class);
 
-    public ILeaderselectionService leaderselectionService;
+    @Autowired
+    @Qualifier("leaderselectionService")
+    private ILeaderselectionService leaderselectionService;
 
     // Authoring SessionMap key names
     private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
@@ -67,9 +69,8 @@ public class AuthoringAction extends LamsDispatchAction {
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
      *
      */
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("")
+    protected String unspecified(AuthoringForm authoringForm, HttpServletRequest request) {
 
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -77,12 +78,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-
-	// set up leaderselectionService
-	if (leaderselectionService == null) {
-	    leaderselectionService = LeaderselectionServiceProxy
-		    .getLeaderselectionService(this.getServlet().getServletContext());
-	}
 
 	// retrieving Leaderselection with given toolContentID
 	Leaderselection leaderselection = leaderselectionService.getContentByContentId(toolContentID);
@@ -99,47 +94,46 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // are editing. This flag is released when updateContent is called.
 	    leaderselection.setDefineLater(true);
 	    leaderselectionService.saveOrUpdateLeaderselection(leaderselection);
-	    
+
 	    //audit log the teacher has started editing activity in monitor
 	    leaderselectionService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	// Set up the authForm.
-	AuthoringForm authForm = (AuthoringForm) form;
-	authForm.setTitle(leaderselection.getTitle());
-	authForm.setInstructions(leaderselection.getInstructions());
+	authoringForm.setTitle(leaderselection.getTitle());
+	authoringForm.setInstructions(leaderselection.getInstructions());
 
 	// Set up sessionMap
-	SessionMap<String, Object> map = new SessionMap<String, Object>();
-	map.put(AuthoringAction.KEY_MODE, mode);
-	map.put(AuthoringAction.KEY_CONTENT_FOLDER_ID, contentFolderID);
-	map.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
-	authForm.setSessionMapID(map.getSessionID());
+	SessionMap<String, Object> map = new SessionMap<>();
+	map.put(AuthoringController.KEY_MODE, mode);
+	map.put(AuthoringController.KEY_CONTENT_FOLDER_ID, contentFolderID);
+	map.put(AuthoringController.KEY_TOOL_CONTENT_ID, toolContentID);
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
 	request.getSession().setAttribute(map.getSessionID(), map);
 	request.setAttribute(LeaderselectionConstants.ATTR_SESSION_MAP, map);
 
-	return mapping.findForward("success");
+	return "pages/authoring";
     }
 
-    public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/updateContent")
+    public String updateContent(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
+	    HttpServletRequest request, HttpServletResponse response) {
 	// TODO need error checking.
 
 	// get authForm and session map.
-	AuthoringForm authForm = (AuthoringForm) form;
 	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(authForm.getSessionMapID());
+		.getAttribute(authoringForm.getSessionMapID());
 
 	// get leaderselection content.
 	Leaderselection leaderselection = leaderselectionService
-		.getContentByContentId((Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
+		.getContentByContentId((Long) map.get(AuthoringController.KEY_TOOL_CONTENT_ID));
 
 	// update leaderselection content using form inputs.
-	ToolAccessMode mode = (ToolAccessMode) map.get(AuthoringAction.KEY_MODE);
-	leaderselection.setTitle(authForm.getTitle());
-	leaderselection.setInstructions(authForm.getInstructions());
+	ToolAccessMode mode = (ToolAccessMode) map.get(AuthoringController.KEY_MODE);
+	leaderselection.setTitle(authoringForm.getTitle());
+	leaderselection.setInstructions(authoringForm.getInstructions());
 
 	// set the update date
 	leaderselection.setUpdateDate(new Date());
@@ -152,10 +146,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
-	authForm.setSessionMapID(map.getSessionID());
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	request.setAttribute(LeaderselectionConstants.ATTR_SESSION_MAP, map);
+	request.setAttribute("authoringForm", authoringForm);
 
-	return mapping.findForward("success");
+	return "pages/authoring";
     }
 }

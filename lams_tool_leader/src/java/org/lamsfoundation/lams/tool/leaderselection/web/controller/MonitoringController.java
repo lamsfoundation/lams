@@ -21,29 +21,25 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.leaderselection.web.actions;
+package org.lamsfoundation.lams.tool.leaderselection.web.controller;
 
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-
 import org.lamsfoundation.lams.tool.leaderselection.dto.LeaderselectionDTO;
 import org.lamsfoundation.lams.tool.leaderselection.dto.LeaderselectionSessionDTO;
 import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
-import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionServiceProxy;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstants;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  *
@@ -51,31 +47,33 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  *
  *
  */
-public class MonitoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
 
-    private static Logger log = Logger.getLogger(MonitoringAction.class);
+    private static Logger log = Logger.getLogger(MonitoringController.class);
 
-    private ILeaderselectionService service;
+    @Autowired
+    @Qualifier("leaderselectionService")
+    private ILeaderselectionService leaderselectionService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("")
+    public String unspecified(HttpServletRequest request) {
 
-	initService();
 	// initialize Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(LeaderselectionConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	Leaderselection content = service.getContentByContentId(toolContentID);
+	Leaderselection content = leaderselectionService.getContentByContentId(toolContentID);
 	if (content == null) {
 	    // TODO error page.
 	}
 
 	// // cache into sessionMap
-	boolean isGroupedActivity = service.isGroupedActivity(toolContentID);
+	boolean isGroupedActivity = leaderselectionService.isGroupedActivity(toolContentID);
 	sessionMap.put(LeaderselectionConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
 	// sessionMap.put(ScratchieConstants.PAGE_EDITABLE, scratchie.isContentInUse());
 	// sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
@@ -94,33 +92,33 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute("contentFolderID", contentFolderID);
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
 
-	return mapping.findForward(LeaderselectionConstants.SUCCESS);
+	return "pages/monitoring/monitoring";
     }
 
     /**
      * Show leaders manage page
      */
-    public ActionForward manageLeaders(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/manageLeaders")
+    public String manageLeaders(HttpServletRequest request) {
 	String sessionMapID = request.getParameter(LeaderselectionConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	request.setAttribute(LeaderselectionConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	return mapping.findForward("manageLeaders");
+	return "/pages/monitoring/manageLeaders";
     }
 
     /**
      * Save selected users as a leaders
-     * @throws IOException 
-     * @throws JSONException 
+     *
+     * @throws IOException
+     * @throws JSONException
      */
-    public ActionForward saveLeaders(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/saveLeaders")
+    public String saveLeaders(HttpServletRequest request) throws IOException {
 	String sessionMapID = request.getParameter(LeaderselectionConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	request.setAttribute(LeaderselectionConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	initService();
 
 	LeaderselectionDTO leaderselectionDT0 = (LeaderselectionDTO) sessionMap.get("leaderselectionDT0");
 	for (LeaderselectionSessionDTO sessionDto : leaderselectionDT0.getSessionDTOs()) {
@@ -129,19 +127,11 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    // save selected users as a leaders
 	    if (leaderUserUid != null) {
-		service.setGroupLeader(leaderUserUid, toolSessionId);
+		leaderselectionService.setGroupLeader(leaderUserUid, toolSessionId);
 	    }
 	}
 
 	return null;
     }
 
-    /**
-     * set up service
-     */
-    private void initService() {
-	if (service == null) {
-	    service = LeaderselectionServiceProxy.getLeaderselectionService(this.getServlet().getServletContext());
-	}
-    }
 }

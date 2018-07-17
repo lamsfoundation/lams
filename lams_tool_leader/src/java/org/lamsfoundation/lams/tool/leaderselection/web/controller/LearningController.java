@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.leaderselection.web.actions;
+package org.lamsfoundation.lams.tool.leaderselection.web.controller;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,10 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -49,24 +45,34 @@ import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstant
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  *
  *
  *
  */
-public class LearningAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningController.class);
 
-    private ILeaderselectionService service;
+    @Autowired
+    @Qualifier("leaderselectionService")
+    private ILeaderselectionService leaderselectionService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    private WebApplicationContext applicationContext;
+
+    @RequestMapping("")
+    public String unspecified(HttpServletRequest request) throws Exception {
 
 	// 'toolSessionID' and 'mode' paramters are expected to be present.
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, false);
@@ -75,7 +81,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	// Retrieve the session and content.
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	LeaderselectionSession session = service.getSessionBySessionId(toolSessionId);
+	LeaderselectionSession session = leaderselectionService.getSessionBySessionId(toolSessionId);
 	if (session == null) {
 	    throw new LeaderselectionException("Cannot retrieve session with toolSessionID" + toolSessionId);
 	}
@@ -85,7 +91,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	// check defineLater
 	if (content.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "pages/learning/defineLater";
 	}
 
 	// set mode, toolSessionID and LeaderselectionDTO
@@ -95,23 +101,23 @@ public class LearningAction extends LamsDispatchAction {
 	// Set the content in use flag.
 	if (!content.isContentInUse()) {
 	    content.setContentInUse(new Boolean(true));
-	    service.saveOrUpdateLeaderselection(content);
+	    leaderselectionService.saveOrUpdateLeaderselection(content);
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId, request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
 	LeaderselectionUser user;
 	if (mode.equals(ToolAccessMode.TEACHER)) {
 	    Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
-	    user = service.getUserByUserIdAndSessionId(userID, toolSessionId);
+	    user = leaderselectionService.getUserByUserIdAndSessionId(userID, toolSessionId);
 	} else {
 	    user = getCurrentUser(toolSessionId);
 	}
 
 	LeaderselectionUser groupLeader = session.getGroupLeader();
 	request.setAttribute(LeaderselectionConstants.ATTR_GROUP_LEADER, groupLeader);
-	List<LeaderselectionUser> groupUsers = service.getUsersBySession(toolSessionId);
+	List<LeaderselectionUser> groupUsers = leaderselectionService.getUsersBySession(toolSessionId);
 	request.setAttribute(LeaderselectionConstants.ATTR_GROUP_USERS, groupUsers);
 	request.setAttribute(LeaderselectionConstants.ATTR_TOOL_SESSION_ID, toolSessionId);
 
@@ -119,31 +125,32 @@ public class LearningAction extends LamsDispatchAction {
 	boolean isSelectLeaderActive = (groupLeader == null) && !user.isFinishedActivity() && !mode.isTeacher();
 	request.setAttribute("isSelectLeaderActive", isSelectLeaderActive);
 
-	return mapping.findForward("leaderselection");
+	return "pages/learning/leaderselection";
     }
 
     /**
      * Sets current user as a leader of a group.
-     * @throws JSONException 
+     *
+     * @throws JSONException
      */
-    public ActionForward becomeLeader(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/becomeLeader")
+    public String becomeLeader(HttpServletRequest request) throws IOException {
 	initService();
 	Long toolSessionId = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
-	LeaderselectionSession session = service.getSessionBySessionId(toolSessionId);
+	LeaderselectionSession session = leaderselectionService.getSessionBySessionId(toolSessionId);
 
 	LeaderselectionUser groupLeader = session.getGroupLeader();
 	// check there is no leader yet. Just in case somebody has pressed "Yes" button faster
 	if (groupLeader == null) {
 	    LeaderselectionUser user = getCurrentUser(toolSessionId);
-	    service.setGroupLeader(user.getUid(), toolSessionId);
+	    leaderselectionService.setGroupLeader(user.getUid(), toolSessionId);
 	}
 
 	return null;
     }
 
-    public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/finishActivity")
+    public ActionForward finishActivity(HttpServletRequest request, HttpServletResponse response) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -151,14 +158,14 @@ public class LearningAction extends LamsDispatchAction {
 
 	if (user != null) {
 	    user.setFinishedActivity(true);
-	    service.saveOrUpdateUser(user);
+	    leaderselectionService.saveOrUpdateUser(user);
 	} else {
 	    log.error("finishActivity(): couldn't find LeaderselectionUser with id: " + user.getUserId()
 		    + "and toolSessionID: " + toolSessionID);
 	}
 
 	ToolSessionManager sessionMgrService = LeaderselectionServiceProxy
-		.getLeaderselectionSessionManager(getServlet().getServletContext());
+		.getLeaderselectionSessionManager(applicationContext.getServletContext());
 
 	String nextActivityUrl;
 	try {
@@ -176,8 +183,9 @@ public class LearningAction extends LamsDispatchAction {
     }
 
     private void initService() {
-	if (service == null) {
-	    service = LeaderselectionServiceProxy.getLeaderselectionService(this.getServlet().getServletContext());
+	if (leaderselectionService == null) {
+	    leaderselectionService = LeaderselectionServiceProxy
+		    .getLeaderselectionService(this.applicationContext.getServletContext());
 	}
     }
 
@@ -185,12 +193,12 @@ public class LearningAction extends LamsDispatchAction {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionId
-	LeaderselectionUser leaderselectionUser = service
+	LeaderselectionUser leaderselectionUser = leaderselectionService
 		.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()), toolSessionId);
 
 	if (leaderselectionUser == null) {
-	    LeaderselectionSession leaderselectionSession = service.getSessionBySessionId(toolSessionId);
-	    leaderselectionUser = service.createLeaderselectionUser(user, leaderselectionSession);
+	    LeaderselectionSession leaderselectionSession = leaderselectionService.getSessionBySessionId(toolSessionId);
+	    leaderselectionUser = leaderselectionService.createLeaderselectionUser(user, leaderselectionSession);
 	}
 
 	return leaderselectionUser;

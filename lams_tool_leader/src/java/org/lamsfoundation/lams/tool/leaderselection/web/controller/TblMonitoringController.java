@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.tool.leaderselection.web.actions;
+package org.lamsfoundation.lams.tool.leaderselection.web.controller;
 
 import java.io.IOException;
 
@@ -6,34 +6,40 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
-import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class TblMonitoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/TblMonitoring")
+public class TblMonitoringController {
 
-    private static Logger log = Logger.getLogger(TblMonitoringAction.class);
+    private static Logger log = Logger.getLogger(TblMonitoringController.class);
 
+    @Autowired
+    @Qualifier("leaderselectionService")
     private ILeaderselectionService leaderselectionService;
 
     /**
      * Save selected user as a leader
-     * 
+     *
      * @throws IOException
      * @throws JSONException
      */
-    public ActionForward changeLeader(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	initService();
+    @RequestMapping(path="/changeLeader", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String changeLeader(HttpServletRequest request) throws IOException {
 
 	Long leaderUserId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -51,17 +57,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	// build JSON
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("isSuccessful", isSuccessful);
-	writeResponse(response, "text/json", LamsDispatchAction.ENCODING_UTF8, responseJSON.toString());
-	return null;
+	return responseJSON.toString();
     }
 
-    /**
-     * set up service
-     */
-    private void initService() {
-	if (leaderselectionService == null) {
-	    leaderselectionService = LeaderselectionServiceProxy
-		    .getLeaderselectionService(this.getServlet().getServletContext());
-	}
-    }
 }
