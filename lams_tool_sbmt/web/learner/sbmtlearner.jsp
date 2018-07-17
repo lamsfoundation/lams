@@ -287,7 +287,7 @@
 			<c:if test="${!displayForm && hasEditRight}">
 
 				<form:form action="learner/uploadFile.do" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validate();" >
-					<form:hidden path="sessionMapID" />
+					<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
 
 					<!-- Hidden fields -->
 					<input type="hidden" name="toolSessionID" value="${toolSessionID}" />

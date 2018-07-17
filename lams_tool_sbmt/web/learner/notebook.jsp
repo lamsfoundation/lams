@@ -26,7 +26,7 @@
 		</div>
 
 		<div class="form-group">
-			<form:form action="/learning/submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="refForm" id="messageForm">
+			<form:form action="learning/submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="refForm" id="messageForm">
 				<form:hidden path="userID" />
 				<form:hidden path="sessionMapID" />
 				<form:textarea path="entryText" cssClass="form-control" id="focused" rows="5" />

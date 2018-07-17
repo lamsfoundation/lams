@@ -46,7 +46,8 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -68,10 +69,6 @@ public class AuthoringController {
      *
      * <BR>
      * Define later will use this method to initial page as well.
-     *
-     * @see org.apache.struts.actions.DispatchAction#unspecified(org.apache.struts.action.ActionMapping,
-     *      org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest,
-     *      javax.servlet.http.HttpServletResponse)
      */
 
     @RequestMapping("/authoring")
@@ -113,24 +110,18 @@ public class AuthoringController {
 
     /**
      * Update all content for submit tool except online/offline instruction files list.
-     *
-     * @param request
-     * @param response
-     * @return
-     * @throws IllegalAccessException
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws Exception
      */
-    public String updateContent(@ModelAttribute AuthoringForm authoringForm, Errors errors, HttpServletRequest request)
+    @RequestMapping("authoring/updateContent")
+    public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(authoringForm.getSessionMapID());
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.PARAM_MODE);
 
-	validate(authoringForm, errors, request);
-	if (errors.hasErrors()) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	errorMap = validate(authoringForm, request);
+	if (!errorMap.isEmpty()) {
 	    return "redirect:/";
 	}
 
@@ -178,9 +169,6 @@ public class AuthoringController {
     // ***********************************************************
     /**
      * The private method to get content from ActionForm parameters (web page).
-     *
-     * @param form
-     * @return
      */
     private SubmitFilesContent getContent(AuthoringForm authoringForm) {
 	Long contentId = authoringForm.getToolContentID();
@@ -200,18 +188,19 @@ public class AuthoringController {
 	return content;
     }
 
-    private void validate(AuthoringForm authoringForm, Errors errors, HttpServletRequest request) {
+    private MultiValueMap validate(AuthoringForm authoringForm, HttpServletRequest request) {
 
 	// if (StringUtils.isBlank(sbmtForm.getTitle())) {
 	// ActionMessage error = new ActionMessage("error.title.blank");
 	// errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 	// }
 	// define it later mode(TEACHER) skip below validation.
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    errors.reject("error.title.blank");
+	    return errorMap;
 	}
-
+	return errorMap;
     }
 
 }

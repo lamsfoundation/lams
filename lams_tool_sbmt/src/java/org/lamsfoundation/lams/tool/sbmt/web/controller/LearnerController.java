@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -73,6 +74,8 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -84,7 +87,6 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Steve.Ni
  */
 @Controller
-@RequestMapping("/learner")
 public class LearnerController implements SbmtConstants {
 
     private static final boolean MODE_OPTIONAL = false;
@@ -105,7 +107,7 @@ public class LearnerController implements SbmtConstants {
     /**
      * The initial page of learner in Submission tool. This page will list all uploaded files and learn
      */
-    @RequestMapping("")
+    @RequestMapping("/learner")
     public String unspecified(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	// initial session Map
 	SessionMap sessionMap = new SessionMap();
@@ -120,14 +122,14 @@ public class LearnerController implements SbmtConstants {
 	    mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, LearnerController.MODE_OPTIONAL);
 	} catch (Exception e) {
 	}
-	if (mode == null) {
-	    mode = ToolAccessMode.LEARNER;
-	}
-
+	
 	String sessionIDStr = WebUtil.readStrParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long sessionID = Long.valueOf(sessionIDStr);
 	request.setAttribute("toolSessionID", sessionID);
-
+	
+        if (mode == null) {
+            mode = ToolAccessMode.LEARNER;
+        }
 	// get session from shared session.
 	HttpSession ss = SessionManager.getSession();
 
@@ -270,6 +272,7 @@ public class LearnerController implements SbmtConstants {
     /**
      * Loads the main learner page with the details currently in the session map
      */
+    @RequestMapping("/refresh")
     public String refresh(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -301,7 +304,7 @@ public class LearnerController implements SbmtConstants {
 
 	String sessionMapID = learnerForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	request.setAttribute("sessionMapID", sessionMapID);
 
 	// set the mode into http session
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -356,6 +359,7 @@ public class LearnerController implements SbmtConstants {
      * Learner choose finish upload button, will invoke this function. This function will mark the <code>finished</code>
      * field by special toolSessionID and userID.
      */
+    @RequestMapping("/finish")
     public void finish(HttpServletRequest request, HttpServletResponse response) {
 
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
@@ -403,17 +407,18 @@ public class LearnerController implements SbmtConstants {
     // validate uploaded form
     private boolean validateUploadForm(LearnerForm learnerForm, HttpServletRequest request) {
 	Locale preferredLocale = (Locale) request.getSession().getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
-	List<String> messages = new ArrayList<>();
+	
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<String, String>();
 	if (learnerForm.getFile() == null || StringUtils.isBlank(learnerForm.getFile().getName())) {
-	    messages.add(this.messageService.getMessage("learner.form.filepath.displayname"));
+	    errorMap.add("GLOBAL", messageService.getMessage("learner.form.filepath.displayname"));
 	}
 	if (StringUtils.isBlank(learnerForm.getDescription())) {
-	    messages.add(this.messageService.getMessage("label.learner.fileDescription"));
+	    errorMap.add("GLOBAL", messageService.getMessage("label.learner.fileDescription"));
 	} else if (learnerForm.getDescription().length() > LearnerForm.DESCRIPTION_LENGTH) {
-	    messages.add("errors.maxdescsize");
+	    errorMap.add("GLOBAL", "errors.maxdescsize");
 	}
 
-//	FileValidatorSpringUtil.validateFileSize(learnerForm.getFile(), false, errors);
+	FileValidatorSpringUtil.validateFileSize(learnerForm.getFile(), false);
 
 	if (learnerForm.getFile() != null) {
 	    LearnerController.logger.debug("Learner submit file : " + learnerForm.getFile().getName());
@@ -421,11 +426,11 @@ public class LearnerController implements SbmtConstants {
 
 	if (learnerForm.getFile() != null && FileUtil.isExecutableFile(learnerForm.getFile().getName())) {
 	    LearnerController.logger.debug("File is executatable : " + learnerForm.getFile().getName());
-	    messages.add("error.attachment.executable");
+	    errorMap.add("GLOBAL", "error.attachment.executable");
 	}
 
-	if (messages != null && !messages.isEmpty()) {
-	    request.setAttribute("messages", messages);
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
 	    return true;
 	}
 	return false;
@@ -503,6 +508,7 @@ public class LearnerController implements SbmtConstants {
 	return learner;
     }
 
+    @RequestMapping("/delete")
     public void deleteLearnerFile(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 	HttpSession ss = SessionManager.getSession();

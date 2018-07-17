@@ -23,12 +23,11 @@
 
 </lams:head>
 <body class="stripes">
-<form:form action="authoring.do" id="authoringForm" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">
+<form:form action="authoring/updateContent.do" id="authoringForm" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">
 	<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
 	<input type="hidden" name="mode" value="${mode}" />
-	<input type="hidden" name="dispatch" value="updateContent" />
 	<form:hidden path="sessionMapID" />
 	<form:hidden path="toolContentID" />
 	<form:hidden path="contentFolderID" />
