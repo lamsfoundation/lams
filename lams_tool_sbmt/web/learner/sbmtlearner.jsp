@@ -48,7 +48,7 @@
 			}
 		}
 		function finish() {
-			var finishUrl = "<lams:WebAppURL />learner.do?method=finish&sessionMapID=${sessionMapID}";
+			var finishUrl = "<lams:WebAppURL />learner/finish.do?sessionMapID=${sessionMapID}";
 			return submitCount(finishUrl);
 		}
 		function notebook() {
@@ -105,8 +105,8 @@
 			var answer = confirm(msg);
 			if (answer) {	
 				 $.ajax({
-			            url: '<c:url value="/learner.do"/>',
-			            data: 'method=deleteLearnerFile&detailId=' + detailId,
+			            url: '<c:url value="/learner/delete.do"/>',
+			            data: 'detailId=' + detailId,
 			            success: function () {
 			            	document.location.href = "<c:url value='/learner.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}'/>";
 			            },

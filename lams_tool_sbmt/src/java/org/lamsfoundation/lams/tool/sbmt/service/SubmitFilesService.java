@@ -620,7 +620,7 @@ public class SubmitFilesService
 	    throw new SubmitFilesException("No such session with a sessionID of: " + sessionID + " found.");
 	}
 
-//	NodeKey nodeKey = processFile(file);
+	NodeKey nodeKey = processFile(file);
 
 	SubmissionDetails details = new SubmissionDetails();
 	details.setFileDescription(fileDescription);
@@ -629,8 +629,8 @@ public class SubmitFilesService
 
 	SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);
 	details.setLearner(learner);
-//	details.setUuid(nodeKey.getUuid());
-//	details.setVersionID(nodeKey.getVersion());
+	details.setUuid(nodeKey.getUuid());
+	details.setVersionID(nodeKey.getVersion());
 	SubmitFilesReport report = new SubmitFilesReport();
 	details.setReport(report);
 	details.setSubmitFileSession(session);
@@ -652,10 +652,10 @@ public class SubmitFilesService
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(FormFile file) {
+    private NodeKey processFile(MultipartFile file) {
 	NodeKey node = null;
-	if ((file != null) && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
+	if ((file != null) && !StringUtils.isEmpty(file.getName())) {
+	    String fileName = file.getName();
 	    try {
 		node = getSbmtToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
@@ -760,7 +760,7 @@ public class SubmitFilesService
     }
 
     @Override
-    public void updateMarks(Long reportID, Float marks, String comments, FormFile markFile, Long sessionID)
+    public void updateMarks(Long reportID, Float marks, String comments, MultipartFile markFile, Long sessionID)
 	    throws InvalidParameterException, RepositoryCheckedException {
 
 	SubmitFilesSession session = getSessionById(sessionID);
@@ -769,7 +769,7 @@ public class SubmitFilesService
 
 	    // can share the mark file across users
 	    NodeKey nodeKey = null;
-	    if ((markFile != null) && !StringUtils.isEmpty(markFile.getFileName())) {
+	    if ((markFile != null) && !StringUtils.isEmpty(markFile.getName())) {
 		nodeKey = this.processFile(markFile);
 	    }
 
@@ -793,7 +793,7 @@ public class SubmitFilesService
 			    report.setMarkFileVersionID(null);
 			}
 
-			report.setMarkFileName(markFile.getFileName());
+			report.setMarkFileName(markFile.getName());
 			report.setMarkFileUUID(nodeKey.getUuid());
 			report.setMarkFileVersionID(nodeKey.getVersion());
 		    }
@@ -811,7 +811,7 @@ public class SubmitFilesService
 		report.setMarks(marks);
 
 		// If there is a new file, delete the existing and add the mark file
-		if ((markFile != null) && !StringUtils.isEmpty(markFile.getFileName())) {
+		if ((markFile != null) && !StringUtils.isEmpty(markFile.getName())) {
 
 		    // Delete the existing
 		    if (report.getMarkFileUUID() != null) {
@@ -826,7 +826,7 @@ public class SubmitFilesService
 		    // NodeKey nodeKey = toolContentHandler.uploadFile(marksFileInputStream, marksFileName, null,
 		    // IToolContentHandler.TYPE_ONLINE);
 
-		    report.setMarkFileName(markFile.getFileName());
+		    report.setMarkFileName(markFile.getName());
 		    report.setMarkFileUUID(nodeKey.getUuid());
 		    report.setMarkFileVersionID(nodeKey.getVersion());
 		}

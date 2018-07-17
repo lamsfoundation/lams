@@ -41,6 +41,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -67,21 +69,22 @@ public class MarkController {
     /**
      * Update mark.
      */
+    @RequestMapping("/updateMark")
     public String updateMark(@ModelAttribute MarkForm markForm, HttpServletRequest request)
 	    throws InvalidParameterException, RepositoryCheckedException {
 
 	// Check whether the mark is valid.
 	Float marks = null;
 	String markStr = markForm.getMarks();
-	List<String> messages = new ArrayList<>();
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<String, String>();
 	try {
 	    marks = NumberUtil.getLocalisedFloat(markStr, request.getLocale());
 	} catch (Exception e) {
-	    messages.add("errors.mark.invalid.number");
+	    errorMap.add("GLOBAL", "errors.mark.invalid.number");
 	}
 
 	String comments = WebUtil.readStrParam(request, "comments", true);
-	if (messages != null && !messages.isEmpty()) {
+	if (!errorMap.isEmpty()) {
 	    List report = new ArrayList<FileDetailsDTO>();
 	    FileDetailsDTO fileDetail = submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale());
 	    // echo back the input, even they are wrong.
@@ -92,7 +95,7 @@ public class MarkController {
 	    request.setAttribute("report", report);
 	    request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, markForm.getToolSessionID());
 
-	    request.setAttribute("messages", messages);
+	    request.setAttribute("errorMap", errorMap);
 	    return "monitoring/mark/updatemark";
 	}
 
@@ -117,6 +120,7 @@ public class MarkController {
     /**
      * Display update mark initial page.
      */
+    @RequestMapping("/newMark")
     public String newMark(@ModelAttribute MarkForm markForm, HttpServletRequest request) {
 
 	FileDetailsDTO fileDetailsDTO = submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale());
@@ -135,6 +139,7 @@ public class MarkController {
     /**
      * Update the form
      */
+    @RequestMapping("/updateMarkForm")
     private void updateMarkForm(MarkForm markForm, FileDetailsDTO fileDetailsDTO) {
 
 	if (fileDetailsDTO.getMarks() != null) {
@@ -149,6 +154,7 @@ public class MarkController {
     /**
      * Remove a mark file
      */
+    @RequestMapping("/removeMarkFile")
     public String removeMarkFile(@ModelAttribute MarkForm markForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 

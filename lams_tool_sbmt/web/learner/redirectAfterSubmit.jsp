@@ -1,4 +1,4 @@
-<%@ include file="/common/taglibs.jsp"%>
+s<%@ include file="/common/taglibs.jsp"%>
 
 <!-- Triggers redirection to the learner page after a file is submitted, to stop Refresh reloading the file. -->
 
@@ -8,7 +8,7 @@
 <%@ include file="/common/header.jsp"%>
 <script language="JavaScript" type="text/JavaScript">
 	$(document).ready(function(){
-		window.location.href = '<lams:WebAppURL />learner.do?method=refresh&sessionMapID=${sessionMapID}';
+		window.location.href = '<lams:WebAppURL />learner/refresh.do?sessionMapID=${sessionMapID}';
 	});
 </script>
 </lams:head>

@@ -87,6 +87,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Steve.Ni
  */
 @Controller
+@RequestMapping("/learner")
 public class LearnerController implements SbmtConstants {
 
     private static final boolean MODE_OPTIONAL = false;
@@ -107,7 +108,7 @@ public class LearnerController implements SbmtConstants {
     /**
      * The initial page of learner in Submission tool. This page will list all uploaded files and learn
      */
-    @RequestMapping("/learner")
+    @RequestMapping("")
     public String unspecified(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	// initial session Map
 	SessionMap sessionMap = new SessionMap();
@@ -418,7 +419,7 @@ public class LearnerController implements SbmtConstants {
 	    errorMap.add("GLOBAL", "errors.maxdescsize");
 	}
 
-	FileValidatorSpringUtil.validateFileSize(learnerForm.getFile(), false);
+	FileValidatorSpringUtil.validateFileSize(learnerForm.getFile().getSize(), false, errorMap);
 
 	if (learnerForm.getFile() != null) {
 	    LearnerController.logger.debug("Learner submit file : " + learnerForm.getFile().getName());

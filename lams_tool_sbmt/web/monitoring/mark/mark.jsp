@@ -19,7 +19,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/readmore.min.js"></script>	
 	<script type="text/javascript">
 		function updateMark(detailId,reportId,sessionId,userId){
-			location.href="<lams:WebAppURL/>mark.do?method=newMark&updateMode=listMark&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
+			location.href="<lams:WebAppURL/>mark/newMark.do?updateMode=listMark&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
 		}
 
 		function removeLearnerFile(detailId,sessionId,userId,filename) {
@@ -27,7 +27,7 @@
 			msg = msg.replace('{0}', filename)
 			var answer = confirm(msg);
 			if (answer) {	
-				location.href="<c:url value="/monitoring.do"/>?method=removeLearnerFile&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId;
+				location.href="<lams:WebAppURL/>monitoring/removeLearnerFile.do?userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId;
 			}
 		}
 
@@ -36,7 +36,7 @@
 			msg = msg.replace('{0}', filename)
 			var answer = confirm(msg);
 			if (answer) {	
-				location.href="<c:url value="/monitoring.do"/>?method=restoreLearnerFile&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId;
+				location.href="<lams:WebAppURL/>monitoring/restoreLearnerFile.do?userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId;
 			}
 		}
 

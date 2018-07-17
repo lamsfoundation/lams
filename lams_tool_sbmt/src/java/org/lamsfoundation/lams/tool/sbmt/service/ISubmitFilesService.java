@@ -135,7 +135,7 @@ public interface ISubmitFilesService {
      * @param marksFileInputStream
      * @param marksFileName
      */
-    public void updateMarks(Long reportID, Float marks, String comments, FormFile file, Long SessionID)
+    public void updateMarks(Long reportID, Float marks, String comments, MultipartFile file, Long SessionID)
 	    throws InvalidParameterException, RepositoryCheckedException;
 
     /**

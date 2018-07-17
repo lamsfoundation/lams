@@ -58,9 +58,8 @@
 
 
 		<c:forEach var="fileInfo" items="${report}" varStatus="status">
-			<form:form action="/mark.do" method="post" modelAttribute="markForm" id="updateMarkForm" enctype="multipart/form-data" onsubmit="return validate();">
+			<form:form action="updateMark.do" method="post" modelAttribute="markForm" id="updateMarkForm" enctype="multipart/form-data" onsubmit="return validate();">
 			
-				<form:hidden path="method" value="updateMark" id="method" />
 				<form:hidden path="toolSessionID" />
 				<form:hidden path="reportID" />
 				<form:hidden path="detailID"  />
@@ -141,12 +140,12 @@
 				<div id="buttons" class="pull-right">	
 					<c:if test="${updateMode == 'listMark'}">
 						<c:set var="cancelUrl">
-							<c:url value="/monitoring.do"/>?method=listMark&userID=${fileInfo.owner.userID}&toolSessionID=${toolSessionID}
+							<c:url value="/monitoring/listMark.do"/>?userID=${fileInfo.owner.userID}&toolSessionID=${toolSessionID}
 						</c:set>
 					</c:if>
 					<c:if test="${updateMode == 'listAllMarks'}">
 						<c:set var="cancelUrl">
-							<c:url value="/monitoring.do"/>?method=listAllMarks&toolSessionID=${toolSessionID}
+							<c:url value="/monitoring/listAllMarks.do"/>?&toolSessionID=${toolSessionID}
 						</c:set>
 					</c:if>
 					<a href="${cancelUrl}" class="btn btn-default">

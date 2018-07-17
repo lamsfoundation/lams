@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
+import org.lamsfoundation.lams.tool.sbmt.web.form.MarkForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -65,6 +66,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
@@ -160,7 +164,7 @@ public class MonitoringController {
     }
 
     /** Ajax call to populate the tablesorter */
-    @RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(path = "/getUsers", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String getUsers(HttpServletRequest request, HttpServletResponse response) {
 
@@ -238,6 +242,7 @@ public class MonitoringController {
     /**
      * AJAX call to refresh statistic page.
      */
+    @RequestMapping("/doStatistic")
     public String doStatistic(HttpServletRequest request) {
 
 	Long contentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -261,6 +266,7 @@ public class MonitoringController {
     /**
      * Release mark
      */
+    @RequestMapping("/releaseMarks")
     public void releaseMarks(HttpServletRequest request, HttpServletResponse response) {
 
 	// get service then update report table
@@ -284,13 +290,14 @@ public class MonitoringController {
     /**
      * Download submit file marks by MS Excel file format.
      */
+    @RequestMapping("/downloadMarks")
     public void downloadMarks(HttpServletRequest request, HttpServletResponse response) {
 
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	// return FileDetailsDTO list according to the given sessionID
 	Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
 	// construct Excel file format and download
-	String errors = null;
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<String, String>();
 	try {
 	    // create an empty excel file
 	    HSSFWorkbook wb = new HSSFWorkbook();
@@ -366,14 +373,18 @@ public class MonitoringController {
 	    response.getOutputStream().write(data, 0, data.length);
 	    response.getOutputStream().flush();
 	} catch (Exception e) {
-//	    LamsDispatchAction.log.error(e);
-	    errors = new ActionMessage("monitoring.download.error", e.toString()).toString();
+	    logger.error(e);
+	    errorMap.add("monitoring.download.error", e.toString());
 	}
 
-	if (errors != null) {
+	if (!errorMap.isEmpty()) {
 	    try {
 		PrintWriter out = response.getWriter();
-		out.write(errors);
+		Iterator<String> it = errorMap.keySet().iterator();
+	         while(it.hasNext()){
+	           String theKey = (String)it.next();
+	           out.write(theKey);
+	         }
 		out.flush();
 	    } catch (IOException e) {
 	    }
@@ -383,7 +394,7 @@ public class MonitoringController {
     /**
      * Set Submission Deadline
      */
-    @RequestMapping(produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(path = "setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -413,6 +424,7 @@ public class MonitoringController {
     /**
      * Display special user's marks information.
      */
+    @RequestMapping("/listMark")
     public String listMark(HttpServletRequest request) {
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	Integer userID = WebUtil.readIntParam(request, "userID");
@@ -428,6 +440,7 @@ public class MonitoringController {
     /**
      * View mark of all learner from same tool content ID.
      */
+    @RequestMapping("/listAllMarks")
     public String listAllMarks(HttpServletRequest request) {
 
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
@@ -445,6 +458,7 @@ public class MonitoringController {
      * Remove the original file created by the learner. Does not actually remove it from the content repository - merely
      * makes it as removed.
      */
+    @RequestMapping("/removeLearnerFile")
     public String removeLearnerFile(HttpServletRequest request) throws ServletException {
 	return removeRestoreLearnerFile(request, true);
     }
@@ -453,10 +467,12 @@ public class MonitoringController {
      * Remove the original file created by the learner. Does not actually remove it from the content repository - merely
      * makes it as removed.
      */
+    @RequestMapping("/restoreLearnerFile")
     public String restoreLearnerFile(HttpServletRequest request) throws ServletException {
 	return removeRestoreLearnerFile(request, false);
     }
 
+    @RequestMapping("/removeRestoreLearnerFile")
     public String removeRestoreLearnerFile(HttpServletRequest request, boolean remove) throws ServletException {
 
 	UserDTO currentUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
