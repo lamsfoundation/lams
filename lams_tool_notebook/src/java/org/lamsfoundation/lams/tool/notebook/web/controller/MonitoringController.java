@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionForward;
 import org.lamsfoundation.lams.tool.notebook.dto.NotebookSessionsDTO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
@@ -104,7 +103,7 @@ public class MonitoringController {
     }
 
     @RequestMapping("/getUsers")
-    public ActionForward getUsers(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public String getUsers(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long toolSessionId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 
