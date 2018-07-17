@@ -697,14 +697,14 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 
     public List<GradebookUserLessonArchive> getArchivedLessonMarks(Long lessonId, Integer userId) {
 	final String GET_ARCHIVED_LESSON_MARKS = "FROM GradebookUserLessonArchive a WHERE "
-		+ " a.lesson.lessonId = :lessonId AND a.learner.userId = :userId ORDER BY a.archiveDate DESC";
+		+ " a.lesson.lessonId = :lessonId AND a.learner.userId = :userId";
 	return getSession().createQuery(GET_ARCHIVED_LESSON_MARKS).setLong("lessonId", lessonId)
 		.setInteger("userId", userId).list();
     }
 
     public List<GradebookUserActivityArchive> getArchivedActivityMarks(Long activityId, Integer userId) {
 	final String GET_ARCHIVED_ACTIVITY_MARKS = "FROM GradebookUserActivityArchive a WHERE "
-		+ " a.activity.activityId = :activityId AND a.learner.userId = :userId ORDER BY a.archiveDate DESC";
+		+ " a.activity.activityId = :activityId AND a.learner.userId = :userId";
 	return getSession().createQuery(GET_ARCHIVED_ACTIVITY_MARKS).setLong("activityId", activityId)
 		.setInteger("userId", userId).list();
     }

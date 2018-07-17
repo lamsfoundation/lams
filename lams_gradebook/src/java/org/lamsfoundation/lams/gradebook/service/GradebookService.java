@@ -207,7 +207,7 @@ public class GradebookService implements IGradebookService {
 	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
 	List<GradebookUserLessonArchive> lessonArchives = gradebookDAO.getArchivedLessonMarks(lesson.getLessonId(),
 		userId);
-	int attemptOrder = lessonArchives.size();
+	int attemptOrder = 1;
 	List<GradebookUserActivityArchive> activityArchives = gradebookDAO.getArchivedActivityMarks(activityId, userId);
 	for (GradebookUserLessonArchive lessonArchive : lessonArchives) {
 	    GBActivityArchiveGridRowDTO activityDTO = new GBActivityArchiveGridRowDTO(attemptOrder,
@@ -229,7 +229,7 @@ public class GradebookService implements IGradebookService {
 		}
 	    }
 	    gradebookActivityDTOs.add(activityDTO);
-	    attemptOrder--;
+	    attemptOrder++;
 	}
 
 	return gradebookActivityDTOs;

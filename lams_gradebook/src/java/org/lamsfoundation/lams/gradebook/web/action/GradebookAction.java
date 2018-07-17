@@ -191,7 +191,7 @@ public class GradebookAction extends LamsDispatchAction {
 	}
 
 	String ret = GradebookUtil.toGridXML(gradebookActivityDTOs, view, GradebookConstants.PARAM_ID, false, null,
-		null, null, null, 100, 1);
+		null, null, GradebookConstants.SORT_DESC, 100, 1);
 
 	writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_XML, LamsDispatchAction.ENCODING_UTF8, ret);
 	return null;
