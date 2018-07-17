@@ -1,6 +1,34 @@
+<!DOCTYPE html>
+
 <%@ include file="/common/taglibs.jsp"%>
 
-<script type="text/javascript">
+<lams:html>
+	<c:set var="lams">
+		<lams:LAMSURL />
+	</c:set>
+	<c:set var="tool">
+		<lams:WebAppURL />
+	</c:set>
+	
+	<lams:head>  
+		<title>
+			<fmt:message key="activity.title" />
+		</title>
+		<lams:css/>
+		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet" />
+		<style type="text/css">
+	    	.dialog{display: none;}
+	    	.ui-dialog-titlebar-close{display: none;}
+	    	.ui-widget-overlay{opacity:0.9;}
+	    </style>
+	
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	</lams:head>
+	
+	<body class="stripes">
+		<script type="text/javascript">
 	$(window).load(function(){
 		$("#leaderSelectionDialog").modal({
 			show: ${isSelectLeaderActive},
@@ -75,107 +103,112 @@
 			}
 		};
 	</c:if>
-</script>
+		</script>
 
-<lams:Page type="learner" title="${content.title}">
-
-	<c:choose>
-		<c:when test="${not empty groupLeader}">
-			<lams:LeaderDisplay username="${groupLeader.firstName} ${groupLeader.lastName}" userId="${groupLeader.userId}"/>
-		</c:when>
-		<c:otherwise>
-			<lams:Alert type="warning" id="no-leader" close="false">
-                <h4>
-                    <fmt:message key="label.no.leader.yet.title" />
-                </h4>
-                <p>
-				    <fmt:message key="label.no.leader.yet.body" />
-                </p>
-			</lams:Alert>
-		</c:otherwise>
-	</c:choose>
-
-	<div>
-		<fmt:message key="label.users.from.group" />
-	</div>
-
-	<div id="usersInGroup">
-		<c:forEach var="user" items="${groupUsers}" varStatus="status">
-			<div id="user-${user.userId}" class="voffset5">
-				<lams:Portrait userId="${user.userId}"/>
-				<span class="portrait-sm-lineheight">
-					<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
-				</span>
-			</div>
-		</c:forEach>
-	</div>
-
-	<div id="actionbuttons" class="voffset20">
-		<button type="button" onclick="location.reload();" class="btn btn-sm btn-default">
-			<i class="fa fa-refresh"></i> 
-			<span class="hidden-xs">
-				<fmt:message key="label.refresh" />
-			</span>
-		</button>
+		<lams:Page type="learner" title="${content.title}">
+			<c:choose>
+				<c:when test="${not empty groupLeader}">
+					<lams:LeaderDisplay username="${groupLeader.firstName} ${groupLeader.lastName}" userId="${groupLeader.userId}"/>
+				</c:when>
+				<c:otherwise>
+					<lams:Alert type="warning" id="no-leader" close="false">
+		                <h4>
+		                    <fmt:message key="label.no.leader.yet.title" />
+		                </h4>
+		                <p>
+						    <fmt:message key="label.no.leader.yet.body" />
+		                </p>
+					</lams:Alert>
+				</c:otherwise>
+			</c:choose>
 		
-		<c:if test="${!isSelectLeaderActive}">
-			<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton" onclick="finishActivity()">
-				<span class="nextActivity"> <c:choose>
-						<c:when test="${activityPosition.last}">
-							<fmt:message key="button.submit" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="button.finish" />
-						</c:otherwise>
-					</c:choose>
-				</span>
-			</html:link>
-		</c:if>
-	</div>
-	
-</lams:Page>
-
-<div id="leaderSelectionDialog" class="modal fade">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<div class="modal-title" id="exampleModalLabel">${content.title}</div>
+			<div>
+				<fmt:message key="label.users.from.group" />
 			</div>
-			<div class="modal-body">
-				<!-- begin -->
-				<div class="panel" id="leaderInstructions">
-					<c:out value="${content.instructions}" escapeXml="false" />
-				</div>
-				<div class="lead">
-					<fmt:message key="label.are.you.going.to.be.leader" />
-				</div>
+		
+			<div id="usersInGroup">
+				<c:forEach var="user" items="${groupUsers}" varStatus="status">
+					<div id="user-${user.userId}" class="voffset5">
+						<lams:Portrait userId="${user.userId}"/>
+						<span class="portrait-sm-lineheight">
+							<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+						</span>
+					</div>
+				</c:forEach>
+			</div>
+		
+			<div id="actionbuttons" class="voffset20">
+				<button type="button" onclick="location.reload();" class="btn btn-sm btn-default">
+					<i class="fa fa-refresh"></i> 
+					<span class="hidden-xs">
+						<fmt:message key="label.refresh" />
+					</span>
+				</button>
+				
+				<c:if test="${!isSelectLeaderActive}">
+					<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton" onclick="finishActivity()">
+						<span class="nextActivity"> <c:choose>
+								<c:when test="${activityPosition.last}">
+									<fmt:message key="button.submit" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="button.finish" />
+								</c:otherwise>
+							</c:choose>
+						</span>
+					</a>
+				</c:if>
+			</div>
+			
+		</lams:Page>
 
-				<div class="voffset10">
-					<fmt:message key="label.users.from.group" />
-				</div>
-
-				<div id="usersInGroup" class="voffset10">
-					<c:forEach var="user" items="${groupUsers}" varStatus="status">
-						<div id="user-${user.userId}" class="voffset2">
-							<div class="user loffset10" id="user-${user.userId}">
-								<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
-							</div>
+		<div id="leaderSelectionDialog" class="modal fade">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<div class="modal-title" id="exampleModalLabel">${content.title}</div>
+					</div>
+					<div class="modal-body">
+						<!-- begin -->
+						<div class="panel" id="leaderInstructions">
+							<c:out value="${content.instructions}" escapeXml="false" />
 						</div>
-					</c:forEach>
-				</div>
-			</div>
+						<div class="lead">
+							<fmt:message key="label.are.you.going.to.be.leader" />
+						</div>
+	
+						<div class="voffset10">
+							<fmt:message key="label.users.from.group" />
+						</div>
+	
+						<div id="usersInGroup" class="voffset10">
+							<c:forEach var="user" items="${groupUsers}" varStatus="status">
+								<div id="user-${user.userId}" class="voffset2">
+									<div class="user loffset10" id="user-${user.userId}">
+										<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+									</div>
+								</div>
+							</c:forEach>
+						</div>
+					</div>
 
-			<div class="modal-footer">
-				<button data-dismiss="modal" class="btn btn-sm btn-default">
-					<fmt:message key="label.no" />
-				</button>
-				<button onclick="leaderSelection();" class="btn btn-sm btn-primary">
-					<fmt:message key="label.yes.become.leader" />
-				</button>
+					<div class="modal-footer">
+						<button data-dismiss="modal" class="btn btn-sm btn-default">
+							<fmt:message key="label.no" />
+						</button>
+						<button onclick="leaderSelection();" class="btn btn-sm btn-primary">
+							<fmt:message key="label.yes.become.leader" />
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
-	</div>
-</div>
+
+		<div class="footer">
+		</div>					
+	</body>
+</lams:html>
+

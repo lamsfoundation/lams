@@ -1,5 +1,4 @@
 <%-- Error Messages --%>
-<%-- Error Messages --%>
  <c:set var="errorKey" value="GLOBAL" /> 
  <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
      <lams:Alert id="error" type="danger" close="false"> 

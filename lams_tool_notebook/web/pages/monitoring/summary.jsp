@@ -28,7 +28,7 @@
 		lams: '${lams}',
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?dispatch=setSubmissionDeadline"/>',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline"/>',
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
@@ -43,7 +43,7 @@
 			
 			jQuery("#group${sessionId}").jqGrid({
 			
-				url: "<c:url value='/monitoring.do'/>?dispatch=getUsers&toolSessionID=${sessionId}",
+				url: "<c:url value='/monitoring/getUsersdo?toolSessionID=${sessionId}'",
 				datatype: 'json',
 				jsonReader : {
 				     root: "rows",
@@ -118,7 +118,7 @@
  					}).text(comment).appendTo(subgrid); 
   					
  					$(".editable${sessionId}_" + rowId + "_t").jinplace({
- 					    url: "<c:url value='/monitoring.do'/>?dispatch=saveTeacherComment&userUid=" + userUid,
+ 					    url: "<c:url value='/monitoring/saveTeacherComment.do?userUid= + ${userUid}' />"
  					    textOnly: true,
  					    placeholder: '<fmt:message key="label.click.to.edit" />',
  					    okButton: "<fmt:message key='button.ok' />",

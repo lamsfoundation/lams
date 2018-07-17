@@ -44,7 +44,8 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -75,7 +76,8 @@ public class AuthoringNotebookConditionController {
      * @return
      */
     @RequestMapping("newConditionInit")
-    private String newConditionInit(@ModelAttribute NotebookConditionForm notebookConditionForm, HttpServletRequest request) {
+    private String newConditionInit(@ModelAttribute NotebookConditionForm notebookConditionForm,
+	    HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, NotebookConstants.ATTR_SESSION_MAP_ID);
 	notebookConditionForm.setSessionMapID(sessionMapID);
 	notebookConditionForm.setOrderId(-1);
@@ -125,12 +127,14 @@ public class AuthoringNotebookConditionController {
      */
     @RequestMapping("/saveOrUpdateCondition")
     private String saveOrUpdateCondition(
-	    @ModelAttribute("notebookConditionForm") NotebookConditionForm notebookConditionForm, Errors errors,
+	    @ModelAttribute("notebookConditionForm") NotebookConditionForm notebookConditionForm,
 	    HttpServletRequest request) {
 
-	validateNotebookCondition(notebookConditionForm, errors, request);
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	validateNotebookCondition(notebookConditionForm, errorMap, request);
 
-	if (errors.hasErrors()) {
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
 	    return "pages/authoring/addCondition";
 	}
 
@@ -138,8 +142,9 @@ public class AuthoringNotebookConditionController {
 	    extractFormToNotebookCondition(request, notebookConditionForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.reject(null, null, messageService.getMessage(NotebookConstants.ERROR_MSG_CONDITION, e.getMessage()));
-	    if (errors.hasErrors()) {
+	    errorMap.add("GLOBAL", messageService.getMessage(NotebookConstants.ERROR_MSG_CONDITION, e.getMessage()));
+	    if (!errorMap.isEmpty()) {
+		request.setAttribute("errorMap", errorMap);
 		return "pages/authoring/addCondition";
 	    }
 	}
@@ -301,8 +306,8 @@ public class AuthoringNotebookConditionController {
      * @param notebookConditionForm
      * @param request
      */
-    private void populateConditionToForm(int orderId, NotebookCondition condition, NotebookConditionForm notebookConditionForm,
-	    HttpServletRequest request) {
+    private void populateConditionToForm(int orderId, NotebookCondition condition,
+	    NotebookConditionForm notebookConditionForm, HttpServletRequest request) {
 	notebookConditionForm.populateForm(condition);
 	if (orderId >= 0) {
 	    notebookConditionForm.setOrderId(orderId + 1);
@@ -354,12 +359,12 @@ public class AuthoringNotebookConditionController {
      * @param notebookConditionForm
      * @return
      */
-    private void validateNotebookCondition( NotebookConditionForm notebookConditionForm, Errors errors,
-	    HttpServletRequest request) {
+    private void validateNotebookCondition(NotebookConditionForm notebookConditionForm,
+	    MultiValueMap<String, String> errorMap, HttpServletRequest request) {
 
 	String formConditionName = notebookConditionForm.getDisplayName();
 	if (StringUtils.isBlank(formConditionName)) {
-	    errors.reject(null, null, messageService.getMessage(NotebookConstants.ERROR_MSG_NAME_BLANK));
+	    errorMap.add("GLOBAL", messageService.getMessage(NotebookConstants.ERROR_MSG_NAME_BLANK));
 	} else {
 
 	    Integer formConditionSequenceId = notebookConditionForm.getOrderId();
@@ -370,7 +375,7 @@ public class AuthoringNotebookConditionController {
 	    for (NotebookCondition condition : conditionList) {
 		if (formConditionName.equals(condition.getName())
 			&& !formConditionSequenceId.equals(new Integer(condition.getOrderId() - 1).toString())) {
-		    errors.reject(null, null, messageService.getMessage(NotebookConstants.ERROR_MSG_NAME_DUPLICATED));
+		    errorMap.add("GLOBAL", messageService.getMessage(NotebookConstants.ERROR_MSG_NAME_DUPLICATED));
 		    break;
 		}
 	    }

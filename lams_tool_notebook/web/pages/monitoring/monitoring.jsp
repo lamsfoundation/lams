@@ -31,7 +31,7 @@
 	</lams:head>
 	<body class="stripes">
 		<script type="text/javascript">
-			var statisticsURL = "<c:url value='/monitoring.do'/>?dispatch=getStatistics&toolContentID=${notebookDTO.toolContentId}&reqID=";
+			var statisticsURL = "<c:url value='/monitoring/getStatistics.do?toolContentID=${notebookDTO.toolContentId}&reqID=";
 		</script>
 
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>

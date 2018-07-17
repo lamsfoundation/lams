@@ -32,7 +32,7 @@
 				<form:form action="learning/finishActivity.do" method="post" onsubmit="disableFinishButton();" modelAttribute="messageForm" id="messageForm">
 					<form:hidden path="toolSessionID" />
 		
-					<button href="#nogo" style="btn btn-primary pull-right voffset10 na" styleId="finishButton"
+					<button href="#nogo" class="btn btn-primary pull-right voffset10 na" id="finishButton" type="button"
 						onclick="submitForm('finish')">
 						<c:choose>
 							<c:when test="${activityPosition.last}">

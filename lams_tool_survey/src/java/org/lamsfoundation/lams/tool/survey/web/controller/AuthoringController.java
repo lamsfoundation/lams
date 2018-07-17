@@ -45,9 +45,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -74,7 +71,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -94,7 +90,7 @@ public class AuthoringController {
     @Autowired
     @Qualifier("lasurvSurveyService")
     private ISurveyService surveyService;
-    
+
     @Autowired
     @Qualifier("lasurvMessageService")
     private MessageService messageService;
@@ -308,7 +304,7 @@ public class AuthoringController {
 	    HttpServletRequest request) throws Exception {
 	// get instructions:
 	List<String> instructionList = getInstructionsFromRequest(request);
-	
+
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	validateSurveyItem(surveyItemForm, instructionList, errorMap);
 
@@ -879,21 +875,6 @@ public class AuthoringController {
      * @param instructionList
      * @return
      */
-    private ActionErrors validateSurveyItem(QuestionForm itemForm, List<String> instructionList) {
-	ActionErrors errors = new ActionErrors();
-	if (StringUtils.isBlank(itemForm.getQuestion().getDescription())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(SurveyConstants.ERROR_MSG_DESC_BLANK));
-	}
-
-	short type = getQuestionType(itemForm);
-	if (type != SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-	    if (instructionList == null || instructionList.size() < 2) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(SurveyConstants.ERROR_MSG_LESS_OPTIONS));
-	    }
-	}
-
-	return errors;
-    }
 
     /**
      * Ajax call, will add one more input line for new survey item instruction.
@@ -959,7 +940,8 @@ public class AuthoringController {
 	return getListFromSession(sessionMap, SurveyConstants.ATTR_DELETED_CONDITION_LIST);
     }
 
-    private void validateSurveyItem(QuestionForm itemForm, List<String> instructionList, MultiValueMap<String, String> errorMap) {
+    private void validateSurveyItem(QuestionForm itemForm, List<String> instructionList,
+	    MultiValueMap<String, String> errorMap) {
 	if (StringUtils.isBlank(itemForm.getQuestion().getDescription())) {
 	    errorMap.add("GLOBAL", messageService.getMessage(SurveyConstants.ERROR_MSG_DESC_BLANK));
 	}
@@ -967,7 +949,7 @@ public class AuthoringController {
 	short type = getQuestionType(itemForm);
 	if (type != SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 	    if (instructionList == null || instructionList.size() < 2) {
-		 errorMap.add("GLOBAL", messageService.getMessage(SurveyConstants.ERROR_MSG_LESS_OPTIONS));
+		errorMap.add("GLOBAL", messageService.getMessage(SurveyConstants.ERROR_MSG_LESS_OPTIONS));
 	    }
 	}
     }

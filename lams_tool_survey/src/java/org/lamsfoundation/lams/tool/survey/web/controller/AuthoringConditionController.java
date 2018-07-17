@@ -35,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
@@ -138,8 +137,6 @@ public class AuthoringConditionController {
     @RequestMapping("/saveOrUpdateCondition")
     public String saveOrUpdateCondition(@ModelAttribute("surveyConditionForm") SurveyConditionForm surveyConditionForm,
 	    HttpServletRequest request) {
-
-//	ActionErrors errors = validateSurveyCondition(conditionForm, request);
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	validateSurveyCondition(surveyConditionForm, request, errorMap);
@@ -445,7 +442,4 @@ public class AuthoringConditionController {
 
     }
 
-    private ActionMessages validate(SurveyConditionForm form, HttpServletRequest request) {
-	return new ActionMessages();
-    }
 }

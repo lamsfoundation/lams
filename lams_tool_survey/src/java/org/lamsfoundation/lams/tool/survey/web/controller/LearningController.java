@@ -243,7 +243,7 @@ public class LearningController {
     }
 
     @RequestMapping("/nextQuestion")
-    private String nextQuestion(AnswerForm surveyForm, MultiValueMap<String, String> errorMap,
+    private String nextQuestion(@ModelAttribute("surveyForm") AnswerForm surveyForm, MultiValueMap<String, String> errorMap,
 	    HttpServletRequest request) {
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
 	String sessionMapID = surveyForm.getSessionMapID();
@@ -286,7 +286,7 @@ public class LearningController {
     }
 
     @RequestMapping("/previousQuestion")
-    private String previousQuestion(AnswerForm surveyForm, MultiValueMap<String, String> errorMap,
+    private String previousQuestion(@ModelAttribute("surveyForm") AnswerForm surveyForm, MultiValueMap<String, String> errorMap,
 	    HttpServletRequest request) {
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
 	String sessionMapID = surveyForm.getSessionMapID();
@@ -520,7 +520,7 @@ public class LearningController {
      * @return
      */
     @RequestMapping("/newReflection")
-    private String newReflection(ReflectionForm messageForm, HttpServletRequest request) {
+    private String newReflection(@ModelAttribute("messageForm") ReflectionForm messageForm, HttpServletRequest request) {
 
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
@@ -542,6 +542,7 @@ public class LearningController {
 	    messageForm.setEntryText(entry.getEntry());
 	}
 
+	request.setAttribute("messageForm", messageForm);
 	return "pages/learning/notebook";
     }
 
@@ -555,7 +556,7 @@ public class LearningController {
      * @return
      */
     @RequestMapping("/submitReflection")
-    private String submitReflection(ReflectionForm messageForm, HttpServletRequest request) {
+    private String submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm, HttpServletRequest request) {
 	Integer userId = messageForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
@@ -577,8 +578,8 @@ public class LearningController {
 	    entry.setLastModified(new Date());
 	    surveyService.updateEntry(entry);
 	}
-
-	return "redirect:/finish";
+	request.setAttribute("messageForm", messageForm);
+	return "redirect:/learning/finish.do";
     }
 
     // *************************************************************************************

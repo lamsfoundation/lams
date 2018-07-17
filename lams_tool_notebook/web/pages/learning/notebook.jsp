@@ -20,7 +20,7 @@
 			CKEDITOR.instances["entryText"].focus();
 		</c:when>		
 		<c:otherwise>
-			document.learningForm.focusedInput.focus();
+			document.forms.learningForm.focusedInput.focus();
 		</c:otherwise>
 		</c:choose>
 		document.getElementById("finishButton").style.visibility = 'visible';
@@ -50,13 +50,13 @@
 			}
 		</c:when>		
 		<c:otherwise>
-			if (forceResponse =="true" && document.learningForm.focusedInput.value == "") {
+			if (forceResponse =="true" && document.forms.learningForm.focusedInput.value == "") {
 
 				retValue = confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>");
 				textAreaReady();
 				return retValue;
 				
-			} else if  (forceResponse =="false" && document.learningForm.focusedInput.value == "" && mode == "learner") {
+			} else if  (forceResponse =="false" && document.forms.learningForm.focusedInput.value == "" && mode == "learner") {
 	
 				if (!confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
 					// otherwise, focus on the text area
@@ -151,7 +151,7 @@
 
 			<c:if test="${mode != 'teacher'}">
 				<div class="right-buttons voffset5">
-					<button href="#nogo" class="btn btn-primary pull-right na" id="finishButton"
+					<button href="#nogo" class="btn btn-primary pull-right na" id="finishButton" type="button"
 						onclick="submitForm('finish')">
 						<c:choose>
 							<c:when test="${activityPosition.last}">
