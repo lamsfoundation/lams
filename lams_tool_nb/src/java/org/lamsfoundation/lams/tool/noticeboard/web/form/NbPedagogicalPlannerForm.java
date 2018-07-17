@@ -25,15 +25,14 @@ package org.lamsfoundation.lams.tool.noticeboard.web.form;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
 import org.springframework.util.StringUtils;
-import org.springframework.validation.Errors;
 
 /**
  *
  *
  */
-public class NbPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class NbPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     private String basicContent;
     private String contentFolderID;
 

@@ -24,7 +24,7 @@
 	}
 	function submitForm(methodName) {
 		var f = document.getElementById('nbLearnerForm');
-		f.action += "?mode=" + methodName;
+		f.action += methodName + ".do";
 		f.submit();
 	}
 </script>
@@ -34,7 +34,8 @@
 		<c:out value="${nbLearnerForm.basicContent}" escapeXml="false" />
 	</div>
 
-	<form:form action="/learning/learner.do" modelAttribute="nbLearnerForm" target="_self" onsubmit="disableFinishButton();" id="nbLearnerForm">
+	<form:form action="/learning/" modelAttribute="nbLearnerForm" target="_self" onsubmit="disableFinishButton();" id="nbLearnerForm">
+		<form:hidden path="mode" />
 		<form:hidden path="toolSessionID" />
 
 		<c:if test="${userFinished and reflectOnActivity}">

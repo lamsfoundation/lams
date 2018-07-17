@@ -31,8 +31,7 @@
 				<td width="40%">
 					<lams:Portrait userId="${reflection.userId}" hover="true"><c:out value="${reflection.username}" /></lams:Portrait>
 				</td>
-				<c:url value="/monitoring/monitoring.do" var="viewReflection">
-					<c:param name="method" value="viewReflection" />
+				<c:url value="/monitoring/viewReflection.do" var="viewReflection">
 					<c:param name="userID" value="${reflection.userId}" />
 					<c:param name="toolSessionID" value="${reflection.externalId}" />
 				</c:url>

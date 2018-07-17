@@ -162,7 +162,10 @@ public class NbLearnerController {
 	}
 
 	boolean readOnly = false;
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, false);
+	if (NbLearnerForm.getMode() == null) {
+	    NbLearnerForm.setMode(ToolAccessMode.LEARNER.toString());
+	}
+	ToolAccessMode mode = WebUtil.getToolAccessMode(NbLearnerForm.getMode());
 	Long userID = null;
 	if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR) {
 	    userID = getUserID(request);
@@ -225,16 +228,14 @@ public class NbLearnerController {
     @RequestMapping("/teacher")
     public String teacher(@ModelAttribute NbLearnerForm NbLearnerForm, HttpServletRequest request,
 	    HttpServletResponse response) throws NbApplicationException {
-	
-	request.setAttribute("mode", "teacher");
+	NbLearnerForm.setMode("teacher");
 	return learner(NbLearnerForm, request, response);
     }
 
     @RequestMapping("/author")
     public String author(@ModelAttribute NbLearnerForm NbLearnerForm, HttpServletRequest request,
 	    HttpServletResponse response) throws NbApplicationException {
-
-	request.setAttribute("mode", "author");
+	NbLearnerForm.setMode("author");
 	return learner(NbLearnerForm, request, response);
 
     }
