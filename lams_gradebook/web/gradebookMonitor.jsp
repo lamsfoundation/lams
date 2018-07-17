@@ -313,7 +313,7 @@
 							    var subgrid_table_id = subgrid_id + "_t",
 							   	    rowData = jQuery("#" + subgrid_id.substring(0, subgrid_id.lastIndexOf('_'))).getRowData(row_id),
 							   	    activityID = rowData["id"].split("_")[0];
-								jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
+								jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll archive'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 								jQuery("#"+subgrid_table_id).jqGrid({
 										 guiStyle: "bootstrap",
 										 iconSet: 'fontAwesome',
