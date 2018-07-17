@@ -91,6 +91,7 @@ public class SignupManagementAction extends Action {
 		signupForm.set("addAsStaff", signup.getAddAsStaff());
 		signupForm.set("addWithAuthor", signup.getAddWithAuthor());
 		signupForm.set("addWithMonitor", signup.getAddWithMonitor());
+		signupForm.set("emailVerify", signup.getEmailVerify());
 		signupForm.set("courseKey", signup.getCourseKey());
 		signupForm.set("blurb", signup.getBlurb());
 		signupForm.set("disabled", signup.getDisabled());
@@ -143,6 +144,7 @@ public class SignupManagementAction extends Action {
 		signup.setAddAsStaff((Boolean) signupForm.get("addAsStaff"));
 		signup.setAddWithAuthor((Boolean) signupForm.get("addWithAuthor"));
 		signup.setAddWithMonitor((Boolean) signupForm.get("addWithMonitor"));
+		signup.setEmailVerify((Boolean) signupForm.get("emailVerify"));
 		signup.setDisabled((Boolean) signupForm.get("disabled"));
 		signup.setLoginTabActive((Boolean) signupForm.get("loginTabActive"));
 		signup.setOrganisation((Organisation) userManagementService.findById(Organisation.class,

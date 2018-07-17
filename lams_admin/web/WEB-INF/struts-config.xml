@@ -151,6 +151,7 @@
 	<form-property name="addAsStaff" type="java.lang.Boolean" initial="0" />
 	<form-property name="addWithAuthor" type="java.lang.Boolean" initial="0" />
 	<form-property name="addWithMonitor" type="java.lang.Boolean" initial="0" />
+	<form-property name="emailVerify" type="java.lang.Boolean" initial="0" />
 	<form-property name="courseKey" type="java.lang.String" />
 	<form-property name="confirmCourseKey" type="java.lang.String" />
 	<form-property name="blurb" type="java.lang.String" />
