@@ -48,6 +48,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Auxiliary action in author mode. It contains operations with NotebookCondition. The rest of operations are located in
@@ -75,7 +76,7 @@ public class AuthoringNotebookConditionController {
      * @param request
      * @return
      */
-    @RequestMapping("newConditionInit")
+    @RequestMapping(value = "newConditionInit", method = RequestMethod.POST)
     private String newConditionInit(@ModelAttribute NotebookConditionForm notebookConditionForm,
 	    HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, NotebookConstants.ATTR_SESSION_MAP_ID);
@@ -93,7 +94,7 @@ public class AuthoringNotebookConditionController {
      * @param response
      * @return
      */
-    @RequestMapping("/editCondition")
+    @RequestMapping(value = "/editCondition", method = RequestMethod.POST)
     private String editCondition(NotebookConditionForm notebookConditionForm, HttpServletRequest request) {
 
 	String sessionMapID = notebookConditionForm.getSessionMapID();
@@ -125,7 +126,7 @@ public class AuthoringNotebookConditionController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping("/saveOrUpdateCondition")
+    @RequestMapping(value = "/saveOrUpdateCondition", method = RequestMethod.POST)
     private String saveOrUpdateCondition(
 	    @ModelAttribute("notebookConditionForm") NotebookConditionForm notebookConditionForm,
 	    HttpServletRequest request) {
@@ -165,7 +166,7 @@ public class AuthoringNotebookConditionController {
      * @param response
      * @return
      */
-    @RequestMapping("/removeCondition")
+    @RequestMapping(value = "/removeCondition", method = RequestMethod.POST)
     private String removeCondition(HttpServletRequest request) {
 
 	// get back sessionMAP
@@ -202,7 +203,7 @@ public class AuthoringNotebookConditionController {
      * @param response
      * @return
      */
-    @RequestMapping("/upCondition")
+    @RequestMapping(value = "/upCondition", method = RequestMethod.POST)
     private String upCondition(HttpServletRequest request) {
 	return switchItem(request, true);
     }
@@ -216,12 +217,12 @@ public class AuthoringNotebookConditionController {
      * @param response
      * @return
      */
-    @RequestMapping("/downCondition")
+    @RequestMapping(value = "/downCondition", method = RequestMethod.POST)
     private String downCondition(HttpServletRequest request) {
 	return switchItem(request, false);
     }
 
-    @RequestMapping("/switchItem")
+    @RequestMapping(value = "/switchItem", method = RequestMethod.POST)
     private String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, NotebookConstants.ATTR_SESSION_MAP_ID);
@@ -381,9 +382,5 @@ public class AuthoringNotebookConditionController {
 	    }
 	}
     }
-
-//    private ActionMessages validate(AuthoringForm taskListForm, ActionMapping mapping, HttpServletRequest request) {
-//	return new ActionMessages();
-//    }
 
 }

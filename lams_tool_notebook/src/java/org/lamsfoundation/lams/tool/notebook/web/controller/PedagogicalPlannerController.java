@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author
@@ -58,7 +59,7 @@ public class PedagogicalPlannerController {
     @Qualifier("notebookService")
     private INotebookService notebookService;
 
-    @RequestMapping("/")
+    @RequestMapping(value = "", method = RequestMethod.POST)
     protected String unspecified(NotebookPedagogicalPlannerForm pedagogicalPlannerForm, HttpServletRequest request) {
 //	if (notebookService == null) {
 //	    notebookService = NotebookServiceProxy.getNotebookService(this.getServlet().getServletContext());
@@ -66,7 +67,7 @@ public class PedagogicalPlannerController {
 	return initPedagogicalPlannerForm(pedagogicalPlannerForm, request);
     }
 
-    @RequestMapping("/initPedagogicalPlannerForm")
+    @RequestMapping(value = "/initPedagogicalPlannerForm", method = RequestMethod.POST)
     public String initPedagogicalPlannerForm(NotebookPedagogicalPlannerForm pedagogicalPlannerForm,
 	    HttpServletRequest request) {
 	NotebookPedagogicalPlannerForm plannerForm = pedagogicalPlannerForm;
@@ -78,7 +79,7 @@ public class PedagogicalPlannerController {
 	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
+    @RequestMapping(value = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
     public String saveOrUpdatePedagogicalPlannerForm(NotebookPedagogicalPlannerForm pedagogicalPlannerForm,
 	    Errors errors, HttpServletRequest request) throws IOException {
 	pedagogicalPlannerForm.validate();

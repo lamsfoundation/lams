@@ -48,6 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -67,7 +68,7 @@ public class MonitoringController {
     @Qualifier("notebookMessageService")
     private MessageService messageService;
 
-    @RequestMapping("/")
+    @RequestMapping(value = "", method = RequestMethod.POST)
     public String unspecified(HttpServletRequest request) {
 
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -102,7 +103,7 @@ public class MonitoringController {
 	return "pages/monitoring/monitoring";
     }
 
-    @RequestMapping("/getUsers")
+    @RequestMapping(value = "/getUsers", method = RequestMethod.POST)
     public String getUsers(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long toolSessionId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
@@ -191,7 +192,7 @@ public class MonitoringController {
      * @throws Exception
      */
 
-    @RequestMapping("/saveTeacherComment")
+    @RequestMapping(value = "/saveTeacherComment", method = RequestMethod.POST)
     public String saveTeacherComment(HttpServletRequest request) throws Exception {
 
 	String teachersComment = WebUtil.readStrParam(request, "value", true);
@@ -225,7 +226,7 @@ public class MonitoringController {
      * @throws IOException
      */
 
-    @RequestMapping("/setSubmissionDeadline")
+    @RequestMapping(value = "/setSubmissionDeadline", method = RequestMethod.POST)
     public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -253,7 +254,7 @@ public class MonitoringController {
 
     /** Get the statistics for monitoring */
 
-    @RequestMapping("/getStatistics")
+    @RequestMapping(value = "/getStatistics")
     public String getStatistics(HttpServletRequest request) {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
