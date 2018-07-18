@@ -21,17 +21,8 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.leaderselection.web.forms;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
@@ -60,8 +51,6 @@ public class AuthoringForm {
     private Long deleteFileUuid;
 
     private SessionMap sessionMap;
-
-
 
     public String getSessionMapID() {
 	return sessionMapID;
