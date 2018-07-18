@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+
+    <class
+        name="org.lamsfoundation.lams.tool.zoom.model.ZoomApi"
+        table="tl_lazoom10_api"
+    >
+
+        <id
+            name="uid"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-ZoomConfig.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="email"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="email"
+        />
+
+        <property
+            name="key"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="api_key"
+        />
+
+        <property
+            name="secret"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="api_secret"
+        />
+
+    </class>
+
+</hibernate-mapping>

@@ -74,6 +74,7 @@
 	<form-property name="firstName" type="java.lang.String" />
 	<form-property name="lastName" type="java.lang.String" />
 	<form-property name="email" type="java.lang.String" />
+	<form-property name="country" type="java.lang.String" />
 	<form-property name="confirmEmail" type="java.lang.String" />
 	<form-property name="courseKey" type="java.lang.String" />
 	<form-property name="submitted" type="java.lang.Boolean" />
@@ -138,6 +139,11 @@
       <forward
         name="twoFactorAuthentication"
         path="/twoFactorAuthentication.do"
+        redirect="false"
+      />
+      <forward
+        name="policyConsents"
+        path="/policyConsents.do"
         redirect="false"
       />
       <forward
@@ -269,6 +275,16 @@
       <forward
         name="index"
         path="/"
+        redirect="false"
+      />
+      <forward
+        name="emailVerify"
+        path="/signup/emailVerify.jsp"
+        redirect="false"
+      />
+      <forward
+        name="emailVerifyResult"
+        path="/signup/emailVerifyResult.jsp"
         redirect="false"
       />
       <forward
@@ -480,7 +496,7 @@
     >
       <forward
         name="portrait"
-        path="/portrait.jsp"
+        path="/profile/portrait.jsp"
         redirect="false"
       />
     </action>
@@ -517,7 +533,7 @@
       type="org.lamsfoundation.lams.web.ProfileSaveAction"
       name="UserForm"
       scope="request"
-      input="/editprofile.jsp"
+      input="/profile/editprofile.jsp"
       unknown="false"
       validate="false"
     >
@@ -543,17 +559,27 @@
     >
       <forward
         name="view"
-        path="/profile.jsp"
+        path="/profile/profile.jsp"
         redirect="false"
       />
       <forward
         name="lessons"
-        path="/lessons.jsp"
+        path="/profile/lessons.jsp"
+        redirect="false"
+      />
+      <forward
+        name="profilePolicyConsents"
+        path="/profile/profilePolicyConsents.jsp"
+        redirect="false"
+      />
+      <forward
+        name="policyDetails"
+        path="/profile/policyDetails.jsp"
         redirect="false"
       />
       <forward
         name="edit"
-        path="/editprofile.jsp"
+        path="/profile/editprofile.jsp"
         redirect="false"
       />
     </action>
@@ -575,7 +601,7 @@
       type="org.lamsfoundation.lams.web.PortraitSaveAction"
       name="PortraitActionForm"
       scope="request"
-      input="/portrait.jsp"
+      input="/profile/portrait.jsp"
       parameter="method"
       unknown="false"
       validate="false"
@@ -654,7 +680,27 @@
         path="/twoFactorAuthSecret.jsp"
         redirect="false"
       />
-    </action>    
+    </action>   
+
+    <action
+      path="/policyConsents"
+      type="org.lamsfoundation.lams.web.action.PolicyConsentsAction"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="policyConsents"
+        path="/policyConsents.jsp"
+        redirect="false"
+      />
+      <forward
+        name="index"
+        path="/index.do"
+        redirect="true"
+      />
+    </action> 
+     
     <action
       path="/passwordChanged"
       type="org.lamsfoundation.lams.web.PasswordChangeAction"

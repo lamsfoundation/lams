@@ -54,21 +54,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Jun-Dir Liew
- *
- * Created at 12:35:38 on 14/06/2006
  */
-
-/**
- * struts doclets
- *
- *
- *
- *
- *
- *
- *
- */
-
 public class UserSaveAction extends LamsDispatchAction {
 
     private static Logger log = Logger.getLogger(UserSaveAction.class);
@@ -157,6 +143,12 @@ public class UserSaveAction extends LamsDispatchAction {
 	    errors.add("email", new ActionMessage("error.email.required"));
 	} else if (!ValidationUtil.isEmailValid(userEmail)) {
 	    errors.add("email", new ActionMessage("error.valid.email.required"));
+	}
+	
+	//country validation
+	String country = (userForm.get("country") == null) ? null : (String) userForm.get("country");
+	if (StringUtils.isBlank(country) || "0".equals(country)) {
+	    errors.add("email", new ActionMessage("error.country.required"));
 	}
 
 	if (errors.isEmpty()) {

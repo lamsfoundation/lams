@@ -181,10 +181,6 @@
 				<td><fmt:formatDate value="${org.createDate}" pattern="${datePattern}" /></td>
 			</tr>
 			<tr>
-				<td><fmt:message key="admin.organisation.locale"/>:</td>
-				<td><c:out value="${org.locale.description}" /></td>
-			</tr>
-			<tr>
 				<td><fmt:message key="admin.can.add.user"/>:</td>
 				<td><c:out value="${org.courseAdminCanAddNewUsers}" /></td>
 			</tr>
@@ -269,10 +265,6 @@
 			<tr>
 				<td><fmt:message key="admin.organisation.create.date"/>:</td>
 				<td><fmt:formatDate value="${org.createDate}" pattern="${datePattern}" /></td>
-			</tr>
-			<tr>
-				<td><fmt:message key="admin.organisation.locale"/>:</td>
-				<td><c:out value="${org.locale.description}" /></td>
 			</tr>
 			<tr>
 				<td><fmt:message key="admin.can.add.user"/>:</td>

@@ -56,6 +56,17 @@ public interface ILogEventService {
      */
     void logEvent(Integer logEventTypeId, Integer userId, Integer targetUserId, Long lessonId, Long activityId,
 	    String description);
+    
+    /**
+     * Records event of specified type in database. Designed to be called from tools, i.e. pass toolContentId instead of
+     * lessonId and activityId.
+     * 
+     * @param eventType
+     * @param toolContentId
+     * @param learnerUserId optional parameter
+     * @param message
+     */
+    void logToolEvent(int eventType, Long toolContentId, Long learnerUserId, String message);
 
     /**
      * Returns event by the given id.

@@ -21,26 +21,30 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.forum.dto;
 
 import java.util.List;
 import java.util.Map;
 
+import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 
 /**
- *
  * @author Anthony Sukkar
- *
  */
 public class SessionDTO {
 
     private Long sessionID;
     private String sessionName;
+    private boolean marksReleased;
     //used for storing data for MonitoringAction.getUsers() serving tablesorter paging
     private Map<ForumUser, List<MessageDTO>> topicsByUser;
+
+    public SessionDTO(ForumToolSession session) {
+	this.sessionID = session.getSessionId();
+	this.sessionName = session.getSessionName();
+	this.marksReleased = session.isMarkReleased();
+    }
 
     public Long getSessionID() {
 	return sessionID;
@@ -56,6 +60,14 @@ public class SessionDTO {
 
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
+    }
+    
+    public boolean isMarksReleased() {
+	return marksReleased;
+    }
+
+    public void setMarksReleased(boolean marksReleased) {
+	this.marksReleased = marksReleased;
     }
 
     public Map<ForumUser, List<MessageDTO>> getTopicsByUser() {

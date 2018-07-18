@@ -36,6 +36,7 @@ import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +60,7 @@ import org.lamsfoundation.lams.integration.util.GroupInfoFetchException;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -70,6 +72,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CSVUtil;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
@@ -96,6 +99,7 @@ public class IntegrationService implements IIntegrationService {
     private IUserManagementService service;
     private ILessonService lessonService;
     private ILamsCoreToolService toolService;
+    private ITimezoneService timezoneService;
 
     /**
      * Returns integration server or LTI tool consumer by its human-entered server key/server id.
@@ -292,8 +296,9 @@ public class IntegrationService implements IIntegrationService {
 
 	if (extUserUseridMap == null) {
 	    String[] defaultLangCountry = LanguageUtil.getDefaultLangCountry();
-	    String[] userData = { "", firstName, lastName, "", "", "", "", "", "", "", "", email, defaultLangCountry[1],
-		    defaultLangCountry[0] };
+	    String country = LanguageUtil.getDefaultCountry();
+	    String[] userData = { "", firstName, lastName, "", "", "", "", country, "", "", "", email,
+		    defaultLangCountry[1], defaultLangCountry[0] };
 	    return createExtUserUseridMap(extServer, extUsername, password, salt, userData, false);
 	} else {
 	    return extUserUseridMap;
@@ -302,14 +307,15 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public ExtUserUseridMap getImplicitExtUserUseridMap(ExtServer extServer, String extUsername, String firstName,
-	    String lastName, String language, String country, String email, boolean prefix, boolean isUpdateUserDetails)
-	    throws UserInfoValidationException {
+	    String lastName, String langIsoCode, String countryIsoCode, String country, String email, boolean prefix,
+	    boolean isUpdateUserDetails) throws UserInfoValidationException {
 
 	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(extServer, extUsername);
 
 	//create new one if it doesn't exist yet
 	if (extUserUseridMap == null) {
-	    String[] userData = { "", firstName, lastName, "", "", "", "", "", "", "", "", email, country, language };
+	    String[] userData = { "", firstName, lastName, "", "", "", "", country, "", "", "", email, countryIsoCode,
+		    langIsoCode };
 	    String salt = HashUtil.salt();
 	    String password = HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt);
 	    return createExtUserUseridMap(extServer, extUsername, password, salt, userData, prefix);
@@ -342,7 +348,11 @@ public class IntegrationService implements IIntegrationService {
 	    user.setLastName(lastName);
 	    user.setEmail(email);
 	    user.setModifiedDate(new Date());
-	    user.setLocale(LanguageUtil.getSupportedLocale(language, country));
+	    user.setLocale(LanguageUtil.getSupportedLocale(langIsoCode, countryIsoCode));
+	    if (StringUtils.isBlank(country)) {
+		country = LanguageUtil.getDefaultCountry();
+	    }
+	    user.setCountry(country);
 	    service.saveUser(user);
 
 	    return extUserUseridMap;
@@ -371,7 +381,6 @@ public class IntegrationService implements IIntegrationService {
 	org.setDescription(extCourseId);
 	org.setOrganisationState(
 		(OrganisationState) service.findById(OrganisationState.class, OrganisationState.ACTIVE));
-	org.setLocale(LanguageUtil.getSupportedLocale(langIsoCode, countryIsoCode));
 
 	org.setEnableCourseNotifications(true);
 
@@ -436,6 +445,12 @@ public class IntegrationService implements IIntegrationService {
 		    + ", firstName:" + firstName + ", lastName:" + lastName);
 	}
 
+	//set user's country to default value if it wasn't provided or has a wrong value
+	String country = userData[7];
+	if (StringUtils.isBlank(country) || !Arrays.asList(CommonConstants.COUNTRY_CODES).contains(country)) {
+	    country = LanguageUtil.getDefaultCountry();
+	}
+
 	User user = new User();
 	user.setLogin(login);
 	user.setPassword(password);
@@ -447,7 +462,7 @@ public class IntegrationService implements IIntegrationService {
 	user.setCity(userData[4]);
 	user.setState(userData[5]);
 	user.setPostcode(userData[6]);
-	user.setCountry(userData[7]);
+	user.setCountry(country);
 	user.setDayPhone(userData[8]);
 	user.setMobilePhone(userData[9]);
 	user.setFax(userData[10]);
@@ -457,6 +472,7 @@ public class IntegrationService implements IIntegrationService {
 	user.setCreateDate(new Date());
 	user.setDisabledFlag(false);
 	user.setLocale(LanguageUtil.getSupportedLocale(userData[13], userData[12]));
+	user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
 	user.setTheme(service.getDefaultTheme());
 	service.saveUser(user);
 	ExtUserUseridMap extUserUseridMap = new ExtUserUseridMap();
@@ -517,7 +533,7 @@ public class IntegrationService implements IIntegrationService {
 	    throw new UserInfoFetchException(e);
 	}
     }
-    
+
     @Override
     public boolean isIntegrationUser(Integer userId) {
 	Map<String, Object> properties = new HashMap<>();
@@ -890,6 +906,10 @@ public class IntegrationService implements IIntegrationService {
 	    return (ExtCourseClassMap) list.get(0);
 	}
     }
+    
+    // ---------------------------------------------------------------------
+    // Inversion of Control Methods - Method injection
+    // ---------------------------------------------------------------------
 
     public void setService(IUserManagementService service) {
 	this.service = service;
@@ -899,16 +919,16 @@ public class IntegrationService implements IIntegrationService {
 	this.lessonService = lessonService;
     }
 
-    public ILessonService getLessonService() {
-	return lessonService;
-    }
-
     public void setGradebookService(IGradebookService gradebookService) {
 	this.gradebookService = gradebookService;
     }
 
     public void setToolService(ILamsCoreToolService toolService) {
 	this.toolService = toolService;
+    }
+    
+    public void setTimezoneService(ITimezoneService timezoneService) {
+	this.timezoneService = timezoneService;
     }
 
 }

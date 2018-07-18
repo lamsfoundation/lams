@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.admin.web.action;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -43,7 +42,6 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -59,14 +57,13 @@ public class OrganisationAction extends LamsDispatchAction {
 
     private static IUserManagementService service;
     private static MessageService messageService;
-    private static List<SupportedLocale> locales;
     private static List status;
 
     @SuppressWarnings("unchecked")
     public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	OrganisationAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
-	initLocalesAndStatus();
+	initStatus();
 	DynaActionForm orgForm = (DynaActionForm) form;
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 
@@ -86,8 +83,6 @@ public class OrganisationAction extends LamsDispatchAction {
 			orgForm.set("parentName", org.getParentOrganisation().getName());
 			orgForm.set("typeId", org.getOrganisationType().getOrganisationTypeId());
 			orgForm.set("stateId", org.getOrganisationState().getOrganisationStateId());
-			SupportedLocale locale = org.getLocale();
-			orgForm.set("localeId", locale != null ? locale.getLocaleId() : null);
 
 			// find a course or subcourse with any lessons, so we warn user when he tries to delete the course
 			Integer courseToDeleteLessons = org.getLessons().size() > 0 ? orgId : null;
@@ -101,7 +96,6 @@ public class OrganisationAction extends LamsDispatchAction {
 			}
 			request.setAttribute("courseToDeleteLessons", courseToDeleteLessons);
 		    }
-		    request.getSession().setAttribute("locales", OrganisationAction.locales);
 		    request.getSession().setAttribute("status", OrganisationAction.status);
 		    if (OrganisationAction.service.isUserSysAdmin()
 			    || OrganisationAction.service.isUserGlobalGroupAdmin()) {
@@ -119,7 +113,7 @@ public class OrganisationAction extends LamsDispatchAction {
     public ActionForward create(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	OrganisationAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
-	initLocalesAndStatus();
+	initStatus();
 	DynaActionForm orgForm = (DynaActionForm) form;
 
 	if (!(request.isUserInRole(Role.SYSADMIN) || OrganisationAction.service.isUserGlobalGroupAdmin())) {
@@ -137,7 +131,6 @@ public class OrganisationAction extends LamsDispatchAction {
 	    Organisation parentOrg = (Organisation) OrganisationAction.service.findById(Organisation.class, parentId);
 	    orgForm.set("parentName", parentOrg.getName());
 	}
-	request.getSession().setAttribute("locales", OrganisationAction.locales);
 	request.getSession().setAttribute("status", OrganisationAction.status);
 	return mapping.findForward("organisation");
     }
@@ -225,12 +218,9 @@ public class OrganisationAction extends LamsDispatchAction {
     }
 
     @SuppressWarnings("unchecked")
-    private void initLocalesAndStatus() {
-	if ((OrganisationAction.locales == null)
-		|| ((OrganisationAction.status == null) && (OrganisationAction.service != null))) {
-	    OrganisationAction.locales = OrganisationAction.service.findAll(SupportedLocale.class);
+    private void initStatus() {
+	if (OrganisationAction.status == null && OrganisationAction.service != null) {
 	    OrganisationAction.status = OrganisationAction.service.findAll(OrganisationState.class);
-	    Collections.sort(OrganisationAction.locales);
 	}
     }
 }

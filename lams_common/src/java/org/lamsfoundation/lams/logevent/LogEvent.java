@@ -58,11 +58,12 @@ public class LogEvent implements Serializable {
     public static final int TYPE_ACCOUNT_LOCKED = 15;
     public static final int TYPE_NOTIFICATION  = 16;
     public static final int TYPE_MARK_UPDATED = 17;  // Audit Service
-    public static final int TYPE_MARK_RELEASED = 18; 
+    public static final int TYPE_MARK_RELEASED = 18; // Marks released in Gradebook
     public static final int TYPE_LEARNER_CONTENT_UPDATED = 19; // Audit Service
     public static final int TYPE_LEARNER_CONTENT_SHOW_HIDE = 20; // Audit Service
     public static final int TYPE_UNKNOWN = 21; // catch all for conversion
     public static final int TYPE_LIVE_EDIT = 22; // Start or end Live Edit of a lesson
+    public static final int TYPE_TOOL_MARK_RELEASED = 23; // Mark released in tool
 
     /** *************************************************************** */
 

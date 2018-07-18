@@ -87,6 +87,8 @@ public class SbmtConstants {
 
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";    
     
+    public static final String ATTR_IS_MARKS_RELEASED = "isMarksReleased";
+    
     public static final String ATTR_SUBMIT_FILES = "submittedFilesMap";
     
     public static final String WAIT_FOR_LEADER = "waitForLeader";

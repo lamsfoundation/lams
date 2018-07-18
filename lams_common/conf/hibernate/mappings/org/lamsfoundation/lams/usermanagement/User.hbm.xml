@@ -194,6 +194,9 @@
 				length="128"
 			</meta>
 		</property>
+		<property name="emailVerified" type="java.lang.Boolean"
+			column="email_verified" length="1">
+		</property>
 		<property name="disabledFlag" type="java.lang.Boolean"
 			column="disabled_flag" not-null="true" length="1">
 			<meta attribute="field-description">

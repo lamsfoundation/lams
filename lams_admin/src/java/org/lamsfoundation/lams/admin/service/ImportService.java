@@ -41,6 +41,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
+import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -68,33 +69,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class ImportService implements IImportService {
 
     private static Logger log = Logger.getLogger(ImportService.class);
-    public IUserManagementService service;
-    public MessageService messageService;
-    public ILogEventService logEventService;
-
-    public IUserManagementService getService() {
-	return service;
-    }
-
-    public void setService(IUserManagementService service) {
-	this.service = service;
-    }
-
-    public MessageService getMessageService() {
-	return messageService;
-    }
-
-    public void setMessageService(MessageService messageService) {
-	this.messageService = messageService;
-    }
-
-    public ILogEventService getLogEventService() {
-	return logEventService;
-    }
-
-    public void setLogEventService(ILogEventService logEventService) {
-	this.logEventService = logEventService;
-    }
+    private IUserManagementService service;
+    private MessageService messageService;
+    private ILogEventService logEventService;
+    private ITimezoneService timezoneService;
 
     // spreadsheet column indexes for user spreadsheet
     private static final short LOGIN = 0;
@@ -126,11 +104,10 @@ public class ImportService implements IImportService {
     private static final short NAME = 0;
     private static final short CODE = 1;
     private static final short DESCRIPTION = 2;
-    private static final short LOCALE_ID = 3;
-    private static final short ORGANISATION_STATE = 4;
-    private static final short ADMIN_ADD_NEW_USERS = 5;
-    private static final short ADMIN_BROWSE_ALL_USERS = 6;
-    private static final short ADMIN_CHANGE_STATUS = 7;
+    private static final short ORGANISATION_STATE = 3;
+    private static final short ADMIN_ADD_NEW_USERS = 4;
+    private static final short ADMIN_BROWSE_ALL_USERS = 5;
+    private static final short ADMIN_CHANGE_STATUS = 6;
 
     // class-wide variables
     ArrayList<ArrayList> results = new ArrayList<ArrayList>();
@@ -258,16 +235,6 @@ public class ImportService implements IImportService {
 	org.setName(name);
 	org.setCode(parseStringCell(row.getCell(ImportService.CODE)));
 	org.setDescription(parseStringCell(row.getCell(ImportService.DESCRIPTION)));
-
-	String localeId = parseStringCell(row.getCell(ImportService.LOCALE_ID));
-	SupportedLocale locale = getLocale(localeId);
-	if (locale == null) {
-	    args[0] = "(" + localeId + ")";
-	    rowResult.add(messageService.getMessage("error.locale.invalid", args));
-	    hasError = true;
-	} else {
-	    org.setLocale(locale);
-	}
 
 	String orgStateText = parseStringCell(row.getCell(ImportService.ORGANISATION_STATE));
 	OrganisationState orgState = getOrganisationState(orgStateText);
@@ -612,14 +579,18 @@ public class ImportService implements IImportService {
 	user.setCity(parseStringCell(row.getCell(ImportService.CITY)));
 	user.setState(parseStringCell(row.getCell(ImportService.STATE)));
 	user.setPostcode(parseStringCell(row.getCell(ImportService.POSTCODE)));
-	user.setCountry(parseStringCell(row.getCell(ImportService.COUNTRY)));
+	String country = parseStringCell(row.getCell(ImportService.COUNTRY));
+	if (StringUtils.isBlank(country)) {
+	    country = LanguageUtil.getDefaultCountry();
+	}
+	user.setCountry(country);
 	user.setDayPhone(parseStringCell(row.getCell(ImportService.DAY_PHONE)));
 	user.setEveningPhone(parseStringCell(row.getCell(ImportService.EVE_PHONE)));
 	user.setMobilePhone(parseStringCell(row.getCell(ImportService.MOB_PHONE)));
 	user.setFax(parseStringCell(row.getCell(ImportService.FAX)));
 	user.setDisabledFlag(false);
 	user.setCreateDate(new Date());
-	user.setTimeZone(user.getTimeZone());
+	user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
 	user.setTutorialsDisabled(false);
 	user.setFirstLogin(true);
 
@@ -845,5 +816,25 @@ public class ImportService implements IImportService {
 	String message = messageService.getMessage(key, args);
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, userDTO != null ? userDTO.getUserID() : null, null, null,
 		null, message);
+    }
+    
+    // ---------------------------------------------------------------------
+    // Inversion of Control Methods - Method injection
+    // ---------------------------------------------------------------------
+
+    public void setService(IUserManagementService service) {
+	this.service = service;
+    }
+
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
+
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
+    }
+    
+    public void setTimezoneService(ITimezoneService timezoneService) {
+	this.timezoneService = timezoneService;
     }
 }

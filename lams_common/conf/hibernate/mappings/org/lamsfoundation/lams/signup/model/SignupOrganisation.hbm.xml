@@ -73,6 +73,15 @@
             column="add_with_monitor"
             length="1"
         />
+        
+        <property
+            name="emailVerify"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
+            column="email_verify"
+            length="1"
+        />
 
         <property
             name="courseKey"

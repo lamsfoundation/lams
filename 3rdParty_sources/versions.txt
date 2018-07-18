@@ -33,6 +33,8 @@ Jackson 2.7.4
 
 jLaTexMath 1.0.6
 
+jsonwebtoken 0.9.0
+
 JSP API 2.3
 
 MySQL Connector/J 5.1.46

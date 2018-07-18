@@ -44,7 +44,6 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
-import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -126,8 +125,6 @@ public class OrgSaveAction extends Action {
 	if (errors.isEmpty()) {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    SupportedLocale locale = (SupportedLocale) service.findById(SupportedLocale.class,
-		    (Integer) orgForm.get("localeId"));
 	    OrganisationState state = (OrganisationState) service.findById(OrganisationState.class,
 		    (Integer) orgForm.get("stateId"));
 
@@ -139,7 +136,7 @@ public class OrgSaveAction extends Action {
 			    .getOrganisationStateId().equals(OrganisationState.ARCHIVED)) {
 			org.setArchivedDate(new Date());
 		    }
-		    writeAuditLog(user, org, orgForm, state, locale);
+		    writeAuditLog(user, org, orgForm, state);
 		    BeanUtils.copyProperties(org, orgForm);
 		} else {
 		    request.setAttribute("errorName", "UserAction");
@@ -153,9 +150,7 @@ public class OrgSaveAction extends Action {
 			(Organisation) service.findById(Organisation.class, (Integer) orgForm.get("parentId")));
 		org.setOrganisationType(
 			(OrganisationType) service.findById(OrganisationType.class, (Integer) orgForm.get("typeId")));
-		writeAuditLog(user, org, orgForm, org.getOrganisationState(), org.getLocale());
 	    }
-	    org.setLocale(locale);
 	    org.setOrganisationState(state);
 	    if (log.isDebugEnabled()) {
 		log.debug("orgId: " + org.getOrganisationId() + " create date: " + org.getCreateDate());
@@ -170,8 +165,7 @@ public class OrgSaveAction extends Action {
 	}
     }
 
-    private void writeAuditLog(UserDTO user, Organisation org, DynaActionForm orgForm, OrganisationState newState,
-	    SupportedLocale newLocale) {
+    private void writeAuditLog(UserDTO user, Organisation org, DynaActionForm orgForm, OrganisationState newState) {
 
 	WebApplicationContext ctx = WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServlet().getServletContext());
@@ -180,7 +174,7 @@ public class OrgSaveAction extends Action {
 
 	String message;
 
-	// audit log entries for organisation attribute changes	
+	// audit log entries for organisation attribute changes
 	if ((Integer) orgForm.get("orgId") != 0) {
 	    final String key = "audit.organisation.change";
 	    String[] args = new String[4];
@@ -190,48 +184,48 @@ public class OrgSaveAction extends Action {
 		args[2] = org.getOrganisationState().getDescription();
 		args[3] = newState.getDescription();
 		message = messageService.getMessage(key, args);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null,
-			null, null, null, message);
+		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
+			null, null, message);
 	    }
 	    if (!StringUtils.equals(org.getName(), (String) orgForm.get("name"))) {
 		args[0] = "name";
 		args[2] = org.getName();
 		args[3] = (String) orgForm.get("name");
 		message = messageService.getMessage(key, args);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null,
-			null, null, null, message);
+		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
+			null, null, message);
 	    }
 	    if (!StringUtils.equals(org.getCode(), (String) orgForm.get("code"))) {
 		args[0] = "code";
 		args[2] = org.getCode();
 		args[3] = (String) orgForm.get("code");
 		message = messageService.getMessage(key, args);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null,
-			null, null, null, message);
+		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
+			null, null, message);
 	    }
 	    if (!StringUtils.equals(org.getDescription(), orgForm.getString("description"))) {
 		args[0] = "description";
 		args[2] = org.getDescription();
 		args[3] = (String) orgForm.get("description");
 		message = messageService.getMessage(key, args);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null,
-			null, null, null, message);
+		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
+			null, null, message);
 	    }
 	    if (!org.getCourseAdminCanAddNewUsers().equals(orgForm.get("courseAdminCanAddNewUsers"))) {
 		args[0] = "courseAdminCanAddNewUsers";
 		args[2] = org.getCourseAdminCanAddNewUsers() ? "true" : "false";
 		args[3] = (Boolean) orgForm.get("courseAdminCanAddNewUsers") ? "true" : "false";
 		message = messageService.getMessage(key, args);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null,
-			null, null, null, message);
+		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
+			null, null, message);
 	    }
 	    if (!org.getCourseAdminCanBrowseAllUsers().equals(orgForm.get("courseAdminCanBrowseAllUsers"))) {
 		args[0] = "courseAdminCanBrowseAllUsers";
 		args[2] = org.getCourseAdminCanBrowseAllUsers() ? "true" : "false";
 		args[3] = (Boolean) orgForm.get("courseAdminCanBrowseAllUsers") ? "true" : "false";
 		message = messageService.getMessage(key, args);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null,
-			null, null, null, message);
+		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
+			null, null, message);
 	    }
 	    if (!org.getCourseAdminCanChangeStatusOfCourse()
 		    .equals(orgForm.get("courseAdminCanChangeStatusOfCourse"))) {
@@ -239,35 +233,16 @@ public class OrgSaveAction extends Action {
 		args[2] = org.getCourseAdminCanChangeStatusOfCourse() ? "true" : "false";
 		args[3] = (Boolean) orgForm.get("courseAdminCanChangeStatusOfCourse") ? "true" : "false";
 		message = messageService.getMessage(key, args);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null,
-			null, null, null, message);
-	    }
-	    /*
-	     * this field not set yet
-	     * if(!org.getCourseAdminCanCreateGuestAccounts().equals((Boolean)orgForm.get(
-	     * "courseAdminCanCreateGuestAccounts"))) {
-	     * args[0] = "courseAdminCanCreateGuestAccounts";
-	     * args[2] = org.getCourseAdminCanCreateGuestAccounts() ? "true" : "false";
-	     * args[3] = (Boolean)orgForm.get("courseAdminCanCreateGuestAccounts") ? "true" : "false";
-	     * message = messageService.getMessage(key, args);
-	     * auditService.log(AdminConstants.MODULE_NAME, message);
-	     * }
-	     */
-	    if (!org.getLocale().getLocaleId().equals(orgForm.get("localeId"))) {
-		args[0] = "locale";
-		args[2] = org.getLocale().getDescription();
-		args[3] = newLocale.getDescription();
-		message = messageService.getMessage(key, args);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null,
-			null, null, null, message);
+		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
+			null, null, message);
 	    }
 	} else {
 	    String[] args = new String[2];
 	    args[0] = org.getName() + "(" + org.getOrganisationId() + ")";
 	    args[1] = org.getOrganisationType().getName();
 	    message = messageService.getMessage("audit.organisation.create", args);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null,
-			null, null, null, message);
+	    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null, null,
+		    null, message);
 	}
     }
 

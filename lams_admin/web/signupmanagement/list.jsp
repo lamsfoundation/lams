@@ -15,6 +15,7 @@
 		<th><fmt:message key="admin.group.code" /></th>
 		<th><fmt:message key="admin.lessons" /></th>
 		<th><fmt:message key="admin.staff" /></th>
+		<th><fmt:message key="admin.email.verify" /></th>
 		<th><fmt:message key="admin.added.on"/></th>
 		<th><fmt:message key="admin.disable.option"/></th>
 		<th><fmt:message key="admin.context.path"/></th>
@@ -33,6 +34,9 @@
 			</td>
 			<td>
 				<c:out value="${signupOrganisation.addAsStaff}" />
+			</td>
+			<td>
+				<c:out value="${signupOrganisation.emailVerify}" />
 			</td>
 			<td>
 				<c:out value="${signupOrganisation.createDate}" />

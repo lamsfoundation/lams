@@ -73,8 +73,6 @@ public class Organisation implements Serializable, Comparable {
 
     private OrganisationState organisationState;
 
-    private SupportedLocale locale;
-
     /** persistent field */
     private Boolean courseAdminCanAddNewUsers;
 
@@ -307,14 +305,6 @@ public class Organisation implements Serializable, Comparable {
 
     public OrganisationDTO getOrganisationDTO() {
 	return new OrganisationDTO(this);
-    }
-
-    public SupportedLocale getLocale() {
-	return locale;
-    }
-
-    public void setLocale(SupportedLocale locale) {
-	this.locale = locale;
     }
 
     @Override

@@ -1,5 +1,10 @@
 package org.lamsfoundation.lams.web.action;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -15,11 +20,13 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.signup.model.SignupOrganisation;
 import org.lamsfoundation.lams.signup.service.ISignupService;
+import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
@@ -29,23 +36,31 @@ public class SignupAction extends Action {
 
     private static Logger log = Logger.getLogger(SignupAction.class);
     private static ISignupService signupService = null;
+    private static ITimezoneService timezoneService = null;
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-
-	if (SignupAction.signupService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    SignupAction.signupService = (ISignupService) wac.getBean("signupService");
+	String method = WebUtil.readStrParam(request, "method", true);
+	if (StringUtils.equals(method, "emailVerify")) {
+	    return emailVerify(mapping, form, request, response);
 	}
 
+	if (signupService == null || timezoneService == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    signupService = (ISignupService) wac.getBean("signupService");
+	    timezoneService = (ITimezoneService) wac.getBean("timezoneService");
+	}
+
+	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(true));
+
 	DynaActionForm signupForm = (DynaActionForm) form;
-	String method = WebUtil.readStrParam(request, "method", true);
+
 	String context = WebUtil.readStrParam(request, "context", true);
 	SignupOrganisation signupOrganisation = null;
 	if (StringUtils.isNotBlank(context)) {
-	    signupOrganisation = SignupAction.signupService.getSignupOrganisation(context);
+	    signupOrganisation = signupService.getSignupOrganisation(context);
 	    request.setAttribute("signupOrganisation", signupOrganisation);
 	}
 	if ((signupForm.get("submitted") == null) || !((Boolean) signupForm.get("submitted"))) {
@@ -67,7 +82,6 @@ public class SignupAction extends Action {
 	    HttpServletResponse response) {
 
 	try {
-
 	    DynaActionForm signupForm = (DynaActionForm) form;
 
 	    // validation
@@ -76,44 +90,84 @@ public class SignupAction extends Action {
 		saveErrors(request, errors);
 		return mapping.findForward("signup");
 	    } else {
+		boolean emailVerify = false;
+		String context = WebUtil.readStrParam(request, "context", true);
+		if (StringUtils.isNotBlank(context)) {
+		    SignupOrganisation signupOrganisation = signupService.getSignupOrganisation(context);
+		    emailVerify = signupOrganisation.getEmailVerify();
+		}
 		// proceed with signup
 		User user = new User();
 		user.setLogin(signupForm.getString("username"));
 		user.setFirstName(signupForm.getString("firstName"));
 		user.setLastName(signupForm.getString("lastName"));
 		user.setEmail(signupForm.getString("email"));
+		user.setCountry(signupForm.getString("country"));
+		user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
 		String salt = HashUtil.salt();
 		user.setSalt(salt);
 		user.setPassword(HashUtil.sha256(signupForm.getString("password"), salt));
-		SignupAction.signupService.signupUser(user, signupForm.getString("context"));
-
-		// send email
-		try {
-		    String subject = "Your LAMS account details";
-		    String body = "Hi there,\n\n";
-		    body += "You've successfully registered an account with username " + user.getLogin();
-		    body += " on the LAMS server at " + Configuration.get(ConfigurationKeys.SERVER_URL);
-		    body += ".  If you ever forget your password, you can reset it via this URL "
-			    + Configuration.get(ConfigurationKeys.SERVER_URL) + "/forgotPassword.jsp.";
-		    body += "\n\n";
-		    body += "Regards,\n";
-		    body += "LAMS Signup System";
-		    boolean isHtmlFormat = false;
-
-		    Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
-		} catch (Exception e) {
-		    SignupAction.log.error(e.getMessage(), e);
-		    request.setAttribute("error", e.getMessage());
+		if (emailVerify) {
+		    user.setEmailVerified(false);
+		    user.setDisabledFlag(true);
+		    signupService.signupUser(user, signupForm.getString("context"));
+		    try {
+			sendVerificationEmail(user);
+		    } catch (Exception e) {
+			log.error(e.getMessage(), e);
+			request.setAttribute("error", e.getMessage());
+		    }
+		    request.setAttribute("email", user.getEmail());
+		    return mapping.findForward("emailVerify");
+		} else {
+		    user.setDisabledFlag(false);
+		    signupService.signupUser(user, signupForm.getString("context"));
+		    try {
+			sendWelcomeEmail(user);
+		    } catch (Exception e) {
+			log.error(e.getMessage(), e);
+			request.setAttribute("error", e.getMessage());
+		    }
+		    return mapping.findForward("success");
 		}
-
-		return mapping.findForward("success");
 	    }
 	} catch (Exception e) {
-	    SignupAction.log.error(e.getMessage(), e);
+	    log.error(e.getMessage(), e);
 	    request.setAttribute("error", e.getMessage());
 	}
 
 	return mapping.findForward("index");
+    }
+
+    private void sendWelcomeEmail(User user) throws AddressException, MessagingException, UnsupportedEncodingException {
+	String subject = "LAMS: account details";
+	String body = "Hi there,\n\n";
+	body += "You've successfully registered an account with username " + user.getLogin();
+	body += " on the LAMS server at " + Configuration.get(ConfigurationKeys.SERVER_URL);
+	body += ".  If you ever forget your password, you can reset it via this URL "
+		+ Configuration.get(ConfigurationKeys.SERVER_URL) + "/forgotPassword.jsp.";
+	body += "\n\n";
+	body += "Regards,\n";
+	body += "LAMS Signup System";
+	boolean isHtmlFormat = false;
+
+	Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
+    }
+
+    private void sendVerificationEmail(User user)
+	    throws AddressException, MessagingException, UnsupportedEncodingException {
+	String hash = HashUtil.sha256(user.getEmail(), user.getSalt());
+	String link = Configuration.get(ConfigurationKeys.SERVER_URL) + "signup/signup.do?method=emailVerify&login="
+		+ URLEncoder.encode(user.getLogin(), "UTF-8") + "&hash=" + hash;
+	String subject = "LAMS: confirm email address";
+	String body = "Hi there,<br/><br/>";
+	body += "Please confirm your email address by clicking on the link below<br/>";
+	body += "<a href=\"" + link + "\">" + link + "</a><br /><br />";
+	body += "Regards,<br />";
+	body += "LAMS Signup System";
+	boolean isHtmlFormat = true;
+
+	Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
     }
 
     private ActionForward signIn(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -130,7 +184,7 @@ public class SignupAction extends Action {
 		String login = signupForm.getString("usernameTab2");
 		String password = signupForm.getString("passwordTab2");
 		String context = signupForm.getString("context");
-		SignupAction.signupService.signinUser(login, context);
+		signupService.signinUser(login, context);
 
 		HttpSession hses = request.getSession();
 		hses.setAttribute("login", login);
@@ -139,7 +193,7 @@ public class SignupAction extends Action {
 		return null;
 	    }
 	} catch (Exception e) {
-	    SignupAction.log.error(e.getMessage(), e);
+	    log.error(e.getMessage(), e);
 	    request.setAttribute("error", e.getMessage());
 	}
 
@@ -155,8 +209,8 @@ public class SignupAction extends Action {
 	    errors.add("username", new ActionMessage("error.username.blank"));
 	} else if (!ValidationUtil.isUserNameValid(userName)) {
 	    errors.add("username", new ActionMessage("error.username.invalid.characters"));
-	    SignupAction.log.info("username has invalid characters: " + userName);
-	} else if (SignupAction.signupService.usernameExists(userName)) {
+	    log.info("username has invalid characters: " + userName);
+	} else if (signupService.usernameExists(userName)) {
 	    errors.add("username", new ActionMessage("error.username.exists"));
 	}
 
@@ -166,7 +220,7 @@ public class SignupAction extends Action {
 	    errors.add("firstName", new ActionMessage("error.first.name.blank"));
 	} else if (!ValidationUtil.isFirstLastNameValid(firstName)) {
 	    errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
-	    SignupAction.log.info("firstname has invalid characters: " + firstName);
+	    log.info("firstname has invalid characters: " + firstName);
 	}
 
 	//last name validation
@@ -175,7 +229,7 @@ public class SignupAction extends Action {
 	    errors.add("lastName", new ActionMessage("error.last.name.blank"));
 	} else if (!ValidationUtil.isFirstLastNameValid(lastName)) {
 	    errors.add("lastName", new ActionMessage("error.lastname.invalid.characters"));
-	    SignupAction.log.info("lastName has invalid characters: " + lastName);
+	    log.info("lastName has invalid characters: " + lastName);
 	}
 
 	//password validation
@@ -198,9 +252,14 @@ public class SignupAction extends Action {
 	    errors.add("email", new ActionMessage("error.emails.unequal"));
 	}
 
+	//country validation
+	String country = (signupForm.get("country") == null) ? null : (String) signupForm.get("country");
+	if (StringUtils.isBlank(country) || "0".equals(country)) {
+	    errors.add("email", new ActionMessage("error.country.required"));
+	}
+
 	// courseKey validation
-	if (!SignupAction.signupService.courseKeyIsValid(signupForm.getString("context"),
-		signupForm.getString("courseKey"))) {
+	if (!signupService.courseKeyIsValid(signupForm.getString("context"), signupForm.getString("courseKey"))) {
 	    errors.add("courseKey", new ActionMessage("error.course.key.invalid"));
 	}
 	return errors;
@@ -214,15 +273,14 @@ public class SignupAction extends Action {
 	if (StringUtils.isBlank(signupForm.getString("passwordTab2"))) {
 	    errors.add("passwordTab2", new ActionMessage("error.password.blank"));
 	}
-	if (!SignupAction.signupService.courseKeyIsValid(signupForm.getString("context"),
-		signupForm.getString("courseKeyTab2"))) {
+	if (!signupService.courseKeyIsValid(signupForm.getString("context"), signupForm.getString("courseKeyTab2"))) {
 	    errors.add("courseKeyTab2", new ActionMessage("error.course.key.invalid"));
 	}
 
 	if (errors.isEmpty()) {
 	    String login = signupForm.getString("usernameTab2");
 	    String password = signupForm.getString("passwordTab2");
-	    User user = SignupAction.signupService.getUserByLogin(login);
+	    User user = signupService.getUserByLogin(login);
 	    if (user == null) {
 		errors.add("usernameTab2", new ActionMessage("error.login.or.password.incorrect",
 			"<a onclick='selectSignupTab();' id='selectLoginTabA'>", "</a>"));
@@ -237,5 +295,27 @@ public class SignupAction extends Action {
 	}
 
 	return errors;
+    }
+
+    /**
+     * Checks whether incoming hash is the same as the expected hash for email verification
+     */
+    public ActionForward emailVerify(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	String login = WebUtil.readStrParam(request, "login", false);
+	String hash = WebUtil.readStrParam(request, "hash", false);
+
+	boolean verified = signupService.emailVerify(login, hash);
+	if (verified) {
+	    request.setAttribute("emailVerified", verified);
+	    User user = signupService.getUserByLogin(login);
+	    try {
+		sendWelcomeEmail(user);
+	    } catch (Exception e) {
+		log.error(e.getMessage(), e);
+		request.setAttribute("error", e.getMessage());
+	    }
+	}
+	return mapping.findForward("emailVerifyResult");
     }
 }

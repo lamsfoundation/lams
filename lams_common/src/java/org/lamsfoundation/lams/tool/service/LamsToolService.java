@@ -160,13 +160,18 @@ public class LamsToolService implements ILamsToolService {
 
     @Override
     public void setActivityEvaluation(Long toolContentId, String toolOutputDefinition) {
+	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
+	ActivityEvaluation evaluation = toolActivity.getEvaluation();
+
 	if (StringUtils.isEmpty(toolOutputDefinition)) {
+	    if (evaluation != null) {
+		toolActivity.setEvaluation(null);
+		activityDAO.delete(evaluation);
+	    }
 	    gradebookService.removeActivityMark(toolContentId);
 	    return;
 	}
 
-	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
-	ActivityEvaluation evaluation = toolActivity.getEvaluation();
 	boolean isToolOutputDefinitionChanged = true;
 	if (evaluation == null) {
 	    evaluation = new ActivityEvaluation();

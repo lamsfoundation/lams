@@ -24,10 +24,13 @@
 package org.lamsfoundation.lams.util;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
@@ -40,7 +43,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * Various internationalisation (internationalization) utilities.
  *
  * @author Fiona Malikoff
- *
  */
 public class LanguageUtil {
 
@@ -51,19 +53,7 @@ public class LanguageUtil {
     public static final String DEFAULT_DIRECTION = "LTR";
 
     private static IUserManagementService service;
-
-    private static IUserManagementService getService() {
-	if (LanguageUtil.service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getWebApplicationContext(SessionManager.getServletContext());
-	    LanguageUtil.service = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return LanguageUtil.service;
-    }
-
-    public static void setService(IUserManagementService service) {
-	LanguageUtil.service = service;
-    }
+    private static MessageService messageService;
 
     /**
      * Get the default language, country, based on entries in the server configuration file.
@@ -126,6 +116,7 @@ public class LanguageUtil {
     public static SupportedLocale getDefaultLocale() {
 	String localeName = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 	String langIsoCode = LanguageUtil.DEFAULT_LANGUAGE;
+	// try to use the server's country first
 	String countryIsoCode = LanguageUtil.DEFAULT_COUNTRY;
 	if (StringUtils.isNotBlank(localeName) && (localeName.length() > 2)) {
 	    langIsoCode = localeName.substring(0, 2);
@@ -135,10 +126,16 @@ public class LanguageUtil {
 	SupportedLocale locale = null;
 	locale = LanguageUtil.getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
 	if (locale == null) {
+	    // if default language and server do not yield result, default to en_AU
 	    locale = LanguageUtil.getSupportedLocaleOrNull(LanguageUtil.DEFAULT_LANGUAGE, LanguageUtil.DEFAULT_COUNTRY);
 	}
 
 	return locale;
+    }
+
+    public static String getDefaultCountry() {
+	String serverCountry = Configuration.get(ConfigurationKeys.SERVER_COUNTRY);
+	return StringUtils.isBlank(serverCountry) ? LanguageUtil.DEFAULT_COUNTRY : serverCountry;
     }
 
     /**
@@ -198,6 +195,48 @@ public class LanguageUtil {
 	    locale = null;
 	}
 	return locale;
+    }
+
+    /**
+     * Get list of all available country names sorted alphabetically.
+     *
+     * @parama enforceUsingDefaultLocale in some rare cases (like with SignupAction) it's useful to enforce using LAMS
+     *         server's default locale, instead of the system default one
+     */
+    public static Map<String, String> getCountryCodes(boolean enforceUsingDefaultLocale) {
+	LanguageUtil.getMessageService();
+	SupportedLocale lamsDefaultLocale = enforceUsingDefaultLocale ? LanguageUtil.getDefaultLocale() : null;
+
+	Map<String, String> countryCodesMap = new HashMap<String, String>();
+	for (String countryCode : CommonConstants.COUNTRY_CODES) {
+	    String countryName = enforceUsingDefaultLocale
+		    ? messageService.getMessage("country." + countryCode, lamsDefaultLocale)
+		    : messageService.getMessage("country." + countryCode);
+	    countryCodesMap.put(countryCode, countryName);
+	}
+
+	//sort alphabetically
+	return countryCodesMap.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.naturalOrder()))
+		.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue,
+			LinkedHashMap::new));
+    }
+
+    private static IUserManagementService getService() {
+	if (service == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(SessionManager.getServletContext());
+	    service = (IUserManagementService) ctx.getBean("userManagementService");
+	}
+	return service;
+    }
+
+    private static MessageService getMessageService() {
+	if (messageService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(SessionManager.getServletContext());
+	    messageService = (MessageService) ctx.getBean("commonMessageService");
+	}
+	return messageService;
     }
 
 }

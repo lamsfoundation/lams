@@ -32,6 +32,12 @@
 			<td></td>
 		</tr>
 		<tr>
+			<td><fmt:message key="admin.email.verify" />:</td>
+			<td colspan="2"><html:checkbox property="emailVerify" />&nbsp;&nbsp;
+				<span class="signupFieldDescription"><fmt:message key="admin.email.verify.desc" /></span>
+			</td>
+		</tr>
+		<tr>
 			<td colspan="2"><html:errors property="courseKey" /></td>
 		</tr>
 		<tr>

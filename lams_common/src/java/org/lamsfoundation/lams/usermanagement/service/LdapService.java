@@ -46,6 +46,7 @@ import javax.naming.ldap.PagedResultsResponseControl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
+import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -67,20 +68,14 @@ public class LdapService implements ILdapService {
     private Logger log = Logger.getLogger(LdapService.class);
 
     private IUserManagementService service;
+    
+    private ITimezoneService timezoneService;
 
     private static final int BULK_UPDATE_CREATED = 0;
 
     private static final int BULK_UPDATE_UPDATED = 1;
 
     private static final int BULK_UPDATE_DISABLED = 2;
-
-    public IUserManagementService getService() {
-	return service;
-    }
-
-    public void setService(IUserManagementService service) {
-	this.service = service;
-    }
 
     @Override
     public void updateLDAPUser(User user, Attributes attrs) {
@@ -102,7 +97,7 @@ public class LdapService implements ILdapService {
 	user.setMobilePhone(map.get("mobile"));
 	user.setLocale(getLocale(map.get("locale")));
 	user.setDisabledFlag(getDisabledBoolean(attrs));
-	getService().saveUser(user);
+	service.saveUser(user);
     }
 
     // tries to match ldap attribute to a locale, otherwise returns server
@@ -159,7 +154,7 @@ public class LdapService implements ILdapService {
 		user.setDisabledFlag(getDisabledBoolean(attrs));
 		user.setCreateDate(new Date());
 		user.setLocale(getLocale(map.get("locale")));
-		user.setTimeZone(user.getTimeZone());
+		user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
 		user.setTutorialsDisabled(false);
 		user.setFirstLogin(true);
 		service.saveUser(user);
@@ -583,12 +578,12 @@ public class LdapService implements ILdapService {
     // create, update, or disable this user
     private int bulkUpdateLDAPUser(String login, Attributes attrs, boolean disabled) {
 	int returnCode = -1;
-	User user = getService().getUserByLogin(login);
+	User user = service.getUserByLogin(login);
 	if (!disabled) {
 	    if (user == null) {
 		log.info("Creating new user for LDAP username: " + login);
 		if (createLDAPUser(attrs)) {
-		    user = getService().getUserByLogin(login);
+		    user = service.getUserByLogin(login);
 		    returnCode = LdapService.BULK_UPDATE_CREATED;
 		} else {
 		    log.error("Couldn't create new user for LDAP username: " + login);
@@ -603,7 +598,7 @@ public class LdapService implements ILdapService {
 	} else {
 	    // remove user from groups and set disabled flag
 	    if (user != null) {
-		getService().disableUser(user.getUserId());
+		service.disableUser(user.getUserId());
 		returnCode = LdapService.BULK_UPDATE_DISABLED;
 	    }
 	}
@@ -621,6 +616,18 @@ public class LdapService implements ILdapService {
 	    }
 	}
 	return null;
+    }
+    
+    // ---------------------------------------------------------------------
+    // Inversion of Control Methods - Method injection
+    // ---------------------------------------------------------------------
+
+    public void setService(IUserManagementService service) {
+	this.service = service;
+    }
+    
+    public void setTimezoneService(ITimezoneService timezoneService) {
+	this.timezoneService = timezoneService;
     }
 
 }

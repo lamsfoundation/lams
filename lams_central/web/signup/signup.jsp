@@ -54,6 +54,11 @@
                     <li><i class="fa fa-info-circle fa-li fa-lg"></i>
                         <fmt:message key="register.if.you.want.to.signup" />
                     </li>
+                    <c:if test="${not empty signupOrganisation and signupOrganisation.emailVerify}">
+	                     <li>
+	                        <fmt:message key="register.email.verify" />
+	                    </li>
+                    </c:if>
                 </ul>
             </div>    
 

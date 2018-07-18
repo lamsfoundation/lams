@@ -62,6 +62,7 @@ public class SysAdminStartAction extends Action {
 	    links.add(new LinkBean("signupManagement.do", "admin.signup.title"));
 	    links.add(new LinkBean("serverlist.do", "sysadmin.maintain.external.servers"));
 	    links.add(new LinkBean("ltiConsumerManagement.do", "label.manage.tool.consumers"));
+	    links.add(new LinkBean("policyManagement.do?method=list", "admin.policies.title"));
 	    links.add(new LinkBean("toolcontentlist.do", "sysadmin.tool.management"));
 	    links.add(new LinkBean("themeManagement.do", "admin.themes.title"));
 	    links.add(new LinkBean("sessionmaintain.do?method=list", "sysadmin.maintain.session"));

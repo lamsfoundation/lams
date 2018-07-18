@@ -110,6 +110,12 @@ public class ProfileSaveAction extends Action {
 	} else if (!ValidationUtil.isEmailValid(userEmail)) {
 	    errors.add("email", new ActionMessage("error.valid.email.required"));
 	}
+	
+	//country validation
+	String country = (userForm.get("country") == null) ? null : (String) userForm.get("country");
+	if (StringUtils.isBlank(country) || "0".equals(country)) {
+	    errors.add("email", new ActionMessage("error.country.required"));
+	}
 
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);

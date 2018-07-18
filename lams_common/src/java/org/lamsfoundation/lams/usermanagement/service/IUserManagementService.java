@@ -52,9 +52,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public interface IUserManagementService {
-    static int PORTRAIT_LARGEST_DIMENSION_LARGE = 200;
-    static int PORTRAIT_LARGEST_DIMENSION_MEDIUM = 80;
-    static int PORTRAIT_LARGEST_DIMENSION_SMALL = 35;
 
     /**
      * save(insert or update)

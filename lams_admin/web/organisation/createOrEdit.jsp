@@ -74,18 +74,6 @@
 		<td><html-el:textarea property="description" cols="50" rows="3" styleClass="form-control" styleId="description" /></td>
 	</tr>
 	<tr>
-		<td><fmt:message key="admin.organisation.locale"/></td>
-		<td>
-			<html-el:select property="localeId" styleClass="form-control" >
-				<c:forEach items="${locales}" var="locale">
-					<html-el:option value="${locale.localeId}">
-						<c:out value="${locale.description}" />
-					</html-el:option>
-				</c:forEach>	
-			</html-el:select>
-		</td>
-	</tr>
-	<tr>
 		<td><fmt:message key="admin.organisation.status"/></td>
 		<td>
 			<html-el:select property="stateId" styleClass="form-control" >
