@@ -278,6 +278,16 @@
         redirect="false"
       />
       <forward
+        name="emailVerify"
+        path="/signup/emailVerify.jsp"
+        redirect="false"
+      />
+      <forward
+        name="emailVerifyResult"
+        path="/signup/emailVerifyResult.jsp"
+        redirect="false"
+      />
+      <forward
         name="success"
         path=".successfulSignup"
         redirect="false"

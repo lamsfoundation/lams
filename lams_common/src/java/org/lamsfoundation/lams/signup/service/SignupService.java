@@ -21,6 +21,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 
 public class SignupService implements ISignupService {
@@ -33,7 +34,6 @@ public class SignupService implements ISignupService {
     public void signupUser(User user, String context) {
 	// save User
 	user.setTheme(userManagementService.getDefaultTheme());
-	user.setDisabledFlag(false);
 	user.setAuthenticationMethod(getAuthenticationMethod(AuthenticationMethod.DB));
 	user.setLocale(getDefaultLocale());
 	user.setCreateDate(new Date());
@@ -140,6 +140,20 @@ public class SignupService implements ISignupService {
     @Override
     public boolean contextExists(Integer soid, String context) {
 	return signupDAO.contextExists(soid, context);
+    }
+
+    @Override
+    public boolean emailVerify(String login, String hash) {
+	User user = getUserByLogin(login);
+	if (user == null || !hash.equals(HashUtil.sha256(user.getEmail(), user.getSalt()))) {
+	    return false;
+	}
+	if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+	    user.setEmailVerified(true);
+	    user.setDisabledFlag(false);
+	    userManagementService.save(user);
+	}
+	return true;
     }
 
     public void setSignupDAO(ISignupDAO signupDAO) {
