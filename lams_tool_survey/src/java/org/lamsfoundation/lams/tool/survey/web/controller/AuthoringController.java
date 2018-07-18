@@ -73,6 +73,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Steve.Ni
@@ -299,7 +300,7 @@ public class AuthoringController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping("/saveOrUpdateItem")
+    @RequestMapping(value="/saveOrUpdateItem", method=RequestMethod.POST)
     public String saveOrUpdateItem(@ModelAttribute("surveyItemForm") QuestionForm surveyItemForm,
 	    HttpServletRequest request) throws Exception {
 	// get instructions:
@@ -551,7 +552,7 @@ public class AuthoringController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping("/update")
+    @RequestMapping(value="/update", method=RequestMethod.POST)
     public String updateContent(@ModelAttribute("authoringForm") SurveyForm authoringForm, HttpServletRequest request)
 	    throws Exception {
 

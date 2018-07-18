@@ -74,6 +74,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -243,8 +244,8 @@ public class LearningController {
     }
 
     @RequestMapping("/nextQuestion")
-    private String nextQuestion(@ModelAttribute("surveyForm") AnswerForm surveyForm, MultiValueMap<String, String> errorMap,
-	    HttpServletRequest request) {
+    private String nextQuestion(@ModelAttribute("surveyForm") AnswerForm surveyForm,
+	    MultiValueMap<String, String> errorMap, HttpServletRequest request) {
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
 	String sessionMapID = surveyForm.getSessionMapID();
 
@@ -286,8 +287,8 @@ public class LearningController {
     }
 
     @RequestMapping("/previousQuestion")
-    private String previousQuestion(@ModelAttribute("surveyForm") AnswerForm surveyForm, MultiValueMap<String, String> errorMap,
-	    HttpServletRequest request) {
+    private String previousQuestion(@ModelAttribute("surveyForm") AnswerForm surveyForm,
+	    MultiValueMap<String, String> errorMap, HttpServletRequest request) {
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
 	String sessionMapID = surveyForm.getSessionMapID();
 
@@ -520,7 +521,8 @@ public class LearningController {
      * @return
      */
     @RequestMapping("/newReflection")
-    private String newReflection(@ModelAttribute("messageForm") ReflectionForm messageForm, HttpServletRequest request) {
+    private String newReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
+	    HttpServletRequest request) {
 
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
@@ -555,8 +557,9 @@ public class LearningController {
      * @param response
      * @return
      */
-    @RequestMapping("/submitReflection")
-    private String submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm, HttpServletRequest request) {
+    @RequestMapping(value = "/submitReflection", method = RequestMethod.POST)
+    private String submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
+	    HttpServletRequest request) {
 	Integer userId = messageForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);

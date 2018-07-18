@@ -7,5 +7,3 @@
          </c:forEach> 
      </lams:Alert> 
 </c:if>
-
-

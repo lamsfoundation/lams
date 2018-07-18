@@ -134,7 +134,7 @@ public class AuthoringConditionController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping("/saveOrUpdateCondition")
+    @RequestMapping(value = "/saveOrUpdateCondition", method = RequestMethod.POST)
     public String saveOrUpdateCondition(@ModelAttribute("surveyConditionForm") SurveyConditionForm surveyConditionForm,
 	    HttpServletRequest request) {
 
