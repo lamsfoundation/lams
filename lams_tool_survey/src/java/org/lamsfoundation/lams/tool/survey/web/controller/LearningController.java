@@ -582,7 +582,7 @@ public class LearningController {
 	    surveyService.updateEntry(entry);
 	}
 	request.setAttribute("messageForm", messageForm);
-	return "redirect:/learning/finish.do";
+	return finish(request);
     }
 
     // *************************************************************************************
