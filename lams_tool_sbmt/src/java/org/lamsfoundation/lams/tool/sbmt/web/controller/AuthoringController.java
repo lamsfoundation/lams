@@ -122,7 +122,7 @@ public class AuthoringController {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	errorMap = validate(authoringForm, request);
 	if (!errorMap.isEmpty()) {
-	    return "redirect:/";
+	    return "authoring/authoring";
 	}
 
 	SubmitFilesContent content = getContent(authoringForm);

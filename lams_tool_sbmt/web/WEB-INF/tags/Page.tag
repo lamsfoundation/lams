@@ -89,7 +89,7 @@
 					</c:if>
 				</c:if>
 			</c:if>
-			<c:if test="${empty toolSessionId}">
+			<c:if test="${empty toolSessionId and not empty formID}">
 				<c:set var="toolForm" value="${requestScope[formID]}" />
 				<c:if test="${not empty toolForm}"> 
 				    <c:set var="toolSessionId"><c:catch var="exception">${toolForm.toolSessionID}</c:catch></c:set>

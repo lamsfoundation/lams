@@ -13,6 +13,7 @@ import org.lamsfoundation.lams.tool.sbmt.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -20,7 +21,8 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -36,6 +38,10 @@ public class ReflectController {
     @Autowired
     @Qualifier("submitFilesService")
     private ISubmitFilesService submitFilesService;
+
+    @Autowired
+    @Qualifier("sbmtMessageService")
+    private static MessageService messageService;
 
     /**
      * Display empty reflection form.
@@ -110,8 +116,7 @@ public class ReflectController {
     //		Private mehtods
     //**********************************************************************************************
 
-    public static void validateBeforeFinish(Errors errors, HttpServletRequest request,
-	    ISubmitFilesService submitFilesService) {
+    public static void validateBeforeFinish(HttpServletRequest request, ISubmitFilesService submitFilesService) {
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -119,11 +124,11 @@ public class ReflectController {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Integer userID = user.getUserID();
-
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	List list = submitFilesService.getFilesUploadedByUser(userID, sessionId, request.getLocale(), false);
 	int minUpload = (Integer) sessionMap.get(SbmtConstants.PARAM_MIN_UPLOAD);
 	if (minUpload > 0) {
-	    errors.reject("error.learning.minimum.upload.number.less");
+	    errorMap.add("GLOBAL", messageService.getMessage("error.learning.minimum.upload.number.less"));
 	}
     }
 }

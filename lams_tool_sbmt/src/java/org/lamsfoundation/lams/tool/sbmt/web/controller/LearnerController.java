@@ -77,7 +77,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -299,8 +298,7 @@ public class LearnerController implements SbmtConstants {
      * more submission use.
      */
     @RequestMapping("/uploadFile")
-    public String uploadFile(@ModelAttribute LearnerForm learnerForm, @RequestParam("file") MultipartFile file,
-	    HttpServletRequest request) {
+    public String uploadFile(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 
 	String sessionMapID = learnerForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -326,7 +324,7 @@ public class LearnerController implements SbmtConstants {
 	    ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	    setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
 
-	    return "redirect:/";
+	    return "learner/sbmtlearner";
 	}
 
 	// get session from shared session.
@@ -335,7 +333,7 @@ public class LearnerController implements SbmtConstants {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Integer userID = user.getUserID();
 
-	file = learnerForm.getFile();
+	MultipartFile file = learnerForm.getFile();
 	String fileDescription = learnerForm.getDescription();
 	// reset fields and display a new form for next new file upload
 	learnerForm.setDescription("");
