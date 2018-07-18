@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
@@ -92,7 +91,7 @@ public interface ISubmitFilesService {
 
     /**
      * Get a the details for a single file uploaded by a learner
-     * 
+     *
      * @param detailId
      * @return SubmissionDetails
      */
@@ -150,14 +149,14 @@ public interface ISubmitFilesService {
     /**
      * Mark the original file uploaded by a learner as deleted. Does not delete the file
      * from the content repository.
-     * 
+     *
      * @param detailID
      */
     public void removeLearnerFile(Long detailID, UserDTO monitor);
 
     /**
      * Mark a deleted original file as not deleted. Undoes what removeLearnerFile().
-     * 
+     *
      * @param detailID
      */
     public void restoreLearnerFile(Long detailID, UserDTO monitor);

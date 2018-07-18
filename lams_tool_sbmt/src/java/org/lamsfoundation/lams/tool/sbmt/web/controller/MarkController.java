@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedExce
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.web.form.MarkForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -66,6 +67,10 @@ public class MarkController {
     @Qualifier("submitFilesService")
     private ISubmitFilesService submitFilesService;
 
+    @Autowired
+    @Qualifier("sbmtMessageService")
+    private MessageService messageService;
+
     /**
      * Update mark.
      */
@@ -76,11 +81,11 @@ public class MarkController {
 	// Check whether the mark is valid.
 	Float marks = null;
 	String markStr = markForm.getMarks();
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<String, String>();
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	try {
 	    marks = NumberUtil.getLocalisedFloat(markStr, request.getLocale());
 	} catch (Exception e) {
-	    errorMap.add("GLOBAL", "errors.mark.invalid.number");
+	    errorMap.add("GLOBAL", messageService.getMessage("errors.mark.invalid.number"));
 	}
 
 	String comments = WebUtil.readStrParam(request, "comments", true);

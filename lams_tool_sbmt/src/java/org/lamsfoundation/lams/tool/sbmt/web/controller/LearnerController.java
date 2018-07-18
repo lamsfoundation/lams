@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.sbmt.web.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -123,14 +122,14 @@ public class LearnerController implements SbmtConstants {
 	    mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, LearnerController.MODE_OPTIONAL);
 	} catch (Exception e) {
 	}
-	
+
 	String sessionIDStr = WebUtil.readStrParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long sessionID = Long.valueOf(sessionIDStr);
 	request.setAttribute("toolSessionID", sessionID);
-	
-        if (mode == null) {
-            mode = ToolAccessMode.LEARNER;
-        }
+
+	if (mode == null) {
+	    mode = ToolAccessMode.LEARNER;
+	}
 	// get session from shared session.
 	HttpSession ss = SessionManager.getSession();
 
@@ -408,15 +407,15 @@ public class LearnerController implements SbmtConstants {
     // validate uploaded form
     private boolean validateUploadForm(LearnerForm learnerForm, HttpServletRequest request) {
 	Locale preferredLocale = (Locale) request.getSession().getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
-	
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<String, String>();
+
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (learnerForm.getFile() == null || StringUtils.isBlank(learnerForm.getFile().getName())) {
 	    errorMap.add("GLOBAL", messageService.getMessage("learner.form.filepath.displayname"));
 	}
 	if (StringUtils.isBlank(learnerForm.getDescription())) {
 	    errorMap.add("GLOBAL", messageService.getMessage("label.learner.fileDescription"));
 	} else if (learnerForm.getDescription().length() > LearnerForm.DESCRIPTION_LENGTH) {
-	    errorMap.add("GLOBAL", "errors.maxdescsize");
+	    errorMap.add("GLOBAL", messageService.getMessage("errors.maxdescsize"));
 	}
 
 	FileValidatorSpringUtil.validateFileSize(learnerForm.getFile().getSize(), false, errorMap);
@@ -427,7 +426,7 @@ public class LearnerController implements SbmtConstants {
 
 	if (learnerForm.getFile() != null && FileUtil.isExecutableFile(learnerForm.getFile().getName())) {
 	    LearnerController.logger.debug("File is executatable : " + learnerForm.getFile().getName());
-	    errorMap.add("GLOBAL", "error.attachment.executable");
+	    errorMap.add("GLOBAL", messageService.getMessage("error.attachment.executable"));
 	}
 
 	if (!errorMap.isEmpty()) {

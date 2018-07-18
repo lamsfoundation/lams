@@ -19,7 +19,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/readmore.min.js"></script>
 	<script type="text/javascript">
 		function updateMark(detailId,reportId,sessionId,userId){
-			location.href="<lams:WebAppURL/>mark.do?method=newMark&updateMode=listAllMarks&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
+			location.href="<lams:WebAppURL/>mark/newMark.do?updateMode=listAllMarks&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
 		}
 		</script>
 </lams:head>

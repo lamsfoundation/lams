@@ -32,7 +32,7 @@
 	<form:hidden path="toolContentID" />
 	<form:hidden path="contentFolderID" />
 	
-	<lams:Page title="${title}" type="navbar">
+	<lams:Page title="${title}" type="navbar" formID="authoringForm">
 		
 		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= SbmtConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 			<lams:Tab id="1" key="label.authoring.heading.basic" />

@@ -41,7 +41,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -272,8 +271,8 @@ public class SubmitFilesService
 	List<SubmissionDetails> leaderSubmissions = submissionDetailsDAO.getBySessionAndLearner(fromUser.getSessionID(),
 		fromUser.getUserID());
 
-	List<SubmissionDetails> existingSubmissions = submissionDetailsDAO
-		.getBySessionAndLearner(toUser.getSessionID(), toUser.getUserID());
+	List<SubmissionDetails> existingSubmissions = submissionDetailsDAO.getBySessionAndLearner(toUser.getSessionID(),
+		toUser.getUserID());
 
 	// Note: uuid never changes once a file is uploaded as this is the key from the content repository.
 	for (SubmissionDetails leadersubmission : leaderSubmissions) {
@@ -314,7 +313,7 @@ public class SubmitFilesService
 	    } else {
 		usersubmission.setReport(null);
 	    }
-	    
+
 	    submissionDetailsDAO.save(usersubmission);
 	}
     }
@@ -700,7 +699,6 @@ public class SubmitFilesService
 	return new ArrayList(details);
     }
 
-    
     @Override
     public SubmissionDetails getSubmissionDetail(Long detailId) {
 	return submissionDetailsDAO.getSubmissionDetailsByID(detailId);
@@ -783,7 +781,7 @@ public class SubmitFilesService
 		    report.setMarks(marks);
 
 		    // If there is a new file, delete the existing and add the mark file
-		    if ( nodeKey != null) {
+		    if (nodeKey != null) {
 
 			// Delete the existing
 			if (report.getMarkFileUUID() != null) {
@@ -854,7 +852,7 @@ public class SubmitFilesService
 		    submitFilesReportDAO.update(report);
 		}
 	    }
-	    
+
 	} else {
 	    SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
 	    if (report != null) {
@@ -1504,6 +1502,5 @@ public class SubmitFilesService
 
 	return (groupLeader != null) && user.getUserID().equals(groupLeader.getUserID());
     }
-
 
 }

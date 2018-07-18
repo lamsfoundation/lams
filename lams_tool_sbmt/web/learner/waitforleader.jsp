@@ -19,7 +19,7 @@
 </lams:head>
 <body class="stripes">
 
-	<lams:Page type="learner" title="${content.title}">
+	<lams:Page type="learner" title="${content.title}" formID="learnerForm">
 	
 				
 		<c:if test="${isLeadershipEnabled}">

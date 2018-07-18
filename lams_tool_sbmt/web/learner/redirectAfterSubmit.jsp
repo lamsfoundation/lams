@@ -14,7 +14,7 @@ s<%@ include file="/common/taglibs.jsp"%>
 </lams:head>
 
 <body class="stripes">
-<lams:Page type="admin">
+<lams:Page type="admin" formID="learnerForm">
 	<div class="text-center" style="margin-top: 10px; margin-bottom: 15px;">
 		<i class="fa fa-2x fa-refresh fa-spin text-primary"></i>
 	</div>

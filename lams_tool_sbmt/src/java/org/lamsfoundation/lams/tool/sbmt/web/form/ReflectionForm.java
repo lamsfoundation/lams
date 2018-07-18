@@ -21,11 +21,9 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.sbmt.web.form;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.validator.ValidatorForm;
 
 /**
  *

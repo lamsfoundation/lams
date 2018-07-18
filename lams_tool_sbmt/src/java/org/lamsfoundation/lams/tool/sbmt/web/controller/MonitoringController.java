@@ -44,7 +44,6 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.tool.sbmt.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
@@ -55,7 +54,6 @@ import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
-import org.lamsfoundation.lams.tool.sbmt.web.form.MarkForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -68,7 +66,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
@@ -267,6 +264,7 @@ public class MonitoringController {
      * Release mark
      */
     @RequestMapping("/releaseMarks")
+    @ResponseBody
     public void releaseMarks(HttpServletRequest request, HttpServletResponse response) {
 
 	// get service then update report table
@@ -297,7 +295,7 @@ public class MonitoringController {
 	// return FileDetailsDTO list according to the given sessionID
 	Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
 	// construct Excel file format and download
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<String, String>();
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	try {
 	    // create an empty excel file
 	    HSSFWorkbook wb = new HSSFWorkbook();
@@ -374,17 +372,17 @@ public class MonitoringController {
 	    response.getOutputStream().flush();
 	} catch (Exception e) {
 	    logger.error(e);
-	    errorMap.add("monitoring.download.error", e.toString());
+	    errorMap.add(messageService.getMessage("monitoring.download.error"), e.toString());
 	}
 
 	if (!errorMap.isEmpty()) {
 	    try {
 		PrintWriter out = response.getWriter();
 		Iterator<String> it = errorMap.keySet().iterator();
-	         while(it.hasNext()){
-	           String theKey = (String)it.next();
-	           out.write(theKey);
-	         }
+		while (it.hasNext()) {
+		    String theKey = it.next();
+		    out.write(theKey);
+		}
 		out.flush();
 	    } catch (IOException e) {
 	    }

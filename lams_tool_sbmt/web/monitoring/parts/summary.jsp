@@ -124,13 +124,12 @@
 	}
 
 	function releaseMarks(sessionId) {
-		var url = "<c:url value="/monitoring.do"/>";
+		var url = "<c:url value="/monitoring/releaseMarks.do"/>";
 		
 		$("#messageArea_Busy").show();
 		$("#messageArea").load(
 			url,
 			{
-				method: "releaseMarks",
 				toolSessionID: sessionId, 
 				reqID: (new Date()).getTime()
 			},
@@ -199,9 +198,7 @@
 		</button>
 		<form action="monitoring/downloadMarks.do" method="post" style="display:inline">
 			<input type="hidden" name="toolSessionID" value="${sessionDto.sessionID}" />
-			<input type="submit" name="downloadMarks" class="btn btn-default loffset5 voffset10" >
-				<fmt:message key="label.monitoring.downloadMarks.button" />
-			</input>
+			<input type="submit" name="downloadMarks" value="<fmt:message key="label.monitoring.downloadMarks.button" />" class="btn btn-default loffset5 voffset10" />
 		</form>
 	</P>
 		

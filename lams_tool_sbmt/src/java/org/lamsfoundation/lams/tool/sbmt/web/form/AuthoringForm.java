@@ -2,8 +2,6 @@ package org.lamsfoundation.lams.tool.sbmt.web.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.validator.ValidatorForm;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 
 /**
@@ -32,7 +30,7 @@ public class AuthoringForm {
     // file and display fields
 
     private boolean limitUpload;
-    
+
     private boolean useSelectLeaderToolOuput;
 
     private int limitUploadNumber;
@@ -178,12 +176,12 @@ public class AuthoringForm {
     public void setNotifyTeachersOnFileSubmit(boolean notifyTeachersOnFileSubmit) {
 	this.notifyTeachersOnFileSubmit = notifyTeachersOnFileSubmit;
     }
-    
+
     public boolean isUseSelectLeaderToolOuput() {
-   	return useSelectLeaderToolOuput;
+	return useSelectLeaderToolOuput;
     }
 
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
-   	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 }
