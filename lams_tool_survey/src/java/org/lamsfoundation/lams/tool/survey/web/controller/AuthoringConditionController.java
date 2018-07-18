@@ -81,7 +81,7 @@ public class AuthoringConditionController {
      * @return
      */
 
-    @RequestMapping("/newConditionInit")
+    @RequestMapping(value = "/newConditionInit", method = RequestMethod.POST)
     public String newConditionInit(HttpServletRequest request) {
 
 	SurveyConditionForm surveyConditionForm = new SurveyConditionForm();
@@ -100,7 +100,7 @@ public class AuthoringConditionController {
      * @param request
      * @return
      */
-    @RequestMapping("/editCondition")
+    @RequestMapping(value = "/editCondition", method = RequestMethod.POST)
     public String editCondition(SurveyConditionForm surveyConditionForm, HttpServletRequest request) {
 
 	String sessionMapID = surveyConditionForm.getSessionMapID();
@@ -210,7 +210,7 @@ public class AuthoringConditionController {
      * @param response
      * @return
      */
-    @RequestMapping("/upCondition")
+    @RequestMapping(value = "/upCondition", method = RequestMethod.POST)
     private String upCondition(HttpServletRequest request) {
 	return switchItem(request, true);
     }
@@ -224,12 +224,12 @@ public class AuthoringConditionController {
      * @param response
      * @return
      */
-    @RequestMapping("/downCondition")
+    @RequestMapping(value = "/downCondition", method = RequestMethod.POST)
     private String downCondition(HttpServletRequest request) {
 	return switchItem(request, false);
     }
 
-    @RequestMapping("/switchItem")
+    @RequestMapping(value = "/switchItem", method = RequestMethod.POST)
     public String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);

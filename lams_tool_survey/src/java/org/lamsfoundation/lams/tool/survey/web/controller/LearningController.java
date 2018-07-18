@@ -111,7 +111,7 @@ public class LearningController {
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
      *
      */
-    @RequestMapping("/start")
+    @RequestMapping(value = "/start", method = RequestMethod.POST)
     private String start(AnswerForm surveyForm, HttpServletRequest request) {
 
 	// initial Session Map
@@ -243,7 +243,7 @@ public class LearningController {
 	}
     }
 
-    @RequestMapping("/nextQuestion")
+    @RequestMapping(value = "/nextQuestion", method = RequestMethod.POST)
     private String nextQuestion(@ModelAttribute("surveyForm") AnswerForm surveyForm,
 	    MultiValueMap<String, String> errorMap, HttpServletRequest request) {
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
@@ -286,7 +286,7 @@ public class LearningController {
 	return "pages/learning/learning";
     }
 
-    @RequestMapping("/previousQuestion")
+    @RequestMapping(value = "/previousQuestion", method = RequestMethod.POST)
     private String previousQuestion(@ModelAttribute("surveyForm") AnswerForm surveyForm,
 	    MultiValueMap<String, String> errorMap, HttpServletRequest request) {
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
@@ -322,7 +322,7 @@ public class LearningController {
 	return "pages/learning/learning";
     }
 
-    @RequestMapping("/retake")
+    @RequestMapping(value = "/retake", method = RequestMethod.POST)
     private String retake(AnswerForm surveyForm, HttpServletRequest request, HttpServletResponse response) {
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
 
@@ -354,7 +354,7 @@ public class LearningController {
 	return "pages/learning/learning";
     }
 
-    @RequestMapping("/showOtherUsersAnswers")
+    @RequestMapping(value = "/showOtherUsersAnswers", method = RequestMethod.POST)
     private String showOtherUsersAnswers(HttpServletRequest request) {
 	String sessionMapID = request.getParameter("sessionMapID");
 	request.setAttribute("sessionMapID", sessionMapID);
@@ -384,7 +384,7 @@ public class LearningController {
      * Get OpenResponses.
      */
 
-    @RequestMapping("/getOpenResponses")
+    @RequestMapping(value = "/getOpenResponses", method = RequestMethod.POST)
     private String getOpenResponses(HttpServletRequest request, HttpServletResponse res)
 	    throws IOException, ServletException {
 
@@ -427,7 +427,7 @@ public class LearningController {
 	return null;
     }
 
-    @RequestMapping("/doSurvey")
+    @RequestMapping(value = "/doSurvey", method = RequestMethod.POST)
     private String doSurvey(@ModelAttribute("surveyForm") AnswerForm surveyForm, HttpServletRequest request) {
 
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
@@ -484,7 +484,7 @@ public class LearningController {
      * @param response
      * @return
      */
-    @RequestMapping("/finish")
+    @RequestMapping(value = "/finish", method = RequestMethod.POST)
     private String finish(HttpServletRequest request) {
 
 	// get back SessionMap
@@ -520,7 +520,7 @@ public class LearningController {
      * @param response
      * @return
      */
-    @RequestMapping("/newReflection")
+    @RequestMapping(value = "/newReflection", method = RequestMethod.POST)
     private String newReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
 	    HttpServletRequest request) {
 

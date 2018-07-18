@@ -69,6 +69,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -107,7 +108,7 @@ public class MonitoringController {
      * @return
      */
 
-    @RequestMapping("/summary")
+    @RequestMapping(value = "/summary", method = RequestMethod.POST)
     private String summary(HttpServletRequest request) {
 
 	// get session from shared session.
@@ -160,7 +161,7 @@ public class MonitoringController {
 	return "pages/monitoring/monitoring";
     }
 
-    @RequestMapping("/listAnswers")
+    @RequestMapping(value = "/listAnswers", method = RequestMethod.POST)
     private String listAnswers(HttpServletRequest request) {
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long questionUid = WebUtil.readLongParam(request, SurveyConstants.ATTR_QUESTION_UID);
@@ -172,7 +173,7 @@ public class MonitoringController {
 	return "pages/monitoring/listanswers";
     }
 
-    @RequestMapping("/getAnswersJSON")
+    @RequestMapping(value = "/getAnswersJSON", method = RequestMethod.POST)
     private String getAnswersJSON(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -240,7 +241,7 @@ public class MonitoringController {
 	return null;
     }
 
-    @RequestMapping("/listReflections")
+    @RequestMapping(value = "/listReflections", method = RequestMethod.POST)
     private String listReflections(HttpServletRequest request) {
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -251,7 +252,7 @@ public class MonitoringController {
 	return "pages/monitoring/listreflections";
     }
 
-    @RequestMapping("/getReflectionsJSON")
+    @RequestMapping(value = "/getReflectionsJSON", method = RequestMethod.POST)
     private String getReflectionsJSON(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -311,7 +312,7 @@ public class MonitoringController {
      * @return
      */
 
-    @RequestMapping("/exportSurvey")
+    @RequestMapping(value = "/exportSurvey", method = RequestMethod.POST)
     private String exportSurvey(HttpServletRequest request, HttpServletResponse response) {
 	Long toolSessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 
@@ -497,7 +498,7 @@ public class MonitoringController {
 	    MonitoringController.log.error(e);
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	    errorMap.add("error.monitoring.export.excel", e.toString());
-	    errors= errorMap.toString();
+	    errors = errorMap.toString();
 	}
 
 	if (errors != null) {
@@ -522,7 +523,7 @@ public class MonitoringController {
      * @throws IOException
      */
 
-    @RequestMapping("/setSubmissionDeadline")
+    @RequestMapping(value = "/setSubmissionDeadline", method = RequestMethod.POST)
     public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);

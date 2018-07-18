@@ -30,7 +30,7 @@
 			<c:set var="title">
 				<fmt:message key="activity.title" />
 			</c:set>
-			<lams:Page title="${title}" type="navbar">		
+			<lams:Page title="${title}" type="navbar" formID="authoringForm">		
 				<lams:Tabs control="true" title="${title}" helpToolSignature="<%= LeaderselectionConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 					<lams:Tab id="1" key="button.basic" />
 				</lams:Tabs>   
