@@ -31,6 +31,7 @@
   <dependencies>
     <module name="javax.api"/>
     <module name="org.apache.xmlbeans"/>
+    <module name="org.apache.commons.collections4"/>
     <module name="org.dom4j"/>
   </dependencies>
 </module>

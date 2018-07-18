@@ -477,6 +477,14 @@
 		
 		
 		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/collections4/main" overwrite="true" verbose="true">
+			<fileset dir="lib/jakarta-commons">
+				<include name="commons-collections4-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/collections4/main/module.xml"
+			  file="lib/jakarta-commons/collections4.module.xml" overwrite="true" verbose="true" />
+		
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/digester/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
 				<include name="commons-digester-*.jar" />
