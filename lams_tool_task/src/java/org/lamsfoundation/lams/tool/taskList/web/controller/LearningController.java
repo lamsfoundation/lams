@@ -522,11 +522,11 @@ public class LearningController implements TaskListConstants {
 	if (file == null || StringUtils.isBlank(file.getName())) {
 	    return "pages/learning/learning";
 	}
-
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	// validate file size
-	boolean fileSizeCorrect = FileValidatorSpringUtil.validateFileSize(file, false);
+	boolean fileSizeCorrect = FileValidatorSpringUtil.validateFileSize(file, false, errorMap);
 	if (!fileSizeCorrect) {
-	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+
 	    errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
 		    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
 	    request.setAttribute("errorMap", errorMap);
