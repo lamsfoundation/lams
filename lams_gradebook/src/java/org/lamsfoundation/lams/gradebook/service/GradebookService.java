@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.gradebook.GradebookUserActivityArchive;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.GradebookUserLessonArchive;
 import org.lamsfoundation.lams.gradebook.dao.IGradebookDAO;
+import org.lamsfoundation.lams.gradebook.dto.GBActivityArchiveGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBActivityGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
@@ -66,7 +67,9 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
+import org.lamsfoundation.lams.lesson.CompletedActivityProgressArchive;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.LearnerProgressArchive;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
@@ -187,6 +190,49 @@ public class GradebookService implements IGradebookService {
 	    }
 
 	    gradebookActivityDTOs.add(activityDTO);
+	}
+
+	return gradebookActivityDTOs;
+    }
+
+    @Override
+    public List<GradebookGridRowDTO> getGBActivityArchiveRowsForLearner(Long activityId, Integer userId,
+	    TimeZone userTimezone) {
+	GradebookService.logger
+		.debug("Getting archive gradebook user data for activity: " + activityId + ". For user: " + userId);
+
+	Activity activity = getActivityById(activityId);
+	Lesson lesson = (Lesson) activity.getLearningDesign().getLessons().iterator().next();
+
+	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
+	List<GradebookUserLessonArchive> lessonArchives = gradebookDAO.getArchivedLessonMarks(lesson.getLessonId(),
+		userId);
+	int attemptOrder = lessonArchives.size();
+	List<GradebookUserActivityArchive> activityArchives = gradebookDAO.getArchivedActivityMarks(activityId, userId);
+	for (GradebookUserLessonArchive lessonArchive : lessonArchives) {
+	    Date archiveDate = lessonArchive.getArchiveDate();
+	    Date adjustedArchiveDate = userTimezone == null ? archiveDate
+		    : DateUtil.convertToTimeZoneFromDefault(userTimezone, archiveDate);
+	    GBActivityArchiveGridRowDTO activityDTO = new GBActivityArchiveGridRowDTO(attemptOrder, adjustedArchiveDate,
+		    lessonArchive.getMark());
+	    for (GradebookUserActivityArchive activityArchive : activityArchives) {
+		if (archiveDate.equals(activityArchive.getArchiveDate())) {
+		    activityDTO.setMark(activityArchive.getMark());
+		    activityDTO.setFeedback(activityArchive.getFeedback());
+
+		    LearnerProgressArchive learnerProgress = learnerProgressDAO
+			    .getLearnerProgressArchive(lesson.getLessonId(), userId, lessonArchive.getArchiveDate());
+		    // Setting status
+		    activityDTO.setStartDate(getActivityStartDate(learnerProgress, activity, userTimezone));
+		    activityDTO.setFinishDate(getActivityFinishDate(learnerProgress, activity, userTimezone));
+		    activityDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
+		    activityDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
+
+		    break;
+		}
+	    }
+	    gradebookActivityDTOs.add(activityDTO);
+	    attemptOrder--;
 	}
 
 	return gradebookActivityDTOs;
@@ -420,6 +466,9 @@ public class GradebookService implements IGradebookService {
 		    gradebookUserDTO.setFeedback(gradebookUserLesson.getFeedback());
 		    gradebookUserDTO.setDisplayMarkAsPercent(isWeighted);
 		}
+
+		boolean hasArchivedMarks = gradebookDAO.hasArchivedMarks(lesson.getLessonId(), learner.getUserId());
+		gradebookUserDTO.setHasArchivedMarks(hasArchivedMarks);
 
 	    }
 	}
@@ -1799,22 +1848,22 @@ public class GradebookService implements IGradebookService {
     }
 
     @Override
-    public void archiveLearnerMarks(Long lessonId, Integer learnerId) {
+    public void archiveLearnerMarks(Long lessonId, Integer learnerId, Date archiveDate) {
 	if (logger.isDebugEnabled()) {
-	    logger.debug(
-		    "Archiving activity and lesson entries for learner ID " + learnerId + " and lesson ID " + lessonId);
+	    logger.debug("Archiving activity and lesson entries for learner ID " + learnerId + " and lesson ID "
+		    + lessonId + " with archive date " + archiveDate);
 	}
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	List<ToolActivity> activities = getLessonActivitiesForLearner(lesson, learnerId);
 	for (ToolActivity activity : activities) {
 	    GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(activity.getActivityId(), learnerId);
 	    if (gradebookUserActivity != null) {
-		gradebookDAO.insert(new GradebookUserActivityArchive(gradebookUserActivity));
+		gradebookDAO.insert(new GradebookUserActivityArchive(gradebookUserActivity, archiveDate));
 	    }
 	}
 	GradebookUserLesson gradebookUserLesson = getGradebookUserLesson(lesson.getLessonId(), learnerId);
 	if (gradebookUserLesson != null) {
-	    gradebookDAO.insert(new GradebookUserLessonArchive(gradebookUserLesson));
+	    gradebookDAO.insert(new GradebookUserLessonArchive(gradebookUserLesson, archiveDate));
 	}
     }
 
@@ -2059,15 +2108,31 @@ public class GradebookService implements IGradebookService {
      * @param timeZone
      * @return
      */
-    private Date getActivityStartDate(LearnerProgress learnerProgress, Activity activity, TimeZone timeZone) {
+    private Date getActivityStartDate(Object learnerProgress, Activity activity, TimeZone timeZone) {
 	Date startDate = null;
 	if (learnerProgress != null) {
-	    startDate = learnerProgress.getAttemptedActivities().get(activity);
+
+	    // this construct looks bad but see LDEV-4609 commit for explanation
+	    if (learnerProgress instanceof LearnerProgressArchive) {
+		startDate = ((LearnerProgressArchive) learnerProgress).getStartDate();
+	    } else {
+		startDate = ((LearnerProgress) learnerProgress).getStartDate();
+	    }
 	    if (startDate == null) {
-		CompletedActivityProgress compProg = learnerProgress.getCompletedActivities().get(activity);
-		if (compProg != null) {
-		    startDate = compProg.getStartDate();
+		if (learnerProgress instanceof LearnerProgressArchive) {
+		    CompletedActivityProgressArchive compProg = ((LearnerProgressArchive) learnerProgress)
+			    .getCompletedActivities().get(activity);
+		    if (compProg != null) {
+			startDate = compProg.getStartDate();
+		    }
+		} else {
+		    CompletedActivityProgress compProg = ((LearnerProgress) learnerProgress).getCompletedActivities()
+			    .get(activity);
+		    if (compProg != null) {
+			startDate = compProg.getStartDate();
+		    }
 		}
+
 	    }
 	}
 
@@ -2092,12 +2157,22 @@ public class GradebookService implements IGradebookService {
      * @param timeZone
      * @return
      */
-    private Date getActivityFinishDate(LearnerProgress learnerProgress, Activity activity, TimeZone timeZone) {
+    private Date getActivityFinishDate(Object learnerProgress, Activity activity, TimeZone timeZone) {
 	Date finishDate = null;
 	if (learnerProgress != null) {
-	    CompletedActivityProgress compProg = learnerProgress.getCompletedActivities().get(activity);
-	    if (compProg != null) {
-		finishDate = compProg.getFinishDate();
+	    // this construct looks bad but see LDEV-4609 commit for explanation
+	    if (learnerProgress instanceof LearnerProgressArchive) {
+		CompletedActivityProgressArchive compProg = ((LearnerProgressArchive) learnerProgress)
+			.getCompletedActivities().get(activity);
+		if (compProg != null) {
+		    finishDate = compProg.getFinishDate();
+		}
+	    } else {
+		CompletedActivityProgress compProg = ((LearnerProgress) learnerProgress).getCompletedActivities()
+			.get(activity);
+		if (compProg != null) {
+		    finishDate = compProg.getFinishDate();
+		}
 	    }
 	}
 
@@ -2114,10 +2189,22 @@ public class GradebookService implements IGradebookService {
 	return finishDate;
     }
 
-    private Long getActivityDuration(LearnerProgress learnerProgress, Activity activity) {
+    private Long getActivityDuration(Object learnerProgress, Activity activity) {
 	if (learnerProgress != null) {
-	    if (learnerProgress.getCompletedActivities().get(activity) != null) {
-		CompletedActivityProgress compProg = learnerProgress.getCompletedActivities().get(activity);
+	    // this construct looks bad but see LDEV-4609 commit for explanation
+	    if (learnerProgress instanceof LearnerProgressArchive) {
+		CompletedActivityProgressArchive compProg = ((LearnerProgressArchive) learnerProgress)
+			.getCompletedActivities().get(activity);
+		if (compProg != null) {
+		    Date startTime = compProg.getStartDate();
+		    Date endTime = compProg.getFinishDate();
+		    if ((startTime != null) && (endTime != null)) {
+			return endTime.getTime() - startTime.getTime();
+		    }
+		}
+	    } else {
+		CompletedActivityProgress compProg = ((LearnerProgress) learnerProgress).getCompletedActivities()
+			.get(activity);
 		if (compProg != null) {
 		    Date startTime = compProg.getStartDate();
 		    Date endTime = compProg.getFinishDate();
@@ -2126,6 +2213,7 @@ public class GradebookService implements IGradebookService {
 		    }
 		}
 	    }
+
 	}
 	return null;
     }
@@ -2162,14 +2250,19 @@ public class GradebookService implements IGradebookService {
      * @param activity
      * @return
      */
-    private String getActivityStatusStr(LearnerProgress learnerProgress, Activity activity) {
+    private String getActivityStatusStr(Object learnerProgress, Activity activity) {
 
 	final String IMAGES_DIR = Configuration.get(ConfigurationKeys.SERVER_URL) + "images";
 	if (learnerProgress != null) {
-	    byte statusByte = learnerProgress.getProgressState(activity);
-	    if (statusByte == LearnerProgress.ACTIVITY_ATTEMPTED && learnerProgress.getCurrentActivity() != null) {
-		return "<i class='fa fa-cog' title='"
-			+ HtmlUtils.htmlEscape(learnerProgress.getCurrentActivity().getTitle()) + "'></i>";
+	    // this construct looks bad but see LDEV-4609 commit for explanation
+	    byte statusByte = learnerProgress instanceof LearnerProgressArchive
+		    ? ((LearnerProgressArchive) learnerProgress).getProgressState(activity)
+		    : ((LearnerProgress) learnerProgress).getProgressState(activity);
+	    Activity currentActivity = learnerProgress instanceof LearnerProgressArchive
+		    ? ((LearnerProgressArchive) learnerProgress).getCurrentActivity()
+		    : ((LearnerProgress) learnerProgress).getCurrentActivity();
+	    if (statusByte == LearnerProgress.ACTIVITY_ATTEMPTED && currentActivity != null) {
+		return "<i class='fa fa-cog' title='" + HtmlUtils.htmlEscape(currentActivity.getTitle()) + "'></i>";
 	    } else if (statusByte == LearnerProgress.ACTIVITY_COMPLETED) {
 		return "<i class='fa fa-check text-success'></i>";
 	    }

@@ -40,3 +40,7 @@
 	width: 95%;
 	height: 500px;
 }
+
+.archive td[role="gridcell"] {
+	color: lighten($gray-base, 50%);
+}

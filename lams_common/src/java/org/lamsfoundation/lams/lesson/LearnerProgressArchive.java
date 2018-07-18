@@ -71,6 +71,8 @@ public class LearnerProgressArchive implements Serializable {
     private Date startDate;
     private Date finishDate;
 
+    private Date archiveDate;
+
     //---------------------------------------------------------------------
     // Constructors
     //---------------------------------------------------------------------
@@ -80,7 +82,7 @@ public class LearnerProgressArchive implements Serializable {
 
     public LearnerProgressArchive(User user, Lesson lesson, Integer attemptId, Map<Activity, Date> attemptedActivities,
 	    Map<Activity, CompletedActivityProgressArchive> completedActivities, Activity currentActivity,
-	    Byte lessonComplete, Date startDate, Date finishDate) {
+	    Byte lessonComplete, Date startDate, Date finishDate, Date archiveDate) {
 	this.user = user;
 	this.lesson = lesson;
 	this.attemptId = attemptId;
@@ -90,6 +92,7 @@ public class LearnerProgressArchive implements Serializable {
 	this.lessonComplete = lessonComplete;
 	this.startDate = startDate;
 	this.finishDate = finishDate;
+	this.archiveDate = archiveDate;
     }
 
     //---------------------------------------------------------------------
@@ -173,6 +176,16 @@ public class LearnerProgressArchive implements Serializable {
 	this.currentActivity = currentActivity;
     }
 
+    public byte getProgressState(Activity activity) {
+	if (getCompletedActivities().containsKey(activity)) {
+	    return LearnerProgress.ACTIVITY_COMPLETED;
+	} else if (getAttemptedActivities().containsKey(activity)) {
+	    return LearnerProgress.ACTIVITY_ATTEMPTED;
+	} else {
+	    return LearnerProgress.ACTIVITY_NOT_ATTEMPTED;
+	}
+    }
+
     /**
      * Has the user completed the lesson? We don't care how (ie at end of
      * sequence or after a "stop after activity")
@@ -216,5 +229,13 @@ public class LearnerProgressArchive implements Serializable {
 
     public void setStartDate(Date startDate) {
 	this.startDate = startDate;
+    }
+
+    public Date getArchiveDate() {
+	return archiveDate;
+    }
+
+    public void setArchiveDate(Date archiveDate) {
+	this.archiveDate = archiveDate;
     }
 }
