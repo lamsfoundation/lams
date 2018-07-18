@@ -111,7 +111,7 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 	}
 
-	String[] localeParts = langIsoCode.split("_");
+	String[] localeParts = langIsoCode == null ? new String[0] : langIsoCode.split("_");
 	// if langIsoCode is just 2 letters, then countryIsoCode stays the same and country will fall back to default
 	// if langIsoCode is en_AU, then it gets split to langIsoCode and countryIsoCode
 	// and the old value of countryIsoCode is considered country
