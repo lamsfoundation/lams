@@ -28,8 +28,8 @@
 <body>
 
 
-	<form:form action="saveNewTask.do" modelAttribute="taskListItemForm" method="post" id="taskListItemForm">
-		<form:hidden path="mode" />
+	<form:form action="saveOrUpdateItem.do" modelAttribute="taskListItemForm" method="post" id="taskListItemForm">
+
 		<form:hidden path="sessionMapID" />
 
 		<h5>

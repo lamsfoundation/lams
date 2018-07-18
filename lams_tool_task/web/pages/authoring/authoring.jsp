@@ -72,7 +72,8 @@
 	<form:hidden path="currentTab" id="currentTab" />
 
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>
-		<lams:Page title="${title}" type="navbar">
+		<lams:Page title="${title}" type="navbar" formID="taskListForm">
+	
 
 			 <lams:Tabs control="true" title="${title}" helpToolSignature="<%= TaskListConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 				<lams:Tab id="1" key="label.authoring.heading.basic" />

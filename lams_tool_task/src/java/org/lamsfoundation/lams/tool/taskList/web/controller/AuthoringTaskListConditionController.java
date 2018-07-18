@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
@@ -43,10 +44,15 @@ import org.lamsfoundation.lams.tool.taskList.util.TaskListConditionComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListConditionForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -61,6 +67,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/authoringCondition")
 public class AuthoringTaskListConditionController {
+
+    @Autowired
+    @Qualifier("lataskMessageService")
+    private MessageService messageService;
 
     /**
      * Display same entire authoring page content from HttpSession variable.
@@ -131,11 +141,12 @@ public class AuthoringTaskListConditionController {
      * persisted.
      */
     @RequestMapping("/saveOrUpdateCondition")
-    public String saveOrUpdateCondition(@ModelAttribute TaskListConditionForm taskListConditionForm, Errors errors,
+    public String saveOrUpdateCondition(@ModelAttribute TaskListConditionForm taskListConditionForm,
 	    HttpServletRequest request) {
 
-	validateTaskListCondition(taskListConditionForm, errors, request);
-	if (errors.hasErrors()) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	validateTaskListCondition(taskListConditionForm, request);
+	if (!errorMap.isEmpty()) {
 	    populateFormWithPossibleItems(taskListConditionForm, request);
 	    return "pages/authoring/parts/addcondition";
 	}
@@ -144,8 +155,8 @@ public class AuthoringTaskListConditionController {
 	    extractFormToTaskListCondition(request, taskListConditionForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.reject(e.getMessage());
-	    if (errors.hasErrors()) {
+	    errorMap.add("GLOBAL", messageService.getMessage("error.upload.faile"));
+	    if (!errorMap.isEmpty()) {
 		populateFormWithPossibleItems(taskListConditionForm, request);
 		return "pages/authoring/parts/addcondition";
 	    }
@@ -381,14 +392,14 @@ public class AuthoringTaskListConditionController {
     /**
      * Validate taskListCondition
      */
-    private void validateTaskListCondition(TaskListConditionForm taskListConditionForm, Errors errors,
-	    HttpServletRequest request) {
+    private void validateTaskListCondition(TaskListConditionForm taskListConditionForm, HttpServletRequest request) {
 
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	String formConditionName = taskListConditionForm.getName();
 	if (StringUtils.isBlank(formConditionName)) {
-	    errors.reject(TaskListConstants.ERROR_MSG_NAME_BLANK);
+	    errorMap.add("GLOBAL", messageService.getMessage("error.condition.name.blank"));
 	} else if (StringUtils.contains(formConditionName, '#')) {
-	    errors.reject(TaskListConstants.ERROR_MSG_NAME_CONTAINS_WRONG_SYMBOL);
+	    errorMap.add("GLOBAL", messageService.getMessage("error.condition.name.contains.wrong.symbol"));
 	} else {
 
 	    String formConditionSequenceId = taskListConditionForm.getSequenceId();
@@ -400,7 +411,8 @@ public class AuthoringTaskListConditionController {
 	    for (TaskListCondition condition : conditionList) {
 		if (formConditionName.equals(condition.getName())
 			&& !formConditionSequenceId.equals((new Integer(condition.getSequenceId() - 1)).toString())) {
-		    errors.reject(TaskListConstants.ERROR_MSG_NAME_DUPLICATED);
+		    errorMap.add("GLOBAL", "error.condition.duplicated.name");
+		    ;
 		    break;
 		}
 	    }
@@ -409,9 +421,27 @@ public class AuthoringTaskListConditionController {
 	// should be selected at least one TaskListItem
 	String[] selectedItems = taskListConditionForm.getSelectedItems();
 	if (selectedItems == null || selectedItems.length == 0) {
-	    errors.reject(TaskListConstants.ERROR_MSG_NO_TASK_LIST_ITEMS);
+	    errorMap.add("GLOBAL", "error.condition.no.tasklistitems.selected");
 	}
 
+    }
+
+    private MultiValueMap<String, String> validate(TaskListForm taskListForm, HttpServletRequest request) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	// if (StringUtils.isBlank(taskListForm.getTaskList().getTitle())) {
+	// ActionMessage error = new ActionMessage("error.resource.item.title.blank");
+	// errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	// }
+
+	// define it later mode(TEACHER) skip below validation.
+	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
+	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
+	    return errorMap;
+	}
+
+	// Some other validation outside basic Tab.
+
+	return errorMap;
     }
 
 }

@@ -22,7 +22,7 @@
 		<form:hidden path="userID" />
 		<form:hidden path="sessionMapID" />
 
-		<lams:Page type="learner" title="${sessionMap.title}">
+		<lams:Page type="learner" title="${sessionMap.title}" formID="messageForm">
 
 			<%@ include file="/common/messages.jsp"%>
 

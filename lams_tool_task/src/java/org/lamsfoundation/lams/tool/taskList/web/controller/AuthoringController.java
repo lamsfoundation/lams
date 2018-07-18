@@ -454,10 +454,6 @@ public class AuthoringController {
 
     /**
      * Display edit page for existed taskList item.
-     *
-     * @param taskListForm
-     * @param request
-     * @return
      */
     @RequestMapping("editItemInit")
     public String editItemInit(@ModelAttribute TaskListItemForm taskListItemForm, HttpServletRequest request) {
@@ -487,17 +483,11 @@ public class AuthoringController {
      * is not persist them into database, just save <code>HttpSession</code>
      * temporarily. Only they will be persist when the entire authoring page is
      * being persisted.
-     *
-     * @param form
-     * @param request
-     * @return
-     * @throws ServletException
      */
     @RequestMapping(path = "/saveOrUpdateItem", method = RequestMethod.POST)
     public String saveOrUpdateItem(@ModelAttribute TaskListItemForm taskListItemForm, HttpServletRequest request) {
 
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	errorMap = validateTaskListItem(taskListItemForm);
+	MultiValueMap<String, String> errorMap = validateTaskListItem(taskListItemForm);
 
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
@@ -773,7 +763,7 @@ public class AuthoringController {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (StringUtils.isBlank(itemForm.getTitle())) {
-	    errorMap.add("GLOBAL", TaskListConstants.ERROR_MSG_TITLE_BLANK);
+	    errorMap.add("GLOBAL", messageService.getMessage("error.resource.item.title.blank"));
 	}
 	return errorMap;
     }
@@ -790,9 +780,9 @@ public class AuthoringController {
     @RequestMapping(path = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
     public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute TaskListPedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request) throws IOException {
-	
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	errorMap = plannerForm.validate();
+
+	MultiValueMap<String, String> errorMap = plannerForm.validate();
+
 	if (!errorMap.isEmpty()) {
 	    TaskList taskList = taskListService.getTaskListByContentId(plannerForm.getToolContentID());
 

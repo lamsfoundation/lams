@@ -76,7 +76,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -380,8 +379,7 @@ public class LearningController implements TaskListConstants {
 	}
 
 	if (!validateBeforeFinish(request, sessionMapID)) {
-	    return "redirect:/";
-	    // getInputForward
+	    return "/pages/learning/learning";
 	}
 
 	// get sessionId from HttpServletRequest
@@ -422,8 +420,7 @@ public class LearningController implements TaskListConstants {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	errorMap = validateTaskListItem(taskListItemForm);
+	MultiValueMap<String, String> errorMap = validateTaskListItem(taskListItemForm);
 
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
@@ -508,8 +505,8 @@ public class LearningController implements TaskListConstants {
      * Uploads specified file to repository and associates it with current TaskListItem.
      */
     @RequestMapping(path = "/uploadFile", method = RequestMethod.POST)
-    public String uploadFile(@ModelAttribute TaskListItemForm taskListItemForm,
-	    @RequestParam("file") MultipartFile file, HttpServletRequest request) throws UploadTaskListFileException {
+    public String uploadFile(@ModelAttribute TaskListItemForm taskListItemForm, HttpServletRequest request)
+	    throws UploadTaskListFileException {
 
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -517,7 +514,7 @@ public class LearningController implements TaskListConstants {
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
 
-	file = taskListItemForm.getUploadedFile();
+	MultipartFile file = taskListItemForm.getUploadedFile();
 
 	if (file == null || StringUtils.isBlank(file.getName())) {
 	    return "pages/learning/learning";
@@ -565,7 +562,7 @@ public class LearningController implements TaskListConstants {
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
 
 	if (!validateBeforeFinish(request, sessionMapID)) {
-	    return "redirect:/";
+	    return "pages/learning/learning";
 	}
 
 	HttpSession ss = SessionManager.getSession();
@@ -652,7 +649,7 @@ public class LearningController implements TaskListConstants {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (StringUtils.isBlank(itemForm.getTitle())) {
-	    errorMap.add("GLOBAL", TaskListConstants.ERROR_MSG_TITLE_BLANK);
+	    errorMap.add("GLOBAL", messageService.getMessage("error.resource.item.title.blank"));
 	}
 	return errorMap;
     }
@@ -671,7 +668,7 @@ public class LearningController implements TaskListConstants {
 	// if current user view less than reqired view count number, then just return error message.
 	if ((minimumNumberTasks - numberCompletedTasks) > 0) {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	    errorMap.add("GLOBAL", "lable.learning.minimum.view.number");
+	    errorMap.add("GLOBAL", messageService.getMessage("lable.learning.minimum.view.number"));
 	    request.setAttribute("errorMap", errorMap);
 	    return false;
 	}

@@ -112,7 +112,7 @@
 </lams:head>
 <body class="stripes">
 
-	<lams:Page type="learner" title="${taskList.title}">
+	<lams:Page type="learner" title="${taskList.title}"> 
 
 		<!--Task Information-->
 
