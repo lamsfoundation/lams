@@ -41,7 +41,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.LanguageUtil;
 
 public class User implements Serializable, Comparable {
-
     /** identifier field */
     private Integer userId;
 
@@ -110,6 +109,9 @@ public class User implements Serializable, Comparable {
 
     /** nullable persistent field */
     private String email;
+
+    /** persistent field */
+    private Boolean emailVerified = true;
 
     /** persistent field */
     private Boolean disabledFlag;
@@ -355,6 +357,14 @@ public class User implements Serializable, Comparable {
 	this.email = email;
     }
 
+    public Boolean getEmailVerified() {
+	return emailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+	this.emailVerified = emailVerified;
+    }
+
     public Boolean getDisabledFlag() {
 	return disabledFlag;
     }
@@ -502,14 +512,10 @@ public class User implements Serializable, Comparable {
 		: pagesWithDisabledTutorials;
 
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
-		theme != null ? new ThemeDTO(theme) : null,
-		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping,
-		(tutorialsDisabled == null ? false : true), // assume tutorials enabled if not set
-		tutorialPages, 
-		(firstLogin == null ? true : false), // assume no firstLogin value means they haven't logged in
-		lastVisitedOrganisationId,
-		portraitUuid
-	);
+		theme != null ? new ThemeDTO(theme) : null, timeZone, authenticationMethod.getAuthenticationMethodId(),
+		fckLanguageMapping, (tutorialsDisabled == null ? false : true), // assume tutorials enabled if not set
+		tutorialPages, (firstLogin == null ? true : false), // assume no firstLogin value means they haven't logged in
+		lastVisitedOrganisationId, portraitUuid);
     }
 
     public UserBasicDTO getUserBasicDTO() {
