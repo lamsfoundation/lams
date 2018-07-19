@@ -17,7 +17,7 @@
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-	<lams:Page type="learner" title="${sessionMap.title}" formID="learnerForm">
+	<lams:Page type="learner" title="${sessionMap.title}" formID="refForm">
 
 		<%@ include file="/common/messages.jsp"%>
 

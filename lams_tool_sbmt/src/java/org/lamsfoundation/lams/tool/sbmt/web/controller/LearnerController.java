@@ -106,7 +106,7 @@ public class LearnerController implements SbmtConstants {
     /**
      * The initial page of learner in Submission tool. This page will list all uploaded files and learn
      */
-    @RequestMapping("")
+    @RequestMapping("/learner")
     public String unspecified(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	// initial session Map
 	SessionMap sessionMap = new SessionMap();
@@ -121,14 +121,12 @@ public class LearnerController implements SbmtConstants {
 	    mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, LearnerController.MODE_OPTIONAL);
 	} catch (Exception e) {
 	}
-
-	String sessionIDStr = WebUtil.readStrParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	Long sessionID = Long.valueOf(sessionIDStr);
-	request.setAttribute("toolSessionID", sessionID);
-
 	if (mode == null) {
 	    mode = ToolAccessMode.LEARNER;
 	}
+	
+	Long sessionID = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
+	
 	// get session from shared session.
 	HttpSession ss = SessionManager.getSession();
 
@@ -404,7 +402,6 @@ public class LearnerController implements SbmtConstants {
 
     // validate uploaded form
     private boolean validateUploadForm(LearnerForm learnerForm, HttpServletRequest request) {
-	Locale preferredLocale = (Locale) request.getSession().getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (learnerForm.getFile() == null || StringUtils.isBlank(learnerForm.getFile().getName())) {
@@ -506,7 +503,7 @@ public class LearnerController implements SbmtConstants {
 	return learner;
     }
 
-    @RequestMapping("/delete")
+    @RequestMapping("/deleteLearnerFile")
     public void deleteLearnerFile(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 	HttpSession ss = SessionManager.getSession();

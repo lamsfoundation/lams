@@ -58,13 +58,6 @@
 	</label>
 </div>
 
-<div class="checkbox">
-	<label for="notifyLearnersOnMarkRelease">
-		<form:checkbox path="notifyLearnersOnMarkRelease" id="notifyLearnersOnMarkRelease" />
-		<fmt:message key="label.authoring.advanced.notify.mark.release" />
-	</label>
-</div>
-
 </lams:SimplePanel>
 
 <lams:SimplePanel titleKey="label.activity.completion">

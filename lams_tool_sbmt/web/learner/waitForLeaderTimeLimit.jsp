@@ -19,7 +19,7 @@
 </lams:head>
 <body class="stripes">
 
-	<lams:Page type="learner" title="${content.title}" formID="learnerForm">
+	<lams:Page type="learner" title="${content.title}">
 				
 		<c:if test="${isLeadershipEnabled}">
 			<lams:LeaderDisplay username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>

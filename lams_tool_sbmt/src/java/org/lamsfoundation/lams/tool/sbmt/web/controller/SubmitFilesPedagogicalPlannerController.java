@@ -64,6 +64,7 @@ public class SubmitFilesPedagogicalPlannerController {
 	return initPedagogicalPlannerForm(plannerForm, request);
     }
 
+    @RequestMapping("/initPedagogicalPlannerForm")
     public String initPedagogicalPlannerForm(@ModelAttribute SubmitFilesPedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -74,6 +75,7 @@ public class SubmitFilesPedagogicalPlannerController {
 	return "authoring/pedagogicalPlannerForm";
     }
 
+    @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
     public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute SubmitFilesPedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request) {
 	List<String> messages = (List<String>) plannerForm.validate();

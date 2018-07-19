@@ -120,7 +120,7 @@ public class MonitoringController {
     /**
      * Default ActionForward for Monitor
      */
-    @RequestMapping("")
+    @RequestMapping("/monitoring")
     public String unspecified(HttpServletRequest request) {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	Long contentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));

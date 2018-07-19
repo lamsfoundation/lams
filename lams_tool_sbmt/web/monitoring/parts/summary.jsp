@@ -196,7 +196,7 @@
 					 class="btn btn-default loffset5 voffset10" >
 			<fmt:message key="label.monitoring.releaseMarks.button" />
 		</button>
-		<form action="monitoring/downloadMarks.do" method="post" style="display:inline">
+		<form action="downloadMarks.do" method="post" style="display:inline">
 			<input type="hidden" name="toolSessionID" value="${sessionDto.sessionID}" />
 			<input type="submit" name="downloadMarks" value="<fmt:message key="label.monitoring.downloadMarks.button" />" class="btn btn-default loffset5 voffset10" />
 		</form>

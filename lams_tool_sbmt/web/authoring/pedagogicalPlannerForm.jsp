@@ -15,7 +15,7 @@
 </lams:head>
 <body style="width: 550px">
 	<h4 class="space-left"><fmt:message key="label.authoring.basic.instruction" /></h4>
-	<form:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" modelAttribute="plannerForm" id="pedagogicalPlannerForm" method="post">
+	<form:form action="saveOrUpdatePedagogicalPlannerForm.do" modelAttribute="plannerForm" id="pedagogicalPlannerForm" method="post">
 		<form:hidden path="toolContentID" id="toolContentID" />
 		<form:hidden path="valid" id="valid" />
 		<form:hidden path="callID" id="callID" />

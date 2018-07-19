@@ -27,7 +27,7 @@
 		<fmt:message key="activity.title"></fmt:message>
 	</c:set>
 
-	<lams:Page type="learner" title="${title}" formID="learnerForm">
+	<lams:Page type="learner" title="${title}">
 
 		<lams:Alert id="submissionDeadline" close="false" type="danger">
 			<fmt:message key="authoring.info.teacher.set.restriction">

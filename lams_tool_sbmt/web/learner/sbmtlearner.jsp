@@ -105,10 +105,9 @@
 			var answer = confirm(msg);
 			if (answer) {	
 				 $.ajax({
-			            url: '<c:url value="/learner/delete.do"/>',
 			            data: 'detailId=' + detailId,
 			            success: function () {
-			            	document.location.href = "<c:url value='/learner.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}'/>";
+			            	document.location.href = "<lams:WebAppURL />learner/"+${sessionMap.mode}+".do?toolSessionID=+"${sessionMap.toolSessionID};
 			            },
 			            error: function(error){
 			                alert("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
@@ -286,7 +285,7 @@
 
 			<c:if test="${!displayForm && hasEditRight}">
 
-				<form:form action="learner/uploadFile.do" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validate();" >
+				<form:form action="uploadFile.do" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validate();" >
 					<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
 
 					<!-- Hidden fields -->

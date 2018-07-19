@@ -13,7 +13,7 @@
 		<fmt:message key="activity.title"></fmt:message>
 	</c:set>
 
-	<lams:Page type="learner" title="${title}" formID="learnerForm">
+	<lams:Page type="learner" title="${title}">
 		<lams:DefineLater />
 		<div id="footer"></div>
 	</lams:Page>
