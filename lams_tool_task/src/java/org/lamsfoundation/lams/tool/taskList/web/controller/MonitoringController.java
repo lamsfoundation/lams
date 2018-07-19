@@ -382,7 +382,6 @@ public class MonitoringController {
      * Mark taskList user as verified.
      */
     @RequestMapping("/setVerifiedByMonitor")
-    @ResponseBody
     public String setVerifiedByMonitor(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long userUid = WebUtil.readLongParam(request, TaskListConstants.ATTR_USER_UID);
