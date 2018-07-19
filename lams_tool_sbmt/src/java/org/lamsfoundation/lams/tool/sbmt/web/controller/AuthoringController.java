@@ -56,6 +56,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author Steve Ni
  */
 @Controller
+@RequestMapping("/authoring")
 public class AuthoringController {
     private Logger log = Logger.getLogger(AuthoringController.class);
 
@@ -111,7 +112,7 @@ public class AuthoringController {
     /**
      * Update all content for submit tool except online/offline instruction files list.
      */
-    @RequestMapping("authoring/updateContent")
+    @RequestMapping("/updateContent")
     public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
@@ -119,9 +120,9 @@ public class AuthoringController {
 		.getAttribute(authoringForm.getSessionMapID());
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.PARAM_MODE);
 
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	errorMap = validate(authoringForm, request);
+	MultiValueMap<String, String> errorMap = validate(authoringForm, request);
 	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
 	    return "authoring/authoring";
 	}
 
