@@ -437,22 +437,12 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		McUsrAttempt userAttempt = this.getUserAttemptByQuestion(user.getUid(), questionUid);
 		if (userAttempt != null) {
-
-		    McOptsContent previosAnswer = userAttempt.getMcOptionsContent();
-		    // check if answer hasn't been changed since the last time
-		    if (previosAnswer.getUid().equals(answerOption.getUid())) {
-			// don't save anything
-			continue;
-
-		    } else {
-			// in case answer has been changed update userttempt
-			userAttempt.setAttemptTime(attemptTime);
-			userAttempt.setMcOptionsContent(answerOption);
-			userAttempt.setMark(mark);
-			userAttempt.setPassed(passed);
-			userAttempt.setAttemptCorrect(isAttemptCorrect);
-			userAttempt.setConfidenceLevel(confidenceLevel);
-		    }
+		    userAttempt.setAttemptTime(attemptTime);
+		    userAttempt.setMcOptionsContent(answerOption);
+		    userAttempt.setMark(mark);
+		    userAttempt.setPassed(passed);
+		    userAttempt.setAttemptCorrect(isAttemptCorrect);
+		    userAttempt.setConfidenceLevel(confidenceLevel);
 
 		} else {
 		    // create new userAttempt

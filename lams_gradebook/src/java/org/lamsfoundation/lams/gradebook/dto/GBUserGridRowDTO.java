@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
@@ -43,6 +42,8 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     private String login;
     private String currentActivity;
     private Long portraitId;
+
+    private boolean hasArchivedMarks;
 
     public GBUserGridRowDTO() {
     }
@@ -72,6 +73,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark, displayMarkAsPercent) : CELL_EMPTY);
 	    ret.add(portraitId != null ? portraitId.toString() : "");
+	    ret.add(String.valueOf(hasArchivedMarks));
 
 	} else if (view == GBGridView.MON_ACTIVITY) {
 
@@ -86,7 +88,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(portraitId != null ? portraitId.toString() : "");
 	    if (activityUrl != null && activityUrl.length() != 0) {
 		ret.add("javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>");
-	    } 
+	    }
 
 	} else if (view == GBGridView.MON_COURSE) {
 	    ret.add(rowName);
@@ -155,4 +157,11 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	this.portraitId = portraitId;
     }
 
+    public boolean getHasArchivedMarks() {
+	return hasArchivedMarks;
+    }
+
+    public void setHasArchivedMarks(boolean hasArchivedAttempts) {
+	this.hasArchivedMarks = hasArchivedAttempts;
+    }
 }

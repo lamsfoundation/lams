@@ -20,17 +20,17 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook.dao.hibernate;
 
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
+import org.lamsfoundation.lams.gradebook.GradebookUserActivityArchive;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
+import org.lamsfoundation.lams.gradebook.GradebookUserLessonArchive;
 import org.lamsfoundation.lams.gradebook.dao.IGradebookDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -111,8 +111,9 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<GradebookUserActivity> getGradebookUserActivitiesForLesson(Long lessonID, Integer userID) {
-	List<GradebookUserActivity> result = getSessionFactory().getCurrentSession().createQuery(GET_GRADEBOOK_ACTIVITIES_FROM_LESSON)
-		.setInteger("userID", userID.intValue()).setLong("lessonID", lessonID.longValue()).list();
+	List<GradebookUserActivity> result = getSessionFactory().getCurrentSession()
+		.createQuery(GET_GRADEBOOK_ACTIVITIES_FROM_LESSON).setInteger("userID", userID.intValue())
+		.setLong("lessonID", lessonID.longValue()).list();
 	return result;
     }
 
@@ -168,28 +169,25 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 
     @Override
     public List<Number> getAllMarksForLesson(Long lessonID) {
-	return (List<Number>) getSessionFactory().getCurrentSession().createQuery(GET_ALL_MARKS_FOR_LESSON)
+	return getSessionFactory().getCurrentSession().createQuery(GET_ALL_MARKS_FOR_LESSON)
 		.setLong("lessonID", lessonID.longValue()).list();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public long getMedianTimeTakenLesson(Long lessonID) {
-	
+
 	final String GET_MEDIAN_TIME_TAKEN_FOR_LESSON = "SELECT AVG(t1.timeTaken) AS medianVal FROM ("
 		+ " SELECT @rownum\\:=@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(progress.finish_date_time, progress.start_date_time)) AS timeTaken"
 		+ "  FROM lams_learner_progress progress,  (SELECT @rownum\\:=0) r"
 		+ "  WHERE progress.lesson_id=:lessonID AND TIMEDIFF(progress.finish_date_time, progress.start_date_time) IS NOT NULL"
-		+ "  ORDER BY TIMEDIFF(progress.finish_date_time, progress.start_date_time)"
-		+ " ) AS t1, "
-		+ " ("
-		+ "  SELECT count(*) AS totalRows"
-		+ "  FROM lams_learner_progress progress"
+		+ "  ORDER BY TIMEDIFF(progress.finish_date_time, progress.start_date_time)" + " ) AS t1, " + " ("
+		+ "  SELECT count(*) AS totalRows" + "  FROM lams_learner_progress progress"
 		+ "  WHERE progress.lesson_id=:lessonID AND TIMEDIFF(progress.finish_date_time, progress.start_date_time) IS NOT NULL"
-		+ " ) AS t2"
-		+ " WHERE t1.rowNumber in ( floor((totalRows+1)/2), floor((totalRows+2)/2) )";
+		+ " ) AS t2" + " WHERE t1.rowNumber in ( floor((totalRows+1)/2), floor((totalRows+2)/2) )";
 
-	List result = getSession().createSQLQuery(GET_MEDIAN_TIME_TAKEN_FOR_LESSON).setLong("lessonID", lessonID).list();
+	List result = getSession().createSQLQuery(GET_MEDIAN_TIME_TAKEN_FOR_LESSON).setLong("lessonID", lessonID)
+		.list();
 
 	if (result == null || result.size() == 0 || result.get(0) == null) {
 	    return 0;
@@ -202,23 +200,19 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     @Override
     @SuppressWarnings("unchecked")
     public long getMedianTimeTakenForActivity(Long activityID) {
-	
+
 	final String GET_MEDIAN_TIME_TAKEN_FOR_ACTIVITY = "SELECT AVG(t1.timeTaken) AS medianVal FROM ("
 		+ " SELECT @rownum\\:=@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(progress.completed_date_time, progress.start_date_time)) AS timeTaken"
 		+ "  FROM lams_progress_completed progress,  (SELECT @rownum\\:=0) r"
 		+ "  WHERE progress.activity_id=:activityID AND TIMEDIFF(progress.completed_date_time, progress.start_date_time) IS NOT NULL"
-		+ "  ORDER BY TIMEDIFF(progress.completed_date_time, progress.start_date_time)"
-		+ " ) AS t1, "
-		+ " ("
-		+ "  SELECT count(*) AS totalRows"
-		+ "  FROM lams_progress_completed progress"
+		+ "  ORDER BY TIMEDIFF(progress.completed_date_time, progress.start_date_time)" + " ) AS t1, " + " ("
+		+ "  SELECT count(*) AS totalRows" + "  FROM lams_progress_completed progress"
 		+ "  WHERE progress.activity_id=:activityID AND TIMEDIFF(progress.completed_date_time, progress.start_date_time) IS NOT NULL"
-		+ " ) AS t2"
-		+ " WHERE t1.rowNumber in ( floor((totalRows+1)/2), floor((totalRows+2)/2) )";
+		+ " ) AS t2" + " WHERE t1.rowNumber in ( floor((totalRows+1)/2), floor((totalRows+2)/2) )";
 
 	List result = getSession().createSQLQuery(GET_MEDIAN_TIME_TAKEN_FOR_ACTIVITY)
 		.setLong("activityID", activityID.longValue()).list();
-	
+
 	if (result == null || result.size() == 0 || result.get(0) == null) {
 	    return 0;
 	} else {
@@ -226,23 +220,20 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	    return ((Number) result.get(0)).intValue() * 1000;
 	}
     }
-    
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public long getMinTimeTakenForActivity(Long activityID) {
-	
+
 	final String GET_MIN_TIME_TAKEN_FOR_ACTIVITY = "SELECT MIN(t1.timeTaken) AS minVal FROM ("
 		+ " SELECT @rownum\\:=@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(progress.completed_date_time, progress.start_date_time)) AS timeTaken"
 		+ "  FROM lams_progress_completed progress,  (SELECT @rownum\\:=0) r"
 		+ "  WHERE progress.activity_id=:activityID AND TIMEDIFF(progress.completed_date_time, progress.start_date_time) IS NOT NULL"
-		+ "  ORDER BY TIMEDIFF(progress.completed_date_time, progress.start_date_time)"
-		+ " ) AS t1 ";
-		
+		+ "  ORDER BY TIMEDIFF(progress.completed_date_time, progress.start_date_time)" + " ) AS t1 ";
 
 	List result = getSession().createSQLQuery(GET_MIN_TIME_TAKEN_FOR_ACTIVITY)
 		.setLong("activityID", activityID.longValue()).list();
-	
+
 	if (result == null || result.size() == 0 || result.get(0) == null) {
 	    return 0;
 	} else {
@@ -254,18 +245,16 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     @Override
     @SuppressWarnings("unchecked")
     public long getMaxTimeTakenForActivity(Long activityID) {
-	
+
 	final String GET_MAX_TIME_TAKEN_FOR_ACTIVITY = "SELECT MAX(t1.timeTaken) AS maxVal FROM ("
 		+ " SELECT @rownum\\:=@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(progress.completed_date_time, progress.start_date_time)) AS timeTaken"
 		+ "  FROM lams_progress_completed progress,  (SELECT @rownum\\:=0) r"
 		+ "  WHERE progress.activity_id=:activityID AND TIMEDIFF(progress.completed_date_time, progress.start_date_time) IS NOT NULL"
-		+ "  ORDER BY TIMEDIFF(progress.completed_date_time, progress.start_date_time)"
-		+ " ) AS t1 ";
-		
+		+ "  ORDER BY TIMEDIFF(progress.completed_date_time, progress.start_date_time)" + " ) AS t1 ";
 
 	List result = getSession().createSQLQuery(GET_MAX_TIME_TAKEN_FOR_ACTIVITY)
 		.setLong("activityID", activityID.longValue()).list();
-	
+
 	if (result == null || result.size() == 0 || result.get(0) == null) {
 	    return 0;
 	} else {
@@ -273,7 +262,6 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	    return ((Number) result.get(0)).intValue() * 1000;
 	}
     }
-    
 
     @Override
     @SuppressWarnings("unchecked")
@@ -309,21 +297,18 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     @Override
     @SuppressWarnings("unchecked")
     public long getMedianTimeTakenForGroupedActivity(Long activityID, Long groupID) {
-	
+
 	final String GET_MEDIAN_TIME_TAKEN_FOR_GROUPED_ACTIVITY = "SELECT AVG(t1.timeTaken) AS medianVal FROM ("
 		+ " SELECT @rownum\\:=@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)) AS timeTaken"
 		+ "  FROM lams_progress_completed compProgress,  (SELECT @rownum\\:=0) r, lams_learner_progress progr, lams_user_group ug "
 		+ "  WHERE compProgress.activity_id=:activityID AND TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time) IS NOT NULL"
 		+ "  AND ug.group_id=:groupID AND compProgress.learner_progress_id = progr.learner_progress_id AND progr.user_id=ug.user_id "
-		+ "  ORDER BY TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)"
-		+ " ) AS t1, "
-		+ " ("
-		+ "  SELECT count(*) AS totalRows"
+		+ "  ORDER BY TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)" + " ) AS t1, "
+		+ " (" + "  SELECT count(*) AS totalRows"
 		+ "  FROM lams_progress_completed compProgress, lams_learner_progress progr, lams_user_group ug"
 		+ "  WHERE compProgress.activity_id=:activityID AND TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time) IS NOT NULL"
 		+ "  AND ug.group_id=:groupID AND compProgress.learner_progress_id = progr.learner_progress_id AND progr.user_id=ug.user_id"
-		+ " ) AS t2"
-		+ " WHERE t1.rowNumber in ( floor((totalRows+1)/2), floor((totalRows+2)/2) )";
+		+ " ) AS t2" + " WHERE t1.rowNumber in ( floor((totalRows+1)/2), floor((totalRows+2)/2) )";
 
 	List result = getSession().createSQLQuery(GET_MEDIAN_TIME_TAKEN_FOR_GROUPED_ACTIVITY)
 		.setLong("activityID", activityID.longValue()).setLong("groupID", groupID.longValue()).list();
@@ -335,20 +320,17 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	    return ((Number) result.get(0)).intValue() * 1000;
 	}
     }
-    
-    
 
     @Override
     @SuppressWarnings("unchecked")
     public long getMinTimeTakenForGroupedActivity(Long activityID, Long groupID) {
-	
+
 	final String GET_MIN_TIME_TAKEN_FOR_GROUPED_ACTIVITY = "SELECT MIN(t1.timeTaken) AS minVal FROM ("
 		+ " SELECT @rownum\\:=@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)) AS timeTaken"
 		+ "  FROM lams_progress_completed compProgress,  (SELECT @rownum\\:=0) r, lams_learner_progress progr, lams_user_group ug "
 		+ "  WHERE compProgress.activity_id=:activityID AND TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time) IS NOT NULL"
 		+ "  AND ug.group_id=:groupID AND compProgress.learner_progress_id = progr.learner_progress_id AND progr.user_id=ug.user_id "
-		+ "  ORDER BY TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)"
-		+ " ) AS t1";
+		+ "  ORDER BY TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)" + " ) AS t1";
 	List result = getSession().createSQLQuery(GET_MIN_TIME_TAKEN_FOR_GROUPED_ACTIVITY)
 		.setLong("activityID", activityID.longValue()).setLong("groupID", groupID.longValue()).list();
 
@@ -359,18 +341,17 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	    return ((Number) result.get(0)).intValue() * 1000;
 	}
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public long getMaxTimeTakenForGroupedActivity(Long activityID, Long groupID) {
-	
+
 	final String GET_MAX_TIME_TAKEN_FOR_GROUPED_ACTIVITY = "SELECT MAX(t1.timeTaken) AS maxVal FROM ("
 		+ " SELECT @rownum\\:=@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)) AS timeTaken"
 		+ "  FROM lams_progress_completed compProgress,  (SELECT @rownum\\:=0) r, lams_learner_progress progr, lams_user_group ug "
 		+ "  WHERE compProgress.activity_id=:activityID AND TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time) IS NOT NULL"
 		+ "  AND ug.group_id=:groupID AND compProgress.learner_progress_id = progr.learner_progress_id AND progr.user_id=ug.user_id "
-		+ "  ORDER BY TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)"
-		+ " ) AS t1";
+		+ "  ORDER BY TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)" + " ) AS t1";
 	List result = getSession().createSQLQuery(GET_MAX_TIME_TAKEN_FOR_GROUPED_ACTIVITY)
 		.setLong("activityID", activityID.longValue()).setLong("groupID", groupID.longValue()).list();
 
@@ -380,8 +361,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	    //converting into milliseconds
 	    return ((Number) result.get(0)).intValue() * 1000;
 	}
-    }  
-    
+    }
 
     @Override
     public List<Lesson> getLessonsByGroupAndUser(final Integer userId, final Integer orgId, int page, int size,
@@ -704,5 +684,28 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		.list();
 
 	return gradebookUserLessons;
+    }
+
+    @Override
+    public boolean hasArchivedMarks(Long lessonId, Integer userId) {
+	final String HAS_ARCHIVED_MARKS = "SELECT COUNT(*) FROM GradebookUserLessonArchive a WHERE "
+		+ " a.lesson.lessonId = :lessonId AND a.learner.userId = :userId";
+	long count = (Long) getSession().createQuery(HAS_ARCHIVED_MARKS).setLong("lessonId", lessonId)
+		.setInteger("userId", userId).uniqueResult();
+	return count > 0;
+    }
+
+    public List<GradebookUserLessonArchive> getArchivedLessonMarks(Long lessonId, Integer userId) {
+	final String GET_ARCHIVED_LESSON_MARKS = "FROM GradebookUserLessonArchive a WHERE "
+		+ " a.lesson.lessonId = :lessonId AND a.learner.userId = :userId";
+	return getSession().createQuery(GET_ARCHIVED_LESSON_MARKS).setLong("lessonId", lessonId)
+		.setInteger("userId", userId).list();
+    }
+
+    public List<GradebookUserActivityArchive> getArchivedActivityMarks(Long activityId, Integer userId) {
+	final String GET_ARCHIVED_ACTIVITY_MARKS = "FROM GradebookUserActivityArchive a WHERE "
+		+ " a.activity.activityId = :activityId AND a.learner.userId = :userId";
+	return getSession().createQuery(GET_ARCHIVED_ACTIVITY_MARKS).setLong("activityId", activityId)
+		.setInteger("userId", userId).list();
     }
 }

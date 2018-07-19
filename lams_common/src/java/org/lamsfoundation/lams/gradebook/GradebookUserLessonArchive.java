@@ -22,6 +22,8 @@
 
 package org.lamsfoundation.lams.gradebook;
 
+import java.util.Date;
+
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -31,16 +33,18 @@ public class GradebookUserLessonArchive {
     private User learner;
     private Double mark;
     private String feedback;
+    private Date archiveDate;
 
     public GradebookUserLessonArchive() {
     }
 
-    public GradebookUserLessonArchive(GradebookUserLesson source) {
+    public GradebookUserLessonArchive(GradebookUserLesson source, Date archiveDate) {
 	this.uid = source.getUid();
 	this.lesson = source.getLesson();
 	this.learner = source.getLearner();
 	this.mark = source.getMark();
 	this.feedback = source.getFeedback();
+	this.archiveDate = archiveDate;
     }
 
     public long getUid() {
@@ -81,5 +85,13 @@ public class GradebookUserLessonArchive {
 
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
+    }
+
+    public Date getArchiveDate() {
+	return archiveDate;
+    }
+
+    public void setArchiveDate(Date archiveDate) {
+	this.archiveDate = archiveDate;
     }
 }

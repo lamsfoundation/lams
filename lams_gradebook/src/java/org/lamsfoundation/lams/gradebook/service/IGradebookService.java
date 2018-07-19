@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.gradebook.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
@@ -52,6 +53,9 @@ public interface IGradebookService {
      * @return
      */
     List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId, TimeZone userTimezone, boolean escapeTitles);
+
+    List<GradebookGridRowDTO> getGBActivityArchiveRowsForLearner(Long activityId, Integer userId,
+	    TimeZone userTimezone);
 
     /**
      * Gets all the activity rows for a user, with the mark for the activity being the user's individual mark
@@ -128,7 +132,7 @@ public interface IGradebookService {
     /**
      * Updates all user marks in specified activity. It recalculates all UserActivityGradebooks and
      * UserLessonGradebooks.
-     * 
+     *
      * @param activity
      */
     void recalculateGradebookMarksForActivity(Activity activity);
@@ -137,7 +141,7 @@ public interface IGradebookService {
      * Recalculates total marks for all users in a lesson. Then stores that mark in a gradebookUserLesson. Doesn't
      * affect anyhow gradebookUserActivity objects. If total mark is positive but there is no gradebookUserLesson
      * available - throws exception.
-     * 
+     *
      * @param lessonId
      * @throws Exception
      */
@@ -297,7 +301,7 @@ public interface IGradebookService {
 
     void removeLearnerFromLesson(Long lessonId, Integer learnerId);
 
-    void archiveLearnerMarks(Long lessonId, Integer learnerId);
+    void archiveLearnerMarks(Long lessonId, Integer learnerId, Date archiveDate);
 
     /**
      * Get a language label
@@ -336,7 +340,7 @@ public interface IGradebookService {
 
     /**
      * Get the raw overall marks for a lesson for charting purposes
-     * 
+     *
      * @param lessonId
      * @return
      */

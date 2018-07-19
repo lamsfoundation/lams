@@ -160,6 +160,45 @@ public class GradebookAction extends LamsDispatchAction {
 	return null;
     }
 
+    public ActionForward getActivityArchiveGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
+
+	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	if (!getSecurityService().isLessonParticipant(lessonID, getUser().getUserID(),
+		"get activity archive gradebook data", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the lesson");
+	    return null;
+	}
+
+	// Getting userID param, it is passed differently from different views
+	UserDTO currentUserDTO = getUser();
+	Integer userID = null;
+	if (view == GBGridView.MON_USER) {
+	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
+	} else if (view == GBGridView.LRN_ACTIVITY) {
+	    if (currentUserDTO != null) {
+		userID = currentUserDTO.getUserID();
+	    }
+	}
+
+	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
+
+	// Get the user gradebook list from the db
+	// A slightly different list is needed for userview or activity view
+	if ((view == GBGridView.MON_USER) || (view == GBGridView.LRN_ACTIVITY)) {//2nd level && from personal marks page (2nd level or 1st)
+	    gradebookActivityDTOs = getGradebookService().getGBActivityArchiveRowsForLearner(activityID, userID,
+		    currentUserDTO.getTimeZone());
+	}
+
+	String ret = GradebookUtil.toGridXML(gradebookActivityDTOs, view, GradebookConstants.PARAM_ID, false, null,
+		null, null, GradebookConstants.SORT_DESC, 100, 1);
+
+	writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_XML, LamsDispatchAction.ENCODING_UTF8, ret);
+	return null;
+    }
+
     @SuppressWarnings("unchecked")
     public ActionForward getLessonCompleteGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {

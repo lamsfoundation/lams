@@ -28,7 +28,6 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.usermanagement.User;
 
 public class GradebookUserActivityArchive {
-
     private long uid;
     private ToolActivity activity;
     private User learner;
@@ -36,11 +35,12 @@ public class GradebookUserActivityArchive {
     private String feedback;
     private Boolean markedInGradebook;
     private Date updateDate;
+    private Date archiveDate;
 
     public GradebookUserActivityArchive() {
     }
 
-    public GradebookUserActivityArchive(GradebookUserActivity source) {
+    public GradebookUserActivityArchive(GradebookUserActivity source, Date archiveDate) {
 	this.uid = source.getUid();
 	this.activity = source.getActivity();
 	this.learner = source.getLearner();
@@ -48,6 +48,7 @@ public class GradebookUserActivityArchive {
 	this.feedback = source.getFeedback();
 	this.markedInGradebook = source.getMarkedInGradebook();
 	this.updateDate = source.getUpdateDate();
+	this.archiveDate = archiveDate;
     }
 
     public long getUid() {
@@ -104,5 +105,13 @@ public class GradebookUserActivityArchive {
 
     public void setUpdateDate(Date updateDate) {
 	this.updateDate = updateDate;
+    }
+
+    public Date getArchiveDate() {
+	return archiveDate;
+    }
+
+    public void setArchiveDate(Date archiveDate) {
+	this.archiveDate = archiveDate;
     }
 }
