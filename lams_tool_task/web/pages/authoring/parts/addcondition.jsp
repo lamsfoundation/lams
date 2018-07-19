@@ -37,8 +37,8 @@
 		    	<c:forEach var="itemE" items="${taskListConditionForm.possibleItems}">
 		    	<div class="checkbox">
 		    	<label>
-		    	<form:checkbox path="selectedItems" value="${itemE.value}"/>
-		    		<c:out value="${itemE.key}" />
+		    	<form:checkbox path="selectedItems" value="${itemE.key}"/>
+		    		<c:out value="${itemE.value}" />
 		    	</label>
 				</div>
 		    	</c:forEach>

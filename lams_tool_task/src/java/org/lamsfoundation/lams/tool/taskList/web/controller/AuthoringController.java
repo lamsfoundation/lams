@@ -566,7 +566,7 @@ public class AuthoringController {
 	return switchItem(request, false);
     }
 
-    public String switchItem(HttpServletRequest request, boolean up) {
+    private String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()

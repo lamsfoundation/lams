@@ -518,7 +518,7 @@ public class LearningController implements TaskListConstants {
 
 	MultipartFile file = taskListItemForm.getUploadedFile();
 
-	if (file == null || StringUtils.isBlank(file.getName())) {
+	if (file == null || StringUtils.isBlank(file.getOriginalFilename())) {
 	    return "pages/learning/learning";
 	}
 

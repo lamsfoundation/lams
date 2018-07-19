@@ -144,7 +144,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     @Override
     public TaskListItemAttachment uploadTaskListItemFile(MultipartFile uploadFile, TaskListUser user)
 	    throws UploadTaskListFileException {
-	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getName())) {
+	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getOriginalFilename())) {
 	    throw new UploadTaskListFileException(
 		    messageService.getMessage("error.msg.upload.file.not.found", new Object[] { uploadFile }));
 	}
@@ -156,7 +156,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	TaskListItemAttachment file = new TaskListItemAttachment();
 	file.setFileUuid(nodeKey.getUuid());
 	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getName());
+	file.setFileName(uploadFile.getOriginalFilename());
 	file.setCreated(new Timestamp(new Date().getTime()));
 	file.setCreateBy(user);
 
