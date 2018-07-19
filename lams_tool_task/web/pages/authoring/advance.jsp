@@ -71,7 +71,7 @@
 	</div>
 	
 	<div class="form-group">
-		<form:input path="taskList.reflectInstructions"	id="reflectInstructions" cssClass="form-control" rows="3" />
+		<textarea name="taskList.reflectInstructions" id="reflectInstructions" class="form-control" rows="3"></textarea>
 	</div>
 
 </lams:SimplePanel>

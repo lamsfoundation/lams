@@ -18,11 +18,11 @@
 		</div>
 	
 		<div class="panel-body">
-	
+			
 			<!-- Basic Info Form-->
-			<%@ include file="/common/messages.jsp"%>
 			<form:form action="../authoringCondition/saveOrUpdateCondition.do" method="post" modelAttribute="taskListConditionForm" id="taskListConditionForm" focus="name"
 			 onSubmit="javascript:return false;" >
+				<%@ include file="/common/messages.jsp"%>
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="sequenceId" />
 	
@@ -34,10 +34,17 @@
 	        	<c:set var="sessionMapID" value="${taskListConditionForm.sessionMapID}" />				
 		    	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 		    
-		    	<div class="form-group form-inline">
-		    	<form:checkboxes path="selectedItems" items="${taskListConditionForm.possibleItems}"/>
+		    	<c:forEach var="itemE" items="${taskListConditionForm.possibleItems}">
+		    	<div class="checkbox">
+		    	<label>
+		    	<form:checkbox path="selectedItems" value="${itemE.value}"/>
+		    		<c:out value="${itemE.key}" />
+		    	</label>
 				</div>
-				
+		    	</c:forEach>
+		    	
+			</form:form>	
+		
 			<div class="voffset5 pull-right">
 			    <a href="#" onclick="hideConditionMessage()"
 					class="btn btn-default btn-xs"><fmt:message key="label.cancel" />
@@ -47,7 +54,7 @@
 				</a> 
 			</div>
 			
-			</form:form>
+			
 	
 			
 		</div>

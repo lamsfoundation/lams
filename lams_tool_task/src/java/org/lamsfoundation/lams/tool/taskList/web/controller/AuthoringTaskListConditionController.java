@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
@@ -46,7 +45,6 @@ import org.lamsfoundation.lams.tool.taskList.web.form.TaskListConditionForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListForm;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -55,6 +53,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Auxiliary action in author mode. It contains operations with TaskListCondition. The rest of operations are located in
@@ -97,20 +96,19 @@ public class AuthoringTaskListConditionController {
      * Display empty page for new taskList item.
      */
     @RequestMapping("/newConditionInit")
-    public String newConditionInit(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request) {
+    public String newConditionInit(@ModelAttribute TaskListConditionForm taskListConditionForm,
+	    HttpServletRequest request) {
 
-	TaskListConditionForm taskListConditionForm = new TaskListConditionForm();
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
 	taskListConditionForm.setSessionMapID(sessionMapID);
 	populateFormWithPossibleItems(taskListConditionForm, request);
-	request.setAttribute("taskListConditionForm", taskListConditionForm);
 	return "pages/authoring/parts/addcondition";
     }
 
     /**
      * Display edit page for existed taskList item.
      */
-    @RequestMapping("/editCondition")
+    @RequestMapping(path = "/editCondition", method = RequestMethod.POST)
     public String editCondition(@ModelAttribute TaskListConditionForm taskListConditionForm,
 	    HttpServletRequest request) {
 
@@ -140,14 +138,15 @@ public class AuthoringTaskListConditionController {
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
      */
-    @RequestMapping("/saveOrUpdateCondition")
+    @RequestMapping(path = "/saveOrUpdateCondition")
     public String saveOrUpdateCondition(@ModelAttribute TaskListConditionForm taskListConditionForm,
 	    HttpServletRequest request) {
 
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	validateTaskListCondition(taskListConditionForm, request);
+	MultiValueMap<String, String> errorMap = validateTaskListCondition(taskListConditionForm, request);
+
 	if (!errorMap.isEmpty()) {
 	    populateFormWithPossibleItems(taskListConditionForm, request);
+	    request.setAttribute("errorMap", errorMap);
 	    return "pages/authoring/parts/addcondition";
 	}
 
@@ -158,6 +157,7 @@ public class AuthoringTaskListConditionController {
 	    errorMap.add("GLOBAL", messageService.getMessage("error.upload.faile"));
 	    if (!errorMap.isEmpty()) {
 		populateFormWithPossibleItems(taskListConditionForm, request);
+		request.setAttribute("errorMap", errorMap);
 		return "pages/authoring/parts/addcondition";
 	    }
 
@@ -172,7 +172,7 @@ public class AuthoringTaskListConditionController {
      * Remove taskList item from HttpSession list and update page display. As authoring rule, all persist only happen
      * when user submit whole page. So this remove is just impact HttpSession values.
      */
-    @RequestMapping("/removeCondition")
+    @RequestMapping(path = "/removeCondition", method = RequestMethod.POST)
     public String removeCondition(@ModelAttribute TaskListConditionForm taskListConditionForm,
 	    HttpServletRequest request) {
 
@@ -392,10 +392,11 @@ public class AuthoringTaskListConditionController {
     /**
      * Validate taskListCondition
      */
-    private void validateTaskListCondition(TaskListConditionForm taskListConditionForm, HttpServletRequest request) {
+    private MultiValueMap validateTaskListCondition(TaskListConditionForm taskListConditionForm,
+	    HttpServletRequest request) {
 
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	String formConditionName = taskListConditionForm.getName();
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (StringUtils.isBlank(formConditionName)) {
 	    errorMap.add("GLOBAL", messageService.getMessage("error.condition.name.blank"));
 	} else if (StringUtils.contains(formConditionName, '#')) {
@@ -411,7 +412,7 @@ public class AuthoringTaskListConditionController {
 	    for (TaskListCondition condition : conditionList) {
 		if (formConditionName.equals(condition.getName())
 			&& !formConditionSequenceId.equals((new Integer(condition.getSequenceId() - 1)).toString())) {
-		    errorMap.add("GLOBAL", "error.condition.duplicated.name");
+		    errorMap.add("GLOBAL", messageService.getMessage("error.condition.duplicated.name"));
 		    ;
 		    break;
 		}
@@ -421,26 +422,8 @@ public class AuthoringTaskListConditionController {
 	// should be selected at least one TaskListItem
 	String[] selectedItems = taskListConditionForm.getSelectedItems();
 	if (selectedItems == null || selectedItems.length == 0) {
-	    errorMap.add("GLOBAL", "error.condition.no.tasklistitems.selected");
+	    errorMap.add("GLOBAL", messageService.getMessage("error.condition.no.tasklistitems.selected"));
 	}
-
-    }
-
-    private MultiValueMap<String, String> validate(TaskListForm taskListForm, HttpServletRequest request) {
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	// if (StringUtils.isBlank(taskListForm.getTaskList().getTitle())) {
-	// ActionMessage error = new ActionMessage("error.resource.item.title.blank");
-	// errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	// }
-
-	// define it later mode(TEACHER) skip below validation.
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    return errorMap;
-	}
-
-	// Some other validation outside basic Tab.
-
 	return errorMap;
     }
 

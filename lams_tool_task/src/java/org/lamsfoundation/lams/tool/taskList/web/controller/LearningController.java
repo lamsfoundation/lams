@@ -59,8 +59,6 @@ import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -118,7 +116,7 @@ public class LearningController implements TaskListConstants {
 	// save toolContentID into HTTPSession
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 
-	Long sessionId = Long.valueOf(request.getParameter(TaskListConstants.PARAM_TOOL_SESSION_ID));
+	Long sessionId = new Long(request.getParameter(TaskListConstants.PARAM_TOOL_SESSION_ID));
 
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
@@ -497,8 +495,12 @@ public class LearningController implements TaskListConstants {
 	sessionMap.put(TaskListConstants.ATTR_TASK_LIST_ITEM, dbItem);
 
 	// form.reset(mapping, request);
+	String redirectURL = "redirect:/learning/start.do";
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.ATTR_MODE, mode);
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.PARAM_TOOL_SESSION_ID,
+		sessionId.toString());
 
-	return "redirect:/learning/start.do";
+	return redirectURL;
     }
 
     /**
@@ -519,13 +521,11 @@ public class LearningController implements TaskListConstants {
 	if (file == null || StringUtils.isBlank(file.getName())) {
 	    return "pages/learning/learning";
 	}
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	// validate file size
-	boolean fileSizeCorrect = FileValidatorSpringUtil.validateFileSize(file, false, errorMap);
-	if (!fileSizeCorrect) {
 
-	    errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
-		    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
+	// validate file size
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	FileValidatorSpringUtil.validateFileSize(file, false, errorMap);
+	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
 	    return "pages/learning/learning";
 	}
@@ -548,7 +548,12 @@ public class LearningController implements TaskListConstants {
 
 	// form.reset(mapping, request);
 
-	return "redirect:/learning/start.do";
+	String redirectURL = "redirect:/learning/start.do";
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.ATTR_MODE, mode);
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.PARAM_TOOL_SESSION_ID,
+		sessionId.toString());
+
+	return redirectURL;
     }
 
     /**

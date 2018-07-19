@@ -46,7 +46,7 @@
 	
 				<div class="form-group">
 					<label for="description"><fmt:message key="label.authoring.basic.resource.description.input" /></label>
-					<lams:CKEditor id="description" value="${taskListItemForm.description}" contentFolderID="${sessionMap.taskListItemForm.contentFolderID}"/>
+					<lams:CKEditor id="description" value="${taskListItemForm.description}" contentFolderID="${sessionMap.taskListForm.contentFolderID}"/>
 				</div>
 	
 				<div class="checkbox">
