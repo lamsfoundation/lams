@@ -37,10 +37,10 @@
 	});
 
 	function leaderSelection() {
+		debugger;
 		$.ajax({
 	    	async: false,
-	        url: '<c:url value="/learning.do"/>',
-	        data: 'dispatch=becomeLeader&toolSessionID=${toolSessionID}',
+	        url: '<c:url value="/learning/becomeLeader.do?toolSessionID=${toolSessionID}"/>',
 	        type: 'post',
 	        success: function (json) {
 	          	location.reload();
@@ -50,7 +50,7 @@
 
     function finishActivity(){
     	document.getElementById("finishButton").disabled = true;
-		location.href = '<c:url value="/learning/finishActivity.do?toolSessionID=${toolSessionID}"/>"';
+		location.href = '<c:url value="/learning/finishActivity.do?toolSessionID=${toolSessionID}"/>';
     }
 
     <%-- Init websocket only if group leader is not chosen --%>
