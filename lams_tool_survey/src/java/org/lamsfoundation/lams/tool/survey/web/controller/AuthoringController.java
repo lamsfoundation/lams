@@ -106,7 +106,7 @@ public class AuthoringController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/removeItem", method = RequestMethod.POST)
+    @RequestMapping(value = "/removeItem")
     public String removeItem(HttpServletRequest request) {
 
 	// get back sessionMAP
@@ -150,7 +150,7 @@ public class AuthoringController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/upItem", method = RequestMethod.POST)
+    @RequestMapping(value = "/upItem")
     public String upItem(HttpServletRequest request) {
 
 	return switchItem(request, true);
@@ -165,13 +165,13 @@ public class AuthoringController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/downItem", method = RequestMethod.POST)
+    @RequestMapping(value = "/downItem")
     public String downItem(HttpServletRequest request) {
 
 	return switchItem(request, false);
     }
 
-    @RequestMapping(value = "/switchItem", method = RequestMethod.POST)
+    @RequestMapping(value = "/switchItem")
     public String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
@@ -212,7 +212,7 @@ public class AuthoringController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/editItemInit", method = RequestMethod.POST)
+    @RequestMapping(value = "/editItemInit")
     public String editItemInit(QuestionForm surveyItemForm, HttpServletRequest request) {
 
 	// get back sessionMAP
@@ -247,7 +247,7 @@ public class AuthoringController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/newItemInit", method = RequestMethod.POST)
+    @RequestMapping(value = "/newItemInit")
     public String newItemlInit(@ModelAttribute("surveyItemForm") QuestionForm surveyItemForm,
 	    HttpServletRequest request) {
 
@@ -266,7 +266,7 @@ public class AuthoringController {
     /**
      * Create a new question based on existing one.
      */
-    @RequestMapping(value = "/copyItemInit", method = RequestMethod.POST)
+    @RequestMapping(value = "/copyItemInit")
     public String copyItemlInit(QuestionForm surveyItemForm, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -345,7 +345,7 @@ public class AuthoringController {
      * @throws ServletException
      *
      */
-    @RequestMapping(value = "/start", method = RequestMethod.POST)
+    @RequestMapping(value = "/start")
     public String start(SurveyForm startForm, HttpServletRequest request) throws Exception {
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
@@ -420,7 +420,7 @@ public class AuthoringController {
 	return "pages/authoring/start";
     }
 
-    @RequestMapping(value = "/definelater", method = RequestMethod.POST)
+    @RequestMapping(value = "/definelater")
     public String definelater(SurveyForm startForm, HttpServletRequest request) throws Exception {
 
 	// update define later flag to true
@@ -523,7 +523,7 @@ public class AuthoringController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    @RequestMapping(value = "/init")
     public String initPage(SurveyForm startForm, HttpServletRequest request) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -886,7 +886,7 @@ public class AuthoringController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/newInstruction", method = RequestMethod.POST)
+    @RequestMapping(value = "/newInstruction")
     public String newInstruction(HttpServletRequest request) {
 	int count = NumberUtils.stringToInt(request.getParameter(AuthoringController.INSTRUCTION_ITEM_COUNT), 0);
 	List instructionList = new ArrayList(++count);
@@ -911,7 +911,7 @@ public class AuthoringController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/removeInstruction", method = RequestMethod.POST)
+    @RequestMapping(value = "/removeInstruction")
     public String removeInstruction(HttpServletRequest request) {
 	int count = NumberUtils.stringToInt(request.getParameter(AuthoringController.INSTRUCTION_ITEM_COUNT), 0);
 	int removeIdx = NumberUtils.stringToInt(request.getParameter("removeIdx"), -1);

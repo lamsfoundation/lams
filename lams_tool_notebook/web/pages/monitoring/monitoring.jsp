@@ -31,7 +31,7 @@
 	</lams:head>
 	<body class="stripes">
 		<script type="text/javascript">
-			var statisticsURL = "<c:url value='/monitoring/getStatistics.do?toolContentID=${notebookDTO.toolContentId}&reqID=";
+		var statisticsURL = "<c:url value='/monitoring/getStatistics.do' />?toolContentID="+${notebookDTO.toolContentId}+"&reqID=";
 		</script>
 
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>
@@ -42,7 +42,6 @@
 				<lams:Tab id="2" key="button.editActivity" />
 				<lams:Tab id="3" key="button.statistics" />
 			</lams:Tabs>
-
 			<lams:TabBodyArea>
 				<lams:TabBodys>
 					<lams:TabBody id="1" titleKey="button.summary" page="summary.jsp" />

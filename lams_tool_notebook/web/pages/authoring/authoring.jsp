@@ -14,7 +14,7 @@
 	
 			<form:hidden path="sessionMapID" />
 	
-		<lams:Page title="${title}" type="navbar"formID="authoringForm">
+		<lams:Page title="${title}" type="navbar" formID="authoringForm">
 
 		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= NotebookConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 			<lams:Tab id="1" key="button.basic" />

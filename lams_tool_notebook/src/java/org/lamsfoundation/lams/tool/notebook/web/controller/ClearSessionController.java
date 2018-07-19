@@ -50,7 +50,7 @@ public class ClearSessionController extends LamsAuthoringFinishController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(value = "/clearsession", method = RequestMethod.POST)
+    @RequestMapping(value = "/clearsession")
     public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	super.execute(request, response, applicationContext);
     }

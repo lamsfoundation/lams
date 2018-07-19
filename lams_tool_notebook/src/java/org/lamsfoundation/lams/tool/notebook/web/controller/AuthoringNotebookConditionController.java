@@ -76,7 +76,7 @@ public class AuthoringNotebookConditionController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "newConditionInit", method = RequestMethod.POST)
+    @RequestMapping(value = "newConditionInit")
     private String newConditionInit(@ModelAttribute NotebookConditionForm notebookConditionForm,
 	    HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, NotebookConstants.ATTR_SESSION_MAP_ID);
@@ -94,7 +94,7 @@ public class AuthoringNotebookConditionController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/editCondition", method = RequestMethod.POST)
+    @RequestMapping(value = "/editCondition")
     private String editCondition(NotebookConditionForm notebookConditionForm, HttpServletRequest request) {
 
 	String sessionMapID = notebookConditionForm.getSessionMapID();
@@ -166,7 +166,7 @@ public class AuthoringNotebookConditionController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/removeCondition", method = RequestMethod.POST)
+    @RequestMapping(value = "/removeCondition")
     private String removeCondition(HttpServletRequest request) {
 
 	// get back sessionMAP
@@ -203,7 +203,7 @@ public class AuthoringNotebookConditionController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/upCondition", method = RequestMethod.POST)
+    @RequestMapping(value = "/upCondition")
     private String upCondition(HttpServletRequest request) {
 	return switchItem(request, true);
     }
@@ -217,12 +217,12 @@ public class AuthoringNotebookConditionController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/downCondition", method = RequestMethod.POST)
+    @RequestMapping(value = "/downCondition")
     private String downCondition(HttpServletRequest request) {
 	return switchItem(request, false);
     }
 
-    @RequestMapping(value = "/switchItem", method = RequestMethod.POST)
+    @RequestMapping(value = "/switchItem")
     private String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, NotebookConstants.ATTR_SESSION_MAP_ID);

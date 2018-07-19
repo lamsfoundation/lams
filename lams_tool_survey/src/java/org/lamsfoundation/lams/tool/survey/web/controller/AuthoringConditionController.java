@@ -81,7 +81,7 @@ public class AuthoringConditionController {
      * @return
      */
 
-    @RequestMapping(value = "/newConditionInit", method = RequestMethod.POST)
+    @RequestMapping(value = "/newConditionInit")
     public String newConditionInit(HttpServletRequest request) {
 
 	SurveyConditionForm surveyConditionForm = new SurveyConditionForm();
@@ -100,7 +100,7 @@ public class AuthoringConditionController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/editCondition", method = RequestMethod.POST)
+    @RequestMapping(value = "/editCondition")
     public String editCondition(SurveyConditionForm surveyConditionForm, HttpServletRequest request) {
 
 	String sessionMapID = surveyConditionForm.getSessionMapID();
@@ -173,7 +173,7 @@ public class AuthoringConditionController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/removeCondition", method = RequestMethod.POST)
+    @RequestMapping(value = "/removeCondition")
     public String removeCondition(HttpServletRequest request) {
 
 	// get back sessionMAP
@@ -210,7 +210,7 @@ public class AuthoringConditionController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/upCondition", method = RequestMethod.POST)
+    @RequestMapping(value = "/upCondition")
     private String upCondition(HttpServletRequest request) {
 	return switchItem(request, true);
     }
@@ -224,12 +224,12 @@ public class AuthoringConditionController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/downCondition", method = RequestMethod.POST)
+    @RequestMapping(value = "/downCondition")
     private String downCondition(HttpServletRequest request) {
 	return switchItem(request, false);
     }
 
-    @RequestMapping(value = "/switchItem", method = RequestMethod.POST)
+    @RequestMapping(value = "/switchItem")
     public String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);

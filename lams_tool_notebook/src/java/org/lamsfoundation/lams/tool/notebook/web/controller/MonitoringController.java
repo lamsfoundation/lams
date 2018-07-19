@@ -68,7 +68,7 @@ public class MonitoringController {
     @Qualifier("notebookMessageService")
     private MessageService messageService;
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "")
     public String unspecified(HttpServletRequest request) {
 
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -103,7 +103,7 @@ public class MonitoringController {
 	return "pages/monitoring/monitoring";
     }
 
-    @RequestMapping(value = "/getUsers", method = RequestMethod.POST)
+    @RequestMapping(value = "/getUsers")
     public String getUsers(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long toolSessionId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
@@ -226,7 +226,7 @@ public class MonitoringController {
      * @throws IOException
      */
 
-    @RequestMapping(value = "/setSubmissionDeadline", method = RequestMethod.POST)
+    @RequestMapping(value = "/setSubmissionDeadline")
     public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);

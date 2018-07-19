@@ -20,7 +20,7 @@
 			CKEDITOR.instances["entryText"].focus();
 		</c:when>		
 		<c:otherwise>
-			document.forms.learningForm.focusedInput.focus();
+			document.forms.messageForm.focusedInput.focus();
 		</c:otherwise>
 		</c:choose>
 		document.getElementById("finishButton").style.visibility = 'visible';
@@ -50,13 +50,13 @@
 			}
 		</c:when>		
 		<c:otherwise>
-			if (forceResponse =="true" && document.forms.learningForm.focusedInput.value == "") {
+			if (forceResponse =="true" && document.forms.messageForm.focusedInput.value == "") {
 
 				retValue = confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>");
 				textAreaReady();
 				return retValue;
 				
-			} else if  (forceResponse =="false" && document.forms.learningForm.focusedInput.value == "" && mode == "learner") {
+			} else if  (forceResponse =="false" && document.forms.messageForm.focusedInput.value == "" && mode == "learner") {
 	
 				if (!confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
 					// otherwise, focus on the text area

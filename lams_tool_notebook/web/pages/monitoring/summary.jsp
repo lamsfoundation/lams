@@ -2,8 +2,8 @@
 <c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
-<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
-<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet"/>
+<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet"/>
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet"/>
 
 <style media="screen,projection" type="text/css">
@@ -43,7 +43,7 @@
 			
 			jQuery("#group${sessionId}").jqGrid({
 			
-				url: "<c:url value='/monitoring/getUsersdo?toolSessionID=${sessionId}'",
+				url: "<c:url value='/monitoring/getUsers.do?toolSessionID=${sessionId}'/>",
 				datatype: 'json',
 				jsonReader : {
 				     root: "rows",
@@ -118,7 +118,7 @@
  					}).text(comment).appendTo(subgrid); 
   					
  					$(".editable${sessionId}_" + rowId + "_t").jinplace({
- 					    url: "<c:url value='/monitoring/saveTeacherComment.do?userUid= + ${userUid}' />"
+ 					    url: "<c:url value='/monitoring/saveTeacherComment.do?userUid= + ${userUid}' />",
  					    textOnly: true,
  					    placeholder: '<fmt:message key="label.click.to.edit" />',
  					    okButton: "<fmt:message key='button.ok' />",
@@ -201,47 +201,47 @@
 	    <c:out value="${notebookDTO.instructions}" escapeXml="false"/>
 	</div>
 	
-	<c:if test="${empty notebookDTO.sessions}">
-		<lams:Alert type="info" id="no-session-summary" close="false">
-			<fmt:message key="message.monitoring.summary.no.session" />
-		</lams:Alert>
-	</c:if>
-	
-</div>
- 
-<c:if test="${isGroupedActivity}">
-	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
-</c:if>
-
-<c:forEach var="session" items="${notebookDTO.sessions}" varStatus="status">
-
-	<c:if test="${isGroupedActivity}">	
-	    <div class="panel panel-default" >
-        <div class="panel-heading" id="heading${session.key}">
-        	<span class="panel-title collapsable-icon-left">
-        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${session.key}" 
-					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${session.key}" >
-			<fmt:message key="message.session.name" />:	<c:out value="${session.value}" /></a>
-			</span>
-        </div>
-        
-        <div id="collapse${session.key}" class="panel-collapse collapse ${status.first ? 'in' : ''}"
-        	 role="tabpanel" aria-labelledby="heading${session.key}">
-	</c:if>
- 
- 	<table id="group${session.key}" class="scroll" cellpadding="0" cellspacing="0" ></table>
-	<div id="group${session.key}pager"></div>
- 
+		<c:if test="${empty notebookDTO.sessions}">
+			<lams:Alert type="info" id="no-session-summary" close="false">
+				<fmt:message key="message.monitoring.summary.no.session" />
+			</lams:Alert>
+		</c:if>
+		
+	</div>
+	 
 	<c:if test="${isGroupedActivity}">
-		</div> <!-- end collapse area  -->
-		</div> <!-- end collapse panel  -->
+		<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
 	</c:if>
+
+	<c:forEach var="session" items="${notebookDTO.sessions}" varStatus="status">
+
+		<c:if test="${isGroupedActivity}">	
+		    <div class="panel panel-default" >
+		        <div class="panel-heading" id="heading${session.key}">
+		        	<span class="panel-title collapsable-icon-left">
+		        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${session.key}" 
+							aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${session.key}" >
+					<fmt:message key="message.session.name" />:	<c:out value="${session.value}" /></a>
+					</span>
+		        </div>
+	        
+	       		<div id="collapse${session.key}" class="panel-collapse collapse ${status.first ? 'in' : ''}"
+	        	 role="tabpanel" aria-labelledby="heading${session.key}">
+		</c:if>
+	 
+	 	<table id="group${session.key}" class="scroll" cellpadding="0" cellspacing="0" ></table>
+		<div id="group${session.key}pager"></div>
+ 
+		<c:if test="${isGroupedActivity}">
+			</div> <!-- end collapse area  -->
+			</div> <!-- end collapse panel  -->
+		</c:if>
 	${ !isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
-</c:forEach>
+	</c:forEach>
 	
-<c:if test="${isGroupedActivity}">
-	</div> <!--  end panel group -->
-</c:if> 
+	<c:if test="${isGroupedActivity}">
+		</div> <!--  end panel group -->
+	</c:if> 
 
 <%@include file="advanceOptions.jsp"%>
 

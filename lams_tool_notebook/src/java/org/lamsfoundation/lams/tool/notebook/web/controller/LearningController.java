@@ -58,7 +58,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -85,7 +84,7 @@ public class LearningController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "")
     public String unspecified(@ModelAttribute("messageForm") LearningForm messageForm, HttpServletRequest request)
 	    throws Exception {
 
@@ -199,7 +198,7 @@ public class LearningController {
 	return notebookUser;
     }
 
-    @RequestMapping(value = "/finishActivity", method = RequestMethod.POST)
+    @RequestMapping(value = "/finishActivity")
     public String finishActivity(@ModelAttribute("messageForm") LearningForm messageForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 

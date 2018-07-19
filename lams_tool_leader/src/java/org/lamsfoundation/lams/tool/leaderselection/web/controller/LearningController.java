@@ -50,6 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -70,7 +71,7 @@ public class LearningController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("")
+    @RequestMapping(value = "", method = RequestMethod.POST)
     public String unspecified(HttpServletRequest request) throws Exception {
 
 	// 'toolSessionID' and 'mode' paramters are expected to be present.
@@ -132,7 +133,7 @@ public class LearningController {
      *
      * @throws JSONException
      */
-    @RequestMapping("/becomeLeader")
+    @RequestMapping(value = "/becomeLeader", method = RequestMethod.POST)
     public String becomeLeader(HttpServletRequest request) throws IOException {
 	initService();
 	Long toolSessionId = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
@@ -148,7 +149,7 @@ public class LearningController {
 	return null;
     }
 
-    @RequestMapping("/finishActivity")
+    @RequestMapping(value = "/finishActivity", method = RequestMethod.POST)
     public String finishActivity(HttpServletRequest request, HttpServletResponse response) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);

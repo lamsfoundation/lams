@@ -67,7 +67,7 @@ public class PedagogicalPlannerController {
 	return initPedagogicalPlannerForm(pedagogicalPlannerForm, request);
     }
 
-    @RequestMapping(value = "/initPedagogicalPlannerForm", method = RequestMethod.POST)
+    @RequestMapping(value = "/initPedagogicalPlannerForm")
     public String initPedagogicalPlannerForm(NotebookPedagogicalPlannerForm pedagogicalPlannerForm,
 	    HttpServletRequest request) {
 	NotebookPedagogicalPlannerForm plannerForm = pedagogicalPlannerForm;
