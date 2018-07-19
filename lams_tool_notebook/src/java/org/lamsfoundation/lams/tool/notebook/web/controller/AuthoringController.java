@@ -51,7 +51,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author
@@ -71,8 +70,6 @@ public class AuthoringController {
     @Qualifier("notebookService")
     private INotebookService notebookService;
 
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     // Authoring SessionMap key names
     private static final String KEY_TOOL_CONTENT_ID = "toolContentID";

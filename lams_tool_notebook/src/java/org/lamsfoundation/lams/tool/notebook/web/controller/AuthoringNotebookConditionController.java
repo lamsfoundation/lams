@@ -94,7 +94,7 @@ public class AuthoringNotebookConditionController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/editCondition")
+    @RequestMapping("/editCondition")
     private String editCondition(NotebookConditionForm notebookConditionForm, HttpServletRequest request) {
 
 	String sessionMapID = notebookConditionForm.getSessionMapID();
@@ -126,7 +126,7 @@ public class AuthoringNotebookConditionController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping(value = "/saveOrUpdateCondition", method = RequestMethod.POST)
+    @RequestMapping("/saveOrUpdateCondition")
     private String saveOrUpdateCondition(
 	    @ModelAttribute("notebookConditionForm") NotebookConditionForm notebookConditionForm,
 	    HttpServletRequest request) {
@@ -143,7 +143,7 @@ public class AuthoringNotebookConditionController {
 	    extractFormToNotebookCondition(request, notebookConditionForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errorMap.add("GLOBAL", messageService.getMessage(NotebookConstants.ERROR_MSG_CONDITION, e.getMessage()));
+	    errorMap.add("GLOBAL", messageService.getMessage(NotebookConstants.ERROR_MSG_CONDITION, new Object[] { e.getMessage() }));
 	    if (!errorMap.isEmpty()) {
 		request.setAttribute("errorMap", errorMap);
 		return "pages/authoring/addCondition";
@@ -222,7 +222,6 @@ public class AuthoringNotebookConditionController {
 	return switchItem(request, false);
     }
 
-    @RequestMapping(value = "/switchItem")
     private String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, NotebookConstants.ATTR_SESSION_MAP_ID);

@@ -123,11 +123,11 @@
     }  				
 </script>	
 <div id="saveCancelButtons" >
-		<html:link href="javascript:doSubmit_Form_Only();" styleId="saveButton" property="submit" styleClass="btn btn-primary pull-right">
+		<a href="javascript:doSubmit_Form_Only();" id="saveButton" property="submit" class="btn btn-primary pull-right">
 			<span class="okIcon"><fmt:message key="${saveButtonLabelKey}" /></span>
-		</html:link>
-		<html:link href="javascript:;" property="cancel" styleId="cancelButton" onclick="javascript:doCancel()" styleClass="btn btn-default roffset5 pull-right">
+		</a>
+		<a href="javascript:;" name="cancel" id="cancelButton" onclick="javascript:doCancel()" class="btn btn-default roffset5 pull-right">
 			<span class="cancelIcon"><fmt:message key="${cancelButtonLabelKey}" /></span>
-		</html:link>
+		</a>
 </div>
 <!-- end tab content -->

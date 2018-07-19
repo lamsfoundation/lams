@@ -15,14 +15,16 @@
 	}
 
 	function textAreaReady() {
-		<c:choose>
-		<c:when test="${notebookDTO.allowRichEditor}">
-			CKEDITOR.instances["entryText"].focus();
-		</c:when>		
-		<c:otherwise>
-			document.forms.messageForm.focusedInput.focus();
-		</c:otherwise>
-		</c:choose>
+		<c:if test="${contentEditable}">
+			<c:choose>
+			<c:when test="${notebookDTO.allowRichEditor}">
+				CKEDITOR.instances["entryText"].focus();
+			</c:when>		
+			<c:otherwise>
+				document.forms.messageForm.focusedInput.focus();
+			</c:otherwise>
+			</c:choose>
+		</c:if>
 		document.getElementById("finishButton").style.visibility = 'visible';
 	}
 	
@@ -120,7 +122,7 @@
 				<c:when test="${contentEditable}">
 					<c:choose>
 						<c:when test="${notebookDTO.allowRichEditor}">
-							<lams:CKEditor id="entryText" value="${lrnForm.entryText}" height="200" contentFolderID="${learnerContentFolder}"
+							<lams:CKEditor id="entryText" value="${messageForm.entryText}" height="200" contentFolderID="${learnerContentFolder}"
 								toolbarSet="DefaultLearner">
 							</lams:CKEditor>
 						</c:when>
@@ -133,7 +135,7 @@
 
 				<c:otherwise>
 					<div class="sbox sbox-body voffset10 bg-warning">
-						<lams:out value="${lrnForm.entryText}" />
+						<lams:out value="${messageForm.entryText}" />
 					</div>
 				</c:otherwise>
 			</c:choose>

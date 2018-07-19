@@ -28,7 +28,7 @@ public class TblMonitoringController {
     private static Logger log = Logger.getLogger(TblMonitoringController.class);
 
     @Autowired
-    @Qualifier("leaderselectionService")
+    @Qualifier(value = "leaderselectionService")
     private ILeaderselectionService leaderselectionService;
 
     /**
