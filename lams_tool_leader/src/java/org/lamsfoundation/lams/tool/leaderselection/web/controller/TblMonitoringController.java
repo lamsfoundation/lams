@@ -3,13 +3,11 @@ package org.lamsfoundation.lams.tool.leaderselection.web.controller;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,7 +35,7 @@ public class TblMonitoringController {
      * @throws IOException
      * @throws JSONException
      */
-    @RequestMapping(path="/changeLeader", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(path = "/changeLeader", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String changeLeader(HttpServletRequest request) throws IOException {
 

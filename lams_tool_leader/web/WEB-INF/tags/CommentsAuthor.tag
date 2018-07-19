@@ -1,5 +1,4 @@
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
@@ -42,23 +41,23 @@
 
 <div class="checkbox">
 	<label>
-	<html:checkbox property="${allowCommentsVariableName}" value="1"
+	<form:checkbox path="${allowCommentsVariableName}" value="1"
 		styleId="${allowCommentsVariableName}">
-	</html:checkbox>
+	</form:checkbox>
 	<fmt:message key="${allowCommentLabelKey}"/>
 	</label>
 </div>
 
 <div id="likedislike">
 <div class="loffset20">
-		<html:radio property="${likeDislikeVariableName}" value="false" />&nbsp;<fmt:message key="${likeOnlyCommentLabelKey}" /> &nbsp;
-		<html:radio property="${likeDislikeVariableName}" value="true" />&nbsp;<fmt:message key="${likeDislikeLabelKey}" /> 
+		<form:radio path="${likeDislikeVariableName}" value="false" />&nbsp;<fmt:message key="${likeOnlyCommentLabelKey}" /> &nbsp;
+		<form:radio path="${likeDislikeVariableName}" value="true" />&nbsp;<fmt:message key="${likeDislikeLabelKey}" /> 
 </div>
 <div class="checkbox">
 	<label>
-	<html:checkbox property="${allowAnonymousVariableName}" 
+	<form:checkbox path="${allowAnonymousVariableName}" 
 		styleId="${allowAnonymousVariableName}">
-	</html:checkbox>
+	</form:checkbox>
 	<fmt:message key="${allowAnonymousLabelKey}"/>
 	</label>
 </div>

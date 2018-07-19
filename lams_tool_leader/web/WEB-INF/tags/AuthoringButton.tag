@@ -32,7 +32,6 @@
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <%@ attribute name="formID" required="true" rtexprvalue="true" %>

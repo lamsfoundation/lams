@@ -15,8 +15,6 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import org.apache.log4j.Logger;
-
-
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
 import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionServiceProxy;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;

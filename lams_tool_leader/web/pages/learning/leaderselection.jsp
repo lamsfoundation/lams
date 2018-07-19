@@ -50,7 +50,7 @@
 
     function finishActivity(){
     	document.getElementById("finishButton").disabled = true;
-		location.href = '<c:url value="/learning.do"/>?dispatch=finishActivity&toolSessionID=${toolSessionID}';
+		location.href = '<c:url value="/learning/finishActivity.do?toolSessionID=${toolSessionID}"/>"';
     }
 
     <%-- Init websocket only if group leader is not chosen --%>

@@ -43,6 +43,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  *
@@ -50,7 +51,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  *
  */
 @Controller
-@RequestMapping("/authoring")
+//@RequestMapping("")
 public class AuthoringController {
 
     private static Logger logger = Logger.getLogger(AuthoringController.class);
@@ -69,7 +70,7 @@ public class AuthoringController {
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
      *
      */
-    @RequestMapping("")
+    @RequestMapping("/authoring")
     protected String unspecified(AuthoringForm authoringForm, HttpServletRequest request) {
 
 	// Extract toolContentID from parameters.
@@ -114,10 +115,10 @@ public class AuthoringController {
 	request.getSession().setAttribute(map.getSessionID(), map);
 	request.setAttribute(LeaderselectionConstants.ATTR_SESSION_MAP, map);
 
-	return "pages/authoring";
+	return "pages/authoring/authoring";
     }
 
-    @RequestMapping("/updateContent")
+    @RequestMapping(value = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
 	    HttpServletRequest request, HttpServletResponse response) {
 	// TODO need error checking.
@@ -151,6 +152,6 @@ public class AuthoringController {
 	request.setAttribute(LeaderselectionConstants.ATTR_SESSION_MAP, map);
 	request.setAttribute("authoringForm", authoringForm);
 
-	return "pages/authoring";
+	return "pages/authoring/authoring";
     }
 }

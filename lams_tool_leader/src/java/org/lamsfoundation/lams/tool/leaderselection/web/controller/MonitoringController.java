@@ -40,7 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  *
@@ -58,7 +57,7 @@ public class MonitoringController {
     @Qualifier("leaderselectionService")
     private ILeaderselectionService leaderselectionService;
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "")
     public String unspecified(HttpServletRequest request) {
 
 	// initialize Session Map
@@ -99,7 +98,7 @@ public class MonitoringController {
     /**
      * Show leaders manage page
      */
-    @RequestMapping(value = "/manageLeaders", method = RequestMethod.POST)
+    @RequestMapping(value = "/manageLeaders")
     public String manageLeaders(HttpServletRequest request) {
 	String sessionMapID = request.getParameter(LeaderselectionConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -114,7 +113,7 @@ public class MonitoringController {
      * @throws IOException
      * @throws JSONException
      */
-    @RequestMapping(value = "/saveLeaders", method = RequestMethod.POST)
+    @RequestMapping(value = "/saveLeaders")
     public String saveLeaders(HttpServletRequest request) throws IOException {
 	String sessionMapID = request.getParameter(LeaderselectionConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()

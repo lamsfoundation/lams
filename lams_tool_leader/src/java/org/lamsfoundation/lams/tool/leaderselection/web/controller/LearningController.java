@@ -50,7 +50,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -71,13 +70,12 @@ public class LearningController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "")
     public String unspecified(HttpServletRequest request) throws Exception {
 
 	// 'toolSessionID' and 'mode' paramters are expected to be present.
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, false);
 	// set up service
-	initService();
 
 	// Retrieve the session and content.
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -133,9 +131,8 @@ public class LearningController {
      *
      * @throws JSONException
      */
-    @RequestMapping(value = "/becomeLeader", method = RequestMethod.POST)
+    @RequestMapping(value = "/becomeLeader")
     public String becomeLeader(HttpServletRequest request) throws IOException {
-	initService();
 	Long toolSessionId = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
 	LeaderselectionSession session = leaderselectionService.getSessionBySessionId(toolSessionId);
 
@@ -149,7 +146,7 @@ public class LearningController {
 	return null;
     }
 
-    @RequestMapping(value = "/finishActivity", method = RequestMethod.POST)
+    @RequestMapping(value = "/finishActivity")
     public String finishActivity(HttpServletRequest request, HttpServletResponse response) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -180,13 +177,6 @@ public class LearningController {
 	}
 
 	return null;
-    }
-
-    private void initService() {
-	if (leaderselectionService == null) {
-	    leaderselectionService = LeaderselectionServiceProxy
-		    .getLeaderselectionService(this.applicationContext.getServletContext());
-	}
     }
 
     private LeaderselectionUser getCurrentUser(Long toolSessionId) {
