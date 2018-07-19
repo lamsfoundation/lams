@@ -85,8 +85,8 @@ public class LoginRequestServlet extends HttpServlet {
 	String timestamp = request.getParameter(LoginRequestDispatcher.PARAM_TIMESTAMP);
 	String hash = request.getParameter(LoginRequestDispatcher.PARAM_HASH);
 	String method = request.getParameter(LoginRequestDispatcher.PARAM_METHOD);
-	String countryIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_COUNTRY);
-	String langIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
+	String country = request.getParameter(LoginRequestDispatcher.PARAM_COUNTRY);
+	String locale = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
 	String courseName = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
 	String usePrefix = request.getParameter(CentralConstants.PARAM_USE_PREFIX);
 	boolean isUpdateUserDetails = WebUtil.readBooleanParam(request,
@@ -111,17 +111,6 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 	}
 
-	String[] localeParts = langIsoCode == null ? new String[0] : langIsoCode.split("_");
-	// if langIsoCode is just 2 letters, then countryIsoCode stays the same and country will fall back to default
-	// if langIsoCode is en_AU, then it gets split to langIsoCode and countryIsoCode
-	// and the old value of countryIsoCode is considered country
-	String country = null;
-	if (localeParts.length == 2 && localeParts[0].length() == 2 && localeParts[1].length() == 2) {
-	    country = countryIsoCode;
-	    langIsoCode = localeParts[0];
-	    countryIsoCode = localeParts[1];
-	}
-
 	ExtServer extServer = getIntegrationService().getExtServer(serverId);
 	boolean prefix = (usePrefix == null) ? true : Boolean.parseBoolean(usePrefix);
 	try {
@@ -130,7 +119,7 @@ public class LoginRequestServlet extends HttpServlet {
 		userMap = getIntegrationService().getExtUserUseridMap(extServer, extUsername, prefix);
 	    } else {
 		userMap = getIntegrationService().getImplicitExtUserUseridMap(extServer, extUsername, firstName,
-			lastName, langIsoCode, countryIsoCode, country, email, prefix, isUpdateUserDetails);
+			lastName, locale, country, email, prefix, isUpdateUserDetails);
 	    }
 
 	    // in case of request for learner with strict authentication check cache should also contain lsid
@@ -155,8 +144,8 @@ public class LoginRequestServlet extends HttpServlet {
 
 	    if (extCourseId != null) {
 		// check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
-		getIntegrationService().getExtCourseClassMap(extServer, userMap, extCourseId, countryIsoCode,
-			langIsoCode, courseName, method, prefix);
+		getIntegrationService().getExtCourseClassMap(extServer, userMap, extCourseId, courseName, method,
+			prefix);
 	    }
 
 	    User user = userMap.getUser();

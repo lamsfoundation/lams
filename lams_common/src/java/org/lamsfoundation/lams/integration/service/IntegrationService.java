@@ -36,7 +36,6 @@ import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -74,7 +73,6 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CSVUtil;
-import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
@@ -137,8 +135,7 @@ public class IntegrationService implements IIntegrationService {
     // wrapper method for compatibility with original integration modules
     @Override
     public ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
-	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method, Boolean prefix)
-	    throws UserInfoValidationException {
+	    String prettyCourseName, String method, Boolean prefix) throws UserInfoValidationException {
 
 	// Set the pretty course name if available, otherwise maintain the extCourseId
 	String courseName = "";
@@ -150,25 +147,23 @@ public class IntegrationService implements IIntegrationService {
 
 	Boolean isTeacher = (StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR)
 		|| StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR));
-	return getExtCourseClassMap(extServer, userMap, extCourseId, courseName, countryIsoCode, langIsoCode,
+	return getExtCourseClassMap(extServer, userMap, extCourseId, courseName,
 		service.getRootOrganisation().getOrganisationId().toString(), isTeacher, prefix);
     }
 
     // wrapper method for compatibility with original integration modules
     @Override
     public ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
-	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method)
-	    throws UserInfoValidationException {
-	return getExtCourseClassMap(extServer, userMap, extCourseId, countryIsoCode, langIsoCode, prettyCourseName,
-		method, true);
+	    String prettyCourseName, String method) throws UserInfoValidationException {
+	return getExtCourseClassMap(extServer, userMap, extCourseId, prettyCourseName, method, true);
     }
 
     // newer method which accepts course name, a parent org id, a flag for whether user should get
     // 'teacher' roles, and a flag for whether to use a prefix in the org's name
     @Override
     public ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
-	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean isTeacher,
-	    Boolean prefix) throws UserInfoValidationException {
+	    String extCourseName, String parentOrgId, Boolean isTeacher, Boolean prefix)
+	    throws UserInfoValidationException {
 	Organisation org;
 	User user = userMap.getUser();
 
@@ -176,7 +171,7 @@ public class IntegrationService implements IIntegrationService {
 	if (extCourseClassMap == null) {
 	    //create new ExtCourseClassMap
 	    extCourseClassMap = createExtCourseClassMap(extServer, user.getUserId(), extCourseId, extCourseName,
-		    countryIsoCode, langIsoCode, parentOrgId, prefix);
+		    parentOrgId, prefix);
 	    org = extCourseClassMap.getOrganisation();
 	} else {
 	    org = extCourseClassMap.getOrganisation();
@@ -204,11 +199,9 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public ExtCourseClassMap createExtCourseClassMap(ExtServer extServer, Integer userId, String extCourseId,
-	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean prefix)
-	    throws UserInfoValidationException {
+	    String extCourseName, String parentOrgId, Boolean prefix) throws UserInfoValidationException {
 	User user = (User) service.findById(User.class, userId);
-	Organisation org = createOrganisation(extServer, user, extCourseId, extCourseName, countryIsoCode, langIsoCode,
-		parentOrgId, prefix);
+	Organisation org = createOrganisation(extServer, user, extCourseId, extCourseName, parentOrgId, prefix);
 	ExtCourseClassMap extCourseClassMap = new ExtCourseClassMap();
 	extCourseClassMap.setCourseid(extCourseId);
 	extCourseClassMap.setExtServer(extServer);
@@ -293,10 +286,10 @@ public class IntegrationService implements IIntegrationService {
 	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(extServer, extUsername);
 
 	if (extUserUseridMap == null) {
-	    String[] defaultLangCountry = LanguageUtil.getDefaultLangCountry();
-	    String country = LanguageUtil.getDefaultCountry();
-	    String[] userData = { "", firstName, lastName, "", "", "", "", country, "", "", "", email,
-		    defaultLangCountry[1], defaultLangCountry[0] };
+	    String defaultLocale = LanguageUtil.getDefaultLocale().getLocaleName();
+	    String defaultCountry = LanguageUtil.getDefaultCountry();
+	    String[] userData = { "", firstName, lastName, "", "", "", "", defaultCountry, "", "", "", email,
+		    defaultLocale };
 	    return createExtUserUseridMap(extServer, extUsername, password, salt, userData, false);
 	} else {
 	    return extUserUseridMap;
@@ -305,15 +298,14 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public ExtUserUseridMap getImplicitExtUserUseridMap(ExtServer extServer, String extUsername, String firstName,
-	    String lastName, String langIsoCode, String countryIsoCode, String country, String email, boolean prefix,
-	    boolean isUpdateUserDetails) throws UserInfoValidationException {
+	    String lastName, String locale, String country, String email, boolean prefix, boolean isUpdateUserDetails)
+	    throws UserInfoValidationException {
 
 	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(extServer, extUsername);
 
 	//create new one if it doesn't exist yet
 	if (extUserUseridMap == null) {
-	    String[] userData = { "", firstName, lastName, "", "", "", "", country, "", "", "", email, countryIsoCode,
-		    langIsoCode };
+	    String[] userData = { "", firstName, lastName, "", "", "", "", country, "", "", "", email, locale };
 	    String salt = HashUtil.salt();
 	    String password = HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt);
 	    return createExtUserUseridMap(extServer, extUsername, password, salt, userData, prefix);
@@ -346,11 +338,8 @@ public class IntegrationService implements IIntegrationService {
 	    user.setLastName(lastName);
 	    user.setEmail(email);
 	    user.setModifiedDate(new Date());
-	    user.setLocale(LanguageUtil.getSupportedLocale(langIsoCode, countryIsoCode));
-	    if (StringUtils.isBlank(country)) {
-		country = LanguageUtil.getDefaultCountry();
-	    }
-	    user.setCountry(country);
+	    user.setLocale(LanguageUtil.getSupportedLocaleByNameOrLanguageCode(locale));
+	    user.setCountry(LanguageUtil.getSupportedCountry(country));
 	    service.saveUser(user);
 
 	    return extUserUseridMap;
@@ -362,8 +351,7 @@ public class IntegrationService implements IIntegrationService {
     }
 
     private Organisation createOrganisation(ExtServer extServer, User user, String extCourseId, String extCourseName,
-	    String countryIsoCode, String langIsoCode, String parentOrgId, Boolean prefix)
-	    throws UserInfoValidationException {
+	    String parentOrgId, Boolean prefix) throws UserInfoValidationException {
 
 	Organisation org = new Organisation();
 
@@ -443,12 +431,6 @@ public class IntegrationService implements IIntegrationService {
 		    + ", firstName:" + firstName + ", lastName:" + lastName);
 	}
 
-	//set user's country to default value if it wasn't provided or has a wrong value
-	String country = userData[7];
-	if (StringUtils.isBlank(country) || !Arrays.asList(CommonConstants.COUNTRY_CODES).contains(country)) {
-	    country = LanguageUtil.getDefaultCountry();
-	}
-
 	User user = new User();
 	user.setLogin(login);
 	user.setPassword(password);
@@ -460,7 +442,7 @@ public class IntegrationService implements IIntegrationService {
 	user.setCity(userData[4]);
 	user.setState(userData[5]);
 	user.setPostcode(userData[6]);
-	user.setCountry(country);
+	user.setCountry(LanguageUtil.getSupportedCountry(userData[7]));
 	user.setDayPhone(userData[8]);
 	user.setMobilePhone(userData[9]);
 	user.setFax(userData[10]);
@@ -469,7 +451,7 @@ public class IntegrationService implements IIntegrationService {
 		(AuthenticationMethod) service.findById(AuthenticationMethod.class, AuthenticationMethod.DB));
 	user.setCreateDate(new Date());
 	user.setDisabledFlag(false);
-	user.setLocale(LanguageUtil.getSupportedLocale(userData[13], userData[12]));
+	user.setLocale(LanguageUtil.getSupportedLocaleByNameOrLanguageCode(userData[12]));
 	user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
 	user.setTheme(service.getDefaultTheme());
 	service.saveUser(user);
@@ -820,10 +802,9 @@ public class IntegrationService implements IIntegrationService {
 		    //create extUserUseridMap if it's not available
 		    if (extUserUseridMap == null) {
 			// User properties list format: <Title>,<First name>,<Last name>,<Address>,<City>,<State>,
-			// <Postcode>,<Country>,<Day time number>,<Mobile number>,<Fax number>,<Email>,<Locale
-			// language>,<Locale country>
-			String[] userData = new String[14];
-			for (int k = 1; k <= 14; k++) {
+			// <Postcode>,<Country ISO code>,<Day time number>,<Mobile number>,<Fax number>,<Email>,<Locale>
+			String[] userData = new String[13];
+			for (int k = 1; k <= 13; k++) {
 			    String userProperty = jsonUser.getString("" + k);
 			    userData[k - 1] = userProperty;
 			}

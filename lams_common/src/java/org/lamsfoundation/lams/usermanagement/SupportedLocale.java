@@ -42,6 +42,13 @@ public class SupportedLocale implements Serializable, Comparable {
     /** default constructor */
     public SupportedLocale() {
     }
+    
+    /**
+     * Return locale name in the format xx_XX, where xx - language ISO code and XX - country ISO code
+     */
+    public String getLocaleName() {
+	return languageIsoCode + "_" + countryIsoCode;
+    }
 
     public Integer getLocaleId() {
 	return this.localeId;
