@@ -30,7 +30,7 @@
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 			</p>
 
-			<input type="text" cols="60" id="notebookEntry" name="entryText" class="form-control" rows="5" />
+			<textarea cols="60" id="notebookEntry" name="entryText" class="form-control" rows="5"></textarea>
 
 			<div class="voffset10">
 				<button type="submit" class="btn btn-primary pull-right na" id="finishButton">
