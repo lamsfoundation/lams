@@ -8,7 +8,7 @@ s<%@ include file="/common/taglibs.jsp"%>
 <%@ include file="/common/header.jsp"%>
 <script language="JavaScript" type="text/JavaScript">
 	$(document).ready(function(){
-		window.location.href = '<lams:WebAppURL />learner/refresh.do?sessionMapID=${sessionMapID}';
+		window.location.href = '<lams:WebAppURL />learning/refresh.do?sessionMapID=${sessionMapID}';
 	});
 </script>
 </lams:head>

@@ -610,7 +610,7 @@ public class SubmitFilesService
     public void uploadFileToSession(Long sessionID, MultipartFile file, String fileDescription, Integer userID)
 	    throws SubmitFilesException {
 
-	if ((file == null) || StringUtils.isEmpty(file.getName())) {
+	if ((file == null) || StringUtils.isEmpty(file.getOriginalFilename())) {
 	    throw new SubmitFilesException("Could not find upload file: " + file);
 	}
 
@@ -623,7 +623,7 @@ public class SubmitFilesService
 
 	SubmissionDetails details = new SubmissionDetails();
 	details.setFileDescription(fileDescription);
-	details.setFilePath(file.getName());
+	details.setFilePath(file.getOriginalFilename());
 	details.setDateOfSubmission(new Date());
 
 	SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);

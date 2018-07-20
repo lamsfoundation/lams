@@ -84,7 +84,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Steve.Ni
  */
 @Controller
-@RequestMapping("/learner")
+@RequestMapping("/learning")
 public class LearnerController implements SbmtConstants {
 
     private static final boolean MODE_OPTIONAL = false;
@@ -106,7 +106,7 @@ public class LearnerController implements SbmtConstants {
      * The initial page of learner in Submission tool. This page will list all uploaded files and learn
      */
     @RequestMapping("/learner")
-    public String unspecified(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
+    public String learner(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	// initial session Map
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -266,6 +266,20 @@ public class LearnerController implements SbmtConstants {
 	return "learner/sbmtlearner";
     }
 
+    @RequestMapping("/teacher")
+    public String teacher(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request,
+	    HttpServletResponse response) {
+	request.setAttribute("mode", "teacher");
+	return learner(learnerForm, request);
+    }
+
+    @RequestMapping("/author")
+    public String author(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request,
+	    HttpServletResponse response) {
+	request.setAttribute("mode", "author");
+	return learner(learnerForm, request);
+    }
+
     /**
      * Loads the main learner page with the details currently in the session map
      */
@@ -356,7 +370,7 @@ public class LearnerController implements SbmtConstants {
      * field by special toolSessionID and userID.
      */
     @RequestMapping("/finish")
-    public void finish(HttpServletRequest request, HttpServletResponse response) {
+    public String finish(HttpServletRequest request, HttpServletResponse response) {
 
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -379,15 +393,14 @@ public class LearnerController implements SbmtConstants {
 	    String nextActivityUrl;
 	    try {
 		nextActivityUrl = sessionMgrService.leaveToolSession(sessionID, new Long(userID.intValue()));
-		response.sendRedirect(nextActivityUrl);
+		return "redirect:" + nextActivityUrl;
 	    } catch (DataMissingException e) {
 		throw new SubmitFilesException(e);
 	    } catch (ToolException e) {
 		throw new SubmitFilesException(e);
-	    } catch (IOException e) {
-		throw new SubmitFilesException(e);
 	    }
 	}
+	return null;
     }
 
     // **********************************************************************************************
@@ -527,7 +540,7 @@ public class LearnerController implements SbmtConstants {
      * Display empty reflection form.
      */
     @RequestMapping("/newReflection")
-    public String newReflection(@ModelAttribute ReflectionForm refForm, HttpServletRequest request,
+    public String newReflection(@ModelAttribute("refForm") ReflectionForm refForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 //		ISubmitFilesService submitFilesService = getService();
@@ -565,7 +578,8 @@ public class LearnerController implements SbmtConstants {
      * Submit reflection form input database.
      */
     @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute ReflectionForm refForm, HttpServletRequest request) {
+    public String submitReflection(@ModelAttribute("refForm") ReflectionForm refForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 	Integer userId = refForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
@@ -589,7 +603,7 @@ public class LearnerController implements SbmtConstants {
 	    submitFilesService.updateEntry(entry);
 	}
 
-	return "learner/finish";
+	return finish(request, response);
     }
 
     public static void validateBeforeFinish(HttpServletRequest request, ISubmitFilesService submitFilesService) {
