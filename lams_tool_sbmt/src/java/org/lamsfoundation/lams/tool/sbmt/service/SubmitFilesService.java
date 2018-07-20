@@ -767,7 +767,7 @@ public class SubmitFilesService
 
 	    // can share the mark file across users
 	    NodeKey nodeKey = null;
-	    if ((markFile != null) && !StringUtils.isEmpty(markFile.getName())) {
+	    if ((markFile != null) && !StringUtils.isEmpty(markFile.getOriginalFilename())) {
 		nodeKey = this.processFile(markFile);
 	    }
 
@@ -791,7 +791,7 @@ public class SubmitFilesService
 			    report.setMarkFileVersionID(null);
 			}
 
-			report.setMarkFileName(markFile.getName());
+			report.setMarkFileName(markFile.getOriginalFilename());
 			report.setMarkFileUUID(nodeKey.getUuid());
 			report.setMarkFileVersionID(nodeKey.getVersion());
 		    }
@@ -809,7 +809,7 @@ public class SubmitFilesService
 		report.setMarks(marks);
 
 		// If there is a new file, delete the existing and add the mark file
-		if ((markFile != null) && !StringUtils.isEmpty(markFile.getName())) {
+		if ((markFile != null) && !StringUtils.isEmpty(markFile.getOriginalFilename())) {
 
 		    // Delete the existing
 		    if (report.getMarkFileUUID() != null) {
@@ -824,7 +824,7 @@ public class SubmitFilesService
 		    // NodeKey nodeKey = toolContentHandler.uploadFile(marksFileInputStream, marksFileName, null,
 		    // IToolContentHandler.TYPE_ONLINE);
 
-		    report.setMarkFileName(markFile.getName());
+		    report.setMarkFileName(markFile.getOriginalFilename());
 		    report.setMarkFileUUID(nodeKey.getUuid());
 		    report.setMarkFileVersionID(nodeKey.getVersion());
 		}
