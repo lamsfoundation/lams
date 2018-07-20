@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.web.form.VoteLearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -63,8 +64,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -81,6 +84,10 @@ public class LearningController implements VoteAppConstants {
 
     @Autowired
     private WebApplicationContext applicationContext;
+
+    @Autowired
+    @Qualifier("lavoteMessageService")
+    private MessageService messageService;
 
     @Autowired
     @Qualifier("voteService")
@@ -321,8 +328,7 @@ public class LearningController implements VoteAppConstants {
     }
 
     @RequestMapping("/continueOptionsCombined")
-    public String continueOptionsCombined(VoteLearningForm voteLearningForm, Errors errors,
-	    HttpServletRequest request) {
+    public String continueOptionsCombined(VoteLearningForm voteLearningForm, HttpServletRequest request) {
 
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
 
@@ -370,7 +376,9 @@ public class LearningController implements VoteAppConstants {
 	if (castVoteCount > intMaxNominationCount) {
 	    voteLearningForm.setMaxNominationCountReached(new Boolean(true).toString());
 	    voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(true).toString());
-	    errors.reject("error.maxNominationCount.reached");
+	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	    errorMap.add("GLOBAL", messageService.getMessage("error.maxNominationCount.reached"));
+	    request.setAttribute("errorMap", errorMap);
 	    logger.error("You have selected too many nominations.");
 	    return "/learning/AnswersContent";
 	}
@@ -506,7 +514,7 @@ public class LearningController implements VoteAppConstants {
 	return objectNode.toString();
     }
 
-    @RequestMapping("/submitReflection")
+    @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
     public String submitReflection(VoteLearningForm voteLearningForm, HttpServletRequest request) {
 
 	LearningController.repopulateRequestParameters(request, voteLearningForm);
@@ -522,13 +530,13 @@ public class LearningController implements VoteAppConstants {
 	String reflectionEntry = request.getParameter(ENTRY_TEXT);
 
 	// check for existing notebook entry
-	NotebookEntry entry = voteService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		MY_SIGNATURE, userID);
+	NotebookEntry entry = voteService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE,
+		userID);
 
 	if (entry == null) {
 	    // create new entry
-	    voteService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE,
-		    userID, reflectionEntry);
+	    voteService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, userID,
+		    reflectionEntry);
 	} else {
 	    // update existing entry
 	    entry.setEntry(reflectionEntry);
@@ -630,7 +638,7 @@ public class LearningController implements VoteAppConstants {
      * make sure this session exists in tool's session table by now.
      */
     @RequestMapping("/start")
-    public String start(VoteLearningForm voteLearningForm, Errors errors, HttpServletRequest request) {
+    public String start(VoteLearningForm voteLearningForm, HttpServletRequest request) {
 
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
 
@@ -646,7 +654,7 @@ public class LearningController implements VoteAppConstants {
 
 	boolean validateParameters = LearningController.validateParameters(request, voteLearningForm);
 	if (!validateParameters) {
-	    return "/VoteErrorBox";
+	    return "/error";
 	}
 
 	String toolSessionID = voteLearningForm.getToolSessionID();
@@ -661,7 +669,7 @@ public class LearningController implements VoteAppConstants {
 	if (voteSession == null) {
 
 	    logger.error("error: The tool expects voteSession.");
-	    return "/VoteErrorBox";
+	    return "/error";
 	}
 
 	/*
@@ -672,8 +680,10 @@ public class LearningController implements VoteAppConstants {
 	if (voteContent == null) {
 
 	    logger.error("error: The tool expects voteContent.");
-	    errors.reject("error.content.doesNotExist");
-	    return "/VoteErrorBox";
+	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	    errorMap.add("GLOBAL", messageService.getMessage("error.content.doesNotExist"));
+	    request.setAttribute("errorMap", errorMap);
+	    return "/error";
 	}
 
 	/*

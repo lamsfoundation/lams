@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.web.form.VoteAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -55,8 +56,10 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/authoring")
@@ -66,6 +69,10 @@ public class AuthoringController implements VoteAppConstants {
     @Autowired
     @Qualifier("voteService")
     private IVoteService voteService;
+
+    @Autowired
+    @Qualifier("lavoteMessageService")
+    private MessageService messageService;
 
     /**
      * repopulateRequestParameters reads and saves request parameters
@@ -127,7 +134,7 @@ public class AuthoringController implements VoteAppConstants {
     /**
      * moves a nomination down in the authoring list
      */
-    @RequestMapping("/moveNominationDown")
+    @RequestMapping(path = "/moveNominationDown", method = RequestMethod.POST)
     @SuppressWarnings("unchecked")
     public String moveNominationDown(VoteAuthoringForm voteAuthoringForm, HttpServletRequest request) {
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
@@ -183,7 +190,7 @@ public class AuthoringController implements VoteAppConstants {
     /**
      * moves a nomination up in the authoring list
      */
-    @RequestMapping("/moveNominationUp")
+    @RequestMapping(path = "/moveNominationUp", method = RequestMethod.POST)
     @SuppressWarnings("unchecked")
     public String moveNominationUp(VoteAuthoringForm voteAuthoringForm, HttpServletRequest request) {
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
@@ -239,7 +246,7 @@ public class AuthoringController implements VoteAppConstants {
     /**
      * removes a nomination from the authoring list
      */
-    @RequestMapping("/removeNomination")
+    @RequestMapping(path = "/removeNomination", method = RequestMethod.POST)
     @SuppressWarnings("unchecked")
     public String removeNomination(VoteAuthoringForm voteAuthoringForm, HttpServletRequest request) {
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
@@ -393,7 +400,7 @@ public class AuthoringController implements VoteAppConstants {
     /**
      * enables adding a new nomination to the authoring nominations list
      */
-    @RequestMapping("/addSingleNomination")
+    @RequestMapping(path = "/addSingleNomination", method = RequestMethod.POST)
     @SuppressWarnings("unchecked")
     public String addSingleNomination(VoteAuthoringForm voteAuthoringForm, HttpServletRequest request) {
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
@@ -457,7 +464,7 @@ public class AuthoringController implements VoteAppConstants {
     /**
      * saves a new or updated nomination in the authoring nominations list
      */
-    @RequestMapping("/saveSingleNomination")
+    @RequestMapping(path = "/saveSingleNomination", method = RequestMethod.POST)
     @SuppressWarnings("unchecked")
     public String saveSingleNomination(VoteAuthoringForm voteAuthoringForm, HttpServletRequest request) {
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
@@ -575,9 +582,9 @@ public class AuthoringController implements VoteAppConstants {
     /**
      * persists the nominations list and other user selections in the db.
      */
-    @RequestMapping("/submitAllContent")
+    @RequestMapping(path = "/submitAllContent", method = RequestMethod.POST)
     @SuppressWarnings("unchecked")
-    public String submitAllContent(VoteAuthoringForm voteAuthoringForm, Errors errors, HttpServletRequest request) {
+    public String submitAllContent(VoteAuthoringForm voteAuthoringForm, HttpServletRequest request) {
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -590,23 +597,24 @@ public class AuthoringController implements VoteAppConstants {
 
 	List<VoteQuestionDTO> questionDTOs = (List<VoteQuestionDTO>) sessionMap.get(VoteAppConstants.LIST_QUESTION_DTO);
 
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (questionDTOs.isEmpty() && (voteAuthoringForm.getAssignedDataFlowObject() == null
 		|| voteAuthoringForm.getAssignedDataFlowObject() == 0)) {
-	    errors.rejectValue("nominations", "nominations.none.submitted");
+	    errorMap.add("nominations", messageService.getMessage("nominations.none.submitted"));
 	    logger.error("Nominations not submitted");
 	}
 
 	String maxNomCount = voteAuthoringForm.getMaxNominationCount();
 	if (maxNomCount != null) {
 	    if (maxNomCount.equals("0") || maxNomCount.contains("-")) {
-		errors.rejectValue("maxNominationCount", "maxNomination.invalid");
+		errorMap.add("maxNominationCount", messageService.getMessage("maxNomination.invalid"));
 		logger.error("Maximum votes in Advance tab is invalid");
 	    }
 
 	    try {
 		//int intMaxNomCount = new Integer(maxNomCount).intValue();
 	    } catch (NumberFormatException e) {
-		errors.rejectValue("maxNominationCount", "maxNomination.invalid");
+		errorMap.add("maxNominationCount", messageService.getMessage("maxNomination.invalid"));
 		logger.error("Maximum votes in Advance tab is invalid");
 	    }
 	}
@@ -635,7 +643,7 @@ public class AuthoringController implements VoteAppConstants {
 	}
 
 	if (isNominationsDuplicate == true) {
-	    errors.rejectValue("nominations", "nominations.duplicate");
+	    errorMap.add("nominations", messageService.getMessage("nominations.duplicate"));
 	    logger.error("There are duplicate nomination entries.");
 	}
 
@@ -682,7 +690,7 @@ public class AuthoringController implements VoteAppConstants {
 
 	VoteContent voteContentTest = voteService.getVoteContent(new Long(strToolContentID));
 
-	if (!errors.hasErrors()) {
+	if (errorMap.isEmpty()) {
 	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
@@ -741,6 +749,8 @@ public class AuthoringController implements VoteAppConstants {
 	    // standard authoring close
 	    request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
+	} else {
+	    request.setAttribute("errorMap", errorMap);
 	}
 
 	voteAuthoringForm.resetUserAction();
@@ -762,7 +772,7 @@ public class AuthoringController implements VoteAppConstants {
     }
 
     @RequestMapping("/start")
-    public String start(VoteAuthoringForm voteAuthoringForm, Errors errors, HttpServletRequest request) {
+    public String start(VoteAuthoringForm voteAuthoringForm, HttpServletRequest request) {
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
@@ -784,9 +794,11 @@ public class AuthoringController implements VoteAppConstants {
 	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 	voteGeneralAuthoringDTO.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 
-	boolean validateSignature = validateDefaultContent(voteAuthoringForm, errors);
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	boolean validateSignature = validateDefaultContent(voteAuthoringForm, errorMap);
 	if (!validateSignature) {
-	    return "/VoteErrorBox";
+	    request.setAttribute("errorMap", errorMap);
+	    return "/error";
 	}
 
 	//no problems getting the default content, will render authoring screen
@@ -797,8 +809,9 @@ public class AuthoringController implements VoteAppConstants {
 	voteGeneralAuthoringDTO.setToolContentID(new Long(strToolContentId).toString());
 
 	if (strToolContentId == null || strToolContentId.equals("")) {
-	    errors.reject("error.contentId.required");
-	    return "/VoteErrorBox";
+	    errorMap.add("GLOBAL", messageService.getMessage("error.contentId.required"));
+	    request.setAttribute("errorMap", errorMap);
+	    return "/error";
 	}
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
@@ -894,7 +907,8 @@ public class AuthoringController implements VoteAppConstants {
      * @param mapping
      * @return ActionForward
      */
-    private boolean validateDefaultContent(VoteAuthoringForm voteAuthoringForm, Errors errors) {
+    private boolean validateDefaultContent(VoteAuthoringForm voteAuthoringForm,
+	    MultiValueMap<String, String> errorMap) {
 	/*
 	 * retrieve the default content id based on tool signature
 	 */
@@ -903,12 +917,12 @@ public class AuthoringController implements VoteAppConstants {
 	    defaultContentID = voteService.getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
 	    if (defaultContentID == 0) {
 		logger.error("Exception occured: No default content");
-		errors.reject("error.defaultContent.notSetup");
+		errorMap.add("GLOBAL", messageService.getMessage("error.defaultContent.notSetup"));
 		return false;
 	    }
 	} catch (Exception e) {
 	    logger.error("error getting the default content id: " + e.getMessage());
-	    errors.reject("error.defaultContent.notSetup");
+	    errorMap.add("GLOBAL", messageService.getMessage("error.defaultContent.notSetup"));
 	    return false;
 	}
 
@@ -917,13 +931,13 @@ public class AuthoringController implements VoteAppConstants {
 	    VoteContent voteContent = voteService.getVoteContent(new Long(defaultContentID));
 	    if (voteContent == null) {
 		logger.error("Exception occured: No default content");
-		errors.reject("error.defaultContent.notSetup");
+		errorMap.add("GLOBAL", messageService.getMessage("error.defaultContent.notSetup"));
 		return false;
 	    }
 	} catch (Exception e) {
 	    logger.error("other problems: " + e);
 	    logger.error("Exception occured: No default question content");
-	    errors.reject("error.defaultContent.notSetup");
+	    errorMap.add("GLOBAL", messageService.getMessage("error.defaultContent.notSetup"));
 	    return false;
 	}
 

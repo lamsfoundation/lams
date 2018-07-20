@@ -360,7 +360,7 @@ public class MonitoringController implements VoteAppConstants {
 
 	boolean validateParameters = validateParameters(request, voteMonitoringForm);
 	if (!validateParameters) {
-	    return "/VoteErrorBox";
+	    return "/error";
 	}
 
 	// initialiseMonitoringData
@@ -375,7 +375,7 @@ public class MonitoringController implements VoteAppConstants {
 
 	    logger.error("Vote Content does not exist");
 	    voteGeneralMonitoringDTO.setUserExceptionContentDoesNotExist(Boolean.TRUE.toString());
-	    return "/VoteErrorBox";
+	    return "/error";
 	}
 
 	voteGeneralMonitoringDTO.setActivityTitle(voteContent.getTitle());
