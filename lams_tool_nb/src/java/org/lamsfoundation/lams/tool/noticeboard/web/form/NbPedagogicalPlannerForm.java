@@ -22,10 +22,11 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.web.form;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
@@ -60,7 +61,8 @@ public class NbPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringFo
 	}
     }
 
-    public void validate(List<String> messages) {
+    @Override
+    public MultiValueMap<String, String> validate(MessageService messageService) {
 	boolean valid = true;
 	boolean allEmpty = true;
 	if (basicContent != null && !basicContent.isEmpty()) {
@@ -68,12 +70,14 @@ public class NbPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringFo
 		allEmpty = false;
 	    }
 	}
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (allEmpty) {
-	    messages.add("authoring.msg.no.tasks.save");
+	    errorMap.add("GLOBAL", messageService.getMessage("authoring.msg.no.tasks.save"));
 	    valid = false;
 	    basicContent = null;
 	}
 
 	setValid(valid);
+	return errorMap;
     }
 }

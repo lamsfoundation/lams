@@ -29,8 +29,10 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     private List<String> nomination;
@@ -53,7 +55,8 @@ public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivitySpring
 	this.contentFolderID = contentFolderID;
     }
 
-    public void validate(Errors errors) {
+    @Override
+    public MultiValueMap<String, String> validate(MessageService messageService) {
 	boolean valid = true;
 	boolean allEmpty = true;
 	if (nomination != null && !nomination.isEmpty()) {
@@ -64,13 +67,15 @@ public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivitySpring
 		}
 	    }
 	}
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (allEmpty) {
-	    errors.reject("nominations.none.submitted");
+	    errorMap.add("GLOBAL", messageService.getMessage("nominations.none.submitted"));
 	    valid = false;
 	    nomination = null;
 	}
 
 	setValid(valid);
+	return errorMap;
     }
 
     public void fillForm(VoteContent voteContent) {

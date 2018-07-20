@@ -22,7 +22,9 @@
 
 package org.lamsfoundation.lams.web.planner;
 
+import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  * The base for any Pedagogical Planner Action Forms that other activities. All Java forms need to inherit from this
@@ -85,7 +87,7 @@ public abstract class PedagogicalPlannerActivitySpringForm {
      *
      * @return
      */
-    public LinkedMultiValueMap<String, String> validate() {
+    public MultiValueMap<String, String> validate(MessageService messageService) {
 	setValid(true);
 	return new LinkedMultiValueMap<>();
     }

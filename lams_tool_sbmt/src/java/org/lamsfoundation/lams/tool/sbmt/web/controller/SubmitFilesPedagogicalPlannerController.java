@@ -32,7 +32,6 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.web.form.SubmitFilesPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +77,7 @@ public class SubmitFilesPedagogicalPlannerController {
     @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
     public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute SubmitFilesPedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request) {
-	List<String> messages = (List<String>) plannerForm.validate();
+	List<String> messages = (List<String>) plannerForm.validate(null);
 	if (messages == null && messages.isEmpty()) {
 	    String content = plannerForm.getInstruction();
 	    Long toolContentID = plannerForm.getToolContentID();

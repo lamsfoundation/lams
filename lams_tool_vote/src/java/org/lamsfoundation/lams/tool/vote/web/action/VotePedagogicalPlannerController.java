@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -56,9 +56,10 @@ public class VotePedagogicalPlannerController {
     }
 
     @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
-    public String saveOrUpdatePedagogicalPlannerForm(VotePedagogicalPlannerForm plannerForm, Errors errors) {
-	plannerForm.validate(errors);
-	if (!errors.hasErrors()) {
+    public String saveOrUpdatePedagogicalPlannerForm(VotePedagogicalPlannerForm plannerForm,
+	    HttpServletRequest request) {
+	MultiValueMap<String, String> errorMap = plannerForm.validate(null);
+	if (errorMap.isEmpty()) {
 	    VoteContent voteContent = voteService.getVoteContent(plannerForm.getToolContentID());
 	    voteContent.setInstructions(plannerForm.getInstructions());
 
@@ -97,7 +98,7 @@ public class VotePedagogicalPlannerController {
 		}
 	    }
 	} else {
-	    //  saveErrors(request, errors);
+	    request.setAttribute("errorMap", errorMap);
 	}
 	return "/authoring/pedagogicalPlannerForm";
     }

@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
+import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -100,7 +101,7 @@ public class PedagogicalPlannerSpringGroupingForm extends PedagogicalPlannerActi
      * Checks if the provided group/learner number is a nonnegative integer.
      */
     @Override
-    public LinkedMultiValueMap<String, String> validate() {
+    public LinkedMultiValueMap<String, String> validate(MessageService messageService) {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	boolean valid = true;
 	boolean numberValid = true;

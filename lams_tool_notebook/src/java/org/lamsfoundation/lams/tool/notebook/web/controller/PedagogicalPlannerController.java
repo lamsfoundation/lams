@@ -36,7 +36,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -81,15 +80,12 @@ public class PedagogicalPlannerController {
 
     @RequestMapping(value = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
     public String saveOrUpdatePedagogicalPlannerForm(NotebookPedagogicalPlannerForm pedagogicalPlannerForm,
-	    Errors errors, HttpServletRequest request) throws IOException {
-	pedagogicalPlannerForm.validate();
-	if (!errors.hasErrors()) {
-	    String instructions = pedagogicalPlannerForm.getInstructions();
-	    Long toolContentID = pedagogicalPlannerForm.getToolContentID();
-	    Notebook notebook = notebookService.getNotebookByContentId(toolContentID);
-	    notebook.setInstructions(instructions);
-	    notebookService.saveOrUpdateNotebook(notebook);
-	}
+	    HttpServletRequest request) throws IOException {
+	String instructions = pedagogicalPlannerForm.getInstructions();
+	Long toolContentID = pedagogicalPlannerForm.getToolContentID();
+	Notebook notebook = notebookService.getNotebookByContentId(toolContentID);
+	notebook.setInstructions(instructions);
+	notebookService.saveOrUpdateNotebook(notebook);
 	return "pages/authoring/pedagogicalPlannerForm";
     }
 

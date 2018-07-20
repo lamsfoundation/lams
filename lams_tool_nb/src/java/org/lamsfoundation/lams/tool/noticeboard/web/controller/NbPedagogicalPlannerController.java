@@ -77,7 +77,7 @@ public class NbPedagogicalPlannerController {
     public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute NbPedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request) {
 
-	MultiValueMap<String, String> errorMap = plannerForm.validate();
+	MultiValueMap<String, String> errorMap = plannerForm.validate(null);
 	if (errorMap.isEmpty()) {
 	    String content = plannerForm.getBasicContent();
 	    Long toolContentID = plannerForm.getToolContentID();
