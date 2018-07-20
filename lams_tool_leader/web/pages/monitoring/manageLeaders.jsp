@@ -7,7 +7,7 @@
 <lams:html>
 	<lams:head>
 		<lams:css />
-		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet"/>
 		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
@@ -33,7 +33,7 @@
 	<c:set var="title"><fmt:message key="label.plese.select.leaders" /></c:set>
 	<lams:Page type="learner" title="${title}">
 			
-		<form action="<c:url value='/monitoring.do'/>?dispatch=saveLeaders&sessionMapID=${sessionMapID}" id="leaders">
+		<form action="<c:url value='/monitoring/saveLeaders.do?sessionMapID=${sessionMapID}'/>" id="leaders">
 				<c:forEach var="session" items="${sessionMap.leaderselectionDT0.sessionDTOs}" varStatus="status">
 					<h1></h1>
 					<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">

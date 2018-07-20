@@ -79,6 +79,6 @@ $(document).ready(function(){
 	</div> 
 </c:if>
 
-<a href="<c:url value='/monitoring.do'/>?dispatch=manageLeaders&sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true" class="btn btn-default pull-right thickbox">
+<a href="<c:url value='/monitoring/manageLeaders.do?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true'/>" class="btn btn-default pull-right thickbox">
 	<fmt:message key="label.manage.leaders" />
 </a>
