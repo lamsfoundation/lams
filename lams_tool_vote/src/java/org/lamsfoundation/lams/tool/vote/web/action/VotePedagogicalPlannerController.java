@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.web.form.VotePedagogicalPlannerForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,10 @@ public class VotePedagogicalPlannerController {
     @Qualifier("voteService")
     private IVoteService voteService;
 
+    @Autowired
+    @Qualifier("lavoteMessageService")
+    private MessageService messageService;
+
     @RequestMapping("/initPedagogicalPlannerForm")
     public String initPedagogicalPlannerForm(VotePedagogicalPlannerForm plannerForm, HttpServletRequest request) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -58,7 +63,7 @@ public class VotePedagogicalPlannerController {
     @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
     public String saveOrUpdatePedagogicalPlannerForm(VotePedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request) {
-	MultiValueMap<String, String> errorMap = plannerForm.validate(null);
+	MultiValueMap<String, String> errorMap = plannerForm.validate(messageService);
 	if (errorMap.isEmpty()) {
 	    VoteContent voteContent = voteService.getVoteContent(plannerForm.getToolContentID());
 	    voteContent.setInstructions(plannerForm.getInstructions());
