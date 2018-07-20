@@ -21,13 +21,14 @@
 	}
 	function submitForm(methodName) {
 		var f = document.getElementById('nbLearnerForm');
+		f.action = methodName + ".do";
 		f.submit();
 	}
 </script>
 
 <lams:Page type="learner" title="${title}" formID="nbLearnerForm">
 
-	<form:form action="reflect.do" method="post" onsubmit="disableFinishButton();" modelAttribute="nbLearnerForm" id="nbLearnerForm">
+	<form:form method="post" onsubmit="disableFinishButton();" modelAttribute="nbLearnerForm" id="nbLearnerForm">
 		<div class="form-group">
 			<div class="panel">
 				<lams:out value="${reflectInstructions}" escapeHtml="true" />
@@ -56,7 +57,7 @@
 	<!-- Comments: the extra div counteracts the float -->
 	<c:if test="${allowComments}">
 		<div class="row no-gutter"><div class="col-xs-12"></div></div>
-		<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}"
+		<lams:Comments toolSessionId="${nbLearnerForm.toolSessionID}"
 			toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" readOnly="true"
 			pageSize="10" sortBy="1" />
 	</c:if>

@@ -371,7 +371,7 @@ public class NbLearnerController {
 	request.setAttribute("allowComments", nbContent.isAllowComments());
 	request.setAttribute("likeAndDislike", nbContent.isCommentsLikeAndDislike());
 	request.setAttribute("anonymous", nbContent.isAllowAnonymous());
-
+	request.setAttribute("toolSessionID", toolSessionID);
 	// get the existing reflection entry
 	NotebookEntry entry = nbService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		NoticeboardConstants.TOOL_SIGNATURE, getUserID(request).intValue());

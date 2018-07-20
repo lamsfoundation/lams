@@ -22,25 +22,19 @@
 			finishButton.disabled = true;
 		}
 	}
-	
-	function finish() {
-		var finishUrl = "<lams:WebAppURL />learning/finish.do?sessionMapID=${sessionMapID}";
-		return submitCount(finishUrl);
+	function submitForm(methodName) {
+		var f = document.getElementById('nbLearnerForm');
+		f.action = methodName + ".do";
+		f.submit();
 	}
-
-	function reflect() {
-		var reflectUrl = "<lams:WebAppURL />learning/reflect.do?sessionMapID=${sessionMapID}";
-		return submitCount(reflectUrl);
-	}
-	
 </script>
 
-<lams:Page type="learner" title="${nbLearnerForm.title}" formID="nbLearnerForm">
+<lams:Page type="learner" title="${nbLearnerForm.title}">
 	<div class="panel">
 		<c:out value="${nbLearnerForm.basicContent}" escapeXml="false" />
 	</div>
 
-	<form:form action="learner.do" modelAttribute="nbLearnerForm" target="_self" onsubmit="disableFinishButton();" id="nbLearnerForm">
+	<form:form modelAttribute="nbLearnerForm" target="_self" onsubmit="disableFinishButton();" id="nbLearnerForm">
 		<form:hidden path="mode" />
 		<form:hidden path="toolSessionID" />
 
@@ -73,22 +67,25 @@
 				<c:when test="${reflectOnActivity}">
 
 					<button  name="continueButton" class="btn btn-sm btn-primary pull-right"
-						id="continueButton" onclick="javascript:reflect();">
+						onclick="submitForm('reflect')">
 						<fmt:message key="button.continue" />
 					</button>
 				</c:when>
 				<c:otherwise>
 
-					<button type="submit" onclick="javascript:finish();" class="btn btn-primary pull-right voffset10 na" name="finishButton" id="finishButton">
-					<c:choose>
-						<c:when test="${activityPosition.last}">
-							<fmt:message key="button.submit" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="button.finish" />
-						</c:otherwise>
-					</c:choose>
-					</button>
+
+					<a href="#nogo" name="finishButton" class="btn btn-primary pull-right voffset10 na"
+						onclick="submitForm('finish')">
+						<c:choose>
+							<c:when test="${activityPosition.last}">
+								<fmt:message key="button.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.finish" />
+							</c:otherwise>
+						</c:choose>
+
+					</a>
 				</c:otherwise>
 			</c:choose>
 		</c:if>
