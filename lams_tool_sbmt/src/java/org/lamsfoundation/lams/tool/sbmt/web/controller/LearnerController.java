@@ -413,7 +413,11 @@ public class LearnerController implements SbmtConstants {
 	    errorMap.add("GLOBAL", messageService.getMessage("errors.maxdescsize"));
 	}
 
-	FileValidatorSpringUtil.validateFileSize(learnerForm.getFile().getSize(), false, errorMap);
+	boolean fileSizeValid = FileValidatorSpringUtil.validateFileSize(learnerForm.getFile().getSize(), false);
+	if (!fileSizeValid) {
+	    errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
+		    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
+	}
 
 	if (learnerForm.getFile() != null) {
 	    LearnerController.logger.debug("Learner submit file : " + learnerForm.getFile().getName());

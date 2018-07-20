@@ -116,7 +116,7 @@ public class PedagogicalPlannerSpringGroupingForm extends PedagogicalPlannerActi
 	    numberValid = false;
 	}
 	if (!numberValid) {
-	    errorMap.add("GLOBAL", "error.planner.grouping.number.integer");
+	    errorMap.add("GLOBAL", messageService.getMessage("error.planner.grouping.number.integer"));
 	    valid = false;
 	}
 	setValid(valid);

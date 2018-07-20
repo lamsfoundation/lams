@@ -59,6 +59,8 @@ import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -524,7 +526,12 @@ public class LearningController implements TaskListConstants {
 
 	// validate file size
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	FileValidatorSpringUtil.validateFileSize(file, false, errorMap);
+	boolean fileSizeValid = FileValidatorSpringUtil.validateFileSize(file, false);
+	if (!fileSizeValid) {
+	    errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
+		    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
+	}
+
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
 	    return "pages/learning/learning";
