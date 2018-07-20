@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.noticeboard.web.form;
 
 import java.util.Map;
@@ -29,13 +28,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 
 /**
  * @author mtruong
  */
-public class NbMonitoringForm extends ActionForm {
+public class NbMonitoringForm {
 
     private static final long serialVersionUID = 6958826482877304278L;
 
@@ -84,8 +81,7 @@ public class NbMonitoringForm extends ActionForm {
 	this.toolContentID = toolContentId;
     }
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
+    public void reset(HttpServletRequest request) {
 	this.method = null;
 
     }

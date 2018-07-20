@@ -27,7 +27,7 @@
 
 <lams:Page type="learner" title="${title}" formID="nbLearnerForm">
 
-	<form:form action="/reflect.do" method="post" onsubmit="disableFinishButton();" modelAttribute="nbLearnerForm" id="nbLearnerForm">
+	<form:form action="reflect.do" method="post" onsubmit="disableFinishButton();" modelAttribute="nbLearnerForm" id="nbLearnerForm">
 		<div class="form-group">
 			<div class="panel">
 				<lams:out value="${reflectInstructions}" escapeHtml="true" />
@@ -38,7 +38,6 @@
 
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="mode" />
-			<form:hidden path="method" value="finish" />
 
 			<a href="#nogo" class="btn btn-primary pull-right voffset10" onclick="submitForm('finish')">
 				<c:choose>

@@ -8,7 +8,7 @@
 
 <div class="checkbox">
 	<label for="reflectOnActivity">
-    <form:checkbox path="reflectOnActivity" value="1" cssClass="noBorder" id="ReflectOnActivity"/><fmt:message key="advanced.reflectOnActivity" />
+    <form:checkbox path="reflectOnActivity" value="1" cssClass="noBorder" id="reflectOnActivity"/><fmt:message key="advanced.reflectOnActivity" />
 	</label>
 </div>
 <div class="form-group">
@@ -30,7 +30,6 @@
 			rao.checked = true;		
 		}
 	}
-
 	ra.onkeyup=turnOnRefect;
 //-->
 </script>
