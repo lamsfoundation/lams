@@ -84,7 +84,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Steve.Ni
  */
 @Controller
-@RequestMapping("/learner")
+@RequestMapping("/learning")
 public class LearnerController implements SbmtConstants {
 
     private static final boolean MODE_OPTIONAL = false;
@@ -106,7 +106,7 @@ public class LearnerController implements SbmtConstants {
      * The initial page of learner in Submission tool. This page will list all uploaded files and learn
      */
     @RequestMapping("/learner")
-    public String unspecified(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
+    public String learner(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	// initial session Map
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -117,14 +117,16 @@ public class LearnerController implements SbmtConstants {
 	// get parameters from Request
 	ToolAccessMode mode = null;
 	try {
-	    mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, LearnerController.MODE_OPTIONAL);
+	    mode = WebUtil.getToolAccessMode((String)request.getAttribute(AttributeNames.PARAM_MODE));
 	} catch (Exception e) {
 	}
 	if (mode == null) {
 	    mode = ToolAccessMode.LEARNER;
 	}
+	
+	request.setAttribute("mode", mode);
 
-	Long sessionID = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
+	Long toolSessionID = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
 
 	// get session from shared session.
 	HttpSession ss = SessionManager.getSession();
@@ -139,19 +141,20 @@ public class LearnerController implements SbmtConstants {
 	}
 
 	ToolContentManager contentManager = getContentManager();
-	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
+	SubmitFilesSession session = submitFilesService.getSessionById(toolSessionID);
 	SubmitFilesContent content = session.getContent();
 
 	// this must before getFileUploadByUser() method becuase getCurrentLearner()
 	// will create session user if it does not exist.
-	SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
-	List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(), false);
+	SubmitUser learner = getCurrentLearner(toolSessionID, submitFilesService);
+	List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, toolSessionID, request.getLocale(),
+		false);
 
 	// check whehter finish lock is on/off
 	boolean lock = content.isLockOnFinished() && learner.isFinished();
 
 	sessionMap.put(AttributeNames.PARAM_MODE, mode);
-	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
+	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 	sessionMap.put(SbmtConstants.ATTR_FINISH_LOCK, lock);
 	sessionMap.put(SbmtConstants.ATTR_LOCK_ON_FINISH, content.isLockOnFinished());
 	sessionMap.put(SbmtConstants.ATTR_USE_SEL_LEADER, content.isUseSelectLeaderToolOuput());
@@ -177,7 +180,7 @@ public class LearnerController implements SbmtConstants {
 	content.setDefineLater(false);
 	submitFilesService.saveOrUpdateContent(content);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request,
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
 		applicationContext.getServletContext());
 
 	// check if there is submission deadline
@@ -209,17 +212,17 @@ public class LearnerController implements SbmtConstants {
 		    IEventNotificationService.DELIVERY_METHOD_MAIL);
 	}
 
-	SortedMap submittedFilesMap = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
+	SortedMap submittedFilesMap = submitFilesService.getFilesUploadedBySession(toolSessionID, request.getLocale());
 	// support for leader select feature
 	SubmitUser groupLeader = content.isUseSelectLeaderToolOuput()
-		? submitFilesService.checkLeaderSelectToolForSessionLeader(learner, new Long(sessionID).longValue())
+		? submitFilesService.checkLeaderSelectToolForSessionLeader(learner, new Long(toolSessionID).longValue())
 		: null;
 
 	if (content.isUseSelectLeaderToolOuput() && !mode.isTeacher()) {
 
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null) {
-		List<SubmitUser> groupUsers = submitFilesService.getUsersBySession(new Long(sessionID).longValue());
+		List<SubmitUser> groupUsers = submitFilesService.getUsersBySession(new Long(toolSessionID).longValue());
 		request.setAttribute(SbmtConstants.ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(SbmtConstants.ATTR_SUBMIT_FILES, submittedFilesMap);
 		request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader");
@@ -231,7 +234,7 @@ public class LearnerController implements SbmtConstants {
 
 	    if (isNonLeader && !learner.isFinished()) {
 		List filesUploadedByLeader = submitFilesService.getFilesUploadedByUser(groupLeader.getUserID(),
-			sessionID, request.getLocale(), false);
+			toolSessionID, request.getLocale(), false);
 
 		if (filesUploadedByLeader == null) {
 		    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY,
@@ -256,7 +259,7 @@ public class LearnerController implements SbmtConstants {
 	}
 
 	sessionMap.put(SbmtConstants.ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = submitFilesService.isUserGroupLeader(learner, sessionID);
+	boolean isUserLeader = submitFilesService.isUserGroupLeader(learner, toolSessionID);
 	sessionMap.put(SbmtConstants.ATTR_IS_USER_LEADER, isUserLeader);
 
 	boolean hasEditRight = !content.isUseSelectLeaderToolOuput()
@@ -264,6 +267,20 @@ public class LearnerController implements SbmtConstants {
 	sessionMap.put(SbmtConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
 
 	return "learner/sbmtlearner";
+    }
+
+    @RequestMapping("/teacher")
+    public String teacher(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request,
+	    HttpServletResponse response) {
+	request.setAttribute("mode", "teacher");
+	return learner(learnerForm, request);
+    }
+
+    @RequestMapping("/author")
+    public String author(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request,
+	    HttpServletResponse response) {
+	request.setAttribute("mode", "author");
+	return learner(learnerForm, request);
     }
 
     /**
@@ -356,7 +373,7 @@ public class LearnerController implements SbmtConstants {
      * field by special toolSessionID and userID.
      */
     @RequestMapping("/finish")
-    public void finish(HttpServletRequest request, HttpServletResponse response) {
+    public String finish(HttpServletRequest request, HttpServletResponse response) {
 
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -379,15 +396,14 @@ public class LearnerController implements SbmtConstants {
 	    String nextActivityUrl;
 	    try {
 		nextActivityUrl = sessionMgrService.leaveToolSession(sessionID, new Long(userID.intValue()));
-		response.sendRedirect(nextActivityUrl);
+		return "redirect:" + nextActivityUrl;
 	    } catch (DataMissingException e) {
 		throw new SubmitFilesException(e);
 	    } catch (ToolException e) {
 		throw new SubmitFilesException(e);
-	    } catch (IOException e) {
-		throw new SubmitFilesException(e);
 	    }
 	}
+	return null;
     }
 
     // **********************************************************************************************
@@ -531,7 +547,7 @@ public class LearnerController implements SbmtConstants {
      * Display empty reflection form.
      */
     @RequestMapping("/newReflection")
-    public String newReflection(@ModelAttribute ReflectionForm refForm, HttpServletRequest request,
+    public String newReflection(@ModelAttribute("refForm") ReflectionForm refForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 //		ISubmitFilesService submitFilesService = getService();
@@ -569,7 +585,8 @@ public class LearnerController implements SbmtConstants {
      * Submit reflection form input database.
      */
     @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute ReflectionForm refForm, HttpServletRequest request) {
+    public String submitReflection(@ModelAttribute("refForm") ReflectionForm refForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 	Integer userId = refForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
@@ -593,7 +610,7 @@ public class LearnerController implements SbmtConstants {
 	    submitFilesService.updateEntry(entry);
 	}
 
-	return "learner/finish";
+	return finish(request, response);
     }
 
     public static void validateBeforeFinish(HttpServletRequest request, ISubmitFilesService submitFilesService) {

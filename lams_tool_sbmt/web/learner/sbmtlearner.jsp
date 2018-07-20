@@ -48,11 +48,11 @@
 			}
 		}
 		function finish() {
-			var finishUrl = "<lams:WebAppURL />learner/finish.do?sessionMapID=${sessionMapID}";
+			var finishUrl = "<lams:WebAppURL />learning/finish.do?sessionMapID=${sessionMapID}";
 			return submitCount(finishUrl);
 		}
 		function notebook() {
-			var continueUrl = "<lams:WebAppURL />learner/newReflection.do?sessionMapID=${sessionMapID}";
+			var continueUrl = "<lams:WebAppURL />learning/newReflection.do?sessionMapID=${sessionMapID}";
 			return submitCount(continueUrl);
 		}
 		function validate() {
@@ -105,9 +105,10 @@
 			var answer = confirm(msg);
 			if (answer) {	
 				 $.ajax({
+					 	url: '<c:url value="/learning/deleteLearnerFile.do"/>',
 			            data: 'detailId=' + detailId,
 			            success: function () {
-			            	document.location.href = "<lams:WebAppURL />learner/"+${sessionMap.mode}+".do?toolSessionID="+${sessionMap.toolSessionID};
+			            	document.location.href = "<lams:WebAppURL />learning/${sessionMap.mode}.do?toolSessionID=${sessionMap.toolSessionID}";
 			            },
 			            error: function(error){
 			                alert("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);

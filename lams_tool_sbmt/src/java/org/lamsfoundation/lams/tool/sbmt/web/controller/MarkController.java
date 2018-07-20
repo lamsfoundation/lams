@@ -145,7 +145,7 @@ public class MarkController {
      * Update the form
      */
     @RequestMapping("/updateMarkForm")
-    private void updateMarkForm(MarkForm markForm, FileDetailsDTO fileDetailsDTO) {
+    private void updateMarkForm(@ModelAttribute MarkForm markForm, FileDetailsDTO fileDetailsDTO) {
 
 	if (fileDetailsDTO.getMarks() != null) {
 	    markForm.setMarks(fileDetailsDTO.getMarks().toString());

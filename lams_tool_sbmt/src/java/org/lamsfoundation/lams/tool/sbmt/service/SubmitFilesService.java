@@ -610,7 +610,7 @@ public class SubmitFilesService
     public void uploadFileToSession(Long sessionID, MultipartFile file, String fileDescription, Integer userID)
 	    throws SubmitFilesException {
 
-	if ((file == null) || StringUtils.isEmpty(file.getName())) {
+	if ((file == null) || StringUtils.isEmpty(file.getOriginalFilename())) {
 	    throw new SubmitFilesException("Could not find upload file: " + file);
 	}
 
@@ -623,7 +623,7 @@ public class SubmitFilesService
 
 	SubmissionDetails details = new SubmissionDetails();
 	details.setFileDescription(fileDescription);
-	details.setFilePath(file.getName());
+	details.setFilePath(file.getOriginalFilename());
 	details.setDateOfSubmission(new Date());
 
 	SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);
@@ -653,8 +653,8 @@ public class SubmitFilesService
      */
     private NodeKey processFile(MultipartFile file) {
 	NodeKey node = null;
-	if ((file != null) && !StringUtils.isEmpty(file.getName())) {
-	    String fileName = file.getName();
+	if ((file != null) && !StringUtils.isEmpty(file.getOriginalFilename())) {
+	    String fileName = file.getOriginalFilename();
 	    try {
 		node = getSbmtToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
@@ -767,7 +767,7 @@ public class SubmitFilesService
 
 	    // can share the mark file across users
 	    NodeKey nodeKey = null;
-	    if ((markFile != null) && !StringUtils.isEmpty(markFile.getName())) {
+	    if ((markFile != null) && !StringUtils.isEmpty(markFile.getOriginalFilename())) {
 		nodeKey = this.processFile(markFile);
 	    }
 
@@ -791,7 +791,7 @@ public class SubmitFilesService
 			    report.setMarkFileVersionID(null);
 			}
 
-			report.setMarkFileName(markFile.getName());
+			report.setMarkFileName(markFile.getOriginalFilename());
 			report.setMarkFileUUID(nodeKey.getUuid());
 			report.setMarkFileVersionID(nodeKey.getVersion());
 		    }
@@ -809,7 +809,7 @@ public class SubmitFilesService
 		report.setMarks(marks);
 
 		// If there is a new file, delete the existing and add the mark file
-		if ((markFile != null) && !StringUtils.isEmpty(markFile.getName())) {
+		if ((markFile != null) && !StringUtils.isEmpty(markFile.getOriginalFilename())) {
 
 		    // Delete the existing
 		    if (report.getMarkFileUUID() != null) {
@@ -824,7 +824,7 @@ public class SubmitFilesService
 		    // NodeKey nodeKey = toolContentHandler.uploadFile(marksFileInputStream, marksFileName, null,
 		    // IToolContentHandler.TYPE_ONLINE);
 
-		    report.setMarkFileName(markFile.getName());
+		    report.setMarkFileName(markFile.getOriginalFilename());
 		    report.setMarkFileUUID(nodeKey.getUuid());
 		    report.setMarkFileVersionID(nodeKey.getVersion());
 		}
