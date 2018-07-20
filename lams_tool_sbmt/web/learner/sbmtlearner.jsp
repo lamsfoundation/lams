@@ -52,7 +52,7 @@
 			return submitCount(finishUrl);
 		}
 		function notebook() {
-			var continueUrl = "<lams:WebAppURL />learning/newReflection.do?sessionMapID=${sessionMapID}";
+			var continueUrl = "<lams:WebAppURL />learner/newReflection.do?sessionMapID=${sessionMapID}";
 			return submitCount(continueUrl);
 		}
 		function validate() {
@@ -107,7 +107,7 @@
 				 $.ajax({
 			            data: 'detailId=' + detailId,
 			            success: function () {
-			            	document.location.href = "<lams:WebAppURL />learner/"+${sessionMap.mode}+".do?toolSessionID=+"${sessionMap.toolSessionID};
+			            	document.location.href = "<lams:WebAppURL />learner/"+${sessionMap.mode}+".do?toolSessionID="+${sessionMap.toolSessionID};
 			            },
 			            error: function(error){
 			                alert("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
@@ -116,6 +116,7 @@
 			       	});
 			}
 		}
+
 	</script>
 
 </lams:head>
@@ -358,7 +359,7 @@
 					</div>
 
 					<c:if test="${sessionMap.mode != 'teacher'}">
-					<button name="notebookButton" style="margin-top: 10px" onclick="javascript:notebook();"
+					<button id="notebookButton" name="notebookButton" style="margin-top: 10px" onclick="javascript:notebook();"
 						class="btn btn-sm btn-primary btn-disable-on-submit pull-left" >
 						<fmt:message key="label.edit" />
 					</button>
@@ -371,12 +372,12 @@
 		<c:if test="${sessionMap.mode != 'teacher'}">
 		<c:choose>
 			<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
-				<button name="notebookButton" onclick="javascript:notebook();" class="btn btn-primary btn-disable-on-submit pull-right">
+				<button id="notebookButton" onclick="javascript:notebook();" class="btn btn-primary btn-disable-on-submit pull-right">
 					<fmt:message key="label.continue" />
-				</button>
+					</button>
 			</c:when>
 			<c:otherwise>
-				<button type="submit"  onclick="javascript:finish();" class="btn btn-primary btn-disable-on-submit pull-right na" id="finishButton">
+				<button type="submit" onclick="javascript:finish();" class="btn btn-primary btn-disable-on-submit pull-right na" id="finishButton">
 					<c:choose>
 						<c:when test="${activityPosition.last}">
 							<fmt:message key="button.submit" />

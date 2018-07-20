@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.SortedMap;
 import java.util.TimeZone;
 
@@ -57,6 +56,7 @@ import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.web.form.LearnerForm;
+import org.lamsfoundation.lams.tool.sbmt.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -66,7 +66,6 @@ import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.filter.LocaleFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -98,7 +97,7 @@ public class LearnerController implements SbmtConstants {
 
     @Autowired
     @Qualifier("sbmtMessageService")
-    private MessageService messageService;
+    private static MessageService messageService;
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -124,9 +123,9 @@ public class LearnerController implements SbmtConstants {
 	if (mode == null) {
 	    mode = ToolAccessMode.LEARNER;
 	}
-	
+
 	Long sessionID = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
-	
+
 	// get session from shared session.
 	HttpSession ss = SessionManager.getSession();
 
@@ -223,6 +222,7 @@ public class LearnerController implements SbmtConstants {
 		List<SubmitUser> groupUsers = submitFilesService.getUsersBySession(new Long(sessionID).longValue());
 		request.setAttribute(SbmtConstants.ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(SbmtConstants.ATTR_SUBMIT_FILES, submittedFilesMap);
+		request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader");
 		return "learner/waitForLeaderTimeLimit";
 	    }
 
@@ -520,6 +520,91 @@ public class LearnerController implements SbmtConstants {
 
 	} else {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not allowed to delete this item");
+	}
+    }
+
+    /**
+     * Display empty reflection form.
+     */
+    @RequestMapping("/newReflection")
+    public String newReflection(@ModelAttribute ReflectionForm refForm, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+//		ISubmitFilesService submitFilesService = getService();
+//		ActionErrors errors = validateBeforeFinish(request,submitFilesService);
+//		if(!errors.isEmpty()){
+//			this.addErrors(request,errors);
+//			return mapping.getInputForward();
+//		}
+
+	//get session value
+	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
+	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+
+	refForm.setUserID(user.getUserID());
+	refForm.setSessionMapID(sessionMapID);
+
+	// get the existing reflection entry
+
+	SessionMap map = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		SbmtConstants.TOOL_SIGNATURE, user.getUserID());
+
+	if (entry != null) {
+	    refForm.setEntryText(entry.getEntry());
+	}
+
+	return "learner/notebook";
+    }
+
+    /**
+     * Submit reflection form input database.
+     */
+    @RequestMapping("/submitReflection")
+    public String submitReflection(@ModelAttribute ReflectionForm refForm, HttpServletRequest request) {
+	Integer userId = refForm.getUserID();
+
+	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
+	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+
+	// check for existing notebook entry
+	NotebookEntry entry = submitFilesService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		SbmtConstants.TOOL_SIGNATURE, userId);
+
+	if (entry == null) {
+	    // create new entry
+	    submitFilesService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    SbmtConstants.TOOL_SIGNATURE, userId, refForm.getEntryText());
+	} else {
+	    // update existing entry
+	    entry.setEntry(refForm.getEntryText());
+	    entry.setLastModified(new Date());
+	    submitFilesService.updateEntry(entry);
+	}
+
+	return "learner/finish";
+    }
+
+    public static void validateBeforeFinish(HttpServletRequest request, ISubmitFilesService submitFilesService) {
+	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Integer userID = user.getUserID();
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	List list = submitFilesService.getFilesUploadedByUser(userID, sessionId, request.getLocale(), false);
+	int minUpload = (Integer) sessionMap.get(SbmtConstants.PARAM_MIN_UPLOAD);
+	if (minUpload > 0) {
+	    errorMap.add("GLOBAL", messageService.getMessage("error.learning.minimum.upload.number.less"));
 	}
     }
 

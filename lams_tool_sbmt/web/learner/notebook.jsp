@@ -26,10 +26,10 @@
 		</div>
 
 		<div class="form-group">
-			<form:form action="learning/submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="refForm" id="messageForm">
+			<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="refForm" id="refForm">
 				<form:hidden path="userID" />
 				<form:hidden path="sessionMapID" />
-				<form:textarea path="entryText" cssClass="form-control" id="focused" rows="5" />
+				<form:textarea path="entryText" cssClass="form-control" id="focused" rows="5"></form:textarea>
 
 
 				<button class="btn btn-primary voffset10 pull-right na" id="finishButton" type="submit">
