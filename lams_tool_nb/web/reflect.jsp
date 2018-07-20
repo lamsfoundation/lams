@@ -25,7 +25,7 @@
 	}
 </script>
 
-<lams:Page type="learner" title="${title}">
+<lams:Page type="learner" title="${title}" formID="nbLearnerForm">
 
 	<form:form action="/reflect.do" method="post" onsubmit="disableFinishButton();" modelAttribute="nbLearnerForm" id="nbLearnerForm">
 		<div class="form-group">

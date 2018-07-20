@@ -43,7 +43,7 @@
 		</c:set>
 			
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>
-		<lams:Page title="${title}" type="navbar">
+		<lams:Page title="${title}" type="navbar" formID="nbMonitoringForm">
 
 		 	<lams:Tabs title="${title}" helpToolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" helpModule="monitoring">
 				<lams:Tab id="1" key="titleHeading.summary" />

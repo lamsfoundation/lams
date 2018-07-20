@@ -279,7 +279,7 @@ public class NbLearnerController {
 	errorMap = new LinkedMultiValueMap<>();
 	if (isDefineLaterSet) {
 	    if (isDefineLaterSet) {
-		errorMap.add("GLOBAL", "message.defineLaterSet");
+		errorMap.add("GLOBAL", messageService.getMessage("message.defineLaterSet"));
 	    }
 	    return true;
 	} else {

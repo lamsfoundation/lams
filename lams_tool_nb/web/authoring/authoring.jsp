@@ -56,7 +56,7 @@
 <form:form modelAttribute="nbAuthoringForm" action="save.do" id="nbAuthoringForm" enctype="multipart/form-data">
 
 <c:set var="title"><fmt:message key="activity.title" /></c:set>
-<lams:Page title="${title}" type="navbar">
+<lams:Page title="${title}" type="navbar" formID="nbAuthoringForm">
 
 			<form:hidden path="toolContentID" />
 			<form:hidden path="contentFolderID" />

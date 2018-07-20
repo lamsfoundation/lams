@@ -28,7 +28,7 @@
 </table>
 
 <p class="align-right">
-	<c:url value="authoring/authoring.do" var="authoringUrl">
+	<c:url value="/authoring/authoring.do" var="authoringUrl">
 		<c:param name="toolContentID" value="${toolContentID}" />
 		<c:param name="defineLater" value="true" />
 		<c:param name="contentFolderID" value="${contentFolderID}" />

@@ -97,17 +97,11 @@ public class NbAuthoringController {
     @RequestMapping("/authoring")
     public String unspecified(@ModelAttribute NbAuthoringForm nbAuthoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
-	/*
-	 * Retrieve the Service
-	 */
-	String contentIdString = nbAuthoringForm.getToolContentID();
-//	Long contentId = NbWebUtil.convertToLong(nbAuthoringForm.getToolContentID());
-//	String contentFolderId = nbAuthoringForm.getContentFolderID();
 
 	Long contentId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_CONTENT_ID);
 	String contentFolderId = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
 
-	nbAuthoringForm.setToolContentID(contentIdString);
+	nbAuthoringForm.setToolContentID(contentId.toString());
 
 	/*
 	 * DefineLater is used in the basic screen. If defineLater is set, then in the authoring page,
@@ -188,7 +182,7 @@ public class NbAuthoringController {
 	String idAsString = nbAuthoringForm.getToolContentID();
 
 	if (idAsString == null) {
-	    String error = messageService.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "Tool Content Id");
+	    String error = messageService.getMessage("error.missingParam");
 	    logger.error(error);
 	    throw new NbApplicationException(error);
 	}

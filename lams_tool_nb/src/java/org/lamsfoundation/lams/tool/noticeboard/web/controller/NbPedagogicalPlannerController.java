@@ -34,7 +34,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,8 +77,7 @@ public class NbPedagogicalPlannerController {
     public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute NbPedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request) {
 
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	errorMap = plannerForm.validate();
+	MultiValueMap<String, String> errorMap = plannerForm.validate();
 	if (errorMap.isEmpty()) {
 	    String content = plannerForm.getBasicContent();
 	    Long toolContentID = plannerForm.getToolContentID();
