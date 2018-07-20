@@ -35,12 +35,16 @@ import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  *
  */
-public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     private List<String> title;
     private List<String> url;
     private List<FormFile> file;
@@ -52,9 +56,10 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
     private String contentFolderID;
 
     @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
+    public MultiValueMap<String, String> validate(MessageService messageService) {
+	boolean valid = true;
 	boolean allEmpty = true;
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (title != null && !title.isEmpty()) {
 	    for (int index = 0; index < title.size(); index++) {
 		if (!StringUtils.isEmpty(title.get(index))) {
@@ -62,9 +67,9 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 		    allEmpty = false;
 		    Short itemType = type.get(index);
 		    // URL should not be blank
+		    
 		    if (itemType.equals(ResourceConstants.RESOURCE_TYPE_URL) && StringUtils.isEmpty(url.get(index))) {
-			ActionMessage error = new ActionMessage("error.planner.url.blank", index + 1);
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+			errorMap.add("GLOBAL", messageService.getMessage("error.planner.url.blank", new Object[] {index + 1}));
 
 		    } else if (itemType.equals(ResourceConstants.RESOURCE_TYPE_FILE)) {
 			/*
@@ -73,16 +78,15 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 			 */
 			FileValidatorUtil.validateFileSize(file.get(index), true, errors);
 			if (fileUuid.get(index) == null && file.get(index) == null) {
-			    ActionMessage error = new ActionMessage("error.planner.file.blank", index + 1);
-			    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+			    ActionMessage error = new ActionMessage("error.planner.file.blank",(Object) (index + 1));
+			    errorMap.add("GLOBAL",messageService.getMessage("error.planner.file.blank", new Object[] {index + 1}));
 			}
 		    }
-		}
+		}   
 	    }
 	}
 	if (allEmpty) {
-	    ActionMessage error = new ActionMessage("error.planner.no.resource.save");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    errorMap.add("GLOBAL", messageService.getMessage("error.planner.no.resource.save"));
 	    title = null;
 	    url = null;
 	    fileName = null;
@@ -91,8 +95,8 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 	    type = null;
 	}
 
-	setValid(errors.isEmpty());
-	return errors;
+	setValid(valid);
+	return errorMap;
     }
 
     public void fillForm(Resource resource) {
