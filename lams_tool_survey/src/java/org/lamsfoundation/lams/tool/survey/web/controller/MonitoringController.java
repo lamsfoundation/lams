@@ -496,7 +496,8 @@ public class MonitoringController {
 	} catch (Exception e) {
 	    MonitoringController.log.error(e);
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	    errorMap.add("error.monitoring.export.excel", e.toString());
+	    errorMap.add("GLOBAL",
+		    messageService.getMessage("error.monitoring.export.excel", new Object[] { e.toString() }));
 	    errors = errorMap.toString();
 	}
 

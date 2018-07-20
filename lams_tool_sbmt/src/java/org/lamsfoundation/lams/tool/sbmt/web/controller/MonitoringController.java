@@ -372,7 +372,8 @@ public class MonitoringController {
 	    response.getOutputStream().flush();
 	} catch (Exception e) {
 	    logger.error(e);
-	    errorMap.add(messageService.getMessage("monitoring.download.error"), e.toString());
+	    errorMap.add("GLOBAL",
+		    messageService.getMessage("monitoring.download.error", new Object[] { e.toString() }));
 	}
 
 	if (!errorMap.isEmpty()) {

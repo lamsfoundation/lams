@@ -781,9 +781,9 @@ public class AuthoringController {
     public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute TaskListPedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request) throws IOException {
 
-	MultiValueMap<String, String> errorMap = plannerForm.validate();
+	MultiValueMap<String, String> errorMap = plannerForm.validate(messageService);
 
-	if (!errorMap.isEmpty()) {
+	if (errorMap.isEmpty()) {
 	    TaskList taskList = taskListService.getTaskListByContentId(plannerForm.getToolContentID());
 
 	    int itemIndex = 0;
