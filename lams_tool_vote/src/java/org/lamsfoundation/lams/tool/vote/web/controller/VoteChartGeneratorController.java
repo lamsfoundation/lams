@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.vote.web.action;
+package org.lamsfoundation.lams.tool.vote.web.controller;
 
 import java.util.HashMap;
 import java.util.LinkedList;

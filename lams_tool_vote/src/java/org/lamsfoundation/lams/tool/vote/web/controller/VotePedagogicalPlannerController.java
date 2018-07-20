@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.vote.web.action;
+package org.lamsfoundation.lams.tool.vote.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
