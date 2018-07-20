@@ -653,8 +653,8 @@ public class SubmitFilesService
      */
     private NodeKey processFile(MultipartFile file) {
 	NodeKey node = null;
-	if ((file != null) && !StringUtils.isEmpty(file.getName())) {
-	    String fileName = file.getName();
+	if ((file != null) && !StringUtils.isEmpty(file.getOriginalFilename())) {
+	    String fileName = file.getOriginalFilename();
 	    try {
 		node = getSbmtToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {

@@ -27,7 +27,8 @@
 	</tr>
 </table>
 
-<c:url value="../learning/teacher.do" var="authoringUrl">
+<c:url value="/authoring/authoring.do" var="authoringUrl">
+	<c:param name="mode" value="teacher" />
 	<c:param name="contentFolderID" value="${contentFolderID}" />
 	<c:param name="toolContentID" value="${toolContentID}" />
 </c:url>

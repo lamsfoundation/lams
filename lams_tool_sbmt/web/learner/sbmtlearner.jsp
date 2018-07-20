@@ -105,9 +105,10 @@
 			var answer = confirm(msg);
 			if (answer) {	
 				 $.ajax({
+					 	url: '<c:url value="/learning/deleteLearnerFile.do"/>',
 			            data: 'detailId=' + detailId,
 			            success: function () {
-			            	document.location.href = "<lams:WebAppURL />learning/"+${sessionMap.mode}+".do?toolSessionID="+${sessionMap.toolSessionID};
+			            	document.location.href = "<lams:WebAppURL />learning/${sessionMap.mode}.do?toolSessionID=${sessionMap.toolSessionID}";
 			            },
 			            error: function(error){
 			                alert("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
