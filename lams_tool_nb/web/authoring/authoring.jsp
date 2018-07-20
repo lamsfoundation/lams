@@ -1,8 +1,6 @@
 <!DOCTYPE html>
-            
-
+           
 <%@ include file="/includes/taglibs.jsp"%>
-
 <%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
 <c:set var="lams">
 	<lams:LAMSURL />
@@ -55,30 +53,29 @@
 
 <body class="stripes" onLoad="init()">
 
-<html:form action="/authoring" styleId="authoringForm" target="_self" enctype="multipart/form-data">
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<form:form modelAttribute="nbAuthoringForm" action="save.do" id="nbAuthoringForm" enctype="multipart/form-data">
 
 <c:set var="title"><fmt:message key="activity.title" /></c:set>
-<lams:Page title="${title}" type="navbar">
+<lams:Page title="${title}" type="navbar" formID="nbAuthoringForm">
 
-			<html:hidden property="toolContentID" />
-			<html:hidden property="contentFolderID" />
-			<html:hidden property="currentTab" styleId="currentTab" />
-			<html:hidden property="defineLater" />
-		
+			<form:hidden path="toolContentID" />
+			<form:hidden path="contentFolderID" />
+			<form:hidden path="currentTab" id="currentTab" />
+			<form:hidden path="defineLater" />
 		 	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 				<lams:Tab id="1" key="label.authoring.heading.basic" />
 				<lams:Tab id="2" key="label.authoring.heading.advanced" />
 			</lams:Tabs>	
 		
 		 	<lams:TabBodyArea>
-		 		<logic:messagesPresent>
-				<lams:Alert id="errorMessages" type="danger" close="false">
-			        <html:messages id="error">
-        			    <c:out value="${error}" escapeXml="false"/><BR/>
-   				     </html:messages>
- 			    </lams:Alert>
-				</logic:messagesPresent>
+		 		<c:set var="hasErrors">
+					<form:errors path='*'/>
+				</c:set>
+				<c:if test="${not empty hasErrors}">
+					<lams:Alert id="error" type="danger" close="false">
+						<form:errors path="*"/>
+					</lams:Alert>
+				</c:if>
 		 		
 				<!--  Set up tabs  -->
 		 		<lams:TabBodys>
@@ -87,10 +84,10 @@
   				</lams:TabBodys>
 		
 				<!-- Button Row -->
-				<html:hidden property="method" value="save" />
+				<form:hidden path="method" value="save" />
 				<c:set var="accessMode">
 					<c:choose>
-						<c:when test="${formBean.defineLater == 'true'}">
+						<c:when test="${nbAuthoringForm.defineLater == 'true'}">
 							teacher
 						</c:when>
 						<c:otherwise>
@@ -98,13 +95,13 @@
 						</c:otherwise>
 					</c:choose>
 				</c:set>
-				<lams:AuthoringButton formID="authoringForm"
+				<lams:AuthoringButton formID="nbAuthoringForm"
 					clearSessionActionUrl="/clearsession.do" toolSignature="lanb11"
-					toolContentID="${formBean.toolContentID}"
+					toolContentID="${nbAuthoringForm.toolContentID}"
 					cancelButtonLabelKey="button.cancel"
 					saveButtonLabelKey="button.save"
 					accessMode="${accessMode}"
-					defineLater="${formBean.defineLater}"
+					defineLater="${nbAuthoringForm.defineLater}"
 					contentFolderID="${NbAuthoringForm.contentFolderID}" />
 			</lams:TabBodyArea>
 
@@ -112,7 +109,7 @@
 <!-- end page div -->
 </lams:Page>
 
-</html:form>
+</form:form>
 
 </body>
 </lams:html>

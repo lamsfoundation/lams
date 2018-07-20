@@ -35,6 +35,7 @@ import org.apache.commons.validator.util.ValidatorUtils;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
+import org.springframework.validation.Errors;
 
 /**
  * This class is used by commons validator. To validate various properties
@@ -104,6 +105,28 @@ public class FileValidatorUtil {
      */
     public static boolean validateFileSize(FormFile file, boolean largeFile, ActionMessages errors) {
 	return FileValidatorUtil.validateFileSize(file, largeFile, ActionMessages.GLOBAL_MESSAGE, errors);
+
+    }
+
+    public static boolean validateFileSize(FormFile file, boolean largeFile, Errors errors) {
+	int fileSize = 0;
+	try {
+	    fileSize = file.getFileSize();
+	} catch (Exception e) {
+	    //skip, do nothing
+	    return true;
+	}
+	float maxFileSize = largeFile ? Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)
+		: Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
+
+	if (fileSize > maxFileSize) {
+	    String maxSize = FileValidatorUtil.formatSize(maxFileSize);
+
+	    // set error message
+	    errors.reject(MSG_KEY, new Object[] { maxSize }, null);
+	    return false;
+	}
+	return true;
 
     }
 

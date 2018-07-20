@@ -11,10 +11,10 @@
 		</c:otherwise>
 	</c:choose>
 	<div id="updateMarksButton" class="pull-right">
-		<html:link href="javascript:updateMark(${fileInfo.submissionID},${fileInfo.reportID},${toolSessionID},${fileInfo.owner.userID});" 
-				  property="submit" styleClass="btn btn-xs btn-default">
+		<a href="javascript:updateMark(${fileInfo.submissionID},${fileInfo.reportID},${toolSessionID},${fileInfo.owner.userID});" 
+				  name="submit" class="btn btn-xs btn-default">
 			<i class="fa fa-pencil-square-o" title="<fmt:message key="label.monitoring.updateMarks.button" />"></i> <span class="hidden-xs"><fmt:message key="label.monitoring.updateMarks.button" /></span>
-		</html:link>
+		</a>
 	</div>	
 </dd>
 
@@ -50,17 +50,17 @@
 			<c:out value="${fileInfo.markFileName}" />
 			<div id="markedActionButtons" class="pull-right">
 				<c:set var="markFileViewURL">
-					<html:rewrite page="/download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=false" />
+					<lams:WebAppURL/>download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=false
 				</c:set>
-				<html:link href="javascript:launchInstructionsPopup('${markFileViewURL}')" styleClass="btn btn-xs btn-default">
+				<a href="javascript:launchInstructionsPopup('${markFileViewURL}')" class="btn btn-xs btn-default">
 					<i class="fa fa-eye" title="<fmt:message key="label.view" />"></i>
-				</html:link>
+				</a>
 				<c:set var="markFileDownloadURL">
-					<html:rewrite page="/download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=true" />
+					<lams:WebAppURL/>download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=true
 				</c:set>
-				<html:link href="${markFileDownloadURL}" styleClass="btn btn-xs btn-default loffset10">
+				<a href="${markFileDownloadURL}" class="btn btn-xs btn-default loffset10">
 					<i class="fa fa-download" title="<fmt:message key="label.download" />"></i>
-				</html:link>
+				</a>
 			</div>
 		</dd>				
 	</c:when>

@@ -3,6 +3,7 @@
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_1.xsd"
 	version="3.1">
+	
 	<context-param>
 		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
 		<param-value>org.lamsfoundation.lams.tool.noticeboard.ApplicationResources</param-value>
@@ -12,19 +13,22 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>classpath:/org/lamsfoundation/lams/tool/noticeboard/dbupdates/autopatchContext.xml</param-value>
 	</context-param>
+	
 	<context-param>
 		<param-name>locatorFactorySelector</param-name>
 		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value>
 	</context-param>
+	
 	<context-param>
 		<param-name>parentContextKey</param-name>
 		<param-value>context.central</param-value>
 	</context-param>
 
-	<filter>
-		<filter-name>SystemSessionFilter</filter-name>
-		<filter-class>org.lamsfoundation.lams.web.session.SystemSessionFilter</filter-class>
-	</filter>
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
 
 	<filter>
 		<filter-name>hibernateFilter</filter-name>
@@ -36,7 +40,13 @@
 			<param-value>coreSessionFactory</param-value>
 		</init-param>
 	</filter>
-
+	<!-- System session filter -->
+	<filter>
+		<filter-name>SystemSessionFilter</filter-name>
+		<filter-class>
+			org.lamsfoundation.lams.web.session.SystemSessionFilter
+		</filter-class>
+	</filter>
 	<filter>
 		<filter-name>LocaleFilter</filter-name>
 		<filter-class>
@@ -49,61 +59,61 @@
 	</filter>
 
 	<filter-mapping>
-		<filter-name>SystemSessionFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
-	<filter-mapping>
 		<filter-name>hibernateFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-
+	<filter-mapping>
+		<filter-name>SystemSessionFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 	<filter-mapping>
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<listener>
-		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
-		</listener-class>
-	</listener>
+	<servlet>
+		<servlet-name>spring</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
 
 	<servlet>
-		<servlet-name>action</servlet-name>
-		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+		<servlet-name>Connector</servlet-name>
+		<servlet-class>net.fckeditor.connector.ConnectorServlet</servlet-class>
 		<init-param>
-			<param-name>config</param-name>
-			<param-value>/WEB-INF/struts-config.xml</param-value>
+			<param-name>baseDir</param-name>
+			<param-value>/UserFiles/</param-value>
 		</init-param>
 		<init-param>
 			<param-name>debug</param-name>
-			<param-value>999</param-value>
-		</init-param>
-		<init-param>
-			<param-name>detail</param-name>
-			<param-value>2</param-value>
-		</init-param>
-		<init-param>
-			<param-name>validate</param-name>
-			<param-value>true</param-value>
+			<param-value>false</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+
 	<!-- The download servlet, reused from the content repository jar -->
 	<servlet>
+		<description>Instructions Download</description>
+		<display-name>Instructions Download</display-name>
 		<servlet-name>download</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
 		<init-param>
 			<param-name>toolContentHandlerBeanName</param-name>
-			<param-value>nbToolContentHandler</param-value>
+			<param-value>lataskTaskListToolContentHandler</param-value>
 		</init-param>
 		<load-on-startup>3</load-on-startup>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>action</servlet-name>
+		<servlet-name>spring</servlet-name>
 		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>Connector</servlet-name>
+		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>
@@ -112,21 +122,7 @@
 	</servlet-mapping>
 
 
-	<error-page>
-		<error-code>500</error-code>
-		<location>/error.jsp</location>
-	</error-page>
-	<error-page>
-		<error-code>403</error-code>
-		<location>/403.jsp</location>
-	</error-page>
-	<error-page>
-		<error-code>404</error-code>
-		<location>/404.jsp</location>
-	</error-page>
-
 	<jsp-config>
-
 		<!-- ======================================================== -->
 		<!-- Struts Tag Library Descriptors -->
 		<!-- ======================================================== -->
@@ -181,6 +177,7 @@
 			<taglib-uri>tags-xml</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
 		</taglib>
+		
 		<!-- ======================================================== -->
 		<!-- JSTL 1.2 Tag Library: Apache implementation of TLV -->
 		<!-- ======================================================== -->
@@ -188,10 +185,12 @@
 			<taglib-uri>tags-permittedTaglibs</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/jstl/permittedTaglibs.tld</taglib-location>
 		</taglib>
+
 		<taglib>
 			<taglib-uri>tags-scriptfree</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/jstl/scriptfree.tld</taglib-location>
 		</taglib>
+		
 		<!-- ======================================================== -->
 		<!-- Customized Tag Library -->
 		<!-- ======================================================== -->
@@ -224,8 +223,7 @@
 		<web-resource-collection>
 			<web-resource-name>Authoring content</web-resource-name>
 			<url-pattern>/authoring/*</url-pattern>
-			<url-pattern>/authoring.do</url-pattern>
-			<url-pattern>/pedagogicalPlanner.do</url-pattern>
+			<url-pattern>/pages/authoring/*</url-pattern>
 			<http-method>GET</http-method>
  			<http-method>POST</http-method>
 		</web-resource-collection>
@@ -239,7 +237,8 @@
 		<web-resource-collection>
 			<web-resource-name>Staff content</web-resource-name>
 			<url-pattern>/monitoring/*</url-pattern>
-			<url-pattern>/monitoring.do</url-pattern>
+			<url-pattern>/pages/monitoring/*</url-pattern>
+			<url-pattern>/definelater.do</url-pattern>
 			<http-method>GET</http-method>
  			<http-method>POST</http-method>
 		</web-resource-collection>
@@ -269,10 +268,12 @@
 		<description>Group Manager</description>
 		<role-name>GROUP MANAGER</role-name>
 	</security-role>
+
 	<security-role>
 		<description>Group Administrator</description>
 		<role-name>GROUP ADMIN</role-name>
 	</security-role>
+
 	<security-role>
 		<description>LAMS System Adminstrator</description>
 		<role-name>SYSADMIN</role-name>
@@ -287,4 +288,17 @@
 			<form-error-page>/login.jsp?failed=y</form-error-page>
 		</form-login-config>
 	</login-config>
+
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/403.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/404.jsp</location>
+	</error-page>
 </web-app>

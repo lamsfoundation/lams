@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.taskList.web.form;
 
 import java.util.ArrayList;
@@ -28,23 +27,23 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  *
  */
-public class TaskListPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class TaskListPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     private List<String> taskListItem;
 
     @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
+    public LinkedMultiValueMap<String, String> validate() {
 	boolean valid = true;
 	boolean allEmpty = true;
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (taskListItem != null && !taskListItem.isEmpty()) {
 	    for (String item : taskListItem) {
 		if (!StringUtils.isEmpty(item)) {
@@ -54,21 +53,20 @@ public class TaskListPedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 	    }
 	}
 	if (allEmpty) {
-	    ActionMessage error = new ActionMessage("authoring.msg.no.tasks.save");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    errorMap.add("GLOBAL", "authoring.msg.no.tasks.save");
 	    valid = false;
 	    taskListItem = null;
 	}
 
 	setValid(valid);
-	return errors;
+	return (LinkedMultiValueMap<String, String>) errorMap;
     }
 
     public void fillForm(TaskList taskList) {
 	if (taskList != null) {
 	    setToolContentID(taskList.getContentId());
 
-	    taskListItem = new ArrayList<String>();
+	    taskListItem = new ArrayList<>();
 	    Set<TaskListItem> items = taskList.getTaskListItems();
 	    if (items != null) {
 		int topicIndex = 0;
@@ -81,7 +79,7 @@ public class TaskListPedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 
     public void setTaskListItem(int number, String TaskListItems) {
 	if (taskListItem == null) {
-	    taskListItem = new ArrayList<String>();
+	    taskListItem = new ArrayList<>();
 	}
 	while (number >= taskListItem.size()) {
 	    taskListItem.add(null);

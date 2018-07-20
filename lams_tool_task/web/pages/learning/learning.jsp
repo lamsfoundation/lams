@@ -112,7 +112,7 @@
 </lams:head>
 <body class="stripes">
 
-	<lams:Page type="learner" title="${taskList.title}">
+	<lams:Page type="learner" title="${taskList.title}"> 
 
 		<!--Task Information-->
 
@@ -165,8 +165,8 @@
 
 		<c:if test="${mode != 'teacher'}">
 			<p>
-				<button onclick="return checkNew()" class="btn btn-sm btn-default btn-disable-on-submit"> <fmt:message
-						key="label.learning.check.for.new" />
+				<button onclick="return checkNew()" class="btn btn-sm btn-default btn-disable-on-submit"> 
+				<fmt:message key="label.learning.check.for.new" />
 				</button>
 			</p>
 		</c:if>
@@ -177,7 +177,7 @@
 			<c:if test="${taskList.allowContributeTasks}">
 
 				<p>
-					<button onclick="javascript:showMessage('<html:rewrite page="/learning/addtask.do?sessionMapID=${sessionMapID}&mode=${mode}"/>');"
+					<button onclick="javascript:showMessage('<lams:WebAppURL/>learning/addtask.do?sessionMapID=${sessionMapID}&mode=${mode}');"
 						class="btn btn-sm btn-default btn-disable-on-submit"><i class="fa fa-sm fa-plus-circle"></i>&nbsp;<fmt:message
 							key="label.authoring.basic.add.task" /> </button>
 				<p>
@@ -217,10 +217,10 @@
 									</c:choose>
 
 									<c:if test="${mode != 'teacher'}">
-										<html:button property="FinishButton" onclick="return continueReflect()"
-											styleClass="btn btn-sm btn-default pull-left voffset10 btn-disable-on-submit">
+										<button type="submit" id="finishButton" onclick="return continueReflect()"
+											class="btn btn-sm btn-default pull-left voffset10 btn-disable-on-submit">
 											<fmt:message key="label.edit" />
-										</html:button>
+										</button>
 									</c:if>
 
 
@@ -248,10 +248,10 @@
 					</c:when>
 
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<html:button property="FinishButton" onclick="return continueReflect()"
-							styleClass="btn btn-primary btn-disable-on-submit voffset10 pull-right">
+						<button type="submit" id="finishButton" onclick="return continueReflect()"
+							class="btn btn-primary btn-disable-on-submit voffset10 pull-right">
 							<fmt:message key="label.continue" />
-						</html:button>
+						</button>
 					</c:when>
 
 					<c:otherwise>

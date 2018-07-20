@@ -2,7 +2,7 @@
 
 <div class="voffset10">
 
-<c:if test="${formBean.totalLearners >= 1}">
+<c:if test="${nbMonitoringForm.totalLearners >= 1}">
 	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.alertContentEdit" />
 	</lams:Alert>
@@ -14,7 +14,7 @@
 			<fmt:message key="basic.title" />
 		</td>
 		<td>
-			<c:out value="${formBean.title}" escapeXml="true" />
+			<c:out value="${nbMonitoringForm.title}" escapeXml="true" />
 		</td>
 	</tr>
 	<tr>
@@ -22,20 +22,20 @@
 			<fmt:message key="basic.content" />
 		</td>
 		<td>
-			<c:out value="${formBean.basicContent}" escapeXml="false" />
+			<c:out value="${nbMonitoringForm.basicContent}" escapeXml="false" />
 		</td>
 	</tr>
 </table>
 
 <p class="align-right">
-	<c:url value="/authoring.do" var="authoringUrl">
+	<c:url value="/authoring/authoring.do" var="authoringUrl">
 		<c:param name="toolContentID" value="${toolContentID}" />
 		<c:param name="defineLater" value="true" />
 		<c:param name="contentFolderID" value="${contentFolderID}" />
 	</c:url>
-	<html:link href="#nogo" onclick="javascript:launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
+	<a href="#nogo" onclick="javascript:launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
 		<fmt:message key="button.edit" />
-	</html:link>
+	</a>
 </p>
 
 </div>

@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web.planner;
 
 import javax.servlet.http.HttpServletRequest;

@@ -9,8 +9,8 @@
 </script>
 
 <div class="panel">
-	<h4><c:out value="${formBean.title}" escapeXml="true" /></h4>
-	<div class="voffset5"><c:out value="${formBean.basicContent}" escapeXml="false" /></div>
+	<h4><c:out value="${nbMonitoringForm.title}" escapeXml="true" /></h4>
+	<div class="voffset5"><c:out value="${nbMonitoringForm.basicContent}" escapeXml="false" /></div>
 </div>
 
 <H4><fmt:message key="titleHeading.statistics"/></H2>
@@ -31,15 +31,14 @@
 				<td width="40%">
 					<lams:Portrait userId="${reflection.userId}" hover="true"><c:out value="${reflection.username}" /></lams:Portrait>
 				</td>
-				<c:url value="monitoring.do" var="viewReflection">
-					<c:param name="method" value="viewReflection" />
+				<c:url value="/monitoring/viewReflection.do" var="viewReflection">
 					<c:param name="userID" value="${reflection.userId}" />
 					<c:param name="toolSessionID" value="${reflection.externalId}" />
 				</c:url>
 				<td>
-				<html:link href="javascript:launchPopup('${viewReflection}')" styleClass="btn btn-default btn-sm ${allowComments ? 'pull-right' : ''}">
+				<a href="javascript:launchPopup('${viewReflection}')" class="btn btn-default btn-sm ${allowComments ? 'pull-right' : ''}">
 							<fmt:message key="link.view" />
-					</html:link>
+					</a>
 				</td>
 			</tr>
 		</c:forEach>

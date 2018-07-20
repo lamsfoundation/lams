@@ -41,7 +41,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -101,6 +100,7 @@ import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.dao.DataAccessException;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -271,8 +271,8 @@ public class SubmitFilesService
 	List<SubmissionDetails> leaderSubmissions = submissionDetailsDAO.getBySessionAndLearner(fromUser.getSessionID(),
 		fromUser.getUserID());
 
-	List<SubmissionDetails> existingSubmissions = submissionDetailsDAO
-		.getBySessionAndLearner(toUser.getSessionID(), toUser.getUserID());
+	List<SubmissionDetails> existingSubmissions = submissionDetailsDAO.getBySessionAndLearner(toUser.getSessionID(),
+		toUser.getUserID());
 
 	// Note: uuid never changes once a file is uploaded as this is the key from the content repository.
 	for (SubmissionDetails leadersubmission : leaderSubmissions) {
@@ -313,7 +313,7 @@ public class SubmitFilesService
 	    } else {
 		usersubmission.setReport(null);
 	    }
-	    
+
 	    submissionDetailsDAO.save(usersubmission);
 	}
     }
@@ -607,11 +607,11 @@ public class SubmitFilesService
     }
 
     @Override
-    public void uploadFileToSession(Long sessionID, FormFile uploadFile, String fileDescription, Integer userID)
+    public void uploadFileToSession(Long sessionID, MultipartFile file, String fileDescription, Integer userID)
 	    throws SubmitFilesException {
 
-	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new SubmitFilesException("Could not find upload file: " + uploadFile);
+	if ((file == null) || StringUtils.isEmpty(file.getName())) {
+	    throw new SubmitFilesException("Could not find upload file: " + file);
 	}
 
 	SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(sessionID);
@@ -619,11 +619,11 @@ public class SubmitFilesService
 	    throw new SubmitFilesException("No such session with a sessionID of: " + sessionID + " found.");
 	}
 
-	NodeKey nodeKey = processFile(uploadFile);
+	NodeKey nodeKey = processFile(file);
 
 	SubmissionDetails details = new SubmissionDetails();
 	details.setFileDescription(fileDescription);
-	details.setFilePath(uploadFile.getFileName());
+	details.setFilePath(file.getName());
 	details.setDateOfSubmission(new Date());
 
 	SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);
@@ -651,10 +651,10 @@ public class SubmitFilesService
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(FormFile file) {
+    private NodeKey processFile(MultipartFile file) {
 	NodeKey node = null;
-	if ((file != null) && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
+	if ((file != null) && !StringUtils.isEmpty(file.getName())) {
+	    String fileName = file.getName();
 	    try {
 		node = getSbmtToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
@@ -699,7 +699,6 @@ public class SubmitFilesService
 	return new ArrayList(details);
     }
 
-    
     @Override
     public SubmissionDetails getSubmissionDetail(Long detailId) {
 	return submissionDetailsDAO.getSubmissionDetailsByID(detailId);
@@ -759,7 +758,7 @@ public class SubmitFilesService
     }
 
     @Override
-    public void updateMarks(Long reportID, Float marks, String comments, FormFile markFile, Long sessionID)
+    public void updateMarks(Long reportID, Float marks, String comments, MultipartFile markFile, Long sessionID)
 	    throws InvalidParameterException, RepositoryCheckedException {
 
 	SubmitFilesSession session = getSessionById(sessionID);
@@ -768,7 +767,7 @@ public class SubmitFilesService
 
 	    // can share the mark file across users
 	    NodeKey nodeKey = null;
-	    if ((markFile != null) && !StringUtils.isEmpty(markFile.getFileName())) {
+	    if ((markFile != null) && !StringUtils.isEmpty(markFile.getName())) {
 		nodeKey = this.processFile(markFile);
 	    }
 
@@ -782,7 +781,7 @@ public class SubmitFilesService
 		    report.setMarks(marks);
 
 		    // If there is a new file, delete the existing and add the mark file
-		    if ( nodeKey != null) {
+		    if (nodeKey != null) {
 
 			// Delete the existing
 			if (report.getMarkFileUUID() != null) {
@@ -792,7 +791,7 @@ public class SubmitFilesService
 			    report.setMarkFileVersionID(null);
 			}
 
-			report.setMarkFileName(markFile.getFileName());
+			report.setMarkFileName(markFile.getName());
 			report.setMarkFileUUID(nodeKey.getUuid());
 			report.setMarkFileVersionID(nodeKey.getVersion());
 		    }
@@ -810,7 +809,7 @@ public class SubmitFilesService
 		report.setMarks(marks);
 
 		// If there is a new file, delete the existing and add the mark file
-		if ((markFile != null) && !StringUtils.isEmpty(markFile.getFileName())) {
+		if ((markFile != null) && !StringUtils.isEmpty(markFile.getName())) {
 
 		    // Delete the existing
 		    if (report.getMarkFileUUID() != null) {
@@ -825,7 +824,7 @@ public class SubmitFilesService
 		    // NodeKey nodeKey = toolContentHandler.uploadFile(marksFileInputStream, marksFileName, null,
 		    // IToolContentHandler.TYPE_ONLINE);
 
-		    report.setMarkFileName(markFile.getFileName());
+		    report.setMarkFileName(markFile.getName());
 		    report.setMarkFileUUID(nodeKey.getUuid());
 		    report.setMarkFileVersionID(nodeKey.getVersion());
 		}
@@ -853,7 +852,7 @@ public class SubmitFilesService
 		    submitFilesReportDAO.update(report);
 		}
 	    }
-	    
+
 	} else {
 	    SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
 	    if (report != null) {

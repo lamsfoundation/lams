@@ -6,8 +6,8 @@
 			<hr class="msg-hr">
 			<!-- Comments Part -->
 			<c:if test="${item.commentsAllowed}">
-				<html:form action="/learning/addNewComment.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${item.uid}"
-					method="post" enctype="multipart/form-data" onsubmit="disableButtons()">
+				<form:form action="addNewComment.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${item.uid}"
+					modelAttribute="taskListItemForm" method="post" enctype="multipart/form-data" onsubmit="disableButtons()">
 
 					<%@ include file="commentlist.jsp"%>
 
@@ -15,7 +15,7 @@
 
 						<div class="form-group voffset5">
 							<label for="comment"><fmt:message key="label.preview.add.comment" /></label>
-							<lams:STRUTS-textarea property="comment" rows="2" styleId="comment" styleClass="form-control" index="${item.uid}" />
+							<textarea name="comment" rows="2" id="comment" class="form-control" index="${item.uid}"></textarea>
 							<c:if test="${(mode != 'teacher') && !itemDTO.commentRequirementsMet}">
 								<div class="help-block">
 									<fmt:message key="label.learning.info.add.comment.required" />
@@ -27,14 +27,14 @@
 						</div>
 
 					</c:if>
-				</html:form>
+				</form:form>
 			</c:if>
 
 			<!-- Uploaded Attachments -->
 			<c:if test="${item.filesAllowed}">
 				<hr class="msg-hr">				
-				<html:form action="/learning/uploadFile.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${item.uid}"
-					method="post" enctype="multipart/form-data" onsubmit="return validateFiles();">
+				<form:form action="uploadFile.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${item.uid}"
+					modelAttribute="taskListItemForm" method="post" enctype="multipart/form-data" onsubmit="return validateFiles();">
 					<c:choose>
 						<c:when test="${(mode != 'teacher') && !itemDTO.attachmentRequirementsMet}">
 							<lams:Alert id="fileRequired" close="true" type="info">
@@ -55,7 +55,7 @@
 						<input type="submit" name="uploadedFileButton" value='<fmt:message key="label.preview.upload.button" />'
 							class="btn btn-default btn-disable-on-submit voffset5" />
 					</c:if>
-				</html:form>
+				</form:form>
 				
 				<lams:WaitingSpinner id="attachmentArea_Busy"/>
 			</c:if>

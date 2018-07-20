@@ -49,6 +49,7 @@
   	<module name="javax.servlet.api" />
   	<module name="javaee.api" />
   	<module name="org.apache.commons.logging" />
+  	<module name="org.apache.commons.fileupload" />
   	<module name="org.hibernate" />
   	<module name="org.jboss.vfs" />
   	<module name="org.quartz" />

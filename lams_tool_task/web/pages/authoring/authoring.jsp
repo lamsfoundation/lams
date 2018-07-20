@@ -64,16 +64,16 @@
 </lams:head>
 
 <body class="stripes" onLoad="init()">
-<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
-	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-	<html:hidden property="taskList.contentId" />
-	<html:hidden property="mode" value="${mode}"/>
-	<html:hidden property="sessionMapID" />
-	<html:hidden property="contentFolderID" />
-	<html:hidden property="currentTab" styleId="currentTab" />
+<form:form action="update.do" method="post" modelAttribute="taskListForm" id="taskListForm">
+	<form:hidden path="taskList.contentId" />
+	<input type="hidden" name="mode" value="${mode}"/>
+	<form:hidden path="sessionMapID" />
+	<form:hidden path="contentFolderID" />
+	<form:hidden path="currentTab" id="currentTab" />
 
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>
-		<lams:Page title="${title}" type="navbar">
+		<lams:Page title="${title}" type="navbar" formID="taskListForm">
+	
 
 			 <lams:Tabs control="true" title="${title}" helpToolSignature="<%= TaskListConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 				<lams:Tab id="1" key="label.authoring.heading.basic" />
@@ -106,19 +106,20 @@
 						accessMode="author"
 					--%>
 		
-					<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
-						toolSignature="<%=TaskListConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.taskList.contentId}" 
-						 customiseSessionID="${formBean.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
-						 contentFolderID="${formBean.contentFolderID}" />
+		
+					<lams:AuthoringButton formID="taskListForm" clearSessionActionUrl="/clearsession.do" 
+						toolSignature="<%=TaskListConstants.TOOL_SIGNATURE%>" toolContentID="${taskListForm.taskList.contentId}" 
+						 customiseSessionID="${taskListForm.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
+						 contentFolderID="${taskListForm.contentFolderID}" />
 			</lams:TabBodyArea>
 	
 			<div id="footer"></div>
 
 		</lams:Page>	
-</html:form>
+</form:form>
 
 <script type="text/javascript">
-	changeMinTasks(${formBean.taskList.minimumNumberTasks});
+	changeMinTasks(${taskListForm.taskList.minimumNumberTasks});
 </script>
 
 </body>

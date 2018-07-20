@@ -71,16 +71,16 @@ public class WikiPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	}
     }
 
-    @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
-	boolean valid = true;
-	if (StringUtils.isEmpty(getTitle())) {
-	    ActionMessage error = new ActionMessage("label.wiki.add.title.required");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	    valid = false;
-	}
-	setValid(valid);
-	return errors;
-    }
+//    @Override
+//    public ActionMessages validate() {
+//	ActionMessages errors = new ActionMessages();
+//	boolean valid = true;
+//	if (StringUtils.isEmpty(getTitle())) {
+//	    ActionMessage error = new ActionMessage("label.wiki.add.title.required");
+//	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+//	    valid = false;
+//	}
+//	setValid(valid);
+//	return errors;
+//    }
 }

@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.SessionDTO;
@@ -38,6 +37,7 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Interface that defines the contract that all TaskLisk service providers must follow.
@@ -103,7 +103,7 @@ public interface ITaskListService {
      * @return
      * @throws UploadTaskListFileException
      */
-    TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, TaskListUser user)
+    TaskListItemAttachment uploadTaskListItemFile(MultipartFile uploadFile, TaskListUser user)
 	    throws UploadTaskListFileException;
 
     /**

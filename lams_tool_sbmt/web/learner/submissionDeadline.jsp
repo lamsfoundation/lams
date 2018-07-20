@@ -11,11 +11,11 @@
 	<script type="text/javascript">
 		function finish() {
 			document.getElementById("finishButton").disabled = true;
-			var finishUrl = "<html:rewrite page='/learner.do?method=finish&sessionMapID=${sessionMapID}'/>";
+			var finishUrl = "<lams:WebAppURL />learner/finish.do?sessionMapID=${sessionMapID}";
 			location.href = finishUrl;
 		}
 		function notebook() {
-			var finishUrl = "<html:rewrite page='/learning/newReflection.do?sessionMapID=${sessionMapID}'/>";
+			var finishUrl = "<lams:WebAppURL />learning/newReflection.do?sessionMapID=${sessionMapID}";
 			location.href = finishUrl;
 		}
 	</script>
@@ -39,13 +39,13 @@
 
 		<c:choose>
 			<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
-				<html:button property="continueButton" onclick="javascript:notebook();" styleClass="btn btn-primary pull-right">
+				<button name="continueButton" onclick="javascript:notebook();" class="btn btn-primary pull-right">
 					<fmt:message key="label.continue" />
-				</html:button>
+				</button>
 			</c:when>
 			<c:otherwise>
-				<html:link href="#nogo" property="finishButton" onclick="javascript:finish();"
-					styleClass="btn btn-primary pull-right na" styleId="finishButton">
+				<a href="#nogo" name="finishButton" onclick="javascript:finish();"
+					class="btn btn-primary pull-right na" id="finishButton">
 					<span class="nextActivity"> <c:choose>
 							<c:when test="${activityPosition.last}">
 								<fmt:message key="button.submit" />
@@ -55,7 +55,7 @@
 							</c:otherwise>
 						</c:choose>
 					</span>
-				</html:link>
+				</a>
 			</c:otherwise>
 		</c:choose>
 
