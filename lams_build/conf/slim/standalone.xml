@@ -249,6 +249,7 @@
 				    <connection-property name="zeroDateTimeBehavior">CONVERT_TO_NULL</connection-property>
 				    <connection-property name="useSSL">false</connection-property>
 				    <connection-property name="autoReconnect">true</connection-property>
+				    <connection-property name="allowPublicKeyRetrieval">true</connection-property>
 				    <connection-property name="useLegacyDatetimeCode">false</connection-property>
 				    <connection-property name="serverTimezone">@db.timezone@</connection-property>
 				    
