@@ -23,8 +23,6 @@
 
 package org.lamsfoundation.lams.tool.sbmt.web.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -77,16 +75,11 @@ public class SubmitFilesPedagogicalPlannerController {
     @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
     public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute SubmitFilesPedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request) {
-	List<String> messages = (List<String>) plannerForm.validate(null);
-	if (messages == null && messages.isEmpty()) {
-	    String content = plannerForm.getInstruction();
-	    Long toolContentID = plannerForm.getToolContentID();
-	    SubmitFilesContent submitFiles = submitFilesService.getSubmitFilesContent(toolContentID);
-	    submitFiles.setInstruction(content);
-	    submitFilesService.saveOrUpdateContent(submitFiles);
-	} else {
-	    request.setAttribute("messages", messages);
-	}
+	String content = plannerForm.getInstruction();
+	Long toolContentID = plannerForm.getToolContentID();
+	SubmitFilesContent submitFiles = submitFilesService.getSubmitFilesContent(toolContentID);
+	submitFiles.setInstruction(content);
+	submitFilesService.saveOrUpdateContent(submitFiles);
 	return "authoring/pedagogicalPlannerForm";
     }
 }
