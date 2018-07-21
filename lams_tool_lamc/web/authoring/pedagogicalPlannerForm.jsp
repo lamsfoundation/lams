@@ -103,6 +103,7 @@
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		<c:set var="sessionMap" value="${sessionScope[formBean.httpSessionID]}" />
 		
+		<html:hidden property="toolContentID" styleId="toolContentID" />
 		<html:hidden property="valid" styleId="valid" />
 		<html:hidden property="callID" styleId="callID" />
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
