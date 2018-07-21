@@ -30,17 +30,7 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 
 /**
- * List contains following element: <br>
- *
- * <li>session_id</li>
- * <li>session_name</li>
- * <li>ScratchieItem.uid</li>
- * <li>ScratchieItem.item_type</li>
- * <li>ScratchieItem.create_by_author</li>
- * <li>ScratchieItem.is_hide</li>
- * <li>ScratchieItem.title</li>
- * <li>User.login_name</li>
- * <li>count(scratchie_item_uid)</li>
+ * ScratchieSession DTO
  *
  * @author Andrey Balan
  */
