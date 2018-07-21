@@ -56,11 +56,6 @@ public class ScratchieItem implements Cloneable {
     // ***********************************************
     // DTO fields:
     private boolean isUnraveled;
-
-    private String correctAnswer;
-    private int userMark;
-    private int userAttempts;
-    private String firstChoiceAnswerLetter;
     private String burningQuestion;
 
     /**
@@ -116,11 +111,7 @@ public class ScratchieItem implements Cloneable {
     public void setUid(Long userID) {
 	this.uid = userID;
     }
-
-    /**
-     *
-     * @return
-     */
+    
     public String getTitle() {
 	return title;
     }
@@ -129,10 +120,6 @@ public class ScratchieItem implements Cloneable {
 	this.title = title;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getDescription() {
 	return description;
     }
@@ -141,10 +128,6 @@ public class ScratchieItem implements Cloneable {
 	this.description = description;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getCreateDate() {
 	return createDate;
     }
@@ -153,10 +136,6 @@ public class ScratchieItem implements Cloneable {
 	this.createDate = createDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isCreateByAuthor() {
 	return isCreateByAuthor;
     }
@@ -165,10 +144,6 @@ public class ScratchieItem implements Cloneable {
 	this.isCreateByAuthor = isCreateByAuthor;
     }
 
-    /**
-     *
-     * @return
-     */
     public Integer getOrderId() {
 	return orderId;
     }
@@ -177,13 +152,6 @@ public class ScratchieItem implements Cloneable {
 	this.orderId = orderId;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     * @return
-     */
     public Set getAnswers() {
 	return answers;
     }
@@ -198,38 +166,6 @@ public class ScratchieItem implements Cloneable {
 
     public void setUnraveled(boolean isUnraveled) {
 	this.isUnraveled = isUnraveled;
-    }
-
-    public String getCorrectAnswer() {
-	return correctAnswer;
-    }
-
-    public void setCorrectAnswer(String correctAnswer) {
-	this.correctAnswer = correctAnswer;
-    }
-
-    public int getUserMark() {
-	return userMark;
-    }
-
-    public void setUserMark(int userMark) {
-	this.userMark = userMark;
-    }
-
-    public int getUserAttempts() {
-	return userAttempts;
-    }
-
-    public void setUserAttempts(int userAttempts) {
-	this.userAttempts = userAttempts;
-    }
-
-    public String getFirstChoiceAnswerLetter() {
-	return firstChoiceAnswerLetter;
-    }
-
-    public void setFirstChoiceAnswerLetter(String firstChoiceAnswerLetter) {
-	this.firstChoiceAnswerLetter = firstChoiceAnswerLetter;
     }
 
     public String getBurningQuestion() {
