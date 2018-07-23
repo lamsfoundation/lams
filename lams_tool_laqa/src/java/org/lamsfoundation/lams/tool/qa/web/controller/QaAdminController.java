@@ -20,8 +20,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.qa.web.action;
+package org.lamsfoundation.lams.tool.qa.web.controller;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,9 +44,10 @@ import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
 import org.lamsfoundation.lams.tool.qa.QaWizardCognitiveSkill;
 import org.lamsfoundation.lams.tool.qa.QaWizardQuestion;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAdminForm;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -67,9 +67,11 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
  *
  *
  */
-public class QaAdminAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/laqa11admin")
+public class QaAdminController {
 
-    private static Logger logger = Logger.getLogger(QaAdminAction.class.getName());
+    private static Logger logger = Logger.getLogger(QaAdminController.class.getName());
 
     public static final String ATTR_CATEGORIES = "categories";
     public static final String ATTR_CATEGORY = "category";
@@ -80,20 +82,14 @@ public class QaAdminAction extends LamsDispatchAction {
     public static final String NULL = "null";
     public static final String FILE_EXPORT = "qa-wizard.xml";
 
+    @Autowired
     private IQaService qaService;
 
     /**
      * Sets up the admin page
      */
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	// set up qaService
-	if (qaService == null) {
-	    qaService = QaServiceProxy.getQaService(this.getServlet().getServletContext());
-	}
-
-	QaAdminForm adminForm = (QaAdminForm) form;
+    @RequestMapping("/")
+    public String unspecified(QaAdminForm adminForm, HttpServletRequest request) {
 
 	QaConfigItem enableQaWizard = qaService.getConfigItem(QaConfigItem.KEY_ENABLE_QAWIZARD);
 	if (enableQaWizard != null) {
@@ -103,7 +99,7 @@ public class QaAdminAction extends LamsDispatchAction {
 	request.setAttribute("error", false);
 	request.setAttribute(ATTR_CATEGORIES, getQaWizardCategories());
 
-	return mapping.findForward("config");
+	return "admin/config";
     }
 
     /**
@@ -115,14 +111,8 @@ public class QaAdminAction extends LamsDispatchAction {
      * @param response
      * @return
      */
-    public ActionForward saveContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	QaAdminForm adminForm = (QaAdminForm) form;
-
-	// set up mdlForumService
-	if (qaService == null) {
-	    qaService = QaServiceProxy.getQaService(this.getServlet().getServletContext());
-	}
+    @RequestMapping("/saveContent")
+    public String saveContent(QaAdminForm adminForm, HttpServletRequest request) {
 
 	QaConfigItem enableQaWizard = qaService.getConfigItem(QaConfigItem.KEY_ENABLE_QAWIZARD);
 
@@ -144,7 +134,7 @@ public class QaAdminAction extends LamsDispatchAction {
 
 	request.setAttribute(ATTR_CATEGORIES, getQaWizardCategories());
 	request.setAttribute("savedSuccess", true);
-	return mapping.findForward("config");
+	return "admin/config";
 
     }
 
@@ -199,7 +189,7 @@ public class QaAdminAction extends LamsDispatchAction {
     @SuppressWarnings("unchecked")
     public void updateWizardFromXML(String xmlStr) {
 	//SortedSet<QaWizardCategory> currentCategories = getQaWizardCategories();
-	SortedSet<QaWizardCategory> newCategories = new TreeSet<QaWizardCategory>();
+	SortedSet<QaWizardCategory> newCategories = new TreeSet<>();
 	try {
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder db = dbf.newDocumentBuilder();
@@ -289,16 +279,11 @@ public class QaAdminAction extends LamsDispatchAction {
      * @param response
      * @return
      */
-    public ActionForward exportWizard(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	// set up mdlForumService
-	if (qaService == null) {
-	    qaService = QaServiceProxy.getQaService(this.getServlet().getServletContext());
-	}
+    @RequestMapping("/exportWizard")
+    public String exportWizard(HttpServletResponse response) throws Exception {
 
 	// now start the export
-	SortedSet<QaWizardCategory> exportCategories = new TreeSet<QaWizardCategory>();
+	SortedSet<QaWizardCategory> exportCategories = new TreeSet<>();
 	for (QaWizardCategory category : getQaWizardCategories()) {
 	    exportCategories.add((QaWizardCategory) category.clone());
 	}
@@ -346,10 +331,6 @@ public class QaAdminAction extends LamsDispatchAction {
     public ActionForward importWizard(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	QaAdminForm adminForm = (QaAdminForm) form;
-
-	if (qaService == null) {
-	    qaService = QaServiceProxy.getQaService(this.getServlet().getServletContext());
-	}
 
 	// First save the config items
 	QaConfigItem enableQaWizard = qaService.getConfigItem(QaConfigItem.KEY_ENABLE_QAWIZARD);

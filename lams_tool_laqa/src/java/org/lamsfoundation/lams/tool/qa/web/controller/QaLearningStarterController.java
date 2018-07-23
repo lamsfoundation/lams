@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.qa.web.action;
+package org.lamsfoundation.lams.tool.qa.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
@@ -67,10 +67,15 @@ import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaLearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * This class is used to load the default content and initialize the presentation Map for Learner mode.
@@ -80,10 +85,17 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @author Ozgur Demirtas
  *
  */
-public class QaLearningStarterAction extends Action implements QaAppConstants {
-    private static Logger logger = Logger.getLogger(QaLearningStarterAction.class.getName());
+@Controller
+@RequestMapping("/learningStarter")
+public class QaLearningStarterController implements QaAppConstants {
+    private static Logger logger = Logger.getLogger(QaLearningStarterController.class.getName());
 
-    private static IQaService qaService;
+    @Autowired
+    private IQaService qaService;
+
+    @Autowired
+    @Qualifier("qaMessageService")
+    private MessageService messageService;
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,

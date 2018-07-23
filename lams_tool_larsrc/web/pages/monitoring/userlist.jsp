@@ -15,7 +15,7 @@
  	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrccommon.js'/>"></script>
+	<script type="text/javascript" src="<c:url page='/includes/javascript/rsrccommon.js'/>"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script> 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 

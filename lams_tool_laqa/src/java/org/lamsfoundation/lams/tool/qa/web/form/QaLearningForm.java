@@ -21,17 +21,14 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.web.form;
 
-/** ActionForm for the Learning environment */
-import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 
 /**
  * @author Ozgur Demirtas
  */
-public class QaLearningForm extends ActionForm implements QaAppConstants {
+public class QaLearningForm implements QaAppConstants {
 
     //controls which method is called by the Lookup map */
     protected String method;

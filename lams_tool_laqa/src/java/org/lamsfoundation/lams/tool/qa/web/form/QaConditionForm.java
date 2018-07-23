@@ -20,13 +20,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.web.form;
 
 import org.apache.struts.util.LabelValueBean;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
-import org.lamsfoundation.lams.web.TextSearchActionForm;
+import org.lamsfoundation.lams.web.TextSearchForm;
 
 /**
  * A text search form with additional parameters for Q&A needs.
@@ -34,7 +33,7 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
  * @author Marcin Cieslak
  *
  */
-public class QaConditionForm extends TextSearchActionForm {
+public class QaConditionForm extends TextSearchForm {
     /**
      * Names of the questions that could be selected by a user.
      */

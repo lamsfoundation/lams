@@ -23,12 +23,7 @@
 
 package org.lamsfoundation.lams.tool.rsrc.web.form;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 
@@ -40,7 +35,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.Resource;
  *
  * User: Dapeng.Ni
  */
-public class ResourceForm extends ActionForm {
+public class ResourceForm {
     private static final long serialVersionUID = 3599879328307492312L;
 
     private static Logger logger = Logger.getLogger(ResourceForm.class.getName());
@@ -51,6 +46,7 @@ public class ResourceForm extends ActionForm {
     private int currentTab;
     private FormFile offlineFile;
     private FormFile onlineFile;
+    
 
     private Resource resource;
 
@@ -65,21 +61,6 @@ public class ResourceForm extends ActionForm {
 	// set Form special varaible from given forum
 	if (resource == null) {
 	    logger.error("Initial ResourceForum failed by null value of Resource.");
-	}
-    }
-
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
-	String param = mapping.getParameter();
-	// if it is start page, all data read out from database or current session
-	// so need not reset checkbox to refresh value!
-	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
-	    resource.setAllowAddFiles(false);
-	    resource.setAllowAddUrls(false);
-	    resource.setLockWhenFinished(false);
-	    resource.setDefineLater(false);
-	    resource.setRunAuto(false);
-	    resource.setReflectOnActivity(false);
 	}
     }
 

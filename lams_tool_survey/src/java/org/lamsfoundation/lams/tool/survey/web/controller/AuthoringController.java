@@ -346,7 +346,7 @@ public class AuthoringController {
      *
      */
     @RequestMapping(value = "/start")
-    public String start(SurveyForm startForm, HttpServletRequest request) throws Exception {
+    private String start(SurveyForm startForm, HttpServletRequest request) throws Exception {
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());

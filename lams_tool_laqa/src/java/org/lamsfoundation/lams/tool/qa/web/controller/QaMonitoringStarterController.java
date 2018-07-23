@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.qa.web.action;
+package org.lamsfoundation.lams.tool.qa.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
@@ -62,14 +62,18 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Starts up the monitoring module
  *
  * @author Ozgur Demirtas
  */
-public class QaMonitoringStarterAction extends Action implements QaAppConstants {
-    private static Logger logger = Logger.getLogger(QaMonitoringStarterAction.class.getName());
+@Controller
+@RequestMapping("/monitoringStarter")
+public class QaMonitoringStarterController implements QaAppConstants {
+    private static Logger logger = Logger.getLogger(QaMonitoringStarterController.class.getName());
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,

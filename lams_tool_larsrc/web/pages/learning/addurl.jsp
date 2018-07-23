@@ -9,39 +9,39 @@
 	
 	<%@ include file="/common/messages.jsp"%>
 	
-	<html:form action="/learning/saveOrUpdateItem" method="post" styleId="resourceItemForm" focus="title" enctype="multipart/form-data">
+	<form:form action="saveOrUpdateItem.do" method="post" modelAttribute="resourceItemForm" id="resourceItemForm" focus="title">
 	
-		<html:hidden property="itemType" styleId="itemType" />
-		<html:hidden property="mode" styleId="mode"/>
-		<html:hidden property="sessionMapID"/>
+		<form:hidden path="itemType" id="itemType" />
+		<form:hidden path="mode" id="mode"/>
+		<form:hidden path="sessionMapID"/>
 	
 		<div class="form-group">
 	    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
-			<html:text property="title" tabindex="1" styleClass="form-control" styleId="resourcetitle"/>
+			<form:input path="title" tabindex="1" cssClass="form-control" id="resourcetitle"/>
 	  	</div>	
 
 		<div class="form-group" id="addurl">
 	    	<label for="url"><fmt:message key="label.authoring.basic.resource.url.input" /></label>
-			<html:text property="url" styleClass="form-control" tabindex="2" styleId="url"/><br/>&nbsp;
-	        <label><html:checkbox property="openUrlNewWindow" tabindex="3" styleId="openUrlNewWindow" ></html:checkbox>&nbsp;
+			<form:input="url" cssClass="form-control" tabindex="2" id="url"/><br/>&nbsp;
+	        <label><form:checkbox path="openUrlNewWindow" tabindex="3" id="openUrlNewWindow" />&nbsp;
 			 <fmt:message key="open.in.new.window" /></label>
 	    </div>
 
 		<div class="form-group">
 	    	<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>
-			<html:text property="description" tabindex="5" maxlength="255" styleClass="form-control" />
+			<form:input path="description" tabindex="5" maxlength="255" cssClass="form-control" />
 	  	</div>	
 
 		<div id="buttons" class="pull-right" >
-	 		<html:button property="goback" onclick="javascript:cancel()" styleClass="btn btn-sm btn-default" styleId="cancelButton">
+	 		<form:button path="goback" onclick="javascript:cancel()" cssClass="btn btn-sm btn-default" id="cancelButton">
 				<fmt:message key="button.cancel" />
-			</html:button>&nbsp;
-			<html:submit styleClass="btn btn-sm btn-default btn-disable-on-submit" styleId="submitButton">
+			</form:button>&nbsp;
+			<input type="submit" cssClass="btn btn-sm btn-default btn-disable-on-submit" id="submitButton">
 			 	<fmt:message key="button.add" />
-			</html:submit>
+			</input>
 		</div>
 	
-	</html:form>
+	</form:form>
 	
 	<script type="text/javascript">
 		$(document).ready(function(){

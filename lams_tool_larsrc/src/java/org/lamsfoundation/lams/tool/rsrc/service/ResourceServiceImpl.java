@@ -44,7 +44,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -112,6 +111,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -488,13 +488,13 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		    }
 		}
 	    }
-	    
+
 	    group.setAllowComments(allowComments);
 
 	    groupList.add(group);
 	}
 
-	if ( groupList.size() == 0) {
+	if (groupList.size() == 0) {
 	    // no sessions but we still need to be able to view the resources in monitoring
 	    groupList.add(createAuthoredItemsGroupList(contentId, resource));
 	}
@@ -506,7 +506,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	group.setSessionId(0L);
 	group.setSessionName("");
 
-	Set<ResourceItem> items = new TreeSet<ResourceItem>(new ResourceItemComparator());
+	Set<ResourceItem> items = new TreeSet<>(new ResourceItemComparator());
 	// get the authored items
 	items.addAll(resource.getResourceItems());
 
@@ -514,10 +514,10 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	for (ResourceItem item : items) {
 	    ResourceItemDTO resourceItemDTO = new ResourceItemDTO(item);
 	    group.getItems().add(resourceItemDTO);
-	    if ( item.isAllowRating() ) {
+	    if (item.isAllowRating()) {
 		group.setAllowRating(true);
 	    }
-	    if ( item.isAllowComments() ) {
+	    if (item.isAllowComments()) {
 		group.setAllowComments(true);
 	    }
 	}
@@ -700,10 +700,10 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(FormFile file) throws UploadResourceFileException {
+    private NodeKey processFile(MultipartFile file) throws UploadResourceFileException {
 	NodeKey node = null;
-	if ((file != null) && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
+	if ((file != null) && !StringUtils.isEmpty(file.getOriginalFilename())) {
+	    String fileName = file.getOriginalFilename();
 	    try {
 		node = resourceToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
@@ -732,10 +732,10 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public void uploadResourceItemFile(ResourceItem item, FormFile file) throws UploadResourceFileException {
+    public void uploadResourceItemFile(ResourceItem item, MultipartFile file) throws UploadResourceFileException {
 	try {
 	    InputStream is = file.getInputStream();
-	    String fileName = file.getFileName();
+	    String fileName = file.getOriginalFilename();
 	    String fileType = file.getContentType();
 	    // For file only upload one sigle file
 	    if (item.getType() == ResourceConstants.RESOURCE_TYPE_FILE) {

@@ -25,7 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
-	<html:base />
+<!--<html:base />  -->	
 	<%@ include file="/common/header.jsp"%>
 
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />

@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.qa.web.action;
+package org.lamsfoundation.lams.tool.qa.web.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,10 +35,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -61,14 +58,18 @@ import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Initializes the tool's authoring mode
  *
  * @author Ozgur Demirtas
  */
-public class QaStarterAction extends Action implements QaAppConstants {
-    private static Logger logger = Logger.getLogger(QaStarterAction.class.getName());
+@Controller
+@RequestMapping("/authoringStarter")
+public class QaStarterController implements QaAppConstants {
+    private static Logger logger = Logger.getLogger(QaStarterController.class.getName());
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -97,7 +98,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	qaAuthoringForm.setToolContentID(strToolContentID);
 
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, "");
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, "");
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
@@ -190,7 +191,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
-	SortedSet<QaCondition> conditionSet = new TreeSet<QaCondition>(new TextSearchConditionComparator());
+	SortedSet<QaCondition> conditionSet = new TreeSet<>(new TextSearchConditionComparator());
 	for (QaCondition condition : qaContent.getConditions()) {
 	    conditionSet.add(condition);
 	    for (QaQuestionDTO dto : questionDTOs) {
@@ -203,7 +204,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	}
 	sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, conditionSet);
 
-	List<QaQuestionDTO> listDeletedQuestionDTOs = new ArrayList<QaQuestionDTO>();
+	List<QaQuestionDTO> listDeletedQuestionDTOs = new ArrayList<>();
 	sessionMap.put(QaAppConstants.LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
 
 	qaAuthoringForm.resetUserAction();
@@ -231,11 +232,11 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	try {
 	    defaultContentID = qaService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    if (defaultContentID == 0) {
-		QaStarterAction.logger.debug("default content id has not been setup");
+		QaStarterController.logger.debug("default content id has not been setup");
 		return false;
 	    }
 	} catch (Exception e) {
-	    QaStarterAction.logger.error("error getting the default content id: " + e.getMessage());
+	    QaStarterController.logger.error("error getting the default content id: " + e.getMessage());
 	    persistError(request, "error.defaultContent.notSetup");
 	    return false;
 	}
@@ -247,13 +248,13 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    //retrieve uid of the content based on default content id determined above
 	    QaContent qaContent = qaService.getQaContent(defaultContentID);
 	    if (qaContent == null) {
-		QaStarterAction.logger.error("Exception occured: No default content");
+		QaStarterController.logger.error("Exception occured: No default content");
 		persistError(request, "error.defaultContent.notSetup");
 		return false;
 	    }
 
 	} catch (Exception e) {
-	    QaStarterAction.logger.error("Exception occured: No default question content");
+	    QaStarterController.logger.error("Exception occured: No default question content");
 	    persistError(request, "error.defaultContent.notSetup");
 	    return false;
 	}
@@ -276,7 +277,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
     private SortedSet<QaCondition> getQaConditionList(SessionMap<String, Object> sessionMap) {
 	SortedSet<QaCondition> list = (SortedSet<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
 	if (list == null) {
-	    list = new TreeSet<QaCondition>(new TextSearchConditionComparator());
+	    list = new TreeSet<>(new TextSearchConditionComparator());
 	    sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, list);
 	}
 	return list;

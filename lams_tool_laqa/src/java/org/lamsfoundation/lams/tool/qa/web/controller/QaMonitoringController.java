@@ -19,7 +19,7 @@ USA
 http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.qa.web.action;
+package org.lamsfoundation.lams.tool.qa.web.controller;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
@@ -54,9 +53,14 @@ import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -66,17 +70,23 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Ozgur Demirtas
  */
-public class QaMonitoringAction extends LamsDispatchAction implements QaAppConstants {
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
+@Controller
+@RequestMapping("/monitoring")
+public class QaMonitoringController implements QaAppConstants {
+
+    @Autowired
+    private IQaService qaService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
+
+    @RequestMapping("/")
+    public String unspecified() throws IOException, ServletException, ToolException {
 	return null;
     }
 
-    public ActionForward updateResponse(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-
-	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+    @RequestMapping("/updateResponse")
+    public String updateResponse(HttpServletRequest request) throws IOException, ServletException {
 
 	Long responseUid = WebUtil.readLongParam(request, QaAppConstants.RESPONSE_UID);
 	String updatedResponse = request.getParameter("updatedResponse");
@@ -99,9 +109,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	return null;
     }
 
-    public ActionForward updateResponseVisibility(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
-	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+    @RequestMapping("/updateResponseVisibility")
+    public String updateResponseVisibility(HttpServletRequest request)
+	    throws IOException, ServletException, ToolException {
 
 	Long responseUid = WebUtil.readLongParam(request, QaAppConstants.RESPONSE_UID);
 	boolean isHideItem = WebUtil.readBooleanParam(request, QaAppConstants.IS_HIDE_ITEM);
@@ -120,9 +130,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
      * @return
      * @throws IOException
      */
-    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	IQaService qaService = getQAService();
+    @RequestMapping("/setSubmissionDeadline")
+    public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	QaContent content = qaService.getQaContent(contentID);
@@ -158,9 +167,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
      * @param response
      * @return
      */
-    public ActionForward setShowOtherAnswersAfterDeadline(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) {
-	IQaService qaService = getQAService();
+    @RequestMapping("/setShowOtherAnswersAfterDeadline")
+    public String setShowOtherAnswersAfterDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	QaContent content = qaService.getQaContent(contentID);
@@ -174,20 +183,18 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
 
     private IQaService getQAService() {
-	return QaServiceProxy.getQaService(getServlet().getServletContext());
+	return QaServiceProxy.getQaService(applicationContext.getServletContext());
     }
 
     /**
      * Get Paged Reflections
      *
-     * @param mapping
-     * @param form
      * @param request
-     * @param response
      * @return
      */
-    public ActionForward getReflectionsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
+    @RequestMapping(path = "/getReflectionsJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getReflectionsJSON(HttpServletRequest request) throws IOException, ServletException, ToolException {
 
 	Long toolSessionId = WebUtil.readLongParam(request, QaAppConstants.TOOL_SESSION_ID);
 
@@ -221,21 +228,18 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    rows.add(responseRow);
 	}
 	responsedata.set("rows", rows);
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(new String(responsedata.toString()));
-	return null;
+	return responsedata.toString();
     }
 
     /**
      * Start to download the page that has an HTML version of the answers. Calls answersDownload
      * which forwards to the jsp to download the file.
-     * 
+     *
      * @throws ServletException
      */
-    public ActionForward getPrintAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/getPrintAnswers")
+    public String getPrintAnswers(HttpServletRequest request) throws ServletException {
 
-	IQaService qaService = getQAService();
 	Long allUserIdValue = -1L;
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -285,15 +289,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	Map<Long, List<RatingCommentDTO>> commentMap = null;
 	if (isAllowRateAnswers && !responses.isEmpty()) {
 	    //create itemIds list
-	    List<Long> itemIds = new LinkedList<Long>();
+	    List<Long> itemIds = new LinkedList<>();
 	    for (QaUsrResp usrResponse : responses) {
 		itemIds.add(usrResponse.getResponseId());
 	    }
 	    List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(),
 		    toolSessionID, itemIds, true, allUserIdValue);
 	    if (itemRatingDtos.size() > 0) {
-		criteriaMap = new HashMap<Long, Collection>();
-		commentMap = new HashMap<Long, List<RatingCommentDTO>>();
+		criteriaMap = new HashMap<>();
+		commentMap = new HashMap<>();
 		for (ItemRatingDTO itemRatingDto : itemRatingDtos) {
 		    criteriaMap.put(itemRatingDto.getItemId(), itemRatingDto.getCriteriaDtos());
 		    commentMap.put(itemRatingDto.getItemId(), itemRatingDto.getCommentDtos());
@@ -304,7 +308,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	request.setAttribute("commentMap", commentMap);
 	request.setAttribute(QaAppConstants.ATTR_CONTENT, qaContent);
 
-	return (mapping.findForward("PrintAnswers"));
+	return "monitoring/PrintAnswers";
     }
 
 }

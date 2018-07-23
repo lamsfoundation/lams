@@ -49,8 +49,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -68,7 +66,6 @@ import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourcePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -82,6 +79,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Steve.Ni
@@ -356,8 +354,8 @@ public class AuthoringController {
      * @throws ServletException
      *
      */
-    @RequestMapping("/start")
-    private String start(ResourceForm authoringForm, HttpServletRequest request) throws ServletException {
+    @RequestMapping(value="/start")
+    private String start(@ModelAttribute ResourceForm startForm, HttpServletRequest request) throws ServletException {
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
@@ -372,12 +370,12 @@ public class AuthoringController {
 
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	authoringForm.setContentFolderID(contentFolderID);
+	startForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	authoringForm.setSessionMapID(sessionMap.getSessionID());
+	startForm.setSessionMapID(sessionMap.getSessionID());
 
 	try {
 	    resource = resourceService.getResourceByContentId(contentId);
@@ -393,7 +391,7 @@ public class AuthoringController {
 		items = resourceService.getAuthoredItems(resource.getUid());
 	    }
 
-	    authoringForm.setResource(resource);
+	    startForm.setResource(resource);
 	} catch (Exception e) {
 	    AuthoringController.log.error(e);
 	    throw new ServletException(e);
@@ -432,9 +430,10 @@ public class AuthoringController {
 	    i++;
 	}
 
-	sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, authoringForm);
+	sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, startForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
+	request.setAttribute("startForm", startForm);
 	return "pages/authoring/start";
     }
 
@@ -538,20 +537,21 @@ public class AuthoringController {
      */
 
     @RequestMapping("/init")
-    private String initPage(ResourceForm AuthoringForm, HttpServletRequest request) throws ServletException {
+    private String initPage(@ModelAttribute ResourceForm startForm, HttpServletRequest request) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	ResourceForm existForm = (ResourceForm) sessionMap.get(ResourceConstants.ATTR_RESOURCE_FORM);
 
 	try {
-	    PropertyUtils.copyProperties(AuthoringForm, existForm);
+	    PropertyUtils.copyProperties(startForm, existForm);
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	request.setAttribute("authoringForm", startForm);
 
 	return "pages/authoring/authoring";
     }
@@ -568,7 +568,7 @@ public class AuthoringController {
      * @throws ServletException
      */
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    private String updateContent(ResourceForm authoringForm, HttpServletRequest request) throws Exception {
+    private String updateContent(@ModelAttribute ResourceForm authoringForm, HttpServletRequest request) throws Exception {
 
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -680,6 +680,7 @@ public class AuthoringController {
 	authoringForm.setResource(resourcePO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute("authoringForm", authoringForm);
 
 	return "pages/authoring/authoring";
     }
@@ -939,7 +940,7 @@ public class AuthoringController {
      * @param resourceItemForm
      * @return
      */
-    private void validateResourceItem(ResourceItemForm resourceItemForm,  MultiValueMap<String, String> errorMap) {
+    private void validateResourceItem(ResourceItemForm resourceItemForm, MultiValueMap<String, String> errorMap) {
 	if (StringUtils.isBlank(resourceItemForm.getTitle())) {
 	    errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_TITLE_BLANK));
 	}
@@ -967,10 +968,11 @@ public class AuthoringController {
 		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
 	    // validate item size
-	    boolean fileSizeValid = FileValidatorSpringUtil.validateFileSize(resourceItemForm.getFile().getSize(), false);
+	    boolean fileSizeValid = FileValidatorSpringUtil.validateFileSize(resourceItemForm.getFile().getSize(),
+		    false);
 	    // for edit validate: file already exist
 	    if (!resourceItemForm.isHasFile() && (resourceItemForm.getFile() == null
-		    || StringUtils.isEmpty(resourceItemForm.getFile().getFileName()))) {
+		    || StringUtils.isEmpty(resourceItemForm.getFile().getOriginalFilename()))) {
 		errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
 	    }
 	}
@@ -990,8 +992,10 @@ public class AuthoringController {
     @RequestMapping(value = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
     public String saveOrUpdatePedagogicalPlannerForm(ResourcePedagogicalPlannerForm pedagogicalPlannerForm,
 	    HttpServletRequest request) throws IOException {
-	pedagogicalPlannerForm.validate();
-	if (errors.isEmpty()) {
+
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	pedagogicalPlannerForm.validate(messageService);
+	if (errorMap.isEmpty()) {
 	    Resource taskList = resourceService.getResourceByContentId(pedagogicalPlannerForm.getToolContentID());
 	    taskList.setInstructions(pedagogicalPlannerForm.getInstructions());
 
@@ -1045,9 +1049,9 @@ public class AuthoringController {
 			    resourceItem.setFileType(null);
 			}
 		    } else if (type.equals(ResourceConstants.RESOURCE_TYPE_FILE)) {
-			FormFile file = pedagogicalPlannerForm.getFile(itemIndex);
+			MultipartFile file = pedagogicalPlannerForm.getFile(itemIndex);
 			resourceItem.setUrl(null);
-			if (file != null && !StringUtils.isEmpty(file.getFileName())) {
+			if (file != null && !StringUtils.isEmpty(file.getOriginalFilename())) {
 			    try {
 				if (hasFile) {
 				    // delete the old file
@@ -1058,8 +1062,8 @@ public class AuthoringController {
 			    } catch (Exception e) {
 				AuthoringController.log.error(e);
 				ActionMessage error = new ActionMessage("error.msg.io.exception");
-				errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-				saveErrors(request, errors);
+				errorMap.add("GLOBAL", messageService.getMessage("error.msg.io.exception"));
+				request.setAttribute("errorMap", errorMap);
 				pedagogicalPlannerForm.setValid(false);
 				return "pages/authoring/pedagogicalPlannerForm";
 			    }
@@ -1086,7 +1090,7 @@ public class AuthoringController {
 	    taskList.getResourceItems().addAll(resourceItems);
 	    resourceService.saveOrUpdateResource(taskList);
 	} else {
-	    saveErrors(request, errors);
+	    request.setAttribute("errorMap", errorMap);
 	}
 	return "pages/authoring/pedagogicalPlannerForm";
     }

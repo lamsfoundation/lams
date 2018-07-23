@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.rsrc.web.action;
+package org.lamsfoundation.lams.tool.rsrc.web.controller;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -29,17 +29,12 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
@@ -57,48 +52,27 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class MonitoringAction extends Action {
-    public static Logger log = Logger.getLogger(MonitoringAction.class);
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
+    public static Logger log = Logger.getLogger(MonitoringController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	String param = mapping.getParameter();
+    @Autowired
+    @Qualifier("resourceService")
+    private IResourceService resourceService;
 
-	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
-
-	if (param.equals("summary")) {
-	    return summary(mapping, form, request, response);
-	}
-	if (param.equals("listuser")) {
-	    return listuser(mapping, form, request, response);
-	}
-	if (param.equals("changeItemVisibility")) {
-	    return changeItemVisibility(mapping, form, request, response);
-	}
-	if (param.equals("getSubgridData")) {
-	    return getSubgridData(mapping, form, request, response);
-	}
-	if (param.equals("viewReflection")) {
-	    return viewReflection(mapping, form, request, response);
-	}
-	if (param.equals("viewComments")) {
-	    return viewComments(mapping, form, request, response);
-	}
-
-	return mapping.findForward(ResourceConstants.ERROR);
-    }
-
-    private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/summary")
+    private String summary(HttpServletRequest request) {
 	// initial Session Map
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -108,14 +82,13 @@ public class MonitoringAction extends Action {
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	IResourceService service = getResourceService();
-	List<SessionDTO> groupList = service.getSummary(contentId);
+	List<SessionDTO> groupList = resourceService.getSummary(contentId);
 
-	Resource resource = service.getResourceByContentId(contentId);
+	Resource resource = resourceService.getResourceByContentId(contentId);
 
 	// Create reflectList if reflection is enabled.
 	if (resource.isReflectOnActivity()) {
-	    List<ReflectDTO> relectList = service.getReflectList(contentId);
+	    List<ReflectDTO> relectList = resourceService.getReflectList(contentId);
 	    sessionMap.put(ResourceConstants.ATTR_REFLECT_LIST, relectList);
 	}
 
@@ -124,27 +97,25 @@ public class MonitoringAction extends Action {
 	sessionMap.put(ResourceConstants.PAGE_EDITABLE, resource.isContentInUse());
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE, resource);
 	sessionMap.put(ResourceConstants.ATTR_TOOL_CONTENT_ID, contentId);
-	sessionMap.put(ResourceConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	sessionMap.put(ResourceConstants.ATTR_IS_GROUPED_ACTIVITY, resourceService.isGroupedActivity(contentId));
+	return "pages/monitoring/monitoring";
     }
 
-    private ActionForward listuser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/listuser")
+    private String listuser(HttpServletRequest request) {
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID);
 
 	// get user list by given item uid
-	IResourceService service = getResourceService();
-	List list = service.getUserListBySessionItem(sessionId, itemUid);
+	List list = resourceService.getUserListBySessionItem(sessionId, itemUid);
 
 	// set to request
 	request.setAttribute(ResourceConstants.ATTR_USER_LIST, list);
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	return "pages/monitoring/userlist";
     }
 
-    private ActionForward getSubgridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	IResourceService service = getResourceService();
+    @RequestMapping("/getSubgridData")
+    private String getSubgridData(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.ATTR_RESOURCE_ITEM_UID);
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -159,9 +130,9 @@ public class MonitoringAction extends Action {
 	}
 	String searchString = WebUtil.readStrParam(request, "userName", true);
 
-	List<VisitLogDTO> visitLogDtos = service.getPagedVisitLogsBySessionAndItem(sessionId, itemUid, page - 1,
+	List<VisitLogDTO> visitLogDtos = resourceService.getPagedVisitLogsBySessionAndItem(sessionId, itemUid, page - 1,
 		rowLimit, sortBy, sortOrder, searchString);
-	int countVisitLogs = service.getCountVisitLogsBySessionAndItem(sessionId, itemUid, searchString);
+	int countVisitLogs = resourceService.getCountVisitLogsBySessionAndItem(sessionId, itemUid, searchString);
 
 	int totalPages = new Double(
 		Math.ceil(new Integer(countVisitLogs).doubleValue() / new Integer(rowLimit).doubleValue())).intValue();
@@ -210,30 +181,28 @@ public class MonitoringAction extends Action {
 	return null;
     }
 
-    private ActionForward changeItemVisibility(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/changeItemVisibility")
+    private String changeItemVisibility(HttpServletRequest request) {
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID);
 	boolean isHideItem = WebUtil.readBooleanParam(request, ResourceConstants.PARAM_IS_HIDE_ITEM);
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	IResourceService service = getResourceService();
-	service.setItemVisible(itemUid, sessionId, contentId, !isHideItem);
+	resourceService.setItemVisible(itemUid, sessionId, contentId, !isHideItem);
 
 	return null;
     }
 
-    private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/viewReflection")
+    private String viewReflection(HttpServletRequest request) {
 
 	Long uid = WebUtil.readLongParam(request, ResourceConstants.ATTR_USER_UID);
 	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	IResourceService service = getResourceService();
-	ResourceUser user = service.getUser(uid);
-	NotebookEntry notebookEntry = service.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+	ResourceUser user = resourceService.getUser(uid);
+	NotebookEntry notebookEntry = resourceService.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		ResourceConstants.TOOL_SIGNATURE, user.getUserId().intValue());
 
-	ResourceSession session = service.getResourceSessionBySessionId(sessionID);
+	ResourceSession session = resourceService.getResourceSessionBySessionId(sessionID);
 
 	ReflectDTO refDTO = new ReflectDTO(user);
 	if (notebookEntry == null) {
@@ -246,11 +215,11 @@ public class MonitoringAction extends Action {
 	refDTO.setReflectInstrctions(session.getResource().getReflectInstructions());
 
 	request.setAttribute("userDTO", refDTO);
-	return mapping.findForward("success");
+	return "pages/monitoring/reflections";
     }
 
-    private ActionForward viewComments(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/viewComments")
+    private String viewComments(HttpServletRequest request) {
 
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.ATTR_RESOURCE_ITEM_UID);
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -274,15 +243,7 @@ public class MonitoringAction extends Action {
 	request.setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_UID, itemUid);
 	request.setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID, sessionId);
 	request.setAttribute("mode", "teacher");
-	return mapping.findForward("success");
+	return "pages/monitoring/comments";
     }
 
-    // *************************************************************************************
-    // Private method
-    // *************************************************************************************
-    private IResourceService getResourceService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
-    }
 }
