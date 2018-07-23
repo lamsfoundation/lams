@@ -144,8 +144,15 @@ public class SignupAction extends Action {
 
     private void sendWelcomeEmail(User user) throws AddressException, MessagingException, UnsupportedEncodingException {
 	String subject = messageService.getMessage("signup.email.welcome.subject");
-	String body = messageService.getMessage("signup.email.welcome.body",
-		new Object[] { user.getLogin(), Configuration.get(ConfigurationKeys.SERVER_URL) });
+	String body = new StringBuilder(messageService.getMessage("signup.email.welcome.body.1")).append("<br /><br />")
+		.append(messageService.getMessage("signup.email.welcome.body.2",
+			new Object[] { user.getLogin(), Configuration.get(ConfigurationKeys.SERVER_URL) }))
+		.append("<br />").append(messageService.getMessage("signup.email.welcome.body.3"))
+		.append("<br /><a href=\"").append(Configuration.get(ConfigurationKeys.SERVER_URL))
+		.append("forgotPassword.jsp\">").append(Configuration.get(ConfigurationKeys.SERVER_URL))
+		.append("forgotPassword.jsp</a><br /><br />")
+		.append(messageService.getMessage("signup.email.welcome.body.4")).append("<br />")
+		.append(messageService.getMessage("signup.email.welcome.body.5")).toString();
 	boolean isHtmlFormat = true;
 
 	Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
@@ -154,10 +161,18 @@ public class SignupAction extends Action {
     private void sendVerificationEmail(User user)
 	    throws AddressException, MessagingException, UnsupportedEncodingException {
 	String hash = HashUtil.sha256(user.getEmail(), user.getSalt());
-	String link = Configuration.get(ConfigurationKeys.SERVER_URL) + "signup/signup.do?method=emailVerify&login="
-		+ URLEncoder.encode(user.getLogin(), "UTF-8") + "&hash=" + hash;
+	StringBuilder stringBuilder = new StringBuilder().append(Configuration.get(ConfigurationKeys.SERVER_URL))
+		.append("signup/signup.do?method=emailVerify&login=")
+		.append(URLEncoder.encode(user.getLogin(), "UTF-8")).append("&hash=").append(hash);
+	String link = stringBuilder.toString();
+
 	String subject = messageService.getMessage("signup.email.verify.subject");
-	String body = messageService.getMessage("signup.email.verify.body", new Object[] { link });
+	stringBuilder = new StringBuilder(messageService.getMessage("signup.email.verify.body.1"))
+		.append("<br /><br />").append(messageService.getMessage("signup.email.verify.body.2"))
+		.append("<br /><a href=\"").append(link).append("\">").append(link).append("</a><br /><br />")
+		.append(messageService.getMessage("signup.email.verify.body.3")).append("<br />")
+		.append(messageService.getMessage("signup.email.verify.body.4"));
+	String body = stringBuilder.toString();
 	boolean isHtmlFormat = true;
 
 	Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
