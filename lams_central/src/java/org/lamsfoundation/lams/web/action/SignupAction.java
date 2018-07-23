@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
@@ -37,6 +38,7 @@ public class SignupAction extends Action {
     private static Logger log = Logger.getLogger(SignupAction.class);
     private static ISignupService signupService = null;
     private static ITimezoneService timezoneService = null;
+    private static MessageService messageService = null;
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -46,11 +48,12 @@ public class SignupAction extends Action {
 	    return emailVerify(mapping, form, request, response);
 	}
 
-	if (signupService == null || timezoneService == null) {
+	if (signupService == null || timezoneService == null || messageService == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    signupService = (ISignupService) wac.getBean("signupService");
 	    timezoneService = (ITimezoneService) wac.getBean("timezoneService");
+	    messageService = (MessageService) wac.getBean("centralMessageService");
 	}
 
 	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(true));
@@ -140,16 +143,10 @@ public class SignupAction extends Action {
     }
 
     private void sendWelcomeEmail(User user) throws AddressException, MessagingException, UnsupportedEncodingException {
-	String subject = "LAMS: account details";
-	String body = "Hi there,\n\n";
-	body += "You've successfully registered an account with username " + user.getLogin();
-	body += " on the LAMS server at " + Configuration.get(ConfigurationKeys.SERVER_URL);
-	body += ".  If you ever forget your password, you can reset it via this URL "
-		+ Configuration.get(ConfigurationKeys.SERVER_URL) + "/forgotPassword.jsp.";
-	body += "\n\n";
-	body += "Regards,\n";
-	body += "LAMS Signup System";
-	boolean isHtmlFormat = false;
+	String subject = messageService.getMessage("signup.email.welcome.subject");
+	String body = messageService.getMessage("signup.email.welcome.body",
+		new Object[] { user.getLogin(), Configuration.get(ConfigurationKeys.SERVER_URL) });
+	boolean isHtmlFormat = true;
 
 	Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
     }
@@ -159,12 +156,8 @@ public class SignupAction extends Action {
 	String hash = HashUtil.sha256(user.getEmail(), user.getSalt());
 	String link = Configuration.get(ConfigurationKeys.SERVER_URL) + "signup/signup.do?method=emailVerify&login="
 		+ URLEncoder.encode(user.getLogin(), "UTF-8") + "&hash=" + hash;
-	String subject = "LAMS: confirm email address";
-	String body = "Hi there,<br/><br/>";
-	body += "Please confirm your email address by clicking on the link below<br/>";
-	body += "<a href=\"" + link + "\">" + link + "</a><br /><br />";
-	body += "Regards,<br />";
-	body += "LAMS Signup System";
+	String subject = messageService.getMessage("signup.email.verify.subject");
+	String body = messageService.getMessage("signup.email.verify.body", new Object[] { link });
 	boolean isHtmlFormat = true;
 
 	Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
