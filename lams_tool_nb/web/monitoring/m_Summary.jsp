@@ -20,14 +20,9 @@
 	<H4><fmt:message key="titleHeading.reflections"/></H4>
 	<table class="table table-striped">
 		<c:forEach var="reflection" items="${reflections}">
-			<logic:empty name="reflections">
-				<tr>
-					<td colspan="2">
-						<fmt:message key="message.no.reflections" />
-					</td>
-				</tr>
-			</logic:empty>
-			<tr>
+		<c:choose>
+		<c:when test="${not empty reflection}">
+		<tr>
 				<td width="40%">
 					<lams:Portrait userId="${reflection.userId}" hover="true"><c:out value="${reflection.username}" /></lams:Portrait>
 				</td>
@@ -41,6 +36,15 @@
 					</a>
 				</td>
 			</tr>
+		</c:when>
+		<c:otherwise>
+			<tr>
+					<td colspan="2">
+					<fmt:message key="message.no.reflections" />
+					</td>
+			</tr>
+		</c:otherwise>
+		</c:choose>
 		</c:forEach>
 	</table>	
 </c:if>
