@@ -19,29 +19,34 @@
 <c:if test="${reflectOnActivity}" >
 	<H4><fmt:message key="titleHeading.reflections"/></H4>
 	<table class="table table-striped">
-		<c:forEach var="reflection" items="${reflections}">
-			<logic:empty name="reflections">
+		<c:choose>
+			<c:when test="${not empty reflections}">
+				<c:forEach var="reflection" items="${reflections}">
+					<tr>
+						<td width="40%">
+							<lams:Portrait userId="${reflection.userId}" hover="true"><c:out value="${reflection.username}" /></lams:Portrait>
+						</td>
+						<c:url value="/monitoring/viewReflection.do" var="viewReflection">
+							<c:param name="userID" value="${reflection.userId}" />
+							<c:param name="toolSessionID" value="${reflection.externalId}" />
+						</c:url>
+						<td>
+						<a href="javascript:launchPopup('${viewReflection}')" class="btn btn-default btn-sm ${allowComments ? 'pull-right' : ''}">
+									<fmt:message key="link.view" />
+							</a>
+						</td>
+					</tr>
+				</c:forEach>
+			</c:when>
+			<c:otherwise>
 				<tr>
 					<td colspan="2">
-						<fmt:message key="message.no.reflections" />
+					<fmt:message key="message.no.reflections" />
 					</td>
 				</tr>
-			</logic:empty>
-			<tr>
-				<td width="40%">
-					<lams:Portrait userId="${reflection.userId}" hover="true"><c:out value="${reflection.username}" /></lams:Portrait>
-				</td>
-				<c:url value="/monitoring/viewReflection.do" var="viewReflection">
-					<c:param name="userID" value="${reflection.userId}" />
-					<c:param name="toolSessionID" value="${reflection.externalId}" />
-				</c:url>
-				<td>
-				<a href="javascript:launchPopup('${viewReflection}')" class="btn btn-default btn-sm ${allowComments ? 'pull-right' : ''}">
-							<fmt:message key="link.view" />
-					</a>
-				</td>
-			</tr>
-		</c:forEach>
+			</c:otherwise>
+		</c:choose>
+
 	</table>	
 </c:if>
 	

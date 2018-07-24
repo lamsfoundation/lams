@@ -22,24 +22,19 @@
 			finishButton.disabled = true;
 		}
 	}
-	
-	function reflect() {
-		var submitUrl = "<lams:WebAppURL />"+${mode}+"/reflect.do?sessionMapID=${sessionMapID}";
-		return submitCount(submitUrl);
-	}
-	
-	function finish() {
-		var finishUrl = "<lams:WebAppURL />"+${mode}+"/finish.do?sessionMapID=${sessionMapID}";
-		return submitCount(finishUrl);
+	function submitForm(methodName) {
+		var f = document.getElementById('nbLearnerForm');
+		f.action = methodName + ".do";
+		f.submit();
 	}
 </script>
 
-<lams:Page type="learner" title="${nbLearnerForm.title}" formID="nbLearnerForm">
+<lams:Page type="learner" title="${nbLearnerForm.title}">
 	<div class="panel">
 		<c:out value="${nbLearnerForm.basicContent}" escapeXml="false" />
 	</div>
 
-	<form:form action="${mode}.do" modelAttribute="nbLearnerForm" target="_self" onsubmit="disableFinishButton();" id="nbLearnerForm">
+	<form:form modelAttribute="nbLearnerForm" target="_self" onsubmit="disableFinishButton();" id="nbLearnerForm">
 		<form:hidden path="mode" />
 		<form:hidden path="toolSessionID" />
 
@@ -72,7 +67,7 @@
 				<c:when test="${reflectOnActivity}">
 
 					<button  name="continueButton" class="btn btn-sm btn-primary pull-right"
-						onclick="javascript:reflect();">
+						onclick="submitForm('reflect')">
 						<fmt:message key="button.continue" />
 					</button>
 				</c:when>
@@ -80,7 +75,7 @@
 
 
 					<a href="#nogo" name="finishButton" class="btn btn-primary pull-right voffset10 na"
-						onclick="javascript:finish();">
+						onclick="submitForm('finish')">
 						<c:choose>
 							<c:when test="${activityPosition.last}">
 								<fmt:message key="button.submit" />

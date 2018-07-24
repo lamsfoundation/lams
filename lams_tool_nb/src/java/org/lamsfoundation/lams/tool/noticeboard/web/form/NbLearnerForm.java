@@ -21,16 +21,14 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.noticeboard.web.form;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 
 /**
  * Creation Date: 19-05-05
- * 
+ *
  *
  *
  *
@@ -38,7 +36,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
  *
  */
 
-public class NbLearnerForm extends ActionForm {
+public class NbLearnerForm {
 
     private static final long serialVersionUID = -669035956406254875L;
 
