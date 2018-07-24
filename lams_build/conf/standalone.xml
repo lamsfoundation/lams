@@ -470,7 +470,7 @@
         <subsystem xmlns="urn:jboss:domain:undertow:1.2">
             <buffer-cache name="default"/>
             <server name="default-server">
-                <http-listener name="default" socket-binding="http" max-post-size="104857600"/>
+                <http-listener name="default" socket-binding="http" max-post-size="209715200"/>
                 <host name="default-host" alias="localhost">
                     <location name="/" handler="welcome-content"/>
                 	 <!-- Removing server headers
