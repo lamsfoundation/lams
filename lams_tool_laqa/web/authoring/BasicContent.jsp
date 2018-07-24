@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <script type="text/javascript">
 <!-- Common Javascript functions for LAMS -->
@@ -20,7 +19,7 @@
 	}
 	
 	function removeQuestion(questionIndex){
-		document.QaAuthoringForm.questionIndex.value=questionIndex;
+		document.forms.QaAuthoringForm.questionIndex.value=questionIndex;
         submitMethod('removeQuestion');
 	}
 
@@ -46,16 +45,16 @@
 	}
 </script>
 
-<html:hidden property="questionIndex" />
+<form:hidden path="questionIndex" />
 
 <div class="form-group">
     <label for="title"><fmt:message key="label.authoring.title.col"/></label>
-    <html:text property="title" styleClass="form-control"></html:text>
+    <form:input path="title" cssClass="form-control"/>
 </div>
 <div class="form-group">
     <label for="instructions"><fmt:message key="label.authoring.instructions.col" /></label>
-    <lams:CKEditor id="instructions" value="${formBean.instructions}"
-    			   contentFolderID="${formBean.contentFolderID}">
+    <lams:CKEditor id="instructions" value="${authoringForm.instructions}"
+    			   contentFolderID="${authoringForm.contentFolderID}">
     </lams:CKEditor>
 </div>
 
@@ -65,7 +64,7 @@
 </div>
 
 <div class="form-inline">
-	<a href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newQuestionBox&contentFolderID=${formBean.contentFolderID}&httpSessionID=${formBean.httpSessionID}&toolContentID=${formBean.toolContentID}&usernameVisible=${formBean.usernameVisible}&showOtherAnswers=${formBean.showOtherAnswers}&lockWhenFinished=${formBean.lockWhenFinished}&questionsSequenced=${formBean.questionsSequenced}"/>');"
+	<a href="javascript:showMessage('<lams:WebAppURL/>authoring/newQuestionBox.do?contentFolderID=${newQuestionForm.contentFolderID}&httpSessionID=${newQuestionForm.httpSessionID}&toolContentID=${newQuestionForm.toolContentID}&usernameVisible=${newQuestionForm.usernameVisible}&showOtherAnswers=${newQuestionForm.showOtherAnswers}&lockWhenFinished=${newQuestionForm.lockWhenFinished}&questionsSequenced=${newQuestionForm.questionsSequenced}');"
 		id="addTopic" class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.add.new.question" /> 
 	</a>
 </div>

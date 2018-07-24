@@ -47,6 +47,19 @@ public class ResourceForm {
     private FormFile offlineFile;
     private FormFile onlineFile;
     
+    //tool access mode;
+    private String mode;
+    
+    
+    
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
 
     private Resource resource;
 

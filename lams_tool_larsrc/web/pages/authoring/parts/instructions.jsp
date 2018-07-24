@@ -15,8 +15,8 @@
 						${status.index+1}
 					</td>
 					<td>
-						<lams:STRUTS-textarea property="instructionItemDesc${status.index}" styleClass="form-control"
-							styleId="instructionItemDesc${status.index}" rows="3" cols="82" value="${item}" />
+						<textarea name="instructionItemDesc${status.index}" class="form-control"
+							id="instructionItemDesc${status.index}" rows="3" cols="82" value="${item}" />
 					</td>
 
 					<td class="arrows" style="width:5%">

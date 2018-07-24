@@ -20,7 +20,7 @@
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-	<link rel="stylesheet" href="<html:rewrite page='/includes/css/qalearning.css'/>">
+	<link rel="stylesheet" href="<lams:WebAppURL/> includes/css/qalearning.css">
 	<lams:css />
 
 	<script type="text/javascript">
@@ -48,7 +48,7 @@
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
-	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+	<c:set var="localeLanguage"><lams:upatherty="localeLanguage" /></c:set>
 	<script src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
 
@@ -240,8 +240,8 @@
 	
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.QaLearningForm.method.value=actionMethod; 
-			document.QaLearningForm.submit();
+			document.forms.QaLearningForm.method.value=actionMethod; 
+			document.forms.QaLearningForm.submit();
 		}
 	</script>
 </lams:head>
@@ -249,7 +249,7 @@
 <body class="stripes">
 
 	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-	<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+	<form:form action="learning.do" modelAttribute="qaLearningForm" method="POST" target="_self">
 
 	<lams:Page type="learner" title="${qaContent.title}">
 
@@ -419,25 +419,25 @@
 		<!-- End of others questions -->
 
 		<!-- buttons -->
-			<html:hidden property="toolSessionID" styleId="toolSessionID" />
-			<html:hidden property="userID" styleId="userID" />
-			<html:hidden property="httpSessionID" />
-			<html:hidden property="totalQuestionCount" />
+			<form:hidden path="toolSessionID" id="toolSessionID" />
+			<form:hidden path="userID" id="userID" />
+			<form:hidden path="httpSessionID" />
+			<form:hidden path="totalQuestionCount" />
 
 			<c:choose>
 				<c:when test="${generalLearnerFlowDTO.requestLearningReportProgress != 'true'}">
 					<c:choose>
 						<c:when test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
-							<html:hidden property="method" value="endLearning" />
+							<form:hidden path="method" value="endLearning" />
 						</c:when>
 						<c:otherwise>
-							<html:hidden property="method" value="forwardtoReflection" />
+							<form:hidden path="method" value="forwardtoReflection" />
 						</c:otherwise>
 					</c:choose>
 				</c:when>
 
 				<c:otherwise>
-					<html:hidden property="method" />
+					<form:hidden path="method" />
 				</c:otherwise>
 			</c:choose>
 
@@ -445,16 +445,16 @@
 				<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
 
 					<div class="right-buttons voffset5" align="right" id="learner-submit">
-						<html:button property="refreshAnswers" styleClass="btn btn-default voffset5 roffset5 pull-left"
+						<form:button path="refreshAnswers" cssClass="btn btn-default voffset5 roffset5 pull-left"
 							onclick="submitMethod('refreshAllResults');">
 							<fmt:message key="label.refresh" />
-						</html:button>
+						</form:button>
 
 						<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
-							<html:button property="redoQuestions" styleClass="btn btn-default voffset5  pull-left"
+							<form:button path="redoQuestions" cssClass="btn btn-default voffset5  pull-left"
 								onclick="submitMethod('redoQuestions');">
 								<fmt:message key="label.redo" />
-							</html:button>
+							</form:button>
 						</c:if>
 
 
@@ -473,10 +473,10 @@
 						</c:if>
 
 						<c:if test="${(generalLearnerFlowDTO.reflection == 'true') && hasEditRight}">
-							<html:button property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
-								styleClass="btn btn-default">
+							<form:button property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
+								cssClass="btn btn-default">
 								<fmt:message key="label.continue" />
-							</html:button>
+							</form:button>
 						</c:if>
 					</div>
 				</c:if>
@@ -486,7 +486,7 @@
 
 	</lams:Page>
 
-	</html:form>
+	</form:form>
 
 </body>
 </lams:html>

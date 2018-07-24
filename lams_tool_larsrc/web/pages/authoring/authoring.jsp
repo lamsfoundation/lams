@@ -68,7 +68,7 @@
 
 	<form:form action="update.do" method="post" modelAttribute="authoringForm" id="authoringForm">
 		<form:hidden path="resource.contentId" />
-		<form:hidden path="mode" value="${mode}"/>
+		<form:hidden path="mode" />
 		<form:hidden path="sessionMapID" />
 		<form:hidden path="contentFolderID" />
 		<form:hidden path="currentTab" styleId="currentTab" />

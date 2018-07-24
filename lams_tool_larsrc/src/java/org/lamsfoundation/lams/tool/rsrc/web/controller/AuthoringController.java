@@ -195,7 +195,7 @@ public class AuthoringController {
      * @param request
      * @return
      */
-    @RequestMapping("/newItemlInit")
+    @RequestMapping("/newItemInit")
     private String newItemlInit(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
 	resourceItemForm.setSessionMapID(sessionMapID);
@@ -550,7 +550,7 @@ public class AuthoringController {
 	}
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	startForm.setMode(mode.toString());
 	request.setAttribute("authoringForm", startForm);
 
 	return "pages/authoring/authoring";

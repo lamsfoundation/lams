@@ -2,9 +2,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
-<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorSpringUtil" %>
 <c:set var="UPLOAD_FILE_LARGE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
-<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorSpringUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
 
 <lams:html>
 	<lams:head>
@@ -57,7 +57,7 @@
 			    }
 			});	 		
 		</script>
-		<script type="text/javascript" src="<c:url page='/includes/javascript/rsrcresourceitem.js'/>"></script>
+		<script type="text/javascript" src="<c:url value='/includes/javascript/rsrcresourceitem.js'/>"></script>
 
 	</lams:head>
 	<body>

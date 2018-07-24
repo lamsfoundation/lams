@@ -60,7 +60,7 @@
 		resourceItemOrderID1++;
 		resourceItemOrderID2++;
 		
-		var url = "<c:url value="/authoring/switchResourceItemPosition.do"/>";
+		var url = "<c:url value='/authoring/switchResourceItemPosition.do'/>";
 		deleteItemLoading();
 		
 		$("#" + resourceListTargetDiv).load(
@@ -94,13 +94,13 @@
 </div>
 
 <div class="form-inline">
-	<button onClick="showResourceItem('<c:url page="<lams:WebAppURL/>authoring/newItemInit.do?sessionMapID=${authoringForm.sessionMapID}&itemType=1"/>');return false;" class="btn btn-default btn-sm btn-disable-on-submit">
+	<button onClick="showResourceItem('<c:url value="newItemInit.do?sessionMapID=${authoringForm.sessionMapID}&itemType=1"/>');return false;" class="btn btn-default btn-sm btn-disable-on-submit">
 		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.url" /></button> 
-	<button onClick="showResourceItem('<c:url page="<lams:WebAppURL/>authoring/newItemInit.do?sessionMapID=${authoringForm.sessionMapID}&itemType=2"/>');return false;"  class="btn btn-default btn-sm loffset5 btn-disable-on-submit">
+	<button onClick="showResourceItem('<c:url value="newItemInit.do?sessionMapID=${authoringForm.sessionMapID}&itemType=2"/>');return false;"  class="btn btn-default btn-sm loffset5 btn-disable-on-submit">
 		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.file" /></button>
-	<button onClick="showResourceItem('<c:url page="<lams:WebAppURL/>authoring/newItemInit.do?sessionMapID=${authoringForm.sessionMapID}&itemType=3"/>');return false;" class="btn btn-default btn-sm loffset5 btn-disable-on-submit">
+	<button onClick="showResourceItem('<c:url value="newItemInit.do?sessionMapID=${authoringForm.sessionMapID}&itemType=3"/>');return false;" class="btn btn-default btn-sm loffset5 btn-disable-on-submit">
 		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.website" /></button>
-	<button onClick="showResourceItem('<c:url page="<lams:WebAppURL/>authoring/newItemInit.do?sessionMapID=${authoringForm.sessionMapID}&itemType=4"/>');return false;" class="btn btn-default btn-sm loffset5 btn-disable-on-submit">
+	<button onClick="showResourceItem('<c:url value="newItemInit.do?sessionMapID=${authoringForm.sessionMapID}&itemType=4"/>');return false;" class="btn btn-default btn-sm loffset5 btn-disable-on-submit">
 		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.learning.object" /> </button>
 </div>
 
