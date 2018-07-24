@@ -435,6 +435,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		    learningDesignJSON.put("canModify",
 			    WorkspaceFolder.OWNER_ACCESS.equals(folderContent.getPermissionCode())
 				    || ((user != null) && isSysAuthorAdmin(user)));
+		    learningDesignJSON.put("readOnly", folderContent.getReadOnly());
 		    result.append("learningDesigns", learningDesignJSON);
 		}
 	    } else {
@@ -453,7 +454,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
 	JSONArray result = new JSONArray();
 	Pattern searchPattern = searchString != null
-		? Pattern.compile(Pattern.quote(searchString), Pattern.CASE_INSENSITIVE) : null;
+		? Pattern.compile(Pattern.quote(searchString), Pattern.CASE_INSENSITIVE)
+		: null;
 	FolderContentDTO userFolder = getUserWorkspaceFolder(userID);
 	long numDesigns = 0;
 

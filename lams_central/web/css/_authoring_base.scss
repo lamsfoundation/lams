@@ -230,6 +230,10 @@ div#ldStoreDialogContents div#ldStoreDialogTree {
 	overflow: auto;
 }
 
+div#ldStoreDialogContents div#ldStoreDialogTree .readOnly {
+	font-style: italic;
+}
+
 div#ldStoreDialogContents #ldStoreDialogAccessCell {
 	border-top: $border-thin-dotted;
 	border-right: $border-thin-dotted;
@@ -279,6 +283,14 @@ div#ldStoreDialogContents img#ldScreenshotLoading  {
 div#ldStoreDialogContents #ldStoreDialogImportPartFrame {
 	border: none;
 	width: 99%;
+}
+
+div#ldStoreDialogContents #ldStoreDialogReadOnlyCheckbox {
+	vertical-align: top;
+}
+
+div#ldStoreDialogContents #ldStoreDialogReadOnlySpan {
+	padding-left: 5px;
 }
 
 div#ldStoreDialogContents div#ldStoreDialogNameContainer {

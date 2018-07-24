@@ -124,6 +124,8 @@
 				SEQUENCE_EXISTS_ERROR : decoderDiv.html('<c:out value="${SEQUENCE_EXISTS_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.sequence.save.error" var="SEQUENCE_SAVE_ERROR_VAR"/>
 				SEQUENCE_SAVE_ERROR : decoderDiv.html('<c:out value="${SEQUENCE_SAVE_ERROR_VAR}" />').text(),
+				<fmt:message key="authoring.fla.readonly.forbidden" var="READONLY_FORBIDDEN_ERROR_VAR"/>
+				READONLY_FORBIDDEN_ERROR : decoderDiv.html('<c:out value="${READONLY_FORBIDDEN_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.svg.save.error" var="SVG_SAVE_ERROR_VAR"/>
 				SVG_SAVE_ERROR : decoderDiv.html('<c:out value="${SVG_SAVE_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.sequence.not.selected.error" var="SEQUENCE_NOT_SELECTED_ERROR_VAR"/>
@@ -278,7 +280,8 @@
 				<fmt:message key="authoring.fla.conditions.mapping.broken" var="CONDITIONS_MAPPING_BROKEN_ERROR_VAR"/>
 				CONDITIONS_MAPPING_BROKEN_ERROR : decoderDiv.html('<c:out value="${CONDITIONS_MAPPING_BROKEN_ERROR_VAR}" />').text()
 			},
-			
+
+			canSetReadOnly = ${canSetReadOnly},
 			isReadOnlyMode = false,
 			activitiesOnlySelectable = false,
 			initContentFolderID = '${contentFolderID}',
@@ -555,6 +558,11 @@
 								<i class="fa fa-font"></i> 
 								<span><fmt:message key="authoring.fla.rename.button" /></span>
 							</button>
+							
+							<label for="ldStoreDialogReadOnlyCheckbox" id="ldStoreDialogReadOnlyLabel">
+								<input type="checkbox" id="ldStoreDialogReadOnlyCheckbox" />
+								<span id="ldStoreDialogReadOnlySpan"><fmt:message key="authoring.fla.readonly.checkbox" /></span>
+							</label>
 						</div>
 						
 						<div id="ldStoreDialogNameContainer">

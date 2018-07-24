@@ -47,6 +47,7 @@
 			},
 			
 			paperMinWidth = 1000,
+			canSetReadOnly = false,
 			isReadOnlyMode = true,
 			activitiesOnlySelectable = ${param.selectable eq 'true'},
 			initLearningDesignID = '${param.learningDesignID}';

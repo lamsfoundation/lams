@@ -338,7 +338,7 @@ var MenuLib = {
 	/**
 	 * Loads subfolders and LDs from the server.
 	 */
-	getFolderContents : function(folderID) {
+	getFolderContents : function(folderID, canSave, canHaveReadOnly) {
 		var result = null;
 			
 		$.ajax({
@@ -353,26 +353,35 @@ var MenuLib = {
 			dataType : 'json',
 			success : function(response) {
 				result = [];
-
 				// parse the response; extract folders and LDs
 				if (response.folders) {
-					$.each(response.folders, function(){
-						result.push({'type'            : 'text',
-								  	 'label'           : this.isRunSequencesFolder ?
-								  			 				LABELS.RUN_SEQUENCES_FOLDER : this.name,
-								  	 'folderID'		   : this.folderID,
-								  	 'canSave'		   : this.folderID > 0 && !this.isRunSequencesFolder,
-						  	         'canModify'	   : this.canModify
+					$.each(response.folders, function(index){
+						// folderID == -2 is courses folder
+						var canSave = this.folderID > 0 && !this.isRunSequencesFolder;
+						result.push({'type'            	   : 'text',
+								  	 'label'               : this.isRunSequencesFolder ?
+								  			 				   LABELS.RUN_SEQUENCES_FOLDER : this.name,
+								  	 'folderID'		       : this.folderID,
+								  	 'isRunSequenceFolder' : this.isRunSequencesFolder,
+								  	 // either take parent's setting or take 2nd (courses) and 3rd (public) folder 
+								  	 'canHaveReadOnly'	   : folderID ? canHaveReadOnly : index > 0,
+								  	 'canSave'		       : canSave,
+						  	         'canModify'	       : this.canModify && !this.isRunSequenceFolder,
+						  	         'labelStyle'		   : 'ygtvlabel' + (!canSave ? ' readOnly' : '')
 									 });
 					});
 				}
 				if (response.learningDesigns) {
 					$.each(response.learningDesigns, function(){
+						var canModify = canSave && this.canModify;
 						result.push({'type'             : 'text',
 						  	         'label'            : this.name,
 						  	         'isLeaf'           : true,
 						  	         'learningDesignId' : this.learningDesignId,
-						  	         'canModify'		: this.canModify
+						  	         'canHaveReadOnly'	: canHaveReadOnly,
+						  	         'canModify'		: canModify,
+						  	         'readOnly'			: this.readOnly,
+						  	         'labelStyle'		: 'ygtvlabel' + (this.readOnly || !canModify ? ' readOnly' : '')
 							        });
 					});
 				}
@@ -649,7 +658,11 @@ var MenuLib = {
 		$('#saveButton').blur();
 		
 		if (!showDialog && layout.ld.learningDesignID) {
-			GeneralLib.saveLearningDesign(layout.ld.folderID, layout.ld.learningDesignID, layout.ld.title);
+			if (!layout.ld.canModify || (!canSetReadOnly && layout.ld.readOnly)) {
+				alert(LABELS.READONLY_FORBIDDEN_ERROR);
+			} else {
+				GeneralLib.saveLearningDesign(layout.ld.folderID, layout.ld.learningDesignID, layout.ld.title, layout.ld.readOnly);
+			}
 			return;
 		}
 		
