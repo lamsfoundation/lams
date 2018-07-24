@@ -16,7 +16,7 @@
 					</td>
 					<td>
 						<textarea name="instructionItemDesc${status.index}" class="form-control"
-							id="instructionItemDesc${status.index}" rows="3" cols="82" value="${item}" />
+							id="instructionItemDesc${status.index}" rows="3" cols="82" value="${item}" ></textarea>
 					</td>
 
 					<td class="arrows" style="width:5%">
@@ -40,7 +40,7 @@
 		
 		<button onclick="addInstruction(); return false;" class="btn btn-default btn-sm btn-disable-on-submit pull-right">
 			<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.resource.add.instruction" /> 
-		</a>
+		</button>
 
 	</form>
 </div>

@@ -126,7 +126,7 @@ public class AuthoringController {
      * @return
      */
     @RequestMapping("/removeItem")
-    private String removeItem(HttpServletRequest request) {
+    private String removeItem(ResourceItemForm resourceItemForm, HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
@@ -145,6 +145,7 @@ public class AuthoringController {
 	    delList.add(item);
 	}
 
+	request.setAttribute("resourceItemForm", resourceItemForm);
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/itemlist";
     }
@@ -174,6 +175,7 @@ public class AuthoringController {
 		populateItemToForm(itemIdx, item, resourceItemForm, request);
 	    }
 	}
+	request.setAttribute("resourceItemForm", resourceItemForm);
 	switch (item.getType()) {
 	    case 1:
 		return "pages/authoring/parts/addurl";
@@ -206,6 +208,7 @@ public class AuthoringController {
 	    instructionList.add("");
 	}
 	request.setAttribute("instructionList", instructionList);
+	request.setAttribute("resourceItemForm", resourceItemForm);
 	switch (type) {
 	    case 1:
 		return "pages/authoring/parts/addurl";
@@ -234,7 +237,7 @@ public class AuthoringController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping(value = "/saveOrUpdateItem", method = RequestMethod.POST)
+    @RequestMapping(value = "/saveOrUpdateItem")
     private String saveOrUpdateItem(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	// get instructions:
 	List<String> instructionList = getInstructionsFromRequest(request);
@@ -244,6 +247,7 @@ public class AuthoringController {
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
 	    request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST, instructionList);
+	    request.setAttribute("resourceItemForm", resourceItemForm);
 	    switch (resourceItemForm.getItemType()) {
 		case 1:
 		    return "pages/authoring/parts/addurl";

@@ -58,7 +58,7 @@
 			});
 
 		</script>
-		<script type="text/javascript" src="<c:url value='includes/javascript/rsrcresourceitem.js'/>"></script>
+		<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/rsrcresourceitem.js"></script>
 	</lams:head>
 	<body>
 
