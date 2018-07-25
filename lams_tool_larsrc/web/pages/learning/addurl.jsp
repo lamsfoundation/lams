@@ -22,7 +22,7 @@
 
 		<div class="form-group" id="addurl">
 	    	<label for="url"><fmt:message key="label.authoring.basic.resource.url.input" /></label>
-			<form:input="url" cssClass="form-control" tabindex="2" id="url"/><br/>&nbsp;
+			<form:input path="url" cssClass="form-control" tabindex="2" id="url"/><br/>&nbsp;
 	        <label><form:checkbox path="openUrlNewWindow" tabindex="3" id="openUrlNewWindow" />&nbsp;
 			 <fmt:message key="open.in.new.window" /></label>
 	    </div>
@@ -33,12 +33,12 @@
 	  	</div>	
 
 		<div id="buttons" class="pull-right" >
-	 		<form:button path="goback" onclick="javascript:cancel()" cssClass="btn btn-sm btn-default" id="cancelButton">
+	 		<button name="goback" onclick="javascript:cancel()" class="btn btn-sm btn-default" id="cancelButton">
 				<fmt:message key="button.cancel" />
-			</form:button>&nbsp;
-			<input type="submit" class="btn btn-sm btn-default btn-disable-on-submit" id="submitButton">
+			</button>&nbsp;
+			<button type="submit" class="btn btn-sm btn-default btn-disable-on-submit" id="submitButton">
 			 	<fmt:message key="button.add" />
-			</input>
+			</button>
 		</div>
 	
 	</form:form>

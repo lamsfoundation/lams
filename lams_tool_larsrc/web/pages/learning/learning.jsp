@@ -305,7 +305,7 @@
 					</c:choose>
 
 					<c:if test="${mode != 'teacher'}">
-						<button name="FinishButton" onclick="return continueReflect()" cssClass="btn btn-sm btn-default voffset5 btn-disable-on-submit">
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-sm btn-default voffset5 btn-disable-on-submit">
 						<fmt:message key="label.edit" />
 						</button>
 					</c:if>
@@ -319,7 +319,7 @@
 					<c:when
 						test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<button name="FinishButton"
-							onclick="return continueReflect()" cssClass="btn btn-default voffset5 pull-right btn-disable-on-submit">
+							onclick="return continueReflect()" class="btn btn-default voffset5 pull-right btn-disable-on-submit">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>

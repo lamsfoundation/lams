@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.rsrc.web.form;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 
 /**
@@ -44,21 +43,18 @@ public class ResourceForm {
     private String sessionMapID;
     private String contentFolderID;
     private int currentTab;
-    private FormFile offlineFile;
-    private FormFile onlineFile;
-    
+    private String offlineFile;
+    private String onlineFile;
+
     //tool access mode;
     private String mode;
-    
-    
-    
 
     public String getMode() {
-        return mode;
+	return mode;
     }
 
     public void setMode(String mode) {
-        this.mode = mode;
+	this.mode = mode;
     }
 
     private Resource resource;
@@ -85,19 +81,19 @@ public class ResourceForm {
 	this.currentTab = currentTab;
     }
 
-    public FormFile getOfflineFile() {
+    public String getOfflineFile() {
 	return offlineFile;
     }
 
-    public void setOfflineFile(FormFile offlineFile) {
+    public void setOfflineFile(String offlineFile) {
 	this.offlineFile = offlineFile;
     }
 
-    public FormFile getOnlineFile() {
+    public String getOnlineFile() {
 	return onlineFile;
     }
 
-    public void setOnlineFile(FormFile onlineFile) {
+    public void setOnlineFile(String onlineFile) {
 	this.onlineFile = onlineFile;
     }
 

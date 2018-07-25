@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
@@ -77,7 +76,6 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivitySp
 			boolean fileSizeValid = FileValidatorSpringUtil.validateFileSize(file.get(index), true);
 			if (!fileSizeValid) {
 			    if (fileUuid.get(index) == null && file.get(index) == null) {
-				ActionMessage error = new ActionMessage("error.planner.file.blank", index + 1);
 				errorMap.add("GLOBAL", messageService.getMessage("error.planner.file.blank",
 					new Object[] { index + 1 }));
 			    }

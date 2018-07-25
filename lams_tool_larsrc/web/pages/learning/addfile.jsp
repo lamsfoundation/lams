@@ -23,7 +23,7 @@
 	
 		<div class="form-group">
 	    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
-			<form:input path="title" cssClass="form-control" tabindex="1" id="resourcetitle"/>
+			<form:input path="title" class="form-control" tabindex="1" id="resourcetitle"/>
 	  	</div>	
 
 		<lams:FileUpload fileFieldname="file" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}" tabindex="2"/>
@@ -35,12 +35,12 @@
 
 		<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>	
 		<div id="buttons" class="pull-right">
-	 		<form:button path="goback" onclick="javascript:cancel()" cssClass="btn btn-sm btn-default" id="cancelButton">
+	 		<button name="goback" onclick="javascript:cancel()" class="btn btn-sm btn-default" id="cancelButton">
 				<fmt:message key="button.cancel" />
-			</form:button>&nbsp;
-			<input type="submit" class="btn btn-sm btn-default btn-disable-on-submit" id="submitButton">
+			</button>&nbsp;
+			<button type="submit" class="btn btn-sm btn-default btn-disable-on-submit" id="submitButton">
 			 	<fmt:message key="button.add" />
-			</input>
+			</button>
 		</div>
 	
 	</form:form>

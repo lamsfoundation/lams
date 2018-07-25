@@ -10,4 +10,4 @@
 		
 	</c:otherwise>
 </c:choose>
-<form:hidden path="hasFile" value="${resourceItemForm.hasFile}" />
+<input type="hidden" name="hasFile" value="${resourceItemForm.hasFile}" />

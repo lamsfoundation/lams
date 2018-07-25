@@ -40,9 +40,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -73,6 +70,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
@@ -468,7 +466,7 @@ public class LearningController {
      * @return
      */
     @RequestMapping("/submitReflection")
-    private String submitReflection(ReflectionForm reflectionForm, HttpServletRequest request) {
+    private String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
 	Integer userId = reflectionForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
@@ -490,6 +488,7 @@ public class LearningController {
 	    entry.setLastModified(new Date());
 	    resourceService.updateEntry(entry);
 	}
+	request.setAttribute("reflectionForm", reflectionForm);
 
 	return finish(request);
     }
@@ -510,7 +509,8 @@ public class LearningController {
 	// if current user view less than reqired view count number, then just return error message.
 	if (miniViewFlag > 0) {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	    errorMap.add("GLOBAL", messageService.getMessage("lable.learning.minimum.view.number.less" + miniViewFlag));
+	    errorMap.add("GLOBAL", messageService.getMessage("lable.learning.minimum.view.number.less",
+		    new Object[] { miniViewFlag }));
 	    request.setAttribute("errorMap", errorMap);
 	    return false;
 	}
@@ -557,27 +557,28 @@ public class LearningController {
      * @param mapping
      * @return
      */
-    private ActionForward findForward(short type, ActionMapping mapping) {
-	ActionForward forward;
-	switch (type) {
-	    case ResourceConstants.RESOURCE_TYPE_URL:
-		forward = mapping.findForward("url");
-		break;
-	    case ResourceConstants.RESOURCE_TYPE_FILE:
-		forward = mapping.findForward("file");
-		break;
-	    case ResourceConstants.RESOURCE_TYPE_WEBSITE:
-		forward = mapping.findForward("website");
-		break;
-	    case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-		forward = mapping.findForward("learningobject");
-		break;
-	    default:
-		forward = null;
-		break;
-	}
-	return forward;
-    }
+
+//    private ActionForward findForward(short type, ActionMapping mapping) {
+//	ActionForward forward;
+//	switch (type) {
+//	    case ResourceConstants.RESOURCE_TYPE_URL:
+//		forward = mapping.findForward("url");
+//		break;
+//	    case ResourceConstants.RESOURCE_TYPE_FILE:
+//		forward = mapping.findForward("file");
+//		break;
+//	    case ResourceConstants.RESOURCE_TYPE_WEBSITE:
+//		forward = mapping.findForward("website");
+//		break;
+//	    case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
+//		forward = mapping.findForward("learningobject");
+//		break;
+//	    default:
+//		forward = null;
+//		break;
+//	}
+//	return forward;
+//    }
 
     private ResourceUser getCurrentUser(IResourceService service, Long sessionId) {
 	// try to get form system session
@@ -609,7 +610,6 @@ public class LearningController {
      * @return
      */
     private void validateResourceItem(ResourceItemForm resourceItemForm, MultiValueMap<String, String> errorMap) {
-	ActionErrors errors = new ActionErrors();
 	if (StringUtils.isBlank(resourceItemForm.getTitle())) {
 	    errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_TITLE_BLANK));
 	}
@@ -680,7 +680,7 @@ public class LearningController {
     }
 
     @RequestMapping("/hideItem")
-    private ActionForward hideItem(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private String hideItem(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID);

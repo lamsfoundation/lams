@@ -48,7 +48,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -358,7 +357,7 @@ public class AuthoringController {
      * @throws ServletException
      *
      */
-    @RequestMapping(value="/start")
+    @RequestMapping(value = "/start")
     private String start(@ModelAttribute ResourceForm startForm, HttpServletRequest request) throws ServletException {
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
@@ -441,8 +440,9 @@ public class AuthoringController {
 	return "pages/authoring/start";
     }
 
-    @RequestMapping("/defineLater")
-    private String defineLater(HttpServletRequest request) throws ServletException {
+    @RequestMapping("/definelater")
+    private String defineLater(@ModelAttribute ResourceForm startForm, HttpServletRequest request)
+	    throws ServletException {
 
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	Resource resource = resourceService.getResourceByContentId(contentId);
@@ -454,80 +454,82 @@ public class AuthoringController {
 	resourceService.auditLogStartEditingActivityInMonitor(contentId);
 
 	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+
+	// save toolContentID into HTTPSession
+
+	// get back the resource and item list and display them on page
+
+	List<ResourceItem> items = null;
+
+	// Get contentFolderID and save to form.
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	startForm.setContentFolderID(contentFolderID);
+
+	// initial Session Map
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	startForm.setSessionMapID(sessionMap.getSessionID());
+
+	try {
+	    resource = resourceService.getResourceByContentId(contentId);
+	    // if resource does not exist, try to use default content instead.
+	    if (resource == null) {
+		resource = resourceService.getDefaultContent(contentId);
+		if (resource.getResourceItems() != null) {
+		    items = new ArrayList<ResourceItem>(resource.getResourceItems());
+		} else {
+		    items = null;
+		}
+	    } else {
+		items = resourceService.getAuthoredItems(resource.getUid());
+	    }
+
+	    startForm.setResource(resource);
+	} catch (Exception e) {
+	    AuthoringController.log.error(e);
+	    throw new ServletException(e);
+	}
+
+	// init it to avoid null exception in following handling
+	if (items == null) {
+	    items = new ArrayList<>();
+	} else {
+	    ResourceUser resourceUser = null;
+	    // handle system default question: createBy is null, now set it to
+	    // current user
+	    for (ResourceItem item : items) {
+		if (item.getCreateBy() == null) {
+		    if (resourceUser == null) {
+			// get back login user DTO
+			HttpSession ss = SessionManager.getSession();
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			resourceUser = new ResourceUser(user, resource);
+		    }
+		    item.setCreateBy(resourceUser);
+		}
+	    }
+	}
+	// init resource item list
+	SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
+	resourceItemList.clear();
+	resourceItemList.addAll(items);
+
+	// If there is no order id, set it up
+	int i = 1;
+	for (ResourceItem resourceItem : resourceItemList) {
+	    if (resourceItem.getOrderId() == null || resourceItem.getOrderId() != i) {
+		resourceItem.setOrderId(i);
+	    }
+	    i++;
+	}
+
+	sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, startForm);
+	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
+	request.setAttribute("startForm", startForm);
+
 	return "pages/authoring/start";
     }
-
-//	List<ResourceItem> items = null;
-//	Resource resource = null;
-//	ResourceForm resourceForm = (ResourceForm) form;
-//
-//	// Get contentFolderID and save to form.
-//	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-//	resourceForm.setContentFolderID(contentFolderID);
-//
-//	// initial Session Map
-//	SessionMap<String, Object> sessionMap = new SessionMap<>();
-//	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-//	resourceForm.setSessionMapID(sessionMap.getSessionID());
-//
-//	try {
-//	    resource = service.getResourceByContentId(contentId);
-//	    // if resource does not exist, try to use default content instead.
-//	    if (resource == null) {
-//		resource = service.getDefaultContent(contentId);
-//		if (resource.getResourceItems() != null) {
-//		    items = new ArrayList<ResourceItem>(resource.getResourceItems());
-//		} else {
-//		    items = null;
-//		}
-//	    } else {
-//		items = service.getAuthoredItems(resource.getUid());
-//	    }
-//
-//	    resourceForm.setResource(resource);
-//	} catch (Exception e) {
-//	    Authoringcontroller.log.error(e);
-//	    throw new ServletException(e);
-//	}
-//
-//	// init it to avoid null exception in following handling
-//	if (items == null) {
-//	    items = new ArrayList<>();
-//	} else {
-//	    ResourceUser resourceUser = null;
-//	    // handle system default question: createBy is null, now set it to
-//	    // current user
-//	    for (ResourceItem item : items) {
-//		if (item.getCreateBy() == null) {
-//		    if (resourceUser == null) {
-//			// get back login user DTO
-//			HttpSession ss = SessionManager.getSession();
-//			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-//			resourceUser = new ResourceUser(user, resource);
-//		    }
-//		    item.setCreateBy(resourceUser);
-//		}
-//	    }
-//	}
-//	// init resource item list
-//	SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
-//	resourceItemList.clear();
-//	resourceItemList.addAll(items);
-//
-//	// If there is no order id, set it up
-//	int i = 1;
-//	for (ResourceItem resourceItem : resourceItemList) {
-//	    if (resourceItem.getOrderId() == null || resourceItem.getOrderId() != i) {
-//		resourceItem.setOrderId(i);
-//	    }
-//	    i++;
-//	}
-//
-//	sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, resourceForm);
-//	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
-//		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-//	return mapping.findForward(ResourceConstants.SUCCESS);
-//    }
 
     /**
      * Display same entire authoring page content from HttpSession variable.
@@ -541,7 +543,8 @@ public class AuthoringController {
      */
 
     @RequestMapping("/init")
-    private String initPage(@ModelAttribute ResourceForm startForm, HttpServletRequest request) throws ServletException {
+    private String initPage(@ModelAttribute ResourceForm startForm, HttpServletRequest request)
+	    throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -572,7 +575,8 @@ public class AuthoringController {
      * @throws ServletException
      */
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    private String updateContent(@ModelAttribute ResourceForm authoringForm, HttpServletRequest request) throws Exception {
+    private String updateContent(@ModelAttribute ResourceForm authoringForm, HttpServletRequest request)
+	    throws Exception {
 
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -1065,7 +1069,6 @@ public class AuthoringController {
 				resourceService.uploadResourceItemFile(resourceItem, file);
 			    } catch (Exception e) {
 				AuthoringController.log.error(e);
-				ActionMessage error = new ActionMessage("error.msg.io.exception");
 				errorMap.add("GLOBAL", messageService.getMessage("error.msg.io.exception"));
 				request.setAttribute("errorMap", errorMap);
 				pedagogicalPlannerForm.setValid(false);

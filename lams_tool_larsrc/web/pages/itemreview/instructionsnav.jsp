@@ -86,7 +86,7 @@
 				}
 
 				function nextIns(currIns){
-					var nextUrl="<c:url value='/nextInstruction.do'/>?mode=${mode}&insIdx=" + currIns + "&sessionMapID=${sessionMapID}&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}";
+					var nextUrl="<c:url value='nextInstruction.do'/>?mode=${mode}&insIdx=" + currIns + "&sessionMapID=${sessionMapID}&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}";
 					$.ajaxSetup({ cache: true });
 					$('#headerFrame').load(nextUrl);
 				} 
