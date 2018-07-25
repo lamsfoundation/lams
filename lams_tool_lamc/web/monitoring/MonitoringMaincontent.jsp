@@ -25,7 +25,7 @@
         }
 
 		function doStatistic(){
-			var url = '<c:url value="/monitoring.do?dispatch=statistic"/>';
+			var url = '<c:url value="/monitoring/statistic.do"/>';
 			$.ajaxSetup({ cache: true });
 			$("#statisticArea").load(
 				url,
@@ -37,20 +37,20 @@
 		}       
 
 		function downloadMarks() {
-			var url = "<c:url value='/monitoring.do'/>";
+			var url = "<c:url value='/monitoring/downloadMarks.do'/>";
 		    var reqIDVar = new Date();
-			var param = "?validate=false&dispatch=downloadMarks&toolContentID=${mcGeneralMonitoringDTO.toolContentID}&reqID="+reqIDVar.getTime();
+			var param = "?validate=false&toolContentID=${mcGeneralMonitoringDTO.toolContentID}&reqID="+reqIDVar.getTime();
 			url = url + param;
 
 			return downloadFile(url, 'message-area-busy', '<fmt:message key="label.summary.downloaded"/>', 'message-area', 'btn-disable-on-submit');
 		}
 		
 		function turnOnDisplayAnswers() {
-			window.open("<c:url value='/monitoring.do'/>?dispatch=displayAnswers&toolContentID=${mcGeneralMonitoringDTO.toolContentID}&contentFolderID=${contentFolderID}","_self")
+			window.open("<c:url value='/monitoring/displayAnswers.do'/>?toolContentID=${mcGeneralMonitoringDTO.toolContentID}&contentFolderID=${contentFolderID}","_self")
 		}
 
 		function turnOnDisplayFeedbackOnly() {
-			window.open("<c:url value='/monitoring.do'/>?dispatch=displayFeedbackOnly&toolContentID=${mcGeneralMonitoringDTO.toolContentID}&contentFolderID=${contentFolderID}","_self")
+			window.open("<c:url value='/monitoring/displayFeedbackOnly.do'/>?toolContentID=${mcGeneralMonitoringDTO.toolContentID}&contentFolderID=${contentFolderID}","_self")
 		}
 
 	</script>

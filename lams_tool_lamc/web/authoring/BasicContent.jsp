@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 <c:set var="sessionMap" value="${sessionScope[sessionMapId]}" />
 
 <script type="text/javascript">
@@ -31,7 +30,7 @@
 	
     function saveQTI(formHTML, formName) {
     	var form = $(formHTML);
-    	form.prop("action", '<html:rewrite page="/authoring.do?dispatch=saveQTI&sessionMapId=${sessionMapId}"/>').appendTo(document.body);
+    	form.prop("action", '<lams:WebAppURL />authoring/saveQTI.do?sessionMapId=${sessionMapId}"/>').appendTo(document.body);
     	form.ajaxSubmit({ 
     		target:  $('#resourceListArea'),
     		iframe: true,
@@ -46,21 +45,21 @@
     function exportQTI() {
     	var frame = document.getElementById("downloadFileDummyIframe"),
     		title = encodeURIComponent(document.getElementsByName("title")[0].value);
-    	frame.src = '<html:rewrite page="/authoring.do?dispatch=exportQTI&sessionMapId=${sessionMapId}" />'
+    	frame.src = '<lams:WebAppURL />authoring/exportQTI.do?sessionMapId=${sessionMapId}" />'
     			+ '&title=' + title;
     }
 </script>
 
-<html:hidden property="questionIndex" />
+<input type="hidden" name="questionIndex" />
 
 <div class="form-group">
     <label for="title"><fmt:message key="label.authoring.title.col"/></label>
-    <html:text property="title" styleClass="form-control"/>
+    <input type="text" name="title" value="MCQ" class="form-control"/>
 </div>
 
 <div class="form-group">
     <label for="instructions"><fmt:message key="label.authoring.instructions.col" /></label>
-    <lams:CKEditor id="instructions" value="${formBean.instructions}" contentFolderID="${sessionMap.contentFolderID}"/>
+    <lams:CKEditor id="instructions" value="${mcAuthoringForm.instructions}" contentFolderID="${sessionMap.contentFolderID}"/>
 </div>
 
 <div id="resourceListArea">
@@ -68,7 +67,7 @@
 </div>
   
 <p>
-	<a href="<html:rewrite page="/authoring.do"/>?dispatch=editQuestionBox&sessionMapId=${sessionMapId}&KeepThis=true&TB_iframe=true&modal=true"
+	<a href="<lams:WebAppURL />authoring/editQuestionBox.do?sessionMapId=${sessionMapId}&KeepThis=true&TB_iframe=true&modal=true"
 		class="btn btn-default btn-sm thickbox"> 
 		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.save.question" /> 
 	</a>

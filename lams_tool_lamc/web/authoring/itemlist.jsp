@@ -75,7 +75,7 @@
 
 				<td align="center" style="width:5%">
 					<c:set var="editItemUrl" >
-						<html:rewrite page="/authoring.do"/>?dispatch=editQuestionBox&questionIndex=${queIndex}&sessionMapId=${sessionMapId}&KeepThis=true&TB_iframe=true&modal=true
+						<lams:WebAppURL />authoring/editQuestionBox.do?questionIndex=${queIndex}&sessionMapId=${sessionMapId}&KeepThis=true&TB_iframe=true&modal=true
 					</c:set>
 					<a href="${editItemUrl}" class="thickbox"> 
 						<i class="fa fa-pencil" title="<fmt:message key='label.tip.editQuestion'/>"></i>

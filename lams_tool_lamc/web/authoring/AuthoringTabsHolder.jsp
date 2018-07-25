@@ -24,6 +24,7 @@
 			document.McAuthoringForm.dispatch.value=actionMethod; 
 			document.McAuthoringForm.submit();
 		}
+
 		
 		function submitModifyAuthoringQuestion(questionIndexValue, actionMethod) {
 			document.McAuthoringForm.questionIndex.value=questionIndexValue; 
@@ -74,12 +75,11 @@
 </lams:head>
 <body onLoad="init();" class="stripes">
 
-	<html:form  action="/authoring?validate=false" styleId="authoringForm" enctype="multipart/form-data" method="POST" target="_self">
-		<html:hidden property="dispatch" value="submitAllContent"/>
-		<html:hidden property="httpSessionID" value="${sessionMapId}"/>
+	<form:form  action="submitAllContent.do" modelAttribute="mcAuthoringForm" id="mcAuthoringForm" enctype="multipart/form-data" method="POST" target="_self">
+		<form:hidden path="httpSessionID" value="${sessionMapId}"/>
 			
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>
-		<lams:Page title="${title}" type="navbar">
+		<lams:Page title="${title}" type="navbar" formID="mcAuthoringForm">
 
 			<lams:Tabs control="true" title="${title}" helpToolSignature="<%= McAppConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 				<lams:Tab id="1" key="label.basic" />
@@ -95,14 +95,14 @@
  					<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
                 </lams:TabBodys>
 
-				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lamc11" 
+				<lams:AuthoringButton formID="mcAuthoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lamc11" 
 					cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${sessionMap.toolContentID}" 
 					contentFolderID="${sessionMap.contentFolderID}" accessMode="${sessionMap.mode}" defineLater="${sessionMap.mode=='teacher'}"/>
 			</lams:TabBodyArea>
 					
 			<div id="footer"></div>
 		</lams:Page>
-	</html:form>
+	</form:form>
 	
 </body>
 </lams:html>

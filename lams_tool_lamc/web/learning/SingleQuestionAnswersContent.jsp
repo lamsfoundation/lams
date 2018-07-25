@@ -2,9 +2,9 @@
 
 <!--options content goes here-->
 
-<html:hidden property="nextQuestionSelected" />
-<html:hidden property="continueOptionsCombined" />
-<html:hidden property="questionIndex" value="${mcGeneralLearnerFlowDTO.questionIndex}" />
+<form:hidden path="nextQuestionSelected" />
+<form:hidden path="continueOptionsCombined" />
+<form:hidden path="questionIndex" value="${mcGeneralLearnerFlowDTO.questionIndex}" />
 
 <c:forEach var="dto" varStatus="status" items="${requestScope.learnerAnswersDTOList}">
 	<c:if test="${dto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}">
@@ -84,23 +84,23 @@
 </c:forEach>
 
 <c:if test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}">
-	<html:button property="continueOptionsCombined" onclick="submitNextQuestionSelected();"
-			styleClass="btn btn-sm btn-primary pull-right">
+	<button name="continueOptionsCombined" onclick="submitNextQuestionSelected();"
+			class="btn btn-sm btn-primary pull-right">
 		<fmt:message key="button.continue" />
-	</html:button>
+	</button>
 </c:if>
 
 <c:if test="${mcGeneralLearnerFlowDTO.totalQuestionCount == '1'}">
-	<html:button property="continueOptionsCombined" onclick="doSubmit();" styleClass="btn btn-sm btn-primary pull-right">
+	<button name="continueOptionsCombined" onclick="doSubmit();" class="btn btn-sm btn-primary pull-right">
 		<fmt:message key="button.continue" />
-	</html:button>
+	</button>
 </c:if>
 
 <c:if test="${mcGeneralLearnerFlowDTO.totalCountReached == 'true'}">
-	<html:button property="continueOptionsCombined" onclick="submitAllAnswers();"
-			styleClass="btn btn-sm btn-primary pull-right">
+	<button name="continueOptionsCombined" onclick="submitAllAnswers();"
+			class="btn btn-sm btn-primary pull-right">
 		<fmt:message key="button.submit" />
-	</html:button>
+	</button>
 </c:if>
 
 <!--options content ends here-->

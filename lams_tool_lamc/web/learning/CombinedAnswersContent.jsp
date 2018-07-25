@@ -81,12 +81,12 @@
   </div>
 </c:forEach>
 
-<html:hidden property="continueOptionsCombined" value="Continue" />
+<form:hidden path="continueOptionsCombined" value="Continue" />
 
 <c:if test="${hasEditRight}">
-  <html:button property="continueButton" styleClass="btn btn-sm btn-primary pull-right" onclick="doSubmit();" styleId="continueButton">
+  <button name="continueButton" class="btn btn-sm btn-primary pull-right" onclick="doSubmit();" id="continueButton">
     <fmt:message key="button.continue" />
-  </html:button>
+  </button>
 </c:if>
 
 <!--options content ends here-->

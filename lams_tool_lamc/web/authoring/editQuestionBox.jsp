@@ -29,6 +29,11 @@
     	    		target:  $('#candidateArea')
     		    });
 			}
+
+			function submitForm(methodName) {
+				var f = document.getElementById('mcAuthoringForm');
+				f.action = methodName + ".do";
+				f.submit();
 			
 			function saveQuestion() {
 				$("#newQuestion").val(CKEDITOR.instances.newQuestion.getData());
@@ -55,7 +60,7 @@
 				
 			function submitModifyCandidate(candidateIndexValue, actionMethod) {
 				document.McAuthoringForm.candidateIndex.value=candidateIndexValue;
-				submitMethod(actionMethod);
+				submitForm(actionMethod);
 			}
 
 			function removeCandidate(candidateIndexValue) {
@@ -146,11 +151,11 @@
 
 <body class="stripes">
 
-	<html:form action="/authoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
-		<html:hidden property="questionIndex" />
+	<form:form action="editQuestionBox.do" modelAttribute="mcAuthoringForm" id="newQuestionForm" enctype="multipart/form-data" method="POST">
+		<form:hidden path="questionIndex" />
 
 		<c:set var="title"><fmt:message key="label.edit.question"/></c:set>
-		<lams:Page title="${title}" type="learner">
+		<lams:Page title="${title}" type="learner" formID="newQuestionForm">
 
 			<div class="form-group">
 				<lams:CKEditor id="newQuestion"
@@ -164,9 +169,9 @@
 			</div>
 			
 			<div class="form-group">
-				<html:button property="newCandidate" onclick="javascript:submitMethod('newCandidateBox');" styleClass="btn btn-default btn-sm">
+				<button name="newCandidate" onclick="javascript:submitForm('newCandidateBox');" class="btn btn-default btn-sm">
 					<fmt:message key="label.add.candidates" />
-				</html:button>
+				</button>
 			</div>
 			
 			<div id="questions-worth" class="form-group">
@@ -203,6 +208,6 @@
 			</div>
 
 		</lams:Page>
-	</html:form>
+	</form:form>
 </body>
 </lams:html>

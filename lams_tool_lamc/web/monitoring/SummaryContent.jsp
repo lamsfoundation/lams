@@ -27,7 +27,7 @@
 		lams: '${lams}',
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?dispatch=setSubmissionDeadline"/>',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
 		toolContentID: '${toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
@@ -45,7 +45,7 @@
 		
 			jQuery("#group${sessionDto.sessionId}").jqGrid({
 				datatype: "json",
-				url: "<c:url value='/monitoring.do'/>?dispatch=getPagedUsers&toolSessionID=${sessionDto.sessionId}",
+				url: "<c:url value='/monitoring/getPagedUsers.do'/>?toolSessionID=${sessionDto.sessionId}",
 				height: 'auto',
 				autowidth: true,
 				shrinkToFit: true,
@@ -127,7 +127,7 @@
 	  			   	{name:'grade', index:'grade', width:80, sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }
 			   	],
 			   	multiselect: false,
-				cellurl: '<c:url value="/monitoring.do?dispatch=saveUserMark"/>',
+				cellurl: '<c:url value="/monitoring/saveUserMark.do"/>',
   				cellEdit: true,
   				afterEditCell: function (rowid,name,val,iRow,iCol){
   					oldValue = eval(val);

@@ -1,19 +1,13 @@
-package org.lamsfoundation.lams.tool.mc.web.action;
+package org.lamsfoundation.lams.tool.mc.web.controller;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
@@ -23,20 +17,28 @@ import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
-import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-public class TblMonitoringAction extends LamsDispatchAction {
-    private static Logger logger = Logger.getLogger(TblMonitoringAction.class.getName());
+@Controller
+@RequestMapping("/tblmonitoring")
+public class TblMonitoringController {
+
+    private static Logger logger = Logger.getLogger(TblMonitoringController.class.getName());
+
+    @Autowired
+    @Qualifier("mcService")
+    private IMcService mcService;
 
     /**
      * Shows iRA page in case of MCQ activity
      */
-    public ActionForward iraMcq(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+    @RequestMapping("/iraMcq")
+    public String iraMcq(HttpServletRequest request) {
 
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	McContent mcContent = mcService.getMcContent(toolContentId);
@@ -48,15 +50,14 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	request.setAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
 	request.setAttribute("questions", mcContent.getMcQueContents());
-	return mapping.findForward("mcq");
+	return "tblmonitoring/mcq";
     }
 
     /**
      * Shows ira StudentChoices page
      */
-    public ActionForward mcqStudentChoices(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+    @RequestMapping("/mcqStudentChoices")
+    public String mcqStudentChoices(HttpServletRequest request) {
 
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	McContent mcContent = mcService.getMcContent(toolContentId);
@@ -78,11 +79,11 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	    totalNumberOfUsers += session.getMcQueUsers().size();
 	}
 
-	ArrayList<McQuestionDTO> questionDtos = new ArrayList<McQuestionDTO>();
+	ArrayList<McQuestionDTO> questionDtos = new ArrayList<>();
 	for (McQueContent question : questions) {
 
 	    // build candidate dtos
-	    List<McOptionDTO> optionDtos = new LinkedList<McOptionDTO>();
+	    List<McOptionDTO> optionDtos = new LinkedList<>();
 	    for (McOptsContent option : (Set<McOptsContent>) question.getMcOptionsContents()) {
 		int optionAttemptCount = mcService.getAttemptsCountPerOption(option.getUid());
 
@@ -103,26 +104,24 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	request.setAttribute("questionDtos", questionDtos);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
-	return mapping.findForward("mcqStudentChoices");
+	return "tblmonitoring/mcqStudentChoices";
     }
 
     /**
      * Get ModalDialog for Teams tab.
-     * 
-     * @throws JSONException
      */
-    public ActionForward getModalDialogForTeamsTab(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+    @RequestMapping("/getModalDialogForTeamsTab")
+    public String getModalDialogForTeamsTab(HttpServletRequest request) {
+
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 
 	McQueUsr user = mcService.getMcUserByContentId(userId, toolContentId);
-	List<McUsrAttempt> finalizedUserAttempts = user == null ? new LinkedList<McUsrAttempt>()
+	List<McUsrAttempt> finalizedUserAttempts = user == null ? new LinkedList<>()
 		: mcService.getFinalizedUserAttempts(user);
 	request.setAttribute("userAttempts", finalizedUserAttempts);
 
-	return mapping.findForward("teams");
+	return "tblmonitoring/teams";
     }
 
 }

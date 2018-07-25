@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.mc.web.action;
+package org.lamsfoundation.lams.tool.mc.web.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,11 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
@@ -53,30 +48,105 @@ import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
-import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.tool.mc.util.AuthoringUtil;
 import org.lamsfoundation.lams.tool.mc.web.form.McAuthoringForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Action class that controls the logic of tool behavior.
  *
  * @author Ozgur Demirtas
  */
-public class McAction extends LamsDispatchAction {
-    private static Logger logger = Logger.getLogger(McAction.class.getName());
+@Controller
+@RequestMapping("/authoring")
+public class McController {
+
+    private static Logger logger = Logger.getLogger(McController.class.getName());
+
+    @Autowired
+    @Qualifier("mcService")
+    private IMcService mcService;
+
+    @Autowired
+    @Qualifier("lamcMessageService")
+    private static MessageService messageService;
+
+    @RequestMapping("/authoring")
+    public String execute(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request) {
+
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	String sessionMapId = sessionMap.getSessionID();
+	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
+
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, strToolContentID);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	sessionMap.put(AttributeNames.ATTR_MODE, mode);
+
+	// request is from monitoring module
+	if (mode.isTeacher()) {
+	    mcService.setDefineLater(strToolContentID, true);
+	}
+
+	if ((strToolContentID == null) || (strToolContentID.equals(""))) {
+	    return "McErrorBox";
+	}
+
+	McContent mcContent = mcService.getMcContent(new Long(strToolContentID));
+
+	// if mcContent does not exist, try to use default content instead.
+	if (mcContent == null) {
+	    long defaultContentID = mcService.getToolDefaultContentIdBySignature(McAppConstants.TOOL_SIGNATURE);
+	    mcContent = mcService.getMcContent(new Long(defaultContentID));
+	    mcContent = McContent.newInstance(mcContent, new Long(strToolContentID));
+	}
+
+	// prepare form
+	mcAuthoringForm.setSln(mcContent.isShowReport() ? "1" : "0");
+	mcAuthoringForm.setQuestionsSequenced(mcContent.isQuestionsSequenced() ? "1" : "0");
+	mcAuthoringForm.setRandomize(mcContent.isRandomize() ? "1" : "0");
+	mcAuthoringForm.setDisplayAnswersFeedback(
+		mcContent.isDisplayAnswers() ? "answers" : mcContent.isDisplayFeedbackOnly() ? "feedback" : "none");
+	mcAuthoringForm.setShowMarks(mcContent.isShowMarks() ? "1" : "0");
+	mcAuthoringForm.setUseSelectLeaderToolOuput(mcContent.isUseSelectLeaderToolOuput() ? "1" : "0");
+	mcAuthoringForm.setPrefixAnswersWithLetters(mcContent.isPrefixAnswersWithLetters() ? "1" : "0");
+	mcAuthoringForm.setRetries(mcContent.isRetries() ? "1" : "0");
+	mcAuthoringForm.setPassmark("" + mcContent.getPassMark());
+	mcAuthoringForm.setReflect(mcContent.isReflect() ? "1" : "0");
+	mcAuthoringForm.setReflectionSubject(mcContent.getReflectionSubject());
+	mcAuthoringForm.setTitle(mcContent.getTitle());
+	mcAuthoringForm.setInstructions(mcContent.getInstructions());
+	mcAuthoringForm.setEnableConfidenceLevels(mcContent.isEnableConfidenceLevels());
+
+	List<McQuestionDTO> questionDtos = AuthoringUtil.buildDefaultQuestions(mcContent);
+	sessionMap.put(McAppConstants.QUESTION_DTOS, questionDtos);
+
+	List<McQuestionDTO> listDeletedQuestionDTOs = new ArrayList<>();
+	sessionMap.put(McAppConstants.LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
+
+	return "authoring/AuthoringTabsHolder";
+    }
 
     /**
      * submits content into the tool database
      */
-    public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/submitAllContent")
+    public String submitAllContent(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	String sessionMapId = mcAuthoringForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
@@ -90,12 +160,11 @@ public class McAction extends LamsDispatchAction {
 		.get(McAppConstants.LIST_DELETED_QUESTION_DTOS);
 
 	if (questionDTOs.isEmpty()) {
-	    ActionMessages errors = new ActionMessages();
-	    ActionMessage error = new ActionMessage("questions.none.submitted");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	    saveErrors(request, errors);
-	    McAction.logger.debug("errors saved: " + errors);
-	    return mapping.findForward(McAppConstants.LOAD_AUTHORING);
+	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	    errorMap.add("GLOBAL", messageService.getMessage("questions.none.submitted"));
+	    request.setAttribute("errorMap", errorMap);
+//            McController.logger.debug("errors saved: " + errors);
+	    return "authoring/AuthoringTabsHolder";
 	}
 
 	// in case request is from monitoring module - prepare for recalculate User Answers
@@ -146,15 +215,15 @@ public class McAction extends LamsDispatchAction {
 	}
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	return mapping.findForward(McAppConstants.LOAD_AUTHORING);
+	return "authoring/AuthoringTabsHolder";
     }
 
     /**
      * opens up an new screen within the current page for editing a question
      */
-    public ActionForward editQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+    @RequestMapping("/editQuestionBox")
+    public String editQuestionBox(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request) {
+
 	String sessionMapId = request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
@@ -192,15 +261,14 @@ public class McAction extends LamsDispatchAction {
 	}
 	sessionMap.put(McAppConstants.QUESTION_DTO, questionDto);
 
-	return (mapping.findForward("editQuestionBox"));
+	return "authoring/editQuestionBox";
     }
 
     /**
      * removes a question from the questions map
      */
-    public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+    @RequestMapping("/removeQuestion")
+    public String removeQuestion(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request) {
 
 	String sessionMapId = request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -237,23 +305,14 @@ public class McAction extends LamsDispatchAction {
 	questionDTOs = tempQuestionDtos;
 	sessionMap.put(McAppConstants.QUESTION_DTOS, questionDTOs);
 
-	return (mapping.findForward("itemList"));
+	return "authoring/itemlist";
     }
 
     /**
      * moves a question down in the list
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
-    public ActionForward moveQuestionDown(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+    @RequestMapping("/moveQuestionDown")
+    public String moveQuestionDown(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request) {
 
 	String sessionMapId = request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -264,16 +323,16 @@ public class McAction extends LamsDispatchAction {
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.QUESTION_DTOS);
-	questionDTOs = McAction.swapQuestions(questionDTOs, questionIndex, "down");
-	questionDTOs = McAction.reorderQuestionDtos(questionDTOs);
+	questionDTOs = McController.swapQuestions(questionDTOs, questionIndex, "down");
+	questionDTOs = McController.reorderQuestionDtos(questionDTOs);
 	sessionMap.put(McAppConstants.QUESTION_DTOS, questionDTOs);
 
-	return (mapping.findForward("itemList"));
+	return "authoring/itemlist";
     }
 
-    public ActionForward moveQuestionUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+    @RequestMapping("/moveQuestionUp")
+    public String moveQuestionUp(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request) {
+
 	String sessionMapId = request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
@@ -283,11 +342,11 @@ public class McAction extends LamsDispatchAction {
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.QUESTION_DTOS);
-	questionDTOs = McAction.swapQuestions(questionDTOs, questionIndex, "up");
-	questionDTOs = McAction.reorderQuestionDtos(questionDTOs);
+	questionDTOs = McController.swapQuestions(questionDTOs, questionIndex, "up");
+	questionDTOs = McController.reorderQuestionDtos(questionDTOs);
 	sessionMap.put(McAppConstants.QUESTION_DTOS, questionDTOs);
 
-	return (mapping.findForward("itemList"));
+	return "authoring/itemlist";
     }
 
     /*
@@ -362,10 +421,8 @@ public class McAction extends LamsDispatchAction {
 	return tempQuestionDtos;
     }
 
-    public ActionForward saveQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-
-	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+    @RequestMapping("/saveQuestion")
+    public String saveQuestion(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request) {
 
 	String sessionMapId = request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -374,7 +431,7 @@ public class McAction extends LamsDispatchAction {
 
 	String mark = request.getParameter("mark");
 
-	List<McOptionDTO> options = McAction.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> options = McController.repopulateOptionDTOs(request, false);
 
 	//remove blank options
 	List<McOptionDTO> optionsWithoutEmptyOnes = new LinkedList<>();
@@ -440,15 +497,16 @@ public class McAction extends LamsDispatchAction {
 	request.setAttribute(McAppConstants.QUESTION_DTOS, questionDTOs);
 	sessionMap.put(McAppConstants.QUESTION_DTOS, questionDTOs);
 
-	return (mapping.findForward("itemList"));
+	return "authoring/itemlist";
     }
 
     /**
      * Parses questions extracted from IMS QTI file and adds them to currently edited question.
      */
+    @RequestMapping("/saveQTI")
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public ActionForward saveQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    public String saveQTI(HttpServletRequest request) throws IOException, ServletException {
+
 	// big part of code was taken from addSingleQuestion() and saveQuestion() methods
 	String sessionMapId = request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -533,15 +591,15 @@ public class McAction extends LamsDispatchAction {
 
 	sessionMap.put(McAppConstants.QUESTION_DTOS, questionDtos);
 
-	return mapping.findForward("itemList");
+	return "authoring/itemlist";
     }
 
     /**
      * Prepares MC questions for QTI packing
      */
+    @RequestMapping("/exportQTI")
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public ActionForward exportQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public String exportQTI(HttpServletRequest request, HttpServletResponse response) {
 	String sessionMapId = request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
@@ -580,8 +638,8 @@ public class McAction extends LamsDispatchAction {
 	return null;
     }
 
-    public ActionForward moveCandidateUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/moveCandidateUp")
+    public String moveCandidateUp(HttpServletRequest request) {
 	String sessionMapId = request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
@@ -590,20 +648,20 @@ public class McAction extends LamsDispatchAction {
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = McController.repopulateOptionDTOs(request, false);
 
 	//moveAddedCandidateUp
 	McQuestionDTO questionDto = (McQuestionDTO) sessionMap.get(McAppConstants.QUESTION_DTO);
 	List<McOptionDTO> listCandidates = new LinkedList<>();
-	listCandidates = McAction.swapOptions(optionDtos, candidateIndex, "up");
+	listCandidates = McController.swapOptions(optionDtos, candidateIndex, "up");
 	questionDto.setOptionDtos(listCandidates);
 	sessionMap.put(McAppConstants.QUESTION_DTO, questionDto);
 
-	return (mapping.findForward("candidateAnswersList"));
+	return "authoring/candidateAnswersList";
     }
 
-    public ActionForward moveCandidateDown(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/moveCandidateDown")
+    public String moveCandidateDown(HttpServletRequest request) {
 	String sessionMapId = request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
@@ -612,16 +670,16 @@ public class McAction extends LamsDispatchAction {
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = McController.repopulateOptionDTOs(request, false);
 
 	//moveAddedCandidateDown
 	McQuestionDTO questionDto = (McQuestionDTO) sessionMap.get(McAppConstants.QUESTION_DTO);
 	List<McOptionDTO> swapedOptions = new LinkedList<>();
-	swapedOptions = McAction.swapOptions(optionDtos, candidateIndex, "down");
+	swapedOptions = McController.swapOptions(optionDtos, candidateIndex, "down");
 	questionDto.setOptionDtos(swapedOptions);
 	sessionMap.put(McAppConstants.QUESTION_DTO, questionDto);
 
-	return (mapping.findForward("candidateAnswersList"));
+	return "authoring/candidateAnswersList";
     }
 
     /*
@@ -670,8 +728,9 @@ public class McAction extends LamsDispatchAction {
 	return newOptionDtos;
     }
 
-    public ActionForward removeCandidate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/removeCandidate")
+    public String removeCandidate(HttpServletRequest request) {
+
 	String sessionMapId = request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
@@ -683,7 +742,7 @@ public class McAction extends LamsDispatchAction {
 	// removeAddedCandidate
 	McQuestionDTO questionDto = (McQuestionDTO) sessionMap.get(McAppConstants.QUESTION_DTO);
 
-	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = McController.repopulateOptionDTOs(request, false);
 	List<McOptionDTO> listFinalCandidatesDTO = new LinkedList<>();
 	int caIndex = 0;
 	for (McOptionDTO mcOptionDTO : optionDtos) {
@@ -697,11 +756,12 @@ public class McAction extends LamsDispatchAction {
 	questionDto.setOptionDtos(listFinalCandidatesDTO);
 	sessionMap.put(McAppConstants.QUESTION_DTO, questionDto);
 
-	return (mapping.findForward("candidateAnswersList"));
+	return "authoring/candidateAnswersList";
     }
 
-    public ActionForward newCandidateBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/newCandidateBox")
+    public String newCandidateBox(HttpServletRequest request) {
+
 	String sessionMapId = request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
@@ -710,14 +770,14 @@ public class McAction extends LamsDispatchAction {
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, true);
+	List<McOptionDTO> optionDtos = McController.repopulateOptionDTOs(request, true);
 
 	//newAddedCandidateBox
 	McQuestionDTO questionDto = (McQuestionDTO) sessionMap.get(McAppConstants.QUESTION_DTO);
 	questionDto.setOptionDtos(optionDtos);
 	sessionMap.put(McAppConstants.QUESTION_DTO, questionDto);
 
-	return (mapping.findForward("candidateAnswersList"));
+	return "authoring/candidateAnswersList";
     }
 
     /**
