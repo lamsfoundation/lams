@@ -41,11 +41,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -65,7 +60,6 @@ import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.LearningUtil;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.util.QaComparator;
@@ -86,6 +80,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -106,14 +101,18 @@ public class QaLearningController implements QaAppConstants {
     @Qualifier("qaMessageService")
     private MessageService messageService;
 
+    @Autowired
+    private WebApplicationContext applicationContext;
+
     @RequestMapping("/")
     public String unspecified() throws IOException, ServletException, ToolException {
 	QaLearningController.logger.warn("dispatching unspecified...");
 	return null;
     }
-    
+
     @RequestMapping("/learning")
-    public String execute(QaLearningForm qaLearningForm, HttpServletRequest request) throws IOException, ServletException, QaApplicationException {
+    public String execute(QaLearningForm qaLearningForm, HttpServletRequest request)
+	    throws IOException, ServletException, QaApplicationException {
 
 	QaUtils.cleanUpSessionAbsolute(request);
 
@@ -125,7 +124,7 @@ public class QaLearningController implements QaAppConstants {
 	/*
 	 * By now, the passed tool session id MUST exist in the db by calling:
 	 * public void createToolSession(Long toolSessionId, Long toolContentId) by the core.
-	 * 
+	 *
 	 * make sure this session exists in tool's session table by now.
 	 */
 	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
@@ -180,13 +179,13 @@ public class QaLearningController implements QaAppConstants {
 
 	/* holds the question contents for a given tool session and relevant content */
 	Map mapQuestionStrings = new TreeMap(new QaComparator());
-	Map<Integer, QaQuestionDTO> mapQuestions = new TreeMap<Integer, QaQuestionDTO>();
+	Map<Integer, QaQuestionDTO> mapQuestions = new TreeMap<>();
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = httpSessionID == null ? null
 		: (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 	if (sessionMap == null) {
-	    sessionMap = new SessionMap<String, Object>();
+	    sessionMap = new SessionMap<>();
 	    Map mapSequentialAnswers = new HashMap();
 	    sessionMap.put(MAP_SEQUENTIAL_ANSWERS_KEY, mapSequentialAnswers);
 	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -232,11 +231,11 @@ public class QaLearningController implements QaAppConstants {
 	 */
 	if (qaContent.isDefineLater()) {
 	    QaUtils.cleanUpSessionAbsolute(request);
-	    return (mapping.findForward(DEFINE_LATER));
+	    return "learning/defineLater";
 	}
 
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(
-		new Long(toolSessionID), request, getServlet().getServletContext());
+		new Long(toolSessionID), request, applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	/*
@@ -295,11 +294,11 @@ public class QaLearningController implements QaAppConstants {
 	    generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
 	    generalLearnerFlowDTO.setTeacherViewOnly(new Boolean(true).toString());
 
-	    QaLearningAction.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId, user,
+	    QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId, user,
 		    generalLearnerFlowDTO);
 	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
-	    return (mapping.findForward(LEARNER_REP));
+	    return "learning/LearnerRep";
 	}
 
 	//check if there is submission deadline
@@ -329,20 +328,20 @@ public class QaLearningController implements QaAppConstants {
 		     */
 		    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 
-		    QaLearningAction.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId, user,
-			    generalLearnerFlowDTO);
+		    QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId,
+			    user, generalLearnerFlowDTO);
 
 		    if (user.isLearnerFinished()) {
 			generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(true).toString());
-			return (mapping.findForward(REVISITED_LEARNER_REP));
+			return "learning/RevisitedLearnerRep";
 		    } else {
 			generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(false).toString());
-			return (mapping.findForward(LEARNER_REP));
+			return "learning/LearnerRep";
 		    }
 
 		    // show submissionDeadline page otherwise
 		} else {
-		    return mapping.findForward("submissionDeadline");
+		    return "learning/submissionDeadline";
 		}
 	    }
 	}
@@ -380,15 +379,15 @@ public class QaLearningController implements QaAppConstants {
 		     */
 		    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 
-		    QaLearningAction.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId, user,
-			    generalLearnerFlowDTO);
+		    QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId,
+			    user, generalLearnerFlowDTO);
 
 		    if (user.isLearnerFinished()) {
 			generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(true).toString());
-			return (mapping.findForward(REVISITED_LEARNER_REP));
+			return "learning/RevisitedLearnerRep";
 		    } else {
 			generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(false).toString());
-			return (mapping.findForward(LEARNER_REP));
+			return "learning/LearnerRep";
 		    }
 		}
 	    }
@@ -397,7 +396,7 @@ public class QaLearningController implements QaAppConstants {
 	//**---- showing AnswersContent.jsp ----**
 	LearningUtil.populateAnswers(sessionMap, qaContent, user, mapQuestions, generalLearnerFlowDTO, qaService);
 
-	return (mapping.findForward(LOAD_LEARNER));
+	return "learning/AnswersContent";
     }
 
     /**
@@ -407,8 +406,7 @@ public class QaLearningController implements QaAppConstants {
      * @param mapping
      * @return ActionForward
      */
-    protected void validateParameters(HttpServletRequest request,
-	    QaLearningForm qaLearningForm) {
+    protected void validateParameters(HttpServletRequest request, QaLearningForm qaLearningForm) {
 	/*
 	 * process incoming tool session id and later derive toolContentId from it.
 	 */
@@ -443,7 +441,6 @@ public class QaLearningController implements QaAppConstants {
 	qaLearningForm.setMode(mode);
     }
 
-
     private QaQueUsr getSpecifiedUser(String toolSessionId, Integer userId) {
 	QaQueUsr qaUser = qaService.getUserByIdAndSession(userId.longValue(), new Long(toolSessionId));
 	if (qaUser == null) {
@@ -451,7 +448,6 @@ public class QaLearningController implements QaAppConstants {
 	}
 	return qaUser;
     }
-//    END OF STARTER
 
     /**
      * submits users responses

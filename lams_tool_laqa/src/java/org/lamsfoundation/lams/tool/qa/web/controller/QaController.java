@@ -36,9 +36,16 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.apache.struts.Globals;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
@@ -50,7 +57,9 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.AuthoringUtil;
+import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
@@ -89,6 +98,208 @@ public class QaController implements QaAppConstants {
     @RequestMapping("/")
     public String unspecified() {
 	return "authoring/AuthoringTabsHolder";
+    }
+    
+    @RequestMapping("/authoring")
+    public String execute(QaAuthoringForm qaAuthoringForm, HttpServletRequest request) throws IOException, ServletException, QaApplicationException {
+
+	QaUtils.cleanUpSessionAbsolute(request);
+
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	qaAuthoringForm.setContentFolderID(contentFolderID);
+
+	qaAuthoringForm.resetRadioBoxes();
+
+	validateDefaultContent(request, qaAuthoringForm);
+
+	//no problems getting the default content, will render authoring screen
+	String strToolContentID = "";
+	/* the authoring url must be passed a tool content id */
+	strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	qaAuthoringForm.setToolContentID(strToolContentID);
+
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
+	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, "");
+	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, "");
+	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+	qaAuthoringForm.setHttpSessionID(sessionMap.getSessionID());
+
+	if (strToolContentID == null || strToolContentID.equals("")) {
+	    QaUtils.cleanUpSessionAbsolute(request);
+	    throw new ServletException("No Tool Content ID found");
+	}
+
+	QaContent qaContent = qaService.getQaContent(new Long(strToolContentID).longValue());
+	if (qaContent == null) {
+	    /* fetch default content */
+	    long defaultContentID = qaService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
+	    qaContent = qaService.getQaContent(defaultContentID);
+	    qaContent = QaContent.newInstance(qaContent, new Long(strToolContentID));
+	}
+
+	prepareDTOandForm(request, qaAuthoringForm, qaContent, qaService, sessionMap);
+
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	// request is from monitoring module
+	if (mode.isTeacher()) {
+	    qaService.setDefineLater(strToolContentID, true);
+	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+
+	SortedSet<QaCondition> conditionList = getQaConditionList(sessionMap);
+	conditionList.clear();
+	conditionList.addAll(qaContent.getConditions());
+
+	qaAuthoringForm.setAllowRichEditor(qaContent.isAllowRichEditor());
+	qaAuthoringForm.setUseSelectLeaderToolOuput(qaContent.isUseSelectLeaderToolOuput());
+
+	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, qaAuthoringForm);
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+
+	// get rating criterias from DB
+	List<RatingCriteria> ratingCriterias = qaService.getRatingCriterias(qaContent.getQaContentId());
+	sessionMap.put(AttributeNames.ATTR_RATING_CRITERIAS, ratingCriterias);
+
+	return "authoring/AuthoringTabsHolder";
+    }
+
+    /**
+     * retrives the existing content information from the db and prepares the data for presentation purposes.
+     *
+     * @param request
+     * @param mapping
+     * @param qaAuthoringForm
+     * @param mapQuestionContent
+     * @param toolContentID
+     * @return ActionForward
+     */
+    protected QaContent prepareDTOandForm(HttpServletRequest request, QaAuthoringForm qaAuthoringForm,
+	    QaContent qaContent, IQaService qaService, SessionMap<String, Object> sessionMap) {
+
+	qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible() ? "1" : "0");
+	qaAuthoringForm.setAllowRateAnswers(qaContent.isAllowRateAnswers() ? "1" : "0");
+	qaAuthoringForm.setNotifyTeachersOnResponseSubmit(qaContent.isNotifyTeachersOnResponseSubmit() ? "1" : "0");
+	qaAuthoringForm.setShowOtherAnswers(qaContent.isShowOtherAnswers() ? "1" : "0");
+	qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced() ? "1" : "0");
+	qaAuthoringForm.setLockWhenFinished(qaContent.isLockWhenFinished() ? "1" : "0");
+	qaAuthoringForm.setNoReeditAllowed(qaContent.isNoReeditAllowed() ? "1" : "0");
+	qaAuthoringForm.setMaximumRates(qaContent.getMaximumRates());
+	qaAuthoringForm.setMinimumRates(qaContent.getMinimumRates());
+	qaAuthoringForm.setReflect(qaContent.isReflect() ? "1" : "0");
+	qaAuthoringForm.setReflectionSubject(qaContent.getReflectionSubject());
+	qaAuthoringForm.setTitle(qaContent.getTitle());
+	qaAuthoringForm.setInstructions(qaContent.getInstructions());
+	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, qaContent.getTitle());
+	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, qaContent.getInstructions());
+
+	List<QaQuestionDTO> questionDTOs = new LinkedList();
+
+	/*
+	 * get the existing question content
+	 */
+	Iterator queIterator = qaContent.getQaQueContents().iterator();
+	while (queIterator.hasNext()) {
+
+	    QaQueContent qaQuestion = (QaQueContent) queIterator.next();
+	    if (qaQuestion != null) {
+		QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qaQuestion);
+		questionDTOs.add(qaQuestionDTO);
+	    }
+	}
+
+	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
+	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
+	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
+
+	SortedSet<QaCondition> conditionSet = new TreeSet<>(new TextSearchConditionComparator());
+	for (QaCondition condition : qaContent.getConditions()) {
+	    conditionSet.add(condition);
+	    for (QaQuestionDTO dto : questionDTOs) {
+		for (QaQueContent question : condition.getQuestions()) {
+		    if (dto.getDisplayOrder().equals(String.valueOf(question.getDisplayOrder()))) {
+			condition.temporaryQuestionDTOSet.add(dto);
+		    }
+		}
+	    }
+	}
+	sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, conditionSet);
+
+	List<QaQuestionDTO> listDeletedQuestionDTOs = new ArrayList<>();
+	sessionMap.put(QaAppConstants.LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
+
+	qaAuthoringForm.resetUserAction();
+
+	return qaContent;
+    }
+
+    /**
+     * each tool has a signature. QA tool's signature is stored in MY_SIGNATURE.
+     * The default tool content id and other depending content ids are obtained
+     * in this method. if all the default content has been setup properly the
+     * method persists DEFAULT_CONTENT_ID in the session.
+     *
+     * @param request
+     * @param mapping
+     * @return ActionForward
+     */
+    public boolean validateDefaultContent(HttpServletRequest request, QaAuthoringForm qaAuthoringForm) {
+
+	/*
+	 * retrieve the default content id based on tool signature
+	 */
+	long defaultContentID = 0;
+	try {
+	    defaultContentID = qaService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
+	    if (defaultContentID == 0) {
+		QaController.logger.debug("default content id has not been setup");
+		return false;
+	    }
+	} catch (Exception e) {
+	    QaController.logger.error("error getting the default content id: " + e.getMessage());
+	    persistError(request, "error.defaultContent.notSetup");
+	    return false;
+	}
+
+	/*
+	 * retrieve uid of the content based on default content id determined above
+	 */
+	try {
+	    //retrieve uid of the content based on default content id determined above
+	    QaContent qaContent = qaService.getQaContent(defaultContentID);
+	    if (qaContent == null) {
+		QaController.logger.error("Exception occured: No default content");
+		persistError(request, "error.defaultContent.notSetup");
+		return false;
+	    }
+
+	} catch (Exception e) {
+	    QaController.logger.error("Exception occured: No default question content");
+	    persistError(request, "error.defaultContent.notSetup");
+	    return false;
+	}
+
+	return true;
+    }
+
+    /**
+     * persists error messages to request scope
+     *
+     * @param request
+     * @param message
+     */
+    public void persistError(HttpServletRequest request, String message) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	errorMap.add(Globals.ERROR_KEY, messageService.getMessage(message));
+	request.setAttribute("errorMap", errorMap);
+    }
+
+    private SortedSet<QaCondition> getQaConditionList(SessionMap<String, Object> sessionMap) {
+	SortedSet<QaCondition> list = (SortedSet<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
+	if (list == null) {
+	    list = new TreeSet<>(new TextSearchConditionComparator());
+	    sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, list);
+	}
+	return list;
     }
 
     /**

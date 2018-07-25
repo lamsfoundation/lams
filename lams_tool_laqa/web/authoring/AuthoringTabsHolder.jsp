@@ -46,7 +46,7 @@
 </lams:head>
 
 <body class="stripes">
-<form:form action="/authoring.do?validate=false" modelAttribute="authoringForm" method="POST" id="authoringForm">
+<form:form action="authoring.do" modelAttribute="authoringForm" method="POST" id="authoringForm">
 	<c:set var="sessionMap" value="${sessionScope[authoringForm.httpSessionID]}" />
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
