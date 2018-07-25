@@ -163,7 +163,7 @@ public class McController {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	    errorMap.add("GLOBAL", messageService.getMessage("questions.none.submitted"));
 	    request.setAttribute("errorMap", errorMap);
-//            McController.logger.debug("errors saved: " + errors);
+            McController.logger.debug("errors saved: " + errorMap);
 	    return "authoring/AuthoringTabsHolder";
 	}
 
