@@ -46,13 +46,12 @@
 			
 		<div class="panel-body">
 
-			<html:form action="/monitoring/updateImage" method="post" styleId="imageGalleryItemForm">
-				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-				<html:hidden property="imageUid" />		
-				<html:hidden property="sessionMapID" value="${sessionMapID}"/>
+			<form:form action="updateImage.do" method="post" modelAttribute="imageGalleryItemForm" id="imageGalleryItemForm">
+				<form:hidden property="imageUid" />		
+				<form:hidden property="sessionMapID" value="${sessionMapID}"/>
 				
 				<c:set var="mediumImagePath">
-			   		<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false
+			   		<lams:WebAppURL />download/?uuid=${image.mediumFileUuid}&preferDownload=false
 				</c:set>	
 				<c:set var="title">
 					<c:out value="${image.title}" escapeXml="true"/>
@@ -63,7 +62,7 @@
 				    <label for="file-title">
 				    	<fmt:message key="label.authoring.basic.resource.title.input"/>
 				    </label>
-				    <html:text property="title" styleClass="form-control" styleId="file-title" tabindex="1"/>
+				    <input type="text" path="title" class="form-control" id="file-title" tabindex="1"/>
 				</div>
 				
 				<div class="form-group">
@@ -71,10 +70,10 @@
 						<fmt:message key="label.authoring.basic.resource.description.input" />
 					</label>
 		            	
-					<lams:CKEditor id="description" value="${formBean.description}" width="99%" 
+					<lams:CKEditor id="description" value="${imageGalleryItemForm.description}" width="99%" 
 						contentFolderID="${sessionMap.imageGalleryForm.contentFolderID}" />
 				</div>
-			</html:form>			
+			</form:form>			
 			<br>
 			
 			<c:if test="${imageGallery.allowRank}">

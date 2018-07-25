@@ -24,7 +24,7 @@
 				
 				<td width="3%" align="left">
 					<c:set var="viewURL">
-						<html:rewrite page="/download/?uuid=${itemAttachment.fileUuid}&preferDownload=false" />
+						<lams:WebAppURL />download/?uuid=${itemAttachment.fileUuid}&preferDownload=false
 					</c:set>					
 					<a href="#nogo" onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')" class="btn btn-default btn-xs">
 						<fmt:message key="label.view" />

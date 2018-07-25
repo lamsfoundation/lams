@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.imageGallery.web.form;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.upload.FormFile;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * ImageGallery Item Form.
@@ -32,7 +33,7 @@ import org.apache.struts.upload.FormFile;
  *
  * @author Andrey Balan
  */
-public class ImageGalleryItemForm extends ActionForm {
+public class ImageGalleryItemForm {
     private String imageIndex;
     private String sessionMapID;
 
@@ -45,7 +46,7 @@ public class ImageGalleryItemForm extends ActionForm {
     private boolean hasFile;
     private Long fileUuid;
     private String fileName;
-    private FormFile file;
+    private MultipartFile file;
 
     //used only in monitoring
     private String imageUid;
@@ -125,11 +126,11 @@ public class ImageGalleryItemForm extends ActionForm {
 	this.hasFile = hasFile;
     }
 
-    public FormFile getFile() {
+    public MultipartFile getFile() {
 	return file;
     }
 
-    public void setFile(FormFile file) {
+    public void setFile(MultipartFile file) {
 	this.file = file;
     }
 

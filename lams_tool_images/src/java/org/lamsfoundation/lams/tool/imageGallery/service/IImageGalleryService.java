@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.rating.ToolRatingManager;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
@@ -40,6 +39,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Interface that defines the contract that all ShareImageGallery service provider must follow.
@@ -73,7 +73,7 @@ public interface IImageGalleryService extends ToolRatingManager {
      * @param file
      * @throws UploadImageGalleryFileException
      */
-    void uploadImageGalleryItemFile(ImageGalleryItem item, FormFile file) throws UploadImageGalleryFileException;
+    void uploadImageGalleryItemFile(ImageGalleryItem item, MultipartFile file) throws UploadImageGalleryFileException;
 
     // ********** for user methods *************
     /**
@@ -285,8 +285,8 @@ public interface IImageGalleryService extends ToolRatingManager {
      * Returns localized next image title.
      *
      * @param nextImageTitleNumber
-     * 
-     * @return 
+     *
+     * @return
      */
     String generateNextImageTitle(Long nextImageTitleNumber);
 
@@ -314,10 +314,10 @@ public interface IImageGalleryService extends ToolRatingManager {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);

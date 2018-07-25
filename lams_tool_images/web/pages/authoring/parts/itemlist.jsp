@@ -15,10 +15,10 @@
 				<tr>
 					<td width="4%" >
 						<c:set var="thumbnailPath">
-						   	<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false
+						   	<lams:WebAppURL />download/?uuid=${image.thumbnailFileUuid}&preferDownload=false
 						</c:set>
 					 	<c:set var="mediumImagePath">
-		   					<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false
+		   					<lams:WebAppURL />download/?uuid=${image.mediumFileUuid}&preferDownload=false
 						</c:set>					
 						<c:set var="title">
 							<c:out value="${image.title}" escapeXml="true"/>
