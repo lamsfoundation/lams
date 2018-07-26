@@ -358,30 +358,28 @@ var MenuLib = {
 					$.each(response.folders, function(index){
 						// folderID == -2 is courses folder
 						var canSave = this.folderID > 0 && !this.isRunSequencesFolder;
-						result.push({'type'            	   : 'text',
-								  	 'label'               : this.isRunSequencesFolder ?
-								  			 				   LABELS.RUN_SEQUENCES_FOLDER : this.name,
+						result.push({'type'				   : 'html',
+									 'html'                : (this.isRunSequencesFolder ? LABELS.RUN_SEQUENCES_FOLDER : this.name)
+																+ (canSave ? '' : ' <i class="fa fa-lock"></i>'),
 								  	 'folderID'		       : this.folderID,
 								  	 'isRunSequenceFolder' : this.isRunSequencesFolder,
 								  	 // either take parent's setting or take 2nd (courses) and 3rd (public) folder 
 								  	 'canHaveReadOnly'	   : folderID ? canHaveReadOnly : index > 0,
 								  	 'canSave'		       : canSave,
-						  	         'canModify'	       : this.canModify && !this.isRunSequenceFolder,
-						  	         'labelStyle'		   : 'ygtvlabel' + (!canSave ? ' readOnly' : '')
-									 });
+						  	         'canModify'	       : this.canModify && !this.isRunSequenceFolder
+									});
 					});
 				}
 				if (response.learningDesigns) {
 					$.each(response.learningDesigns, function(){
 						var canModify = canSave && this.canModify;
-						result.push({'type'             : 'text',
-						  	         'label'            : this.name,
+						result.push({'type'				: 'html',
+									 'html'             : this.name + (this.readOnly || !canModify ? ' <i class="fa fa-lock"></i>' : ''),
 						  	         'isLeaf'           : true,
 						  	         'learningDesignId' : this.learningDesignId,
 						  	         'canHaveReadOnly'	: canHaveReadOnly,
 						  	         'canModify'		: canModify,
-						  	         'readOnly'			: this.readOnly,
-						  	         'labelStyle'		: 'ygtvlabel' + (this.readOnly || !canModify ? ' readOnly' : '')
+						  	         'readOnly'			: this.readOnly
 							        });
 					});
 				}

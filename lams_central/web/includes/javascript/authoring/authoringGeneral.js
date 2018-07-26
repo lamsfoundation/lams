@@ -953,7 +953,7 @@ GeneralInitLib = {
 			if (childNodeData) {
 				$.each(childNodeData, function(){
 						// create and add a leaf
-						new YAHOO.widget.TextNode(this, node);
+						new YAHOO.widget.HTMLNode(this, node);
 					});
 			}
 			

@@ -230,8 +230,8 @@ div#ldStoreDialogContents div#ldStoreDialogTree {
 	overflow: auto;
 }
 
-div#ldStoreDialogContents div#ldStoreDialogTree .readOnly {
-	font-style: italic;
+div#ldStoreDialogContents div#ldStoreDialogTree .ygtvhtml .fa-lock {
+	color: red;
 }
 
 div#ldStoreDialogContents #ldStoreDialogAccessCell {
