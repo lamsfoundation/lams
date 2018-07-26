@@ -23,8 +23,6 @@
 
 package org.lamsfoundation.lams.tool.imageGallery.web.form;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.upload.FormFile;
 import org.springframework.web.multipart.MultipartFile;
 
 /**

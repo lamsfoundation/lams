@@ -106,7 +106,7 @@
 					</button>
 								
 					<c:if test="${not finishedLock}">
-						<button onclick="javascript:newImageInit('<lams:WebAppURL />authoring/newImageInit.do'/>?sessionMapID=${sessionMapID}&saveUsingLearningAction=true');"
+						<button onclick="javascript:newImageInit('<lams:WebAppURL />authoring/newImageInit.do?sessionMapID=${sessionMapID}&saveUsingLearningAction=true');"
 								class="btn btn-default btn-sm" id="add-new-image-button">  
 							<i class="fa fa-upload"></i> <fmt:message key="label.learning.add.new.image" />
 						</button>

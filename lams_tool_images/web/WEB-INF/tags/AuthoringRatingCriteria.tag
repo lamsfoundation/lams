@@ -285,19 +285,17 @@ $(document).ready(function() {
 					</label>
 					<form:select path="${formContentPrefix}minimumRates" id="minimum-rates" onmouseup="validateRatingLimits(true);" 
 							cssClass="form-control form-control-inline">
-						<form:option value="0">
-							<fmt:message key="${noMinimumLabel}" />
-						</form:option>
-						<form:option value="1">1</form:option>
-						<form:option value="2">2</form:option>
-						<form:option value="3">3</form:option>
-						<form:option value="4">4</form:option>
-						<form:option value="5">5</form:option>
-						<form:option value="6">6</form:option>
-						<form:option value="7">7</form:option>
-						<form:option value="8">8</form:option>
-						<form:option value="9">9</form:option>
-						<form:option value="10">10</form:option>
+						<form:option value="0" label="<fmt:message key="${noMinimumLabel}" />"/>
+						<form:option value="1" label="1"/>
+						<form:option value="2" label="2"/>
+						<form:option value="3" label="3"/>
+						<form:option value="4" label="4"/>
+						<form:option value="5" label="5"/>
+						<form:option value="6" label="6"/>
+						<form:option value="7" label="7"/>
+						<form:option value="8" label="8"/>
+						<form:option value="9" label="9"/>
+						<form:option value="10" label="10"/>
 					</form:select>
 				
 					<label for="maximum-rates">
@@ -305,19 +303,17 @@ $(document).ready(function() {
 					</label>
 					<form:select path="${formContentPrefix}maximumRates" id="maximum-rates" onmouseup="validateRatingLimits(false);" 
 							cssClass="form-control form-control-inline">
-						<form:option value="0">
-							<fmt:message key="${noMaximumLabel}" />
-						</form:option>
-						<form:option value="1">1</form:option>
-						<form:option value="2">2</form:option>
-						<form:option value="3">3</form:option>
-						<form:option value="4">4</form:option>
-						<form:option value="5">5</form:option>
-						<form:option value="6">6</form:option>
-						<form:option value="7">7</form:option>
-						<form:option value="8">8</form:option>
-						<form:option value="9">9</form:option>
-						<form:option value="10">10</form:option>
+						<form:option value="0" label="<fmt:message key="${noMaximumLabel}"/>
+						<form:option value="1" label="1"/>
+						<form:option value="2" label="2"/>
+						<form:option value="3" label="3"/>
+						<form:option value="4" label="4"/>
+						<form:option value="5" label="5"/>
+						<form:option value="6" label="6"/>
+						<form:option value="7" label="7"/>
+						<form:option value="8" label="8"/>
+						<form:option value="9" label="9"/>
+						<form:option value="10" label="10"/>
 					</form:select>
 				</div>
 			</c:if>

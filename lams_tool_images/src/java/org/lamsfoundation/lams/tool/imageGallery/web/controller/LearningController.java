@@ -259,21 +259,21 @@ public class LearningController {
      * Save file or url imageGallery item into database.
      */
     @RequestMapping("/saveNewImage")
-    public String saveNewImage(@ModelAttribute ImageGalleryItemForm itemForm, HttpServletRequest request,
+    public String saveNewImage(@ModelAttribute ImageGalleryItemForm imageGalleryItemForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(itemForm.getSessionMapID());
+		.getAttribute(imageGalleryItemForm.getSessionMapID());
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 
 	//validate form
 	boolean isLargeFilesAllowed = mode.isTeacher();
-	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateImageGalleryItem(itemForm,
+	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateImageGalleryItem(imageGalleryItemForm,
 		isLargeFilesAllowed);
 
 	try {
 	    if (errorMap.isEmpty()) {
-		extractFormToImageGalleryItem(request, itemForm);
+		extractFormToImageGalleryItem(request, imageGalleryItemForm);
 	    }
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly

@@ -1,7 +1,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <script lang="javascript">
-	$(document).ready(function() {
+
+$(document).ready(function() {
 	    $('#allowRank').click(function() {
 	        $(".rating-criteria-tag").show("slow");
 	    });
@@ -14,24 +15,24 @@
 	 * Processes mouse click event on allowRatingsOrVote ckeckbox
 	 */
 	function allowRatingsOrVoteClicked() {
-		document.imageGalleryForm.allowVote.disabled = ! eval(document.imageGalleryForm.allowVote.disabled); 
-		document.imageGalleryForm.allowRank.disabled = ! eval(document.imageGalleryForm.allowRank.disabled);
-		if (document.imageGalleryForm.allowRatingsOrVote.checked) {
-			document.imageGalleryForm.allowVote.checked = true;
+		document.forms.imageGalleryForm.allowVote.disabled = ! eval(document.forms.imageGalleryForm.allowVote.disabled); 
+		document.forms.imageGalleryForm.allowRank.disabled = ! eval(document.forms.imageGalleryForm.allowRank.disabled);
+		if (document.forms.imageGalleryForm.allowRatingsOrVote.checked) {
+			document.forms.imageGalleryForm.allowVote.checked = true;
 		} else {
-			document.imageGalleryForm.allowVote.checked = false;
-			document.imageGalleryForm.allowRank.checked = false;
+			document.forms.imageGalleryForm.allowVote.checked = false;
+			document.forms.imageGalleryForm.allowRank.checked = false;
 			$(".rating-criteria-tag").hide("slow");
 		}
 	}
 
 	function uncheckNotifyTeachersOnImageSumbit() {
-		document.imageGalleryForm.notifyTeachersOnImageSumbit.checked = false;
-		document.imageGalleryForm.notifyTeachersOnImageSumbit.disabled = ! eval(document.imageGalleryForm.notifyTeachersOnImageSumbit.disabled);
+		document.forms.imageGalleryForm.notifyTeachersOnImageSumbit.checked = false;
+		document.forms.imageGalleryForm.notifyTeachersOnImageSumbit.disabled = ! eval(document.forms.imageGalleryForm.notifyTeachersOnImageSumbit.disabled);
 	}
 </script>
 	
-<c:set var="sessionMap"	value="${sessionScope[authoringForm.sessionMapID]}" />
+<c:set var="sessionMap"	value="${sessionScope[imageGalleryForm.sessionMapID]}" />
 
 <!-- Advance Tab Content -->
 
@@ -83,12 +84,12 @@
 		</label>
 	</div>
 		
-	<c:if test='${!imageGalleryForm.imageGallery.allowRank}'><c:set var="styleId">display:none;</c:set></c:if>
+	<c:if test='${!imageGalleryForm.imageGallery.allowRank}'><c:set var="id">display:none;</c:set></c:if>
 	<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
 		upLabel="label.authoring.up" downLabel="label.authoring.down"
 		allowCommentsLabel="label.authoring.advance.allow.learner.comment.images"
 		formContentPrefix="imageGallery"
-	    id="${styleId}"/>
+	    id="${id}"/>
 	
 </div>
 

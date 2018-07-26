@@ -22,7 +22,7 @@
 		var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"/>';
 		var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
 	</script>
-	<script type="text/javascript" src="${lams}includes/javascript/imageGalleryitem.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/imageGalleryitem.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script>

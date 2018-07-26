@@ -16,13 +16,13 @@
 	</c:otherwise>
 </c:choose>
 
-<form:form action="saveMultipleImages.do" method="post" modelAttribute="imageGalleryItemsForm" id="imageGalleryItemsForm" enctype="multipart/form-data">
+<form:form action="saveMultipleImages.do" method="post" modelAttribute="multipleImagesForm" id="multipleImagesForm" enctype="multipart/form-data">
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<div class="panel-title">
 				<fmt:message key="label.authoring.basic.add.multiple.images" />
-				<a href="javascript:showMessage('<lams:WebAppURL />authoring/newImageInit.do?sessionMapID=${imageGalleryItemsForm.sessionMapID}');" 
+				<a href="javascript:showMessage('<lams:WebAppURL />authoring/newImageInit.do?sessionMapID=${multipleImagesForm.sessionMapID}');" 
 						class="btn btn-default btn-xs pull-right">
 					<fmt:message key="label.authoring.basic.upload.single.image" />
 				</a>
@@ -32,7 +32,7 @@
 		<div class="panel-body">
 	
 			<%@ include file="/common/messages.jsp"%>	
-			<form:hidden parth="sessionMapID" id="sessionMapID"/>
+			<form:hidden path="sessionMapID" id="sessionMapID"/>
 	
 			<div class="form-group">
 				<label>

@@ -1,11 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<link rel="stylesheet" href="${lams}includes/css/lytebox.css"  type="text/css">
+<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/lytebox.css"  type="text/css">
 
 <script type="text/javascript"> 
-	var pathToImageFolder = "${lams}includes/images/"; 
+	var pathToImageFolder = "<lams:WebAppURL/>includes/images/"; 
 </script>
-<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/lytebox.js'/>" ></script>
+<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/lytebox.js" ></script>
 <script lang="javascript">
 
 	function hideMessage(){

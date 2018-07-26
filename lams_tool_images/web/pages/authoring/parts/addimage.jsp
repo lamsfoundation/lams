@@ -4,12 +4,12 @@
 		<c:set var="FORM_ACTION" value="/learning/saveNewImage.do"/>
 	</c:when>
 	<c:otherwise>
-		<c:set var="FORM_ACTION" value="/authoring/saveOrUpdateImage"/>
+		<c:set var="FORM_ACTION" value="saveOrUpdateImage.do"/>
 	</c:otherwise>
 </c:choose>
 
-<form:form action="saveOrUpdateImage.do" method="post" modelAttribute="imageGalleryItemForm" id="imageGalleryItemForm" enctype="multipart/form-data">
-	<c:set var="sessionMap"	value="${sessionScope[imageGalleryItemForm.sessionMapID]}" />
+<form:form action="${FORM_ACTION}" method="post" modelAttribute="imageGalleryItemForm" id="imageGalleryItemForm" enctype="multipart/form-data">
+	<c:set var="sessionMap"	value="${sessionScope[imageGalleryForm.sessionMapID]}" />
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
@@ -28,8 +28,8 @@
 			
 		<div class="panel-body">
 			<%@ include file="/common/messages.jsp"%>
-			<form:hidden property="sessionMapID" />
-			<form:hidden property="imageIndex" />
+			<form:hidden path="sessionMapID" />
+			<form:hidden path="imageIndex" />
 	
 			<div class="form-group">
 			    <label for="file-title">
@@ -56,7 +56,7 @@
 			</div>
 				
 			<div class="form-group">
-				<c:set var="itemAttachment" value="imageGalleryItemForm" />
+				<c:set var="itemAttachment" value="${imageGalleryItemForm}"/>
 				<div id="itemAttachmentArea">
 					<%@ include file="/pages/authoring/parts/imagefile.jsp"%>
 				</div>

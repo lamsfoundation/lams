@@ -176,7 +176,7 @@ public class AuthoringController {
      * Display same entire authoring page content from HttpSession variable.
      */
     @RequestMapping(path = "/init", method = RequestMethod.POST)
-    public String initPage(@ModelAttribute("imageGalleryForm") ImageGalleryForm startForm, HttpServletRequest request)
+    public String initPage(@ModelAttribute ImageGalleryForm startForm, HttpServletRequest request)
 	    throws ServletException {
 
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
@@ -193,16 +193,15 @@ public class AuthoringController {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 	request.setAttribute("imageGalleryForm", startForm);
-
 	return "pages/authoring/authoring";
     }
 
     /**
      * This method will persist all inforamtion in this authoring page, include all imageGallery item, information etc.
      */
-    @RequestMapping("/update")
-    public String updateContent(@ModelAttribute ImageGalleryForm imageGalleryForm, HttpServletRequest request)
-	    throws IllegalAccessException, InvocationTargetException, Exception {
+    @RequestMapping(path = "/update", method = RequestMethod.POST)
+    public String updateContent(@ModelAttribute ImageGalleryForm imageGalleryForm,
+	    HttpServletRequest request) throws IllegalAccessException, InvocationTargetException, Exception {
 
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -373,14 +372,14 @@ public class AuthoringController {
      * persisted.
      */
     @RequestMapping("/saveOrUpdateImage")
-    public String saveOrUpdateImage(@ModelAttribute ImageGalleryItemForm itemForm, HttpServletRequest request,
+    public String saveOrUpdateImage(@ModelAttribute ImageGalleryItemForm imageGalleryItemForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateImageGalleryItem(itemForm, true);
+	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateImageGalleryItem(imageGalleryItemForm, true);
 
 	try {
 	    if (errorMap.isEmpty()) {
-		extractFormToImageGalleryItem(request, itemForm);
+		extractFormToImageGalleryItem(request, imageGalleryItemForm);
 	    }
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
@@ -394,7 +393,7 @@ public class AuthoringController {
 	}
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, imageGalleryItemForm.getSessionMapID());
 	// return null to close this window
 	return "pages/authoring/parts/itemlist";
     }
@@ -467,14 +466,14 @@ public class AuthoringController {
      * persisted.
      */
     @RequestMapping("/saveMultipleImages")
-    public String saveMultipleImages(@ModelAttribute MultipleImagesForm multipleForm, HttpServletRequest request,
+    public String saveMultipleImages(@ModelAttribute MultipleImagesForm multipleImagesForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateMultipleImages(multipleForm, true);
+	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateMultipleImages(multipleImagesForm, true);
 
 	try {
 	    if (errorMap.isEmpty()) {
-		extractMultipleFormToImageGalleryItems(request, multipleForm);
+		extractMultipleFormToImageGalleryItems(request, multipleImagesForm);
 	    }
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
@@ -487,7 +486,7 @@ public class AuthoringController {
 	}
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, multipleForm.getSessionMapID());
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, multipleImagesForm.getSessionMapID());
 	// return null to close this window
 	return "pages/authoring/parts/itemlist";
     }

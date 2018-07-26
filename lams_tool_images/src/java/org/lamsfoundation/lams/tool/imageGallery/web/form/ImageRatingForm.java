@@ -31,7 +31,7 @@ import org.apache.struts.action.ActionForm;
  *
  * @author Andrey Balan
  */
-public class ImageRatingForm extends ActionForm {
+public class ImageRatingForm {
 
     private static final long serialVersionUID = -8962161058929959289L;
 

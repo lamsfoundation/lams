@@ -47,8 +47,8 @@
 		<div class="panel-body">
 
 			<form:form action="updateImage.do" method="post" modelAttribute="imageGalleryItemForm" id="imageGalleryItemForm">
-				<form:hidden property="imageUid" />		
-				<form:hidden property="sessionMapID" value="${sessionMapID}"/>
+				<form:hidden path="imageUid" />		
+				<form:hidden path="sessionMapID" value="${sessionMapID}"/>
 				
 				<c:set var="mediumImagePath">
 			   		<lams:WebAppURL />download/?uuid=${image.mediumFileUuid}&preferDownload=false
