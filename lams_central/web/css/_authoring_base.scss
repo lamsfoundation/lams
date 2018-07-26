@@ -230,6 +230,10 @@ div#ldStoreDialogContents div#ldStoreDialogTree {
 	overflow: auto;
 }
 
+div#ldStoreDialogContents div#ldStoreDialogTree .ygtvhtml {
+	cursor: pointer;
+}
+
 div#ldStoreDialogContents div#ldStoreDialogTree .ygtvhtml .fa-lock {
 	color: red;
 }

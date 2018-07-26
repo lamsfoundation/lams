@@ -374,6 +374,7 @@ var MenuLib = {
 					$.each(response.learningDesigns, function(){
 						var canModify = canSave && this.canModify;
 						result.push({'type'				: 'html',
+									 'label'			: this.name,
 									 'html'             : this.name + (this.readOnly || !canModify ? ' <i class="fa fa-lock"></i>' : ''),
 						  	         'isLeaf'           : true,
 						  	         'learningDesignId' : this.learningDesignId,

@@ -545,7 +545,6 @@ GeneralInitLib = {
 		});
 	    
 		$('#ldStoreDialogSaveButton', ldStoreDialogContents).click(function(){
-			debugger;
     		var dialog = layout.ldStoreDialog,
 				title = $('#ldStoreDialogNameContainer input', dialog).val().trim();
 			if (!title) {
@@ -1005,7 +1004,7 @@ GeneralInitLib = {
 			
 			//show LearningDesign thumbnail and title
 			var learningDesignID = event.node.highlightState == 0   ? +nodeData.learningDesignId : null,
-				title            = !isOpenDialog && learningDesignID ? event.node.label : null;
+				title            = !isOpenDialog && learningDesignID ? nodeData.label : null;
 			GeneralLib.showLearningDesignThumbnail(learningDesignID, title);				
 		});
 		tree.subscribe('clickEvent', tree.onEventToggleHighlight);
