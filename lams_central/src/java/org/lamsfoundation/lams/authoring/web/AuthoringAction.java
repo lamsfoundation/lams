@@ -151,6 +151,10 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	request.setAttribute("licenses", getAuthoringService().getAvailableLicenses());
 
+	boolean canSetReadOnly = getUserManagementService().isUserSysAdmin()
+		|| getUserManagementService().isUserGlobalGroupAdmin();
+	request.setAttribute("canSetReadOnly", canSetReadOnly);
+
 	return mapping.findForward("openAutoring");
     }
 
@@ -217,6 +221,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	// we'll go from top to bottom
 	Collections.reverse(folderPath);
 	ldJSON.put("folderPath", new JSONArray(gson.toJson(folderPath)));
+
+	ldJSON.put("readOnlyEnabled", true);
 	responseJSON.put("ld", ldJSON);
 
 	List<LearningDesignAccess> accessList = getAuthoringService().updateLearningDesignAccessByUser(userId);
