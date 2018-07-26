@@ -49,6 +49,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -78,7 +79,7 @@ public class QaAuthoringConditionController {
      * @return
      */
     @RequestMapping("/newConditionInit")
-    private String newConditionInit(QaConditionForm QaConditionForm, HttpServletRequest request) {
+    private String newConditionInit(@ModelAttribute QaConditionForm QaConditionForm, HttpServletRequest request) {
 
 	populateFormWithPossibleItems(QaConditionForm, request);
 	QaConditionForm.setOrderId(-1);

@@ -5,8 +5,7 @@
 </div>
 
 <div class="panel-body">
-<form:form action="authoring.do?validate=false" modelAttribute="newQuestionForm" id="newQuestionForm" method="POST">
-	<form:hidden path="dispatch" value="${empty newQuestionForm.editableQuestionIndex ? 'addSingleQuestion' : 'saveSingleQuestion'}" />
+<form:form action="${empty newQuestionForm.editableQuestionIndex ? 'addSingleQuestion' : 'saveSingleQuestion'}.do" modelAttribute="newQuestionForm" id="newQuestionForm" method="POST">
 	<form:hidden path="toolContentID" />
 	<form:hidden path="httpSessionID" />
 	<form:hidden path="contentFolderID" />

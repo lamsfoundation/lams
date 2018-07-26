@@ -75,6 +75,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -101,28 +102,28 @@ public class QaController implements QaAppConstants {
     }
     
     @RequestMapping("/authoring")
-    public String execute(QaAuthoringForm qaAuthoringForm, HttpServletRequest request) throws IOException, ServletException, QaApplicationException {
+    public String execute(@ModelAttribute QaAuthoringForm authoringForm, HttpServletRequest request) throws IOException, ServletException, QaApplicationException {
 
 	QaUtils.cleanUpSessionAbsolute(request);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	authoringForm.setContentFolderID(contentFolderID);
 
-	qaAuthoringForm.resetRadioBoxes();
+	authoringForm.resetRadioBoxes();
 
-	validateDefaultContent(request, qaAuthoringForm);
+	validateDefaultContent(request, authoringForm);
 
 	//no problems getting the default content, will render authoring screen
 	String strToolContentID = "";
 	/* the authoring url must be passed a tool content id */
 	strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	qaAuthoringForm.setToolContentID(strToolContentID);
+	authoringForm.setToolContentID(strToolContentID);
 
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, "");
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, "");
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	qaAuthoringForm.setHttpSessionID(sessionMap.getSessionID());
+	authoringForm.setHttpSessionID(sessionMap.getSessionID());
 
 	if (strToolContentID == null || strToolContentID.equals("")) {
 	    QaUtils.cleanUpSessionAbsolute(request);
@@ -137,7 +138,7 @@ public class QaController implements QaAppConstants {
 	    qaContent = QaContent.newInstance(qaContent, new Long(strToolContentID));
 	}
 
-	prepareDTOandForm(request, qaAuthoringForm, qaContent, qaService, sessionMap);
+	prepareDTOandForm(request, authoringForm, qaContent, qaService, sessionMap);
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	// request is from monitoring module
@@ -150,15 +151,16 @@ public class QaController implements QaAppConstants {
 	conditionList.clear();
 	conditionList.addAll(qaContent.getConditions());
 
-	qaAuthoringForm.setAllowRichEditor(qaContent.isAllowRichEditor());
-	qaAuthoringForm.setUseSelectLeaderToolOuput(qaContent.isUseSelectLeaderToolOuput());
+	authoringForm.setAllowRichEditor(qaContent.isAllowRichEditor());
+	authoringForm.setUseSelectLeaderToolOuput(qaContent.isUseSelectLeaderToolOuput());
 
-	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, qaAuthoringForm);
+	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, authoringForm);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	// get rating criterias from DB
 	List<RatingCriteria> ratingCriterias = qaService.getRatingCriterias(qaContent.getQaContentId());
 	sessionMap.put(AttributeNames.ATTR_RATING_CRITERIAS, ratingCriterias);
+	request.setAttribute("authoringForm", authoringForm);
 
 	return "authoring/AuthoringTabsHolder";
     }
@@ -242,7 +244,7 @@ public class QaController implements QaAppConstants {
      * @param mapping
      * @return ActionForward
      */
-    public boolean validateDefaultContent(HttpServletRequest request, QaAuthoringForm qaAuthoringForm) {
+    public boolean validateDefaultContent(HttpServletRequest request, QaAuthoringForm authoringForm) {
 
 	/*
 	 * retrieve the default content id based on tool signature
@@ -306,15 +308,15 @@ public class QaController implements QaAppConstants {
      * submits content into the tool database
      */
     @RequestMapping("/submitAllContent")
-    public String submitAllContent(QaAuthoringForm qaAuthoringForm, HttpServletRequest request)
+    public String submitAllContent(QaAuthoringForm authoringForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = authoringForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	authoringForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Long toolContentID = new Long(strToolContentID);
@@ -329,8 +331,8 @@ public class QaController implements QaAppConstants {
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	authoringForm.setTitle(richTextTitle);
+	authoringForm.setInstructions(richTextInstructions);
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
@@ -392,13 +394,13 @@ public class QaController implements QaAppConstants {
 		    .get(AttributeNames.ATTR_RATING_CRITERIAS);
 	    qaService.saveRatingCriterias(request, oldCriterias, toolContentID);
 
-	    QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	    QaUtils.setFormProperties(request, authoringForm, strToolContentID, httpSessionID);
 
 	    request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	} else {
 	    if (qaContent != null) {
-		QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+		QaUtils.setFormProperties(request, authoringForm, strToolContentID, httpSessionID);
 	    }
 	}
 
@@ -410,15 +412,16 @@ public class QaController implements QaAppConstants {
 	    qaService.deleteCondition(condition);
 	}
 
-	qaAuthoringForm.resetUserAction();
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setCurrentTab("1");
+	authoringForm.resetUserAction();
+	authoringForm.setToolContentID(strToolContentID);
+	authoringForm.setHttpSessionID(httpSessionID);
+	authoringForm.setCurrentTab("1");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
+	request.setAttribute("authoringForm", authoringForm);
 
 	return "authoring/AuthoringTabsHolder";
     }
@@ -599,16 +602,16 @@ public class QaController implements QaAppConstants {
      * saveSingleQuestion
      */
     @RequestMapping("/saveSingleQuestion")
-    public String saveSingleQuestion(QaAuthoringForm qaAuthoringForm, HttpServletRequest request)
+    public String saveSingleQuestion(@ModelAttribute("newQuestionForm")QaAuthoringForm newQuestionForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = newQuestionForm.getHttpSessionID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	newQuestionForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
@@ -696,22 +699,23 @@ public class QaController implements QaAppConstants {
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	newQuestionForm.setTitle(richTextTitle);
+	newQuestionForm.setInstructions(richTextInstructions);
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
 
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setCurrentTab("1");
+	newQuestionForm.setToolContentID(strToolContentID);
+	newQuestionForm.setHttpSessionID(httpSessionID);
+	newQuestionForm.setCurrentTab("1");
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
+	request.setAttribute("authoringForm", newQuestionForm);
 	return "authoring/AuthoringTabsHolder";
     }
 
@@ -719,16 +723,16 @@ public class QaController implements QaAppConstants {
      * addSingleQuestion
      */
     @RequestMapping("/addSingleQuestion")
-    public String addSingleQuestion(QaAuthoringForm qaAuthoringForm, HttpServletRequest request)
+    public String addSingleQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = newQuestionForm.getHttpSessionID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	newQuestionForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
@@ -765,22 +769,23 @@ public class QaController implements QaAppConstants {
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	newQuestionForm.setTitle(richTextTitle);
+	newQuestionForm.setInstructions(richTextInstructions);
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
 
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setCurrentTab("1");
+	newQuestionForm.setToolContentID(strToolContentID);
+	newQuestionForm.setHttpSessionID(httpSessionID);
+	newQuestionForm.setCurrentTab("1");
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
+	request.setAttribute("authoringForm", newQuestionForm);
 	return "authoring/AuthoringTabsHolder";
     }
 
@@ -788,17 +793,17 @@ public class QaController implements QaAppConstants {
      * opens up an new screen within the current page for adding a new question
      */
     @RequestMapping("/newQuestionBox")
-    public String newQuestionBox(QaAuthoringForm qaAuthoringForm, HttpServletRequest request)
+    public String newQuestionBox(@ModelAttribute QaAuthoringForm authoringForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = authoringForm.getHttpSessionID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	authoringForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
@@ -806,10 +811,10 @@ public class QaController implements QaAppConstants {
 
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	authoringForm.setTitle(richTextTitle);
+	authoringForm.setInstructions(richTextInstructions);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, authoringForm, strToolContentID, httpSessionID);
 
 	Collection<QaQuestionDTO> questionDTOs = (Collection<QaQuestionDTO>) sessionMap
 		.get(QaAppConstants.LIST_QUESTION_DTOS);
@@ -823,6 +828,7 @@ public class QaController implements QaAppConstants {
 	    request.setAttribute(QaAppConstants.ATTR_WIZARD_CATEGORIES, qaService.getWizardCategories());
 	}
 
+	request.setAttribute("authoringForm", authoringForm);
 	return "authoring/newQuestionBox";
     }
 
@@ -830,17 +836,17 @@ public class QaController implements QaAppConstants {
      * opens up an new screen within the current page for editing a question
      */
     @RequestMapping("/newEditableQuestionBox")
-    public String newEditableQuestionBox(QaAuthoringForm qaAuthoringForm, HttpServletRequest request)
+    public String newEditableQuestionBox(QaAuthoringForm authoringForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = authoringForm.getHttpSessionID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 
-	qaAuthoringForm.setEditableQuestionIndex(questionIndex);
+	authoringForm.setEditableQuestionIndex(questionIndex);
 
 	List<QaQuestionDTO> questionDTOs = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
 
@@ -866,24 +872,25 @@ public class QaController implements QaAppConstants {
 	}
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	authoringForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	authoringForm.setTitle(richTextTitle);
+	authoringForm.setInstructions(richTextInstructions);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, authoringForm, strToolContentID, httpSessionID);
 
-	qaAuthoringForm.setRequired(requiredBoolean);
-	qaAuthoringForm.setMinWordsLimit(minWordsLimit);
-	qaAuthoringForm.setEditableQuestionText(editableQuestion);
-	qaAuthoringForm.setFeedback(editableFeedback);
+	authoringForm.setRequired(requiredBoolean);
+	authoringForm.setMinWordsLimit(minWordsLimit);
+	authoringForm.setEditableQuestionText(editableQuestion);
+	authoringForm.setFeedback(editableFeedback);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
+	request.setAttribute("authoringForm", authoringForm);
 
 	return "authoring/newQuestionBox";
     }
@@ -892,10 +899,10 @@ public class QaController implements QaAppConstants {
      * removes a question from the questions map
      */
     @RequestMapping("/removeQuestion")
-    public String removeQuestion(QaAuthoringForm qaAuthoringForm, HttpServletRequest request)
+    public String removeQuestion(QaAuthoringForm authoringForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = authoringForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
@@ -945,19 +952,20 @@ public class QaController implements QaAppConstants {
 	}
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	authoringForm.setContentFolderID(contentFolderID);
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	authoringForm.setTitle(richTextTitle);
+	authoringForm.setInstructions(richTextInstructions);
 	request.getSession().setAttribute(httpSessionID, sessionMap);
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setCurrentTab("1");
+	QaUtils.setFormProperties(request, authoringForm, strToolContentID, httpSessionID);
+	authoringForm.setToolContentID(strToolContentID);
+	authoringForm.setHttpSessionID(httpSessionID);
+	authoringForm.setCurrentTab("1");
+	request.setAttribute("authoringForm", authoringForm);
 
 	return "authoring/AuthoringTabsHolder";
     }
@@ -966,10 +974,10 @@ public class QaController implements QaAppConstants {
      * moves a question down in the list
      */
     @RequestMapping("/moveQuestionDown")
-    public String moveQuestionDown(QaAuthoringForm qaAuthoringForm, HttpServletRequest request)
+    public String moveQuestionDown(QaAuthoringForm authoringForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = authoringForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
@@ -987,7 +995,7 @@ public class QaController implements QaAppConstants {
 	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	authoringForm.setContentFolderID(contentFolderID);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 
@@ -998,19 +1006,20 @@ public class QaController implements QaAppConstants {
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	authoringForm.setTitle(richTextTitle);
+	authoringForm.setInstructions(richTextInstructions);
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, authoringForm, strToolContentID, httpSessionID);
 
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setCurrentTab("1");
+	authoringForm.setToolContentID(strToolContentID);
+	authoringForm.setHttpSessionID(httpSessionID);
+	authoringForm.setCurrentTab("1");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
+	request.setAttribute("authoringForm", authoringForm);
 	return "authoring/AuthoringTabsHolder";
     }
 
@@ -1018,10 +1027,10 @@ public class QaController implements QaAppConstants {
      * moves a question up in the list
      */
     @RequestMapping("/moveQuestionUp")
-    public String moveQuestionUp(QaAuthoringForm qaAuthoringForm, HttpServletRequest request)
+    public String moveQuestionUp(QaAuthoringForm authoringForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = authoringForm.getHttpSessionID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
@@ -1040,7 +1049,7 @@ public class QaController implements QaAppConstants {
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	authoringForm.setContentFolderID(contentFolderID);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 
@@ -1051,20 +1060,21 @@ public class QaController implements QaAppConstants {
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	authoringForm.setTitle(richTextTitle);
+	authoringForm.setInstructions(richTextInstructions);
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, authoringForm, strToolContentID, httpSessionID);
 
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setCurrentTab("1");
+	authoringForm.setToolContentID(strToolContentID);
+	authoringForm.setHttpSessionID(httpSessionID);
+	authoringForm.setCurrentTab("1");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
+	request.setAttribute("authoringForm", authoringForm);
 	return "authoring/AuthoringTabsHolder";
     }
 

@@ -46,12 +46,11 @@
 </lams:head>
 
 <body class="stripes">
-<form:form action="authoring.do" modelAttribute="authoringForm" method="POST" id="authoringForm">
+<form:form action="submitAllContent.do" modelAttribute="authoringForm" method="POST" id="authoringForm">
 	<c:set var="sessionMap" value="${sessionScope[authoringForm.httpSessionID]}" />
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
 	<form:hidden path="mode" value="${mode}" />
-	<form:hidden path="dispatch" value="submitAllContent" />
 	<form:hidden path="toolContentID" />
 	<form:hidden path="contentFolderID" />
 	<form:hidden path="httpSessionID"/>		
