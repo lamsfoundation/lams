@@ -433,7 +433,7 @@ public class LearningController {
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
 	if (!validateBeforeFinish(request, sessionMapID)) {
-	    return "pages/learning/notebook";
+	    return "pages/learning/learning";
 	}
 
 	HttpSession ss = SessionManager.getSession();
@@ -453,7 +453,7 @@ public class LearningController {
 	    reflectionForm.setEntryText(entry.getEntry());
 	}
 
-	return "pages/learning/finish";
+	return "/pages/learning/notebook";
     }
 
     /**
