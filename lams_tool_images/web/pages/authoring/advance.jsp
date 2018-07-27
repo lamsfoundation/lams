@@ -112,12 +112,13 @@ $(document).ready(function() {
 </div>
 
 <div class="form-group">
-	<textarea name="imageGallery.reflectInstructions" cols="60" rows="3" id="reflect-instructions" class="form-control"></textarea>
+	<textarea name="imageGallery.reflectInstructions" cols="60" rows="3" id="reflect-instructions" class="form-control">${imageGalleryForm.imageGallery.reflectInstructions}</textarea>
 </div>
 
 </lams:SimplePanel>
 
 <script type="text/javascript">
+<!--
 	//automatically turn on refect option if there are text input in refect instruction area
 	var ra = document.getElementById("reflect-instructions");
 	var rao = document.getElementById("reflect-on");
@@ -132,4 +133,5 @@ $(document).ready(function() {
 	}
 
 	ra.onkeyup=turnOnRefect;
+//-->
 </script>

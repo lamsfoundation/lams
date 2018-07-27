@@ -82,7 +82,7 @@
     <label for="imageGallery.title">
     	<fmt:message key="label.authoring.basic.title"/>
     </label>
-    <input type="text" name="imageGallery.title" value="Image Gallery" class="form-control"/>
+    <input type="text" name="imageGallery.title" value="${imageGalleryForm.imageGallery.title}" class="form-control"/>
 </div>
 
 <div class="form-group">
