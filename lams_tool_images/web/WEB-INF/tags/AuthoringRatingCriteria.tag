@@ -10,6 +10,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
 <%@ attribute name="criterias" required="true" rtexprvalue="true" type="java.util.Collection" %>
@@ -283,10 +284,10 @@ $(document).ready(function() {
 					<label for="minimum-rates">
 						<fmt:message key="${minimumLabel}" />
 					</label>
-					<form:select path="${formContentPrefix}minimumRates" id="minimum-rates" onmouseup="validateRatingLimits(true);" 
+					<form:select path="${formContentPrefix}minimumRates" id="minimum-rates" multiple="multiple" onmouseup="validateRatingLimits(true);" 
 							cssClass="form-control form-control-inline">
-						<form:option value="0" label="<fmt:message key="${noMinimumLabel}" />"/>
-						<form:option value="1" label="1"/>
+						<form:option value="0"><fmt:message key='${noMinimumLabel}' /></form:option>
+						<form:option value="1">1</form:option>
 						<form:option value="2" label="2"/>
 						<form:option value="3" label="3"/>
 						<form:option value="4" label="4"/>
@@ -301,9 +302,9 @@ $(document).ready(function() {
 					<label for="maximum-rates">
 						<fmt:message key="${maximumLabel}" />
 					</label>
-					<form:select path="${formContentPrefix}maximumRates" id="maximum-rates" onmouseup="validateRatingLimits(false);" 
+					<form:select path="${formContentPrefix}maximumRates" id="maximum-rates" multiple="multiple" onmouseup="validateRatingLimits(false);" 
 							cssClass="form-control form-control-inline">
-						<form:option value="0" label="<fmt:message key="${noMaximumLabel}"/>
+						<form:option value="0"><fmt:message key='${noMaximumLabel}' /></form:option>
 						<form:option value="1" label="1"/>
 						<form:option value="2" label="2"/>
 						<form:option value="3" label="3"/>

@@ -13,15 +13,15 @@
 			document.getElementById("finishButton").disabled = true;
 		}
 		function submitForm(methodName){
-			var f = document.getElementById('messageForm');
+			var f = document.getElementById('reflectionForm');
 			f.submit();
 		}
 	</script>
 </lams:head>
 <body class="stripes">
-	<lams:Page type="learner" title="${sessionMap.title}" formID="messageForm">
+	<lams:Page type="learner" title="${sessionMap.title}" formID="reflectionForm">
 		
-		<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="reflectionForm" id="messageForm">
+		<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="reflectionForm" id="reflectionForm">
 			<form:hidden path="userID" />
 			<form:hidden path="sessionMapID" />
 

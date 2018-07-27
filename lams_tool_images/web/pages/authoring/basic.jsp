@@ -82,7 +82,7 @@
     <label for="imageGallery.title">
     	<fmt:message key="label.authoring.basic.title"/>
     </label>
-    <input type="text" path="imageGallery.title" class="form-control"/>
+    <input type="text" name="imageGallery.title" value="Image Gallery" class="form-control"/>
 </div>
 
 <div class="form-group">
@@ -99,7 +99,7 @@
 	<%@ include file="/pages/authoring/parts/itemlist.jsp"%>
 </div>
 
-<c:url var="showMessageURL" value='/authoring/newImageInit.do'>
+<c:url var="showMessageURL" value="/authoring/newImageInit.do">
 	<c:param name="sessionMapID" value="${imageGalleryForm.sessionMapID}" />
 </c:url>
 <a href="#nogo" class="btn btn-default btn-sm" onclick="javascript:showMessage('${showMessageURL}')">

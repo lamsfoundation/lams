@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:choose>
 	<c:when test="${saveUsingLearningAction}">
-		<c:set var="FORM_ACTION" value="/learning/saveNewImage.do"/>
+		<c:set var="FORM_ACTION" value="<lams:WebAppURL/>learning/saveNewImage.do"/>
 	</c:when>
 	<c:otherwise>
 		<c:set var="FORM_ACTION" value="saveOrUpdateImage.do"/>
@@ -35,7 +35,7 @@
 			    <label for="file-title">
 			    	<fmt:message key="label.authoring.basic.resource.title.input"/>
 			    </label>
-			    <input type="text" path="title" class="form-control input-sm" id="file-title" tabindex="1"/>
+			    <input type="text" name="title" value="${imageGalleryItemForm.title}" class="form-control input-sm" id="file-title" tabindex="1"/>
 			</div>
 		
 			<div class="form-group">

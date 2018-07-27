@@ -84,12 +84,12 @@ $(document).ready(function() {
 		</label>
 	</div>
 		
-	<c:if test='${!imageGalleryForm.imageGallery.allowRank}'><c:set var="id">display:none;</c:set></c:if>
+	<c:if test='${!imageGalleryForm.imageGallery.allowRank}'><c:set var="styleId">display:none;</c:set></c:if>
 	<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
 		upLabel="label.authoring.up" downLabel="label.authoring.down"
 		allowCommentsLabel="label.authoring.advance.allow.learner.comment.images"
 		formContentPrefix="imageGallery"
-	    id="${id}"/>
+	    styleId="${styleId}"/>
 	
 </div>
 

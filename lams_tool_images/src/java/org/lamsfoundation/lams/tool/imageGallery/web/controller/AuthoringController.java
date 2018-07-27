@@ -172,6 +172,23 @@ public class AuthoringController {
 	return "pages/authoring/start";
     }
 
+    @RequestMapping("/definelater")
+    public String defineLater(@ModelAttribute ImageGalleryForm imageGalleryForm, HttpServletRequest request) {
+
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	ImageGallery imageGallery = igService.getImageGalleryByContentId(contentId);
+
+	imageGallery.setDefineLater(true);
+	igService.saveOrUpdateImageGallery(imageGallery);
+
+	//audit log the teacher has started editing activity in monitor
+	igService.auditLogStartEditingActivityInMonitor(contentId);
+
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+	request.setAttribute("startForm", imageGalleryForm);
+	return "pages/authoring/start";
+    }
+
     /**
      * Display same entire authoring page content from HttpSession variable.
      */
@@ -200,8 +217,8 @@ public class AuthoringController {
      * This method will persist all inforamtion in this authoring page, include all imageGallery item, information etc.
      */
     @RequestMapping(path = "/update", method = RequestMethod.POST)
-    public String updateContent(@ModelAttribute ImageGalleryForm imageGalleryForm,
-	    HttpServletRequest request) throws IllegalAccessException, InvocationTargetException, Exception {
+    public String updateContent(@ModelAttribute ImageGalleryForm imageGalleryForm, HttpServletRequest request)
+	    throws IllegalAccessException, InvocationTargetException, Exception {
 
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -358,7 +375,7 @@ public class AuthoringController {
      * temporarily remove from page, all permenant change will happen only when user sumbit this imageGallery item
      * again.
      */
-    @RequestMapping("/removeImage")
+    @RequestMapping("/removeImageFile")
     public String removeImageFile(HttpServletRequest request) {
 
 	request.setAttribute("itemAttachment", null);
@@ -372,8 +389,8 @@ public class AuthoringController {
      * persisted.
      */
     @RequestMapping("/saveOrUpdateImage")
-    public String saveOrUpdateImage(@ModelAttribute ImageGalleryItemForm imageGalleryItemForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String saveOrUpdateImage(@ModelAttribute ImageGalleryItemForm imageGalleryItemForm,
+	    HttpServletRequest request, HttpServletResponse response) {
 
 	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateImageGalleryItem(imageGalleryItemForm, true);
 
@@ -495,7 +512,7 @@ public class AuthoringController {
      * Remove imageGallery item from HttpSession list and update page display. As authoring rule, all persist only
      * happen when user submit whole page. So this remove is just impact HttpSession values.
      */
-    @RequestMapping("/removeImageFile")
+    @RequestMapping("/removeImage")
     public String removeImage(HttpServletRequest request) {
 
 	// get back sessionMAP

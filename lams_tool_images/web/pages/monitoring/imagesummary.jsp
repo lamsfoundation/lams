@@ -62,7 +62,7 @@
 				    <label for="file-title">
 				    	<fmt:message key="label.authoring.basic.resource.title.input"/>
 				    </label>
-				    <input type="text" path="title" class="form-control" id="file-title" tabindex="1"/>
+				    <input type="text" name="title" value="${imageGalleryItemForm.title}" class="form-control" id="file-title" tabindex="1"/>
 				</div>
 				
 				<div class="form-group">
@@ -136,7 +136,7 @@
 				<a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-default roffset5">
 					<fmt:message key="label.cancel" /> 
 				</a>
-				<a href="#nogo" onclick="javascript:document.imageGalleryItemForm.submit();" class="btn btn-default">
+				<a href="#nogo" onclick="javascript:document.forms.imageGalleryItemForm.submit();" class="btn btn-default">
 					<fmt:message key="label.monitoring.imagesummary.save" /> 
 				</a>
 			</div>

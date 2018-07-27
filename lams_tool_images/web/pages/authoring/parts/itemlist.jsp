@@ -30,7 +30,7 @@
 					
 					<td>
 						<a href="${mediumImagePath}" rel="lyteframe" title="${title}" rev="width: ${image.mediumImageWidth + 20}px; height: ${image.mediumImageHeight + 30}px; scrolling: auto;">
-							<c:out value="${image.title}" escapeXml="true"/>
+							<c:out value="${title}" escapeXml="true"/>
 						</a>
 					</td>
 					

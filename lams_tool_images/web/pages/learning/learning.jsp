@@ -32,8 +32,8 @@
 	<c:set var="mediumImageDimensions" value="${sessionMap.mediumImageDimensions}" />
 	<c:set var="thumbnailImageDimensions" value="${empty sessionMap.thumbnailImageDimensions ? 100 : sessionMap.thumbnailImageDimensions}" />
 
-	<link rel="stylesheet" type="text/css" href="${lams}/includes/css/fotorama.css"/>
-	<link href="${lams}/includes/css/imageGallery.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>/includes/css/fotorama.css"/>
+	<link href="<lams:WebAppURL/>includes/css/imageGallery.css" rel="stylesheet" type="text/css">
 	
     <lams:css suffix="jquery.jRating"/>
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css">
@@ -47,11 +47,11 @@
 		var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message>';
 		var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
 	</script>
-	<script type="text/javascript" src="${lams}/includes/javascript/imageGalleryitem.js"></script>
-	<script type="text/javascript" src="${lams}/includes/javascript/uploadImageLearning.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/imageGalleryitem.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/uploadImageLearning.js"></script>
     <script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
- 	<script type="text/javascript" src="${lams}/includes/javascript/fotorama.js"></script>
+ 	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/fotorama.js"></script>
 	<script type="text/javascript">
 	
 		$(document).ready(function(){ 
@@ -86,9 +86,9 @@
 							</c:if>					
 						
 							{
-								img: "<lams:WebAppURL />/download/?uuid="+${image.mediumFileUuid}+"&preferDownload="+false,
-								//thumb: "<lams:WebAppURL />/download/?uuid="+${image.thumbnailFileUuid}+"&preferDownload="+false,
-								full: "<lams:WebAppURL />/download/?uuid="+${image.originalFileUuid}+"&preferDownload="+false,
+								img: "<lams:WebAppURL />download/?uuid="+${image.mediumFileUuid}+"&preferDownload="+false,
+								//thumb: ""<lams:WebAppURL />download/?uuid="+${image.thumbnailFileUuid}+"&preferDownload="+false,
+								full: "<lams:WebAppURL />download/?uuid="+${image.originalFileUuid}+"&preferDownload="+false,
 								id: '${image.uid}', // Custom anchor is used with the hash:true option.
 								caption: '<div class="caption-heading">${image.titleEscaped}</div>'
 									+ '${description}'
