@@ -21,12 +21,12 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.imageGallery.web.action;
+package org.lamsfoundation.lams.tool.imageGallery.web.controller;
 
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -39,16 +39,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.action.ActionRedirect;
-import org.apache.struts.config.ForwardConfig;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -72,62 +62,41 @@ import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageRatingForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.MultipleImagesForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.HtmlUtils;
 
 /**
  *
  * @author Andrey Balan
  */
-public class LearningAction extends Action {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @Autowired
+    @Qualifier("laimagImageGalleryService")
+    private IImageGalleryService igService;
 
-	String param = mapping.getParameter();
-	// -----------------------ImageGallery Learner function ---------------------------
-	if (param.equals("start")) {
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("finish")) {
-	    return finish(mapping, form, request, response);
-	}
-	if (param.equals("saveNewImage")) {
-	    return saveNewImage(mapping, form, request, response);
-	}
-	if (param.equals("saveMultipleImages")) {
-	    return saveMultipleImages(mapping, form, request, response);
-	}
-	if (param.equals("deleteImage")) {
-	    return deleteImage(mapping, form, request, response);
-	}
+    @Autowired
+    @Qualifier("laimagMessageService")
+    private static MessageService messageService;
 
-	// ================ Comments =======================
-	if (param.equals("loadImageData")) {
-	    return loadImageData(mapping, form, request, response);
-	}
-	if (param.equals("vote")) {
-	    return vote(mapping, form, request, response);
-	}
-
-	// ================ Reflection =======================
-	if (param.equals("newReflection")) {
-	    return newReflection(mapping, form, request, response);
-	}
-	if (param.equals("submitReflection")) {
-	    return submitReflection(mapping, form, request, response);
-	}
-
-	return mapping.findForward(ImageGalleryConstants.ERROR);
-    }
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /**
      * Read imageGallery data from database and put them into HttpSession. It will redirect to init.do directly after
@@ -135,16 +104,15 @@ public class LearningAction extends Action {
      * user "refresh page",
      *
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/start")
+    public String start(HttpServletRequest request) {
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	Long sessionId = new Long(request.getParameter(ImageGalleryConstants.PARAM_TOOL_SESSION_ID));
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-	IImageGalleryService service = getImageGalleryService();
-	ImageGallery imageGallery = service.getImageGalleryBySessionId(sessionId);
+	ImageGallery imageGallery = igService.getImageGalleryBySessionId(sessionId);
 
 	// save toolContentID into HTTPSession
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
@@ -156,10 +124,10 @@ public class LearningAction extends Action {
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // imageGalleryUser may be null if the user was force completed.
-	    imageGalleryUser = getSpecifiedUser(service, sessionId,
+	    imageGalleryUser = getSpecifiedUser(igService, sessionId,
 		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
-	    imageGalleryUser = getCurrentUser(service, sessionId);
+	    imageGalleryUser = getCurrentUser(igService, sessionId);
 	}
 	Integer userId = imageGalleryUser.getUserId().intValue();
 
@@ -172,7 +140,7 @@ public class LearningAction extends Action {
 
 	// get notebook entry
 	String entryText = new String();
-	NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+	NotebookEntry notebookEntry = igService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		ImageGalleryConstants.TOOL_SIGNATURE, userId);
 	if (notebookEntry != null) {
 	    entryText = notebookEntry.getEntry();
@@ -193,9 +161,9 @@ public class LearningAction extends Action {
 	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_INSTRUCTION, imageGallery.getReflectInstructions());
 	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ENTRY, entryText);
 
-	ImageGalleryConfigItem mediumImageDimensionsKey = service
+	ImageGalleryConfigItem mediumImageDimensionsKey = igService
 		.getConfigItem(ImageGalleryConfigItem.KEY_MEDIUM_IMAGE_DIMENSIONS);
-	ImageGalleryConfigItem thumbnailImageDimensionsKey = service
+	ImageGalleryConfigItem thumbnailImageDimensionsKey = igService
 		.getConfigItem(ImageGalleryConfigItem.KEY_THUMBNAIL_IMAGE_DIMENSIONS);
 	sessionMap.put(ImageGalleryConstants.ATTR_MEDIUM_IMAGE_DIMENSIONS,
 		Integer.parseInt(mediumImageDimensionsKey.getConfigValue()));
@@ -204,28 +172,28 @@ public class LearningAction extends Action {
 
 	// add define later support
 	if (imageGallery.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "pages/learning/definelater";
 	}
 
 	// set contentInUse flag to true!
 	imageGallery.setContentInUse(true);
 	imageGallery.setDefineLater(false);
-	service.saveOrUpdateImageGallery(imageGallery);
+	igService.saveOrUpdateImageGallery(imageGallery);
 
 	// store how many items are rated
 	if (imageGallery.isAllowRank()) {
-	    int countRatedImages = service.getCountItemsRatedByUser(imageGallery.getContentId(), userId.intValue());
+	    int countRatedImages = igService.getCountItemsRatedByUser(imageGallery.getContentId(), userId.intValue());
 	    sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedImages);
 	}
 
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
-		request, getServlet().getServletContext());
+		request, applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	// Create set of images, along with this filtering out items added by users from other groups
-	TreeSet<ImageGalleryItem> images = new TreeSet<ImageGalleryItem>(new ImageGalleryItemComparator());
+	TreeSet<ImageGalleryItem> images = new TreeSet<>(new ImageGalleryItemComparator());
 	if (mode.isLearner()) {
-	    Set<ImageGalleryItem> groupImages = service.getImagesForGroup(imageGallery, sessionId);
+	    Set<ImageGalleryItem> groupImages = igService.getImagesForGroup(imageGallery, sessionId);
 	    for (ImageGalleryItem image : groupImages) {
 
 		// initialize login name abd userid to avoid session close error in proxy object
@@ -253,29 +221,23 @@ public class LearningAction extends Action {
 	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_LIST, images);
 	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_GALLERY, imageGallery);
 
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+	return "pages/learning/learning";
     }
 
     /**
      * Finish learning session.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/finish")
+    public String finish(HttpServletRequest request) {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	// get toolSessionID from sessionMAP
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	IImageGalleryService service = getImageGalleryService();
 	// get sessionId from HttpServletRequest
 	String nextActivityUrl = null;
 	try {
@@ -283,48 +245,49 @@ public class LearningAction extends Action {
 	    UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    Long userID = new Long(userDTO.getUserID().longValue());
 
-	    nextActivityUrl = service.finishToolSession(sessionId, userID);
+	    nextActivityUrl = igService.finishToolSession(sessionId, userID);
 	    request.setAttribute(ImageGalleryConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
 	} catch (ImageGalleryException e) {
-	    LearningAction.log.error("Failed get next activity url:" + e.getMessage());
+	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
 	}
 
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+	return "pages/learning/finish";
     }
 
     /**
      * Save file or url imageGallery item into database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException 
      */
-    private ActionForward saveNewImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/saveNewImage")
+    public String saveNewImage(@ModelAttribute ImageGalleryItemForm imageGalleryItemForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(itemForm.getSessionMapID());
+
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(imageGalleryItemForm.getSessionMapID());
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-	
+
 	//validate form
 	boolean isLargeFilesAllowed = mode.isTeacher();
-	ActionErrors errors = ImageGalleryUtils.validateImageGalleryItem(itemForm, isLargeFilesAllowed);
+	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateImageGalleryItem(imageGalleryItemForm,
+		isLargeFilesAllowed);
 
 	try {
-	    if (errors.isEmpty()) {
-		extractFormToImageGalleryItem(request, itemForm);
+	    if (errorMap.isEmpty()) {
+		extractFormToImageGalleryItem(request, imageGalleryItemForm);
 	    }
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-		    new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
+	    errorMap.add("GLOBAL", messageService.getMessage("error.upload.failed"));
 	}
 
-	if (!errors.isEmpty()) {
+	if (!errorMap.isEmpty()) {
 	    ServletOutputStream outputStream = response.getOutputStream();
-	    outputStream.print(errors.get().next().toString());
+	    StringBuilder sb = new StringBuilder();
+	    Iterator it = errorMap.entrySet().iterator();
+	    while (it.hasNext()) {
+		MultiValueMap.Entry pair = (MultiValueMap.Entry) it.next();
+		sb.append(pair.getKey() + " " + pair.getValue());
+	    }
+	    outputStream.print(sb.toString());
 	    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
@@ -333,37 +296,32 @@ public class LearningAction extends Action {
 
     /**
      * Save file or url imageGallery item into database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException 
      */
-    private ActionForward saveMultipleImages(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/saveMultipleImages")
+    public String saveMultipleImages(@ModelAttribute MultipleImagesForm multipleForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	MultipleImagesForm multipleForm = (MultipleImagesForm) form;
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(multipleForm.getSessionMapID());
+
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(multipleForm.getSessionMapID());
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-	
+
 	//validate form
 	boolean isLargeFilesAllowed = mode.isTeacher();
-	ActionErrors errors = ImageGalleryUtils.validateMultipleImages(multipleForm, isLargeFilesAllowed);
+	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateMultipleImages(multipleForm,
+		isLargeFilesAllowed);
 
 	try {
-	    if (errors.isEmpty()) {
+	    if (errorMap.isEmpty()) {
 		extractMultipleFormToImageGalleryItems(request, multipleForm);
 	    }
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-		    new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
+	    errorMap.add("GLOBAL", messageService.getMessage("error.upload.failed"));
 	}
 
-	if (!errors.isEmpty()) {
+	if (!errorMap.isEmpty()) {
 	    ServletOutputStream outputStream = response.getOutputStream();
-	    outputStream.print(errors.get().next().toString());
+//	    outputStream.print(errors.get().next().toString());
 	    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
@@ -372,54 +330,41 @@ public class LearningAction extends Action {
 
     /**
      * Save file or url imageGallery item into database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward deleteImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	IImageGalleryService service = getImageGalleryService();
+    @RequestMapping("/deleteImage")
+    public String deleteImage(HttpServletRequest request, HttpServletResponse response) {
 
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
 	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
 
-	service.deleteImage(sessionId, imageUid);
+	igService.deleteImage(sessionId, imageUid);
 
 	// redirect
-	ForwardConfig redirectConfig = mapping.findForwardConfig(ImageGalleryConstants.SUCCESS);
-	ActionRedirect redirect = new ActionRedirect(redirectConfig);
-	redirect.addParameter(AttributeNames.ATTR_MODE, mode);
-	redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+	String redirect = "redirect:/learning/start.do";
+	redirect = WebUtil.appendParameterToURL(redirect, AttributeNames.ATTR_MODE, mode.toString());
+	redirect = WebUtil.appendParameterToURL(redirect, AttributeNames.PARAM_TOOL_SESSION_ID, sessionId.toString());
 	return redirect;
     }
 
     /**
      * Sets Image data to session variable, to be shown on main learning page.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward loadImageData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/loadImageData")
+    public String loadImageData(HttpServletRequest request) {
+
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
-	IImageGalleryService service = getImageGalleryService();
 	ImageGallery imageGallery = (ImageGallery) sessionMap.get(ImageGalleryConstants.ATTR_IMAGE_GALLERY);
 	Long userId = ((Integer) sessionMap.get(AttributeNames.PARAM_USER_ID)).longValue();
 
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
-	ImageGalleryItem image = service.getImageGalleryItemByUid(imageUid);
+	ImageGalleryItem image = igService.getImageGalleryItemByUid(imageUid);
 	String escapedDescription = image.getDescription().replaceAll("[\"]", "&quot;");
 	image.setDescription(escapedDescription);
 	sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_IMAGE, image);
@@ -436,10 +381,11 @@ public class LearningAction extends Action {
 	boolean isCommentsEnabled = false;
 	int countRatedImages = 0;
 	Long toolSessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
-	
+
 	if (imageGallery.isAllowRank()) {
 
-	    ItemRatingDTO itemRatingDto = service.getRatingCriteriaDtos(imageGallery.getContentId(), toolSessionId, imageUid, userId);
+	    ItemRatingDTO itemRatingDto = igService.getRatingCriteriaDtos(imageGallery.getContentId(), toolSessionId,
+		    imageUid, userId);
 	    sessionMap.put(AttributeNames.ATTR_ITEM_RATING_DTO, itemRatingDto);
 
 	    if (itemRatingDto != null) {
@@ -448,7 +394,7 @@ public class LearningAction extends Action {
 	    }
 
 	    // store how many items are rated
-	    countRatedImages = service.getCountItemsRatedByUser(imageGallery.getContentId(), userId.intValue());
+	    countRatedImages = igService.getCountItemsRatedByUser(imageGallery.getContentId(), userId.intValue());
 	}
 	sessionMap.put("commentsMinWordsLimit", commentsMinWordsLimit);
 	sessionMap.put("isCommentsEnabled", isCommentsEnabled);
@@ -456,7 +402,7 @@ public class LearningAction extends Action {
 
 	if (imageGallery.isAllowVote()) {
 	    boolean isVotedForThisImage = false;
-	    ImageVote imageVote = service.getImageVoteByImageAndUser(imageUid, userId);
+	    ImageVote imageVote = igService.getImageVoteByImageAndUser(imageUid, userId);
 	    if (imageVote != null && imageVote.isVoted()) {
 		isVotedForThisImage = true;
 	    }
@@ -467,128 +413,103 @@ public class LearningAction extends Action {
 	boolean isAuthor = !image.isCreateByAuthor() && (createdBy != null) && (createdBy.getUserId().equals(userId));
 	sessionMap.put(ImageGalleryConstants.PARAM_IS_AUTHOR, isAuthor);
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+	return "pages/learning/parts/commentsarea";
     }
 
     /**
      * Move down current item.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward vote(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/vote")
+    public String vote(@ModelAttribute ImageRatingForm imageRatingForm, HttpServletRequest request) {
+
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
-	IImageGalleryService service = getImageGalleryService();
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),
+	ImageGalleryUser imageGalleryUser = igService.getUserByIDAndSession(new Long(user.getUserID().intValue()),
 		sessionId);
 
 	// persist ImageGalleryItem changes in DB
-	boolean formVote = ((ImageRatingForm) form).getVote();
-	ImageVote imageVote = service.getImageVoteByImageAndUser(imageUid, imageGalleryUser.getUserId());
+	boolean formVote = imageRatingForm.getVote();
+	ImageVote imageVote = igService.getImageVoteByImageAndUser(imageUid, imageGalleryUser.getUserId());
 	if (imageVote == null) {
 	    imageVote = new ImageVote();
 	    imageVote.setCreateBy(imageGalleryUser);
-	    ImageGalleryItem image = service.getImageGalleryItemByUid(imageUid);
+	    ImageGalleryItem image = igService.getImageGalleryItemByUid(imageUid);
 	    imageVote.setImageGalleryItem(image);
 	}
 	imageVote.setVoted(formVote);
-	service.saveOrUpdateImageVote(imageVote);
+	igService.saveOrUpdateImageVote(imageVote);
 
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+	return "pages/learning/parts/commentsarea";
     }
 
     /**
      * Display empty reflection form.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newReflection")
+    public String newReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
 
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 
-	ReflectionForm refForm = (ReflectionForm) form;
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
-	refForm.setUserID(user.getUserID());
-	refForm.setSessionMapID(sessionMapID);
+	reflectionForm.setUserID(user.getUserID());
+	reflectionForm.setSessionMapID(sessionMapID);
 
 	// get the existing reflection entry
-	IImageGalleryService submitFilesService = getImageGalleryService();
 
 	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+	NotebookEntry entry = igService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		ImageGalleryConstants.TOOL_SIGNATURE, user.getUserID());
 
 	if (entry != null) {
-	    refForm.setEntryText(entry.getEntry());
+	    reflectionForm.setEntryText(entry.getEntry());
 	}
 
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+	return "pages/learning/notebook";
     }
 
     /**
      * Submit reflection form input database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ReflectionForm refForm = (ReflectionForm) form;
-	Integer userId = refForm.getUserID();
+    @RequestMapping("/submitReflection")
+    public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
+
+	Integer userId = reflectionForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	IImageGalleryService service = getImageGalleryService();
-
 	// check for existing notebook entry
-	NotebookEntry entry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+	NotebookEntry entry = igService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		ImageGalleryConstants.TOOL_SIGNATURE, userId);
 
 	if (entry == null) {
 	    // create new entry
-	    service.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ImageGalleryConstants.TOOL_SIGNATURE, userId, refForm.getEntryText());
+	    igService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    ImageGalleryConstants.TOOL_SIGNATURE, userId, reflectionForm.getEntryText());
 	} else {
 	    // update existing entry
-	    entry.setEntry(refForm.getEntryText());
+	    entry.setEntry(reflectionForm.getEntryText());
 	    entry.setLastModified(new Date());
-	    service.updateEntry(entry);
+	    igService.updateEntry(entry);
 	}
 
-	return finish(mapping, form, request, response);
+	return finish(request);
     }
 
     // *************************************************************************************
     // Private methods
     // *************************************************************************************
-    private IImageGalleryService getImageGalleryService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (IImageGalleryService) wac.getBean(ImageGalleryConstants.IMAGE_GALLERY_SERVICE);
-    }
 
     private ImageGalleryUser getCurrentUser(IImageGalleryService service, Long sessionId) {
 	// try to get form system session
@@ -609,8 +530,8 @@ public class LearningAction extends Action {
     private ImageGalleryUser getSpecifiedUser(IImageGalleryService service, Long sessionId, Integer userId) {
 	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(userId.intValue()), sessionId);
 	if (imageGalleryUser == null) {
-	    LearningAction.log
-		    .error("Unable to find specified user for imageGallery activity. Screens are likely to fail. SessionId="
+	    LearningController.log.error(
+		    "Unable to find specified user for imageGallery activity. Screens are likely to fail. SessionId="
 			    + sessionId + " UserId=" + userId);
 	}
 	return imageGalleryUser;
@@ -618,29 +539,25 @@ public class LearningAction extends Action {
 
     /**
      * Extract web form content to imageGallery item.
-     *
-     * @param request
-     * @param imageForm
-     * @throws ImageGalleryException
      */
     private void extractFormToImageGalleryItem(HttpServletRequest request, ImageGalleryItemForm imageForm)
 	    throws Exception {
-	IImageGalleryService service = getImageGalleryService();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(imageForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(imageForm.getSessionMapID());
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-	
+
 	ImageGallery imageGallery;
 	Long toolSessionId = null;
 	ImageGalleryUser user = null;
 	if (mode.isLearner() || mode.isAuthor()) {
 	    toolSessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
-	    imageGallery = service.getImageGalleryBySessionId(toolSessionId);
-	    user = getCurrentUser(service, toolSessionId);
+	    imageGallery = igService.getImageGalleryBySessionId(toolSessionId);
+	    user = getCurrentUser(igService, toolSessionId);
 
-	// monitor
+	    // monitor
 	} else {
 	    Long contentId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_CONTENT_ID);
-	    imageGallery = service.getImageGalleryByContentId(contentId);
+	    imageGallery = igService.getImageGalleryByContentId(contentId);
 	}
 
 	ImageGalleryItem image = new ImageGalleryItem();
@@ -651,7 +568,7 @@ public class LearningAction extends Action {
 	// item.setFileName();
 	if (imageForm.getFile() != null) {
 	    try {
-		service.uploadImageGalleryItemFile(image, imageForm.getFile());
+		igService.uploadImageGalleryItemFile(image, imageForm.getFile());
 	    } catch (UploadImageGalleryFileException e) {
 		// remove new image!
 		throw e;
@@ -663,10 +580,10 @@ public class LearningAction extends Action {
 	    Long nextImageTitleNumber = imageGallery.getNextImageTitle();
 	    imageGallery.setNextImageTitle(nextImageTitleNumber + 1);
 
-	    title = service.generateNextImageTitle(nextImageTitleNumber);
+	    title = igService.generateNextImageTitle(nextImageTitleNumber);
 	}
 	image.setTitle(title);
-	
+
 	image.setCreateBy(user);
 	image.setDescription(imageForm.getDescription());
 	image.setCreateByAuthor(false);
@@ -687,28 +604,24 @@ public class LearningAction extends Action {
 	image.setSequenceId(maxSeq);
 
 	imageList.add(image);
-	service.saveOrUpdateImageGallery(imageGallery);
+	igService.saveOrUpdateImageGallery(imageGallery);
 
-	service.saveOrUpdateImageGalleryItem(image);
+	igService.saveOrUpdateImageGalleryItem(image);
 
 	// notify teachers
 	if (mode.isLearner() && imageGallery.isNotifyTeachersOnImageSumbit()) {
-	    service.notifyTeachersOnImageSumbit(toolSessionId, user);
+	    igService.notifyTeachersOnImageSumbit(toolSessionId, user);
 	}
     }
 
     /**
      * Extract web form content to imageGallery items.
-     *
-     * @param request
-     * @param multipleForm
-     * @throws ImageGalleryException
      */
     private void extractMultipleFormToImageGalleryItems(HttpServletRequest request, MultipleImagesForm multipleForm)
 	    throws Exception {
 
-	List<FormFile> fileList = ImageGalleryUtils.createFileListFromMultipleForm(multipleForm);
-	for (FormFile file : fileList) {
+	List<MultipartFile> fileList = ImageGalleryUtils.createFileListFromMultipleForm(multipleForm);
+	for (MultipartFile file : fileList) {
 	    ImageGalleryItemForm imageForm = new ImageGalleryItemForm();
 	    imageForm.setSessionMapID(multipleForm.getSessionMapID());
 	    imageForm.setTitle("");

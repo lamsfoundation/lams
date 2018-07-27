@@ -13,17 +13,17 @@
 			document.getElementById("finishButton").disabled = true;
 		}
 		function submitForm(methodName){
-			var f = document.getElementById('messageForm');
+			var f = document.getElementById('reflectionForm');
 			f.submit();
 		}
 	</script>
 </lams:head>
 <body class="stripes">
-	<lams:Page type="learner" title="${sessionMap.title}">
+	<lams:Page type="learner" title="${sessionMap.title}" formID="reflectionForm">
 		
-		<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
-			<html:hidden property="userID" />
-			<html:hidden property="sessionMapID" />
+		<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="reflectionForm" id="reflectionForm">
+			<form:hidden path="userID" />
+			<form:hidden path="sessionMapID" />
 
 			<%@ include file="/common/messages.jsp"%>
 
@@ -31,9 +31,9 @@
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 			</p>
 
-			<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control" />
+			<textarea id="focused" rows="5" name="entryText" class="form-control"></textarea>
 
-			<html:link href="#nogo" styleClass="btn btn-primary voffset5 pull-right" styleId="finishButton" onclick="submitForm('finish')">
+			<a href="#nogo" class="btn btn-primary voffset5 pull-right" id="finishButton" onclick="submitForm('finish')">
 				<div class="na"> 
 					<c:choose>
 						<c:when test="${sessionMap.activityPosition.last}">
@@ -44,9 +44,9 @@
 						</c:otherwise>
 					</c:choose>
 				</div>
-			</html:link>
+			</a>
 				
-		</html:form>
+		</form:form>
 	
 		<div id="footer">
 		</div>

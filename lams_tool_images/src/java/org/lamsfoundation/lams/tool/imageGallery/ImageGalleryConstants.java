@@ -23,7 +23,7 @@
 
 package org.lamsfoundation.lams.tool.imageGallery;
 
-public class ImageGalleryConstants {
+public interface ImageGalleryConstants {
     public static final String TOOL_SIGNATURE = "laimag10";
     public static final String IMAGE_GALLERY_SERVICE = "laimagImageGalleryService";
     public static final String TOOL_CONTENT_HANDLER_NAME = "laimagImageGalleryToolContentHandler";

@@ -22,7 +22,7 @@
 		var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"/>';
 		var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
 	</script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/imageGalleryitem.js'/>"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/imageGalleryitem.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script>
@@ -51,16 +51,14 @@
 </lams:head>
 
 <body class="stripes" onLoad="init();">
-	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+	<form:form action="update.do" method="post" modelAttribute="imageGalleryForm" id="imageGalleryForm" enctype="multipart/form-data">
 	
 		<c:set var="title"><fmt:message key="label.learning.heading" /></c:set>
-		<lams:Page title="${title}" type="navbar">
-			<html:hidden property="imageGallery.contentId"/>
-			<html:hidden property="mode" value="${mode}"/>
-			<html:hidden property="sessionMapID" />
-			<html:hidden property="contentFolderID" />
-			<html:hidden property="currentTab" styleId="currentTab" />
+		<lams:Page title="${title}" type="navbar" formID="imageGalleryForm">
+			<form:hidden path="imageGallery.contentId"/>
+			<form:hidden path="sessionMapID" />
+			<form:hidden path="contentFolderID" />
+			<form:hidden path="currentTab" id="currentTab" />
 	
 			<lams:Tabs control="true" title="${title}" helpToolSignature="<%= ImageGalleryConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 				<lams:Tab id="1" key="label.authoring.heading.basic" />
@@ -78,10 +76,10 @@
 		
 				<!-- Button Row -->
 				<div id="saveCancelButtons">
-					<lams:AuthoringButton formID="authoringForm"
+					<lams:AuthoringButton formID="imageGalleryForm"
 						clearSessionActionUrl="/clearsession.do" toolSignature="<%=ImageGalleryConstants.TOOL_SIGNATURE%>"
-						toolContentID="${formBean.imageGallery.contentId}" accessMode="${mode}" defineLater="${mode=='teacher'}"
-						contentFolderID="${formBean.contentFolderID}" />
+						toolContentID="${imageGalleryForm.imageGallery.contentId}" accessMode="${mode}" defineLater="${mode=='teacher'}"
+						contentFolderID="${imageGalleryForm.contentFolderID}" />
 				</div>
 			</lams:TabBodyArea>
 	
@@ -90,6 +88,6 @@
 		<!-- end page div -->
 		</lams:Page>
 	
-	</html:form>
+	</form:form>
 </body>
 </lams:html>

@@ -32,8 +32,8 @@
 	<c:set var="mediumImageDimensions" value="${sessionMap.mediumImageDimensions}" />
 	<c:set var="thumbnailImageDimensions" value="${empty sessionMap.thumbnailImageDimensions ? 100 : sessionMap.thumbnailImageDimensions}" />
 
-	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/fotorama.css'/>"/>
-	<link href="<html:rewrite page='/includes/css/imageGallery.css'/>" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>/includes/css/fotorama.css"/>
+	<link href="<lams:WebAppURL/>includes/css/imageGallery.css" rel="stylesheet" type="text/css">
 	
     <lams:css suffix="jquery.jRating"/>
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css">
@@ -47,11 +47,11 @@
 		var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message>';
 		var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
 	</script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/imageGalleryitem.js'/>"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/uploadImageLearning.js'/>"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/imageGalleryitem.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/uploadImageLearning.js"></script>
     <script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
- 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/fotorama.js'/>"></script>
+ 	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/fotorama.js"></script>
 	<script type="text/javascript">
 	
 		$(document).ready(function(){ 
@@ -86,9 +86,9 @@
 							</c:if>					
 						
 							{
-								img: '<html:rewrite page="/download/?uuid="/>${image.mediumFileUuid}&preferDownload=false',
-								//thumb: '<html:rewrite page="/download/?uuid="/>${image.thumbnailFileUuid}&preferDownload=false',
-								full: '<html:rewrite page="/download/?uuid="/>${image.originalFileUuid}&preferDownload=false',
+								img: "<lams:WebAppURL />download/?uuid="+${image.mediumFileUuid}+"&preferDownload="+false,
+								//thumb: ""<lams:WebAppURL />download/?uuid="+${image.thumbnailFileUuid}+"&preferDownload="+false,
+								full: "<lams:WebAppURL />download/?uuid="+${image.originalFileUuid}+"&preferDownload="+false,
 								id: '${image.uid}', // Custom anchor is used with the hash:true option.
 								caption: '<div class="caption-heading">${image.titleEscaped}</div>'
 									+ '${description}'
@@ -237,9 +237,9 @@
 					</div>
 
 					<c:if test="${mode != 'teacher'}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-default pull-left">
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-default pull-left">
 							<fmt:message key="label.edit" />
-						</html:button>
+						</button>
 					</c:if>
 				</div>
 			</div>
@@ -253,12 +253,12 @@
 			>
 				<c:choose>
 					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-primary pull-right" >
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-primary pull-right" >
 							<fmt:message key="label.continue" />
-						</html:button>
+						</button>
 					</c:when>
 					<c:otherwise>
-						<html:link href="#nogo" property="FinishButton" styleId="finishButton"	onclick="return finishSession()" styleClass="btn btn-primary pull-right" >
+						<a href="#nogo" name="FinishButton" id="finishButton"	onclick="return finishSession()" class="btn btn-primary pull-right" >
 							<span class="na">
 								<c:choose>
 				 					<c:when test="${sessionMap.activityPosition.last}">
@@ -269,7 +269,7 @@
 				 					</c:otherwise>
 				 				</c:choose>
 							</span>
-						</html:link>
+						</a>
 					</c:otherwise>
 				</c:choose>
 			</div>

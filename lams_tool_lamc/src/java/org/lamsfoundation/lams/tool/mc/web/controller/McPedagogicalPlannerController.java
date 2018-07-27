@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.mc.web.action;
+package org.lamsfoundation.lams.tool.mc.web.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,53 +31,60 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
-import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.tool.mc.web.form.McPedagogicalPlannerForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-public class McPedagogicalPlannerAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/pedagogicalPlanner")
+public class McPedagogicalPlannerController {
 
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return initPedagogicalPlannerForm(mapping, form, request, response);
+    @Autowired
+    @Qualifier("mcService")
+    private IMcService mcService;
+
+    @Autowired
+    @Qualifier("lamcMessageService")
+    private static MessageService messageService;
+
+    protected String unspecified(@ModelAttribute McPedagogicalPlannerForm plannerForm, HttpServletRequest request) {
+	return initPedagogicalPlannerForm(plannerForm, request);
     }
 
-    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	McPedagogicalPlannerForm plannerForm = (McPedagogicalPlannerForm) form;
+    @RequestMapping("/initPedagogicalPlannerForm")
+    public String initPedagogicalPlannerForm(@ModelAttribute McPedagogicalPlannerForm plannerForm,
+	    HttpServletRequest request) {
+
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McContent mcContent = getMcService().getMcContent(toolContentID);
-	plannerForm.fillForm(mcContent, getMcService());
-	return mapping.findForward(McAppConstants.SUCCESS);
+	McContent mcContent = mcService.getMcContent(toolContentID);
+	plannerForm.fillForm(mcContent, mcService);
+	return "authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
+    public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute McPedagogicalPlannerForm plannerForm,
+	    HttpServletRequest request) throws IOException {
 
-	McPedagogicalPlannerForm plannerForm = (McPedagogicalPlannerForm) form;
-	ActionMessages errors = plannerForm.validate(request);
+	MultiValueMap<String, String> errorMap = plannerForm.validate(request);
 
-	if (errors.isEmpty()) {
-	    McContent mcContent = getMcService().getMcContent(plannerForm.getToolContentID());
+	if (errorMap.isEmpty()) {
+	    McContent mcContent = mcService.getMcContent(plannerForm.getToolContentID());
 	    int questionIndex = 1;
 	    String question = null;
 
@@ -100,7 +106,7 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 		    plannerForm.removeQuestion(questionIndex - 1);
 		} else {
 		    if (questionIndex <= mcContent.getMcQueContents().size()) {
-			McQueContent mcQueContent = getMcService().getQuestionByDisplayOrder((long) questionIndex,
+			McQueContent mcQueContent = mcService.getQuestionByDisplayOrder((long) questionIndex,
 				mcContent.getUid());
 			mcQueContent.setQuestion(question);
 			int candidateAnswerDTOIndex = 0;
@@ -114,11 +120,11 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 				McOptionDTO answerDTO = candidateAnswerDTOList.get(candidateAnswerDTOIndex);
 				candidateAnswer.setCorrectOption(McAppConstants.CORRECT.equals(answerDTO.getCorrect()));
 				candidateAnswer.setMcQueOptionText(answerDTO.getCandidateAnswer());
-				getMcService().updateMcOptionsContent(candidateAnswer);
+				mcService.updateMcOptionsContent(candidateAnswer);
 			    }
 			    candidateAnswerDTOIndex++;
 			}
-			getMcService().saveOrUpdateMcQueContent(mcQueContent);
+			mcService.saveOrUpdateMcQueContent(mcQueContent);
 		    } else {
 			McQueContent mcQueContent = new McQueContent();
 			mcQueContent.setDisplayOrder(questionIndex);
@@ -136,28 +142,29 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 			    candidateAnswer.setMcQueContentId(mcQueContent.getMcContentId());
 			    candidateAnswers.add(candidateAnswer);
 			}
-			getMcService().saveOrUpdateMcQueContent(mcQueContent);
+			mcService.saveOrUpdateMcQueContent(mcQueContent);
 			mcContent.getMcQueContents().add(mcQueContent);
 		    }
 		    questionIndex++;
 		}
 	    } while (questionIndex <= plannerForm.getQuestionCount());
 	    for (; questionIndex <= mcContent.getMcQueContents().size(); questionIndex++) {
-		McQueContent mcQueContent = getMcService().getQuestionByDisplayOrder((long) questionIndex,
+		McQueContent mcQueContent = mcService.getQuestionByDisplayOrder((long) questionIndex,
 			mcContent.getUid());
 		mcContent.getMcQueContents().remove(mcQueContent);
-		getMcService().removeMcQueContent(mcQueContent);
+		mcService.removeMcQueContent(mcQueContent);
 	    }
-	    plannerForm.fillForm(mcContent, getMcService());
+	    plannerForm.fillForm(mcContent, mcService);
 	} else {
-	    saveErrors(request, errors);
+	    request.setAttribute("errorMap", errorMap);
 	}
-	return mapping.findForward(McAppConstants.SUCCESS);
+	return "authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward createPedagogicalPlannerQuestion(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) {
-	McPedagogicalPlannerForm plannerForm = (McPedagogicalPlannerForm) form;
+    @RequestMapping("/createPedagogicalPlannerQuestion")
+    public String createPedagogicalPlannerQuestion(@ModelAttribute McPedagogicalPlannerForm plannerForm,
+	    HttpServletRequest request) {
+
 	int questionDisplayOrder = plannerForm.getQuestionCount().intValue() + 1;
 	plannerForm.setCandidateAnswerCount(new ArrayList<Integer>(plannerForm.getQuestionCount()));
 	Map<String, String[]> paramMap = request.getParameterMap();
@@ -169,13 +176,8 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 	plannerForm.setQuestion(questionDisplayOrder - 1, "");
 	plannerForm.getCandidateAnswerCount().add(McAppConstants.CANDIDATE_ANSWER_DEFAULT_COUNT);
 	plannerForm.setCorrect(questionDisplayOrder - 1, "1");
-	return mapping.findForward(McAppConstants.SUCCESS);
-    }
 
-    private IMcService getMcService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return McServiceProxy.getMcService(getServlet().getServletContext());
+	return "authoring/pedagogicalPlannerForm";
     }
 
 }

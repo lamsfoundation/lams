@@ -9,7 +9,7 @@
 				${candidateIndex}
 			</c:when>
 			<c:otherwise>
-				${formBean.candidateIndex}
+				${mcAuthoringForm.candidateIndex}
 			</c:otherwise>
 		</c:choose>
 	</c:set>
