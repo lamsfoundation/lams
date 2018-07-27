@@ -19,7 +19,7 @@
 			</div>
 	
 			<%-- Text search form fields are being included --%>
-			<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}"  />
+			<lams:TextSearch sessionMapID="${sessionMapID}"  />
 						
 			<h4><fmt:message key="textsearch.questions" /></h4>
 			<c:forEach var="itemE" items="${QaConditionForm.possibleItems}">

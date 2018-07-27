@@ -32,12 +32,12 @@
 
 	<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
-		<html:form action="/learning?validate=false" method="POST" styleId="form">
-			<html:hidden property="method" />
-			<html:hidden property="toolSessionID" />
-			<html:hidden property="userID" />
-			<html:hidden property="httpSessionID" />
-			<html:hidden property="totalQuestionCount" />
+		<form:form action="/learning.do" method="POST" modelAttribute="form" id="form">
+			<form:hidden property="method" />
+			<form:hidden property="toolSessionID" />
+			<form:hidden property="userID" />
+			<form:hidden property="httpSessionID" />
+			<form:hidden property="totalQuestionCount" />
 
 
 			<lams:Alert type="danger" id="submission-deadline" close="false">
@@ -51,8 +51,8 @@
 			<div class="right-buttons">
 
 				<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
-					<html:link href="#nogo" property="endLearning" styleId="finishButton"
-						onclick="javascript:submitMethod('endLearning');return false" styleClass="btn btn-primary pull-right">
+					<a href="#nogo" name="endLearning" id="finishButton"
+						onclick="javascript:submitMethod('endLearning');return false" class="btn btn-primary pull-right">
 						<span class="na"> <c:choose>
 								<c:when test="${sessionMap.activityPosition.last}">
 									<fmt:message key="button.submit" />
@@ -62,18 +62,18 @@
 								</c:otherwise>
 							</c:choose>
 						</span>
-					</html:link>
+					</a>
 				</c:if>
 
 				<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
-					<html:button property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
-						styleClass="btn btn-primary pull-right">
+					<button name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
+						class="btn btn-primary pull-right">
 						<fmt:message key="label.continue" />
-					</html:button>
+					</button>
 				</c:if>
 
 			</div>
-		</html:form>
+		</form:form>
 
 		<div id="footer"></div>
 	</lams:Page>

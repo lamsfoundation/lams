@@ -41,17 +41,17 @@
 	<c:if test="${content.reflect}"> 			
 		<div style="margin-bottom: 20px">
 			<c:set var="viewReflectionsURL"><lams:WebAppURL/>/monitoring/Reflections.jsp?toolSessionID=${groupDto.sessionId}</c:set>
-			<html:button property="viewAllMarks" onclick="javascript:launchPopup('${viewReflectionsURL}')"
-					styleClass="btn btn-default loffset5 voffset10" >
+			<button name="viewAllMarks" onclick="javascript:launchPopup('${viewReflectionsURL}')"
+					class="btn btn-default loffset5 voffset10" >
 				<fmt:message key="label.notebook.entries" />
-			</html:button>
+			</button>
 		</div>
 	</c:if>
 				  	
 	<c:forEach var="question" items="${questionDTOs}">
 		<div class="panel panel-default"">
 			<div class="panel-heading">
-				<a href="javascript:launchPopup('<html:rewrite page="/monitoring.do?dispatch=getPrintAnswers&questionUid=${question.uid}&toolSessionID=${groupDto.sessionId}"/>');"	
+				<a href="javascript:launchPopup('<lams:WebAppURL/>monitoring.getPrintAnswers.do?questionUid=${question.uid}&toolSessionID=${groupDto.sessionId}');"	
 					id="printAnswers" class="btn btn-default btn-xs pull-right"><i class="fa fa-print"></i></a>
 				<c:out value="${question.question}" escapeXml="false"/>
 			</div>

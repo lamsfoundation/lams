@@ -11,7 +11,7 @@
 <%-- Success Messages --%>
  <c:set var="infokey" value="GLOBALINFO" /> 
  <c:if test="${not empty infoMap and not empty infoMap[infokey]}"> 
-     <lams:Alert id="message" message="false"> 
+     <lams:Alert type="info"> 
          <c:forEach var="info" items="${infoMap[infokey]}"> 
              <c:out value="${info}" /><br /> 
          </c:forEach> 

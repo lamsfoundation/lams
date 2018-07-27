@@ -127,7 +127,8 @@ public class AuthoringController {
      * @return
      */
     @RequestMapping("/removeItem")
-    private String removeItem(ResourceItemForm resourceItemForm, HttpServletRequest request) {
+    private String removeItem(@ModelAttribute("resourceItemForm") ResourceItemForm resourceItemForm,
+	    HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
@@ -146,7 +147,6 @@ public class AuthoringController {
 	    delList.add(item);
 	}
 
-	request.setAttribute("resourceItemForm", resourceItemForm);
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/itemlist";
     }
@@ -159,7 +159,8 @@ public class AuthoringController {
      * @return
      */
     @RequestMapping("/editItemInit")
-    private String editItemInit(ResourceItemForm resourceItemForm, HttpServletRequest request) {
+    private String editItemInit(@ModelAttribute("resourceItemForm") ResourceItemForm resourceItemForm,
+	    HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
@@ -176,7 +177,6 @@ public class AuthoringController {
 		populateItemToForm(itemIdx, item, resourceItemForm, request);
 	    }
 	}
-	request.setAttribute("resourceItemForm", resourceItemForm);
 	switch (item.getType()) {
 	    case 1:
 		return "pages/authoring/parts/addurl";
@@ -528,7 +528,6 @@ public class AuthoringController {
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, startForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-	request.setAttribute("startForm", startForm);
 
 	return "pages/authoring/start";
     }
@@ -978,12 +977,11 @@ public class AuthoringController {
 		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
 	    // validate item size
-	    if(!FileValidatorSpringUtil.validateFileSize(resourceItemForm.getFile().getSize(),
-		    false)) {
+	    if (!FileValidatorSpringUtil.validateFileSize(resourceItemForm.getFile().getSize(), false)) {
 		errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
-			    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
+			new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
 	    }
-	    
+
 	    // for edit validate: file already exist
 	    if (!resourceItemForm.isHasFile() && (resourceItemForm.getFile() == null
 		    || StringUtils.isEmpty(resourceItemForm.getFile().getOriginalFilename()))) {

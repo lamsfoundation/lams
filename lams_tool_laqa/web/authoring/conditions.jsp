@@ -48,12 +48,12 @@
 
 <!-- Conditions Tab Content -->
 <div id="conditionsArea">
-	<c:set var="sessionMapID" value="${QaConditionForm.httpSessionID}" />
+	<c:set var="sessionMapID" value="${authoringForm.httpSessionID}" />
 	<%@ include file="/authoring/conditionList.jsp"%>
 </div>
  
  <div class="form-inline">
-	<a href="javascript:showConditionMessage('<lams:WebAppURL/>authoringConditions/newConditionInit.do?sessionMapID=${QaConditionForm.httpSessionID}');" 
+	<a href="javascript:showConditionMessage('../authoringConditions/newConditionInit.do?sessionMapID=${authoringForm.httpSessionID}');" 
 		class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.conditions.add.condition" /></a> 
 </div>
 

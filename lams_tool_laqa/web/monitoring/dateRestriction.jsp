@@ -49,9 +49,9 @@
 		<label for="datetime"><fmt:message key="monitor.summary.after.date" />&nbsp;
 		<input type="text" name="datetime" id="datetime" value="" class="form-control form-control-inline"/>
 		</label>							
-		<html:link	href="javascript:storeShowOtherAnswersAfterDeadline(); setSubmissionDeadline();" styleClass="btn btn-default">
+		<a	href="javascript:storeShowOtherAnswersAfterDeadline(); setSubmissionDeadline();" class="btn btn-default">
 			<fmt:message key="monitor.summary.set.restriction" />
-		</html:link>
+		</a>
 		</div>
 	</div>
 
@@ -60,9 +60,9 @@
 		<span id="dateInfo">
 		</span>
 		</label>
-		<html:link	href="javascript:$('#show-other-answers-after-deadline').prop('checked', false); removeSubmissionDeadline();" styleClass="btn btn-default">
+		<a	href="javascript:$('#show-other-answers-after-deadline').prop('checked', false); removeSubmissionDeadline();" class="btn btn-default">
 			<fmt:message key="monitor.summary.unset.restriction" />
-		</html:link>
+		</a>
 	</div>
 	
 	<div class="checkbox">

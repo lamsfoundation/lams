@@ -17,21 +17,21 @@
 <body class="stripes">
 
 <!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-<html:form action="/learning?validate=false" styleId="reflectionForm" onsubmit="disableFinishButton()">
+<form:form action="/learning.do" modelAttribute="reflectionForm" id="dreflectionForm" onsubmit="disableFinishButton()">
 
 <lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
-		<html:hidden property="method" value="submitReflection"/>
-		<html:hidden property="toolSessionID" />
-		<html:hidden property="userID" />
-		<html:hidden property="httpSessionID" />
-		<html:hidden property="totalQuestionCount" />
+		<form:hidden path="method" value="submitReflection"/>
+		<form:hidden path="toolSessionID" />
+		<form:hidden path="userID" />
+		<form:hidden path="httpSessionID" />
+		<form:hidden path="totalQuestionCount" />
 
 			<p>
 				<lams:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 			</p>
 
-			<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control"></html:textarea>
+			<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control"></form:textarea>
 
 			
 				<button id="finishButton" class="btn btn-primary voffset5 pull-right na">
@@ -50,7 +50,7 @@
 	<div id="footer"></div>
 </lams:Page>
 
-</html:form>
+</form:form>
 
 
 <script type="text/javascript">

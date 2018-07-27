@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <div id="itemList">
 	<table class="table table-striped table-condensed">
