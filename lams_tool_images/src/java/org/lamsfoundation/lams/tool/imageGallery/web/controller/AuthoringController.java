@@ -173,7 +173,8 @@ public class AuthoringController {
     }
 
     @RequestMapping("/definelater")
-    public String defineLater(@ModelAttribute ImageGalleryForm imageGalleryForm, HttpServletRequest request) {
+    public String defineLater(@ModelAttribute ImageGalleryForm imageGalleryForm, HttpServletRequest request)
+	    throws ServletException {
 
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	ImageGallery imageGallery = igService.getImageGalleryByContentId(contentId);
@@ -184,6 +185,71 @@ public class AuthoringController {
 	//audit log the teacher has started editing activity in monitor
 	igService.auditLogStartEditingActivityInMonitor(contentId);
 
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+
+	List<ImageGalleryItem> items = null;
+
+	// Get contentFolderID and save to form.
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	imageGalleryForm.setContentFolderID(contentFolderID);
+
+	// initial Session Map
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	imageGalleryForm.setSessionMapID(sessionMap.getSessionID());
+
+	try {
+	    imageGallery = igService.getImageGalleryByContentId(contentId);
+	    // if imageGallery does not exist, try to use default content instead.
+	    if (imageGallery == null) {
+		imageGallery = igService.getDefaultContent(contentId);
+		if (imageGallery.getImageGalleryItems() != null) {
+		    items = new ArrayList<ImageGalleryItem>(imageGallery.getImageGalleryItems());
+		} else {
+		    items = null;
+		}
+	    } else {
+		items = igService.getAuthoredItems(imageGallery.getUid());
+	    }
+
+	    imageGalleryForm.setImageGallery(imageGallery);
+	    imageGalleryForm.setAllowRatingsOrVote(imageGallery.isAllowVote() || imageGallery.isAllowRank());
+	} catch (Exception e) {
+	    AuthoringController.log.error(e);
+	    throw new ServletException(e);
+	}
+
+	// init it to avoid null exception in following handling
+	if (items == null) {
+	    items = new ArrayList<>();
+	} else {
+	    ImageGalleryUser imageGalleryUser = null;
+	    // handle system default question: createBy is null, now set it to current user
+	    for (ImageGalleryItem item : items) {
+		if (item.getCreateBy() == null) {
+		    if (imageGalleryUser == null) {
+			// get back login user DTO
+			HttpSession ss = SessionManager.getSession();
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			imageGalleryUser = new ImageGalleryUser(user, imageGallery);
+		    }
+		    item.setCreateBy(imageGalleryUser);
+		}
+	    }
+	}
+	// init imageGallery item list
+	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageList(sessionMap);
+	imageGalleryItemList.clear();
+	imageGalleryItemList.addAll(items);
+
+	// get rating criterias from DB
+	List<RatingCriteria> ratingCriterias = igService.getRatingCriterias(contentId);
+	sessionMap.put(AttributeNames.ATTR_RATING_CRITERIAS, ratingCriterias);
+
+	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_GALLERY_FORM, imageGalleryForm);
+	sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, imageGallery.getNextImageTitle());
+	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
 	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
 	request.setAttribute("startForm", imageGalleryForm);
 	return "pages/authoring/start";
@@ -379,7 +445,7 @@ public class AuthoringController {
     public String removeImageFile(HttpServletRequest request) {
 
 	request.setAttribute("itemAttachment", null);
-	return "pages/authoring/parts/itemlist";
+	return "pages/authoring/parts/imagefile";
     }
 
     /**
@@ -533,7 +599,7 @@ public class AuthoringController {
 	}
 
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return "pages/authoring/parts/imagefile";
+	return "pages/authoring/parts/itemlist";
     }
 
     // *************************************************************************************

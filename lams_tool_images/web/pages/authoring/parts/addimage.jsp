@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:choose>
 	<c:when test="${saveUsingLearningAction}">
-		<c:set var="FORM_ACTION" value="<lams:WebAppURL/>learning/saveNewImage.do"/>
+		<c:set var="FORM_ACTION" value="../learning/saveNewImage.do"/>
 	</c:when>
 	<c:otherwise>
 		<c:set var="FORM_ACTION" value="saveOrUpdateImage.do"/>

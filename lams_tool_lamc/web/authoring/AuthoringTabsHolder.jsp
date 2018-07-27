@@ -20,9 +20,10 @@
 			});		
 		});
 
-		function submitMethod(actionMethod) {
-			document.McAuthoringForm.dispatch.value=actionMethod; 
-			document.McAuthoringForm.submit();
+		function submitMethod(methodName) {
+			var f = document.getElementById('mcAuthoringForm');
+			f.action = methodName + ".do";
+			f.submit();
 		}
 
 		

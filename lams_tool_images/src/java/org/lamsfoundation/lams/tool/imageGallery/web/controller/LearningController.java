@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.imageGallery.web.controller;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -38,8 +39,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -282,7 +281,13 @@ public class LearningController {
 
 	if (!errorMap.isEmpty()) {
 	    ServletOutputStream outputStream = response.getOutputStream();
-//	    outputStream.print(errorMap.get().next().toString());
+	    StringBuilder sb = new StringBuilder();
+	    Iterator it = errorMap.entrySet().iterator();
+	    while (it.hasNext()) {
+		MultiValueMap.Entry pair = (MultiValueMap.Entry) it.next();
+		sb.append(pair.getKey() + " " + pair.getValue());
+	    }
+	    outputStream.print(sb.toString());
 	    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
@@ -327,8 +332,7 @@ public class LearningController {
      * Save file or url imageGallery item into database.
      */
     @RequestMapping("/deleteImage")
-    public String deleteImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String deleteImage(HttpServletRequest request, HttpServletResponse response) {
 
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
 	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
@@ -340,7 +344,7 @@ public class LearningController {
 	igService.deleteImage(sessionId, imageUid);
 
 	// redirect
-	String redirect = "redirect:learning/start.do";
+	String redirect = "redirect:/learning/start.do";
 	redirect = WebUtil.appendParameterToURL(redirect, AttributeNames.ATTR_MODE, mode.toString());
 	redirect = WebUtil.appendParameterToURL(redirect, AttributeNames.PARAM_TOOL_SESSION_ID, sessionId.toString());
 	return redirect;

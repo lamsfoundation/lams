@@ -27,9 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.springframework.web.multipart.MultipartFile;
 
