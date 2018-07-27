@@ -20,13 +20,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.web.form;
 
-import org.apache.struts.action.ActionForm;
 import org.apache.struts.upload.FormFile;
 
-public class QaAdminForm extends ActionForm {
+public class QaAdminForm {
 
     public static final long serialVersionUID = 978235712395273523L;
 

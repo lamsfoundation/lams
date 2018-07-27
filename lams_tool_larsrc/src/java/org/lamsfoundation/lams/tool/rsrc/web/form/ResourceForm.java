@@ -23,13 +23,7 @@
 
 package org.lamsfoundation.lams.tool.rsrc.web.form;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 
 /**
@@ -40,7 +34,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.Resource;
  *
  * User: Dapeng.Ni
  */
-public class ResourceForm extends ActionForm {
+public class ResourceForm {
     private static final long serialVersionUID = 3599879328307492312L;
 
     private static Logger logger = Logger.getLogger(ResourceForm.class.getName());
@@ -49,8 +43,19 @@ public class ResourceForm extends ActionForm {
     private String sessionMapID;
     private String contentFolderID;
     private int currentTab;
-    private FormFile offlineFile;
-    private FormFile onlineFile;
+    private String offlineFile;
+    private String onlineFile;
+
+    //tool access mode;
+    private String mode;
+
+    public String getMode() {
+	return mode;
+    }
+
+    public void setMode(String mode) {
+	this.mode = mode;
+    }
 
     private Resource resource;
 
@@ -68,21 +73,6 @@ public class ResourceForm extends ActionForm {
 	}
     }
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
-	String param = mapping.getParameter();
-	// if it is start page, all data read out from database or current session
-	// so need not reset checkbox to refresh value!
-	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
-	    resource.setAllowAddFiles(false);
-	    resource.setAllowAddUrls(false);
-	    resource.setLockWhenFinished(false);
-	    resource.setDefineLater(false);
-	    resource.setRunAuto(false);
-	    resource.setReflectOnActivity(false);
-	}
-    }
-
     public int getCurrentTab() {
 	return currentTab;
     }
@@ -91,19 +81,19 @@ public class ResourceForm extends ActionForm {
 	this.currentTab = currentTab;
     }
 
-    public FormFile getOfflineFile() {
+    public String getOfflineFile() {
 	return offlineFile;
     }
 
-    public void setOfflineFile(FormFile offlineFile) {
+    public void setOfflineFile(String offlineFile) {
 	this.offlineFile = offlineFile;
     }
 
-    public FormFile getOnlineFile() {
+    public String getOnlineFile() {
 	return onlineFile;
     }
 
-    public void setOnlineFile(FormFile onlineFile) {
+    public void setOnlineFile(String onlineFile) {
 	this.onlineFile = onlineFile;
     }
 

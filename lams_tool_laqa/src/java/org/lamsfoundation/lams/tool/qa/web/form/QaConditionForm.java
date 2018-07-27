@@ -20,13 +20,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.web.form;
 
-import org.apache.struts.util.LabelValueBean;
+import java.util.Map;
+
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
-import org.lamsfoundation.lams.web.TextSearchActionForm;
+import org.lamsfoundation.lams.web.TextSearchForm;
 
 /**
  * A text search form with additional parameters for Q&A needs.
@@ -34,11 +34,11 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
  * @author Marcin Cieslak
  *
  */
-public class QaConditionForm extends TextSearchActionForm {
+public class QaConditionForm extends TextSearchForm {
     /**
      * Names of the questions that could be selected by a user.
      */
-    private LabelValueBean[] possibleItems;
+    private Map<String, String> possibleItems;
     /**
      * Numbers of questions that were selected by a user.
      */
@@ -70,11 +70,11 @@ public class QaConditionForm extends TextSearchActionForm {
 	setSelectedItems(selectedItems);
     }
 
-    public LabelValueBean[] getPossibleItems() {
+    public Map<String, String> getPossibleItems() {
 	return possibleItems;
     }
 
-    public void setPossibleItems(LabelValueBean[] possibleItems) {
+    public void setPossibleItems(Map<String, String> possibleItems) {
 	this.possibleItems = possibleItems;
     }
 

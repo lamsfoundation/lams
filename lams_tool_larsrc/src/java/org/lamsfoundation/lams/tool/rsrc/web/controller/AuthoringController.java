@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.rsrc.web.action;
+package org.lamsfoundation.lams.tool.rsrc.web.controller;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -42,21 +42,12 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -73,99 +64,44 @@ import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourcePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Steve.Ni
  */
-public class AuthoringAction extends Action {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
     private static final int INIT_INSTRUCTION_COUNT = 2;
     private static final String INSTRUCTION_ITEM_DESC_PREFIX = "instructionItemDesc";
     private static final String INSTRUCTION_ITEM_COUNT = "instructionCount";
     private static final String ITEM_TYPE = "itemType";
 
-    private static Logger log = Logger.getLogger(AuthoringAction.class);
+    private static Logger log = Logger.getLogger(AuthoringController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    @Qualifier("resourceService")
+    private IResourceService resourceService;
 
-	String param = mapping.getParameter();
-	// -----------------------Resource Author function
-	// ---------------------------
-	if (param.equals("start")) {
-	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("definelater")) {
-	    // update define later flag to true
-	    Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	    IResourceService service = getResourceService();
-	    Resource resource = service.getResourceByContentId(contentId);
-
-	    resource.setDefineLater(true);
-	    service.saveOrUpdateResource(resource);
-	    
-	    //audit log the teacher has started editing activity in monitor
-	    service.auditLogStartEditingActivityInMonitor(contentId);
-
-	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("initPage")) {
-	    return initPage(mapping, form, request, response);
-	}
-	if (param.equals("updateContent")) {
-	    return updateContent(mapping, form, request, response);
-	}
-
-	// ----------------------- Add resource item function
-	// ---------------------------
-	if (param.equals("newItemInit")) {
-	    return newItemlInit(mapping, form, request, response);
-	}
-	if (param.equals("editItemInit")) {
-	    return editItemInit(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdateItem")) {
-	    return saveOrUpdateItem(mapping, form, request, response);
-	}
-	if (param.equals("removeItem")) {
-	    return removeItem(mapping, form, request, response);
-	}
-	// -----------------------Resource Item Instruction function
-	// ---------------------------
-	if (param.equals("newInstruction")) {
-	    return newInstruction(mapping, form, request, response);
-	}
-	if (param.equals("removeInstruction")) {
-	    return removeInstruction(mapping, form, request, response);
-	}
-	if (param.equals("removeItemAttachment")) {
-	    return removeItemAttachment(mapping, form, request, response);
-	}
-	if (param.equals("initPedagogicalPlannerForm")) {
-	    return initPedagogicalPlannerForm(mapping, form, request, response);
-	}
-	if (param.equals("createPedagogicalPlannerItem")) {
-	    return createPedagogicalPlannerItem(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdatePedagogicalPlannerForm")) {
-	    return saveOrUpdatePedagogicalPlannerForm(mapping, form, request, response);
-	}
-	if (param.equals("switchResourceItemPosition")) {
-	    return switchResourceItemPosition(mapping, form, request, response);
-	}
-
-	return mapping.findForward(ResourceConstants.ERROR);
-    }
+    @Autowired
+    @Qualifier("resourceMessageService")
+    private MessageService messageService;
 
     /**
      * Remove resource item attachment, such as single file, learning object
@@ -173,16 +109,13 @@ public class AuthoringAction extends Action {
      * permenant change will happen only when user sumbit this resource item
      * again.
      *
-     * @param mapping
-     * @param form
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward removeItemAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	request.setAttribute("itemAttachment", null);
-	return mapping.findForward(ResourceConstants.SUCCESS);
+    @RequestMapping("/removeItemAttachment")
+    private String removeItemAttachment(HttpServletRequest request) {
+	request.setAttribute("resourceItemForm", null);
+	return "pages/authoring/parts/itemattachment";
     }
 
     /**
@@ -190,23 +123,22 @@ public class AuthoringAction extends Action {
      * authoring rule, all persist only happen when user submit whole page. So
      * this remove is just impact HttpSession values.
      *
-     * @param mapping
-     * @param form
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeItem")
+    private String removeItem(@ModelAttribute("resourceItemForm") ResourceItemForm resourceItemForm,
+	    HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
 	    SortedSet<ResourceItem> resourceList = getResourceItemList(sessionMap);
-	    List<ResourceItem> rList = new ArrayList<ResourceItem>(resourceList);
+	    List<ResourceItem> rList = new ArrayList<>(resourceList);
 	    ResourceItem item = rList.remove(itemIdx);
 	    resourceList.clear();
 	    resourceList.addAll(rList);
@@ -216,59 +148,80 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
     }
 
     /**
      * Display edit page for existed resource item.
      *
-     * @param mapping
-     * @param form
+     * @param resourceItemForm
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/editItemInit")
+    private String editItemInit(@ModelAttribute("resourceItemForm") ResourceItemForm resourceItemForm,
+	    HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX), -1);
 	ResourceItem item = null;
 	if (itemIdx != -1) {
 	    SortedSet<ResourceItem> resourceList = getResourceItemList(sessionMap);
-	    List<ResourceItem> rList = new ArrayList<ResourceItem>(resourceList);
+	    List<ResourceItem> rList = new ArrayList<>(resourceList);
 	    item = rList.get(itemIdx);
 	    if (item != null) {
-		populateItemToForm(itemIdx, item, (ResourceItemForm) form, request);
+		populateItemToForm(itemIdx, item, resourceItemForm, request);
 	    }
 	}
-	return findForward(item == null ? -1 : item.getType(), mapping);
+	switch (item.getType()) {
+	    case 1:
+		return "pages/authoring/parts/addurl";
+	    case 2:
+		return "pages/authoring/parts/addfile";
+	    case 3:
+		return "pages/authoring/parts/addwebsite";
+	    case 4:
+		return "pages/authoring/parts/addlearningobject";
+	    default:
+		throw new IllegalArgumentException("Unknown item type" + item.getType());
+	}
     }
 
     /**
      * Display empty page for new resource item.
      *
-     * @param mapping
-     * @param form
+     * @param authorngForm
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newItemInit")
+    private String newItemlInit(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	((ResourceItemForm) form).setSessionMapID(sessionMapID);
+	resourceItemForm.setSessionMapID(sessionMapID);
 
-	short type = (short) WebUtil.readIntParam(request, AuthoringAction.ITEM_TYPE);
-	List<String> instructionList = new ArrayList<String>(AuthoringAction.INIT_INSTRUCTION_COUNT);
-	for (int idx = 0; idx < AuthoringAction.INIT_INSTRUCTION_COUNT; idx++) {
+	short type = (short) WebUtil.readIntParam(request, AuthoringController.ITEM_TYPE);
+	List<String> instructionList = new ArrayList<>(AuthoringController.INIT_INSTRUCTION_COUNT);
+	for (int idx = 0; idx < AuthoringController.INIT_INSTRUCTION_COUNT; idx++) {
 	    instructionList.add("");
 	}
 	request.setAttribute("instructionList", instructionList);
-	return findForward(type, mapping);
+	request.setAttribute("resourceItemForm", resourceItemForm);
+	switch (type) {
+	    case 1:
+		return "pages/authoring/parts/addurl";
+	    case 2:
+		return "pages/authoring/parts/addfile";
+	    case 3:
+		return "pages/authoring/parts/addwebsite";
+	    case 4:
+		return "pages/authoring/parts/addlearningobject";
+	    default:
+		throw new IllegalArgumentException("Unknown item type" + type);
+	}
     }
 
     /**
@@ -285,37 +238,60 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping(value = "/saveOrUpdateItem")
+    private String saveOrUpdateItem(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	// get instructions:
 	List<String> instructionList = getInstructionsFromRequest(request);
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	validateResourceItem(resourceItemForm, errorMap);
 
-	ResourceItemForm itemForm = (ResourceItemForm) form;
-	ActionErrors errors = validateResourceItem(itemForm);
-
-	if (!errors.isEmpty()) {
-	    this.addErrors(request, errors);
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
 	    request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST, instructionList);
-	    return findForward(itemForm.getItemType(), mapping);
+	    request.setAttribute("resourceItemForm", resourceItemForm);
+	    switch (resourceItemForm.getItemType()) {
+		case 1:
+		    return "pages/authoring/parts/addurl";
+		case 2:
+		    return "pages/authoring/parts/addfile";
+		case 3:
+		    return "pages/authoring/parts/addwebsite";
+		case 4:
+		    return "pages/authoring/parts/addlearningobject";
+		default:
+		    throw new IllegalArgumentException("Unknown item type" + resourceItemForm.getItemType());
+	    }
+
 	}
 
 	try {
-	    extractFormToResourceItem(request, instructionList, itemForm);
+	    extractFormToResourceItem(request, instructionList, resourceItemForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather
 	    // then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-		    new ActionMessage(ResourceConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
-	    if (!errors.isEmpty()) {
-		this.addErrors(request, errors);
+	    errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_UPLOAD_FAILED,
+		    new Object[] { e.getMessage() }));
+	    if (!errorMap.isEmpty()) {
+		request.setAttribute("errorMap", errorMap);
 		request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST, instructionList);
-		return findForward(itemForm.getItemType(), mapping);
+		switch (resourceItemForm.getItemType()) {
+		    case 1:
+			return "pages/authoring/parts/addurl";
+		    case 2:
+			return "pages/authoring/parts/addfile";
+		    case 3:
+			return "pages/authoring/parts/addwebsite";
+		    case 4:
+			return "pages/authoring/parts/addlearningobject";
+		    default:
+			throw new IllegalArgumentException("Unknown item type" + resourceItemForm.getItemType());
+		}
 	    }
 	}
 	// set session map ID so that itemlist.jsp can get sessionMAP
-	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
+	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, resourceItemForm.getSessionMapID());
 	// return null to close this window
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
     }
 
     /**
@@ -328,12 +304,12 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward newInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newInstruction")
+    private String newInstruction(HttpServletRequest request) {
 	int numberOfInstructions = WebUtil.readIntParam(request, INSTRUCTION_ITEM_COUNT);
-	List<String> instructionList = new ArrayList<String>(++numberOfInstructions);
+	List<String> instructionList = new ArrayList<>(++numberOfInstructions);
 	for (int idx = 0; idx < numberOfInstructions; idx++) {
-	    String item = request.getParameter(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
+	    String item = request.getParameter(AuthoringController.INSTRUCTION_ITEM_DESC_PREFIX + idx);
 	    if (item == null) {
 		instructionList.add("");
 	    } else {
@@ -341,7 +317,7 @@ public class AuthoringAction extends Action {
 	    }
 	}
 	request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST, instructionList);
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	return "pages/authoring/parts/instructions";
     }
 
     /**
@@ -353,13 +329,13 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward removeInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeInstruction")
+    private String removeInstruction(HttpServletRequest request) {
 	int numberOfInstructions = WebUtil.readIntParam(request, INSTRUCTION_ITEM_COUNT);
 	int removeIdx = WebUtil.readIntParam(request, "removeIdx");
-	List<String> instructionList = new ArrayList<String>(numberOfInstructions - 1);
+	List<String> instructionList = new ArrayList<>(numberOfInstructions - 1);
 	for (int idx = 0; idx < numberOfInstructions; idx++) {
-	    String item = request.getParameter(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
+	    String item = request.getParameter(AuthoringController.INSTRUCTION_ITEM_DESC_PREFIX + idx);
 	    if (idx == removeIdx) {
 		continue;
 	    }
@@ -370,7 +346,7 @@ public class AuthoringAction extends Action {
 	    }
 	}
 	request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST, instructionList);
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	return "pages/authoring/parts/instructions";
     }
 
     /**
@@ -383,51 +359,52 @@ public class AuthoringAction extends Action {
      * @throws ServletException
      *
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping(value = "/start")
+    private String start(@ModelAttribute("startForm") ResourceForm startForm, HttpServletRequest request) throws ServletException {
+
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, ResourceConstants.PARAM_TOOL_CONTENT_ID));
 
 	// get back the resource and item list and display them on page
-	IResourceService service = getResourceService();
 
 	List<ResourceItem> items = null;
 	Resource resource = null;
-	ResourceForm resourceForm = (ResourceForm) form;
 
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	resourceForm.setContentFolderID(contentFolderID);
+	startForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	resourceForm.setSessionMapID(sessionMap.getSessionID());
+	startForm.setSessionMapID(sessionMap.getSessionID());
 
 	try {
-	    resource = service.getResourceByContentId(contentId);
+	    resource = resourceService.getResourceByContentId(contentId);
 	    // if resource does not exist, try to use default content instead.
 	    if (resource == null) {
-		resource = service.getDefaultContent(contentId);
+		resource = resourceService.getDefaultContent(contentId);
 		if (resource.getResourceItems() != null) {
 		    items = new ArrayList<ResourceItem>(resource.getResourceItems());
 		} else {
 		    items = null;
 		}
 	    } else {
-		items = service.getAuthoredItems(resource.getUid());
+		items = resourceService.getAuthoredItems(resource.getUid());
 	    }
 
-	    resourceForm.setResource(resource);
+	    startForm.setResource(resource);
 	} catch (Exception e) {
-	    AuthoringAction.log.error(e);
+	    AuthoringController.log.error(e);
 	    throw new ServletException(e);
 	}
 
 	// init it to avoid null exception in following handling
 	if (items == null) {
-	    items = new ArrayList<ResourceItem>();
+	    items = new ArrayList<>();
 	} else {
 	    ResourceUser resourceUser = null;
 	    // handle system default question: createBy is null, now set it to
@@ -458,10 +435,100 @@ public class AuthoringAction extends Action {
 	    i++;
 	}
 
-	sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, resourceForm);
+	sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, startForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	return "pages/authoring/start";
+    }
+
+    @RequestMapping("/definelater")
+    private String defineLater(@ModelAttribute("startForm") ResourceForm startForm, HttpServletRequest request)
+	    throws ServletException {
+
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Resource resource = resourceService.getResourceByContentId(contentId);
+
+	resource.setDefineLater(true);
+	resourceService.saveOrUpdateResource(resource);
+
+	//audit log the teacher has started editing activity in monitor
+	resourceService.auditLogStartEditingActivityInMonitor(contentId);
+
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+
+	// save toolContentID into HTTPSession
+
+	// get back the resource and item list and display them on page
+
+	List<ResourceItem> items = null;
+
+	// Get contentFolderID and save to form.
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	startForm.setContentFolderID(contentFolderID);
+
+	// initial Session Map
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	startForm.setSessionMapID(sessionMap.getSessionID());
+
+	try {
+	    resource = resourceService.getResourceByContentId(contentId);
+	    // if resource does not exist, try to use default content instead.
+	    if (resource == null) {
+		resource = resourceService.getDefaultContent(contentId);
+		if (resource.getResourceItems() != null) {
+		    items = new ArrayList<ResourceItem>(resource.getResourceItems());
+		} else {
+		    items = null;
+		}
+	    } else {
+		items = resourceService.getAuthoredItems(resource.getUid());
+	    }
+
+	    startForm.setResource(resource);
+	} catch (Exception e) {
+	    AuthoringController.log.error(e);
+	    throw new ServletException(e);
+	}
+
+	// init it to avoid null exception in following handling
+	if (items == null) {
+	    items = new ArrayList<>();
+	} else {
+	    ResourceUser resourceUser = null;
+	    // handle system default question: createBy is null, now set it to
+	    // current user
+	    for (ResourceItem item : items) {
+		if (item.getCreateBy() == null) {
+		    if (resourceUser == null) {
+			// get back login user DTO
+			HttpSession ss = SessionManager.getSession();
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			resourceUser = new ResourceUser(user, resource);
+		    }
+		    item.setCreateBy(resourceUser);
+		}
+	    }
+	}
+	// init resource item list
+	SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
+	resourceItemList.clear();
+	resourceItemList.addAll(items);
+
+	// If there is no order id, set it up
+	int i = 1;
+	for (ResourceItem resourceItem : resourceItemList) {
+	    if (resourceItem.getOrderId() == null || resourceItem.getOrderId() != i) {
+		resourceItem.setOrderId(i);
+	    }
+	    i++;
+	}
+
+	sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, startForm);
+	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
+
+	return "pages/authoring/start";
     }
 
     /**
@@ -474,23 +541,26 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+
+    @RequestMapping("/init")
+    private String initPage(@ModelAttribute("startForm") ResourceForm startForm, HttpServletRequest request)
+	    throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	ResourceForm existForm = (ResourceForm) sessionMap.get(ResourceConstants.ATTR_RESOURCE_FORM);
 
-	ResourceForm resourceForm = (ResourceForm) form;
 	try {
-	    PropertyUtils.copyProperties(resourceForm, existForm);
+	    PropertyUtils.copyProperties(startForm, existForm);
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
-	
-	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	startForm.setMode(mode.toString());
+	request.setAttribute("authoringForm", startForm);
+
+	return "pages/authoring/authoring";
     }
 
     /**
@@ -504,35 +574,35 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	ResourceForm resourceForm = (ResourceForm) form;
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    private String updateContent(@ModelAttribute("authoringForm") ResourceForm authoringForm, HttpServletRequest request)
+	    throws Exception {
 
 	// get back sessionMAP
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(resourceForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(authoringForm.getSessionMapID());
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	Resource resource = resourceForm.getResource();
-	IResourceService service = getResourceService();
-	
+	Resource resource = authoringForm.getResource();
+
 	// **********************************Get Resource PO*********************
-	Resource resourcePO = service.getResourceByContentId(resource.getContentId());
+	Resource resourcePO = resourceService.getResourceByContentId(resource.getContentId());
 	if (resourcePO == null) {
 	    // new Resource, create it
 	    resourcePO = resource;
 	    resourcePO.setCreated(new Timestamp(new Date().getTime()));
 	    resourcePO.setUpdated(new Timestamp(new Date().getTime()));
-	    
+
 	} else {
 	    Set<LearnerItemRatingCriteria> criterias = resourcePO.getRatingCriterias();
 	    Long uid = resourcePO.getUid();
 	    PropertyUtils.copyProperties(resourcePO, resource);
 
 	    // copyProperties() above may result in "collection assigned to two objects in a session" exception
-	    service.evict(resource);
-	    resourceForm.setResource(null);
+	    resourceService.evict(resource);
+	    authoringForm.setResource(null);
 	    resource = null;
 	    // set back UID && rating criteria
 	    resourcePO.setUid(uid);
@@ -551,7 +621,7 @@ public class AuthoringAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	ResourceUser resourceUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
+	ResourceUser resourceUser = resourceService.getUserByIDAndContent(new Long(user.getUserID().intValue()),
 		resourcePO.getContentId());
 	if (resourceUser == null) {
 	    resourceUser = new ResourceUser(user, resourcePO);
@@ -583,7 +653,7 @@ public class AuthoringAction extends Action {
 	    ResourceItem item = (ResourceItem) iter.next();
 	    iter.remove();
 	    if (item.getUid() != null) {
-		service.deleteResourceItem(item.getUid());
+		resourceService.deleteResourceItem(item.getUid());
 	    }
 	}
 	// handle resource item attachment file:
@@ -601,38 +671,30 @@ public class AuthoringAction extends Action {
 	}
 	// **********************************************
 	// finally persist resourcePO again
-	    
-	service.saveOrUpdateResource(resourcePO);
+
+	resourceService.saveOrUpdateResource(resourcePO);
 
 	// Set up rating criteria. Do not delete existing criteria as this will destroy ratings already done
 	// if the monitor edits the activity and turns of the criteria temporarily.
-	if ( useRatings ) {
-	    if ( resourcePO.getRatingCriterias() == null || resourcePO.getRatingCriterias().size() == 0 ) {
-		LearnerItemRatingCriteria newCriteria = service.createRatingCriteria(resourcePO.getContentId());
-		if ( resourcePO.getRatingCriterias() == null ) {
+	if (useRatings) {
+	    if (resourcePO.getRatingCriterias() == null || resourcePO.getRatingCriterias().size() == 0) {
+		LearnerItemRatingCriteria newCriteria = resourceService.createRatingCriteria(resourcePO.getContentId());
+		if (resourcePO.getRatingCriterias() == null) {
 		    resourcePO.setRatingCriterias(new HashSet<LearnerItemRatingCriteria>());
 		}
 		resourcePO.getRatingCriterias().add(newCriteria);
 	    }
 	}
-	resourceForm.setResource(resourcePO);
+	authoringForm.setResource(resourcePO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	
-	return mapping.findForward(ResourceConstants.SUCCESS);
+
+	return "pages/authoring/authoring";
     }
 
     // *************************************************************************************
     // Private method
     // *************************************************************************************
-    /**
-     * Return ResourceService bean.
-     */
-    private IResourceService getResourceService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
-    }
 
     /**
      * List save current resource items.
@@ -644,7 +706,7 @@ public class AuthoringAction extends Action {
 	SortedSet<ResourceItem> list = (SortedSet<ResourceItem>) sessionMap
 		.get(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
 	if (list == null) {
-	    list = new TreeSet<ResourceItem>(new ResourceItemComparator());
+	    list = new TreeSet<>(new ResourceItemComparator());
 	    sessionMap.put(ResourceConstants.ATTR_RESOURCE_ITEM_LIST, list);
 	}
 	return list;
@@ -698,7 +760,7 @@ public class AuthoringAction extends Action {
     private List<String> getInstructionsFromRequest(HttpServletRequest request) {
 	String list = request.getParameter("instructionList");
 	String[] params = list.split("&");
-	Map<String, String> paramMap = new HashMap<String, String>();
+	Map<String, String> paramMap = new HashMap<>();
 	String[] pair;
 	for (String item : params) {
 	    pair = item.split("=");
@@ -708,15 +770,15 @@ public class AuthoringAction extends Action {
 	    try {
 		paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
 	    } catch (UnsupportedEncodingException e) {
-		AuthoringAction.log.error("Error occurs when decode instruction string:" + e.toString());
+		AuthoringController.log.error("Error occurs when decode instruction string:" + e.toString());
 	    }
 	}
 
 	int count = paramMap.keySet().size();
-	List<String> instructionList = new ArrayList<String>();
+	List<String> instructionList = new ArrayList<>();
 
 	for (int idx = 0; idx < count; idx++) {
-	    String item = paramMap.get(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
+	    String item = paramMap.get(AuthoringController.INSTRUCTION_ITEM_DESC_PREFIX + idx);
 	    if (item == null) {
 		continue;
 	    }
@@ -726,35 +788,6 @@ public class AuthoringAction extends Action {
 
 	return instructionList;
 
-    }
-
-    /**
-     * Get back relative <code>ActionForward</code> from request.
-     *
-     * @param type
-     * @param mapping
-     * @return
-     */
-    private ActionForward findForward(short type, ActionMapping mapping) {
-	ActionForward forward;
-	switch (type) {
-	    case ResourceConstants.RESOURCE_TYPE_URL:
-		forward = mapping.findForward("url");
-		break;
-	    case ResourceConstants.RESOURCE_TYPE_FILE:
-		forward = mapping.findForward("file");
-		break;
-	    case ResourceConstants.RESOURCE_TYPE_WEBSITE:
-		forward = mapping.findForward("website");
-		break;
-	    case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-		forward = mapping.findForward("learningobject");
-		break;
-	    default:
-		forward = null;
-		break;
-	}
-	return forward;
     }
 
     /**
@@ -816,7 +849,8 @@ public class AuthoringAction extends Action {
 	 * when persisting this resource item.
 	 */
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(itemForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(itemForm.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<ResourceItem> resourceList = getResourceItemList(sessionMap);
 	int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(), -1);
@@ -828,7 +862,7 @@ public class AuthoringAction extends Action {
 	    item.setOrderId(resourceList.size() + 1);
 	    resourceList.add(item);
 	} else { // edit
-	    List<ResourceItem> rList = new ArrayList<ResourceItem>(resourceList);
+	    List<ResourceItem> rList = new ArrayList<>(resourceList);
 	    item = rList.get(itemIdx);
 	}
 	short type = itemForm.getItemType();
@@ -859,9 +893,8 @@ public class AuthoringAction extends Action {
 		    delAttItem.setFileUuid(item.getFileUuid());
 		    delAttItem.setFileVersionId(item.getFileVersionId());
 		}
-		IResourceService service = getResourceService();
 		try {
-		    service.uploadResourceItemFile(item, itemForm.getFile());
+		    resourceService.uploadResourceItemFile(item, itemForm.getFile());
 		} catch (UploadResourceFileException e) {
 		    // if it is new add , then remove it!
 		    if (itemIdx == -1) {
@@ -911,18 +944,17 @@ public class AuthoringAction extends Action {
      * Vaidate resource item regards to their type (url/file/learning
      * object/website zip file)
      *
-     * @param itemForm
+     * @param resourceItemForm
      * @return
      */
-    private ActionErrors validateResourceItem(ResourceItemForm itemForm) {
-	ActionErrors errors = new ActionErrors();
-	if (StringUtils.isBlank(itemForm.getTitle())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ResourceConstants.ERROR_MSG_TITLE_BLANK));
+    private void validateResourceItem(ResourceItemForm resourceItemForm, MultiValueMap<String, String> errorMap) {
+	if (StringUtils.isBlank(resourceItemForm.getTitle())) {
+	    errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_TITLE_BLANK));
 	}
 
-	if (itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_URL) {
-	    if (StringUtils.isBlank(itemForm.getUrl())) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ResourceConstants.ERROR_MSG_URL_BLANK));
+	if (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_URL) {
+	    if (StringUtils.isBlank(resourceItemForm.getUrl())) {
+		errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_URL_BLANK));
 		// URL validation: Commom URL validate(1.3.0) work not very
 		// well: it can not support http://
 		// address:port format!!!
@@ -939,43 +971,48 @@ public class AuthoringAction extends Action {
 	// errors.add(ActionMessages.GLOBAL_MESSAGE,new
 	// ActionMessage(ResourceConstants.ERROR_MSG_DESC_BLANK));
 	// }
-	if (itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE
-		|| itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
-		|| itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
+	if (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE
+		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
+		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
 	    // validate item size
-	    FileValidatorUtil.validateFileSize(itemForm.getFile(), true, errors);
+	    if (!FileValidatorSpringUtil.validateFileSize(resourceItemForm.getFile().getSize(), false)) {
+		errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
+			new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
+	    }
+
 	    // for edit validate: file already exist
-	    if (!itemForm.isHasFile()
-		    && (itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
+	    if (!resourceItemForm.isHasFile() && (resourceItemForm.getFile() == null
+		    || StringUtils.isEmpty(resourceItemForm.getFile().getOriginalFilename()))) {
+		errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
 	    }
 	}
-	return errors;
     }
 
-    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ResourcePedagogicalPlannerForm plannerForm = (ResourcePedagogicalPlannerForm) form;
+    @RequestMapping("/initPedagogicalPlannerForm")
+    public String initPedagogicalPlannerForm(ResourcePedagogicalPlannerForm pedagogicalPlannerForm,
+	    HttpServletRequest request) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Resource taskList = getResourceService().getResourceByContentId(toolContentID);
-	plannerForm.fillForm(taskList);
+	Resource taskList = resourceService.getResourceByContentId(toolContentID);
+	pedagogicalPlannerForm.fillForm(taskList);
 	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	plannerForm.setContentFolderID(contentFolderId);
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	pedagogicalPlannerForm.setContentFolderID(contentFolderId);
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException {
-	ResourcePedagogicalPlannerForm plannerForm = (ResourcePedagogicalPlannerForm) form;
-	ActionMessages errors = plannerForm.validate();
-	if (errors.isEmpty()) {
-	    Resource taskList = getResourceService().getResourceByContentId(plannerForm.getToolContentID());
-	    taskList.setInstructions(plannerForm.getInstructions());
+    @RequestMapping(value = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
+    public String saveOrUpdatePedagogicalPlannerForm(ResourcePedagogicalPlannerForm pedagogicalPlannerForm,
+	    HttpServletRequest request) throws IOException {
+
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	pedagogicalPlannerForm.validate(messageService);
+	if (errorMap.isEmpty()) {
+	    Resource taskList = resourceService.getResourceByContentId(pedagogicalPlannerForm.getToolContentID());
+	    taskList.setInstructions(pedagogicalPlannerForm.getInstructions());
 
 	    int itemIndex = 0;
 	    String title = null;
 	    ResourceItem resourceItem = null;
-	    List<ResourceItem> newItems = new LinkedList<ResourceItem>();
+	    List<ResourceItem> newItems = new LinkedList<>();
 	    // we need a copy for later Hibernate-bound processing
 	    LinkedList<ResourceItem> resourceItems = new LinkedList<ResourceItem>(taskList.getResourceItems());
 	    Iterator<ResourceItem> taskListItemIterator = resourceItems.iterator();
@@ -989,9 +1026,9 @@ public class AuthoringAction extends Action {
 	     * taskListItemIterator = reversedResourceItems.iterator();
 	     */
 	    do {
-		title = plannerForm.getTitle(itemIndex);
+		title = pedagogicalPlannerForm.getTitle(itemIndex);
 		if (StringUtils.isEmpty(title)) {
-		    plannerForm.removeItem(itemIndex);
+		    pedagogicalPlannerForm.removeItem(itemIndex);
 		} else {
 		    if (taskListItemIterator.hasNext()) {
 			resourceItem = taskListItemIterator.next();
@@ -1003,18 +1040,18 @@ public class AuthoringAction extends Action {
 
 			HttpSession session = SessionManager.getSession();
 			UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
-			ResourceUser taskListUser = getResourceService().getUserByIDAndContent(
-				new Long(user.getUserID().intValue()), plannerForm.getToolContentID());
+			ResourceUser taskListUser = resourceService.getUserByIDAndContent(
+				new Long(user.getUserID().intValue()), pedagogicalPlannerForm.getToolContentID());
 			resourceItem.setCreateBy(taskListUser);
 
 			newItems.add(resourceItem);
 		    }
 		    resourceItem.setTitle(title);
-		    Short type = plannerForm.getType(itemIndex);
+		    Short type = pedagogicalPlannerForm.getType(itemIndex);
 		    resourceItem.setType(type);
 		    boolean hasFile = resourceItem.getFileUuid() != null;
 		    if (type.equals(ResourceConstants.RESOURCE_TYPE_URL)) {
-			resourceItem.setUrl(plannerForm.getUrl(itemIndex));
+			resourceItem.setUrl(pedagogicalPlannerForm.getUrl(itemIndex));
 			if (hasFile) {
 			    resourceItem.setFileName(null);
 			    resourceItem.setFileUuid(null);
@@ -1022,29 +1059,27 @@ public class AuthoringAction extends Action {
 			    resourceItem.setFileType(null);
 			}
 		    } else if (type.equals(ResourceConstants.RESOURCE_TYPE_FILE)) {
-			FormFile file = plannerForm.getFile(itemIndex);
+			MultipartFile file = pedagogicalPlannerForm.getFile(itemIndex);
 			resourceItem.setUrl(null);
-			IResourceService service = getResourceService();
-			if (file != null && !StringUtils.isEmpty(file.getFileName())) {
+			if (file != null && !StringUtils.isEmpty(file.getOriginalFilename())) {
 			    try {
 				if (hasFile) {
 				    // delete the old file
-				    service.deleteFromRepository(resourceItem.getFileUuid(),
+				    resourceService.deleteFromRepository(resourceItem.getFileUuid(),
 					    resourceItem.getFileVersionId());
 				}
-				service.uploadResourceItemFile(resourceItem, file);
+				resourceService.uploadResourceItemFile(resourceItem, file);
 			    } catch (Exception e) {
-				AuthoringAction.log.error(e);
-				ActionMessage error = new ActionMessage("error.msg.io.exception");
-				errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-				saveErrors(request, errors);
-				plannerForm.setValid(false);
-				return mapping.findForward(ResourceConstants.SUCCESS);
+				AuthoringController.log.error(e);
+				errorMap.add("GLOBAL", messageService.getMessage("error.msg.io.exception"));
+				request.setAttribute("errorMap", errorMap);
+				pedagogicalPlannerForm.setValid(false);
+				return "pages/authoring/pedagogicalPlannerForm";
 			    }
-			    plannerForm.setFileName(itemIndex, resourceItem.getFileName());
-			    plannerForm.setFileUuid(itemIndex, resourceItem.getFileUuid());
-			    plannerForm.setFileVersion(itemIndex, resourceItem.getFileVersionId());
-			    plannerForm.setFile(itemIndex, null);
+			    pedagogicalPlannerForm.setFileName(itemIndex, resourceItem.getFileName());
+			    pedagogicalPlannerForm.setFileUuid(itemIndex, resourceItem.getFileUuid());
+			    pedagogicalPlannerForm.setFileVersion(itemIndex, resourceItem.getFileVersionId());
+			    pedagogicalPlannerForm.setFile(itemIndex, null);
 			}
 		    }
 		    itemIndex++;
@@ -1057,40 +1092,42 @@ public class AuthoringAction extends Action {
 	    while (taskListItemIterator.hasNext()) {
 		resourceItem = taskListItemIterator.next();
 		taskListItemIterator.remove();
-		getResourceService().deleteResourceItem(resourceItem.getUid());
+		resourceService.deleteResourceItem(resourceItem.getUid());
 	    }
 	    resourceItems.addAll(newItems);
 
 	    taskList.getResourceItems().addAll(resourceItems);
-	    getResourceService().saveOrUpdateResource(taskList);
+	    resourceService.saveOrUpdateResource(taskList);
 	} else {
-	    saveErrors(request, errors);
+	    request.setAttribute("errorMap", errorMap);
 	}
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward createPedagogicalPlannerItem(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-	ResourcePedagogicalPlannerForm plannerForm = (ResourcePedagogicalPlannerForm) form;
-	int insertIndex = plannerForm.getItemCount();
-	plannerForm.setTitle(insertIndex, "");
-	plannerForm.setType(insertIndex, new Short(request.getParameter(ResourceConstants.ATTR_ADD_RESOURCE_TYPE)));
-	plannerForm.setUrl(insertIndex, null);
-	plannerForm.setFileName(insertIndex, null);
-	plannerForm.setFile(insertIndex, null);
-	plannerForm.setFileUuid(insertIndex, null);
-	plannerForm.setFileVersion(insertIndex, null);
-	return mapping.findForward(ResourceConstants.SUCCESS);
+    @RequestMapping("/createPedagogicalPlannerItem")
+    public String createPedagogicalPlannerItem(ResourcePedagogicalPlannerForm pedagogicalPlannerForm,
+	    HttpServletRequest request) throws IOException, ServletException {
+	int insertIndex = pedagogicalPlannerForm.getItemCount();
+	pedagogicalPlannerForm.setTitle(insertIndex, "");
+	pedagogicalPlannerForm.setType(insertIndex,
+		new Short(request.getParameter(ResourceConstants.ATTR_ADD_RESOURCE_TYPE)));
+	pedagogicalPlannerForm.setUrl(insertIndex, null);
+	pedagogicalPlannerForm.setFileName(insertIndex, null);
+	pedagogicalPlannerForm.setFile(insertIndex, null);
+	pedagogicalPlannerForm.setFileUuid(insertIndex, null);
+	pedagogicalPlannerForm.setFileVersion(insertIndex, null);
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    private ActionForward switchResourceItemPosition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/switchResourceItemPosition")
+    private String switchResourceItemPosition(HttpServletRequest request) {
 
 	String sessionMapID = WebUtil.readStrParam(request, "sessionMapID");
 	int resourceItemOrderID1 = WebUtil.readIntParam(request, "resourceItemOrderID1");
 	int resourceItemOrderID2 = WebUtil.readIntParam(request, "resourceItemOrderID2");
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<ResourceItem> resourceList = getResourceItemList(sessionMap);
 
@@ -1105,13 +1142,13 @@ public class AuthoringAction extends Action {
 	    }
 	}
 
-	SortedSet<ResourceItem> newItems = new TreeSet<ResourceItem>(new ResourceItemComparator());
+	SortedSet<ResourceItem> newItems = new TreeSet<>(new ResourceItemComparator());
 	newItems.addAll(resourceList);
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE_ITEM_LIST, newItems);
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	// return null to close this window
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
     }
 
 }

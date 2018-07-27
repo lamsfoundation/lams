@@ -2,9 +2,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
-<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorSpringUtil" %>
 <c:set var="UPLOAD_FILE_LARGE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
-<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorSpringUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
 <c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
 
 <lams:html>
@@ -58,7 +58,7 @@
 			});
 
 		</script>
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
+		<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/rsrcresourceitem.js"></script>
 	</lams:head>
 	<body>
 
@@ -71,20 +71,19 @@
 
 			<%@ include file="/common/messages.jsp"%>
 
-			<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="resourceItemForm" enctype="multipart/form-data">
+			<form:form action="saveOrUpdateItem.do" method="post" modelAttribute="resourceItemForm"  id="resourceItemForm">
 				<input type="hidden" name="instructionList" id="instructionList" />
-				<html:hidden property="sessionMapID" />
+				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="itemType" id="itemType" value="2" />
-				<html:hidden property="itemIndex" />
+				<form:hidden path="itemIndex" />
 	
 				<div class="form-group">
 				   	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
-					<html:text styleId="title" property="title" styleClass="form-control" />
+					<form:input id="title" path="title" cssClass="form-control" />
 			  	</div>	
 			  
 
 				<div class="form-group">
-					<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 					<span id="itemAttachmentArea">
 					<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
 					</span>
@@ -94,7 +93,7 @@
 				<div class="form-group">
 					<%@ include file="ratings.jsp"%>	
 				</div>
-			</html:form>
+			</form:form>
 	
 			<!-- Instructions -->
 			<%@ include file="instructions.jsp"%>

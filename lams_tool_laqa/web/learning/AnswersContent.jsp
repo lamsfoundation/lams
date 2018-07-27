@@ -93,8 +93,8 @@
 		
 		function doSubmit(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.QaLearningForm.method.value=actionMethod; 
-			document.QaLearningForm.submit();
+			document.forms.QaLearningForm.method.value=actionMethod; 
+			document.forms.QaLearningForm.submit();
 		}
 		
 		if (${!hasEditRight && mode != "teacher"}) {
@@ -199,8 +199,8 @@
 <body class="stripes">
 
 	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-	<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self"
-		styleId="learningForm">
+	<form:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self"
+		id="learningForm">
 
 	<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
@@ -231,18 +231,18 @@
 
 			<c:choose>
 				<c:when test="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}">
-					<html:hidden property="method" value="getNextQuestion" />
+					<form:hidden path="method" value="getNextQuestion" />
 				</c:when>
 				<c:otherwise>
-					<html:hidden property="method" value="submitAnswersContent" />
+					<form:hidden path="method" value="submitAnswersContent" />
 				</c:otherwise>
 			</c:choose>
 
-			<html:hidden property="toolSessionID" styleId="tool-session-id" />
-			<html:hidden property="userID" />
-			<html:hidden property="httpSessionID" />
-			<html:hidden property="questionIndex" />
-			<html:hidden property="totalQuestionCount" />
+			<form:hidden path="toolSessionID" id="tool-session-id" />
+			<form:hidden path="userID" />
+			<form:hidden path="httpSessionID" />
+			<form:hidden path="questionIndex" />
+			<form:hidden path="totalQuestionCount" />
 
 			
 
@@ -250,14 +250,14 @@
 				<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false" />
 			</div>
 
-			<logic:messagesPresent>
-			<lams:Alert id="error" type="danger" close="false">
-				<html:messages id="error" message="false">
-						<c:out value="${error}" escapeXml="false" />
-						<BR>
-					</html:messages>
-			</lams:Alert>
-			</logic:messagesPresent>
+			 <c:set var="errorKey" value="GLOBAL" /> 
+			 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+			     <lams:Alert id="error" type="danger" close="false"> 
+			         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+			             <c:out value="${error}" /><br /> 
+			         </c:forEach> 
+			     </lams:Alert> 
+			</c:if>
 			
 			<c:choose>
 				<c:when test="${(generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}">
@@ -298,7 +298,7 @@
 
 	</lams:Page>
 
-	</html:form>
+	</form:form>
 
 </body>
 </lams:html>

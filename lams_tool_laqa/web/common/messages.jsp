@@ -1,19 +1,19 @@
 <%-- Error Messages --%>
-<logic:messagesPresent>
-    <div class="error" id="errorMessages">
-        <html:messages id="error">
-            &nbsp&nbsp <i class="fa fa-exclamation-triangle"></i>
-            &nbsp&nbsp <c:out value="${error}" escapeXml="false"/><br/>
-        </html:messages>
-    </div>
-</logic:messagesPresent>
+ <c:set var="errorKey" value="GLOBAL" /> 
+ <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+     <lams:Alert id="error" type="danger" close="false"> 
+         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+             <c:out value="${error}" /><br /> 
+         </c:forEach> 
+     </lams:Alert> 
+</c:if>
 
 <%-- Success Messages --%>
-<logic:messagesPresent message="true">
-    <div class="message" id="successMessages">
-        <html:messages id="message" message="true">
-            &nbsp&nbsp <i class="fa fa-info-circle"></i>
-            &nbsp&nbsp <c:out value="${message}" escapeXml="false"/><br/>
-        </html:messages>
-    </div>
-</logic:messagesPresent>
+ <c:set var="infokey" value="GLOBALINFO" /> 
+ <c:if test="${not empty infoMap and not empty infoMap[infokey]}"> 
+     <lams:Alert type="info"> 
+         <c:forEach var="info" items="${infoMap[infokey]}"> 
+             <c:out value="${info}" /><br /> 
+         </c:forEach> 
+     </lams:Alert> 
+</c:if>

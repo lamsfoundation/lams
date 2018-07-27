@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.rating.RatingException;
@@ -40,6 +39,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Dapeng.Ni
@@ -91,7 +91,7 @@ public interface IResourceService {
      * @param file
      * @throws UploadResourceFileException
      */
-    void uploadResourceItemFile(ResourceItem item, FormFile file) throws UploadResourceFileException;
+    void uploadResourceItemFile(ResourceItem item, MultipartFile file) throws UploadResourceFileException;
 
     // ********** for user methods *************
     /**
@@ -272,20 +272,23 @@ public interface IResourceService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);
-    
+
     void evict(Object object);
 
     /** Create an anonymous star rating criteria */
     LearnerItemRatingCriteria createRatingCriteria(Long toolContentId) throws RatingException;
+
     /** Delete an anonymous star rating criteria */
     int deleteRatingCriteria(Long toolContentId);
+
     /** Get the actual ratings and the criteria for display */
-    List<ItemRatingDTO> getRatingCriteriaDtos(Long toolContentId, Long toolSessionId, Collection<Long> itemIds, Long userId);
+    List<ItemRatingDTO> getRatingCriteriaDtos(Long toolContentId, Long toolSessionId, Collection<Long> itemIds,
+	    Long userId);
 }

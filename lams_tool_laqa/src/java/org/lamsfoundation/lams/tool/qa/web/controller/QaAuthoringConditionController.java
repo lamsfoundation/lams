@@ -20,123 +20,99 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.qa.web.action;
+package org.lamsfoundation.lams.tool.qa.web.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.util.LabelValueBean;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.web.form.QaConditionForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Auxiliary action in author mode. It contains operations with QaCondition. The
  * rest of operations are located in <code>QaAction</code> action.
  *
  * @author Marcin Cieslak
- * @see org.lamsfoundation.lams.tool.qa.web.action.QaAction
+ * @see org.lamsfoundation.lams.tool.qa.web.controller.QaAction
  */
-public class QaAuthoringConditionAction extends Action {
+@Controller
+@RequestMapping("/authoringConditions")
+public class QaAuthoringConditionController {
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    private IQaService qaService;
 
-	String param = mapping.getParameter();
-
-	if (param.equals("newConditionInit")) {
-	    return newConditionInit(mapping, form, request, response);
-	}
-	if (param.equals("editCondition")) {
-	    return editCondition(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdateCondition")) {
-	    return saveOrUpdateCondition(mapping, form, request, response);
-	}
-	if (param.equals("removeCondition")) {
-	    return removeCondition(mapping, form, request, response);
-	}
-	if (param.equals("upCondition")) {
-	    return upCondition(mapping, form, request, response);
-	}
-	if (param.equals("downCondition")) {
-	    return downCondition(mapping, form, request, response);
-	}
-	return null;
-    }
+    @Autowired
+    @Qualifier("qaMessageService")
+    private MessageService messageService;
 
     /**
      * Display empty page for a new condition.
      *
-     * @param mapping
-     * @param form
+     * @param QaConditionForm
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward newConditionInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newConditionInit")
+    private String newConditionInit(@ModelAttribute("QaConditionForm") QaConditionForm QaConditionForm, HttpServletRequest request) {
 
-	populateFormWithPossibleItems(form, request);
-	((QaConditionForm) form).setOrderId(-1);
-	return mapping.findForward("addcondition");
+	populateFormWithPossibleItems(QaConditionForm, request);
+	QaConditionForm.setOrderId(-1);
+	return "authoring/addCondition";
     }
 
     /**
      * Display edit page for an existing condition.
      *
-     * @param mapping
-     * @param form
+     * @param QaConditionForm
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward editCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/editCondition")
+    private String editCondition(@ModelAttribute("QaConditionForm")QaConditionForm QaConditionForm, HttpServletRequest request) {
 
-	QaConditionForm qaConditionForm = (QaConditionForm) form;
-	String sessionMapID = qaConditionForm.getSessionMapID();
+	String sessionMapID = QaConditionForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
 	int orderId = NumberUtils.stringToInt(request.getParameter(QaAppConstants.PARAM_ORDER_ID), -1);
 	QaCondition condition = null;
 	if (orderId != -1) {
 	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
-	    List<QaCondition> conditionList = new ArrayList<QaCondition>(conditionSet);
+	    List<QaCondition> conditionList = new ArrayList<>(conditionSet);
 	    condition = conditionList.get(orderId);
 	    if (condition != null) {
-		populateConditionToForm(orderId, condition, qaConditionForm, request);
+		populateConditionToForm(orderId, condition, QaConditionForm, request);
 	    }
 	}
 
-	populateFormWithPossibleItems(form, request);
-	return condition == null ? null : mapping.findForward("addcondition");
+	populateFormWithPossibleItems(QaConditionForm, request);
+	return condition == null ? null : "authoring/addCondition";
     }
 
     /**
@@ -146,40 +122,37 @@ public class QaAuthoringConditionAction extends Action {
      * <code>HttpSession</code> temporarily. Only they will be persist when
      * the entire authoring page is being persisted.
      *
-     * @param mapping
-     * @param form
+     * @param QaConditionForm
      * @param request
-     * @param response
      * @return
      * @throws ServletException
      */
-    private ActionForward saveOrUpdateCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping(value = "/saveOrUpdateCondition", method = RequestMethod.POST)
+    private String saveOrUpdateCondition(@ModelAttribute("QaConditionForm")QaConditionForm QaConditionForm, HttpServletRequest request) {
 
-	QaConditionForm conditionForm = (QaConditionForm) form;
-	ActionErrors errors = validateQaCondition(conditionForm, request);
+	MultiValueMap<String, String> errorMap = validateQaCondition(QaConditionForm, request);
 
-	if (!errors.isEmpty()) {
-	    populateFormWithPossibleItems(form, request);
-	    this.addErrors(request, errors);
-	    return mapping.findForward("addcondition");
+	if (!errorMap.isEmpty()) {
+	    populateFormWithPossibleItems(QaConditionForm, request);
+	    request.setAttribute("errorMap", errorMap);
+	    return "authoring/addCondition";
 	}
 
 	try {
-	    extractFormToQaCondition(request, conditionForm);
+	    extractFormToQaCondition(request, QaConditionForm);
 	} catch (Exception e) {
 
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.condition", e.getMessage()));
-	    if (!errors.isEmpty()) {
-		populateFormWithPossibleItems(form, request);
-		this.addErrors(request, errors);
-		return mapping.findForward("addcondition");
+	    errorMap.add("GLOBAL", messageService.getMessage("error.condition", new Object[] { e.getMessage() }));
+	    if (!errorMap.isEmpty()) {
+		populateFormWithPossibleItems(QaConditionForm, request);
+		request.setAttribute("errorMap", errorMap);
+		return "authoring/addCondition";
 	    }
 	}
 
-	request.setAttribute(QaAppConstants.ATTR_SESSION_MAP_ID, conditionForm.getSessionMapID());
+	request.setAttribute(QaAppConstants.ATTR_SESSION_MAP_ID, QaConditionForm.getSessionMapID());
 
-	return mapping.findForward(QaAppConstants.SUCCESS);
+	return "authoring/conditionList";
     }
 
     /**
@@ -187,14 +160,11 @@ public class QaAuthoringConditionAction extends Action {
      * authoring rule, all persist only happen when user submit whole page. So
      * this remove is just impact HttpSession values.
      *
-     * @param mapping
-     * @param form
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward removeCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeCondition")
+    private String removeCondition(HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, QaAppConstants.ATTR_SESSION_MAP_ID);
@@ -203,7 +173,7 @@ public class QaAuthoringConditionAction extends Action {
 	int orderId = NumberUtils.stringToInt(request.getParameter(QaAppConstants.PARAM_ORDER_ID), -1);
 	if (orderId != -1) {
 	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
-	    List<QaCondition> conditionList = new ArrayList<QaCondition>(conditionSet);
+	    List<QaCondition> conditionList = new ArrayList<>(conditionSet);
 	    QaCondition condition = conditionList.remove(orderId);
 	    for (QaCondition otherCondition : conditionSet) {
 		if (otherCondition.getOrderId() > orderId) {
@@ -218,38 +188,32 @@ public class QaAuthoringConditionAction extends Action {
 	}
 
 	request.setAttribute(QaAppConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(QaAppConstants.SUCCESS);
+	return "authoring/conditionList";
     }
 
     /**
      * Move up current item.
      *
-     * @param mapping
-     * @param form
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward upCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, true);
+    @RequestMapping("/upCondition")
+    private String upCondition(HttpServletRequest request) {
+	return switchItem(request, true);
     }
 
     /**
      * Move down current item.
      *
-     * @param mapping
-     * @param form
      * @param request
-     * @param response
      * @return
      */
-    private ActionForward downCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, false);
+    @RequestMapping("/downCondition")
+    private String downCondition(HttpServletRequest request) {
+	return switchItem(request, false);
     }
 
-    private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
+    private String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, QaAppConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -257,7 +221,7 @@ public class QaAuthoringConditionAction extends Action {
 	int orderId = NumberUtils.stringToInt(request.getParameter(QaAppConstants.PARAM_ORDER_ID), -1);
 	if (orderId != -1) {
 	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
-	    List<QaCondition> conditionList = new ArrayList<QaCondition>(conditionSet);
+	    List<QaCondition> conditionList = new ArrayList<>(conditionSet);
 	    // get current and the target item, and switch their sequnece
 	    QaCondition condition = conditionList.get(orderId);
 	    QaCondition repCondition;
@@ -276,20 +240,12 @@ public class QaAuthoringConditionAction extends Action {
 	}
 
 	request.setAttribute(QaAppConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(QaAppConstants.SUCCESS);
+	return "authoring/conditionList";
     }
 
     // *************************************************************************************
     // Private methods for internal needs
     // *************************************************************************************
-    /**
-     * Return QaService bean.
-     */
-    private IQaService getQaService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return QaServiceProxy.getQaService(getServlet().getServletContext());
-    }
 
     /**
      * List save current taskList items.
@@ -300,7 +256,7 @@ public class QaAuthoringConditionAction extends Action {
     private SortedSet<QaCondition> getQaConditionSet(SessionMap sessionMap) {
 	SortedSet<QaCondition> list = (SortedSet<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
 	if (list == null) {
-	    list = new TreeSet<QaCondition>(new TextSearchConditionComparator());
+	    list = new TreeSet<>(new TextSearchConditionComparator());
 	    sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, list);
 	}
 	return list;
@@ -315,7 +271,7 @@ public class QaAuthoringConditionAction extends Action {
     private List<QaQuestionDTO> getQuestionList(SessionMap sessionMap) {
 	List<QaQuestionDTO> list = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
 	if (list == null) {
-	    list = new LinkedList<QaQuestionDTO>();
+	    list = new LinkedList<>();
 	    sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, list);
 	}
 	return list;
@@ -372,17 +328,15 @@ public class QaAuthoringConditionAction extends Action {
      * @param form
      * @param request
      */
-    private void populateFormWithPossibleItems(ActionForm form, HttpServletRequest request) {
-	QaConditionForm conditionForm = (QaConditionForm) form;
+    private void populateFormWithPossibleItems(@ModelAttribute("QaConditionForm")QaConditionForm QaConditionForm, HttpServletRequest request) {
 	// get back sessionMAP
-	String sessionMapID = conditionForm.getSessionMapID();
+	String sessionMapID = QaConditionForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
 	List<QaQuestionDTO> questions = getQuestionList(sessionMap);
 
 	// Initialise the LabelValueBeans in the possibleOptions array.
-	LabelValueBean[] lvBeans = new LabelValueBean[questions.size()];
-
+	Map<String, String> possibleItems = new HashMap<>(questions.size());
 	int i = 0;
 	for (QaQuestionDTO question : questions) {
 	    String nonHTMLQuestion = question.getQuestion();
@@ -394,9 +348,9 @@ public class QaAuthoringConditionAction extends Action {
 		    nonHTMLQuestion = nonHTMLQuestion.substring(0, QaAppConstants.QUESTION_CUTOFF_INDEX) + "...";
 		}
 	    }
-	    lvBeans[i++] = new LabelValueBean(nonHTMLQuestion, new Integer(question.getDisplayOrder()).toString());
+	    possibleItems.put(nonHTMLQuestion, new Integer(question.getDisplayOrder()).toString());
 	}
-	conditionForm.setPossibleItems(lvBeans);
+	QaConditionForm.setPossibleItems(possibleItems);
     }
 
     /**
@@ -415,7 +369,7 @@ public class QaAuthoringConditionAction extends Action {
 	QaCondition condition = null;
 
 	if (orderId == -1) { // add
-	    String properConditionName = getQaService().createConditionName(conditionSet);
+	    String properConditionName = qaService.createConditionName(conditionSet);
 	    condition = form.extractCondition();
 	    condition.setName(properConditionName);
 	    int maxOrderId = 1;
@@ -426,7 +380,7 @@ public class QaAuthoringConditionAction extends Action {
 	    condition.setOrderId(maxOrderId);
 	    conditionSet.add(condition);
 	} else { // edit
-	    List<QaCondition> conditionList = new ArrayList<QaCondition>(conditionSet);
+	    List<QaCondition> conditionList = new ArrayList<>(conditionSet);
 	    condition = conditionList.get(orderId - 1);
 	    form.extractCondition(condition);
 	}
@@ -448,43 +402,41 @@ public class QaAuthoringConditionAction extends Action {
     /**
      * Validate QaCondition
      *
-     * @param conditionForm
+     * @param QaConditionForm
      * @return
      */
-    private ActionErrors validateQaCondition(QaConditionForm conditionForm, HttpServletRequest request) {
-	ActionErrors errors = new ActionErrors();
+    private MultiValueMap<String, String> validateQaCondition(QaConditionForm QaConditionForm,
+	    HttpServletRequest request) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
-	String formConditionName = conditionForm.getDisplayName();
+	String formConditionName = QaConditionForm.getDisplayName();
 	if (StringUtils.isBlank(formConditionName)) {
 
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.condition.name.blank"));
+	    errorMap.add("GLOBAL", messageService.getMessage("error.condition.name.blank"));
 	} else {
 
-	    Integer formConditionOrderId = conditionForm.getOrderId();
+	    Integer formConditionOrderId = QaConditionForm.getOrderId();
 
-	    String sessionMapID = conditionForm.getSessionMapID();
+	    String sessionMapID = QaConditionForm.getSessionMapID();
 	    SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
 	    for (QaCondition condition : conditionSet) {
 		if (formConditionName.equals(condition.getDisplayName())
 			&& !formConditionOrderId.equals(condition.getOrderId())) {
 
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.condition.duplicated.name"));
+		    errorMap.add("GLOBAL", messageService.getMessage("error.condition.duplicated.name"));
 		    break;
 		}
 	    }
 	}
 
 	// should be selected at least one question
-	Integer[] selectedItems = conditionForm.getSelectedItems();
+	Integer[] selectedItems = QaConditionForm.getSelectedItems();
 	if (selectedItems == null || selectedItems.length == 0) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.condition.no.questions.selected"));
+	    errorMap.add("GLOBAL", messageService.getMessage("error.condition.no.questions.selected"));
 	}
 
-	return errors;
+	return errorMap;
     }
 
-    private ActionMessages validate(QaConditionForm form, ActionMapping mapping, HttpServletRequest request) {
-	return new ActionMessages();
-    }
 }

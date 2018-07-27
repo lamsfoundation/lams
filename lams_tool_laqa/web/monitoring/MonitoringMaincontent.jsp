@@ -11,7 +11,7 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
-<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+<c:set var="localeLanguage"><lams:user name="localeLanguage" /></c:set>
 
 <lams:html>
 	<lams:head>
@@ -23,7 +23,7 @@
 	<lams:css suffix="jquery.jRating"/>
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css"> 
-	<link type="text/css" rel="stylesheet" href="<html:rewrite page='/includes/css/qalearning.css'/>">
+	<link type="text/css" rel="stylesheet" href="<lams:WebAppURL/>includes/css/qalearning.css">
 	<style media="screen,projection" type="text/css">
 		.rating-stars-div {
 			padding-top: 12px;
@@ -349,14 +349,13 @@
 </lams:head>
 <body class="stripes">
 
-<html:form action="/monitoring?validate=false" method="POST" enctype="multipart/form-data" >
+<form:form action="/monitoring.do" method="POST" >
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
-	<html:hidden property="dispatch"/>
-	<html:hidden property="currentUid"/>
-	<html:hidden property="toolContentID"/>
-	<html:hidden property="httpSessionID"/>					
-	<html:hidden property="contentFolderID"/>	
+	<form:hidden path="currentUid"/>
+	<form:hidden path="toolContentID"/>
+	<form:hidden path="httpSessionID"/>					
+	<form:hidden path="contentFolderID"/>	
 	
 	<lams:Page title="${title}" type="navbar">
 	
@@ -391,6 +390,6 @@
 			</c:choose>
 		</div>
 	</lams:Page>
-</html:form>
+</form:form>
 </body>
 </lams:html>

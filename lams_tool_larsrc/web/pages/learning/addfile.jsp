@@ -15,35 +15,35 @@
 	
 	<%@ include file="/common/messages.jsp"%>
 	
-	<html:form action="/learning/saveOrUpdateItem" method="post" styleId="resourceItemForm" focus="title" enctype="multipart/form-data">
+	<form:form action="saveOrUpdateItem.do" method="post" modelAttribute="resourceItemForm" id="resourceItemForm" focus="title">
 	
-		<html:hidden property="itemType" styleId="itemType" />
-		<html:hidden property="mode" styleId="mode"/>
-		<html:hidden property="sessionMapID"/>
+		<form:hidden path="itemType" id="itemType" />
+		<form:hidden path="mode" id="mode"/>
+		<form:hidden path="sessionMapID"/>
 	
 		<div class="form-group">
 	    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
-			<html:text property="title" styleClass="form-control" tabindex="1" styleId="resourcetitle"/>
+			<form:input path="title" class="form-control" tabindex="1" id="resourcetitle"/>
 	  	</div>	
 
 		<lams:FileUpload fileFieldname="file" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}" tabindex="2"/>
 
 		<div class="form-group voffset10">
 	    	<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>
-			<html:text property="description" tabindex="3" styleClass="form-control" maxlength="255"/>
+			<form:input path="description" tabindex="3" cssClass="form-control" maxlength="255"/>
 	  	</div>	
 
 		<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>	
 		<div id="buttons" class="pull-right">
-	 		<html:button property="goback" onclick="javascript:cancel()" styleClass="btn btn-sm btn-default" styleId="cancelButton">
+	 		<button name="goback" onclick="javascript:cancel()" class="btn btn-sm btn-default" id="cancelButton">
 				<fmt:message key="button.cancel" />
-			</html:button>&nbsp;
-			<html:submit styleClass="btn btn-sm btn-default btn-disable-on-submit" styleId="submitButton">
+			</button>&nbsp;
+			<button type="submit" class="btn btn-sm btn-default btn-disable-on-submit" id="submitButton">
 			 	<fmt:message key="button.add" />
-			</html:submit>
+			</button>
 		</div>
 	
-	</html:form>
+	</form:form>
 	
 	<script type="text/javascript">
 

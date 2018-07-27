@@ -11,6 +11,7 @@ ALTER TABLE tl_laqa11_que_content MODIFY feedback MEDIUMTEXT;
 ALTER TABLE tl_laqa11_usr_resp MODIFY answer MEDIUMTEXT;
 ALTER TABLE tl_laqa11_usr_resp MODIFY answer_autosaved MEDIUMTEXT;
 
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on

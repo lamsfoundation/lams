@@ -11,7 +11,7 @@
 <c:set var="isLeadershipEnabled" value="${qaContent.useSelectLeaderToolOuput}" />
 <c:set var="isCommentsEnabled" value="${sessionMap.isCommentsEnabled}" />
 <c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
-<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+<c:set var="localeLanguage"><lams:user name="localeLanguage" /></c:set>
 <lams:html>
 <lams:head>
 	<title><fmt:message key="activity.title" /></title>
@@ -19,7 +19,7 @@
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-	<link rel="stylesheet" href="<html:rewrite page='/includes/css/qalearning.css'/>">
+	<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/qalearning.css">
 	<lams:css />
 
 	<script src="${lams}includes/javascript/jquery.timeago.js" type="text/javascript"></script>
@@ -351,10 +351,10 @@
 		<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' 
 				&& (generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
 			<div style="overflow: hidden;">
-				<html:button property="redoQuestions" styleClass="btn btn-default pull-left"
+				<button name="redoQuestions" class="btn btn-default pull-left"
 					onclick="submitMethod('redoQuestions');">
 					<fmt:message key="label.redo" />
-				</html:button>
+				</button>
 			</div>
 		</c:if>
 
@@ -434,10 +434,10 @@
 							</div>
 
 							<c:if test="${hasEditRight}">
-								<html:button property="forwardtoReflection" styleClass="btn btn-default pull-left"
+								<button name="forwardtoReflection" class="btn btn-default pull-left"
 									onclick="submitMethod('forwardtoReflection');">
 									<fmt:message key="label.edit" />
-								</html:button>
+								</button>
 							</c:if>
 						</div>
 					</div>
@@ -465,13 +465,13 @@
 			</div>
 		</c:if>
 
-		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
-			<html:hidden property="method" />
-			<html:hidden property="toolSessionID" styleId="toolSessionID" />
-			<html:hidden property="userID" styleId="userID" />
-			<html:hidden property="httpSessionID" />
-			<html:hidden property="totalQuestionCount" />
-		</html:form>
+		<form:form action="/learning.do" method="POST" target="_self">
+			<form:hidden path="method" />
+			<form:hidden path="toolSessionID" id="toolSessionID" />
+			<form:hidden path="userID" id="userID" />
+			<form:hidden path="httpSessionID" />
+			<form:hidden path="totalQuestionCount" />
+		</form:form>
 
 
 		<div id="footer"></div>

@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <div id="itemList">
 	<table class="table table-striped table-condensed">
@@ -25,7 +24,7 @@
 		 			</c:if>
 				</td>
 				<td align="center" style="width:5%"><i class="fa fa-pencil"	title="<fmt:message key="label.tip.editQuestion" />"
-					onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableQuestionBox&questionIndex=${status.count}&contentFolderID=${formBean.contentFolderID}&httpSessionID=${formBean.httpSessionID}&toolContentID=${formBean.toolContentID}&usernameVisible=${formBean.usernameVisible}&lockWhenFinished=${formBean.lockWhenFinished}&questionsSequenced=${formBean.questionsSequenced}"/>')"></i>
+					onclick="javascript:showMessage('<lams:WebAppURL/>authoring/newEditableQuestionBox.do?questionIndex=${status.count}&contentFolderID=${newQuestionForm.contentFolderID}&httpSessionID=${newQuestionForm.httpSessionID}&toolContentID=${newQuestionForm.toolContentID}&usernameVisible=${newQuestionForm.usernameVisible}&lockWhenFinished=${newQuestionForm.lockWhenFinished}&questionsSequenced=${newQuestionForm.questionsSequenced}')"></i>
 				</td>
 				<td  align="center" style="width:5%"><i class="fa fa-times"	title="<fmt:message key="label.tip.deleteQuestion" />"
 					onclick="removeQuestion(${status.count})"></i>

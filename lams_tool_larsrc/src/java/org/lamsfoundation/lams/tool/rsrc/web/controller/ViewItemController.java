@@ -21,10 +21,8 @@
  * ****************************************************************
  */
 
+package org.lamsfoundation.lams.tool.rsrc.web.controller;
 
-package org.lamsfoundation.lams.tool.rsrc.web.action;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -33,59 +31,36 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.dto.InstructionNavDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
-import org.lamsfoundation.lams.tool.rsrc.service.ResourceServiceProxy;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-public class ViewItemAction extends Action {
+@Controller
+public class ViewItemController {
 
-    private static final Logger log = Logger.getLogger(ViewItemAction.class);
+    private static final Logger log = Logger.getLogger(ViewItemController.class);
 
-    private static IResourceService resourceService;
-
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-
-	String param = mapping.getParameter();
-	// -----------------------Display Learning Object function ---------------------------
-	if (param.equals("reviewItem")) {
-	    return reviewItem(mapping, form, request, response);
-	}
-	// for preview top frame html page use:
-	if (param.equals("nextInstruction")) {
-	    return nextInstruction(mapping, form, request, response);
-	}
-	// for preview top frame html page use:
-	if (param.equals("openUrlPopup")) {
-	    return openUrlPopup(mapping, form, request, response);
-	}
-
-	return mapping.findForward(ResourceConstants.ERROR);
-    }
+    @Autowired
+    @Qualifier("resourceService")
+    private IResourceService resourceService;
 
     /**
      * Display main frame to display instrcution and item content.
@@ -96,8 +71,9 @@ public class ViewItemAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward reviewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+
+    @RequestMapping("/reviewItem")
+    private String reviewItem(HttpServletRequest request) {
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
@@ -110,15 +86,14 @@ public class ViewItemAction extends Action {
 	Long sessionId = NumberUtils.createLong(idStr);
 	// mark this item access flag if it is learner
 	if (ToolAccessMode.LEARNER.toString().equals(mode)) {
-	    IResourceService service = getResourceService();
 	    HttpSession ss = SessionManager.getSession();
 	    // get back login user DTO
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    service.setItemAccess(item.getUid(), new Long(user.getUserID().intValue()), sessionId);
+	    resourceService.setItemAccess(item.getUid(), new Long(user.getUserID().intValue()), sessionId);
 	}
 
 	if (item == null) {
-	    return mapping.findForward(ResourceConstants.ERROR);
+	    return "error";
 	}
 	if (item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT) {
 	    sessionMap.put(ResourceConstants.ATT_LEARNING_OBJECT, item);
@@ -130,7 +105,7 @@ public class ViewItemAction extends Action {
 		getReviewUrl(request, item, sessionMapID, mode, itemIdx));
 
 	request.setAttribute(ResourceConstants.ATTR_ALLOW_COMMENTS, item.isAllowComments());
-	
+
 	// these attribute will be use to instruction navigator page
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
 	request.setAttribute(ResourceConstants.PARAM_ITEM_INDEX, itemIdx);
@@ -139,7 +114,7 @@ public class ViewItemAction extends Action {
 	request.setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID, sessionId);
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	return "pages/itemreview/mainframe";
 
     }
 
@@ -152,8 +127,9 @@ public class ViewItemAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward nextInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+
+    @RequestMapping("/nextInstruction")
+    private String nextInstruction(HttpServletRequest request) {
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
@@ -162,7 +138,7 @@ public class ViewItemAction extends Action {
 
 	ResourceItem item = getResourceItem(request, sesionMap, mode);
 	if (item == null) {
-	    return mapping.findForward(ResourceConstants.ERROR);
+	    return "error";
 	}
 
 	int currIns = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_CURRENT_INSTRUCTION_INDEX),
@@ -172,7 +148,7 @@ public class ViewItemAction extends Action {
 	InstructionNavDTO navDto = new InstructionNavDTO();
 	// For Learner upload item, its instruction will display description/comment fields in ReosourceItem.
 	if (!item.isCreateByAuthor()) {
-	    List<ResourceItemInstruction> navItems = new ArrayList<ResourceItemInstruction>(1);
+	    List<ResourceItemInstruction> navItems = new ArrayList<>(1);
 	    // create a new instruction and put ResourceItem description into it: just for display use.
 	    ResourceItemInstruction ins = new ResourceItemInstruction();
 	    ins.setSequenceId(1);
@@ -196,7 +172,7 @@ public class ViewItemAction extends Action {
 
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	request.setAttribute(ResourceConstants.ATTR_RESOURCE_INSTRUCTION, navDto);
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	return "pages/itemreview/instructionsnav";
     }
 
     /**
@@ -208,13 +184,10 @@ public class ViewItemAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward openUrlPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 
-	if (resourceService == null) {
-	    resourceService = ResourceServiceProxy.getResourceService(getServlet().getServletContext());
-	}
+    @RequestMapping("/openUrlPopup")
+    private String openUrlPopup(HttpServletRequest request) {
+	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -230,7 +203,7 @@ public class ViewItemAction extends Action {
 	request.setAttribute(ResourceConstants.PARAM_OPEN_URL_POPUP, popupUrl);
 
 	request.setAttribute(ResourceConstants.PARAM_TITLE, item.getTitle());
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	return "pages/itemreview/openurl";
     }
 
     // *************************************************************************************
@@ -250,21 +223,14 @@ public class ViewItemAction extends Action {
 	if (ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)) {
 	    int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX), 0);
 	    // authoring: does not save item yet, so only has ItemList from session and identity by Index
-	    List<ResourceItem> resourceList = new ArrayList<ResourceItem>(getResourceItemList(sessionMap));
+	    List<ResourceItem> resourceList = new ArrayList<>(getResourceItemList(sessionMap));
 	    item = resourceList.get(itemIdx);
 	} else {
 	    Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
 	    // get back the resource and item list and display them on page
-	    IResourceService service = getResourceService();
-	    item = service.getResourceItemByUid(itemUid);
+	    item = resourceService.getResourceItemByUid(itemUid);
 	}
 	return item;
-    }
-
-    private IResourceService getResourceService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
     }
 
     private static Pattern usePopupButtonForURL = Pattern.compile("wikipedia|google",
@@ -275,8 +241,8 @@ public class ViewItemAction extends Action {
     public static final String DEFAULT_PROTOCOL = "http://";
     public static final String HTTPS_SCHEME = "https";
 
-
-    private Object getReviewUrl(HttpServletRequest request, ResourceItem item, String sessionMapID, String mode, int itemIdx) {
+    private Object getReviewUrl(HttpServletRequest request, ResourceItem item, String sessionMapID, String mode,
+	    int itemIdx) {
 	short type = item.getType();
 	String url = null;
 	switch (type) {
@@ -290,19 +256,19 @@ public class ViewItemAction extends Action {
 		// check all three cases that trigger popup - first is set in authoring
 		boolean usePopup = item.isOpenUrlNewWindow();
 		// See LDEV-4503 regarding https/http issues
-		if ( ! usePopup ) {
+		if (!usePopup) {
 		    String serverScheme = request.getScheme();
 		    usePopup = HTTPS_SCHEME.equalsIgnoreCase(serverScheme) && httpPattern.matcher(url).find();
 		}
-    		// See LDEV-1736 regarding wikipedia regex
-		if ( ! usePopup ) {
-            		Matcher matcher = usePopupButtonForURL.matcher(url);
-            		usePopup = matcher.find();
+		// See LDEV-1736 regarding wikipedia regex
+		if (!usePopup) {
+		    Matcher matcher = usePopupButtonForURL.matcher(url);
+		    usePopup = matcher.find();
 		}
 
-		if ( usePopup ) {
+		if (usePopup) {
 		    url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
-		} 
+		}
 		break;
 
 	    case ResourceConstants.RESOURCE_TYPE_FILE:
@@ -355,7 +321,7 @@ public class ViewItemAction extends Action {
     private SortedSet<ResourceItem> getResourceItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<ResourceItem> list = (SortedSet) sessionMap.get(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
 	if (list == null) {
-	    list = new TreeSet<ResourceItem>(new ResourceItemComparator());
+	    list = new TreeSet<>(new ResourceItemComparator());
 	    sessionMap.put(ResourceConstants.ATTR_RESOURCE_ITEM_LIST, list);
 	}
 	return list;

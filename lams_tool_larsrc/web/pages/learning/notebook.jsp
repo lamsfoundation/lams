@@ -21,9 +21,9 @@
 
 	<lams:Page type="learner" title="${sessionMap.title}">
 	
-	<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();" styleId="reflectionForm">
-		<html:hidden property="userID" />
-		<html:hidden property="sessionMapID" />
+	<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="reflectionForm" id="reflectionForm">
+		<form:hidden path="userID" />
+		<form:hidden path="sessionMapID" />
 
 		<div id="content">
 			<%@ include file="/common/messages.jsp"%>
@@ -32,7 +32,7 @@
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 			</p>
 
-			<html:textarea rows="8" property="entryText" styleId="focused" styleClass="form-control" />
+			<form:textarea rows="8" path="entryText" id="focused" cssClass="form-control" />
 
 			<div class="space-bottom-top align-right">
 				<button type="submit" class="btn btn-primary voffset5 pull-right na" id="finishButton">
@@ -49,7 +49,7 @@
 				</button>
 			</div>
 		</div>
-	</html:form>
+	</form:form>
 
 	<div id="footer">
 	</div>

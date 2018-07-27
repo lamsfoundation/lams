@@ -21,10 +21,7 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.web.form;
-
-import org.apache.struts.action.ActionForm;
 
 /**
  * @author Ozgur Demirtas
@@ -32,5 +29,5 @@ import org.apache.struts.action.ActionForm;
  *         TODO To change the template for this generated type comment go to Window -
  *         Preferences - Java - Code Style - Code Templates
  */
-public class QaEmptyForm extends ActionForm {
+public class QaEmptyForm {
 }

@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.qa.web.action;
+package org.lamsfoundation.lams.tool.qa.web.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,16 +36,10 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
+import org.apache.struts.Globals;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
@@ -58,18 +51,25 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.AuthoringUtil;
+import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Q&A Tool's authoring methods. Additionally, there is one more method that initializes authoring and it's located in
@@ -77,59 +77,266 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  *
  * @author Ozgur Demirtas
  */
-public class QaAction extends LamsDispatchAction implements QaAppConstants {
-    private static Logger logger = Logger.getLogger(QaAction.class.getName());
+@Controller
+@RequestMapping("/authoring")
+public class QaController implements QaAppConstants {
+    private static Logger logger = Logger.getLogger(QaController.class.getName());
 
-    private static IQaService qaService;
+    @Autowired
+    private IQaService qaService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
+    @Autowired
+    @Qualifier("qaMessageService")
+    private MessageService messageService;
+
+    @RequestMapping("/")
+    public String unspecified() {
+	return "authoring/AuthoringTabsHolder";
+    }
+
+    @RequestMapping("/authoring")
+    public String execute(@ModelAttribute("authoringForm") QaAuthoringForm authoringForm, HttpServletRequest request)
+	    throws IOException, ServletException, QaApplicationException {
+
+	QaUtils.cleanUpSessionAbsolute(request);
+
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	authoringForm.setContentFolderID(contentFolderID);
+
+	authoringForm.resetRadioBoxes();
+
+	validateDefaultContent(request, authoringForm);
+
+	//no problems getting the default content, will render authoring screen
+	String strToolContentID = "";
+	/* the authoring url must be passed a tool content id */
+	strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	authoringForm.setToolContentID(strToolContentID);
+
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
+	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, "");
+	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, "");
+	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+	authoringForm.setHttpSessionID(sessionMap.getSessionID());
+
+	if (strToolContentID == null || strToolContentID.equals("")) {
+	    QaUtils.cleanUpSessionAbsolute(request);
+	    throw new ServletException("No Tool Content ID found");
+	}
+
+	QaContent qaContent = qaService.getQaContent(new Long(strToolContentID).longValue());
+	if (qaContent == null) {
+	    /* fetch default content */
+	    long defaultContentID = qaService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
+	    qaContent = qaService.getQaContent(defaultContentID);
+	    qaContent = QaContent.newInstance(qaContent, new Long(strToolContentID));
+	}
+
+	prepareDTOandForm(request, authoringForm, qaContent, qaService, sessionMap);
+
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	// request is from monitoring module
+	if (mode.isTeacher()) {
+	    qaService.setDefineLater(strToolContentID, true);
+	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+
+	SortedSet<QaCondition> conditionList = getQaConditionList(sessionMap);
+	conditionList.clear();
+	conditionList.addAll(qaContent.getConditions());
+
+	authoringForm.setAllowRichEditor(qaContent.isAllowRichEditor());
+	authoringForm.setUseSelectLeaderToolOuput(qaContent.isUseSelectLeaderToolOuput());
+
+	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, authoringForm);
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+
+	// get rating criterias from DB
+	List<RatingCriteria> ratingCriterias = qaService.getRatingCriterias(qaContent.getQaContentId());
+	sessionMap.put(AttributeNames.ATTR_RATING_CRITERIAS, ratingCriterias);
+
+	return "authoring/AuthoringTabsHolder";
+    }
+
+    /**
+     * retrives the existing content information from the db and prepares the data for presentation purposes.
+     *
+     * @param request
+     * @param mapping
+     * @param authoringForm
+     * @param mapQuestionContent
+     * @param toolContentID
+     * @return ActionForward
+     */
+    protected QaContent prepareDTOandForm(HttpServletRequest request,@ModelAttribute("authoringForm") QaAuthoringForm authoringForm,
+	    QaContent qaContent, IQaService qaService, SessionMap<String, Object> sessionMap) {
+
+	authoringForm.setUsernameVisible(qaContent.isUsernameVisible() ? "1" : "0");
+	authoringForm.setAllowRateAnswers(qaContent.isAllowRateAnswers() ? "1" : "0");
+	authoringForm.setNotifyTeachersOnResponseSubmit(qaContent.isNotifyTeachersOnResponseSubmit() ? "1" : "0");
+	authoringForm.setShowOtherAnswers(qaContent.isShowOtherAnswers() ? "1" : "0");
+	authoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced() ? "1" : "0");
+	authoringForm.setLockWhenFinished(qaContent.isLockWhenFinished() ? "1" : "0");
+	authoringForm.setNoReeditAllowed(qaContent.isNoReeditAllowed() ? "1" : "0");
+	authoringForm.setMaximumRates(qaContent.getMaximumRates());
+	authoringForm.setMinimumRates(qaContent.getMinimumRates());
+	authoringForm.setReflect(qaContent.isReflect() ? "1" : "0");
+	authoringForm.setReflectionSubject(qaContent.getReflectionSubject());
+	authoringForm.setTitle(qaContent.getTitle());
+	authoringForm.setInstructions(qaContent.getInstructions());
+	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, qaContent.getTitle());
+	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, qaContent.getInstructions());
+
+	List<QaQuestionDTO> questionDTOs = new LinkedList();
+
+	/*
+	 * get the existing question content
+	 */
+	Iterator queIterator = qaContent.getQaQueContents().iterator();
+	while (queIterator.hasNext()) {
+
+	    QaQueContent qaQuestion = (QaQueContent) queIterator.next();
+	    if (qaQuestion != null) {
+		QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qaQuestion);
+		questionDTOs.add(qaQuestionDTO);
+	    }
+	}
+
+	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
+	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
+	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
+
+	SortedSet<QaCondition> conditionSet = new TreeSet<>(new TextSearchConditionComparator());
+	for (QaCondition condition : qaContent.getConditions()) {
+	    conditionSet.add(condition);
+	    for (QaQuestionDTO dto : questionDTOs) {
+		for (QaQueContent question : condition.getQuestions()) {
+		    if (dto.getDisplayOrder().equals(String.valueOf(question.getDisplayOrder()))) {
+			condition.temporaryQuestionDTOSet.add(dto);
+		    }
+		}
+	    }
+	}
+	sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, conditionSet);
+
+	List<QaQuestionDTO> listDeletedQuestionDTOs = new ArrayList<>();
+	sessionMap.put(QaAppConstants.LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
+
+	authoringForm.resetUserAction();
+
+	return qaContent;
+    }
+
+    /**
+     * each tool has a signature. QA tool's signature is stored in MY_SIGNATURE.
+     * The default tool content id and other depending content ids are obtained
+     * in this method. if all the default content has been setup properly the
+     * method persists DEFAULT_CONTENT_ID in the session.
+     *
+     * @param request
+     * @param mapping
+     * @return ActionForward
+     */
+    public boolean validateDefaultContent(HttpServletRequest request,@ModelAttribute("authoringForm") QaAuthoringForm authoringForm) {
+
+	/*
+	 * retrieve the default content id based on tool signature
+	 */
+	long defaultContentID = 0;
+	try {
+	    defaultContentID = qaService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
+	    if (defaultContentID == 0) {
+		QaController.logger.debug("default content id has not been setup");
+		return false;
+	    }
+	} catch (Exception e) {
+	    QaController.logger.error("error getting the default content id: " + e.getMessage());
+	    persistError(request, "error.defaultContent.notSetup");
+	    return false;
+	}
+
+	/*
+	 * retrieve uid of the content based on default content id determined above
+	 */
+	try {
+	    //retrieve uid of the content based on default content id determined above
+	    QaContent qaContent = qaService.getQaContent(defaultContentID);
+	    if (qaContent == null) {
+		QaController.logger.error("Exception occured: No default content");
+		persistError(request, "error.defaultContent.notSetup");
+		return false;
+	    }
+
+	} catch (Exception e) {
+	    QaController.logger.error("Exception occured: No default question content");
+	    persistError(request, "error.defaultContent.notSetup");
+	    return false;
+	}
+
+	return true;
+    }
+
+    /**
+     * persists error messages to request scope
+     *
+     * @param request
+     * @param message
+     */
+    public void persistError(HttpServletRequest request, String message) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	errorMap.add(Globals.ERROR_KEY, messageService.getMessage(message));
+	request.setAttribute("errorMap", errorMap);
+    }
+
+    private SortedSet<QaCondition> getQaConditionList(SessionMap<String, Object> sessionMap) {
+	SortedSet<QaCondition> list = (SortedSet<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
+	if (list == null) {
+	    list = new TreeSet<>(new TextSearchConditionComparator());
+	    sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, list);
+	}
+	return list;
     }
 
     /**
      * submits content into the tool database
      */
-    public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/submitAllContent")
+    public String submitAllContent(@ModelAttribute("authoringForm") QaAuthoringForm authoringForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 
-	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-	qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = authoringForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	authoringForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Long toolContentID = new Long(strToolContentID);
 
 	List<QaQuestionDTO> questionDTOs = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
 
-	ActionMessages errors = new ActionMessages();
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (questionDTOs.size() == 0) {
-	    ActionMessage error = new ActionMessage("questions.none.submitted");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    errorMap.add("GLOBAL", messageService.getMessage("questions.none.submitted"));
 	}
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	authoringForm.setTitle(richTextTitle);
+	authoringForm.setInstructions(richTextInstructions);
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-	if (!errors.isEmpty()) {
-	    saveErrors(request, errors);
-	    QaAction.logger.debug("errors saved: " + errors);
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    QaController.logger.debug("errors saved: " + errorMap);
 	}
 
 	QaContent qaContent = qaService.getQaContent(toolContentID);
-	if (errors.isEmpty()) {
+	if (errorMap.isEmpty()) {
 	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
@@ -180,13 +387,13 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		    .get(AttributeNames.ATTR_RATING_CRITERIAS);
 	    qaService.saveRatingCriterias(request, oldCriterias, toolContentID);
 
-	    QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	    QaUtils.setFormProperties(request, authoringForm, strToolContentID, httpSessionID);
 
 	    request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	} else {
 	    if (qaContent != null) {
-		QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+		QaUtils.setFormProperties(request, authoringForm, strToolContentID, httpSessionID);
 	    }
 	}
 
@@ -198,17 +405,17 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    qaService.deleteCondition(condition);
 	}
 
-	qaAuthoringForm.resetUserAction();
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setCurrentTab("1");
+	authoringForm.resetUserAction();
+	authoringForm.setToolContentID(strToolContentID);
+	authoringForm.setHttpSessionID(httpSessionID);
+	authoringForm.setCurrentTab("1");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
-	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
+	return "authoring/AuthoringTabsHolder";
     }
 
     private QaContent saveOrUpdateQaContent(List<QaQuestionDTO> questionDTOs, HttpServletRequest request,
@@ -333,7 +540,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaContent = qaService.getQaContent(toolContentId);
 
 	for (QaCondition condition : conditions) {
-	    condition.setQuestions(new TreeSet<QaQueContent>(new QaQueContentComparator()));
+	    condition.setQuestions(new TreeSet<>(new QaQueContentComparator()));
 	    for (QaQuestionDTO dto : condition.temporaryQuestionDTOSet) {
 		for (QaQueContent queContent : qaContent.getQaQueContents()) {
 		    if (dto.getDisplayOrder().equals(String.valueOf(queContent.getDisplayOrder()))) {
@@ -386,18 +593,17 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     /**
      * saveSingleQuestion
      */
-    public ActionForward saveSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/saveSingleQuestion")
+    public String saveSingleQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 
-	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = newQuestionForm.getHttpSessionID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	newQuestionForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
@@ -485,40 +691,41 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	newQuestionForm.setTitle(richTextTitle);
+	newQuestionForm.setInstructions(richTextInstructions);
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
 
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setCurrentTab("1");
+	newQuestionForm.setToolContentID(strToolContentID);
+	newQuestionForm.setHttpSessionID(httpSessionID);
+	newQuestionForm.setCurrentTab("1");
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
+	request.setAttribute("authoringForm", newQuestionForm);
+	
+	return "authoring/AuthoringTabsHolder";
     }
 
     /**
      * addSingleQuestion
      */
-    public ActionForward addSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/addSingleQuestion")
+    public String addSingleQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
+	    HttpServletRequest request) throws IOException, ServletException {
 
-	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = newQuestionForm.getHttpSessionID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	newQuestionForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
@@ -555,42 +762,41 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	newQuestionForm.setTitle(richTextTitle);
+	newQuestionForm.setInstructions(richTextInstructions);
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
 
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setCurrentTab("1");
+	newQuestionForm.setToolContentID(strToolContentID);
+	newQuestionForm.setHttpSessionID(httpSessionID);
+	newQuestionForm.setCurrentTab("1");
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
+	request.setAttribute("authoringForm", newQuestionForm);
+	return "authoring/AuthoringTabsHolder";
     }
 
     /**
      * opens up an new screen within the current page for adding a new question
      */
-    public ActionForward newQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+    @RequestMapping("/newQuestionBox")
+    public String newQuestionBox(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 
-	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = newQuestionForm.getHttpSessionID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	newQuestionForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
@@ -598,10 +804,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	newQuestionForm.setTitle(richTextTitle);
+	newQuestionForm.setInstructions(richTextInstructions);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
 
 	Collection<QaQuestionDTO> questionDTOs = (Collection<QaQuestionDTO>) sessionMap
 		.get(QaAppConstants.LIST_QUESTION_DTOS);
@@ -615,24 +821,24 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    request.setAttribute(QaAppConstants.ATTR_WIZARD_CATEGORIES, qaService.getWizardCategories());
 	}
 
-	return mapping.findForward("newQuestionBox");
+	return "authoring/newQuestionBox";
     }
 
     /**
      * opens up an new screen within the current page for editing a question
      */
-    public ActionForward newEditableQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+    @RequestMapping("/newEditableQuestionBox")
+    public String newEditableQuestionBox(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = newQuestionForm.getHttpSessionID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 
-	qaAuthoringForm.setEditableQuestionIndex(questionIndex);
+	newQuestionForm.setEditableQuestionIndex(questionIndex);
 
 	List<QaQuestionDTO> questionDTOs = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
 
@@ -658,36 +864,36 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	}
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	newQuestionForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	newQuestionForm.setTitle(richTextTitle);
+	newQuestionForm.setInstructions(richTextInstructions);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
 
-	qaAuthoringForm.setRequired(requiredBoolean);
-	qaAuthoringForm.setMinWordsLimit(minWordsLimit);
-	qaAuthoringForm.setEditableQuestionText(editableQuestion);
-	qaAuthoringForm.setFeedback(editableFeedback);
+	newQuestionForm.setRequired(requiredBoolean);
+	newQuestionForm.setMinWordsLimit(minWordsLimit);
+	newQuestionForm.setEditableQuestionText(editableQuestion);
+	newQuestionForm.setFeedback(editableFeedback);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 
-	return mapping.findForward("editQuestionBox");
+	return "authoring/newQuestionBox";
     }
 
     /**
      * removes a question from the questions map
      */
-    public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+    @RequestMapping("/removeQuestion")
+    public String removeQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = newQuestionForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
@@ -695,7 +901,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaQuestionDTO questionToDelete = null;
 	List<QaQuestionDTO> questionDTOs = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
 
-	List<QaQuestionDTO> listFinalQuestionDTO = new LinkedList<QaQuestionDTO>();
+	List<QaQuestionDTO> listFinalQuestionDTO = new LinkedList<>();
 	int queIndex = 0;
 	for (QaQuestionDTO questionDTO : questionDTOs) {
 
@@ -737,31 +943,32 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	}
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	newQuestionForm.setContentFolderID(contentFolderID);
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	newQuestionForm.setTitle(richTextTitle);
+	newQuestionForm.setInstructions(richTextInstructions);
 	request.getSession().setAttribute(httpSessionID, sessionMap);
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setCurrentTab("1");
+	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
+	newQuestionForm.setToolContentID(strToolContentID);
+	newQuestionForm.setHttpSessionID(httpSessionID);
+	newQuestionForm.setCurrentTab("1");
+	request.setAttribute("authoringForm", newQuestionForm);
 
-	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
+	return "authoring/AuthoringTabsHolder";
     }
 
     /**
      * moves a question down in the list
      */
-    public ActionForward moveQuestionDown(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+    @RequestMapping("/moveQuestionDown")
+    public String moveQuestionDown(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = newQuestionForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 
@@ -772,14 +979,14 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
 		.get(QaAppConstants.ATTR_CONDITION_SET);
 
-	questionDTOs = QaAction.swapQuestions(questionDTOs, questionIndex, "down", conditionSet);
+	questionDTOs = QaController.swapQuestions(questionDTOs, questionIndex, "down", conditionSet);
 
-	questionDTOs = QaAction.reorderQuestionDTOs(questionDTOs);
+	questionDTOs = QaController.reorderQuestionDTOs(questionDTOs);
 
 	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	newQuestionForm.setContentFolderID(contentFolderID);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 
@@ -790,30 +997,31 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	newQuestionForm.setTitle(richTextTitle);
+	newQuestionForm.setInstructions(richTextInstructions);
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
 
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setCurrentTab("1");
+	newQuestionForm.setToolContentID(strToolContentID);
+	newQuestionForm.setHttpSessionID(httpSessionID);
+	newQuestionForm.setCurrentTab("1");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
+	request.setAttribute("authoringForm", newQuestionForm);
+	return "authoring/AuthoringTabsHolder";
     }
 
     /**
      * moves a question up in the list
      */
-    public ActionForward moveQuestionUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+    @RequestMapping("/moveQuestionUp")
+    public String moveQuestionUp(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
+	String httpSessionID = newQuestionForm.getHttpSessionID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
@@ -824,15 +1032,15 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
 		.get(QaAppConstants.ATTR_CONDITION_SET);
-	questionDTOs = QaAction.swapQuestions(questionDTOs, questionIndex, "up", conditionSet);
+	questionDTOs = QaController.swapQuestions(questionDTOs, questionIndex, "up", conditionSet);
 
-	questionDTOs = QaAction.reorderQuestionDTOs(questionDTOs);
+	questionDTOs = QaController.reorderQuestionDTOs(questionDTOs);
 
 	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	qaAuthoringForm.setContentFolderID(contentFolderID);
+	newQuestionForm.setContentFolderID(contentFolderID);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 
@@ -843,21 +1051,22 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
-	qaAuthoringForm.setTitle(richTextTitle);
-	qaAuthoringForm.setInstructions(richTextInstructions);
+	newQuestionForm.setTitle(richTextTitle);
+	newQuestionForm.setInstructions(richTextInstructions);
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
 
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setCurrentTab("1");
+	newQuestionForm.setToolContentID(strToolContentID);
+	newQuestionForm.setHttpSessionID(httpSessionID);
+	newQuestionForm.setCurrentTab("1");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
+	request.setAttribute("authoringForm", newQuestionForm);
+	return "authoring/AuthoringTabsHolder";
     }
 
     private static List<QaQuestionDTO> swapQuestions(List<QaQuestionDTO> questionDTOs, String questionIndex,
@@ -875,11 +1084,11 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    replacedQuestionIndex = --intQuestionIndex;
 	}
 
-	QaQuestionDTO mainQuestion = QaAction.getQuestionAtDisplayOrder(questionDTOs, intOriginalQuestionIndex);
+	QaQuestionDTO mainQuestion = QaController.getQuestionAtDisplayOrder(questionDTOs, intOriginalQuestionIndex);
 
-	QaQuestionDTO replacedQuestion = QaAction.getQuestionAtDisplayOrder(questionDTOs, replacedQuestionIndex);
+	QaQuestionDTO replacedQuestion = QaController.getQuestionAtDisplayOrder(questionDTOs, replacedQuestionIndex);
 
-	List<QaQuestionDTO> newQuestionDtos = new LinkedList<QaQuestionDTO>();
+	List<QaQuestionDTO> newQuestionDtos = new LinkedList<>();
 
 	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
 	while (iter.hasNext()) {
@@ -906,8 +1115,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	// references in conditions also need to be changed
 	if (conditions != null) {
 	    for (QaCondition condition : conditions) {
-		SortedSet<QaQuestionDTO> newQuestionDTOSet = new TreeSet<QaQuestionDTO>(
-			new QaQuestionContentDTOComparator());
+		SortedSet<QaQuestionDTO> newQuestionDTOSet = new TreeSet<>(new QaQuestionContentDTOComparator());
 		for (QaQuestionDTO dto : newQuestionDtos) {
 		    if (condition.temporaryQuestionDTOSet.contains(dto)) {
 			newQuestionDTOSet.add(dto);
@@ -934,7 +1142,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     private static List<QaQuestionDTO> reorderQuestionDTOs(List<QaQuestionDTO> questionDTOs) {
-	List<QaQuestionDTO> listFinalQuestionDTO = new LinkedList<QaQuestionDTO>();
+	List<QaQuestionDTO> listFinalQuestionDTO = new LinkedList<>();
 
 	int queIndex = 0;
 	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
@@ -971,7 +1179,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     private List<QaCondition> getDeletedQaConditionList(SessionMap<String, Object> sessionMap) {
 	List<QaCondition> list = (List<QaCondition>) sessionMap.get(QaAppConstants.ATTR_DELETED_CONDITION_LIST);
 	if (list == null) {
-	    list = new ArrayList<QaCondition>();
+	    list = new ArrayList<>();
 	    sessionMap.put(QaAppConstants.ATTR_DELETED_CONDITION_LIST, list);
 	}
 	return list;

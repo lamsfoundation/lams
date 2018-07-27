@@ -65,22 +65,21 @@
   	</script>
 </lams:head>
 <body id="body">
-	<%@ include file="/common/messages.jsp"%>
 	<h4 class="space-left"><fmt:message key="label.questions"/></h4>
-	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
-		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-		<html:hidden property="toolContentID" styleId="toolContentID" />
-		<html:hidden property="valid" styleId="valid" />
-		<html:hidden property="callID" styleId="callID" />
-		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
+	<form:form action="pedagogicalPlanner/saveOrUpdatePedagogicalPlannerForm.do" modelAttribute="pedagogicalPlannerForm" id="pedagogicalPlannerForm" method="post">
+		<%@ include file="/common/messages.jsp"%>
+		<form:hidden path="toolContentID" id="toolContentID" />
+		<form:hidden path="valid" id="valid" />
+		<form:hidden path="callID" id="callID" />
+		<form:hidden path="activityOrderNumber" id="activityOrderNumber" />
 		
 		<table id="questionTable" cellpadding="0" cellspacing="0">
-			<c:forEach var="questionIndex"  begin="1" end="${formBean.questionCount}">
+			<c:forEach var="questionIndex"  begin="1" end="${pedagogicalPlannerForm.questionCount}">
 				<tr>
 					<td class="FCKcell">
 						<lams:CKEditor id="question[${questionIndex-1}]"
-							value="${formBean.questionList[questionIndex-1]}"
-							contentFolderID="${formBean.contentFolderID}"
+							value="${pedagogicalPlannerForm.questionList[questionIndex-1]}"
+							contentFolderID="${pedagogicalPlannerForm.contentFolderID}"
 		 	   	            toolbarSet="CustomPedplanner" height="150px"
 		  	              width="${param.plannerCKEditorShortWidth}" displayExpanded="false">
 						</lams:CKEditor>
@@ -93,7 +92,7 @@
 				</tr>
 			</c:forEach>
 		</table>
-	</html:form>
+	</form:form>
 	<a class="button" href="javascript:createQuestion();"><fmt:message key="label.add.new.question" /></a>
 </body>
 </lams:html>

@@ -23,7 +23,7 @@
 	
 	<script type="text/JavaScript">
 	  function submitMethod(actionMethod) {
-		   var form = document.QaAuthoringForm;
+		   var form = document.forms.QaAuthoringForm;
 		   if (!form.dispatch) {
 		    form = form[0];
 		   }
@@ -32,7 +32,7 @@
 		  }
 		  
 		  function submitModifyAuthoringQuestion(questionIndexValue, actionMethod) {
-		   var form = document.QaAuthoringForm;
+		   var form = document.forms.QaAuthoringForm;
 		   if (!form.questionIndex) {
 		    form = form[0];
 		   }
@@ -46,16 +46,14 @@
 </lams:head>
 
 <body class="stripes">
-<html:form action="/authoring?validate=false" styleId="authoringForm" method="POST" enctype="multipart/form-data">
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<c:set var="sessionMap" value="${sessionScope[formBean.httpSessionID]}" />
+<form:form action="submitAllContent.do" modelAttribute="authoringForm" method="POST" id="authoringForm">
+	<c:set var="sessionMap" value="${sessionScope[authoringForm.httpSessionID]}" />
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
-	<html:hidden property="mode" value="${mode}" />
-	<html:hidden property="dispatch" value="submitAllContent" />
-	<html:hidden property="toolContentID" />
-	<html:hidden property="contentFolderID" />
-	<html:hidden property="httpSessionID"/>		
+	<form:hidden path="mode" value="${mode}" />
+	<form:hidden path="toolContentID" />
+	<form:hidden path="contentFolderID" />
+	<form:hidden path="httpSessionID"/>		
 	
 <lams:Page title="${title}" type="navbar">
 	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= QaAppConstants.MY_SIGNATURE %>" helpModule="authoring">
@@ -65,14 +63,15 @@
 	</lams:Tabs>
 
 	<lams:TabBodyArea>
-		<logic:messagesPresent>
-			<lams:Alert id="errors" type="danger" close="true">
-			        <html:messages id="error">
-			            <c:out value="${error}" escapeXml="false"/><br/>
-			        </html:messages>
-			</lams:Alert>
-		</logic:messagesPresent>
-		
+		 <c:set var="errorKey" value="GLOBAL" /> 
+		 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+		     <lams:Alert id="error" type="danger" close="false"> 
+		         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+		             <c:out value="${error}" /><br /> 
+		         </c:forEach> 
+		     </lams:Alert> 
+		</c:if>
+				
 		<lams:TabBodys>
 			<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
 			<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
@@ -86,13 +85,13 @@
 			defineLater="${mode == 'teacher'}"
 			cancelButtonLabelKey="label.cancel"
 			saveButtonLabelKey="label.save"
-			toolContentID="${formBean.toolContentID}"
-			contentFolderID="${formBean.contentFolderID}" />
+			toolContentID="${authoringForm.toolContentID}"
+			contentFolderID="${authoringForm.contentFolderID}" />
 	</lams:TabBodyArea>
 	
 	<div id="footer"></div>
 	
 </lams:Page>
-</html:form>
+</form:form>
 </body>
 </lams:html>

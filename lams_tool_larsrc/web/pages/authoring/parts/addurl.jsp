@@ -32,7 +32,7 @@
 			});
 
 		</script>
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
+		<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/rsrcresourceitem.js"></script>
 	</lams:head>
 	<body>
 
@@ -45,30 +45,30 @@
 
 			<%@ include file="/common/messages.jsp"%>
 	
-			<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="resourceItemForm">
-				<html:hidden property="sessionMapID" />
+			<form:form action="saveOrUpdateItem.do" method="post" modelAttribute="resourceItemForm" id="resourceItemForm">
+				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="instructionList" id="instructionList" />
 				<input type="hidden" name="itemType" id="itemType" value="1" />
-				<html:hidden property="itemIndex" />
+				<form:hidden path="itemIndex" />
 
 				<div class="form-group">
 			    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
-					<html:text property="title" styleId="title" styleClass="form-control" />
+					<form:input path="title" id="title" cssClass="form-control" />
 			  	</div>	
 			  
 				<div class="form-group">
 					<label for="url"><fmt:message key="label.authoring.basic.resource.url.input" /></label>:
-					<html:text styleId="url" property="url"  styleClass="form-control"/>
+					<form:input id="url" path="url"  cssClass="form-control"/>
 					<br/>
 					
-					<html:checkbox property="openUrlNewWindow" styleId="openUrlNewWindow" styleClass="loffset5"/>
+					<form:checkbox path="openUrlNewWindow" id="openUrlNewWindow" cssClass="loffset5"/>
 					&nbsp;<label for="openUrlNewWindow"><fmt:message key="open.in.new.window" /></label>
 					<br/>
 					
 					<%@ include file="ratings.jsp"%>	
 				</div>
 
-			</html:form>
+			</form:form>
 
 			<!-- Instructions -->
 			<%@ include file="instructions.jsp"%>
