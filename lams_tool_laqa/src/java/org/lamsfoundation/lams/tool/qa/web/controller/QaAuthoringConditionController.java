@@ -23,8 +23,10 @@
 package org.lamsfoundation.lams.tool.qa.web.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -334,8 +336,7 @@ public class QaAuthoringConditionController {
 	List<QaQuestionDTO> questions = getQuestionList(sessionMap);
 
 	// Initialise the LabelValueBeans in the possibleOptions array.
-	LabelValueBean[] lvBeans = new LabelValueBean[questions.size()];
-
+	Map<String, String> possibleItems = new HashMap<>(questions.size());
 	int i = 0;
 	for (QaQuestionDTO question : questions) {
 	    String nonHTMLQuestion = question.getQuestion();
@@ -347,9 +348,9 @@ public class QaAuthoringConditionController {
 		    nonHTMLQuestion = nonHTMLQuestion.substring(0, QaAppConstants.QUESTION_CUTOFF_INDEX) + "...";
 		}
 	    }
-	    lvBeans[i++] = new LabelValueBean(nonHTMLQuestion, new Integer(question.getDisplayOrder()).toString());
+	    possibleItems.put(nonHTMLQuestion, new Integer(question.getDisplayOrder()).toString());
 	}
-	QaConditionForm.setPossibleItems(lvBeans);
+	QaConditionForm.setPossibleItems(possibleItems);
     }
 
     /**

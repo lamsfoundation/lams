@@ -360,7 +360,7 @@ public class AuthoringController {
      *
      */
     @RequestMapping(value = "/start")
-    private String start(@ModelAttribute ResourceForm startForm, HttpServletRequest request) throws ServletException {
+    private String start(@ModelAttribute("startForm") ResourceForm startForm, HttpServletRequest request) throws ServletException {
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
@@ -438,12 +438,11 @@ public class AuthoringController {
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, startForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-	request.setAttribute("startForm", startForm);
 	return "pages/authoring/start";
     }
 
     @RequestMapping("/definelater")
-    private String defineLater(@ModelAttribute ResourceForm startForm, HttpServletRequest request)
+    private String defineLater(@ModelAttribute("startForm") ResourceForm startForm, HttpServletRequest request)
 	    throws ServletException {
 
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -544,7 +543,7 @@ public class AuthoringController {
      */
 
     @RequestMapping("/init")
-    private String initPage(@ModelAttribute ResourceForm startForm, HttpServletRequest request)
+    private String initPage(@ModelAttribute("startForm") ResourceForm startForm, HttpServletRequest request)
 	    throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -576,7 +575,7 @@ public class AuthoringController {
      * @throws ServletException
      */
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    private String updateContent(@ModelAttribute ResourceForm authoringForm, HttpServletRequest request)
+    private String updateContent(@ModelAttribute("authoringForm") ResourceForm authoringForm, HttpServletRequest request)
 	    throws Exception {
 
 	// get back sessionMAP
@@ -689,7 +688,6 @@ public class AuthoringController {
 	authoringForm.setResource(resourcePO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	request.setAttribute("authoringForm", authoringForm);
 
 	return "pages/authoring/authoring";
     }
