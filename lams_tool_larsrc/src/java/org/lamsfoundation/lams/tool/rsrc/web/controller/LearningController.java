@@ -58,6 +58,8 @@ import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -558,28 +560,6 @@ public class LearningController {
      * @return
      */
 
-//    private ActionForward findForward(short type, ActionMapping mapping) {
-//	ActionForward forward;
-//	switch (type) {
-//	    case ResourceConstants.RESOURCE_TYPE_URL:
-//		forward = mapping.findForward("url");
-//		break;
-//	    case ResourceConstants.RESOURCE_TYPE_FILE:
-//		forward = mapping.findForward("file");
-//		break;
-//	    case ResourceConstants.RESOURCE_TYPE_WEBSITE:
-//		forward = mapping.findForward("website");
-//		break;
-//	    case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-//		forward = mapping.findForward("learningobject");
-//		break;
-//	    default:
-//		forward = null;
-//		break;
-//	}
-//	return forward;
-//    }
-
     private ResourceUser getCurrentUser(IResourceService service, Long sessionId) {
 	// try to get form system session
 	HttpSession ss = SessionManager.getSession();
@@ -639,7 +619,10 @@ public class LearningController {
 	    }
 
 	    // validate item size
-	    FileValidatorSpringUtil.validateFileSize(resourceItemForm.getFile(), false);
+	    if (!FileValidatorSpringUtil.validateFileSize(resourceItemForm.getFile(), false)) {
+		errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
+			new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
+	    }
 
 	    // for edit validate: file already exist
 	    if (!resourceItemForm.isHasFile() && ((resourceItemForm.getFile() == null)

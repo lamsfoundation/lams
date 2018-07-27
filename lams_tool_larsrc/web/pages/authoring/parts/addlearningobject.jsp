@@ -85,7 +85,7 @@
 
 				<div class="form-group">
 					<!-- <label for="file"><fmt:message key="label.authoring.basic.resource.zip.file.input" /></label> -->
-					<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+					<c:set var="itemAttachment" value="${resourceItemForm}" />
 					<span id="itemAttachmentArea">
 					<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
 					</span>

@@ -64,7 +64,7 @@
 </div>
 
 <div class="form-inline">
-	<a href="javascript:showMessage('<lams:WebAppURL/>authoring/newQuestionBox.do?contentFolderID=${newQuestionForm.contentFolderID}&httpSessionID=${newQuestionForm.httpSessionID}&toolContentID=${newQuestionForm.toolContentID}&usernameVisible=${newQuestionForm.usernameVisible}&showOtherAnswers=${newQuestionForm.showOtherAnswers}&lockWhenFinished=${newQuestionForm.lockWhenFinished}&questionsSequenced=${newQuestionForm.questionsSequenced}');"
+	<a href="javascript:showMessage('<lams:WebAppURL/>authoring/newQuestionBox.do?contentFolderID=${authoringForm.contentFolderID}&httpSessionID=${authoringForm.httpSessionID}&toolContentID=${authoringForm.toolContentID}&usernameVisible=${authoringForm.usernameVisible}&showOtherAnswers=${authoringForm.showOtherAnswers}&lockWhenFinished=${authoringForm.lockWhenFinished}&questionsSequenced=${authoringForm.questionsSequenced}');"
 		id="addTopic" class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.add.new.question" /> 
 	</a>
 </div>

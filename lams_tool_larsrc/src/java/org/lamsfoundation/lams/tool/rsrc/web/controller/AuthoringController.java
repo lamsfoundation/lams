@@ -64,6 +64,8 @@ import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourcePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -112,7 +114,7 @@ public class AuthoringController {
      */
     @RequestMapping("/removeItemAttachment")
     private String removeItemAttachment(HttpServletRequest request) {
-	request.setAttribute("itemAttachment", null);
+	request.setAttribute("resourceItemForm", null);
 	return "pages/authoring/parts/itemattachment";
     }
 
@@ -976,8 +978,12 @@ public class AuthoringController {
 		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
 	    // validate item size
-	    boolean fileSizeValid = FileValidatorSpringUtil.validateFileSize(resourceItemForm.getFile().getSize(),
-		    false);
+	    if(!FileValidatorSpringUtil.validateFileSize(resourceItemForm.getFile().getSize(),
+		    false)) {
+		errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
+			    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
+	    }
+	    
 	    // for edit validate: file already exist
 	    if (!resourceItemForm.isHasFile() && (resourceItemForm.getFile() == null
 		    || StringUtils.isEmpty(resourceItemForm.getFile().getOriginalFilename()))) {
