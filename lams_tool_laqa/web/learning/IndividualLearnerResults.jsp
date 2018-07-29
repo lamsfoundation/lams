@@ -123,17 +123,17 @@
 
 			<div class="voffset10">
 				<c:if test="${!generalLearnerFlowDTO.noReeditAllowed}">
-					<form:button path="redoQuestions" cssClass="btn btn-default pull-left"
+					<button name="redoQuestions" class="btn btn-default pull-left"
 						onclick="submitMethod('redoQuestions');">
 						<fmt:message key="label.redo" />
-					</form:button>
+					</button>
 				</c:if>
 
 				<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
-					<form:button path="viewAllResults" onclick="submitMethod('storeAllResults');"
-						cssClass="btn btn-default pull-right">
+					<button name="viewAllResults" onclick="submitMethod('storeAllResults');"
+						class="btn btn-default pull-right">
 						<fmt:message key="label.allResponses" />
-					</form:button>
+					</button>
 				</c:if>
 
 				<c:if test="${!generalLearnerFlowDTO.showOtherAnswers}">
@@ -155,10 +155,10 @@
 					</c:if>
 
 					<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
-						<form:button path="forwardtoReflection" onclick="javascript:submitMethod('storeAllResults');"
-							cssClass="btn btn-primary pull-right">
+						<button name="forwardtoReflection" onclick="javascript:submitMethod('storeAllResults');"
+							class="btn btn-primary pull-right">
 							<fmt:message key="label.continue" />
-						</form:button>
+						</button>
 					</c:if>
 				</c:if>
 

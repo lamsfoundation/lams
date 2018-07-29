@@ -7,7 +7,10 @@
 	</div>
 
 	<div class="panel-body">	
-	
+	 <%-- For some reason Spring MVC consumes this first form and only renders the second one.
+	   If this redundant form is removed, the other one would be consumed, so this one needs to stay --%>
+	 <form:form modelAttribute="QaConditionForm">
+	 </form:form>
 		<!-- Basic Info Form-->
 		<form:form action="../authoringConditions/saveOrUpdateCondition.do" method="post" modelAttribute="QaConditionForm" id="QaConditionForm" >
 			<%@ include file="/common/messages.jsp"%>
@@ -25,8 +28,8 @@
 			<c:forEach var="itemE" items="${QaConditionForm.possibleItems}">
 				<div class="checkbox">
 					<label>
-						<form:checkbox path="selectedItems" value="${itemE.key}"/>
-						<c:out value="${itemE.value}"/>
+						<form:checkbox path="selectedItems" value="${itemE.value}"/>
+						<c:out value="${itemE.key}"/>
 					</label>
 				</div>
 			</c:forEach>

@@ -23,7 +23,7 @@
 	<lams:css suffix="jquery.jRating"/>
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css"> 
-	<link type="text/css" rel="stylesheet" href="<lams:WebAppURL/>includes/css/qalearning.css">
+	<link type="text/css" rel="stylesheet" href="${tool}ncludes/css/qalearning.css">
 	<style media="screen,projection" type="text/css">
 		.rating-stars-div {
 			padding-top: 12px;

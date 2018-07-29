@@ -445,16 +445,16 @@
 				<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
 
 					<div class="right-buttons voffset5" align="right" id="learner-submit">
-						<form:button path="refreshAnswers" cssClass="btn btn-default voffset5 roffset5 pull-left"
+						<button name="refreshAnswers" class="btn btn-default voffset5 roffset5 pull-left"
 							onclick="submitMethod('refreshAllResults');">
 							<fmt:message key="label.refresh" />
-						</form:button>
+						</button>
 
 						<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
-							<form:button path="redoQuestions" cssClass="btn btn-default voffset5  pull-left"
+							<button name="redoQuestions" class="btn btn-default voffset5  pull-left"
 								onclick="submitMethod('redoQuestions');">
 								<fmt:message key="label.redo" />
-							</form:button>
+							</button>
 						</c:if>
 
 
@@ -473,10 +473,10 @@
 						</c:if>
 
 						<c:if test="${(generalLearnerFlowDTO.reflection == 'true') && hasEditRight}">
-							<form:button property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
-								cssClass="btn btn-default">
+							<button name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
+								class="btn btn-default">
 								<fmt:message key="label.continue" />
-							</form:button>
+							</button>
 						</c:if>
 					</div>
 				</c:if>

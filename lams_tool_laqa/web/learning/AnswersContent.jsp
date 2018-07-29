@@ -105,7 +105,7 @@
 			
 	        $.ajax({
 	        	async: false,
-	            url: '<c:url value="/learning.do"/>',
+	            url: '<c:url value="../learning.do"/>',
 	            data: 'method=checkLeaderProgress&toolSessionID=' + $("#tool-session-id").val(),
 	            dataType: 'json',
 	            type: 'post',
@@ -134,7 +134,7 @@
 					
 					//ajax form submit
 					$('#learningForm').ajaxSubmit({
-						url: "<c:url value='/learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
+						url: "<c:url value='learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
 			               success: function() {
 			               	$.growlUI('<i class="fa fa-lg fa-floppy-o"></i> <fmt:message key="label.learning.draft.autosaved" />');
 			               }
@@ -199,8 +199,8 @@
 <body class="stripes">
 
 	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-	<form:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self"
-		id="learningForm">
+	<form:form action="learning.do" enctype="multipart/form-data" method="POST" target="_self"
+		id="learningForm" modelAttribute="learningForm">
 
 	<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 

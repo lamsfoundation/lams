@@ -127,8 +127,8 @@ public class QaAuthoringConditionController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping(value = "/saveOrUpdateCondition", method = RequestMethod.POST)
-    private String saveOrUpdateCondition(@ModelAttribute("QaConditionForm")QaConditionForm QaConditionForm, HttpServletRequest request) {
+    @RequestMapping(value = "/saveOrUpdateCondition")
+    private String saveOrUpdateCondition(@ModelAttribute("QaConditionForm") QaConditionForm QaConditionForm, HttpServletRequest request) {
 
 	MultiValueMap<String, String> errorMap = validateQaCondition(QaConditionForm, request);
 

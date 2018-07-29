@@ -81,11 +81,11 @@
 
 <c:if test="${hasEditRight}">
 	<div class="right-buttons">
-		<form:button path="btnCombined"
+		<button name="btnCombined"
 			onclick="javascript:submitMethod('submitAnswersContent');"
-			cssClass="btn btn-default pull-right voffset5">
+			class="btn btn-default pull-right voffset5">
 			<fmt:message key="button.submitAllContent" />
-		</form:button>
+		</button>
 	</div>
 </c:if>
 

@@ -23,7 +23,7 @@
 	
 	<script type="text/JavaScript">
 	  function submitMethod(actionMethod) {
-		   var form = document.forms.QaAuthoringForm;
+		   var form = document.forms.authoringForm;
 		   if (!form.dispatch) {
 		    form = form[0];
 		   }
@@ -32,7 +32,7 @@
 		  }
 		  
 		  function submitModifyAuthoringQuestion(questionIndexValue, actionMethod) {
-		   var form = document.forms.QaAuthoringForm;
+		   var form = document.forms.authoringForm;
 		   if (!form.questionIndex) {
 		    form = form[0];
 		   }
