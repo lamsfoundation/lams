@@ -58,11 +58,15 @@ function _drawChart(type, chartID, rawData, legendOnHover) {
 					  .attr('height', 15)
 					  .attr('fill', scaleColor(d.name));
 				// label
+				var val = Math.round(+d.value);
+				if (isNaN(val)) {
+					val = 0;
+				}
 				legend.append('text')
 					  .attr('x', 20)
 					  .attr('y', index * 30 + 11)
 					  .attr('text-anchor', 'start')
-					  .text(d.name + ' (' + Math.round(+d.value) + ' %)');
+					  .text(d.name + ' (' + val + ' %)');
 			});
 		}
 		
@@ -125,8 +129,8 @@ function _drawBarChart(chartDiv, legend, width, height, rawData, domainX, scaleC
 		.attr('class', 'bar')
 		.attr("x", function(d) {return scaleX(d.name)})
 		.attr("width", scaleX.bandwidth())
-		.attr("y", function(d) {return y(d.value)})
-		.attr("height", function(d){return height - y(d.value)})
+		.attr("y", function(d) {return isNaN(d.value) ? 0 : y(d.value)})
+		.attr("height", function(d){return height - (isNaN(d.value) ? height : y(d.value))})
 		.attr('fill', function(d) {return scaleColor(d.name)})
 		.on('mouseover', function(d) {
 			if (tooltip) {
