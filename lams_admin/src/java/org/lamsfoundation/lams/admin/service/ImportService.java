@@ -588,7 +588,6 @@ public class ImportService implements IImportService {
 	user.setDisabledFlag(false);
 	user.setCreateDate(new Date());
 	user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
-	user.setTutorialsDisabled(false);
 	user.setFirstLogin(true);
 
 	return (hasError ? null : user);
@@ -814,7 +813,7 @@ public class ImportService implements IImportService {
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, userDTO != null ? userDTO.getUserID() : null, null, null,
 		null, message);
     }
-    
+
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     // ---------------------------------------------------------------------
@@ -830,7 +829,7 @@ public class ImportService implements IImportService {
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
     }
-    
+
     public void setTimezoneService(ITimezoneService timezoneService) {
 	this.timezoneService = timezoneService;
     }

@@ -169,19 +169,6 @@ h3.group4{
 	cursor: pointer;
 }
 
-a#tutorialVideoHref {
-	margin: 5px;
-	border: none;
-	color: inherit;
-	float: right;
-}
-
-a#tutorialVideoHref:hover {
-	border: none;
-	color: inherit;
-	cursor: pointer;
-}
-
 #content a.activityButton {
 	border: none;
 	text-decoration: none;

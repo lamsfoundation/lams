@@ -98,14 +98,9 @@
 			activeOrgId = <c:choose><c:when test="${empty activeOrgId}">null</c:when><c:otherwise>${activeOrgId}</c:otherwise></c:choose>;
 
 		$(document).ready(function(){
-			<%-- If it's the user's first login, display a dialog asking if tutorial videos should be shown --%>
+			<%-- If it's the user's first login, show tour --%>
 			<c:if test="${firstLogin}">
-				<c:url var="disableAllTutorialVideosUrl" value="tutorial.do">
-					<c:param name="method" value="disableAllTutorialVideos" />
-				</c:url>
-				if (!confirm("<fmt:message key='label.tutorial.disable.all' />")){
-			 		$.get("${disableAllTutorialVideosUrl}");
-				}
+				startTour();
 			</c:if>
 
 			<c:if test="${showTimezoneWarning}"> 

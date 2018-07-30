@@ -161,12 +161,6 @@ public class User implements Serializable, Comparable {
     /** persistent field */
     private Boolean changePassword;
 
-    /** persistent field */
-    private Boolean tutorialsDisabled;
-
-    /** persistent field */
-    private Set<String> pagesWithDisabledTutorials = new HashSet<String>();
-
     /** persistent field - latch */
     private Boolean firstLogin;
 
@@ -508,13 +502,9 @@ public class User implements Serializable, Comparable {
 
 	TimeZone timeZone = TimeZone.getTimeZone(getTimeZone());
 
-	Set<String> tutorialPages = (pagesWithDisabledTutorials == null) || pagesWithDisabledTutorials.isEmpty() ? null
-		: pagesWithDisabledTutorials;
-
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
 		theme != null ? new ThemeDTO(theme) : null, timeZone, authenticationMethod.getAuthenticationMethodId(),
-		fckLanguageMapping, (tutorialsDisabled == null ? false : true), // assume tutorials enabled if not set
-		tutorialPages, (firstLogin == null ? true : false), // assume no firstLogin value means they haven't logged in
+		fckLanguageMapping, (firstLogin == null || firstLogin ? true : false), // assume no firstLogin value means they haven't logged in
 		lastVisitedOrganisationId, portraitUuid);
     }
 
@@ -608,22 +598,6 @@ public class User implements Serializable, Comparable {
 
     public void setTimeZone(String timeZone) {
 	this.timeZone = timeZone;
-    }
-
-    public Boolean getTutorialsDisabled() {
-	return tutorialsDisabled;
-    }
-
-    public void setTutorialsDisabled(Boolean tutorialsDisabled) {
-	this.tutorialsDisabled = tutorialsDisabled;
-    }
-
-    public Set<String> getPagesWithDisabledTutorials() {
-	return pagesWithDisabledTutorials;
-    }
-
-    public void setPagesWithDisabledTutorials(Set<String> pagesWithDisabledTutorials) {
-	this.pagesWithDisabledTutorials = pagesWithDisabledTutorials;
     }
 
     public Boolean isFirstLogin() {

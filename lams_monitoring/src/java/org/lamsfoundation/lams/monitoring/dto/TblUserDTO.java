@@ -10,7 +10,7 @@ public class TblUserDTO extends UserDTO {
     public TblUserDTO(UserDTO userDto) {
 	super(userDto.getUserID(), userDto.getFirstName(), userDto.getLastName(), userDto.getLocaleCountry(),
 		userDto.getLocaleLanguage(), userDto.getLocaleCountry(), userDto.getDirection(), userDto.getEmail(),
-		userDto.getTheme(), userDto.getTimeZone(), null, null, null, null, null, null, userDto.getPortraitUuid());
+		userDto.getTheme(), userDto.getTimeZone(), null, null, null, null, userDto.getPortraitUuid());
     }
 
     public void setGroupLeader(boolean groupLeader) {

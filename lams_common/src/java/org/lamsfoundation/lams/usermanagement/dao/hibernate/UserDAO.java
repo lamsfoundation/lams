@@ -92,7 +92,7 @@ public class UserDAO extends LAMSBaseDAO implements IUserDAO {
 	    Long portraitUuid = element[5] != null ? ((Number) element[5]).longValue() : null;
 
 	    UserDTO userDto = new UserDTO(userId, firstName, lastName, login, null, null, null, email, null, null, null,
-		    null, true, null, false, null, portraitUuid);
+		    null, false, null, portraitUuid);
 
 	    userDtos.add(userDto);
 	}

@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.usermanagement.service;
 
 import java.io.IOException;
@@ -68,7 +67,7 @@ public class LdapService implements ILdapService {
     private Logger log = Logger.getLogger(LdapService.class);
 
     private IUserManagementService service;
-    
+
     private ITimezoneService timezoneService;
 
     private static final int BULK_UPDATE_CREATED = 0;
@@ -155,10 +154,9 @@ public class LdapService implements ILdapService {
 		user.setCreateDate(new Date());
 		user.setLocale(getLocale(map.get("locale")));
 		user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
-		user.setTutorialsDisabled(false);
 		user.setFirstLogin(true);
 		service.saveUser(user);
-		service.logUserCreated(user, (User)null);
+		service.logUserCreated(user, (User) null);
 		return true;
 	    } else {
 		log.error("===> Login name from LDAP is empty - user not created.");
@@ -617,7 +615,7 @@ public class LdapService implements ILdapService {
 	}
 	return null;
     }
-    
+
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     // ---------------------------------------------------------------------
@@ -625,7 +623,7 @@ public class LdapService implements ILdapService {
     public void setService(IUserManagementService service) {
 	this.service = service;
     }
-    
+
     public void setTimezoneService(ITimezoneService timezoneService) {
 	this.timezoneService = timezoneService;
     }

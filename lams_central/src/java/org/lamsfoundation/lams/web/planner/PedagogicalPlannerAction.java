@@ -91,7 +91,6 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -214,9 +213,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String FIELD_NAME_FULL_DESCRIPTION = "fullDescription";
     private static final String FIELD_NAME_ANCESTOR_UID = "ancestorUid";
 
-    // Tutorial video page string for recognising which page the video was started from
-    private static final String PAGE_STRING_START_PLANNER = "StPed";
-
     // Parameters
     public static final String PARAM_REQUEST_SRC = "requestSrc";
     public static final String PARAM_FORBID_BUTTONS = "forbidButtons";
@@ -233,14 +229,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      */
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
-	// First we check if a tutorial video should be displayed
-	HttpSession session = SessionManager.getSession();
-	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
-	boolean doNotShowAgain = (userDto.getPagesWithDisabledTutorials() != null)
-		&& userDto.getPagesWithDisabledTutorials().contains(PedagogicalPlannerAction.PAGE_STRING_START_PLANNER);
-	boolean showTutorial = !(userDto.getTutorialsDisabled() || doNotShowAgain);
-	request.setAttribute(AttributeNames.ATTR_SHOW_TUTORIAL, showTutorial);
 
 	// process requestSrc and notifyCloseURL parameters (if any)
 	String requestSrc = request.getParameter(PedagogicalPlannerAction.PARAM_REQUEST_SRC);
@@ -794,14 +782,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	dto.setImportNode(importNode);
 	dto.setTitlePath(titlePath);
 	request.setAttribute(CentralConstants.ATTR_NODE, dto);
-
-	// Set doNotShowAgain parameter
-	HttpSession session = SessionManager.getSession();
-	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
-	boolean doNotShowAgain = (userDto.getPagesWithDisabledTutorials() != null)
-		&& userDto.getPagesWithDisabledTutorials().contains(PedagogicalPlannerAction.PAGE_STRING_START_PLANNER);
-	request.setAttribute(AttributeNames.ATTR_DO_NOT_SHOW_AGAIN, doNotShowAgain);
-	request.setAttribute(AttributeNames.ATTR_PAGE_STR, PedagogicalPlannerAction.PAGE_STRING_START_PLANNER);
 
 	if (edit) {
 	    // If we are in edit mode, the node form is displayed, requiring additional parameters
