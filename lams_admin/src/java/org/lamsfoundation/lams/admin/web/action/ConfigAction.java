@@ -22,6 +22,9 @@
  */
 package org.lamsfoundation.lams.admin.web.action;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -75,6 +78,11 @@ public class ConfigAction extends LamsDispatchAction {
 
 	request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
 	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
+	Map<String, String> smtpAuthTypes = new LinkedHashMap<String, String>();
+	smtpAuthTypes.put("none", "None");
+	smtpAuthTypes.put("starttls", "STARTTLS");
+	smtpAuthTypes.put("ssl", "SSL");
+	request.setAttribute("smtpAuthTypes", smtpAuthTypes);
 
 	return mapping.findForward("config");
     }

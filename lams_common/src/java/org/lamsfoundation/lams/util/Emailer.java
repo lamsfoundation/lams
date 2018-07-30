@@ -58,17 +58,26 @@ public class Emailer {
      */
     public static Session getMailSession() {
 	String smtpServer = Configuration.get(ConfigurationKeys.SMTP_SERVER);
+	String smtpPort = Configuration.get(ConfigurationKeys.SMTP_PORT);
 	Properties properties = new Properties();
 	properties.put("mail.smtp.host", smtpServer);
+	properties.put("mail.smtp.port", smtpPort);
 
 	String smtpAuthUser = Configuration.get(ConfigurationKeys.SMTP_AUTH_USER);
 	String smtpAuthPass = Configuration.get(ConfigurationKeys.SMTP_AUTH_PASSWORD);
+	String smtpAuthSecurity = Configuration.get(ConfigurationKeys.SMTP_AUTH_SECURITY);
 	Session session = null;
 	if (StringUtils.isBlank(smtpAuthUser)) {
 	    session = Session.getInstance(properties);
 	} else {
 	    properties.setProperty("mail.smtp.submitter", smtpAuthUser);
 	    properties.setProperty("mail.smtp.auth", "true");
+
+	    if (smtpAuthSecurity.equals("starttls")) {
+		properties.put("mail.smtp.starttls.enable", "true");
+	    } else if (smtpAuthSecurity.equals("ssl")) {
+		properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+	    }
 	    SMTPAuthenticator auth = new SMTPAuthenticator(smtpAuthUser, smtpAuthPass);
 	    session = Session.getInstance(properties, auth);
 	}
@@ -153,7 +162,6 @@ public class Emailer {
 	    message.setContent(mp);
 
 	}
-
 	Transport.send(message);
     }
 }

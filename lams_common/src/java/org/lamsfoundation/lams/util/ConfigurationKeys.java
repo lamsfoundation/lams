@@ -47,6 +47,8 @@ public class ConfigurationKeys {
     public static String LAMS_EAR_DIR = "EARDir";
 
     public static String SMTP_SERVER = "SMTPServer";
+    
+    public static String SMTP_PORT = "SMTPPort";
 
     public static String LAMS_ADMIN_EMAIL = "LamsSupportEmail";
 
@@ -217,6 +219,8 @@ public class ConfigurationKeys {
     public static String SMTP_AUTH_USER = "SMTPUser";
 
     public static String SMTP_AUTH_PASSWORD = "SMTPPassword";
+    
+    public static String SMTP_AUTH_SECURITY = "SMTPAuthSecurity";
 
     public static String PROFILE_EDIT_ENABLE = "ProfileEditEnable";
 
