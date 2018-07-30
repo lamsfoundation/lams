@@ -82,7 +82,7 @@ public class IndexAction extends LamsDispatchAction {
 	setHeaderLinks(request);
 	setAdminLinks(request);
 
-	// check if this is user's first login; some action (like displaying a dialog for disabling tutorials) can be
+	// check if this is user's first login; some action (like displaying a tour) can be
 	// taken based on that parameter; immediatelly, the value in DB is updated
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);

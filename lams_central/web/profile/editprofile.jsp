@@ -209,23 +209,6 @@
 								</div>
 
 								<div class="form-group">
-									<label><fmt:message key="label.tutorial.enabled" />:</label>
-									<!-- For users' comfort we write it as a positive sentece - "should the tutorials be enabled"?
-			 But for simplicity of coding, we keep it as a negative value - "should the tutorials be disabled?"
-			 This is the reason to mix true/false and yes/no answers.
-		-->
-									<html:select property="tutorialsDisabled"
-										disabled="${!profileEditEnabled}" styleClass="form-control">
-										<html:option value="false">
-											<fmt:message key="label.yes" />
-										</html:option>
-										<html:option value="true">
-											<fmt:message key="label.no" />
-										</html:option>
-									</html:select>
-								</div>
-
-								<div class="form-group">
 									<label><fmt:message key="label.theme" />:</label>
 									<html:select property="userTheme" disabled="${!profileEditEnabled}" styleClass="form-control">
 										<c:forEach items="${themes}" var="theme">
@@ -386,24 +369,6 @@
 									</c:set>
 									${timeZone}
 								</div>
-								<div class="form-group">
-									<label><fmt:message key="label.tutorial.enabled" />:<bean:write
-											name="UserForm" property="tutorialsDisabled" /></label>
-									<!-- For users' comfort we write it as a positive sentece - "should the tutorials be enabled"?
-			 But for simplicity of coding, we keep it as a negative value - "should the tutorials be disabled?"
-			 This is the reason to mix true/false and yes/no answers.
-		-->
-									<html:select property="tutorialsDisabled"
-										disabled="${!profileEditEnabled}" styleClass="form-control">
-										<html:option value="false">
-											<fmt:message key="label.yes" />
-										</html:option>
-										<html:option value="true">
-											<fmt:message key="label.no" />
-										</html:option>
-									</html:select>
-								</div>
-
 							</c:if>
 
 						</div>

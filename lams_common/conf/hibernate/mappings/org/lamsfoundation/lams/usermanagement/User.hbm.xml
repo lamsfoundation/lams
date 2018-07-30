@@ -362,15 +362,6 @@
 			</meta>
 		</property>
 
-		<property name="tutorialsDisabled" type="java.lang.Boolean"
-			column="tutorials_disabled" length="1">
-			<meta attribute="field-description">
-				@hibernate.property
-				column="tutorials_disabled"
-				length="1"
-			</meta>
-		</property>
-
 		<property name="firstLogin" type="java.lang.Boolean" column="first_login"
 			length="1">
 			<meta attribute="field-description">
@@ -387,14 +378,6 @@
 			<key column="user_id"></key>
 
 			<element column="learning_design_id" type="long" not-null="true" />
-		</set>
-
-		<set name="pagesWithDisabledTutorials" lazy="false"
-			table="lams_user_disabled_tutorials" cascade="all-delete-orphan">
-			<key>
-				<column name="user_id" />
-			</key>
-			<element column="page_str" type="string" length="5" not-null="true" />
 		</set>
 
 		<property name="modifiedDate" type="java.sql.Timestamp"

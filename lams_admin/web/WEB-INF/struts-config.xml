@@ -79,7 +79,6 @@
 	<form-property name="fax" type="java.lang.String" />
 	<form-property name="email" type="java.lang.String" />
 	<form-property name="localeId" type="java.lang.Integer" />
-	<form-property name="tutorialsDisabled" type="java.lang.Boolean" initial="false" />
 	<form-property name="firstLogin" type="java.lang.Boolean" initial="true" />
 	<form-property name="timeZone" type="java.lang.String" />
 	<form-property name="userTheme" type="java.lang.Long" />
