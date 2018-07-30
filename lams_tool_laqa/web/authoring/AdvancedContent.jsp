@@ -7,16 +7,16 @@
 	$(document).ready(function() {
 		
 		$("#useSelectLeaderToolOuput").click(function() {
-			if (document.forms.QaAuthoringForm.useSelectLeaderToolOuput.checked) {
+			if (document.forms.authoringForm.useSelectLeaderToolOuput.checked) {
 				//uncheck checkboxes
-				document.forms.QaAuthoringForm.showOtherAnswers.checked = false;
+				document.forms.authoringForm.showOtherAnswers.checked = false;
 				//disable checkboxes
-				document.forms.QaAuthoringForm.showOtherAnswers.disabled = true;
+				document.forms.authoringForm.showOtherAnswers.disabled = true;
 				
 				$("#show-other-answers-options").hide('slow');
 			} else {
 				//enable checkboxes
-				document.forms.QaAuthoringForm.showOtherAnswers.disabled = false;
+				document.forms.authoringForm.showOtherAnswers.disabled = false;
 			}	
 		});
 		

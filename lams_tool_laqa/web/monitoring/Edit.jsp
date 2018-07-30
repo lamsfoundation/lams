@@ -23,8 +23,8 @@
 
 <c:url value="/authoring/authoring.do" var="authoringUrl">
 	<c:param name="mode" value="teacher" />
-	<c:param name="toolContentID" value="${authoringForm.toolContentID}" />
-	<c:param name="contentFolderID" value="${authoringForm.contentFolderID}" />
+	<c:param name="toolContentID" value="${qaMonitoringForm.toolContentID}" />
+	<c:param name="contentFolderID" value="${qaMonitoringForm.contentFolderID}" />
 </c:url>
 <a href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
 	<fmt:message key="label.edit" />

@@ -68,6 +68,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
@@ -98,8 +99,8 @@ public class QaMonitoringController implements QaAppConstants {
     }
 
     @RequestMapping("/monitoring")
-    private String execute(QaMonitoringForm qaMonitoringForm, HttpServletRequest request)
-	    throws IOException, ServletException, QaApplicationException {
+    private String execute(@ModelAttribute("qaMonitoringForm") QaMonitoringForm qaMonitoringForm,
+	    HttpServletRequest request) throws IOException, ServletException, QaApplicationException {
 	QaUtils.cleanUpSessionAbsolute(request);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
@@ -220,8 +221,8 @@ public class QaMonitoringController implements QaAppConstants {
      * @return ActionForward
      * @throws ServletException
      */
-    protected String validateParameters(HttpServletRequest request, QaMonitoringForm qaMonitoringForm)
-	    throws ServletException {
+    protected String validateParameters(HttpServletRequest request,
+	    @ModelAttribute("qaMonitoringForm") QaMonitoringForm qaMonitoringForm) throws ServletException {
 
 	String strToolContentId = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 

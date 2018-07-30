@@ -65,7 +65,7 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
  *
  */
 @Controller
-@RequestMapping("/laqa11admin")
+@RequestMapping("/admin")
 public class QaAdminController {
 
     private static Logger logger = Logger.getLogger(QaAdminController.class.getName());
@@ -85,7 +85,7 @@ public class QaAdminController {
     /**
      * Sets up the admin page
      */
-    @RequestMapping("/")
+    @RequestMapping("/admin")
     public String unspecified(QaAdminForm adminForm, HttpServletRequest request) {
 
 	QaConfigItem enableQaWizard = qaService.getConfigItem(QaConfigItem.KEY_ENABLE_QAWIZARD);

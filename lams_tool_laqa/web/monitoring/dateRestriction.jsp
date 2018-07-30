@@ -25,7 +25,7 @@
 		}
 		
 		$.ajax({
-			url : '<c:url value="/monitoring.do?dispatch=setShowOtherAnswersAfterDeadline"/>',
+			url : '<c:url value="setShowOtherAnswersAfterDeadline.do"/>',
 			async: false,
 			data: {
 				toolContentID:'${content.qaContentId}',

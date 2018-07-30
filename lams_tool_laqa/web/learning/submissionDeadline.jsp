@@ -15,8 +15,8 @@
 			if (actionMethod == 'endLearning') {
 				document.getElementById("finishButton").disabled = true;
 			}
-			document.QaLearningForm.method.value = actionMethod;
-			document.QaLearningForm.submit();
+			document.forms.form.action = actionMethod+".do";
+			document.forms.form.submit();
 		}
 
 		function submitMethod(actionMethod) {
@@ -32,8 +32,7 @@
 
 	<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
-		<form:form action="/learning.do" method="POST" modelAttribute="form" id="form">
-			<form:hidden property="method" />
+		<form:form action="learning.do" method="POST" modelAttribute="form" id="form">
 			<form:hidden property="toolSessionID" />
 			<form:hidden property="userID" />
 			<form:hidden property="httpSessionID" />
@@ -66,7 +65,7 @@
 				</c:if>
 
 				<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
-					<button name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
+					<button name="forwardtoReflection" type="button" onclick="javascript:submitMethod('forwardtoReflection');"
 						class="btn btn-primary pull-right">
 						<fmt:message key="label.continue" />
 					</button>

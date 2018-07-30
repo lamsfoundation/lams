@@ -76,7 +76,7 @@
 			$(".tablesorter").each(function() {
 				$(this).tablesorterPager({	
 					savePages: false,
-					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&isAllowRateAnswers=${qaContent.allowRateAnswers}&isAllowRichEditor=${qaContent.allowRichEditor}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $("#toolSessionID").val() + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
+					ajaxUrl : "<c:url value='getResponses.do'/>?{page}&size={size}&{sortList:column}&isAllowRateAnswers=${qaContent.allowRateAnswers}&isAllowRichEditor=${qaContent.allowRichEditor}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $("#toolSessionID").val() + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
 					ajaxProcessing: function (data) {
 				    	if (data && data.hasOwnProperty('rows')) {
 				    		var rows = [],
@@ -234,8 +234,8 @@
 	
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.QaLearningForm.method.value=actionMethod; 
-			document.QaLearningForm.submit();
+			document.learningForm.action=actionMethod+".do"; 
+			document.learningForm.submit();
 		}
 	</script>
 </lams:head>
@@ -351,7 +351,7 @@
 		<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' 
 				&& (generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
 			<div style="overflow: hidden;">
-				<button name="redoQuestions" class="btn btn-default pull-left"
+				<button name="redoQuestions" type="button" class="btn btn-default pull-left"
 					onclick="submitMethod('redoQuestions');">
 					<fmt:message key="label.redo" />
 				</button>
@@ -427,14 +427,14 @@
 						</div>
 						<div class="panel-body">
 							<div class="reflectionInstructions">
-								<lams:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
+								<lams:out value="${learningForm.reflectionSubject}" escapeHtml="true" />
 							</div>
 							<div class="panel">
-								<lams:out value="${QaLearningForm.entryText}" escapeHtml="true" />
+								<lams:out value="${learningForm.entryText}" escapeHtml="true" />
 							</div>
 
 							<c:if test="${hasEditRight}">
-								<button name="forwardtoReflection" class="btn btn-default pull-left"
+								<button name="forwardtoReflection" type="button" class="btn btn-default pull-left"
 									onclick="submitMethod('forwardtoReflection');">
 									<fmt:message key="label.edit" />
 								</button>
@@ -465,8 +465,7 @@
 			</div>
 		</c:if>
 
-		<form:form action="/learning.do" method="POST" target="_self">
-			<form:hidden path="method" />
+		<form:form action="learning.do" method="POST" target="_self">
 			<form:hidden path="toolSessionID" id="toolSessionID" />
 			<form:hidden path="userID" id="userID" />
 			<form:hidden path="httpSessionID" />

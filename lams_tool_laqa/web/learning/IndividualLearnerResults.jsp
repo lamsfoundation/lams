@@ -13,8 +13,8 @@
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.forms.QaLearningForm.method.value = actionMethod;
-			document.forms.QaLearningForm.submit();
+			document.forms.qaLearningForm.action = actionMethod=".do";
+			document.forms.qaLearningForm.submit();
 		}
 	</script>
 </lams:head>
@@ -22,7 +22,7 @@
 <body class="stripes">
 
 	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-	<form:form action="learning.do?validate=false" enmethod="POST" target="_self">
+	<form:form action="learning.do" method="POST" target="_self">
 
 		<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
@@ -123,14 +123,14 @@
 
 			<div class="voffset10">
 				<c:if test="${!generalLearnerFlowDTO.noReeditAllowed}">
-					<button name="redoQuestions" class="btn btn-default pull-left"
+					<button type="button" name="redoQuestions" class="btn btn-default pull-left"
 						onclick="submitMethod('redoQuestions');">
 						<fmt:message key="label.redo" />
 					</button>
 				</c:if>
 
 				<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
-					<button name="viewAllResults" onclick="submitMethod('storeAllResults');"
+					<button name="viewAllResults" type="button" onclick="submitMethod('storeAllResults');"
 						class="btn btn-default pull-right">
 						<fmt:message key="label.allResponses" />
 					</button>
@@ -139,7 +139,7 @@
 				<c:if test="${!generalLearnerFlowDTO.showOtherAnswers}">
 					<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
 						<div class="space-bottom-top align-right">
-							<button type="submit" id="finishButton" 
+							<button type="button" id="finishButton" 
 								onclick="javascript:submitMethod('storeAllResults');return false" class="btn btn-primary pull-right na">
 								<c:choose>
 									<c:when test="${sessionMap.activityPosition.last}">
@@ -155,7 +155,7 @@
 					</c:if>
 
 					<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
-						<button name="forwardtoReflection" onclick="javascript:submitMethod('storeAllResults');"
+						<button name="forwardtoReflection" type="button" onclick="javascript:submitMethod('storeAllResults');"
 							class="btn btn-primary pull-right">
 							<fmt:message key="label.continue" />
 						</button>

@@ -36,7 +36,7 @@
   		function createQuestion(){
   			prepareFormData();
   			$('#pedagogicalPlannerForm').ajaxSubmit({
-  				url: "<c:url value='/pedagogicalPlanner.do?dispatch=createPedagogicalPlannerQuestion' />",
+  				url: "<c:url value='createPedagogicalPlannerQuestion.do' />",
   				success: function(responseText){
  	  				var bodyTag = '<body';
  	  				var selectedBody = responseText.substring(responseText.search(bodyTag) + 1);

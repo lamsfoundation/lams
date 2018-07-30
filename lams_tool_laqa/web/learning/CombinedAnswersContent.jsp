@@ -82,6 +82,7 @@
 <c:if test="${hasEditRight}">
 	<div class="right-buttons">
 		<button name="btnCombined"
+			type="button"
 			onclick="javascript:submitMethod('submitAnswersContent');"
 			class="btn btn-default pull-right voffset5">
 			<fmt:message key="button.submitAllContent" />

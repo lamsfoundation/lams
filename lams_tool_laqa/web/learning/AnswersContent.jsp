@@ -93,8 +93,8 @@
 		
 		function doSubmit(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.forms.QaLearningForm.method.value=actionMethod; 
-			document.forms.QaLearningForm.submit();
+			document.forms.learningForm.action=actionMethod+".do"; 
+			document.forms.learningForm.submit();
 		}
 		
 		if (${!hasEditRight && mode != "teacher"}) {
@@ -105,8 +105,8 @@
 			
 	        $.ajax({
 	        	async: false,
-	            url: '<c:url value="../learning.do"/>',
-	            data: 'method=checkLeaderProgress&toolSessionID=' + $("#tool-session-id").val(),
+	            url: '<c:url value="checkLeaderProgress.do"/>',
+	            data: 'toolSessionID=' + $("#tool-session-id").val(),
 	            dataType: 'json',
 	            type: 'post',
 	            success: function (json) {
@@ -134,7 +134,7 @@
 					
 					//ajax form submit
 					$('#learningForm').ajaxSubmit({
-						url: "<c:url value='learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
+						url: "<c:url value='autoSaveAnswers.do?date='/>" + new Date().getTime(),
 			               success: function() {
 			               	$.growlUI('<i class="fa fa-lg fa-floppy-o"></i> <fmt:message key="label.learning.draft.autosaved" />');
 			               }
@@ -199,8 +199,8 @@
 <body class="stripes">
 
 	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-	<form:form action="learning.do" enctype="multipart/form-data" method="POST" target="_self"
-		id="learningForm" modelAttribute="learningForm">
+	<form:form action="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential' ? 'getNextQuestion.do' : 'submitAnswersContent.do'}"
+	 method="POST" target="_self" id="learningForm" modelAttribute="learningForm">
 
 	<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
@@ -228,15 +228,6 @@
 
 		<!-- End advanced settings and notices -->
 
-
-			<c:choose>
-				<c:when test="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}">
-					<form:hidden path="method" value="getNextQuestion" />
-				</c:when>
-				<c:otherwise>
-					<form:hidden path="method" value="submitAnswersContent" />
-				</c:otherwise>
-			</c:choose>
 
 			<form:hidden path="toolSessionID" id="tool-session-id" />
 			<form:hidden path="userID" />

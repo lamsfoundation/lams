@@ -11,7 +11,7 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
-<c:set var="localeLanguage"><lams:user name="localeLanguage" /></c:set>
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 
 <lams:html>
 	<lams:head>
@@ -48,7 +48,7 @@
 			lams: '${lams}',
 			submissionDeadline: '${submissionDeadline}',
 			submissionDateString: '${submissionDateString}',
-			setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?dispatch=setSubmissionDeadline"/>',
+			setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
 			toolContentID: '${content.qaContentId}',
 			messageNotification: '<fmt:message key="monitor.summary.notification" />',
 			messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
@@ -117,7 +117,7 @@
 	                cssPageDisplay: '.pagedisplay',
 	                cssPageSize: '.pagesize',
 	                cssDisabled: 'disabled',
-					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&{filterList:fcol}&isMonitoring=true&isAllowRateAnswers=${qaContent.allowRateAnswers}&isAllowRichEditor=${qaContent.allowRichEditor}&isOnlyLeadersIncluded=${qaContent.useSelectLeaderToolOuput}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $(this).attr('data-session-id') + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
+					ajaxUrl : "<c:url value='learning/learning.do'/>?getResponses&page={page}&size={size}&{sortList:column}&{filterList:fcol}&isMonitoring=true&isAllowRateAnswers=${qaContent.allowRateAnswers}&isAllowRichEditor=${qaContent.allowRichEditor}&isOnlyLeadersIncluded=${qaContent.useSelectLeaderToolOuput}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $(this).attr('data-session-id') + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
 					ajaxProcessing: function (data) {
 				    	if (data && data.hasOwnProperty('rows')) {
 				    		var rows = [],
@@ -268,9 +268,8 @@
 						
 				        $.ajax({
 				        	async: false,
-				            url: '<c:url value="/monitoring.do"/>',
+				            url: '<c:url value="updateResponse.do"/>',
 				            data: {
-				            	dispatch: "updateResponse",
 				            	responseUid: responseUid,
 				            	updatedResponse: updatedResponse
 				            },
@@ -291,8 +290,7 @@
 	  	
 		function changeResponseVisibility(linkObject, responseUid, isHideItem) {
 	        $.ajax({
-	            url: '<c:url value="/monitoring.do"/>',
-	            data: 'dispatch=updateResponseVisibility&responseUid=' + responseUid + '&isHideItem=' + isHideItem,
+	            url: '<c:url value="monitoring.do"/>?updateResponseVisibility&responseUid=' + responseUid + '&isHideItem=' + isHideItem,
 	            dataType: 'json',
 	            type: 'post',
 	            success: function (json) {
@@ -327,8 +325,8 @@
 		}
 	  	
 		function submitMonitoringMethod(actionMethod) {
-			document.QaMonitoringForm.dispatch.value=actionMethod; 
-			document.QaMonitoringForm.submit();
+			document.forms.qaMonitoringForm.action=actionMethod+".do"; 
+			document.forms.qaMonitoringForm.submit();
 		}
 		
 		function submitMethod(actionMethod) {
@@ -336,7 +334,7 @@
 		}
 
 		function submitModifyMonitoringQuestion(questionIndexValue, actionMethod) {
-			document.QaMonitoringForm.questionIndex.value=questionIndexValue; 
+			document.forms.qaMonitoringForm.questionIndex.value=questionIndexValue; 
 			submitMethod(actionMethod);
 		}
 
@@ -349,7 +347,7 @@
 </lams:head>
 <body class="stripes">
 
-<form:form action="/monitoring.do" method="POST" >
+<form:form action="monitoring.do" method="POST" modelAttribute="qaMonitoringForm" >
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
 	<form:hidden path="currentUid"/>

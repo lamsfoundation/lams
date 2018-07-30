@@ -24,10 +24,7 @@
 	<script type="text/JavaScript">
 	  function submitMethod(actionMethod) {
 		   var form = document.forms.authoringForm;
-		   if (!form.dispatch) {
-		    form = form[0];
-		   }
-		   form.dispatch.value=actionMethod; 
+		   form.action=actionMethod+".do"; 
 		   form.submit();
 		  }
 		  

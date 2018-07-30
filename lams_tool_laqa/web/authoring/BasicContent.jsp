@@ -19,7 +19,7 @@
 	}
 	
 	function removeQuestion(questionIndex){
-		document.forms.QaAuthoringForm.questionIndex.value=questionIndex;
+		document.forms.authoringForm.questionIndex.value=questionIndex;
         submitMethod('removeQuestion');
 	}
 
