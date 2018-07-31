@@ -48,7 +48,7 @@
 			lams: '${lams}',
 			submissionDeadline: '${submissionDeadline}',
 			submissionDateString: '${submissionDateString}',
-			setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
+			setSubmissionDeadlineUrl: '<c:url value="setSubmissionDeadline.do"/>',
 			toolContentID: '${content.qaContentId}',
 			messageNotification: '<fmt:message key="monitor.summary.notification" />',
 			messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
@@ -117,7 +117,7 @@
 	                cssPageDisplay: '.pagedisplay',
 	                cssPageSize: '.pagesize',
 	                cssDisabled: 'disabled',
-					ajaxUrl : "<c:url value='learning/learning.do'/>?getResponses&page={page}&size={size}&{sortList:column}&{filterList:fcol}&isMonitoring=true&isAllowRateAnswers=${qaContent.allowRateAnswers}&isAllowRichEditor=${qaContent.allowRichEditor}&isOnlyLeadersIncluded=${qaContent.useSelectLeaderToolOuput}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $(this).attr('data-session-id') + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
+					ajaxUrl : "<c:url value='../learning/getResponses.do'/>?page={page}&size={size}&{sortList:column}&{filterList:fcol}&isMonitoring=true&isAllowRateAnswers=${qaContent.allowRateAnswers}&isAllowRichEditor=${qaContent.allowRichEditor}&isOnlyLeadersIncluded=${qaContent.useSelectLeaderToolOuput}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $(this).attr('data-session-id') + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
 					ajaxProcessing: function (data) {
 				    	if (data && data.hasOwnProperty('rows')) {
 				    		var rows = [],

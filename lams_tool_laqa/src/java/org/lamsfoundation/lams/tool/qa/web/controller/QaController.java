@@ -820,6 +820,7 @@ public class QaController implements QaAppConstants {
 	    request.setAttribute(QaAppConstants.ATTR_WIZARD_ENABLED, true);
 	    request.setAttribute(QaAppConstants.ATTR_WIZARD_CATEGORIES, qaService.getWizardCategories());
 	}
+	request.setAttribute("authoringForm", newQuestionForm);
 
 	return "authoring/newQuestionBox";
     }
@@ -882,6 +883,7 @@ public class QaController implements QaAppConstants {
 	newQuestionForm.setFeedback(editableFeedback);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
+	request.setAttribute("authoringForm", newQuestionForm);
 
 	return "authoring/newQuestionBox";
     }

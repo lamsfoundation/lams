@@ -24,7 +24,7 @@
 		 			</c:if>
 				</td>
 				<td align="center" style="width:5%"><i class="fa fa-pencil"	title="<fmt:message key="label.tip.editQuestion" />"
-					onclick="javascript:showMessage('<lams:WebAppURL/>authoring/newEditableQuestionBox.do?questionIndex=${status.count}&contentFolderID=${newQuestionForm.contentFolderID}&httpSessionID=${newQuestionForm.httpSessionID}&toolContentID=${newQuestionForm.toolContentID}&usernameVisible=${newQuestionForm.usernameVisible}&lockWhenFinished=${newQuestionForm.lockWhenFinished}&questionsSequenced=${newQuestionForm.questionsSequenced}')"></i>
+					onclick="javascript:showMessage('<lams:WebAppURL/>authoring/newEditableQuestionBox.do?questionIndex=${status.count}&contentFolderID=${authoringForm.contentFolderID}&httpSessionID=${authoringForm.httpSessionID}&toolContentID=${authoringForm.toolContentID}&usernameVisible=${authoringForm.usernameVisible}&lockWhenFinished=${authoringForm.lockWhenFinished}&questionsSequenced=${authoringForm.questionsSequenced}')"></i>
 				</td>
 				<td  align="center" style="width:5%"><i class="fa fa-times"	title="<fmt:message key="label.tip.deleteQuestion" />"
 					onclick="removeQuestion(${status.count})"></i>

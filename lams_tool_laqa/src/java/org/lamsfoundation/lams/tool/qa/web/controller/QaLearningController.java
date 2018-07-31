@@ -475,7 +475,7 @@ public class QaLearningController implements QaAppConstants {
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (qaQueUsr.isResponseFinalized()) {
-	    String redirectURL = "redirect:/learning/learningStarter.do";
+	    String redirectURL = "redirect:/learning/learning.do";
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.PARAM_TOOL_SESSION_ID,
 		    toolSessionID.toString());
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, QaAppConstants.MODE, "learner");
@@ -567,7 +567,7 @@ public class QaLearningController implements QaAppConstants {
 	if (errorMap.isEmpty() && qaContent.isNotifyTeachersOnResponseSubmit()) {
 	    qaService.notifyTeachersOnResponseSubmit(new Long(toolSessionID));
 	}
-
+	request.setAttribute("learningForm", qaLearningForm);
 	return "learning/AnswersContent";
     }
 
