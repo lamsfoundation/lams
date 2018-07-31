@@ -29,6 +29,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$module->version  = 2016010910;    // If version == 0 then module will not be installed
-$module->requires = 2012120300;  // Requires this Moodle version
-$module->cron     = 0;           // Period for cron to check this module (secs)
+$plugin->version  = 2017022010;    // If version == 0 then module will not be installed
+$plugin->requires = 2015111000;  // Requires this Moodle version
+$plugin->component = 'mod_lamslesson';      // Full name of the plugin (used for diagnostics)
+$plugin->cron     = 0;           // Period for cron to check this module (secs)
+
