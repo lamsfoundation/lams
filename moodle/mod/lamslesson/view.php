@@ -98,7 +98,7 @@ if ($canparticipate || $canmanage) {
   $popupaction = new popup_action('click', $learnerurl, 'openlesson', array('height' => 720, 'width' => 1280));
 
   echo '<div class="centerlink">';
-  echo $OUTPUT->action_link($learnerurl, get_string('openlesson', 'lamslesson'), $popupaction, array('class' => 'btn btn-success'), new pix_icon('t/go'));
+  echo $OUTPUT->action_link('#', get_string('openlesson', 'lamslesson'), $popupaction, array('class' => 'btn btn-success'), new pix_icon('t/go'));
   echo '</div>';
 
 
@@ -108,8 +108,7 @@ if ($canmanage) {
     $popupmonitoraction = new popup_action('click', $monitorurl, 'monitorlesson', array('height' => 720, 'width' => 1280));
 
   echo '<div class="centerlink">';
-  // echo $OUTPUT->action_link($monitorurl, get_string('openmonitor', 'lamslesson'), new popup_action('click', $monitorurl, '', array('height' => 600, 'width' => 996)));
-  echo $OUTPUT->action_link($monitorurl, get_string('openmonitor', 'lamslesson'), $popupmonitoraction, array('class' => 'btn btn-default'), new pix_icon('i/dashboard'));
+  echo $OUTPUT->action_link('#', get_string('openmonitor', 'lamslesson'), $popupmonitoraction, array('class' => 'btn btn-default'), new pix_icon('i/dashboard'));
   echo '</div>';
 }
 
