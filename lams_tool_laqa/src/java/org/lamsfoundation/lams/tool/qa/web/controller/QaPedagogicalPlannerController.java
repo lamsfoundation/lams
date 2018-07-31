@@ -48,7 +48,7 @@ public class QaPedagogicalPlannerController {
     @Autowired
     private IQaService qaService;
 
-    @RequestMapping("/")
+    @RequestMapping("")
     protected String unspecified(QaPedagogicalPlannerForm pedagogicalPlannerForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 	return initPedagogicalPlannerForm(pedagogicalPlannerForm, request);

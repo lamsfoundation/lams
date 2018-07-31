@@ -26,9 +26,9 @@
 	
 		<lams:Page type="learner" title="${title}" hideProgressBar="true">
 			
-			<html:submit styleClass="btn btn-primary pull-right" onclick="javascript:window.close();">
+			<button type="button" class="btn btn-primary pull-right" onclick="javascript:window.close();">
 				<fmt:message key="button.close" />
-			</html:submit>
+			</button>
 			
 			<div class="footer"></div>
 			

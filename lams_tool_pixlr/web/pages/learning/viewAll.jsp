@@ -34,11 +34,10 @@
 	
 	<body class="stripes">
 		<lams:Page type="learner" title="${pixlrDTO.title}">
-			<html:form action="/learning" method="post" styleId="messageForm">
-				<html:hidden property="toolSessionID" styleId="toolSessionID"/>
-				<html:hidden property="mode" value="${mode}" />
-				<html:hidden property="dispatch" styleId = "dispatch" value="finishActivity" />
-				<html:hidden property="redoQuestion" value="true" />
+			<form:form action="finishActivity.do" modelAttribute="messageForm" method="post" id="messageForm">
+				<form:hidden path="toolSessionID" id="toolSessionID"/>
+				<form:hidden path="mode" value="${mode}" />
+				<form:hidden path="redoQuestion" value="true" />
 				
 				<c:choose>
 					<c:when test="${!empty learnerDTOs}">
@@ -79,26 +78,26 @@
 				</c:choose>
 					
 				<%--Bottom buttons--------------------------------------------------%>
-				<html:submit styleClass="btn btn-default btn-sm" onclick="javascript:document.getElementById('dispatch').value = 'viewAllImages';">
+				<button type="button" class="btn btn-default btn-sm" onclick="javascript:document.getElementById('dispatch').value = 'viewAllImages';">
 					<fmt:message key="button.refresh" />
-				</html:submit>
+				</button>
 					
 				<c:if test="${!pixlrDTO.lockOnFinish}">
-					<html:submit styleClass="btn btn-default btn-sm loffset5" onclick="javascript:document.getElementById('dispatch').value = 'unspecified';">
+					<button type="button" class="btn btn-default btn-sm loffset5" onclick="javascript:document.getElementById('dispatch').value = 'unspecified';">
 						<fmt:message key="button.redo" />
-					</html:submit>
+					</button>
 				</c:if>
 									
 				<div class="voffset10 pull-right">
 					<c:choose>
 						<c:when test="${pixlrDTO.reflectOnActivity}">
-							<html:submit styleClass="btn btn-primary" onclick="javascript:document.getElementById('dispatch').value = 'openNotebook';">
+							<button type="button" class="btn btn-primary" onclick="javascript:document.getElementById('dispatch').value = 'openNotebook';">
 								<fmt:message key="button.continue" />
-							</html:submit>
+							</button>
 						</c:when>
 						
 						<c:otherwise>
-							<html:link href="#nogo" styleClass="btn btn-primary" styleId="finishButton" onclick="submitForm('finished');return false">
+							<a href="#nogo" class="btn btn-primary" id="finishButton" onclick="submitForm('finished');return false">
 								<span class="na">
 									<c:choose>
 										<c:when test="${activityPosition.last}">
@@ -110,12 +109,12 @@
 										</c:otherwise>
 									</c:choose>
 								</span>
-							</html:link>
+							</a>
 						</c:otherwise>
 					</c:choose>
 				</div>
 				
-			</html:form>
+			</buttonform>
 				
 			<div class="footer"></div>
 			

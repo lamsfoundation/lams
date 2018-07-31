@@ -33,8 +33,8 @@
 	<c:param name="mode" value="teacher" />
 	<c:param name="contentFolderID" value="${contentFolderID}" />
 </c:url>
-<html:link href="#nogo" onclick="javascript:launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
+<a href="#nogo" onclick="javascript:launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
 	<fmt:message key="button.editActivity" />
-</html:link>
+</a>
 
 

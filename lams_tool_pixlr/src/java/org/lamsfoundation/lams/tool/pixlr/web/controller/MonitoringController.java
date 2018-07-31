@@ -21,15 +21,11 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.pixlr.web.actions;
+package org.lamsfoundation.lams.tool.pixlr.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.pixlr.dto.PixlrDTO;
@@ -38,12 +34,13 @@ import org.lamsfoundation.lams.tool.pixlr.dto.PixlrUserDTO;
 import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrUser;
 import org.lamsfoundation.lams.tool.pixlr.service.IPixlrService;
-import org.lamsfoundation.lams.tool.pixlr.service.PixlrServiceProxy;
 import org.lamsfoundation.lams.tool.pixlr.util.PixlrConstants;
 import org.lamsfoundation.lams.tool.pixlr.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author
@@ -57,15 +54,15 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class MonitoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
 
-    public IPixlrService pixlrService;
+    @Autowired
+    private IPixlrService pixlrService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	setupService();
+    @RequestMapping("/")
+    public String unspecified(HttpServletRequest request) {
 
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
@@ -102,13 +99,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute("toolContentID", toolContentID);
 	request.setAttribute("pixlrImageFolderURL", PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL);
 	request.setAttribute("isGroupedActivity", pixlrService.isGroupedActivity(toolContentID));
-	return mapping.findForward("success");
+	return "pages/monitoring/monitoring";
     }
 
-    public ActionForward showPixlr(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	setupService();
+    @RequestMapping("/showPixlr")
+    public String showPixlr(HttpServletRequest request) {
 
 	Long uid = new Long(WebUtil.readLongParam(request, "userUID"));
 
@@ -118,17 +113,12 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	request.setAttribute("userDTO", userDTO);
 
-	return mapping.findForward("pixlr_display");
+	return "pages/monitoring/pixlrDisplay";
     }
 
     /**
      * set up pixlrService
      */
-    private void setupService() {
-	if (pixlrService == null) {
-	    pixlrService = PixlrServiceProxy.getPixlrService(this.getServlet().getServletContext());
-	}
-    }
 
     /**
      * Opens a user's reflection
@@ -139,8 +129,8 @@ public class MonitoringAction extends LamsDispatchAction {
      * @param response
      * @return
      */
-    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/openNotebook")
+    public String openNotebook(HttpServletRequest request) {
 
 	//MonitoringForm monitorForm = (MonitoringForm) form;
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionID", false);
@@ -156,7 +146,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	request.setAttribute("pixlrUserDTO", pixlrUserDTO);
 
-	return mapping.findForward("notebook");
+	return "/pages/learning/notebook";
     }
 
     /**
@@ -168,11 +158,10 @@ public class MonitoringAction extends LamsDispatchAction {
      * @param response
      * @return
      */
-    public ActionForward toggleHideImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/toggleHideImage")
+    public String toggleHideImage(MonitoringForm monitorForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	setupService();
-	MonitoringForm monitorForm = (MonitoringForm) form;
 	PixlrUser pixlrUser = pixlrService.getUserByUID(monitorForm.getHideUserImageUid());
 
 	if (pixlrUser.isImageHidden()) {
@@ -181,6 +170,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	    pixlrUser.setImageHidden(true);
 	}
 	pixlrService.saveOrUpdatePixlrUser(pixlrUser);
-	return unspecified(mapping, monitorForm, request, response);
+	return unspecified(request);
     }
 }

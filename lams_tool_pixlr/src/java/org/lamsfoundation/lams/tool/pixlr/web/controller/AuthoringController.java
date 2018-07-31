@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.pixlr.web.actions;
+package org.lamsfoundation.lams.tool.pixlr.web.controller;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -31,41 +30,48 @@ import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
 import org.lamsfoundation.lams.tool.pixlr.service.IPixlrService;
-import org.lamsfoundation.lams.tool.pixlr.service.PixlrServiceProxy;
 import org.lamsfoundation.lams.tool.pixlr.util.PixlrConstants;
 import org.lamsfoundation.lams.tool.pixlr.util.PixlrException;
 import org.lamsfoundation.lams.tool.pixlr.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  */
-public class AuthoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
 
-    private static Logger logger = Logger.getLogger(AuthoringAction.class);
+    private static Logger logger = Logger.getLogger(AuthoringController.class);
 
-    public IPixlrService pixlrService;
+    @Autowired
+    @Qualifier("pixlrService")
+    private IPixlrService pixlrService;
+
+    @Autowired
+    @Qualifier("pixlrMessageService")
+    private MessageService messageService;
 
     // Authoring SessionMap key names
     private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
@@ -78,23 +84,18 @@ public class AuthoringAction extends LamsDispatchAction {
      * will be used to retrieve content for this tool.
      *
      */
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("")
+    protected String unspecified(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
+	    HttpServletRequest request) {
 
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	AuthoringForm authForm = (AuthoringForm) form;
-
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// set up pixlrService
-	if (pixlrService == null) {
-	    pixlrService = PixlrServiceProxy.getPixlrService(this.getServlet().getServletContext());
-	}
 
 	// retrieving Pixlr with given toolContentID
 	Pixlr pixlr = pixlrService.getPixlrByContentId(toolContentID);
@@ -111,7 +112,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // are editing. This flag is released when updateContent is called.
 	    pixlr.setDefineLater(true);
 	    pixlrService.saveOrUpdatePixlr(pixlr);
-	    
+
 	    //audit log the teacher has started editing activity in monitor
 	    pixlrService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
@@ -130,62 +131,61 @@ public class AuthoringAction extends LamsDispatchAction {
 	request.setAttribute("imageExists", imageExists);
 
 	// Set up the authForm.
-	updateAuthForm(authForm, pixlr);
-	authForm.setToolContentID(toolContentID);
-	authForm.setMode(mode.toString());
-	authForm.setContentFolderID(contentFolderID);
+	updateAuthForm(authoringForm, pixlr);
+	authoringForm.setToolContentID(toolContentID);
+	authoringForm.setMode(mode.toString());
+	authoringForm.setContentFolderID(contentFolderID);
 
 	// Set up sessionMap
-	SessionMap<String, Object> map = createSessionMap(pixlr, mode, contentFolderID,
-		toolContentID);
-	authForm.setSessionMapID(map.getSessionID());
+	SessionMap<String, Object> map = createSessionMap(pixlr, mode, contentFolderID, toolContentID);
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
 	request.getSession().setAttribute(map.getSessionID(), map);
 	request.setAttribute(PixlrConstants.ATTR_SESSION_MAP, map);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
-    public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws PixlrException {
+    @RequestMapping("/updateContent")
+    public String updateContent(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
+	    HttpServletRequest request) throws PixlrException {
 	// TODO need error checking.
 
 	// get authForm and session map.
-	AuthoringForm authForm = (AuthoringForm) form;
-	SessionMap<String, Object> map = getSessionMap(request, authForm);
-	ToolAccessMode mode = (ToolAccessMode) map.get(AuthoringAction.KEY_MODE);
+	SessionMap<String, Object> map = getSessionMap(request, authoringForm);
+	ToolAccessMode mode = (ToolAccessMode) map.get(AuthoringController.KEY_MODE);
 
 	// get pixlr content.
-	Pixlr pixlr = pixlrService.getPixlrByContentId((Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
-	ActionErrors errors = new ActionErrors();
+	Pixlr pixlr = pixlrService.getPixlrByContentId((Long) map.get(AuthoringController.KEY_TOOL_CONTENT_ID));
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	try {
 	    // TODO: Need to check if this is an edit, if so, delete the old image
-	    if (authForm.getExistingImageFileName().equals(PixlrConstants.DEFAULT_IMAGE_FILE_NAME)
-		    || authForm.getExistingImageFileName().trim().equals("")) {
-		errors = validateImageFile(authForm);
+	    if (authoringForm.getExistingImageFileName().equals(PixlrConstants.DEFAULT_IMAGE_FILE_NAME)
+		    || authoringForm.getExistingImageFileName().trim().equals("")) {
+		errorMap = validateImageFile(authoringForm);
 
-		if (!errors.isEmpty()) {
-		    this.addErrors(request, errors);
-		    updateAuthForm(authForm, pixlr);
+		if (!errorMap.isEmpty()) {
+		    request.setAttribute("errorMap", errorMap);
+		    updateAuthForm(authoringForm, pixlr);
 		    if (mode != null) {
-			authForm.setMode(mode.toString());
+			authoringForm.setMode(mode.toString());
 		    } else {
-			authForm.setMode("");
+			authoringForm.setMode("");
 		    }
-		    return mapping.findForward("success");
+		    return "pages/authoring/authoring";
 		}
-		uploadFormImage(authForm, pixlr);
+		uploadFormImage(authoringForm, pixlr);
 	    }
 	} catch (Exception e) {
 	    logger.error("Problem uploading image", e);
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PixlrConstants.ERROR_MSG_FILE_UPLOAD));
+	    errorMap.add("GLOBAL", messageService.getMessage(PixlrConstants.ERROR_MSG_FILE_UPLOAD));
 	    //throw new PixlrException("Problem uploading image", e);
 	}
 
 	// update pixlr content using form inputs.
-	updatePixlr(pixlr, authForm);
+	updatePixlr(pixlr, authoringForm);
 
 	// set the update date
 	pixlr.setUpdateDate(new Date());
@@ -198,18 +198,18 @@ public class AuthoringAction extends LamsDispatchAction {
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
-	authForm.setSessionMapID(map.getSessionID());
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	request.setAttribute(PixlrConstants.ATTR_SESSION_MAP, map);
 
-	updateAuthForm(authForm, pixlr);
+	updateAuthForm(authoringForm, pixlr);
 	if (mode != null) {
-	    authForm.setMode(mode.toString());
+	    authoringForm.setMode(mode.toString());
 	} else {
-	    authForm.setMode("");
+	    authoringForm.setMode("");
 	}
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
     /* ========== Private Methods ********** */
@@ -262,11 +262,11 @@ public class AuthoringAction extends LamsDispatchAction {
     private SessionMap<String, Object> createSessionMap(Pixlr pixlr, ToolAccessMode mode, String contentFolderID,
 	    Long toolContentID) {
 
-	SessionMap<String, Object> map = new SessionMap<String, Object>();
+	SessionMap<String, Object> map = new SessionMap<>();
 
-	map.put(AuthoringAction.KEY_MODE, mode);
-	map.put(AuthoringAction.KEY_CONTENT_FOLDER_ID, contentFolderID);
-	map.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
+	map.put(AuthoringController.KEY_MODE, mode);
+	map.put(AuthoringController.KEY_CONTENT_FOLDER_ID, contentFolderID);
+	map.put(AuthoringController.KEY_TOOL_CONTENT_ID, toolContentID);
 
 	return map;
     }
@@ -289,15 +289,15 @@ public class AuthoringAction extends LamsDispatchAction {
      * @param itemForm
      * @return
      */
-    private ActionErrors validateImageFile(AuthoringForm itemForm) {
-	ActionErrors errors = new ActionErrors();
+    private MultiValueMap<String, String> validateImageFile(AuthoringForm itemForm) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	// validate file size
-	FileValidatorUtil.validateFileSize(itemForm.getFile(), true, errors);
+	FileValidatorSpringUtil.validateFileSize(itemForm.getFile(), true);
 	// for edit validate: file already exist
 	if (!itemForm.isHasFile()
-		&& ((itemForm.getFile() == null) || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PixlrConstants.ERROR_MSG_FILE_BLANK));
+		&& ((itemForm.getFile() == null) || StringUtils.isEmpty(itemForm.getFile().getOriginalFilename()))) {
+	    errorMap.add("GLOBAL", messageService.getMessage(PixlrConstants.ERROR_MSG_FILE_BLANK));
 	}
 
 	// check for allowed format : gif, png, jpg
@@ -306,12 +306,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	    if (StringUtils.isEmpty(contentType) || !(contentType.equals("image/gif") || contentType.equals("image/png")
 		    || contentType.equals("image/jpg") || contentType.equals("image/jpeg")
 		    || contentType.equals("image/pjpeg"))) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE,
-			new ActionMessage(PixlrConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
+		errorMap.add("GLOBAL", messageService.getMessage(PixlrConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
 	    }
 	}
 
-	return errors;
+	return errorMap;
     }
 
     /**
@@ -326,9 +325,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	String filename = PixlrConstants.DEFAULT_IMAGE_FILE_NAME;
 
 	// set up pixlrService
-	if (pixlrService == null) {
-	    pixlrService = PixlrServiceProxy.getPixlrService(this.getServlet().getServletContext());
-	}
 
 	if (imageForm.getFile() != null) {
 
@@ -338,14 +334,15 @@ public class AuthoringAction extends LamsDispatchAction {
 		pixlrDir.mkdirs();
 	    }
 
-	    FormFile formFile = imageForm.getFile();
+	    MultipartFile formFile = imageForm.getFile();
 
-	    filename = FileUtil.generateUniqueContentFolderID() + pixlrService.getFileExtension(formFile.getFileName());
+	    filename = FileUtil.generateUniqueContentFolderID()
+		    + pixlrService.getFileExtension(formFile.getOriginalFilename());
 	    String fileWriteName = PixlrConstants.LAMS_PIXLR_BASE_DIR + File.separator + filename;
 	    File uploadFile = new File(fileWriteName);
 	    FileOutputStream out = new FileOutputStream(uploadFile);
 
-	    out.write(formFile.getFileData());
+	    out.write(formFile.getBytes());
 
 	    // Now save the image size
 	    BufferedImage imageFile = ImageIO.read(uploadFile);
@@ -359,15 +356,11 @@ public class AuthoringAction extends LamsDispatchAction {
 
     }
 
-    public ActionForward deleteImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/deleteImage")
+    public String deleteImage(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
+	    HttpServletRequest request) {
 
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-
-	// set up pixlrService
-	if (pixlrService == null) {
-	    pixlrService = PixlrServiceProxy.getPixlrService(this.getServlet().getServletContext());
-	}
 
 	// retrieving Pixlr with given toolContentID
 	Pixlr pixlr = pixlrService.getPixlrByContentId(toolContentID);
@@ -388,6 +381,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	    pixlrService.saveOrUpdatePixlr(pixlr);
 	}
 
-	return unspecified(mapping, form, request, response);
+	return unspecified(authoringForm, request);
     }
 }

@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.pixlr.web.forms;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,14 +30,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
  */
 @SuppressWarnings("unchecked")
-public class AuthoringForm extends ActionForm {
+public class AuthoringForm{
 
     private static final long serialVersionUID = 3950453134542135495L;
 
@@ -61,9 +59,9 @@ public class AuthoringForm extends ActionForm {
 
     String reflectInstructions;
 
-    FormFile onlineFile;
+    MultipartFile onlineFile;
 
-    FormFile offlineFile;
+    MultipartFile offlineFile;
 
     String currentTab;
 
@@ -88,15 +86,7 @@ public class AuthoringForm extends ActionForm {
     private Long fileUuid;
     private Long fileVersionId;
     private String fileName;
-    private FormFile file;
-
-    @Override
-    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-	ActionErrors ac = new ActionErrors();
-	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
-
-	return ac;
-    }
+    private MultipartFile file;
 
     public String getSessionMapID() {
 	return sessionMapID;
@@ -138,11 +128,11 @@ public class AuthoringForm extends ActionForm {
 	this.lockOnFinished = lockOnFinished;
     }
 
-    public FormFile getOfflineFile() {
+    public MultipartFile getOfflineFile() {
 	return offlineFile;
     }
 
-    public void setOfflineFile(FormFile offlineFile) {
+    public void setOfflineFile(MultipartFile offlineFile) {
 	this.offlineFile = offlineFile;
     }
 
@@ -154,11 +144,11 @@ public class AuthoringForm extends ActionForm {
 	this.offlineInstruction = offlineInstruction;
     }
 
-    public FormFile getOnlineFile() {
+    public MultipartFile getOnlineFile() {
 	return onlineFile;
     }
 
-    public void setOnlineFile(FormFile onlineFile) {
+    public void setOnlineFile(MultipartFile onlineFile) {
 	this.onlineFile = onlineFile;
     }
 
@@ -234,11 +224,11 @@ public class AuthoringForm extends ActionForm {
 	this.fileName = fileName;
     }
 
-    public FormFile getFile() {
+    public MultipartFile getFile() {
 	return file;
     }
 
-    public void setFile(FormFile file) {
+    public void setFile(MultipartFile file) {
 	this.file = file;
     }
 

@@ -35,12 +35,11 @@
 	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
 </c:if>
 
-<html:form action="/monitoring" method="post" styleId="monitoringForm">
+<form:form action="toggleHideImage.do" modelAttribute="monitoringForm" method="post" id="monitoringForm">
 	
-	<html:hidden property="dispatch" styleId="dispatch" value="toggleHideImage" />
-	<html:hidden property="contentFolderID" value="${contentFolderID}" />	
-	<html:hidden property="toolContentID" value="${toolContentID}"/>
-	<html:hidden property="hideUserImageUid" styleId="hideUserImageUid"/>
+	<form:hidden path="contentFolderID" value="${contentFolderID}" />	
+	<form:hidden path="toolContentID" value="${toolContentID}"/>
+	<form:hidden path="hideUserImageUid" id="hideUserImageUid"/>
 	
 	<c:forEach var="session" items="${dto.sessionDTOs}" varStatus="status">
 	
@@ -135,7 +134,7 @@
 	
 	</c:forEach>
 
-</html:form>
+</form:form>
 
 <c:if test="${isGroupedActivity}">
 	</div> <!--  end panel group -->

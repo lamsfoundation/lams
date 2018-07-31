@@ -868,7 +868,7 @@ public class QaLearningController implements QaAppConstants {
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (qaQueUsr.isResponseFinalized()) {
-	    String redirectURL = "redirect:learning/learningIndex.jsp";
+	    String redirectURL = "redirect:learning/LearnerRep.jsp";
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.PARAM_TOOL_SESSION_ID,
 		    toolSessionID.toString());
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, QaAppConstants.MODE, "learner");
@@ -880,6 +880,7 @@ public class QaLearningController implements QaAppConstants {
 	storeSequentialAnswer(qaLearningForm, request, generalLearnerFlowDTO, true);
 
 	qaLearningForm.resetAll();
+	request.setAttribute("learningForm",qaLearningForm);
 	return "learning/AnswersContent";
     }
 
@@ -893,7 +894,7 @@ public class QaLearningController implements QaAppConstants {
      * @param getNextQuestion
      * @return
      */
-    private Object[] storeSequentialAnswer(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
+    private Object[] storeSequentialAnswer(QaLearningForm qaLearningForm,
 	    HttpServletRequest request, GeneralLearnerFlowDTO generalLearnerFlowDTO, boolean getNextQuestion) {
 	String httpSessionID = qaLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()

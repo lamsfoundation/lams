@@ -11,7 +11,7 @@ UPDATE lams_tool SET
 	learner_progress_url = 'tool/laqa11/learning/learning.do?mode=teacher',
 	monitor_url = 'tool/laqa11/monitoring/monitoring.do',
 	pedagogical_planner_url = 'tool/laqa11/pedagogicalPlanner/initPedagogicalPlannerForm.do',
-	admin_url= 'tool/laqa11/admin/admin.do' 
+	admin_url= 'tool/laqa11/admin.do' 
 WHERE tool_signature = 'laqa11';
 
 ----------------------Put all sql statements above here-------------------------

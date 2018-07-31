@@ -11,7 +11,7 @@
 <c:set var="isLeadershipEnabled" value="${qaContent.useSelectLeaderToolOuput}" />
 <c:set var="isCommentsEnabled" value="${sessionMap.isCommentsEnabled}" />
 <c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
-<c:set var="localeLanguage"><lams:user name="localeLanguage" /></c:set>
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 <lams:html>
 <lams:head>
 	<title><fmt:message key="activity.title" /></title>
@@ -234,8 +234,8 @@
 	
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.learningForm.action=actionMethod+".do"; 
-			document.learningForm.submit();
+			document.forms.learningForm.action=actionMethod+".do"; 
+			document.forms.learningForm.submit();
 		}
 	</script>
 </lams:head>

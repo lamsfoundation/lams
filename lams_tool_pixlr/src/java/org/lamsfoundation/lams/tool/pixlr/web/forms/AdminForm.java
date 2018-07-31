@@ -34,20 +34,13 @@ import org.apache.struts.action.ActionMessages;
 /**
  *
  */
-public class AdminForm extends ActionForm {
+public class AdminForm{
 
     private static final long serialVersionUID = 378528935723874238L;
 
     String languagesCSV;
 
     public AdminForm() {
-    }
-
-    @Override
-    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-	ActionErrors ac = new ActionErrors();
-	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
-	return ac;
     }
 
     public String getLanguagesCSV() {

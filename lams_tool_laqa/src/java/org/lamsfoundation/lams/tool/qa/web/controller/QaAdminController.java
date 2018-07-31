@@ -85,7 +85,7 @@ public class QaAdminController {
     /**
      * Sets up the admin page
      */
-    @RequestMapping("/admin")
+    @RequestMapping("")
     public String unspecified(QaAdminForm adminForm, HttpServletRequest request) {
 
 	QaConfigItem enableQaWizard = qaService.getConfigItem(QaConfigItem.KEY_ENABLE_QAWIZARD);

@@ -249,7 +249,7 @@
 <body class="stripes">
 
 	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-	<form:form action="(${generalLearnerFlowDTO.requestLearningReportProgress != 'true'} ? (${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight} ? endLearning.do : forwardtoReflection) : learning.do" modelAttribute="qaLearningForm" method="POST" target="_self">
+	<form:form action="${generalLearnerFlowDTO.requestLearningReportProgress != 'true' ? (((generalLearnerFlowDTO.reflection != 'true') || !hasEditRight) ? endLearning.do : forwardtoReflection.do) : learning.do}"  modelAttribute="qaLearningForm" method="POST" target="_self">
 
 		<lams:Page type="learner" title="${qaContent.title}">
 	

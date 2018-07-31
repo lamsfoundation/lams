@@ -28,18 +28,17 @@
 				</lams:Alert>
 			</c:if>
 			
-			<html:form action="/lapixl10admin" styleId="lapixl10AdminForm" method="post" enctype="multipart/form-data">
+			<form:form action="saveContent.do" modelAttribute="lapixl10AdminForm" id="lapixl10AdminForm" method="post">
 				
-				<html:hidden property="dispatch" value="saveContent" />
 				<form-group>
 					<label for="languagesCSV"><fmt:message key="admin.pixlrLanguageCSV" /></label>
-					<html:text property="languagesCSV" size="50" maxlength="511" styleClass="form-group">
-					</html:text>
+					<form:input path="languagesCSV" size="50" maxlength="511" cssClass="form-group">
+					</form:input>
 				</form-group>
 							
-				<html:submit styleClass="btn btn-primary pull-right"><fmt:message key="button.save" /></html:submit>
+				<button type="button" class="btn btn-primary pull-right"><fmt:message key="button.save" /></button>
 			
-			</html:form>
+			</form:form>
 			
 			<div id="footer">
 			</div>

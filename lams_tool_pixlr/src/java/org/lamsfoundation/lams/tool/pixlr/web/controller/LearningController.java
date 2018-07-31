@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.pixlr.web.actions;
+package org.lamsfoundation.lams.tool.pixlr.web.controller;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -44,9 +43,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -70,9 +66,13 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author
@@ -86,20 +86,24 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class LearningAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningController.class);
 
     private static final boolean MODE_OPTIONAL = false;
     private static final String PIXLR_UTL = "http://www.pixlr.com/editor/";
 
+    @Autowired
     private IPixlrService pixlrService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    private WebApplicationContext applicationContext;
 
-	LearningForm learningForm = (LearningForm) form;
+    @RequestMapping("/")
+    public String unspecified(@ModelAttribute("learningForm") LearningForm learningForm, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
 	// 'toolSessionID' and 'mode' paramters are expected to be present.
 	// TODO need to catch exceptions and handle errors.
@@ -113,11 +117,6 @@ public class LearningAction extends LamsDispatchAction {
 	    isRedo = true;
 	}
 
-	// set up pixlrService
-	if (pixlrService == null) {
-	    pixlrService = PixlrServiceProxy.getPixlrService(this.getServlet().getServletContext());
-	}
-
 	// Retrieve the session and content.
 	PixlrSession pixlrSession = pixlrService.getSessionBySessionId(toolSessionID);
 	if (pixlrSession == null) {
@@ -128,7 +127,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	// check defineLater
 	if (pixlr.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "pages/learning/defineLater";
 	}
 
 	// set mode, toolSessionID and PixlrDTO
@@ -146,7 +145,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
 	// get the user
 	PixlrUser pixlrUser;
@@ -159,7 +158,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	// return to the viewAll images page if the user has already clicked it
 	if (pixlrUser.isFinishedActivity() && pixlr.isAllowViewOthersImages() && !isRedo) {
-	    return viewAllImages(mapping, learningForm, request, response);
+	    return viewAllImages(request);
 	}
 
 	// set up the user dto
@@ -205,19 +204,14 @@ public class LearningAction extends LamsDispatchAction {
 	    request.setAttribute("contentEditable", true);
 	}
 	request.setAttribute("finishedActivity", pixlrUser.isFinishedActivity());
-	return mapping.findForward("pixlr");
+	return "pages/learning/pixlr";
     }
 
-    public ActionForward updatePixlrImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/updatePixlrImage")
+    public String updatePixlrImage(HttpServletRequest request) {
 	Boolean success;
 
 	log.debug("Saving image from pixlr");
-
-	// set up pixlrService
-	if (pixlrService == null) {
-	    pixlrService = PixlrServiceProxy.getPixlrService(this.getServlet().getServletContext());
-	}
 
 	String imageURL = WebUtil.readStrParam(request, "image");
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
@@ -231,7 +225,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	try {
-	    InputStream is = LearningAction.getResponseInputStreamFromExternalServer(imageURL,
+	    InputStream is = LearningController.getResponseInputStreamFromExternalServer(imageURL,
 		    new HashMap<String, String>());
 
 	    String realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
@@ -263,7 +257,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	request.setAttribute("success", success);
-	return mapping.findForward("success");
+	return "pages/learning/success";
     }
 
     private PixlrUser getCurrentUser(Long toolSessionId) {
@@ -281,8 +275,8 @@ public class LearningAction extends LamsDispatchAction {
 	return pixlrUser;
     }
 
-    public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/finishActivity")
+    public String finishActivity(HttpServletRequest request, HttpServletResponse response) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
 
@@ -297,7 +291,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	ToolSessionManager sessionMgrService = PixlrServiceProxy
-		.getPixlrSessionManager(getServlet().getServletContext());
+		.getPixlrSessionManager(applicationContext.getServletContext());
 
 	String nextActivityUrl;
 	try {
@@ -350,13 +344,12 @@ public class LearningAction extends LamsDispatchAction {
 	return is;
     }
 
-    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	LearningForm lrnForm = (LearningForm) form;
+    @RequestMapping("/openNotebook")
+    public String openNotebook(@ModelAttribute("reflectEditForm") LearningForm reflectEditForm,
+	    HttpServletRequest request, HttpServletResponse response) {
 
 	// set the finished flag
-	PixlrUser pixlrUser = this.getCurrentUser(lrnForm.getToolSessionID());
+	PixlrUser pixlrUser = this.getCurrentUser(reflectEditForm.getToolSessionID());
 	PixlrDTO pixlrDTO = new PixlrDTO(pixlrUser.getPixlrSession().getPixlr());
 
 	request.setAttribute("pixlrDTO", pixlrDTO);
@@ -365,23 +358,23 @@ public class LearningAction extends LamsDispatchAction {
 		CoreNotebookConstants.NOTEBOOK_TOOL, PixlrConstants.TOOL_SIGNATURE, pixlrUser.getUserId().intValue());
 
 	if (notebookEntry != null) {
-	    lrnForm.setEntryText(notebookEntry.getEntry());
+	    reflectEditForm.setEntryText(notebookEntry.getEntry());
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(pixlrUser.getPixlrSession().getSessionId(), request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
-	return mapping.findForward("notebook");
+	request.setAttribute("messageForm", reflectEditForm);
+	return "pages/learning/notebook";
     }
 
-    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/submitReflection")
+    public String submitReflection(@ModelAttribute("messageForm") LearningForm messageForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	// save the reflection entry and call the notebook.
 
-	LearningForm lrnForm = (LearningForm) form;
-
-	PixlrUser pixlrUser = this.getCurrentUser(lrnForm.getToolSessionID());
+	PixlrUser pixlrUser = this.getCurrentUser(messageForm.getToolSessionID());
 	Long toolSessionID = pixlrUser.getPixlrSession().getSessionId();
 	Integer userID = pixlrUser.getUserId().intValue();
 
@@ -392,28 +385,22 @@ public class LearningAction extends LamsDispatchAction {
 	if (entry == null) {
 	    // create new entry
 	    pixlrService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    PixlrConstants.TOOL_SIGNATURE, userID, lrnForm.getEntryText());
+		    PixlrConstants.TOOL_SIGNATURE, userID, messageForm.getEntryText());
 	} else {
 	    // update existing entry
-	    entry.setEntry(lrnForm.getEntryText());
+	    entry.setEntry(messageForm.getEntryText());
 	    entry.setLastModified(new Date());
 	    pixlrService.updateEntry(entry);
 	}
 
-	return finishActivity(mapping, form, request, response);
+	return finishActivity(request, response);
     }
 
-    public ActionForward viewAllImages(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String viewAllImages(HttpServletRequest request) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, MODE_OPTIONAL);
-
-	// set up pixlrService
-	if (pixlrService == null) {
-	    pixlrService = PixlrServiceProxy.getPixlrService(this.getServlet().getServletContext());
-	}
 
 	// Retrieve the session and content.
 	PixlrSession pixlrSession = pixlrService.getSessionBySessionId(toolSessionID);
@@ -437,7 +424,7 @@ public class LearningAction extends LamsDispatchAction {
 	pixlrService.saveOrUpdatePixlrUser(pixlrUser);
 
 	// set up the of images learner set
-	Set<PixlrUserDTO> learnerSet = new HashSet<PixlrUserDTO>();
+	Set<PixlrUserDTO> learnerSet = new HashSet<>();
 	for (PixlrUser learner : pixlrSession.getPixlrUsers()) {
 	    if (learner.getImageFileName() != null && !learner.getImageFileName().equals("")
 		    && !learner.getImageFileName().equals(pixlr.getImageFileName())) {
@@ -457,9 +444,9 @@ public class LearningAction extends LamsDispatchAction {
 	request.setAttribute("pixlrImageFolderURL", PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL);
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
-	return mapping.findForward("viewAll");
+	return "pages/learning/viewAll";
     }
 
     /**
@@ -471,7 +458,8 @@ public class LearningAction extends LamsDispatchAction {
 	String locale = "en";
 
 	String languagesCSV = pixlrService.getConfigItem(PixlrConfigItem.KEY_LANGUAGE_CSV) != null
-		? pixlrService.getConfigItem(PixlrConfigItem.KEY_LANGUAGE_CSV).getConfigValue() : null;
+		? pixlrService.getConfigItem(PixlrConfigItem.KEY_LANGUAGE_CSV).getConfigValue()
+		: null;
 
 	if (languagesCSV != null && !languagesCSV.equals("")) {
 	    UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
