@@ -9,9 +9,10 @@
 	var origImageWidth;
 	
 	function submitForm(actionMethod) {
-		document.action= actionMethod+".do";
-		document.getElementById("authoringForm").submit();
-	}
+        var form = document.getElementById("authoringForm");
+		form.action= actionMethod+".do";
+		form.submit();
+		}
 	
 	function openImage(url) {
 		openPopup(url, origImageHeight, origImageWidth);
