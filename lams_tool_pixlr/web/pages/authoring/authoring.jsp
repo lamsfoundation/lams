@@ -8,12 +8,6 @@
 <c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING" scope="request"><%=FileValidatorSpringUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
 
 <lams:html>
-	<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>
-	<c:set var="tool">
-		<lams:WebAppURL />
-	</c:set>
 
 	<lams:head>
 		<title>
@@ -61,7 +55,7 @@
 				}
 			</script>	
 		
-			<form:form action="updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post" onsubmit="return validate();">
+			<form:form action="authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post" onsubmit="return validate();">
 				<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 				
 				<form:hidden path="currentTab" id="currentTab" />

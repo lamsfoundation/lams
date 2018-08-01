@@ -94,7 +94,7 @@
 				<%--Reflection--------------------------------------------------%>
 		
 				<c:if test="${pixlrUserDTO.finishedActivity and pixlrDTO.reflectOnActivity and pixlrUserDTO.finishedReflection}">
-					<form:form action="openNotebook.do" method="post" id="reflectEditForm" modelAttribute="reflectEditForm">
+					<form:form action="openNotebook.do" method="post" id="learningForm" modelAttribute="learningForm">
 						<form:hidden path="mode" value="${mode}" />	
 						<form:hidden path="toolSessionID" id="toolSessionID"/>
 						

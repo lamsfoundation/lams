@@ -21,7 +21,7 @@
 			}
 			
 			function submitForm(methodName){
-				var f = document.getElementById('messageForm');
+				var f = document.getElementById('learningForm');
 				f.submit();
 			}
 
@@ -34,7 +34,7 @@
 	<body class="stripes">
 		<lams:Page type="learner" title="${pixlrDTO.title}">
 		
-			<form:form action="submitReflection.do" modelAttribute="messageForm" method="post" onsubmit="disableFinishButton();" id="messageForm">
+			<form:form action="submitReflection.do" modelAttribute="learningForm" method="post" onsubmit="disableFinishButton();" id="learningForm">
 				<form:hidden path="toolSessionID" id="toolSessionID"/>
 				<form:hidden path="mode" value="${mode}" />
 				

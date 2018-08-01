@@ -22,37 +22,36 @@
  */
 /* $$Id$$ */
 
-package org.lamsfoundation.lams.tool.videoRecorder.web.actions;
+package org.lamsfoundation.lams.tool.videoRecorder.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.RedirectingActionForward;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
-public class LearningAction extends LamsDispatchAction {
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
+
+    @Autowired
+    private WebApplicationContext applicationContext;
+
+    @RequestMapping("")
+    public String unspecified(HttpServletRequest request) throws Exception {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	ILearnerService learnerService = (ILearnerService) wac.getBean("learnerService");
+	ILearnerService learnerService = (ILearnerService) applicationContext.getBean("learnerService");
 	String finishURL = learnerService.completeToolSession(toolSessionId, user.getUserID().longValue());
-	return new RedirectingActionForward(finishURL);
+	return "index";
     }
 }

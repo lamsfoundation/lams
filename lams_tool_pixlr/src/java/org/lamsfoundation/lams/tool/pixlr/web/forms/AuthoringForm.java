@@ -23,13 +23,6 @@
 
 package org.lamsfoundation.lams.tool.pixlr.web.forms;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,7 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  */
 @SuppressWarnings("unchecked")
-public class AuthoringForm{
+public class AuthoringForm {
 
     private static final long serialVersionUID = 3950453134542135495L;
 
@@ -59,9 +52,9 @@ public class AuthoringForm{
 
     String reflectInstructions;
 
-    MultipartFile onlineFile;
+    String onlineFile;
 
-    MultipartFile offlineFile;
+    String offlineFile;
 
     String currentTab;
 
@@ -128,11 +121,11 @@ public class AuthoringForm{
 	this.lockOnFinished = lockOnFinished;
     }
 
-    public MultipartFile getOfflineFile() {
+    public String getOfflineFile() {
 	return offlineFile;
     }
 
-    public void setOfflineFile(MultipartFile offlineFile) {
+    public void setOfflineFile(String offlineFile) {
 	this.offlineFile = offlineFile;
     }
 
@@ -144,11 +137,11 @@ public class AuthoringForm{
 	this.offlineInstruction = offlineInstruction;
     }
 
-    public MultipartFile getOnlineFile() {
+    public String getOnlineFile() {
 	return onlineFile;
     }
 
-    public void setOnlineFile(MultipartFile onlineFile) {
+    public void setOnlineFile(String onlineFile) {
 	this.onlineFile = onlineFile;
     }
 

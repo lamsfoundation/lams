@@ -1,6 +1,7 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 
 <!--question content goes here-->
 <c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
@@ -53,7 +54,7 @@
 							</c:choose>
 						</div>
 
-						<form:hidden path="currentQuestionIndex"><c:out value="${questionEntry.key}" /></form:hidden>
+						<form:hidden path="currentQuestionIndex" value="${questionEntry.key}" />
 	</c:if>
 </c:forEach>
 

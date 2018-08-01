@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -159,10 +160,10 @@ public class MonitoringController {
      * @return
      */
     @RequestMapping("/toggleHideImage")
-    public String toggleHideImage(MonitoringForm monitorForm, HttpServletRequest request,
+    public String toggleHideImage(@ModelAttribute("monitoringForm")MonitoringForm monitoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	PixlrUser pixlrUser = pixlrService.getUserByUID(monitorForm.getHideUserImageUid());
+	PixlrUser pixlrUser = pixlrService.getUserByUID(monitoringForm.getHideUserImageUid());
 
 	if (pixlrUser.isImageHidden()) {
 	    pixlrUser.setImageHidden(false);

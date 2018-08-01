@@ -217,39 +217,39 @@ public class AuthoringController {
     /**
      * Updates Pixlr content using AuthoringForm inputs.
      *
-     * @param authForm
+     * @param authoringForm
      * @param mode
      * @return
      */
-    private void updatePixlr(Pixlr pixlr, AuthoringForm authForm) {
-	pixlr.setTitle(authForm.getTitle());
-	pixlr.setInstructions(authForm.getInstructions());
-	pixlr.setLockOnFinished(authForm.isLockOnFinished());
-	pixlr.setReflectOnActivity(authForm.isReflectOnActivity());
-	pixlr.setReflectInstructions(authForm.getReflectInstructions());
-	pixlr.setAllowViewOthersImages(authForm.isAllowViewOthersImages());
+    private void updatePixlr(Pixlr pixlr, @ModelAttribute("authoringForm") AuthoringForm authoringForm) {
+	pixlr.setTitle(authoringForm.getTitle());
+	pixlr.setInstructions(authoringForm.getInstructions());
+	pixlr.setLockOnFinished(authoringForm.isLockOnFinished());
+	pixlr.setReflectOnActivity(authoringForm.isReflectOnActivity());
+	pixlr.setReflectInstructions(authoringForm.getReflectInstructions());
+	pixlr.setAllowViewOthersImages(authoringForm.isAllowViewOthersImages());
     }
 
     /**
      * Updates AuthoringForm using Pixlr content.
      *
      * @param pixlr
-     * @param authForm
+     * @param authoringForm
      * @return
      */
-    private void updateAuthForm(AuthoringForm authForm, Pixlr pixlr) {
-	authForm.setTitle(pixlr.getTitle());
-	authForm.setInstructions(pixlr.getInstructions());
-	authForm.setLockOnFinished(pixlr.isLockOnFinished());
-	authForm.setReflectOnActivity(pixlr.isReflectOnActivity());
-	authForm.setExistingImageFileName(pixlr.getImageFileName());
-	authForm.setReflectInstructions(pixlr.getReflectInstructions());
-	authForm.setAllowViewOthersImages(pixlr.isAllowViewOthersImages());
+    private void updateAuthForm(@ModelAttribute("authoringForm") AuthoringForm authoringForm, Pixlr pixlr) {
+	authoringForm.setTitle(pixlr.getTitle());
+	authoringForm.setInstructions(pixlr.getInstructions());
+	authoringForm.setLockOnFinished(pixlr.isLockOnFinished());
+	authoringForm.setReflectOnActivity(pixlr.isReflectOnActivity());
+	authoringForm.setExistingImageFileName(pixlr.getImageFileName());
+	authoringForm.setReflectInstructions(pixlr.getReflectInstructions());
+	authoringForm.setAllowViewOthersImages(pixlr.isAllowViewOthersImages());
 
 	if (pixlr.getImageFileName() == null || pixlr.getImageFileName().trim().equals("")) {
-	    authForm.setFileName(PixlrConstants.DEFAULT_IMAGE_FILE_NAME);
+	    authoringForm.setFileName(PixlrConstants.DEFAULT_IMAGE_FILE_NAME);
 	} else {
-	    authForm.setFileName(pixlr.getImageFileName());
+	    authoringForm.setFileName(pixlr.getImageFileName());
 	}
     }
 
@@ -317,16 +317,17 @@ public class AuthoringController {
      * Upload the image to the open www/images/pixlr folder
      *
      * @param request
-     * @param imageForm
+     * @param authoringForm
      * @throws ImageGalleryException
      */
-    private void uploadFormImage(AuthoringForm imageForm, Pixlr pixlr) throws Exception {
+    private void uploadFormImage(@ModelAttribute("authoringForm") AuthoringForm authoringForm, Pixlr pixlr)
+	    throws Exception {
 
 	String filename = PixlrConstants.DEFAULT_IMAGE_FILE_NAME;
 
 	// set up pixlrService
 
-	if (imageForm.getFile() != null) {
+	if (authoringForm.getFile() != null) {
 
 	    // check the directory exists, then create it if it doesnt
 	    File pixlrDir = new File(PixlrConstants.LAMS_PIXLR_BASE_DIR);
@@ -334,7 +335,7 @@ public class AuthoringController {
 		pixlrDir.mkdirs();
 	    }
 
-	    MultipartFile formFile = imageForm.getFile();
+	    MultipartFile formFile = authoringForm.getFile();
 
 	    filename = FileUtil.generateUniqueContentFolderID()
 		    + pixlrService.getFileExtension(formFile.getOriginalFilename());

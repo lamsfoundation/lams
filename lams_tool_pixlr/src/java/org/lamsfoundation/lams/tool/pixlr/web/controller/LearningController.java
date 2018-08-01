@@ -345,11 +345,11 @@ public class LearningController {
     }
 
     @RequestMapping("/openNotebook")
-    public String openNotebook(@ModelAttribute("reflectEditForm") LearningForm reflectEditForm,
+    public String openNotebook(@ModelAttribute("learningForm") LearningForm learningForm,
 	    HttpServletRequest request, HttpServletResponse response) {
 
 	// set the finished flag
-	PixlrUser pixlrUser = this.getCurrentUser(reflectEditForm.getToolSessionID());
+	PixlrUser pixlrUser = this.getCurrentUser(learningForm.getToolSessionID());
 	PixlrDTO pixlrDTO = new PixlrDTO(pixlrUser.getPixlrSession().getPixlr());
 
 	request.setAttribute("pixlrDTO", pixlrDTO);
@@ -358,23 +358,22 @@ public class LearningController {
 		CoreNotebookConstants.NOTEBOOK_TOOL, PixlrConstants.TOOL_SIGNATURE, pixlrUser.getUserId().intValue());
 
 	if (notebookEntry != null) {
-	    reflectEditForm.setEntryText(notebookEntry.getEntry());
+	    learningForm.setEntryText(notebookEntry.getEntry());
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(pixlrUser.getPixlrSession().getSessionId(), request,
 		applicationContext.getServletContext());
 
-	request.setAttribute("messageForm", reflectEditForm);
 	return "pages/learning/notebook";
     }
 
     @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute("messageForm") LearningForm messageForm, HttpServletRequest request,
+    public String submitReflection(@ModelAttribute("learningForm") LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	// save the reflection entry and call the notebook.
 
-	PixlrUser pixlrUser = this.getCurrentUser(messageForm.getToolSessionID());
+	PixlrUser pixlrUser = this.getCurrentUser(learningForm.getToolSessionID());
 	Long toolSessionID = pixlrUser.getPixlrSession().getSessionId();
 	Integer userID = pixlrUser.getUserId().intValue();
 
@@ -385,10 +384,10 @@ public class LearningController {
 	if (entry == null) {
 	    // create new entry
 	    pixlrService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    PixlrConstants.TOOL_SIGNATURE, userID, messageForm.getEntryText());
+		    PixlrConstants.TOOL_SIGNATURE, userID, learningForm.getEntryText());
 	} else {
 	    // update existing entry
-	    entry.setEntry(messageForm.getEntryText());
+	    entry.setEntry(learningForm.getEntryText());
 	    entry.setLastModified(new Date());
 	    pixlrService.updateEntry(entry);
 	}
