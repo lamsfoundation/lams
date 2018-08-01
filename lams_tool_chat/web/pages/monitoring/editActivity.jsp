@@ -29,7 +29,7 @@
 	</tbody>
 </table>
 
-<c:url value="/authoring.do" var="authoringUrl">
+<c:url value="/authoring/authoring.do" var="authoringUrl">
 	<c:param name="toolContentID" value="${dto.toolContentId}" />
 	<c:param name="mode" value="teacher" />
 	<c:param name="contentFolderID" value="${contentFolderID}"></c:param>

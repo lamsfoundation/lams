@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.tool.chat.web.actions;
+package org.lamsfoundation.lams.tool.chat.web.controller;
 
 import java.io.IOException;
 import java.util.Date;

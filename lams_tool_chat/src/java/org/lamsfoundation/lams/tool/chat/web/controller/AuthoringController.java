@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.chat.web.actions;
+package org.lamsfoundation.lams.tool.chat.web.controller;
 
 import java.util.Date;
 import java.util.List;
@@ -31,34 +30,41 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatCondition;
-import org.lamsfoundation.lams.tool.chat.service.ChatServiceProxy;
 import org.lamsfoundation.lams.tool.chat.service.IChatService;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  */
-public class AuthoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
 
-    private static Logger logger = Logger.getLogger(AuthoringAction.class);
+    private static Logger logger = Logger.getLogger(AuthoringController.class);
 
-    public IChatService chatService;
+    @Autowired
+    @Qualifier("chatService")
+    private IChatService chatService;
+
+    @Autowired
+    @Qualifier("chatMessageService")
+    private MessageService messageService;
 
     // Authoring SessionMap key names
     private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
@@ -71,20 +77,15 @@ public class AuthoringAction extends LamsDispatchAction {
      * Default method when no dispatch parameter is specified. It is expected that the parameter
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
      */
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/authoring")
+    public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
+
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-
-	// set up chatService
-	if (chatService == null) {
-	    chatService = ChatServiceProxy.getChatService(this.getServlet().getServletContext());
-	}
 
 	// retrieving Chat with given toolContentID
 	Chat chat = chatService.getChatByContentId(toolContentID);
@@ -101,45 +102,43 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // are editing. This flag is released when updateContent is called.
 	    chat.setDefineLater(true);
 	    chatService.saveOrUpdateChat(chat);
-	    
+
 	    //audit log the teacher has started editing activity in monitor
 	    chatService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	// Set up the authForm.
-	AuthoringForm authForm = (AuthoringForm) form;
-	updateAuthForm(authForm, chat);
+	updateAuthForm(authoringForm, chat);
 
 	// Set up sessionMap
 	SessionMap<String, Object> map = createSessionMap(chat, mode, contentFolderID, toolContentID);
-	authForm.setSessionMapID(map.getSessionID());
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
 	request.getSession().setAttribute(map.getSessionID(), map);
 	request.setAttribute(ChatConstants.ATTR_SESSION_MAP, map);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
-    public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/updateContent")
+    public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
 	// TODO need error checking.
 
-	// get authForm and session map.
-	AuthoringForm authForm = (AuthoringForm) form;
-	SessionMap<String, Object> map = getSessionMap(request, authForm);
+	// get session map.
+	SessionMap<String, Object> map = getSessionMap(request, authoringForm);
 
 	// get chat content.
-	Chat chat = chatService.getChatByContentId((Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
+	Chat chat = chatService.getChatByContentId((Long) map.get(AuthoringController.KEY_TOOL_CONTENT_ID));
 
 	// update chat content using form inputs
-	updateChat(chat, authForm);
+	updateChat(chat, authoringForm);
 
 	chatService.releaseConditionsFromCache(chat);
 
 	Set<ChatCondition> conditions = chat.getConditions();
 	if (conditions == null) {
-	    conditions = new TreeSet<ChatCondition>(new TextSearchConditionComparator());
+	    conditions = new TreeSet<>(new TextSearchConditionComparator());
 	}
 	SortedSet<ChatCondition> conditionSet = (SortedSet<ChatCondition>) map.get(ChatConstants.ATTR_CONDITION_SET);
 	conditions.addAll(conditionSet);
@@ -167,65 +166,54 @@ public class AuthoringAction extends LamsDispatchAction {
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
-	authForm.setSessionMapID(map.getSessionID());
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	request.setAttribute(ChatConstants.ATTR_SESSION_MAP, map);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
     /* ========== Private Methods ********** */
 
     /**
      * Updates Chat content using AuthoringForm inputs.
-     *
-     * @param authForm
-     * @param mode
-     * @return
      */
-    private void updateChat(Chat chat, AuthoringForm authForm) {
-	chat.setTitle(authForm.getTitle());
-	chat.setInstructions(authForm.getInstructions());
-	chat.setLockOnFinished(authForm.isLockOnFinished());
-	chat.setReflectOnActivity(authForm.isReflectOnActivity());
-	chat.setReflectInstructions(authForm.getReflectInstructions());
-	chat.setFilteringEnabled(authForm.isFilteringEnabled());
-	chat.setFilterKeywords(authForm.getFilterKeywords());
+    private void updateChat(Chat chat, AuthoringForm authoringForm) {
+	chat.setTitle(authoringForm.getTitle());
+	chat.setInstructions(authoringForm.getInstructions());
+	chat.setLockOnFinished(authoringForm.isLockOnFinished());
+	chat.setReflectOnActivity(authoringForm.isReflectOnActivity());
+	chat.setReflectInstructions(authoringForm.getReflectInstructions());
+	chat.setFilteringEnabled(authoringForm.isFilteringEnabled());
+	chat.setFilterKeywords(authoringForm.getFilterKeywords());
     }
 
     /**
      * Updates AuthoringForm using Chat content.
-     *
-     * @param chat
-     * @param authForm
-     * @return
      */
-    private void updateAuthForm(AuthoringForm authForm, Chat chat) {
-	authForm.setTitle(chat.getTitle());
-	authForm.setInstructions(chat.getInstructions());
-	authForm.setLockOnFinished(chat.isLockOnFinished());
-	authForm.setReflectOnActivity(chat.isReflectOnActivity());
-	authForm.setReflectInstructions(chat.getReflectInstructions());
-	authForm.setFilteringEnabled(chat.isFilteringEnabled());
-	authForm.setFilterKeywords(chat.getFilterKeywords());
+    private void updateAuthForm(AuthoringForm authoringForm, Chat chat) {
+	authoringForm.setTitle(chat.getTitle());
+	authoringForm.setInstructions(chat.getInstructions());
+	authoringForm.setLockOnFinished(chat.isLockOnFinished());
+	authoringForm.setReflectOnActivity(chat.isReflectOnActivity());
+	authoringForm.setReflectInstructions(chat.getReflectInstructions());
+	authoringForm.setFilteringEnabled(chat.isFilteringEnabled());
+	authoringForm.setFilterKeywords(chat.getFilterKeywords());
     }
 
     /**
      * Updates SessionMap using Chat content.
-     *
-     * @param chat
-     * @param mode
      */
     private SessionMap<String, Object> createSessionMap(Chat chat, ToolAccessMode mode, String contentFolderID,
 	    Long toolContentID) {
 
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 
-	sessionMap.put(AuthoringAction.KEY_MODE, mode);
-	sessionMap.put(AuthoringAction.KEY_CONTENT_FOLDER_ID, contentFolderID);
-	sessionMap.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
-	
-	SortedSet<ChatCondition> set = new TreeSet<ChatCondition>(new TextSearchConditionComparator());
+	sessionMap.put(AuthoringController.KEY_MODE, mode);
+	sessionMap.put(AuthoringController.KEY_CONTENT_FOLDER_ID, contentFolderID);
+	sessionMap.put(AuthoringController.KEY_TOOL_CONTENT_ID, toolContentID);
+
+	SortedSet<ChatCondition> set = new TreeSet<>(new TextSearchConditionComparator());
 	if (chat.getConditions() != null) {
 	    set.addAll(chat.getConditions());
 	}
@@ -235,12 +223,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Retrieve the SessionMap from the HttpSession.
-     *
-     * @param request
-     * @param authForm
-     * @return
      */
-    private SessionMap<String, Object> getSessionMap(HttpServletRequest request, AuthoringForm authForm) {
-	return (SessionMap<String, Object>) request.getSession().getAttribute(authForm.getSessionMapID());
+    private SessionMap<String, Object> getSessionMap(HttpServletRequest request, AuthoringForm authoringForm) {
+	return (SessionMap<String, Object>) request.getSession().getAttribute(authoringForm.getSessionMapID());
     }
 }

@@ -13,7 +13,7 @@
 		lams: '${lams}',
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?dispatch=setSubmissionDeadline"/>',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
@@ -69,9 +69,9 @@
 				</td>
 				<td rowspan="2">
 					<div class="pull-right">
-						<a href="#" onClick="javascript:launchPopup('monitoring.do?dispatch=openChatHistory&toolSessionID=${session.sessionID}')" class="btn btn-default btn-sm">
+						<a href="#" onClick="javascript:launchPopup('openChatHistory.do?toolSessionID=${session.sessionID}')" class="btn btn-default btn-sm">
 							<fmt:message>summary.editMessages</fmt:message></a>
-						<a href="#" onClick="javascript:launchPopup('learning.do?toolSessionID=${session.sessionID}&mode=teacher')" class="btn btn-default btn-sm">
+						<a href="#" onClick="javascript:launchPopup('../learning/learning.do?toolSessionID=${session.sessionID}&mode=teacher')" class="btn btn-default btn-sm">
 							<fmt:message>summary.openChat</fmt:message></a>
 					</div>			
 				</td>
@@ -135,8 +135,7 @@
 						<c:if test="${dto.reflectOnActivity}">
 							<td class="text-center">
 								<c:if test="${user.finishedReflection}">
-									<c:url value="monitoring.do" var="openNotebook">
-										<c:param name="dispatch" value="openNotebook" />
+									<c:url value="openNotebook.do" var="openNotebook">
 										<c:param name="uid" value="${user.uid}" />
 									</c:url>
 	

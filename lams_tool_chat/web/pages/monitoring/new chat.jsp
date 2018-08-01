@@ -16,9 +16,7 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	</lams:head>
-
 	<body class="stripes">
-			
 			
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript">
@@ -27,7 +25,7 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 		<script type="text/javascript" src="includes/javascript/learning.js"></script>
 			
-		<lams:Page type="learner" title="${chatDTO.title}">
+		<lams:Page type="learner" title="${pageTitle.monitoring}">
 			<div class="panel">
 				<c:out value="${chatDTO.instructions}" escapeXml="false" />
 			</div>

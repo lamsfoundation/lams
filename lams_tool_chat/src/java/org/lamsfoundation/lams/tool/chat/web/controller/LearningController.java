@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.chat.web.actions;
+package org.lamsfoundation.lams.tool.chat.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
@@ -33,9 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -55,10 +51,16 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author
@@ -70,26 +72,33 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class LearningAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
-    private static IChatService chatService;
+    private static Logger log = Logger.getLogger(LearningController.class);
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    @Qualifier("chatService")
+    private IChatService chatService;
+
+    @Autowired
+    @Qualifier("chatMessageService")
+    private MessageService messageService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
+
+    @RequestMapping("/learning")
+    public String unspecified(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
+
 	// 'toolSessionID' and 'mode' paramters are expected to be present.
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, false);
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	// set up chatService
-	if (LearningAction.chatService == null) {
-	    LearningAction.chatService = ChatServiceProxy.getChatService(this.getServlet().getServletContext());
-	}
-
 	// Retrieve the session and content.
-	ChatSession chatSession = LearningAction.chatService.getSessionBySessionId(toolSessionID);
+	ChatSession chatSession = chatService.getSessionBySessionId(toolSessionID);
 	if (chatSession == null) {
 	    throw new ChatException("Cannot retrieve session with toolSessionID" + toolSessionID);
 	}
@@ -101,7 +110,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	// check defineLater
 	if (chat.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "pages/learning/defineLater";
 	}
 
 	request.setAttribute("MODE", mode.toString());
@@ -112,8 +121,8 @@ public class LearningAction extends LamsDispatchAction {
 	ChatUserDTO chatUserDTO = new ChatUserDTO(chatUser);
 	if (chatUser.isFinishedActivity()) {
 	    // get the notebook entry.
-	    NotebookEntry notebookEntry = LearningAction.chatService.getEntry(toolSessionID,
-		    CoreNotebookConstants.NOTEBOOK_TOOL, ChatConstants.TOOL_SIGNATURE, chatUser.getUserId().intValue());
+	    NotebookEntry notebookEntry = chatService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    ChatConstants.TOOL_SIGNATURE, chatUser.getUserId().intValue());
 	    if (notebookEntry != null) {
 		chatUserDTO.notebookEntry = notebookEntry.getEntry();
 	    }
@@ -123,11 +132,11 @@ public class LearningAction extends LamsDispatchAction {
 	// Ensure that the content is use flag is set.
 	if (!chat.isContentInUse()) {
 	    chat.setContentInUse(new Boolean(true));
-	    LearningAction.chatService.saveOrUpdateChat(chat);
+	    chatService.saveOrUpdateChat(chat);
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
 	/* Check if submission deadline is null */
 
@@ -145,29 +154,30 @@ public class LearningAction extends LamsDispatchAction {
 
 	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("submissionDeadline");
+		return "pages/learning/submissionDeadline";
 	    }
 
 	}
 
-	return mapping.findForward("learning");
+	return "pages/learning/learning";
     }
 
-    public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/finishActivity")
+    public String finishActivity(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	LearningForm lrnForm = (LearningForm) form;
-
 	// set the finished flag
-	ChatUser chatUser = LearningAction.chatService.getUserByUID(lrnForm.getChatUserUID());
+	ChatUser chatUser = chatService.getUserByUID(learningForm.getChatUserUID());
 	if (chatUser != null) {
 	    chatUser.setFinishedActivity(true);
-	    LearningAction.chatService.saveOrUpdateChatUser(chatUser);
+	    chatService.saveOrUpdateChatUser(chatUser);
 	} else {
-	    LearningAction.log.error("finishActivity(): couldn't find ChatUser with uid: " + lrnForm.getChatUserUID());
+	    LearningController.log
+		    .error("finishActivity(): couldn't find ChatUser with uid: " + learningForm.getChatUserUID());
 	}
 
-	ToolSessionManager sessionMgrService = ChatServiceProxy.getChatSessionManager(getServlet().getServletContext());
+	ToolSessionManager sessionMgrService = ChatServiceProxy
+		.getChatSessionManager(applicationContext.getServletContext());
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -189,70 +199,68 @@ public class LearningAction extends LamsDispatchAction {
 	return null; // TODO need to return proper page.
     }
 
-    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/openNotebook")
+    public String openNotebook(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	LearningForm lrnForm = (LearningForm) form;
-
 	// set the finished flag
-	ChatUser chatUser = LearningAction.chatService.getUserByUID(lrnForm.getChatUserUID());
+	ChatUser chatUser = chatService.getUserByUID(learningForm.getChatUserUID());
 	ChatDTO chatDTO = new ChatDTO(chatUser.getChatSession().getChat());
 
 	request.setAttribute("chatDTO", chatDTO);
 
-	NotebookEntry notebookEntry = LearningAction.chatService.getEntry(chatUser.getChatSession().getSessionId(),
+	NotebookEntry notebookEntry = chatService.getEntry(chatUser.getChatSession().getSessionId(),
 		CoreNotebookConstants.NOTEBOOK_TOOL, ChatConstants.TOOL_SIGNATURE, chatUser.getUserId().intValue());
 
 	if (notebookEntry != null) {
-	    lrnForm.setEntryText(notebookEntry.getEntry());
+	    learningForm.setEntryText(notebookEntry.getEntry());
 	}
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, chatUser.getChatSession().getSessionId());
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(chatUser.getChatSession().getSessionId(), request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
-	return mapping.findForward("notebook");
+	return "pages/learning/notebook";
     }
 
-    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/submitReflection")
+    public String submitReflection(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	// save the reflection entry and call the notebook.
 
-	LearningForm lrnForm = (LearningForm) form;
-
-	ChatUser chatUser = LearningAction.chatService.getUserByUID(lrnForm.getChatUserUID());
+	ChatUser chatUser = chatService.getUserByUID(learningForm.getChatUserUID());
 	Long toolSessionID = chatUser.getChatSession().getSessionId();
 	Integer userID = chatUser.getUserId().intValue();
 
 	// check for existing notebook entry
-	NotebookEntry entry = LearningAction.chatService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+	NotebookEntry entry = chatService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		ChatConstants.TOOL_SIGNATURE, userID);
 
 	if (entry == null) {
 	    // create new entry
-	    LearningAction.chatService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ChatConstants.TOOL_SIGNATURE, userID, lrnForm.getEntryText());
+	    chatService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    ChatConstants.TOOL_SIGNATURE, userID, learningForm.getEntryText());
 	} else {
 	    // update existing entry
-	    entry.setEntry(lrnForm.getEntryText());
+	    entry.setEntry(learningForm.getEntryText());
 	    entry.setLastModified(new Date());
-	    LearningAction.chatService.updateEntry(entry);
+	    chatService.updateEntry(entry);
 	}
 
-	return finishActivity(mapping, form, request, response);
+	return finishActivity(learningForm, request, response);
     }
 
     private ChatUser getCurrentUser(Long toolSessionId) {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionId
-	ChatUser chatUser = LearningAction.chatService
-		.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()), toolSessionId);
+	ChatUser chatUser = chatService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+		toolSessionId);
 
 	if (chatUser == null) {
-	    ChatSession chatSession = LearningAction.chatService.getSessionBySessionId(toolSessionId);
-	    chatUser = LearningAction.chatService.createChatUser(user, chatSession);
+	    ChatSession chatSession = chatService.getSessionBySessionId(toolSessionId);
+	    chatUser = chatService.createChatUser(user, chatSession);
 	}
 
 	return chatUser;

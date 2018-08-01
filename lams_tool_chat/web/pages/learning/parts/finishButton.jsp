@@ -1,8 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<html:form action="/learning" method="post">
-	<html:hidden property="chatUserUID" value="${chatUserDTO.uid}" />
-	<html:hidden property="dispatch" value="openNotebook" />
+<form:form action="openNotebook.do" method="post" modelAttribute="learningForm" id="learningForm">
+	<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
 
 	<c:if
 		test="${chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
@@ -24,12 +23,10 @@
 				</c:choose>
 			</p>
 
-			<html:submit styleClass="button">
-				<fmt:message key="button.edit" />
-			</html:submit>
+			<input type="submit" class="button" value="<fmt:message key="button.edit" />">
 		</div>
 	</c:if>
-</html:form>
+</form:form>
 
 <script type="text/javascript">
 	function disableFinishButton() {
@@ -39,27 +36,23 @@
 		}
 	}
          function submitForm(methodName){
-                var f = document.getElementById('messageForm');
+                var f = document.getElementById('learningForm');
                 f.submit();
         }
 </script>
 
-<html:form action="/learning" method="post"
-	onsubmit="disableFinishButton();"  styleId="messageForm">
-	<html:hidden property="chatUserUID" value="${chatUserDTO.uid}" />
+<form:form action="${!chatUserDTO.finishedActivity and chatDTO.reflectOnActivity ? 'openNotebook.do' : 'finishActivity.do'}" method="post"
+	onsubmit="disableFinishButton();"  modelAttribute="learningForm" id="learningForm">
+	<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
 
 		<c:choose>
 			<c:when
 				test="${!chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
-				<html:hidden property="dispatch" value="openNotebook" />
 
-				<html:submit styleClass="btn btn-responsive btn-primary pull-right voffset10">
-					<fmt:message key="button.continue" />
-				</html:submit>
+				<input type="submit" value="<fmt:message key="button.continue" />" class="btn btn-responsive btn-primary pull-right voffset10"/>
 			</c:when>
 			<c:otherwise>
-				<html:hidden property="dispatch" value="finishActivity" />
-				<html:link href="#nogo" styleClass="btn btn-primary pull-right voffset10 na btn-autoresize" styleId="finishButton"  onclick="submitForm('finish')">
+				<a href="#nogo" class="btn btn-primary pull-right voffset10 na btn-autoresize" id="finishButton"  onclick="submitForm('finish')">
 					 <span class="nextActivity">
 						 <c:choose>
 						 	<c:when test="${activityPosition.last}">
@@ -70,8 +63,8 @@
 						 	</c:otherwise>
 						 </c:choose>
 					 </span>
-				</html:link>
+				</a>
 			</c:otherwise>
 		</c:choose>
 	</div>
-</html:form>
+</form:form>

@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.chat.web.actions;
+package org.lamsfoundation.lams.tool.chat.web.controller;
 
 import java.io.IOException;
 
@@ -30,18 +29,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
-import org.lamsfoundation.lams.tool.chat.service.ChatServiceProxy;
 import org.lamsfoundation.lams.tool.chat.service.IChatService;
-import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.web.forms.ChatPedagogicalPlannerForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author
@@ -52,53 +51,48 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class PedagogicalPlannerAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/pedagogicalPlanner")
+public class PedagogicalPlannerController {
 
-    private static Logger logger = Logger.getLogger(PedagogicalPlannerAction.class);
+    private static Logger logger = Logger.getLogger(PedagogicalPlannerController.class);
 
-    public IChatService chatService;
+    @Autowired
+    @Qualifier("chatService")
+    private IChatService chatService;
 
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	if (chatService == null) {
-	    chatService = ChatServiceProxy.getChatService(this.getServlet().getServletContext());
-	}
-	return initPedagogicalPlannerForm(mapping, form, request, response);
-    }
+    @Autowired
+    @Qualifier("chatMessageService")
+    private MessageService messageService;
 
-    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ChatPedagogicalPlannerForm plannerForm = (ChatPedagogicalPlannerForm) form;
+    @RequestMapping("/initPedagogicalPlannerForm")
+    public String initPedagogicalPlannerForm(@ModelAttribute ChatPedagogicalPlannerForm plannerForm,
+	    HttpServletRequest request, HttpServletResponse response) {
+
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Chat chat = getChatService().getChatByContentId(toolContentID);
+	Chat chat = chatService.getChatByContentId(toolContentID);
 	plannerForm.fillForm(chat);
 	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	plannerForm.setContentFolderID(contentFolderId);
-	return mapping.findForward(ChatConstants.SUCCESS);
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
+    @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
+    public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute ChatPedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException {
-	ChatPedagogicalPlannerForm plannerForm = (ChatPedagogicalPlannerForm) form;
-	ActionMessages errors = plannerForm.validate();
-	if (errors.isEmpty()) {
+
+	MultiValueMap<String, String> errorMap = plannerForm.validate(messageService);
+	if (errorMap.isEmpty()) {
 	    String instructions = plannerForm.getInstructions();
 	    Long toolContentID = plannerForm.getToolContentID();
-	    Chat chat = getChatService().getChatByContentId(toolContentID);
+	    Chat chat = chatService.getChatByContentId(toolContentID);
 	    chat.setInstructions(instructions);
-	    getChatService().saveOrUpdateChat(chat);
+	    chatService.saveOrUpdateChat(chat);
 	} else {
-	    saveErrors(request, errors);
+	    request.setAttribute("errorMap", errorMap);
+	    ;
 	}
-	return mapping.findForward(ChatConstants.SUCCESS);
-    }
-
-    private IChatService getChatService() {
-	if (chatService == null) {
-	    chatService = ChatServiceProxy.getChatService(this.getServlet().getServletContext());
-	}
-	return chatService;
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
 }

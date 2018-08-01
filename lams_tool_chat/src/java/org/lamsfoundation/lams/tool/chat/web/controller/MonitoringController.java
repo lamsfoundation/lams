@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.chat.web.actions;
+package org.lamsfoundation.lams.tool.chat.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
@@ -36,9 +35,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.chat.dto.ChatDTO;
@@ -48,16 +44,23 @@ import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
-import org.lamsfoundation.lams.tool.chat.service.ChatServiceProxy;
 import org.lamsfoundation.lams.tool.chat.service.IChatService;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author
@@ -72,25 +75,32 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class MonitoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
 
-    private static Logger log = Logger.getLogger(MonitoringAction.class);
+    private static Logger log = Logger.getLogger(MonitoringController.class);
 
-    public IChatService chatService;
+    @Autowired
+    @Qualifier("chatService")
+    private IChatService chatService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	MonitoringAction.log.info("excuting monitoring action");
+    @Autowired
+    @Qualifier("chatMessageService")
+    private MessageService messageService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
+
+    @RequestMapping("/monitoring")
+    public String unspecified(HttpServletRequest request) {
+
+	MonitoringController.log.info("excuting monitoring action");
 
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	// set up chatService
-	if (chatService == null) {
-	    chatService = ChatServiceProxy.getChatService(this.getServlet().getServletContext());
-	}
 	Chat chat = chatService.getChatByContentId(toolContentID);
 	ChatDTO chatDTO = new ChatDTO(chat);
 
@@ -109,7 +119,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    request.setAttribute("submissionDeadline", tzSubmissionDeadline.getTime());
 	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
-	    request.setAttribute("submissionDateString", DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	    request.setAttribute("submissionDateString",
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 
 	}
 
@@ -162,22 +173,22 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute("monitoringDTO", chatDTO);
 	request.setAttribute("contentFolderID", contentFolderID);
 
-	return mapping.findForward("success");
+	return "pages/monitoring/monitoring";
     }
 
-    public ActionForward openChatHistory(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/openChatHistory")
+    public String openChatHistory(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	MonitoringForm monitoringForm = (MonitoringForm) form;
 	// TODO check for null from chatService. forward to appropriate page.
 	ChatSession chatSession = chatService.getSessionBySessionId(monitoringForm.getToolSessionID());
 	ChatSessionDTO sessionDTO = new ChatSessionDTO(chatSession);
 	request.setAttribute("sessionDTO", sessionDTO);
-	return mapping.findForward("chat_history");
+	return "pages/monitoring/chatHistory";
     }
 
-    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/openNotebook")
+    public String openNotebook(HttpServletRequest request) {
 
 	Long uid = WebUtil.readLongParam(request, "uid", false);
 
@@ -190,12 +201,13 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	request.setAttribute("chatUserDTO", chatUserDTO);
 
-	return mapping.findForward("notebook");
+	return "pages/monitoring/notebook";
     }
 
-    public ActionForward editMessage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/editMessage")
+    public String editMessage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
-	MonitoringForm monitoringForm = (MonitoringForm) form;
+
 	ChatMessage chatMessage = chatService.getMessageByUID(monitoringForm.getMessageUID());
 
 	boolean hasChanged = false;
@@ -214,26 +226,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	    chatMessage.setHidden(monitoringForm.isMessageHidden());
 	    chatService.saveOrUpdateChatMessage(chatMessage);
 	}
-	return openChatHistory(mapping, form, request, response);
+	return openChatHistory(monitoringForm, request, response);
     }
 
     /**
      * Set Submission Deadline
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException 
      */
-    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	// set up chatService
-	if (chatService == null) {
-	    chatService = ChatServiceProxy.getChatService(this.getServlet().getServletContext());
-	}
+    @RequestMapping(path = "setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseBody
+    public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Chat chat = chatService.getChatByContentId(contentID);
@@ -252,13 +253,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	chat.setSubmissionDeadline(tzSubmissionDeadline);
 	chatService.saveOrUpdateChat(chat);
 
-	response.setContentType("text/plain;charset=utf-8");
-	response.getWriter().print(formattedDate);
-	return null;
+	return formattedDate;
     }
-    
-
-
 
     /* Private Methods */
 
