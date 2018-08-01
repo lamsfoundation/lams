@@ -23,7 +23,7 @@
 
 	<body class="stripes" onload="init();">
 	
-		<lams:Page title="<fmt:message key="pageTitle.monitoring" />" type="navbar">
+		<lams:Page title='<fmt:message key="pageTitle.monitoring" />' type="navbar">
 			<script type="text/javascript">
 				var initialTabId = "${pixlrDTO.currentTab}";
 			</script>

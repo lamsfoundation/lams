@@ -20,21 +20,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.pixlr.web.forms;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 
 /**
  *
  */
-public class AdminForm{
+public class AdminForm {
 
     private static final long serialVersionUID = 378528935723874238L;
 

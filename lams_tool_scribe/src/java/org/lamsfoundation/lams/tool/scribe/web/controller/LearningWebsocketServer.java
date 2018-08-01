@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.tool.scribe.web.actions;
+package org.lamsfoundation.lams.tool.scribe.web.controller;
 
 import java.io.IOException;
 import java.util.Iterator;

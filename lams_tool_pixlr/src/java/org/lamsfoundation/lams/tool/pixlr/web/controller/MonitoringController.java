@@ -62,8 +62,8 @@ public class MonitoringController {
     @Autowired
     private IPixlrService pixlrService;
 
-    @RequestMapping("/")
-    public String unspecified(HttpServletRequest request) {
+    @RequestMapping("")
+    public String unspecified(@ModelAttribute("monitoringForm")MonitoringForm monitoringForm,HttpServletRequest request) {
 
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
@@ -104,7 +104,7 @@ public class MonitoringController {
     }
 
     @RequestMapping("/showPixlr")
-    public String showPixlr(HttpServletRequest request) {
+    public String showPixlr(@ModelAttribute("monitoringForm")MonitoringForm monitoringForm,HttpServletRequest request) {
 
 	Long uid = new Long(WebUtil.readLongParam(request, "userUID"));
 
@@ -171,6 +171,6 @@ public class MonitoringController {
 	    pixlrUser.setImageHidden(true);
 	}
 	pixlrService.saveOrUpdatePixlrUser(pixlrUser);
-	return unspecified(request);
+	return unspecified(monitoringForm,request);
     }
 }

@@ -88,7 +88,7 @@ public class QaController implements QaAppConstants {
     @Qualifier("qaMessageService")
     private MessageService messageService;
 
-    @RequestMapping("/")
+    @RequestMapping("")
     public String unspecified() {
 	return "authoring/AuthoringTabsHolder";
     }

@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.scribe.web.actions;
+package org.lamsfoundation.lams.tool.scribe.web.controller;
 
 import javax.servlet.http.HttpSession;
 

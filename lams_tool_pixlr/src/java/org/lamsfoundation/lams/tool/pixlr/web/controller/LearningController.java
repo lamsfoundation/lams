@@ -101,7 +101,7 @@ public class LearningController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/")
+    @RequestMapping("")
     public String unspecified(@ModelAttribute("learningForm") LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 

@@ -5,7 +5,7 @@
 </div>
 
 <div class="panel-body">
-<form:form action="${empty newQuestionForm.editableQuestionIndex ? 'addSingleQuestion' : 'saveSingleQuestion'}.do" modelAttribute="newQuestionForm" id="newQuestionForm" method="POST">
+<form:form action="${empty newQuestionForm.editableQuestionIndex ? 'addSingleQuestion.do' : 'saveSingleQuestion.do'}" modelAttribute="newQuestionForm" id="newQuestionForm" method="POST">
 	<form:hidden path="toolContentID" />
 	<form:hidden path="httpSessionID" />
 	<form:hidden path="contentFolderID" />
@@ -17,7 +17,7 @@
 
 			<div class="checkbox">
 				<label> <form:checkbox path="required" value="1"
-						styleId="required" />&nbsp;<fmt:message key="label.required.desc" />
+						id="required" />&nbsp;<fmt:message key="label.required.desc" />
 				</label>
 			</div>
 

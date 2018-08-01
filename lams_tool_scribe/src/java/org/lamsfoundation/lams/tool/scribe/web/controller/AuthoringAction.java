@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.scribe.web.actions;
+package org.lamsfoundation.lams.tool.scribe.web.controller;
 
 import java.util.Collections;
 import java.util.Date;
@@ -52,6 +52,8 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  *
@@ -65,6 +67,8 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  *
  *
  */
+@Controller
+@RequestMapping("")
 public class AuthoringAction extends LamsDispatchAction {
 
     private static Logger logger = Logger.getLogger(AuthoringAction.class);
