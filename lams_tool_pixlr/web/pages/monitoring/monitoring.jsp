@@ -23,11 +23,7 @@
 
 	<body class="stripes" onload="init();">
 	
-		<tiles:useAttribute name="pageTitleKey" />
-		<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
-		<c:set var="title"><fmt:message key="${pTitleKey}" /></c:set>
-		
-		<lams:Page title="${title}" type="navbar">
+		<lams:Page title="<fmt:message key="pageTitle.monitoring" />" type="navbar">
 			<script type="text/javascript">
 				var initialTabId = "${pixlrDTO.currentTab}";
 			</script>

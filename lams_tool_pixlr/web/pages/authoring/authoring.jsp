@@ -3,9 +3,9 @@
 <%@ page import="org.lamsfoundation.lams.tool.pixlr.util.PixlrConstants"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
-<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorSpringUtil" %>
 <c:set var="UPLOAD_FILE_LARGE_MAX_SIZE" scope="request"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
-<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING" scope="request"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING" scope="request"><%=FileValidatorSpringUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
 
 <lams:html>
 	<c:set var="lams">
@@ -33,11 +33,8 @@
 
 	<body class="stripes" onload="init();">
 	
-		<tiles:useAttribute name="pageTitleKey" />
-		<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
-		<c:set var="title"><fmt:message key="${pTitleKey}" /></c:set>
 		
-		<lams:Page title="${title}" type="navbar">
+		<lams:Page title='<fmt:message key="pageTitle.authoring"/>' type="navbar">
 				
 			<script type="text/javascript">
 				function validate() {
@@ -64,7 +61,7 @@
 				}
 			</script>	
 		
-			<form:form action="authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post" onsubmit="return validate();">
+			<form:form action="updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post" onsubmit="return validate();">
 				<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 				
 				<form:hidden path="currentTab" id="currentTab" />

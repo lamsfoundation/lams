@@ -427,10 +427,10 @@
 						</div>
 						<div class="panel-body">
 							<div class="reflectionInstructions">
-								<lams:out value="${learningForm.reflectionSubject}" escapeHtml="true" />
+								<lams:out value="${qaLearningForm.reflectionSubject}" escapeHtml="true" />
 							</div>
 							<div class="panel">
-								<lams:out value="${learningForm.entryText}" escapeHtml="true" />
+								<lams:out value="${qaLearningForm.entryText}" escapeHtml="true" />
 							</div>
 
 							<c:if test="${hasEditRight}">

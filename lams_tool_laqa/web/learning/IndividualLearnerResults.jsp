@@ -13,7 +13,7 @@
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.forms.qaLearningForm.action = actionMethod=".do";
+			document.forms.qaLearningForm.action = actionMethod+".do";
 			document.forms.qaLearningForm.submit();
 		}
 	</script>
@@ -22,7 +22,7 @@
 <body class="stripes">
 
 	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-	<form:form action="learning.do" method="POST" target="_self">
+	<form:form action="learning.do" method="POST" modelAttribute="qaLearningForm" target="_self">
 
 		<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 

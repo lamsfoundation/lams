@@ -93,8 +93,8 @@
 		
 		function doSubmit(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.forms.learningForm.action=actionMethod+".do"; 
-			document.forms.learningForm.submit();
+			document.forms.qaLearningForm.action=actionMethod+".do"; 
+			document.forms.qaLearningForm.submit();
 		}
 		
 		if (${!hasEditRight && mode != "teacher"}) {
@@ -133,7 +133,7 @@
 					}
 					
 					//ajax form submit
-					$('#learningForm').ajaxSubmit({
+					$('#qaLearningForm').ajaxSubmit({
 						url: "<c:url value='autoSaveAnswers.do?date='/>" + new Date().getTime(),
 			               success: function() {
 			               	$.growlUI('<i class="fa fa-lg fa-floppy-o"></i> <fmt:message key="label.learning.draft.autosaved" />');
@@ -200,7 +200,7 @@
 
 	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
 	<form:form action="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential' ? 'getNextQuestion.do' : 'submitAnswersContent.do'}"
-	 method="POST" target="_self" id="learningForm" modelAttribute="learningForm">
+	 method="POST" target="_self" id="qaLearningForm" modelAttribute="qaLearningForm">
 
 	<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 

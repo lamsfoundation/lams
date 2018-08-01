@@ -112,15 +112,15 @@ public class QaLearningController implements QaAppConstants {
     }
 
     @RequestMapping("/learning")
-    public String execute(@ModelAttribute("learningForm") QaLearningForm learningForm, HttpServletRequest request)
+    public String execute(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm, HttpServletRequest request)
 	    throws IOException, ServletException, QaApplicationException {
 
 	QaUtils.cleanUpSessionAbsolute(request);
 
 	/* validate learning mode parameters */
-	validateParameters(request, learningForm);
-	String mode = learningForm.getMode();
-	String toolSessionID = learningForm.getToolSessionID();
+	validateParameters(request, qaLearningForm);
+	String mode = qaLearningForm.getMode();
+	String toolSessionID = qaLearningForm.getToolSessionID();
 
 	/*
 	 * By now, the passed tool session id MUST exist in the db by calling:
@@ -149,8 +149,8 @@ public class QaLearningController implements QaAppConstants {
 	    user = getCurrentUser(toolSessionID);
 	}
 	Long userId = user.getQueUsrId();
-	learningForm.setUserID(user.getQueUsrId().toString());
-	request.setAttribute("qaLearningForm", learningForm);
+	qaLearningForm.setUserID(user.getQueUsrId().toString());
+	request.setAttribute("qaLearningForm", qaLearningForm);
 	QaQueUsr groupLeader = null;
 	if (qaContent.isUseSelectLeaderToolOuput()) {
 	    groupLeader = qaService.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionID).longValue());
@@ -182,7 +182,7 @@ public class QaLearningController implements QaAppConstants {
 	Map mapQuestionStrings = new TreeMap(new QaComparator());
 	Map<Integer, QaQuestionDTO> mapQuestions = new TreeMap<>();
 
-	String httpSessionID = learningForm.getHttpSessionID();
+	String httpSessionID = qaLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = httpSessionID == null ? null
 		: (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 	if (sessionMap == null) {
@@ -190,7 +190,7 @@ public class QaLearningController implements QaAppConstants {
 	    Map mapSequentialAnswers = new HashMap();
 	    sessionMap.put(MAP_SEQUENTIAL_ANSWERS_KEY, mapSequentialAnswers);
 	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	    learningForm.setHttpSessionID(sessionMap.getSessionID());
+	    qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
 
 	    sessionMap.put(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
 		    qaService.getLearnerContentFolder(new Long(toolSessionID), user.getQueUsrId()));
@@ -223,7 +223,7 @@ public class QaLearningController implements QaAppConstants {
 		MY_SIGNATURE, userId.intValue());
 	if (notebookEntry != null) {
 	    //String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
-	    learningForm.setEntryText(notebookEntry.getEntry());
+	    qaLearningForm.setEntryText(notebookEntry.getEntry());
 	    generalLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
 	}
 
@@ -263,7 +263,7 @@ public class QaLearningController implements QaAppConstants {
 	generalLearnerFlowDTO.setMapQuestions(mapQuestionStrings);
 	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
 	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(mapQuestions.size()));
-	learningForm.setTotalQuestionCount(new Integer(mapQuestions.size()).toString());
+	qaLearningForm.setTotalQuestionCount(new Integer(mapQuestions.size()).toString());
 
 	String feedBackType = "";
 	if (qaContent.isQuestionsSequenced()) {
@@ -359,7 +359,7 @@ public class QaLearningController implements QaAppConstants {
 	 * if the 'All Responses' has been clicked no more user entry is accepted, and isResponseFinalized() returns
 	 * true
 	 */
-	Long currentToolSessionID = new Long(learningForm.getToolSessionID());
+	Long currentToolSessionID = new Long(qaLearningForm.getToolSessionID());
 
 	//if Response is Finalized
 	if (user.isResponseFinalized()) {
@@ -567,8 +567,7 @@ public class QaLearningController implements QaAppConstants {
 	if (errorMap.isEmpty() && qaContent.isNotifyTeachersOnResponseSubmit()) {
 	    qaService.notifyTeachersOnResponseSubmit(new Long(toolSessionID));
 	}
-	request.setAttribute("learningForm", qaLearningForm);
-	return "learning/AnswersContent";
+	return forwardName;
     }
 
     @RequestMapping("/checkLeaderProgress")
@@ -688,6 +687,7 @@ public class QaLearningController implements QaAppConstants {
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	qaLearningForm.resetAll();
+	request.setAttribute("learningForm", qaLearningForm);
 	return "learning/AnswersContent";
     }
 
@@ -1100,7 +1100,7 @@ public class QaLearningController implements QaAppConstants {
 
     /**
      *
-     * @param reflectionForm
+     * @param qaLearningForm
      * @param request
      * @param response
      * @return
@@ -1109,21 +1109,21 @@ public class QaLearningController implements QaAppConstants {
      * @throws ToolException
      */
     @RequestMapping("/submitReflection")
-    public String submitReflection(QaLearningForm reflectionForm, HttpServletRequest request,
+    public String submitReflection(@ModelAttribute("qaLearningForm")QaLearningForm qaLearningForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, ToolException {
 
-	LearningUtil.saveFormRequestData(request, reflectionForm);
+	LearningUtil.saveFormRequestData(request, qaLearningForm);
 
-	String httpSessionID = reflectionForm.getHttpSessionID();
+	String httpSessionID = qaLearningForm.getHttpSessionID();
 
-	reflectionForm.setHttpSessionID(httpSessionID);
+	qaLearningForm.setHttpSessionID(httpSessionID);
 
 	String toolSessionIDString = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	reflectionForm.setToolSessionID(toolSessionIDString);
+	qaLearningForm.setToolSessionID(toolSessionIDString);
 	Long toolSessionID = new Long(toolSessionIDString);
 
 	String userIDString = request.getParameter("userID");
-	reflectionForm.setUserID(userIDString);
+	qaLearningForm.setUserID(userIDString);
 	Integer userID = new Integer(userIDString);
 
 	String reflectionEntry = request.getParameter(QaAppConstants.ENTRY_TEXT);
@@ -1144,13 +1144,13 @@ public class QaLearningController implements QaAppConstants {
 	    qaService.updateEntry(entry);
 	}
 
-	reflectionForm.resetUserActions(); /* resets all except submitAnswersContent */
-	return endLearning(reflectionForm, request, response);
+	qaLearningForm.resetUserActions(); /* resets all except submitAnswersContent */
+	return endLearning(qaLearningForm, request, response);
     }
 
     /**
      *
-     * @param reflectionForm
+     * @param qaLearningForm
      * @param request
      * @return
      * @throws IOException
@@ -1158,12 +1158,12 @@ public class QaLearningController implements QaAppConstants {
      * @throws ToolException
      */
     @RequestMapping("/forwardtoReflection")
-    public String forwardtoReflection(QaLearningForm reflectionForm, HttpServletRequest request)
+    public String forwardtoReflection(@ModelAttribute("qaLearningForm")QaLearningForm qaLearningForm, HttpServletRequest request)
 	    throws IOException, ServletException, ToolException {
 
-	String httpSessionID = reflectionForm.getHttpSessionID();
+	String httpSessionID = qaLearningForm.getHttpSessionID();
 
-	reflectionForm.setHttpSessionID(httpSessionID);
+	qaLearningForm.setHttpSessionID(httpSessionID);
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -1172,9 +1172,9 @@ public class QaLearningController implements QaAppConstants {
 	QaContent qaContent = qaSession.getQaContent();
 
 	String userID = request.getParameter("userID");
-	reflectionForm.setUserID(userID);
+	qaLearningForm.setUserID(userID);
 
-	return forwardtoReflection(request, qaContent, toolSessionID, userID, reflectionForm);
+	return forwardtoReflection(request, qaContent, toolSessionID, userID, qaLearningForm);
     }
 
     @RequestMapping("/forwardtoReflection")

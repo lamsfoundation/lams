@@ -17,7 +17,7 @@
 <body class="stripes">
 
 <!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-<form:form action="learning/submitReflection.do" modelAttribute="reflectionForm" id="dreflectionForm" onsubmit="disableFinishButton()">
+<form:form action="learning/submitReflection.do" modelAttribute="qaLearningForm" id="qaLearningForm" onsubmit="disableFinishButton()">
 
 <lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 

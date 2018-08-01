@@ -24,7 +24,7 @@
     <label for="title">
     	<fmt:message key="label.authoring.basic.title"/>
     </label>
-    <form:input path="title" class="form-control"/>
+    <form:input path="title" cssClass="form-control"/>
 </div>
 
 <div class="form-group">

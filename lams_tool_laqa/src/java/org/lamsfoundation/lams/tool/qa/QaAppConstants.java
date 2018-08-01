@@ -51,11 +51,11 @@ public interface QaAppConstants {
     public static final String AUTHORING_STARTER = "starter";
     public static final String TITLE = "title";
     public static final String INSTRUCTIONS = "instructions";
-    public static final String LOAD_LEARNER = "loadLearner";
+    public static final String LOAD_LEARNER = "learning/AnswersContent";
     public static final String LEARNING_STARTER = "learningStarter";
     public static final String MONITORING_STARTER = "monitoringStarter";
     public static final String VIEW_ALL_RESULTS = "viewAllResults";
-    public static final String INDIVIDUAL_LEARNER_RESULTS = "individualLearnerResults";
+    public static final String INDIVIDUAL_LEARNER_RESULTS = "learning/IndividualLearnerResults";
     public static final String MAP_ALL_RESULTS_KEY = "mapAllResultsKey";
     public static final String SOURCE_QA_STARTER = "sourceQaStarter";
     public static final String EDITABLE_RESPONSE_ID = "editableResponseId";

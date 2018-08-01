@@ -22,12 +22,8 @@
 		<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
 	</lams:head>
 	<body class="stripes">
-	
-		<tiles:useAttribute name="pageTitleKey" ignore="true"/>
-		<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
-		<c:set var="title"><fmt:message key="${pTitleKey}" /></c:set>
 		
-		<lams:Page title="${title}" type="learner">
+		<lams:Page title="<fmt:message key="pageTitle.monitoring" />" type="learner">
 			<div id="content">
 				<table class="table">
 				<tr>
