@@ -40,7 +40,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -416,7 +415,7 @@ public class QaLearningController implements QaAppConstants {
 	long toolSessionId = 0;
 	if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	    errorMap.add(Globals.ERROR_KEY, messageService.getMessage("error.toolSessionId.required"));
+	    errorMap.add("GLOBAL", messageService.getMessage("error.toolSessionId.required"));
 	    logger.error("error.toolSessionId.required");
 	    request.setAttribute("errorMap", errorMap);
 	    return;
@@ -880,7 +879,7 @@ public class QaLearningController implements QaAppConstants {
 	storeSequentialAnswer(qaLearningForm, request, generalLearnerFlowDTO, true);
 
 	qaLearningForm.resetAll();
-	request.setAttribute("learningForm",qaLearningForm);
+	request.setAttribute("learningForm", qaLearningForm);
 	return "learning/AnswersContent";
     }
 
@@ -894,8 +893,8 @@ public class QaLearningController implements QaAppConstants {
      * @param getNextQuestion
      * @return
      */
-    private Object[] storeSequentialAnswer(QaLearningForm qaLearningForm,
-	    HttpServletRequest request, GeneralLearnerFlowDTO generalLearnerFlowDTO, boolean getNextQuestion) {
+    private Object[] storeSequentialAnswer(QaLearningForm qaLearningForm, HttpServletRequest request,
+	    GeneralLearnerFlowDTO generalLearnerFlowDTO, boolean getNextQuestion) {
 	String httpSessionID = qaLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
@@ -979,14 +978,13 @@ public class QaLearningController implements QaAppConstants {
 	// if so, check if the answer is blank and generate an error if it is blank.
 	boolean isRequiredQuestionMissed = dto.isRequired() && isEmpty(newAnswer);
 	if (isRequiredQuestionMissed) {
-	    errorMap.add(Globals.ERROR_KEY,
-		    messageService.getMessage("error.required", new Object[] { questionIndex }));
+	    errorMap.add("GLOBAL", messageService.getMessage("error.required", new Object[] { questionIndex }));
 	}
 
 	boolean isMinWordsLimitReached = ValidationUtil.isMinWordsLimitReached(newAnswer, dto.getMinWordsLimit(),
 		Boolean.parseBoolean(generalLearnerFlowDTO.getAllowRichEditor()));
 	if (!isMinWordsLimitReached) {
-	    errorMap.add(Globals.ERROR_KEY, messageService.getMessage("label.minimum.number.words",
+	    errorMap.add("GLOBAL", messageService.getMessage("label.minimum.number.words",
 		    ": " + new Object[] { dto.getMinWordsLimit() }));
 	}
 
@@ -1109,8 +1107,9 @@ public class QaLearningController implements QaAppConstants {
      * @throws ToolException
      */
     @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute("qaLearningForm")QaLearningForm qaLearningForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
+    public String submitReflection(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
+	    HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException, ToolException {
 
 	LearningUtil.saveFormRequestData(request, qaLearningForm);
 
@@ -1158,8 +1157,8 @@ public class QaLearningController implements QaAppConstants {
      * @throws ToolException
      */
     @RequestMapping("/forwardtoReflection")
-    public String forwardtoReflection(@ModelAttribute("qaLearningForm")QaLearningForm qaLearningForm, HttpServletRequest request)
-	    throws IOException, ServletException, ToolException {
+    public String forwardtoReflection(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
+	    HttpServletRequest request) throws IOException, ServletException, ToolException {
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
 

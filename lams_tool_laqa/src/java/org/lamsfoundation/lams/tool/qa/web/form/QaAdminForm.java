@@ -22,7 +22,7 @@
 
 package org.lamsfoundation.lams.tool.qa.web.form;
 
-import org.apache.struts.upload.FormFile;
+import org.springframework.web.multipart.MultipartFile;
 
 public class QaAdminForm {
 
@@ -36,7 +36,7 @@ public class QaAdminForm {
     private String deleteCategoriesCSV;
     private String deleteSkillsCSV;
     private String deleteQuestionsCSV;
-    private FormFile importFile;
+    private MultipartFile importFile;
 
     public QaAdminForm() {
     }
@@ -85,11 +85,11 @@ public class QaAdminForm {
 	this.deleteQuestionsCSV = deleteQuestionsCSV;
     }
 
-    public FormFile getImportFile() {
+    public MultipartFile getImportFile() {
 	return importFile;
     }
 
-    public void setImportFile(FormFile importFile) {
+    public void setImportFile(MultipartFile importFile) {
 	this.importFile = importFile;
     }
 }

@@ -39,8 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
@@ -325,8 +323,7 @@ public class QaMonitoringController implements QaAppConstants {
      * @return
      */
     @RequestMapping("/setShowOtherAnswersAfterDeadline")
-    public String setShowOtherAnswersAfterDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String setShowOtherAnswersAfterDeadline(HttpServletRequest request) {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	QaContent content = qaService.getQaContent(contentID);

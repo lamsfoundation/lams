@@ -15,8 +15,8 @@
 			if (actionMethod == 'endLearning') {
 				document.getElementById("finishButton").disabled = true;
 			}
-			document.forms.form.action = actionMethod+".do";
-			document.forms.form.submit();
+			document.forms.qaLearningForm.action = actionMethod+".do";
+			document.forms.qaLearningForm.submit();
 		}
 
 		function submitMethod(actionMethod) {
@@ -32,11 +32,11 @@
 
 	<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
-		<form:form action="learning.do" method="POST" modelAttribute="form" id="form">
-			<form:hidden property="toolSessionID" />
-			<form:hidden property="userID" />
-			<form:hidden property="httpSessionID" />
-			<form:hidden property="totalQuestionCount" />
+		<form:form action="learning.do" method="POST" modelAttribute="qaLearningForm" id="qaLearningForm">
+			<form:hidden path="toolSessionID" />
+			<form:hidden path="userID" />
+			<form:hidden path="httpSessionID" />
+			<form:hidden path="totalQuestionCount" />
 
 
 			<lams:Alert type="danger" id="submission-deadline" close="false">

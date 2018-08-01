@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
@@ -168,8 +167,9 @@ public class QaController implements QaAppConstants {
      * @param toolContentID
      * @return ActionForward
      */
-    protected QaContent prepareDTOandForm(HttpServletRequest request,@ModelAttribute("authoringForm") QaAuthoringForm authoringForm,
-	    QaContent qaContent, IQaService qaService, SessionMap<String, Object> sessionMap) {
+    protected QaContent prepareDTOandForm(HttpServletRequest request,
+	    @ModelAttribute("authoringForm") QaAuthoringForm authoringForm, QaContent qaContent, IQaService qaService,
+	    SessionMap<String, Object> sessionMap) {
 
 	authoringForm.setUsernameVisible(qaContent.isUsernameVisible() ? "1" : "0");
 	authoringForm.setAllowRateAnswers(qaContent.isAllowRateAnswers() ? "1" : "0");
@@ -237,7 +237,8 @@ public class QaController implements QaAppConstants {
      * @param mapping
      * @return ActionForward
      */
-    public boolean validateDefaultContent(HttpServletRequest request,@ModelAttribute("authoringForm") QaAuthoringForm authoringForm) {
+    public boolean validateDefaultContent(HttpServletRequest request,
+	    @ModelAttribute("authoringForm") QaAuthoringForm authoringForm) {
 
 	/*
 	 * retrieve the default content id based on tool signature
@@ -284,7 +285,7 @@ public class QaController implements QaAppConstants {
      */
     public void persistError(HttpServletRequest request, String message) {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	errorMap.add(Globals.ERROR_KEY, messageService.getMessage(message));
+	errorMap.add("GLOBAL", messageService.getMessage(message));
 	request.setAttribute("errorMap", errorMap);
     }
 
@@ -301,8 +302,8 @@ public class QaController implements QaAppConstants {
      * submits content into the tool database
      */
     @RequestMapping("/submitAllContent")
-    public String submitAllContent(@ModelAttribute("authoringForm") QaAuthoringForm authoringForm, HttpServletRequest request)
-	    throws IOException, ServletException {
+    public String submitAllContent(@ModelAttribute("authoringForm") QaAuthoringForm authoringForm,
+	    HttpServletRequest request) throws IOException, ServletException {
 
 	String httpSessionID = authoringForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -594,8 +595,8 @@ public class QaController implements QaAppConstants {
      * saveSingleQuestion
      */
     @RequestMapping("/saveSingleQuestion")
-    public String saveSingleQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm, HttpServletRequest request)
-	    throws IOException, ServletException {
+    public String saveSingleQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
+	    HttpServletRequest request) throws IOException, ServletException {
 
 	String httpSessionID = newQuestionForm.getHttpSessionID();
 
@@ -708,7 +709,7 @@ public class QaController implements QaAppConstants {
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 	request.setAttribute("authoringForm", newQuestionForm);
-	
+
 	return "authoring/AuthoringTabsHolder";
     }
 
@@ -786,8 +787,8 @@ public class QaController implements QaAppConstants {
      * opens up an new screen within the current page for adding a new question
      */
     @RequestMapping("/newQuestionBox")
-    public String newQuestionBox(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm, HttpServletRequest request)
-	    throws IOException, ServletException {
+    public String newQuestionBox(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
+	    HttpServletRequest request) throws IOException, ServletException {
 
 	String httpSessionID = newQuestionForm.getHttpSessionID();
 
@@ -829,8 +830,8 @@ public class QaController implements QaAppConstants {
      * opens up an new screen within the current page for editing a question
      */
     @RequestMapping("/newEditableQuestionBox")
-    public String newEditableQuestionBox(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm, HttpServletRequest request)
-	    throws IOException, ServletException {
+    public String newEditableQuestionBox(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
+	    HttpServletRequest request) throws IOException, ServletException {
 
 	String httpSessionID = newQuestionForm.getHttpSessionID();
 
@@ -892,8 +893,8 @@ public class QaController implements QaAppConstants {
      * removes a question from the questions map
      */
     @RequestMapping("/removeQuestion")
-    public String removeQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm, HttpServletRequest request)
-	    throws IOException, ServletException {
+    public String removeQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
+	    HttpServletRequest request) throws IOException, ServletException {
 
 	String httpSessionID = newQuestionForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -967,8 +968,8 @@ public class QaController implements QaAppConstants {
      * moves a question down in the list
      */
     @RequestMapping("/moveQuestionDown")
-    public String moveQuestionDown(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm, HttpServletRequest request)
-	    throws IOException, ServletException {
+    public String moveQuestionDown(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
+	    HttpServletRequest request) throws IOException, ServletException {
 
 	String httpSessionID = newQuestionForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -1020,8 +1021,8 @@ public class QaController implements QaAppConstants {
      * moves a question up in the list
      */
     @RequestMapping("/moveQuestionUp")
-    public String moveQuestionUp(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm, HttpServletRequest request)
-	    throws IOException, ServletException {
+    public String moveQuestionUp(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
+	    HttpServletRequest request) throws IOException, ServletException {
 
 	String httpSessionID = newQuestionForm.getHttpSessionID();
 

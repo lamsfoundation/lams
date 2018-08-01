@@ -35,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
@@ -52,7 +51,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Auxiliary action in author mode. It contains operations with QaCondition. The
@@ -80,7 +78,8 @@ public class QaAuthoringConditionController {
      * @return
      */
     @RequestMapping("/newConditionInit")
-    private String newConditionInit(@ModelAttribute("QaConditionForm") QaConditionForm QaConditionForm, HttpServletRequest request) {
+    private String newConditionInit(@ModelAttribute("QaConditionForm") QaConditionForm QaConditionForm,
+	    HttpServletRequest request) {
 
 	populateFormWithPossibleItems(QaConditionForm, request);
 	QaConditionForm.setOrderId(-1);
@@ -95,7 +94,8 @@ public class QaAuthoringConditionController {
      * @return
      */
     @RequestMapping("/editCondition")
-    private String editCondition(@ModelAttribute("QaConditionForm")QaConditionForm QaConditionForm, HttpServletRequest request) {
+    private String editCondition(@ModelAttribute("QaConditionForm") QaConditionForm QaConditionForm,
+	    HttpServletRequest request) {
 
 	String sessionMapID = QaConditionForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -128,7 +128,8 @@ public class QaAuthoringConditionController {
      * @throws ServletException
      */
     @RequestMapping(value = "/saveOrUpdateCondition")
-    private String saveOrUpdateCondition(@ModelAttribute("QaConditionForm") QaConditionForm QaConditionForm, HttpServletRequest request) {
+    private String saveOrUpdateCondition(@ModelAttribute("QaConditionForm") QaConditionForm QaConditionForm,
+	    HttpServletRequest request) {
 
 	MultiValueMap<String, String> errorMap = validateQaCondition(QaConditionForm, request);
 
@@ -328,7 +329,8 @@ public class QaAuthoringConditionController {
      * @param form
      * @param request
      */
-    private void populateFormWithPossibleItems(@ModelAttribute("QaConditionForm")QaConditionForm QaConditionForm, HttpServletRequest request) {
+    private void populateFormWithPossibleItems(@ModelAttribute("QaConditionForm") QaConditionForm QaConditionForm,
+	    HttpServletRequest request) {
 	// get back sessionMAP
 	String sessionMapID = QaConditionForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);

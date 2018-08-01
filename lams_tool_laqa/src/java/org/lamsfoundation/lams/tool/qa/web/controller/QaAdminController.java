@@ -348,7 +348,7 @@ public class QaAdminController {
 
 	// Now perform the import
 	try {
-	    String xml = new String(adminForm.getImportFile().getFileData());
+	    String xml = new String(adminForm.getImportFile().getBytes());
 	    XStream conversionXml = new XStream(new SunUnsafeReflectionProvider());
 	    conversionXml.addPermission(AnyTypePermission.ANY);
 	    SortedSet<QaWizardCategory> exportCategories = (SortedSet<QaWizardCategory>) conversionXml.fromXML(xml);
