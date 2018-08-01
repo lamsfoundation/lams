@@ -8,19 +8,9 @@
 	<c:set var="tool"> <lams:WebAppURL /> </c:set>
 	
 	<lams:head>
-		<title>
-			<fmt:message key="activity.title" />
-		</title>
-		<lams:headItems />
-	
 		<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
-	</lams:head>
-
-	<body class="stripes" onload="init();">
 		
-		<lams:Page title="${activity.title}" type="navbar" formID="authoringForm">
-			
-			<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>css/jquery.minicolors.css"></link>
+		<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>css/jquery.minicolors.css"></link>
 			<link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link>
 			<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
 			
@@ -44,7 +34,12 @@
 					$('a[href*="doSubmit_Form_Only()"]').click(setMindmapContent);
 				});	
 			</script>
-			
+	</lams:head>
+
+	<body class="stripes" onload="init();">
+	
+		<title><fmt:message key="activity.title" /></title>
+		<lams:Page title="${activity.title}" type="navbar" formID="authoringForm">
 			<form:form action="updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post" enctype="multipart/form-data">
 				
 				<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
