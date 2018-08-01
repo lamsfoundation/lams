@@ -6,7 +6,7 @@
 
 	<div class="checkbox">
 		<label for="multiUserMode">
-			<html:checkbox property="multiUserMode" value="1" styleId="multiUserMode"/>
+			<form:checkbox path="multiUserMode" value="1" id="multiUserMode"/>
 			<fmt:message key="advanced.multiUserMode" />
 		</label>
 	</div>
@@ -17,7 +17,7 @@
 
 	<div class="checkbox">
 		<label for="lock-when-finished">
-			<html:checkbox property="lockOnFinished" styleId="lock-when-finished"/>
+			<form:checkbox path="lockOnFinished" id="lock-when-finished"/>
 			<fmt:message key="advanced.lockOnFinished" />
 		</label>
 	</div>
@@ -25,13 +25,13 @@
 	<!-- Reflection -->
 	<div class="checkbox">
 		<label for="reflect-on">
-			<html:checkbox property="reflectOnActivity" styleId="reflect-on"/>
+			<form:checkbox path="reflectOnActivity" id="reflect-on"/>
 			<fmt:message key="advanced.reflectOnActivity" />
 		</label>
 	</div>
 	
 	<div class="form-group">
-		<html:textarea property="reflectInstructions" cols="60" rows="3" styleId="reflect-instructions" styleClass="form-control"/>
+		<textarea name="reflectInstructions" cols="60" rows="3" id="reflect-instructions" class="form-control">${authoringForm.reflectInstructions}</textarea>
 	</div>
 
 </lams:SimplePanel>

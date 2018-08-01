@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.mindmap.web.actions;
+package org.lamsfoundation.lams.tool.mindmap.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
@@ -35,9 +35,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -66,10 +63,18 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -85,44 +90,42 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  *
  */
-public class LearningAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningController.class);
     private static final boolean MODE_OPTIONAL = false;
-    private IMindmapService mindmapService;
 
     private static final String REQUEST_JSON_TYPE = "type"; // Expected to be int: 0 - delete; 1 - create node; 2 - change color; 3 - change text
     private static final String REQUEST_JSON_REQUEST_ID = "requestId"; // Expected to be long
     private static final String REQUEST_JSON_PARENT_NODE_ID = "parentId"; // Expected to be long
 
+    @Autowired
+    @Qualifier("mindmapService")
+    private IMindmapService mindmapService;
+
+    @Autowired
+    @Qualifier("mindmapMessageService")
+    private MessageService messageService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
+
     /**
      * Default action on page load. Clones Mindmap Nodes for each Learner in single-user mode. Uses shared (runtime
      * created in CopyToolContent method) Mindmap Nodes in multi-user mode.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return null
      */
-    @Override
-    @SuppressWarnings("rawtypes")
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/learning")
+    public String unspecified(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
-	LearningForm learningForm = (LearningForm) form;
 
 	// 'toolSessionID' and 'mode' parameters are expected to be present.
 	// TODO need to catch exceptions and handle errors.
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,
-		LearningAction.MODE_OPTIONAL);
+		LearningController.MODE_OPTIONAL);
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// set up mindmapService
-	if (mindmapService == null) {
-	    mindmapService = MindmapServiceProxy.getMindmapService(this.getServlet().getServletContext());
-	}
 
 	// Retrieve the session and content.
 	MindmapSession mindmapSession = mindmapService.getSessionBySessionId(toolSessionID);
@@ -134,7 +137,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	// check defineLater
 	if (mindmap.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "pages/learning/defineLater";
 	}
 
 	// set mode, toolSessionID and MindmapDTO
@@ -157,7 +160,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -173,7 +176,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("submissionDeadline");
+		return "pages/learning/submissionDeadline";
 	    }
 	}
 
@@ -240,17 +243,11 @@ public class LearningAction extends LamsDispatchAction {
 	    request.setAttribute("isMonitor", isMonitor);
 	}
 
-	return mapping.findForward("mindmap");
+	return "pages/learning/mindmap";
     }
 
     /**
      * Clones Mindmap Nodes for each Learner (used in single-user mode only).
-     *
-     * @param fromMindmapNode
-     * @param toMindmapNode
-     * @param fromContent
-     * @param toContent
-     * @param user
      */
     @SuppressWarnings("rawtypes")
     public void cloneMindmapNodesForRuntime(MindmapNode fromMindmapNode, MindmapNode toMindmapNode, Mindmap fromContent,
@@ -271,19 +268,11 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Gets the Notify Requests (Actions) from Flash and returns proper Notify Responses
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return null
-     * @throws IOException
-     * @throws JsonProcessingException
-     * @throws JSONException
      */
-    @SuppressWarnings("rawtypes")
-    public ActionForward notifyServerActionJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JsonProcessingException, IOException {
+    @RequestMapping(path = "/notifyServerActionJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String notifyServerActionJSON(HttpServletRequest request, HttpServletResponse response)
+	    throws JsonProcessingException, IOException {
 	Long userId = WebUtil.readLongParam(request, "userId", false);
 	Long mindmapId = WebUtil.readLongParam(request, "mindmapId", false);
 	Long toolSessionId = WebUtil.readLongParam(request, "sessionId", false);
@@ -317,7 +306,7 @@ public class LearningAction extends LamsDispatchAction {
 		mindmapNode = mindmapService.getMindmapNodeByUniqueIdSessionId(
 			JsonUtil.optLong(notifyRequest, IdeaJSON.MAPJS_JSON_ID_KEY), mindmapId, toolSessionId);
 		if (mindmapNode == null) {
-		    LearningAction.log.error("notifyServerAction(): Error finding node!");
+		    LearningController.log.error("notifyServerAction(): Error finding node!");
 		    return null;
 		}
 	    }
@@ -360,7 +349,7 @@ public class LearningAction extends LamsDispatchAction {
 		MindmapNode parentNode = mindmapService.getMindmapNodeByUniqueIdSessionId(parentNodeId, mindmapId,
 			toolSessionId);
 		if (parentNode == null) {
-		    LearningAction.log.error("notifyServerAction(): Unable to find parent node: " + parentNodeId
+		    LearningController.log.error("notifyServerAction(): Unable to find parent node: " + parentNodeId
 			    + " toolSessionId " + toolSessionId);
 		}
 
@@ -408,25 +397,11 @@ public class LearningAction extends LamsDispatchAction {
 	    }
 	}
 
-	try {
-	    response.setContentType("application/x-json;charset=utf-8");
-	    response.getWriter().write(notifyResponse.toString());
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-
-	return null;
+	return notifyResponse.toString();
     }
 
     /**
      * Saves Notify Requests to database
-     *
-     * @param mindmapRequest
-     * @param requestType
-     * @param notifyRequestModel
-     * @param userId
-     * @param mindmapId
-     * @param nodeChildId
      */
     private MindmapRequest saveMindmapRequestJSON(MindmapRequest mindmapRequest, int requestType, Long requestId,
 	    Long nodeId, Long userId, Long mindmapId, Long nodeChildId, Long sessionId) {
@@ -445,30 +420,17 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Returns the serialized JSON of the Mindmap Nodes from Database
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return null
-     * @throws JSONException
-     * @throws IOException
      */
-    @SuppressWarnings("rawtypes")
-    public ActionForward setMindmapContentJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	// set up mindmapService
-	if (mindmapService == null) {
-	    mindmapService = MindmapServiceProxy.getMindmapService(this.getServlet().getServletContext());
-	}
+    @RequestMapping(path = "/setMindmapContentJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String setMindmapContentJSON(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long mindmapId = WebUtil.readLongParam(request, "mindmapId", false);
 	Long toolSessionId = WebUtil.readLongParam(request, "sessionId", true);
 	Mindmap mindmap = mindmapService.getMindmapByUid(mindmapId);
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,
-		LearningAction.MODE_OPTIONAL);
+		LearningController.MODE_OPTIONAL);
 	boolean monitoring = mode.equals(ToolAccessMode.TEACHER);
 
 	// In monitoring we do not need the user when accessing multi mode mindmap
@@ -517,15 +479,14 @@ public class LearningAction extends LamsDispatchAction {
 		jsonObject.put("lastActionId", lastActionId);
 	    }
 
-	    response.setContentType("application/x-json;charset=utf-8");
-	    response.getWriter().print(jsonObject.toString());
-	    return null;
+	    return jsonObject.toString();
 	}
 	return null;
     }
 
-    public ActionForward saveLastMindmapChanges(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping(path = "/saveLastMindmapChanges", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String saveLastMindmapChanges(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long userId = WebUtil.readLongParam(request, "userId", false);
 	Long toolContentId = WebUtil.readLongParam(request, "mindmapId", false);
@@ -545,9 +506,7 @@ public class LearningAction extends LamsDispatchAction {
 	    responseJSON = new NotifyResponseJSON(0, null, 0L);
 	}
 
-	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(responseJSON.toString());
-	return null;
+	return responseJSON.toString();
     }
 
     private Long saveMapJsJSON(Mindmap mindmap, MindmapUser mindmapUser, String mindmapContent,
@@ -589,9 +548,6 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Returns current learner
-     *
-     * @param toolSessionId
-     * @return mindmapUser
      */
     private MindmapUser getCurrentUser(Long toolSessionId) {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
@@ -610,19 +566,10 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Saving Mindmap nodes and proceed to reflection.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws JSONException
      */
-    public ActionForward reflect(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/reflect")
+    public String reflect(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-
-	LearningForm learningForm = (LearningForm) form;
 
 	Long userId = WebUtil.readLongParam(request, "userId", false);
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId", false);
@@ -652,23 +599,16 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(mindmapSession.getSessionId(), request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
-	return mapping.findForward("reflect");
+	return "pages/learning/reflect";
     }
 
     /**
      * Finish Mindmap Activity and save reflection if appropriate.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return null
-     * @throws IOException
-     * @throws JSONException
      */
-    public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/finishActivity")
+    public String finishActivity(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
@@ -686,7 +626,6 @@ public class LearningAction extends LamsDispatchAction {
 
 	if (mindmapUser != null) {
 	    if (!contentLocked) {
-		LearningForm learningForm = (LearningForm) form;
 
 		mindmapUser.setFinishedActivity(true);
 		mindmapService.saveOrUpdateMindmapUser(mindmapUser);
@@ -716,12 +655,12 @@ public class LearningAction extends LamsDispatchAction {
 	    }
 
 	} else {
-	    LearningAction.log.error(
+	    LearningController.log.error(
 		    "finishActivity(): couldn't find MindmapUser is null " + " and toolSessionID: " + toolSessionID);
 	}
 
 	ToolSessionManager sessionMgrService = MindmapServiceProxy
-		.getMindmapSessionManager(getServlet().getServletContext());
+		.getMindmapSessionManager(applicationContext.getServletContext());
 
 	String nextActivityUrl;
 	try {

@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.mindmap.web.actions;
+package org.lamsfoundation.lams.tool.mindmap.web.controller;
 
 import java.io.IOException;
 
@@ -30,18 +29,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.service.IMindmapService;
-import org.lamsfoundation.lams.tool.mindmap.service.MindmapServiceProxy;
-import org.lamsfoundation.lams.tool.mindmap.util.MindmapConstants;
 import org.lamsfoundation.lams.tool.mindmap.web.forms.MindmapPedagogicalPlannerForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author
@@ -52,53 +51,48 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class PedagogicalPlannerAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/pedagogicalPlanner")
+public class PedagogicalPlannerController {
 
-    private static Logger logger = Logger.getLogger(PedagogicalPlannerAction.class);
+    private static Logger logger = Logger.getLogger(PedagogicalPlannerController.class);
 
-    public IMindmapService mindmapService;
+    @Autowired
+    @Qualifier("mindmapService")
+    private IMindmapService mindmapService;
 
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	if (mindmapService == null) {
-	    mindmapService = MindmapServiceProxy.getMindmapService(this.getServlet().getServletContext());
-	}
-	return initPedagogicalPlannerForm(mapping, form, request, response);
-    }
+    @Autowired
+    @Qualifier("mindmapMessageService")
+    private MessageService messageService;
 
-    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	MindmapPedagogicalPlannerForm plannerForm = (MindmapPedagogicalPlannerForm) form;
+    @RequestMapping("/initPedagogicalPlannerForm")
+    public String initPedagogicalPlannerForm(@ModelAttribute MindmapPedagogicalPlannerForm plannerForm,
+	    HttpServletRequest request, HttpServletResponse response) {
+
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Mindmap mindmap = getMindmapService().getMindmapByContentId(toolContentID);
+	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
 	plannerForm.fillForm(mindmap);
 	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	plannerForm.setContentFolderID(contentFolderId);
-	return mapping.findForward(MindmapConstants.SUCCESS);
+	return "pages/authoring/pedagogicalPlannerForm";
 
     }
 
-    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
+    @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
+    public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute MindmapPedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException {
-	MindmapPedagogicalPlannerForm plannerForm = (MindmapPedagogicalPlannerForm) form;
-	ActionMessages errors = plannerForm.validate();
-	if (errors.isEmpty()) {
+
+	MultiValueMap<String, String> errorMap = plannerForm.validate(messageService);
+	if (errorMap.isEmpty()) {
 	    String instructions = plannerForm.getInstructions();
 	    Long toolContentID = plannerForm.getToolContentID();
-	    Mindmap mindmap = getMindmapService().getMindmapByContentId(toolContentID);
+	    Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
 	    mindmap.setInstructions(instructions);
-	    getMindmapService().saveOrUpdateMindmap(mindmap);
+	    mindmapService.saveOrUpdateMindmap(mindmap);
 	} else {
-	    saveErrors(request, errors);
+	    request.setAttribute("errorMap", errorMap);
 	}
-	return mapping.findForward(MindmapConstants.SUCCESS);
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    private IMindmapService getMindmapService() {
-	if (mindmapService == null) {
-	    mindmapService = MindmapServiceProxy.getMindmapService(this.getServlet().getServletContext());
-	}
-	return mindmapService;
-    }
 }

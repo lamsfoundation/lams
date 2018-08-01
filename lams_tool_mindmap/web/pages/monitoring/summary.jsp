@@ -13,7 +13,7 @@
 		lams: '${lams}',
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?dispatch=setSubmissionDeadline"/>',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
@@ -110,13 +110,13 @@
 								</td>
 						
 								<td >
-									<a href="./monitoring.do?dispatch=showMindmap&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
+									<a href="./monitoring/showMindmap.dp?toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
 										<fmt:message key="label.view" />
 									</a>		
 								</td>
 						
 								<td width="30%">
-									<a href="./monitoring.do?dispatch=reflect&userUID=${user.uid}&toolContentID=${dto.toolContentId}">
+									<a href="./monitoring/reflect.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}">
 										<fmt:message key="label.view" />
 									</a>
 								</td>
@@ -131,7 +131,7 @@
 							</td>
 					
 							<td>
-								<a href="./monitoring.do?dispatch=showMindmap&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
+								<a href="./monitoring/showMindmap.do?toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
 									<fmt:message key="label.view" />
 								</a>		
 							</td>
@@ -155,7 +155,7 @@
 									<fmt:message key="label.notAvailable" />
 								</c:when>
 								<c:otherwise>
-									<a href="./monitoring.do?dispatch=showMindmap&userUID=${user.uid}&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
+									<a href="./monitoring/showMindmap.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
 										<fmt:message key="label.view" />
 									</a>									
 								</c:otherwise>
@@ -164,7 +164,7 @@
 						
 						<c:if test="${dto.reflectOnActivity}">
 						<td>
-							<a href="./monitoring.do?dispatch=reflect&userUID=${user.uid}&toolContentID=${dto.toolContentId}"><fmt:message key="label.view" />	</a>
+							<a href="./monitoring/reflect.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}"><fmt:message key="label.view" />	</a>
 						</td>
 						</c:if>
 						

@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.tool.mindmap.web.actions;
+package org.lamsfoundation.lams.tool.mindmap.web.controller;
 
 import java.io.IOException;
 import java.util.Iterator;

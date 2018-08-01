@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.mindmap.web.actions;
+package org.lamsfoundation.lams.tool.mindmap.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
@@ -33,9 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
@@ -43,14 +39,18 @@ import org.lamsfoundation.lams.tool.mindmap.dto.MindmapUserDTO;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
 import org.lamsfoundation.lams.tool.mindmap.service.IMindmapService;
-import org.lamsfoundation.lams.tool.mindmap.service.MindmapServiceProxy;
 import org.lamsfoundation.lams.tool.mindmap.util.MindmapConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author Ruslan Kazakov
@@ -61,25 +61,22 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class MonitoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
 
-    private static Logger log = Logger.getLogger(MonitoringAction.class);
-    public IMindmapService mindmapService;
+    private static Logger log = Logger.getLogger(MonitoringController.class);
+
+    @Autowired
+    @Qualifier("mindmapService")
+    private IMindmapService mindmapService;
 
     /**
      * Default action on page load
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return null
      */
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/monitoring")
+    public String unspecified(HttpServletRequest request, HttpServletResponse response) {
 
-	setupService();
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
@@ -107,25 +104,18 @@ public class MonitoringAction extends LamsDispatchAction {
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    request.setAttribute(MindmapConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
-	    request.setAttribute(MindmapConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	    request.setAttribute(MindmapConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
-	return mapping.findForward("success");
+	return "pages/monitoring/monitoring";
     }
 
     /**
      * Shows Mindmap Nodes for each learner
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return null
      */
-    public ActionForward showMindmap(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	setupService();
+    @RequestMapping("/showMindmap")
+    public String showMindmap(HttpServletRequest request, HttpServletResponse response) {
 
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
@@ -134,7 +124,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute("sessionId", WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	request.setAttribute("mode", ToolAccessMode.TEACHER);
 
-	if ( ! mindmap.isMultiUserMode() ) {
+	if (!mindmap.isMultiUserMode()) {
 	    Long userId = new Long(WebUtil.readLongParam(request, "userUID"));
 	    MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
 	    MindmapUserDTO userDTO = new MindmapUserDTO(mindmapUser);
@@ -142,19 +132,14 @@ public class MonitoringAction extends LamsDispatchAction {
 	    request.setAttribute("userId", mindmapUser.getUid());
 	}
 
-	return mapping.findForward("mindmap_display");
+	return "pages/monitoring/mindmapDisplay";
     }
+
     /**
      * Shows Notebook reflection that Learner has done.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward reflect(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/reflect")
+    public String reflect(HttpServletRequest request, HttpServletResponse response) {
 
 	Long userId = WebUtil.readLongParam(request, "userUID", false);
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentID", false);
@@ -171,22 +156,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	    request.setAttribute("reflectEntry", entry.getEntry());
 	}
 
-	return mapping.findForward("reflect");
+	return "pages/monitoring/reflect";
     }
 
     /**
      * Set Submission Deadline
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException 
      */
-    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	setupService();
+    @RequestMapping(path = "setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseBody
+    public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Mindmap mindmap = mindmapService.getMindmapByContentId(contentID);
@@ -204,17 +182,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 	mindmap.setSubmissionDeadline(tzSubmissionDeadline);
 	mindmapService.saveOrUpdateMindmap(mindmap);
-	response.setContentType("text/plain;charset=utf-8");
-	response.getWriter().print(formattedDate);
-	return null;
+	return formattedDate;
     }
 
-    /**
-     * Sets mindmapService
-     */
-    private void setupService() {
-	if (mindmapService == null) {
-	    mindmapService = MindmapServiceProxy.getMindmapService(this.getServlet().getServletContext());
-	}
-    }
 }

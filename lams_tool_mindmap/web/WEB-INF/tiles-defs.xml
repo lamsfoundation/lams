@@ -91,7 +91,9 @@
 		<put name="body" value="/pages/learning/mindmap.jsp" />
 	</definition>
 	
-	<definition name="tiles:/learning/reflect" extends="tiles:/layout:learning">
+	<definition 
+	
+	name="tiles:/learning/reflect" extends="tiles:/layout:learning">
 		<put name="body" value="/pages/learning/reflect.jsp" />
 	</definition>
 	

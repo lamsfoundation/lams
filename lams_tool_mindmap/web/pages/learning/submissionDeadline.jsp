@@ -1,6 +1,20 @@
+<!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
-<script type="text/javascript">
+<lams:html>
+	<c:set var="lams"> <lams:LAMSURL /> </c:set>
+	<c:set var="tool"> <lams:WebAppURL /> </c:set>
+	
+	<lams:head>
+		<title>
+			<fmt:message key="activity.title" />
+		</title>
+		<lams:headItems />
+		<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
+
+	</lams:head>
+	
+	<script type="text/javascript">
 	function disableFinishButton() {
 		document.getElementById("finishButton").disabled = true;
 	}
@@ -8,37 +22,42 @@
 		var f = document.getElementById('Form');
 		f.submit();
 	}
-</script>
+	</script>
 
-<lams:Page type="learner" title="${mindmapDTO.title}">
-
-	<lams:Alert id="deadline" type="danger" close="false">
-		<fmt:message key="authoring.info.teacher.set.restriction" >
-			<fmt:param><lams:Date value="${submissionDeadline}" /></fmt:param>
-		</fmt:message>
-	</lams:Alert>
-
-	<c:if test="${mode == 'learner' || mode == 'author'}">
-		<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="Form">
-			<html:hidden property="dispatch" value="finishActivity" />
-			<html:hidden property="toolSessionID" />
-
-			<div class="voffset10 pull-right">
-				<html:link href="#nogo" styleClass="btn btn-primary na" styleId="finishButton" onclick="submitForm('finish')">
-					<span class="na">
-						<c:choose>
-							<c:when test="${activityPosition.last}">
-								<fmt:message key="button.submit" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="button.finish" />
-							</c:otherwise>
-						</c:choose>
-					</span>
-				</html:link>
-			</div>
-		</html:form>
-	</c:if>
+	<body class="stripes">
 	
-</lams:Page>
+	<lams:Page type="learner" title="${mindmapDTO.title}" formID="learningForm">
+	
+		<lams:Alert id="deadline" type="danger" close="false">
+			<fmt:message key="authoring.info.teacher.set.restriction" >
+				<fmt:param><lams:Date value="${submissionDeadline}" /></fmt:param>
+			</fmt:message>
+		</lams:Alert>
+	
+		<c:if test="${mode == 'learner' || mode == 'author'}">
+			<form:form action="finishActivity.do" method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="learningForm">
+				<form:hidden path="toolSessionID" />
+	
+				<div class="voffset10 pull-right">
+					<a href="#nogo" class="btn btn-primary na" id="finishButton" onclick="submitForm('finish')">
+						<span class="na">
+							<c:choose>
+								<c:when test="${activityPosition.last}">
+									<fmt:message key="button.submit" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="button.finish" />
+								</c:otherwise>
+							</c:choose>
+						</span>
+					</a>
+				</div>
+			</form:form>
+		</c:if>
+		
+	</lams:Page>
 
+<div class="footer">
+		</div>					
+	</body>
+</lams:html>

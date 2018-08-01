@@ -1,22 +1,42 @@
+<!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
-<h3>
-	<fmt:message>label.notebookEntry</fmt:message>
-</h3>
+<lams:html>
+	<c:set var="tool"> <lams:WebAppURL /> </c:set>
+	
+	<script type="text/javascript">
+		var initialTabId = "${mindmapDTO.currentTab}";
+	</script>
+	<script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
 
-<table class="table">
-	<tr>
-		<th>
-			<c:out value="${mindmapUser}" escapeXml="true"/>
-		</th>
-	</tr>
-	<tr>
-		<td>
-			<lams:out value="${reflectEntry}" escapeHtml="true" />
-		</td>
-	</tr>
-</table>
-		
-<html:button styleClass="btn btn-primary voffset10 pull-right" property="backButton" onclick="history.go(-1)">
-	<fmt:message>button.back</fmt:message>
-</html:button>
+	<body class="stripes">	
+	
+		<lams:Page title="${pageTitle.monitoring}" type="learner">
+
+			<div id="content">
+				<h3>
+					<fmt:message>label.notebookEntry</fmt:message>
+				</h3>
+				
+				<table class="table">
+					<tr>
+						<th>
+							<c:out value="${mindmapUser}" escapeXml="true"/>
+						</th>
+					</tr>
+					<tr>
+						<td>
+							<lams:out value="${reflectEntry}" escapeHtml="true" />
+						</td>
+					</tr>
+				</table>
+						
+				<button class="btn btn-primary voffset10 pull-right" property="backButton" onclick="history.go(-1)">
+					<fmt:message>button.back</fmt:message>
+				</button>
+
+			</div>
+			<div id="footer"></div>
+		</lams:Page>
+	</body>
+</lams:html>

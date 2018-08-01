@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.mindmap.web.actions;
+package org.lamsfoundation.lams.tool.mindmap.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
@@ -31,9 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mindmap.dto.RootJSON;
@@ -41,15 +38,21 @@ import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
 import org.lamsfoundation.lams.tool.mindmap.service.IMindmapService;
-import org.lamsfoundation.lams.tool.mindmap.service.MindmapServiceProxy;
 import org.lamsfoundation.lams.tool.mindmap.util.MindmapConstants;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
 import org.lamsfoundation.lams.tool.mindmap.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -62,34 +65,37 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  *
  */
-public class AuthoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
 
-    private static Logger logger = Logger.getLogger(AuthoringAction.class);
-
-    public IMindmapService mindmapService;
+    private static Logger logger = Logger.getLogger(AuthoringController.class);
 
     // Authoring SessionMap key names
     private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
     private static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
     private static final String KEY_MODE = "mode";
 
+    @Autowired
+    @Qualifier("mindmapService")
+    private IMindmapService mindmapService;
+
+    @Autowired
+    @Qualifier("mindmapMessageService")
+    private MessageService messageService;
+
     /**
      * Default method when no dispatch parameter is specified. It is expected that the parameter
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
      */
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/authoring")
+    public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-
-	// set up mindmapService
-	if (mindmapService == null) {
-	    mindmapService = MindmapServiceProxy.getMindmapService(this.getServlet().getServletContext());
-	}
 
 	// retrieving Mindmap with given toolContentID
 	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
@@ -125,30 +131,25 @@ public class AuthoringAction extends LamsDispatchAction {
 	request.setAttribute("mindmapId", mindmap.getUid());
 
 	// Set up the authForm.
-	AuthoringForm authForm = (AuthoringForm) form;
-	updateAuthForm(authForm, mindmap);
+	updateAuthForm(authoringForm, mindmap);
 
 	// Set up sessionMap
 	SessionMap<String, Object> map = createSessionMap(mindmap, mode, contentFolderID, toolContentID);
-	authForm.setSessionMapID(map.getSessionID());
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
 	request.getSession().setAttribute(map.getSessionID(), map);
 	request.setAttribute(MindmapConstants.ATTR_SESSION_MAP, map);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
     /**
      * Returns the serialized XML of the Mindmap Nodes from Database
      */
-    public ActionForward setMindmapContentJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	// set up mindmapService
-	if (mindmapService == null) {
-	    mindmapService = MindmapServiceProxy.getMindmapService(this.getServlet().getServletContext());
-	}
+    @RequestMapping(path = "/setMindmapContentJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String setMindmapContentJSON(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long mindmapId = WebUtil.readLongParam(request, "mindmapId", false);
 	List mindmapNodeList = mindmapService.getAuthorRootNodeByMindmapId(mindmapId);
@@ -156,7 +157,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	if (mindmapNodeList != null && mindmapNodeList.size() > 0) {
 	    MindmapNode rootMindmapNode = (MindmapNode) mindmapNodeList.get(0);
 
-	    String rootMindmapUser = mindmapService.getMindmapMessageService().getMessage("node.instructor.label");
+	    String rootMindmapUser = messageService.getMessage("node.instructor.label");
 
 	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(),
 		    rootMindmapNode.getText(), rootMindmapNode.getColor(), rootMindmapUser, 1));
@@ -166,9 +167,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 	    jsonObject.set("mindmap", new RootJSON(currentNodeModel, false));
 
-	    response.setContentType("application/x-json;charset=utf-8");
-	    response.getWriter().print(jsonObject.toString());
-	    return null;
+	    return jsonObject.toString();
 	}
 
 	return null;
@@ -176,20 +175,19 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Saves Mindmap Nodes to Database
-     *
-     * @throws IOException
      */
-    public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/updateContent")
+    public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	// get authForm and session map.
-	AuthoringForm authForm = (AuthoringForm) form;
-	SessionMap<String, Object> map = getSessionMap(request, authForm);
+
+	// get session map.
+	SessionMap<String, Object> map = getSessionMap(request, authoringForm);
 
 	// get mindmap content.
-	Mindmap mindmap = mindmapService.getMindmapByContentId((Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
+	Mindmap mindmap = mindmapService.getMindmapByContentId((Long) map.get(AuthoringController.KEY_TOOL_CONTENT_ID));
 
 	// update mindmap content using form inputs
-	updateMindmap(mindmap, authForm);
+	updateMindmap(mindmap, authoringForm);
 
 	// set the update date
 	mindmap.setUpdateDate(new Date());
@@ -202,13 +200,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
-	authForm.setSessionMapID(map.getSessionID());
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	request.setAttribute(MindmapConstants.ATTR_SESSION_MAP, map);
 
 	/* Saving Minmdap Nodes */
 	MindmapUser mindmapUser = mindmapService.getUserByUID(mindmap.getCreateBy());
-	String mindmapContent = authForm.getMindmapContent();
+	String mindmapContent = authoringForm.getMindmapContent();
 
 	NodeModel rootNodeModel = RootJSON.toNodeModel(mindmapContent);
 	if (rootNodeModel == null) {
@@ -239,68 +237,54 @@ public class AuthoringAction extends LamsDispatchAction {
 	nodesToDeleteCondition += mindmapService.getNodesToDeleteCondition() + " and mindmap_id = " + mindmap.getUid();
 	mindmapService.deleteNodes(nodesToDeleteCondition);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
     /**
      * Updates Mindmap content using AuthoringForm inputs.
-     *
-     * @param mindmap
-     * @param authForm
-     * @param mode
      */
-    private void updateMindmap(Mindmap mindmap, AuthoringForm authForm) {
-	mindmap.setTitle(authForm.getTitle());
-	mindmap.setInstructions(authForm.getInstructions());
-	mindmap.setLockOnFinished(authForm.isLockOnFinished());
-	mindmap.setMultiUserMode(authForm.isMultiUserMode());
+    private void updateMindmap(Mindmap mindmap, AuthoringForm authoringForm) {
+	mindmap.setTitle(authoringForm.getTitle());
+	mindmap.setInstructions(authoringForm.getInstructions());
+	mindmap.setLockOnFinished(authoringForm.isLockOnFinished());
+	mindmap.setMultiUserMode(authoringForm.isMultiUserMode());
 	// reflection
-	mindmap.setReflectOnActivity(authForm.isReflectOnActivity());
-	mindmap.setReflectInstructions(authForm.getReflectInstructions());
+	mindmap.setReflectOnActivity(authoringForm.isReflectOnActivity());
+	mindmap.setReflectInstructions(authoringForm.getReflectInstructions());
     }
 
     /**
      * Updates AuthoringForm using Mindmap content.
-     *
-     * @param authForm
-     * @param mindmap
      */
-    private void updateAuthForm(AuthoringForm authForm, Mindmap mindmap) {
-	authForm.setTitle(mindmap.getTitle());
-	authForm.setInstructions(mindmap.getInstructions());
-	authForm.setLockOnFinished(mindmap.isLockOnFinished());
-	authForm.setMultiUserMode(mindmap.isMultiUserMode());
+    private void updateAuthForm(AuthoringForm authoringForm, Mindmap mindmap) {
+	authoringForm.setTitle(mindmap.getTitle());
+	authoringForm.setInstructions(mindmap.getInstructions());
+	authoringForm.setLockOnFinished(mindmap.isLockOnFinished());
+	authoringForm.setMultiUserMode(mindmap.isMultiUserMode());
 	// reflection
-	authForm.setReflectOnActivity(mindmap.isReflectOnActivity());
-	authForm.setReflectInstructions(mindmap.getReflectInstructions());
+	authoringForm.setReflectOnActivity(mindmap.isReflectOnActivity());
+	authoringForm.setReflectInstructions(mindmap.getReflectInstructions());
     }
 
     /**
      * Updates SessionMap using Mindmap content.
-     *
-     * @param mindmap
-     * @param mode
-     * @return map
      */
     private SessionMap<String, Object> createSessionMap(Mindmap mindmap, ToolAccessMode mode, String contentFolderID,
 	    Long toolContentID) {
 
-	SessionMap<String, Object> map = new SessionMap<String, Object>();
+	SessionMap<String, Object> map = new SessionMap<>();
 
-	map.put(AuthoringAction.KEY_MODE, mode);
-	map.put(AuthoringAction.KEY_CONTENT_FOLDER_ID, contentFolderID);
-	map.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
+	map.put(AuthoringController.KEY_MODE, mode);
+	map.put(AuthoringController.KEY_CONTENT_FOLDER_ID, contentFolderID);
+	map.put(AuthoringController.KEY_TOOL_CONTENT_ID, toolContentID);
 
 	return map;
     }
 
     /**
      * Retrieve the SessionMap from the HttpSession.
-     *
-     * @param request
-     * @param authForm
      */
-    private SessionMap<String, Object> getSessionMap(HttpServletRequest request, AuthoringForm authForm) {
-	return (SessionMap<String, Object>) request.getSession().getAttribute(authForm.getSessionMapID());
+    private SessionMap<String, Object> getSessionMap(HttpServletRequest request, AuthoringForm authoringForm) {
+	return (SessionMap<String, Object>) request.getSession().getAttribute(authoringForm.getSessionMapID());
     }
 }
