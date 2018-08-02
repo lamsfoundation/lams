@@ -10,6 +10,13 @@
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+	<bean id="lascrbMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+	<property name="basename"><value>org.lamsfoundation.lams.tool.scribe.ApplicationResources</value></property>
+	</bean>
+	<bean id="lascrbMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource"><ref bean="lascrbMessageSource"/></property>										
+	</bean>
+	
 	<bean id="lascrbScribeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="preInterceptors">

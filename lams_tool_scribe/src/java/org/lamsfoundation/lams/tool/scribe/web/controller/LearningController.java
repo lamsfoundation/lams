@@ -31,10 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -55,32 +51,46 @@ import org.lamsfoundation.lams.tool.scribe.util.ScribeException;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
 import org.lamsfoundation.lams.tool.scribe.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.context.WebApplicationContext;
 
-public class LearningAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningController.class);
 
     private static final boolean MODE_OPTIONAL = false;
 
+    @Autowired
+    @Qualifier("lascrbScribeService")
     private IScribeService scribeService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    @Qualifier("lascrbMessageService")
+    private MessageService messageService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
+
+    @RequestMapping("")
+    public String unspecified(@ModelAttribute("learningForm") LearningForm learningform, HttpServletRequest request)
+	    throws Exception {
 	// 'toolSessionID' and 'mode' paramters are expected to be present.
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,
-		LearningAction.MODE_OPTIONAL);
+		LearningController.MODE_OPTIONAL);
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	// set up scribeService
-	if (scribeService == null) {
-	    scribeService = ScribeServiceProxy.getScribeService(this.getServlet().getServletContext());
-	}
 	scribeService.createReportEntry(toolSessionID);
 
 	// Retrieve the session and content.
@@ -92,7 +102,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	// check defineLater
 	if (scribe.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "/pages/learning/defineLater";
 	}
 
 	// Ensure that the content in use flag is set.
@@ -102,7 +112,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
 	// Retrieve the current user
 	ScribeUser scribeUser = getCurrentUser(toolSessionID);
@@ -113,7 +123,7 @@ public class LearningAction extends LamsDispatchAction {
 	    if (scribe.isAutoSelectScribe() == false) {
 		// learner needs to wait until a scribe has been appointed by
 		// teacher.
-		return mapping.findForward("waitForScribe");
+		return "pages/learning/waitForScribe";
 
 	    } else {
 		// appoint the currentUser as the scribe
@@ -123,7 +133,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	// setup dto's forms and attributes.
-	((LearningForm) form).setToolSessionID(scribeSession.getSessionId());
+	learningform.setToolSessionID(scribeSession.getSessionId());
 	request.setAttribute("MODE", mode.toString());
 	setupDTOs(request, scribeSession, scribeUser);
 
@@ -133,7 +143,7 @@ public class LearningAction extends LamsDispatchAction {
 	    if (scribeSession.getScribe().isShowAggregatedReports()) {
 		setupOtherGroupReportDTO(request, scribeSession, scribeUser);
 	    }
-	    return mapping.findForward("report");
+	    return "pages/learning/report";
 	}
 
 	// check if user has started activity
@@ -143,14 +153,14 @@ public class LearningAction extends LamsDispatchAction {
 	    } else {
 		request.setAttribute("role", "learner");
 	    }
-	    return mapping.findForward("instructions");
+	    return "pages/learning/instructions";
 	}
 
 	// check if current user is the scribe.
 	if (scribeSession.getAppointedScribe().getUid() == scribeUser.getUid()) {
-	    return mapping.findForward("scribe");
+	    return "pages/learning/scribe";
 	} else {
-	    return mapping.findForward("learning");
+	    return "pages/learning/learning";
 	}
 
     }
@@ -170,18 +180,17 @@ public class LearningAction extends LamsDispatchAction {
 	return scribeUser;
     }
 
-    public ActionForward startActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/startActivity")
+    public String startActivity(@ModelAttribute("learningForm") LearningForm learningform, HttpServletRequest request) {
 
-	LearningForm lrnForm = (LearningForm) form;
-	Long toolSessionID = lrnForm.getToolSessionID();
+	Long toolSessionID = learningform.getToolSessionID();
 
 	ScribeSession scribeSession = scribeService.getSessionBySessionId(toolSessionID);
 	ScribeUser scribeUser = getCurrentUser(toolSessionID);
 
 	// setup dto's, forms and attributes.
-	lrnForm.setToolSessionID(scribeSession.getSessionId());
-	request.setAttribute("MODE", lrnForm.getMode());
+	learningform.setToolSessionID(scribeSession.getSessionId());
+	request.setAttribute("MODE", learningform.getMode());
 	setupDTOs(request, scribeSession, scribeUser);
 
 	// update scribe user and go to instructions page
@@ -190,29 +199,28 @@ public class LearningAction extends LamsDispatchAction {
 
 	// check if current user is the scribe.
 	if (scribeSession.getAppointedScribe().getUid() == scribeUser.getUid()) {
-	    return mapping.findForward("scribe");
+	    return "pages/learning/scribe";
 	}
 
-	return mapping.findForward("learning");
+	return "pages/learning/learning";
     }
 
-    public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/finishActivity")
+    public String finishActivity(@ModelAttribute("learningForm") LearningForm learningform, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	LearningForm lrnForm = (LearningForm) form;
-
 	// set the finished flag
-	ScribeUser scribeUser = scribeService.getUserByUID(lrnForm.getScribeUserUID());
+	ScribeUser scribeUser = scribeService.getUserByUID(learningform.getScribeUserUID());
 	if (scribeUser != null) {
 	    scribeUser.setFinishedActivity(true);
 	    scribeService.saveOrUpdateScribeUser(scribeUser);
 	} else {
-	    LearningAction.log
-		    .error("finishActivity(): couldn't find ScribeUser with uid: " + lrnForm.getScribeUserUID());
+	    LearningController.log
+		    .error("finishActivity(): couldn't find ScribeUser with uid: " + learningform.getScribeUserUID());
 	}
 
 	ToolSessionManager sessionMgrService = ScribeServiceProxy
-		.getScribeSessionManager(getServlet().getServletContext());
+		.getScribeSessionManager(applicationContext.getServletContext());
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -234,54 +242,52 @@ public class LearningAction extends LamsDispatchAction {
 	return null; // TODO need to return proper page.
     }
 
-    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/openNotebook")
+    public String openNotebook(@ModelAttribute("learningForm") LearningForm learningform, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	LearningForm lrnForm = (LearningForm) form;
-
 	// set the finished flag
-	ScribeUser scribeUser = scribeService.getUserByUID(lrnForm.getScribeUserUID());
+	ScribeUser scribeUser = scribeService.getUserByUID(learningform.getScribeUserUID());
 	ScribeDTO scribeDTO = new ScribeDTO(scribeUser.getScribeSession().getScribe());
 
 	request.setAttribute("scribeDTO", scribeDTO);
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(scribeUser.getScribeSession().getSessionId(),
-		request, getServlet().getServletContext());
+		request, applicationContext.getServletContext());
 
-	return mapping.findForward("notebook");
+	return "pages/learning/notebook";
     }
 
-    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping(value = "/submitReflection", method = RequestMethod.POST)
+    public String submitReflection(@ModelAttribute("learningForm") LearningForm learningform,
+	    HttpServletRequest request, HttpServletResponse response) {
 
 	// save the reflection entry and call the notebook.
 
-	LearningForm lrnForm = (LearningForm) form;
-
-	ScribeUser scribeUser = scribeService.getUserByUID(lrnForm.getScribeUserUID());
+	ScribeUser scribeUser = scribeService.getUserByUID(learningform.getScribeUserUID());
 
 	scribeService.createNotebookEntry(scribeUser.getScribeSession().getSessionId(),
 		CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE, scribeUser.getUserId().intValue(),
-		lrnForm.getEntryText());
+		learningform.getEntryText());
 
-	return finishActivity(mapping, form, request, response);
+	return finishActivity(learningform, request, response);
     }
 
-    public ActionForward forceCompleteActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	LearningForm lrnForm = (LearningForm) form;
-	ScribeUser scribeUser = scribeService.getUserByUID(lrnForm.getScribeUserUID());
+    @RequestMapping("/forceCompleteActivity")
+    public String forceCompleteActivity(@ModelAttribute("learningForm") LearningForm learningform,
+	    HttpServletRequest request, HttpServletResponse response) throws IOException {
+	ScribeUser scribeUser = scribeService.getUserByUID(learningform.getScribeUserUID());
 	ScribeSession session = scribeUser.getScribeSession();
 
 	if (session.getAppointedScribe().getUid() == scribeUser.getUid()) {
 	    session.setForceComplete(true);
 	} else {
 	    // TODO need to implement this.
-	    LearningAction.log
+	    LearningController.log
 		    .error("ScribeUserUID: " + scribeUser.getUid() + " is not allowed to forceComplete this session");
 	}
 
-	request.setAttribute("MODE", lrnForm.getMode());
+	request.setAttribute("MODE", learningform.getMode());
 	setupDTOs(request, session, scribeUser);
 	scribeService.saveOrUpdateScribeUser(scribeUser);
 
@@ -290,9 +296,9 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(session.getSessionId(), request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
-	return mapping.findForward("report");
+	return "pages/learning/report";
     }
 
     // Private methods.

@@ -26,7 +26,7 @@
   		function createHeading(){
   			prepareFormData();
   			$('#pedagogicalPlannerForm').ajaxSubmit({
-  				url: "<c:url value='/pedagogicalPlanner.do?dispatch=createPedagogicalPlannerHeading' />",
+  				url: "<c:url value='/pedagogicalPlanner/createPedagogicalPlannerHeading.do?' />",
   				success: function(responseText){
  	  				var bodyTag = '<body';
  	  				var selectedBody = responseText.substring(responseText.search(bodyTag) + 1);
@@ -50,24 +50,23 @@
   	</script>
 </lams:head>
 <body id="body">
-	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
-		<html:hidden property="toolContentID" styleId="toolContentID" />
-		<html:hidden property="valid" styleId="valid" />
-		<html:hidden property="callID" styleId="callID" />
-		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
-		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	<form:form action="/pedagogicalPlanner/saveOrUpdatePedagogicalPlannerForm.do?" modelAttribute="pedagogicalPlannerForm" id="pedagogicalPlannerForm" method="post">
+		<form:hidden path="toolContentID" id="toolContentID" />
+		<form:hidden path="valid" id="valid" />
+		<form:hidden path="callID" id="callID" />
+		<html:hidden path="activityOrderNumber" id="activityOrderNumber" />
 		
 		<c:choose>
-			<c:when test="${formBean.headingCount eq 0}">
+			<c:when test="${pedagogicalPlannerForm.headingCount eq 0}">
 				<h4 class="space-left"><fmt:message key="message.noHeadings" /></h4>
 			</c:when>
 			<c:otherwise>
 				<h4 class="space-left"><fmt:message key="label.authoring.basic.heading"/></h4>
-				<c:forEach var="headingIndex"  begin="1" end="${formBean.headingCount}" >
+				<c:forEach var="headingIndex"  begin="1" end="${pedagogicalPlannerForm.headingCount}" >
 					<div class="FCKdiv">
 						<lams:CKEditor id="heading[${headingIndex-1}]"
-							value="${formBean.headingList[headingIndex-1]}"
-							contentFolderID="${formBean.contentFolderID}"
+							value="${pedagogicalPlannerForm.headingList[headingIndex-1]}"
+							contentFolderID="${pedagogicalPlannerForm.contentFolderID}"
 			                toolbarSet="CustomPedplanner" height="150px"
 			                width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 						</lams:CKEditor>
@@ -75,7 +74,7 @@
 				</c:forEach>
 			</c:otherwise>
 		</c:choose>
-	</html:form>
+	</form:form>
 	<a class="button" href="javascript:createHeading();"><fmt:message key="label.authoring.basic.heading.add" /></a>
 </body>
 </lams:html>

@@ -18,7 +18,7 @@
 	<target name="_copy-websocket">
 		<echo>${ant.project.name}: Copying additional Java classes to WAR</echo>
 		<copy todir="${basedir}/build/war/WEB-INF/classes"
-			  file="${basedir}/build/classes/java/org/lamsfoundation/lams/tool/scribe/web/actions/LearningWebsocketServer.class"
+			  file="${basedir}/build/classes/java/org/lamsfoundation/lams/tool/scribe/web/controller/LearningWebsocketServer.class"
 			  verbose="true"
 		/>
 	</target>

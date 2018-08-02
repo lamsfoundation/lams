@@ -21,20 +21,14 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scribe.web.controller;
 
 import java.io.IOException;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.scribe.dto.ScribeDTO;
@@ -44,15 +38,18 @@ import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
-import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
 import org.lamsfoundation.lams.tool.scribe.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author
@@ -65,29 +62,28 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class MonitoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
 
-    private static Logger log = Logger.getLogger(MonitoringAction.class);
+    private static Logger log = Logger.getLogger(MonitoringController.class);
 
-    public IScribeService scribeService;
+    @Autowired
+    @Qualifier("lascrbScribeService")
+    private IScribeService scribeService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("")
+    public String unspecified(@ModelAttribute("monitoringForm") MonitoringForm monitoringForm,
+	    HttpServletRequest request) {
 	log.info("excuting monitoring action");
 
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	MonitoringForm monForm = (MonitoringForm) form;
-	monForm.setContentFolderID(contentFolderID);
+	monitoringForm.setContentFolderID(contentFolderID);
 
-	monForm.setCurrentTab(WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
+	monitoringForm.setCurrentTab(WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
 
-	// set up scribeService
-	if (scribeService == null) {
-	    scribeService = ScribeServiceProxy.getScribeService(this.getServlet().getServletContext());
-	}
 	Scribe scribe = scribeService.getScribeByContentId(toolContentID);
 
 	ScribeDTO scribeDTO = setupScribeDTO(scribe);
@@ -96,11 +92,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute("monitoringDTO", scribeDTO);
 	request.setAttribute("contentFolderID", contentFolderID);
 
-	return mapping.findForward("success");
+	return "pages/monitoring/monitoring";
     }
 
-    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/openNotebook")
+    public String openNotebook(HttpServletRequest request) {
 
 	Long uid = WebUtil.readLongParam(request, "uid", false);
 
@@ -113,16 +109,15 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	request.setAttribute("scribeUserDTO", scribeUserDTO);
 
-	return mapping.findForward("notebook");
+	return "pages/monitoring/notebook";
     }
 
-    public ActionForward appointScribe(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/appointScribe")
+    public String appointScribe(@ModelAttribute("monitoringForm") MonitoringForm monitoringForm,
+	    HttpServletRequest request) {
 
-	MonitoringForm monForm = (MonitoringForm) form;
-
-	ScribeSession session = scribeService.getSessionBySessionId(monForm.getToolSessionID());
-	ScribeUser user = scribeService.getUserByUID(monForm.getAppointedScribeUID());
+	ScribeSession session = scribeService.getSessionBySessionId(monitoringForm.getToolSessionID());
+	ScribeUser user = scribeService.getUserByUID(monitoringForm.getAppointedScribeUID());
 
 	session.setAppointedScribe(user);
 	scribeService.saveOrUpdateScribeSession(session);
@@ -131,27 +126,26 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean isGroupedActivity = scribeService.isGroupedActivity(session.getScribe().getToolContentId());
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
 	request.setAttribute("monitoringDTO", scribeDTO);
-	request.setAttribute("contentFolderID", monForm.getContentFolderID());
+	request.setAttribute("contentFolderID", monitoringForm.getContentFolderID());
 
-	monForm.setCurrentTab(WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
+	monitoringForm.setCurrentTab(WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
 
-	return mapping.findForward("success");
+	return "pages/monitoring/monitoring";
     }
 
-    public ActionForward forceCompleteActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/forceCompleteActivity")
+    public String forceCompleteActivity(@ModelAttribute("monitoringForm") MonitoringForm monitoringForm,
+	    HttpServletRequest request) throws IOException {
 
-	MonitoringForm monForm = (MonitoringForm) form;
-
-	ScribeSession session = scribeService.getSessionBySessionId(monForm.getToolSessionID());
+	ScribeSession session = scribeService.getSessionBySessionId(monitoringForm.getToolSessionID());
 	session.setForceComplete(true);
 	scribeService.saveOrUpdateScribeSession(session);
 
 	ScribeDTO scribeDTO = setupScribeDTO(session.getScribe());
 	request.setAttribute("monitoringDTO", scribeDTO);
-	request.setAttribute("contentFolderID", monForm.getContentFolderID());
+	request.setAttribute("contentFolderID", monitoringForm.getContentFolderID());
 
-	return mapping.findForward("success");
+	return "pages/monitoring/monitoring";
     }
 
     /* Private Methods */

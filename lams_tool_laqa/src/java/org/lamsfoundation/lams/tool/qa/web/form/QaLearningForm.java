@@ -30,9 +30,6 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
  */
 public class QaLearningForm implements QaAppConstants {
 
-    //controls which method is called by the Lookup map */
-    protected String method;
-
     protected String answer;
     protected String currentQuestionIndex;
     protected String submitAnswersContent;
@@ -265,21 +262,6 @@ public class QaLearningForm implements QaAppConstants {
      */
     public void setResponseId(String responseId) {
 	this.responseId = responseId;
-    }
-
-    /**
-     * @return Returns the method.
-     */
-    public String getMethod() {
-	return method;
-    }
-
-    /**
-     * @param method
-     *            The method to set.
-     */
-    public void setMethod(String method) {
-	this.method = method;
     }
 
     /**

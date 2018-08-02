@@ -25,10 +25,9 @@
 		</script>
 	</lams:head>
 	<body class="stripes" onload="init();">
-		<html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data">
+		<form:form action="/authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post" enctype="multipart/form-data">
 		
-			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-			<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
+			<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 		
 			<c:set var="title"><fmt:message key="activity.title" /></c:set>
 			<lams:Page title="${title}" type="navbar">
@@ -38,20 +37,20 @@
 					<lams:Tab id="2" key="button.advanced" />
 				</lams:Tabs>
 		
-				<html:hidden property="currentTab" styleId="currentTab" />
-				<html:hidden property="dispatch" value="updateContent" />
-				<html:hidden property="sessionMapID" />
+				<form:hidden path="currentTab" id="currentTab" />
+				<form:hidden path="sessionMapID" />
 		
 				
 		        <lams:TabBodyArea>
 					<div id="message" style="text-align: center;">
-						<logic:messagesPresent>
-							<lams:Alert id="errorMessages" type="danger" close="false">
-							        <html:messages id="error">
-							            <c:out value="${error}" escapeXml="false"/><br/>
-							        </html:messages>
-							</lams:Alert>
-						</logic:messagesPresent>			
+						 <c:set var="messageKey" value="MESSAGE" /> 
+						 <c:if test="${not empty infoMap and not empty infoMap[messageKey]}"> 
+						     <lams:Alert id="error" type="danger" close="false"> 
+						         <c:forEach var="message" items="${infoMap[messageKey]}"> 
+						             <c:out value="${message}" /><br /> 
+						         </c:forEach> 
+						     </lams:Alert> 
+						</c:if>			
 					</div>
 			
 					<%-- Page tabs --%>
@@ -73,7 +72,7 @@
 		
 			</lams:Page>
 		
-		</html:form>
+		</form:form>
 
 	</body>
 </lams:html>

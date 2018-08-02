@@ -11,7 +11,7 @@
 		<label for="datetime"><fmt:message key="monitor.summary.after.date" />&nbsp;
 		<input type="text" name="datetime" id="datetime" value="" class="form-control form-control-inline"/>
 		</label>							
-		<a	href="javascript:setSubmissionDeadline();" style="btn btn-default">
+		<a	href="javascript:setSubmissionDeadline();" class="btn btn-default">
 			<fmt:message key="monitor.summary.set.restriction" />
 		</a>
 		</div>
@@ -22,7 +22,7 @@
 		<span id="dateInfo">
 		</span>
 		</label>
-		<a	href="javascript:removeSubmissionDeadline();" style="btn btn-default">
+		<a	href="javascript:removeSubmissionDeadline();" class="btn btn-default">
 			<fmt:message key="monitor.summary.unset.restriction" />
 		</a>
 	</div>

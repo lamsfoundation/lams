@@ -74,14 +74,13 @@
 		
 			</c:if>
 		
-			<html:form action="/learning.do">
-				<html:hidden property="dispatch" value="startActivity" />
-				<html:hidden property="toolSessionID" />
-				<html:hidden property="mode" value="${MODE}" />
-				<html:submit styleClass="btn btn-primary voffset10 pull-right">
+			<form:form action="learning/startActivity.do" modelAttribute="learningForm">
+				<form:hidden path="toolSessionID" />
+				<form:hidden path="mode" value="${MODE}" />
+				<button class="btn btn-primary voffset10 pull-right">
 					<fmt:message key="button.continue" />
-				</html:submit>
-			</html:form>
+				</button>
+			</form:form>
 		
 		</lams:Page>
 	</body>

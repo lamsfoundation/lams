@@ -198,17 +198,16 @@
 			<hr>
 		
 		
-			<html:form action="learning" onsubmit="return confirmForceComplete();">
-				<html:hidden property="dispatch" value="forceCompleteActivity" />
-				<html:hidden property="scribeUserUID" value="${scribeUserDTO.uid}" />
-				<html:hidden property="mode" />
+			<form:form action="learning/forceCompleteActivity.do" modelAttribute="learningForm" onsubmit="return confirmForceComplete();">
+				<form:hidden path="scribeUserUID" value="${scribeUserDTO.uid}" />
+				<form:hidden path="mode" />
 		
 				<div id="forceCompleteBtn">
-					<html:submit styleClass="btn btn-primary pull-right">
+					<button class="btn btn-primary pull-right">
 						<fmt:message key="button.forceComplete" />
-					</html:submit>
+					</button>
 				</div>
-			</html:form>
+			</form:form>
 		
 			<div id="agreeButton">
 				<a id="agreeButton" class="btn btn-success pull-left" onclick="javascript:submitApproval();"> <fmt:message

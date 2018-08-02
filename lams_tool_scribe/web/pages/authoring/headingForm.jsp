@@ -40,16 +40,13 @@
 			}
 		</script>
 		
-		<html:form action="/authoring" styleId="headingForm" method="post">
+		<form:form action="authoring/addOrUpdateHeading.do" modelAttribute="authoringForm id="authoringForm" method="post">
 		
-			<html:hidden property="dispatch" value="addOrUpdateHeading" />
-			<html:hidden property="sessionMapID" />
-			<html:hidden property="headingIndex" />
+			<form:hidden path="sessionMapID" />
+			<form:hidden path="headingIndex" />
 		
-			<c:set var="formBean"
-				value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<c:set var="sessionMap"
-				value="${sessionScope[formBean.sessionMapID]}" />
+				value="${sessionScope[authoringForm.sessionMapID]}" />
 		
 			<div class="panel panel-default add-file">
 				<div class="panel-heading panel-title">
@@ -59,8 +56,8 @@
 				<div class="panel-body">
 		
 					<c:set var="headingText" value="" />
-					<c:if test="${not empty formBean.headingIndex}">
-						<c:set var="headingText">${sessionMap.headings[formBean.headingIndex].headingText}</c:set>
+					<c:if test="${not empty authoringForm.headingIndex}">
+						<c:set var="headingText">${sessionMap.headings[authoringForm.headingIndex].headingText}</c:set>
 					</c:if>
 				
 					<lams:CKEditor id="heading" value="${headingText}" contentFolderID="${sessionMap.contentFolderID}"/>
@@ -76,7 +73,7 @@
 				</div>
 			</div>
 			
-		</html:form>
+		</form:form>
 	</body>
 </lams:html>
 

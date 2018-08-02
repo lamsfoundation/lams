@@ -1176,7 +1176,6 @@ public class QaLearningController implements QaAppConstants {
 	return forwardtoReflection(request, qaContent, toolSessionID, userID, qaLearningForm);
     }
 
-    @RequestMapping("/forwardtoReflection")
     private String forwardtoReflection(HttpServletRequest request, QaContent qaContent, String toolSessionID,
 	    String userID, QaLearningForm reflectionForm) {
 

@@ -17,15 +17,15 @@
 	});
 </script>
 
-<html:form action="/monitoring">
-	<html:hidden property="toolContentID" value="${dto.toolContentID}" />
-	<html:hidden property="contentFolderID" />
+<form:form action="monitoring.do" modelAttribute="monitoringForm">
+	<form:hidden path="toolContentID" value="${dto.toolContentID}" />
+	<form:hidden path="contentFolderID" />
 	<p>
-		<html:submit styleClass="btn btn-default pull-right">
+		<button class="btn btn-default pull-right">
 			<fmt:message key="button.refresh" />
-		</html:submit>
+		</button>
 	</p>
-</html:form>
+</form:form>
 
 
 <div class="panel">
@@ -64,27 +64,26 @@
 	<div class="loffset5">
 		<c:choose>
 			<c:when test="${not empty session.userDTOs and (not dto.autoSelectScribe or session.appointedScribe != null)}">
-				<html:form action="/monitoring">
+				<form:form action="monitoring/appointScribe.do" modelAttribute="monitoringForm">
 		
-					<html:hidden property="toolSessionID" value="${session.sessionID}" />
-					<html:hidden property="dispatch" value="appointScribe" />
-					<html:hidden property="contentFolderID" />
-					<html:hidden property="currentTab" styleId="currentTab" />
+					<form:hidden path="toolSessionID" value="${session.sessionID}" />
+					<form:hidden path="contentFolderID" />
+					<form:hidden path="currentTab" id="currentTab" />
 		
 					<div class="form-group form-inline">
 						<fmt:message key="heading.selectScribe" />
-						<html:select property="appointedScribeUID" styleClass="form-control input-sm loffset5">
+						<form:select path="appointedScribeUID" cssClass="form-control input-sm loffset5">
 							<c:forEach var="user" items="${session.userDTOs}">
- 								<html:option value="${user.uid}">
+ 								<form:option value="${user.uid}">
  									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
-								</html:option>
+								</form:option>
  							</c:forEach>
-						</html:select>
-						<html:submit styleClass="btn btn-default btn-sm loffset5">
+						</form:select>
+						<button class="btn btn-default btn-sm loffset5">
 							<fmt:message key="button.select" />
-						</html:submit>
+						</button>
 					</div>	
-				</html:form>
+				</form:form>
 			</c:when>
 		
 			<c:otherwise>
@@ -120,14 +119,13 @@
 			<%@include file="/pages/parts/voteDisplay.jsp"%>
 	
 			<c:if test="${session.forceComplete eq false}">
-				<html:form action="monitoring" onsubmit="return confirmForceComplete();">
-					<html:hidden property="dispatch" value="forceCompleteActivity" />
-					<html:hidden property="toolSessionID" value="${session.sessionID}" />
-					<html:hidden property="contentFolderID" />
-					<html:submit styleClass="btn btn-default btn-sm">
+				<form:form action="monitoring/forceCompleteActivity.do" modelAttribute="monitoringForm" onsubmit="return confirmForceComplete();">
+					<form:hidden path="toolSessionID" value="${session.sessionID}" />
+					<form:hidden path="contentFolderID" />
+					<button class="btn btn-default btn-sm">
 						<fmt:message key="button.forceComplete" />
-					</html:submit>
-				</html:form>
+					</button>
+				</form:form>
 			</c:if>
 		</div>
 		</div>
@@ -162,10 +160,7 @@
 					<c:if test="${dto.reflectOnActivity}">
 						<td style="text-align: right">
 							<c:if test="${user.finishedReflection}">
-								<c:url value="monitoring.do" var="openNotebook">
-									<c:param name="dispatch" value="openNotebook" />
-									<c:param name="uid" value="${user.uid}" />
-								</c:url>
+								<c:url value="monitoring/openNotebook.do?uid='${user.uid}'"/>
 
 								<a href="javascript:launchPopup('${openNotebook}','<fmt:message key="heading.reflection" />');" class="btn btn-default btn-sm" >
 									<fmt:message key="link.view" />

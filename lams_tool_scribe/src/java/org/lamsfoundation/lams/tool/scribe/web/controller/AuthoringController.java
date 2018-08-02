@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scribe.web.controller;
 
 import java.util.Collections;
@@ -33,26 +32,25 @@ import java.util.ListIterator;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
 import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
-import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -68,12 +66,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
  *
  */
 @Controller
-@RequestMapping("")
-public class AuthoringAction extends LamsDispatchAction {
+@RequestMapping("/authoring")
+public class AuthoringController {
 
-    private static Logger logger = Logger.getLogger(AuthoringAction.class);
+    private static Logger logger = Logger.getLogger(AuthoringController.class);
 
-    public IScribeService scribeService;
+    @Autowired
+    @Qualifier("lascrbScribeService")
+    private IScribeService scribeService;
+
+    @Autowired
+    @Qualifier("lascrbMessageService")
+    private MessageService messageService;
 
     // Authoring SessionMap key names
     private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
@@ -88,11 +92,11 @@ public class AuthoringAction extends LamsDispatchAction {
      * Default method when no dispatch parameter is specified. It is expected
      * that the parameter <code>toolContentID</code> will be passed in. This
      * will be used to retrieve content for this tool.
-     * 
+     *
      */
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("")
+    protected String unspecified(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
+	    HttpServletRequest request) {
 
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -100,11 +104,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-
-	// set up scribeService
-	if (scribeService == null) {
-	    scribeService = ScribeServiceProxy.getScribeService(this.getServlet().getServletContext());
-	}
 
 	// retrieving Scribe with given toolContentID
 	Scribe scribe = scribeService.getScribeByContentId(toolContentID);
@@ -118,9 +117,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	// check if content in use is set
 	if (scribe.isContentInUse()) {
 	    // Cannot edit, send to message page.
-	    request.setAttribute(ScribeConstants.ATTR_MESSAGE,
-		    getResources(request).getMessage("error.content.locked"));
-	    return mapping.findForward("message_page");
+//	    request.setAttribute(ScribeConstants.ATTR_MESSAGE, messageService.getMessage("error.content.locked"));
+	    MultiValueMap<String, String> infoMap = new LinkedMultiValueMap<>();
+	    infoMap.add("MESSAGE", messageService.getMessage("error.content.locked"));
+	    request.setAttribute("infoMap",infoMap);
+	    return "common/message";
 	}
 
 	if (mode.isTeacher()) {
@@ -129,40 +130,38 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // are editing. This flag is released when updateContent is called.
 	    scribe.setDefineLater(true);
 	    scribeService.saveOrUpdateScribe(scribe);
-	    
+
 	    //audit log the teacher has started editing activity in monitor
 	    scribeService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	// Set up the authForm.
-	AuthoringForm authForm = (AuthoringForm) form;
-	updateAuthForm(authForm, scribe);
+	updateAuthForm(authoringForm, scribe);
 
 	// Set up sessionMap
-	SessionMap<String, Object> map = createSessionMap(scribe, mode, contentFolderID,
-		toolContentID);
-	authForm.setSessionMapID(map.getSessionID());
+	SessionMap<String, Object> map = createSessionMap(scribe, mode, contentFolderID, toolContentID);
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
 	request.getSession().setAttribute(map.getSessionID(), map);
 	request.setAttribute(ScribeConstants.ATTR_SESSION_MAP, map);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
-    public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/updateContent")
+    public String updateContent(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
+	    HttpServletRequest request) {
 	// TODO need error checking.
 
 	// get authForm and session map.
-	AuthoringForm authForm = (AuthoringForm) form;
-	SessionMap<String, Object> map = getSessionMap(request, authForm);
+	SessionMap<String, Object> map = getSessionMap(request, authoringForm);
 
 	// get scribe content.
 	Scribe scribe = scribeService.getScribeByContentId((Long) map.get(KEY_TOOL_CONTENT_ID));
 
 	// update scribe content using form inputs
-	updateScribe(scribe, authForm);
+	updateScribe(scribe, authoringForm);
 
 	// update headings.
 	List<ScribeHeading> updatedHeadings = getHeadingList(map);
@@ -217,39 +216,38 @@ public class AuthoringAction extends LamsDispatchAction {
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
-	authForm.setSessionMapID(map.getSessionID());
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	request.setAttribute(ScribeConstants.ATTR_SESSION_MAP, map);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
-    public ActionForward loadHeadingForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/loadHeadingForm")
+    public String loadHeadingForm(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
+	    HttpServletRequest request) {
 
 	String sessionMapID = WebUtil.readStrParam(request, "sessionMapID");
 	Integer headingIndex = WebUtil.readIntParam(request, "headingIndex", true);
-
-	AuthoringForm authForm = ((AuthoringForm) form);
 
 	if (headingIndex == null) {
 	    headingIndex = -1;
 	}
 
-	authForm.setHeadingIndex(headingIndex);
-	authForm.setSessionMapID(sessionMapID);
+	authoringForm.setHeadingIndex(headingIndex);
+	authoringForm.setSessionMapID(sessionMapID);
 
-	return mapping.findForward("heading_form");
+	return "pages/authoring/headingForm";
     }
 
-    public ActionForward addOrUpdateHeading(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/addOrUpdateHeading")
+    public String addOrUpdateHeading(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
+	    HttpServletRequest request) {
 
-	AuthoringForm authForm = (AuthoringForm) form;
-	SessionMap<String, Object> map = getSessionMap(request, authForm);
+	SessionMap<String, Object> map = getSessionMap(request, authoringForm);
 
-	String headingText = authForm.getHeading();
-	Integer headingIndex = authForm.getHeadingIndex();
+	String headingText = authoringForm.getHeading();
+	Integer headingIndex = authoringForm.getHeadingIndex();
 	Long toolContentID = getToolContentID(map);
 
 	Scribe scribe = scribeService.getScribeByContentId(toolContentID);
@@ -270,14 +268,14 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 
 	request.setAttribute("sessionMapID", map.getSessionID());
-	return mapping.findForward("heading_response");
+	return "pages/authoring/headingResponse";
     }
 
-    public ActionForward moveHeading(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/moveHeading")
+    public String moveHeading(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
+	    HttpServletRequest request) {
 
-	AuthoringForm authForm = (AuthoringForm) form;
-	SessionMap<String, Object> map = getSessionMap(request, authForm);
+	SessionMap<String, Object> map = getSessionMap(request, authoringForm);
 
 	int headingIndex = WebUtil.readIntParam(request, "headingIndex");
 	String direction = WebUtil.readStrParam(request, "direction");
@@ -298,7 +296,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    }
 	} else {
 	    // invalid direction, don't move anywhere.
-	    log.error("moveHeading: received invalid direction : " + direction);
+	    logger.error("moveHeading: received invalid direction : " + direction);
 	}
 
 	// adding heading back into list
@@ -312,21 +310,21 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 
 	request.setAttribute("sessionMapID", map.getSessionID());
-	return mapping.findForward("heading_response");
+	return "pages/authoring/headingResponse";
     }
 
-    public ActionForward deleteHeading(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/deleteHeading")
+    public String deleteHeading(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
+	    HttpServletRequest request) {
 
-	AuthoringForm authForm = (AuthoringForm) form;
-	SessionMap<String, Object> map = getSessionMap(request, authForm);
+	SessionMap<String, Object> map = getSessionMap(request, authoringForm);
 
-	Integer headingIndex = authForm.getHeadingIndex();
+	Integer headingIndex = authoringForm.getHeadingIndex();
 
 	getHeadingList(map).remove(headingIndex.intValue());
 
 	request.setAttribute("sessionMapID", map.getSessionID());
-	return mapping.findForward("heading_response");
+	return "pages/authoring/headingResponse";
 
     }
 
@@ -334,46 +332,46 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Updates Scribe content using AuthoringForm inputs.
-     * 
-     * @param authForm
+     *
+     * @param authoringForm
      * @param mode
      * @return
      */
-    private void updateScribe(Scribe scribe, AuthoringForm authForm) {
-	scribe.setTitle(authForm.getTitle());
-	scribe.setInstructions(authForm.getInstructions());
-	scribe.setReflectOnActivity(authForm.isReflectOnActivity());
-	scribe.setReflectInstructions(authForm.getReflectInstructions());
-	scribe.setAutoSelectScribe(authForm.isAutoSelectScribe());
-	scribe.setShowAggregatedReports(authForm.isShowAggregatedReports());
+    private void updateScribe(Scribe scribe, AuthoringForm authoringForm) {
+	scribe.setTitle(authoringForm.getTitle());
+	scribe.setInstructions(authoringForm.getInstructions());
+	scribe.setReflectOnActivity(authoringForm.isReflectOnActivity());
+	scribe.setReflectInstructions(authoringForm.getReflectInstructions());
+	scribe.setAutoSelectScribe(authoringForm.isAutoSelectScribe());
+	scribe.setShowAggregatedReports(authoringForm.isShowAggregatedReports());
     }
 
     /**
      * Updates AuthoringForm using Scribe content.
-     * 
+     *
      * @param scribe
-     * @param authForm
+     * @param authoringForm
      * @return
      */
-    private void updateAuthForm(AuthoringForm authForm, Scribe scribe) {
-	authForm.setTitle(scribe.getTitle());
-	authForm.setInstructions(scribe.getInstructions());
-	authForm.setReflectOnActivity(scribe.isReflectOnActivity());
-	authForm.setReflectInstructions(scribe.getReflectInstructions());
-	authForm.setAutoSelectScribe(scribe.isAutoSelectScribe());
-	authForm.setShowAggregatedReports(scribe.isShowAggregatedReports());
+    private void updateAuthForm(AuthoringForm authoringForm, Scribe scribe) {
+	authoringForm.setTitle(scribe.getTitle());
+	authoringForm.setInstructions(scribe.getInstructions());
+	authoringForm.setReflectOnActivity(scribe.isReflectOnActivity());
+	authoringForm.setReflectInstructions(scribe.getReflectInstructions());
+	authoringForm.setAutoSelectScribe(scribe.isAutoSelectScribe());
+	authoringForm.setShowAggregatedReports(scribe.isShowAggregatedReports());
     }
 
     /**
      * Updates SessionMap using Scribe content.
-     * 
+     *
      * @param scribe
      * @param mode
      */
     private SessionMap<String, Object> createSessionMap(Scribe scribe, ToolAccessMode mode, String contentFolderID,
 	    Long toolContentID) {
 
-	SessionMap<String, Object> map = new SessionMap<String, Object>();
+	SessionMap<String, Object> map = new SessionMap<>();
 
 	map.put(KEY_MODE, mode);
 	map.put(KEY_CONTENT_FOLDER_ID, contentFolderID);
@@ -399,7 +397,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Retrieve the SessionMap from the HttpSession.
-     * 
+     *
      * @param request
      * @param authForm
      * @return

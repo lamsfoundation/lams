@@ -18,10 +18,7 @@
 		<lams:headItems />
 	</lams:head>
 	<body class="stripes">
-		<tiles:useAttribute name="pageTitleKey" ignore="true"/>
-		<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
-		<c:set var="title"><fmt:message key="${pTitleKey}" /></c:set>
-		<lams:Page title="${title}" type="monitor">
+		<lams:Page title='<fmt:message key="pageTitle.monitoring.notebook"/>' type="monitor">
 			<h4>
 				<c:out value="${scribeUserDTO.firstName} ${scribeUserDTO.lastName}" escapeXml="true"/>
 			</h4>

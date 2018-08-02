@@ -51,7 +51,6 @@
 		</c:if>
 		<!-- End announcements -->
 
-			<form:hidden path="method" value="storeAllResults" />
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="userID" />
 			<form:hidden path="httpSessionID" />

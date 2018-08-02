@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scribe.web.controller;
 
 import java.io.IOException;
@@ -34,18 +33,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
 import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
-import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.web.forms.ScribePedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author
@@ -56,44 +56,50 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class PedagogicalPlannerAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/pedagogicalPlanner")
+public class PedagogicalPlannerController {
 
-    private static Logger logger = Logger.getLogger(PedagogicalPlannerAction.class);
-    public IScribeService scribeService;
+    private static Logger logger = Logger.getLogger(PedagogicalPlannerController.class);
 
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return initPedagogicalPlannerForm(mapping, form, request, response);
+    @Autowired
+    @Qualifier("lascrbScribeService")
+    private IScribeService scribeService;
+
+    @RequestMapping("")
+    protected String unspecified(@ModelAttribute("pedagogicalPlannerForm") ScribePedagogicalPlannerForm pedagogicalPlannerForm,
+	    HttpServletRequest request) {
+	return initPedagogicalPlannerForm(pedagogicalPlannerForm, request);
     }
 
-    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ScribePedagogicalPlannerForm plannerForm = (ScribePedagogicalPlannerForm) form;
+    @RequestMapping("/initPedagogicalPlannerForm")
+    public String initPedagogicalPlannerForm(@ModelAttribute("pedagogicalPlannerForm") ScribePedagogicalPlannerForm pedagogicalPlannerForm,
+	    HttpServletRequest request) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Scribe scribe = getScribeService().getScribeByContentId(toolContentID);
-	plannerForm.fillForm(scribe);
+	Scribe scribe = scribeService.getScribeByContentId(toolContentID);
+	pedagogicalPlannerForm.fillForm(scribe);
 	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	plannerForm.setContentFolderID(contentFolderId);
-	return mapping.findForward("success");
+	pedagogicalPlannerForm.setContentFolderID(contentFolderId);
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException {
-	ScribePedagogicalPlannerForm plannerForm = (ScribePedagogicalPlannerForm) form;
-	ActionMessages errors = plannerForm.validate();
-	if (errors.isEmpty()) {
-	    Scribe scribe = getScribeService().getScribeByContentId(plannerForm.getToolContentID());
+    @RequestMapping(value = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
+    public String saveOrUpdatePedagogicalPlannerForm(
+	    @ModelAttribute("pedagogicalPlannerForm") ScribePedagogicalPlannerForm pedagogicalPlannerForm, HttpServletRequest request)
+	    throws IOException {
+	MultiValueMap<String, String> errorMap = pedagogicalPlannerForm.validate();
+	if (errorMap.isEmpty()) {
+	    Scribe scribe = scribeService.getScribeByContentId(pedagogicalPlannerForm.getToolContentID());
 
 	    int headingIndex = 0;
 	    String heading = null;
 	    ScribeHeading scribeHeading = null;
-	    List<ScribeHeading> newHeadings = new LinkedList<ScribeHeading>();
+	    List<ScribeHeading> newHeadings = new LinkedList<>();
 	    Iterator<ScribeHeading> scribeHeadingIterator = scribe.getScribeHeadings().iterator();
 	    do {
-		heading = plannerForm.getHeading(headingIndex);
+		heading = pedagogicalPlannerForm.getHeading(headingIndex);
 		if (StringUtils.isEmpty(heading)) {
-		    plannerForm.removeHeading(headingIndex);
+		    pedagogicalPlannerForm.removeHeading(headingIndex);
 		} else {
 		    if (scribeHeadingIterator.hasNext()) {
 			scribeHeading = scribeHeadingIterator.next();
@@ -113,27 +119,21 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    while (scribeHeadingIterator.hasNext()) {
 		scribeHeading = scribeHeadingIterator.next();
 		scribeHeadingIterator.remove();
-		getScribeService().deleteHeading(scribeHeading.getUid());
+		scribeService.deleteHeading(scribeHeading.getUid());
 	    }
 	    scribe.getScribeHeadings().addAll(newHeadings);
-	    getScribeService().saveOrUpdateScribe(scribe);
+	    scribeService.saveOrUpdateScribe(scribe);
 	} else {
-	    saveErrors(request, errors);
+	    request.setAttribute("errorMap", errorMap);
 	}
-	return mapping.findForward("success");
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward createPedagogicalPlannerHeading(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) {
-	ScribePedagogicalPlannerForm plannerForm = (ScribePedagogicalPlannerForm) form;
-	plannerForm.setHeading(plannerForm.getHeadingCount().intValue(), "");
-	return mapping.findForward("success");
-    }
-
-    private IScribeService getScribeService() {
-	if (scribeService == null) {
-	    scribeService = ScribeServiceProxy.getScribeService(this.getServlet().getServletContext());
-	}
-	return scribeService;
+    @RequestMapping("/createPedagogicalPlannerHeading")
+    public String createPedagogicalPlannerHeading(
+	    @ModelAttribute("pedagogicalPlannerForm") ScribePedagogicalPlannerForm pedagogicalPlannerForm, HttpServletRequest request,
+	    HttpServletResponse response) {
+	pedagogicalPlannerForm.setHeading(pedagogicalPlannerForm.getHeadingCount().intValue(), "");
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 }
