@@ -8,7 +8,7 @@ function doSelectTab(tabId) {
 }
 
 function doSubmit(method) {
-	document.authoringForm.dispatch.value = method;
-	document.authoringForm.submit();
+	document.forms.authoringForm.dispatch.value = method;
+	document.forms.authoringForm.submit();
 }
 
