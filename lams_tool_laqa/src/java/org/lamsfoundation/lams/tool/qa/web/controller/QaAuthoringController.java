@@ -78,8 +78,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 @RequestMapping("/authoring")
-public class QaController implements QaAppConstants {
-    private static Logger logger = Logger.getLogger(QaController.class.getName());
+public class QaAuthoringController implements QaAppConstants {
+    private static Logger logger = Logger.getLogger(QaAuthoringController.class.getName());
 
     @Autowired
     private IQaService qaService;
@@ -247,11 +247,11 @@ public class QaController implements QaAppConstants {
 	try {
 	    defaultContentID = qaService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    if (defaultContentID == 0) {
-		QaController.logger.debug("default content id has not been setup");
+		QaAuthoringController.logger.debug("default content id has not been setup");
 		return false;
 	    }
 	} catch (Exception e) {
-	    QaController.logger.error("error getting the default content id: " + e.getMessage());
+	    QaAuthoringController.logger.error("error getting the default content id: " + e.getMessage());
 	    persistError(request, "error.defaultContent.notSetup");
 	    return false;
 	}
@@ -263,13 +263,13 @@ public class QaController implements QaAppConstants {
 	    //retrieve uid of the content based on default content id determined above
 	    QaContent qaContent = qaService.getQaContent(defaultContentID);
 	    if (qaContent == null) {
-		QaController.logger.error("Exception occured: No default content");
+		QaAuthoringController.logger.error("Exception occured: No default content");
 		persistError(request, "error.defaultContent.notSetup");
 		return false;
 	    }
 
 	} catch (Exception e) {
-	    QaController.logger.error("Exception occured: No default question content");
+	    QaAuthoringController.logger.error("Exception occured: No default question content");
 	    persistError(request, "error.defaultContent.notSetup");
 	    return false;
 	}
@@ -333,7 +333,7 @@ public class QaController implements QaAppConstants {
 
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
-	    QaController.logger.debug("errors saved: " + errorMap);
+	    QaAuthoringController.logger.debug("errors saved: " + errorMap);
 	}
 
 	QaContent qaContent = qaService.getQaContent(toolContentID);
@@ -618,11 +618,8 @@ public class QaController implements QaAppConstants {
 
 	String editableQuestionIndex = request.getParameter("editableQuestionIndex");
 
-	String required = request.getParameter("required");
-	boolean requiredBoolean = false;
-	if (required != null && required.equalsIgnoreCase("1")) {
-	    requiredBoolean = true;
-	}
+	boolean requiredBoolean = newQuestionForm.isRequired();
+	
 	int minWordsLimit = WebUtil.readIntParam(request, "minWordsLimit");
 
 	if (newQuestion != null && newQuestion.length() > 0) {
@@ -734,11 +731,7 @@ public class QaController implements QaAppConstants {
 
 	String newQuestion = request.getParameter("newQuestion");
 	String feedback = request.getParameter("feedback");
-	String required = request.getParameter("required");
-	boolean requiredBoolean = false;
-	if (required != null && required.equalsIgnoreCase("1")) {
-	    requiredBoolean = true;
-	}
+	boolean requiredBoolean = newQuestionForm.isRequired();
 	int minWordsLimit = WebUtil.readIntParam(request, "minWordsLimit");
 
 	int listSize = questionDTOs.size();
@@ -982,9 +975,9 @@ public class QaController implements QaAppConstants {
 	SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
 		.get(QaAppConstants.ATTR_CONDITION_SET);
 
-	questionDTOs = QaController.swapQuestions(questionDTOs, questionIndex, "down", conditionSet);
+	questionDTOs = QaAuthoringController.swapQuestions(questionDTOs, questionIndex, "down", conditionSet);
 
-	questionDTOs = QaController.reorderQuestionDTOs(questionDTOs);
+	questionDTOs = QaAuthoringController.reorderQuestionDTOs(questionDTOs);
 
 	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
@@ -1035,9 +1028,9 @@ public class QaController implements QaAppConstants {
 
 	SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
 		.get(QaAppConstants.ATTR_CONDITION_SET);
-	questionDTOs = QaController.swapQuestions(questionDTOs, questionIndex, "up", conditionSet);
+	questionDTOs = QaAuthoringController.swapQuestions(questionDTOs, questionIndex, "up", conditionSet);
 
-	questionDTOs = QaController.reorderQuestionDTOs(questionDTOs);
+	questionDTOs = QaAuthoringController.reorderQuestionDTOs(questionDTOs);
 
 	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
@@ -1087,9 +1080,9 @@ public class QaController implements QaAppConstants {
 	    replacedQuestionIndex = --intQuestionIndex;
 	}
 
-	QaQuestionDTO mainQuestion = QaController.getQuestionAtDisplayOrder(questionDTOs, intOriginalQuestionIndex);
+	QaQuestionDTO mainQuestion = QaAuthoringController.getQuestionAtDisplayOrder(questionDTOs, intOriginalQuestionIndex);
 
-	QaQuestionDTO replacedQuestion = QaController.getQuestionAtDisplayOrder(questionDTOs, replacedQuestionIndex);
+	QaQuestionDTO replacedQuestion = QaAuthoringController.getQuestionAtDisplayOrder(questionDTOs, replacedQuestionIndex);
 
 	List<QaQuestionDTO> newQuestionDtos = new LinkedList<>();
 

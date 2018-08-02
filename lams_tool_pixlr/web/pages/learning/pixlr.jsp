@@ -126,14 +126,14 @@
 				
 				<%--Finish buttons--------------------------------------------------%>
 				
-				<form:form action="finishActivity.do" method="post" onsubmit="disableFinishButton();" id="learningForm" modelAttribute="learningForm">
+				<form:form action="learning/finishActivity.do" method="post" onsubmit="disableFinishButton();" id="learningForm" modelAttribute="learningForm">
 					<form:hidden path="toolSessionID" id="toolSessionID"/>
 					<form:hidden path="mode" value="${mode}" />	
 					<div class="voffset10 pull-right">
 						
 						<c:choose>
 							<c:when test="${pixlrDTO.allowViewOthersImages}">
-								<button type="button" class="btn btn-primary" onclick="javascript:document.getElementById('dispatch').value = 'viewAllImages';">
+								<button class="btn btn-primary" onclick="javascript:document.getElementById("learningForm").action = 'viewAllImages.do';">
 									<fmt:message key="button.viewAll" />
 								</button>
 							</c:when>
@@ -141,7 +141,7 @@
 							<c:otherwise>
 								<c:choose>
 									<c:when test="${!pixlrUserDTO.finishedActivity and pixlrDTO.reflectOnActivity}">
-										<button type="button" class="btn btn-primary" onclick="javascript:document.getElementById('dispatch').value = 'openNotebook';">
+										<button class="btn btn-primary" onclick="javascript:document.getElementById("learningForm").action = 'openNotebook.do';">
 											<fmt:message key="button.continue" />
 										</button>
 									</c:when>
