@@ -21,23 +21,17 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.spreadsheet.web.action;
+package org.lamsfoundation.lams.tool.spreadsheet.web.controller;
 
 import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
@@ -50,79 +44,46 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  */
-public class AuthoringAction extends Action {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
 
-    private static Logger log = Logger.getLogger(AuthoringAction.class);
+    private static Logger log = Logger.getLogger(AuthoringController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	String param = mapping.getParameter();
-	// -----------------------Spreadsheet Author function ---------------------------
-	if (param.equals("start")) {
-	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("definelater")) {
-	    // update define later flag to true
-	    Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	    ISpreadsheetService service = getSpreadsheetService();
-	    Spreadsheet spreadsheet = service.getSpreadsheetByContentId(contentId);
-
-	    spreadsheet.setDefineLater(true);
-	    service.saveOrUpdateSpreadsheet(spreadsheet);
-	    
-	    //audit log the teacher has started editing activity in monitor
-	    service.auditLogStartEditingActivityInMonitor(contentId);
-
-	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("initPage")) {
-	    return initPage(mapping, form, request, response);
-	}
-
-	if (param.equals("updateContent")) {
-	    return updateContent(mapping, form, request, response);
-	}
-
-	return mapping.findForward(SpreadsheetConstants.ERROR);
-    }
+    @Autowired
+    @Qualifier("spreadsheetService")
+    private ISpreadsheetService service;
 
     /**
      * Read spreadsheet data from database and put them into HttpSession. It will redirect to init.do directly after
      * this method run successfully.
      *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     *
-     * @throws ServletException
-     *
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/start")
+    public String start(@ModelAttribute SpreadsheetForm spreadsheetForm, HttpServletRequest request)
+	    throws ServletException {
 
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, SpreadsheetConstants.PARAM_TOOL_CONTENT_ID));
 
-	// get back the spreadsheet and item list and display them on page
-	ISpreadsheetService service = getSpreadsheetService();
-
 	Spreadsheet spreadsheet = null;
-	SpreadsheetForm spreadsheetForm = (SpreadsheetForm) form;
 
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	spreadsheetForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	spreadsheetForm.setSessionMapID(sessionMap.getSessionID());
 
@@ -141,26 +102,21 @@ public class AuthoringAction extends Action {
 	sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE_FORM, spreadsheetForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-	return mapping.findForward(SpreadsheetConstants.SUCCESS);
+	return "pages/authoring/start";
     }
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
-    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/init")
+    public String initPage(@ModelAttribute SpreadsheetForm spreadsheetForm, HttpServletRequest request)
+	    throws ServletException {
+
 	String sessionMapID = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	SpreadsheetForm existForm = (SpreadsheetForm) sessionMap.get(SpreadsheetConstants.ATTR_RESOURCE_FORM);
 
-	SpreadsheetForm spreadsheetForm = (SpreadsheetForm) form;
 	try {
 	    PropertyUtils.copyProperties(spreadsheetForm, existForm);
 	} catch (Exception e) {
@@ -170,28 +126,20 @@ public class AuthoringAction extends Action {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	return mapping.findForward(SpreadsheetConstants.SUCCESS);
+	return "pages/authoring/authoring";
     }
 
     /**
-     * This method will persist all inforamtion in this authoring page, include all spreadsheet item, information etc.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
+     * This method will persist all information in this authoring page, include all spreadsheet item, information etc.
      */
-    private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	SpreadsheetForm spreadsheetForm = (SpreadsheetForm) (form);
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
+    public String updateContent(@ModelAttribute SpreadsheetForm spreadsheetForm, HttpServletRequest request)
+	    throws Exception {
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	Spreadsheet spreadsheet = spreadsheetForm.getSpreadsheet();
-	ISpreadsheetService service = getSpreadsheetService();
 
 	// **********************************Get Spreadsheet PO*********************
 	Spreadsheet spreadsheetPO = service.getSpreadsheetByContentId(spreadsheetForm.getSpreadsheet().getContentId());
@@ -200,7 +148,7 @@ public class AuthoringAction extends Action {
 	    spreadsheetPO = spreadsheet;
 	    spreadsheetPO.setCreated(new Timestamp(new Date().getTime()));
 	    spreadsheetPO.setUpdated(new Timestamp(new Date().getTime()));
-	    
+
 	} else {
 	    Long uid = spreadsheetPO.getUid();
 	    PropertyUtils.copyProperties(spreadsheetPO, spreadsheet);
@@ -234,19 +182,7 @@ public class AuthoringAction extends Action {
 	spreadsheetForm.setSpreadsheet(spreadsheetPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	return mapping.findForward(SpreadsheetConstants.SUCCESS);
-    }
-
-    // *************************************************************************************
-    // Private method
-    // *************************************************************************************
-    /**
-     * Return SpreadsheetService bean.
-     */
-    private ISpreadsheetService getSpreadsheetService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (ISpreadsheetService) wac.getBean(SpreadsheetConstants.RESOURCE_SERVICE);
+	return "pages/authoring/authoring";
     }
 
 }

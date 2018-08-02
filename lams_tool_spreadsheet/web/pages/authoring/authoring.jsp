@@ -2,7 +2,7 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants"%>
-<c:set var="spreadsheetURL"><html:rewrite page="/includes/javascript/simple_spreadsheet/spreadsheet_offline.html"/>?lang=${pageContext.response.locale.language}</c:set>
+<c:set var="spreadsheetURL"><lams:WebAppURL/>includes/javascript/simple_spreadsheet/spreadsheet_offline.html?lang=${pageContext.response.locale.language}</c:set>
 
 <lams:html>
 <lams:head>
@@ -37,13 +37,11 @@
     </script> 
 </lams:head>
 <body class="stripes" onLoad="init()">
-<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data" onsubmit="return onSubmitHandler();">
-	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-	<html:hidden property="spreadsheet.contentId" />
-	 <html:hidden property="mode" value="${mode}"/>
-	<html:hidden property="sessionMapID" />
-	<html:hidden property="contentFolderID" />
-	<html:hidden property="currentTab" styleId="currentTab" />
+<form:form action="updateContent.do" method="post" id="spreadsheetForm" modelAttribute="spreadsheetForm" enctype="multipart/form-data" onsubmit="return onSubmitHandler();">
+	<form:hidden path="spreadsheet.contentId" />
+	<form:hidden path="sessionMapID" />
+	<form:hidden path="contentFolderID" />
+	<form:hidden path="currentTab" id="currentTab" />
 
 	<c:set var="title"><fmt:message key="activity.title"/> ${lang}</c:set>
 	<lams:Page title="${title}" type="navbar">
@@ -68,14 +66,14 @@
 			</lams:TabBodys>
 
 		<!-- Button Row -->
-		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
-			toolSignature="<%=SpreadsheetConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.spreadsheet.contentId}" 
-			 customiseSessionID="${formBean.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
-			 contentFolderID="${formBean.contentFolderID}" />
+		<lams:AuthoringButton formID="spreadsheetForm" clearSessionActionUrl="/clearsession.do" 
+			toolSignature="<%=SpreadsheetConstants.TOOL_SIGNATURE%>" toolContentID="${spreadsheetForm.spreadsheet.contentId}" 
+			 customiseSessionID="${spreadsheetForm.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
+			 contentFolderID="${spreadsheetForm.contentFolderID}" />
 		</lams:TabBodyArea>
 
 		<div id="footer"></div>
 	</lams:Page>	
-</html:form>
+</form:form>
 </body>
 </lams:html>

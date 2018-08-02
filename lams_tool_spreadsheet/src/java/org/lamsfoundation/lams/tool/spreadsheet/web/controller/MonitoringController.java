@@ -21,14 +21,13 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.spreadsheet.web.action;
+package org.lamsfoundation.lams.tool.spreadsheet.web.controller;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,13 +37,6 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.Summary;
@@ -54,67 +46,52 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
 import org.lamsfoundation.lams.tool.spreadsheet.service.ISpreadsheetService;
 import org.lamsfoundation.lams.tool.spreadsheet.web.form.MarkForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class MonitoringAction extends Action {
-    public static Logger log = Logger.getLogger(MonitoringAction.class);
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	String param = mapping.getParameter();
+    public static Logger log = Logger.getLogger(MonitoringController.class);
 
-	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
+    @Autowired
+    @Qualifier("spreadsheetService")
+    private ISpreadsheetService service;
 
-	if (param.equals("summary")) {
-	    return summary(mapping, form, request, response);
-	}
-	if (param.equals("getUsers")) {
-	    return getUsers(mapping, form, request, response);
-	}
-	if (param.equals("doStatistic")) {
-	    return doStatistic(mapping, form, request, response);
-	}
-	if (param.equals("viewAllMarks")) {
-	    return viewAllMarks(mapping, form, request, response);
-	}
-	if (param.equals("releaseMarks")) {
-	    return releaseMarks(mapping, form, request, response);
-	}
-	if (param.equals("downloadMarks")) {
-	    return downloadMarks(mapping, form, request, response);
-	}
-	if (param.equals("editMark")) {
-	    return editMark(mapping, form, request, response);
-	}
-	if (param.equals("saveMark")) {
-	    return saveMark(mapping, form, request, response);
-	}
-	return mapping.findForward(SpreadsheetConstants.ERROR);
-    }
+    @Autowired
+    @Qualifier("spreadsheetMessageService")
+    private MessageService messageService;
 
-    private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/summary")
+    public String summary(HttpServletRequest request, HttpServletResponse response) {
 	//initial Session Map
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(SpreadsheetConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	ISpreadsheetService service = getSpreadsheetService();
 	List<Summary> summaryList = service.getSummary(contentId);
 
-	List<StatisticDTO> statisticList = getSpreadsheetService().getStatistics(contentId);
+	List<StatisticDTO> statisticList = service.getStatistics(contentId);
 	request.setAttribute(SpreadsheetConstants.ATTR_STATISTIC_LIST, statisticList);
 
 	Spreadsheet spreadsheet = service.getSpreadsheetByContentId(contentId);
@@ -128,11 +105,12 @@ public class MonitoringAction extends Action {
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	sessionMap.put(SpreadsheetConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 
-	return mapping.findForward(SpreadsheetConstants.SUCCESS);
+	return "pages/monitoring/monitoring";
     }
 
-    private ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping(path = "/getUsers", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getUsers(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -154,7 +132,6 @@ public class MonitoringAction extends Action {
 	}
 
 	//return user list according to the given sessionID
-	ISpreadsheetService service = getSpreadsheetService();
 	Spreadsheet spreadsheet = service.getSpreadsheetByContentId(contentId);
 	List<Object[]> users = service.getUsersForTablesorter(sessionID, page, size, sorting, searchString,
 		spreadsheet.isReflectOnActivity());
@@ -187,46 +164,31 @@ public class MonitoringAction extends Action {
 	    rows.add(responseRow);
 	}
 	responsedata.set("rows", rows);
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(new String(responsedata.toString()));
-	return null;
+
+	return responsedata.toString();
     }
 
     /**
      * AJAX call to refresh statistic page.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward doStatistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/doStatistic")
+    public String doStatistic(HttpServletRequest request) {
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	ISpreadsheetService service = getSpreadsheetService();
 
 	List<StatisticDTO> statisticList = service.getStatistics(contentId);
 	request.setAttribute(SpreadsheetConstants.ATTR_STATISTIC_LIST, statisticList);
 	request.setAttribute(SpreadsheetConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 
-	return mapping.findForward(SpreadsheetConstants.SUCCESS);
+	return "pages/monitoring/parts/statisticspart";
     }
 
     /**
      * View mark of all learner from same tool content ID.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward viewAllMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/viewAllMarks")
+    public String viewAllMarks(HttpServletRequest request) {
 
 	Long sessionId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
-	ISpreadsheetService service = getSpreadsheetService();
 
 	//return FileDetailsDTO list according to the given sessionID
 	List<SpreadsheetUser> userList = service.getUserListBySessionId(sessionId);
@@ -235,23 +197,17 @@ public class MonitoringAction extends Action {
 	request.setAttribute(SpreadsheetConstants.ATTR_SESSION_MAP_ID,
 		WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_SESSION_MAP_ID));
 
-	return mapping.findForward("viewAllMarks");
+	return "pages/monitoring/parts/viewallmarks";
     }
 
     /**
      * Release mark
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward releaseMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/releaseMarks")
+    @ResponseBody
+    public String releaseMarks(HttpServletRequest request, HttpServletResponse response) {
 
 	//get service then update report table
-	ISpreadsheetService service = getSpreadsheetService();
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 
 	service.releaseMarksForSession(sessionID);
@@ -263,7 +219,7 @@ public class MonitoringAction extends Action {
 	    if (session != null) {
 		sessionName = session.getSessionName();
 	    }
-	    out.write(service.getMessageService().getMessage("msg.mark.released", new String[] { sessionName }));
+	    out.write(messageService.getMessage("msg.mark.released", new String[] { sessionName }));
 	    out.flush();
 	} catch (IOException e) {
 	}
@@ -273,19 +229,12 @@ public class MonitoringAction extends Action {
 
     /**
      * Download Spreadsheet marks by MS Excel file format.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward downloadMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/downloadMarks")
+    public String downloadMarks(HttpServletRequest request, HttpServletResponse response) {
 
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	//return user list according to the given sessionID
-	ISpreadsheetService service = getSpreadsheetService();
 	List<SpreadsheetUser> userList = service.getUserListBySessionId(sessionID);
 
 	//construct Excel file format and download
@@ -303,13 +252,13 @@ public class MonitoringAction extends Action {
 
 	    row = sheet.createRow(idx++);
 	    cell = row.createCell(0);
-	    cell.setCellValue(service.getMessageService().getMessage("label.monitoring.downloadmarks.learner.name"));
+	    cell.setCellValue(messageService.getMessage("label.monitoring.downloadmarks.learner.name"));
 
 	    cell = row.createCell(1);
-	    cell.setCellValue(service.getMessageService().getMessage("label.monitoring.downloadmarks.marks"));
+	    cell.setCellValue(messageService.getMessage("label.monitoring.downloadmarks.marks"));
 
 	    cell = row.createCell(2);
-	    cell.setCellValue(service.getMessageService().getMessage("label.monitoring.downloadmarks.comments"));
+	    cell.setCellValue(messageService.getMessage("label.monitoring.downloadmarks.comments"));
 
 	    for (SpreadsheetUser user : userList) {
 		if (user.getUserModifiedSpreadsheet() != null && user.getUserModifiedSpreadsheet().getMark() != null) {
@@ -350,8 +299,8 @@ public class MonitoringAction extends Action {
 	    response.getOutputStream().write(data, 0, data.length);
 	    response.getOutputStream().flush();
 	} catch (Exception e) {
-	    MonitoringAction.log.error(e);
-	    errors = new ActionMessage("monitoring.download.error", e.toString()).toString();
+	    MonitoringController.log.error(e);
+	    errors = "monitoring.download.error";
 	}
 
 	if (errors != null) {
@@ -366,11 +315,12 @@ public class MonitoringAction extends Action {
 	return null;
     }
 
-    public ActionForward editMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/editMark")
+    public String editMark(@ModelAttribute MarkForm markForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_SESSION_MAP_ID);
 	Long userUid = WebUtil.readLongParam(request, SpreadsheetConstants.ATTR_USER_UID);
-	SpreadsheetUser user = getSpreadsheetService().getUser(userUid);
+	SpreadsheetUser user = service.getUser(userUid);
 
 	//		if((user == null) || (user.getUserModifiedSpreadsheet() == null)){
 	//			ActionErrors errors = new ActionErrors();
@@ -379,7 +329,6 @@ public class MonitoringAction extends Action {
 	//			return mapping.findForward("error");
 	//		}
 
-	MarkForm markForm = (MarkForm) form;
 	markForm.setSessionMapID(sessionMapID);
 	markForm.setUserUid(user.getUid());
 	markForm.setUserName(user.getFullUsername());
@@ -398,43 +347,42 @@ public class MonitoringAction extends Action {
 	}
 	request.setAttribute(SpreadsheetConstants.ATTR_CODE, code);
 
-	return mapping.findForward(SpreadsheetConstants.SUCCESS);
+	return "pages/monitoring/parts/editmark";
     }
 
-    public ActionForward saveMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping(path = "/saveMark", method = RequestMethod.POST)
+    public String saveMark(@ModelAttribute MarkForm markForm, HttpServletRequest request,
 	    HttpServletResponse response) {
-	MarkForm markForm = (MarkForm) form;
 
 	Float markFloat = null;
 	String markComment = null;
 
 	// get the mark details, validating as we go.
-	ActionErrors errors = new ActionErrors();
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	String markStr = markForm.getMarks();
 	if (StringUtils.isBlank(markStr)) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(SpreadsheetConstants.ERROR_MSG_MARKS_BLANK));
+	    errorMap.add("GLOBAL", messageService.getMessage("error.summary.marks.blank"));
 	} else {
 	    try {
 		markFloat = NumberUtil.getLocalisedFloat(markStr, request.getLocale());
 	    } catch (Exception e) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE,
-			new ActionMessage(SpreadsheetConstants.ERROR_MSG_MARKS_INVALID_NUMBER));
+		errorMap.add("GLOBAL", messageService.getMessage("error.summary.marks.invalid.number"));
 	    }
 	}
 
 	markComment = markForm.getComments();
 	if (StringUtils.isBlank(markComment)) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(SpreadsheetConstants.ERROR_MSG_COMMENTS_BLANK));
+	    errorMap.add("GLOBAL", messageService.getMessage("error.summary.comments.blank"));
 	}
 
-	if (!errors.isEmpty()) {
-	    this.addErrors(request, errors);
-	    return mapping.findForward("editMark");
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    return "pages/monitoring/parts/editmark";
 	}
 
 	// passed validation so proceed to save
 	Long userUid = markForm.getUserUid();
-	SpreadsheetUser user = getSpreadsheetService().getUser(userUid);
+	SpreadsheetUser user = service.getUser(userUid);
 	if (user != null && user.getUserModifiedSpreadsheet() != null) {
 	    //check whether it is "edit(old item)" or "add(new item)"
 	    SpreadsheetMark mark;
@@ -448,7 +396,7 @@ public class MonitoringAction extends Action {
 	    mark.setMarks(markFloat);
 	    mark.setComments(markComment);
 
-	    getSpreadsheetService().saveOrUpdateUserModifiedSpreadsheet(user.getUserModifiedSpreadsheet());
+	    service.saveOrUpdateUserModifiedSpreadsheet(user.getUserModifiedSpreadsheet());
 	}
 
 	request.setAttribute("mark", NumberUtil.formatLocalisedNumber(markFloat, request.getLocale(),
@@ -458,7 +406,7 @@ public class MonitoringAction extends Action {
 	//set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(SpreadsheetConstants.ATTR_SESSION_MAP_ID, markForm.getSessionMapID());
 
-	return mapping.findForward(SpreadsheetConstants.SUCCESS);
+	return "pages/monitoring/parts/updatemarkaftersave";
     }
 
     // *************************************************************************************
@@ -467,20 +415,11 @@ public class MonitoringAction extends Action {
 
     /**
      * Save statistic information into request
-     *
-     * @param request
-     * @param submitFilesSessionList
      */
     private void statistic(HttpServletRequest request, List submitFilesSessionList) {
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	List<StatisticDTO> statisticList = getSpreadsheetService().getStatistics(contentId);
+	List<StatisticDTO> statisticList = service.getStatistics(contentId);
 
-    }
-
-    private ISpreadsheetService getSpreadsheetService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (ISpreadsheetService) wac.getBean(SpreadsheetConstants.RESOURCE_SERVICE);
     }
 
 }

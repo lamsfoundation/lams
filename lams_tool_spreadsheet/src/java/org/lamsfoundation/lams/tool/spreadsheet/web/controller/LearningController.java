@@ -21,24 +21,14 @@
  * ****************************************************************
  */
 
+package org.lamsfoundation.lams.tool.spreadsheet.web.controller;
 
-package org.lamsfoundation.lams.tool.spreadsheet.web.action;
-
-import java.io.IOException;
 import java.util.Date;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionRedirect;
-import org.apache.struts.config.ForwardConfig;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -57,56 +47,43 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.util.HtmlUtils;
 
 /**
  *
  * @author Andrey Balan
  */
-public class LearningAction extends Action {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @Autowired
+    @Qualifier("spreadsheetService")
+    private ISpreadsheetService service;
 
-	String param = mapping.getParameter();
-	//-----------------------Spreadsheet Learner function ---------------------------
-	if (param.equals("start")) {
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("saveUserSpreadsheet")) {
-	    return saveUserSpreadsheet(mapping, form, request, response);
-	}
-	if (param.equals("finish")) {
-	    return finish(mapping, form, request, response);
-	}
-
-	//================ Reflection =======================
-	if (param.equals("newReflection")) {
-	    return newReflection(mapping, form, request, response);
-	}
-	if (param.equals("submitReflection")) {
-	    return submitReflection(mapping, form, request, response);
-	}
-
-	return mapping.findForward(SpreadsheetConstants.ERROR);
-    }
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /**
      * Read spreadsheet data from database and put them into HttpSession. It will redirect to init.do directly after
      * this method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/start")
+    public String start(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
 
-	//initial Session Map 
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	//initial Session Map
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	//save toolContentID into HTTPSession
@@ -119,7 +96,6 @@ public class LearningAction extends Action {
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 
 	//get back the spreadsheet and item list and display them on page
-	ISpreadsheetService service = getSpreadsheetService();
 	SpreadsheetUser spreadsheetUser = null;
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
@@ -164,7 +140,7 @@ public class LearningAction extends Action {
 
 	//add define later support
 	if (spreadsheet.isDefineLater()) {
-	    return mapping.findForward(SpreadsheetConstants.DEFINE_LATER);
+	    return "pages/learning/definelater";
 	}
 
 	//set contentInUse flag to true
@@ -172,7 +148,7 @@ public class LearningAction extends Action {
 	    spreadsheet.setContentInUse(true);
 	    service.saveOrUpdateSpreadsheet(spreadsheet);
 	}
-	
+
 	String code;
 	if (spreadsheet.isLearnerAllowedToSave() && (spreadsheetUser.getUserModifiedSpreadsheet() != null)) {
 	    code = spreadsheetUser.getUserModifiedSpreadsheet().getUserModifiedSpreadsheet();
@@ -185,36 +161,31 @@ public class LearningAction extends Action {
 	if ((spreadsheetUser != null) && (spreadsheetUser.getUserModifiedSpreadsheet() != null)
 		&& (spreadsheetUser.getUserModifiedSpreadsheet().getMark() != null)) {
 	    request.setAttribute(SpreadsheetConstants.ATTR_USER_IS_MARKED, true);
-	    if ( (spreadsheetUser.getUserModifiedSpreadsheet().getMark().getDateMarksReleased() != null)) {
-	    request.setAttribute(SpreadsheetConstants.ATTR_USER_MARK,
-		 spreadsheetUser.getUserModifiedSpreadsheet().getMark());
+	    if ((spreadsheetUser.getUserModifiedSpreadsheet().getMark().getDateMarksReleased() != null)) {
+		request.setAttribute(SpreadsheetConstants.ATTR_USER_MARK,
+			spreadsheetUser.getUserModifiedSpreadsheet().getMark());
 	    }
 	} else {
 	    request.setAttribute(SpreadsheetConstants.ATTR_USER_IS_MARKED, false);
 	}
-	
+
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
-		request, getServlet().getServletContext());
+		request, applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
-	return mapping.findForward(SpreadsheetConstants.SUCCESS);
+	return "pages/learning/learning";
     }
 
     /**
      * Finish learning session.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward saveUserSpreadsheet(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/saveUserSpreadsheet")
+    public String saveUserSpreadsheet(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
 
 	//get back SessionMap
 	String sessionMapID = request.getParameter(SpreadsheetConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	//get mode and ToolSessionID from sessionMAP
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -222,7 +193,6 @@ public class LearningAction extends Action {
 	boolean userFinished = (Boolean) sessionMap.get(SpreadsheetConstants.ATTR_USER_FINISHED);
 
 	//save learner changes in spreadsheet if such option is activated in spreadsheet
-	ISpreadsheetService service = getSpreadsheetService();
 	Spreadsheet spreadsheet = (Spreadsheet) sessionMap.get(SpreadsheetConstants.ATTR_RESOURCE);
 	Spreadsheet spreadsheetPO = service.getSpreadsheetByContentId(spreadsheet.getContentId());
 	if (spreadsheetPO.isLearnerAllowedToSave() && !mode.isTeacher()
@@ -231,53 +201,49 @@ public class LearningAction extends Action {
 	    SpreadsheetUser spreadsheetUser = getCurrentUser(service, sessionId);
 	    UserModifiedSpreadsheet userModifiedSpreadsheet = spreadsheetUser.getUserModifiedSpreadsheet();
 
-	    if ( spreadsheetUser.getUserModifiedSpreadsheet() == null || spreadsheetUser.getUserModifiedSpreadsheet().getMark() == null ) {
-		if ( userModifiedSpreadsheet == null ) {
+	    if (spreadsheetUser.getUserModifiedSpreadsheet() == null
+		    || spreadsheetUser.getUserModifiedSpreadsheet().getMark() == null) {
+		if (userModifiedSpreadsheet == null) {
 		    userModifiedSpreadsheet = new UserModifiedSpreadsheet();
 		}
 		String code = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_CODE);
 		userModifiedSpreadsheet.setUserModifiedSpreadsheet(code);
 		spreadsheetUser.setUserModifiedSpreadsheet(userModifiedSpreadsheet);
 		service.saveOrUpdateUser(spreadsheetUser);
-	    } 
+	    }
 	}
 
 	String typeOfAction = WebUtil.readStrParam(request, "typeOfAction");
-	ForwardConfig conf;
+	String conf;
 	if ("finishSession".equals(typeOfAction)) {
-	    conf = mapping.findForwardConfig("finishSession");
+	    conf = "finishSession.do";
 	} else if ("continueReflect".equals(typeOfAction)) {
-	    conf = mapping.findForwardConfig("continueReflect");
+	    conf = "newReflection.do";
 	} else {
-	    conf = mapping.findForwardConfig("start");
+	    conf = "start.do";
 	}
-	ActionRedirect redirect = new ActionRedirect(conf);
-	redirect.addParameter(SpreadsheetConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
-	redirect.addParameter(AttributeNames.ATTR_MODE, mode);
+
+	String redirect = "redirect:/learning/" + conf;
+	redirect = WebUtil.appendParameterToURL(redirect, SpreadsheetConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	redirect = WebUtil.appendParameterToURL(redirect, AttributeNames.PARAM_TOOL_SESSION_ID, sessionId.toString());
+	redirect = WebUtil.appendParameterToURL(redirect, AttributeNames.ATTR_MODE, mode.toString());
 	return redirect;
     }
 
     /**
      * Finish learning session.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/finish")
+    public String finish(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
 
 	//get back SessionMap
 	String sessionMapID = request.getParameter(SpreadsheetConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	//get mode and ToolSessionID from sessionMAP
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	ISpreadsheetService service = getSpreadsheetService();
 	// get sessionId from HttpServletRequest
 	String nextActivityUrl = null;
 	try {
@@ -291,65 +257,49 @@ public class LearningAction extends Action {
 	    log.error("Failed get next activity url:" + e.getMessage());
 	}
 
-	return mapping.findForward(SpreadsheetConstants.SUCCESS);
+	return "pages/learning/finish";
     }
 
     /**
      * Display empty reflection form.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newReflection")
+    public String newReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
 
 	//get session value
 	String sessionMapID = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_SESSION_MAP_ID);
 
-	ReflectionForm refForm = (ReflectionForm) form;
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
-	refForm.setUserID(user.getUserID());
-	refForm.setSessionMapID(sessionMapID);
+	reflectionForm.setUserID(user.getUserID());
+	reflectionForm.setSessionMapID(sessionMapID);
 
-//		 get the existing reflection entry
-	ISpreadsheetService submitFilesService = getSpreadsheetService();
-
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Long toolSessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+	NotebookEntry entry = service.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		SpreadsheetConstants.TOOL_SIGNATURE, user.getUserID());
 
 	if (entry != null) {
-	    refForm.setEntryText(entry.getEntry());
+	    reflectionForm.setEntryText(entry.getEntry());
 	}
 
-	return mapping.findForward(SpreadsheetConstants.SUCCESS);
+	return "pages/learning/notebook";
     }
 
     /**
      * Submit reflection form input database.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ReflectionForm refForm = (ReflectionForm) form;
-	Integer userId = refForm.getUserID();
+    @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
+    public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
+
+	Integer userId = reflectionForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	ISpreadsheetService service = getSpreadsheetService();
 
 	// check for existing notebook entry
 	NotebookEntry entry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -358,26 +308,20 @@ public class LearningAction extends Action {
 	if (entry == null) {
 	    // create new entry
 	    service.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    SpreadsheetConstants.TOOL_SIGNATURE, userId, refForm.getEntryText());
+		    SpreadsheetConstants.TOOL_SIGNATURE, userId, reflectionForm.getEntryText());
 	} else {
 	    // update existing entry
-	    entry.setEntry(refForm.getEntryText());
+	    entry.setEntry(reflectionForm.getEntryText());
 	    entry.setLastModified(new Date());
 	    service.updateEntry(entry);
 	}
 
-	return finish(mapping, form, request, response);
+	return finish(reflectionForm, request);
     }
 
     //*************************************************************************************
     // Private methods
     //*************************************************************************************
-
-    private ISpreadsheetService getSpreadsheetService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (ISpreadsheetService) wac.getBean(SpreadsheetConstants.RESOURCE_SERVICE);
-    }
 
     private SpreadsheetUser getCurrentUser(ISpreadsheetService service, Long sessionId) {
 	//try to get form system session
