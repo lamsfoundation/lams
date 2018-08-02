@@ -30,7 +30,6 @@ public class MonitoringForm {
 
     private static final long serialVersionUID = 9096908688391850595L;
 
-    String dispatch;
     boolean teacherVisible;
     Long toolSessionID;
 
@@ -55,13 +54,6 @@ public class MonitoringForm {
 	this.messageUID = messageUID;
     }
 
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
-    }
 
     public Long getToolSessionID() {
 	return toolSessionID;
