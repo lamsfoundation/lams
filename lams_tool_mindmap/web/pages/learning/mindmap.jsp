@@ -49,7 +49,7 @@
 			</script>
 		
 		<form:form action="${reflectOnActivity ? 'reflect.do' : 'finishActivity.do'}" method="post" onsubmit="return false;" modelAttribute="learningForm" id="submitForm">
-			<form:hidden path="userId" value="${userIdParam}" />
+			<input type="hidden" name="userId" value="${userIdParam}" />
 			<form:hidden path="toolContentId" value="${toolContentIdParam}" />
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="mindmapContent" id="mindmapContent" />

@@ -1,24 +1,17 @@
-<%@ include file="/common/taglibs.jsp"%>
-
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
-	<c:set var="tool"> <lams:WebAppURL /> 	</c:set>
-	
-	<script type="text/javascript">
-		var initialTabId = "${mindmapDTO.currentTab}";
-	</script>
-	<script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
-	
-	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>css/jquery.minicolors.css"></link>
-	<link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link>
-	<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
-				
-	<script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script src="<lams:LAMSURL/>includes/javascript/jquery.minicolors.min.js"></script>
-	<script src="${tool}includes/javascript/mapjs/main.js"></script>
-	<script src="${tool}includes/javascript/mapjs/underscore-min.js"></script>
+		<lams:head>
+			<title>
+				<fmt:message key="activity.title" />
+			</title>
+			<lams:headItems />
+			<script type="text/javascript">
+				var initialTabId = "${mindmapDTO.currentTab}";
+			</script>
+			<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/monitoring.js"></script>
+		</lams:head>
 
 	<body class="stripes">	
 	

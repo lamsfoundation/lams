@@ -2,12 +2,17 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
-	<c:set var="tool"> <lams:WebAppURL /> </c:set>
-	
-	<script type="text/javascript">
-		var initialTabId = "${mindmapDTO.currentTab}";
-	</script>
-	<script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
+
+	<lams:head>
+			<title>
+				<fmt:message key="activity.title" />
+			</title>
+			<lams:headItems />
+			<script type="text/javascript">
+				var initialTabId = "${mindmapDTO.currentTab}";
+			</script>
+			<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/monitoring.js"></script>
+	</lams:head>
 
 	<body class="stripes">	
 	

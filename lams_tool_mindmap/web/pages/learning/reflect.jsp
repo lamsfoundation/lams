@@ -41,7 +41,7 @@
 			
 			<c:choose>
 				<c:when test="${contentEditable}">
-					<textarea rows="5" name="entryText" value="${reflectEntry}" class="form-control" id="focused"></textarea>
+					<textarea rows="5" name="entryText" class="form-control" id="focused">${reflectEntry}</textarea>
 				</c:when>
 			
 				<c:otherwise>
