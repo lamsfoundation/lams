@@ -34,7 +34,7 @@
 	
 	<body class="stripes">
 		<lams:Page type="learner" title="${pixlrDTO.title}">
-			<form:form action="finishActivity.do" modelAttribute="learningForm" method="post" id="learningForm">
+			<form:form action="learning/finishActivity.do" modelAttribute="learningForm" method="post" id="learningForm">
 				<form:hidden path="toolSessionID" id="toolSessionID"/>
 				<form:hidden path="mode" value="${mode}" />
 				<form:hidden path="redoQuestion" value="true" />
@@ -78,12 +78,12 @@
 				</c:choose>
 					
 				<%--Bottom buttons--------------------------------------------------%>
-				<button type="button" class="btn btn-default btn-sm" onclick="javascript:document.getElementById('dispatch').value = 'viewAllImages';">
+				<button  class="btn btn-default btn-sm" onclick="javascript:document.getElementById('dispatch').value = 'viewAllImages';">
 					<fmt:message key="button.refresh" />
 				</button>
 					
 				<c:if test="${!pixlrDTO.lockOnFinish}">
-					<button type="button" class="btn btn-default btn-sm loffset5" onclick="javascript:document.getElementById('dispatch').value = 'unspecified';">
+					<button  class="btn btn-default btn-sm loffset5" onclick="javascript:document.getElementById('dispatch').value = 'unspecified';">
 						<fmt:message key="button.redo" />
 					</button>
 				</c:if>
@@ -91,7 +91,7 @@
 				<div class="voffset10 pull-right">
 					<c:choose>
 						<c:when test="${pixlrDTO.reflectOnActivity}">
-							<button type="button" class="btn btn-primary" onclick="javascript:document.getElementById('dispatch').value = 'openNotebook';">
+							<button class="btn btn-primary" onclick="javascript:document.getElementById('dispatch').value = 'openNotebook';">
 								<fmt:message key="button.continue" />
 							</button>
 						</c:when>
@@ -114,7 +114,7 @@
 					</c:choose>
 				</div>
 				
-			</buttonform>
+			</form:form>
 				
 			<div class="footer"></div>
 			

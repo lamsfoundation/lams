@@ -17,7 +17,7 @@
 <body class="stripes">
 
 <!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-<form:form action="learning/submitReflection.do" modelAttribute="qaLearningForm" id="qaLearningForm" onsubmit="disableFinishButton()">
+<form:form action="submitReflection.do" modelAttribute="qaLearningForm" id="qaLearningForm" onsubmit="disableFinishButton()">
 
 <lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
@@ -33,7 +33,7 @@
 			<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control"></form:textarea>
 
 			
-				<button id="finishButton" type="button" class="btn btn-primary voffset5 pull-right na">
+				<button id="finishButton"  class="btn btn-primary voffset5 pull-right na">
 					<span class="nextActivity">
 						<c:choose>
 		 					<c:when test="${sessionMap.activityPosition.last}">

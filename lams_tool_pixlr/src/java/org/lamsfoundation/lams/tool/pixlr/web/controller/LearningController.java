@@ -111,11 +111,7 @@ public class LearningController {
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	String redoQuestion = request.getParameter("redoQuestion");
-	boolean isRedo = false;
-	if (redoQuestion != null && redoQuestion.equals("true")) {
-	    isRedo = true;
-	}
+	boolean isRedo = learningForm.isRedoQuestion();
 
 	// Retrieve the session and content.
 	PixlrSession pixlrSession = pixlrService.getSessionBySessionId(toolSessionID);
@@ -276,7 +272,7 @@ public class LearningController {
     }
 
     @RequestMapping("/finishActivity")
-    public String finishActivity(HttpServletRequest request, HttpServletResponse response) {
+    public String finishActivity(@ModelAttribute("learningForm") LearningForm learningForm,HttpServletRequest request, HttpServletResponse response) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
 
@@ -392,7 +388,7 @@ public class LearningController {
 	    pixlrService.updateEntry(entry);
 	}
 
-	return finishActivity(request, response);
+	return finishActivity(learningForm, request, response);
     }
 
     public String viewAllImages(HttpServletRequest request) {

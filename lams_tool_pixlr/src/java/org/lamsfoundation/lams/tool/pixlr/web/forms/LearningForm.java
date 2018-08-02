@@ -36,9 +36,18 @@ public class LearningForm {
     String title;
     String instructions;
 
-    String dispatch;
     Long toolSessionID;
     String mode;
+    
+    boolean redoQuestion = false;
+    
+    public boolean isRedoQuestion() {
+        return redoQuestion;
+    }
+
+    public void setRedoQuestion(boolean redoQuestion) {
+        this.redoQuestion = redoQuestion;
+    }
 
     String entryText;
 
@@ -48,14 +57,6 @@ public class LearningForm {
 
     public void setMode(String mode) {
 	this.mode = mode;
-    }
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
     }
 
     public Long getToolSessionID() {
