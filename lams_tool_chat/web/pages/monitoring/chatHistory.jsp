@@ -1,11 +1,4 @@
-<%@ include file="/common/taglibs.jsp"%>
-
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
-
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
@@ -100,8 +93,8 @@
 								</label>
 								<br />
 		
-								<textarea name="messageBody" value="${message.body}"
-									style="width:95%" rows="3" />
+								<textarea name="messageBody" value="${messageBody}"
+									style="width:95%" rows="3" ></textarea>
 								<br />
 		
 								<input type="submit" value="<fmt:message>button.save</fmt:message>" class="btn btn-primary btn-sm">

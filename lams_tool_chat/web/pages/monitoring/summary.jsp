@@ -139,9 +139,9 @@
 										<c:param name="uid" value="${user.uid}" />
 									</c:url>
 	
-									<html:link href="javascript:launchPopup('${fn:escapeXml(openNotebook)}')">
+									<a href="javascript:launchPopup('${fn:escapeXml(openNotebook)}')">
 										<fmt:message key="link.view" />
-									</html:link>
+									</a>
 								</c:if>
 							</td>
 						</c:if>
