@@ -59,14 +59,14 @@
 			}
 				
 			function submitModifyCandidate(candidateIndexValue, actionMethod) {
-				document.McAuthoringForm.candidateIndex.value=candidateIndexValue;
+				document.forms.McAuthoringForm.candidateIndex.value=candidateIndexValue;
 				submitForm(actionMethod);
 			}
 
 			function removeCandidate(candidateIndexValue) {
 				if (validateMinumumCandidateCount()) {
-					document.McAuthoringForm.candidateIndex.value=candidateIndexValue;
-					submitMethod("removeCandidate");
+					document.forms.McAuthoringForm.candidateIndex.value=candidateIndexValue;
+					submitForm("removeCandidate");
 				}
 			}
 	
@@ -80,7 +80,7 @@
 				}
 				
 				var singleCorrectEntry = 0;
-				var radioCorrect=document.McAuthoringForm.correct;
+				var radioCorrect=document.forms.McAuthoringForm.correct;
 				if ((radioCorrect == 'null') || (radioCorrect == 'undefined')) {
 					var msg = "<fmt:message key="candidates.groupSize.warning"/>";
 					alert(msg);
@@ -129,7 +129,7 @@
 			}
 
 			function validateMinumumCandidateCount() {
-				var radioCorrect=document.McAuthoringForm.correct;
+				var radioCorrect=document.forms.McAuthoringForm.correct;
 				if ((radioCorrect == 'undefined') || (radioCorrect == null)) {
 					var msg = "<fmt:message key="candidates.unremovable.groupSize"/>";
 					alert(msg);
@@ -201,7 +201,7 @@
 				<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm roffset5"> 
 					<fmt:message key="label.cancel" />
 				</a>
-				<a href="#" onclick="saveQuestion();"
+				<a href="#" onclick="javascript:submitForm('saveQuestion');"
 					onmousedown="self.focus();" class="btn btn-default btn-sm"> 
 					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.save" />
 				</a>

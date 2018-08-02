@@ -99,7 +99,7 @@
 		</label>
 	</div>
 	<div class="form-group">
-		<textarea name="reflectionSubject" id="reflectInstructions" class="form-control" rows="3"></textarea>
+		<textarea name="reflectionSubject" id="reflectInstructions" class="form-control" rows="3">${mcAuthoringForm.reflectionSubject}</textarea>
 	</div>
 </lams:SimplePanel>
 

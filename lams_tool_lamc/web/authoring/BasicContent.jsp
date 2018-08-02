@@ -3,8 +3,8 @@
 
 <script type="text/javascript">
 	function removeQuestion(questionIndex) {
-		document.McAuthoringForm.questionIndex.value=questionIndex;
-		document.McAuthoringForm.dispatch.value='removeQuestion'; 
+		document.forms.McAuthoringForm.questionIndex.value=questionIndex;
+		document.forms.McAuthoringForm.dispatch.value='removeQuestion'; 
 		
 		$('#authoringForm').ajaxSubmit({ 
     		target:  $('#resourceListArea'),
@@ -13,7 +13,7 @@
 			},
     		iframe: true,
     		success:    function() { 
-    			document.McAuthoringForm.dispatch.value="submitAllContent";
+    			document.forms.McAuthoringForm.dispatch.value="submitAllContent";
     			refreshThickbox();
     	    }
 	    });
@@ -35,7 +35,7 @@
     		target:  $('#resourceListArea'),
     		iframe: true,
     		success:    function() { 
-    			document.McAuthoringForm.dispatch.value="submitAllContent";
+    			document.forms.McAuthoringForm.dispatch.value="submitAllContent";
     			refreshThickbox();
     	    	form.remove();
     	    }
@@ -54,7 +54,7 @@
 
 <div class="form-group">
     <label for="title"><fmt:message key="label.authoring.title.col"/></label>
-    <input type="text" name="title" value="MCQ" class="form-control"/>
+    <input type="text" name="title" value="${mcAuthoringForm.title}" class="form-control"/>
 </div>
 
 <div class="form-group">
