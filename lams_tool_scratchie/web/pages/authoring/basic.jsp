@@ -86,7 +86,7 @@
     function exportQTI(){
     	var frame = document.getElementById("downloadFileDummyIframe"),
     		title = encodeURIComponent(document.getElementsByName("scratchie.title")[0].value);
-    	frame.src = '<html:rewrite page="/authoring/exportQTI.do?sessionMapID=${sessionMapID}" />'
+    	frame.src = '<lams:WebAppURL />/authoring/exportQTI.do?sessionMapID=${sessionMapID}'
     			+ '&title=' + title;
     }
 </script>

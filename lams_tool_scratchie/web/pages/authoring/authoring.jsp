@@ -40,14 +40,13 @@
 </lams:head>
 <body class="stripes" onLoad="init()">
 			
-	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data" >
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<html:hidden property="scratchie.contentId" />
-		<html:hidden property="mode" value="${mode}"/>
-		<html:hidden property="sessionMapID" />
-		<html:hidden property="contentFolderID" />
-		<html:hidden property="currentTab" styleId="currentTab" />
-		<input type="hidden" name="itemList" id="itemList" />
+	<form:form action="authoring/update.do" modelAttribute="authoringForm" method="post" id="authoringForm" enctype="multipart/form-data" >
+		<form:hidden path="scratchie.contentId" />
+		<form:hidden path="mode" value="${mode}"/>
+		<form:hidden path="sessionMapID" />
+		<form:hidden path="contentFolderID" />
+		<form:hidden path="currentTab" id="currentTab" />
+		<form:hidden path="itemList" id="itemList" />
 	
 
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>
@@ -87,7 +86,7 @@
 
 		</lams:Page>
 		
-	</html:form>
+	</form:form>
 
 </body>
 </lams:html>
