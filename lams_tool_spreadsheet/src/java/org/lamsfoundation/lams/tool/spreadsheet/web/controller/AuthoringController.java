@@ -105,8 +105,45 @@ public class AuthoringController {
 	return "pages/authoring/start";
     }
 
+    @RequestMapping("/definelater")
+    public String defineLater(@ModelAttribute SpreadsheetForm spreadsheetForm, HttpServletRequest request)
+	    throws ServletException {
+
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Spreadsheet spreadsheet = service.getSpreadsheetByContentId(contentId);
+
+	spreadsheet.setDefineLater(true);
+	service.saveOrUpdateSpreadsheet(spreadsheet);
+
+	//audit log the teacher has started editing activity in monitor
+	service.auditLogStartEditingActivityInMonitor(contentId);
+
+	// initial Session Map
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	spreadsheetForm.setSessionMapID(sessionMap.getSessionID());
+
+	try {
+	    spreadsheet = service.getSpreadsheetByContentId(contentId);
+	    // if spreadsheet does not exist, try to use default content instead.
+	    if (spreadsheet == null) {
+		spreadsheet = service.getDefaultContent(contentId);
+	    }
+	    spreadsheetForm.setSpreadsheet(spreadsheet);
+	} catch (Exception e) {
+	    log.error(e);
+	    throw new ServletException(e);
+	}
+
+	sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE_FORM, spreadsheetForm);
+	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+
+	return "pages/authoring/start";
+    }
+
     /**
-     * Display same entire authoring page content from HttpSession variable.
      */
     @RequestMapping("/init")
     public String initPage(@ModelAttribute SpreadsheetForm spreadsheetForm, HttpServletRequest request)

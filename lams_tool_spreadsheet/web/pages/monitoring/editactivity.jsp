@@ -30,11 +30,11 @@
 	</tr>
 </table>
 
-<c:url  var="authoringUrl" value="/authoring/init.do">
+<c:url  var="authoringUrl" value="/authoring/definelater.do">
 	<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
 	<c:param name="contentFolderID" value="${sessionMap.contentFolderID}" />
 </c:url>
-<a href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
+<a href="javascript:;" onclick="launchPopup('${authoringUrl}')" class="btn btn-default pull-right">
 	<fmt:message key="label.monitoring.edit.activity.edit" />
 </a>
  
