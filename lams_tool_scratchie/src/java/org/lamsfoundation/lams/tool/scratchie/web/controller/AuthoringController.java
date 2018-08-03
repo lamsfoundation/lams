@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.scratchie.web.action;
+package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -45,14 +45,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.questions.Answer;
@@ -71,174 +65,124 @@ import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieForm;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieItemForm;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchiePedagogicalPlannerForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Andrey Balan
  */
-public class AuthoringAction extends Action {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
 
-    private static Logger log = Logger.getLogger(AuthoringAction.class);
+    private static Logger log = Logger.getLogger(AuthoringController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    @Qualifier("scratchieService")
+    private IScratchieService scratchieService;
 
-	// -----------------------Scratchie Author functions -----------
-	String param = mapping.getParameter();
-	if (param.equals("start")) {
-	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("definelater")) {
-	    // update define later flag to true
-	    Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	    IScratchieService service = getScratchieService();
-	    Scratchie scratchie = service.getScratchieByContentId(contentId);
+    @Autowired
+    @Qualifier("scratchieMessageService")
+    private MessageService messageService;
 
-	    scratchie.setDefineLater(true);
-	    service.saveOrUpdateScratchie(scratchie);
-	    
-	    //audit log the teacher has started editing activity in monitor
-	    service.auditLogStartEditingActivityInMonitor(contentId);
+    @RequestMapping("/start")
+    private String start(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request)
+	    throws ServletException {
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	return starting(authoringForm, request);
 
-	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("initPage")) {
-	    return initPage(mapping, form, request, response);
-	}
-
-	if (param.equals("updateContent")) {
-	    return updateContent(mapping, form, request, response);
-	}
-	// ----------------------- Scratchie item functions ---------
-	if (param.equals("addItem")) {
-	    return addItem(mapping, form, request, response);
-	}
-	if (param.equals("editItem")) {
-	    return editItem(mapping, form, request, response);
-	}
-	if (param.equals("saveItem")) {
-	    return saveItem(mapping, form, request, response);
-	}
-	if (param.equals("saveQTI")) {
-	    return saveQTI(mapping, form, request, response);
-	}
-	if (param.equals("exportQTI")) {
-	    return exportQTI(mapping, form, request, response);
-	}
-	if (param.equals("removeItem")) {
-	    return removeItem(mapping, form, request, response);
-	}
-	if (param.equals("upItem")) {
-	    return upItem(mapping, form, request, response);
-	}
-	if (param.equals("downItem")) {
-	    return downItem(mapping, form, request, response);
-	}
-	// ----------------------- Answers functions ---------------
-	if (param.equals("addAnswer")) {
-	    return addAnswer(mapping, form, request, response);
-	}
-	if (param.equals("removeAnswer")) {
-	    return removeAnswer(mapping, form, request, response);
-	}
-	if (param.equals("upAnswer")) {
-	    return upAnswer(mapping, form, request, response);
-	}
-	if (param.equals("downAnswer")) {
-	    return downAnswer(mapping, form, request, response);
-	}
-	// -----------------------PedagogicalPlanner functions ---------
-	if (param.equals("initPedagogicalPlannerForm")) {
-	    return initPedagogicalPlannerForm(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdatePedagogicalPlannerForm")) {
-	    return saveOrUpdatePedagogicalPlannerForm(mapping, form, request, response);
-	}
-
-	return mapping.findForward(ScratchieConstants.ERROR);
     }
 
-    /**
-     * Read scratchie data from database and put them into HttpSession. It will redirect to init.do directly after this
-     * method run successfully.
-     *
-     * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     *
-     * @throws ServletException
-     *
-     */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/definelater")
+    private String definelater(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request)
+	    throws ServletException {
+	// update define later flag to true
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Scratchie scratchie = scratchieService.getScratchieByContentId(contentId);
+
+	scratchie.setDefineLater(true);
+	scratchieService.saveOrUpdateScratchie(scratchie);
+
+	//audit log the teacher has started editing activity in monitor
+	scratchieService.auditLogStartEditingActivityInMonitor(contentId);
+
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+	return starting(authoringForm, request);
+
+    }
+
+    private String starting(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request)
+	    throws ServletException {
 
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, ScratchieConstants.PARAM_TOOL_CONTENT_ID));
 
-	// get back the scratchie and item list and display them on page
-	IScratchieService service = getScratchieService();
-
 	List<ScratchieItem> items = null;
 	Scratchie scratchie = null;
-	ScratchieForm scratchieForm = (ScratchieForm) form;
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	scratchieForm.setSessionMapID(sessionMap.getSessionID());
-
+	authoringForm.setSessionMapID(sessionMap.getSessionID());
 
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	scratchieForm.setContentFolderID(contentFolderID);
+	authoringForm.setContentFolderID(contentFolderID);
 
 	try {
-	    scratchie = service.getScratchieByContentId(contentId);
+	    scratchie = scratchieService.getScratchieByContentId(contentId);
 	    // if scratchie does not exist, try to use default content instead.
 	    if (scratchie == null) {
-		scratchie = service.getDefaultContent(contentId);
+		scratchie = scratchieService.getDefaultContent(contentId);
 		if (scratchie.getScratchieItems() != null) {
-		    items = new ArrayList<ScratchieItem>(scratchie.getScratchieItems());
+		    items = new ArrayList<>(scratchie.getScratchieItems());
 		} else {
 		    items = null;
 		}
 	    } else {
-		items = service.getAuthoredItems(scratchie.getUid());
+		items = scratchieService.getAuthoredItems(scratchie.getUid());
 	    }
 
-	    scratchieForm.setScratchie(scratchie);
+	    authoringForm.setScratchie(scratchie);
 	} catch (Exception e) {
-	    AuthoringAction.log.error(e);
+	    AuthoringController.log.error(e);
 	    throw new ServletException(e);
 	}
 
-	ScratchieConfigItem isEnabledExtraPointOption = service
+	ScratchieConfigItem isEnabledExtraPointOption = scratchieService
 		.getConfigItem(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION);
 	sessionMap.put(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION,
 		new Boolean(isEnabledExtraPointOption.getConfigValue()));
-	
+
 	//prepare advanced option allowing to overwrite default preset marks
-	ScratchieConfigItem defaultPresetMarksConfigItem = service.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS);
-	String defaultPresetMarks = defaultPresetMarksConfigItem == null ? "" : defaultPresetMarksConfigItem.getConfigValue();
-	boolean presetMarksOverwritten = scratchie.getPresetMarks() != null && !scratchie.getPresetMarks().equals(defaultPresetMarks);
+	ScratchieConfigItem defaultPresetMarksConfigItem = scratchieService
+		.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS);
+	String defaultPresetMarks = defaultPresetMarksConfigItem == null ? ""
+		: defaultPresetMarksConfigItem.getConfigValue();
+	boolean presetMarksOverwritten = scratchie.getPresetMarks() != null
+		&& !scratchie.getPresetMarks().equals(defaultPresetMarks);
 	sessionMap.put(ScratchieConstants.ATTR_IS_PRESET_MARKS_OVERWRITTEN, presetMarksOverwritten);
 	sessionMap.put(ScratchieConstants.ATTR_DEFAULT_PRESET_MARKS, defaultPresetMarks);
 
 	// init it to avoid null exception in following handling
 	if (items == null) {
-	    items = new ArrayList<ScratchieItem>();
+	    items = new ArrayList<>();
 	} else {
 	    for (ScratchieItem item : items) {
 
 		// sort answers by order id. it's needed only for the default answers. rest could be skipped
-		TreeSet<ScratchieAnswer> answerList = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
+		TreeSet<ScratchieAnswer> answerList = new TreeSet<>(new ScratchieAnswerComparator());
 		answerList.addAll(item.getAnswers());
 		item.setAnswers(answerList);
 	    }
@@ -256,28 +200,29 @@ public class AuthoringAction extends Action {
 	    }
 	    i++;
 	}
-	
+
 	//display confidence providing activities
-	Set<ToolActivity> confidenceLevelsActivities = service.getPrecedingConfidenceLevelsActivities(contentId);
+	Set<ToolActivity> confidenceLevelsActivities = scratchieService
+		.getPrecedingConfidenceLevelsActivities(contentId);
 	sessionMap.put(ScratchieConstants.ATTR_CONFIDENCE_LEVELS_ACTIVITIES, confidenceLevelsActivities);
 
-	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_FORM, scratchieForm);
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_FORM, authoringForm);
+	return "pages/authoring/start";
     }
 
     /**
      * Display same entire authoring page content from HttpSession variable.
      */
-    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/initPage")
+    private String initPage(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request)
+	    throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	ScratchieForm existForm = (ScratchieForm) sessionMap.get(ScratchieConstants.ATTR_RESOURCE_FORM);
 
-	ScratchieForm scratchieForm = (ScratchieForm) form;
 	try {
-	    PropertyUtils.copyProperties(scratchieForm, existForm);
+	    PropertyUtils.copyProperties(authoringForm, existForm);
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
@@ -285,33 +230,32 @@ public class AuthoringAction extends Action {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	return "pages/authoring/start";
     }
 
     /**
      * This method will persist all inforamtion in this authoring page, include all scratchie item, information etc.
      */
-    private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	ScratchieForm scratchieForm = (ScratchieForm) form;
+    @RequestMapping("/update")
+    private String updateContent(@ModelAttribute("authoringForm") ScratchieForm authoringForm,
+	    HttpServletRequest request) throws Exception {
 
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(scratchieForm.getSessionMapID());
+		.getAttribute(authoringForm.getSessionMapID());
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
-	Scratchie scratchie = scratchieForm.getScratchie();
-	IScratchieService service = getScratchieService();
+	Scratchie scratchie = authoringForm.getScratchie();
 
 	// **********************************Get Scratchie PO*********************
-	Scratchie scratchiePO = service.getScratchieByContentId(scratchieForm.getScratchie().getContentId());
+	Scratchie scratchiePO = scratchieService.getScratchieByContentId(authoringForm.getScratchie().getContentId());
 
 	Set<ScratchieItem> oldItems = null;
 
 	//allow using old and modified questions and references altogether
 	if (mode.isTeacher()) {
-	    oldItems = (scratchiePO == null) ? new HashSet<ScratchieItem>() : scratchiePO.getScratchieItems();
+	    oldItems = (scratchiePO == null) ? new HashSet<>() : scratchiePO.getScratchieItems();
 
 	    // initialize oldItems' answers
 	    for (ScratchieItem oldItem : oldItems) {
@@ -319,7 +263,7 @@ public class AuthoringAction extends Action {
 		}
 	    }
 
-	    service.releaseItemsFromCache(scratchiePO);
+	    scratchieService.releaseItemsFromCache(scratchiePO);
 	}
 
 	if (scratchiePO == null) {
@@ -343,7 +287,7 @@ public class AuthoringAction extends Action {
 	}
 
 	// ************************* Handle scratchie items *******************
-	Set<ScratchieItem> items = new LinkedHashSet<ScratchieItem>();
+	Set<ScratchieItem> items = new LinkedHashSet<>();
 	SortedSet<ScratchieItem> newItems = getItemList(sessionMap);
 	Iterator<ScratchieItem> iter = newItems.iterator();
 	while (iter.hasNext()) {
@@ -358,7 +302,7 @@ public class AuthoringAction extends Action {
 	//recalculate results in case content is edited from monitoring
 	List<ScratchieItem> deletedItems = getDeletedItemList(sessionMap);
 	if (mode.isTeacher()) {
-	    service.recalculateUserAnswers(scratchiePO, oldItems, newItems, deletedItems);
+	    scratchieService.recalculateUserAnswers(scratchiePO, oldItems, newItems, deletedItems);
 	}
 
 	// delete items from database.
@@ -367,37 +311,37 @@ public class AuthoringAction extends Action {
 	    ScratchieItem item = iter.next();
 	    iter.remove();
 	    if (item.getUid() != null) {
-		service.deleteScratchieItem(item.getUid());
+		scratchieService.deleteScratchieItem(item.getUid());
 	    }
 	}
 
 	// **********************************************
 	// finally persist scratchiePO again
-	service.saveOrUpdateScratchie(scratchiePO);
+	scratchieService.saveOrUpdateScratchie(scratchiePO);
 
-	scratchieForm.setScratchie(scratchiePO);
+	authoringForm.setScratchie(scratchiePO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	return mapping.findForward("author");
+	return "pages/authoring/authoring";
     }
 
     /**
      * Ajax call, will add one more input line for new resource item instruction.
      */
-    private ActionForward addItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/addItem")
+    private String addItem(@ModelAttribute("scratchieItemForm") ScratchieItemForm scratchieItemForm,
+	    HttpServletRequest request) {
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	ScratchieItemForm itemForm = (ScratchieItemForm) form;
-	itemForm.setSessionMapID(sessionMapID);
-	itemForm.setContentFolderID(contentFolderID);
+	scratchieItemForm.setSessionMapID(sessionMapID);
+	scratchieItemForm.setContentFolderID(contentFolderID);
 
-	List<ScratchieAnswer> answerList = new ArrayList<ScratchieAnswer>();
+	List<ScratchieAnswer> answerList = new ArrayList<>();
 	for (int i = 0; i < ScratchieConstants.INITIAL_ANSWERS_NUMBER; i++) {
 	    ScratchieAnswer answer = new ScratchieAnswer();
 	    answer.setOrderId(i + 1);
@@ -406,14 +350,15 @@ public class AuthoringAction extends Action {
 	request.setAttribute(ScratchieConstants.ATTR_ANSWER_LIST, answerList);
 
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	return "pages/authoring/parts/additem";
     }
 
     /**
      * Display edit page for existed scratchie item.
      */
-    private ActionForward editItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/editItem")
+    private String editItem(@ModelAttribute("scratchieItemForm") ScratchieItemForm scratchieItemForm,
+	    HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
@@ -425,24 +370,23 @@ public class AuthoringAction extends Action {
 	ScratchieItem item = null;
 	if (itemIdx != -1) {
 	    SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
-	    List<ScratchieItem> rList = new ArrayList<ScratchieItem>(itemList);
+	    List<ScratchieItem> rList = new ArrayList<>(itemList);
 	    item = rList.get(itemIdx);
 	    if (item != null) {
-		ScratchieItemForm itemForm = (ScratchieItemForm) form;
-		itemForm.setTitle(item.getTitle());
-		itemForm.setDescription(item.getDescription());
+		scratchieItemForm.setTitle(item.getTitle());
+		scratchieItemForm.setDescription(item.getDescription());
 		if (itemIdx >= 0) {
-		    itemForm.setItemIndex(new Integer(itemIdx).toString());
+		    scratchieItemForm.setItemIndex(new Integer(itemIdx).toString());
 		}
 
 		Set<ScratchieAnswer> answerList = item.getAnswers();
 		request.setAttribute(ScratchieConstants.ATTR_ANSWER_LIST, answerList);
 
-		itemForm.setContentFolderID(contentFolderID);
+		scratchieItemForm.setContentFolderID(contentFolderID);
 	    }
 	}
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	return "pages/authoring/parts/additem";
     }
 
     /**
@@ -451,15 +395,16 @@ public class AuthoringAction extends Action {
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
      */
-    private ActionForward saveItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
 
-	ScratchieItemForm itemForm = (ScratchieItemForm) form;
+    @RequestMapping(value = "/saveItem", method = RequestMethod.POST)
+    private String saveItem(@ModelAttribute("scratchieItemForm") ScratchieItemForm scratchieItemForm,
+	    HttpServletRequest request) {
+
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(itemForm.getSessionMapID());
+		.getAttribute(scratchieItemForm.getSessionMapID());
 	// check whether it is "edit(old Question)" or "add(new Question)"
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
-	int itemIdx = NumberUtils.toInt(itemForm.getItemIndex(), -1);
+	int itemIdx = NumberUtils.toInt(scratchieItemForm.getItemIndex(), -1);
 	ScratchieItem item = null;
 
 	if (itemIdx == -1) { // add
@@ -473,16 +418,16 @@ public class AuthoringAction extends Action {
 	    item.setOrderId(maxSeq);
 	    itemList.add(item);
 	} else { // edit
-	    List<ScratchieItem> rList = new ArrayList<ScratchieItem>(itemList);
+	    List<ScratchieItem> rList = new ArrayList<>(itemList);
 	    item = rList.get(itemIdx);
 	}
 
-	item.setTitle(itemForm.getTitle());
-	item.setDescription(itemForm.getDescription());
+	item.setTitle(scratchieItemForm.getTitle());
+	item.setDescription(scratchieItemForm.getDescription());
 
 	// set options
 	Set<ScratchieAnswer> answerList = getAnswersFromRequest(request, true);
-	Set<ScratchieAnswer> answers = new LinkedHashSet<ScratchieAnswer>();
+	Set<ScratchieAnswer> answers = new LinkedHashSet<>();
 	int orderId = 0;
 	for (ScratchieAnswer answer : answerList) {
 	    answer.setOrderId(orderId++);
@@ -491,16 +436,16 @@ public class AuthoringAction extends Action {
 	item.setAnswers(answers);
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, scratchieItemForm.getSessionMapID());
+	return "pages/authoring/parts/itemlist";
     }
 
     /**
      * Parses questions extracted from IMS QTI file and adds them as new items.
      */
     @SuppressWarnings("rawtypes")
-    private ActionForward saveQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UnsupportedEncodingException {
+    @RequestMapping("/saveQTI")
+    private String saveQTI(HttpServletRequest request) throws UnsupportedEncodingException {
 	// big part of code was taken from saveItem() method
 	String sessionMapId = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -522,7 +467,7 @@ public class AuthoringAction extends Action {
 	    item.setDescription(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
 		    question.getResourcesFolderPath()));
 
-	    TreeSet<ScratchieAnswer> answerList = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
+	    TreeSet<ScratchieAnswer> answerList = new TreeSet<>(new ScratchieAnswerComparator());
 	    String correctAnswer = null;
 	    int orderId = 1;
 	    if (question.getAnswers() != null) {
@@ -567,20 +512,21 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapId);
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
     }
 
     /**
      * Prepares Scratchie content for QTI packing
      */
     @SuppressWarnings({ "unchecked" })
-    private ActionForward exportQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UnsupportedEncodingException {
+    @RequestMapping("/exportQTI")
+    private String exportQTI(HttpServletRequest request, HttpServletResponse response)
+	    throws UnsupportedEncodingException {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
-	List<Question> questions = new LinkedList<Question>();
+	List<Question> questions = new LinkedList<>();
 
 	for (ScratchieItem item : itemList) {
 	    Question question = new Question();
@@ -589,8 +535,8 @@ public class AuthoringAction extends Action {
 	    question.setTitle(item.getTitle());
 	    question.setText(item.getDescription());
 
-	    List<Answer> answers = new ArrayList<Answer>();
-	    Set<ScratchieAnswer> scratchieAnswers = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
+	    List<Answer> answers = new ArrayList<>();
+	    Set<ScratchieAnswer> scratchieAnswers = new TreeSet<>(new ScratchieAnswerComparator());
 	    scratchieAnswers.addAll(item.getAnswers());
 
 	    for (ScratchieAnswer itemAnswer : scratchieAnswers) {
@@ -622,8 +568,8 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeItem")
+    private String removeItem(HttpServletRequest request) {
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -633,7 +579,7 @@ public class AuthoringAction extends Action {
 
 	int itemIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIndex != -1) {
-	    List<ScratchieItem> rList = new ArrayList<ScratchieItem>(itemList);
+	    List<ScratchieItem> rList = new ArrayList<>(itemList);
 	    ScratchieItem item = rList.remove(itemIndex);
 	    itemList.clear();
 	    itemList.addAll(rList);
@@ -644,7 +590,7 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(ScratchieConstants.ATTR_ITEM_LIST, itemList);
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
     }
 
     /**
@@ -656,9 +602,9 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward upItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, true);
+    @RequestMapping("/upItem")
+    private String upItem(HttpServletRequest request) {
+	return switchItem(request, true);
     }
 
     /**
@@ -670,12 +616,12 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward downItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, false);
+    @RequestMapping("/downItem")
+    private String downItem(HttpServletRequest request) {
+	return switchItem(request, false);
     }
 
-    private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
+    private String switchItem(HttpServletRequest request, boolean up) {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -684,7 +630,7 @@ public class AuthoringAction extends Action {
 
 	int itemIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIndex != -1) {
-	    List<ScratchieItem> rList = new ArrayList<ScratchieItem>(itemList);
+	    List<ScratchieItem> rList = new ArrayList<>(itemList);
 
 	    // get current and the target item, and switch their sequnece
 	    ScratchieItem item = rList.get(itemIndex);
@@ -705,7 +651,7 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(ScratchieConstants.ATTR_ITEM_LIST, itemList);
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
     }
 
     // ----------------------- Answers functions ---------------
@@ -719,8 +665,8 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward addAnswer(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/addAnswer")
+    private String addAnswer(HttpServletRequest request) {
 
 	SortedSet<ScratchieAnswer> answerList = getAnswersFromRequest(request, false);
 
@@ -736,7 +682,7 @@ public class AuthoringAction extends Action {
 	request.setAttribute(ScratchieConstants.ATTR_ANSWER_LIST, answerList);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	return "pages/authoring/parts/answerlist";
     }
 
     /**
@@ -748,14 +694,14 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward removeAnswer(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeAnswer")
+    private String removeAnswer(HttpServletRequest request) {
 
 	SortedSet<ScratchieAnswer> answerList = getAnswersFromRequest(request, false);
 
 	int answerIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ANSWER_INDEX), -1);
 	if (answerIndex != -1) {
-	    List<ScratchieAnswer> rList = new ArrayList<ScratchieAnswer>(answerList);
+	    List<ScratchieAnswer> rList = new ArrayList<>(answerList);
 	    rList.remove(answerIndex);
 	    answerList.clear();
 	    answerList.addAll(rList);
@@ -764,7 +710,7 @@ public class AuthoringAction extends Action {
 	request.setAttribute(ScratchieConstants.ATTR_ANSWER_LIST, answerList);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	return "pages/authoring/parts/answerlist";
     }
 
     /**
@@ -776,9 +722,9 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward upAnswer(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchAnswer(mapping, request, true);
+    @RequestMapping("/upAnswer")
+    private String upAnswer(HttpServletRequest request) {
+	return switchAnswer(request, true);
     }
 
     /**
@@ -790,17 +736,17 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward downAnswer(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchAnswer(mapping, request, false);
+    @RequestMapping("/downAnswer")
+    private String downAnswer(HttpServletRequest request) {
+	return switchAnswer(request, false);
     }
 
-    private ActionForward switchAnswer(ActionMapping mapping, HttpServletRequest request, boolean up) {
+    private String switchAnswer(HttpServletRequest request, boolean up) {
 	SortedSet<ScratchieAnswer> answerList = getAnswersFromRequest(request, false);
 
 	int answerIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ANSWER_INDEX), -1);
 	if (answerIndex != -1) {
-	    List<ScratchieAnswer> rList = new ArrayList<ScratchieAnswer>(answerList);
+	    List<ScratchieAnswer> rList = new ArrayList<>(answerList);
 
 	    // get current and the target item, and switch their sequnece
 	    ScratchieAnswer answer = rList.get(answerIndex);
@@ -821,48 +767,41 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(ScratchieConstants.ATTR_ANSWER_LIST, answerList);
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	return "pages/authoring/parts/answerlist";
     }
 
     // ----------------------- PedagogicalPlannerForm ---------------
 
-    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ScratchiePedagogicalPlannerForm plannerForm = (ScratchiePedagogicalPlannerForm) form;
+    @RequestMapping("/initPedagogicalPlannerForm")
+    public String initPedagogicalPlannerForm(
+	    @ModelAttribute("pedagogicalPlannerForm") ScratchiePedagogicalPlannerForm pedagogicalPlannerForm,
+	    HttpServletRequest request) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Scratchie scratchie = getScratchieService().getScratchieByContentId(toolContentID);
-	plannerForm.fillForm(scratchie);
+	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentID);
+	pedagogicalPlannerForm.fillForm(scratchie);
 	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	plannerForm.setContentFolderID(contentFolderId);
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	pedagogicalPlannerForm.setContentFolderID(contentFolderId);
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException {
-	ScratchiePedagogicalPlannerForm plannerForm = (ScratchiePedagogicalPlannerForm) form;
-	ActionMessages errors = plannerForm.validate();
-	if (errors.isEmpty()) {
-	    Scratchie scratchie = getScratchieService().getScratchieByContentId(plannerForm.getToolContentID());
-	    scratchie.setInstructions(plannerForm.getInstructions());
-	    getScratchieService().saveOrUpdateScratchie(scratchie);
+    @RequestMapping(value = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
+    public String saveOrUpdatePedagogicalPlannerForm(
+	    @ModelAttribute("pedagogicalPlannerForm") ScratchiePedagogicalPlannerForm pedagogicalPlannerForm,
+	    HttpServletRequest request) throws IOException {
+	MultiValueMap<String, String> errorMap = pedagogicalPlannerForm.validate(messageService);
+	if (errorMap.isEmpty()) {
+	    Scratchie scratchie = scratchieService.getScratchieByContentId(pedagogicalPlannerForm.getToolContentID());
+	    scratchie.setInstructions(pedagogicalPlannerForm.getInstructions());
+	    scratchieService.saveOrUpdateScratchie(scratchie);
 	} else {
-	    saveErrors(request, errors);
+	    request.setAttribute("errorMap", errorMap);
 	}
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
     // *************************************************************************************
     // Private method
     // *************************************************************************************
-    /**
-     * Return ScratchieService bean.
-     */
-    private IScratchieService getScratchieService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (IScratchieService) wac.getBean(ScratchieConstants.SCRATCHIE_SERVICE);
-    }
-
     /**
      * List save current scratchie items.
      *
@@ -872,7 +811,7 @@ public class AuthoringAction extends Action {
     private SortedSet<ScratchieItem> getItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<ScratchieItem> list = (SortedSet<ScratchieItem>) sessionMap.get(ScratchieConstants.ATTR_ITEM_LIST);
 	if (list == null) {
-	    list = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
+	    list = new TreeSet<>(new ScratchieItemComparator());
 	    sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, list);
 	}
 	return list;
@@ -918,7 +857,7 @@ public class AuthoringAction extends Action {
 		: NumberUtils.toInt(paramMap.get(ScratchieConstants.ATTR_ANSWER_CORRECT));
 
 	int count = NumberUtils.toInt(paramMap.get(ScratchieConstants.ATTR_ANSWER_COUNT));
-	TreeSet<ScratchieAnswer> answerList = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
+	TreeSet<ScratchieAnswer> answerList = new TreeSet<>(new ScratchieAnswerComparator());
 	for (int i = 0; i < count; i++) {
 
 	    String answerDescription = paramMap.get(ScratchieConstants.ATTR_ANSWER_DESCRIPTION_PREFIX + i);
@@ -959,7 +898,7 @@ public class AuthoringAction extends Action {
 	}
 
 	String[] params = list.split("&");
-	Map<String, String> paramMap = new HashMap<String, String>();
+	Map<String, String> paramMap = new HashMap<>();
 	String[] pair;
 	for (String item : params) {
 	    pair = item.split("=");

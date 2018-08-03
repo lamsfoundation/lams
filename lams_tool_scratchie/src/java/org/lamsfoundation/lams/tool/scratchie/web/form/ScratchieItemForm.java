@@ -20,10 +20,7 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scratchie.web.form;
-
-import org.apache.struts.action.ActionForm;
 
 /**
  *
@@ -31,7 +28,7 @@ import org.apache.struts.action.ActionForm;
  *
  *
  */
-public class ScratchieItemForm extends ActionForm {
+public class ScratchieItemForm {
     private static final long serialVersionUID = 3599879328307492312L;
 
     private String itemIndex;

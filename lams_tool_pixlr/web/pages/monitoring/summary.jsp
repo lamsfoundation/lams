@@ -9,7 +9,7 @@
 	});
 	
 	function submitForm(method, uid) {
-		document.getElementById("dispatch").value = method;
+		document.getElementById("dispatch").action = method+".do";
 		document.getElementById("hideUserImageUid").value = uid;
 		document.getElementById("monitoringForm").submit();
 	}

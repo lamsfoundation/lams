@@ -37,7 +37,7 @@
 			<form:form action="learning/finishActivity.do" modelAttribute="learningForm" method="post" id="learningForm">
 				<form:hidden path="toolSessionID" id="toolSessionID"/>
 				<form:hidden path="mode" value="${mode}" />
-				<form:hidden path="redoQuestion" value="true" />
+				<form:hidden path="redoQuestion" />
 				
 				<c:choose>
 					<c:when test="${!empty learnerDTOs}">

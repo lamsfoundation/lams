@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.tool.scratchie.web.action;
+package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
 import java.io.IOException;
 import java.util.Calendar;

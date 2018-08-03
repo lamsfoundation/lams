@@ -154,7 +154,7 @@ public class LearningController {
 
 	// return to the viewAll images page if the user has already clicked it
 	if (pixlrUser.isFinishedActivity() && pixlr.isAllowViewOthersImages() && !isRedo) {
-	    return viewAllImages(request);
+	    return viewAllImages(learningForm, request);
 	}
 
 	// set up the user dto
@@ -391,7 +391,8 @@ public class LearningController {
 	return finishActivity(learningForm, request, response);
     }
 
-    public String viewAllImages(HttpServletRequest request) {
+    @RequestMapping("/viewAllImages")
+    public String viewAllImages(@ModelAttribute("learningForm") LearningForm learningForm, HttpServletRequest request) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -405,6 +406,7 @@ public class LearningController {
 
 	Pixlr pixlr = pixlrSession.getPixlr();
 
+	learningForm.setRedoQuestion(true);
 	// get the user
 	PixlrUser pixlrUser;
 	if (mode.equals(ToolAccessMode.TEACHER)) {

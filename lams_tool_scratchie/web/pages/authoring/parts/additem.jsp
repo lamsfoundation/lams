@@ -220,16 +220,15 @@
 	
 			<%@ include file="/common/messages.jsp"%>
 			
-			<html:form action="/authoring/saveItem" method="post" styleId="scratchieItemForm">
-				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-				<html:hidden property="sessionMapID" />
-				<input type="hidden" name="answerList" id="answerList" />
-				<html:hidden property="itemIndex" />
-				<html:hidden property="contentFolderID" styleId="contentFolderID"/>
+			<form:form action="authoring/saveItem.do" method="post" modelAttribute="scratchieItemForm" id="scratchieItemForm">
+				<form:hidden path="sessionMapID" />
+				<form:hidden path="answerList" id="answerList" />
+				<form:hidden path="itemIndex" />
+				<form:hidden path="contentFolderID" id="contentFolderID"/>
 	
 				<div class="form-group">
 					<label for="title"><fmt:message key="label.authoring.basic.question.name" /></label>
-					<html:text property="title" styleClass="form-control"/>
+					<form:input path="title" cssClass="form-control"/>
 				</div>
 
 				<div class="form-group">
@@ -244,7 +243,7 @@
 
 				<div class="form-group"><fmt:message key="label.authoring.scratchie.answers" /></div>
 			
-			</html:form>
+			</form:form>
 			
 			<!-- Answers -->
 			<form id="answerForm" name="answerForm">

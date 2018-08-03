@@ -33,7 +33,7 @@
 			}
 		
 			function refresh() {
-				window.location.href = "<lams:WebAppURL/>/learning.do?mode=${mode}&toolSessionID=${toolSessionID}&redoQuestion=true";
+				window.location.href = "<lams:WebAppURL/>learning.do?mode=${mode}&toolSessionID=${toolSessionID}&redoQuestion=true";
 			}
 		
 			function disableFinishButton() {
@@ -133,7 +133,7 @@
 						
 						<c:choose>
 							<c:when test="${pixlrDTO.allowViewOthersImages}">
-								<button class="btn btn-primary" onclick="javascript:document.getElementById("learningForm").action = 'viewAllImages.do';">
+								<button class="btn btn-primary" onclick="javascript:document.getElementById('learningForm').action = 'learning/viewAllImages.do';">
 									<fmt:message key="button.viewAll" />
 								</button>
 							</c:when>
@@ -141,12 +141,12 @@
 							<c:otherwise>
 								<c:choose>
 									<c:when test="${!pixlrUserDTO.finishedActivity and pixlrDTO.reflectOnActivity}">
-										<button class="btn btn-primary" onclick="javascript:document.getElementById("learningForm").action = 'openNotebook.do';">
+										<button class="btn btn-primary" onclick="javascript:document.getElementById('learningForm').action = 'openNotebook.do';">
 											<fmt:message key="button.continue" />
 										</button>
 									</c:when>
 									
-									<c:otherwise>
+									<c:otherwise>!!
 										<a href="#nogo" class="btn btn-primary" id="finishButton" onclick="submitForm('finished');">
 											<span class="na">
 												<c:choose>

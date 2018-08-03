@@ -40,7 +40,7 @@
 			}
 		</script>
 		
-		<form:form action="authoring/addOrUpdateHeading.do" modelAttribute="authoringForm id="authoringForm" method="post">
+		<form:form action="authoring/addOrUpdateHeading.do" modelAttribute="authoringForm" id="authoringForm" method="post">
 		
 			<form:hidden path="sessionMapID" />
 			<form:hidden path="headingIndex" />

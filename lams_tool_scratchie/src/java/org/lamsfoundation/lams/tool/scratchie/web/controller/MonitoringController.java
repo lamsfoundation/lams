@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.scratchie.web.action;
+package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
@@ -40,10 +40,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
@@ -64,63 +60,36 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class MonitoringAction extends Action {
-    public static Logger log = Logger.getLogger(MonitoringAction.class);
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
+    public static Logger log = Logger.getLogger(MonitoringController.class);
 
-    private static IScratchieService service;
+    @Autowired
+    @Qualifier("scratchieService")
+    private IScratchieService scratchieService;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	String param = mapping.getParameter();
+    @RequestMapping("/summary")
+    private String summary(HttpServletRequest request) {
 
-	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
-
-	if (param.equals("summary")) {
-	    return summary(mapping, form, request, response);
-	}
-	if (param.equals("itemSummary")) {
-	    return itemSummary(mapping, form, request, response);
-	}
-	if (param.equals("saveUserMark")) {
-	    return saveUserMark(mapping, form, request, response);
-	}
-	if (param.equals("setSubmissionDeadline")) {
-	    return setSubmissionDeadline(mapping, form, request, response);
-	}
-	if (param.equals("exportExcel")) {
-	    return exportExcel(mapping, form, request, response);
-	}
-	if (param.equals("getMarkChartData")) {
-	    return getMarkChartData(mapping, form, request, response);
-	}
-	if (param.equals("statistic")) {
-	    return statistic(mapping, form, request, response);
-	}
-
-	return mapping.findForward(ScratchieConstants.ERROR);
-    }
-
-    private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	initializeScratchieService();
 	// initialize Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	List<GroupSummary> summaryList = service.getMonitoringSummary(contentId, true);
+	List<GroupSummary> summaryList = scratchieService.getMonitoringSummary(contentId, true);
 
-	Scratchie scratchie = service.getScratchieByContentId(contentId);
-	Set<ScratchieUser> learners = service.getAllLeaders(contentId);
+	Scratchie scratchie = scratchieService.getScratchieByContentId(contentId);
+	Set<ScratchieUser> learners = scratchieService.getAllLeaders(contentId);
 
 	//set SubmissionDeadline, if any
 	if (scratchie.getSubmissionDeadline() != null) {
@@ -135,7 +104,7 @@ public class MonitoringAction extends Action {
 	}
 
 	// cache into sessionMap
-	boolean isGroupedActivity = service.isGroupedActivity(contentId);
+	boolean isGroupedActivity = scratchieService.isGroupedActivity(contentId);
 	sessionMap.put(ScratchieConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
 	sessionMap.put(ScratchieConstants.ATTR_SUMMARY_LIST, summaryList);
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
@@ -147,23 +116,23 @@ public class MonitoringAction extends Action {
 
 	// Create BurningQuestionsDtos if BurningQuestions is enabled.
 	if (scratchie.isBurningQuestionsEnabled()) {
-	    List<BurningQuestionItemDTO> burningQuestionItemDtos = service.getBurningQuestionDtos(scratchie, null, true);
+	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
+		    null, true);
 	    sessionMap.put(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 	}
 
 	// Create reflectList if reflection is enabled.
 	if (scratchie.isReflectOnActivity()) {
-	    List<ReflectDTO> reflections = service.getReflectionList(contentId);
+	    List<ReflectDTO> reflections = scratchieService.getReflectionList(contentId);
 	    sessionMap.put(ScratchieConstants.ATTR_REFLECTIONS, reflections);
 	}
 
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	return "pages/monitoring/monitoring";
     }
 
-    private ActionForward itemSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/itemSummary")
+    private String itemSummary(HttpServletRequest request) {
 
-	initializeScratchieService();
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -173,11 +142,11 @@ public class MonitoringAction extends Action {
 	if (itemUid.equals(-1)) {
 	    return null;
 	}
-	ScratchieItem item = service.getScratchieItemByUid(itemUid);
+	ScratchieItem item = scratchieService.getScratchieItemByUid(itemUid);
 	request.setAttribute(ScratchieConstants.ATTR_ITEM, item);
 
 	Long contentId = (Long) sessionMap.get(ScratchieConstants.ATTR_TOOL_CONTENT_ID);
-	List<GroupSummary> summaryList = service.getQuestionSummary(contentId, itemUid);
+	List<GroupSummary> summaryList = scratchieService.getQuestionSummary(contentId, itemUid);
 
 	// escape JS sensitive characters in answer descriptions
 	for (GroupSummary summary : summaryList) {
@@ -189,21 +158,20 @@ public class MonitoringAction extends Action {
 	}
 
 	request.setAttribute(ScratchieConstants.ATTR_SUMMARY_LIST, summaryList);
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	return "pages/monitoring/parts/itemSummary";
     }
 
-    private ActionForward saveUserMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/saveUserMark")
+    private String saveUserMark(HttpServletRequest request) {
 
 	if ((request.getParameter(ScratchieConstants.PARAM_NOT_A_NUMBER) == null)
 		&& !StringUtils.isEmpty(request.getParameter(ScratchieConstants.ATTR_USER_ID))
 		&& !StringUtils.isEmpty(request.getParameter(ScratchieConstants.PARAM_SESSION_ID))) {
-	    initializeScratchieService();
 
 	    Long userId = WebUtil.readLongParam(request, ScratchieConstants.ATTR_USER_ID);
 	    Long sessionId = WebUtil.readLongParam(request, ScratchieConstants.PARAM_SESSION_ID);
 	    Integer newMark = Integer.valueOf(request.getParameter(ScratchieConstants.PARAM_MARK));
-	    service.changeUserMark(userId, sessionId, newMark);
+	    scratchieService.changeUserMark(userId, sessionId, newMark);
 	}
 
 	return null;
@@ -219,12 +187,11 @@ public class MonitoringAction extends Action {
      * @return
      * @throws IOException
      */
-    private ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	initializeScratchieService();
+    @RequestMapping("/setSubmissionDeadline")
+    private String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Scratchie scratchie = service.getScratchieByContentId(contentID);
+	Scratchie scratchie = scratchieService.getScratchieByContentId(contentID);
 
 	Long dateParameter = WebUtil.readLongParam(request, ScratchieConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
@@ -238,7 +205,7 @@ public class MonitoringAction extends Action {
 	    formattedDate = DateUtil.convertToStringForJSON(tzSubmissionDeadline, request.getLocale());
 	}
 	scratchie.setSubmissionDeadline(tzSubmissionDeadline);
-	service.saveOrUpdateScratchie(scratchie);
+	scratchieService.saveOrUpdateScratchie(scratchie);
 
 	response.setContentType("text/plain;charset=utf-8");
 	response.getWriter().print(formattedDate);
@@ -250,16 +217,15 @@ public class MonitoringAction extends Action {
      *
      * @throws IOException
      */
-    private ActionForward exportExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/exportExcel")
+    private String exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-	initializeScratchieService();
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = service.exportExcel(scratchie.getContentId());
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = scratchieService.exportExcel(scratchie.getContentId());
 
 	String fileName = "scratchie_export.xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -283,10 +249,10 @@ public class MonitoringAction extends Action {
     /**
      * Get the mark summary with data arranged in bands. Can be displayed graphically or in a table.
      */
-    private ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException {
+    @RequestMapping("/getMarkChartData")
+    private String getMarkChartData(HttpServletRequest request, HttpServletResponse res)
+	    throws IOException, ServletException {
 
-	initializeScratchieService();
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -296,7 +262,7 @@ public class MonitoringAction extends Action {
 	List<Number> results = null;
 
 	if (scratchie != null) {
-	    results = service.getMarksArray(scratchie.getContentId());
+	    results = scratchieService.getMarksArray(scratchie.getContentId());
 	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
@@ -312,10 +278,9 @@ public class MonitoringAction extends Action {
 
     }
 
-    private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/statistic")
+    private String statistic(HttpServletRequest request) {
 
-	initializeScratchieService();
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -323,20 +288,9 @@ public class MonitoringAction extends Action {
 
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
 	if (scratchie != null) {
-	    LeaderResultsDTO leaderDto = service.getLeaderResultsDTOForLeaders(scratchie.getContentId());
+	    LeaderResultsDTO leaderDto = scratchieService.getLeaderResultsDTOForLeaders(scratchie.getContentId());
 	    sessionMap.put("leaderDto", leaderDto);
 	}
-	return mapping.findForward(ScratchieConstants.SUCCESS);
-    }
-
-    // *************************************************************************************
-    // Private method
-    // *************************************************************************************
-    private void initializeScratchieService() {
-	if (service == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    service = (IScratchieService) wac.getBean(ScratchieConstants.SCRATCHIE_SERVICE);
-	}
+	return "pages/monitoring/parts/statisticpart";
     }
 }

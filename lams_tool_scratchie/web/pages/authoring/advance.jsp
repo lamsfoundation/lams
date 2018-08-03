@@ -32,7 +32,7 @@
 	<c:if test="${sessionMap.isEnabledExtraPointOption}">
 		<div class="checkbox">
 			<label for="extraPoint">
-				<html:checkbox property="scratchie.extraPoint" styleId="extraPoint"/>
+				<form:checkbox path="scratchie.extraPoint" id="extraPoint"/>
 				<fmt:message key="label.authoring.advanced.give.extra.point" />
 			</label>
 		</div>
@@ -40,21 +40,21 @@
 	
 	<div class="checkbox">
 		<label for="burning-questions-enabled">
-			<html:checkbox property="scratchie.burningQuestionsEnabled" styleId="burning-questions-enabled"/>
+			<form:checkbox path="scratchie.burningQuestionsEnabled" id="burning-questions-enabled"/>
 			<fmt:message key="label.authoring.advanced.burning.questions" />
 		</label>
 	</div>
 	
 	<div class="checkbox">
 		<label for="show-scratchies-in-results">
-			<html:checkbox property="scratchie.showScrachiesInResults" styleId="show-scratchies-in-results"/>
+			<form:checkbox property="scratchie.showScrachiesInResults" styleId="show-scratchies-in-results"/>
 			<fmt:message key="label.authoring.advanced.show.scratchies.in.results" />
 		</label>
 	</div>
 	
 	<div class="checkbox">
 		<label for="shuffle-items">
-			<html:checkbox property="scratchie.shuffleItems" styleId="shuffle-items"/>
+			<form:checkbox path="scratchie.shuffleItems" id="shuffle-items"/>
 			<fmt:message key="label.authoring.advanced.shuffle.items" />
 		</label>
 	</div>
@@ -62,7 +62,7 @@
 	<div class="form-inline">
 		<label for="time-limit">
 			<fmt:message key="label.time.limit" />&nbsp;
-			<html:text property="scratchie.timeLimit" size="3" styleId="time-limit" styleClass="form-control input-sm"/>
+			<form:input path="scratchie.timeLimit" size="3" id="time-limit" cssClass="form-control input-sm"/>
 		</label>
 	</div>
 	
@@ -85,11 +85,11 @@
 					/>
 				
 					<fmt:message key="label.show.confidence.level" />&nbsp;
-					<html:select property="scratchie.confidenceLevelsActivityUiid" styleClass="form-control input-sm" styleId="confidence-levels-activity">
+					<form:select path="scratchie.confidenceLevelsActivityUiid" cssClass="form-control input-sm" id="confidence-levels-activity">
 						<c:forEach var="confidenceProvidingActivity" items="${confidenceLevelsActivities}">
-							<html:option value="${confidenceProvidingActivity.activityUIID}">${confidenceProvidingActivity.title}</html:option>
+							<form:option value="${confidenceProvidingActivity.activityUIID}">${confidenceProvidingActivity.title}</form:option>
 						</c:forEach>
-					</html:select>
+					</form:select>
 				</label>
 			</c:otherwise>
 		</c:choose>
@@ -115,7 +115,7 @@
 		<div class="form-inline">
 			<label for="preset-marks">
 				<fmt:message key="admin.preset.marks" />&nbsp;
-				<html:text styleId="preset-marks" property="scratchie.presetMarks" size="50" maxlength="255" styleClass="form-control form-control-inline"	/>
+				<form:input id="preset-marks" path="scratchie.presetMarks" size="50" maxlength="255" cssClass="form-control form-control-inline"	/>
 			</label>
 		</div>
 	</div>
@@ -124,13 +124,13 @@
 <lams:SimplePanel titleKey="label.activity.completion">
 	<div class="checkbox">
 		<label for="reflect-on">
-			<html:checkbox property="scratchie.reflectOnActivity" styleId="reflect-on"/>
+			<form:checkbox path="scratchie.reflectOnActivity" id="reflect-on"/>
 			<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 		</label>
 	</div>
 	
 	<div class="form-group">
-		<html:textarea property="scratchie.reflectInstructions"  styleClass="form-control" styleId="reflectInstructions" rows="3" />
+		<form:textarea path="scratchie.reflectInstructions"  cssClass="form-control" id="reflectInstructions" rows="3" />
 	</div>
 </lams:SimplePanel>
 

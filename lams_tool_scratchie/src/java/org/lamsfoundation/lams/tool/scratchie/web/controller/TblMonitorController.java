@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.scratchie.web.action;
+package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,7 +42,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
@@ -57,25 +56,31 @@ import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class TblMonitorAction extends LamsDispatchAction {
-    private static Logger log = Logger.getLogger(TblMonitorAction.class);
+@Controller
+@RequestMapping("/tblmonitoring")
+public class TblMonitorController {
+    private static Logger log = Logger.getLogger(TblMonitorController.class);
 
-    private static IScratchieService scratchieService;
+    @Autowired
+    @Qualifier("scratchieService")
+    private IScratchieService scratchieService;
 
     /**
      * Shows tra page
      */
-    public ActionForward tra(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	initializeScratchieService();
+    @RequestMapping("/tra")
+    public String tra(HttpServletRequest request) throws IOException, ServletException {
 
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
@@ -83,7 +88,7 @@ public class TblMonitorAction extends LamsDispatchAction {
 	int attemptedLearnersNumber = scratchieService.countUsersByContentId(toolContentId);
 	request.setAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
-	Set<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
+	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
 	request.setAttribute("items", items);
 
@@ -97,7 +102,7 @@ public class TblMonitorAction extends LamsDispatchAction {
 	    }
 
 	    int groupsSize = scratchieService.countSessionsByContentId(toolContentId);
-	    ArrayList<String[]> groupRows = new ArrayList<String[]>();
+	    ArrayList<String[]> groupRows = new ArrayList<>();
 	    for (int groupCount = 0; groupCount < groupsSize; groupCount++) {
 		ExcelCell[] groupRow = firstPageData[5 + groupCount];
 
@@ -109,15 +114,14 @@ public class TblMonitorAction extends LamsDispatchAction {
 	    request.setAttribute("groupRows", groupRows);
 	}
 
-	return mapping.findForward("tra");
+	return "pages/tblmonitoring/tra";
     }
 
     /**
      * Shows tra StudentChoices page
      */
-    public ActionForward traStudentChoices(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	initializeScratchieService();
+    @RequestMapping("/traStudentChoices")
+    public String traStudentChoices(HttpServletRequest request) throws IOException, ServletException {
 
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
@@ -140,31 +144,30 @@ public class TblMonitorAction extends LamsDispatchAction {
 	request.setAttribute("correctAnswers", correctAnswersRow);
 
 	int groupsSize = scratchieService.countSessionsByContentId(toolContentId);
-	ArrayList<ExcelCell[]> groupRows = new ArrayList<ExcelCell[]>();
+	ArrayList<ExcelCell[]> groupRows = new ArrayList<>();
 	for (int groupCount = 0; groupCount < groupsSize; groupCount++) {
 	    ExcelCell[] groupRow = secondPageData[6 + groupCount];
 	    groupRows.add(groupRow);
 	}
 	request.setAttribute("groupRows", groupRows);
 
-	Set<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
+	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
 	request.setAttribute("items", items);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
-	return mapping.findForward("traStudentChoices");
+	return "pages/tblmonitoring/traStudentChoices";
     }
 
     /**
      * Exports tool results into excel.
      *
      * Had to move it from the tool as tool uses SessionMap
-     * 
+     *
      * @throws IOException
      */
-    public ActionForward exportExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	initializeScratchieService();
+    @RequestMapping("/exportExcel")
+    public String exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = scratchieService.exportExcel(toolContentId);
@@ -184,12 +187,13 @@ public class TblMonitorAction extends LamsDispatchAction {
 
     /**
      * Shows Teams page
-     * 
+     *
      * @throws JSONException
      */
-    public ActionForward isBurningQuestionsEnabled(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping(value = "/isBurningQuestionsEnabled", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String isBurningQuestionsEnabled(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	initializeScratchieService();
 
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
@@ -197,16 +201,15 @@ public class TblMonitorAction extends LamsDispatchAction {
 	// build JSON
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("isBurningQuestionsEnabled", scratchie.isBurningQuestionsEnabled());
-	writeResponse(response, "text/json", LamsDispatchAction.ENCODING_UTF8, responseJSON.toString());
-	return null;
+	return responseJSON.toString();
+
     }
 
     /**
      * Shows Teams page
      */
-    public ActionForward burningQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	initializeScratchieService();
+    @RequestMapping("/burningQuestions")
+    public String burningQuestions(HttpServletRequest request) throws IOException, ServletException {
 
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
@@ -241,35 +244,23 @@ public class TblMonitorAction extends LamsDispatchAction {
 	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 	}
 
-	return mapping.findForward("burningQuestions");
+	return "pages/tblmonitoring/burningQuestions";
     }
 
     /**
      * Shows Teams page
      */
-    public ActionForward getModalDialogForTeamsTab(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	initializeScratchieService();
+    @RequestMapping("/getModalDialogForTeamsTab")
+    public String getModalDialogForTeamsTab(HttpServletRequest request) throws IOException, ServletException {
 
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 
 	ScratchieUser user = scratchieService.getUserByUserIDAndContentID(userId, toolContentId);
-	Collection<ScratchieItem> scratchieItems = user == null ? new LinkedList<ScratchieItem>()
+	Collection<ScratchieItem> scratchieItems = user == null ? new LinkedList<>()
 		: scratchieService.getItemsWithIndicatedScratches(user.getSession().getSessionId());
 
 	request.setAttribute("scratchieItems", scratchieItems);
-	return mapping.findForward("teams");
-    }
-
-    // *************************************************************************************
-    // Private method
-    // *************************************************************************************
-    private void initializeScratchieService() {
-	if (scratchieService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    scratchieService = (IScratchieService) wac.getBean(ScratchieConstants.SCRATCHIE_SERVICE);
-	}
+	return "pages/tblmonitoring/teams";
     }
 }

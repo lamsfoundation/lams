@@ -25,7 +25,7 @@
 		</script>
 	</lams:head>
 	<body class="stripes" onload="init();">
-		<form:form action="/authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post" enctype="multipart/form-data">
+		<form:form action="authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post" enctype="multipart/form-data">
 		
 			<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 		
