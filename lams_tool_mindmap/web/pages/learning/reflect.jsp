@@ -15,6 +15,19 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+		
+		<script type="text/javascript">
+			function disableFinishButton() {
+				document.getElementById("finishButton").disabled = true;
+			}
+			function submitForm(methodName){
+		 		var f = document.getElementById('learningForm');
+				f.submit();
+		 	}
+			$(document).ready(function() {
+				document.getElementById("focused").focus();
+			});
+		</script>
 	</lams:head>
 
 	<body class="stripes">
