@@ -133,7 +133,7 @@
 						
 						<c:choose>
 							<c:when test="${pixlrDTO.allowViewOthersImages}">
-								<button class="btn btn-primary" onclick="javascript:document.getElementById('learningForm').action = 'learning/viewAllImages.do';">
+								<button class="btn btn-primary" onclick="javascript:document.getElementById('learningForm').action = '<lams:WebAppURL />learning/viewAllImages.do';">
 									<fmt:message key="button.viewAll" />
 								</button>
 							</c:when>
@@ -141,7 +141,7 @@
 							<c:otherwise>
 								<c:choose>
 									<c:when test="${!pixlrUserDTO.finishedActivity and pixlrDTO.reflectOnActivity}">
-										<button class="btn btn-primary" onclick="javascript:document.getElementById('learningForm').action = 'openNotebook.do';">
+										<button class="btn btn-primary" onclick="javascript:document.getElementById('learningForm').action = '<lams:WebAppURL />learning/openNotebook.do';">
 											<fmt:message key="button.continue" />
 										</button>
 									</c:when>
