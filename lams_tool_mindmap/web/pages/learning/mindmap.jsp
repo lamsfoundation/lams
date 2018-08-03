@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
-<lams:html>
-	<c:set var="lams"> <lams:LAMSURL /> </c:set>
-	<c:set var="tool"> <lams:WebAppURL /> </c:set>
+	<lams:html>
+		<c:set var="lams"> <lams:LAMSURL /> </c:set>
+		<c:set var="tool"> 	<lams:WebAppURL />	</c:set>
 	
-	<lams:head>
+	<lams:head>  
+		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
 		<title>
 			<fmt:message key="activity.title" />
 		</title>
-		<lams:headItems />
-		<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
-
-	</lams:head>
-
-	<body class="stripes">
+		<lams:css/>
+	
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+		
 		<link rel="stylesheet" type="text/css" href="${lams}css/jquery.minicolors.css"></link>
 		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link>
 		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
@@ -42,19 +43,22 @@
 			function submitForm() {
 				var mindmapContent = document.getElementById("mindmapContent");
 				mindmapContent.value = JSON.stringify(contentAggregate);
-		 	 	var f = document.getElementById('submitForm');
+		 	 	var f = document.getElementById('learningForm');
 		 		f.submit();
 			}
 			
 			</script>
+	</lams:head>
+
+	<body class="stripes">
 		
-		<form:form action="${reflectOnActivity ? 'reflect.do' : 'finishActivity.do'}" method="post" onsubmit="return false;" modelAttribute="learningForm" id="submitForm">
+		<form:form action="${reflectOnActivity ? 'reflect.do' : 'finishActivity.do'}" method="post" onsubmit="return false;" modelAttribute="learningForm" id="learningForm">
 			<input type="hidden" name="userId" value="${userIdParam}" />
-			<form:hidden path="toolContentId" value="${toolContentIdParam}" />
+			<input type="hidden" name="toolContentId" value="${toolContentIdParam}" />
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="mindmapContent" id="mindmapContent" />
 		
-			<lams:Page type="learner" title="${mindmapDTO.title}" hideProgressBar="${isMonitor}">
+			<lams:Page type="learner" title="${mindmapDTO.title}" hideProgressBar="${isMonitor}" formID="learningForm">
 			
 				<%--Advanced settings and notices-----------------------------------%>
 				
@@ -126,7 +130,6 @@
 		
 			</lams:Page>
 		</form:form>
-		<div class="footer">
-		</div>					
+		<div class="footer"></div>					
 	</body>
 </lams:html>

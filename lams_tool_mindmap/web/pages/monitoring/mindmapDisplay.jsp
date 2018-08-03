@@ -2,21 +2,39 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
-		<lams:head>
-			<title>
-				<fmt:message key="activity.title" />
-			</title>
-			<lams:headItems />
-			<script type="text/javascript">
-				var initialTabId = "${mindmapDTO.currentTab}";
-			</script>
-			<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/monitoring.js"></script>
-		</lams:head>
+		<c:set var="lams"> <lams:LAMSURL /> </c:set>
+		<c:set var="tool">	<lams:WebAppURL /> </c:set>
+	
+	<lams:head>
+		<title>
+			<fmt:message key="activity.title" />
+		</title>
+		<lams:headItems />
+		<script type="text/javascript">
+			var initialTabId = "${mindmapDTO.currentTab}";
+		</script>
+		<script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
+		
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+		
+		<link rel="stylesheet" type="text/css" href="${lams}css/jquery.minicolors.css"></link>
+		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link>
+		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
+		
+		<script src="${lams}includes/javascript/jquery.minicolors.min.js"></script>
+		<script src="${tool}includes/javascript/jquery.timer.js"></script>
+		<script src="${tool}includes/javascript/mapjs/main.js"></script>
+		<script src="${tool}includes/javascript/mapjs/underscore-min.js"></script>
+	</lams:head>
 
 	<body class="stripes">	
 	
-		<lams:Page title="${pageTitle.monitoring}" type="learner">
+		<c:set var="title"><fmt:message key="activity.title" /></c:set>
+		<lams:Page title="${title}" type="learner">
 
+			
 			<div id="content">
 
 				<c:choose>
@@ -39,7 +57,7 @@
 				</button>
 
 			</div>
-			<div id="footer"></div>
 		</lams:Page>
+		<div id="footer"></div>
 	</body>
 </lams:html>

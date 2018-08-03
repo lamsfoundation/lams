@@ -109,7 +109,7 @@
 								</td>
 						
 								<td >
-									<a href="showMindmap.dp?toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
+									<a href="showMindmap.do?toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
 										<fmt:message key="label.view" />
 									</a>		
 								</td>

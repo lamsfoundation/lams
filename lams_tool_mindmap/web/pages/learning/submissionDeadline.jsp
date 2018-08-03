@@ -1,32 +1,34 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
-<lams:html>
-	<c:set var="lams"> <lams:LAMSURL /> </c:set>
-	<c:set var="tool"> <lams:WebAppURL /> </c:set>
+	<lams:html>
+		<c:set var="lams"> <lams:LAMSURL /> </c:set>
+		<c:set var="tool"> 	<lams:WebAppURL />	</c:set>
 	
-	<lams:head>
+	<lams:head>  
+		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
 		<title>
 			<fmt:message key="activity.title" />
 		</title>
-		<lams:headItems />
-		<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
-
-	</lams:head>
+		<lams:css/>
 	
-	<script type="text/javascript">
-	function disableFinishButton() {
-		document.getElementById("finishButton").disabled = true;
-	}
-	function submitForm(methodName){
-		var f = document.getElementById('Form');
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+		
+		<script type="text/javascript">
+		function disableFinishButton() {
+			document.getElementById("finishButton").disabled = true;
+		}
+		function submitForm(methodName){
+		var f = document.getElementById('learningForm');
 		f.submit();
 	}
-	</script>
+</script>
+	</lams:head>
 
 	<body class="stripes">
-	
-	<lams:Page type="learner" title="${mindmapDTO.title}" formID="learningForm">
+		<lams:Page type="learner" title="${mindmapDTO.title}" formID="learningForm">
 	
 		<lams:Alert id="deadline" type="danger" close="false">
 			<fmt:message key="authoring.info.teacher.set.restriction" >
@@ -57,7 +59,7 @@
 		
 	</lams:Page>
 
-<div class="footer">
+		<div class="footer">
 		</div>					
 	</body>
 </lams:html>

@@ -33,7 +33,7 @@
 		mindMupContent = content;
 		$.ajax({ 
 	        method: "POST", 
-	        url: "${url=='author'?'/authoring/setMindmapContentJSON.do':'/learning/setMindmapContentJSON.do'}", 
+	        url: "${url=='author'? 'setMindmapContentJSON.do':'../learning/setMindmapContentJSON.do'}",
 	        data: { mindmapId: "${mindmapId}", userId: "${userId}", 
 				sessionId: "${sessionId}", mode: "${mode}" } , 
 	        dataType: "json", 

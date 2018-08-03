@@ -1,11 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="dto" value="${mindmapDTO}" />
 
-<!--<c:if test="${dto.contentInUse}">
+<c:if test="${dto.contentInUse}">
 	<lams:Alert type="warn" id="alertContentEdit" close="false">
 		<fmt:message key="message.alertContentEdit" />
 	</lams:Alert>
-</c:if>-->
+</c:if>
 
 <table class="table table-condensed">
 	<tbody>

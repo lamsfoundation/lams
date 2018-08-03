@@ -2,22 +2,26 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
-
+		<c:set var="lams"> <lams:LAMSURL /> </c:set>
+		<c:set var="tool">	<lams:WebAppURL /> </c:set>
+	
 	<lams:head>
-			<title>
-				<fmt:message key="activity.title" />
-			</title>
-			<lams:headItems />
-			<script type="text/javascript">
-				var initialTabId = "${mindmapDTO.currentTab}";
-			</script>
-			<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/monitoring.js"></script>
+		<title>
+			<fmt:message key="activity.title" />
+		</title>
+		<lams:headItems />
+		<script type="text/javascript">
+			var initialTabId = "${mindmapDTO.currentTab}";
+		</script>
+		<script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
 	</lams:head>
 
 	<body class="stripes">	
 	
-		<lams:Page title="${pageTitle.monitoring}" type="learner">
+		<c:set var="title"><fmt:message key="activity.title" /></c:set>
+		<lams:Page title="${title}" type="learner">
 
+			
 			<div id="content">
 				<h3>
 					<fmt:message>label.notebookEntry</fmt:message>
@@ -41,7 +45,7 @@
 				</button>
 
 			</div>
-			<div id="footer"></div>
 		</lams:Page>
+		<div id="footer"></div>
 	</body>
 </lams:html>
